@@ -15,13 +15,14 @@
  */
 package org.labkey.test.module;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -692,7 +693,10 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
     private String doSaveRows(EHRUser user, List<JSONObject> commands, JSONObject extraContext, boolean expectSuccess)
     {
         long start = System.currentTimeMillis();
-        PostMethod method = null;
+        HttpClient client = WebTestHelper.getHttpClient(user.getUser(), PasswordUtil.getPassword());
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpPost method = null;
+        HttpResponse response = null;
         try
         {
             JSONObject json = new JSONObject();
@@ -700,11 +704,13 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
             json.put("extraContext", extraContext);
 
             String requestUrl = WebTestHelper.getBaseURL() + "/query/" + CONTAINER_PATH +"/saveRows.view";
-            method = new PostMethod(requestUrl);
-            method.addRequestHeader("Content-Type", "application/json");
-            method.setRequestEntity(new StringRequestEntity(json.toString(), "application/json", "UTF-8"));
-            HttpClient client = WebTestHelper.getHttpClient(requestUrl, user.getUser(), PasswordUtil.getPassword());
-            int status = client.executeMethod(method);
+            method = new HttpPost(requestUrl);
+            method.addHeader("Content-Type", "application/json");
+            method.setEntity(new StringEntity(json.toString(), "application/json", "UTF-8"));
+
+            response = client.execute(method, context);
+            int status = response.getStatusLine().getStatusCode();
+
             long stop = System.currentTimeMillis();
             if (_saveRowsTimes != null)
                 _saveRowsTimes.add(stop - start);
@@ -713,20 +719,19 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
 
             if (expectSuccess && HttpStatus.SC_OK != status)
             {
-                logResponse(method);
+                logResponse(response);
                 Assert.assertEquals("SaveRows request failed unexpectedly with code: " + status, HttpStatus.SC_OK, status);
             }
             else if (!expectSuccess && HttpStatus.SC_BAD_REQUEST != status)
             {
-                logResponse(method);
+                logResponse(response);
                 Assert.assertEquals("SaveRows request failed unexpectedly with code: " + status, HttpStatus.SC_BAD_REQUEST, status);
             }
 
-            return method.getResponseBodyAsString();
-        }
-        catch (URIException e)
-        {
-            throw new RuntimeException(e);
+            String responseBody = WebTestHelper.getHttpResponseBody(response);
+            EntityUtils.consume(response.getEntity()); // close connection
+
+            return responseBody;
         }
         catch (IOException e)
         {
@@ -738,20 +743,27 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
         }
         finally
         {
-            method.releaseConnection();
+            try{
+                if (response != null)
+                    EntityUtils.consume(response.getEntity());
+            }
+            catch (IOException ex)
+            {/*ignore*/}
+            if (client != null)
+                client.getConnectionManager().shutdown();
         }
     }
 
-    private void logResponse(HttpMethod method)
+    private void logResponse(HttpResponse response)
     {
         try
         {
-            String response = method.getResponseBodyAsString();
-            JSONObject o = new JSONObject(response);
+            String responseBody = WebTestHelper.getHttpResponseBody(response);
+            JSONObject o = new JSONObject(responseBody);
             if (o.has("exception"))
                 log("Expection: " + o.getString("exception"));
 
-            Map<String, List<String>> ret = processResponse(method.getResponseBodyAsString());
+            Map<String, List<String>> ret = processResponse(responseBody);
             for (String field : ret.keySet())
             {
                 log("Error in field: " + field);
@@ -762,10 +774,6 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
             }
         }
         catch (JSONException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (IOException e)
         {
             throw new RuntimeException(e);
         }

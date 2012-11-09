@@ -22,6 +22,22 @@ import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.ProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.RedirectStrategy;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Assert;
@@ -457,7 +473,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-
     @After
     public void tearDown() throws Exception
     {
@@ -466,6 +481,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             _driver.quit();
         }
+    }
+
+    public void tearDown(boolean forceTeardown) throws Exception
+    {
+       if (forceTeardown)
+           _driver.quit();
+        else
+           tearDown();
     }
 
     private boolean validateJsError(JavaScriptError error)
@@ -1219,28 +1242,89 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @LogMethod
     private void verifyRedirectBehavior(String upgradeText)
     {
-        // Do these checks in a new window because the primary upgrade window seems to interfere with this test, #15853
-        String window = newWindow();
-        _driver.switchTo().window(window);
+        // Do these checks via direct http requests the primary upgrade window seems to interfere with this test, #15853
 
-        // These requests should NOT redirect to the upgrade page
-        beginAt("/login/resetPassword.view");
-        assertTextNotPresent(upgradeText);
-        beginAt("/admin/maintenance.view");
-        assertTextNotPresent(upgradeText);
+        HttpClient client = WebTestHelper.getHttpClient();
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpResponse response = null;
+        HttpUriRequest method;
+        int status;
 
-        // Check that sign out and sign in work properly during upgrade/install (once initial user is configured)
-        beginAt("/login/logout.view");
+        try
+        {
+            // These requests should NOT redirect to the upgrade page
 
-        // Dismiss authentication dialog
-        _shortWait.until(ExpectedConditions.alertIsPresent());
-        Alert alert = _driver.switchTo().alert();
-        alert.dismiss();
+            method = new HttpGet(getBaseURL() + "/login/resetPassword.view");
+            response = client.execute(method, context);
+            status = response.getStatusLine().getStatusCode();
+            Assert.assertEquals("Unexpected response", HttpStatus.SC_OK, status);
+            Assert.assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
+            EntityUtils.consume(response.getEntity());
 
-        _driver.close();
+            method = new HttpGet(getBaseURL() + "/admin/maintenance.view");
+            response = client.execute(method, context);
+            status = response.getStatusLine().getStatusCode();
+            Assert.assertEquals("Unexpected response", HttpStatus.SC_OK, status);
+            Assert.assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
+            EntityUtils.consume(response.getEntity());
 
-        switchToMainWindow();
-        simpleSignIn();
+
+            // Check that sign out and sign in work properly during upgrade/install (once initial user is configured)
+
+            ((DefaultHttpClient)client).setRedirectStrategy(new DefaultRedirectStrategy()
+            {
+                @Override
+                public boolean isRedirected(HttpRequest httpRequest, HttpResponse httpResponse, HttpContext httpContext) throws ProtocolException
+                {
+                    boolean isRedirect=false;
+                    try {
+                        isRedirect = super.isRedirected(httpRequest, httpResponse, httpContext);
+                    } catch (ProtocolException e) {}
+                    if (!isRedirect) {
+                        int responseCode = httpResponse.getStatusLine().getStatusCode();
+                        if (responseCode == 301 || responseCode == 302)
+                            return true;
+//                        if (WebTestHelper.getHttpResponseBody(httpResponse).contains("http-equiv=\"Refresh\""))
+//                            return true;
+                    }
+                    return isRedirect;
+                }
+
+                //TODO: Generate HttpRequest for 'http-equiv' redirect
+//                @Override
+//                public HttpUriRequest getRedirect(HttpRequest httpRequest, HttpResponse httpResponse, HttpContext httpContext) throws ProtocolException
+//                {
+//                    HttpUriRequest redirectRequest = null;
+//                    ProtocolException ex = null;
+//                    try
+//                    {
+//                        return super.getRedirect(httpRequest, httpResponse, httpContext);
+//                    }
+//                    catch (ProtocolException e){ex = e;}
+//                    redirectRequest = httpRequest.;
+//
+//                    if (redirectRequest == null)
+//                        throw ex;
+//                    else
+//                        return redirectRequest;
+//                }
+            });
+            method = new HttpPost(getBaseURL() + "/login/logout.view");
+            List<NameValuePair> args = new ArrayList<NameValuePair>();
+            args.add(new BasicNameValuePair("login", PasswordUtil.getUsername()));
+            args.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
+            ((HttpPost)method).setEntity(new UrlEncodedFormEntity(args));
+            response = client.execute(method, context);
+            status = response.getStatusLine().getStatusCode();
+            Assert.assertEquals("Unexpected response", HttpStatus.SC_OK, status);
+            // TODO: check login, once http-equiv redirect is sorted out
+            Assert.assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
+            EntityUtils.consume(response.getEntity());
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex);
+        }
     }
 
     /**

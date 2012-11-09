@@ -16,19 +16,30 @@
 
 package org.labkey.test;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.AuthCache;
+import org.apache.http.client.HttpClient;
+import org.apache.http.HttpStatus;
 import org.apache.http.HttpException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
+import org.junit.Assert;
 import org.labkey.test.util.PasswordUtil;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 /**
@@ -174,12 +185,15 @@ public class WebTestHelper
     public static void logToServer(String message) throws Exception
     {
         String encodedUrl = getBaseURL() + "/admin/log.view?message=" + encodeURI(message);
-        HttpClient client = getHttpClient(getBaseURL() + "/admin/log.view?message=" + message);
-        GetMethod get = new GetMethod(encodedUrl);
-        int responseCode = client.executeMethod(get);
+        HttpClient client = getHttpClient();
+        HttpGet get = new HttpGet(encodedUrl);
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpResponse response = client.execute(get, context);
+        int responseCode = response.getStatusLine().getStatusCode();
 
+        client.getConnectionManager().shutdown();
         if (responseCode != HttpStatus.SC_OK)
-            throw new Exception("Contacting server failed: " + HttpStatus.getStatusText(responseCode));
+            throw new Exception("Contacting server failed: " + response.getStatusLine());
     }
 
     private static String encodeURI(String parameter)
@@ -193,22 +207,78 @@ public class WebTestHelper
         return tabName + "Tab";
     }
 
-    public static HttpClient getHttpClient(String url) throws URIException
+    public static DefaultHttpClient getHttpClient()
     {
-        return getHttpClient(url, PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        return getHttpClient(PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
 
-    public static HttpClient getHttpClient(String url, String username, String password) throws URIException
+    public static DefaultHttpClient getHttpClient(String username, String password)
     {
-        HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
-        client.getState().setCredentials(
-                new AuthScope(new URI(url, false).getHost(),
-                        AuthScope.ANY_PORT, AuthScope.ANY_REALM),
-                new UsernamePasswordCredentials(username, password)
-        );
-        //send basic auth header on first request
-        client.getParams().setAuthenticationPreemptive(true);
-        return client;
+        try
+        {
+            DefaultHttpClient client = new DefaultHttpClient();
+            URI target = new URI(getBaseURL());
+            HttpHost targetHost = new HttpHost(target.getHost(), target.getPort(), target.getScheme());
+
+            client.getCredentialsProvider().setCredentials(
+                    new AuthScope(targetHost.getHostName(), AuthScope.ANY_PORT, AuthScope.ANY_REALM),
+                    new UsernamePasswordCredentials(username, password)
+            );
+
+            //send basic auth header on first request
+            return client;
+        }
+        catch (URISyntaxException e)
+        {
+            Assert.fail("Unable to parse URL: " + getBaseURL());
+            return null; // unreachable
+        }
+
+    }
+
+    public static HttpContext getBasicHttpContext()
+    {
+        try
+        {
+            URI target = new URI(getBaseURL());
+            HttpHost targetHost = new HttpHost(target.getHost(), target.getPort(), target.getScheme());
+
+            // Create AuthCache instance
+            AuthCache authCache = new BasicAuthCache();
+            // Generate BASIC scheme object and add it to the local auth cache
+            BasicScheme basicAuth = new BasicScheme();
+            authCache.put(targetHost, basicAuth);
+
+            // Add AuthCache to the execution context
+            BasicHttpContext localcontext = new BasicHttpContext();
+            localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
+
+            return localcontext;
+        }
+        catch (URISyntaxException e)
+        {
+            Assert.fail("Unable to parse URL: " + getBaseURL());
+            return null; // unreachable
+        }
+    }
+
+    public static String getHttpResponseBody(HttpResponse response)
+    {
+        StringBuilder builder = new StringBuilder();
+        try
+        {
+            BufferedReader br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+            String thisLine;
+            while ((thisLine = br.readLine()) != null)
+            {
+                builder.append(thisLine);
+            }
+        }
+        catch (IOException ex)
+        {/*ignore*/}
+
+        return builder.toString();
     }
 
     public static int getHttpGetResponse(String url) throws HttpException, IOException
@@ -218,9 +288,11 @@ public class WebTestHelper
 
     public static int getHttpGetResponse(String url, String username, String password) throws HttpException, IOException
     {
-        HttpClient client = getHttpClient(url, username, password);
-        GetMethod method = new GetMethod(url);
-        return client.executeMethod(method);
+        HttpClient client = getHttpClient(username, password);
+        HttpGet method = new HttpGet(url);
+        int status = client.execute(method).getStatusLine().getStatusCode();
+        client.getConnectionManager().shutdown();
+        return status;
     }
 
     public static class FolderIdentifier

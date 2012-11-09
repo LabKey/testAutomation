@@ -15,11 +15,17 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -27,6 +33,9 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: brittp
@@ -321,23 +330,29 @@ public class ClientAPITest extends BaseSeleniumWebTest
         String svgText = getFormElement(Locator.id("svgtext"));
 
         String url = WebTestHelper.getBaseURL() + "/visualization/" + PROJECT_NAME + "/" + EscapeUtil.encode(FOLDER_NAME)+ "/exportPDF.view";
-        HttpClient httpClient = WebTestHelper.getHttpClient(url);
-        PostMethod method = null;
+        HttpClient httpClient = WebTestHelper.getHttpClient();
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpPost method = null;
+        HttpResponse response = null;
 
         try
         {
-            method = new PostMethod(url);
-            method.addParameter("svg", svgText);
-            int status = httpClient.executeMethod(method);
+            method = new HttpPost(url);
+            List<NameValuePair> args = new ArrayList<NameValuePair>();
+            args.add(new BasicNameValuePair("svg", svgText));
+            method.setEntity(new UrlEncodedFormEntity(args));
+            response = httpClient.execute(method, context);
+            int status = response.getStatusLine().getStatusCode();
             Assert.assertEquals("SVG Downloaded", HttpStatus.SC_OK, status);
-            Assert.assertTrue(method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
-            Assert.assertTrue(method.getResponseHeader("Content-Type").getValue().startsWith("application/pdf"));
-            method.getResponseBodyAsString();
+            Assert.assertTrue(response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
+            Assert.assertTrue(response.getHeaders("Content-Type")[0].getValue().startsWith("application/pdf"));
         }
         finally
         {
-            if (null != method)
-                method.releaseConnection();
+            if (null != response)
+                EntityUtils.consume(response.getEntity());
+            if (httpClient != null)
+                httpClient.getConnectionManager().shutdown();
         }
     }
 

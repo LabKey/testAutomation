@@ -17,12 +17,15 @@
 package org.labkey.test.tests;
 
 import junit.framework.Assert;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.Runner;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONValue;
 import junit.framework.TestSuite;
@@ -114,30 +117,33 @@ public class JUnitTest extends TestSuite
 
     public static TestSuite suite(boolean secondAttempt) throws Exception
     {
-        GetMethod method = null;
+        HttpClient client = WebTestHelper.getHttpClient();
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpGet method = null;
+        HttpResponse response = null;
         try
         {
             String url = WebTestHelper.getBaseURL() + "/junit/testlist.view?";
-            HttpClient client = WebTestHelper.getHttpClient(url);
-            method = new GetMethod(url);
-            int status = client.executeMethod(method);
+            method = new HttpGet(url);
+            response = client.execute(method, context);
+            int status = response.getStatusLine().getStatusCode();
             if (status == HttpStatus.SC_OK)
             {
                 TestSuite remotesuite = new JUnitTest();
 
-                String response = method.getResponseBodyAsString();
-                if (StringUtils.isEmpty(response))
+                String responseBody = WebTestHelper.getHttpResponseBody(response);
+                if (responseBody.isEmpty())
                     throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
-                Object json = JSONValue.parse(response);
+                Object json = JSONValue.parse(responseBody);
                 if (json == null &&
-                        response.contains("<title>Upgrade Status</title>") ||
-                        response.contains("<title>Upgrade Modules</title>") ||
-                        response.contains("<title>Account Setup</title>") ||
-                        response.contains("This server is being upgraded to a new version of LabKey Server."))
+                        responseBody.contains("<title>Upgrade Status</title>") ||
+                        responseBody.contains("<title>Upgrade Modules</title>") ||
+                        responseBody.contains("<title>Account Setup</title>") ||
+                        responseBody.contains("This server is being upgraded to a new version of LabKey Server."))
                 {
                     if (secondAttempt)
-                        throw new AssertionFailedError("Failed to update or bootstrap on second attempt: " + response);
+                        throw new AssertionFailedError("Failed to update or bootstrap on second attempt: " + responseBody);
 
                     // perform upgrade then try to fetch the list again
                     upgradeHelper();
@@ -145,7 +151,7 @@ public class JUnitTest extends TestSuite
                 }
 
                 if (json == null || !(json instanceof Map))
-                    throw new AssertionFailedError("Can't parse or cast json response: " + response);
+                    throw new AssertionFailedError("Can't parse or cast json response: " + responseBody);
 
                 Map<String, List<String>> obj = (Map<String, List<String>>)json;
                 for (Map.Entry<String, List<String>> entry : obj.entrySet())
@@ -164,12 +170,15 @@ public class JUnitTest extends TestSuite
             }
             else
             {
-                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + HttpStatus.getStatusText(status) + "): " + url);
+                throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + response.getStatusLine() + "): " + url);
             }
         }
         finally
         {
-            if (method != null) method.releaseConnection();
+            if (response != null)
+                EntityUtils.consume(response.getEntity());
+            if (client != null)
+                client.getConnectionManager().shutdown();
         }
     }
 
@@ -186,24 +195,27 @@ public class JUnitTest extends TestSuite
         @Override
         protected void runTest() throws Throwable
         {
-            GetMethod method = null;
+            HttpClient client = WebTestHelper.getHttpClient();
+            HttpContext context = WebTestHelper.getBasicHttpContext();
+            HttpGet method = null;
+            HttpResponse response = null;
             try
             {
                 String url = WebTestHelper.getBaseURL() + "/junit/go.view?testCase=" + _remoteClass;
-                HttpClient client = WebTestHelper.getHttpClient(url);
-                method = new GetMethod(url);
-                int status = client.executeMethod(method);
-                String response = method.getResponseBodyAsString();
+                method = new HttpGet(url);
+                response = client.execute(method, context);
+                int status = response.getStatusLine().getStatusCode();
+                String responseBody = WebTestHelper.getHttpResponseBody(response);
 
                 if (status == HttpStatus.SC_OK)
                 {
                     log("remote junit successful: " + _remoteClass);
-                    log(dump(response));
+                    log(dump(responseBody));
                 }
                 else
                 {
                     log("remote junit failed: " + _remoteClass);
-                    Assert.fail("remote junit failed: " + _remoteClass + "\n" + dump(response));
+                    Assert.fail("remote junit failed: " + _remoteClass + "\n" + dump(responseBody));
                 }
             }
             catch (IOException ioe)
@@ -212,7 +224,10 @@ public class JUnitTest extends TestSuite
             }
             finally
             {
-                if (method != null) method.releaseConnection();
+                if (response != null)
+                    EntityUtils.consume(response.getEntity());
+                if (client != null)
+                    client.getConnectionManager().shutdown();
             }
         }
 

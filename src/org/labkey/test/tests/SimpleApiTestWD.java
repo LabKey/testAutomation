@@ -16,11 +16,16 @@
 
 package org.labkey.test.tests;
 
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
@@ -174,43 +179,51 @@ public abstract class SimpleApiTestWD extends BaseWebDriverTest
 
     private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch, String username, String password, boolean acceptErrors) throws UnsupportedEncodingException
     {
-        HttpMethod method = null;
+        HttpClient client = username == null ? WebTestHelper.getHttpClient() : WebTestHelper.getHttpClient(username, password);
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpUriRequest method = null;
+        HttpResponse response = null;
         String requestUrl = WebTestHelper.getBaseURL() + '/' + url;
 
         switch (type)
         {
             case get:
-                method = new GetMethod(requestUrl);
+                method = new HttpGet(requestUrl);
                 break;
             case post:
-                method = new PostMethod(requestUrl);
-                ((PostMethod)method).setRequestEntity(new StringRequestEntity(formData, "application/json", "UTF-8"));
+                method = new HttpPost(requestUrl);
+                ((HttpPost)method).setEntity(new StringEntity(formData, "application/json", "UTF-8"));
                 break;
         }
 
-        if (method != null)
+        try
+        {
+
+            response = client.execute(method, context);
+            int status = response.getStatusLine().getStatusCode();
+            String responseBody = WebTestHelper.getHttpResponseBody(response);
+            if (status == HttpStatus.SC_OK || acceptErrors)
+            {
+                _helper.assertEquals("FAILED: test " + name, expectedResponse, responseBody);
+            }
+            else
+                Assert.fail(String.format("FAILED: test %s failed with status code: %s%s", name, status, responseBody != null ? "\n" + responseBody : ""));
+        }
+        catch (IOException e)
+        {
+            Assert.fail("Test failed requesting the URL: " + e.getMessage());
+        }
+        finally
         {
             try
             {
-                HttpClient client = username == null ? WebTestHelper.getHttpClient(requestUrl) : WebTestHelper.getHttpClient(requestUrl, username, password);
-
-                int status = client.executeMethod(method);
-                String response = method.getResponseBodyAsString();
-                if (status == HttpStatus.SC_OK || acceptErrors)
-                {
-                    _helper.assertEquals("FAILED: test " + name, expectedResponse, response);
-                }
-                else
-                    Assert.fail(String.format("FAILED: test %s failed with status code: %s%s", name, status, response != null ? "\n" + response : ""));
+                if (response != null)
+                    EntityUtils.consume(response.getEntity());
             }
-            catch (IOException e)
-            {
-                Assert.fail("Test failed requesting the URL: " + e.getMessage());
-            }
-            finally
-            {
-                method.releaseConnection();
-            }
+            catch (IOException ex)
+            {/*ignore*/}
+            if (client != null)
+                client.getConnectionManager().shutdown();
         }
     }
 

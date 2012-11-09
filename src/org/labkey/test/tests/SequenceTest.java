@@ -15,10 +15,13 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
@@ -819,18 +822,21 @@ public class SequenceTest extends BaseWebDriverTest
     {
         log("Verifying merged FASTQ export");
 
-        HttpClient httpClient = WebTestHelper.getHttpClient(url);
-        GetMethod method = null;
+        HttpClient httpClient = WebTestHelper.getHttpClient();
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpGet method = null;
+        HttpResponse response = null;
 
         try
         {
             //first try FASTQ merge
             url = getBaseURL().replaceAll(getContextPath(), "") + url;
-            method = new GetMethod(url);
-            int status = httpClient.executeMethod(method);
-            Assert.assertTrue("FASTQ was not Downloaded", status == HttpStatus.SC_OK);
-            Assert.assertTrue("Response header incorrect", method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
-            Assert.assertTrue("Response header incorrect", method.getResponseHeader("Content-Type").getValue().startsWith("application/x-gzip"));
+            method = new HttpGet(url);
+            response = httpClient.execute(method, context);
+            int status = response.getStatusLine().getStatusCode();
+            Assert.assertEquals("FASTQ was not Downloaded", HttpStatus.SC_OK, status);
+            Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
+            Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Type")[0].getValue().startsWith("application/x-gzip"));
 
             InputStream is = null;
             GZIPInputStream gz = null;
@@ -838,7 +844,7 @@ public class SequenceTest extends BaseWebDriverTest
 
             try
             {
-                is = method.getResponseBodyAsStream();
+                is = response.getEntity().getContent();
                 gz = new GZIPInputStream(is);
                 br = new BufferedReader(new InputStreamReader(gz));
                 int count = 0;
@@ -853,7 +859,6 @@ public class SequenceTest extends BaseWebDriverTest
                 //TODO: reenable this check once it can be made to work reliably on team city
                 //Assert.assertTrue("Length of file doesnt match expected value of "+expectedLength+", was: " + count, count == expectedLength);
 
-                method.releaseConnection();
             }
             finally
             {
@@ -868,8 +873,10 @@ public class SequenceTest extends BaseWebDriverTest
         }
         finally
         {
-            if (null != method)
-                method.releaseConnection();
+            if (null != response)
+                EntityUtils.consume(response.getEntity());
+            if (httpClient != null)
+                httpClient.getConnectionManager().shutdown();
         }
     }
 

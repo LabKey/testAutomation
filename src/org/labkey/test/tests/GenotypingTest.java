@@ -15,9 +15,17 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
@@ -38,7 +46,9 @@ import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
@@ -383,8 +393,10 @@ public class GenotypingTest extends BaseSeleniumWebTest
         log("Verifying FASTQ and ZIP export");
 
         String url = WebTestHelper.getBaseURL() + "/genotyping/" + getProjectName() + "/mergeFastqFiles.view";
-        HttpClient httpClient = WebTestHelper.getHttpClient(url);
-        PostMethod method = null;
+        HttpClient httpClient = WebTestHelper.getHttpClient();
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpPost method = null;
+        HttpResponse response = null;
 
         try
         {
@@ -392,20 +404,24 @@ public class GenotypingTest extends BaseSeleniumWebTest
             Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
             SelectRowsResponse resp = cmd.execute(cn, getProjectName());
-
-            //first try FASTQ merge
-            method = new PostMethod(url);
-            for (Map<String, Object> row : resp.getRows())
-            {
-                method.addParameter("dataIds", row.get("DataId").toString());
-            }
             Assert.assertTrue("Wrong number of files found.  Expected 30, found " + resp.getRows().size(), resp.getRows().size() == 30);
 
-            method.addParameter("zipFileName", "genotypingExport");
-            int status = httpClient.executeMethod(method);
+            //first try FASTQ merge
+            method = new HttpPost(url);
+            List<NameValuePair> args = new ArrayList<NameValuePair>();
+            for (Map<String, Object> row : resp.getRows())
+            {
+                args.add(new BasicNameValuePair("dataIds", row.get("DataId").toString()));
+            }
+
+            args.add(new BasicNameValuePair("zipFileName", "genotypingExport"));
+
+            method.setEntity(new UrlEncodedFormEntity(args));
+            response = httpClient.execute(method, context);
+            int status = response.getStatusLine().getStatusCode();
             Assert.assertTrue("FASTQ was not Downloaded", status == HttpStatus.SC_OK);
-            Assert.assertTrue("Response header incorrect", method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
-            Assert.assertTrue("Response header incorrect", method.getResponseHeader("Content-Type").getValue().startsWith("application/x-gzip"));
+            Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
+            Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Type")[0].getValue().startsWith("application/x-gzip"));
 
             InputStream is = null;
             GZIPInputStream gz = null;
@@ -413,7 +429,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
             try
             {
-                is = method.getResponseBodyAsStream();
+                is = response.getEntity().getContent();
                 gz = new GZIPInputStream(is);
                 br = new BufferedReader(new InputStreamReader(gz));
                 int count = 0;
@@ -426,7 +442,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
                 int expectedLength = 1088;
 //                Assert.assertTrue("Length of file doesnt match expected value of "+expectedLength+", was: " + count, count == expectedLength);
 
-                method.releaseConnection();
+                EntityUtils.consume(response.getEntity());
             }
             finally
             {
@@ -440,24 +456,28 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
             //then ZIP export
             url = WebTestHelper.getBaseURL() + "/experiment/" + getProjectName() + "/exportFiles.view";
-            httpClient = WebTestHelper.getHttpClient(url);
+            httpClient = WebTestHelper.getHttpClient();
 
-            method = new PostMethod(url);
+            method = new HttpPost(url);
+            args = new ArrayList<NameValuePair>();
             for (Map<String, Object> row : resp.getRows())
             {
-                method.addParameter("dataIds", row.get("DataId").toString());
+                args.add(new BasicNameValuePair("dataIds", row.get("DataId").toString()));
             }
 
-            method.addParameter("zipFileName", "genotypingZipExport");
-            status = httpClient.executeMethod(method);
-            Assert.assertTrue("Status code incorrect", status == HttpStatus.SC_OK);
-            Assert.assertTrue("Response header incorrect", method.getResponseHeader("Content-Disposition").getValue().startsWith("attachment;"));
-            Assert.assertTrue("Response header incorrect", method.getResponseHeader("Content-Type").getValue().startsWith("application/zip"));
+            args.add(new BasicNameValuePair("zipFileName", "genotypingZipExport"));
+            response = httpClient.execute(method, context);
+            status = response.getStatusLine().getStatusCode();
+            Assert.assertEquals("Status code was incorrect", HttpStatus.SC_OK, status);
+            Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
+            Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Type")[0].getValue().startsWith("application/x-gzip"));
         }
         finally
         {
-            if (null != method)
-                method.releaseConnection();
+            if (null != response)
+                EntityUtils.consume(response.getEntity());
+            if (httpClient != null)
+                httpClient.getConnectionManager().shutdown();
         }
     }
 
