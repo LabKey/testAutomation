@@ -136,6 +136,8 @@ public class ViralLoadAssayTest extends LabModulesTest
     {
         setUpTest();
         createRunTemplate();
+        //TODO: import abi 7500 results, verify calcs
+        //import roche instruments
     }
 
     @Override
@@ -252,7 +254,7 @@ public class ViralLoadAssayTest extends LabModulesTest
         String url = getCurrentRelativeURL();
         url += "&exportAsWebPage=1";
         beginAt(url);
-        waitForElement(_helper.getAssayWell("G1", LabModuleHelper.NTC_COLOR));
+        waitForElement(_helper.getAssayWell("G1", LabModuleHelper.NTC_COLOR), WAIT_FOR_PAGE);
 
         waitAndClick(Locator.ext4Button("Download"));
         waitForPageToLoad();

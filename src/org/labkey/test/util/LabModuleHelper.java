@@ -63,7 +63,7 @@ public class LabModuleHelper
         _test.waitForElement(l, _test.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(l, label);
 
-        _test.sleep(2000);
+        _test.sleep(3000);
         _test.clickButton("Save", 0);
         _test.waitForText("Save successful.", 20000);
         _test.assertTextNotPresent("Unknown");
