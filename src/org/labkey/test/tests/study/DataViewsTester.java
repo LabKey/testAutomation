@@ -179,7 +179,7 @@ public class DataViewsTester
 
     private void openCustomizePanel()
     {
-        _test.click(Locator.css("a>img[title=Edit]"));
+        _test.waitAndClick(Locator.css("a>img[title=Edit]"));
         _test.waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
