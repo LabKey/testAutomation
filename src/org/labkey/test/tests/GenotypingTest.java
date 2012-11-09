@@ -470,8 +470,8 @@ public class GenotypingTest extends BaseSeleniumWebTest
             response = httpClient.execute(method, context);
             status = response.getStatusLine().getStatusCode();
             Assert.assertEquals("Status code was incorrect", HttpStatus.SC_OK, status);
-            Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
-            Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Type")[0].getValue().startsWith("application/x-gzip"));
+            Assert.assertEquals("Response header incorrect", "attachment; filename=\"genotypingZipExport\"", response.getHeaders("Content-Disposition")[0].getValue());
+            Assert.assertEquals("Response header incorrect", "application/zip;charset=UTF-8", response.getHeaders("Content-Type")[0].getValue());
         }
         finally
         {
