@@ -466,6 +466,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
             }
 
             args.add(new BasicNameValuePair("zipFileName", "genotypingZipExport"));
+            method.setEntity(new UrlEncodedFormEntity(args));
             response = httpClient.execute(method, context);
             status = response.getStatusLine().getStatusCode();
             Assert.assertEquals("Status code was incorrect", HttpStatus.SC_OK, status);
