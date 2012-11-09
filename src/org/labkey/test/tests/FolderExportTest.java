@@ -52,12 +52,6 @@ public class FolderExportTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected boolean isConfigurationSupported()
-    {
-        return System.getProperty("os.name").contains("Windows");
-    }
-
-    @Override
     protected boolean isFileUploadTest()
     {
         return true; // for importFolderFromZip
