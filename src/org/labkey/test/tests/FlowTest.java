@@ -87,7 +87,7 @@ public class FlowTest extends BaseFlowTest
 
             copyAnalysisScriptTest();
 
-            verifyDiscoverableFCSFiles();
+            //verifyDiscoverableFCSFiles();
 
 
         }
