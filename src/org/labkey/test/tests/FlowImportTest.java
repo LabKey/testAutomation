@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.BaseFlowTest;
+import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
@@ -61,8 +62,12 @@ public class FlowImportTest extends BaseFlowTest
         // assert microFCS directory is selected in the pipeline tree browser since it contains the .fcs files used by the workspace
         //Assert.assertEquals("/flowjoquery/microFCS", getTreeSelection("tree"));
         importAnalysis_selectFCSFiles(getContainerPath(), SelectFCSFileOption.Browse, keywordDirs);
+        log("** Check only samples that exist in keywordDirs are selected");
+        assertNotChecked(Locator.name("selectedSamples.rows[285].selected"));
+        assertChecked(Locator.name("selectedSamples.rows[295].selected"));
+        assertChecked(Locator.name("selectedSamples.rows[296].selected"));
+        importAnalysis_reviewSamples(getContainerPath(), false, null, null);
         importAnalysis_analysisEngine(getContainerPath(), AnalysisEngine.FlowJoWorkspace);
-        importAnalysis_analysisOptions(getContainerPath(), Arrays.asList("All Samples"), false, null, null, null);
         // assert previous analysis folder is available in drop down
         assertTextPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(getContainerPath(), analysisFolder, true);
@@ -88,9 +93,17 @@ public class FlowImportTest extends BaseFlowTest
         assertTextPresent("Previously imported FCS files.");
         // assert keyword run shows up in list of keyword runs
         importAnalysis_selectFCSFiles(getContainerPath(), SelectFCSFileOption.Previous, Arrays.asList("microFCS"));
-        importAnalysis_resolveFCSFiles(getContainerPath());
+        log("** Check only samples that have been previously imported are selected and are matched");
+        assertNotChecked(Locator.name("selectedSamples.rows[285].selected"));
+        assertOptionEquals(Locator.name("selectedSamples.rows[285].matchedFile"), "");
+        assertChecked(Locator.name("selectedSamples.rows[295].selected"));
+        assertOptionEquals(Locator.name("selectedSamples.rows[295].matchedFile"), "118795.fcs (microFCS)");
+        assertChecked(Locator.name("selectedSamples.rows[296].selected"));
+        assertOptionEquals(Locator.name("selectedSamples.rows[296].matchedFile"), "118797.fcs (microFCS)");
+        importAnalysis_reviewSamples(getContainerPath(), false, Arrays.asList("All Samples"), null);
+        assertTextPresent("All selected rows must be matched to a previously imported FCS file.");
+        importAnalysis_reviewSamples(getContainerPath(), false, Arrays.asList("labkey-demo-samples"), null);
         importAnalysis_analysisEngine(getContainerPath(), AnalysisEngine.FlowJoWorkspace);
-        importAnalysis_analysisOptions(getContainerPath(), Arrays.asList("All Samples"), false, null, null, null);
         // assert FlowJoAnalysis analysis folder doesn't show up in list of folders
         assertTextNotPresent("Choose an analysis folder to put the results into");
         importAnalysis_analysisFolder(getContainerPath(), analysisFolder + "_1", false);

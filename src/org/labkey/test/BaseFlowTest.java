@@ -336,34 +336,16 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         importAnalysis_selectFCSFiles(options.getContainerPath(), options.getSelectFCSFilesOption(), options.getKeywordDirs());
         assertFormElementEquals(Locator.name("selectFCSFilesOption"), options.getSelectFCSFilesOption().name());
 
-        switch (options.getSelectFCSFilesOption())
-        {
-            case None:
-                // no-op
-                break;
+        boolean resolving = options.getSelectFCSFilesOption() == SelectFCSFileOption.Previous;
+        importAnalysis_reviewSamples(options.getContainerPath(), resolving, options.getSelectedGroupNames(), options.getSelectedSampleIds());
 
-            case Included:
-                Assert.fail("Not yet implemented");
-                break;
+        // R Analysis engine can only be selected when using Mac FlowJo workspaces
+        if (!options.getWorkspacePath().endsWith(".wsp"))
+            importAnalysis_analysisEngine(options.getContainerPath(), options.getAnalysisEngine());
 
-            case Previous:
-                importAnalysis_resolveFCSFiles(options.getContainerPath());
-                // R Analysis engine can only be selected when using Mac FlowJo workspaces
-                if (!options.getWorkspacePath().endsWith(".wsp"))
-                    importAnalysis_analysisEngine(options.getContainerPath(), options.getAnalysisEngine());
-                break;
-
-            case Browse:
-                // R Analysis engine can only be selected when using Mac FlowJo workspaces
-                if (!options.getWorkspacePath().endsWith(".wsp"))
-                    importAnalysis_analysisEngine(options.getContainerPath(), options.getAnalysisEngine());
-                break;
-
-            default:
-                Assert.fail();
-        }
-
-        importAnalysis_analysisOptions(options.getContainerPath(), options.getImportGroupNames(), options.isREngineNormalization(), options.getREngineNormalizationReference(), options.getREngineNormalizationSubsets(), options.getREngineNormalizationParameters());
+        // Analysis option page only shown when using R normalization.
+        if (options.getAnalysisEngine() == AnalysisEngine.R && options.isREngineNormalization())
+            importAnalysis_analysisOptions(options.getContainerPath(), options.isREngineNormalization(), options.getREngineNormalizationReference(), options.getREngineNormalizationSubsets(), options.getREngineNormalizationParameters());
 
         importAnalysis_analysisFolder(options.getContainerPath(), options.getAnalysisName(), options.isExistingAnalysisFolder());
 
@@ -372,8 +354,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 options.getWorkspacePath(),
                 options.getSelectFCSFilesOption(),
                 options.getKeywordDirs(),
+                options.getSelectedGroupNames(),
+                options.getSelectedSampleIds(),
                 options.getAnalysisEngine(),
-                options.getImportGroupNames(),
                 options.isREngineNormalization(),
                 options.getREngineNormalizationReference(),
                 options.getREngineNormalizationSubsets(),
@@ -441,10 +424,25 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickButton("Next");
     }
 
-    protected void importAnalysis_resolveFCSFiles(String containerPath)
+    protected void importAnalysis_reviewSamples(String containerPath, boolean resolving, List<String> selectedGroupNames, List<String> selectedSampleIds)
     {
-        assertTitleEquals("Import Analysis: Resolve FCS Files: " + containerPath);
-        // UNDONE: Test resolving files
+        assertTitleEquals("Import Analysis: Review Samples: " + containerPath);
+
+        if (resolving)
+        {
+            // UNDONE: Test resolving files
+            assertTextPresent("Matched");
+        }
+
+        if (selectedGroupNames != null && selectedGroupNames.size() > 0)
+        {
+            setFormElement(Locator.id("importGroupNames"), StringUtils.join(selectedGroupNames, ","));
+        }
+        else if (selectedSampleIds != null && selectedSampleIds.size() > 0)
+        {
+            // UNDONE: Select individual rows for import
+        }
+
         clickButton("Next");
     }
 
@@ -456,13 +454,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickButton("Next");
     }
 
-    protected void importAnalysis_analysisOptions(String containerPath, List<String> groupNames, boolean rEngineNormalization, String rEngineNormalizationReference, List<String> rEngineNormalizationSubsets, List<String> rEngineNormalizationParameters)
+    protected void importAnalysis_analysisOptions(String containerPath, boolean rEngineNormalization, String rEngineNormalizationReference, List<String> rEngineNormalizationSubsets, List<String> rEngineNormalizationParameters)
     {
         assertTitleEquals("Import Analysis: Analysis Options: " + containerPath);
-        if (groupNames != null && groupNames.size() > 0)
-        {
-            setFormElement(Locator.id("importGroupNames"), StringUtils.join(groupNames, ","));
-        }
 
         // R normalization options only present if rEngine as selected
         if (isElementPresent(Locator.id("rEngineNormalization")))
@@ -519,16 +513,19 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         importAnalysis_confirm(containerPath, workspacePath,
                 selectFCSFilesOption, keywordDirs,
+                Arrays.asList("All Samples"),
+                null,
                 analysisEngine,
-                Arrays.asList("All Samples"), false, null, null, null,
+                false, null, null, null,
                 analysisFolder, existingAnalysisFolder);
     }
 
     protected void importAnalysis_confirm(String containerPath, String workspacePath,
                                           SelectFCSFileOption selectFCSFilesOption,
                                           List<String> keywordDirs,
+                                          List<String> selectedGroupNames,
+                                          List<String> selectedSampleIds,
                                           AnalysisEngine analysisEngine,
-                                          List<String> importGroupNames,
                                           boolean rEngineNormalization,
                                           String rEngineNormalizationReference,
                                           List<String> rEngineNormalizationSubsets,
@@ -538,15 +535,12 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         assertTitleEquals("Import Analysis: Confirm: " + containerPath);
 
+        assertTextPresent("Workspace: " + workspacePath);
+
         if (analysisEngine.equals("FlowJoWorkspace"))
             assertTextPresent("Analysis Engine: No analysis engine selected");
         else if (analysisEngine.equals("R"))
             assertTextPresent("Analysis Engine: External R analysis engine");
-
-        if (importGroupNames == null)
-            assertTextPresent("Import Groups: All Samples");
-        else
-            assertTextPresent("Import Groups: " + StringUtils.join(importGroupNames, ","));
 
         if (rEngineNormalization)
         {
@@ -563,8 +557,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         // XXX: assert fcsPath is present: need to normalize windows path backslashes
         if (keywordDirs == null)
             assertTextPresent("FCS File Path: none set");
-
-        assertTextPresent("Workspace: " + workspacePath);
 
         clickButton("Finish");
         waitForPipeline(containerPath);
@@ -605,8 +597,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         private final String _workspacePath;
         private SelectFCSFileOption _selectFCSFilesOption;
         private final List<String> _keywordDirs;
+        private final List<String> _selectedGroupNames;
+        private final List<String> _selectedSampleIds;
         private final AnalysisEngine _analysisEngine;
-        private final List<String> _importGroupNames;
         private final boolean _rEngineNormalization;
         private final String _rEngineNormalizationReference;
         private final List<String> _rEngineNormalizationSubsets;
@@ -630,8 +623,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             _workspacePath = workspacePath;
             _selectFCSFilesOption = selectFCSFilesOption;
             _keywordDirs = keywordDirs;
+            _selectedGroupNames = Arrays.asList("All Samples");
+            _selectedSampleIds = null;
             _analysisEngine = AnalysisEngine.FlowJoWorkspace;
-            _importGroupNames = Arrays.asList("All Samples");
             _rEngineNormalization = false;
             _rEngineNormalizationReference = null;
             _rEngineNormalizationSubsets = null;
@@ -647,8 +641,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 String workspacePath,
                 SelectFCSFileOption selectFCSFilesOption,
                 List<String> keywordDirs,
+                List<String> selectGroupNames,
+                List<String> selectSampleIds,
                 AnalysisEngine analysisEngine,
-                List<String> importGroupNames,
                 boolean rEngineNormalization,
                 String rEngineNormalizationReference,
                 List<String> rEngineNormalizationSubsets,
@@ -662,8 +657,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             _workspacePath = workspacePath;
             _selectFCSFilesOption = selectFCSFilesOption;
             _keywordDirs = keywordDirs;
+            _selectedGroupNames = selectGroupNames;
+            _selectedSampleIds = selectSampleIds;
             _analysisEngine = analysisEngine;
-            _importGroupNames = importGroupNames;
             _rEngineNormalization = rEngineNormalization;
             _rEngineNormalizationReference = rEngineNormalizationReference;
             _rEngineNormalizationSubsets = rEngineNormalizationSubsets;
@@ -693,14 +689,19 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             return _keywordDirs;
         }
 
+        public List<String> getSelectedGroupNames()
+        {
+            return _selectedGroupNames;
+        }
+
+        public List<String> getSelectedSampleIds()
+        {
+            return _selectedSampleIds;
+        }
+
         public AnalysisEngine getAnalysisEngine()
         {
             return _analysisEngine;
-        }
-
-        public List<String> getImportGroupNames()
-        {
-            return _importGroupNames;
         }
 
         public boolean isREngineNormalization()
