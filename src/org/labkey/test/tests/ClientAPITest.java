@@ -27,11 +27,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.PasswordUtil;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ import java.util.List;
  * User: brittp
  * Created: Mar 12, 2008 9:36:47 AM
  */
-public class ClientAPITest extends BaseSeleniumWebTest
+public class ClientAPITest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ClientAPITestProject";
     private static final String OTHER_PROJECT = "OtherClientAPITestProject"; // for cross-project query test
@@ -50,7 +50,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
     private final static String LIST_NAME = "People";
     private final static String SUBFOLDER_LIST = "subfolderList"; // for cross-folder query test
     private static final String OTHER_PROJECT_LIST = "otherProjectList"; // for cross-project query test
-    private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
+    private final static ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
     protected static final String TEST_ASSAY = "TestAssay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
@@ -66,11 +66,11 @@ public class ClientAPITest extends BaseSeleniumWebTest
             "Boxplot No Outliers, All Points"
     };
 
-    private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
+    private final static ListHelperWD.ListColumn[] LIST_COLUMNS = new ListHelperWD.ListColumn[]
     {
-        new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "The first name"),
-        new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "The last name"),
-        new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age")
+        new ListHelperWD.ListColumn("FirstName", "First Name", ListHelperWD.ListColumnType.String, "The first name"),
+        new ListHelperWD.ListColumn("LastName", "Last Name", ListHelperWD.ListColumnType.String, "The last name"),
+        new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "The age")
     };
     static
     {
@@ -151,7 +151,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteUsers(afterTest, EMAIL_RECIPIENTS);
 
@@ -232,7 +232,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         }
 
         _listHelper.clickImportData();
-        setFormElement("text", data.toString());
+        setFormElement(Locator.name("text"), data.toString());
         _listHelper.submitImportTsv_success();
         for (String[] rowData : TEST_DATA)
         {
@@ -246,17 +246,17 @@ public class ClientAPITest extends BaseSeleniumWebTest
         // Create lists for cross-folder query test.
         _listHelper.createList(SUBFOLDER_NAME, SUBFOLDER_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
         _listHelper.clickImportData();
-        setFormElement("text", data.toString());
+        setFormElement(Locator.name("text"), data.toString());
         _listHelper.submitImportTsv_success();
 
         // Create lists for cross-folder query test.
         _listHelper.createList(OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
         _listHelper.clickImportData();
-        setFormElement("text", data.toString());
+        setFormElement(Locator.name("text"), data.toString());
         _listHelper.submitImportTsv_success();
 
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickFolder(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
     }
 
     private String waitForDivPopulation()
@@ -269,7 +269,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         while (waitSeconds-- > 0)
         {
             log("Waiting for " + TEST_DIV_NAME + " div to render...");
-            String divHtml = selenium.getEval("this.browserbot.getCurrentWindow().document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
+            String divHtml = (String)executeScript("return document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
             if (divHtml.length() > 0)
                 return divHtml;
             sleep(1000);
@@ -282,8 +282,8 @@ public class ClientAPITest extends BaseSeleniumWebTest
     {
         addWebPart("Wiki");
         createNewWikiPage("HTML");
-        setFormElement("name", WIKIPAGE_NAME);
-        setFormElement("title", WIKIPAGE_NAME);
+        setFormElement(Locator.name("name"), WIKIPAGE_NAME);
+        setFormElement(Locator.name("title"), WIKIPAGE_NAME);
         setWikiBody("placeholder text");
         saveWikiPage();
     }
@@ -294,14 +294,14 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         waitForDivPopulation();
         assertTextPresent("Webpart Title");
-        for (ListHelper.ListColumn column : LIST_COLUMNS)
+        for (ListHelperWD.ListColumn column : LIST_COLUMNS)
             assertTextPresent(column.getLabel());
     }
 
     private void chartTest()
     {
         String chartHtml = setSourceFromFile("chartTest.js");
-        if (chartHtml.indexOf("<img") < 0 && chartHtml.indexOf("<IMG") < 0)
+        if (!chartHtml.contains("<img") && !chartHtml.contains("<IMG"))
             Assert.fail("Test div does not contain an image:\n" + chartHtml);
     }
 
@@ -331,7 +331,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         String url = WebTestHelper.getBaseURL() + "/visualization/" + PROJECT_NAME + "/" + EscapeUtil.encode(FOLDER_NAME)+ "/exportPDF.view";
         HttpClient httpClient = WebTestHelper.getHttpClient();
         HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpPost method = null;
+        HttpPost method;
         HttpResponse response = null;
 
         try
@@ -361,7 +361,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         assertTextPresent(GRIDTEST_GRIDTITLE);
 
-        for (ListHelper.ListColumn col : LIST_COLUMNS)
+        for (ListHelperWD.ListColumn col : LIST_COLUMNS)
             assertTextPresent(col.getLabel());
 
         for (int row = 0; row < PAGE_SIZE; ++row)
@@ -373,73 +373,61 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         assertTextPresent("Displaying 1 - " + PAGE_SIZE);
 
-        selenium.click("add-record-button");
+        click(Locator.id("add-record-button"));
         String prevActiveCellId;
         // enter a new first name
-        sleep(50);
+//        sleep(50);
         String activeCellId = getActiveEditorId();
-        selenium.type(Locator.id(activeCellId).toString(), "Abe");
-        selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
-        sleep(50);
+        setFormElement(Locator.id(activeCellId), "Abe");
+        pressTab(Locator.id(activeCellId));
+//        sleep(50);
         // enter a new last name
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             Assert.fail("Failed to advance to next edit field");
-        selenium.type(Locator.id(activeCellId).toString(), "Abeson");
-        selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
-        sleep(50);
+        setFormElement(Locator.id(activeCellId), "Abeson");
+        pressTab(Locator.id(activeCellId));
+//        sleep(50);
         // enter a new age
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             Assert.fail("Failed to advance to next edit field");
-        selenium.type(Locator.id(activeCellId).toString(), "51");
-        selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
+        setFormElement(Locator.id(activeCellId), "51");
+        pressTab(Locator.id(activeCellId));
 
         waitUntilGridUpdateComplete();
 
         // on the next row, change 'Bill' to 'Billy'
-        selenium.doubleClick("//div[contains(@class,'x-grid3-row-selected')]//div[contains(@class,'x-grid3-col-1')]");
+        doubleClick(Locator.xpath("//div[contains(@class,'x-grid3-row-selected')]//div[contains(@class,'x-grid3-col-1')]"));
         sleep(500);
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             Assert.fail("Failed to advance to next edit field");
-        selenium.type(Locator.id(activeCellId).toString(), "Billy");
-        selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
-        sleep(50);
+        setFormElement(Locator.id(activeCellId), "Billy");
+        pressTab(Locator.id(activeCellId));
+//        sleep(50);
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             Assert.fail("Failed to advance to next edit field");
-        selenium.type(Locator.id(activeCellId).toString(), "Billyson");
-        selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
-        sleep(50);
+        setFormElement(Locator.id(activeCellId), "Billyson");
+        pressTab(Locator.id(activeCellId));
+//        sleep(50);
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             Assert.fail("Failed to advance to next edit field");
-        selenium.keyPress(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyDown(Locator.id(activeCellId).toString(), "\t");
-        selenium.keyUp(Locator.id(activeCellId).toString(), "\t");
+        pressTab(Locator.id(activeCellId));
         sleep(500);
 
         // delete the row below Billy (which should contain Jane)
-        selenium.click("delete-records-button");
-        sleep(50);
-        selenium.click("//div[contains(@class, 'x-window-dlg')]//button[text()='Delete']");
-        sleep(50);
+        click(Locator.id("delete-records-button"));
+//        sleep(50);
+        click(Locator.xpath("//div[contains(@class, 'x-window-dlg')]//button[text()='Delete']"));
+//        sleep(50);
 
         int limit = 30;
         while (isTextPresent("Jane") && limit-- > 0)
@@ -451,7 +439,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextNotPresent("Jane");
 
         //test paging
-        selenium.click("//button[contains(@class, 'x-tbar-page-next')]");
+        click(Locator.xpath("//button[contains(@class, 'x-tbar-page-next')]"));
 
         limit = 30;
         while (!isTextPresent("Norbert") && limit-- > 0)
@@ -461,7 +449,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent("Penny");
         assertTextPresent("Yak");
 
-        selenium.click("//button[contains(@class, 'x-tbar-page-prev')]");
+        click(Locator.xpath("//button[contains(@class, 'x-tbar-page-prev')]"));
         limit = 30;
         while (!isTextPresent("Abe") && limit-- > 0)
             sleep(1000);
@@ -471,7 +459,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         assertTextPresent("Johnson");
 
         //test sorting
-        selenium.click("//div[contains(@class, 'x-grid3-hd-2')]");
+        click(Locator.xpath("//div[contains(@class, 'x-grid3-hd-2')]"));
         limit = 30;
         while (!isTextPresent("Yak") && limit-- > 0)
             sleep(1000);
@@ -483,32 +471,29 @@ public class ClientAPITest extends BaseSeleniumWebTest
     private String getActiveEditorId()
     {
         int limit = 3;
-        String activeEditor = selenium.getEval("this.browserbot.getCurrentWindow().gridView.activeEditor;");
-        while(null == activeEditor && limit-- > 0)
+        waitFor(new Checker()
         {
-            sleep(50);
-            activeEditor = selenium.getEval("this.browserbot.getCurrentWindow().gridView.activeEditor;");
-        }
-        if(null == activeEditor)
-            Assert.fail("Could not get the id of the active editor in the grid!");
+            @Override
+            public boolean check()
+            {
+                return (Boolean)executeScript("return window.gridView.activeEditor != null;");
+            }
+        }, "Could not get the id of the active editor in the grid!", limit * 50);
 
-        return selenium.getEval("this.browserbot.getCurrentWindow().gridView.activeEditor.field.id;");
+        return (String)executeScript("return window.gridView.activeEditor.field.id;");
     }
 
     private void waitUntilGridUpdateComplete()
     {
         int tries = 20;
-        String numDirty = "";
-        while(tries > 0 && "0".compareTo(numDirty) != 0)
-        {
-            numDirty = selenium.getEval("this.browserbot.getCurrentWindow().gridView.getStore().getModifiedRecords().length;");
+        Long numDirty;
+        do{
+            numDirty = (Long)executeScript("return window.gridView.getStore().getModifiedRecords().length;");
             log("getModifiedRecords().length returned " + numDirty);
             sleep(500);
-            --tries;
-        }
+        }while(--tries > 0 && numDirty != 0L);
         if(tries == 0)
             Assert.fail("Insert or update via the Ext grid did not complete!");
-
     }
 
     private void assayTest()
@@ -523,13 +508,13 @@ public class ClientAPITest extends BaseSeleniumWebTest
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
-        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
-        selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), TEST_ASSAY);
+        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_DESC);
 
-        selenium.click(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath());
+        click(Locator.xpath(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath()));
         _listHelper.setColumnName(getPropertyXPath("Run Fields"), 0, "RunDate");
         _listHelper.setColumnLabel(getPropertyXPath("Run Fields"), 0, "Run Date");
-        _listHelper.setColumnType(this, getPropertyXPath("Run Fields"), 0, ListHelper.ListColumnType.DateTime);
+        _listHelper.setColumnType(getPropertyXPath("Run Fields"), 0, ListHelperWD.ListColumnType.DateTime);
 
         sleep(1000);
         clickButton("Save", 0);
@@ -648,7 +633,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         for (String user : EMAIL_RECIPIENTS)
             createUser(user, null);
 
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         enableEmailRecorder();
 
         // test failure cases: no from email
@@ -742,7 +727,7 @@ public class ClientAPITest extends BaseSeleniumWebTest
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "Test Started");
         waitForText("Test Complete");
-        assertTextNotPresent("ERROR");
+        Assert.assertFalse(loc.findElement(_driver).getText().contains("ERROR"));
         clearTestPage("WebDav Client API Test complete.");
     }
 }
