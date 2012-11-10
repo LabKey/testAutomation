@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class ViralLoadAssayTest extends LabModulesTest
 {
-    private static final String ASSAY_NAME = "Viral Load";
+    private static final String ASSAY_NAME = "Viral Load Test";
     private String DETECTOR_NAME = "PIATAK SIVGAG";
 
     private static final String[][] TEMPLATE_DATA = new String[][]{
