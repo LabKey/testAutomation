@@ -496,6 +496,7 @@ public class ListTest extends BaseSeleniumWebTest
         log("Test single list web part");
         addWebPart("List - Single");
         setText("title", "This is my single list web part title");
+        //TODO:  This didn't work with the convetional _ext4Helper.selectComboBoxItem(), so we are using two clicks instead.
         click(Locator.xpath("//input[@name='listId']"));
         click(Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains( text(), '>')]"));
         //This will only work so long as it's the only button on the page.
