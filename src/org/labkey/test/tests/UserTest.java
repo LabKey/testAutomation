@@ -97,7 +97,6 @@ public class UserTest extends SecurityTest
         //get appropriate user
         String userEmail = getEmailChangeableUser();
         String newUserEmail = NORMAL_USER2_ALTERNATE;
-        deleteUser(newUserEmail);
 
         //change their email address
         changeUserEmail(userEmail, newUserEmail);
@@ -159,8 +158,6 @@ public class UserTest extends SecurityTest
      */
     private String getEmailChangeableUser()
     {
-
-        deleteUser(NORMAL_USER2_ALTERNATE);
         createUserAndNotify(NORMAL_USER2, NORMAL_USER);
         clickLinkContainingText("Home");
         setInitialPassword(NORMAL_USER2, TEST_PASSWORD);
