@@ -578,6 +578,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Wizard Page 7 : Reports
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports']"));
         waitForElement(Locator.css(".studyWizardViewList"));
+        //Lagged out and couldn't find elements without a sleep.  Could be a local issue, but it certainly broke the test once.
+        sleep(1000);
         for (String report : reports)
         {
             getWrapper().getEval("selenium.selectExtGridItem('name', '" + report + "', -1, 'studyWizardReportList', true)");
