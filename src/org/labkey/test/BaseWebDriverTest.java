@@ -223,6 +223,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         else
         {
             final FirefoxProfile profile = new FirefoxProfile();
+            profile.setPreference("app.update.auto", false);
             if (enableScriptCheck())
             {
                 try
@@ -1533,8 +1534,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @Test(timeout=1200000) // 20 minute default test timeout
     public void testSteps() throws Exception
     {
-        try{ resumeJsErrorChecker(); }// Make sure js error checker didn't get stuck paused by a failure in the crawler.
-        catch (Throwable t){/*ignore*/}
         try
         {
             log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
