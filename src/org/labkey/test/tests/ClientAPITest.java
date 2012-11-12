@@ -362,7 +362,7 @@ public class ClientAPITest extends BaseWebDriverTest
         assertTextPresent(GRIDTEST_GRIDTITLE);
 
         for (ListHelperWD.ListColumn col : LIST_COLUMNS)
-            assertTextPresent(col.getLabel());
+            waitForText(col.getLabel());
 
         for (int row = 0; row < PAGE_SIZE; ++row)
         {
