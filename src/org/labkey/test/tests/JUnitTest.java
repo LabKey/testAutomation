@@ -170,6 +170,8 @@ public class JUnitTest extends TestSuite
             }
             else
             {
+                System.err.println("Getting unit test list from server failed with error code " + status + ". Error page content is:");
+                response.getEntity().writeTo(System.err);
                 throw new AssertionFailedError("Failed to fetch remote junit test list (" + status + " - " + response.getStatusLine() + "): " + url);
             }
         }

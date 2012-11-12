@@ -43,6 +43,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -692,7 +693,7 @@ public class Runner extends TestSuite
     }
 
     /** Entry point for Ant JUnit runner. */
-    public static TestSuite suite()
+    public static TestSuite suite() throws Throwable
     {
         try
         {
@@ -711,13 +712,15 @@ public class Runner extends TestSuite
 
             return suite(testNames, set);
         }
+        catch (InvocationTargetException e)
+        {
+            System.err.print(BaseTestRunner.getFilteredTrace(e.getTargetException()));
+            throw e.getTargetException();
+        }
         catch (Exception e)
         {
             System.err.print(BaseTestRunner.getFilteredTrace(e));
-            if (e instanceof RuntimeException)
-                throw (RuntimeException) e;
-            else
-                throw new RuntimeException(e);
+            throw e;
         }
     }
 
