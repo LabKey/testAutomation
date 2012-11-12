@@ -41,7 +41,6 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     String studyFolder = "study folder";
     String assayFolder = "assay folder";
-    private String specimenFile = "progress_report_test_data.xlsx";
     int pipelineCount = 0;
     private String assay1File = "PCR Data.tsv";
 
@@ -81,7 +80,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         waitForElement(table);
         Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@style, 'background:green')]")));
         Assert.assertEquals(21, getXpathCount( Locator.xpath("//td[contains(@style, 'background:red')]")));
-        Assert.assertEquals(1, getXpathCount( Locator.xpath("//td[contains(@style, 'background:orange')]")));
+        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@style, 'background:orange')]")));
         Assert.assertEquals(0, getXpathCount(Locator.xpath("//td[contains(@style, 'flagged.png')]")));
 
         flagSpecimenForReview();
@@ -97,7 +96,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         configureGroupingColumn("PCR", "gene");
         waitForElement(table);
         clickLinkWithText("48 results from PCR have been uploaded.");
-        assertTextPresent("Participant Visit not found", 6);
+        assertTextPresent("Participant Visit not found", 8);
         assertTextPresent("2 duplicates found", 4);
     }
 
