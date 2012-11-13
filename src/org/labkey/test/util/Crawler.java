@@ -99,6 +99,7 @@ public class Crawler
             new ControllerActionId("core", "downloadFileLink"),
             new ControllerActionId("experiment", "showFile"),
             new ControllerActionId("flow-run", "download"),
+            new ControllerActionId("issues", "download"),
             new ControllerActionId("login", "logout"),
             new ControllerActionId("login", "enable"),
             new ControllerActionId("login", "disable"),
