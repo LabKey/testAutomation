@@ -28,7 +28,6 @@ import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.ProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.RedirectStrategy;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -151,8 +150,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     /**
      * @deprecated Refactor usages to use {@link #_driver}
      */
-    @Deprecated protected final DefaultSeleniumWrapper selenium;
-    public final WebDriver _driver;
+    @Deprecated protected DefaultSeleniumWrapper selenium;
+    public WebDriver _driver; // TODO: Refactor to private with getter
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
     private String _lastPageText = null;
@@ -169,8 +168,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private boolean _fileUploadAvailable;
     protected long _startTime;
     private ArrayList<JavaScriptError> _jsErrors;
-    public final WebDriverWait _shortWait;
-    public final WebDriverWait _longWait;
+    public WebDriverWait _shortWait; // TODO: Refactor to private with getter
+    public WebDriverWait _longWait; // TODO: Refactor to private with getter
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public ExtHelperWD _extHelper = new ExtHelperWD(this);
@@ -211,7 +210,33 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _listHelper = new ListHelperWD(this);
         _customizeViewsHelper = new CustomizeViewsHelperWD(this);
         _jsErrors = new ArrayList<JavaScriptError>();
+    }
 
+    protected boolean useNativeEvents()
+    {
+        return false;
+    }
+
+    public static String getLabKeyRoot()
+    {
+        return WebTestHelper.getLabKeyRoot();
+    }
+
+    public static String getSampledataPath()
+    {
+        File path = new File(getLabKeyRoot(), "sampledata");
+        return path.toString();
+    }
+    public static String getContextPath()
+    {
+        return WebTestHelper.getContextPath();
+    }
+
+    protected abstract @Nullable String getProjectName();
+
+    @Before
+    public void setUp() throws Exception
+    {
         if (getBrowser().startsWith("*ie")) //experimental
         {
             _driver = new InternetExplorerDriver();
@@ -265,35 +290,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         _shortWait = new WebDriverWait(_driver, WAIT_FOR_JAVASCRIPT/1000);
         _longWait = new WebDriverWait(_driver, WAIT_FOR_PAGE/1000);
-
-    }
-
-    protected boolean useNativeEvents()
-    {
-        return false;
-    }
-
-    public static String getLabKeyRoot()
-    {
-        return WebTestHelper.getLabKeyRoot();
-    }
-
-    public static String getSampledataPath()
-    {
-        File path = new File(getLabKeyRoot(), "sampledata");
-        return path.toString();
-    }
-    public static String getContextPath()
-    {
-        return WebTestHelper.getContextPath();
-    }
-
-    protected abstract @Nullable String getProjectName();
-
-    @Before
-    public void setUp() throws Exception
-    {
-        /*block base setup*/
     }
 
     public Object executeScript(String script, Object... arguments)
@@ -478,7 +474,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void tearDown() throws Exception
     {
         boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
-        if (!skipTearDown || onTeamCity())
+        if ((!skipTearDown || onTeamCity())&& _driver != null)
         {
             _driver.quit();
         }
@@ -742,8 +738,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         assertTitleEquals("Sign In");
         assertFormPresent("login");
-        setText("email", email);
-        setText("password", password);
+        setFormElement(Locator.id("email"), email);
+        setFormElement(Locator.id("password"), password, true);
         clickButton("Sign In");
     }
 
@@ -766,8 +762,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         resetLink.click();
         waitForPageToLoad();
 
-        setFormElement("password", password);
-        setFormElement("password2", password);
+        setFormElement(Locator.id("password"), password);
+        setFormElement(Locator.id("password2"), password);
 
         clickButton("Set Password");
     }
@@ -790,8 +786,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         assertTextPresent(username, "Choose a password you'll use to access this server", "six non-whitespace characters or more, cannot match email address");
 
-        setFormElement("password", newPassword);
-        setFormElement("password2", newPassword);
+        setFormElement(Locator.id("password"), newPassword);
+        setFormElement(Locator.id("password2"), newPassword);
 
         clickButton("Set Password");
 
@@ -810,9 +806,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         goToMyAccount();
         clickButton("Change Password");
 
-        setFormElement("oldPassword", oldPassword);
-        setFormElement("password", password);
-        setFormElement("password2", password);
+        setFormElement(Locator.id("oldPassword"), oldPassword);
+        setFormElement(Locator.id("password"), password);
+        setFormElement(Locator.id("password2"), password);
 
         clickButton("Set Password");
     }
@@ -855,7 +851,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             // Remember old login settings.
             curStrength = PasswordRule.valueOf(getText(Locator.xpath("//input[@name='strength' and @value='Weak']/.."))); // getAttribute broken on IE
-            curExpiration = PasswordExpiration.valueOf(getFormElement("expiration"));
+            curExpiration = PasswordExpiration.valueOf(getFormElement(Locator.name("expiration")));
         }
 
         if ( strength != null && curStrength != strength)
@@ -867,7 +863,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if ( expiration != null && curExpiration != expiration)
         {
             if ( oldExpiration == null ) oldExpiration = curExpiration;
-            setFormElement("expiration", expiration.toString());
+            setFormElement(Locator.name("expiration"), expiration.toString());
         }
 
         clickButton("Save");
@@ -894,12 +890,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             beginAt("/login/configureDbLogin.view");
 
             if ( oldStrength != null ) click(Locator.radioButtonByNameAndValue("strength", oldStrength.toString()));
-            if ( oldExpiration != null ) setFormElement("expiration", oldExpiration.toString());
+            if ( oldExpiration != null ) setFormElement(Locator.name("expiration"), oldExpiration.toString());
 
             clickButton("Save");
 
             if ( oldStrength != null ) Assert.assertEquals("Unable to reset password strength.", oldStrength, PasswordRule.valueOf(getText(Locator.xpath("//input[@name='strength' and @value='Weak']/.."))));
-            if ( oldExpiration != null ) Assert.assertEquals("Unable to reset password expiration.", oldExpiration, PasswordExpiration.valueOf(getFormElement("expiration")));
+            if ( oldExpiration != null ) Assert.assertEquals("Unable to reset password expiration.", oldExpiration, PasswordExpiration.valueOf(getFormElement(Locator.name("expiration"))));
 
             // Back to default.
             oldStrength = null;
