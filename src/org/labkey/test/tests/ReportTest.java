@@ -1407,6 +1407,7 @@ public class ReportTest extends StudyBaseTest
         sleep(5000);
         _extHelper.clickExtButton("Select Chart Query", "Save", 0);
         _extHelper.waitForExtDialog("Y Axis");
+        waitForText("4c.Induration 1st measure", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath("//div[text()='4c.Induration 1st measure']"));
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
 
@@ -1424,6 +1425,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.css("svg text:contains('4c.Induration 1st measure')"));
         _extHelper.waitForExtDialog("Y Axis");
         click(Locator.ext4Radio("log"));
+        waitForText("2.Body temperature", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath("//div[text()='2.Body temperature']"));
         setFormElement(Locator.name("label"), "TestYAxis");
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
@@ -1433,6 +1435,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.css("svg text:contains('Cohort')"));
         _extHelper.waitForExtDialog("X Axis");
         click(Locator.ext4Radio("log"));
+        waitForText("Cat Mice Let", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath("//div[text()='Cat Mice Let']"));
         _extHelper.setExtFormElementByLabel("X Axis", "Label:", "TestXAxis");
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
@@ -1472,6 +1475,7 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Charts", "Create Box Plot");
 
         _extHelper.waitForExtDialog("Y Axis");
+        waitForText("2.Body temperature", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath("//div[text()='2.Body temperature']"));
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
 
@@ -1578,9 +1582,11 @@ public class ReportTest extends StudyBaseTest
         sleep(5000);
         _extHelper.clickExtButton("Select Chart Query", "Save", 0);
         _extHelper.waitForExtDialog("Y Axis");
+        waitForText("1. Weight", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("Y Axis") + "//div[text()='1. Weight']"));
         _extHelper.clickExtButton("Y Axis", "Ok", 0);
         _extHelper.waitForExtDialog("X Axis");
+        waitForText("4. Pulse", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='4. Pulse']"));
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
@@ -1599,6 +1605,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.css("svg text:contains('1. Weight')"));
         _extHelper.waitForExtDialog("Y Axis");
         click(Locator.ext4Radio("log"));
+        waitForText("2. Body Temp", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("Y Axis") + "//div[text()='2. Body Temp']"));
         setFormElement(Locator.name("label"), "TestYAxis");
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
@@ -1608,6 +1615,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.css("svg text:contains('4. Pulse')"));
         _extHelper.waitForExtDialog("X Axis");
         click(Locator.ext4Radio("log"));
+        waitForText("Cat Mice Let", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='Cat Mice Let']"));
         _extHelper.setExtFormElementByLabel("X Axis", "Label:", "TestXAxis");
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
@@ -1647,9 +1655,11 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Charts", "Create Scatter Plot");
 
         _extHelper.waitForExtDialog("Y Axis");
+        waitForText("1. Weight", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("Y Axis") + "//div[text()='1. Weight']"));
         _extHelper.clickExtButton("Y Axis", "Ok", 0);
         _extHelper.waitForExtDialog("X Axis");
+        waitForText("4. Pulse", WAIT_FOR_JAVASCRIPT);
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='4. Pulse']"));
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
