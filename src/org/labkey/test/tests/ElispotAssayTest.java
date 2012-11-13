@@ -16,7 +16,7 @@
 
 package org.labkey.test.tests;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;

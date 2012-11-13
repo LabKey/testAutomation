@@ -16,7 +16,7 @@
 package org.labkey.test.util;
 
 import junit.framework.Assert;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
