@@ -92,7 +92,6 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
 
         // Create list
         impersonate(ADMIN_USER);
-        // TODO: possibly insert as ADMIN_USER if list's ModifiedBy column should be hidden (it is not)
         ListHelper.ListColumn userColumn = new ListHelper.ListColumn("user", "user", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(getProjectName(), "core", "Users"));
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
         clickButton("Done");
