@@ -271,6 +271,7 @@ if (browserVersion.isFirefox) {
                     msg.message.indexOf("XULElement.selectedIndex") == -1 && // Ignore known Firefox Issue
                     msg.message.indexOf("Failed to decode base64 string!") == -1 && // Firefox issue
                     msg.message.indexOf("xulrunner-1.9.0.14/components/FeedProcessor.js") == -1 && // Firefox problem
+                    msg.message.indexOf("{file: \"resource://") == -1 && // Firefox problem
                     msg.message.indexOf("Image corrupt or truncated: <unknown>") == -1)  // Selenium problem with pages that lack a favicon (e.g., errors since reset)
                 {
                     LOG.error("JsErrorChecker: " + msg.message);
