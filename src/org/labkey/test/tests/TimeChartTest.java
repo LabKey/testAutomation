@@ -1229,7 +1229,6 @@ public class TimeChartTest extends StudyBaseTest
         applyChanges();
         openSaveMenu();
         saveReport(false);
-        sleep(1000); // give it a second to save
 
         pushLocation(); // for impersonation test
         pushLocation(); // for impersonation test
@@ -1299,6 +1298,11 @@ public class TimeChartTest extends StudyBaseTest
         waitAndClick(getButtonLocator("Save", 1));
         if (expectReload)
             waitForPageToLoad();
+        else
+        {
+            _extHelper.waitForExtDialog("Success");
+            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        }
         waitFor(new Checker()
         {
             @Override
