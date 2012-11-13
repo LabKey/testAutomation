@@ -91,7 +91,8 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         stopImpersonating();
 
         // Create list
-        // TODO: possibly insert as ADMIN_USER if list's ModifiedBy row should be hidden (it is not)
+        impersonate(ADMIN_USER);
+        // TODO: possibly insert as ADMIN_USER if list's ModifiedBy column should be hidden (it is not)
         ListHelper.ListColumn userColumn = new ListHelper.ListColumn("user", "user", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(getProjectName(), "core", "Users"));
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
         clickButton("Done");
@@ -107,6 +108,7 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         _customizeViewsHelper.addCustomizeViewColumn("user/ModifiedBy/Email", "Email");
         _customizeViewsHelper.addCustomizeViewColumn("ModifiedBy/Email", "Email");
         _customizeViewsHelper.saveCustomView(EMAIL_VIEW, true);
+        stopImpersonating();
 
         // Create query webpart
         clickFolder(getProjectName());
@@ -153,29 +155,43 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         goToExperimentalFeatures();
         Locator.XPathLocator toggleLink = Locator.xpath("id('labkey-experimental-feature-" + feature + "')");
 
-        if (enable && "Enable".equals(getText(toggleLink)))
+        if (enable)
         {
-            if(!_initialFeatureStates.containsKey(feature))
+            if ("enable".equals(getText(toggleLink).toLowerCase()))
             {
-                _initialFeatureStates.put(feature, false);
+                if(!_initialFeatureStates.containsKey(feature))
+                {
+                    _initialFeatureStates.put(feature, false);
+                }
+                click(toggleLink);
+                waitForElement(toggleLink.append("[text()='Disable']"));
             }
-            click(toggleLink);
-            waitForElement(toggleLink.append("[text()='Disable']"));
+            else
+            {
+                log("Experimental feature already enabled: " + feature);
+            }
         }
-        if (!enable && "Disable".equals(getText(toggleLink)))
+        if (!enable)
         {
-            if(!_initialFeatureStates.containsKey(feature))
+            if ("enable".equals(getText(toggleLink).toLowerCase()))
             {
-                _initialFeatureStates.put(feature, false);
+                if(!_initialFeatureStates.containsKey(feature))
+                {
+                    _initialFeatureStates.put(feature, false);
+                }
+                click(toggleLink);
+                waitForElement(toggleLink.append("[text()='Enable']"));
             }
-            click(toggleLink);
-            waitForElement(toggleLink.append("[text()='Enable']"));
+            else
+            {
+                log("Experimental feature already disabled: " + feature);
+            }
         }
     }
 
     private void goToExperimentalFeatures()
     {
-        if (!selenium.getTitle().equals("Experimental Features"))
+        if (!_driver.getTitle().equals("Experimental Features"))
         {
             goToAdminConsole();
             clickLinkWithText("experimental features");
