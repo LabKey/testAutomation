@@ -788,7 +788,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if(resetUrl!=null)
             beginAt(resetUrl);
 
-        assertTextPresent(new String[] {username, "Choose a password you'll use to access this server","six characters or more, cannot match email addres"});
+        assertTextPresent(username, "Choose a password you'll use to access this server", "six non-whitespace characters or more, cannot match email address");
 
         setFormElement("password", newPassword);
         setFormElement("password2", newPassword);
@@ -1128,7 +1128,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             verifyInitialUserError(email, null, null, "You must enter a password.");
             verifyInitialUserError(email, "LongEnough", null, "You must enter a password.");
             verifyInitialUserError(email, null, "LongEnough", "You must enter a password.");
-            verifyInitialUserError(email, "short", "short", "Your password must be six characters or more.");
+            verifyInitialUserError(email, "short", "short", "Your password must be six non-whitespace characters or more.");
             verifyInitialUserError(email, email, email, "Your password must not match your email address.");
             verifyInitialUserError(email, "LongEnough", "ButDontMatch", "Your password entries didn't match.");
 

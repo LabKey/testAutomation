@@ -231,7 +231,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         beginAt(resetUrl);
 
         String[][] passwords = {{"fooba", null}, {"foobar","foobar2"}};
-        String[][] messages = {{"Your password must be six characters or more."}, {"Your password entries didn't match."}};
+        String[][] messages = {{"Your password must be six non-whitespace characters or more."}, {"Your password entries didn't match."}};
         attemptSetInvalidPasswords(PasswordAlterType.RESET_PASSWORD, passwords, messages);
 
         resetPassword(resetUrl, NORMAL_USER, NORMAL_USER_PASSWORD);
