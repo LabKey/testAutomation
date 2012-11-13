@@ -123,8 +123,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
 
         createSubfolder(PROJECT_NAME, PROJECT_NAME, "StudyFolder", "Study", null);
         createDefaultStudy();
-
-        clickLinkWithText(PROJECT_NAME);
+        beginAt("project/" + getProjectName() + "/begin.view?");
 
         mouseOver(Locator.menuBarItem("Studies"));
         waitForText("StudyFolder Study", WAIT_FOR_JAVASCRIPT);
