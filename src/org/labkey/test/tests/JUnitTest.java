@@ -90,6 +90,7 @@ public class JUnitTest extends TestSuite
         JUnitSeleniumHelper helper = new JUnitSeleniumHelper();
         try
         {
+            helper.setUp();
             // sign in performs upgrade if necessary
             helper.signIn();
             helper.unfail();
