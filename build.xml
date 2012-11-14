@@ -526,6 +526,7 @@
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
             <sysproperty key="enableFirebugPanels" value="${sysprop.enableFirebugPanels}"/>
+            <sysproperty key="webdriver.ie.driver" value="${webdriver.ie.driver}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -980,6 +981,8 @@
             <isset property="suite"/>
         </condition>
 
+        <property name="webdriver.ie.driver" value="${test.dir}/bin/IEDriverServer.exe"/>
+
         <echo message="User property overrides:" />
         <echo message="    suite: ${sysprop.suite}"/>
         <echo message="    tests: ${sysprop.test}"/>
@@ -1055,6 +1058,7 @@
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
             <sysproperty key="enableFirebugPanels" value="${sysprop.enableFirebugPanels}"/>
+            <sysproperty key="webdriver.ie.driver" value="${webdriver.ie.driver}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -1103,6 +1107,7 @@
             <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
             <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
             <sysproperty key="enableFirebugPanels" value="${sysprop.enableFirebugPanels}"/>
+            <sysproperty key="webdriver.ie.driver" value="${webdriver.ie.driver}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
