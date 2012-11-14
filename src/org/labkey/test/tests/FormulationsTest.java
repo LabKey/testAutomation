@@ -552,9 +552,7 @@ public class FormulationsTest extends BaseSeleniumWebTest
         clickButton("Save", 0);
         waitForText("Save Successful");
         clickButton("OK", 0);
-
-        waitForText("Run Information", 10000);
-        click(Locator.xpath("(//img[@class='x4-tool-close'])[1]"));
+        waitForPageToLoad();
     }
 
     protected void performSearch()
