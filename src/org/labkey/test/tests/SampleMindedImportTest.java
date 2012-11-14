@@ -106,9 +106,9 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         assertLinkPresentWithText("BAL");
         assertLinkPresentWithText("Blood");
         clickLinkWithText("By Individual Vial");
-        assertLinkPresentWithTextCount("TestStudy03P1000001", 6);
-        assertLinkPresentWithTextCount("TestStudy03P2000001", 3);
-        assertLinkPresentWithTextCount("TestStudy03P20043001", 5);
+        assertLinkPresentWithTextCount("P1000001", 6);
+        assertLinkPresentWithTextCount("P2000001", 3);
+        assertLinkPresentWithTextCount("P20043001", 5);
         assertTextPresent("20045467");
         assertTextPresent("45627879");
         assertTextPresent("1000001-21");
@@ -128,7 +128,7 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         Assert.assertEquals("Incorrect number of vials.", "Count:  5", specimenTable.getTotal("Global Unique Id"));
 
         clickLinkWithText("Group vials");
-        assertLinkPresentWithTextCount("TestStudy03P20043001", 2);
+        assertLinkPresentWithTextCount("P20043001", 2);
         assertTextPresent("Visit SE");
 
         // add column sequencenum
