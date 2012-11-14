@@ -51,7 +51,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyFirstRun();
         verifySecondRun();
         verifyExtraHaplotypeAssignment();
-        verifyCustomerReport();
+        verifyAssignmentReport();
     }
 
     @Override
@@ -126,9 +126,9 @@ public class HaplotypeAssayTest extends GenotypingTest
         log("Verify Haplotype Assignment data for the first run");
         goToAssayRun("first run");
 
-        // add the Animal/CustomerAnimalId column so we can verify that as well
+        // add the Animal/ClientAnimalId column so we can verify that as well
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("AnimalId/CustomerAnimalId");
+        _customizeViewsHelper.addCustomizeViewColumn("AnimalId/ClientAnimalId");
         _customizeViewsHelper.saveCustomView();
 
         DataRegionTable drt = new DataRegionTable("Data", this);
@@ -141,7 +141,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyColumnDataValues(drt, "Mamu-BHaplotype1", "B015c,B012b,B001c,B012b,B002");
         verifyColumnDataValues(drt, "Mamu-BHaplotype2", "B025a,B017a,B017a,B012b,B002");
         verifyColumnDataValues(drt, "Enabled", "true,true,true,true,true");
-        verifyColumnDataValues(drt, "CustomerAnimalId", "x123,x234,x345,x456,x567");
+        verifyColumnDataValues(drt, "ClientAnimalId", "x123,x234,x345,x456,x567");
 
         // verify concatenated haplotype strings
         assertTextPresent("A001,A023,B015c,B025a");
@@ -155,7 +155,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         drt = new DataRegionTable("query", this);
         Assert.assertEquals("Unexpected number of Animal records", 5, drt.getDataRowCount());
         verifyColumnDataValues(drt, "LabAnimalId", "ID-1,ID-2,ID-3,ID-4,ID-5");
-        verifyColumnDataValues(drt, "CustomerAnimalId", "x123,x234,x345,x456,x567");
+        verifyColumnDataValues(drt, "ClientAnimalId", "x123,x234,x345,x456,x567");
 
         verifyHaplotypeRecordsByType(11, 5, 6);
     }
@@ -177,7 +177,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyColumnDataValues(drt, "Mamu-BHaplotype1", "B015c,,B012b,B033,B033,B033");
         verifyColumnDataValues(drt, "Mamu-BHaplotype2", "B025a,,B012b,B033,B033,B033");
         verifyColumnDataValues(drt, "Enabled", "true,true,true,true,true,true");
-        verifyColumnDataValues(drt, "CustomerAnimalId", "x456,x567,x678,x789,x888,x999");
+        verifyColumnDataValues(drt, "ClientAnimalId", "x456,x567,x678,x789,x888,x999");
 
         // verify concatenated haplotype strings
         assertTextPresent("A001,A023,B015c,B025a");
@@ -189,7 +189,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         drt = new DataRegionTable("query", this);
         Assert.assertEquals("Unexpected number of Animal records", 9, drt.getDataRowCount());
         verifyColumnDataValues(drt, "LabAnimalId", "ID-1,ID-2,ID-3,ID-4,ID-5,ID-6,ID-7,ID-8,ID-9");
-        verifyColumnDataValues(drt, "CustomerAnimalId", "x123,x234,x345,x456,x567,x678,x789,x888,x999");
+        verifyColumnDataValues(drt, "ClientAnimalId", "x123,x234,x345,x456,x567,x678,x789,x888,x999");
 
         verifyHaplotypeRecordsByType(13, 6, 7);
     }
@@ -229,12 +229,12 @@ public class HaplotypeAssayTest extends GenotypingTest
         drt.clearFilter("AnimalId");
     }
 
-    private void verifyCustomerReport()
+    private void verifyAssignmentReport()
     {
-        log("Verify Haplotype Assignment customer report");
+        log("Verify Haplotype Assignment Report");
         goToProjectHome();
         goToAssayRun("first run");
-        clickLinkWithText("produce customer report");
+        clickLinkWithText("produce report");
         waitForText("Search for animal IDs by:");
         assertTextPresent("Show report column headers as:");
         assertTextPresent("Enter the animal IDs separated by whitespace, comma, or semicolon:");
@@ -248,7 +248,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         DataRegionTable drt = new DataRegionTable("report", this);
         assertTextPresentInThisOrder("A001", "B001c", "B017a");
         verifyColumnDataValues(drt, "ID-3", "2,1,1");
-        _ext4Helper.selectComboBoxItem("Show report column headers as", "CustomerAnimalID");
+        _ext4Helper.selectComboBoxItem("Show report column headers as", "ClientAnimalID");
         clickButton("Submit", 0);
         waitForText("x345");
         drt = new DataRegionTable("report", this);
@@ -256,7 +256,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyColumnDataValues(drt, "x345", "2,1,1");
 
         // test with IDs that only have one result
-        _ext4Helper.selectComboBoxItem("Search for animal IDs by", "CustomerAnimalID");
+        _ext4Helper.selectComboBoxItem("Search for animal IDs by", "ClientAnimalID");
         _ext4Helper.selectComboBoxItem("Show report column headers as", "LabAnimalID");
         setFormElement(Locator.name("idsTextArea"), "x123,x234;x345 x678 x789");
         clickButton("Submit", 0);
@@ -292,7 +292,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         clickLinkWithText("edit");
         uncheckCheckbox(Locator.name("quf_enabled"));
         clickButton("Submit");
-        clickLinkWithText("produce customer report");
+        clickLinkWithText("produce report");
         waitForText("Enter the animal IDs separated by whitespace, comma, or semicolon:");
         dr = Locator.id("dataregion_report");
         setFormElement(Locator.name("idsTextArea"), "ID-4");
@@ -363,7 +363,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         setFormElement(Locator.name("data"), getFileContents(dataFile));
         waitForElementToDisappear(cb, WAIT_FOR_JAVASCRIPT);
         _ext4Helper.selectComboBoxItem("Lab Animal ID *", "OC ID");
-        _ext4Helper.selectComboBoxItem("Customer Animal ID", "Animal ID");
+        _ext4Helper.selectComboBoxItem("Client Animal ID", "Animal ID");
         _ext4Helper.selectComboBoxItem("Total # Reads Evaluated *", "# Reads Merged");
         _ext4Helper.selectComboBoxItem("Total # Reads Identified *", "# Reads Identified");
     }
