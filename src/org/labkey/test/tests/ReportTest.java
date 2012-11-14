@@ -55,6 +55,7 @@ public class ReportTest extends StudyBaseTest
     private static final String TEST_GRID_VIEW = "Test Grid View";
     public static final String AUTHOR_REPORT = "Author report";
     protected static final String DEVELOPER_USER = "developer_user1@report.test";
+    protected static final String ATTACHMENT_USER = "attachment_user1@report.test";
     public static final String COHORT_1 = "Group 1";
     public static final String COHORT_2 = "Group 2";
 
@@ -119,7 +120,7 @@ public class ReportTest extends StudyBaseTest
     @Override
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        deleteUsers(false, TEST_USER, R_USER, AUTHOR_USER, DEVELOPER_USER);
+        deleteUsers(false, TEST_USER, R_USER, AUTHOR_USER, DEVELOPER_USER, ATTACHMENT_USER);
         super.doCleanup(afterTest);
     }
 
@@ -219,7 +220,16 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     protected Locator getReportGridLink(String reportName, String linkText)
     {
-        goToManageViews();
+        return getReportGridLink(reportName, linkText, true);
+    }
+
+    @LogMethod
+    protected Locator getReportGridLink(String reportName, String linkText, boolean isAdmin)
+    {
+        if (isAdmin)
+        {
+            goToManageViews();
+        }
         final Locator report = Locator.tagContainingText("div", reportName);
 
         waitForElement(report, 10000);
@@ -241,10 +251,15 @@ public class ReportTest extends StudyBaseTest
         return link;
     }
 
+    protected void clickReportGridLink(String reportName, String linkText, boolean isAdmin)
+    {
+        Locator link = getReportGridLink(reportName, linkText, isAdmin);
+        clickAndWait(link);
+    }
+
     protected void clickReportGridLink(String reportName, String linkText)
     {
-        Locator link = getReportGridLink(reportName, linkText);
-        clickAndWait(link);
+        clickReportGridLink(reportName, linkText, true);
     }
 
     @LogMethod
@@ -597,6 +612,92 @@ public class ReportTest extends StudyBaseTest
         }
         //TODO: Verify reports. Blocked: 13761: Attachment reports can't be viewed
 //        clickReportGridLink(ATTACHMENT_REPORT2_NAME, "view");
+
+        // relies on reports created in this function so
+        // call from here
+        doUpdateAttachmentReportTest();
+    }
+
+    @LogMethod
+    private void doUpdateAttachmentReportTest()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+
+        //
+        // verify edit URL works, share the local attachment report (REPORT)
+        //
+        if (isFileUploadAvailable())
+        {
+            clickReportGridLink(ATTACHMENT_REPORT_NAME, "edit");
+            click(Locator.xpath("//input[../label[string()='Share this report with all users?']]"));
+            clickButton("Save");
+            waitForText("Manage Views");
+        }
+
+        //
+        // verify details edit button works, share the server attachment report (REPORT2)
+        //
+        clickReportGridLink(ATTACHMENT_REPORT2_NAME, "details");
+        clickButton("Edit Report");
+        click(Locator.xpath("//input[../label[string()='Share this report with all users?']]"));
+        clickButton("Save");
+        waitForText("Report Details");
+
+        //
+        // verify a non-admin can edit a local attachment report but not a
+        // server attachment report
+        //
+        createUser(ATTACHMENT_USER, null);
+        clickLinkWithText(getProjectName());
+        enterPermissionsUI();
+        setUserPermissions(ATTACHMENT_USER, "Editor");
+        impersonate(ATTACHMENT_USER);
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+
+        // can edit local
+        if (isFileUploadAvailable())
+        {
+            clickTab("Clinical and Assay Data");
+            clickWebpartMenuItem("Data Views", true, "Manage Views");
+            waitForText("Manage Views");
+            clickReportGridLink(ATTACHMENT_REPORT_NAME, "details", false /*isAdmin*/);
+            waitForText("Report Details");
+            Locator.XPathLocator l = getButtonLocator("Edit Report");
+            Assert.assertTrue("Expected 'Edit Report' button to be present", l != null);
+            clickButton("Edit Report");
+            clickButton("Save");
+            waitForText("Report Details");
+        }
+
+        // cannot edit server
+        clickTab("Clinical and Assay Data");
+        clickWebpartMenuItem("Data Views", true, "Manage Views");
+        clickReportGridLink(ATTACHMENT_REPORT2_NAME, "details", false /*isAdmin*/);
+        waitForText("Report Details");
+        Locator.XPathLocator l = getButtonLocator("Edit Report");
+        Assert.assertTrue("Expected 'Edit Report' button to not be present", l == null);
+        stopImpersonating();
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(getFolderName());
+        goToManageViews();
+
+        //
+        // verify we can  change a server attachment type to a local attachment type
+        //
+        if (isFileUploadAvailable())
+        {
+            // verify we have an edit button on the details page
+            clickReportGridLink(ATTACHMENT_REPORT2_NAME, "edit");
+            // change this from a server attachment report to a local attachment report
+            click(Locator.xpath("//input[../label[string()='Upload file to server']]"));
+            Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
+            ref.setToFile(ATTACHMENT_REPORT2_FILE.toString());
+            clickButton("Save");
+            // save should return back to the details page
+            waitForText("Manage Views");
+        }
     }
 
     private static final String LINK_REPORT1_NAME = "Link Report1";
