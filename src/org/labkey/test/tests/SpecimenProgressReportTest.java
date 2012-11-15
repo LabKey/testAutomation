@@ -20,6 +20,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.junit.Assert;
 import org.labkey.test.util.UIAssayHelper;
@@ -37,12 +38,17 @@ import java.util.Collections;
 public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 {
     public static final String STUDY_PIPELINE_ROOT = getLabKeyRoot() + "/sampledata/specimenprogressreport";
-    public static final String assay1 = "PCR";
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     String studyFolder = "study folder";
     String assayFolder = "assay folder";
     int pipelineCount = 0;
+    private String assay1 = "PCR";
     private String assay1File = "PCR Data.tsv";
+    private String assay1XarPath = "/assays/PCR.xar";
+    private String assay2 = "RNA";
+    private String assay2File = "RNA Data.tsv";
+    private String assay2XarPath = "/assays/RNA.xar";
+    private Locator.XPathLocator tableLoc = Locator.xpath("//table[@id='dataregion_ProgressReport']");
 
     @Override
     protected String getProjectName()
@@ -64,46 +70,88 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         _containerHelper.createSubfolder(getProjectName(), studyFolder, "Study");
         importFolderFromZip(STUDY_PIPELINE_ROOT + "/Study.folder.zip");
 
-        createSpecimenFolder();
+        // set the label for the unscheduled visit
+        clickLinkWithText("Manage");
+        clickLinkWithText("Manage Visits");
+        clickAndWait(Locator.xpath("//td[contains(text(),'999.0-999.9999')]/../td/a[contains(text(), 'edit')]"));
+        setFormElement(Locator.name("label"), "SR");
+        clickLinkWithText("Save");
+
+        createAssayFolder();
         waitForText("This assay is unlocked");
-        assertTextPresent("30 collections have occurred.",  "48 results from PCR have been uploaded", "46 PCR queries");
-        //"5 results from RNA have been uploaded",                                                  , "1 RNA queries"
+        assertTextPresent("33 collections have occurred.",  "48 results from " + assay1 + " have been uploaded", "46 " + assay1 + " queries");
         assertTextNotPresent("Configuration error:",
                 "You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report.");
 
-
-
-//        _ext4Helper.selectRadioButtonByText("PCR");
-//        sleep(4000);
-
-        Locator.XPathLocator table = Locator.xpath("//table[@id='dataregion_ProgressReport']");//Locator.xpath("//table[contains(@class,'labkey-data-region')]");
-        waitForElement(table);
+        waitForElement(tableLoc);
         Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@style, 'background:green')]")));
-        Assert.assertEquals(21, getXpathCount( Locator.xpath("//td[contains(@style, 'background:red')]")));
+        Assert.assertEquals(22, getXpathCount( Locator.xpath("//td[contains(@style, 'background:red')]")));
         Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@style, 'background:orange')]")));
         Assert.assertEquals(0, getXpathCount(Locator.xpath("//td[contains(@style, 'flagged.png')]")));
 
-        flagSpecimenForReview();
+        flagSpecimenForReview(assay1, assay1File, null);
 
-        waitForElement(table);
+        waitForElement(tableLoc);
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@style, 'flagged.png')]")));
 
         // verify legend text and ordering
         assertTextPresentInThisOrder("specimen collected", "specimen received by lab", "specimen received but invalid", "assay results available", "query");
 
         // verify setting the PCR additional grouping column
-        assertTextPresent("46 PCR queries");
-        configureGroupingColumn("PCR", "gene");
-        waitForElement(table);
-        clickLinkWithText("48 results from PCR have been uploaded.");
+        verifyAdditionalGroupingColumn(assay1, "gene");
+
+        // verify unscheduled visit ordering for the RNA assay
+        verifyUnscheduledVisitDisplay(assay2);
+    }
+
+    private void verifyAdditionalGroupingColumn(String assayName, String groupCol)
+    {
+        clickLinkWithText(assayFolder);
+        waitForText("46 " + assayName + " queries");
+        configureGroupingColumn(assayName, groupCol);
+        waitForElement(tableLoc);
+        clickLinkWithText("48 results from " + assayName + " have been uploaded.");
         assertTextPresent("Participant Visit not found", 8);
         assertTextPresent("2 duplicates found", 4);
     }
 
-    private void flagSpecimenForReview()
+    private void verifyUnscheduledVisitDisplay(String assayName)
     {
-        clickLinkWithText(assay1);
-        clickLinkWithText(assay1File);
+        clickLinkWithText(assayFolder);
+        waitForElement(tableLoc);
+        configureAssayProgressDashboard(assay2);
+        configureAssaySchema(assayName, true);
+
+        flagSpecimenForReview(assayName, assay2File, "2011-03-02");
+
+        clickLinkWithText(assayFolder);
+        waitForElement(tableLoc);
+
+        _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
+        waitForElement(tableLoc);
+        assertTextPresentInThisOrder("SR1", "SR2", "SR3");
+        Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@style, 'background:green')]")));
+        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@style, 'background:red')]")));
+        Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@style, 'background:orange')]")));
+        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@style, 'flagged.png')]")));
+
+        clickLinkWithText("7 results from " + assayName + " have been uploaded.");
+        assertTextPresent("Participant Visit not found", 1);
+        assertTextPresent("Specimen type is not expected by this Assay", 1);
+    }
+
+    private void flagSpecimenForReview(String assayName, String runName, String collectionDateFilterStr)
+    {
+        clickLinkWithText(assayFolder);
+
+        clickLinkWithText(assayName);
+        clickLinkWithText(runName);
+
+        if (collectionDateFilterStr != null)
+        {
+            DataRegionTable drt = new DataRegionTable("Data", this);
+            drt.setFilter("Date", "Equals", collectionDateFilterStr);
+        }
 
         click(Locator.tagWithAttribute("img", "title", "Flag for review"));
         clickButton("OK", 0);
@@ -112,18 +160,17 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         clickLinkWithText(assayFolder);
     }
 
-    private void createSpecimenFolder() throws CommandException, IOException
+    private void createAssayFolder() throws CommandException, IOException
     {
         goToProjectHome();
         _containerHelper.createSubfolder(getProjectName(), assayFolder, "Assay");
         enableModule(assayFolder, "rho");
 
-        _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + "/assays/PCR.xar", ++pipelineCount, "PCR");
-        assay1File = "PCR Data.tsv";
-        _assayHelper.importAssay("PCR", STUDY_PIPELINE_ROOT + "/assays/" + assay1File,  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
+        _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + assay1XarPath, ++pipelineCount, assay1);
+        _assayHelper.importAssay(assay1, STUDY_PIPELINE_ROOT + "/assays/" + assay1File,  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
         clickLinkWithText(assayFolder);
-        _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + "/assays/RNA.xar", ++pipelineCount, "RNA");
-        _assayHelper.importAssay("RNA", STUDY_PIPELINE_ROOT + "/assays/RNA Data.tsv",  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
+        _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + assay2XarPath, ++pipelineCount, assay2);
+        _assayHelper.importAssay(assay2, STUDY_PIPELINE_ROOT + "/assays/" + assay2File,  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
 
 
         clickLinkWithText(assayFolder);
@@ -131,9 +178,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         addWebPart("Assay Progress Report");
         assertTextPresent("You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report", 2);
 
-        configureAssayProgressDashboard();
-        configureAssaySchema("PCR", true);
-//        configureAssaySchema("RNA", false);
+        configureAssayProgressDashboard(assay1);
+        configureAssaySchema(assay1, true);
         clickLinkWithText(assayFolder);
     }
 
@@ -151,11 +197,10 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         _customizeViewsHelper.saveCustomView();
     }
 
-    private void configureAssayProgressDashboard()
+    private void configureAssayProgressDashboard(String assayName)
     {
         clickWebpartMenuItem("Assay Progress Dashboard", true, "Customize");
-        _extHelper.checkCheckbox(assay1);
-//        _extHelper.checkCheckbox("RNA");
+        _extHelper.checkCheckbox(assayName);
         click(Locator.tagContainingText("label", "Specimen Report Study Folder Study"));
         clickButton("Save");
     }
