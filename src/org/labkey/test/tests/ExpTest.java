@@ -94,8 +94,8 @@ public class ExpTest extends BaseSeleniumWebTest
         // Write a simple custom query that wraps the data table
         clickTab("Query");
         createNewQuery("exp");
-        setFormElement("ff_newQueryName", "dataCustomQuery");
-        selectOptionByText("ff_baseTableName", "Data");
+        setFormElement(Locator.name("ff_newQueryName"), "dataCustomQuery");
+        selectOptionByText(Locator.name("ff_baseTableName"), "Data");
         clickButton("Create and Edit Source");
         setQueryEditorValue("queryText", "SELECT Datas.Name AS Name,\n" +
                 "Datas.RowId AS RowId,\n" +
@@ -143,12 +143,12 @@ public class ExpTest extends BaseSeleniumWebTest
         waitForElement(Locator.linkWithText("edit metadata"), WAIT_FOR_JAVASCRIPT); //on Ext panel
         clickLinkWithText("edit metadata");
         waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
-        selenium.click("//span" + Locator.navButton("Alias Field").getPath());
-        selectOptionByText("sourceColumn", "RowId");
-        selenium.click("//span" + Locator.navButton("OK").getPath());
+        click(Locator.xpath("//span").append(Locator.navButton("Alias Field")));
+        selectOptionByText(Locator.name("sourceColumn"), "RowId");
+        click(Locator.xpath("//span").append(Locator.navButton("OK")));
 
         // Make it a lookup into our custom query
-        int fieldCount = selenium.getXpathCount("//input[contains(@name, 'ff_type')]").intValue();
+        int fieldCount = getXpathCount(Locator.xpath("//input[contains(@name, 'ff_type')]"));
         Assert.assertTrue(fieldCount > 0);
         _listHelper.setColumnType(fieldCount - 1, new ListHelper.LookupInfo(null, "exp", "dataCustomQuery"));
         mouseClick(Locator.name("ff_type" + (fieldCount - 1)).toString());
@@ -168,8 +168,8 @@ public class ExpTest extends BaseSeleniumWebTest
         // Since this metadata is shared, clear it out 
         clickMenuButton("Query", "Edit Metadata");
         waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
-        selenium.click("//span" + Locator.navButton("Reset to Default").getPath());
-        selenium.click("//span" + Locator.navButton("OK").getPath());
+        click(Locator.xpath("//span").append(Locator.navButton("Reset to Default")));
+        click(Locator.xpath("//span").append(Locator.navButton("OK")));
         waitForText("Reset successful", WAIT_FOR_JAVASCRIPT);
     }
 }

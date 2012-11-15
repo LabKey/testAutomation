@@ -721,6 +721,11 @@ public class Locator
             return new XPathLocator(path + clause);
         }
 
+        public XPathLocator append(XPathLocator child)
+        {
+            return new XPathLocator(path + child.getPath());
+        }
+
         public String getPath()
         {
             return path;
