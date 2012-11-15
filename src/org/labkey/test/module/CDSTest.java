@@ -550,11 +550,12 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         assertNounInfoPage("Not Actually CHAVI 001", Arrays.asList("Bellew M", "Arnold N", "Observational", "CHAVI"));
         assertNounInfoPage("NotRV144", Arrays.asList("Piehler B", "Lum K", "Trial", "USMHRP"));
 
-        goToAppHome();
-        click("Labs");
-        assertNounInfoPage("Arnold/Bellew Lab", Arrays.asList("Description", "PI", "Nick Arnold"));
-        assertNounInfoPage("LabKey Lab", Arrays.asList("Description", "PI", "Mark Igra"));
-        assertNounInfoPage("Piehler/Eckels Lab", Arrays.asList("Description", "PI", "Britt Piehler"));
+        // Labs info pages are currently disabled
+//        goToAppHome();
+//        click("Labs");
+//        assertNounInfoPage("Arnold/Bellew Lab", Arrays.asList("Description", "PI", "Nick Arnold"));
+//        assertNounInfoPage("LabKey Lab", Arrays.asList("Description", "PI", "Mark Igra"));
+//        assertNounInfoPage("Piehler/Eckels Lab", Arrays.asList("Description", "PI", "Britt Piehler"));
 
         goToAppHome();
         click("Assays");
@@ -699,10 +700,10 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     }
 
     //getText(Locator.css("svg"))
-    private static final String CD4_LYMPH = "Created with Rapha\u00ebl 2.1.0CD4050100150200250300350400450Lymphocytes200400600800100012001400160018002000";
-    private static final String HEMO_CD4 = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD450100150200250300350400450";
-    private static final String HEMO_CD4_UNFILTERED = "Created with Rapha\u00ebl 2.1.0Hemoglobin05101520CD41002003004005006007008009001000110012001300";
-    private static final String WT_PLSE_LOG = "Created with Rapha\u00ebl 2.1.0Pulse110100Weight Kg10100";
+    private static final String CD4_LYMPH = "Created with Rapha\u00ebl 2.1.0Lab Results: CD4050100150200250300350400450Lab Results: Lymphocytes200400600800100012001400160018002000";
+    private static final String HEMO_CD4 = "Created with Rapha\u00ebl 2.1.0Lab Results: Hemoglobin05101520Lab Results: CD450100150200250300350400450";
+    private static final String HEMO_CD4_UNFILTERED = "Created with Rapha\u00ebl 2.1.0Lab Results: Hemoglobin05101520Lab Results: CD41002003004005006007008009001000110012001300";
+    private static final String WT_PLSE_LOG = "Created with Rapha\u00ebl 2.1.0Physical Exam: Pulse110100Physical Exam: Weight Kg10100";
     private static final String SCATTER_FEEDBACK_STATE = "{\"activeView\":\"scatterview\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Study\"},\"views\":{},\"filters\":[],\"selections\":[],\"detail\":{\"hierarchy\":\"\",\"value\":31,\"highlight\":\"\",\"label\":\"Antigens\",\"valueLabel\":\"\",\"multi\":true},\"id\":206}";
     private void verifyScatterPlot()
     {
@@ -753,6 +754,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         // set Y to log scale
         click(Locator.xpath("//div[@id='plotymeasurewin']//div[contains(@class, 'x4-form-cb-wrap')][.//label[text()='Log']]//input"));
         clickButton("Set Y-Axis", 0);
+        waitForText("Points outside the plotting area have no match");
         clickButton(xAxisButton, 0);
         sleep(animation);
         _extHelper.pickMeasure("xaxispicker", "Physical Exam", "Pulse");
@@ -772,7 +774,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         goToHome();
         goToProjectHome();
         goToSchemaBrowser();
-        selectQuery("CDS", "Feedback");
+        selectQuery("CDS", "feedback");
         waitAndClick(Locator.linkWithText("view data"));
 
         waitForElement(Locator.id("dataregion_query"));
