@@ -2667,6 +2667,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             desc = "CONTAINS ONE OF (" + value.replace(";", ", ") + "))";
         }
+        else if(type.contains("Does Not Equal Any Of"))
+        {
+            desc = "IS NOT ANY OF (" + value.replace(";", ", ") + "))";
+        }
         else if(type.contains("Does Not Contain Any Of"))
         {
             desc = "DOES NOT CONTAIN ANY OF (" + value.replace(";", ", ") + "))";
