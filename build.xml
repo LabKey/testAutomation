@@ -58,7 +58,7 @@
         <os family="unix"/>
     </condition>
 
-    <property name="clover.jar" location="${project.root}/external/clover/clover-ant-3.1.6/lib/clover.jar"/>
+    <property name="clover.jar" location="${project.root}/external/clover/clover-ant-3.1.8/lib/clover.jar"/>
 
 
     <target name="usage">
