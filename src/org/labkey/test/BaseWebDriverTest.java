@@ -6024,10 +6024,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickLinkWithText(projectName);
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Project Groups");
-        click(Locator.xpath("//div[contains(@class, 'pGroup') and text()='" + groupName + "']"));
-        boolean ret = isElementPresent(Locator.xpath("//div[@id='userInfoPopup']//td[text()='" + email +  "']"));
-        click(Locator.xpath("//div[@id='userInfoPopup']//button[text()='Done']"));
-        exitPermissionsUI();
+        waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
+        waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
+        _extHelper.waitForExtDialog(groupName + " Information");
+        boolean ret = isElementPresent(Locator.xpath("//table[contains(@class, 'userinfo')]//td[text()='" + email +  "']"));
+        clickButton("Done");
         return ret;
     }
 
