@@ -81,6 +81,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverBackedSelenium;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
@@ -245,6 +246,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             _driver = new HtmlUnitDriver(true);
         }
+        else if (getBrowser().startsWith("*googlechrome")) //experimental
+        {
+            _driver = new ChromeDriver();
+        }
         else
         {
             final FirefoxProfile profile = new FirefoxProfile();
@@ -283,7 +288,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         _driver.manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
-        _driver.manage().timeouts().pageLoadTimeout(WAIT_FOR_PAGE, TimeUnit.MILLISECONDS);
 
         selenium = new DefaultSeleniumWrapper(_driver, WebTestHelper.getBaseURL());
         selenium.setTimeout(Integer.toString(defaultWaitForPage));
@@ -3042,7 +3046,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         for (String text : texts)
         {
-            text = text.replace("&nbsp;", " ");
             Assert.assertTrue("Text '" + text + "' was not present", isTextPresent(text));
         }
     }
