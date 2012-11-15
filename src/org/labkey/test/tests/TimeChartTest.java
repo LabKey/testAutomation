@@ -57,8 +57,8 @@ public class TimeChartTest extends StudyBaseTest
 
     private static final String[] VISIT_STRINGS = {"1 week Post-V#1", "Int. Vis. %{S.1.1} .%{S.2.1}", "Grp1:F/U/Grp2:V#2", "G1: 6wk/G2: 2wk", "6 week Post-V#2", "1 wk Post-V#2/V#3", "6 wk Post-V#2/V#3"};
 
-    private static final String USER1 = "user1_timechart@timechart.test";
-    private static final String USER2 = "user2_timechart@timechart.test";
+    public static final String USER1 = "user1_timechart@timechart.test";
+    public static final String USER2 = "user2_timechart@timechart.test";
 
     private static final String WIKIPAGE_NAME = "VisualizationGetDataAPITest";
     private static final String[] GETDATA_API_TEST_TITLES = {
@@ -235,13 +235,6 @@ public class TimeChartTest extends StudyBaseTest
         return PROJECT_NAME;
     }
 
-    @Override
-    public void doCleanup(boolean afterTest)
-    {
-        deleteUsers(afterTest, USER1, USER2);
-        deleteProject(PROJECT_NAME, afterTest);
-    }
-
     public void configureStudy()
     {
         if (!isLinkPresentWithText(PROJECT_NAME))
@@ -356,10 +349,10 @@ public class TimeChartTest extends StudyBaseTest
         _ext4Helper.checkGridRowCheckbox(GROUP2_NAME);
         waitForCharts(2);
 
-        waitForText(GROUP1_NAME + " CD4");
-        assertTextPresent(GROUP1_NAME + " CD4", 4); // 1 time in chart legend + 1 time in the thumbnail preview on the save dialog
+        // NOTE: the legend display text may wrap the content, so we can check the legend hover text
+        assertTextPresent(GROUP1_NAME + " CD4", 2); // 1 time in chart legend hover + 1 time in the thumbnail preview on the save dialog
         assertTextPresent(GROUP1_NAME + ",\n Days", 20); // 10 in the chart + 10 in the thumbnail preview on the save dialog
-        assertTextPresent(GROUP2_NAME + " CD4", 2);
+        assertTextPresent(GROUP2_NAME + " CD4", 1);
         assertTextPresent(GROUP2_NAME + ",\n Days", 12);
 
         goToGroupingTab();

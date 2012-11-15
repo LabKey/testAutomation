@@ -56,4 +56,11 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         filteredTimeChartRegressionTest();
     }
+
+    @Override
+    public void doCleanup(boolean afterTest) throws Exception
+    {
+        deleteUsers(afterTest, USER1, USER2);
+        super.doCleanup(afterTest);
+    }
 }
