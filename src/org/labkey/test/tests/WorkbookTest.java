@@ -16,10 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
-public class WorkbookTest extends BaseSeleniumWebTest
+public class WorkbookTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "Workbook Test Project";
     private static final String DEFAULT_WORKBOOK_NAME = "TestWorkbook";
@@ -82,6 +82,7 @@ public class WorkbookTest extends BaseSeleniumWebTest
         waitAndClick(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
         waitForElement(Locator.xpath("//input[@value='"+DEFAULT_WORKBOOK_NAME+"']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//input[@value='"+DEFAULT_WORKBOOK_NAME+"']"), "Renamed"+DEFAULT_WORKBOOK_NAME);
+        click(Locator.css("body"));
         assertTextPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
 
         // Clear description
@@ -104,10 +105,9 @@ public class WorkbookTest extends BaseSeleniumWebTest
 
         // Delete a workbook
         checkDataRegionCheckbox("query", 2); // Select renamed workbook
-        clickButton("Delete");
-        assertConfirmation("Are you sure you want to delete the selected row?");
-        assertTextNotPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
-
+        clickButton("Delete", 0);
+        assertAlert("Are you sure you want to delete the selected row?");
+        waitForTextToDisappear("Renamed"+DEFAULT_WORKBOOK_NAME);
 
         // Test Workbook APIs
 
@@ -116,8 +116,8 @@ public class WorkbookTest extends BaseSeleniumWebTest
         addWebPart("Wiki");
 
         createNewWikiPage();
-        setFormElement("name", APITEST_NAME);
-        setFormElement("title", APITEST_NAME);
+        setFormElement(Locator.name("name"), APITEST_NAME);
+        setFormElement(Locator.name("title"), APITEST_NAME);
         setWikiBody("Placeholder text.");
         saveWikiPage();
 
@@ -157,9 +157,9 @@ public class WorkbookTest extends BaseSeleniumWebTest
         clickLinkWithText(project);
         clickButton("Insert New");
 
-        setFormElement("workbookTitle", title);
-        setFormElement("workbookDescription", description);
-        setFormElement("workbookFolderType", folderType.toString());
+        setFormElement(Locator.id("workbookTitle"), title);
+        setFormElement(Locator.id("workbookDescription"), description);
+        setFormElement(Locator.id("workbookFolderType"), folderType.toString());
 
         clickButton("Create Workbook");
     }

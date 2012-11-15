@@ -3323,6 +3323,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, selenium.getValue(loc.toString()));
     }
 
+    /**
+     * @deprecated Use {@link #assertOptionEquals(Locator, String)}
+     * @param selectName
+     * @return
+     */
+    @Deprecated
     public void assertOptionEquals(String selectName, String value)
     {
         assertOptionEquals(new Locator(selectName), value);
@@ -3343,6 +3349,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return selenium.getSelectedValue(loc.toString());
     }
 
+    /**
+     * @deprecated Use {@link #getSelectedOptionText(Locator)}
+     * @param selectName
+     * @return
+     */
+    @Deprecated
     public String getSelectedOptionText(String selectName)
     {
         return getSelectedOptionText(new Locator(selectName));

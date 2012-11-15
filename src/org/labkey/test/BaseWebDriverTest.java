@@ -2454,6 +2454,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return confirmation;
     }
 
+    /**
+     * @deprecated Use {@link #assertAlert(String)}
+     * @param msg
+     */
+    @Deprecated
     public void assertConfirmation(String msg)
     {
         assertAlert(msg);
@@ -2646,7 +2651,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForElement(Locator.permissionButton(group, destRole));
     }
 
-    public void createSubFolderFromTemplate(String project, String child, String template, String[] objectsToCopy)
+    public void createSubFolderFromTemplate(String project, String child, String template, @Nullable String[] objectsToCopy)
     {
         createSubfolder(project, project, child, "Create From Template Folder", template, objectsToCopy, false);
 
@@ -2660,7 +2665,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
 
-    public void createSubfolder(String project, String parent, String child, String folderType, String[] tabsToAdd)
+    public void createSubfolder(String project, String parent, String child, String folderType, @Nullable String[] tabsToAdd)
     {
         createSubfolder(project, parent, child, folderType, tabsToAdd, false);
     }
@@ -3771,6 +3776,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return select.getFirstSelectedOption().getAttribute("value");
     }
 
+    /**
+     * @deprecated Use {@link #getSelectedOptionText(Locator)}
+     * @param selectName
+     * @return
+     */
+    @Deprecated
     public String getSelectedOptionText(String selectName)
     {
         return getSelectedOptionText(Locator.name(selectName));
@@ -5109,7 +5120,18 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return "//td[contains(text(), '" + propertyHeading + "')]/../..";
     }
 
+    /**
+     * @deprecated Use {@link #getElementCount(org.labkey.test.Locator)}
+     * @param xpath
+     * @return
+     */
+    @Deprecated
     public int getXpathCount(Locator.XPathLocator xpath)
+    {
+        return xpath.findElements(_driver).size();
+    }
+
+    public int getElementCount(Locator xpath)
     {
         return xpath.findElements(_driver).size();
     }

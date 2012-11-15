@@ -18,6 +18,8 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 
 /**
@@ -25,7 +27,7 @@ import org.labkey.test.util.DataRegionTable;
  * User: Karl Lum
  * Date: Mar 13, 2008
  */
-public class AuditLogTest extends BaseSeleniumWebTest
+public class AuditLogTest extends BaseWebDriverTest
 {
     public static final String USER_AUDIT_EVENT = "User events";
     public static final String GROUP_AUDIT_EVENT = "Group events";
@@ -54,7 +56,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
     @Override
     protected void checkViews(){} // Skip.  Project is deleted as part of test
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteUsers(afterTest, AUDIT_TEST_USER);
         deleteProject(getProjectName(), afterTest);
@@ -98,7 +100,7 @@ public class AuditLogTest extends BaseSeleniumWebTest
         setPermissions("Testers", "Editor");
 
         clickManageGroup("Testers");
-        setFormElement("names", AUDIT_TEST_USER);
+        setFormElement(Locator.name("names"), AUDIT_TEST_USER);
         uncheckCheckbox("sendEmail");
         clickButton("Update Group Membership");
         deleteUser(AUDIT_TEST_USER);
@@ -124,9 +126,9 @@ public class AuditLogTest extends BaseSeleniumWebTest
             instance.clickLinkWithText("audit log");
         }
 
-        if (!instance.getSelectedOptionText("view").equals(eventType))
+        if (!instance.getSelectedOptionText(Locator.name("view")).equals(eventType))
         {
-            instance.selectOptionByText("view", eventType);
+            instance.selectOptionByText(Locator.name("view"), eventType);
             instance.waitForPageToLoad();
         }
         instance.log("searching for audit entry: " + msg);

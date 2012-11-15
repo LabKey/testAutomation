@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 
@@ -23,7 +23,7 @@ import org.labkey.test.util.ListHelper;
  * User: brittp
  * Date: Apr 28, 2010 2:38:02 PM
  */
-public class ButtonCustomizationTest extends BaseSeleniumWebTest
+public class ButtonCustomizationTest extends BaseWebDriverTest
 {
     protected final static String PROJECT_NAME = "ButtonVerifyProject";
     private static final String LIST_NAME = "Cities";
@@ -154,10 +154,10 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         clickLinkWithText(LIST_NAME);
         assertNavButtonNotPresent(METADATA_OVERRIDE_BUTTON);
         clickButton("Insert New");
-        setFormElement("quf_name", "Seattle");
+        setFormElement(Locator.name("quf_name"), "Seattle");
         clickButton("Submit");
         clickButton("Insert New");
-        setFormElement("quf_name", "Portland");
+        setFormElement(Locator.name("quf_name"), "Portland");
         clickButton("Submit");
         
         // assert custom buttons can be added to the standard set:
@@ -191,7 +191,7 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         _extHelper.clickExtTab("XML Metadata");
         setQueryEditorValue("metadataText", getMetadataXML(false));
         clickButton("Save", 0);
-        assertTextNotPresent("Failed");
+        waitForElement(Locator.id("status").withText("Saved"));
         _extHelper.clickExtTab("Source");
         clickButton("Save & Finish");
         verifyMetadataButtons();
@@ -200,15 +200,15 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         addWebPart("Wiki");
         createNewWikiPage("HTML");
-        setFormElement("name", "buttonTest");
-        setFormElement("title", "buttonTest");
+        setFormElement(Locator.name("name"), "buttonTest");
+        setFormElement(Locator.name("title"), "buttonTest");
         setWikiBody(getJavaScriptCustomizer());
         clickButton("Save & Close");
 
         addWebPart("Wiki");
         createNewWikiPage("HTML");
-        setFormElement("name", "paramEcho");
-        setFormElement("title", "Parameter Echo");
+        setFormElement(Locator.name("name"), "paramEcho");
+        setFormElement(Locator.name("title"), "Parameter Echo");
         setWikiBody(PARAM_ECHO_JAVASCRIPT);
         clickButton("Save & Close");
 
@@ -239,14 +239,14 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
 
         // Verify that link buttons don't send parameters at all:
         clickButton(METADATA_LINK_BUTTON);
-        assertTextNotPresent(".select");
+        assertElementNotPresent(Locator.id("params").containing(".select"));
 
         // wait for the button to enable:
         waitForElement(Locator.navButton(METADATA_GET_BUTTON), 10000);
         
         // Verify that GET buttons to send form values as GET parameters:
         clickButton(METADATA_GET_BUTTON);
-        assertTextPresent(".select: 2");
+        assertElementPresent(Locator.id("params").containing(".select: 2"));
 
         // Verify that the JavaScript button override added to the metadata-defined button bar, rather than replacing it:
         verifyMetadataButtons();
@@ -268,7 +268,7 @@ public class ButtonCustomizationTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteProject(getProjectName(), afterTest);
     }

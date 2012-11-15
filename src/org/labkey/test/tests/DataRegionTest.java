@@ -17,7 +17,8 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
@@ -26,12 +27,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: kevink
  * Date: Mar 4, 2008 1:05:38 PM
  */
-public class DataRegionTest extends BaseSeleniumWebTest
+public class DataRegionTest extends BaseWebDriverTest
 {
     private static final String FIRST_LINK = "First Page";
     private static final String PREV_LINK = "Previous Page";
@@ -99,7 +102,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteProject(getProjectName(), afterTest);
     }
@@ -118,7 +121,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
     {
         exportDataRegion("Script", "R");
         goToAuditLog();
-        selectOptionByText("view", "Query events");
+        selectOptionByText(Locator.name("view"), "Query events");
         waitForPageToLoad();
 
         DataRegionTable auditTable =  new DataRegionTable("audit", this);
@@ -182,12 +185,12 @@ public class DataRegionTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("Show Selected");
         assertLinkPresentWithText("Show Unselected");
         assertLinkPresentWithText("Show All");
-        assertTextPresent("1 - 3 of 16");
+        assertPaginationText(1, 3, 16);
         Assert.assertEquals(3, table.getDataRowCount());
 
         log("Test 5 per page");
         table.setMaxRows(5);
-        assertTextPresent("1 - 5 of 16");
+        assertPaginationText(1, 5, 16);
         Assert.assertEquals(5, table.getDataRowCount());
         Assert.assertEquals("aqua", table.getDataAsText(0, 3));
         assertLinkNotPresentWithTitle(FIRST_LINK);
@@ -197,7 +200,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
 
         log("Next Page");
         table.pageNext();
-        assertTextPresent("6 - 10 of 16");
+        assertPaginationText(6, 10, 16);
         Assert.assertEquals(5, table.getDataRowCount());
         Assert.assertEquals("grey", table.getDataAsText(0, 3));
         assertLinkNotPresentWithTitle(FIRST_LINK);
@@ -207,7 +210,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
 
         log("Last Page");
         table.pageLast();
-        assertTextPresent("16 - 16 of 16");
+        assertPaginationText(16, 16, 16);
         Assert.assertEquals(1, table.getDataRowCount());
         Assert.assertEquals("yellow", table.getDataAsText(0, 3));
         assertLinkPresentWithTitle(FIRST_LINK);
@@ -217,7 +220,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
 
         log("Previous Page");
         table.pagePrev();
-        assertTextPresent("11 - 15 of 16");
+        assertPaginationText(11, 15, 16);
         Assert.assertEquals(5, table.getDataRowCount());
         Assert.assertEquals("purple", table.getDataAsText(0, 3));
         assertLinkPresentWithTitle(FIRST_LINK);
@@ -227,7 +230,7 @@ public class DataRegionTest extends BaseSeleniumWebTest
 
         log("Setting a filter should go back to first page");
         table.setFilter(NAME_COLUMN.getName(), "Does Not Equal", "aqua");
-        assertTextPresent("1 - 5 of 15");
+        assertPaginationText(1, 5, 15);
         Assert.assertEquals("black", table.getDataAsText(0, 3));
 
         log("Show Selected");
@@ -262,4 +265,20 @@ public class DataRegionTest extends BaseSeleniumWebTest
 
     }
 
+    /**
+     * Assert that a Data Region has expected pagination text (e.g. "1 - 3 of 16")
+     * @param firstRow position in data of first displayed row
+     * @param lastRow position in data of last displayed row
+     * @param totalRows total number of rows in data behind the dataregion
+     */
+    private void assertPaginationText(int firstRow, int lastRow, int totalRows)
+    {
+        String expected = firstRow + " - " + lastRow + " of " + totalRows;
+        String fullPaginationText = Locator.css(".labkey-pagination").findElement(_driver).getText();
+        Pattern pattern = Pattern.compile("\\d+ - \\d+ of \\d+");
+        Matcher matcher = pattern.matcher(fullPaginationText);
+        matcher.find();
+        String actual = matcher.group(0);
+        Assert.assertEquals("Wrong pagination text", expected, actual);
+    }
 }

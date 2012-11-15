@@ -15,7 +15,8 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 
 /*
@@ -23,7 +24,7 @@ import org.labkey.test.util.ListHelper;
 * Date: Oct 6, 2008
 * Time: 12:47:28 PM
 */
-public class FieldValidatorTest extends BaseSeleniumWebTest
+public class FieldValidatorTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ValidatorVerifyProject";
     private static final String LIST_NAME = "QCList";
@@ -62,9 +63,9 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
 
         log("Test upload data");
         clickButton("Import Data");
-        setFormElement("text", TEST_DATA_FAIL);
+        setFormElement(Locator.name("text"), TEST_DATA_FAIL);
         _listHelper.submitImportTsv_error(null);
-        assertTextPresent(SEX_ERROR_MSG);
+        waitForText(SEX_ERROR_MSG);
         assertTextPresent(ID_ERROR_MSG);
         assertTextPresent(AGE_ERROR_MSG);
 
@@ -76,51 +77,51 @@ public class FieldValidatorTest extends BaseSeleniumWebTest
         // ID regex validation
         log("Test inserting new row");
         clickButton("Insert New");
-        setFormElement("quf_id", "id:123abc:001");
-        setFormElement("quf_name", "Sid");
-        setFormElement("quf_sex", "male");
-        setFormElement("quf_age", "25");
+        setFormElement(Locator.name("quf_id"), "id:123abc:001");
+        setFormElement(Locator.name("quf_name"), "Sid");
+        setFormElement(Locator.name("quf_sex"), "male");
+        setFormElement(Locator.name("quf_age"), "25");
         submit();
-        assertTextPresent(ID_ERROR_MSG);
-        setFormElement("quf_id", "ID:123abc:002");
+        waitForText(ID_ERROR_MSG);
+        setFormElement(Locator.name("quf_id"), "ID:123abc:002");
         submit();
-        assertTextPresent(ID_ERROR_MSG);
-        setFormElement("quf_id", "ID:123abc:001");
+        waitForText(ID_ERROR_MSG);
+        setFormElement(Locator.name("quf_id"), "ID:123abc:001");
         submit();
         assertTextPresent("ID:123abc:001");
 
         // age range validation
         log("Test inserting new row");
         clickButton("Insert New");
-        setFormElement("quf_id", "ID:123abc:001");
-        setFormElement("quf_name", "Mikey");
-        setFormElement("quf_sex", "male");
-        setFormElement("quf_age", "10");
+        setFormElement(Locator.name("quf_id"), "ID:123abc:001");
+        setFormElement(Locator.name("quf_name"), "Mikey");
+        setFormElement(Locator.name("quf_sex"), "male");
+        setFormElement(Locator.name("quf_age"), "10");
         submit();
-        assertTextPresent(AGE_ERROR_MSG);
-        setFormElement("quf_age", "25");
+        waitForText(AGE_ERROR_MSG);
+        setFormElement(Locator.name("quf_age"), "25");
         submit();
         assertTextPresent("Mikey");
 
         // sex validation
         log("Test inserting new row");
         clickButton("Insert New");
-        setFormElement("quf_id", "ID:123abc:001");
-        setFormElement("quf_name", "Kim");
-        setFormElement("quf_sex", "Female");
-        setFormElement("quf_age", "25");
+        setFormElement(Locator.name("quf_id"), "ID:123abc:001");
+        setFormElement(Locator.name("quf_name"), "Kim");
+        setFormElement(Locator.name("quf_sex"), "Female");
+        setFormElement(Locator.name("quf_age"), "25");
         submit();
-        assertTextPresent(SEX_ERROR_MSG);
-        setFormElement("quf_sex", "femalefemale");
+        waitForText(SEX_ERROR_MSG);
+        setFormElement(Locator.name("quf_sex"), "femalefemale");
         submit();
-        assertTextPresent(SEX_ERROR_MSG);
+        waitForText(SEX_ERROR_MSG);
 
-        setFormElement("quf_sex", "female");
+        setFormElement(Locator.name("quf_sex"), "female");
         submit();
         assertTextPresent("Kim");
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteProject(getProjectName(), afterTest);
     }
