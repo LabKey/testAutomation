@@ -19,7 +19,7 @@ import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.*;
 import org.labkey.remoteapi.query.*;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 
@@ -39,7 +39,7 @@ import java.util.Map;
  * the API, so this test will setup a list and then use the Java
  * client API library to insert, read, update, and delete from that list
  */
-public class JavaClientApiTest extends BaseSeleniumWebTest
+public class JavaClientApiTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "~Java Client Api Verify Project~";
     public static final String LIST_NAME = "People";
@@ -59,7 +59,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
     protected void doSecurityTest() throws Exception
     {
         log("Starting security portion of test...");
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
 
         Connection cn = new Connection(getBaseURL());
         cn.setEmail(PasswordUtil.getUsername());
@@ -115,7 +115,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
     protected void doQueryTest() throws Exception
     {
         log("Starting query portion of test...");
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         addWebPart("Lists");
 
         log("Creating list for Query test...");
@@ -130,12 +130,12 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
                 new ListHelper.ListColumn("Notes", "Notes", ListHelper.ListColumnType.String, "Notes"));
 
         log("Setting permissions...");
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         enterPermissionsUI();
         setSiteGroupPermissions("Guests", "Editor");
         exitPermissionsUI();
 
-        clickLinkWithText(PROJECT_NAME);
+        clickFolder(PROJECT_NAME);
         clickLinkWithText(LIST_NAME);
         doCRUDtTest();
         doCommandFromResponseTest();
@@ -295,7 +295,7 @@ public class JavaClientApiTest extends BaseSeleniumWebTest
         log("Completed test of maxrows=0");
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteProject(getProjectName(), afterTest);
     }
