@@ -169,7 +169,8 @@ public enum TestSet
         SequenceTest.class,
         ViralLoadAssayTest.class,
         StudyPublishTest.class,
-        ExperimentalFeaturesTest.class,
+        //ExperimentalFeaturesTest.class,  -- hidden email test moved out, currently no experimental features being tested
+        HiddenEmailTest.class,
         ElisaAssayTest.class
     ),
 

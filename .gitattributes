@@ -201,6 +201,7 @@ src/org/labkey/test/tests/GpatAssayTest.java -text
 src/org/labkey/test/tests/GroupTest.java -text
 src/org/labkey/test/tests/HTTPApiTest.java -text
 src/org/labkey/test/tests/HaplotypeAssayTest.java -text
+src/org/labkey/test/tests/HiddenEmailTest.java -text
 src/org/labkey/test/tests/IssuesTest.java -text
 src/org/labkey/test/tests/JUnitTest.java -text
 src/org/labkey/test/tests/JavaClientApiTest.java -text
