@@ -6404,7 +6404,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected void startImportStudyFromZip(String studyFile)
     {
         clickButton("Import Study");
-        setFormElement("studyZip", studyFile);
+        setFormElement(Locator.name("folderZip"), studyFile);
         clickButton("Import Study From Local Zip Archive");
         assertTextNotPresent("You must select a .study.zip file to import.");
     }
