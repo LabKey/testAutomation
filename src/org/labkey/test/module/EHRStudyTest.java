@@ -647,13 +647,13 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         clickButton("Show Animal");
         assertTitleContains("Animal - "+MORE_ANIMAL_IDS[0]);
 
-        log("Quick Search - Show Group");
-        clickFolder(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
-        waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
-        _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='animalGroup']/.."), "Alive, at Center");
-        clickButton("Show Group");
-        waitForText("1 - 36 of 36", WAIT_FOR_JAVASCRIPT);
+//        log("Quick Search - Show Group");
+//        clickFolder(PROJECT_NAME);
+//        clickLinkWithText(FOLDER_NAME);
+//        waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
+//        _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='animalGroup']/.."), "Alive, at Center");
+//        clickButton("Show Group");
+//        waitForText("1 - 36 of 36", WAIT_FOR_JAVASCRIPT);
 
         log("Quick Search - Show Project");
         clickFolder(PROJECT_NAME);
