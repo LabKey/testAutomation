@@ -5872,7 +5872,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected void startImportStudyFromZip(String studyFile)
     {
         clickButton("Import Study");
-        setFormElement("studyZip", studyFile);
+        setFormElement(Locator.name("folderZip"), studyFile);
         clickButton("Import Study From Local Zip Archive");
         assertTextNotPresent("You must select a .study.zip file to import.");
     }
@@ -6915,7 +6915,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         goToManageStudy();
         clickButton("Reload Study");
-        setFormElement("studyZip", studyFile);
+        setFormElement(Locator.name("folderZip"), studyFile);
         clickButton("Reload Study From Local Zip Archive");
         waitForPipelineJobsToComplete(2, "Study Reload", false);
 
