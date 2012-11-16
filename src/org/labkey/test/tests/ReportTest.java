@@ -1660,7 +1660,7 @@ public class ReportTest extends StudyBaseTest
     }
 
     private static final String SCATTER_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200";
-    private static final String SCATTER_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice AnullMice BMice CTestYAxis33.034.035.036.037.038.039.040.0";
+    private static final String SCATTER_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice ANot in Cat Mice LetMice BMice CTestYAxis33.034.035.036.037.038.039.040.0";
     private static final String SCATTER_PLOT_NAME_MV = "ManageViewsScatterPlot";
     private static final String SCATTER_PLOT_DESC_MV = "This scatter plot was created through the manage views UI";
     @LogMethod

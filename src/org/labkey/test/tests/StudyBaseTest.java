@@ -288,7 +288,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     {
         log("Going to Manage Study Page of: " + studyName);
         waitAndClick(Locator.linkContainingText(projectName));
-        clickLinkContainingText(studyName);
+        waitAndClick(Locator.linkContainingText(studyName));
         clickLinkContainingText("Manage Study");
     }
 
