@@ -405,14 +405,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         if (isChecked(Locator.id(SelectFCSFileOption.Browse.name())))
             _extHelper.waitForFileGridReady();
 
-//        waitFor(new Checker()
-//        {
-//            @Override
-//            public boolean check()
-//            {
-//                return selenium.getTitle().startsWith("Import Analysis: Select FCS Files");
-//            }
-//        }, "Import Analysis: Select FCS Files title failed to appear", 3000);
         assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
         switch (selectFCSFilesOption)
         {
@@ -448,7 +440,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 return checked;
             }
         }, "selectFCSFilesOption", 2000);
-        //assertFormElementEquals(Locator.name("selectFCSFilesOption"), selectFCSFilesOption.name());
         clickButton("Next");
     }
 
