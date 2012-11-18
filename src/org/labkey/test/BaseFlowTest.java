@@ -313,6 +313,13 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickLinkContainingText("FCS files to be imported");
         selectPipelineFileAndImportAction(analysisZipPath, "Import External Analysis");
 
+        importAnalysis_selectFCSFiles(containerPath, SelectFCSFileOption.None, null);
+        importAnalysis_reviewSamples(containerPath, false, null, null);
+        String analysisFolder = new File(analysisZipPath).getName();
+        importAnalysis_analysisFolder(containerPath, analysisFolder, false);
+        // UNDONE: use importAnalysis_confim step
+        clickButton("Finish");
+
         waitForPipeline(containerPath);
     }
 
@@ -392,10 +399,20 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickButton("Next");
     }
 
-    protected void importAnalysis_selectFCSFiles(String containerPath, SelectFCSFileOption selectFCSFilesOption, List<String> keywordDirs)
+    protected void importAnalysis_selectFCSFiles(String containerPath, final SelectFCSFileOption selectFCSFilesOption, List<String> keywordDirs)
     {
-        waitForPageToLoad();
-        sleep(3500); // Avoid race condition for form
+        waitForExtReady();
+        if (isChecked(Locator.id(SelectFCSFileOption.Browse.name())))
+            _extHelper.waitForFileGridReady();
+
+//        waitFor(new Checker()
+//        {
+//            @Override
+//            public boolean check()
+//            {
+//                return selenium.getTitle().startsWith("Import Analysis: Select FCS Files");
+//            }
+//        }, "Import Analysis: Select FCS Files title failed to appear", 3000);
         assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
         switch (selectFCSFilesOption)
         {
@@ -422,6 +439,16 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             default:
                 Assert.fail();
         }
+        waitFor(new Checker() {
+            @Override
+            public boolean check()
+            {
+                boolean checked = isChecked(Locator.id(selectFCSFilesOption.name()));
+                log("selectedFCSFilesOption is checked: " + checked);
+                return checked;
+            }
+        }, "selectFCSFilesOption", 2000);
+        //assertFormElementEquals(Locator.name("selectFCSFilesOption"), selectFCSFilesOption.name());
         clickButton("Next");
     }
 
