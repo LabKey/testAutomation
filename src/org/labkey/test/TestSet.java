@@ -171,7 +171,8 @@ public enum TestSet
         StudyPublishTest.class,
         //ExperimentalFeaturesTest.class,  -- hidden email test moved out, currently no experimental features being tested
         HiddenEmailTest.class,
-        ElisaAssayTest.class
+        ElisaAssayTest.class,
+        ContainerContextTest.class
     ),
 
     MiniTest(
@@ -291,7 +292,8 @@ public enum TestSet
         IssuesTest.class,
         ScriptValidationTest.class,
         FilterTest.class,
-        PivotQueryTest.class
+        PivotQueryTest.class,
+        ContainerContextTest.class
     ),
 
     IDRI(
