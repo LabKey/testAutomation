@@ -700,9 +700,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     }
 
     //getText(Locator.css("svg"))
-    private static final String CD4_LYMPH = "Created with Rapha\u00ebl 2.1.0Lab Results: CD4050100150200250300350400450Lab Results: Lymphocytes200400600800100012001400160018002000";
-    private static final String HEMO_CD4 = "Created with Rapha\u00ebl 2.1.0Lab Results: Hemoglobin05101520Lab Results: CD450100150200250300350400450";
-    private static final String HEMO_CD4_UNFILTERED = "Created with Rapha\u00ebl 2.1.0Lab Results: Hemoglobin05101520Lab Results: CD41002003004005006007008009001000110012001300";
+    private static final String CD4_LYMPH = "Created with Rapha\u00ebl 2.1.0Lab Results: CD450100150200250300350400450Lab Results: Lymphocytes200400600800100012001400160018002000";
+    private static final String HEMO_CD4 = "Created with Rapha\u00ebl 2.1.0Lab Results: Hemoglobin8101214161820Lab Results: CD450100150200250300350400450";
+    private static final String HEMO_CD4_UNFILTERED = "Created with Rapha\u00ebl 2.1.0Lab Results: Hemoglobin68101214161820Lab Results: CD41002003004005006007008009001000110012001300";
     private static final String WT_PLSE_LOG = "Created with Rapha\u00ebl 2.1.0Physical Exam: Pulse110100Physical Exam: Weight Kg10100";
     private static final String SCATTER_FEEDBACK_STATE = "{\"activeView\":\"scatterview\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Study\"},\"views\":{},\"filters\":[],\"selections\":[],\"detail\":{\"hierarchy\":\"\",\"value\":31,\"highlight\":\"\",\"label\":\"Antigens\",\"valueLabel\":\"\",\"multi\":true},\"id\":206}";
     private void verifyScatterPlot()
