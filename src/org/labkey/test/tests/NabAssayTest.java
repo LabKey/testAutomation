@@ -33,6 +33,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 {
     private final static String TEST_ASSAY_PRJ_NAB = "Nab Test Verify Project";            //project for nab test
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
+    private final static String TEST_ASSAY_FLDR_NAB_RENAME = "Rename" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
     protected static final String TEST_ASSAY_NAB = "TestAssayNab";
     protected static final String TEST_ASSAY_NAB_DESC = "Description for NAb assay";
@@ -289,7 +290,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             selenium.chooseOkOnNextConfirmation();
             clickLinkWithText("edit assay design");
             assertConfirmation("This assay is defined in the /Nab Test Verify Project folder. Would you still like to edit it?");
-            
+
             waitForElement(Locator.xpath("//span[@id='id_editable_run_properties']"), WAIT_FOR_JAVASCRIPT);
             checkCheckbox(Locator.xpath("//span[@id='id_editable_run_properties']/input"));
             clickButton("Save & Close");
@@ -354,7 +355,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertStudyData(4);
 
             assertAliasedAUCStudyData();
-            
+
             clickLinkWithText("assay");
             assertNabData(true);
 
@@ -385,8 +386,25 @@ public class NabAssayTest extends AbstractQCAssayTest
             beginAt("/login/logout.view");  // stop impersonating
 
             runTransformTest();
+
+            moveAssayFolderTest();
         }
     } //doTestSteps()
+
+    /**
+     * previously, assays sometimes failed to find their source files after a folder move
+     * this test verifies the fix
+     */
+    private void moveAssayFolderTest()
+    {
+        log("rename assay folder and verify source file still findable");
+        renameFolder(getProjectName(), TEST_ASSAY_FLDR_NAB, TEST_ASSAY_FLDR_NAB_RENAME, false);
+        clickLinkWithText(TEST_ASSAY_FLDR_NAB_RENAME);
+        clickLinkWithText(TEST_ASSAY_NAB);
+        clickLinkContainingText("run details");
+
+        assertTextPresent("Description for NAb assay");
+    }
 
 
     private void uploadFile(String filePath, String uniqueifier, String finalButton)
