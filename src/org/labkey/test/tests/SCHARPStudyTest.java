@@ -89,13 +89,13 @@ public class SCHARPStudyTest extends BaseWebDriverTest
     {
         log("Importing study from " + _zipFilePath + "...");
         clickButton("Import Study");
-        setFormElement("studyZip", _zipFilePath);
+        setFormElement(Locator.name("folderZip"), _zipFilePath);
         clickButton("Import Study From Local Zip Archive");
         assertTextNotPresent("This file does not appear to be a valid .zip file");
 
         if (isTextPresent("You must select a .zip file to import"))
         {
-            setFormElement("studyZip", _zipFilePath);
+            setFormElement(Locator.name("folderZip"), _zipFilePath);
             clickButton("Import Study");
         }
 
