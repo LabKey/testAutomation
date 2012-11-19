@@ -1813,6 +1813,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return System.getProperty("databaseVersion");
     }
 
+    public WebDriver getDriver()
+    {
+        return _driver;
+    }
+
     public boolean isGroupConcatSupported()
     {
         if ("pg".equals(getDatabaseType()))
@@ -2404,7 +2409,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getProjectUrl()
     {
-        return getBaseURL() + "/project/" + getProjectName() + "/begin.view?";
+        return getBaseURL() + "/project/" + EscapeUtil.encode(getProjectName()) + "/begin.view?";
     }
 
     public static String stripContextPath(String url)
@@ -3457,7 +3462,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 waitForText(array[1]); //wait for the property name to appear
                 String query = ComponentQuery.fromAttributes("field", map);
                 Ext4FieldRefWD ref = _ext4Helper.queryOne(query, Ext4FieldRefWD.class);
-                String val = ref.getValue();
+                String val = (String)ref.getValue();
                 if(StringUtils.isEmpty(val) || !val.equals(array[2]))
                 {
                     changed = true;

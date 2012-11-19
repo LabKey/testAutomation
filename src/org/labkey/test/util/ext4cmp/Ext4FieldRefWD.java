@@ -43,6 +43,13 @@ public class Ext4FieldRefWD extends Ext4CmpRefWD
         return ref;
     }
 
+    public static Ext4FieldRefWD getForBoxLabel(BaseWebDriverTest test, String boxLabel)
+    {
+        Ext4FieldRefWD ref = test._ext4Helper.queryOne("field[boxLabel^=\"" + boxLabel + "\"]", Ext4FieldRefWD.class);
+        Assert.assertNotNull("Unable to locate field with boxLabel: " + boxLabel, ref);
+        return ref;
+    }
+
     public static boolean isFieldPresent(BaseWebDriverTest test, String label)
     {
         return null != test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRefWD.class);
@@ -63,8 +70,8 @@ public class Ext4FieldRefWD extends Ext4CmpRefWD
         eval("setValue(arguments[0])", checked);
     }
 
-    public String getValue()
+    public Object getValue()
     {
-        return (String)getEval("getValue()");
+        return getEval("getValue()");
     }
 }

@@ -185,7 +185,7 @@ public class SequenceTest extends BaseWebDriverTest
         String prop_value = "NewValue";
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("textarea[itemId='sourceField']", Ext4FieldRefWD.class);
         String newValue = prop_name + "," + prop_value;
-        String val = textarea.getValue();
+        String val = (String)textarea.getValue();
         val += "\n" + newValue;
         textarea.setValue(val);
         clickButton("Done Editing", 0);
@@ -254,9 +254,7 @@ public class SequenceTest extends BaseWebDriverTest
         clickButton("Download");
 
         //the browser converts line breaks to spaces.  this is a hack to get them back
-        String text = _driver.getPageSource().replaceAll("<[^>]+>|&[^;]+;", "");
-        text = text.replaceAll(" {2,}", " ");
-        text = text.replaceAll(", ", ",\n").replaceAll("] ", "]\n");
+        String text = _helper.getPageText();
         for (String[] a : fieldPairs)
         {
             String line = a[0] + "," + a[1];
@@ -555,10 +553,10 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4FieldRefWD.getForLabel(this, "Protocol Description").setValue(protocolDescription);
 
         log("Verifying Pre-processing section");
-        WebElement el = _driver.findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Total Reads").getId()));
+        WebElement el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Total Reads").getId()));
         Assert.assertFalse("Reads field should be hidden", el.isDisplayed());
         Ext4FieldRefWD.getForLabel(this, "Downsample Reads").setChecked(true);
-        el = _driver.findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Total Reads").getId()));
+        el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Total Reads").getId()));
         Assert.assertTrue("Reads field should be visible", el.isDisplayed());
 
         Ext4FieldRefWD.getForLabel(this, "Total Reads").setValue(totalReads);
@@ -595,17 +593,17 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4FieldRefWD.getForLabel(this, "Seed Mismatches").setValue(seedMismatches);
         Ext4FieldRefWD.getForLabel(this, "Simple Clip Threshold").setValue(simpleClipThreshold);
 
-        el = _driver.findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Window Size").getId()));
+        el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Window Size").getId()));
         Assert.assertFalse("Window Size field should be hidden", el.isDisplayed());
         Ext4FieldRefWD.getForLabel(this, "Quality Trimming (by sliding window)").setChecked(true);
 
-        el = _driver.findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Window Size").getId()));
+        el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Window Size").getId()));
         Assert.assertTrue("Window Size field should be visible", el.isDisplayed());
 
         Ext4FieldRefWD.getForLabel(this, "Window Size").setValue(qualWindowSize);
         Ext4FieldRefWD.getForLabel(this, "Avg Qual").setValue(qualAvgQual);
 
-        el = _driver.findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Min Qual").getId()));
+        el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Min Qual").getId()));
         Assert.assertFalse("Min Qual field should be hidden", el.isDisplayed());
 
         log("Testing Alignment Section");

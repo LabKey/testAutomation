@@ -23,6 +23,7 @@ import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
 
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.Random;
 
 /**
@@ -34,11 +35,14 @@ import java.util.Random;
 public class LabModuleHelper
 {
     private BaseWebDriverTest _test;
+    public final static SimpleDateFormat _dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     private final Random _random = new Random(System.currentTimeMillis());
+    public static final String IMPORT_DATA_TEXT = "Import Data";
+    public static final String UPLOAD_RESULTS_TEXT = "Upload Results";
 
-    public static final String CTL_COLOR = "rgb(255, 192, 203)";
+    public static final String POS_COLOR = "rgb(255, 192, 203)";
     public static final String UNKNOWN_COLOR = "rgb(0, 0, 255)";
-    public static final String NTC_COLOR = "rgb(255, 255, 0)";
+    public static final String NEG_COLOR = "rgb(255, 255, 0)";
     public static final String STD_COLOR = "rgb(0, 128, 0)";
 
     public LabModuleHelper(BaseWebDriverTest test)
@@ -59,11 +63,16 @@ public class LabModuleHelper
         _test.checkRadioButton("providerName", provider);
         _test.clickButton("Next");
 
-        Locator l = Locator.id("AssayDesignerName");
+        Locator l = Locator.xpath("//input[@id='AssayDesignerName']");
         _test.waitForElement(l, _test.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement(l, label);
+        l.findElement(_test.getDriver()).sendKeys(label + "\t");
+        Locator desc = Locator.xpath("//textarea[@id='AssayDesignerDescription']");
+        _test.setFormElement(desc, "This is an assay");
+        _test.log(l.findElement(_test.getDriver()).getAttribute("value"));
 
-        _test.sleep(3000);
+        _test.waitForText("Result Fields");
+
+        _test.sleep(1000);
         _test.clickButton("Save", 0);
         _test.waitForText("Save successful.", 20000);
         _test.assertTextNotPresent("Unknown");
@@ -197,5 +206,48 @@ public class LabModuleHelper
     public Locator getAssayWell(String text, String color)
     {
         return Locator.xpath("//div[contains(@style, '" + color + "') and text() = '" + text + "']");
+    }
+
+    public String getPageText()
+    {
+        //the browser converts line breaks to spaces.  this is a hack to get them back
+        String text = _test.getDriver().getPageSource().replaceAll("<[^>]+>|&[^;]+;", "");
+        text = text.replaceAll(" {2,}", " ");
+        text = text.replaceAll(", ", ",\n").replaceAll("] ", "]\n");
+        return text;
+    }
+
+    public void switchTabs()
+    {
+        String winHandleBefore = _test.getDriver().getWindowHandle();
+
+    }
+
+    public void goToAssayResultImport(String assayName)
+    {
+        goToLabHome();
+        clickNavPanelItem(assayName + ":", IMPORT_DATA_TEXT);
+        _test._ext4Helper.clickExt4MenuItem(UPLOAD_RESULTS_TEXT);
+        _test.waitForElement(Ext4Helper.ext4Window(UPLOAD_RESULTS_TEXT));
+        _test.waitAndClick(Locator.ext4Button("Submit"));
+        _test.waitForPageToLoad();
+
+    }
+
+    public String getExampleData()
+    {
+        String currentWindow = _test.getDriver().getWindowHandle();
+        for (String handle : _test.getDriver().getWindowHandles())
+        {
+            if (!currentWindow.equals(handle))
+            {
+                _test.getDriver().switchTo().window(handle);
+                String text = getPageText();
+                _test.getDriver().close();
+                _test.getDriver().switchTo().window(currentWindow);
+                return text;
+            }
+        }
+        return null;
     }
 }
