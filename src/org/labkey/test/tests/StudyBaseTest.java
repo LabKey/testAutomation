@@ -289,7 +289,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         log("Going to Manage Study Page of: " + studyName);
         waitAndClick(Locator.linkContainingText(projectName));
         waitAndClick(Locator.linkContainingText(studyName));
-        clickLinkContainingText("Manage Study");
+        waitAndClick(Locator.linkContainingText("Manage Study"));
     }
 
     //must be in folder whose designation you wish to change.
