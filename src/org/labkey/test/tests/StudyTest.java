@@ -461,10 +461,10 @@ public class StudyTest extends StudyBaseTest
      */
     private void createStudy()
     {
-//        clickButtonContainingText("Create", 0);
-        //Issue 12505:  uncomment "wait for cancel", comment out
-//        waitForText("Cancel", defaultWaitForPage);
-//        waitForText("Add Selected", defaultWaitForPage);
+        clickButtonContainingText("Create", 0);
+        //Issue 12505
+        waitForText("Cancel", defaultWaitForPage);
+        waitForText("Add Selected", defaultWaitForPage);
         clickButtonContainingText("Create", "Add Selected");
     }
 
