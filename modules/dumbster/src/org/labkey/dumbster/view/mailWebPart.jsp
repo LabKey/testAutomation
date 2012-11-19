@@ -20,6 +20,7 @@
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
 <%@ page import="org.labkey.api.view.ViewContext" %>
+<%@ page import="org.labkey.dumbster.DumbsterController" %>
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
@@ -110,6 +111,7 @@ function toggleRecorder(checkbox)
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Date/Time</div></td>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Message</div></td>
         <td class="labkey-column-header labkey-col-header-filter" align="left"><div>Headers</div></td>
+        <td class="labkey-column-header labkey-col-header-filter" align="left"><div>View</div></td>
     </tr>
     <%
     if (messages.length > 0)
@@ -169,18 +171,23 @@ function toggleRecorder(checkbox)
             <td><a onclick="toggleBody('email_body_<%=rowIndex%>'); return false;"><%=h(m.getHeaderValue("Subject"))%></a>
                 <div id="email_body_<%=rowIndex%>" style="display: none;"><br><%=body%></div></td>
             <td><a onclick="toggleBody('email_headers_<%=rowIndex%>'); return false;">View headers</a>
-                <div id="email_headers_<%=rowIndex%>" style="display: none;"><br><%=headers%></div></td></tr>
+                <div id="email_headers_<%=rowIndex%>" style="display: none;"><br><%=headers%></div></td>
+            <td>
+                <a href="<%=h(DumbsterController.getViewMessageURL(context.getContainer(), rowIndex - 1, "html"))%>" target="_messageHtml">HTML</a>
+                <a href="<%=h(DumbsterController.getViewMessageURL(context.getContainer(), rowIndex - 1, "text"))%>" target="_messageText">Text</a>
+            </td>
+        </tr>
 <%
         }
     }
 %>
-    <tr id="emailRecordEmpty" style="display: <%=messages.length > 0 ? "none" : ""%>;"><td colspan="3">No email recorded.</td></tr>
+    <tr id="emailRecordEmpty" style="display: <%=text(messages.length > 0 ? "none" : "")%>;"><td colspan="3">No email recorded.</td></tr>
 </table>
 <%
     if (context.getUser().isAdministrator())
     {
 %>
-        <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this);" <%=recorder ? "checked" : ""%>> Record email messages sent
+        <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this);" <%=text(recorder ? "checked" : "")%>> Record email messages sent
 <%
     }
 %>

@@ -16,16 +16,20 @@
 
 package org.labkey.dumbster;
 
+import com.dumbster.smtp.SmtpMessage;
 import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.ApiResponse;
 import org.labkey.api.action.ApiSimpleResponse;
+import org.labkey.api.action.ExportAction;
 import org.labkey.api.action.SimpleViewAction;
 import org.labkey.api.action.SpringActionController;
+import org.labkey.api.data.Container;
 import org.labkey.api.security.RequiresPermissionClass;
 import org.labkey.api.security.RequiresSiteAdmin;
 import org.labkey.api.security.permissions.ReadPermission;
 import org.labkey.api.settings.AppProps;
 import org.labkey.api.settings.WriteableAppProps;
+import org.labkey.api.view.ActionURL;
 import org.labkey.api.view.HtmlView;
 import org.labkey.api.view.NavTree;
 import org.labkey.api.view.template.PageConfig;
@@ -33,6 +37,10 @@ import org.labkey.dumbster.model.DumbsterManager;
 import org.labkey.dumbster.view.MailWebPart;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * View action is like MultiActionController, but each action is a class not a method
@@ -104,6 +112,118 @@ public class DumbsterController extends SpringActionController
         public void setRecord(boolean record)
         {
             _record = record;
+        }
+    }
+
+    public static class MessageForm
+    {
+        private int _message;
+        private String _type;
+
+        public int getMessage()
+        {
+            return _message;
+        }
+
+        @SuppressWarnings({"UnusedDeclaration"})
+        public void setMessage(int message)
+        {
+            _message = message;
+        }
+
+        public String getType()
+        {
+            return _type;
+        }
+
+        @SuppressWarnings({"UnusedDeclaration"})
+        public void setType(String type)
+        {
+            _type = type;
+        }
+    }
+
+    public static ActionURL getViewMessageURL(Container c, int index, String type)
+    {
+        ActionURL url = new ActionURL(ViewMessage.class, c);
+        url.addParameter("message", index);
+        url.addParameter("type", type);
+        return url;
+    }
+
+    @RequiresSiteAdmin
+    public class ViewMessage extends ExportAction<MessageForm>
+    {
+        @Override
+        public void export(MessageForm form, HttpServletResponse response, BindException errors) throws Exception
+        {
+            SmtpMessage message = DumbsterManager.get().getMessages()[form.getMessage()];
+
+            Map<String, String> map = new HashMap<String, String>();
+            String[] lines = message.getBody().split("\n");
+
+            String key = null;
+            StringBuilder content = new StringBuilder();
+
+            for (String line : lines)
+            {
+                if (line.startsWith("------=_"))
+                {
+                    if (null != key)
+                        map.put(key, content.toString());
+
+                    content = new StringBuilder();
+                }
+                else if (line.startsWith("Content-Type: "))
+                {
+                    key = line.substring(14, line.indexOf(';'));
+                }
+                else if (!line.startsWith("Content-Transfer-Encoding:"))
+                {
+                    content.append(line);
+                    content.append('\n');
+                }
+            }
+
+            String output;
+            String contentType = "text/plain";
+
+            if ("html".equals(form.getType()))
+            {
+                String contents = map.get("text/html");
+                String html = null;
+
+                if (null != contents)
+                {
+                    int htmlStart = contents.indexOf("<html>");
+
+                    if (htmlStart > -1)
+                    {
+                        int htmlEnd = contents.indexOf("</html>");
+
+                        if (htmlEnd > -1)
+                        {
+                            html = contents.substring(htmlStart, htmlEnd);
+                            contentType = "text/html";
+                        }
+                    }
+                }
+
+                output = null != html ? html : "No HTML found";
+            }
+            else
+            {
+                String contents = map.get("text/plain");
+
+                output = null != contents ? contents : "No text found";
+            }
+
+            getPageConfig().setTemplate(PageConfig.Template.None);
+
+            // Just blast the HTML contents... no debug comments, view divs, etc.
+            response.setContentType(contentType);
+            response.getWriter().print(output);
+            response.flushBuffer();
         }
     }
 }
