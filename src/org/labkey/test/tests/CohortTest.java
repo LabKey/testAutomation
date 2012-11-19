@@ -253,6 +253,10 @@ public class CohortTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
         clickLinkWithText("2 datasets");
         clickLinkWithText("Test Results");
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewSort("ParticipantId", "Ascending");
+        _customizeViewsHelper.applyCustomView();
+
         clickMenuButton("Participant Groups", "Cohorts", "Positive", "Cohort as of data collection");
         clickLinkWithText("Infected1");
         assertLinkNotPresentWithText("Previous Participant");
@@ -263,7 +267,7 @@ public class CohortTest extends BaseWebDriverTest
         assertTextPresent("Infected3");
         assertLinkPresentWithText("Previous Participant");
         assertLinkNotPresentWithText("Next Participant"); // Participant 4 should be filtered out
-           
+
         // Check basic cohorts
         log("Check basic cohort features.");
         clickFolder(PROJECT_NAME);
