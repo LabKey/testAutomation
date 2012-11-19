@@ -78,13 +78,13 @@ public class UserTest extends SecurityTest
         assertTextPresent("Active");
 
         goToMyAccount();
-        assertTextPresent("User Id");
+        assertTextPresent("First Name");
         assertTextPresent("Last Login");
 
         impersonate(NORMAL_USER);
 
         goToMyAccount();
-        assertTextPresent("User Id");
+        assertTextPresent("First Name");
         assertTextNotPresent("Last Login");
 
         stopImpersonating();
