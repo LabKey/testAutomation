@@ -355,7 +355,7 @@ public class FlowTest extends BaseFlowTest
         // verify sample set and background values can be displayed in the FCSAnalysis grid
         goToFlowDashboard();
         clickLinkWithText("29 FCS files");
-        clickLinkWithText("Show Graphs");
+        _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Inline");
 //            sleep(3000);
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn("Background/Count");
