@@ -154,12 +154,12 @@ public class WorkbookTest extends BaseWebDriverTest
 
     private void createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
     {
-        clickLinkWithText(project);
+        clickFolder(project);
         clickButton("Insert New");
 
         setFormElement(Locator.id("workbookTitle"), title);
         setFormElement(Locator.id("workbookDescription"), description);
-        setFormElement(Locator.id("workbookFolderType"), folderType.toString());
+        selectOptionByText(Locator.id("workbookFolderType"), folderType.toString());
 
         clickButton("Create Workbook");
     }
