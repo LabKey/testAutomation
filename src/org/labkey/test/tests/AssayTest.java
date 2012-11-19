@@ -794,7 +794,10 @@ public class AssayTest extends AbstractAssayTest
         log("Testing cross-folder data");
 
         clickFolder(TEST_ASSAY_PRJ_SECURITY);
-        
+
+        // Remove so we can easily click on the Views menu for the right web part
+        removeWebPart("Assay List");
+
         addWebPart("Assay Runs");
         selectOptionByText("viewProtocolId", "General: " + TEST_ASSAY);
         // assay runs has a details page that needs to be submitted
@@ -861,6 +864,9 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Cancel", defaultWaitForPage);
 
         clickFolder(TEST_ASSAY_PRJ_SECURITY);
+
+        // Add it back to the portal page
+        addWebPart("Assay List");
     }
 
     private void verifyStudyList()
