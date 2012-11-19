@@ -141,8 +141,8 @@ public enum TestSet
         TimeChartDateBasedTest.class,
         TimeChartVisitBasedTest.class,
         TimeChartAPITest.class,
-//        EHRStudyTest.class, // TODO : 16316: EHRStudyTest causing Java memory errors
-//        EHRApiTest.class,
+        EHRStudyTest.class, // TODO : 16316: EHRStudyTest causing Java memory errors
+        EHRApiTest.class,
         ComplianceTrainingTest.class,
         GpatAssayTest.class,
         FolderTest.class,
