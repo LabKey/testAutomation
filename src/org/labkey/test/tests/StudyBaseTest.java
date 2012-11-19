@@ -290,6 +290,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         waitAndClick(Locator.linkContainingText(projectName));
         waitAndClick(Locator.linkContainingText(studyName));
         waitAndClick(Locator.linkContainingText("Manage Study"));
+        waitForElement(Locator.xpath("id('labkey-nav-trail-current-page')[text()='Manage Study']"));
     }
 
     //must be in folder whose designation you wish to change.
