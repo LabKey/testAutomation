@@ -428,16 +428,13 @@ public class Crawler
         }
 
         _test.log("Starting crawl...");
-        _test.beginAt(WebTestHelper.getContextPath() + "/");
-        _test.waitForPageToLoad();
+        _test.beginAt(_test.getProjectUrl());
 
         // Breadth first search
         int newPages = crawl(inject);
         saveCrawlStats(_test, _urlToCheck.getDepth(), newPages, _actionsVisited.size(), _crawlTime);
 
         _test.log("Crawl complete. " + newPages + " pages visited, " + _actionsVisited.size() + " unique actions tested by all tests.");
-        _test.beginAt(WebTestHelper.getContextPath() + "/");
-        _test.waitForPageToLoad();
     }
 
 

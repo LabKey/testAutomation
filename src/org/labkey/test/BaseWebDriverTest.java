@@ -22,6 +22,7 @@ import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -134,6 +135,7 @@ import java.util.zip.CRC32;
 import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
+import static org.labkey.test.WebTestHelper.getHttpGetResponse;
 import static org.labkey.test.WebTestHelper.getTabLinkId;
 import static org.labkey.test.WebTestHelper.getTargetServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
@@ -313,10 +315,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     private boolean jsCheckerPaused = false;
+    private static int _jsErrorPauseCount = 0; // To keep track of nested pauses
     public void pauseJsErrorChecker()
     {
         if (this.enableScriptCheck())
         {
+            _jsErrorPauseCount++;
             if (!jsCheckerPaused)
             {
                 jsCheckerPaused = true;
@@ -329,7 +333,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if (this.enableScriptCheck())
         {
-            if (jsCheckerPaused)
+            if (--_jsErrorPauseCount < 1 && jsCheckerPaused)
             {
                 jsCheckerPaused = false;
                 JavaScriptError.readErrors(_driver); // clear errors
@@ -2409,7 +2413,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getProjectUrl()
     {
-        return getBaseURL() + "/project/" + EscapeUtil.encode(getProjectName()) + "/begin.view?";
+        return "/project/" + EscapeUtil.encode(getProjectName()) + "/begin.view?";
     }
 
     public static String stripContextPath(String url)
@@ -2692,10 +2696,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertLinkNotPresentWithText(child);
         log("Creating subfolder " + child + " under project " + parent);
         String _active = (!parent.equals(project)? parent : project);
-        clickLinkWithText(_active);
+        if (!getText(Locator.css(".nav-tree-selected")).equals(_active))
+            clickLinkWithText(_active);
         goToFolderManagement();
         waitForExt4FolderTreeNode(parent, 10000);
-        clickButton("Create Subfolder");
+        clickButton("Create Subfolder", 0);
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("name"), child);
     }
@@ -2745,11 +2750,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
         }
 
-        waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
+        waitAndClickButton("Next");
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, child));
-        waitForPageToLoad();
 
         //second page of the wizard
+        waitForElement(Locator.css(".labkey-nav-page-header").withText("Users / Permissions"));
         if (inheritPermissions)
         {
             //nothing needed, this is the default
@@ -2758,28 +2763,32 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             waitAndClick(Locator.xpath("//td[./label[text()='My User Only']]/input"));
         }
 
-        waitAndClick(Locator.xpath("//button[./span[text()='Finish']]")); //Leave permissions where they are
-        waitForPageToLoad();
+        waitAndClickButton("Finish");
+        waitForElement(Locator.css(".nav-tree-selected").withText(child));
 
         //unless we need addtional tabs, we end here.
         if (null == tabsToAdd || tabsToAdd.length == 0)
             return;
 
-        goToFolderManagement();
-        clickLinkWithText("Folder Type");
 
-        for (String tabname : tabsToAdd)
-            checkCheckbox(Locator.checkboxByTitle(tabname));
-
-        submit();
-        if ("None".equals(folderType))
+        if (null != folderType && !folderType.equals("None")) // Added in the wizard for custom folders
         {
-            for (String tabname : tabsToAdd)
-                assertTabPresent(tabname);
-        }
+            goToFolderManagement();
+            clickLinkWithText("Folder Type");
 
-        // verify that there's a link to our new folder:
-        assertLinkPresentWithText(child);
+            for (String tabname : tabsToAdd)
+                checkCheckbox(Locator.checkboxByTitle(tabname));
+
+            submit();
+            if ("None".equals(folderType))
+            {
+                for (String tabname : tabsToAdd)
+                    assertTabPresent(tabname);
+            }
+
+            // verify that there's a link to our new folder:
+            assertLinkPresentWithText(child);
+        }
     }
 
     protected void deleteDir(File dir)
@@ -2828,7 +2837,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void renameFile(String oldFilename, String newFilename)
     {
         Locator l = Locator.xpath("//div[text()='" + oldFilename + "']");
-        clickAt(l, "1,1");
+        click(l);
         click(Locator.css("button.iconRename"));
 
         waitForDraggableMask();
@@ -2847,7 +2856,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
         clickButton("Rename");
-        setText("name", newFolderName);
+        setFormElement(Locator.name("name"), newFolderName);
         if (createAlias)
             checkCheckbox("addAlias");
         else
@@ -2898,6 +2907,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertElementVisible(Locator.css(".labkey-nav-tree-text").withText(folder));
     }
 
+    /**
+     * Expand any necessary nodes in the left nav bar and click a link to a project or folder
+     * @param folder
+     */
     public void clickFolder(String folder)
     {
         expandFolder(folder);
@@ -2927,38 +2940,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @LogMethod
     public void enableEmailRecorder()
     {
-        log("Enable email recorder");
-        pushLocation();
-        goToHome();
-        goToModule("Dumbster");
-        waitForElement(Locator.checkboxByName("emailRecordOn"), WAIT_FOR_JAVASCRIPT);
-        if ( initialRecorderSetting == null )
-            initialRecorderSetting = getFormElement("emailRecordOn");
-        uncheckCheckbox("emailRecordOn");
-        checkCheckbox("emailRecordOn");
-        popLocation();
-    }
-
-    @LogMethod
-    public void disableEmailRecorder()
-    {
-        log("Disable email recorder");
-        pushLocation();
-        goToModule("Dumbster");
-        waitForElement(Locator.checkboxByName("emailRecordOn"), WAIT_FOR_JAVASCRIPT);
-        if ( initialRecorderSetting == null )
-            initialRecorderSetting = getFormElement("emailRecordOn");
-        uncheckCheckbox("emailRecordOn");
-        popLocation();
-    }
-
-    private static String initialRecorderSetting = null;
-    public void resetEmailRecorder()
-    {
-        if ( initialRecorderSetting.equals("true") )
-            enableEmailRecorder();
-        else if ( initialRecorderSetting.equals("false") )
-            disableEmailRecorder();
+        try {getHttpGetResponse("http://localhost:8080/labkey/dumbster/home/setRecordEmail.view?record=true", PasswordUtil.getUsername(), PasswordUtil.getPassword());}
+        catch (IOException e) {Assert.fail("Failed to enable email recorder");}
+        catch (HttpException e) {Assert.fail("Failed to enable email recorder");}
     }
 
     public void addWebPart(String webPartName)
@@ -3915,7 +3899,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     /** Find nth link with the exact text specified and click it, optionally waiting for the page to load */
     public void clickLinkWithText(String text, int index, boolean wait)
     {
-        clickLinkWithText(text, index, wait ? defaultWaitForPage: 0);
+        clickLinkWithText(text, index, wait ? defaultWaitForPage : 0);
     }
 
     /** Find nth link with the exact text specified, click it, and wait up to millis for the page to load */
@@ -4019,15 +4003,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void fireEventJs(Locator l, SeleniumEvent event)
     {
         executeScript(
-            "var element = arguments[0];" +
-            "var eventType = arguments[1];" +
-            "var myEvent = document.createEvent('UIEvent');\n" +
-            "myEvent.initEvent(\n" +
-            "   eventType      // event type\n" +
-            "   ,true      // can bubble?\n" +
-            "   ,true      // cancelable?\n" +
-            ");\n" +
-            "element.dispatchEvent(myEvent);", l.findElement(_driver), event.toString());
+                "var element = arguments[0];" +
+                        "var eventType = arguments[1];" +
+                        "var myEvent = document.createEvent('UIEvent');\n" +
+                        "myEvent.initEvent(\n" +
+                        "   eventType      // event type\n" +
+                        "   ,true      // can bubble?\n" +
+                        "   ,true      // cancelable?\n" +
+                        ");\n" +
+                        "element.dispatchEvent(myEvent);", l.findElement(_driver), event.toString());
     }
 
     /**
@@ -5966,7 +5950,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         for(String userEmail : userEmails)
         {
-            String userXPath = "//a[text()='details']/../../td[text()='" + userEmail + "']";
             int row = usersTable.getRow("Email", userEmail);
 
             boolean isPresent = row != -1;

@@ -22,6 +22,7 @@ import junit.framework.AssertionFailedError;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.apache.http.HttpException;
 import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Assert;
@@ -169,8 +170,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         if (this.enableScriptCheck())
             beginJsErrorChecker();
-
-
     }
 
     public void beginJsErrorChecker()
@@ -183,14 +182,17 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selenium.getEval("selenium.doEndJsErrorChecker();");
     }
 
+    private static int _jsErrorPauseCount = 0;
     public void pauseJsErrorChecker()
     {
         selenium.getEval("selenium.pauseJsErrorChecker();");
+        _jsErrorPauseCount++;
     }
 
     public void resumeJsErrorChecker()
     {
-        selenium.getEval("selenium.resumeJsErrorChecker();");
+        if (--_jsErrorPauseCount < 1)
+            selenium.getEval("selenium.resumeJsErrorChecker();");
     }
 
     /**
@@ -2059,7 +2061,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public String getProjectUrl()
     {
-        return getBaseURL() + "/project/" + getProjectName() + "/begin.view?";
+        return "/project/" + getProjectName() + "/begin.view?";
     }
 
     public static String stripContextPath(String url)
@@ -2358,21 +2360,24 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (null == tabsToAdd || tabsToAdd.length == 0)
             return;
 
-        goToFolderManagement();
-        clickLinkWithText("Folder Type");
-
-        for (String tabname : tabsToAdd)
-            checkCheckbox(Locator.checkboxByTitle(tabname));
-
-        submit();
-        if ("None".equals(folderType))
+        if (null != folderType && !folderType.equals("None"))
         {
-            for (String tabname : tabsToAdd)
-                assertTabPresent(tabname);
-        }
+            goToFolderManagement();
+            clickLinkWithText("Folder Type");
 
-        // verify that there's a link to our new folder:
-        assertLinkPresentWithText(child);
+            for (String tabname : tabsToAdd)
+                checkCheckbox(Locator.checkboxByTitle(tabname));
+
+            submit();
+            if ("None".equals(folderType))
+            {
+                for (String tabname : tabsToAdd)
+                    assertTabPresent(tabname);
+            }
+
+            // verify that there's a link to our new folder:
+            assertLinkPresentWithText(child);
+        }
     }
 
     protected void deleteDir(File dir)
@@ -2508,38 +2513,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @LogMethod
     public void enableEmailRecorder()
     {
-        log("Enable email recorder");
-        pushLocation();
-        goToHome();
-        goToModule("Dumbster");
-        waitForElement(Locator.checkboxByName("emailRecordOn"), WAIT_FOR_JAVASCRIPT);
-        if ( initialRecorderSetting == null )
-            initialRecorderSetting = getFormElement("emailRecordOn");
-        uncheckCheckbox("emailRecordOn");
-        checkCheckbox("emailRecordOn");
-        popLocation();
-    }
-
-    @LogMethod
-    public void disableEmailRecorder()
-    {
-        log("Disable email recorder");
-        pushLocation();
-        goToModule("Dumbster");
-        waitForElement(Locator.checkboxByName("emailRecordOn"), WAIT_FOR_JAVASCRIPT);
-        if ( initialRecorderSetting == null )
-            initialRecorderSetting = getFormElement("emailRecordOn");
-        uncheckCheckbox("emailRecordOn");
-        popLocation();
-    }
-
-    private static String initialRecorderSetting = null;
-    public void resetEmailRecorder()
-    {
-        if ( initialRecorderSetting.equals("true") )
-            enableEmailRecorder();
-        else if ( initialRecorderSetting.equals("false") )
-            disableEmailRecorder();
+        try {getHttpGetResponse("http://localhost:8080/labkey/dumbster/home/setRecordEmail.view?record=true", PasswordUtil.getUsername(), PasswordUtil.getPassword());}
+        catch (IOException e) {Assert.fail("Failed to enable email recorder");}
+        catch (HttpException e) {Assert.fail("Failed to enable email recorder");}
     }
 
     public void addWebPart(String webPartName)
