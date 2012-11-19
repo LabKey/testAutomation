@@ -2092,7 +2092,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 relativeURL = "/" + relativeURL;
             }
         }
+        pauseJsErrorChecker();
         selenium.open(getBaseURL() + relativeURL, millis);
+        resumeJsErrorChecker();
     }
 
     public String getContainerId(String url)

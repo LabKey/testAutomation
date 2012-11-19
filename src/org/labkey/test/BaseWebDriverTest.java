@@ -2442,7 +2442,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 relativeURL = "/" + relativeURL;
             }
         }
+        pauseJsErrorChecker();
         _driver.navigate().to(getBaseURL() + relativeURL);
+        resumeJsErrorChecker();
     }
 
     public String getContainerId(String url)
@@ -2961,7 +2963,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void addWebPart(String webPartName)
     {
-        Assert.assertTrue("Could not find webpart with name: " + webPartName, isElementPresent(Locator.css("option").withText(webPartName)));
+        Locator.css("option").withText(webPartName).waitForElmement(_driver, 1000);
         Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
         selectOptionByText(form.append("//select"), webPartName);
         submit(form);
@@ -4010,18 +4012,22 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * Click by triggering click event on supplied element. Useful for clicking svg elements
-     * @param l element to be clicked
+     * Creat and fire a JavaScript UIEvent
+     * @param l event target
+     * @param event event
      */
-    public void clickJs(Locator l)
+    public void fireEventJs(Locator l, SeleniumEvent event)
     {
-        executeScript("var clickEvt = document.createEvent('MouseEvents');\n" +
-                "clickEvt.initEvent(\n" +
-                "   'click'      // event type\n" +
-                "   ,true      // can bubble?\n" +
-                "   ,true      // cancelable?\n" +
-                ");\n" +
-                "arguments[0].dispatchEvent(clickEvt);", l.findElement(_driver));
+        executeScript(
+            "var element = arguments[0];" +
+            "var eventType = arguments[1];" +
+            "var myEvent = document.createEvent('UIEvent');\n" +
+            "myEvent.initEvent(\n" +
+            "   eventType      // event type\n" +
+            "   ,true      // can bubble?\n" +
+            "   ,true      // cancelable?\n" +
+            ");\n" +
+            "element.dispatchEvent(myEvent);", l.findElement(_driver), event.toString());
     }
 
     /**
@@ -4925,6 +4931,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         executeScript("arguments[0].value = arguments[1]", el, text);
     }
 
+    /**
+     * @deprecated Use {@link #setFormElement(Locator, File)}
+     * @param element
+     * @param file
+     */
+    @Deprecated
     public void setFormElement(String element, File file)
     {
         setFormElement(Locator.name(element), file);
