@@ -1276,16 +1276,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 }
             }
 
-            try
-            {
-                log("Pre-cleaning " + getClass().getSimpleName());
-                doCleanup(false);
-            }
-            catch (Throwable t)
-            {
-                t.printStackTrace();
-                // fall through
-            }
+            log("Pre-cleaning " + getClass().getSimpleName());
+            doCleanup(false);
 
             // Only do this as part of test startup if we haven't already checked. Since we do this as the last
             // step in the test, there's no reason to bother doing it again at the beginning of the next test
