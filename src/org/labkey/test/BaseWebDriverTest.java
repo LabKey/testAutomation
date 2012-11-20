@@ -263,7 +263,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 catch(IOException e)
                     {Assert.fail("Failed to load JS error checker: " + e.getMessage());}
             }
-            if (!onTeamCity()) // Firebug just clutters up screenshots on TeamCity
+            if (firefoxExtensionsEnabled() && !onTeamCity()) // Firebug just clutters up screenshots on TeamCity
             {
                 try
                 {
@@ -1592,8 +1592,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             checkViews();
 
-            checkLeaksAndErrors();
-
             checkActionCoverage();
 
             if (enableLinkCheck())
@@ -1779,7 +1777,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean firebugPanelsEnabled()
     {
-        return !onTeamCity() && "true".equals(System.getProperty("enableFirebugPanels"));
+        return "true".equals(System.getProperty("enableFirebugPanels"));
+    }
+
+    public boolean firefoxExtensionsEnabled()
+    {
+        return "true".equals(System.getProperty("enableFirefoxExtensions"));
     }
 
     public boolean onTeamCity()
