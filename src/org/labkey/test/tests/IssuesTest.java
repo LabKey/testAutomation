@@ -285,7 +285,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         // Test issues grid with issues in a sub-folder
         subFolderIssuesTest();
 
-        emailTest();//todo: move down
+        emailTest();
 
         // UNDONE test these actions
         // CompleteUserAction
@@ -509,15 +509,15 @@ public class IssuesTest extends BaseSeleniumWebTest
         log("Testing .lastFilter");
 
         // insert a new issue
-        clickLinkWithText("new issue");
-        setFormElement("title", ISSUE_TITLE_1);
-        selectOptionByText("type", "UFO");
-        selectOptionByText("area", "Area51");
-        selectOptionByText("priority", "1");
-        setFormElement("comment", "alien autopsy");
-        selectOptionByText("milestone", "2013");
-        selectOptionByText("assignedTo", getDisplayName());
-        setFormElement("string4", "http://www.issues2.test");
+        clickLinkWithText("New Issue");
+        setFormElement(Locator.id("title"), ISSUE_TITLE_1);
+        selectOptionByText(Locator.id("type"), "UFO");
+        selectOptionByText(Locator.id("area"), "Area51");
+        selectOptionByText(Locator.id("priority"), "1");
+        setFormElement(Locator.id("comment"), "alien autopsy");
+        selectOptionByText(Locator.id("milestone"), "2013");
+        selectOptionByText(Locator.id("assignedTo"), getDisplayName());
+        setFormElement(Locator.input("string4"), "http://www.issues2.test");
         selectOptionByText("string5", "Cadmium");
         clickButton("Save");
 
