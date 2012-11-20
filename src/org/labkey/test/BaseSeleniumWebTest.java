@@ -2591,14 +2591,19 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     }
 
-    public boolean isTextPresent(String text)
+    public boolean isTextPresent(String... texts)
     {
-        if(text==null)
+        if(texts==null)
             return true;
 
-        //Need to unencode here? Selenium turns &nbsp; into space???
-        text = text.replace("&nbsp;", " ");
-        return selenium.isTextPresent(text);
+        for (String text : texts)
+        {
+            //Need to unencode here? Selenium turns &nbsp; into space???
+            text = text.replace("&nbsp;", " ");
+            if (!selenium.isTextPresent(text))
+                return false;
+        }
+        return true;
     }
 
     public String getText(Locator elementLocator)
@@ -5920,8 +5925,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         log("Signing out");
         beginAt("/login/logout.view");
-        waitForPageToLoad();
-        assertLinkPresentWithText("Sign In");
+        waitForElement(Locator.xpath("//a[string()='Sign In']")); // Will recognize link [BeginAction] or button [LoginAction]("Sign In");
     }
 
     /*

@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 
 /**
@@ -79,6 +80,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
      * Create some users, assign to groups and validate the permissions by
      * impersonating the user.
      */
+    @LogMethod
     private void userPermissionRightsTest()
     {
         _containerHelper.createProject(PERM_PROJECT_NAME, null);
@@ -240,6 +242,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
      * @param projectName
      * @param groupName
      */
+    @LogMethod
     private void createUserInProjectForGroup(String userName, String projectName, String groupName, boolean sendEmail)
     {
         if (isElementPresent(Locator.permissionRendered()))

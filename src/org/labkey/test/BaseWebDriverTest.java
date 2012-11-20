@@ -3004,23 +3004,41 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     }
 
-    public boolean isTextPresent(String text)
+    public boolean isTextPresent(String... texts)
     {
-        if(text==null || text.length() == 0)
+        if(texts==null || texts.length == 0)
             return true;
 
-        //Need to unencode here? Selenium turns &nbsp; into space???
-        text = text.replace("&", "&amp;");
-        text = text.replace("<", "&lt;");
-        text = text.replace(">", "&gt;");
-        try
+        String source = getHtmlSource();
+
+        for (String text : texts)
         {
-            return getHtmlSource().contains(text);
+            text = text.replace("&", "&amp;");
+            text = text.replace("<", "&lt;");
+            text = text.replace(">", "&gt;");
+            if (!source.contains(text))
+                return false;
         }
-        catch(StaleElementReferenceException ex)
+        return true;
+    }
+
+    public List<String> getMissingTexts(String... texts)
+    {
+        List<String> missingTexts = new ArrayList<String>();
+        if(texts==null || texts.length == 0)
+            return missingTexts;
+
+        String source = getHtmlSource();
+
+        for (String text : texts)
         {
-            return false;
+            text = text.replace("&", "&amp;");
+            text = text.replace("<", "&lt;");
+            text = text.replace(">", "&gt;");
+            if (!source.contains(text))
+                missingTexts.add(text);
         }
+        return missingTexts;
     }
 
     public String getText(Locator elementLocator)
@@ -3029,29 +3047,36 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return el.getText();
     }
 
-    /** Verifies that all the strings are present in the page */
+    /**
+     * Verifies that all the strings are present in the page html source
+     * @param texts
+     */
     public void assertTextPresent(String... texts)
     {
         if(texts==null)
             return;
 
-        for (String text : texts)
+        List<String> missingTexts = getMissingTexts(texts);
+
+        if (missingTexts.size() > 0)
         {
-            Assert.assertTrue("Text '" + text + "' was not present", isTextPresent(text));
+            String failMsg = (missingTexts.size() == 1 ? "Text ['" : "Texts ['") + missingTexts.get(0) + "'";
+            for (int i = 1; i < missingTexts.size(); i++)
+            {
+                failMsg += ", '" + missingTexts.get(i) + "'";
+            }
+            failMsg += missingTexts.size() == 1 ? "] was not present" : "] were not present";
+            Assert.fail(failMsg);
         }
     }
 
-    /** Verifies that all the strings are present in the page */
+    /**
+     * Verifies that all the strings are present in the page html source
+     * @param texts
+     */
     public void assertTextPresent(List<String> texts)
     {
-        if(texts==null)
-            return;
-
-        for (String text : texts)
-        {
-            String _text = text.replace("&nbsp;", " ");
-            Assert.assertTrue("Text '" + text + "' was not present", isTextPresent(_text));
-        }
+        assertTextPresent((String[])texts.toArray());
     }
 
     //takes the arguments used to set a filter and transforms them into the description in the grid view
@@ -6475,8 +6500,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         log("Signing out");
         beginAt("/login/logout.view");
-        waitForPageToLoad();
-        assertElementPresent(Locator.xpath("//a[string()='Sign In']")); // Will recognize link [BeginAction] or button [LoginAction]
+        waitForElement(Locator.xpath("//a[string()='Sign In']")); // Will recognize link [BeginAction] or button [LoginAction]
     }
 
     /*
