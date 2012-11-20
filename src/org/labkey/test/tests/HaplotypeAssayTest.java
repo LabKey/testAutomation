@@ -52,6 +52,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifySecondRun();
         verifyExtraHaplotypeAssignment();
         verifyAssignmentReport();
+        verifyDuplicateRecords();
     }
 
     @Override
@@ -206,6 +207,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         DataRegionTable drt = new DataRegionTable("Data", this);
         String animalAnalysisId = drt.getDataAsText(4, "RowId"); // row index 4 is ID-5
         goToQuery("AnimalHaplotypeAssignment");
+        waitForText("1 - 39 of 39");
         // ADD: animal ID-5, haplotype A001
         clickButton("Insert New");
         selectOptionByText(Locator.name("quf_HaplotypeId"), "A001");
@@ -283,8 +285,29 @@ public class HaplotypeAssayTest extends GenotypingTest
         waitForText("Warning: multiple enabled assay results were found for the following IDs: ID-4 (2), ID-5 (2)");
         drt = new DataRegionTable("report", this);
         verifyColumnDataValues(drt, "ID-4", "1,,1,2,,2,1,1");
+        verifyColumnDataValues(drt, "ID-5", "1,2,,,3,,,");
+    }
 
-        // test disabling a run and clearing a duplicate
+    private void verifyDuplicateRecords()
+    {
+        // test editing a run/animal record to clear a duplicate for ID-4
+        goToManageAssays();
+        clickLinkWithText(ASSAY_NAME);
+        clickLinkWithText("first run");
+        drt = new DataRegionTable("Data", this);
+        drt.setFilter("AnimalId", "Equals", "ID-4");
+        clickLinkWithText("edit");
+        waitForText("Mamu-B Haplotype", 2, WAIT_FOR_JAVASCRIPT);
+        _ext4Helper.uncheckCheckbox("Enabled:");
+        clickButton("Submit");
+        drt = new DataRegionTable("Data", this);
+        verifyColumnDataValues(drt, "Enabled", "false");
+        setReportIds("ID-4");
+        assertTextNotPresent("Warning: multiple enabled assay results were found for the following IDs");
+        assertTextPresentInThisOrder("A001","A023","B015c","B025a");
+        assertTextNotPresent("A004", "B012b");
+
+        // test disabling a run and clearing the other duplicate for ID-5
         goToManageAssays();
         clickLinkWithText(ASSAY_NAME);
         drt = new DataRegionTable("Runs", this);
@@ -292,15 +315,20 @@ public class HaplotypeAssayTest extends GenotypingTest
         clickLinkWithText("edit");
         uncheckCheckbox(Locator.name("quf_enabled"));
         clickButton("Submit");
+        setReportIds("ID-5");
+        assertTextNotPresent("Warning: multiple enabled assay results were found for the following IDs");
+        assertTextPresentInThisOrder("A001","A002a","B002");
+    }
+
+    private void setReportIds(String ids)
+    {
         clickLinkWithText("produce report");
         waitForText("Enter the animal IDs separated by whitespace, comma, or semicolon:");
-        dr = Locator.id("dataregion_report");
-        setFormElement(Locator.name("idsTextArea"), "ID-4");
+        Locator dr = Locator.id("dataregion_report");
+        setFormElement(Locator.name("idsTextArea"), ids);
         sleep(500); // entering text enables the submit button
         clickButton("Submit", 0);
         waitForElement(dr);
-        assertTextPresentInThisOrder("A004","A023","B012b");
-        assertTextNotPresent("A001", "B015c", "B025a");
     }
 
     private void goToQuery(String queryName)
