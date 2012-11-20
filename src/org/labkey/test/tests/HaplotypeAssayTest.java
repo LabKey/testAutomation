@@ -114,6 +114,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         setFormElement(Locator.name("data"), getFileContents(ERROR_RUN_FILE));
         clickButton("Save and Finish");
         waitForText("Column header mapping missing for: Lab Animal ID");
+        waitForElementToDisappear(Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Mamu-B Haplotype 2 *:']"), WAIT_FOR_JAVASCRIPT);
         _ext4Helper.selectComboBoxItem("Lab Animal ID *", "OC ID");
         clickButton("Save and Finish");
         waitForText("Column header mapping missing for: Total # Reads Evaluated");
@@ -236,7 +237,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         log("Verify Haplotype Assignment Report");
         goToProjectHome();
         goToAssayRun("first run");
-        clickLinkWithText("produce report");
+        clickButton("Produce Report");
         waitForText("Search for animal IDs by:");
         assertTextPresent("Show report column headers as:");
         assertTextPresent("Enter the animal IDs separated by whitespace, comma, or semicolon:");
@@ -290,10 +291,15 @@ public class HaplotypeAssayTest extends GenotypingTest
 
     private void verifyDuplicateRecords()
     {
+        // verify that the two duplicates show up on the duplicates report
+        goToAssayRun("first run");
+        clickLinkWithText("view duplicates");
+        waitForText("# Active Assignments");
+        assertLinkPresentWithText("ID-4");
+        assertLinkPresentWithText("ID-5");
+
         // test editing a run/animal record to clear a duplicate for ID-4
-        goToManageAssays();
-        clickLinkWithText(ASSAY_NAME);
-        clickLinkWithText("first run");
+        goToAssayRun("first run");
         drt = new DataRegionTable("Data", this);
         drt.setFilter("AnimalId", "Equals", "ID-4");
         clickLinkWithText("edit");
@@ -302,7 +308,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         clickButton("Submit");
         drt = new DataRegionTable("Data", this);
         verifyColumnDataValues(drt, "Enabled", "false");
-        setReportIds("ID-4");
+        setReportId("ID-4");
         assertTextNotPresent("Warning: multiple enabled assay results were found for the following IDs");
         assertTextPresentInThisOrder("A001","A023","B015c","B025a");
         assertTextNotPresent("A004", "B012b");
@@ -315,19 +321,26 @@ public class HaplotypeAssayTest extends GenotypingTest
         clickLinkWithText("edit");
         uncheckCheckbox(Locator.name("quf_enabled"));
         clickButton("Submit");
-        setReportIds("ID-5");
+        goToAssayRun("second run");
+        setReportId("ID-5");
         assertTextNotPresent("Warning: multiple enabled assay results were found for the following IDs");
         assertTextPresentInThisOrder("A001","A002a","B002");
+
+        // verify that the duplicates report is now clear
+        clickLinkWithText("view duplicates");
+        waitForText("# Active Assignments");
+        assertTextNotPresent("ID-4", "ID-5");
     }
 
-    private void setReportIds(String ids)
+    private void setReportId(String id)
     {
-        clickLinkWithText("produce report");
+        // this method assumes that we are already viewing the Assay results grid
+        drt = new DataRegionTable("Data", this);
+        drt.setFilter("AnimalId", "Equals", id);
+        checkCheckbox(".select");
+        clickButton("Produce Report");
         waitForText("Enter the animal IDs separated by whitespace, comma, or semicolon:");
         Locator dr = Locator.id("dataregion_report");
-        setFormElement(Locator.name("idsTextArea"), ids);
-        sleep(500); // entering text enables the submit button
-        clickButton("Submit", 0);
         waitForElement(dr);
     }
 
