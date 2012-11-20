@@ -2943,9 +2943,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @LogMethod
     public void enableEmailRecorder()
     {
-        try {getHttpGetResponse("http://localhost:8080/labkey/dumbster/home/setRecordEmail.view?record=true", PasswordUtil.getUsername(), PasswordUtil.getPassword());}
-        catch (IOException e) {Assert.fail("Failed to enable email recorder");}
-        catch (HttpException e) {Assert.fail("Failed to enable email recorder");}
+        try {
+            getHttpGetResponse(WebTestHelper.getBaseURL() + "/dumbster/setRecordEmail.view?record=true", PasswordUtil.getUsername(), PasswordUtil.getPassword());}
+        catch (IOException e) {
+            Assert.fail("Failed to enable email recorder");}
+        catch (HttpException e) {
+            Assert.fail("Failed to enable email recorder");}
     }
 
     public void addWebPart(String webPartName)
