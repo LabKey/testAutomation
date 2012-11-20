@@ -229,7 +229,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickLinkWithText("" + issueId);
 
         // UpdateAction
-        clickLinkWithText("update");
+        updateIssue();
         setFormElement("comment", "don't believe the hype");
         clickButton("Save");
         searchFor(PROJECT_NAME, "2012", 1, ISSUE_TITLE_0);
@@ -249,6 +249,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         // CloseAction
         clickLinkWithText("close");
         clickButton("Save");
+        assertTextPresent("Issues List"); //we should be back at the issues list now
 
         // Test .lastFilter
         testLastFilter(issueId);
@@ -376,6 +377,12 @@ public class IssuesTest extends BaseSeleniumWebTest
         selectOptionByText("string5", "Cadmium");
         clickButton("Save");
 
+        //Issue 16238: From close issue screen: "Save" goes back to issue, "cancel" goes to issue list. This is the opposite of what I want
+        log("verify cancelling returns to the same issue page");
+        updateIssue();
+        clickButton("Cancel");
+        assertTextPresent(ISSUE_TITLE_2);
+
         goToModule("Dumbster");
         pushLocation();
 
@@ -397,7 +404,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("Issues Summary");
         clickLinkWithText(ISSUE_TITLE_2);
-        clickLinkWithText("update");
+        updateIssue();
         selectOptionByText("priority", "0");
         setFormElement("notifyList", USER3);
         setFormElement("comment", "Oh Noez!");
@@ -413,6 +420,11 @@ public class IssuesTest extends BaseSeleniumWebTest
                 USER3.equals(emailTable.getDataAsText(0, "To")) || USER3.equals(emailTable.getDataAsText(1, "To")));
         Assert.assertTrue("User did not receive updated issue notification",
                 PasswordUtil.getUsername().equals(emailTable.getDataAsText(0, "To")) || PasswordUtil.getUsername().equals(emailTable.getDataAsText(1, "To")));
+    }
+
+    private void updateIssue()
+    {
+        clickLinkWithText("update");
     }
 
     private void entryTypeNameTest()
