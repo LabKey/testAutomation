@@ -562,6 +562,9 @@ public class ReportTest extends StudyBaseTest
     private static final File ATTACHMENT_REPORT_FILE = new File(getLabKeyRoot() + "/sampledata/Microarray/", "test1.jpg"); // arbitrary image file
 
     private static final String ATTACHMENT_REPORT2_NAME = "Attachment Report2";
+    private static final String ATTACHMENT_REPORT3_NAME = "Attachment Report3";
+    private static final String UPDATE_ATTACHMENT_REPORT = "Update Attachment Report";
+
     private static final String ATTACHMENT_REPORT2_DESCRIPTION= "This attachment report points at a file on the server.";
     private static final File ATTACHMENT_REPORT2_FILE = new File(getLabKeyRoot() + "/sampledata/Microarray/", "test2.jpg"); // arbitrary image file
 
@@ -679,6 +682,7 @@ public class ReportTest extends StudyBaseTest
         Locator.XPathLocator l = getButtonLocator("Edit Report");
         Assert.assertTrue("Expected 'Edit Report' button to not be present", l == null);
         stopImpersonating();
+
         clickLinkWithText(getProjectName());
         clickLinkWithText(getFolderName());
         goToManageViews();
@@ -698,6 +702,37 @@ public class ReportTest extends StudyBaseTest
             // save should return back to the details page
             waitForText("Manage Views");
         }
+
+        // verify rename
+        clickReportGridLink(ATTACHMENT_REPORT2_NAME, "edit");
+        setFormElement("viewName", ATTACHMENT_REPORT3_NAME);
+        clickButton("Save");
+        waitForText(ATTACHMENT_REPORT3_NAME);
+
+        // verify can rename to same name
+        clickReportGridLink(ATTACHMENT_REPORT3_NAME, "edit");
+        setFormElement("viewName", ATTACHMENT_REPORT3_NAME);
+        clickButton("Save");
+        waitForText(ATTACHMENT_REPORT3_NAME);
+
+        Locator statusElement = Locator.input("status");
+
+        // verify we can set a property
+        clickReportGridLink(ATTACHMENT_REPORT3_NAME, "edit");
+        waitForText(UPDATE_ATTACHMENT_REPORT);
+        Assert.assertFalse("Locked".equals(getFormElement(statusElement)));
+        setFormElement("status", "Locked");
+        clickButton("Save");
+        waitForText(ATTACHMENT_REPORT3_NAME);
+        clickReportGridLink(ATTACHMENT_REPORT3_NAME, "edit");
+        waitForText(UPDATE_ATTACHMENT_REPORT);
+        Assert.assertTrue("Locked".equals(getFormElement(statusElement)));
+        clickButton("Cancel");
+        waitForText(ATTACHMENT_REPORT3_NAME);
+
+        //
+        // todo:  add test for issue 16544 when fixed
+        //
     }
 
     private static final String LINK_REPORT1_NAME = "Link Report1";
