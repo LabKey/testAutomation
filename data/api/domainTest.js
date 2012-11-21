@@ -12,7 +12,7 @@ function r(msg, last) {
 function getSuccessHandler(domainDesign)
 {
     var html = '';
-    html += '<b>' + domainDesign.name + '<\\/b><br> ';
+    html += '<b>' + domainDesign.name + '</b><br> ';
 
     for (var i in domainDesign.fields)
     {

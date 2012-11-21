@@ -2531,14 +2531,22 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {blur,change,mousedown,mouseup,click,reset,select,submit,abort,error,load,mouseout,mouseover,unload,keyup}
 
     /**
-     * @deprecated Direct event firing should be avoided. Use Javascript (via {@link #executeScript(String, Object...)}) if needed
-     * @param loc
-     * @param event
+     * Create and fire a JavaScript UIEvent
+     * @param l event target
+     * @param event event
      */
-    @Deprecated
-    public void fireEvent(Locator loc, SeleniumEvent event)
+    public void fireEvent(Locator l, SeleniumEvent event)
     {
-        selenium.fireEvent(loc.toString(), event.toString());
+        executeScript(
+                "var element = arguments[0];" +
+                        "var eventType = arguments[1];" +
+                        "var myEvent = document.createEvent('UIEvent');\n" +
+                        "myEvent.initEvent(\n" +
+                        "   eventType      // event type\n" +
+                        "   ,true      // can bubble?\n" +
+                        "   ,true      // cancelable?\n" +
+                        ");\n" +
+                        "element.dispatchEvent(myEvent);", l.findElement(_driver), event.toString());
     }
 
     @LogMethod
@@ -4018,25 +4026,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void click(Locator l)
     {
         clickAndWait(l, 0);
-    }
-
-    /**
-     * Creat and fire a JavaScript UIEvent
-     * @param l event target
-     * @param event event
-     */
-    public void fireEventJs(Locator l, SeleniumEvent event)
-    {
-        executeScript(
-                "var element = arguments[0];" +
-                        "var eventType = arguments[1];" +
-                        "var myEvent = document.createEvent('UIEvent');\n" +
-                        "myEvent.initEvent(\n" +
-                        "   eventType      // event type\n" +
-                        "   ,true      // can bubble?\n" +
-                        "   ,true      // cancelable?\n" +
-                        ");\n" +
-                        "element.dispatchEvent(myEvent);", l.findElement(_driver), event.toString());
     }
 
     /**
@@ -5916,7 +5905,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             deleteAllUsersFromGroup();
             click(Locator.xpath("//td/a/span[text()='Delete Empty Group']"));
-            waitForElementToDisappear(Locator.xpath("//div[@class='pGroup' and text()="+Locator.xq(groupName)+"]"), WAIT_FOR_JAVASCRIPT);
+            waitForElementToDisappear(Locator.xpath("//div[@class='pGroup' and text()=" + Locator.xq(groupName) + "]"), WAIT_FOR_JAVASCRIPT);
         }
     }
 

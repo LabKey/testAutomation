@@ -9,7 +9,7 @@ function renderer(assayArray)
     for (var defIndex = 0; defIndex  < assayArray.length; defIndex ++)
     {
 	var definition = assayArray[defIndex ];
-	html += '<b>' + definition.type + '<\\/b>: ' + definition.name + '<br>';
+	html += '<b>' + definition.type + '</b>: ' + definition.name + '<br>';
         for (var domain in definition.domains)
         {
             html += '&nbsp;&nbsp;&nbsp;' + domain + '<br>';

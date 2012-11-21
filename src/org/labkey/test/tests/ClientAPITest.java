@@ -510,6 +510,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), TEST_ASSAY);
         setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_DESC);
+        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
 
         click(Locator.xpath(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath()));
         _listHelper.setColumnName(getPropertyXPath("Run Fields"), 0, "RunDate");
