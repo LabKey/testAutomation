@@ -216,7 +216,17 @@ public class ViralLoadAssayTest extends LabModulesTest
         waitAndClick(Locator.ext4Button("Submit"));
         waitForPageToLoad();
 
-        _helper.addRecordsToAssayTemplate(TEMPLATE_DATA);
+        List<String> expectedCols = new ArrayList<String>();
+        expectedCols.add("well");
+        expectedCols.add("category");
+        expectedCols.add("subjectId");
+        expectedCols.add("date");
+        expectedCols.add("sampleVol");
+        expectedCols.add("comment");
+        expectedCols.add("sampleId");
+
+        waitForElement(Locator.xpath("//span[contains(text(), 'Freezer Id') and contains(@class, 'x4-column-header-text')]")); //ensure grid loaded
+        _helper.addRecordsToAssayTemplate(TEMPLATE_DATA, expectedCols);
 
         waitAndClick(Locator.ext4Button("Plate Layout"));
         waitForElement(Ext4Helper.ext4Window("Configure Plate"));
@@ -271,7 +281,7 @@ public class ViralLoadAssayTest extends LabModulesTest
         //restore original contents
         grid.setGridCell(1, 1, "A5");
 
-        //TODO: test other error messages including a run lacking any controls, required values, etc.
+        //TODO: test other error messages including a run lacking any controls, required values, also verify well matching template, etc.
 //        click(Locator.ext4Button("Download"));
 //       grid.setGridCell(1, 2, "");
 //        grid.setGridCell(1, 2, "Subject1");
@@ -489,7 +499,7 @@ public class ViralLoadAssayTest extends LabModulesTest
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
         waitForPageToLoad();
         DataRegionTable dr2 = new DataRegionTable("query", this);
-        Assert.assertEquals("Run plan not marked completed", 0, templates.getDataRowCount());
+        Assert.assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
     }
 
     private void importLC480Run()
@@ -588,9 +598,6 @@ public class ViralLoadAssayTest extends LabModulesTest
     {
         log("Verifying Light Cycle Import");
 
-        //note: until we better handle converting bad dates, this section will log an error, sp we reset them
-        checkErrors();
-
         _helper.goToAssayResultImport(ASSAY_NAME);
 
         //a proxy for page loading
@@ -679,9 +686,6 @@ public class ViralLoadAssayTest extends LabModulesTest
         Assert.assertEquals("Incorrect sample type", "Serum", sampleType);
 
         verifyImportedVLs(totalRows, expected, results, new String[]{"Subject Id"});
-
-        //see above
-        resetErrors();
     }
 
     private void verifyImportedVLs(int totalRows, Map<String, String[]> expected, DataRegionTable results, @Nullable String[] keyFields)

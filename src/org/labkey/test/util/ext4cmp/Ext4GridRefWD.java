@@ -59,11 +59,12 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         _test.doubleClick(cell);
         Locator input = Locator.css("div.x4-grid-editor input");
         _test.setFormElement(input, value);
-        //Ext4FieldRefWD field = new Ext4FieldRefWD(input.findElement(_test.getDriver()), _test);
-        //field.eval("getPlugin('editingplugin').completeEdit()");
-        _test.sleep(200);
+
+        //shift focus to commit changes
+        input.findElement(_test.getDriver()).sendKeys("\t");
+        _test.sleep(100);
 
         _test.click(Locator.css("body"));
-        _test.sleep(200);
+        _test.sleep(100);
     }
 }

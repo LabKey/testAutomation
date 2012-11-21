@@ -19,11 +19,13 @@ import junit.framework.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
 
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -39,6 +41,7 @@ public class LabModuleHelper
     private final Random _random = new Random(System.currentTimeMillis());
     public static final String IMPORT_DATA_TEXT = "Import Data";
     public static final String UPLOAD_RESULTS_TEXT = "Upload Results";
+    public static final String LAB_HOME_TEXT = "Types of Data:";
 
     public static final String POS_COLOR = "rgb(255, 192, 203)";
     public static final String UNKNOWN_COLOR = "rgb(0, 0, 255)";
@@ -106,7 +109,7 @@ public class LabModuleHelper
     public void goToLabHome()
     {
         _test.goToProjectHome();
-        _test.waitForText("Types of Data:");
+        _test.waitForText(LAB_HOME_TEXT);
     }
 
     public void verifyNavPanelRowItemPresent(String label)
@@ -181,6 +184,11 @@ public class LabModuleHelper
 
     public void addRecordsToAssayTemplate(String[][] data)
     {
+        addRecordsToAssayTemplate(data, null);
+    }
+
+    public void addRecordsToAssayTemplate(String[][] data, List<String> expectedColumns)
+    {
         _test.log("Setting assay template");
 
         StringBuilder sb = new StringBuilder();
@@ -193,6 +201,19 @@ public class LabModuleHelper
         _test.waitForText("Sample Information");
         _test.waitAndClick(Locator.ext4Button("Add From Spreadsheet"));
         _test.waitForElement(Ext4Helper.ext4Window("Spreadsheet Import"));
+
+        if (expectedColumns != null)
+        {
+            Ext4CmpRefWD win = _test._ext4Helper.queryOne("window", Ext4CmpRefWD.class);
+            String fields = (String)win.getEval("getFieldsInTemplateTest()");
+            String[] fieldArray = fields.split(";");
+            Assert.assertEquals("Incorrect column number in template", expectedColumns.size(), fieldArray.length);
+
+            for (String field : fieldArray)
+            {
+                Assert.assertTrue("Field present in template that should not be: " + field, expectedColumns.contains(field));
+            }
+        }
 
         Ext4FieldRefWD textArea = _test._ext4Helper.queryOne("#textField", Ext4FieldRefWD.class);
         textArea.setValue(sb.toString());

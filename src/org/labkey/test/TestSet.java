@@ -168,6 +168,8 @@ public enum TestSet
         LabModulesTest.class,
         SequenceTest.class,
         ViralLoadAssayTest.class,
+        ELISPOT_AssayTest.class,
+        ElectrochemiluminescenceAssayTest.class,
         StudyPublishTest.class,
         //ExperimentalFeaturesTest.class,  -- hidden email test moved out, currently no experimental features being tested
         HiddenEmailTest.class,
