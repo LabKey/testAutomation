@@ -49,7 +49,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         super.doCleanup(afterTest);
 
         deleteUsers(afterTest, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);
-        try{deleteGroup(TEST_GROUP);}catch(Throwable t){/**/}
+        deleteGroup(TEST_GROUP, afterTest);
     }
 
     @Override
@@ -123,8 +123,9 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         goToSiteGroups();
         _ext4Helper.clickExt4Tab("Permissions");
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        assertElementNotPresent(Locator.permissionButton(TEST_GROUP, "SeeEmailAddresses"));
-        assertElementNotPresent(Locator.permissionButton(IMPERSONATED_USER, "SeeEmailAddresses"));
+        removeSiteGroupPermission("All Site Users", "See Email Addresses");
+        assertElementNotPresent(Locator.permissionButton(TEST_GROUP, "See Email Addresses"));
+        assertElementNotPresent(Locator.permissionButton(IMPERSONATED_USER, "See Email Addresses"));
         clickButton("Save and Finish");
     }
 
