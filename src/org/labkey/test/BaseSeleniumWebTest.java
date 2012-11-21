@@ -5324,15 +5324,22 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         deleteUsers(true, userEmail);
     }
 
-    @LogMethod
     public void deleteGroup(String groupName)
     {
-        log("Attempting to delete group: " + groupName);
-        selectGroup(groupName);
-        deleteAllUsersFromGroup();
+        deleteGroup(groupName, false);
+    }
 
-        click(Locator.xpath("//td/a/span[text()='Delete Empty Group']"));
-        waitForElementToDisappear(Locator.xpath("//div[@class='pGroup' and text()="+Locator.xq(groupName)+"]"), WAIT_FOR_JAVASCRIPT);
+    @LogMethod
+    public void deleteGroup(String groupName, boolean failIfNotFound)
+    {
+        log("Attempting to delete group: " + groupName);
+        if (selectGroup(groupName, failIfNotFound))
+        {
+            deleteAllUsersFromGroup();
+
+            click(Locator.xpath("//td/a/span[text()='Delete Empty Group']"));
+            waitForElementToDisappear(Locator.xpath("//div[@class='pGroup' and text()="+Locator.xq(groupName)+"]"), WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     private void deleteAllUsersFromGroup()
@@ -5369,15 +5376,28 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickButton("Done");
     }
 
-    public void selectGroup(String groupName)
+    public boolean selectGroup(String groupName)
+    {
+        return selectGroup(groupName, false);
+    }
+
+    public boolean selectGroup(String groupName, boolean failIfNotFound)
     {
         if(!isElementPresent(Locator.xpath("//li[contains(@class,'tab-strip-active')]//span[text()='Site Groups']")))
             goToSiteGroups();
 
-        waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.xpath("//div[text()='" + groupName + "']/../.."), 1000);
-        mouseDown(Locator.xpath("//div[text()='" + groupName + "']/../.."));
-        _extHelper.waitForExtDialog(groupName + " Information");
+        waitForElement(Locator.css(".groupPicker .x4-grid-body"), WAIT_FOR_JAVASCRIPT);
+        if (isElementPresent(Locator.xpath("//div[text()='" + groupName + "']")))
+        {
+            waitForElement(Locator.xpath("//div[text()='" + groupName + "']/../.."), 1000);
+            mouseDown(Locator.xpath("//div[text()='" + groupName + "']/../.."));
+            _extHelper.waitForExtDialog(groupName + " Information");
+            return true;
+        }
+        else if (failIfNotFound)
+            Assert.fail("Group not found:" + groupName);
+
+        return false;
     }
 
     @LogMethod

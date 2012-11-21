@@ -52,11 +52,11 @@ public class GroupTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest)
     {
         deleteUsers(afterTest, TEST_USERS_FOR_GROUP);
-        try{deleteGroup(SIMPLE_GROUP);}catch(Throwable t){/*ignore*/}
-        try{deleteGroup(COMPOUND_GROUP);}catch(Throwable t){/*ignore*/}
-        try{deleteGroup(BAD_GROUP);}catch(Throwable t){/*ignore*/}
-        try{deleteGroup(CHILD_GROUP);}catch(Throwable t){/*ignore*/}
-        try{deleteGroup(API_SITE_GROUP);}catch(Throwable t){/*ignore*/}
+        deleteGroup(SIMPLE_GROUP, afterTest);
+        deleteGroup(COMPOUND_GROUP, afterTest);
+        deleteGroup(BAD_GROUP, afterTest);
+        deleteGroup(CHILD_GROUP, afterTest);
+        deleteGroup(API_SITE_GROUP, afterTest);
         deleteProject(getProjectName(), afterTest);
         deleteProject(getProject2Name(), afterTest);
     }
@@ -289,7 +289,7 @@ public class GroupTest extends BaseWebDriverTest
 
     private void verifyExportFunction()
     {
-        selectGroup(COMPOUND_GROUP);
+        selectGroup(COMPOUND_GROUP, true);
         clickLinkWithText("manage group");
         //Selenium can't handle file exports, so there's nothing to be done here.
         assertElementPresent(getButtonLocatorContainingText("Export All to Excel"));

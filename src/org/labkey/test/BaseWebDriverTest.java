@@ -5160,9 +5160,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return xpath.findElements(_driver).size();
     }
 
-    public int getElementCount(Locator xpath)
+    public int getElementCount(Locator locator)
     {
-        return xpath.findElements(_driver).size();
+        return locator.findElements(_driver).size();
     }
 
     /**
@@ -5878,11 +5878,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         goToSiteUsers();
         clickButton("Add Users");
 
-        setFormElement("newUsers", userName);
+        setFormElement(Locator.name("newUsers"), userName);
         if (cloneUserName != null)
         {
             checkCheckbox("cloneUserCheck");
-            setFormElement("cloneUser", cloneUserName);
+            setFormElement(Locator.name("cloneUser"), cloneUserName);
         }
         clickButton("Add Users");
 
@@ -5897,21 +5897,27 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         if (!isElementPresent(Locator.xpath("//input[@value='" + userEmail + "']")))
         {
-            setFormElement("names", userEmail);
+            setFormElement(Locator.name("names"), userEmail);
             uncheckCheckbox("sendEmail");
             clickButton("Update Group Membership");
         }
     }
 
-    @LogMethod
     public void deleteGroup(String groupName)
     {
-        log("Attempting to delete group: " + groupName);
-        selectGroup(groupName);
-        deleteAllUsersFromGroup();
+        deleteGroup(groupName, false);
+    }
 
-        click(Locator.xpath("//td/a/span[text()='Delete Empty Group']"));
-        waitForElementToDisappear(Locator.xpath("//div[@class='pGroup' and text()="+Locator.xq(groupName)+"]"), WAIT_FOR_JAVASCRIPT);
+    @LogMethod
+    public void deleteGroup(String groupName, boolean failIfNotFound)
+    {
+        log("Attempting to delete group: " + groupName);
+        if (selectGroup(groupName, failIfNotFound))
+        {
+            deleteAllUsersFromGroup();
+            click(Locator.xpath("//td/a/span[text()='Delete Empty Group']"));
+            waitForElementToDisappear(Locator.xpath("//div[@class='pGroup' and text()="+Locator.xq(groupName)+"]"), WAIT_FOR_JAVASCRIPT);
+        }
     }
 
     private void deleteAllUsersFromGroup()
@@ -5920,7 +5926,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         while(isElementPresent(l))
         {
-            int i = getXpathCount(l);
+            int i = getElementCount(l);
             click(l);
             waitForElementToDisappear(l.index(i), WAIT_FOR_JAVASCRIPT);
         }
@@ -5950,14 +5956,27 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickButton("Done");
     }
 
-    public void selectGroup(String groupName)
+    public boolean selectGroup(String groupName)
+    {
+        return selectGroup(groupName, false);
+    }
+
+    public boolean selectGroup(String groupName, boolean failIfNotFound)
     {
         if(!isElementPresent(Locator.css(".x4-tab-active").withText("Site Groups")))
             goToSiteGroups();
 
-        waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
-        waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
-        _extHelper.waitForExtDialog(groupName + " Information");
+        waitForElement(Locator.css(".groupPicker .x4-grid-body"), WAIT_FOR_JAVASCRIPT);
+        if (isElementPresent(Locator.xpath("//div[text()='" + groupName + "']")))
+        {
+            click(Locator.xpath("//div[text()='" + groupName + "']"));
+            _extHelper.waitForExtDialog(groupName + " Information");
+            return true;
+        }
+        else if (failIfNotFound)
+            Assert.fail("Group not found:" + groupName);
+
+        return false;
     }
 
     @LogMethod
