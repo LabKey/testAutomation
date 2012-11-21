@@ -55,6 +55,12 @@ public class FlowTest extends BaseFlowTest
     }
 
     @Override
+    protected void doCleanup(boolean afterTest) throws Exception
+    {
+        super.doCleanup(afterTest);
+    }
+
+    @Override
     protected void init()
     {
         // fail fast if R is not configured
@@ -82,6 +88,8 @@ public class FlowTest extends BaseFlowTest
             configureSampleSetAndMetadata();
 
             sampleSetAndMetadataTest();
+
+            customGraphQuery();
 
             positivityReportTest();
 
@@ -357,6 +365,9 @@ public class FlowTest extends BaseFlowTest
         clickLinkWithText("29 FCS files");
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Inline");
 //            sleep(3000);
+        assertTextNotPresent("Error generating graph");
+        assertTextPresent("No graph for:\n(<APC-A>)");
+
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn("Background/Count");
         _customizeViewsHelper.removeCustomizeViewColumn("Background/Singlets:Count");
@@ -382,12 +393,42 @@ public class FlowTest extends BaseFlowTest
         // check PTID value from sample set present
         assertTextPresent("P02034");
 
+        // check no graph errors are present and the graphs have labels
+        assertTextNotPresent("Error generating graph");
+        beginAt("/flow/Flow%20Verify%20Project/FlowShortTest/query.view?schemaName=flow&query.queryName=FCSAnalyses&query.showGraphs=Inline&query.viewName=");
+        String href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
+        Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+
+        _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
+        href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
+        Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+
         // UNDONE: assert background values are correctly calculated
 
         // check well details page for FCSFile has link to the sample
         clickLinkWithText("91779.fcs-" + FCS_FILE_1);
         clickLinkWithText("91779.fcs");
         assertLinkPresentWithText(FCS_FILE_1 + "-C01");
+    }
+
+    public void customGraphQuery()
+    {
+        // Create custom query with a Graph column
+        String graphQuery =
+                "SELECT FCSAnalyses.Name,\n" +
+                "FCSAnalyses.Graph.\"(FSC-H:FSC-A)\" AS Singlets,\n" +
+                "FCSAnalyses.Graph.\"(<APC-A>)\"\n" +
+                "FROM FCSAnalyses";
+        createQuery(PROJECT_NAME, "GraphQuery", graphQuery, null, true);
+        beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=GraphQuery&query.showGraphs=Inline");
+        assertTextNotPresent("Error generating graph");
+        assertTextPresent("No graph for:\n(<APC-A>)");
+        String href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
+        Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+
+        _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
+        href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
+        Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
     }
 
     public void copyAnalysisScriptTest()
