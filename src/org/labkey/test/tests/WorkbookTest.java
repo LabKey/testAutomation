@@ -159,7 +159,7 @@ public class WorkbookTest extends BaseWebDriverTest
 
         setFormElement(Locator.id("workbookTitle"), title);
         setFormElement(Locator.id("workbookDescription"), description);
-        selectOptionByText(Locator.id("workbookFolderType"), folderType.toString());
+        selectOptionByValue(Locator.id("workbookFolderType"), folderType.toString());
 
         clickButton("Create Workbook");
     }
