@@ -50,7 +50,6 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         public Integer rowid;
         public String text;
         public int intNotNull;
-        public boolean bitNotNull;
         public Date dateTimeNotNull;
 
         public Row(String text, int intNotNull, Date dateTimeNotNull)

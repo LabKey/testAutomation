@@ -46,7 +46,7 @@ public class SecurityTest extends BaseSeleniumWebTest
     protected static final String PROJECT_ADMIN_USER = "admin_securitytest@security.test";
     protected static final String NORMAL_USER = "user_securitytest@security.test";
     protected static final String[] PASSWORDS= {"0asdfgh!", "1asdfgh!", "2asdfgh!", "3asdfgh!", "4asdfgh!", "5asdfgh!", "6asdfgh!", "7asdfgh!", "8asdfgh!", "9asdfgh!", "10asdfgh!"};
-    protected static String NORMAL_USER_PASSWORD = PASSWORDS[0];
+    protected static final String NORMAL_USER_PASSWORD = PASSWORDS[0];
     protected static final String TO_BE_DELETED_USER = "delete_me@security.test";
     protected static final String SITE_ADMIN_USER = "siteadmin_securitytest@security.test";
 
