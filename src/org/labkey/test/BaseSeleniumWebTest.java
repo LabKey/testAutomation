@@ -2053,7 +2053,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public String getProjectUrl()
     {
-        return "/project/" + getProjectName() + "/begin.view?";
+        return "/project/" + EscapeUtil.encode(getProjectName()) + "/begin.view?";
     }
 
     public static String stripContextPath(String url)

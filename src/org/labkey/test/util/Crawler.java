@@ -400,7 +400,7 @@ public class Crawler
         String currentProject = st.nextToken();
         for (String createdProject : _test.getContainerHelper().getCreatedProjects())
         {
-            if (currentProject.equals(createdProject))
+            if (currentProject.equals(EscapeUtil.encode(createdProject)))
                 return true;
         }
         return false;
