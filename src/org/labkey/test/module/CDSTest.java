@@ -64,7 +64,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     @Override
     public void doCleanup(boolean afterTest)
     {
-        deleteProject(getProjectName(), afterTest);
+//        deleteProject(getProjectName(), afterTest);
     }
 
     @Override
@@ -76,10 +76,10 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     @Override
     public void doTestSteps()
     {
-        setupProject();
-        importData();
-        populateFactTable();
-        verifyFactTable();
+//        setupProject();
+//        importData();
+//        populateFactTable();
+//        verifyFactTable();
 
         selenium.windowMaximize(); // Provides more useful screenshots on failure
 
