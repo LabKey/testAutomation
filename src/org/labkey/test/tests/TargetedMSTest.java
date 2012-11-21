@@ -134,7 +134,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
     @Override
     protected void doCleanup(boolean afterTest) throws Exception
     {
-        deleteProject(getProjectName());
+        deleteProject(getProjectName(), afterTest);
     }
 
     @Override
