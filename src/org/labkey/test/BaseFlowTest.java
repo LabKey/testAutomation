@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,7 +71,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected String getContainerPath()
     {
         if (_containerPath == null)
-            _containerPath = "/" + getProjectName() + "/" + getFolderName();
+            _containerPath = "/" + EscapeUtil.encode(getProjectName()) + "/" + EscapeUtil.encode(getFolderName());
         return _containerPath;
     }
 
