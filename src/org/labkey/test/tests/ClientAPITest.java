@@ -269,9 +269,12 @@ public class ClientAPITest extends BaseWebDriverTest
         while (waitSeconds-- > 0)
         {
             log("Waiting for " + TEST_DIV_NAME + " div to render...");
-            String divHtml = (String)executeScript("return document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
-            if (divHtml.length() > 0)
-                return divHtml;
+            if (isElementPresent(Locator.id(TEST_DIV_NAME)))
+            {
+                String divHtml = (String)executeScript("return document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
+                if (divHtml.length() > 0)
+                    return divHtml;
+            }
             sleep(1000);
         }
         Assert.fail("Div failed to render.");
@@ -556,7 +559,7 @@ public class ClientAPITest extends BaseWebDriverTest
         clickButton("Save", 10000);
 
         setSourceFromFile("domainTest.js");
-        waitForText("Finished DomainTests.", 30000);
+        waitForElement(Locator.id(TEST_DIV_NAME).containing("Finished DomainTests."), 30000);
 
         assertElementContains(Locator.id(TEST_DIV_NAME), "Updated StudyProperties domain");
         assertElementContains(Locator.id(TEST_DIV_NAME), "Did not find the");
