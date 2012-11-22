@@ -29,7 +29,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.RReportHelperWD;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
@@ -93,8 +93,8 @@ public class FilterTest extends ListTest
 
     public void doTestSteps()
     {
-        RReportHelper _rReportHelper = new RReportHelper(this);
-        _rReportHelper.ensureRConfig();
+        RReportHelperWD _RReportHelperWD = new RReportHelperWD(this);
+        _RReportHelperWD.ensureRConfig();
         setUpList();
         _customizeViewsHelper.createRView(null, R_VIEW);
         filterTest();
