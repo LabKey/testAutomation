@@ -2953,7 +2953,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void addWebPart(String webPartName)
     {
-        Locator.css("option").withText(webPartName).waitForElmement(_driver, 1000);
+        Locator.css("option").withText(webPartName).waitForElmement(_driver, WAIT_FOR_JAVASCRIPT);
         Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
         selectOptionByText(form.append("//select"), webPartName);
         submit(form);
@@ -3099,6 +3099,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         else if(type.contains("Contains One Of"))
         {
             desc = "CONTAINS ONE OF (" + value.replace(";", ", ") + "))";
+        }
+        else if(type.contains("Does Not Equal Any Of"))
+        {
+            desc = "IS NOT ANY OF (" + value.replace(";", ", ") + "))";
         }
         else if(type.contains("Does Not Contain Any Of"))
         {
@@ -4915,6 +4919,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             //Retype the last character manually to trigger events
             el.sendKeys(text.substring(text.length()-1));
         }
+
+        fireEvent(l, SeleniumEvent.blur); // Make GWT form elements behave better
     }
 
     /**
@@ -5043,8 +5049,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             waitForElement(Locator.xpath("//span["+Locator.NOT_HIDDEN+" and text()='Filter Type:']"), WAIT_FOR_JAVASCRIPT);
         }
         _extHelper.selectComboBoxItem("Filter Type:", filter1Type); //Select combo box item.
-        if(filter1 != null) setFormElement(Locator.id("value_1"), filter1);
-        if(filter2Type!=null)
+        if(filter1 != null && !filter1Type.contains("Blank"))
+            setFormElement(Locator.id("value_1"), filter1);
+        if(filter2Type!=null && !filter2Type.contains("Blank"))
         {
             _extHelper.selectComboBoxItem("and:", filter2Type); //Select combo box item.
             if(filter2 != null) setFormElement(Locator.id("value_2"), filter2);

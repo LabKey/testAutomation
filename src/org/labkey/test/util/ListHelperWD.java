@@ -18,6 +18,7 @@ package org.labkey.test.util;
 
 import junit.framework.Assert;
 import org.apache.commons.lang3.StringUtils;
+import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
@@ -73,9 +74,8 @@ public class ListHelperWD extends ListHelper
         _test.clickButton("Submit", 0);
         if (null != error)
         {
-            _test.waitForElement(Locator.css(".labkey-error"));
             if (0<error.length())
-                Assert.assertTrue("Wrong error: " + _test.getText(Locator.css(".labkey-error")), _test.getText(Locator.css(".labkey-error")).contains(error));
+                _test.waitForElement(Locator.css(".labkey-error").containing(error));
         }
         else
         {
@@ -395,14 +395,9 @@ public class ListHelperWD extends ListHelper
 
     private void createListHelper(String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
-
         _test.selectOptionByText(Locator.id("ff_keyType"), listKeyType.toString());
-        _test.setFormElementJS(Locator.id("ff_keyName"), listKeyName);
-
-        // GWT nonsense
-        _test.sleep(2000);
-        _test.pressTab(Locator.id("ff_keyName"));
-        _test.click(Locator.id("ff_name"));
+        _test.setFormElement(Locator.id("ff_keyName"), listKeyName);
+        _test.fireEvent(Locator.id("ff_keyName"), BaseWebDriverTest.SeleniumEvent.blur);
 
         _test.clickButton("Create List", 0);
         _test.waitForElement(Locator.name("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -418,97 +413,8 @@ public class ListHelperWD extends ListHelper
         for (int i = 1; i <= cols.length; i++)
         {
             ListColumn col = cols[i-1];
-            _test.waitForElement(Locator.id("button_Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            _test.clickButton("Add Field", 0);
-            _test.setFormElement(Locator.name("ff_name" + i),  col.getName());
-            _test.setFormElement(Locator.name("ff_label" + i), col.getLabel());
-            // Set type.
-            LookupInfo lookup = col.getLookup();
-            // click the combobox trigger image
-            _test.click(Locator.xpath("//input[@name='ff_type" + i + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
-            // click lookup checkbox
-            _test._extHelper.waitForExtDialog("Choose Field Type", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            _test.checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : col.getType().toString()) + "']/../input[@name = 'rangeURI']"));
 
-            if (lookup != null)
-            {
-                _test._shortWait.until(new ExpectedCondition<Boolean>()
-                {
-                    @Override
-                    public Boolean apply(WebDriver driver)
-                    {
-                        return driver.findElement(By.name("lookupContainer")).isEnabled();
-                    }
-                });
-
-                if (lookup.getFolder() != null)
-                {
-                    _test.click(Locator.xpath("//input[@name = 'lookupContainer']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
-                    Locator.css("div.x-combo-list-item").withText(lookup.getFolder()).waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
-                }
-                _test.sleep(500);
-
-                _test.click(Locator.xpath("//input[@name = 'schema']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
-                Locator.css("div.x-combo-list-item").withText(lookup.getSchema()).waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
-                _test.sleep(500);
-
-                _test.click(Locator.xpath("//input[@name = 'table']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
-                Locator.css("div.x-combo-list-item").containing(lookup.getTable()).waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
-            }
-
-            _test.clickButton("Apply", 0);
-
-            // wait a while to make sure rangeURI is set (async check)
-            _test.sleep(1000);
-
-            _test._extHelper.clickExtTab("Display");
-            _test.setFormElement(Locator.id("propertyDescription"), col.getDescription());
-
-            if (col.getFormat() != null)
-            {
-                _test._extHelper.clickExtTab("Format");
-                _test.setFormElement(Locator.id("propertyFormat"), col.getFormat());
-            }
-
-            if (null != col.getURL())
-            {
-                _test.setFormElement(Locator.id("url"), col.getURL());
-            }
-
-            if (col.isRequired())
-            {
-                _test._extHelper.clickExtTab("Validators");
-                clickRequired("");
-            }
-
-            FieldValidator validator = col.getValidator();
-            if (validator != null)
-            {
-                _test._extHelper.clickExtTab("Validators");
-                if (validator instanceof RegExValidator)
-                    _test.clickButton("Add RegEx Validator", 0);
-                else
-                    _test.clickButton("Add Range Validator", 0);
-                _test.setFormElement(Locator.name("name"), validator.getName());
-                _test.setFormElement(Locator.name("description"), validator.getDescription());
-                _test.setFormElement(Locator.name("errorMessage"), validator.getMessage());
-
-                if (validator instanceof RegExValidator)
-                {
-                    _test.setFormElement(Locator.name("expression"), ((RegExValidator)validator).getExpression());
-                }
-                else if (validator instanceof RangeValidator)
-                {
-                    _test.setFormElement(Locator.name("firstRangeValue"), ((RangeValidator)validator).getFirstRange());
-                }
-                _test.clickButton("OK", 0);
-            }
-
-            if (col.isMvEnabled())
-            {
-                _test._extHelper.clickExtTab("Advanced");
-                clickMvEnabled("");
-            }
+            addField(col);
         }
 
         clickSave();
@@ -526,6 +432,105 @@ public class ListHelperWD extends ListHelper
         }
     }
 
+    public void addField(ListColumn col)
+    {
+        int i = _test.getElementCount(Locator.css(".labkey-pad-cells > tbody > tr")) - 1;
+        _test.waitForElement(Locator.id("button_Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.clickButton("Add Field", 0);
+        _test.setFormElement(Locator.name("ff_name" + i),  col.getName());
+        _test.setFormElement(Locator.name("ff_label" + i), col.getLabel());
+        // Set type.
+        LookupInfo lookup = col.getLookup();
+        // click the combobox trigger image
+        _test.click(Locator.xpath("//input[@name='ff_type" + i + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
+        // click lookup checkbox
+        _test._extHelper.waitForExtDialog("Choose Field Type", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : col.getType().toString()) + "']/../input[@name = 'rangeURI']"));
+
+        if (lookup != null)
+        {
+            _test._shortWait.until(new ExpectedCondition<Boolean>()
+            {
+                @Override
+                public Boolean apply(WebDriver driver)
+                {
+                    return driver.findElement(By.name("lookupContainer")).isEnabled();
+                }
+            });
+
+            if (lookup.getFolder() != null)
+            {
+                _test.click(Locator.xpath("//input[@name = 'lookupContainer']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
+                Locator.css("div.x-combo-list-item").withText(lookup.getFolder()).waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
+            }
+            _test.sleep(500);
+
+            _test.click(Locator.xpath("//input[@name = 'schema']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
+            Locator.css("div.x-combo-list-item").withText(lookup.getSchema()).waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
+            _test.sleep(500);
+
+            _test.click(Locator.xpath("//input[@name = 'table']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
+            Locator.css("div.x-combo-list-item").containing(lookup.getTable() + " (").waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
+        }
+
+        _test.clickButton("Apply", 0);
+
+        _test._extHelper.waitForExtDialogToDisappear("Choose Field Type");
+        // wait a while to make sure rangeURI is set (async check)
+//        _test.sleep(1000);
+
+        _test._extHelper.clickExtTab("Display");
+        if (col.getDescription() != null)
+        {
+            _test.setFormElement(Locator.id("propertyDescription"), col.getDescription());
+        }
+
+        if (col.getFormat() != null)
+        {
+            _test._extHelper.clickExtTab("Format");
+            _test.setFormElement(Locator.id("propertyFormat"), col.getFormat());
+        }
+
+        if (null != col.getURL())
+        {
+            _test.setFormElement(Locator.id("url"), col.getURL());
+        }
+
+        if (col.isRequired())
+        {
+            _test._extHelper.clickExtTab("Validators");
+            clickRequired("");
+        }
+
+        FieldValidator validator = col.getValidator();
+        if (validator != null)
+        {
+            _test._extHelper.clickExtTab("Validators");
+            if (validator instanceof RegExValidator)
+                _test.clickButton("Add RegEx Validator", 0);
+            else
+                _test.clickButton("Add Range Validator", 0);
+            _test.setFormElement(Locator.name("name"), validator.getName());
+            _test.setFormElement(Locator.name("description"), validator.getDescription());
+            _test.setFormElement(Locator.name("errorMessage"), validator.getMessage());
+
+            if (validator instanceof RegExValidator)
+            {
+                _test.setFormElement(Locator.name("expression"), ((RegExValidator)validator).getExpression());
+            }
+            else if (validator instanceof RangeValidator)
+            {
+                _test.setFormElement(Locator.name("firstRangeValue"), ((RangeValidator)validator).getFirstRange());
+            }
+            _test.clickButton("OK", 0);
+        }
+
+        if (col.isMvEnabled())
+        {
+            _test._extHelper.clickExtTab("Advanced");
+            clickMvEnabled("");
+        }
+    }
 
     public void beginCreateListFromTab(String tabName, String listName)
     {
@@ -553,6 +558,7 @@ public class ListHelperWD extends ListHelper
         _test.clickButton("Create New List");
         _test.waitForElement(Locator.id("ff_name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(Locator.id("ff_name"), listName);
+        _test.fireEvent(Locator.id("ff_name"), BaseWebDriverTest.SeleniumEvent.blur);
     }
 
 

@@ -329,7 +329,7 @@ public class DataRegionTable
         {
             while (true)
             {
-                String value = _test.getAttribute(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) +"]//tr[" + (row+5) + "]//input[@name='.select']/"), "value");
+                String value = _test.getAttribute(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) +"]//tr[" + (row+5) + "]//input[@name='.select']"), "value");
                 _mapRows.put(value, row);
                 if (value.equals(pk))
                     return row;

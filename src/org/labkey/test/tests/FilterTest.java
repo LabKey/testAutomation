@@ -22,12 +22,15 @@ package org.labkey.test.tests;
  * Time: 3:58 PM
  */
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,12 +55,10 @@ public class FilterTest extends ListTest
                 "3\tYellow\t1990\n" );
 
         clickButton("Submit", 0);
-        waitForElement(Locator.tagWithText("button", "OK"), WAIT_FOR_JAVASCRIPT);
-        _extHelper.clickExtButton("OK");
-        waitForPageToLoad();
+        waitForElement(Locator.id("labkey-nav-trail-current-page").withText(FACET_TEST_LIST));
     }
 
-
+    @LogMethod
     void setUpList()
     {
         StringBuilder testDataFull = new StringBuilder();
@@ -82,14 +83,13 @@ public class FilterTest extends ListTest
         _listHelper.createList(PROJECT_NAME, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
         log("Set title field of 'Colors' to 'Desc'");
         clickEditDesign();
-        selectOptionByText("ff_titleColumn", "Desc");
+        selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
         clickDone();
         clickLinkWithText(LIST_NAME_COLORS);
         clickImportData();
-        setFormElement("text", testDataFull.toString());
+        setFormElement(Locator.name("text"), testDataFull.toString());
         submitImportTsv();
     }
-
 
     public void doTestSteps()
     {
@@ -110,6 +110,7 @@ public class FilterTest extends ListTest
         sleep(400);
     }
 
+    @LogMethod
     private void facetedFilterTest()
     {
         createList2();
@@ -128,8 +129,8 @@ public class FilterTest extends ListTest
         setUpFacetedFilter("query", "Color", "Robust");
         _extHelper.clickExtTab("Choose Filters");
         //NOTE: the filter will optimize this to EQUALS, since there is 1 value
-        waitForFormElementToEqual(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "Robust", getFormElement("value_1"));
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Equals");
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "Robust", getFormElement(Locator.name("value_1")));
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
         verifyColumnValues("query", "Color", "Robust");
@@ -137,8 +138,8 @@ public class FilterTest extends ListTest
         // Issue 14710: Switching between faceted and logical filters breaks dialog
         setUpFacetedFilter("query", "Color", "Robust", "Light");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "Zany", getFormElement("value_1"));
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "Zany", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.waitForExtDialog("Confirm change");
@@ -150,10 +151,10 @@ public class FilterTest extends ListTest
         //now repeat with a filter that should be translated
         setUpFacetedFilter("query", "Color", "Light");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "Light", getFormElement("value_1"));
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Equals");
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "Light", getFormElement(Locator.name("value_1")));
 
-        setFormElement("value_1", "Light;Robust");
+        setFormElement(Locator.name("value_1"), "Light;Robust");
 
         _extHelper.clickExtTab("Choose Values"); //we should get no alerts, and Light + Robust should be checked
         _extHelper.clickExtButton("OK");
@@ -177,16 +178,16 @@ public class FilterTest extends ListTest
 
         setUpFacetedFilter("query", "year", "1990");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div/input"), "Equals");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "1990", getFormElement("value_1"));
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Equals");
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "1990", getFormElement(Locator.name("value_1")));
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
         verifyColumnValues("query", "year", "1990");
 
         setUpFacetedFilter("query", "year", "1990", "1980");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div/input"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement("value_1"));
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.waitForExtDialog("Confirm change");
@@ -194,11 +195,9 @@ public class FilterTest extends ListTest
         _extHelper.clickExtButton("OK");
         verifyColumnValues("query", "year", "1980", "1970", "1990");
 
-        // TODO: Blocked: 14710: Switching between faceted and logical filters breaks dialog
-//        setFacetedFilter("query", "year");
-//        verifyColumnValues("1980", "1990", "1970");
+        setFacetedFilter("query", "year");
+        verifyColumnValues("query", "year", "1980", "1970", "1990");
     }
-
 
     private void verifyColumnValues(String dataregion, String columnName, String... expectedValues)
     {
@@ -216,7 +215,7 @@ public class FilterTest extends ListTest
             Assert.assertEquals(1, StringUtils.countMatches(filterDialogText, text));
     }
 
-
+    @LogMethod
     protected void filterTest()
     {
         log("Filter Test");
@@ -228,7 +227,7 @@ public class FilterTest extends ListTest
         filterCancelButtonWorksTest();
     }
 
-
+    @LogMethod
     private void invalidFiltersGenerateCorrectErrorTest()
     {
         String[][] testArgs = generateInvalidFilterTestArgs();
@@ -241,7 +240,7 @@ public class FilterTest extends ListTest
 
     }
 
-
+    @LogMethod
     private void invalidFiltersGenerateCorrectErrorTest(String
                         regionName, String columnName, String filterType,
                         String filterValue, String expectedError)
@@ -260,7 +259,7 @@ public class FilterTest extends ListTest
         assertTextPresent(expectedError);
 
         clickButton("CANCEL", 0);
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
     }
 
@@ -301,6 +300,7 @@ public class FilterTest extends ListTest
         return _listCol4.getName();
     }
 
+    @LogMethod
     public void validFiltersGenerateCorrectResultsTest()
     {
         List<FilterArgs> testArgs = generateValidFilterArgsAndResponses();
@@ -327,8 +327,8 @@ public class FilterTest extends ListTest
         public String[] notPresent;
 
         public FilterArgs(String columnName,
-                          String filter1Type, String filter1Value,
-                          String filter2Type, String filter2Value,
+                          String filter1Type, @Nullable String filter1Value,
+                          @Nullable String filter2Type, @Nullable String filter2Value,
                           String[] present, String[] notPresent)
         {
             this.columnName = columnName;
@@ -342,40 +342,40 @@ public class FilterTest extends ListTest
     }
 
     public static FilterArgs FilterArgs(String columnName,
-                             String filter1Type, String filter1Value,
-                             String filter2Type, String filter2Value,
+                             String filter1Type, @Nullable String filter1Value,
+                             @Nullable String filter2Type, @Nullable String filter2Value,
                              String[] present, String[] notPresent)
     {
         return new FilterArgs(columnName, filter1Type, filter1Value, filter2Type, filter2Value, present, notPresent);
     }
 
     private List<FilterArgs> generateValidFilterArgsAndResponses()
-    {
-        return Arrays.asList(
-                //String columnName, String filter1Type, String filter1, String filter2Type, String filter2, String[] textPresentAfterFilter, String[] textNotPresentAfterFilter,
-                //Issue 12197
-                FilterArgs(_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1]}),
-                FilterArgs(_listCol1.getName(), "Equals", TEST_DATA[1][0], null, null, new String[] {TEST_DATA[1][0]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][3]}),
-                FilterArgs(_listCol1.getName(), "Starts With", "Z", null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1],TEST_DATA[1][2]}),
-                FilterArgs(_listCol1.getName(), "Does Not Start With", "Z", null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][0]}, new String[] {TEST_DATA[1][3]}),
-                //can't check for the absence of thing you're excluding, since it will be present in the filter text
-                FilterArgs(_listCol1.getName(), "Does Not Equal", TEST_DATA[1][0], null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][3]}, new String[] {TEST_DATA[5][0]}),
-                FilterArgs(_listCol1.getName(), "Does Not Equal Any Of (e.g. \"a;b;c\")", TEST_DATA[1][0] + ";" + TEST_DATA[1][1], null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}, new String[] {TEST_DATA[5][0], TEST_DATA[5][1]}),
-                FilterArgs(_listCol3.getName(), "Equals", "true", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][2]}, new String[] {TEST_DATA[1][1],TEST_DATA[1][3]}),
-                FilterArgs(_listCol3.getName(), "Does Not Equal", "false", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][2]}, new String[] {TEST_DATA[1][1],TEST_DATA[1][3]}),
-                //filter is case insensitive
-                FilterArgs(_listCol6.getName(), "Contains", "e", "Contains", "r", new String[] {TEST_DATA[5][2],TEST_DATA[5][0], TEST_DATA[5][1]}, new String[] {TEST_DATA[1][3]}),
-//                FilterArgs(_listCol2.getName(), "Is Greater Than", "2", "Is Less Than or Equal To", "4", new String[] {TEST_DATA[1][2]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1],TEST_DATA[1][3]}),
-                FilterArgs(_listCol4.getName(), "Is Greater Than or Equal To", "9", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][1]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}),
-                FilterArgs(_listCol4.getName(), "Is Greater Than", "9", null, null, new String[] {TEST_DATA[1][0]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3],TEST_DATA[1][1]}),
-                FilterArgs(_listCol4.getName(), "Is Blank", "", null, null, new String[] {}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3],TEST_DATA[1][1], TEST_DATA[1][0]}),
-                //new filters for faceted filtering
-                FilterArgs(_listCol6.getName(),  "Contains One Of (e.g. \"a;b;c\")", TEST_DATA[5][1] + ";" + TEST_DATA[5][3], null, null, new String[] {TEST_DATA[5][1]}, new String[] {TEST_DATA[1][0], TEST_DATA[1][2]}),
-                FilterArgs(_listCol1.getName(), "Does Not Contain Any Of (e.g. \"a;b;c\")", TEST_DATA[1][3] + ";" + TEST_DATA[1][1], null, null, new String[] {TEST_DATA[1][0], TEST_DATA[1][2]}, new String[] {TEST_DATA[0][1] , TEST_DATA[0][3]}),
-                FilterArgs(_listCol6.getName(), "Is Blank", "", null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][1] ,TEST_DATA[1][2], TEST_DATA[1][0]}),
-                FilterArgs(_listCol6.getName(), "Is Not Blank", "", null, null, new String[] {TEST_DATA[1][1] ,TEST_DATA[1][2], TEST_DATA[1][0]}, new String[] {TEST_DATA[1][3]})
-        );
-    }
+        {
+            return Arrays.asList(
+                    //String columnName, String filter1Type, String filter1, String filter2Type, String filter2, String[] textPresentAfterFilter, String[] textNotPresentAfterFilter,
+                    //Issue 12197
+                    FilterArgs(_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1]}),
+                    FilterArgs(_listCol1.getName(), "Equals", TEST_DATA[1][0], null, null, new String[] {TEST_DATA[1][0]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][3]}),
+                    FilterArgs(_listCol1.getName(), "Starts With", "Z", null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1],TEST_DATA[1][2]}),
+                    FilterArgs(_listCol1.getName(), "Does Not Start With", "Z", null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][0]}, new String[] {TEST_DATA[1][3]}),
+                    //can't check for the absence of thing you're excluding, since it will be present in the filter text
+                    FilterArgs(_listCol1.getName(), "Does Not Equal", TEST_DATA[1][0], null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][1],TEST_DATA[1][3]}, new String[] {TEST_DATA[5][0]}),
+                    FilterArgs(_listCol1.getName(), "Does Not Equal Any Of (e.g. \"a;b;c\")", TEST_DATA[1][0] + ";" + TEST_DATA[1][1], null, null, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}, new String[] {TEST_DATA[5][0], TEST_DATA[5][1]}),
+                    FilterArgs(_listCol3.getName(), "Equals", "true", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][2]}, new String[] {TEST_DATA[1][1],TEST_DATA[1][3]}),
+                    FilterArgs(_listCol3.getName(), "Does Not Equal", "false", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][2]}, new String[] {TEST_DATA[1][1],TEST_DATA[1][3]}),
+                    //filter is case insensitive
+                    FilterArgs(_listCol6.getName(), "Contains", "e", "Contains", "r", new String[] {TEST_DATA[5][2],TEST_DATA[5][0], TEST_DATA[5][1]}, new String[] {TEST_DATA[1][3]}),
+    //                FilterArgs(_listCol2.getName(), "Is Greater Than", "2", "Is Less Than or Equal To", "4", new String[] {TEST_DATA[1][2]}, new String[] {TEST_DATA[1][0],TEST_DATA[1][1],TEST_DATA[1][3]}),
+                    FilterArgs(_listCol4.getName(), "Is Greater Than or Equal To", "9", null, null, new String[] {TEST_DATA[1][0],TEST_DATA[1][1]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3]}),
+                    FilterArgs(_listCol4.getName(), "Is Greater Than", "9", null, null, new String[] {TEST_DATA[1][0]}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3],TEST_DATA[1][1]}),
+                    FilterArgs(_listCol4.getName(), "Is Blank", null, null, null, new String[] {}, new String[] {TEST_DATA[1][2],TEST_DATA[1][3],TEST_DATA[1][1], TEST_DATA[1][0]}),
+                    //new filters for faceted filtering
+                    FilterArgs(_listCol6.getName(),  "Contains One Of (e.g. \"a;b;c\")", TEST_DATA[5][1] + ";" + TEST_DATA[5][3], null, null, new String[] {TEST_DATA[5][1]}, new String[] {TEST_DATA[1][0], TEST_DATA[1][2]}),
+                    FilterArgs(_listCol1.getName(), "Does Not Contain Any Of (e.g. \"a;b;c\")", TEST_DATA[1][3] + ";" + TEST_DATA[1][1], null, null, new String[] {TEST_DATA[1][0], TEST_DATA[1][2]}, new String[] {TEST_DATA[0][1] , TEST_DATA[0][3]}),
+                    FilterArgs(_listCol6.getName(), "Is Blank", null, null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][1] ,TEST_DATA[1][2], TEST_DATA[1][0]}),
+                    FilterArgs(_listCol6.getName(), "Is Not Blank", null, null, null, new String[] {TEST_DATA[1][1] ,TEST_DATA[1][2], TEST_DATA[1][0]}, new String[] {TEST_DATA[1][3]})
+            );
+        }
 
     //Issue 12787: Canceling filter dialog requires two clicks
     private void filterCancelButtonWorksTest()
@@ -384,11 +384,12 @@ public class FilterTest extends ListTest
         runMenuItemHandler(id);
 
         clickButton("CANCEL",0);
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         assertTextNotPresent("Show Rows Where");
     }
 
+    @LogMethod
     private void validFilterGeneratesCorrectResultsTest(String columnName, String filter1Type, String filter1, String filter2Type, String filter2,
             String[] textPresentAfterFilter, String[] textNotPresentAfterFilter)
     {
@@ -404,7 +405,6 @@ public class FilterTest extends ListTest
 
         log("** Checking filter present in R view");
         clickMenuButton("Views", R_VIEW);
-        sleep(1000);
         checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
         clickMenuButton("Views", "default");
@@ -414,6 +414,7 @@ public class FilterTest extends ListTest
         runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
         waitForTextToDisappear("Loading...");
         _extHelper.clickExtTab("Choose Filters");
+        _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
 
         if (filter1 != null)
         {
@@ -429,7 +430,7 @@ public class FilterTest extends ListTest
                 // Next, it is inverted from "Not In" to "In" and "Mellow;Robust;Zany" are selected.
                 // When switching tabs, the number of selected values (1) is less than half of the available values (4),
                 // so the filter is inverted again from "Not In" to "Does Not Equal Any Of" and "Light" is selected.
-                //waitForFormElementToEqual(Locator.name("field_1"), "Does Not Equals Any Of (e.g. \"a;b;c\")");
+                //waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equals Any Of (e.g. \"a;b;c\")");
                 waitForFormElementToEqual(Locator.name("value_1"), "Light");
             }
             else if (filter1Type.equals("Does Not Equal Any Of (e.g. \"a;b;c\")") && "Light;Mellow".equals(filter1))
@@ -437,7 +438,7 @@ public class FilterTest extends ListTest
                 // In this test case, "Does Not Equal Any Of" and "Light;Mellow" are the initial filter type and value.
                 // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;Zany" are selected.
                 // When switching tabs, nothing changes.
-                //waitForFormElementToEqual(Locator.name("field_1"), "Equals One Of (e.g. \"a;b;c\")");
+                //waitForFormElementToEqual(Locator.name("filterType_1"), "Equals One Of (e.g. \"a;b;c\")");
                 waitForFormElementToEqual(Locator.name("value_1"), "Robust;Zany");
             }
             else if (filter1Type.equals("Does Not Equal") && "false".equals(filter1))
@@ -445,26 +446,33 @@ public class FilterTest extends ListTest
                 // In this test case, "Does Not Equal" and "false" are the initial filter type and value.
                 // When showing the dialog "Does Not Equal" is inverted as "In" and "true" is selected.
                 // When switching tabs, the filter is simplified from "In" to "Equal" because only a single value, "true", is selected.
-                //waitForFormElementToEqual(Locator.name("field_1"), "Equals");
-                waitForFormElementToEqual(Locator.name("value_1"), "true");
+                if (getFormElement(Locator.name("filterType_1")).equals("Equals"))
+                    assertFormElementEquals(Locator.id("value_1"), "true");
+                else
+                    assertFormElementEquals(Locator.id("value_1"), filter1);
             }
             else
             {
-                waitForFormElementToEqual(Locator.name("value_1"), filter1);
+                assertFormElementEquals(Locator.id("value_1"), filter1);
             }
         }
 
         if(filter2!=null)
-            waitForFormElementToEqual(Locator.name("value_2"), filter2);
+            assertFormElementEquals(Locator.id("value_2"), filter2);
+        else
+            assertFormElementEquals(Locator.name("filterType_2"), "No Other Filter");
 
         clickButtonContainingText("CANCEL", 0);
 
-        clickButton("Clear All");
+        executeScript("LABKEY.DataRegions['query'].clearAllFilters();");
+        waitForElementToDisappear(Locator.css(".labkey-dataregion-msg"), WAIT_FOR_JAVASCRIPT);
+        //clickButton("Clear All"); // Can't trigger :hover pseudo-class with webdriver
     }
 
+    @LogMethod
     protected void checkFilterWasApplied(String[] textPresentAfterFilter, String[] textNotPresentAfterFilter, String columnName, String filter1Type, String filter1, String filter2Type, String filter2 )
     {
-        waitForTextToDisappear("Loading", defaultWaitForPage);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         assertTextPresent(textPresentAfterFilter);
         assertTextNotPresent(textNotPresentAfterFilter);
         //make sure we show user a description of what's going on.  See 11.2-3_make_filters_work.docx
@@ -475,7 +483,6 @@ public class FilterTest extends ListTest
         }
 
     }
-
 
     protected void doCleanup(boolean afterTest)
     {

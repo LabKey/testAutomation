@@ -17,7 +17,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.WebTestHelper;
@@ -26,6 +26,10 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
+import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.By;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Arrays;
@@ -38,7 +42,7 @@ import static org.labkey.test.util.ListHelper.ListColumnType.String;
  * User: ulberge
  * Date: Jul 13, 2007
  */
-public class ListTest extends BaseSeleniumWebTest
+public class ListTest extends BaseWebDriverTest
 {
     protected final static String PROJECT_VERIFY = "ListVerifyProject" ;//+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_OTHER = "OtherListVerifyProject";
@@ -49,7 +53,7 @@ public class ListTest extends BaseSeleniumWebTest
     protected final static String LIST_DESCRIPTION = "A list of colors and what they are like";
     protected final static String FAKE_COL1_NAME = "FakeName";
     protected final static String ALIASED_KEY_NAME = "Material";
-    protected final static String HIDDEN_TEXT = "Hidden";
+    protected final static String HIDDEN_TEXT = "CantSeeMe";
     protected final static String DETAILS_BUTTON_NAME = "Show Grid";
 
     protected final ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
@@ -143,21 +147,22 @@ public class ListTest extends BaseSeleniumWebTest
         return true;
     }
 
+    @LogMethod
     protected void setUpListFinish()
     {
         // delete existing rows
         log("Test deleting rows");
         checkCheckbox(".toggle");
-        selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
-        Assert.assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
+        assertAlert("Are you sure you want to delete the selected rows?");
         waitForPageToLoad();
         // load test data
         clickImportData();
-        setFormElement("text", LIST_DATA2);
+        setFormElement(Locator.name("text"), LIST_DATA2);
         submitImportTsv();
     }
 
+    @LogMethod
     protected void setUpList(String projectName)
     {
 
@@ -169,7 +174,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Add description and test edit");
         clickEditDesign();
-        setFormElement("ff_description", LIST_DESCRIPTION);
+        setFormElement(Locator.id("ff_description"), LIST_DESCRIPTION);
         setColumnName(0, LIST_KEY_NAME2);
         clickSave();
 
@@ -182,17 +187,15 @@ public class ListTest extends BaseSeleniumWebTest
         clickImportData();
         submitImportTsv("Form contains no data");
 
-        setFormElement("text", TEST_FAIL);
+        setFormElement(Locator.id("tsv3"), TEST_FAIL);
         submitImportTsv("No rows were inserted.");
-//        assertTextPresent(TEST_FAIL);
 
-        setFormElement("text", TEST_FAIL2);
+        setFormElement(Locator.id("tsv3"), TEST_FAIL2);
         submitImportTsv("Data does not contain required field: Color");
-//        assertTextPresent(TEST_FAIL2);
 
-        setFormElement("text", TEST_FAIL3);
+        setFormElement(Locator.id("tsv3"), TEST_FAIL3);
         submitImportTsv("Could not convert");
-        setFormElement("text", LIST_DATA);
+        setFormElement(Locator.id("tsv3"), LIST_DATA);
         submitImportTsv();
 
         log("Check upload worked correctly");
@@ -210,13 +213,13 @@ public class ListTest extends BaseSeleniumWebTest
         // Second row (Green)
         Assert.assertEquals(1,table.getRow(TEST_DATA[0][1]));
         clickLinkWithText("edit", 1);
-        setFormElement("quf_" + _listCol2.getName(), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
+        setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
         checkCheckbox("quf_JewelTone");
         submit();
         // Third row (Red)
         Assert.assertEquals(2,table.getRow(TEST_DATA[0][2]));
         clickLinkWithText("edit", 2);
-        setFormElement("quf_" + _listCol2.getName(), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
+        setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox("quf_JewelTone");
         submit();
 
@@ -243,10 +246,10 @@ public class ListTest extends BaseSeleniumWebTest
         setColumnName(5, _listCol5.getName());
         setColumnLabel(5,_listCol5.getLabel());
         setColumnType(5,_listCol5.getType());
-        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
-        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
-        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
-        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInDetail']/input"));
+        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInGrid']/input"));
+        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInInsert']/input"));
+        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInUpdate']/input"));
+        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInDetail']/input"));
 
         clickButton("Add Field", 0);
         setColumnName(6, _listCol6.getName());
@@ -256,7 +259,7 @@ public class ListTest extends BaseSeleniumWebTest
         waitForElement(Locator.id("importAliases"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("importAliases"), ALIASED_KEY_NAME);
 
-        mouseClick(Locator.id("partdown_2").toString());
+        click(Locator.id("partdown_2"));
 
         clickSave();
 
@@ -265,7 +268,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Set title field of 'Colors' to 'Desc'");
         clickEditDesign();
-        selectOptionByText("ff_titleColumn", "Desc");
+        selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
         clickDone();
 
         clickLinkWithText(LIST_NAME_COLORS);
@@ -307,19 +310,19 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         if(!getBrowserType().contains("iexplore"))
             assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
-        String html = selenium.getHtmlSource();
+        String html = getHtmlSource();
         Assert.assertTrue("Description \"" + _listCol1.getDescription() + "\" not present.", html.contains(_listCol1.getDescription()));
         Assert.assertTrue("Description \"" + _listCol3.getDescription() + "\" not present.", html.contains(_listCol3.getDescription()));
-        setFormElement("quf_" + _listCol1.getName(), TEST_DATA[1][3]);
-        setFormElement("quf_" + _listCol2.getName(), "wrong type");
+        setFormElement(Locator.name("quf_" + _listCol1.getName()), TEST_DATA[1][3]);
+        setFormElement(Locator.name("quf_" + _listCol2.getName()), "wrong type");
         // Jewel Tone checkbox is left blank -- we'll make sure it's posted as false below
-        setFormElement("quf_" + _listCol4.getName(), TEST_DATA[4][3]);
+        setFormElement(Locator.name("quf_" + _listCol4.getName()), TEST_DATA[4][3]);
         submit();
         assertTextPresent("This field is required");
-        setFormElement("quf_" + LIST_KEY_NAME2, TEST_DATA[0][3]);
+        setFormElement(Locator.name("quf_" + LIST_KEY_NAME2), TEST_DATA[0][3]);
         submit();
         assertTextPresent("Could not convert");
-        setFormElement("quf_" + _listCol2.getName(), CONVERTED_MONTHS[3]);
+        setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[3]);
         submit();
 
         log("Check new row was added");
@@ -336,8 +339,9 @@ public class ListTest extends BaseSeleniumWebTest
         dataregionToEditDesign();
 
         setColumnName(5,_listCol5.getName()); // Select Hidden field.
-        checkCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
-        mouseClick(Locator.id("partdown_2").toString());
+        checkCheckbox(Locator.xpath("//span[@id='propertyShownInGrid']/input"));
+        click(Locator.id("partdown_2"));
+        sleep(200); // GWT form timing
         clickDone();
 
         log("Check that hidden column is hidden.");
@@ -359,8 +363,9 @@ public class ListTest extends BaseSeleniumWebTest
         dataregionToEditDesign();
 
         setColumnName(5,_listCol5.getName()); // Select Hidden field.
-        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInGrid']/input"));
-        checkCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
+        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInGrid']/input"));
+        checkCheckbox(Locator.xpath("//span[@id='propertyShownInInsert']/input"));
+        sleep(200); // GWT form timing
         clickDone();
 
 //        clickLinkWithText("view data");
@@ -378,8 +383,9 @@ public class ListTest extends BaseSeleniumWebTest
         dataregionToEditDesign();
 
         setColumnName(5,_listCol5.getName()); // Select Hidden field.
-        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInInsert']/input"));
-        checkCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
+        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInInsert']/input"));
+        checkCheckbox(Locator.xpath("//span[@id='propertyShownInUpdate']/input"));
+        sleep(200); // GWT form timing
         clickDone();
 
 //        clickLinkWithText("view data");
@@ -397,8 +403,9 @@ public class ListTest extends BaseSeleniumWebTest
         dataregionToEditDesign();
 
         setColumnName(5,_listCol5.getName()); // Select Hidden field.
-        uncheckCheckbox(Locator.raw("//span[@id='propertyShownInUpdate']/input"));
-        checkCheckbox(Locator.raw("//span[@id='propertyShownInDetail']/input"));
+        uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInUpdate']/input"));
+        checkCheckbox(Locator.xpath("//span[@id='propertyShownInDetail']/input"));
+        click(Locator.name("ff_name0"));
         clickDone();
 
 //        clickLinkWithText("view data");
@@ -428,7 +435,9 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextNotPresent(TEST_DATA[0][3]);
 
         log("Test Customize View");
-        clickButton("Clear All");
+        executeScript("LABKEY.DataRegions['query'].clearAllFilters();");
+        waitForElementToDisappear(Locator.css(".labkey-dataregion-msg"), WAIT_FOR_JAVASCRIPT);
+        //clickButton("Clear All"); // Can't trigger :hover pseudo-class with webdriver
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn(_listCol4.getName());
         _customizeViewsHelper.addCustomizeViewFilter(_listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
@@ -465,11 +474,11 @@ public class ListTest extends BaseSeleniumWebTest
 
         filterTest();
 
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
 
         log("Test that sort only affects one web part");
         setSort("qwp2", _listCol4.getName(), SortDirection.ASC);
-        String source = selenium.getHtmlSource();
+        String source = getHtmlSource();
         int index;
         Assert.assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&
                 source.indexOf(TEST_DATA[1][1], index) < source.indexOf(TEST_DATA[1][2], index));
@@ -482,10 +491,10 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("created", 1);
-        Assert.assertEquals("details Links", 6, countLinksWithText("details"));
+        Assert.assertEquals("details Links", 6, countLinksWithText("DETAILS"));
         Assert.assertEquals("Project Links", 17 + 3, countLinksWithText(PROJECT_VERIFY)); // Table links + header & sidebar links
         Assert.assertEquals("List Links", 17 + 1, countLinksWithText(LIST_NAME_COLORS)); // Table links + header link
-        clickLinkWithText("details");
+        clickLinkWithText("DETAILS");
         assertTextPresent("List Item Details");
         assertTextNotPresent("No details available for this event.");
         assertTextNotPresent("Unable to find the audit history detail for this event");
@@ -495,13 +504,12 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test single list web part");
         addWebPart("List - Single");
-        setText("title", "This is my single list web part title");
+        setFormElement(Locator.name("title"), "This is my single list web part title");
         //TODO:  This didn't work with the convetional _ext4Helper.selectComboBoxItem(), so we are using two clicks instead.
         click(Locator.xpath("//input[@name='listId']"));
         click(Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains( text(), '>')]"));
         //This will only work so long as it's the only button on the page.
         click(Locator.xpath("//button"));
-        waitForPageToLoad();
         waitForText("Import Data");
         assertTextPresent("View Design");
         clickAndWait(Locator.linkWithSpan("This is my single list web part title"), WAIT_FOR_PAGE);
@@ -572,8 +580,8 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test edit row");
         clickLinkWithText("edit", 0);
-        selectOptionByText("quf_Color", TEST_DATA[1][1]);
-        selectOptionByText("quf_Owner", LIST2_FOREIGN_KEY_OUTSIDE);
+        selectOptionByText(Locator.name("quf_Color"), TEST_DATA[1][1]);
+        selectOptionByText(Locator.name("quf_Owner"), LIST2_FOREIGN_KEY_OUTSIDE);
         submit();
 
         clickMenuButton("Views", "default");
@@ -581,11 +589,9 @@ public class ListTest extends BaseSeleniumWebTest
 
         log("Test deleting rows");
         checkCheckbox(".toggle");
-        selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
-        Assert.assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected rows?");
-        waitForPageToLoad();
-        assertTextNotPresent(LIST2_KEY);
+        assertAlert("Are you sure you want to delete the selected rows?");
+        waitForTextToDisappear(LIST2_KEY);
         assertTextNotPresent(LIST2_KEY2);
         assertTextNotPresent(LIST2_KEY3);
         assertTextNotPresent(LIST2_KEY4);
@@ -615,7 +621,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresent("query not found");
 
         log("Test exporting a nonexistent list returns a 404");
-        selenium.open(WebTestHelper.getBaseURL() + exportUrl.substring(WebTestHelper.getContextPath().length()));
+        beginAt(exportUrl.substring(WebTestHelper.getContextPath().length()));
         Assert.assertEquals("Incorrect response code", 404, getResponseCode());
         assertTextPresent("Query '" + LIST_NAME_COLORS + "' in schema 'lists' doesn't exist.");
 
@@ -632,6 +638,7 @@ public class ListTest extends BaseSeleniumWebTest
      }
 
     String crossContainerLookupList = "CCLL";
+    @LogMethod
     private void crossContainerLookupTest()
     {
         //create list with look up A
@@ -654,17 +661,18 @@ public class ListTest extends BaseSeleniumWebTest
         //add columns to look all the way to C
     }
 
+    @LogMethod
     private void filterTest()
     {
         log("Filter Test");
-        clickLinkWithText(PROJECT_VERIFY);
+        clickFolder(PROJECT_VERIFY);
         addWebPart("Query");
-        selectOptionByText("schemaName", "lists");
-        selenium.click("document.frmCustomize.selectQuery[1]");
+        selectOptionByText(Locator.name("schemaName"), "lists");
+        click(Locator.id("selectQueryContents"));
         submit();
         addWebPart("Query");
-        selectOptionByText("schemaName", "lists");
-        selenium.click("document.frmCustomize.selectQuery[1]");
+        selectOptionByText(Locator.name("schemaName"), "lists");
+        click(Locator.id("selectQueryContents"));
         submit();
 
         log("Test that the right filters are present for each type");
@@ -685,9 +693,6 @@ public class ListTest extends BaseSeleniumWebTest
         clickLinkContainingText(LIST_NAME_COLORS);
     }
 
-
-
-
     /*  Issue 11825: Create test for "Clear Sort"
         Issue 15567: Can't sort DataRegion by column name that has comma
 
@@ -696,6 +701,7 @@ public class ListTest extends BaseSeleniumWebTest
 
         preconditions:  table already sorted by description
      */
+    @LogMethod
     private void clearSortTest()
     {
         //make sure elements are ordered the way they should be
@@ -712,6 +718,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertTextPresentInThisOrder(TEST_DATA[5][0], TEST_DATA[5][1],TEST_DATA[5][2]);
     }
 
+    @LogMethod
     private void doUploadTest()
     {
         if (!isFileUploadAvailable())
@@ -729,8 +736,8 @@ public class ListTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText("manage lists");
         clickButton("Create New List");
-        waitForElement(Locator.name("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        setFormElement("ff_name",  TSV_LIST_NAME);
+        waitForElement(Locator.id("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        setFormElement(Locator.id("ff_name"),  TSV_LIST_NAME);
         checkCheckbox(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
         clickButton("Create List", 0);
         waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
@@ -753,6 +760,7 @@ public class ListTest extends BaseSeleniumWebTest
         assertElementPresent(Locator.xpath("//tr[./td/div[text()='DateCol'] and ./td/div[text()='DateTime']]"));
     }
 
+    @LogMethod
     private void customFormattingTest()
     {
         // Assumes we are at the list designer after doUploadTest()
@@ -763,7 +771,7 @@ public class ListTest extends BaseSeleniumWebTest
         click(Locator.xpath("//span[text()='Format']"));
         clickButton("Add Conditional Format", 0);
         _extHelper.waitForExtDialog("Apply Conditional Format Where BoolCol", WAIT_FOR_JAVASCRIPT);
-        setFormElement("value_1", "true");
+        setFormElement(Locator.id("value_1"), "true");
         _extHelper.clickExtButton("Apply Conditional Format Where BoolCol", "OK", 0);
         checkCheckbox("Bold");
         checkCheckbox("Italic");
@@ -787,14 +795,14 @@ public class ListTest extends BaseSeleniumWebTest
         clickButton("Add Conditional Format", 0);
         _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
-        setFormElement("value_1", "7");
+        setFormElement(Locator.id("value_1"), "7");
         _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
         checkCheckbox("Strikethrough");
         // If greater than 5, Bold  //TODO: Set before (>7) format. Blocked: 12865
         clickButton("Add Conditional Format", 0);
         _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
-        setFormElement("value_1", "5");
+        setFormElement(Locator.id("value_1"), "5");
         _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
         checkCheckbox("Bold", 1);
 
@@ -820,27 +828,29 @@ public class ListTest extends BaseSeleniumWebTest
         assertElementPresent(Locator.xpath("//td[text()='8' and contains(@style, 'line-through') and not(contains(@style, 'bold'))]"));
 
         // Check for appropriate tooltips
-        assertTextNotPresent("Formatting applied because column > 5.");
-        mouseOver(Locator.xpath("//td[text()='6' and contains(@style, 'bold')]"));
+        assertElementNotPresent(Locator.id("helpDivBody")
+                        .withText("Formatting applied because column > 5."));
+        Actions builder = new Actions(_driver);
+        builder.moveToElement(Locator.xpath("//td[text()='6' and contains(@style, 'bold')]").findElement(_driver)).build().perform();
         // Tooltip doesn't show instantly, so wait for a bit
-        sleep(2000);
-        assertTextPresent("Formatting applied because column > 5.");
-        mouseOut(Locator.xpath("//td[text()='6' and contains(@style, 'bold')]"));
+        _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("helpDivBody")
+                .withText("Formatting applied because column > 5.").waitForElmement(_driver, WAIT_FOR_JAVASCRIPT)));
+        click(Locator.css("img[alt=close]"));
         // Tooltip doesn't hide instantly, so wait for a bit
-        sleep(2000);
-        assertTextNotPresent("Formatting applied because column > 5.");
+        _shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("helpDiv")));
 
-        assertTextNotPresent("Formatting applied because column = true.");
-        mouseOver(Locator.xpath("//td[text()='true']"));
+        assertElementNotPresent(Locator.id("helpDivBody")
+                        .withText("Formatting applied because column = true."));
+        builder.moveToElement(Locator.xpath("//td[text()='true']").findElement(_driver)).build().perform();
         // Tooltip doesn't show instantly, so wait for a bit
-        sleep(2000);
-        assertTextPresent("Formatting applied because column = true.");
-        mouseOut(Locator.xpath("//td[text()='true']"));
+        _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("helpDivBody")
+                .withText("Formatting applied because column = true.").waitForElmement(_driver, WAIT_FOR_JAVASCRIPT)));
+        click(Locator.css("img[alt=close]"));
         // Tooltip doesn't hide instantly, so wait for a bit
-        sleep(2000);
-        assertTextNotPresent("Formatting applied because column = true.");
+        _shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("helpDiv")));
     }
 
+    @LogMethod
     private void doRenameFieldsTest()
     {
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
@@ -962,7 +972,7 @@ public class ListTest extends BaseSeleniumWebTest
         _listHelper.createList(PROJECT_VERIFY, name, cols.get(0).getType(), cols.get(0).getName(),
                 cols.subList(1, cols.size()).toArray(new ListHelper.ListColumn[cols.size() - 1]));
         clickEditDesign();
-        selectOptionByText("ff_titleColumn", cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
+        selectOptionByText(Locator.id("ff_titleColumn"), cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
         clickSave();
         clickImportData();
         setListImportAsTestDataField(toTSV(cols,data));
@@ -970,7 +980,7 @@ public class ListTest extends BaseSeleniumWebTest
 
     private void setListImportAsTestDataField(String data)
     {
-        setFormElement("text", data);
+        setFormElement(Locator.name("text"), data);
         submitImportTsv();
     }
 
@@ -980,7 +990,7 @@ public class ListTest extends BaseSeleniumWebTest
         return Locator.xpath("//input[@name='" + name + "' and @value='" + value + "']");
     }
 
-
+    @LogMethod
     protected void customizeURLTest()
     {
         this.pushLocation();
@@ -1069,20 +1079,16 @@ public class ListTest extends BaseSeleniumWebTest
     void setColumnName(int index, String name)
     {
         setFormElement(Locator.name("ff_name"+index), name);
-        TAB(Locator.name("ff_name" + index));
+        pressTab(Locator.name("ff_name" + index));
     }
     void setColumnLabel(int index, String label)
     {
         setFormElement(Locator.name("ff_label"+index), label);
-        TAB(Locator.name("ff_label"+index));
+        pressTab(Locator.name("ff_label" + index));
     }
     void setColumnType(int index, ListHelper.ListColumnType type)
     {
         setFormElement(Locator.name("ff_type" + index), type.toString());
-        TAB(Locator.name("ff_type" + index));
-    }
-    void TAB(Locator l)
-    {
-        _listHelper.TAB(l);
+        pressTab(Locator.name("ff_type" + index));
     }
 }
