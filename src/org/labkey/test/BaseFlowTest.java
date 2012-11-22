@@ -71,7 +71,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected String getContainerPath()
     {
         if (_containerPath == null)
-            _containerPath = "/" + EscapeUtil.encode(getProjectName()) + "/" + EscapeUtil.encode(getFolderName());
+            _containerPath = "/" + getProjectName() + "/" + getFolderName();
         return _containerPath;
     }
 
