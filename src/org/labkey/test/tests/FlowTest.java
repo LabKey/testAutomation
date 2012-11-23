@@ -395,7 +395,6 @@ public class FlowTest extends BaseFlowTest
 
         // check no graph errors are present and the graphs have labels
         assertTextNotPresent("Error generating graph");
-        beginAt("/flow"+getContainerPath()+"/query.view?schemaName=flow&query.queryName=FCSAnalyses&query.showGraphs=Inline&query.viewName=");
         String href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
 
