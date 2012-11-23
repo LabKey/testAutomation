@@ -87,6 +87,19 @@ public class LabModuleHelper
         return Locator.xpath("//span[text() = '" + label + "']/../../../div[not(contains(@style, 'display: none'))]//span[text() = '" + itemText + "']");
     }
 
+    public static Locator getNavPanelItem(String label, int index)
+    {
+        //NOTE: this should return only visible items.  add 1 to index to exclude label
+        return Locator.xpath("(//span[text() = '" + label + "']/../../../div[not(contains(@style, 'display: none'))]//span)[" +  (index + 1) + "]");
+    }
+
+    public void clickNavPanelItem(String label, int index)
+    {
+        Locator l = getNavPanelItem(label, index);
+        _test.waitForElement(l);
+        _test.waitAndClick(l);
+    }
+
     public void clickNavPanelItem(String label, String itemText)
     {
         Locator l = getNavPanelItem(label, itemText);
@@ -270,5 +283,10 @@ public class LabModuleHelper
             }
         }
         return null;
+    }
+
+    public Locator toolIcon(String name)
+    {
+        return Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = '" + name + "']");
     }
 }

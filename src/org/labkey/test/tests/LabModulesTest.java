@@ -24,6 +24,8 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.UIContainerHelper;
+import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
+import org.openqa.selenium.Alert;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -46,6 +48,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
     protected String PROJECT_NAME = "LaboratoryVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    private String VIRAL_LOAD_ASSAYNAME = "Viral Load Test";
 
     private int _oligosTotal = 0;
     private int _samplesTotal = 0;
@@ -67,17 +70,20 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     @Override
     protected void doTestSteps() throws Exception
     {
-        setUpTest();
-        goToProjectHome();
-        overviewUITest();
-        labToolsWebpartTest();
-        workbookCreationTest();
-        dnaOligosTableTest();
-        samplesTableTest();
-        urlGenerationTest();
-        peptideTableTest();
-        searchPanelTest();
-        queryMetadataTest();
+//        setUpTest();
+//        overviewUITest();
+//        reportsTest();
+        settingsTest();
+        defaultAssayImportMethodTest();
+
+//        labToolsWebpartTest();
+//        workbookCreationTest();
+//        dnaOligosTableTest();
+//        samplesTableTest();
+//        urlGenerationTest();
+//        peptideTableTest();
+//        searchPanelTest();
+//        queryMetadataTest();
     }
 
     protected void setUpTest() throws Exception
@@ -99,9 +105,12 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     protected List<Pair<String, String>> getAssaysToCreate()
     {
         List<Pair<String, String>> assays = new ArrayList<Pair<String, String>>();
-        assays.add(Pair.of("Immunophenotyping", "TruCount"));
-        assays.add(Pair.of("SSP Typing", "MHC_SSP"));
-        assays.add(Pair.of("Viral Loads", "Viral_Load"));
+        assays.add(Pair.of("Immunophenotyping", "TruCount Test"));
+        assays.add(Pair.of("ICS", "ICS Test"));
+        assays.add(Pair.of("SSP Typing", "SSP Test"));
+        assays.add(Pair.of("Viral Loads", VIRAL_LOAD_ASSAYNAME));
+        assays.add(Pair.of("ELISPOT_Assay", "ELISPOT Test"));
+        assays.add(Pair.of("Electrochemiluminescence Assay", "Electrochemiluminescence Assay Test"));
 
         return assays;
     }
@@ -147,26 +156,196 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
     }
 
+    private void settingsTest()
+    {
+        log("Testing Settings");
+        _helper.goToLabHome();
+        waitAndClick(_helper.toolIcon("Settings"));
+        waitForPageToLoad();
+        waitForText("Reference Sequences"); //proxy for page load
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Assay Types:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Instruments:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Peptide Pools:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Diluents:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Roche E411 Tests:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Cell Populations:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Units:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Reference AA Features:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Reference NT Features:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Virus Strains:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Cell Types:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Genders:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Sample Types:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Manage Freezers:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Barcodes:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("DNA Loci:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Haplotype Definitions:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Input Material Types:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("ABI7500 Detectors:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Fluors:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Techniques:"));
+
+        waitAndClick(Locator.linkContainingText("Control Item Visibility"));
+        waitForPageToLoad();
+        waitForText("Sequence"); //proxy for page load
+        waitForText("TruCount"); //proxy for page load
+
+        log("Disabling items");
+
+        int i = 1;
+        for (Pair<String, String> pair : getAssaysToCreate())
+        {
+            Ext4FieldRefWD.getForBoxLabel(this, pair.getValue()).setValue(false);
+            sleep(40); //wait for listener to act
+            Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, pair.getValue() + ": Raw Data").getValue());
+
+            if (i == 1)
+                Ext4FieldRefWD.getForBoxLabel(this, pair.getValue()).setValue(true);
+
+            i++;
+        }
+
+        //sequence
+        Ext4FieldRefWD.getForBoxLabel(this, "Sequence").setValue(false);
+        sleep(40); //wait for listener to act
+        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "Browse Sequence Data").getValue());
+
+
+        //samples
+        Ext4FieldRefWD.getForBoxLabel(this, "Samples").setValue(false);
+        sleep(40); //wait for listener to act
+        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "Freezer Summary").getValue());
+        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Samples").getValue());
+
+        //oligos
+        Ext4FieldRefWD.getForBoxLabel(this, "DNA_Oligos").setValue(false);
+        sleep(40); //wait for listener to act
+        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All DNA Oligos").getValue());
+
+        //peptides
+        Ext4FieldRefWD.getForBoxLabel(this, "Peptides").setValue(false);
+        sleep(40); //wait for listener to act
+        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Peptides").getValue());
+
+        click(Locator.ext4Button("Submit"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
+        click(Locator.ext4Button("OK"));
+
+        //should redirect to lab home
+        waitForText("Types of Data:");
+
+        assertElementNotPresent(LabModuleHelper.getNavPanelRow("Sequence:"));
+        assertElementNotPresent(LabModuleHelper.getNavPanelRow("Samples:"));
+        assertElementNotPresent(LabModuleHelper.getNavPanelRow("DNA_Oligos:"));
+        assertElementNotPresent(LabModuleHelper.getNavPanelRow("Peptides:"));
+        i = 1;
+        for (Pair<String, String> pair : getAssaysToCreate())
+        {
+            if (i == 1)
+                assertElementPresent(LabModuleHelper.getNavPanelRow(pair.getValue() + ":"));
+            else
+                assertElementNotPresent(LabModuleHelper.getNavPanelRow(pair.getValue() + ":"));
+
+            i++;
+        }
+
+        //also verify reports
+        clickTab("Reports");
+        waitForText("Raw Data");
+        i = 1;
+        for (Pair<String, String> pair : getAssaysToCreate())
+        {
+            if (i == 1)
+                assertElementPresent(Locator.linkContainingText(pair.getValue() + ": Raw Data"));
+            else
+                assertElementNotPresent(Locator.linkContainingText(pair.getValue() + ": Raw Data"));
+
+            i++;
+        }
+        assertElementPresent(Locator.linkContainingText("TruCount Test: Results Pivoted"));
+
+        assertElementNotPresent(Locator.linkContainingText("View All")); //covers samples, peptides, oligos
+        assertElementNotPresent(Locator.linkContainingText("Browse Sequence Data"));
+
+        //restore defaults
+        clickTab("Settings");
+        waitForPageToLoad();
+        waitAndClick(Locator.linkContainingText("Control Item Visibility"));
+        waitForPageToLoad();
+        waitForText("Sequence"); //proxy for page load
+        waitForText("TruCount"); //proxy for page load
+
+        for (Pair<String, String> pair : getAssaysToCreate())
+        {
+            Ext4FieldRefWD.getForBoxLabel(this, pair.getValue()).setValue(true);
+        }
+        Ext4FieldRefWD.getForBoxLabel(this, "Sequence").setValue(true);
+        Ext4FieldRefWD.getForBoxLabel(this, "Samples").setValue(true);
+        Ext4FieldRefWD.getForBoxLabel(this, "DNA_Oligos").setValue(true);
+        Ext4FieldRefWD.getForBoxLabel(this, "Peptides").setValue(true);
+
+        click(Locator.ext4Button("Submit"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
+        click(Locator.ext4Button("OK"));
+    }
+
+    private void reportsTest()
+    {
+        _helper.goToLabHome();
+        clickTab("Reports");
+
+        //TODO: also verify link targets
+
+        waitForText("Sequence"); //proxy for page load
+
+        for (Pair<String, String> pair : getAssaysToCreate())
+        {
+            assertElementPresent(Locator.linkContainingText(pair.getValue() + ": Raw Data"));
+        }
+        assertElementPresent(Locator.linkContainingText("TruCount Test: Results Pivoted"));
+        assertElementPresent(Locator.linkContainingText("SSP Test: SSP_Summary"));
+        assertElementPresent(Locator.linkContainingText("SSP Test: SSP_Pivot"));
+        assertElementPresent(Locator.linkContainingText("ICS Test: Results Pivoted"));
+        assertElementPresent(Locator.linkContainingText(VIRAL_LOAD_ASSAYNAME + ": Viral_Load_Summary"));
+
+        assertElementPresent(Locator.linkContainingText("View All DNA Oligos"));
+        assertElementPresent(Locator.linkContainingText("View All Peptides"));
+        assertElementPresent(Locator.linkContainingText("View All Samples"));
+        assertElementPresent(Locator.linkContainingText("Freezer Summary"));
+
+        assertElementPresent(Locator.linkContainingText("Browse Sequence Data"));
+
+    }
+
     private void labToolsWebpartTest()
     {
-        waitAndClick(Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Data']"));
+        waitAndClick(_helper.toolIcon("Import Data"));
         assertElementPresent(Ext4Helper.ext4MenuItem("Sequence"));
         for(Pair<String, String> pair : getAssaysToCreate())
         {
             assertElementPresent(Ext4Helper.ext4MenuItem(pair.getValue()));
         }
 
-        waitAndClick(Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Samples']"));
+        waitAndClick(_helper.toolIcon("Import Samples"));
         for (String s : getSampleItems())
         {
             assertElementPresent(Ext4Helper.ext4MenuItem(s));
         }
 
         //verify settings hidden for readers
-        assertElementPresent(Locator.xpath("//div[contains(@class, 'tool-icon') and contains(@class, 'x4-icon-text-left')]//span[text() = 'Settings']"));
+        //Locator settings = Locator.xpath("//div[contains(@class, 'tool-icon') and contains(@class, 'x4-icon-text-left')]//span[text() = 'Settings']");
+        Locator settings = _helper.toolIcon("Settings");
+        assertElementPresent(settings);
         impersonateRole("Reader");
         _helper.goToLabHome();
-        assertElementNotPresent(Locator.xpath("//div[contains(@class, 'tool-icon') and contains(@class, 'x4-icon-text-left')]//span[text() = 'Settings']"));
+        assertElementNotPresent(settings);
         stopImpersonatingRole();
         goToProjectHome();
 
@@ -190,10 +369,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         //verify correct name and correct webparts present
         assertElementPresent(_helper.webpartTitle("Lab Tools"));
         assertElementPresent(_helper.webpartTitle("Files"));
-        assertElementPresent(_helper.webpartTitle("Experiment Runs"));
+        assertElementPresent(_helper.webpartTitle("Folder Summary"));
 
         //we expect insert from within the workbook to go straight to the import page (unlike the top-level folder, which gives a dialog)
-        waitAndClick(Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Samples']"));
+        waitAndClick(_helper.toolIcon("Import Samples"));
         for (String s : getSampleItems())
         {
             assertElementPresent(Ext4Helper.ext4MenuItem(s));
@@ -418,7 +597,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
     private  void insertDummySampleRow(String suffix)
     {
-        Locator locator = Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = 'Import Samples']");
+        Locator locator = _helper.toolIcon("Import Samples");
         waitForElement(locator);
         click(locator);
         //NOTE: we are in a workbook
@@ -554,7 +733,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     protected void doCleanup(boolean afterTest)
     {
         //TODO
-        super.doCleanup(afterTest);
+//        super.doCleanup(afterTest);
     }
 
     @Override
@@ -563,4 +742,30 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         return null;
     }
 
+    private void defaultAssayImportMethodTest()
+    {
+        log("verifying ability to set default import method");
+        _helper.goToLabHome();
+        click(Locator.xpath("//a//span[text() = 'Settings']"));
+        waitForPageToLoad();
+        waitForText("Set Assay Defaults");
+        _helper.clickNavPanelItem("Set Assay Defaults");
+        waitForPageToLoad();
+        String defaultVal = "LC480";
+        _helper.waitForField(VIRAL_LOAD_ASSAYNAME);
+        Ext4FieldRefWD.getForLabel(this, VIRAL_LOAD_ASSAYNAME).setValue(defaultVal);
+        waitAndClick(Locator.ext4Button("Submit"));
+
+        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitAndClick(Locator.ext4Button("OK"));
+        waitForPageToLoad();
+        waitForText("Types of Data");
+        _helper.goToAssayResultImport(VIRAL_LOAD_ASSAYNAME);
+        _helper.waitForField("Source Material");
+        Boolean state = (Boolean)Ext4FieldRefWD.getForBoxLabel(this, defaultVal).getValue();
+        Assert.assertTrue("Default method not correct", state);
+        beginAt(getProjectUrl());
+        Alert alert = _driver.switchTo().alert();
+        alert.accept();
+    }
 }

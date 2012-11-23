@@ -58,12 +58,9 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         Locator cell = Ext4GridRefWD.locateExt4GridCell(rowIdx, cellIdx, _id);
         _test.doubleClick(cell);
         Locator input = Locator.css("div.x4-grid-editor input");
+        //WebElement el = input.findElement(_test.getDriver());
+
         _test.setFormElement(input, value);
-
-        //shift focus to commit changes
-        input.findElement(_test.getDriver()).sendKeys("\t");
-        _test.sleep(100);
-
         _test.click(Locator.css("body"));
         _test.sleep(100);
     }

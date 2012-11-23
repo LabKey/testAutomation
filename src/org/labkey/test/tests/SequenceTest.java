@@ -137,7 +137,7 @@ public class SequenceTest extends BaseWebDriverTest
     private void createIlluminaSampleSheet()
     {
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", _readsetCt.toString());
+        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
         waitForPageToLoad();
 
         //verify CSV file creation
@@ -360,7 +360,7 @@ public class SequenceTest extends BaseWebDriverTest
     {
         //verify import and instrument run creation
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", _readsetCt.toString());
+        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
         waitForPageToLoad();
 
         DataRegionTable dr = new DataRegionTable("query", this);
@@ -394,7 +394,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("Verifying readset details page");
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", _readsetCt.toString());
+        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
         waitForPageToLoad();
         dr = new DataRegionTable("query", this);
         dr.clickLink(1,1);
@@ -414,7 +414,7 @@ public class SequenceTest extends BaseWebDriverTest
         //verify export
         log("Verifying FASTQ Export");
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", _readsetCt.toString());
+        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
         waitForPageToLoad();
         dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
@@ -450,7 +450,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("Verifying View Analyses");
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", _readsetCt.toString());
+        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
         waitForPageToLoad();
         waitForText("Instrument Run"); //proxy for dataRegion loading
         dr = new DataRegionTable("query", this);
@@ -472,7 +472,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("Verifying Readset Edit");
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", _readsetCt.toString());
+        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
         waitForPageToLoad();
         waitForText("Instrument Run"); //proxy for dataRegion loading
         dr.clickLink(1,0);
@@ -501,7 +501,7 @@ public class SequenceTest extends BaseWebDriverTest
         log("Verifying Analysis Panel UI");
 
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", _readsetCt.toString());
+        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
         waitForPageToLoad();
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.uncheckAllOnPage();

@@ -228,8 +228,9 @@ public class ELISPOT_AssayTest extends LabModulesTest
     private void verifyExpectedValues()
     {
         log("Verifying results");
-        DataRegionTable dr = _helper.getDrForQueryWebpart("Experiment Runs (" + ASSAY_NAME + ")");
-        dr.clickLink(0, 1);
+        _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
+        waitForPageToLoad();
+        waitAndClick(Locator.linkContainingText("view results"));
         waitForPageToLoad();
 
         DataRegionTable results = new DataRegionTable("Data", this);
