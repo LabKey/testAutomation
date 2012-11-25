@@ -400,8 +400,6 @@ public class ViralLoadAssayTest extends LabModulesTest
 
         DataRegionTable results = new DataRegionTable("Data", this);
 
-        //TODO: verify QCFlags / high CV
-
         int totalRows = 92;
         Map<String, String[]> expected = new LinkedHashMap<String, String[]>();
         expected.put("0", new String[]{"LowQual1", "Unknown", "2012-02-01", "32360000"});
@@ -499,8 +497,8 @@ public class ViralLoadAssayTest extends LabModulesTest
 
         verifyImportedVLs(totalRows, expected, results, null);
 
-        int j = 1;
-        while (j < 5)
+        int j = 0;
+        while (j < 4)
         {
             Assert.assertEquals("Incorrect QC Flag", "HIGH CV", results.getDataAsText(j, "QC Flags"));
             j++;

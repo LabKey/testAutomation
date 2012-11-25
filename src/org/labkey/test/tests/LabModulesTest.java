@@ -70,20 +70,20 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     @Override
     protected void doTestSteps() throws Exception
     {
-//        setUpTest();
-//        overviewUITest();
-//        reportsTest();
+        setUpTest();
+        overviewUITest();
+        reportsTest();
         settingsTest();
         defaultAssayImportMethodTest();
 
-//        labToolsWebpartTest();
-//        workbookCreationTest();
-//        dnaOligosTableTest();
-//        samplesTableTest();
-//        urlGenerationTest();
-//        peptideTableTest();
-//        searchPanelTest();
-//        queryMetadataTest();
+        labToolsWebpartTest();
+        workbookCreationTest();
+        dnaOligosTableTest();
+        samplesTableTest();
+        urlGenerationTest();
+        peptideTableTest();
+        searchPanelTest();
+        queryMetadataTest();
     }
 
     protected void setUpTest() throws Exception
@@ -303,7 +303,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //TODO: also verify link targets
 
-        waitForText("Sequence"); //proxy for page load
+        waitForElement(Locator.linkContainingText("Browse Sequence Data")); //proxy for page load
 
         for (Pair<String, String> pair : getAssaysToCreate())
         {
@@ -340,7 +340,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         }
 
         //verify settings hidden for readers
-        //Locator settings = Locator.xpath("//div[contains(@class, 'tool-icon') and contains(@class, 'x4-icon-text-left')]//span[text() = 'Settings']");
         Locator settings = _helper.toolIcon("Settings");
         assertElementPresent(settings);
         impersonateRole("Reader");
@@ -369,7 +368,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         //verify correct name and correct webparts present
         assertElementPresent(_helper.webpartTitle("Lab Tools"));
         assertElementPresent(_helper.webpartTitle("Files"));
-        assertElementPresent(_helper.webpartTitle("Folder Summary"));
+        assertElementPresent(_helper.webpartTitle("Workbook Summary"));
 
         //we expect insert from within the workbook to go straight to the import page (unlike the top-level folder, which gives a dialog)
         waitAndClick(_helper.toolIcon("Import Samples"));
@@ -733,7 +732,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     protected void doCleanup(boolean afterTest)
     {
         //TODO
-//        super.doCleanup(afterTest);
+        super.doCleanup(afterTest);
     }
 
     @Override
