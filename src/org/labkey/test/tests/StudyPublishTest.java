@@ -529,10 +529,6 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Wizard page 3 : Datasets
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Datasets']"));
         waitForElement(Locator.css(".studyWizardDatasetList"));
-        clickButton("Next", 0);
-        _extHelper.waitForExtDialog("Error");
-        assertTextPresent("You must select at least one dataset to create the new study from.");
-        _extHelper.clickExtButton("Error", "OK", 0);
         for (String dataset : datasets)
         {
             getWrapper().getEval("selenium.selectExtGridItem('Label', '"+dataset+"', -1, 'studyWizardDatasetList', true)");

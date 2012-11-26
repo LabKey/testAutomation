@@ -131,7 +131,6 @@ public class AncillaryStudyTest extends StudyBaseTest
         waitForElement(Locator.xpath("//div[contains(@class, 'studyWizardDatasetList')]"), WAIT_FOR_JAVASCRIPT);
         clickAt(Locator.xpath("//label/span[text()='Data Refresh']"), "1,1");
         waitForElement(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and @class='g-tip-header']//span[text()='Data Refresh']"), WAIT_FOR_JAVASCRIPT);
-        assertWizardError("Finish", "You must select at least one dataset to create the new study from.");
         for(int i = 0; i < DATASETS.length; i++)
         {
             selenium.getEval("selenium.selectExtGridItem('Label', '"+DATASETS[i]+"', -1, 'studyWizardDatasetList', true)");
