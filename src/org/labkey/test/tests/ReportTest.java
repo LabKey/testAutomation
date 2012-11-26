@@ -1076,6 +1076,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.setExtFormElementByLabel("Report Description", PARTICIPANT_REPORT_DESCRIPTION);
         clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         // verify visiting saved report
         goToManageViews();
@@ -1369,6 +1370,7 @@ public class ReportTest extends StudyBaseTest
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[" + Locator.NOT_HIDDEN + "]"), WAIT_FOR_JAVASCRIPT);
         clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         //TODO: Test toggling participant/group modes
         //TODO: Blocked: 16110: Participant report filter panel loses state when switching between participant and group modes
