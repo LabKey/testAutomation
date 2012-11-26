@@ -1244,7 +1244,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return true;
     }
 
-    @Test
+    @Test(timeout=1800000) // 30 minute default test timeout
     public void testSteps() throws Exception
     {
         try{ resumeJsErrorChecker(); }// Make sure js error checker didn't get stuck paused by a failure in the crawler.
