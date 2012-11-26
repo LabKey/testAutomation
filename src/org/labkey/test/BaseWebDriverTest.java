@@ -1656,8 +1656,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 try
                 {
                     dump();
-                    dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
-                    dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
+                    if (onTeamCity())
+                    {
+                        dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
+                        dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
+                    }
                     if (_testTimeout)
                         dumpThreads();
                 }

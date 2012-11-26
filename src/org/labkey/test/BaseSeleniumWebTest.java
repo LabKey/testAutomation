@@ -1353,8 +1353,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 try
                 {
                     dump();
-                    dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
-                    dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
+                    if (onTeamCity())
+                    {
+                        dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
+                        dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
+                    }
                     if (_testTimeout)
                         dumpThreads();
                 }
