@@ -1640,7 +1640,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             clickLinkWithText(getProjectName());
             if(!"Query Schema Browser".equals(selenium.getTitle()))
                 goToSchemaBrowser();
-            validateQueries();
+            validateQueries(true);
 //            validateLabAuditTrail();
         }
     }
@@ -6191,13 +6191,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
-    public void validateQueries()
+    public void validateQueries(boolean validateSubfolders)
     {
         _extHelper.clickExtButton("Validate Queries", 0);
         Locator locButton = Locator.xpath("//button[text()='Start Validation']");
         Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
         waitForElement(locButton, WAIT_FOR_JAVASCRIPT);
-        checkCheckbox(Locator.id("lk-vq-subfolders"));
+        if (validateSubfolders)
+            checkCheckbox(Locator.id("lk-vq-subfolders"));
         checkCheckbox(Locator.id("lk-vq-systemqueries"));
         click(locButton);
         waitForElement(locFinishMsg, 120000);

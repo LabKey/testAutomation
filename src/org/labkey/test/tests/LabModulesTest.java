@@ -68,6 +68,12 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     }
 
     @Override
+    public void validateQueries(boolean validateSubfolders)
+    {
+        super.validateQueries(false); // too may subfolders
+    }
+
+    @Override
     protected void doTestSteps() throws Exception
     {
         setUpTest();

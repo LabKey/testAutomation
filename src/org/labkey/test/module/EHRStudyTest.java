@@ -131,7 +131,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
     }
 
     @Override
-    public void validateQueries()
+    public void validateQueries(boolean validateSubfolders)
     {
         //NOTE: the queries are also validated as part of study import
         //also, validation takes place on the project root, while the EHR and required datasets are loaded into a subfolder
