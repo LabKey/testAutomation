@@ -22,8 +22,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
@@ -124,12 +122,12 @@ public class GenotypingTest extends BaseSeleniumWebTest
         for(int i=0; i<3; i++)
         {
             clickLinkContainingText("configure",i, false);
-            waitForExtMask();
+            _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
             _extHelper.clickExtDropDownMenu("userQuery_schema", "lists");
             _extHelper.clickExtDropDownMenu("userQuery_query", listVals[i]);
             _extHelper.clickExtDropDownMenu("userQuery_view", "[default view]");
             _extHelper.clickExtButton("Submit", 0);
-            waitForExtMaskToDisappear();
+            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         }
         setFormElement(Locator.name("galaxyURL"), "http://galaxy.labkey.org:8080");
         clickButton("Submit");
@@ -137,7 +135,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
         log("Configure Galaxy Server Key");
         clickLinkWithText("My Settings");
-        setFormElement("galaxyKey", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        setFormElement(Locator.name("galaxyKey"), "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         clickButton("Submit");
     }
 
@@ -607,7 +605,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         waitForText("Export Files");
         assertTextPresent("ZIP Archive", "Merge");
         clickButtonContainingText("Cancel", 0);
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
     }
 
@@ -616,8 +614,6 @@ public class GenotypingTest extends BaseSeleniumWebTest
         log("import genotyping run");
         startImportRun("reads.txt", "Import 454 Reads", first454importNum);
         waitForPipelineJobsToComplete(++pipelineJobCount, "Import Run", false);
-//        assertTextNotPresent("IMPORT");
-        assertTextNotPresent("ERROR");
 
         goToProjectHome();
         clickLinkWithText("View Runs");
@@ -670,7 +666,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         _extHelper.selectFileBrowserItem(file);
 
         selectImportDataAction(importAction);
-        setFormElement("run", associatedRun);
+        setFormElement(Locator.name("run"), associatedRun);
         clickButton("Import Reads");
 
     }
@@ -682,14 +678,14 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
         selectImportDataAction(importAction);
 
-        setFormElement("run", illuminaImportNum);
-        setFormElement("prefix", "Illumina-");
+        setFormElement(Locator.name("run"), illuminaImportNum);
+        setFormElement(Locator.name("prefix"), "Illumina-");
         clickButton("Import Reads");
 
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         //delete run first, due to issue  ###
 //        goToHome();
@@ -728,26 +724,40 @@ public class GenotypingTest extends BaseSeleniumWebTest
             }
         }
 
-        deleteTemplateRow();
+        deleteTemplateRow(afterTest);
         deleteProject(getProjectName(), afterTest);
 
 //        deleteDir(new File(pipelineLoc + "\\analysis_" + getRunNumber()));
 //        deleteDir(new File(pipelineLoc + "\\analysis_" + (getRunNumber()-1)));
     }
 
-    private void deleteTemplateRow() throws Exception
+    private void deleteTemplateRow(boolean failOnError)
     {
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         DeleteRowsCommand cmd = new DeleteRowsCommand("genotyping", "IlluminaTemplates");
         cmd.addRow(Collections.singletonMap("Name", (Object) TEMPLATE_NAME));
-        SaveRowsResponse resp = cmd.execute(cn, getProjectName());
+        SaveRowsResponse resp;
+        try
+        {
+            resp = cmd.execute(cn, getProjectName());
+        }
+        catch (Exception ex)
+        {
+            if (failOnError)
+                throw new RuntimeException(ex);
+            else
+            {
+                log("Template rows not deleted. Nothing to be deleted.");
+                return;
+            }
+        }
         log("Template rows deleted: " + resp.getRowsAffected());
     }
 
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "server/modules/genotyping";
     }
 
 }
