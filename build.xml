@@ -493,6 +493,7 @@
                 haltonfailure="false" haltonerror="false" showoutput="true">
             <jvmarg value="-Xmx512m"/>
             <jvmarg value="-Xdebug" />
+            <jvmarg value="-Duser.timezone=${sysprop.timezone}" />
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend.selenium},address=${sysprop.selenium.debug.port}" />
             <classpath refid="test.run.classpath"/>
             <sysproperty key="suite" value="${sysprop.suiteToUse}"/>
@@ -981,11 +982,13 @@
         </condition>
 
         <!-- Set property sysprop.suite: user provided string or DRT by default -->
-        <condition property="sysprop.suite" value="DRT">
-            <not><isset property="suite"/></not>
-        </condition>
-        <condition property="sysprop.suite" value="${suite}">
+        <condition property="sysprop.suite" value="${suite}" else="DRT">
             <isset property="suite"/>
+        </condition>
+
+        <!-- Set property sysprop.timezone. Normalizes timezone for tests running on TeamCity -->
+        <condition property="sysprop.timezone" value="America/Los_Angeles" else="${user.timezone}">
+            <isset property="teamcity.buildType.id"/>
         </condition>
 
         <property name="webdriver.ie.driver" value="${test.dir}/bin/IEDriverServer.exe"/>
@@ -1022,6 +1025,7 @@
         <echo message="User property overrides:" />
         <echo message="    suite: ${sysprop.suite}"/>
         <echo message="    tests: ${sysprop.test}"/>
+        <echo message="    time zone: ${sysprop.timezone}"/>
         <echo message="    clean up after test: ${sysprop.clean}"/>
         <echo message="    clean up only: ${sysprop.cleanOnly}"/>
         <echo message="    halt on error: ${sysprop.haltOnError}"/>
@@ -1059,6 +1063,7 @@
                 haltonerror="${sysprop.haltOnError}">
             <jvmarg value="-Xdebug" />
             <jvmarg value="-Xmx512m"/>
+            <jvmarg value="-Duser.timezone=${sysprop.timezone}" />
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend},address=${sysprop.selenium.debug.port}" />
             <jvmarg value="-Djava.compiler=NONE" />
             <classpath refid="test.run.classpath" />
@@ -1117,6 +1122,7 @@
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="false" showoutput="true">
             <jvmarg value="-Xmx512m"/>
+            <jvmarg value="-Duser.timezone=${sysprop.timezone}" />
             <classpath refid="test.run.classpath"/>
             <sysproperty key="suite" value="${sysprop.suite}"/>
             <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
