@@ -56,7 +56,7 @@ public class HaplotypeAssayTest extends GenotypingTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteProject(getProjectName(), afterTest);
     }
@@ -99,6 +99,7 @@ public class HaplotypeAssayTest extends GenotypingTest
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("AssayDesignerName"), ASSAY_NAME);
+        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         checkCheckbox(Locator.name("editableRunProperties"));
 
         clickButton("Save", 0);
