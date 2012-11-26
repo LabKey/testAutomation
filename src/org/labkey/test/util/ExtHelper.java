@@ -84,14 +84,12 @@ public class ExtHelper extends AbstractHelper
         return _test.isElementPresent(itemLocator);
     }
 
-    @LogMethod
     public void clickExtDropDownMenu(String menuId, String value)
     {
         clickExtDropDownMenu(Locator.id(menuId), value);
     }
 
 
-    @LogMethod
     public void clickExtDropDownMenu(Locator menuLocator, String value)
     {
         _test.click(menuLocator);

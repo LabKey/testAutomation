@@ -107,7 +107,6 @@ public class ExtHelperWD extends AbstractHelperWD
         return (Boolean)_test.executeScript(script, id);
     }
 
-    @LogMethod
     public void clickExtDropDownMenu(String menuId, String value)
     {
         clickExtDropDownMenu(Locator.id(menuId), value);
@@ -119,7 +118,6 @@ public class ExtHelperWD extends AbstractHelperWD
         return elements.get(index).getSize().height;        
     }
 
-    @LogMethod
     public void clickExtDropDownMenu(Locator menuLocator, String value)
     {
         _test.click(menuLocator);
