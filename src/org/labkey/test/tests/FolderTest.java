@@ -46,6 +46,9 @@ public class FolderTest extends BaseWebDriverTest
     protected void checkQueries() // skip query validation
     { /* Too many folder to check queries. */ }
 
+    public boolean enableLinkCheck()
+    {return false;} // too many folders
+
     @Override
     protected void doTestSteps() throws Exception
     {
@@ -62,8 +65,8 @@ public class FolderTest extends BaseWebDriverTest
         addWebPart("Wiki");
 
         createNewWikiPage();
-        setFormElement("name", WIKITEST_NAME);
-        setFormElement("title", WIKITEST_NAME);
+        setFormElement(Locator.id("name"), WIKITEST_NAME);
+        setFormElement(Locator.id("title"), WIKITEST_NAME);
         setWikiBody("Placeholder text.");
         saveWikiPage();
 
@@ -82,7 +85,7 @@ public class FolderTest extends BaseWebDriverTest
         waitForExt4FolderTreeNode(PROJECT_NAME, 10000);
 
         log("Ensure folders will be visible");
-        selenium.windowMaximize();
+        _driver.manage().window().maximize();
 
         clickButton("Change Display Order");
         checkRadioButton("resetToAlphabetical", "false");
