@@ -611,10 +611,6 @@ public class ViralLoadAssayTest extends LabModulesTest
     private void importLightCyclerRun()
     {
         log("Verifying Light Cycle Import");
-
-        //note: until we better handle converting bad dates, this section will log an error, sp we reset them
-        checkErrors();
-
         _helper.goToAssayResultImport(ASSAY_NAME);
 
         //a proxy for page loading
@@ -636,14 +632,7 @@ public class ViralLoadAssayTest extends LabModulesTest
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
         String text = _helper.getExampleData();
 
-        log("Trying to save invalid data");
-        String errorText = text.replaceAll("de0114_2008.09.08_1_JG", "de0114_200.09.08_1_JG");
-        textarea.setValue(errorText);
-        waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
-        click(Locator.ext4Button("OK"));
-
-        errorText = text.replaceAll("CTL_negative", "");
+        String errorText = text.replaceAll("CTL_negative", "");
         errorText = errorText.replaceAll("de0115_2008.09.08_1_JG\t\t\t0", "");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
@@ -704,9 +693,6 @@ public class ViralLoadAssayTest extends LabModulesTest
         Assert.assertEquals("Incorrect sample type", "Serum", sampleType);
 
         verifyImportedVLs(totalRows, expected, results, new String[]{"Subject Id"});
-
-        //see above
-        resetErrors();
     }
 
     private void verifyImportedVLs(int totalRows, Map<String, String[]> expected, DataRegionTable results, @Nullable String[] keyFields)
