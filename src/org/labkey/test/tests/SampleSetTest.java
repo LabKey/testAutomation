@@ -349,6 +349,8 @@ public class SampleSetTest extends BaseSeleniumWebTest
 
         DataRegionTable drt = new DataRegionTable("Material", this);
 
-        Assert.assertEquals(attachment.getName(), drt.getDataAsText(index, "File Attachment"));
+        String path = drt.getDataAsText(index, "File Attachment");
+        Assert.assertNotNull("Path shouldn't be null", path);
+        Assert.assertTrue("Path didn't contain " + attachment.getName() + ", but was: " + path, path.contains(attachment.getName()));
     }
 }
