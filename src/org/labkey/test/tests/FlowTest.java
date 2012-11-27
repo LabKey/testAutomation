@@ -412,17 +412,25 @@ public class FlowTest extends BaseFlowTest
 
     public void customGraphQuery()
     {
-        // Create custom query with a Graph column
+        log("** Creating custom query with Graph columns");
         String graphQuery =
                 "SELECT FCSAnalyses.Name,\n" +
                 "FCSAnalyses.Graph.\"(FSC-H:FSC-A)\" AS Singlets,\n" +
                 "FCSAnalyses.Graph.\"(<APC-A>)\"\n" +
                 "FROM FCSAnalyses";
         createQuery(PROJECT_NAME, "GraphQuery", graphQuery, null, true);
+
+        log("** Executing custom query with Graph columns");
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=GraphQuery&query.showGraphs=Inline");
+
+        // verify Issue 16304: query over flow.FCSFiles doesn't include URL for Name column
+        DataRegionTable table = new DataRegionTable("query", this);
+        String href = table.getHref(0, "Name");
+        Assert.assertTrue("Expected 'Name' href to go to showWell.view: " + href, href.contains("/" + getFolderName() + "/showWell.view"));
+        
         assertTextNotPresent("Error generating graph");
         assertTextPresent("No graph for:\n(<APC-A>)");
-        String href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
+        href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
 
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
