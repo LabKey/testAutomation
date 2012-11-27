@@ -1349,7 +1349,7 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             importRunForTestLuminexConfig(files[i], testDate, i);
 
-            displayingRowId = verifyRunFileAssociations(displayingRowId, (i+1));
+            displayingRowId = verifyRunFileAssociations(i+1);
         }
 
         //verify that the uploaded runs do not have associated guide sets
@@ -1389,7 +1389,7 @@ public class LuminexTest extends AbstractQCAssayTest
             checkCheckbox("_titrationRole_qccontrol_Standard1");
             clickButton("Save and Finish");
 
-            displayingRowId = verifyRunFileAssociations(displayingRowId, (i+1));
+            displayingRowId = verifyRunFileAssociations(i+1);
         }
 
         // verify that the newly uploaded runs got the correct guide set applied to them
@@ -2214,18 +2214,14 @@ public class LuminexTest extends AbstractQCAssayTest
     }
 
     @LogMethod
-    private boolean verifyRunFileAssociations(boolean displayingRowId, int index)
+    private boolean verifyRunFileAssociations(int index)
     {
         // verify that the PDF of curves file was generated along with the xls file and the Rout file
-        if (!displayingRowId)
-        {
-            _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.addCustomizeViewColumn("RowId");
-            _customizeViewsHelper.applyCustomView();
-            displayingRowId = true;
-        }
         DataRegionTable table = new DataRegionTable("Runs", this);
-        clickLinkWithText(table.getDataAsText(0, "Row Id"));
+        table.setFilter("Name", "Equals", "Guide Set plate " + index);
+        clickAndWait(Locator.tagWithAttribute("img", "src", "/labkey/Experiment/images/graphIcon.gif"));
+        clickLinkWithText("Text View");
+        waitForText("Protocol Applications"); // bottom section of the "Text View" tab for the run details page
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_4PL.pdf", 3);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_5PL.pdf", 3);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".xls", 4);
