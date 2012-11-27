@@ -65,8 +65,8 @@ public class FolderTest extends BaseWebDriverTest
         addWebPart("Wiki");
 
         createNewWikiPage();
-        setFormElement(Locator.id("name"), WIKITEST_NAME);
-        setFormElement(Locator.id("title"), WIKITEST_NAME);
+        setFormElement(Locator.id("wiki-input-name"), WIKITEST_NAME);
+        setFormElement(Locator.id("wiki-input-title"), WIKITEST_NAME);
         setWikiBody("Placeholder text.");
         saveWikiPage();
 
