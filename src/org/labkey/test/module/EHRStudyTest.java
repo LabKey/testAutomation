@@ -328,7 +328,6 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         assertNoErrorText();
 
         beginAt("/ehr/" + CONTAINER_PATH + "/datasets.view");
-        waitForPageToLoad();
         waitForText("Necropsies");
         waitAndClick(LabModuleHelper.getNavPanelItem("Necropsies:", VIEW_TEXT));
         waitForPageToLoad();
@@ -342,7 +341,6 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         assertNoErrorText();
 
         beginAt("/ehr/" + CONTAINER_PATH + "/datasets.view");
-        waitForPageToLoad();
         waitForText("Drug Administration");
         waitAndClick(LabModuleHelper.getNavPanelItem("Drug Administration:", VIEW_TEXT));
         waitForPageToLoad();
@@ -355,7 +353,6 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         assertNoErrorText();
 
         beginAt("/ehr/" + CONTAINER_PATH + "/datasets.view");
-        waitForPageToLoad();
         waitForText("Housing");
         waitAndClick(LabModuleHelper.getNavPanelItem("Housing:", VIEW_TEXT));
         waitForPageToLoad();
@@ -371,7 +368,6 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         assertNoErrorText();
 
         beginAt("/ehr/" + CONTAINER_PATH + "/datasets.view");
-        waitForPageToLoad();
         waitForText("Clinpath Runs");
         waitAndClick(LabModuleHelper.getNavPanelItem("Clinpath Runs:", VIEW_TEXT));
         waitForPageToLoad();
@@ -411,7 +407,6 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
     {
         //housing queries
         beginAt("/project/" + CONTAINER_PATH + "/begin.view");
-        waitForPageToLoad();
         waitAndClick(Locator.linkWithText("Housing Queries"));
         waitForPageToLoad();
         waitForText("View:"); //a proxy for the search panel loading
@@ -419,7 +414,6 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         //animal queries
         beginAt("/project/" + CONTAINER_PATH + "/begin.view");
-        waitForPageToLoad();
         waitAndClick(Locator.linkWithText("Animal Search"));
         waitForPageToLoad();
         waitForTextToDisappear("Loading");
@@ -429,7 +423,6 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         //project, protocol queries
         beginAt("/project/" + CONTAINER_PATH + "/begin.view");
-        waitForPageToLoad();
         waitAndClick(Locator.linkWithText("Protocol and Project Queries"));
         waitForPageToLoad();
         waitForTextToDisappear("Loading");
@@ -439,7 +432,6 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         //population overview
         beginAt("/project/" + CONTAINER_PATH + "/begin.view");
-        waitForPageToLoad();
         waitAndClick(Locator.linkWithText("Population Summary"));
         waitForPageToLoad();
         waitForText("Current Population Counts");
@@ -499,7 +491,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         log("Verify Project search");
         waitAndClick(Locator.ext4Radio("Multiple Animals"));
-        waitAndClick(Locator.xpath("//a[text()='[Search By Project/Protocol]']"));
+        waitAndClick(Locator.xpath("//span[text()='[Search By Project/Protocol]']"));
         waitForElement(Ext4Helper.ext4Window("Search By Project/Protocol"));
         _ext4Helper.selectComboBoxItem("Project", PROJECT_ID);
         clickButton("Submit", 0);
@@ -509,7 +501,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         log("Verify Protocol search");
         waitAndClick(Locator.ext4Radio("Multiple Animals"));
-        waitAndClick(Locator.xpath("//a[text()='[Search By Project/Protocol]']"));
+        waitAndClick(Locator.xpath("//span[text()='[Search By Project/Protocol]']"));
         waitForElement(Ext4Helper.ext4Window("Search By Project/Protocol"));
         _ext4Helper.selectComboBoxItem("Protocol", PROTOCOL_ID);
         clickButton("Submit", 0);
@@ -618,14 +610,14 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
 
         log("Check subjectBox parsing");
         setFormElement("subjectBox",  MORE_ANIMAL_IDS[0]+","+MORE_ANIMAL_IDS[1]+";"+MORE_ANIMAL_IDS[2]+" "+MORE_ANIMAL_IDS[3]+"\n"+MORE_ANIMAL_IDS[4]);
-        clickButton("  Replace -->", 0);
+        waitAndClick(Locator.ext4Button("Replace -->"));
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", 5, getDataRegionRowCount(dataRegionName));
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[2]);
-                                      
-        clickButton("Clear", 0);
+
+        waitAndClick(Locator.ext4Button("Clear"));
         refreshAnimalHistoryReport();
         assertAlert("Must Enter At Least 1 Animal ID");
         assertElementNotPresent(Locator.buttonContainingText("(X)"));
@@ -634,7 +626,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
     private void refreshAnimalHistoryReport()
     {
         waitForText("Abstract");
-        clickButton("Refresh", 0);
+        waitAndClick(Locator.ext4Button("Refresh"));
     }
 
     private void quickSearchTest()
@@ -822,13 +814,13 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtTab("All Tasks");
         waitForElement(Locator.xpath("//div[contains(@class, 'all-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'all-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'all-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
         _extHelper.clickExtTab("Tasks By Room");
         waitForElement(Locator.xpath("//div[contains(@class, 'room-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 3, selenium.getXpathCount("//div[contains(@class, 'room-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 3, selenium.getXpathCount("//div[contains(@class, 'room-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
         _extHelper.clickExtTab("Tasks By Id");
         waitForElement(Locator.xpath("//div[contains(@class, 'id-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 3, selenium.getXpathCount("//div[contains(@class, 'id-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 3, selenium.getXpathCount("//div[contains(@class, 'id-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
 
         stopImpersonating();
 
@@ -873,7 +865,7 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         waitForElement(Locator.xpath("//div[contains(@class, 'my-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtTab("Review Required");
         waitForElement(Locator.xpath("//div[contains(@class, 'review-requested-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'review-requested-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'review-requested-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
         String href2 = getAttribute(Locator.linkWithText(TASK_TITLE), "href");
         beginAt(href2); // Clicking opens in a new window.
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-weight-records-grid')]"), WAIT_FOR_JAVASCRIPT);
@@ -929,13 +921,13 @@ public class EHRStudyTest extends SimpleApiTest implements AdvancedSqlTest
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtTab("All Tasks");
         waitForElement(Locator.xpath("//div[contains(@class, 'all-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'all-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'all-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
         _extHelper.clickExtTab("Tasks By Room");
         waitForElement(Locator.xpath("//div[contains(@class, 'room-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'room-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'room-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
         _extHelper.clickExtTab("Tasks By Id");
         waitForElement(Locator.xpath("//div[contains(@class, 'id-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'id-tasks-marker') and "+Locator.NOT_HIDDEN+"]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'id-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
         stopImpersonating();
 
         log("Fulfil MPR task");
