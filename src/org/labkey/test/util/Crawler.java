@@ -107,6 +107,7 @@ public class Crawler
             new ControllerActionId("ms2", "showParamsFile"),
             // Tested directly in XTandemTest
             new ControllerActionId("ms2", "showPeptide"),
+            new ControllerActionId("pipeline-status", "showList"), // Is likely to contain 404 links
             new ControllerActionId("project", "deleteWebPart"),
             new ControllerActionId("project", "moveWebPart"),
             new ControllerActionId("query", "printRows"),
