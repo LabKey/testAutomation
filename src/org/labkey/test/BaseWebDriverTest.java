@@ -764,8 +764,25 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         // Get setPassword URL from notification email.
         goToModule("Dumbster");
-        String emailSubject = user + " : Welcome to the Demo Installation LabKey Server Web Site new user registration";
-        clickLinkWithText(emailSubject, 0);
+
+        //the name of the installation can vary, so we need to infer the email subject
+        WebElement link = null;
+        String linkPrefix = user + " : Welcome to the ";
+        String linkSuffix = "new user registration";
+        for (WebElement el : getDriver().findElements(By.partialLinkText(linkPrefix)))
+        {
+            String text = el.getText();
+            if (text.startsWith(linkPrefix) && text.endsWith(linkSuffix))
+            {
+                link = el;
+                break;
+            }
+        }
+        Assert.assertNotNull("Link for found", link);
+
+        String emailSubject = link.getText();
+        link.click();
+
         WebElement resetLink = _shortWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//table[@id='dataregion_EmailRecord']//a[text() = '" + emailSubject + "']/..//a[contains(@href, 'setPassword.view')]")));
         resetLink.click();
         waitForPageToLoad();
