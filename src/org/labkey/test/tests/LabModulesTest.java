@@ -494,16 +494,13 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         clickButton("OK", 0);
         waitForElement(Ext4Helper.invalidField());
 
-        //TODO: why doesnt this work?
-//        _helper.setFormField("box_row", "-100");
-//        _helper.setFormField("freezer", "Freezer1");
-//        sleep(50);
-//        clickButton("Submit", 0);
-//
-//        waitForElement(Ext4Helper.ext4Window("Error"));
-//        assertTextPresent("Cannot have a negative value for row");
-//        clickButton("OK", 0);
+        _helper.setFormField("box_row", "-100");
+        _helper.setFormField("location", "Location1");
+        clickButton("Submit", 0);
 
+        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForText("Cannot have a negative value for box_row");
+        clickButton("OK", 0);
 
         //test presence of UI to download multiple templates
         _ext4Helper.clickTabContainingText("Import Spreadsheet");
