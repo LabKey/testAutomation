@@ -31,5 +31,6 @@ public class TimeChartVisitBasedTest extends TimeChartTest
     public void doVerifySteps()
     {
         visitBasedChartTest();
+        filteredViewQueryMeasureTest();
     }
 }

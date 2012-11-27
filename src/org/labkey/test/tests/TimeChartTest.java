@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import com.sun.xml.internal.bind.v2.TODO;
 import junit.framework.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
@@ -42,6 +41,7 @@ public class TimeChartTest extends StudyBaseTest
     private static final String Y_AXIS_LABEL = "New Y-Axis Label";
     private static final String CHART_TITLE = "New Chart Title";
     private static final String VISIT_CHART_TITLE = "APX-1: Abbreviated Physical Exam";
+    private static final String QUERY_MEASURE_DATASET = "APX-1: Abbreviated Physical Exam";
     private static final String ADD_MEASURE_DIALOG = "Add Measure...";
     protected static final String PARTICIPANTS = "Participants";
     protected static final String PARTICIPANTS_GROUPS = "Participant Groups";
@@ -271,39 +271,24 @@ public class TimeChartTest extends StudyBaseTest
 
     public void doVerifySteps()
     {
-        createChartTest(); // run via TimeChartDateBasedTest
-
-        stdDevRegressionTest(); // run via TimeChartDateBasedTest
-
-        visualizationTest(); // run via TimeChartDateBasedTest
-
-        generateChartPerParticipantTest(); // run via TimeChartDateBasedTest
-
-        saveTest(); // run via TimeChartDateBasedTest
-
-        timeChartPermissionsTest(); // run via TimeChartDateBasedTest
-
-        pointClickFunctionTest(); // run via TimeChartDateBasedTest
-
-        multiMeasureTimeChartTest(); // run via TimeChartDateBasedTest
-
-        getDataDateTest(); // run via TimeChartAPITest
-
-        getDataVisitTest(); // run via TimeChartAPITest
-
-        createParticipantGroups(); // run via TimeChartAPITest and TimeChartDatBasedTest
-
-        participantGroupTimeChartTest(); // run via TimeChartDateBasedTest
-
-        multiAxisTimeChartTest(); // run via TimeChartDateBasedTest
-
-        aggregateTimeChartUITest(); // run via TimeChartDateBasedTest
-
-        aggregateTimeChartSQLTest(); // run via TimeChartAPITest
-
-        filteredTimeChartRegressionTest(); // run via TimeChartDateBasedTest
-
-        visitBasedChartTest(); // run via TimeChartVisitBasedChart
+        Assert.fail("Run time chart individual tests.");
+//        createChartTest(); // run via TimeChartDateBasedTest
+//        stdDevRegressionTest(); // run via TimeChartDateBasedTest
+//        visualizationTest(); // run via TimeChartDateBasedTest
+//        generateChartPerParticipantTest(); // run via TimeChartDateBasedTest
+//        saveTest(); // run via TimeChartDateBasedTest
+//        timeChartPermissionsTest(); // run via TimeChartDateBasedTest
+//        pointClickFunctionTest(); // run via TimeChartDateBasedTest
+//        multiMeasureTimeChartTest(); // run via TimeChartDateBasedTest
+//        getDataDateTest(); // run via TimeChartAPITest
+//        getDataVisitTest(); // run via TimeChartAPITest
+//        createParticipantGroups(); // run via TimeChartAPITest and TimeChartDatBasedTest
+//        participantGroupTimeChartTest(); // run via TimeChartDateBasedTest
+//        multiAxisTimeChartTest(); // run via TimeChartDateBasedTest
+//        aggregateTimeChartUITest(); // run via TimeChartDateBasedTest
+//        aggregateTimeChartSQLTest(); // run via TimeChartAPITest
+//        filteredTimeChartRegressionTest(); // run via TimeChartDateBasedTest
+//        visitBasedChartTest(); // run via TimeChartVisitBasedChart
     }
 
     public void aggregateTimeChartSQLTest()
@@ -314,7 +299,7 @@ public class TimeChartTest extends StudyBaseTest
     //depends on:  participantGroupTimeChartTest
     public void aggregateTimeChartUITest()
     {
-        goToTimeChartScreenAndStartChooseMeasure();
+        goToNewTimeChart();
 
         //choose measure
         _ext4Helper.clickGridRowText("CD4+ (cells/mm3)", 0);
@@ -375,17 +360,21 @@ public class TimeChartTest extends StudyBaseTest
         waitForText("Lab Results: CD4");
     }
 
-    private void goToTimeChartScreenAndStartChooseMeasure()
+    private void goToNewTimeChart()
     {
 
         clickLinkWithText(FOLDER_NAME);
         goToManageViews();
         clickMenuButton("Create", "Time Chart");
+        clickChooseInitialMeasure();
+    }
 
+    private void clickChooseInitialMeasure()
+    {
         waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickButton("Choose a Measure", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForLoadingMaskToDisappear(5*WAIT_FOR_JAVASCRIPT);
     }
 
     public void generateChartPerParticipantTest()
@@ -421,10 +410,7 @@ public class TimeChartTest extends StudyBaseTest
         addWebPart("Specimens");
         goToManageViews();
         clickMenuButton("Create", "Time Chart");
-        waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Choose a Measure", 0);
-        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        clickChooseInitialMeasure();
         waitForText("NAbAssay", WAIT_FOR_JAVASCRIPT);
 
         log("Test measure search.");
@@ -455,11 +441,7 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresent(ptid);
 
         clickMenuButton("Charts", "Create Time Chart");
-
-        waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Choose a Measure", 0);
-        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        clickChooseInitialMeasure();
         waitForText("Physical Exam", WAIT_FOR_JAVASCRIPT);
 
         _ext4Helper.clickGridRowText("Pulse", 0);
@@ -478,10 +460,7 @@ public class TimeChartTest extends StudyBaseTest
         clickLinkWithText(VISIT_FOLDER_NAME);
         goToManageViews();
         clickMenuButton("Create", "Time Chart");
-        waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Choose a Measure", 0);
-        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
-        _extHelper.waitForLoadingMaskToDisappear(5*WAIT_FOR_JAVASCRIPT);
+        clickChooseInitialMeasure();
         _ext4Helper.clickGridRowText("1. Weight", 0);
         clickButton("Select", 0);
         waitForText("Days Since Contact Date", WAIT_FOR_JAVASCRIPT);
@@ -538,10 +517,55 @@ public class TimeChartTest extends StudyBaseTest
         assertTextNotPresent(VISIT_STRINGS);
 
         openSaveMenu();
-        setFormElement("reportName", VISIT_REPORT_NAME);
-        setFormElement("reportDescription", REPORT_DESCRIPTION);
+        setFormElement(Locator.name("reportName"), VISIT_REPORT_NAME);
+        setFormElement(Locator.name("reportDescription"), REPORT_DESCRIPTION);
         saveReport(true);
         waitForText(VISIT_CHART_TITLE, WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void filteredViewQueryMeasureTest()
+    {
+        log("Create query over " + QUERY_MEASURE_DATASET + " dataset.");
+        clickLinkWithText(VISIT_FOLDER_NAME);
+        goToModule("Query");
+        createNewQuery("study");
+        setFormElement(Locator.name("ff_newQueryName"), "My APX Query");
+        selectOptionByText(Locator.name("ff_baseTableName"), QUERY_MEASURE_DATASET);
+        clickButton("Create and Edit Source");
+        setQueryEditorValue("queryText", "SELECT x.MouseId, x.MouseVisit, x.SequenceNum, x.APXtempc, x.sfdt_136 FROM \"APX-1: Abbreviated Physical Exam\" AS x");
+        clickButton("Save & Finish");
+        waitForText("1 - 47 of 47");
+
+        // verify filtered view issue 16498
+        log("Filter the default view of the query");
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewFilter("sfdt_136", "Contains One Of", "1;2;");
+        _customizeViewsHelper.saveCustomView();
+        waitForText("1 - 31 of 31");
+
+        log("Create a Time Chart from the measure in the new query");
+        clickMenuButton("Charts", "Create Time Chart");
+        clickChooseInitialMeasure();
+        waitForText("My APX Query", 2); // once in filter textbox, and once for the Body Temp measure grid row
+        _ext4Helper.clickGridRowText("2. Body Temp", 0);
+        clickButton("Select", 0);
+        waitForText("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.", WAIT_FOR_JAVASCRIPT);
+        goToAxisTab("X-Axis");
+        _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
+        applyChanges();
+        waitForText("My APX Query", WAIT_FOR_JAVASCRIPT);
+        click(Locator.tagWithText("span", "999320016"));
+        waitForText("4 wk Post-V#2/V#3", WAIT_FOR_JAVASCRIPT); // last visit from ptid 999320016
+        assertTextPresent("2. Body Temp: ", 6); // hover text label (3 for chart and 3 for thumbnail in save dialog)
+        clickButton("View Data", 0);
+        waitForText("1 - 9 of 9", WAIT_FOR_JAVASCRIPT);
+        assertTextNotPresent("801.0"); // sequenceNum filtered out by default view filter
+        clickButton("View Chart(s)", 0);
+
+        openSaveMenu();
+        setFormElement(Locator.name("reportName"), VISIT_REPORT_NAME + " 2");
+        saveReport(true);
+        waitForText("My APX Query", WAIT_FOR_JAVASCRIPT);
     }
 
     public void saveTest()
@@ -709,10 +733,7 @@ public class TimeChartTest extends StudyBaseTest
         clickLinkWithText(FOLDER_NAME);
         goToManageViews();
         clickMenuButton("Create", "Time Chart");
-        waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Choose a Measure", 0);
-        _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        clickChooseInitialMeasure();
         _ext4Helper.clickGridRowText("CD4+ (cells/mm3)", 0);
         clickButton("Select", 0);
         enterMeasuresPanel();
@@ -744,8 +765,8 @@ public class TimeChartTest extends StudyBaseTest
         clickLinkWithText("edit");
         waitForText(CHART_TITLE);
         assertTextPresent("Days Since Start Date", 2); // X-Axis labels for each measure
-        assertTextPresent(CHART_TITLE+": Lymphocytes", 1); // Title
-        assertTextPresent(CHART_TITLE+": CD4", 1); // Title
+        assertTextPresent(CHART_TITLE+": Lymphs (cells/mm3)", 1); // Title
+        assertTextPresent(CHART_TITLE+": CD4+ (cells/mm3)", 1); // Title
     }
 
     public void getDataDateTest()
@@ -890,8 +911,8 @@ public class TimeChartTest extends StudyBaseTest
         // until the final details are worked out, just ignore the number of occurances of text, and fix them later
         //
         assertTextPresent("Days Since Start Date");//, 2); // X-Axis labels for each measure
-        assertTextPresent(CHART_TITLE+": Lymphocytes");//, 1); // Title
-        assertTextPresent(CHART_TITLE+": CD4");//, 1); // Title
+        assertTextPresent(CHART_TITLE+": Lymphs (cells/mm3)");//, 1); // Title
+        assertTextPresent(CHART_TITLE+": CD4+ (cells/mm3)");//, 1); // Title
 
         goToGroupingTab();
         setParticipantSelection(PARTICIPANTS_GROUPS);
