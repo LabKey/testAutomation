@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -33,21 +34,20 @@ import java.util.Collections;
  * User: elvan
  * Date: 9/11/12
  * Time: 2:42 PM
- * To change this template use File | Settings | File Templates.
  */
 public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 {
     public static final String STUDY_PIPELINE_ROOT = getLabKeyRoot() + "/sampledata/specimenprogressreport";
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
-    String studyFolder = "study folder";
-    String assayFolder = "assay folder";
+    private static final String studyFolder = "study folder";
+    private static final String assayFolder = "assay folder";
     int pipelineCount = 0;
-    private String assay1 = "PCR";
-    private String assay1File = "PCR Data.tsv";
-    private String assay1XarPath = "/assays/PCR.xar";
-    private String assay2 = "RNA";
-    private String assay2File = "RNA Data.tsv";
-    private String assay2XarPath = "/assays/RNA.xar";
+    private static final String assay1 = "PCR";
+    private static final String assay1File = "PCR Data.tsv";
+    private static final String assay1XarPath = "/assays/PCR.xar";
+    private static final String assay2 = "RNA";
+    private static final String assay2File = "RNA Data.tsv";
+    private static final String assay2XarPath = "/assays/RNA.xar";
     private Locator.XPathLocator tableLoc = Locator.xpath("//table[@id='dataregion_ProgressReport']");
 
     @Override
@@ -84,18 +84,18 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
                 "You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report.");
 
         waitForElement(tableLoc);
-        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@style, 'background:green')]")));
-        Assert.assertEquals(22, getXpathCount( Locator.xpath("//td[contains(@style, 'background:red')]")));
-        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@style, 'background:orange')]")));
-        Assert.assertEquals(0, getXpathCount(Locator.xpath("//td[contains(@style, 'flagged.png')]")));
+        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
+        Assert.assertEquals(22, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
+        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
+        Assert.assertEquals(0, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
 
         flagSpecimenForReview(assay1, assay1File, null);
 
         waitForElement(tableLoc);
-        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@style, 'flagged.png')]")));
+        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
 
         // verify legend text and ordering
-        assertTextPresentInThisOrder("specimen collected", "specimen received by lab", "specimen received but invalid", "assay results available", "query");
+        assertTextPresentInThisOrder("specimen collected", "specimen received by lab", "specimen received but invalid", "assay results available"); //, "query"); appears too many times on page!
 
         // verify setting the PCR additional grouping column
         verifyAdditionalGroupingColumn(assay1, "gene");
@@ -120,7 +120,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         clickLinkWithText(assayFolder);
         waitForElement(tableLoc);
         configureAssayProgressDashboard(assay2);
-        configureAssaySchema(assayName, true);
+        configureAssaySchema(assayName);
 
         flagSpecimenForReview(assayName, assay2File, "2011-03-02");
 
@@ -130,17 +130,17 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
         waitForElement(tableLoc);
         assertTextPresentInThisOrder("SR1", "SR2", "SR3");
-        Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@style, 'background:green')]")));
-        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@style, 'background:red')]")));
-        Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@style, 'background:orange')]")));
-        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@style, 'flagged.png')]")));
+        Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
+        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
+        Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
+        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
 
         clickLinkWithText("7 results from " + assayName + " have been uploaded.");
         assertTextPresent("Participant Visit not found", 1);
         assertTextPresent("Specimen type is not expected by this Assay", 1);
     }
 
-    private void flagSpecimenForReview(String assayName, String runName, String collectionDateFilterStr)
+    private void flagSpecimenForReview(String assayName, String runName, @Nullable String collectionDateFilterStr)
     {
         clickLinkWithText(assayFolder);
 
@@ -179,11 +179,11 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         assertTextPresent("You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report", 2);
 
         configureAssayProgressDashboard(assay1);
-        configureAssaySchema(assay1, true);
+        configureAssaySchema(assay1);
         clickLinkWithText(assayFolder);
     }
 
-    private void configureAssaySchema(String assayName, boolean showFlag)
+    private void configureAssaySchema(String assayName)
     {
         ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo("", "rho", assayName + " Query");
         _assayHelper.addAliasedFieldToMetadata("assay.General." + assayName, "Data", "RowId", "qcmessage", lookupInfo);
@@ -213,7 +213,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteProject(getProjectName(), afterTest);
     }
