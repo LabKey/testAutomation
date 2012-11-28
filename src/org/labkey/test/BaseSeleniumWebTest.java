@@ -2598,8 +2598,15 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             //Need to unencode here? Selenium turns &nbsp; into space???
             text = text.replace("&nbsp;", " ");
-            if (!selenium.isTextPresent(text))
+            try
+            {
+                if (!selenium.isTextPresent(text))
+                    return false;
+            }
+            catch (SeleniumException ex)
+            {
                 return false;
+            }
         }
         return true;
     }
