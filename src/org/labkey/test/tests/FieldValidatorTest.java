@@ -64,7 +64,7 @@ public class FieldValidatorTest extends BaseWebDriverTest
         log("Test upload data");
         clickButton("Import Data");
         setFormElement(Locator.name("text"), TEST_DATA_FAIL);
-        _listHelper.submitImportTsv_error(null);
+        _listHelper.submitImportTsv_success();
         waitForText(SEX_ERROR_MSG);
         assertTextPresent(ID_ERROR_MSG);
         assertTextPresent(AGE_ERROR_MSG);
