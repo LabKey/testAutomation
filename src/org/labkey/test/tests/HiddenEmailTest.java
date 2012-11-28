@@ -19,8 +19,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.ListHelper;
-
-import java.util.HashMap;
+import org.labkey.test.util.LogMethod;
 
 /**
  * Created by IntelliJ IDEA.
@@ -61,17 +60,21 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
     @Override
     protected void doTestSteps() throws Exception
     {
-
-        doHiddenEmailTest();
-    }
-
-    private void doHiddenEmailTest()
-    {
         setupHiddenEmailTest();
         verifyHiddenEmailTest();
-
     }
+
+    @LogMethod
     private void setupHiddenEmailTest()
+    {
+        createUsersAndGroups();
+        createHiddenEmailList();
+        createQueryWebpart();
+        setHiddenEmailPermissions();
+    }
+
+    @LogMethod
+    private void createUsersAndGroups()
     {
         // Create users and groups
         createUser(ADMIN_USER, null);
@@ -88,9 +91,13 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         setFormElement(Locator.name("quf_FirstName"), displayNameFromEmail(CHECKED_USER));
         clickButton("Submit");
         stopImpersonating();
+    }
 
+    @LogMethod
+    private void createHiddenEmailList()
+    {
         // Create list
-        // impersonate(ADMIN_USER); // TODO: 16513: Experimental email hiding doesn't hide List.ModifiedBy
+        impersonate(ADMIN_USER);
         ListHelper.ListColumn userColumn = new ListHelper.ListColumn("user", "user", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(getProjectName(), "core", "Users"));
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
         clickButton("Done");
@@ -106,8 +113,12 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         _customizeViewsHelper.addCustomizeViewColumn("user/ModifiedBy/Email", "Email");
         _customizeViewsHelper.addCustomizeViewColumn("ModifiedBy/Email", "Email");
         _customizeViewsHelper.saveCustomView(EMAIL_VIEW, true);
-//        stopImpersonating(); // TODO: 16513: Experimental email hiding doesn't hide List.ModifiedBy
+        stopImpersonating();
+    }
 
+    @LogMethod
+    private void createQueryWebpart()
+    {
         // Create query webpart
         clickFolder(getProjectName());
         addWebPart("Query");
@@ -118,8 +129,12 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("ModifiedBy/Email", "Email");
         _customizeViewsHelper.saveCustomView(EMAIL_VIEW, true);
+    }
 
-        // Verify user permissions for hidden emails
+    @LogMethod
+    private void setHiddenEmailPermissions()
+    {
+        // Set user permissions for hidden emails
         goToSiteGroups();
         _ext4Helper.clickExt4Tab("Permissions");
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
@@ -129,6 +144,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         clickButton("Save and Finish");
     }
 
+    @LogMethod
     private void verifyHiddenEmailTest()
     {
         impersonate(IMPERSONATED_USER);
