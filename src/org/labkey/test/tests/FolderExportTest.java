@@ -31,7 +31,7 @@ import java.io.File;
 public class FolderExportTest extends BaseSeleniumWebTest
 {
 
-    String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Study Data Tools", "List", "Report web part", "Workbooks"};
+    String[] webParts = {"Study Overview", "Data Pipeline", "Datasets", "Specimens", "Views", "Test wiki", "Study Data Tools", "Lists", "~!@#$%^&*()_+query web part", "Report web part", "Workbooks"};
     File dataDir = new File(getSampledataPath(), "FolderExport");
     private String folderFromZip = "1 Folder From Zip"; // add numbers to folder names to keep ordering for created folders
     private String folderFromPipelineZip = "2 Folder From Pipeline Zip";
@@ -142,7 +142,12 @@ public class FolderExportTest extends BaseSeleniumWebTest
 
     private void verifyExpectedWebPartsPresent()
     {
-        assertTextPresentInThisOrder(webParts);
+        // TODO: when test is converted to WebDriver, use _driver.findElements(By.className("labkey-wp-title-text"));
+        // (currently this conversion to WebDriver pushes this test beyond 30 min locally)
+        for (int index = 0; index < webParts.length; index++)
+        {
+            assertElementPresent(Locator.xpath("//span[text()='" + webParts[index] + "' and contains(@class, 'labkey-wp-title-text')]"));
+        }
     }
     private void verifyFolderImportAsExpected(int subfolderIndex)
     {
@@ -225,5 +230,11 @@ public class FolderExportTest extends BaseSeleniumWebTest
     public String getAssociatedModuleDirectory()
     {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void validateQueries(boolean validateSubfolders)
+    {
+        super.validateQueries(false); // too may subfolders
     }
 }

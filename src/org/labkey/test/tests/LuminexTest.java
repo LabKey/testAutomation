@@ -1344,12 +1344,11 @@ public class LuminexTest extends AbstractQCAssayTest
         testDate.add(Calendar.DATE, -files.length);
 
         // upload the first set of files (2 runs)
-        boolean displayingRowId = false;
         for (int i = 0; i < 2; i++)
         {
             importRunForTestLuminexConfig(files[i], testDate, i);
 
-            displayingRowId = verifyRunFileAssociations(i+1);
+            verifyRunFileAssociations(i+1);
         }
 
         //verify that the uploaded runs do not have associated guide sets
@@ -1389,7 +1388,7 @@ public class LuminexTest extends AbstractQCAssayTest
             checkCheckbox("_titrationRole_qccontrol_Standard1");
             clickButton("Save and Finish");
 
-            displayingRowId = verifyRunFileAssociations(i+1);
+            verifyRunFileAssociations(i+1);
         }
 
         // verify that the newly uploaded runs got the correct guide set applied to them
