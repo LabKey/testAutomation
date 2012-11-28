@@ -256,6 +256,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             final FirefoxProfile profile = new FirefoxProfile();
             profile.setPreference("app.update.auto", false);
+            profile.setPreference("extensions.update.autoUpdate", false);
+            profile.setPreference("extensions.update.enabled", false);
             if (enableScriptCheck())
             {
                 try
