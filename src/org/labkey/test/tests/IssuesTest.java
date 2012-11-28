@@ -288,6 +288,9 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         emailTest();
 
+        // remove query which is broken now because requiredFieldsTest() renames MyFirstString
+        deleteQuery(PROJECT_NAME, "issues", "xxyzzy");
+
         // UNDONE test these actions
         // CompleteUserAction
         // ExportTsvAction
@@ -570,7 +573,17 @@ public class IssuesTest extends BaseSeleniumWebTest
         waitForText(ISSUE_TITLE_0, WAIT_FOR_JAVASCRIPT);
         waitForText(ISSUE_TITLE_1, WAIT_FOR_JAVASCRIPT);
         clickLinkWithText(PROJECT_NAME);
+
+
     }
+
+    private void deleteQuery(String container, String schemaName, String queryName)
+    {
+        String deleteQueryURL = "query/" + container + "/deleteQuery.view?schemaName=" + schemaName + "&query.queryName=" + queryName;
+        beginAt(deleteQueryURL);
+        clickButton("OK");
+    }
+
 
     public void subFolderIssuesTest()
     {
