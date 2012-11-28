@@ -1,0 +1,10 @@
+<cv:customView xmlns:cv="http://labkey.org/data/xml/queryCustomView" hidden="true">
+    <cv:columns>
+        <cv:column name="RowId"/>
+        <!--<cv:column name="Color"/>-->
+        <cv:column name="ModelYear"/>
+        <cv:column name="Milage"/>
+        <!--<cv:column name="LastService"/>-->
+        <cv:column name="ModelId/ManufacturerId/Name"/>
+    </cv:columns>
+</cv:customView>

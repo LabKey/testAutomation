@@ -17,25 +17,33 @@ package org.labkey.test.tests;
 
 import org.json.simple.JSONObject;
 import org.junit.Assert;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.Row;
+import org.labkey.remoteapi.query.RowMap;
+import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelperWD;
-import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.Maps;
-import org.labkey.remoteapi.query.*;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.CommandException;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelperWD;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
-import java.util.Date;
 
 /*
 * User: Dave
@@ -92,6 +100,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestQueries();
         doTestQueryViews();
         doTestReports();
+        doTestInsertUpdateViews();
         doTestParameterizedQueries();
         doTestContainerColumns();
         doTestFilterSort();
@@ -672,6 +681,54 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Assert.assertEquals("Expected vehicles.container to return the value: " + entityId, entityId, vehicleRow.get("value"));
         Assert.assertEquals("Expected vehicles.container to return the displayValue: " + getProjectName(), getProjectName(), vehicleRow.get("displayValue"));
 
+    }
+
+    private void doTestInsertUpdateViews() throws IOException, CommandException
+    {
+        log("Testings custom views for insert/update/details");
+
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+        log("** using selectRows to test details view, which has been customized in schema XML only");
+        SelectRowsCommand selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        selectCmd.setViewName("~~DETAILS~~");
+        selectCmd.setMaxRows(-1);
+        SelectRowsResponse selectResp = selectCmd.execute(cn, getProjectName());
+
+        String[] expectedCols = new String[]{"ModelId", "ModelYear", "Milage", "LastService", "RowId"};
+        Assert.assertEquals("Expected to return " + expectedCols.length + " columns, based on the saved view", expectedCols.length, selectResp.getColumnModel().size());
+        for (String col : expectedCols)
+        {
+            Assert.assertNotNull("Details view does not contain column: " + col, selectResp.getColumnModel(col));
+        }
+
+        log("** using selectRows to test insert view");
+        selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        selectCmd.setViewName("~~INSERT~~");
+        selectCmd.setMaxRows(-1);
+        selectResp = selectCmd.execute(cn, getProjectName());
+
+        expectedCols = new String[]{"RowId", "ModelYear", "Milage", "ModelId/ManufacturerId/Name"};
+        Assert.assertEquals("Expected to return " + expectedCols.length + " columns, based on the saved view", expectedCols.length, selectResp.getColumnModel().size());
+
+        for (String col : expectedCols)
+        {
+            Assert.assertNotNull("Insert view does not contain column: " + col, selectResp.getColumnModel(col));
+        }
+
+        log("** using selectRows to test update view");
+        selectCmd = new SelectRowsCommand(VEHICLE_SCHEMA, "Vehicles");
+        selectCmd.setViewName("~~UPDATE~~");
+        selectCmd.setMaxRows(-1);
+        selectResp = selectCmd.execute(cn, getProjectName());
+
+        expectedCols = new String[]{"RowId", "ModelYear", "Milage", "LastService", "ModelId/ManufacturerId/Name"};
+        Assert.assertEquals("Expected to return " + expectedCols.length + " columns, based on the saved view", expectedCols.length, selectResp.getColumnModel().size());
+
+        for (String col : expectedCols)
+        {
+            Assert.assertNotNull("Update view does not contain column: " + col, selectResp.getColumnModel(col));
+        }
     }
 
     private void doTestParameterizedQueries()

@@ -71,6 +71,8 @@ modules/simpletest/queries/vehicle/Vehicles/AlternateImportTemplate.qview.xml -t
 modules/simpletest/queries/vehicle/Vehicles/Filter[!!-~]On[!!-~]Letter[!!-~]P.qview.xml -text
 modules/simpletest/queries/vehicle/Vehicles/SortOnModelYear.qview.xml -text
 modules/simpletest/queries/vehicle/Vehicles/VehiclesInCurrentAndSubfolders.qview.xml -text
+modules/simpletest/queries/vehicle/Vehicles/~~INSERT~~.qview.xml -text
+modules/simpletest/queries/vehicle/Vehicles/~~UPDATE~~.qview.xml -text
 modules/simpletest/queries/vehicle/colors.js -text
 modules/simpletest/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS[!!-~]Report.js -text
 modules/simpletest/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS[!!-~]Report.report.xml -text
