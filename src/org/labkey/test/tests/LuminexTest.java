@@ -1850,10 +1850,14 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         clickFolder(getProjectName());
         assertTextNotPresent("GS Analyte");
-         addWebPart("Wiki");
+
+        String wikiName = "LuminexGuideSetTestWiki";
+        addWebPart("Wiki");
         createNewWikiPage("HTML");
-        setWikiBody(getFileContents("server/test/data/api/LuminexGuideSet.html"));
+        setFormElement(Locator.name("name"), wikiName);
+        setWikiBody("Placeholder text.");
         saveWikiPage();
+        setSourceFromFile("LuminexGuideSet.html", wikiName);
 
         waitForElement(Locator.id("button_loadqwps"), defaultWaitForPage);
         click(Locator.id("button_loadqwps"));
