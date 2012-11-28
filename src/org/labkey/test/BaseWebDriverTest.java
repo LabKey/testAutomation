@@ -4940,7 +4940,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             el.sendKeys(text.substring(text.length()-1));
         }
 
-        fireEvent(l, SeleniumEvent.blur); // Make GWT form elements behave better
+        if (el.getAttribute("class").contains("gwt-TextBox"))
+            fireEvent(l, SeleniumEvent.blur); // Make GWT form elements behave better
     }
 
     /**
@@ -6760,8 +6761,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String queryURL = "query/" + container + "/begin.view?schemaName=" + schemaName;
         beginAt(queryURL);
         createNewQuery(schemaName);
-        setFormElement("ff_newQueryName", name);
-        clickButton("Create and Edit Source");
+        setFormElement(Locator.name("ff_newQueryName"), name);
+        clickButton("Create and Edit Source", 0);
+        waitForElement(Locator.id("labkey-nav-trail-current-page").withText("Edit " + name));
 //        toggleSQLQueryEditor();
         setQueryEditorValue("queryText", sql);
 //        setFormElement("queryText", sql);
@@ -6773,12 +6775,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 //        setFormElement("metadataText", xml);
         }
         clickButton("Save", 0);
-        waitForText("Saved", WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
         if (inheritable)
         {
             beginAt(queryURL);
             editQueryProperties("flow", name);
-            selectOptionByValue("inheritable", "true");
+            selectOptionByValue(Locator.name("inheritable"), "true");
             submit();
         }
     }
