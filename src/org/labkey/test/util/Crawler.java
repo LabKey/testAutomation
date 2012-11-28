@@ -133,6 +133,7 @@ public class Crawler
             new ControllerActionId("study-samples", "emailLabSpecimenLists"),
             new ControllerActionId("study-samples", "getSpecimenExcel"),
             new ControllerActionId("study-samples", "download"),
+            new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("NAb", "download"),
             new ControllerActionId("user", "impersonate"),
             new ControllerActionId("wiki", "download"));
