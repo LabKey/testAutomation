@@ -216,7 +216,10 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         {
             try
             {
-                EntityUtils.consume(response.getEntity());
+                if (response != null)
+                {
+                    EntityUtils.consume(response.getEntity());
+                }
             }
             catch (IOException ex)
             {/*ignore*/}

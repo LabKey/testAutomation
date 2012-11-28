@@ -31,6 +31,7 @@ import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.labkey.test.util.PasswordUtil;
 
@@ -185,15 +186,29 @@ public class WebTestHelper
     public static void logToServer(String message) throws Exception
     {
         String encodedUrl = getBaseURL() + "/admin/log.view?message=" + encodeURI(message);
-        HttpClient client = getHttpClient();
-        HttpGet get = new HttpGet(encodedUrl);
-        HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpResponse response = client.execute(get, context);
-        int responseCode = response.getStatusLine().getStatusCode();
-
-        client.getConnectionManager().shutdown();
+        HttpClient client = null;
+        HttpContext context = null;
+        HttpResponse response = null;
+        int responseCode;
+        String responseStatusLine = "";
+        try
+        {
+            client = getHttpClient();
+            context = WebTestHelper.getBasicHttpContext();
+            HttpGet get = new HttpGet(encodedUrl);
+            response = client.execute(get, context);
+            responseCode = response.getStatusLine().getStatusCode();
+            responseStatusLine = response.getStatusLine().toString();
+        }
+        finally
+        {
+            if (null != response)
+                EntityUtils.consume(response.getEntity());
+            if (client != null)
+                client.getConnectionManager().shutdown();
+        }
         if (responseCode != HttpStatus.SC_OK)
-            throw new Exception("Contacting server failed: " + response.getStatusLine());
+            throw new Exception("Contacting server failed: " + responseStatusLine);
     }
 
     private static String encodeURI(String parameter)
