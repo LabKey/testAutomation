@@ -6109,7 +6109,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Locator loc = Locator.queryTreeNode(schemaName, queryName);
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         click(loc);
-        waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + queryName + "']"), 1000);
+        waitForElement(Locator.linkWithText(schemaName + "." + queryName));
     }
 
     public boolean isLookupLinkPresent(String schemaName, String queryName, String pkName)
