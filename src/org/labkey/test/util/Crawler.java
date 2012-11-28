@@ -96,6 +96,7 @@ public class Crawler
             new ControllerActionId("admin", "memTracker"),
             new ControllerActionId("admin", "setAdminMode"),
             new ControllerActionId("admin", "dumpHeap"),
+            new ControllerActionId("admin", "addTab"),
             new ControllerActionId("assay", "assayDetailRedirect"),
             new ControllerActionId("core", "downloadFileLink"),
             new ControllerActionId("experiment", "showFile"),
