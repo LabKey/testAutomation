@@ -33,10 +33,8 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.PasswordUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -57,14 +55,8 @@ import java.util.UUID;
  * Date: 8/6/12
  * Time: 6:05 PM
  */
-public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
+public class EHRApiTest extends AbstractEHRTest
 {
-    private static final String PROJECT_NAME = "EHR_TestProject";// + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
-    private static final String FOLDER_NAME = "EHR";
-    private static final String CONTAINER_PATH = PROJECT_NAME + "/" + FOLDER_NAME;
-
-    private static final String STUDY_ZIP = "/sampledata/study/EHR Study Anon Small.zip";
-
     private static String FIELD_QCSTATELABEL = "QCStateLabel";
     private static String FIELD_OBJECTID = "objectid";
     private static String FIELD_LSID = "lsid";
@@ -81,6 +73,12 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
     private static String[] CAGES = {"1", "2", "3"};
     private static Integer[] PROJECTS = {12345, 123456, 1234567};
 
+    public EHRApiTest()
+    {
+        super();
+        STUDY_ZIP = STUDY_ZIP_NO_DATA;
+    }
+
     @Override
     public void runUITests()
     {
@@ -91,67 +89,12 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
     public void runApiTests() throws Exception
     {
         initProject();
-        defineQCStates();
-        setupEhrPermissions();
+
         goToProjectHome();
         createTestSubjects();
 
         doSecurityTest();
-        doTriggerScriptTest();
-
-    }
-
-    @Override
-    public void doCleanup(boolean afterTest)
-    {
-        long startTime = System.currentTimeMillis();
-        deleteProject(getProjectName(), afterTest);
-        if(isTextPresent(PROJECT_NAME))
-        {
-            log("Wait extra long for folder to finish deleting.");
-            while (isTextPresent(PROJECT_NAME) && System.currentTimeMillis() - startTime < 300000) // 5 minutes max.
-            {
-                sleep(5000);
-                refresh();
-            }
-            if (!isTextPresent(PROJECT_NAME)) log("Test Project deleted in " + (System.currentTimeMillis() - startTime) + "ms");
-            else Assert.fail("Test Project not finished deleting after 5 minutes");
-        }
-
-        deleteUsers(afterTest,
-                DATA_ADMIN.getUser(),
-                REQUESTER.getUser(),
-                BASIC_SUBMITTER.getUser(),
-                REQUEST_ADMIN.getUser(),
-                FULL_UPDATER.getUser(),
-                FULL_SUBMITTER.getUser());
-    }
-
-    protected void initProject()
-    {
-        //TODO: maybe just inherit from parent?
-        enableEmailRecorder();
-
-        _containerHelper.createProject(PROJECT_NAME, "EHR");
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "EHR", new String[]{"EHR", "Pipeline", "Study"});
-        enableModule(PROJECT_NAME, "EHR");
-
-        clickLinkWithText(FOLDER_NAME);
-
-        //import the study first, so we have fewer queries to validate
-        goToModule("Study");
-        importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
-
-        String[] prop = {"/" + PROJECT_NAME, "EHRStudyContainer", "/" + CONTAINER_PATH};
-        setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(prop)));
-
-        beginAt(getBaseURL() + "/ehr/" + CONTAINER_PATH + "/_initEHR.view");
-        clickButton("Delete All", 0);
-        waitForText("Delete Complete", 120000);
-        clickButton("Populate All", 0);
-        waitForText("Populate Complete", 120000);
-
-        goToProjectHome();
+        doTriggerScriptTests();
     }
 
     private void doSecurityTest() throws Exception
@@ -167,7 +110,7 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
         resetErrors(); //note: inserting records without permission will log errors by design.  the UI should prevent this from happening, so we want to be aware if it does occur
     }
 
-    private void doTriggerScriptTest() throws Exception
+    private void doTriggerScriptTests() throws Exception
     {
         _saveRowsTimes = new ArrayList<Long>();
         weightValidationTest();
@@ -566,7 +509,7 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
         calculateAverage();
 
         //then update.  update is fun b/c we need to test many QCState combinations.  Updating a row from 1 QCstate to a new QCState technically
-        //requires update permission on the original QCState, plus insert permission into the new QCState
+        //requires update Permission on the original QCState, plus insert Permission into the new QCState
         for (EHRQCState originalQc : EHRQCState.values())
         {
             // first create an initial row as a data admin
@@ -756,9 +699,9 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
 
     private void logResponse(HttpResponse response)
     {
+        String responseBody = WebTestHelper.getHttpResponseBody(response);
         try
         {
-            String responseBody = WebTestHelper.getHttpResponseBody(response);
             JSONObject o = new JSONObject(responseBody);
             if (o.has("exception"))
                 log("Expection: " + o.getString("exception"));
@@ -775,7 +718,8 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
         }
         catch (JSONException e)
         {
-            throw new RuntimeException(e);
+            log("Response was not JSON");
+            log(responseBody);
         }
     }
 
@@ -979,7 +923,7 @@ public class EHRApiTest extends EHRStudyTest implements AdvancedSqlTest
 
             add(new Permission(EHRRole.BASIC_SUBMITTER, EHRQCState.IN_PROGRESS, "delete"));
 
-            // Request Admin is basically the same as Full Submitter, except they also have RequestAdmin permission, which is not currently tested.  It is primarily used in UI
+            // Request Admin is basically the same as Full Submitter, except they also have RequestAdmin Permission, which is not currently tested.  It is primarily used in UI
             add(new Permission(EHRRole.REQUEST_ADMIN, EHRQCState.ABNORMAL, "insert"));
             add(new Permission(EHRRole.REQUEST_ADMIN, EHRQCState.COMPLETED, "insert"));
             add(new Permission(EHRRole.REQUEST_ADMIN, EHRQCState.DELETE_REQUESTED, "insert"));

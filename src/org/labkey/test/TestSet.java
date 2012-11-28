@@ -19,7 +19,8 @@ package org.labkey.test;
 import org.labkey.test.module.CDSPopulation;
 import org.labkey.test.module.CDSTest;
 import org.labkey.test.module.EHRApiTest;
-import org.labkey.test.module.EHRStudyTest;
+import org.labkey.test.module.EHRDataEntryTest;
+import org.labkey.test.module.EHRReportingAndUITest;
 import org.labkey.test.module.ModuleTest;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
@@ -141,7 +142,8 @@ public enum TestSet
         TimeChartDateBasedTest.class,
         TimeChartVisitBasedTest.class,
         TimeChartAPITest.class,
-        EHRStudyTest.class, // TODO : 16316: EHRStudyTest causing Java memory errors
+        EHRReportingAndUITest.class, // TODO : 16316: EHRReportingAndUITest causing Java memory errors
+        EHRDataEntryTest.class,
         EHRApiTest.class,
         ComplianceTrainingTest.class,
         GpatAssayTest.class,
@@ -311,7 +313,8 @@ public enum TestSet
     ),
 
     EHR(
-        EHRStudyTest.class,
+        EHRReportingAndUITest.class,
+        EHRDataEntryTest.class,
         EHRApiTest.class
     ),
 
