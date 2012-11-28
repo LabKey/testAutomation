@@ -28,6 +28,7 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.RReportHelper;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -79,6 +80,9 @@ public class ContainerContextTest extends BaseSeleniumWebTest
 
     protected void doSetup() throws Exception
     {
+        RReportHelper _rReportHelper = new RReportHelper(this);
+        _rReportHelper.ensureRConfig();
+
         _containerHelper.createProject(getProjectName(), null);
         enableModule(getProjectName(), "Laboratory");
         addWebPart("Workbooks");
