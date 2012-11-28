@@ -79,6 +79,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertModuleEnabledByDefault("Study");
 
         doTestTabbedFolder();
+        doTestContainerTabConversion();
 
         clickLinkWithText(getProjectName());
         doTestCustomFolder();
@@ -96,7 +97,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestFilterSort();
         doTestImportTemplates();
     }
-    
     private void doTestCustomFolder()
     {
         assertTextPresent("A customized web part");
@@ -811,7 +811,76 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Manage Study", "Study Container", "Overview", "Specimen Data");
         clickLinkWithText("Specimen Data");
         assertTextPresent("Vial Search", "Specimens");
+    }
 
+    private void doTestContainerTabConversion()
+    {
+        // Set up a Collaboration folder with study and assay subfolders
+        final String COLLAB_FOLDER = "collab1";
+        final String STUDYCONTAINER_NAME = "Study Container Tab";
+        final String STUDYTAB_NAME = "Study Container";
+        final String ASSAYCONTAINER_NAME = "Assay Container Tab 2";
+        final String ASSAYTAB_NAME = "Assay Container";
+        final String COLLABFOLDER_PATH = getProjectName() + "/" + COLLAB_FOLDER;
+        final String EXTRA_ASSAY_WEBPART = "Run Groups";
+        clickLinkWithText(getProjectName());
+        _containerHelper.createSubfolder(getProjectName(), COLLAB_FOLDER, "Collaboration");
+        _containerHelper.createSubfolder(COLLABFOLDER_PATH, STUDYCONTAINER_NAME, "Study");
+        _containerHelper.createSubfolder(COLLABFOLDER_PATH, ASSAYCONTAINER_NAME, "Assay");
+        clickLinkWithText(COLLAB_FOLDER);
+        clickLinkWithText(STUDYCONTAINER_NAME);
+        assertTextPresent("Study Overview");
+        clickLinkWithText("Create Study");
+        clickLinkWithText("Create Study");
+        clickLinkWithText(COLLAB_FOLDER);
+        clickLinkWithText(ASSAYCONTAINER_NAME);
+        addWebPart(EXTRA_ASSAY_WEBPART);
+
+        // Change folder type to XML Tabbed
+        clickLinkWithText(COLLAB_FOLDER);
+        goToFolderManagement();
+        clickLinkWithText("Folder Type");
+        checkRadioButton("folderType", TABBED_FOLDER_TYPE);
+        clickLinkWithText("Update Folder");
+
+        // Verify that subfolders got moved into tabs
+        assertTextPresent(STUDYTAB_NAME, ASSAYTAB_NAME);
+        clickLinkWithText(STUDYTAB_NAME);
+        assertTextPresent("Study Overview");
+        clickLinkWithText("Specimen Data");
+        assertTextPresent("Vial Search", "Import Specimens");
+        clickLinkWithText(ASSAYTAB_NAME);
+        assertTextPresent("Assay List");
+        assertTextPresent(EXTRA_ASSAY_WEBPART);
+
+        // Change back to Collab
+        clickLinkWithText(COLLAB_FOLDER);
+        goToFolderManagement();
+        clickLinkWithText("Folder Type");
+        checkRadioButton("folderType", "Collaboration");
+        clickLinkWithText("Update Folder");
+
+        // Study and Assay should be hidden now
+        assertTextNotPresent(STUDYTAB_NAME, ASSAYTAB_NAME, STUDYCONTAINER_NAME, ASSAYCONTAINER_NAME);
+
+        // Now change back to TABBED
+        clickLinkWithText(COLLAB_FOLDER);
+        goToFolderManagement();
+        clickLinkWithText("Folder Type");
+        checkRadioButton("folderType", TABBED_FOLDER_TYPE);
+        clickLinkWithText("Update Folder");
+
+        // Verify that folder tabs are back
+        assertTextPresent(STUDYTAB_NAME, ASSAYTAB_NAME);
+        clickLinkWithText(STUDYTAB_NAME);
+        assertTextPresent("Study Overview");
+        clickLinkWithText("Specimen Data");
+        assertTextPresent("Vial Search", "Import Specimens");
+        clickLinkWithText(ASSAYTAB_NAME);
+        assertTextPresent("Assay List");
+        assertTextPresent(EXTRA_ASSAY_WEBPART);
+
+        deleteFolder(getProjectName(), COLLAB_FOLDER);
     }
 
     protected void assertModuleDeployed(String moduleName)
