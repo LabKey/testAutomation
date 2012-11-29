@@ -138,14 +138,14 @@ public class FilterTest extends ListTest
         // Issue 14710: Switching between faceted and logical filters breaks dialog
         setUpFacetedFilter("query", "Color", "Robust", "Light");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "Zany", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
-        _extHelper.waitForExtDialog("Confirm change");
-        _extHelper.clickExtButton("Confirm change", "Yes", 0);
-        _extHelper.clickExtButton("OK");
-        //the change above would result in filters being dropped.  because we did not select new filters, we expect this to return an unfiltered grid
+        _extHelper.clickExtTab("Choose Filters");
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Is Blank");
+        clickButton("Clear Filter");
+        //the change above would result in filters being dropped.
         verifyColumnValues("query", "Color", "Light", "Robust", "Zany");
 
         //now repeat with a filter that should be translated
@@ -156,7 +156,9 @@ public class FilterTest extends ListTest
 
         setFormElement(Locator.name("value_1"), "Light;Robust");
 
-        _extHelper.clickExtTab("Choose Values"); //we should get no alerts, and Light + Robust should be checked
+        _extHelper.clickExtTab("Choose Values"); //we should get no alerts
+        clickButton("Clear Filter");
+        setUpFacetedFilter("query", "Color", "Light", "Robust");
         _extHelper.clickExtButton("OK");
         verifyColumnValues("query", "Color", "Light", "Robust");
         verifyColumnValues("query", "year", "1980", "1970");
@@ -186,14 +188,12 @@ public class FilterTest extends ListTest
 
         setUpFacetedFilter("query", "year", "1990", "1980");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal Any Of (e.g. \"a;b;c\")");
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal");
         Assert.assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
-        _extHelper.waitForExtDialog("Confirm change");
-        _extHelper.clickExtButton("Confirm change", "Yes", 0);
         _extHelper.clickExtButton("OK");
-        verifyColumnValues("query", "year", "1980", "1970", "1990");
+        verifyColumnValues("query", "year", "1980", "1990");
 
         setFacetedFilter("query", "year");
         verifyColumnValues("query", "year", "1980", "1970", "1990");
