@@ -353,6 +353,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return false;
     }
 
+    /**
+     * @Deprecated WebDriver doesn't have file upload limitations
+     * @return
+     */
+    @Deprecated
     public boolean isFileUploadAvailable()
     {
         return _fileUploadAvailable;
@@ -395,23 +400,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (browserPath.length() > 0)
             browserPath = " " + browserPath;
 
-        //File upload is "experimental" in selenium, so only use it when
-        //necessary
-        if (isFileUploadTest())
-        {
-            // IE is currently unable to do a file upload
-            if (browser.startsWith(IE_BROWSER))
-            {
-                log("Warning: Internet Explorer cannot do file uploads!");
-                //browser = IE_UPLOAD_BROWSER;
-                _fileUploadAvailable = false;
-            }
-            else if (browser.startsWith(FIREFOX_BROWSER))
-            {
-                browser = FIREFOX_UPLOAD_BROWSER;
-                _fileUploadAvailable = true;
-            }
-        }
+        _fileUploadAvailable = true;
         return browser + browserPath;
     }
 
