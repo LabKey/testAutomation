@@ -729,10 +729,6 @@ public class ReportTest extends StudyBaseTest
         Assert.assertTrue("Locked".equals(getFormElement(statusElement)));
         clickButton("Cancel");
         waitForText(ATTACHMENT_REPORT3_NAME);
-
-        //
-        // todo:  add test for issue 16544 when fixed
-        //
     }
 
     private static final String LINK_REPORT1_NAME = "Link Report1";
