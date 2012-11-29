@@ -310,8 +310,7 @@ public enum TestSet
     Weekly(600000, BVTnDaily,
             // Add special test classes, not in daily or BVT.
             SecurityTestExtended.class,
-            NabMigrationTest.class,
-            MoveFileTest.class
+            NabMigrationTest.class
     ),
 
     EHR(
