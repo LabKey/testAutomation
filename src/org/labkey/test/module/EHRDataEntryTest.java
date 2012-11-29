@@ -38,7 +38,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
     {
         initProject();
 
-        weightDataEntryTest();
+//        weightDataEntryTest();
         mprDataEntryTest();
     }
 
@@ -57,7 +57,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         waitAndClick(Locator.linkWithText("Enter Weights"));
         waitForPageToLoad();
         waitForElement(Locator.name("title"), WAIT_FOR_JAVASCRIPT);
-        setFormElement("title", TASK_TITLE);
+        setFormElement(Locator.name("title"), TASK_TITLE);
         _extHelper.selectComboBoxItem("Assigned To:", BASIC_SUBMITTER.getGroup() + "\u00A0"); // appended with a nbsp (Alt+0160)
 
         log("Add blank weight entries");
@@ -96,7 +96,6 @@ public class EHRDataEntryTest extends AbstractEHRTest
         waitForElementToDisappear(Locator.tagWithText("div", MORE_ANIMAL_IDS[0]), WAIT_FOR_JAVASCRIPT);
         waitForElementToDisappear(Locator.tagWithText("div", MORE_ANIMAL_IDS[1]), WAIT_FOR_JAVASCRIPT);
 
-        //TODO: Test duplicate record
         _helper.selectDataEntryRecord("weight", MORE_ANIMAL_IDS[4], true);
         clickButton("Duplicate Selected", 0);
         _extHelper.waitForExtDialog("Duplicate Records");
@@ -108,13 +107,13 @@ public class EHRDataEntryTest extends AbstractEHRTest
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtTab("All Tasks");
         waitForElement(Locator.xpath("//div[contains(@class, 'all-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'all-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 1, getElementCount(Locator.xpath("//div[contains(@class, 'all-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']")));
         _extHelper.clickExtTab("Tasks By Room");
         waitForElement(Locator.xpath("//div[contains(@class, 'room-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 3, selenium.getXpathCount("//div[contains(@class, 'room-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 3, getElementCount(Locator.xpath("//div[contains(@class, 'room-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']")));
         _extHelper.clickExtTab("Tasks By Id");
         waitForElement(Locator.xpath("//div[contains(@class, 'id-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 3, selenium.getXpathCount("//div[contains(@class, 'id-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 3, getElementCount(Locator.xpath("//div[contains(@class, 'id-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']")));
 
         stopImpersonating();
 
@@ -146,6 +145,8 @@ public class EHRDataEntryTest extends AbstractEHRTest
         _extHelper.waitForExtDialog("Submit For Review");
         _extHelper.selectComboBoxItem("Assign To:", DATA_ADMIN.getGroup());
         _extHelper.clickExtButton("Submit For Review", "Submit");
+        waitForText("Enter Blood Draws");
+        waitForElement(Locator.id("userMenuPopupText"));
 
         sleep(1000); // Weird
         stopImpersonating();
@@ -159,7 +160,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         waitForElement(Locator.xpath("//div[contains(@class, 'my-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtTab("Review Required");
         waitForElement(Locator.xpath("//div[contains(@class, 'review-requested-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'review-requested-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 1, getElementCount(Locator.xpath("//div[contains(@class, 'review-requested-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']")));
         String href2 = getAttribute(Locator.linkWithText(TASK_TITLE), "href");
         beginAt(href2); // Clicking opens in a new window.
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-weight-records-grid')]"), WAIT_FOR_JAVASCRIPT);
@@ -168,6 +169,8 @@ public class EHRDataEntryTest extends AbstractEHRTest
         clickButton("Submit Final", 0);
         _extHelper.waitForExtDialog("Finalize Form");
         _extHelper.clickExtButton("Finalize Form", "Yes");
+        waitForText("Enter Blood Draws");
+        waitForElement(Locator.id("userMenuPopupText"));
 
         sleep(1000); // Weird
         stopImpersonating();
@@ -205,7 +208,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         waitForElement(Locator.name("title"), WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByLabel("Id:", PROJECT_MEMBER_ID);
         waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT);
-        setFormElement("title", MPR_TASK_TITLE);
+        setFormElement(Locator.name("title"), MPR_TASK_TITLE);
         _extHelper.selectComboBoxItem("Assigned To:", BASIC_SUBMITTER.getGroup() + "\u00A0"); // appended with a nbsp (Alt+0160)
 
         sleep(1000);
@@ -215,13 +218,13 @@ public class EHRDataEntryTest extends AbstractEHRTest
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtTab("All Tasks");
         waitForElement(Locator.xpath("//div[contains(@class, 'all-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'all-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 1, getElementCount(Locator.xpath("//div[contains(@class, 'all-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']")));
         _extHelper.clickExtTab("Tasks By Room");
         waitForElement(Locator.xpath("//div[contains(@class, 'room-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'room-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 1, getElementCount(Locator.xpath("//div[contains(@class, 'room-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']")));
         _extHelper.clickExtTab("Tasks By Id");
         waitForElement(Locator.xpath("//div[contains(@class, 'id-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Incorrect number of task rows.", 1, selenium.getXpathCount("//div[contains(@class, 'id-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']"));
+        Assert.assertEquals("Incorrect number of task rows.", 1, getElementCount(Locator.xpath("//div[contains(@class, 'id-tasks-marker') and " + Locator.NOT_HIDDEN + "]//tr[@class='labkey-alternate-row' or @class='labkey-row']")));
         stopImpersonating();
 
         log("Fulfil MPR task");
@@ -240,8 +243,8 @@ public class EHRDataEntryTest extends AbstractEHRTest
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-drug_administration-records-grid')]"), WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem("Project:", PROJECT_ID + " (" + DUMMY_PROTOCOL + ")\u00A0");
         _extHelper.selectComboBoxItem("Type:", "Physical Exam\u00A0");
-        setFormElement("remark", "Bonjour");
-        setFormElement("performedby", BASIC_SUBMITTER.getUser());
+        _helper.setDataEntryField("remark", "Bonjour");
+        _helper.setDataEntryField("performedby", BASIC_SUBMITTER.getUser());
 
         log("Add treatments record.");
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-drug_administration-records-grid')]"), WAIT_FOR_JAVASCRIPT);
@@ -250,13 +253,15 @@ public class EHRDataEntryTest extends AbstractEHRTest
         _extHelper.selectComboBoxItem("Code:", "Antibiotic");
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='code']/.."), "amoxicillin (c-54620)\u00a0");
         _extHelper.selectComboBoxItem("Route:", "oral\u00a0");
-        setFormElement("concentration", "5");
+        _helper.setDataEntryFieldInTab("Treatments & Procedures", "concentration", "5");
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='conc_units']/.."), "mg/tablet\u00a0");
+
         //TODO: assert units
-        setFormElement("dosage", "2");
+
+        _helper.setDataEntryFieldInTab("Treatments & Procedures", "dosage", "2");
         click(Locator.xpath("//img["+VISIBLE+" and contains(@class, 'x-form-search-trigger')]"));
         waitForElement(Locator.xpath("//div[@class='x-form-invalid-msg']"), WAIT_FOR_JAVASCRIPT);
-        _helper.setDataEntryField("Treatments & Procedures", "remark", "Yum");
+        _helper.setDataEntryFieldInTab("Treatments & Procedures", "remark", "Yum");
 
         //TODO: Test more procedures.
 //        log("Add blood draw record.");
@@ -290,6 +295,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
 //        clickVisibleButton("Add Record");
 
         clickButton("Save & Close");
+        waitForText("Data Entry");
 
         stopImpersonating();
     }

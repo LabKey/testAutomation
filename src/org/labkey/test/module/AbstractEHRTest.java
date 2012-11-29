@@ -20,12 +20,14 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.tests.SimpleApiTest;
+import org.labkey.test.tests.SimpleApiTestWD;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.EHRTestHelper;
 import org.labkey.test.util.PasswordUtil;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -41,7 +43,7 @@ import java.util.regex.Pattern;
  * Date: 11/27/12
  * Time: 2:22 PM
  */
-abstract public class AbstractEHRTest extends SimpleApiTest implements AdvancedSqlTest
+abstract public class AbstractEHRTest extends SimpleApiTestWD implements AdvancedSqlTest
 {
     protected String PROJECT_NAME = "EHR_TestProject";
     protected String FOLDER_NAME = "EHR";
@@ -162,17 +164,17 @@ abstract public class AbstractEHRTest extends SimpleApiTest implements AdvancedS
         setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(prop)));
 
         clickLinkWithText(FOLDER_NAME);
-        beginAt(getBaseURL()+"/ehr/"+CONTAINER_PATH+"/_initEHR.view");
+        beginAt(getBaseURL() + "/ehr/" + CONTAINER_PATH + "/_initEHR.view");
         clickButton("Delete All", 0);
-        waitForText("Delete Complete", 120000);
+        waitForElement(Locator.xpath("//div[text() = 'Delete Complete']"), 200000);
         clickButton("Populate All", 0);
-        waitForText("Populate Complete", 120000);
+        waitForElement(Locator.xpath("//div[text() = 'Populate Complete']"), 200000);
 
         //these tables do not have a container field, so are not deleted when the test project is deleted
         clickButton("Delete Data From SNOMED", 0);
-        waitForText("Delete Complete", 120000);
+        waitForElement(Locator.xpath("//div[text() = 'Delete Complete']"), 200000);
         clickButton("Populate SNOMED Table", 0);
-        waitForText("Populate Complete", 120000);
+        waitForElement(Locator.xpath("//div[text() = 'Populate Complete']"), 200000);
 
         goToModule("Study");
         importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
@@ -256,7 +258,29 @@ abstract public class AbstractEHRTest extends SimpleApiTest implements AdvancedS
 
     protected void assertNoErrorText()
     {
-        assertTextNotPresent("error", "Error", "ERROR", "failed", "Failed", "Invalid", "invalid");
+        String[] texts = new String[]{"error", "Error", "ERROR", "failed", "Failed", "Invalid", "invalid"};
+        for (String text : texts)
+        {
+            Assert.assertFalse("text should not be present: " + text, isVisibleTextPresent(text));
+        }
+    }
+
+    public boolean isVisibleTextPresent(String... texts)
+    {
+        if(texts==null || texts.length == 0)
+            return true;
+
+        String source = getBodyText();
+
+        for (String text : texts)
+        {
+            text = text.replace("&", "&amp;");
+            text = text.replace("<", "&lt;");
+            text = text.replace(">", "&gt;");
+            if (!source.contains(text))
+                return false;
+        }
+        return true;
     }
 
     protected void defineQCStates()
@@ -275,7 +299,7 @@ abstract public class AbstractEHRTest extends SimpleApiTest implements AdvancedS
             clickButton("Save");
         }
 
-        setFormElement("showPrivateDataByDefault", "true");
+        selectOptionByValue(Locator.name("showPrivateDataByDefault"), "true");
         clickButton("Done");
     }
 
@@ -341,7 +365,7 @@ abstract public class AbstractEHRTest extends SimpleApiTest implements AdvancedS
         setPDP(REQUESTER);
         setPDP(REQUEST_ADMIN);
 
-        waitFor(new BaseSeleniumWebTest.Checker()
+        waitFor(new BaseWebDriverTest.Checker()
         {
             public boolean check()
             {
@@ -359,12 +383,18 @@ abstract public class AbstractEHRTest extends SimpleApiTest implements AdvancedS
 
     public void setPDP(EHRUser user)
     {
-        int col = getWrapper().getXpathCount("//table[@id='datasetSecurityFormTable']//th[.='" + user.getGroup() + "']/preceding-sibling::*").intValue() + 1;
-        int rowCt = getTableRowCount("datasetSecurityFormTable");
-        for (int i = 3; i <= rowCt; i++) // xpath indexing is 1 based
-        {
-            selectOptionByText(Locator.xpath("//table[@id='datasetSecurityFormTable']/tbody/tr[" + i + "]/td[" + col + "]//select"), user.getRole().toString());
-        }
+        int col = getElementCount(Locator.xpath("//table[@id='datasetSecurityFormTable']//th[.='" + user.getGroup() + "']/preceding-sibling::*"));
+
+        //see if we can use the top toggle
+        Select el = new Select(getDriver().findElement(By.xpath("//table[@id='datasetSecurityFormTable']/tbody/tr[" + 2 + "]/td[" + col + "]//select")));
+        el.selectByValue(user.getRole().toString());
+        sleep(250);
+
+//        int rowCt = getTableRowCount("datasetSecurityFormTable");
+//        for (int i = 3; i <= rowCt; i++) // xpath indexing is 1 based
+//        {
+//            selectOptionByText(Locator.xpath("//table[@id='datasetSecurityFormTable']/tbody/tr[" + i + "]/td[" + col + "]//select"), user.getRole().toString());
+//        }
     }
 
     public Locator getAnimalHistoryRadioButtonLocator(String groupName, String setting)

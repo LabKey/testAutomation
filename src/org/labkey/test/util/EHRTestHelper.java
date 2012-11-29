@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.module.EHRReportingAndUITest;
 
@@ -27,9 +27,9 @@ import org.labkey.test.module.EHRReportingAndUITest;
  */
 public class EHRTestHelper
 {
-    private BaseSeleniumWebTest _test;
+    private BaseWebDriverTest _test;
 
-    public EHRTestHelper(BaseSeleniumWebTest test)
+    public EHRTestHelper(BaseWebDriverTest test)
     {
         _test = test;
     }
@@ -43,8 +43,9 @@ public class EHRTestHelper
 
     public void selectDataEntryRecord(String query, String Id, boolean keepExisting)
     {
-        _test.getWrapper().getEval("selenium.selectExtGridItem('Id','" + Id + "', -1, 'ehr-" + query + "-records-grid', " + keepExisting + ");");
-        if(!keepExisting)_test.waitForElement(Locator.xpath("//div[@id='Id']/a[text()='"+Id+"']"), _test.WAIT_FOR_JAVASCRIPT);
+        _test._extHelper.selectExtGridItem("Id", Id, -1, "ehr-" + query + "-records-grid", keepExisting);
+        if(!keepExisting)
+            _test.waitForElement(Locator.xpath("//div[@id='Id']/a[text()='"+Id+"']"), _test.WAIT_FOR_JAVASCRIPT);
     }
 
     public void clickVisibleButton(String text)
@@ -52,10 +53,18 @@ public class EHRTestHelper
         _test.click(Locator.xpath("//button[text()='"+text+"' and "+ EHRReportingAndUITest.VISIBLE+" and not(contains(@class, 'x-hide-display'))]"));
     }
 
-    public void setDataEntryField(String tabName, String fieldName, String value)
+    public void setDataEntryFieldInTab(String tabName, String fieldName, String value)
     {
+        value += "\t"; //force blur event
         _test.setFormElement(Locator.xpath("//div[./div/span[text()='" + tabName + "']]//*[(self::input or self::textarea) and @name='" + fieldName + "']"), value);
-        _test.fireEvent(Locator.xpath("//div[./div/span[text()='" + tabName + "']]//*[(self::input or self::textarea) and @name='" + fieldName + "']"), BaseSeleniumWebTest.SeleniumEvent.blur);
+        _test.sleep(100);
+    }
+
+    public void setDataEntryField(String fieldName, String value)
+    {
+        value += "\t"; //force blur event
+        _test.setFormElement(Locator.name(fieldName), value);
+        _test.sleep(100);
     }
 }
 
