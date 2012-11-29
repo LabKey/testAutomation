@@ -4184,13 +4184,15 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public Locator.XPathLocator getButtonLocator(String text)
     {
-        // check for normal button:
-        Locator.XPathLocator locator = Locator.button(text);
-        if (isElementPresent(locator))
-            return locator;
+        Locator.XPathLocator locator;
 
         // check for normal labkey nav button:
         locator = Locator.navButton(text);
+        if (isElementPresent(locator))
+            return locator;
+
+        // check for normal button:
+        locator = Locator.button(text);
         if (isElementPresent(locator))
             return locator;
 
@@ -4443,7 +4445,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         setSort(regionName, columnName, direction, defaultWaitForPage);
     }
-
     //clear sort from a column
     public void clearSort(String regionName, String columnName)
     {
@@ -4617,6 +4618,34 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public int getXpathCount(Locator.XPathLocator xpath)
     {
         return selenium.getXpathCount(xpath.getPath()).intValue();
+    }
+
+    /**
+     *
+     * @param feature  the enable link will have an id of the form "labkey-experimental-feature-[feature]
+     */
+    public void enableExperimentalFeature(String feature)
+    {
+        log("Attempting to enable feature: " + feature);
+        goToAdminConsole();
+        clickLinkWithText("experimental features");
+
+        String xpath = "//div[div[text()='Create Specimen Study']]/a";
+        if(!isElementPresent(Locator.xpath(xpath)))
+            Assert.fail("No such feature found");
+        else
+        {
+            Locator link = Locator.xpath(xpath + "[text()='Enable']");
+            if(isElementPresent(link))
+            {
+                click(link);
+                log("Enable link found, enabling");
+            }
+            else
+            {
+                log("Link not found, presumed enabled");
+            }
+        }
     }
 
     /**
@@ -5708,6 +5737,75 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         int row = getCohortRow(table, cohort);
         String s = table.getDataAsText(row, "Enrolled");
         Assert.assertTrue("Enrolled column should be " + String.valueOf(enrolled), (0 == s.compareToIgnoreCase(String.valueOf(enrolled))));
+    }
+
+    //TODO
+    protected void createWorkbooks(String projectName, String fileWorkbookName, String fileWorkbookDescription,
+                                 String assayWorkbookName, String assayWorkbookDescription, String defaultWorkbookName, String defaultWorkbookDescription)
+    {
+        createFileWorkbook(projectName, fileWorkbookName, fileWorkbookDescription);
+
+
+        // Create Assay Workbook
+        createWorkbook(projectName, assayWorkbookName, assayWorkbookDescription, WorkbookFolderType.ASSAY_WORKBOOK);
+        assertLinkPresentWithText("Experiment Runs");
+        Assert.assertEquals(assayWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
+        Assert.assertEquals(assayWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
+        assertLinkNotPresentWithText(assayWorkbookName); // Should not appear in folder tree.
+
+        // Create Default Workbook
+        createWorkbook(projectName, defaultWorkbookName, defaultWorkbookDescription, WorkbookFolderType.DEFAULT_WORKBOOK);
+        assertLinkPresentWithText("Files");
+        assertLinkPresentWithText("Experiment Runs");
+        Assert.assertEquals(defaultWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
+        Assert.assertEquals(defaultWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
+        assertLinkNotPresentWithText(defaultWorkbookName); // Should not appear in folder tree.
+    }
+
+
+
+    private void createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
+    {
+        clickLinkWithText(project);
+        clickButton("Insert New");
+
+        setFormElement("workbookTitle", title);
+        setFormElement("workbookDescription", description);
+        setFormElement("workbookFolderType", folderType.toString());
+
+        clickButton("Create Workbook");
+    }
+
+
+
+    protected enum WorkbookFolderType
+    {
+        ASSAY_WORKBOOK("Assay Test Workbook"),
+        FILE_WORKBOOK("File Test Workbook"),
+        DEFAULT_WORKBOOK("Workbook");
+
+        private final String _type;
+
+        WorkbookFolderType(String type)
+        {
+            this._type = type;
+        }
+
+        @Override
+        public String toString()
+        {
+            return _type;
+        }
+    }
+
+    private void createFileWorkbook(String projectName, String fileWorkbookName, String fileWorkbookDescription)
+    {
+        // Create File Workbook
+        createWorkbook(projectName, fileWorkbookName, fileWorkbookDescription, WorkbookFolderType.FILE_WORKBOOK);
+        assertLinkPresentWithText("Files");
+        Assert.assertEquals(fileWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
+        Assert.assertEquals(fileWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
+        assertLinkNotPresentWithText(fileWorkbookName); // Should not appear in folder tree.
     }
 
     /**

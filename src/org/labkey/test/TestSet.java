@@ -152,6 +152,7 @@ public enum TestSet
         LibraTest.class,
 //        StudyReloadTest.class, //TODO:  don't checkin
         AncillaryStudyTest.class,
+        AncillaryStudyFromSpecimenRequestTest.class,
         FolderExportTest.class,
         GenotypingTest.class,
         HaplotypeAssayTest.class,
@@ -309,7 +310,8 @@ public enum TestSet
     Weekly(600000, BVTnDaily,
             // Add special test classes, not in daily or BVT.
             SecurityTestExtended.class,
-            NabMigrationTest.class
+            NabMigrationTest.class,
+            MoveFileTest.class
     ),
 
     EHR(

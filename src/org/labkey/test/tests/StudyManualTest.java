@@ -32,6 +32,7 @@ import java.util.Set;
  */
 public class StudyManualTest extends StudyTest
 {
+
     private final String CRF_SCHEMAS = getStudySampleDataPath() + "datasets/schema.tsv";
 
     protected final String VISIT_MAP = getStudySampleDataPath() + "v068_visit_map.txt";
@@ -121,6 +122,8 @@ public class StudyManualTest extends StudyTest
         selectImportDataAction("Import Datasets");
         clickButton("Start Import");
         waitForPipelineJobsToComplete(1, "study import", false);
+
+        //create w
 
     }
 

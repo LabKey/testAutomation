@@ -55,28 +55,9 @@ public class WorkbookTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         addWebPart("Workbooks");
+        createWorkbooks(PROJECT_NAME, FILE_WORKBOOK_NAME, FILE_WORKBOOK_DESCRIPTION, ASSAY_WORKBOOK_NAME,
+                ASSAY_WORKBOOK_DESCRIPTION, DEFAULT_WORKBOOK_NAME, DEFAULT_WORKBOOK_DESCRIPTION);
 
-        // Create File Workbook
-        createWorkbook(PROJECT_NAME, FILE_WORKBOOK_NAME, FILE_WORKBOOK_DESCRIPTION, WorkbookFolderType.FILE_WORKBOOK);
-        assertLinkPresentWithText("Files");
-        Assert.assertEquals(FILE_WORKBOOK_NAME, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
-        Assert.assertEquals(FILE_WORKBOOK_DESCRIPTION, getText(Locator.xpath("//div[@id='wb-description']")));
-        assertLinkNotPresentWithText(FILE_WORKBOOK_NAME); // Should not appear in folder tree.
-
-        // Create Assay Workbook
-        createWorkbook(PROJECT_NAME, ASSAY_WORKBOOK_NAME, ASSAY_WORKBOOK_DESCRIPTION, WorkbookFolderType.ASSAY_WORKBOOK);
-        assertLinkPresentWithText("Experiment Runs");
-        Assert.assertEquals(ASSAY_WORKBOOK_NAME, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
-        Assert.assertEquals(ASSAY_WORKBOOK_DESCRIPTION, getText(Locator.xpath("//div[@id='wb-description']")));
-        assertLinkNotPresentWithText(ASSAY_WORKBOOK_NAME); // Should not appear in folder tree.
-
-        // Create Default Workbook
-        createWorkbook(PROJECT_NAME, DEFAULT_WORKBOOK_NAME, DEFAULT_WORKBOOK_DESCRIPTION, WorkbookFolderType.DEFAULT_WORKBOOK);
-        assertLinkPresentWithText("Files");
-        assertLinkPresentWithText("Experiment Runs");
-        Assert.assertEquals(DEFAULT_WORKBOOK_NAME, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
-        Assert.assertEquals(DEFAULT_WORKBOOK_DESCRIPTION, getText(Locator.xpath("//div[@id='wb-description']")));
-        assertLinkNotPresentWithText(DEFAULT_WORKBOOK_NAME); // Should not appear in folder tree.
 
         // Edit Workbook Name
         waitAndClick(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
