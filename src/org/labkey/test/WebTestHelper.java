@@ -29,6 +29,9 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -230,8 +233,10 @@ public class WebTestHelper
     public static DefaultHttpClient getHttpClient(String username, String password)
     {
         try
-        {
-            DefaultHttpClient client = new DefaultHttpClient();
+        {    // set the connection timeout value to 30 seconds (30000 milliseconds)
+            final HttpParams httpParams = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParams, 30000);
+            DefaultHttpClient client = new DefaultHttpClient(httpParams);
             URI target = new URI(getBaseURL());
             HttpHost targetHost = new HttpHost(target.getHost(), target.getPort(), target.getScheme());
 
