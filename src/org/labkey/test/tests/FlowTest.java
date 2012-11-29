@@ -410,6 +410,7 @@ public class FlowTest extends BaseFlowTest
         assertLinkPresentWithText(FCS_FILE_1 + "-C01");
     }
 
+    //Issue 16304: query over flow.FCSFiles doesn't copy include URL for Name column
     public void customGraphQuery()
     {
         log("** Creating custom query with Graph columns");
