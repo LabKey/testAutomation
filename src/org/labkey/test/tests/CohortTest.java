@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
+import org.openqa.selenium.Alert;
 
 import java.io.File;
 import java.util.Collections;
@@ -130,7 +131,7 @@ public class CohortTest extends BaseWebDriverTest
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 5, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 6, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
 
-        selectOptionByText("cohortFilterType", "Initial cohort");
+        selectOptionByText(Locator.name("cohortFilterType"), "Initial cohort");
         clickButton("Refresh");
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE).toString(), TABLE_NEGATIVE);
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_POSITIVE).toString(), TABLE_POSITIVE);
@@ -157,7 +158,7 @@ public class CohortTest extends BaseWebDriverTest
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 5, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
         assertTableCellNotContains(TABLE_UNASSIGNED, 2, 6, INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4);
 
-        selectOptionByText("cohortFilterType", "Current cohort");
+        selectOptionByText(Locator.name("cohortFilterType"), "Current cohort");
         clickButton("Refresh");
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE).toString(), TABLE_NEGATIVE);
         selenium.assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_POSITIVE).toString(), TABLE_POSITIVE);
@@ -193,10 +194,10 @@ public class CohortTest extends BaseWebDriverTest
         clickLinkWithText("Change Visit Order");
         checkCheckbox("explicitChronologicalOrder");
         checkCheckbox("explicitDisplayOrder");
-        selectOptionByText("displayOrderItems", "Visit 3");
+        selectOptionByText(Locator.name("displayOrderItems"), "Visit 3");
         clickButtonByIndex("Move Up", 0, 0);
         clickButtonByIndex("Move Up", 0, 0);
-        selectOptionByText("chronologicalOrderItems", "Visit 3");
+        selectOptionByText(Locator.name("chronologicalOrderItems"), "Visit 3");
         clickButtonByIndex("Move Up", 1, 0);
         clickButtonByIndex("Move Up", 1, 0);
         clickButton("Save");
@@ -274,8 +275,7 @@ public class CohortTest extends BaseWebDriverTest
         clickTab("Manage");
         clickLinkWithText("Manage Cohorts");
         clickRadioButtonById("simpleCohorts");
-        selenium.getConfirmation();
-        waitForPageToLoad();
+        _driver.switchTo().alert().accept();
 
         clickFolder(PROJECT_NAME);
         waitAndClick(Locator.linkWithText("Blood"));
@@ -424,7 +424,7 @@ public class CohortTest extends BaseWebDriverTest
         clickTab("Manage");
         clickLinkWithText("Manage Cohorts");
         clickRadioButtonById("advancedCohorts");
-        selenium.getConfirmation();
+        _driver.switchTo().alert().accept();
         waitForPageToLoad();
 
         verifyDatasetEnrolledCohortFilterAdvanced("Test Results", 16, 0, 12, 6);
@@ -535,7 +535,7 @@ public class CohortTest extends BaseWebDriverTest
         {
             Locator all = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//b[contains(@class, 'filter-description') and contains(text(), 'All')]/../../../..//div[contains(@class, 'x4-grid-row-checker')]");
             waitForElement(all);
-            mouseDown(all);
+            click(all);
         }
 
         if (previousCohort != null)
