@@ -137,7 +137,9 @@ public class Crawler
             new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("NAb", "download"),
             new ControllerActionId("user", "impersonate"),
-            new ControllerActionId("wiki", "download"));
+            new ControllerActionId("wiki", "download"),
+            // Used in the ContainerContext test to check URL generation, but doesn't actually exist
+            new ControllerActionId("fake", "action"));
 
 
         return list;
