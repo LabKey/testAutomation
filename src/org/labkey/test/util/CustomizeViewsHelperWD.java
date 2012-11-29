@@ -228,19 +228,19 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         for (int i = 0; i < fieldKeyParts.length - 1; i ++ )
         {
             nodePath += fieldKeyParts[i];
-            _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            if (_test.isElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
-                _test.click(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
-            _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'minus')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 2);
+            _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            if (_test.isElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
+                _test.click(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
+            _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'minus')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 2);
             nodePath += "/";
         }
 
-        return Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldKey=" + Locator.xq(fieldKey) + "]");
+        return Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(fieldKey) + "]");
     }
 
     private void addCustomizeViewItem(String[] fieldKeyParts, String column_name, ViewItemType type)
     {
-        // fieldKey is the value contained in @fieldKey
+        // fieldKey is the value contained in @fieldkey
         _test.log("Adding " + column_name + " " + type.toString());
 
         changeTab(type);
@@ -254,7 +254,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
     public void addCustomizeViewColumn(String fieldKey, String column_name)
     {
-        // fieldKey is the value contained in @fieldKey
+        // fieldKey is the value contained in @fieldkey
         _test.log("Adding " + column_name + " column");
 
         addCustomizeViewItem(fieldKey.split("/"), column_name, ViewItemType.Columns);
