@@ -291,6 +291,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             _driver = new FirefoxDriver(profile);
         }
 
+        BrowserInfo browserInfo = BrowserInfo.getBrowserInfo(this);
+        log("Browser: " + browserInfo.getType() + " " + browserInfo.getVersion());
+        if (browserInfo.getType().equals("Firefox") && Float.parseFloat(browserInfo.getVersion()) >= 17f)
+            Assert.fail("Selenium does not currently support Firefox 17, please install Firefox 16 to run Selenium tests.");
+
         _driver.manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
 
         selenium = new DefaultSeleniumWrapper(_driver, WebTestHelper.getBaseURL());
@@ -944,6 +949,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         //TODO:  this is causing all kinds of problems
 //        if (!isElementPresent(Locator.id("leftmenupanel")) && !(isElementPresent(Locator.id("Admin ConsoleTab"))))
 //            clickAdminMenuItem("Show Navigation Bar");
+        assertElementPresent(Locator.css("#adminMenuPopupText"));
+        assertElementPresent(Locator.css(".labkey-expandable-nav-panel"));
     }
 
     public void goToAdminConsole()
@@ -1415,37 +1422,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _driver.close();
         _driver.switchTo().window((String)windows[0]);
     }
-
-    //This is for the split test, I don't want to wait until that's complete to be able to check in other changes in this file
-//    public void waitForSystemMaintenanceCompletion()
-//    {
-//        beginAt("/admin/showPrimaryLog.view?");
-//        String log = selenium.getBodyText();
-//
-//        int startIndex =log.lastIndexOf("=== Starting SystemMaintenanceStartTest (1 of 1) ===");
-//        if(!( startIndex > log.lastIndexOf("=== Completed SystemMaintenanceStartTest  ===")))
-//        {
-//            fail("Last SystemMaintenanceStartTest has not finished");
-//        }
-//
-//
-//       for(String msg : new String[] {"System maintenance complete", "Search Service Maintenance complete",
-//               "Report Service Maintenance complete", "MS1 Data File Purge Task complete",
-//               "Database maintenance complete", "Purge unused participants complete", "External schema reload complete"})
-//       {
-//            if(!( startIndex < log.lastIndexOf(msg)))
-//            {
-//                fail("\"" + msg + "\" did not appear" );
-//            }
-//       }
-//        goBack();
-//    }
-//
-//    protected void fail(String msg)
-//    {
-//        goBack(); //don't want to fail on the log file, it will create huge artifacts
-//        Assert.fail(msg);
-//    }
 
     public void populateLastPageInfo()
     {
@@ -2409,6 +2385,46 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 {
                     e.printStackTrace();
                 }
+        }
+    }
+
+    public static class BrowserInfo
+    {
+        private static BrowserInfo instance = null;
+        private static String _type;
+        private static String _version;
+
+        private BrowserInfo(){}
+
+        private BrowserInfo(String type, String version)
+        {
+            _type = type;
+            _version = version;
+        }
+
+        public static BrowserInfo getBrowserInfo(BaseWebDriverTest test)
+        {
+            if (instance == null)
+            {
+                List<String> browserInfoArray = (ArrayList<String>)test.executeScript(
+                        "    var N= navigator.appName, ua= navigator.userAgent, tem;\n" +
+                        "    var M= ua.match(/(opera|chrome|safari|firefox|msie)\\/?\\s*(\\.?\\d+(\\.\\d+)*)/i);\n" +
+                        "    if(M && (tem= ua.match(/version\\/([\\.\\d]+)/i))!= null) M[2]= tem[1];\n" +
+                        "    M= M? [M[1], M[2]]: [N, navigator.appVersion, '-?'];\n" +
+                        "    return M;");
+                instance = new BrowserInfo(browserInfoArray.get(0), browserInfoArray.get(1));
+            }
+            return instance;
+        }
+
+        public String getType()
+        {
+            return _type;
+        }
+
+        public String getVersion()
+        {
+            return _version;
         }
     }
 
@@ -3955,8 +3971,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         log("Clicking link with text '" + text + "'");
 
-        if (_driver.findElements(By.linkText(text.toUpperCase())).size() > 0)
-            clickAndWait(Locator.linkWithText(text.toUpperCase()).index(index), millis);
+        if (_driver.findElements(By.linkText(text)).size() == 0 && _driver.findElements(By.linkText(text.toUpperCase())).size() > 0)
+            clickAndWait(Locator.linkWithText(text.toUpperCase()).index(index), millis); // Links might be all caps after CSS is applied
         else
             clickAndWait(Locator.linkWithText(text).index(index), millis);
     }
