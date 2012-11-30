@@ -1519,7 +1519,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return true;
     }
 
-    @Test(timeout=1200000) // 20 minute default test timeout
+    @Test(timeout=2700000) // 45 minute default test timeout
     public void testSteps() throws Exception
     {
         try
