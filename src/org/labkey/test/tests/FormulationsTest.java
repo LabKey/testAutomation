@@ -53,6 +53,7 @@ public class FormulationsTest extends BaseWebDriverTest
             ListHelper.ListColumnType.Integer,
             "Used to sort ambigiously named timepoints based on day.");
     private static final String PROJECT_NAME = "FormulationsTest";
+    private static final String FOLDER_NAME = "My Study";
     private static final String RAWMATERIALS_SET_NAME = "Raw Materials";
     private static final String TEMPERATURE_LIST = "Temperatures";
     private static final String TIME_LIST = "Timepoints";
@@ -131,6 +132,7 @@ public class FormulationsTest extends BaseWebDriverTest
         insertFormulation();
         defineParticleSizeAssay();
         uploadParticleSizeData();
+        validateParticleSizeCopyToStudy();
 
         defineVisualAssay();
         uploadVisualAssayData();
@@ -144,8 +146,12 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     protected void setupFormulationsProject()
     {
+        enableEmailRecorder();
         _containerHelper.createProject(PROJECT_NAME, "IDRI Formulations");
-        enableModule(PROJECT_NAME, "Dumbster");
+        _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, "Study");
+        createDefaultStudy();
+
+        clickFolder(PROJECT_NAME);
 
         // Sample Sets should already exist
         assertLinkPresentWithText(COMPOUNDS_NAME);
@@ -375,6 +381,40 @@ public class FormulationsTest extends BaseWebDriverTest
             waitForElement(Locator.linkWithText(file.getName()));
             assertElementNotPresent(Locator.css(".labkey-error"));
         }
+    }
+
+    @LogMethod
+    private void validateParticleSizeCopyToStudy()
+    {
+        clickFolder(PROJECT_NAME);
+        clickLinkWithText(PS_ASSAY);
+
+        DataRegionTable runs = new DataRegionTable("Runs", this);
+        Assert.assertEquals("Wrong number of " + PS_ASSAY + " runs", 1, runs.getDataRowCount());
+        runs.checkCheckbox(0);
+
+        clickButton("Copy to Study");
+        selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + FOLDER_NAME + " (" + FOLDER_NAME + " Study)");
+        clickButton("Next", 0);
+        Locator.name("participantId").waitForElmement(_driver, WAIT_FOR_JAVASCRIPT);
+
+        List<WebElement> ptidFields = _driver.findElements(By.name("participantId"));
+        List<WebElement> visitFields = _driver.findElements(By.name("visitId"));
+        for (WebElement el: ptidFields)
+        {
+            el.sendKeys("placeholder");
+        }
+        for (WebElement el: visitFields)
+        {
+            el.sendKeys("1");
+        }
+
+        waitAndClick(WAIT_FOR_JAVASCRIPT, getButtonLocator("Copy to Study"), 0);
+
+        waitAndClick(Locator.linkWithText(FORMULATION + ".xls"));
+
+        waitForElement(Locator.css(".nav-tree-selected").withText(PROJECT_NAME));
+        assertElementPresent(Locator.linkWithText("copied"), 99);
     }
 
     @LogMethod

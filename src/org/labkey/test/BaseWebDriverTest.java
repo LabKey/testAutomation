@@ -3723,9 +3723,20 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertTrue("Element '" + loc + "' is not present", isElementPresent(loc));
     }
 
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator, int)}
+     * @param loc
+     * @param amount
+     */
+    @Deprecated
     public void assertElementPresent(Locator.XPathLocator loc, int amount)
     {
         Assert.assertEquals("Xpath '" + loc.getPath() + "' not present expected number of times.", amount, getXpathCount(loc));
+    }
+
+    public void assertElementPresent(Locator loc, int amount)
+    {
+        Assert.assertEquals("Element '" + loc + "' is not present " + amount + " times", amount, getElementCount(loc));
     }
 
     public void assertElementContains(Locator loc, String text)
@@ -5389,15 +5400,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     /** Sets selection state for rows of the data region on the current page. */
     public void checkAllOnPage(String dataRegionName)
     {
-        String id = EscapeUtil.jsString(dataRegionName);
-        checkCheckbox((WebElement)executeScript("return document.forms[" + id + "].elements['.toggle']"));
+        WebElement toggle = Locator.css("#dataregion_" + dataRegionName + " input[name='.toggle']").findElement(_driver);
+        checkCheckbox(toggle);
     }
 
     /** Clears selection state for rows of the data region on the current page. */
     public void uncheckAllOnPage(String dataRegionName)
     {
-        String id = EscapeUtil.jsString(dataRegionName);
-        WebElement toggle = (WebElement)executeScript("return document.forms[" + id + "].elements['.toggle']");
+        WebElement toggle = Locator.css("#dataregion_" + dataRegionName + " input[name='.toggle']").findElement(_driver);
         checkCheckbox(toggle);
         uncheckCheckbox(toggle);
     }
@@ -5412,15 +5422,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     /** Sets selection state for single rows of the data region. */
     public void checkDataRegionCheckbox(String dataRegionName, int index)
     {
-        String id = EscapeUtil.jsString(dataRegionName);
-        checkCheckbox((WebElement)executeScript("return document.forms[" + id + "].elements['.select'][" + index + "]"));
+        List<WebElement> selects = Locator.css("#dataregion_" + dataRegionName + " input[name='.select']").findElements(_driver);
+        checkCheckbox(selects.get(index));
     }
 
     /** Sets selection state for single rows of the data region. */
     public void uncheckDataRegionCheckbox(String dataRegionName, int index)
     {
-        String id = EscapeUtil.jsString(dataRegionName);
-        uncheckCheckbox((WebElement)executeScript("return document.forms[" + id + "].elements['.select'][" + index + "]"));
+        List<WebElement> selects = Locator.css("#dataregion_" + dataRegionName + " input[name='.select']").findElements(_driver);
+        uncheckCheckbox(selects.get(index));
     }
 
     public void clickCheckbox(String name)
