@@ -79,7 +79,7 @@ public class ListHelperWD extends ListHelper
         }
         else
         {
-            _test.waitForPageToLoad();
+            _test.waitForElement(Locator.css(".labkey-data-region"));
         }
     }
 
