@@ -547,20 +547,20 @@ public class FormulationsTest extends BaseWebDriverTest
         // move files to appropriate locations for samples/standards/methods
         Actions builder = new Actions(_driver);
         builder
-            .clickAndHold(Locator.css(".x4-grid-row").withText(HPLC_SAMPLE1).waitForElmement(_driver, WAIT_FOR_JAVASCRIPT))
-            .release(Locator.css(".samples-grid .x4-grid-view").findElement(_driver))
-            .build().perform();
-        builder
             .clickAndHold(Locator.css(".x4-grid-row").withText(HPLC_SAMPLE2).waitForElmement(_driver, WAIT_FOR_JAVASCRIPT))
             .release(Locator.css(".samples-grid .x4-grid-view").findElement(_driver))
             .build().perform();
         builder
-            .clickAndHold(Locator.css(".x4-grid-row").withText(HPLC_STANDARD1).findElement(_driver))
-            .release(Locator.css(".standards-grid .x4-grid-view").findElement(_driver))
+            .clickAndHold(Locator.css(".x4-grid-row").withText(HPLC_SAMPLE1).waitForElmement(_driver, WAIT_FOR_JAVASCRIPT))
+            .release(Locator.css(".x4-grid-row").withText(HPLC_SAMPLE2).findElement(_driver))
             .build().perform();
         builder
             .clickAndHold(Locator.css(".x4-grid-row").withText(HPLC_STANDARD2).findElement(_driver))
             .release(Locator.css(".standards-grid .x4-grid-view").findElement(_driver))
+            .build().perform();
+        builder
+            .clickAndHold(Locator.css(".x4-grid-row").withText(HPLC_STANDARD1).findElement(_driver))
+            .release(Locator.css(".x4-grid-row").withText(HPLC_STANDARD2).findElement(_driver))
             .build().perform();
         builder
             .clickAndHold(Locator.css(".x4-grid-row").withText(HPLC_METHOD).findElement(_driver))
