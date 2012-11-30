@@ -1475,13 +1475,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         try
         {
-            return _driver.findElement(By.cssSelector("html")).getText();
+            return _driver.findElement(By.cssSelector("body")).getText();
         }
         catch (StaleElementReferenceException ex)
         {
             try
             {
-                return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("html"))).getText();
+                return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body"))).getText();
             }
             catch (TimeoutException tex)
             {
@@ -1493,7 +1493,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             try
             {
-                return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("html"))).getText();
+                return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body"))).getText();
             }
             catch (TimeoutException tex)
             {
