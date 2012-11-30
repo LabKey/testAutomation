@@ -70,10 +70,9 @@ public class StudyRedesignTest extends StudyBaseTest
         clickTab("Manage");
         clickLinkWithText("Manage Views");
         clickMenuButton("Create", "R View");
-        clickButton("Save", 0);
-        waitForText("Please enter a view name:");
+        clickButton("Save", "Please enter a view name:");
         setFormElement(Locator.xpath("//div[./span[.='Please enter a view name:']]/div/input"), REPORT_NAME);
-        clickButton("Save");
+        _extHelper.clickExtButton("Save");
 
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_ONE, "Mouse", PTIDS_ONE);
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_TWO, "Mouse", PTIDS_TWO);
