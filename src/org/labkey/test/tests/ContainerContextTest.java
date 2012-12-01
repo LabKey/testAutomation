@@ -15,26 +15,27 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.RReportHelperWD;
 
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ContainerContextTest extends BaseSeleniumWebTest
+public class ContainerContextTest extends BaseWebDriverTest
 {
     private static final String SUB_FOLDER_A = "A";
     private static final String SUB_FOLDER_B = "B";
@@ -61,7 +62,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteProject(getProjectName(), afterTest);
     }
@@ -80,8 +81,8 @@ public class ContainerContextTest extends BaseSeleniumWebTest
 
     protected void doSetup() throws Exception
     {
-        RReportHelper _rReportHelper = new RReportHelper(this);
-        _rReportHelper.ensureRConfig();
+        RReportHelperWD rReportHelperWD = new RReportHelperWD(this);
+        rReportHelperWD.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), null);
         enableModule(getProjectName(), "Laboratory");
@@ -91,6 +92,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies"});
     }
 
+    @LogMethod
     protected void doTestListLookupURL()
     {
         log("** Creating lookup target list in sub-folder");
@@ -101,11 +103,10 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         };
         String lookupTargetListName = SUB_FOLDER_A + "-LookupTarget-List";
         _listHelper.createList(SUB_FOLDER_A, lookupTargetListName, LIST_KEY_TYPE, LIST_KEY_NAME, lookupTargetCols);
-        clickButton("Done");
 
         log("** Insert row into lookup target list");
         goToProjectHome();
-        clickLinkWithText(SUB_FOLDER_A);
+        clickFolder(SUB_FOLDER_A);
         clickLinkWithText(lookupTargetListName);
         _listHelper.insertNewRow(Maps.<String, String>of(
                 "LookupName", "MyLookupItem1",
@@ -130,7 +131,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         goToProjectHome();
         clickLinkWithText(lookupSourceListName);
         clickButton("Insert New");
-        setFormElement("quf_MyName", "MyName");
+        setFormElement(Locator.name("quf_MyName"), "MyName");
         selectOptionByText(Locator.name("quf_ListLookup"), "MyLookupItem2");
         clickButton("Submit");
 
@@ -140,11 +141,11 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         _customizeViewsHelper.saveCustomView();
 
         log("** Checking URLs go to correct container...");
-        String href = getAttribute(Locator.linkWithText("edit"), "href");
+        String href = getAttribute(Locator.linkWithText("EDIT"), "href");
         Assert.assertTrue("Expected [edit] link to go to " + getProjectName() + " container, href=" + href,
                 href.contains("/list/" + getProjectName() + "/update.view?"));
 
-        href = getAttribute(Locator.linkWithText("details"), "href");
+        href = getAttribute(Locator.linkWithText("DETAILS"), "href");
         Assert.assertTrue("Expected [details] link to go to " + getProjectName() + " container, href=" + href,
                 href.contains("/list/" + getProjectName() + "/details.view?"));
 
@@ -163,11 +164,12 @@ public class ContainerContextTest extends BaseSeleniumWebTest
     }
 
     // Issue 15610: viscstudieslist - URLs generated from lookups are broken
+    @LogMethod
     protected void doTestIssue15610()
     {
         log("** Creating study in " + SUB_FOLDER_A);
         goToProjectHome();
-        clickLinkWithText(SUB_FOLDER_A);
+        clickFolder(SUB_FOLDER_A);
         goToManageStudy();
         clickButton("Create Study");
         setFormElement(Locator.name("label"), SUB_FOLDER_A + "-Study");
@@ -210,6 +212,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
     }
 
     // Issue 15751: Pipeline job list generates URLs without correct container
+    @LogMethod
     protected void doTestIssue15751()
     {
         log("** Create pipeline jobs");
@@ -229,6 +232,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
                 href.contains("/pipeline-status/" + getProjectName() + "/" + SUB_FOLDER_B + "/details.view"));
     }
 
+    @LogMethod
     protected void insertJobIntoSubFolder(String folder)
     {
         goToProjectHome();
@@ -258,6 +262,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         waitForText("COMPLETE", WAIT_FOR_PAGE);
     }
 
+    @LogMethod
     protected void doTestSimpleModuleTables() throws Exception
     {
         log("** Inserting data into labratory.samples table...");
@@ -270,6 +275,8 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         for (int i = 0; i < max; i++)
         {
             String workbookName = "Workbook" + i;
+//            LabModuleHelper labModuleHelper = new LabModuleHelper(this);
+//            String id = labModuleHelper.createWorkbook(workbookName, "Description");
             String id = createWorkbook(workbookName, "Description");
             workbookIds[i] = id;
             parentSampleIds[i] = i > 0 ? sampleIds[i-1] : null;
@@ -409,11 +416,13 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
     }
 
+    @LogMethod
     protected void removeMetadata(String container, String schemaName, String queryName)
     {
         overrideMetadata(container, schemaName, queryName, "");
     }
 
+    @LogMethod
     private void verifySimpleModuleTables(
             String queryName,
             String detailsAction,
@@ -428,7 +437,6 @@ public class ContainerContextTest extends BaseSeleniumWebTest
     {
         log("** Checking containers on lookup URLs for '" + queryName + "'");
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=laboratory&query.queryName=" + queryName + "&query.sort=RowId");
-        //waitForPageToLoad();
 
         DataRegionTable dr = new DataRegionTable("query", this);
 
@@ -505,6 +513,7 @@ public class ContainerContextTest extends BaseSeleniumWebTest
         log("** Checked containers on lookup URLs for query '" + queryName + "'\n");
     }
 
+    @LogMethod
     private String insertLabSample(String workbookId, String suffix, String parentSampleId)
     {
         try
@@ -537,11 +546,11 @@ public class ContainerContextTest extends BaseSeleniumWebTest
     {
         goToProjectHome();
         clickButton("Create New Workbook", 0);
-        waitForElement(_ext4Helper.ext4Window("Create Workbook"));
-        setText("title", workbookTitle);
-        setText("description", workbookDescription);
+        waitForElement(Ext4Helper.ext4Window("Create Workbook"));
+        setFormElement(Locator.name("title"), workbookTitle);
+        setFormElement(Locator.name("description"), workbookDescription);
         clickButton("Submit");
-        waitForPageToLoad();
+        waitForElement(Locator.css("span.wb-name + span").withText(workbookTitle));
 
         try
         {

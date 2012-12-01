@@ -15,24 +15,22 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 8/16/12
  * Time: 11:44 AM
- * To change this template use File | Settings | File Templates.
  */
 public class PipelineHelper
 {
-    BaseSeleniumWebTest _test = null;
+    BaseWebDriverTest _test = null;
     private static final String CUSTOM_PROPERTY = "customProperty";
 
-    public PipelineHelper(BaseSeleniumWebTest test)
+    public PipelineHelper(BaseWebDriverTest test)
     {
         _test = test;
     }
@@ -45,7 +43,7 @@ public class PipelineHelper
     public void renameFile(String currentName, String newName)
     {
         Locator l = Locator.xpath("//div[text()='" + currentName + "']");
-        _test.clickAt(l, "1,1");
+        _test.click(l);
         _test.click(Locator.css("button.iconRename"));
 
         _test.waitForDraggableMask();
@@ -62,10 +60,10 @@ public class PipelineHelper
      */
     public void createFolder(String folderName)
     {
-        _test.clickButton("Create Folder", _test.WAIT_FOR_EXT_MASK_TO_APPEAR);
-        _test.setFormElement("folderName", folderName);
-        _test.clickButton("Submit", BaseSeleniumWebTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
-        _test.waitForText(folderName);
+        _test.clickButton("Create Folder", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_APPEAR);
+        _test.setFormElement(Locator.name("folderName"), folderName);
+        _test.clickButton("Submit", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        _test.waitForElement(Locator.css("#fileBrowser td.x-grid3-cell").withText(folderName));
     }
 
     public void goToConfigureTab()
@@ -83,8 +81,8 @@ public class PipelineHelper
     //won't work for adding and then removing something
     public void removeButton(String name)
     {
-            _test.click(Locator.xpath("(" + Locator.buttonContainingText(name).toXpath() + ")[3]"));
-            _test.click(Locator.tagContainingText("span", "remove"));
+        _test.click(Locator.xpath("(" + Locator.buttonContainingText(name).toXpath() + ")[3]"));
+        _test.click(Locator.tagContainingText("span", "remove"));
     }
 
     public void commitPipelineAdminChanges()
@@ -97,13 +95,13 @@ public class PipelineHelper
     {
         goToAdminMenu();
 
-            _test._extHelper.clickExtTab("Toolbar and Grid Settings");
-            _test.waitForText("Configure Grid columns and Toolbar");
+        _test._extHelper.clickExtTab("Toolbar and Grid Settings");
+        _test.waitForText("Configure Grid columns and Toolbar");
     }
 
     public void goToAdminMenu()
     {
-        _test.clickButton("Admin", _test.WAIT_FOR_EXT_MASK_TO_APPEAR);
+        _test.clickButton("Admin", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_APPEAR);
         _test._extHelper.waitForExtDialog("Manage File Browser Configuration", 5000);
     }
 
@@ -117,38 +115,37 @@ public class PipelineHelper
     {
         Locator file =  Locator.tagContainingText("div",fileName);
         _test.waitForElement(file);
-        _test.clickAt(file, "1,1");
+        _test.click(file);
         _test.click(Locator.xpath("//button[contains(@class,'iconMove')]"));
-        _test.waitForExtMask();
+        _test._extHelper.waitForExtDialog("Choose Destination", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         //TODO:  this doesn't yet support nested folders
         Locator folder =Locator.xpath("(//a/span[contains(text(),'" + destinationPath + "')])[2]");
-        _test.waitForElement(folder, 3*_test.defaultWaitForPage);  //if it still isn't coming up, that's a product bug
-        _test.clickAt(folder, "1,1");
-        _test.clickButton("Move", _test.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        _test.waitForElement(folder, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);  //if it still isn't coming up, that's a product bug
+        _test._shortWait.until(LabKeyExpectedConditions.animationIsDone(Locator.css(".x-window ul.x-tree-node-ct").withText(destinationPath)));
+        _test.click(folder);
+        _test.clickButton("Move", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
     }
 
     public void uploadFile(File file, String description, String customProperty, String lookupColumn )
     {
+        _test.setFormElement(Locator.css(".single-upload-panel input[type=file]"), file);
+        _test._extHelper.setExtFormElementByLabel("Description:", description);
+        _test.clickButton("Upload", 0);
+        _test._extHelper.waitForExtDialog("Extended File Properties", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.setFormElement(Locator.name(CUSTOM_PROPERTY), customProperty);
+        _test._extHelper.selectComboBoxItem("LookupColumn:",lookupColumn);
+        _test.clickButton("Done", 0);
+        _test._extHelper.waitForExt3MaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-            _test.setFormElement(Locator.xpath("//input[contains(@class, 'x-form-file') and @type='file']"), file.toString());
-            _test._extHelper.setExtFormElementByLabel("Description:", description);
-            _test.clickButton("Upload", 0);
-            _test._extHelper.waitForExtDialog("Extended File Properties", _test.WAIT_FOR_JAVASCRIPT);
-            _test.setFormElement(CUSTOM_PROPERTY, customProperty);
-            _test._extHelper.selectComboBoxItem("LookupColumn:",lookupColumn);
-            _test.clickButton("Done", 0);
-            _test.waitForExtMaskToDisappear();
-
-
-            _test.waitForText(description, _test.WAIT_FOR_JAVASCRIPT);
-            _test.waitForText(customProperty, _test.WAIT_FOR_JAVASCRIPT);
-            _test.waitForText(lookupColumn, _test.WAIT_FOR_JAVASCRIPT);
+        _test.waitForText(description, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForText(customProperty, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForText(lookupColumn, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
 
     public void importFile(String fileName, String importAction)
     {
-            _test._extHelper.clickFileBrowserFileCheckbox(fileName);
-            _test.selectImportDataAction(importAction);
+        _test._extHelper.clickFileBrowserFileCheckbox(fileName);
+        _test.selectImportDataAction(importAction);
     }
 }

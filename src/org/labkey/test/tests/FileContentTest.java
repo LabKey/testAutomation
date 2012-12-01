@@ -17,24 +17,25 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PipelineHelper;
 import org.labkey.test.util.SearchHelper;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
-public class FileContentTest extends BaseSeleniumWebTest
+public class FileContentTest extends BaseWebDriverTest
 {
     private final SearchHelper _searchHelper = new SearchHelper(this);
 
     // Use a special exotic character in order to make sure we don't break
     // i18n. See https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=5369
     protected static final String PROJECT_NAME = "File Content T\u017Dst Project";
-    private static final String PROJECT_ENCODED = "File%20Content%20T%C3%A9st%20Project";
     private static final String FILE_DESCRIPTION = "FileContentTestFile";
     private static final String CUSTOM_PROPERTY_VALUE = "ExtendedProperty";
     private static final String CUSTOM_PROPERTY = "customProperty";
@@ -64,7 +65,7 @@ public class FileContentTest extends BaseSeleniumWebTest
     }
 
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteProject(PROJECT_NAME, afterTest);
         deleteUsers(afterTest, TEST_USER);
@@ -87,35 +88,26 @@ public class FileContentTest extends BaseSeleniumWebTest
         setPermissions(TEST_GROUP, "Editor");
         exitPermissionsUI();
 
-        goToProjectSettings();
-        clickLinkWithText("Files");
-
-        File dir = getTestTempDir();
-        dir.mkdirs();
-        setFormElement("rootPath", dir.getAbsolutePath());
-        submit();
-
-        clickLinkWithText(PROJECT_NAME);
         addWebPart("Files");
 
-        if (isFileUploadAvailable())
-        {
             // Setup notificaiton emails
             // as they are now digest based.
             goToFolderManagement();
             clickLinkWithText("Notifications");
             click(Locator.navButton("Update Settings"));
+            _shortWait.until(LabKeyExpectedConditions.animationIsDone(Locator.css(".labkey-ribbon > div")));
             // Set folder default
             _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "15 minute digest");
             click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Folder Default']"));
             _extHelper.waitForExtDialog("Update complete", WAIT_FOR_JAVASCRIPT);
-            waitForExtMaskToDisappear();
+            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
             // Change user setting TEST_USER -> No Email
             DataRegionTable table = new DataRegionTable("Users", this);
             checkDataRegionCheckbox("Users", table.getRow("Email", TEST_USER));
             _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='fileEmailOption']]"), "No Email");
             click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Settings']"));
-            waitAndClickButton("Yes");
+            _extHelper.waitForExtDialog("Update selected users");
+            _extHelper.clickExtButton("Update selected users", "Yes");
             waitForPageToLoad();
             Assert.assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(table.getRow("Email", TEST_USER), "File Settings"));
 
@@ -137,9 +129,9 @@ public class FileContentTest extends BaseSeleniumWebTest
             checkRadioButton("fileOption", "useCustom");
             clickButton("Edit Properties...");
             waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
-            setFormElement("ff_name0", CUSTOM_PROPERTY);
-            setFormElement("url", "http://labkey.test/?a=${"+CUSTOM_PROPERTY+"}&b=${"+COLUMN_NAME+"}");
-            addLookupField(null, 1, COLUMN_NAME, COLUMN_NAME, new ListHelper.LookupInfo(PROJECT_NAME, "lists", LIST_NAME));
+            setFormElement(Locator.name("ff_name0"), CUSTOM_PROPERTY);
+            setFormElement(Locator.id("url"), "http://labkey.test/?a=${"+CUSTOM_PROPERTY+"}&b=${"+COLUMN_NAME+"}");
+            _listHelper.addLookupField(null, 1, COLUMN_NAME, COLUMN_NAME, new ListHelper.LookupInfo(PROJECT_NAME, "lists", LIST_NAME));
             clickButton("Save & Close");
 
             waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
@@ -166,7 +158,7 @@ public class FileContentTest extends BaseSeleniumWebTest
 
             // Save settings.
             clickButton("Submit", 0);
-            waitForExtMaskToDisappear();
+            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
             // Verify custom action buttons
             waitForElementToDisappear(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
@@ -178,13 +170,13 @@ public class FileContentTest extends BaseSeleniumWebTest
 //            clickButton("Admin", 0);
 //            ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
 //            clickButton("Submit", 0);
-//
-            windowMaximize();
+
+//            windowMaximize();
             pipelineHelper.goToConfigureButtonsTab();
             pipelineHelper.removeButton("Import Data");
             pipelineHelper.addCreateFolderButton();
             pipelineHelper.commitPipelineAdminChanges();
-            waitForExtMaskToDisappear();
+            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
             waitForElement(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
             
             String filename = "InlineFile.html";
@@ -238,7 +230,8 @@ public class FileContentTest extends BaseSeleniumWebTest
 
             // Delete file.
             clickLinkWithText(PROJECT_NAME);
-            sleep(1000); //TODO:  if this helps, try and find a better fix
+            click(Locator.css("button.iconFolderTree"));
+            _shortWait.until(ExpectedConditions.visibilityOf(Locator.xpath("id('fileBrowser')//div[contains(@id, 'xsplit')]").findElement(_driver)));
             _extHelper.selectFileBrowserItem(folderName + "/" + filename);
             click(Locator.css("button.iconDelete"));
             clickButton("Yes", 0);
@@ -249,7 +242,7 @@ public class FileContentTest extends BaseSeleniumWebTest
             assertTextPresent("annotations updated: "+CUSTOM_PROPERTY+"="+CUSTOM_PROPERTY_VALUE);
             assertTextPresent("File deleted from project: /" + PROJECT_NAME);
 
-            beginAt(getBaseURL()+"/filecontent/" + PROJECT_NAME + "/sendShortDigest.view");
+            beginAt(getBaseURL()+"/filecontent/" + EscapeUtil.encode(PROJECT_NAME) + "/sendShortDigest.view");
             goToModule("Dumbster");
             assertTextNotPresent(TEST_USER);  // User opted out of notifications
             clickLinkWithText("File Management Notification", false);
@@ -257,6 +250,5 @@ public class FileContentTest extends BaseSeleniumWebTest
             assertTextBefore("annotations updated", "File deleted");
 
             validateLabAuditTrail();
-        }
     }
 }

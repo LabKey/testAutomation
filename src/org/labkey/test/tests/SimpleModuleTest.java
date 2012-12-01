@@ -32,6 +32,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelperWD;
@@ -106,6 +107,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestFilterSort();
         doTestImportTemplates();
     }
+
+    @LogMethod
     private void doTestCustomFolder()
     {
         assertTextPresent("A customized web part");
@@ -116,6 +119,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertLinkNotPresentWithText("Create Run Group"); // Not in small Run Groups web-part.
     }
 
+    @LogMethod
     private void doTestSchemas() throws Exception
     {
         log("** Testing schemas in modules...");
@@ -362,6 +366,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         }
     }
 
+    @LogMethod
     private void doTestTableAudit() throws Exception
     {
         goToSchemaBrowser();
@@ -424,6 +429,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToSchemaBrowser();
     }
 
+    @LogMethod
     private void cleanupSchema(Connection cn) throws IOException
     {
         // enable simpletest module in Home so we can delete from all containers
@@ -435,6 +441,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         cleanupTable(cn, "Colors");
     }
 
+    @LogMethod
     private void cleanupTable(Connection cn, String tableName) throws IOException
     {
         log("** Deleting all " + tableName + " in all containers");
@@ -494,6 +501,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         }
     }
 
+    @LogMethod
     private void doTestViews()
     {
         log("Testing views in modules...");
@@ -506,6 +514,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("This is another view in the simple test module");
     }
 
+    @LogMethod
     private void doTestWebParts()
     {
         log("Testing web parts in modules...");
@@ -520,6 +529,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Assert.assertTrue("Module context not being loaded propertly", value);
     }
 
+    @LogMethod
     private void createList()
     {
         //create a list for our query
@@ -558,6 +568,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
                 new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
     }
 
+    @LogMethod
     private void doTestQueries()
     {
         log("Testing queries in modules...");
@@ -573,6 +584,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextNotPresent("Britt");
     }
 
+    @LogMethod
     private void doTestQueryViews()
     {
         log("Testing module-based custom query views...");
@@ -599,6 +611,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     }
 
+    @LogMethod
     private void doTestReports()
     {
         RReportHelperWD _rReportHelper = new RReportHelperWD(this);
@@ -638,6 +651,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("\"crazy\"");
     }
 
+    @LogMethod
     private void doTestImportTemplates() throws Exception
     {
         log("Testing import templates...");
@@ -653,6 +667,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Assert.assertTrue("Wrong number of templates found", getXpathCount((Locator.XPathLocator)l) == 2);
     }
 
+    @LogMethod
     private void doTestContainerColumns() throws Exception
     {
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
@@ -683,6 +698,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     }
 
+    @LogMethod
     private void doTestInsertUpdateViews() throws IOException, CommandException
     {
         log("Testings custom views for insert/update/details");
@@ -731,6 +747,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         }
     }
 
+    @LogMethod
     private void doTestParameterizedQueries()
     {
         log("Create embedded QWP to test parameterized query.");
@@ -752,6 +769,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextNotPresent("Prius");
     }
 
+    @LogMethod
     private void doTestFilterSort() throws Exception
     {
         log("** Testing filtering and sorting via java API...");
@@ -778,6 +796,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     }
 
+    @LogMethod
     private void doTestModuleProperties() throws Exception
     {
         String prop1 = "TestProp1";
@@ -808,6 +827,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Assert.assertEquals("Module context not set propertly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
     }
 
+    @LogMethod
     private void doTestTabbedFolder()
     {
         clickFolder(FOLDER_NAME);
@@ -870,6 +890,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Vial Search", "Specimens");
     }
 
+    @LogMethod
     private void doTestContainerTabConversion()
     {
         // Set up a Collaboration folder with study and assay subfolders

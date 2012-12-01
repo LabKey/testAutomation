@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -40,7 +41,7 @@ public class UIUserHelper extends AbstractUserHelper
             _test.goToSiteUsers();
             _test.clickButton("Add Users");
 
-            _test.setFormElement("newUsers", userName);
+            _test.setFormElement(Locator.name("newUsers"), userName);
             _test.uncheckCheckbox("sendMail");
 //            if (cloneUserName != null)
 //            {

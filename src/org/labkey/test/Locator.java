@@ -42,8 +42,8 @@ public class Locator
     private String _text;
 
     // XPATH fragments
-    @Deprecated public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@style, 'left: -10000px')])";
-    @Deprecated public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'x-item-disabled')])";
+    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@style, 'left: -10000px')])";
+    public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'disabled')])";
 
     @Deprecated // TODO: Should be private
     protected Locator(String rawString)

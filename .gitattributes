@@ -331,6 +331,7 @@ src/org/labkey/test/util/ImpersonationLoggingAspect.java -text
 src/org/labkey/test/util/JSONHelper.java -text
 src/org/labkey/test/util/JUnitFooter.java -text
 src/org/labkey/test/util/JUnitHeader.java -text
+src/org/labkey/test/util/LabKeyExpectedConditions.java -text
 src/org/labkey/test/util/LabModuleHelper.java -text
 src/org/labkey/test/util/ListHelper.java -text
 src/org/labkey/test/util/ListHelperWD.java -text

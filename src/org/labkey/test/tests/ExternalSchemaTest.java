@@ -21,7 +21,7 @@ import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.*;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.util.DataRegionTable;
@@ -36,7 +36,7 @@ import java.util.*;
  * User: kevink
  * Date: Oct 29, 2008 3:52:53 PM
  */
-public class ExternalSchemaTest extends BaseSeleniumWebTest
+public class ExternalSchemaTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ExternalSchemaProject";
     private static final String FOLDER_NAME = "SubFolder";
@@ -67,7 +67,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             else
             {
                 Calendar c = Calendar.getInstance();
-                c.set(2008, 9, 25);
+                c.set(2008, Calendar.OCTOBER, 25);
                 c.clear(Calendar.MILLISECOND); // milliseconds aren't serialized in JSON
                 this.dateTimeNotNull = c.getTime();
             }
@@ -149,9 +149,9 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         if (!isTextPresent("reload"))
         {
             clickLinkWithText("define new schema");
-            setFormElement("userSchemaName", USER_SCHEMA_NAME);
-            setFormElement("dbSchemaName", DB_SCHEMA_NAME);
-            setFormElement("metaData", getFileContents("server/modules/core/resources/schemas/test.xml"));
+            setFormElement(Locator.name("userSchemaName"), USER_SCHEMA_NAME);
+            setFormElement(Locator.name("dbSchemaName"), DB_SCHEMA_NAME);
+            setFormElement(Locator.name("metaData"), getFileContents("server/modules/core/resources/schemas/test.xml"));
             clickButton("Create");
         }
 
@@ -170,7 +170,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
         clickButton("Update");
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         deleteProject(getProjectName(), afterTest);
     }
@@ -342,7 +342,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
             String text = (String)row.get("Text");
             int intNotNull = ((Number)row.get("IntNotNull")).intValue();
             Date datetimeNotNull = (Date)row.get("DatetimeNotNull");
-            Row r = new Row(rowid.intValue(), text, intNotNull, datetimeNotNull);
+            Row r = new Row(rowid, text, intNotNull, datetimeNotNull);
             rows.add(r);
         }
         return rows.toArray(new Row[rows.size()]);
@@ -385,7 +385,7 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
 
     String join(String sep, int... pks)
     {
-        StringBuffer buf = new StringBuffer(pks.length * 2);
+        StringBuilder buf = new StringBuilder(pks.length * 2);
         buf.append(pks[0]);
         for (int i = 1; i < pks.length; i++)
             buf.append(sep).append(pks[i]);
@@ -396,9 +396,9 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
     {
         log("** Inserting via form: text='" + text + "', intNotNull=" + intNotNull + "...");
         beginAt("/query/" + containerPath + "/insertQueryRow.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
-        setFormElement("quf_Text", text);
-        setFormElement("quf_IntNotNull", String.valueOf(intNotNull));
-        setFormElement("quf_DatetimeNotNull", "2008-09-25");
+        setFormElement(Locator.name("quf_Text"), text);
+        setFormElement(Locator.name("quf_IntNotNull"), String.valueOf(intNotNull));
+        setFormElement(Locator.name("quf_DatetimeNotNull"), "2008-09-25");
         submit();
     }
 
@@ -435,9 +435,9 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
     {
         log("** Updating via form: RowId=" + pk + ", text='" + text + "', intNotNull=" + intNotNull + "...");
         beginAt("/query/" + containerPath + "/updateQueryRow.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME + "&RowId=" + pk);
-        setFormElement("quf_Text", text);
-        setFormElement("quf_IntNotNull", String.valueOf(intNotNull));
-        setFormElement("quf_DatetimeNotNull", "2008-09-25");
+        setFormElement(Locator.name("quf_Text"), text);
+        setFormElement(Locator.name("quf_IntNotNull"), String.valueOf(intNotNull));
+        setFormElement(Locator.name("quf_DatetimeNotNull"), "2008-09-25");
         submit();
     }
 
@@ -474,9 +474,8 @@ public class ExternalSchemaTest extends BaseSeleniumWebTest
 
         for (int aPk : pk)
             checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(aPk)));
-        selenium.chooseOkOnNextConfirmation();
         clickButton("Delete", 0);
-        Assert.assertEquals(selenium.getConfirmation(), "Are you sure you want to delete the selected row" + (pk.length == 1 ? "?" : "s?"));
+        assertAlert("Are you sure you want to delete the selected row" + (pk.length == 1 ? "?" : "s?"));
         waitForPageToLoad();
     }
 

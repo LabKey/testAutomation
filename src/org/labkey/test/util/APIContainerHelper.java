@@ -38,7 +38,7 @@ public class APIContainerHelper extends AbstractContainerHelper
     @Override
     public void doCreateProject(String projectName, String folderType)
     {
-        doCreateFolder(projectName, "/", folderType);
+        doCreateFolder(projectName, "", folderType);
     }
 
     public final void createSubfolder(String parent, String folderName, String folderType)
@@ -61,7 +61,14 @@ public class APIContainerHelper extends AbstractContainerHelper
             throw new RuntimeException(e);
         }
 
-        _test.beginAt("/project" + path.replace("#", "%23") + "/" + folderName.replace("#", "%23") +  "/begin.view?");
+        String[] splitPath = path.split("/");
+        path = "";
+        for (String container : splitPath)
+        {
+            path = path + "/" + EscapeUtil.encode(container);
+        }
+
+        _test.beginAt("/project" + path + "/" + EscapeUtil.encode(folderName) +  "/begin.view?");
     }
 
     @Override

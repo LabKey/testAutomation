@@ -3590,20 +3590,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void waitForElementToDisappear(final Locator locator, int wait)
     {
-        String failMessage = "Element with locator " + locator + " was still present.";
-//        if(locator.toString().contains("xt") && getBrowser().equals("*iexploreproxy"))
-//        {
-//            // IE can't detect some ext elements disappearing
-//            sleep(10000);
-//            return;
-//        }
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return !isElementPresent(locator);
-            }
-        }, failMessage, wait);
+        locator.waitForElmementToDisappear(_driver, wait);
     }
 
     public void waitForTextToDisappear(final String text)
@@ -4987,7 +4974,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void setFormElement(Locator loc, File file)
     {
-        Assert.assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
+        WebElement el = loc.findElement(_driver);
+        int i = 1;
+        int zIndex;
+        while (!el.isDisplayed() && i < 5 )
+        {
+            zIndex = Integer.parseInt(el.getCssValue("z-index")) * i++;
+            executeScript("arguments[0].style.zIndex = arguments[1];", el, zIndex); // force element to the front
+        }
         setFormElement(loc, file.getAbsolutePath());
     }
 
@@ -5131,13 +5125,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             for(String v : values)
             {
-                mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("Show Rows Where "+columnLabel+"...")+
+                click(Locator.xpath(_extHelper.getExtDialogXPath("Show Rows Where "+columnLabel+"...")+
                     "//div[contains(@class,'x-grid3-row') and .//span[text()='"+v+"']]//div[@class='x-grid3-row-checker']"));
             }
         }
         else if (values.length == 1)
         {
-            mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("Show Rows Where "+columnLabel+"...")+
+            click(Locator.xpath(_extHelper.getExtDialogXPath("Show Rows Where "+columnLabel+"...")+
                     "//div[contains(@class,'x-grid3-row')]//span[text()='"+values[0]+"']"));
         }
     }
@@ -5710,6 +5704,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
             savePermissions();
             assertPermissionSetting(userOrGroupName, permissionString);
+            _ext4Helper.waitForMaskToDisappear();
         }
     }
 

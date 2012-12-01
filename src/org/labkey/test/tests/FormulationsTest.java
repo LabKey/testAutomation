@@ -22,14 +22,13 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -465,15 +464,7 @@ public class FormulationsTest extends BaseWebDriverTest
 
         waitForText("What temperatures are you examining?");
         WebElement radio = Locator.radioButtonByNameAndValue("time", "1 mo").findElement(_driver);
-        _shortWait.until(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                WebElement el = _driver.findElement(By.cssSelector("#card-1-fieldset-2"));
-                return el.getCssValue("position").equals("static");
-            }
-        });
+        _shortWait.until(LabKeyExpectedConditions.animationIsDone(Locator.css(("#card-1-fieldset-2"))));
         radio.click();
         clickButton("Next", 0);
         waitForText("Please complete this page to continue.");

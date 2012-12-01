@@ -18,6 +18,7 @@ package org.labkey.test.util;
 
 import junit.framework.Assert;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -439,45 +440,8 @@ public class ListHelperWD extends ListHelper
         _test.clickButton("Add Field", 0);
         _test.setFormElement(Locator.name("ff_name" + i),  col.getName());
         _test.setFormElement(Locator.name("ff_label" + i), col.getLabel());
-        // Set type.
-        LookupInfo lookup = col.getLookup();
-        // click the combobox trigger image
-        _test.click(Locator.xpath("//input[@name='ff_type" + i + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
-        // click lookup checkbox
-        _test._extHelper.waitForExtDialog("Choose Field Type", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : col.getType().toString()) + "']/../input[@name = 'rangeURI']"));
 
-        if (lookup != null)
-        {
-            _test._shortWait.until(new ExpectedCondition<Boolean>()
-            {
-                @Override
-                public Boolean apply(WebDriver driver)
-                {
-                    return driver.findElement(By.name("lookupContainer")).isEnabled();
-                }
-            });
-
-            if (lookup.getFolder() != null)
-            {
-                _test.click(Locator.xpath("//input[@name = 'lookupContainer']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
-                Locator.css("div.x-combo-list-item").withText(lookup.getFolder()).waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
-            }
-            _test.sleep(500);
-
-            _test.click(Locator.xpath("//input[@name = 'schema']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
-            Locator.css("div.x-combo-list-item").withText(lookup.getSchema()).waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
-            _test.sleep(500);
-
-            _test.click(Locator.xpath("//input[@name = 'table']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
-            Locator.css("div.x-combo-list-item").containing(lookup.getTable() + " (").waitForElmement(_test._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT).click();
-        }
-
-        _test.clickButton("Apply", 0);
-
-        _test._extHelper.waitForExtDialogToDisappear("Choose Field Type");
-        // wait a while to make sure rangeURI is set (async check)
-//        _test.sleep(1000);
+        setColumnType(null, col.getLookup(), col.getType(), i);
 
         _test._extHelper.clickExtTab("Display");
         if (col.getDescription() != null)
@@ -642,58 +606,96 @@ public class ListHelperWD extends ListHelper
     {
         setColumnName(null, index, name);
     }
+
     public void setColumnName(String prefix, int index, String name)
     {
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_name" + index + "']");
         _test.setFormElement(l, name);
         _test.pressTab(l);
     }
+
     public void setColumnLabel(int index, String label)
     {
         setColumnLabel(null,index,label);
     }
+
     public void setColumnLabel(String prefix, int index, String label)
     {
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_label" + index + "']");
         _test.setFormElement(l, label);
         _test.pressTab(l);
     }
+
     public void setColumnType(int index, ListColumnType type)
     {
         setColumnType(null, index, type);
     }
+
     public void setColumnType(String prefix, int index, ListColumnType type)
     {
-        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']");
-        _test.setFormElement(l, type.toString());
-        _test.pressTab(l);
+        setColumnType(prefix, null, type, index);
     }
+
     public void setColumnType(int index, LookupInfo lookup)
     {
         setColumnType(null, index, lookup);
     }
+
     public void setColumnType(String prefix, int index, LookupInfo lookup)
     {
-        //test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']"));
-        _test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
-        if ( _test.isAlertPresent() ) _test.getAlert(); // Don't worry about schema alert until saving.
-        _test.click(Locator.xpath("//div[./label[text() = 'Lookup']]/input[@type = 'radio']"));
-        if ( lookup.getFolder() != null ) _test.setFormElement(Locator.name("lookupContainer"), lookup.getFolder());
-        if ( lookup.getSchema() != null ) _test.setFormElement(Locator.name("schema"), lookup.getSchema());
-        if ( lookup.getTable() != null ) _test.setFormElement(Locator.name("table"), lookup.getTable());
+        setColumnType(prefix, lookup, null, index);
+    }
+
+    @LogMethod
+    private void setColumnType(@Nullable String prefix, @Nullable LookupInfo lookup, @Nullable ListColumnType colType, int i)
+    {
+        // click the combobox trigger image
+        _test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + i + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
+        // click lookup checkbox
+        _test._extHelper.waitForExtDialog("Choose Field Type", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : colType) + "']/../input[@name = 'rangeURI']"));
+
+        if (lookup != null)
+        {
+            _test._shortWait.until(new ExpectedCondition<Boolean>()
+            {
+                @Override
+                public Boolean apply(WebDriver driver)
+                {
+                    return driver.findElement(By.name("lookupContainer")).isEnabled();
+                }
+            });
+
+            if (lookup.getFolder() != null)
+            {
+                _test.click(Locator.xpath("//input[@name = 'lookupContainer']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
+                _test.waitAndClick(Locator.css("div.x-combo-list-item").withText(lookup.getFolder()));
+                _test.waitForElementToDisappear(Locator.css("div.x-combo-list-item"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            }
+
+            _test.click(Locator.xpath("//input[@name = 'schema']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
+            _test.waitAndClick(Locator.css("div.x-combo-list-item").withText(lookup.getSchema()));
+            _test.waitForElementToDisappear(Locator.css("div.x-combo-list-item"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+
+            _test.click(Locator.xpath("//input[@name = 'table']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
+            _test.waitAndClick(Locator.css("div.x-combo-list-item").containing(lookup.getTable() + " ("));
+            _test.waitForElementToDisappear(Locator.css("div.x-combo-list-item"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        }
+
         _test.clickButton("Apply", 0);
-        _test.sleep(1000);
+
+        _test._extHelper.waitForExtDialogToDisappear("Choose Field Type");
     }
 
     public void selectPropertyTab(String name)
     {
         selectPropertyTab(null, name);
     }
+
     public void selectPropertyTab(String prefix, String name)
     {
         _test.click(Locator.xpath((null == prefix ? "" : prefix) + "//span[contains(@class,'x-tab-strip-text') and text()='" + name + "']"));
     }
-
 
     public void clickRequired(String prefix)
     {

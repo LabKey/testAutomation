@@ -309,7 +309,6 @@ public class ExtHelperWD extends AbstractHelperWD
             formElement = Locator.xpath(getExtDialogXPath(windowTitle) + "//td[./label[text()='"+label+"']]/../td/*[self::input or self::textarea]");
         }
         _test.setFormElement(formElement, text);
-        _test.fireEvent(formElement, BaseWebDriverTest.SeleniumEvent.blur);
     }
 
     public String getExtFormElementByLabel(String label)
@@ -599,9 +598,9 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
-        _test.click(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"));
+        _test.click(Locator.xpath(parentLocator.getPath() + "//*[contains(@class, 'x-form-arrow-trigger')]"));
         _test.waitAndClick(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"));
-        _test.click(Locator.xpath("/html/body"));
+        _test.waitForElementToDisappear(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void selectComboBoxItem(String label, String selection)
