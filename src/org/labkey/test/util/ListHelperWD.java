@@ -671,11 +671,13 @@ public class ListHelperWD extends ListHelper
                 _test.click(Locator.xpath("//input[@name = 'lookupContainer']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
                 _test.waitAndClick(Locator.css("div.x-combo-list-item").withText(lookup.getFolder()));
                 _test.waitForElementToDisappear(Locator.css("div.x-combo-list-item"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                _test.sleep(500);
             }
 
             _test.click(Locator.xpath("//input[@name = 'schema']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
             _test.waitAndClick(Locator.css("div.x-combo-list-item").withText(lookup.getSchema()));
             _test.waitForElementToDisappear(Locator.css("div.x-combo-list-item"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            _test.sleep(500);
 
             _test.click(Locator.xpath("//input[@name = 'table']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
             _test.waitAndClick(Locator.css("div.x-combo-list-item").containing(lookup.getTable() + " ("));
