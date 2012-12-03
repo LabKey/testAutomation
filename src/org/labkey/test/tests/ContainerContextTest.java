@@ -253,7 +253,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         clickCheckboxById("runInBackground");
         clickButton("Save", 0);
         setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), folder + "-BackgroundReport");
-        _extHelper.clickExtButton("Save");
+        _extHelper.clickExtButton("Save", 0);
+        waitForElement(Locator.id("query"));
 
         log("** Executing background R script");
         clickMenuButton("Views", folder + "-BackgroundReport");
