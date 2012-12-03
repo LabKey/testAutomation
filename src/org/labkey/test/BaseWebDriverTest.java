@@ -5352,14 +5352,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     /** Sets selection state for rows of the data region on the current page. */
     public void checkAllOnPage(String dataRegionName)
     {
-        WebElement toggle = Locator.css("#dataregion_" + dataRegionName + " input[name='.toggle']").findElement(_driver);
+        String id = Locator.xq("dataregion_" + dataRegionName);
+        WebElement toggle = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']").findElement(_driver);
         checkCheckbox(toggle);
     }
 
     /** Clears selection state for rows of the data region on the current page. */
     public void uncheckAllOnPage(String dataRegionName)
     {
-        WebElement toggle = Locator.css("#dataregion_" + dataRegionName + " input[name='.toggle']").findElement(_driver);
+        String id = Locator.xq("dataregion_" + dataRegionName);
+        WebElement toggle = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']").findElement(_driver);
         checkCheckbox(toggle);
         uncheckCheckbox(toggle);
     }
@@ -5374,14 +5376,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     /** Sets selection state for single rows of the data region. */
     public void checkDataRegionCheckbox(String dataRegionName, int index)
     {
-        List<WebElement> selects = Locator.css("#dataregion_" + dataRegionName + " input[name='.select']").findElements(_driver);
+        String id = Locator.xq("dataregion_" + dataRegionName);
+        List<WebElement> selects = Locator.xpath("//table[@id=" + id + "]//input[@name='.select']").findElements(_driver);
         checkCheckbox(selects.get(index));
     }
 
     /** Sets selection state for single rows of the data region. */
     public void uncheckDataRegionCheckbox(String dataRegionName, int index)
     {
-        List<WebElement> selects = Locator.css("#dataregion_" + dataRegionName + " input[name='.select']").findElements(_driver);
+        String id = Locator.xq("dataregion_" + dataRegionName);
+        List<WebElement> selects = Locator.xpath("//table[@id=" + id + "]//input[@name='.select']").findElements(_driver);
         uncheckCheckbox(selects.get(index));
     }
 
