@@ -2989,7 +2989,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void removeWebPart(String webPartTitle)
     {
         Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[img[@title='Remove From Page']]");
-        int startCount = getXpathCount(removeButton);
+        int startCount = getElementCount(removeButton);
         click(removeButton);
         waitForElementToDisappear(removeButton.index(startCount), WAIT_FOR_JAVASCRIPT);
     }
@@ -3283,19 +3283,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void waitForPageToLoad(int millis)
     {
-        if (isAlertPresent())
-        {
-            Alert alert = _driver.switchTo().alert();
-            String text = alert.getText();
-            alert.accept();
-            Assert.fail("ERROR: Unexpected alert.\n" + text);
-        }
-        else
-        {
-            _testTimeout = true;
-            selenium.waitForPageToLoad(Integer.toString(millis));
-            _testTimeout = false;
-        }
+        _testTimeout = true;
+        selenium.waitForPageToLoad(Integer.toString(millis));
+        _testTimeout = false;
     }
 
     /**
@@ -3351,38 +3341,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             Assert.fail(failMessage + " ["+wait+"ms]");
     }
 
-    /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelperWD#waitForExt3MaskToDisappear(int)}
-     */
-    @Deprecated public void waitForExtMaskToDisappear()
-    {
-        waitForExtMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelperWD#waitForExt3MaskToDisappear(int)}
-     */
-    @Deprecated public void waitForExtMaskToDisappear(int wait)
-    {
-        _extHelper.waitForExt3MaskToDisappear(wait);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelperWD#waitForExt3Mask(int)}
-     */
-    @Deprecated public void waitForExtMask()
-    {
-        waitForExtMask(WAIT_FOR_JAVASCRIPT);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.ExtHelperWD#waitForExt3Mask(int)}
-     */
-    @Deprecated public void waitForExtMask(int wait)
-    {
-        _extHelper.waitForExt3Mask(wait);
-    }
-
     //like wait for ExtMask, but waits for a draggable mask (for example, the file rename mask)
     public void waitForDraggableMask()
     {
@@ -3436,10 +3394,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         pushLocation();
         beginAt("/query" + containerPath + "/internalNewView.view");
-        setFormElement("ff_schemaName", schema);
-        setFormElement("ff_queryName", query);
+        setFormElement(Locator.name("ff_schemaName"), schema);
+        setFormElement(Locator.name("ff_queryName"), query);
         if (viewName != null)
-            setFormElement("ff_viewName", viewName);
+            setFormElement(Locator.name("ff_viewName"), viewName);
         submit();
         StringBuilder strFields = new StringBuilder(fields[0]);
         for (int i = 1; i < fields.length; i ++)
@@ -3447,7 +3405,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             strFields.append("&");
             strFields.append(fields[i]);
         }
-        setFormElement("ff_columnList", strFields.toString());
+        setFormElement(Locator.name("ff_columnList"), strFields.toString());
         submit();
         popLocation();
     }
@@ -4795,10 +4753,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (buttonLocator != null)
             clickAndWait(buttonLocator, waitMillis);
         else if(waitMillis==WAIT_FOR_EXT_MASK_TO_APPEAR)
-            waitForExtMask();
+            _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
 
         else if(waitMillis==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
-            waitForExtMaskToDisappear();
+            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         else
             Assert.fail("No button found with text \"" + text + "\"");
     }
