@@ -274,7 +274,9 @@ public class CreateVialsTest extends AbstractViabilityTest
         clickButton("Move Vials", 0);
         _extHelper.waitForExtDialog("Move Vials");
         setFormElement("changeLocationField", "Site C");
-        clickButton("Move Vials", WAIT_FOR_JAVASCRIPT);
+        sleep(100);                                                     // TODO: without the sleep sometimes fails; improve use of setFormElement
+        _extHelper.clickExtButton("Move Vials", WAIT_FOR_JAVASCRIPT);
+//        clickButton("Move Vials", WAIT_FOR_JAVASCRIPT);
 
         Assert.assertEquals("B02_1.0_1", table.getDataAsText(1, "Global Unique Id"));
         Assert.assertEquals("Site C", table.getDataAsText(1, "Site Name"));
