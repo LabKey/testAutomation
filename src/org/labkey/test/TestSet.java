@@ -76,7 +76,7 @@ public enum TestSet
         TargetedMSTest.class
     ),
 
-    Daily(600000,
+    DailyA(600000,
         BasicTest.class,
         EmbeddedWebPartTest.class,
         ModuleAssayTest.class,
@@ -85,8 +85,7 @@ public enum TestSet
         NabAssayTest.class,
         FlowJoQueryTest.class,
         FlowImportTest.class,
-        // Disable FlowNormalizationTest until Issue 16434 is resolved
-        //FlowNormalizationTest.class,
+        FlowNormalizationTest.class,
         FlowCBCTest.class,
         DataRegionTest.class,
         UserPermissionsTest.class,
@@ -126,7 +125,10 @@ public enum TestSet
         JavaClientApiTest.class,
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
-        SpecimenProgressReportTest.class,
+        SpecimenProgressReportTest.class
+    ),
+
+    DailyB(600000,
         FormulationsTest.class,
         CohortTest.class,
         RlabkeyTest.class,
@@ -142,7 +144,7 @@ public enum TestSet
         TimeChartDateBasedTest.class,
         TimeChartVisitBasedTest.class,
         TimeChartAPITest.class,
-        EHRReportingAndUITest.class, // TODO : 16316: EHRReportingAndUITest causing Java memory errors
+        EHRReportingAndUITest.class,
         EHRDataEntryTest.class,
         EHRApiTest.class,
         ComplianceTrainingTest.class,
@@ -150,7 +152,6 @@ public enum TestSet
         FolderTest.class,
         StudyDemoModeTest.class,
         LibraTest.class,
-//        StudyReloadTest.class, //TODO:  don't checkin
         AncillaryStudyTest.class,
         AncillaryStudyFromSpecimenRequestTest.class,
         FolderExportTest.class,
@@ -174,11 +175,12 @@ public enum TestSet
         ELISPOT_AssayTest.class,
         ElectrochemiluminescenceAssayTest.class,
         StudyPublishTest.class,
-        //ExperimentalFeaturesTest.class,  -- hidden email test moved out, currently no experimental features being tested
         HiddenEmailTest.class,
         ElisaAssayTest.class,
         ContainerContextTest.class
     ),
+
+    Daily(600000, DailyA, DailyB.tests),
 
     MiniTest(
         LuminexUploadAndCopyTest.class,
@@ -308,9 +310,9 @@ public enum TestSet
     BVTnDaily(BVT, Daily.tests),
 
     Weekly(600000, BVTnDaily,
-            // Add special test classes, not in daily or BVT.
-            SecurityTestExtended.class,
-            NabMigrationTest.class
+        // Add special test classes, not in daily or BVT.
+        SecurityTestExtended.class,
+        NabMigrationTest.class
     ),
 
     EHR(
@@ -320,7 +322,12 @@ public enum TestSet
     ),
 
     CDSPopulation(
-            CDSPopulation.class
+        CDSPopulation.class
+    ),
+
+    InDevelopment(
+        StudyReloadTest.class,
+        ExperimentalFeaturesTest.class // currently no experimental features being tested
     ),
 
     CONTINUE()
