@@ -610,12 +610,12 @@ public class FormulationsTest extends BaseWebDriverTest
         clickButton("Next", 0);
 
         // Replicate sample
-        _extHelper.selectExt4ComboBoxItem(Locator.xpath("//tr[./td/input[@name='replicatechoice']]").index(1), HPLC_SAMPLE1);
+        _extHelper.selectExt4ComboBoxItem((Locator.XPathLocator)Locator.xpath("//tr[./td/input[@name='replicatechoice']]").index(1), HPLC_SAMPLE1);
         clickButton("Next", 0);
 
         // Enter standard info
-        _extHelper.selectExt4ComboBoxItem(Locator.xpath("//input[@name='Compound']/../..").index(0), "Alum");
-        _extHelper.selectExt4ComboBoxItem(Locator.xpath("//input[@name='Compound']/../..").index(1), "Squawk");
+        _extHelper.selectExt4ComboBoxItem((Locator.XPathLocator)Locator.xpath("//input[@name='Compound']/../..").index(0), "Alum");
+        _extHelper.selectExt4ComboBoxItem((Locator.XPathLocator)Locator.xpath("//input[@name='Compound']/../..").index(1), "Squawk");
         setFormElement(Locator.name("Concentration"), "789.01");
         setFormElement(Locator.name("Concentration").index(1), "789.02");
         setFormElement(Locator.xpath("(//input[@name='Diluent'])[3]"), "Not Starch");
@@ -635,12 +635,12 @@ public class FormulationsTest extends BaseWebDriverTest
         waitForTextToDisappear(HPLC_STANDARD1);
     }
 
-    private final String[] HPLC_ROWS = {"EDIT STD1 3004837B   Not Starch standard Alum 789.01 /HPLCRun/STD1.CSV TD789 5 T=0  HPLCRun\\QDEMUL3.M",
-                                        "EDIT STD2 3004837B   Some Starch standard Squawk 789.02 /HPLCRun/STD2.txt TD789 5 T=0  HPLCRun\\QDEMUL3.M",
-                                        "EDIT 3004837A     Starch sample     /HPLCRun/3004837A.CSV TD789 5 T=0  HPLCRun\\QDEMUL3.M",
-                                        "EDIT STD1 3004837B   Not Starch standard Alum 789.01 /HPLCRun/STD1.CSV TD789 5 T=0  HPLCRun\\QDEMUL3.M",
-                                        "EDIT STD2 3004837B   Some Starch standard Squawk 789.02 /HPLCRun/STD2.txt TD789 5 T=0  HPLCRun\\QDEMUL3.M",
-                                        "EDIT 3004837B     Starch sample     /HPLCRun/3004837A.CSV TD789 5 T=0  HPLCRun\\QDEMUL3.M"};
+    private final String[] HPLC_ROWS = {"EDIT STD1 3004837B   Not Starch standard Alum 789.01 /HPLCRun/STD1.CSV TD789 5 T=0  HPLCRun"+File.separator+"QDEMUL3.M",
+                                        "EDIT STD2 3004837B   Some Starch standard Squawk 789.02 /HPLCRun/STD2.txt TD789 5 T=0  HPLCRun"+File.separator+"QDEMUL3.M",
+                                        "EDIT 3004837A     Starch sample     /HPLCRun/3004837A.CSV TD789 5 T=0  HPLCRun"+File.separator+"QDEMUL3.M",
+                                        "EDIT STD1 3004837B   Not Starch standard Alum 789.01 /HPLCRun/STD1.CSV TD789 5 T=0  HPLCRun"+File.separator+"QDEMUL3.M",
+                                        "EDIT STD2 3004837B   Some Starch standard Squawk 789.02 /HPLCRun/STD2.txt TD789 5 T=0  HPLCRun"+File.separator+"QDEMUL3.M",
+                                        "EDIT 3004837B     Starch sample     /HPLCRun/3004837A.CSV TD789 5 T=0  HPLCRun"+File.separator+"QDEMUL3.M"};
     @LogMethod
     private void validateHPLCAssayData()
     {
