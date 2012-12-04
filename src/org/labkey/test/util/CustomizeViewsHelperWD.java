@@ -349,14 +349,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
             builder.moveToElement(el).click().build().perform();
         }
 
-        _test.assertElementNotPresent(Locator.xpath(itemXPath+closeXPath));
-
-//        do{
-//            _test.click(click);
-//            _test.mouseOver(close);
-//            _test.click(close);
-//            _test.assertElementPresent(close, --clauseCount); // Make sure clause is deleted. Prevent infinite loop on failure.
-//        }while (_test.isElementPresent(item)); // Removes all clauses for a single fieldkey
+        _test.waitForElementToDisappear(Locator.xpath(itemXPath+closeXPath), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     //enable customize view grid to show hidden fields
