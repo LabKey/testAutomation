@@ -1996,9 +1996,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             return; // No manage views option
         }
 
-        waitForExtMaskToDisappear();
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         String viewXpath = "//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]";
-        int viewCount = getXpathCount(Locator.xpath(viewXpath));
+        int viewCount = getElementCount(Locator.xpath(viewXpath));
         for (int i = 1; i <= viewCount; i++)
         {
             pushLocation();
@@ -2007,9 +2007,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             String viewName = getText(Locator.xpath(thisViewXpath + "//td[contains(@class, 'x-grid3-cell-first')]"));
             click(Locator.xpath(thisViewXpath));
             waitAndClick(Locator.linkWithText("VIEW"));
-            waitForPageToLoad();
-            waitForText(viewName);
+            waitForElement(Locator.id("labkey-nav-trail-current-page").withText(viewName));
             popLocation();
+            _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         }
     }
 

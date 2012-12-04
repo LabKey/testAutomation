@@ -1691,7 +1691,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             return; // No manage views option
         }
 
-        waitForExtMaskToDisappear();
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         String viewXpath = "//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]";
         int viewCount = getXpathCount(Locator.xpath(viewXpath));
         for (int i = 1; i <= viewCount; i++)
@@ -1704,6 +1704,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             waitForPageToLoad();
             waitForText(viewName);
             popLocation();
+            _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         }
     }
 
@@ -3048,7 +3049,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void waitForExt4FolderTreeNode(String nodeText, int wait)
     {
-        final Locator locator = new Locator("//tr[contains(@class, 'x4-grid-row')]/td/div[text()=" + Locator.xq(nodeText) + "]");
+        final Locator locator = Locator.xpath("//tr[contains(@class, 'x4-grid-row')]/td/div[text()=" + Locator.xq(nodeText) + "]");
         String failMessage = "Ext 4 Tree Node with locator " + locator + " did not appear.";
         waitFor(new Checker()
         {
