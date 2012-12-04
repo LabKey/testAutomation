@@ -3093,12 +3093,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         if (missingTexts.size() > 0)
         {
-            String failMsg = (missingTexts.size() == 1 ? "Text ['" : "Texts ['") + missingTexts.get(0) + "'";
+            String failMsg = (missingTexts.size() == 1 ? "Text '" : "Texts ['") + missingTexts.get(0) + "'";
             for (int i = 1; i < missingTexts.size(); i++)
             {
                 failMsg += ", '" + missingTexts.get(i) + "'";
             }
-            failMsg += missingTexts.size() == 1 ? "] was not present" : "] were not present";
+            failMsg += missingTexts.size() == 1 ? " was not present" : "] were not present";
             Assert.fail(failMsg);
         }
     }
@@ -6084,37 +6084,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             Assert.fail("user " + email + " was found in group " + projectName + "/" + groupName);
     }
 
-    /**
-     * Saves a wiki page that is currently being created or edited. Because
-     * the wiki edit page now uses AJAX to save the page, use this function to
-     * reliably save the page and wait for the browser to redirect to where it would
-     * normally go next.
-     */
     public void saveWikiPage()
     {
-        String curUrl = _driver.getCurrentUrl();
-
-        //get the redir parameter
-        String redirUrl = getUrlParam(curUrl, "redirect", true);
-        if(null == redirUrl || redirUrl.length() == 0)
-        {
-            String pageName = getUrlParam(curUrl, "name", true);
-            if(null == pageName)
-                pageName = Locator.id("wiki-input-name").findElement(_driver).getText();
-            assert null != pageName && pageName.length() > 0;
-            int idxStart = curUrl.indexOf("/wiki/");
-            int idxEnd = curUrl.indexOf("/editWiki.view?", idxStart);
-            redirUrl = getContextPath() + curUrl.substring(idxStart, idxEnd) + "/page.view?name=" + pageName;
-        }
-
-        log("Saving wiki...");
-        clickButton("Save", 0);
-        log("Waiting for AJAX save return...");
-        //waitForText("Saved.", 10000);
-        waitFor(new WikiSaveChecker(), "Wiki page failed to save!", 10000);
-        //sleep(100);
-        log("Navigating to " + redirUrl);
-        beginAt(redirUrl);
+        String title = Locator.id("wiki-input-title").findElement(_driver).getText();
+        if (title.equals("")) title = Locator.id("wiki-input-name").findElement(_driver).getText();
+        clickButton("Save & Close", 0);
     }
 
     public String getUrlParam(String url, String paramName, boolean decode)
@@ -6137,15 +6111,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         else
             return null;
-    }
-
-    public class WikiSaveChecker implements Checker
-    {
-        private Locator _locator = Locator.id("status");
-        public boolean check()
-        {
-            return "Saved.".equals(getText(_locator));
-        }
     }
 
     private long start = 0;

@@ -3262,7 +3262,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void assertFormElementEquals(String elementName, String value)
     {
-        assertFormElementEquals(new Locator(elementName), value);
+        assertFormElementEquals(new Locator.DeprecatedLocator(elementName), value);
     }
 
     public void waitForFormElementToEqual(final Locator locator, final String value)
@@ -3302,7 +3302,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @Deprecated
     public String getFormElement(String elementName)
     {
-        Locator loc = new Locator(elementName);
+        Locator loc = new Locator.DeprecatedLocator(elementName);
         return selenium.getValue(loc.toString());
     }
 
@@ -3324,7 +3324,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @Deprecated
     public void assertOptionEquals(String selectName, String value)
     {
-        assertOptionEquals(new Locator(selectName), value);
+        assertOptionEquals(new Locator.DeprecatedLocator(selectName), value);
     }
 
     public void assertOptionEquals(Locator loc, String value)
@@ -3350,7 +3350,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @Deprecated
     public String getSelectedOptionText(String selectName)
     {
-        return getSelectedOptionText(new Locator(selectName));
+        return getSelectedOptionText(new Locator.DeprecatedLocator(selectName));
     }
 
     public void assertElementNotPresent(String errorMsg, Locator loc)

@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 
@@ -25,7 +25,7 @@ import org.labkey.test.util.ListHelper;
  * Date: Apr 6, 2011
  * Time: 2:19:10 PM
  */
-public class GpatAssayTest extends BaseSeleniumWebTest
+public class GpatAssayTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "GpatAssayTest Project";
 
@@ -74,7 +74,8 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_XLS);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
-        setFormElement("AssayDesignerName", ASSAY_NAME_XLS);
+        setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_XLS);
+        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         uncheckCheckbox(Locator.xpath("//span[@id='id_import_Role']/input"));
         click(Locator.xpath("//tr[./td/span[@id='id_import_Score']]//div[contains(@class, 'x-tbar-page-next')]"));
         _extHelper.waitForExtDialog("Score Column Properties");
@@ -97,8 +98,8 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         clickButton("Next");
         clickButton("Save and Finish");
         clickLinkWithText(GPAT_ASSAY_XLS);
-        assertTextNotPresent("Role"); // excluded column
-        assertTextPresent("1 - 100 of 201");
+        assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
+        assertElementPresent(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
 
         log("Import XLSX GPAT assay");
         clickLinkWithText(PROJECT_NAME);
@@ -106,7 +107,8 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_XLSX);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
-        setFormElement("AssayDesignerName", ASSAY_NAME_XLSX);
+        setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_XLSX);
+        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         uncheckCheckbox(Locator.xpath("//span[@id='id_import_Role']/input"));
         click(Locator.xpath("//tr[./td/span[@id='id_import_Score']]//div[contains(@class, 'x-tbar-page-next')]"));
         _extHelper.waitForExtDialog("Score Column Properties");
@@ -126,8 +128,8 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         clickButton("Next");
         clickButton("Save and Finish");
         clickLinkWithText(GPAT_ASSAY_XLSX);
-        assertTextNotPresent("Role"); // excluded column
-        assertTextPresent("1 - 100 of 201");
+        assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
+        assertElementPresent(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
 
         log("Import TSV GPAT assay");
         clickLinkWithText(PROJECT_NAME);
@@ -135,7 +137,8 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_TSV);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
-        setFormElement("AssayDesignerName", ASSAY_NAME_TSV);
+        setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_TSV);
+        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         uncheckCheckbox(Locator.xpath("//span[@id='id_import_Role']/input"));
         click(Locator.xpath("//tr[./td/span[@id='id_import_Score']]//div[contains(@class, 'x-tbar-page-next')]"));
         _extHelper.waitForExtDialog("Score Column Properties");
@@ -158,14 +161,15 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         _listHelper.setColumnLabel(7, "Result");
         _listHelper.setColumnName(7, "Result");
         click(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//span[contains(@class,'x-tab-strip-text') and text()='" + "Advanced" + "']"));
-        setFormElement(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']") , "Score");                   
-        
+        setFormElement(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']") , "Score");
+        pressTab(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']"));
+
         clickButton("Save & Close");
         clickButton("Next");
         clickButton("Save and Finish");
         clickLinkWithText(GPAT_ASSAY_TSV);
-        assertTextNotPresent("Role"); // excluded column
-        assertTextPresent("1 - 100 of 201");
+        assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
+        assertElementPresent(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
 
         log("Verify standard column aliases");
         clickLinkWithText(PROJECT_NAME);
@@ -211,7 +215,8 @@ public class GpatAssayTest extends BaseSeleniumWebTest
         _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_FNA);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
-        setFormElement("AssayDesignerName", ASSAY_NAME_FNA);
+        setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_FNA);
+        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
 
         clickButton("Begin import");
         clickButton("Next");

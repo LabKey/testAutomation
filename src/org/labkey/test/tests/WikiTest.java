@@ -32,7 +32,7 @@ public class WikiTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES +  "WikiVerifyProject";
 
     private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
-    private static final String WIKI_PAGE_WEBPART_TEST = "Best Gene Name";
+    private static final String WIKI_PAGE_WEBPART_ID = "qwp999";
     private static final String WIKI_PAGE_TITLE = "Test Wiki";
     private static final String WIKI_PAGE_CONTENT =
             "<b>Some HTML content</b>\n" +
@@ -80,7 +80,7 @@ public class WikiTest extends BaseWebDriverTest
         clickLinkWithText("full-text search");
         if (isTextPresent("pause crawler"))
             clickButton("pause crawler");
-        beginAt(selenium.getLocation().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
+        beginAt(_driver.getCurrentUrl().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
 
         clickFolder(PROJECT_NAME);
         addWebPart("Wiki");
@@ -89,32 +89,25 @@ public class WikiTest extends BaseWebDriverTest
         log("test create new html page with a webpart");
         createNewWikiPage("HTML");
 
-        setFormElement("name", WIKI_PAGE_TITLE);
-        setFormElement("title", WIKI_PAGE_TITLE);
+        setFormElement(Locator.name("name"), WIKI_PAGE_TITLE);
+        setFormElement(Locator.name("title"), WIKI_PAGE_TITLE);
         setWikiBody(WIKI_PAGE_CONTENT);
 
         log("test attachments in wiki");
-        if (isFileUploadAvailable())
-        {
-            File file = new File(getLabKeyRoot() + "/common.properties");
-            setFormElement("formFiles[0]", file);
-        }
-        else
-            log("File upload skipped.");
+        File file = new File(getLabKeyRoot() + "/common.properties");
+        setFormElement(Locator.name("formFiles[0]"), file);
         saveWikiPage();
 
-        if (isFileUploadAvailable())
-            assertTextPresent("common.properties");
-        assertTextPresent(WIKI_PAGE_WEBPART_TEST);
+        waitForElement(Locator.id(WIKI_PAGE_WEBPART_ID));
+        assertTextPresent("common.properties");
         assertTextPresent("Some HTML content");
 
         log("test search wiki");
         searchFor(PROJECT_NAME, "Wiki", 1, WIKI_PAGE_TITLE);
 
-
         log("test edit wiki");
         clickLinkWithText("Edit");
-        setFormElement("title", WIKI_PAGE_ALTTITLE);
+        setFormElement(Locator.name("title"), WIKI_PAGE_ALTTITLE);
         String wikiPageContentEdited =
             "<b>Some HTML content</b><br>\n" +
             "<b>More HTML content</b><br>\n";

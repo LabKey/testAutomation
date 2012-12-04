@@ -16,14 +16,14 @@
 
 package org.labkey.test.module;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 /**
  * User: ulberge
  * Date: Aug 7, 2007
  */
-public class ModuleTest extends BaseSeleniumWebTest
+public class ModuleTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ModuleVerifyProject";
     private static final String TEST_MODULE_TEMPLATE_FOLDER_NAME = "testmodule";
@@ -40,7 +40,7 @@ public class ModuleTest extends BaseSeleniumWebTest
         clickLinkWithText(PROJECT_NAME);
         goToFolderManagement();
         clickLinkWithText("Folder Type");
-        checkCheckbox(Locator.raw("//input[@value='" + TEST_MODULE_TEMPLATE_FOLDER_NAME + "']"));
+        checkCheckbox(Locator.xpath("//input[@value='" + TEST_MODULE_TEMPLATE_FOLDER_NAME + "']"));
         clickButton("Update Folder");
         clickTab(TEST_MODULE_TEMPLATE_FOLDER_NAME);
         assertTextPresent("Hello, and welcome to the " + TEST_MODULE_TEMPLATE_FOLDER_NAME + " module.");

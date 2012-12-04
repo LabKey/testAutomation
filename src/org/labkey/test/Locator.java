@@ -34,92 +34,58 @@ import java.util.List;
  * Date: Feb 8, 2007
  * Time: 10:59:37 AM
  */
-public class Locator
+public abstract class Locator
 {
-    private String loc;
-    private int _index;
-    private String _contains;
-    private String _text;
+    protected String _loc;
+    protected int _index;
+    protected String _contains;
+    protected String _text;
 
     // XPATH fragments
     public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@style, 'left: -10000px')])";
     public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'disabled')])";
 
-    @Deprecated // TODO: Should be private
-    protected Locator(String rawString)
+    @Deprecated
+    protected Locator(String loc)
     {
-        loc = rawString;
+        _loc = loc;
         _index = 0;
     }
 
-    private Locator(String rawString, int index, String contains, String text)
+    private Locator(String loc, int index, String contains, String text)
     {
-        loc = rawString;
+        _loc = loc;
         _index = index;
-        _contains = (text == null ? contains : null); // withText() takes precedence over contains()
+        _contains = contains;
         _text = text;
     }
 
-    public Locator containing(String contains)
-    {
-        return new Locator(loc, _index, contains, _text);
-    }
+    public abstract Locator containing(String contains);
 
-    public Locator withText(String text)
-    {
-        return new Locator(loc, _index, null, text);
-    }
+    public abstract Locator withText(String text);
 
-    public Locator index(int index)
-    {
-        return new Locator(loc, index, _contains, _text);
-    }
+    public abstract Locator index(int index);
 
     /**
      * Not for direct use with selenium
      * Converts a locator into a format suitable for logging
      * @return Human-readable version of Locator
      */
-    public String toString()
-    {
-        if (loc.startsWith("name=") && _index > 0)
-            return loc + " index=" + _index;
-        else
-            return loc;
-    }
+    public abstract String toString();
 
     @Deprecated
     public String toXpath()
     {
-        String xpath = loc.substring(loc.indexOf("=")+1);
+        String xpath = _loc.substring(_loc.indexOf("=")+1);
         return xpath;
-
     }
 
-    private By toBy()
-    {
-        if (loc.startsWith("id="))
-            return By.id(loc.substring(loc.indexOf("=")+1));
-        if (loc.startsWith("name="))
-            return By.name(loc.substring(loc.indexOf("=")+1));
-        if (loc.startsWith("xpath="))
-            return By.xpath(loc.substring(loc.indexOf("=")+1));
-        if (loc.startsWith("css="))
-        {
-            if (loc.contains(":contains("))
-                throw new IllegalArgumentException("CSS3 has deprecated the ':contains' pseudo-class");
-            return By.cssSelector(loc.substring(loc.indexOf("=")+1));
-        }
-        if (loc.startsWith("link="))
-            return By.linkText(loc.substring(loc.indexOf("=")+1));
-        else
-            throw new RuntimeException("Unable to convert locator: " + loc);
-    }
+    protected abstract By toBy();
 
     @Deprecated
     public static Locator raw(String str)
     {
-        return new Locator(str);
+        return new DeprecatedLocator(str);
     }
 
     public WebElement findElement(WebDriver driver)
@@ -156,7 +122,7 @@ public class Locator
                 }
             }
         }
-        else if (_contains != null && !_contains.equals(""))
+        if (_contains != null && !_contains.equals(""))
         {
             Iterator<WebElement> it = elements.iterator();
             WebElement el;
@@ -236,24 +202,23 @@ public class Locator
         return findElements(driver);
     }
 
-    public static Locator id(String id)
+    public static IdLocator id(String id)
     {
-        return new Locator("id=" + id);
+        return new IdLocator(id);
     }
 
-    public static Locator name(String name)
+    public static NameLocator name(String name)
     {
-        return new Locator("name=" + name);
+        return new NameLocator(name);
     }
 
-    public static Locator css(String selector)
+    public static CssLocator css(String selector)
     {
-//        if (selector.contains(":contains("))
-            //todo: throw new IllegalArgumentException("CSS3 has deprecated :contains()");
-        return new Locator("css=" + selector);
+        return new CssLocator(selector);
     }
 
     /**
+     * @deprecated Use {@link NameLocator} with {@link #index(int)}
      * Element by name and index within the set of elements with that name
      * @param name
      * @param index
@@ -261,7 +226,7 @@ public class Locator
      */
     @Deprecated public static Locator name(String name, int index)
     {
-        return new Locator("name=" + name, index, null, null);
+        return new NameLocator(name).index(index);
     }
 
     /**
@@ -273,7 +238,7 @@ public class Locator
     @Deprecated
     public static Locator dom(String scriptExpr)
     {
-        return new Locator("dom=" + scriptExpr);
+        return new DeprecatedLocator("dom=" + scriptExpr);
     }
 
     /**
@@ -426,9 +391,9 @@ public class Locator
         return xpath("(//a/img[contains(@src, " + xq(image) + ")])[" + (index + 1) + "]");
     }
 
-    public static Locator linkWithText(String text)
+    public static LinkLocator linkWithText(String text)
     {
-        return new Locator("link=" + text);
+        return new LinkLocator(text);
     }
 
     public static XPathLocator linkWithText(String text, int index)
@@ -475,7 +440,6 @@ public class Locator
     {
         return xpath("//td[@id='bodypanel']//a[contains(text(), " + xq(text) + ")]");
     }
-
 
     public static XPathLocator buttonWithImgSrc(String imgSrc)
     {
@@ -576,7 +540,7 @@ public class Locator
     public static XPathLocator lookupLink(String schemaName, String queryName, String pkName)
     {
         String linkText = schemaName + "." + queryName + "." + (null != pkName ? pkName : "");
-        return Locator.xpath("//span[contains(@class, 'labkey-link') and contains(text(), " + xq(linkText) + ")]");
+        return xpath("//span[contains(@class, 'labkey-link') and contains(text(), " + xq(linkText) + ")]");
     }
 
     /**
@@ -642,12 +606,6 @@ public class Locator
         return xpath("//a[@class='x-tree-node-anchor']/span[text()='" + folderName + "' or text()='" + folderName + "*']");
     }
 
-
-//    public static XPathLocator fileTreeByPath(String path)
-//    {
-//        return xpath("//a[@class='x-tree-node-anchor']/span[text()=" + xq(path) + "]");
-//    }
-
     /**
      * Quote text to be used as literal string in xpath expression
      *     Direct port from attibuteValue function in selenium IDE locatorBuilders.js
@@ -685,60 +643,276 @@ public class Locator
             result += ')';
             return result;
         }
-
     }
+
     public static class XPathLocator extends Locator
     {
-        String path;
         public XPathLocator(String loc)
         {
-            super("xpath=" + loc);
-            path = loc;
+            super(loc);
         }
 
-        /**
-         * Return nth instance of all matching tags.
-         * @param index Use java-style 0-based indexes not xpath style 1-based
-         * @return
-         */
-        public XPathLocator index(int index)
+        private XPathLocator(String loc, int index, String contains, String text)
         {
-            return new XPathLocator("(" + path + ")[" + (index + 1) + "]");
+            super(loc, index, contains, text);
+        }
+
+        public Locator containing(String contains)
+        {
+            return new XPathLocator(_loc, _index, contains, _text);
+        }
+
+        public Locator withText(String text)
+        {
+            return new XPathLocator(_loc, _index, _contains, text);
+        }
+
+        public Locator index(int index)
+        {
+            return new XPathLocator(_loc, index, _contains, _text);
+        }
+
+        protected By toBy()
+        {
+            return By.xpath(getPath());
         }
 
         public XPathLocator parent()
         {
-            return new XPathLocator("(" + path + ")/..");
+            return new XPathLocator("(" + getPath() + ")/..");
         }
 
         public XPathLocator child(String str)
         {
-            return new XPathLocator("(" + path + ")/" + str);
+            return new XPathLocator("(" + getPath() + ")/" + str);
         }
 
         public XPathLocator append(String clause)
         {
-            return new XPathLocator(path + clause);
+            return new XPathLocator(getPath() + clause);
         }
 
         public XPathLocator append(XPathLocator child)
         {
-            return new XPathLocator(path + child.getPath());
+            return new XPathLocator(getPath() + child.getPath());
         }
 
         public String getPath()
         {
-            return path;
+            return _loc;
+        }
+
+        public String toString()
+        {
+            return "xpath="+toXpath();
         }
 
         public String toXpath()
         {
-            return path;
-//            if (loc.startsWith("xpath="))
-//                return loc.substring(loc.indexOf("=")+1);
-//            else
-//                throw new RuntimeException(loc + " is not an xpath locator.");
+            return "(" + _loc + ")"+
+                    (_index != 0 ? "[" + (_index + 1) + "]" : "") +
+                    (_text != null && !_text.equals("") ? "[normalize-space()='" + _text + "']" : "") +
+                    (_contains != null && !_contains.equals("") ? "[contains(normalize-space(), '" + _contains + "')]" : "");
+        }
+    }
+
+    public static class IdLocator extends Locator
+    {
+        public IdLocator(String loc)
+        {
+            super(loc);
         }
 
+        private IdLocator(String loc, int index, String contains, String text)
+        {
+            super(loc, index, contains, text);
+        }
+
+        public Locator containing(String contains)
+        {
+            return new IdLocator(_loc, _index, contains, _text);
+        }
+
+        public Locator withText(String text)
+        {
+            return new IdLocator(_loc, _index, _contains, text);
+        }
+
+        public Locator index(int index)
+        {
+            return new IdLocator(_loc, index, _contains, _text);
+        }
+
+        protected By toBy()
+        {
+            return By.id(_loc);
+        }
+
+        public String toString()
+        {
+            return "id=" + _loc;
+        }
+    }
+
+    public static class NameLocator extends Locator
+    {
+        public NameLocator(String loc)
+        {
+            super(loc);
+        }
+
+        private NameLocator(String loc, int index, String contains, String text)
+        {
+            super(loc, index, contains, text);
+        }
+
+        public Locator containing(String contains)
+        {
+            return new NameLocator(_loc, _index, contains, _text);
+        }
+
+        public Locator withText(String text)
+        {
+            return new NameLocator(_loc, _index, _contains, text);
+        }
+
+        public Locator index(int index)
+        {
+            return new NameLocator(_loc, index, _contains, _text);
+        }
+
+        @Override
+        public String toString()
+        {
+            return "name=" + _loc + (_index > 0 ? " index=" + _index : "");
+        }
+
+        protected By toBy()
+        {
+            return By.name(_loc);
+        }
+    }
+
+    public static class CssLocator extends Locator
+    {
+        public CssLocator(String loc)
+        {
+            super(loc);
+        }
+
+        private CssLocator(String loc, int index, String contains, String text)
+        {
+            super(loc, index, contains, text);
+        }
+
+        public Locator containing(String contains)
+        {
+            return new CssLocator(_loc, _index, contains, _text);
+        }
+
+        public Locator withText(String text)
+        {
+            return new CssLocator(_loc, _index, _contains, text);
+        }
+
+        public Locator index(int index)
+        {
+            return new CssLocator(_loc, index, _contains, _text);
+        }
+
+        @Override
+        public String toString()
+        {
+            return "css=" + _loc;
+        }
+
+        protected By toBy()
+        {
+            if (_loc.contains(":contains("))
+                throw new IllegalArgumentException("CSS3 has does not support the ':contains' pseudo-class: '" + _loc + "'");
+            return By.cssSelector(_loc);
+        }
+    }
+
+    public static class LinkLocator extends Locator
+    {
+        public LinkLocator(String loc)
+        {
+            super(loc);
+        }
+
+        private LinkLocator(String loc, int index, String contains, String text)
+        {
+            super(loc, index, contains, text);
+        }
+
+        public Locator containing(String contains)
+        {
+            return new LinkLocator(_loc, _index, contains, _text);
+        }
+
+        public Locator withText(String text)
+        {
+            return new LinkLocator(_loc, _index, _contains, text);
+        }
+
+        public Locator index(int index)
+        {
+            return new LinkLocator(_loc, index, _contains, _text);
+        }
+
+        @Override
+        public String toString()
+        {
+            return "link=" + _loc;
+        }
+
+        protected By toBy()
+        {
+            return By.linkText(_loc);
+        }
+    }
+
+    /**
+     * @deprecated Placeholder for tests before WebDriver conversion
+     */
+    @Deprecated
+    public static class DeprecatedLocator extends Locator
+    {
+        public DeprecatedLocator(String loc)
+        {
+            super(loc);
+        }
+
+        private DeprecatedLocator(String loc, int index, String contains, String text)
+        {
+            super(loc, index, contains, text);
+        }
+
+        public Locator containing(String contains)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public Locator withText(String text)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        public Locator index(int index)
+        {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String toString()
+        {
+            return _loc;
+        }
+
+        protected By toBy()
+        {
+            throw new UnsupportedOperationException("Deprecated Locator: '" + toString() +"' not supported by WebDriver");
+        }
     }
 }
