@@ -87,12 +87,12 @@ public class CreateVialsTest extends AbstractViabilityTest
         clickTab("Manage");
         log("** Adding new Sites to check null ExternalId (Issue 12074)");
         clickLinkContainingText("Manage Labs/Sites");
-        setFormElement("newId", "100");
-        setFormElement("newLabel", "Alice Lab");
+        setFormElement(Locator.name("newId"), "100");
+        setFormElement(Locator.name("newLabel"), "Alice Lab");
         clickButton("Save");
 
-        setFormElement("newId", "200");
-        setFormElement("newLabel", "Bob's Lab");
+        setFormElement(Locator.name("newId"), "200");
+        setFormElement(Locator.name("newLabel"), "Bob's Lab");
         clickButton("Save");
 
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=study&query.queryName=Site&query.sort=RowId");
@@ -116,7 +116,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         log("** Upload run without a TargetStudy set and try to create vials.");
         uploadViabilityRun("/sampledata/viability/122810.EP5.CSV", "run1", false);
         clickButton("Save and Finish");
-        String confirmation = getConfirmationAndWait();
+        getConfirmationAndWait();
         clickLinkContainingText("run1");
 
         DataRegionTable table = new DataRegionTable("Data", this);
@@ -133,11 +133,11 @@ public class CreateVialsTest extends AbstractViabilityTest
 
         log("** Upload run again but this time set a TargetStudy, visit ids, and a single specimen id on the first row");
         uploadViabilityRun("/sampledata/viability/122810.EP5.CSV", "run2", true);
-        setFormElement("_pool_B01_0_VisitID", "1.0");
+        setFormElement(Locator.name("_pool_B01_0_VisitID"), "1.0");
         clickCheckboxById("_pool_B01_0_VisitIDCheckBox");
         addSpecimenIds("_pool_B01_0_SpecimenIDs", "vial1");
         clickButton("Save and Finish");
-        confirmation = getConfirmationAndWait();
+        getConfirmationAndWait();
 
         clickLinkContainingText("run2");
         table = new DataRegionTable("Data", this);
@@ -158,9 +158,9 @@ public class CreateVialsTest extends AbstractViabilityTest
         click(Locator.xpath("//div[contains(@class, 'x-combo-list-item') and text()='Alice Lab']"));
         assertFormElementEquals("defaultLocationField", "Alice Lab");
 
-        setFormElement("maxCellPerVialField", "10e6");
-        setFormElement("defaultUsedCellsField", "1e5");
-        setFormElement("defaultLocationField", "Site A");
+        setFormElement(Locator.name("maxCellPerVialField"), "10e6");
+        setFormElement(Locator.name("defaultUsedCellsField"), "1e5");
+        setFormElement(Locator.name("defaultLocationField"), "Site A");
         //String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
         //click(Locator.id(btnId));
         _extHelper.clickExtButton("Create Vials");
@@ -173,40 +173,40 @@ public class CreateVialsTest extends AbstractViabilityTest
         Assert.assertEquals("B02", table.getDataAsText(0, "Participant ID"));
         Assert.assertEquals(getFolderName() + " Study", table.getDataAsText(0, "Target Study"));
         Assert.assertEquals("2.050E7", table.getDataAsText(0, "Original Viable Cells"));
-        Assert.assertEquals("100000", getFormElement(Locator.name("usedCells", 0)));
-        Assert.assertEquals("20404212", getFormElement(Locator.name("viableCells", 0)));
+        Assert.assertEquals("100000", getFormElement(Locator.name("usedCells")));
+        Assert.assertEquals("20404212", getFormElement(Locator.name("viableCells")));
         Assert.assertEquals("3", table.getDataAsText(0, "Vial Count"));
-        Assert.assertEquals("Site A", getFormElement(Locator.name("siteLabel", 0)));
-        setFormElement(Locator.name("siteLabel", 0), "Bob's Lab");
+        Assert.assertEquals("Site A", getFormElement(Locator.name("siteLabel")));
+        setFormElement(Locator.name("siteLabel"), "Bob's Lab");
 
-        setFormElement(Locator.name("usedCells", 0), "1");
-        fireEvent(Locator.name("usedCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
-        Assert.assertEquals("20504211", getFormElement(Locator.name("viableCells", 0)));
+        setFormElement(Locator.name("usedCells"), "1");
+        fireEvent(Locator.name("usedCells"), BaseSeleniumWebTest.SeleniumEvent.change);
+        Assert.assertEquals("20504211", getFormElement(Locator.name("viableCells")));
         Assert.assertEquals("3", table.getDataAsText(0, "Vial Count"));
 
-        setFormElement(Locator.name("viableCells", 0), "10000000");
-        fireEvent(Locator.name("viableCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
-        Assert.assertEquals("10504212", getFormElement(Locator.name("usedCells", 0)));
+        setFormElement(Locator.name("viableCells"), "10000000");
+        fireEvent(Locator.name("viableCells"), BaseSeleniumWebTest.SeleniumEvent.change);
+        Assert.assertEquals("10504212", getFormElement(Locator.name("usedCells")));
         Assert.assertEquals("1", table.getDataAsText(0, "Vial Count"));
 
-        setFormElement(Locator.name("viableCells", 0), "20000000");
-        fireEvent(Locator.name("viableCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
-        Assert.assertEquals("504212", getFormElement(Locator.name("usedCells", 0)));
+        setFormElement(Locator.name("viableCells"), "20000000");
+        fireEvent(Locator.name("viableCells"), BaseSeleniumWebTest.SeleniumEvent.change);
+        Assert.assertEquals("504212", getFormElement(Locator.name("usedCells")));
         Assert.assertEquals("2", table.getDataAsText(0, "Vial Count"));
 
-        setFormElement(Locator.name("viableCells", 0), "50000000");
-        fireEvent(Locator.name("viableCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
-        Assert.assertEquals("-29495788", getFormElement(Locator.name("usedCells", 0)));
+        setFormElement(Locator.name("viableCells"), "50000000");
+        fireEvent(Locator.name("viableCells"), BaseSeleniumWebTest.SeleniumEvent.change);
+        Assert.assertEquals("-29495788", getFormElement(Locator.name("usedCells")));
         Assert.assertEquals("5", table.getDataAsText(0, "Vial Count"));
 
-        pressTab(Locator.name("viableCells", 0).toString());
+        pressTab(Locator.name("viableCells"));
 
         clickButton("Save", 0);
         assertAlert("All used cell fields must be greater than or equal to zero.");
 
-        setFormElement(Locator.name("viableCells", 0), "20000001");
-        fireEvent(Locator.name("viableCells", 0), BaseSeleniumWebTest.SeleniumEvent.change);
-        Assert.assertEquals("504211", getFormElement(Locator.name("usedCells", 0)));
+        setFormElement(Locator.name("viableCells"), "20000001");
+        fireEvent(Locator.name("viableCells"), BaseSeleniumWebTest.SeleniumEvent.change);
+        Assert.assertEquals("504211", getFormElement(Locator.name("usedCells")));
         Assert.assertEquals("3", table.getDataAsText(0, "Vial Count"));
 
         clickButton("Save");
@@ -273,10 +273,9 @@ public class CreateVialsTest extends AbstractViabilityTest
         table.checkCheckbox(3);
         clickButton("Move Vials", 0);
         _extHelper.waitForExtDialog("Move Vials");
-        setFormElement("changeLocationField", "Site C");
-        sleep(100);                                                     // TODO: without the sleep sometimes fails; improve use of setFormElement
+        setFormElement(Locator.id("changeLocationField"), "Site C");
+        pressTab(Locator.id("changeLocationField"));
         _extHelper.clickExtButton("Move Vials", WAIT_FOR_JAVASCRIPT);
-//        clickButton("Move Vials", WAIT_FOR_JAVASCRIPT);
 
         Assert.assertEquals("B02_1.0_1", table.getDataAsText(1, "Global Unique Id"));
         Assert.assertEquals("Site C", table.getDataAsText(1, "Site Name"));
@@ -291,7 +290,7 @@ public class CreateVialsTest extends AbstractViabilityTest
 
         log("** Copy to study");
         clickLinkWithText("view runs");
-        selenium.click(".toggle");
+        click(Locator.name(".toggle"));
         clickButton("Copy to Study");
         clickButton("Next");
         assertTitleContains("Copy to " + getFolderName() + " Study");
