@@ -338,14 +338,13 @@ public class ListTest extends BaseWebDriverTest
         log("Check hidden field is hidden only where specified.");
         dataregionToEditDesign();
 
-        setColumnName(5,_listCol5.getName()); // Select Hidden field.
-        checkCheckbox(Locator.xpath("//span[@id='propertyShownInGrid']/input"));
         click(Locator.id("partdown_2"));
-        sleep(200); // GWT form timing
+        click(Locator.id("name5")); // Select Hidden field.
+        checkCheckbox(Locator.xpath("//span[@id='propertyShownInGrid']/input"));
+        waitForElement(Locator.xpath("//img[@id = 'partstatus_5'][contains(@src, 'partchanged')]"));
         clickDone();
 
         log("Check that hidden column is hidden.");
-//        clickLinkWithText("view data");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from grid view.
         clickLinkWithText("details");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
@@ -362,13 +361,12 @@ public class ListTest extends BaseWebDriverTest
 
         dataregionToEditDesign();
 
-        setColumnName(5,_listCol5.getName()); // Select Hidden field.
+        click(Locator.id("name5")); // Select Hidden field.
         uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInGrid']/input"));
         checkCheckbox(Locator.xpath("//span[@id='propertyShownInInsert']/input"));
-        sleep(200); // GWT form timing
+        waitForElement(Locator.xpath("//img[@id = 'partstatus_5'][contains(@src, 'partchanged')]"));
         clickDone();
 
-//        clickLinkWithText("view data");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         clickLinkWithText("details");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
@@ -382,13 +380,12 @@ public class ListTest extends BaseWebDriverTest
 
         dataregionToEditDesign();
 
-        setColumnName(5,_listCol5.getName()); // Select Hidden field.
+        click(Locator.id("name5")); // Select Hidden field.
         uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInInsert']/input"));
         checkCheckbox(Locator.xpath("//span[@id='propertyShownInUpdate']/input"));
-        sleep(200); // GWT form timing
+        waitForElement(Locator.xpath("//img[@id = 'partstatus_5'][contains(@src, 'partchanged')]"));
         clickDone();
 
-//        clickLinkWithText("view data");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         clickLinkWithText("details");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
@@ -402,13 +399,12 @@ public class ListTest extends BaseWebDriverTest
 
         dataregionToEditDesign();
 
-        setColumnName(5,_listCol5.getName()); // Select Hidden field.
+        click(Locator.id("name5")); // Select Hidden field.
         uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInUpdate']/input"));
         checkCheckbox(Locator.xpath("//span[@id='propertyShownInDetail']/input"));
-        click(Locator.name("ff_name0"));
+        waitForElement(Locator.xpath("//img[@id = 'partstatus_5'][contains(@src, 'partchanged')]"));
         clickDone();
 
-//        clickLinkWithText("view data");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
         clickLinkWithText("details");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from details view.
@@ -727,8 +723,8 @@ public class ListTest extends BaseWebDriverTest
         log("Infer from excel file, then import data");
         File excelFile = new File(EXCEL_DATA_FILE);
         _listHelper.createListFromFile(PROJECT_VERIFY, "Fruits from Excel", excelFile);
+        waitForElement(Locator.linkWithText("pomegranate"));
         assertNoLabkeyErrors();
-        assertTextPresent("pomegranate");
 
         File tsvFile = new File(TSV_DATA_FILE);
         //Cancel test disabled because teamcity is too slow to run it successfully
@@ -750,8 +746,8 @@ public class ListTest extends BaseWebDriverTest
 
         log("Infer from a tsv file, then import data");
         _listHelper.createListFromFile(PROJECT_VERIFY, TSV_LIST_NAME, tsvFile);
+        waitForElement(Locator.linkWithText("pomegranate"));
         assertNoLabkeyErrors();
-        assertTextPresent("pomegranate");
         log("Verify correct types are inferred from file");
         clickButton("View Design");
         waitForElement(Locator.xpath("//tr[./td/div[text()='BoolCol'] and ./td/div[text()='Boolean']]"), WAIT_FOR_JAVASCRIPT);
