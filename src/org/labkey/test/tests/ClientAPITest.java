@@ -32,6 +32,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 
 import java.util.ArrayList;
@@ -202,6 +203,7 @@ public class ClientAPITest extends BaseWebDriverTest
         clearTestPage("Test Complete.");
     }
 
+    @LogMethod
     private void clearTestPage(String message)
     {
         if (!isTextPresent(WIKIPAGE_NAME))
@@ -211,6 +213,7 @@ public class ClientAPITest extends BaseWebDriverTest
         saveWikiPage();
     }
 
+    @LogMethod
     private void createLists()
     {
         _listHelper.createList(FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
@@ -281,6 +284,7 @@ public class ClientAPITest extends BaseWebDriverTest
         return null;
     }
 
+    @LogMethod
     private void createWiki()
     {
         addWebPart("Wiki");
@@ -291,6 +295,7 @@ public class ClientAPITest extends BaseWebDriverTest
         saveWikiPage();
     }
 
+    @LogMethod
     private void webpartTest()
     {
         setSourceFromFile("webPartTest.js");
@@ -301,6 +306,7 @@ public class ClientAPITest extends BaseWebDriverTest
             assertTextPresent(column.getLabel());
     }
 
+    @LogMethod
     private void chartTest()
     {
         String chartHtml = setSourceFromFile("chartTest.js");
@@ -308,6 +314,7 @@ public class ClientAPITest extends BaseWebDriverTest
             Assert.fail("Test div does not contain an image:\n" + chartHtml);
     }
 
+    @LogMethod
     private void chartAPITest() throws Exception
     {
         setSourceFromFile("chartingAPITest.js");
@@ -358,6 +365,7 @@ public class ClientAPITest extends BaseWebDriverTest
         }
     }
 
+    @LogMethod
     private void gridTest()
     {
         setSourceFromFile("gridTest.js");
@@ -499,6 +507,7 @@ public class ClientAPITest extends BaseWebDriverTest
             Assert.fail("Insert or update via the Ext grid did not complete!");
     }
 
+    @LogMethod
     private void assayTest()
     {
         addWebPart("Assay List");
@@ -535,6 +544,7 @@ public class ClientAPITest extends BaseWebDriverTest
         assertTextPresent("VisitID - Double");
     }
 
+    @LogMethod
     private void domainTest()
     {
         addWebPart("Study Overview");
@@ -588,6 +598,7 @@ public class ClientAPITest extends BaseWebDriverTest
         return setSource(srcFragment, false);
     }
 
+    @LogMethod
     private String setSource(String srcFragment, boolean excludeTags)
     {
         if (!isTextPresent(WIKIPAGE_NAME))
@@ -604,6 +615,7 @@ public class ClientAPITest extends BaseWebDriverTest
         return waitForDivPopulation();
     }
 
+    @LogMethod
     private void queryTest()
     {
         setSourceFromFile("queryTest.js");
@@ -630,7 +642,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final String EMAIL_BODY_PLAIN = "This is a test message.";
     private static final String EMAIL_BODY_HTML = "<h2>This is a test message.<\\\\/h2>";
     private static final String[] EMAIL_RECIPIENTS = {"user1@clientapi.test", "user2@clientapi.test", "user3@clientapi.test"};
-
+    @LogMethod
     private void emailApiTest()
     {
         // create the users for this test
@@ -717,6 +729,7 @@ public class ClientAPITest extends BaseWebDriverTest
                 contentStr.toString(), String.valueOf(allowUnregisteredUser));
     }
 
+    @LogMethod
     private void extIntegrationTest()
     {
         setSourceFromFile("extIntegrationTest.html", true);
@@ -725,6 +738,7 @@ public class ClientAPITest extends BaseWebDriverTest
         clearTestPage("Ext integration Test complete.");
     }
 
+    @LogMethod
     private void webdavAPITest()
     {
         setSourceFromFile("webdavTest.html", true);
