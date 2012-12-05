@@ -192,6 +192,10 @@
         <path refid="test.lib.classpath" />
         <pathelement path="${clover.jar}"/>
         <pathelement path="${test.lib.home}/aspectjrt.jar"/>
+        <!-- Put two paths for tools.jar on the classpath, in case java.home is pointed at the JRE in the ./jre
+             subdirectory of the JDK -->
+        <pathelement path="${java.home}/lib/tools.jar"/>
+        <pathelement path="${java.home}/../lib/tools.jar"/>
     </path>
 
     <path id="test.run.classpath">

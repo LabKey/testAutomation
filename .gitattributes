@@ -119,6 +119,8 @@ src/org/labkey/test/TestConfig.java -text
 src/org/labkey/test/TestSet.java -text
 src/org/labkey/test/WebTest.java -text
 src/org/labkey/test/WebTestHelper.java -text
+src/org/labkey/test/debug/DummyProcess.java -text
+src/org/labkey/test/debug/ThreadDumpAndKill.java -text
 src/org/labkey/test/module/AbstractEHRTest.java -text
 src/org/labkey/test/module/CDSPopulation.java -text
 src/org/labkey/test/module/CDSTest.java -text
