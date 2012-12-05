@@ -2007,7 +2007,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             String viewName = getText(Locator.xpath(thisViewXpath + "//td[contains(@class, 'x-grid3-cell-first')]"));
             click(Locator.xpath(thisViewXpath));
             waitAndClick(Locator.linkWithText("VIEW"));
-            waitForElement(Locator.id("labkey-nav-trail-current-page").withText(viewName));
+            assertTextPresent(viewName);
             popLocation();
             _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         }
