@@ -20,6 +20,7 @@ import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.TimeChartHelper;
 
 /**
  * User: kevink
@@ -76,19 +77,13 @@ public class FlowCBCTest extends BaseFlowTest
         waitForText("Save successful.", 20000);
     }
 
+    public boolean isFileUploadTest(){return true;}
+
     void initializeStudyFolder()
     {
         log("** Initialize Study Folder");
-        createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[] { "Study", "Letvin", "Flow" });
-        clickButton("Create Study");
-        // use date-based study
-        click(Locator.xpath("(//input[@name='timepointType'])[1]"));
-        setFormElement(Locator.xpath("//input[@name='startDate']"), "2012-03-01");
-        clickButton("Create Study");
-
-        clickLinkWithText("Manage Timepoints");
-        setFormElement(Locator.xpath("//input[@name='defaultTimepointDuration']"), "7");
-        clickButton("Update");
+        createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[]{"Study", "Letvin", "Flow"});
+        importFolderFromZip(getLabKeyRoot() + PIPELINE_PATH + "\\FlowStudy.folder.zip");       //Issue 16697: dataset ignored when importing study archive
     }
 
     @Override
@@ -99,6 +94,18 @@ public class FlowCBCTest extends BaseFlowTest
         copyCBCResultsToStudy();
 
         verifyQuery();
+        
+//        verifyTimeChartFromFlowData();     //TODO: Issue 16709: JS error when creating Time Chart from flow data
+    }
+
+    private void verifyTimeChartFromFlowData()
+    {
+        beginAt("/visualization/Flow Verify Project/KoStudy/timeChartWizard.view?edit=true&queryName=mem naive CBCFlow&schemaName=study&dataRegionName=query&filterUrl=%2Flabkey%2Fquery%2FFlow%2520Verify%2520Project%2FKoStudy%2FexecuteQuery.view%3Fquery.queryName%3Dmem%2520naive%2520CBCFlow%26query.sort%3DParticipantId%26schemaName%3Dstudy");
+        TimeChartHelper tch = new TimeChartHelper(this);
+        tch.addAMeasure("CD3+ Lymph");
+        Assert.assertFalse("OK button appeared, indicating a problem with the graph", isElementPresent(Locator.button("OK")));
+        assertTextNotPresent("There are no demographic date options available in this study");
+        tch.save("Flow Report");
     }
 
     private void copyFlowResultsToStudy()

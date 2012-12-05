@@ -359,6 +359,7 @@ src/org/labkey/test/util/StudyHelper.java -text
 src/org/labkey/test/util/StudyHelperWD.java -text
 src/org/labkey/test/util/TestAspect.aj -text
 src/org/labkey/test/util/TestLogger.java -text
+src/org/labkey/test/util/TimeChartHelper.java -text
 src/org/labkey/test/util/UIAssayHelper.java -text
 src/org/labkey/test/util/UIContainerHelper.java -text
 src/org/labkey/test/util/UIUserHelper.java -text
