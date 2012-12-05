@@ -160,7 +160,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         selenium = new DefaultSeleniumWrapper();
         selenium.start();
-//        driver = selenium.getWrappedDriver();
         selenium.setTimeout(Integer.toString(defaultWaitForPage));
         //Now inject our standard javascript functions...
         InputStream inputStream = BaseSeleniumWebTest.class.getResourceAsStream("seleniumHelpers.js");
@@ -6379,12 +6378,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     public class DefaultSeleniumWrapper extends DefaultSelenium
-//    public class DefaultSeleniumWrapper extends WebDriverBackedSelenium
     {
         DefaultSeleniumWrapper()
         {
-            super("localhost", getSeleniumServerPort(), getBrowser(), WebTestHelper.getBaseURL() + "/");
-//            super(getBrowser().startsWith("*ie")?new InternetExplorerDriver():new FirefoxDriver(), WebTestHelper.getBaseURL() + "/");
+            super("localhost", getSeleniumServerPort(), getBrowser(), WebTestHelper.getBaseURL());
         }
 
         private void log(String s)

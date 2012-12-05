@@ -309,9 +309,22 @@ public class WebTestHelper
     public static int getHttpGetResponse(String url, String username, String password) throws HttpException, IOException
     {
         HttpClient client = getHttpClient(username, password);
-        HttpGet method = new HttpGet(url);
-        int status = client.execute(method).getStatusLine().getStatusCode();
-        client.getConnectionManager().shutdown();
+        HttpResponse response = null;
+        int status;
+
+        try
+        {
+            HttpGet method = new HttpGet(url);
+
+            response = client.execute(method);
+            status = response.getStatusLine().getStatusCode();
+        }
+        finally
+        {
+            if (response != null)
+                EntityUtils.consume(response.getEntity());
+            client.getConnectionManager().shutdown();
+        }
         return status;
     }
 
