@@ -80,6 +80,14 @@ public abstract class Locator
         return xpath;
     }
 
+    protected String getLoggableDescription()
+    {
+        return toString() +
+            (_index == 0 ? "" : "\nIndex: " + _index) +
+            (_contains == null ? "" : "\nContaining: " + _contains) +
+            (_text == null ? "" : "\nWith Text: " + _text);
+    }
+
     protected abstract By toBy();
 
     @Deprecated
@@ -92,10 +100,7 @@ public abstract class Locator
     {
         List<WebElement> elements = findElements(driver);
         if (elements.size() <= _index)
-            throw new NoSuchElementException("Unable to find element: " + toString() +
-                (_index == 0 ? "" : "\nIndex: " + _index) +
-                (_contains == null ? "" : "\nContaining: " + _contains) +
-                (_text == null ? "" : "\nWith Text: " + _text));
+            throw new NoSuchElementException("Unable to find element: " + getLoggableDescription());
         return elements.get(_index);
     }
 
@@ -713,6 +718,11 @@ public abstract class Locator
                     (_index != 0 ? "[" + (_index + 1) + "]" : "") +
                     (_text != null && !_text.equals("") ? "[normalize-space()='" + _text + "']" : "") +
                     (_contains != null && !_contains.equals("") ? "[contains(normalize-space(), '" + _contains + "')]" : "");
+        }
+
+        protected String getLoggableDescription()
+        {
+            return toXpath();
         }
     }
 
