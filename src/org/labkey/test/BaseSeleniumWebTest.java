@@ -6320,7 +6320,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public void pressTab(Locator l)
     {
-        pressTab(l.toXpath());
+        pressTab(l.toString());
     }
 
     /**
@@ -6328,8 +6328,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * @param l
      */
     public void pressEnter(Locator l)
-        {
-            pressEnter(l.toXpath());
+    {
+        pressEnter(l.toString());
     }
 
     /**
@@ -6337,8 +6337,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * @param l
      */
     public void pressDownArrow(Locator l)
-        {
-            pressDownArrow(l.toXpath());
+    {
+        pressDownArrow(l.toString());
     }
 
     /**

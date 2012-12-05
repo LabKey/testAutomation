@@ -271,9 +271,9 @@ public class GenotypingTest extends BaseSeleniumWebTest
         String[] alleles = {"Mamu-A1*004:01:01", "Mamu-A1*004:01:02"};
         for(String allele: alleles)
         {
-            Locator l =  Locator.tagWithText("div", allele);
+            Locator.XPathLocator l =  Locator.tagWithText("div", allele);
             isElementPresent(l);
-            Assert.assertEquals(1, getXpathCount(Locator.xpath(l.toXpath())));
+            Assert.assertEquals(1, getXpathCount(l));
         }
 
         //click some checkboxes

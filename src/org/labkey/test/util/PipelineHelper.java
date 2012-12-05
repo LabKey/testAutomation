@@ -81,7 +81,7 @@ public class PipelineHelper
     //won't work for adding and then removing something
     public void removeButton(String name)
     {
-        _test.click(Locator.xpath("(" + Locator.buttonContainingText(name).toXpath() + ")[3]"));
+        _test.click(Locator.buttonContainingText(name).index(3));
         _test.click(Locator.tagContainingText("span", "remove"));
     }
 

@@ -220,7 +220,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
      * @param fieldKeyParts
      * @return A Locator for the &lt;div&gt; item in the "Available Fields" column tree.
      */
-    private Locator expandPivots(String[] fieldKeyParts)
+    private Locator.XPathLocator expandPivots(String[] fieldKeyParts)
     {
         String nodePath = "";
         String fieldKey = StringUtils.join(fieldKeyParts, "/");
@@ -246,8 +246,8 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         changeTab(type);
 
         // Expand all nodes necessary to reveal the desired node.
-        Locator columnItem = expandPivots(fieldKeyParts);
-        Locator checkbox = Locator.xpath(columnItem.toXpath() + "/input[@type='checkbox']");
+        Locator.XPathLocator columnItem = expandPivots(fieldKeyParts);
+        Locator checkbox = columnItem.append("/input[@type='checkbox']");
 
         _test.checkCheckbox(checkbox);
     }
@@ -349,7 +349,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
             builder.moveToElement(el).click().build().perform();
         }
 
-        _test.waitForElementToDisappear(Locator.xpath(itemXPath+closeXPath), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElementToDisappear(Locator.xpath(itemXPath + closeXPath), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     //enable customize view grid to show hidden fields
@@ -692,12 +692,12 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
     private boolean isColumnHidden(String fieldKey, boolean hidden)
     {
-        Locator columnItem = expandPivots(fieldKey.split("/"));
+        Locator.XPathLocator columnItem = expandPivots(fieldKey.split("/"));
         if (!_test.isElementPresent(columnItem))
             return false;
 
         // back up the DOM one element to find the <li> node
-        Locator li = Locator.xpath(columnItem.toXpath() + "/..");
+        Locator.XPathLocator li = columnItem.append("/..");
         String liStyle = _test.getAttribute(li, "style");
         _test.log("Column '" + li.toString() + "' style attribute: " + liStyle);
 

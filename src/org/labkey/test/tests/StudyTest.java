@@ -158,8 +158,8 @@ public class StudyTest extends StudyBaseTest
 
         log("filter participant results down");
         Locator filterSearchText = Locator.xpath("//input[@name='filterSearch']");
-        selenium.type(filterSearchText.toXpath(), "a");
-        selenium.type(filterSearchText.toXpath(), "abbrev");
+        setFormElement(filterSearchText, "a");
+        setFormElement(filterSearchText, "abbrev");
         setFormElement(Locator.xpath("//input[@type='text']"), "abbrevi");
         fireEvent(filterSearchText, SeleniumEvent.change);
         sleep(1000);

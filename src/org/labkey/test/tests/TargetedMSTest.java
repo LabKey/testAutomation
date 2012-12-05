@@ -113,7 +113,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
 
         //Click down arrow next to protein name. Click "Search for other references to this protein"
 
-        String xpath = Locator.xpath("//span[a[text()='YAL038W']]/span/img").toXpath();
+        String xpath = Locator.xpath("//span[a[text()='YAL038W']]/span/img").toString();
         selenium.mouseOver(xpath);
         selenium.mouseMoveAt(xpath, "1,1");
         waitForText("Search for other references to this protein");

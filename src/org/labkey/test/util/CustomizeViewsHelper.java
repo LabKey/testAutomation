@@ -187,7 +187,7 @@ public class CustomizeViewsHelper extends AbstractHelper
      * @param fieldKeyParts
      * @return A Locator for the &lt;div&gt; item in the "Available Fields" column tree.
      */
-    private Locator expandPivots(String[] fieldKeyParts)
+    private Locator.XPathLocator expandPivots(String[] fieldKeyParts)
     {
         String nodePath = "";
         String fieldKey = StringUtils.join(fieldKeyParts, "/");
@@ -655,12 +655,12 @@ public class CustomizeViewsHelper extends AbstractHelper
 
     private boolean isColumnHidden(String fieldKey, boolean hidden)
     {
-        Locator columnItem = expandPivots(fieldKey.split("/"));
+        Locator.XPathLocator columnItem = expandPivots(fieldKey.split("/"));
         if (!_test.isElementPresent(columnItem))
             return false;
 
         // back up the DOM one element to find the <li> node
-        Locator li = Locator.xpath(columnItem.toXpath() + "/..");
+        Locator li = columnItem.append("/..");
         String liStyle = _test.getAttribute(li, "style");
         _test.log("Column '" + li.toString() + "' style attribute: " + liStyle);
 
