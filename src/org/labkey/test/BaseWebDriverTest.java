@@ -6089,6 +6089,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String title = Locator.id("wiki-input-title").findElement(_driver).getText();
         if (title.equals("")) title = Locator.id("wiki-input-name").findElement(_driver).getText();
         clickButton("Save & Close", 0);
+        waitForElement(Locator.linkWithText(title));
     }
 
     public String getUrlParam(String url, String paramName, boolean decode)
