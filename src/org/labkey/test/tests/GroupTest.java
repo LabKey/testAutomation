@@ -156,7 +156,7 @@ public class GroupTest extends BaseWebDriverTest
 
 
         //exapnd plus  to check specific groups
-        clickAt(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex+1), "1,1");
+        click(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex+1));
 //        Assert.assertTrue(StringHelper.stringArraysAreEquivalentTrimmed(("Reader, Author RoleGroup(s) ReaderSite: " + GROUP2 + "AuthorSite: " + GROUP2 + ", Site: Users").split(" "),
 //                drt.getDataAsText(rowIndex, accessColumn).split(" "))); //TODO: Fix
 
@@ -280,7 +280,7 @@ public class GroupTest extends BaseWebDriverTest
     //verify attempting add a user and a group containing that user to another group results in a warning
     private void verifyRedundantUserWarnings()
     {
-        setFormElement("names", TEST_USERS_FOR_GROUP[0]); //this user is in group1 and so is already in group 2
+        setFormElement(Locator.name("names"), TEST_USERS_FOR_GROUP[0]); //this user is in group1 and so is already in group 2
         clickButton("Update Group Membership");
         assertTextPresent("* These group members already appear in other included member groups and can be safely removed.");
         Assert.assertTrue("Missing or badly formatted group redundancy warning", getBodyText().contains(TEST_USERS_FOR_GROUP[0] + " *"));
@@ -311,7 +311,6 @@ public class GroupTest extends BaseWebDriverTest
     protected void createProjectCopyPerms()
     {
         String projectName = getProject2Name();
-        String folderType = null;
 
         ensureAdminMode();
         log("Creating project with name " + projectName);
@@ -327,7 +326,7 @@ public class GroupTest extends BaseWebDriverTest
 
         //second page of the wizard
         waitAndClick(Locator.xpath("//td[./label[text()='Copy From Existing Project']]/input"));
-        _extHelper.clickExtDropDownMenu(Locator.xpath("//td[@id='targetProject-inputCell']/input"), getProjectName());
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject-triggerWrap']"), getProjectName());
         waitAndClickButton("Next");
 
         //third page of wizard
@@ -335,7 +334,7 @@ public class GroupTest extends BaseWebDriverTest
 
         assertUserCanSeeProject(TEST_USERS_FOR_GROUP[1], getProject2Name());
 
-//        _createdProjects.add(projectName);
+        _containerHelper.addCreatedProject(projectName);
     }
 
 

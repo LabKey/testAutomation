@@ -18,6 +18,8 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -52,12 +54,14 @@ public class Ext4HelperWD extends AbstractHelperWD
         else
         {
             // wait for the dropdown to open
-            Locator listItem =     Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains( text(), '" + selection + "')]");
+            Locator listItem = Locator.css("li.x4-boundlist-item");
             _test.waitForElement(listItem);
 
             // select the list item
-            _test.click(listItem);
-            //_test.mouseDown(Locator.xpath("/html/body"));
+            _test.click(listItem.withText(selection));
+
+            // menu should disappear
+            _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("li.x4-boundlist-item")));
         }
     }
 
