@@ -272,7 +272,7 @@
         </java>
     </target>
 
-    <target name="setCruiseControlPassword" depends="compile">
+    <target name="setTeamcityAgentPassword" depends="compile">
         <java classname="org.labkey.test.util.PasswordUtil">
             <classpath refid="test.run.classpath"/>
             <arg id="action" value="set"/>
@@ -473,7 +473,7 @@
         <delete failonerror="false" dir="${tomcat.home}/temp" />
         <mkdir dir="${tomcat.home}/logs" />
         <mkdir dir="${tomcat.home}/temp" />
-        <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_cc" />
+        <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_teamcity" />
         <antcall target="waitfor-labkey-started"/>
 
         <antcall target="startSeleniumServer" />
@@ -567,7 +567,31 @@
           </or>
       </waitfor>
     </target>
-    
+
+    <target name="ensure-tomcat-shutdown" if="tomcat.debug" depends="prepare">
+        <path id="shutdown.build.classpath">
+            <!-- Put two paths for tools.jar on the classpath, in case java.home is pointed at the JRE in the ./jre
+                 subdirectory of the JDK -->
+            <pathelement path="${java.home}/lib/tools.jar"/>
+            <pathelement path="${java.home}/../lib/tools.jar"/>
+        </path>
+        <path id="shutdown.run.classpath">
+            <path refid="shutdown.build.classpath" />
+            <pathelement path="${test.build.home}/classes"/>
+        </path>
+        <javac srcdir="${test.src.home}/org/labkey/test/debug"
+            destdir="${test.build.home}/classes"
+            deprecation="${test.compile.deprecation}"
+            optimize="${test.compile.optimize}"
+            source="1.6"
+            classpathref="shutdown.build.classpath"
+            includeantruntime="false" />
+        <java classname="org.labkey.test.debug.ThreadDumpAndKill" failonerror="false">
+            <classpath refid="shutdown.run.classpath"/>
+            <arg value="${tomcat.debug}"/>
+        </java>
+    </target>
+
     <target name="fail_message" if="suite.failed">
         <echo message="${sysprop.suiteToUse} FAILED"/>
     </target>
@@ -1119,7 +1143,7 @@
         <echo message="Deleting log files from ${tomcat.home}/logs"/>
         <delete failonerror="false" dir="${tomcat.home}/logs" />
         <mkdir dir="${tomcat.home}/logs" />
-        <ant inheritall="true" antfile="${project.root}/server/build.xml" target="start_tomcat_cc" />
+        <ant inheritall="true" antfile="${project.root}/server/build.xml" target="start_tomcat_teamcity" />
         <antcall target="waitfor-labkey-started"/>
 
         <junit fork="true" forkmode="once" maxmemory="512m"
@@ -1585,7 +1609,7 @@
     </target>
 
     <target name="skipfish_teamcity" description="Fire up tomcat and run skipfish" depends="skipfish_init">
-        <ant target="start_tomcat_cc" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>
+        <ant target="start_tomcat_teamcity" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>
         <antcall target="waitfor-labkey-started"/>
         <antcall target="skipfish_scan"/>
         <ant target="stop_tomcat" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>

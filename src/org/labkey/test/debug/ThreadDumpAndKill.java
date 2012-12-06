@@ -38,7 +38,7 @@ public class ThreadDumpAndKill
                 if (connector instanceof SocketAttachingConnector)
                 {
                     connect((SocketAttachingConnector)connector, port);
-                    return;
+                    System.exit(0);
                 }
             }
             System.err.println("No SocketAttachingConnector found!");
@@ -62,6 +62,7 @@ public class ThreadDumpAndKill
         Map<String, Connector.Argument> arguments = connector.defaultArguments();
         arguments.get("hostname").setValue("localhost");
         arguments.get("port").setValue(Integer.toString(port));
+        System.out.println("Attempting to shutdown Tomcat on debug port: " + port);
         try
         {
             VirtualMachine vm = connector.attach(arguments);
