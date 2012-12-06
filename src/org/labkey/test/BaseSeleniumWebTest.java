@@ -158,6 +158,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @Before
     public void setUp() throws Exception
     {
+        // Make sure LabKey server is responding.
+        // The Selenium constructor will hang if it is not.
+        // java.net.SocketTimeoutException is the likely failure.
+        WebTestHelper.getHttpGetResponse(WebTestHelper.getBaseURL());
+
         selenium = new DefaultSeleniumWrapper();
         selenium.start();
         selenium.setTimeout(Integer.toString(defaultWaitForPage));

@@ -17,6 +17,7 @@
 package org.labkey.test;
 
 import org.apache.http.HttpHost;
+import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
@@ -29,9 +30,6 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -233,10 +231,13 @@ public class WebTestHelper
     public static DefaultHttpClient getHttpClient(String username, String password)
     {
         try
-        {    // set the connection timeout value to 30 seconds (30000 milliseconds)
-            final HttpParams httpParams = new BasicHttpParams();
-            HttpConnectionParams.setConnectionTimeout(httpParams, 30000);
-            DefaultHttpClient client = new DefaultHttpClient(httpParams);
+        {
+            DefaultHttpClient client = new DefaultHttpClient();
+
+            client.getParams().setParameter("http.protocol.version", HttpVersion.HTTP_1_1);
+            client.getParams().setParameter("http.socket.timeout", 60000);
+            client.getParams().setParameter("http.protocol.content-charset", "UTF-8");
+
             URI target = new URI(getBaseURL());
             HttpHost targetHost = new HttpHost(target.getHost(), target.getPort(), target.getScheme());
 

@@ -70,10 +70,10 @@ public class PivotQueryTest extends BaseWebDriverTest
         setSort("query", "ParticipantId", SortDirection.ASC);
 
         log("** Verifing pivot table headers");
-        Locator AnalyteName_header = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[3]/td[2]");
+        Locator AnalyteName_header = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[2]/td[2]");
         assertElementContains(AnalyteName_header, "Analyte Name");
 
-        Locator IL_10_header = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[4]/td[1]");
+        Locator IL_10_header = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[3]/td[1]");
         assertElementContains(IL_10_header, "IL-10 (23)");
 
         Locator ConcInRange_MIN_header = Locator.xpath("//*[@id=\"query:IL-10 (23)::ConcInRange_MIN:header\"]");
@@ -81,19 +81,19 @@ public class PivotQueryTest extends BaseWebDriverTest
 
         log("** Verifing pivot table contents");
         // First "Participant" data cell
-        Locator Participant_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[7]/td[1]");
+        Locator Participant_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[1]");
         assertElementContains(Participant_cell, "249318596");
 
         // First "ParticipantCount" data cell
-        Locator ParticipantCount_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[7]/td[2]");
+        Locator ParticipantCount_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[2]");
         assertElementContains(ParticipantCount_cell, "5");
 
         // First "ConcInRange_MIN" data cell
-        Locator ConcInRange_MIN_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[7]/td[3]");
+        Locator ConcInRange_MIN_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[3]");
         assertElementContains(ConcInRange_MIN_cell, "7.99");
 
         // First "ConcInRange_CONCAT" data cell
-        Locator ConcInRange_CONCAT_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[7]/td[6]");
+        Locator ConcInRange_CONCAT_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[6]");
         String contents = selenium.getText(ConcInRange_CONCAT_cell.toString());
         Assert.assertNotNull("The GROUP_CONCAT cell is empty", contents);
         String[] concats = contents.split(", *");

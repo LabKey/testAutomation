@@ -78,7 +78,16 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
     {
         // Create users and groups
         createUser(ADMIN_USER, null);
-        addUserToGroup("Site Administrators", ADMIN_USER);
+
+        pushLocation();
+        goToSiteAdmins();
+        setFormElement(Locator.xpath("//textarea[@name='names']"), ADMIN_USER);
+        uncheckCheckbox("sendEmail");
+        clickButton("Update Group Membership");
+        assertTextPresent(ADMIN_USER);
+        clickButton("Update Group Membership");
+        popLocation();
+
         impersonate(ADMIN_USER); // Use created user to ensure we have a known 'Modified by' column for created users
         createGlobalPermissionsGroup(TEST_GROUP, IMPERSONATED_USER, CHECKED_USER);
         _containerHelper.createProject(getProjectName(), null);

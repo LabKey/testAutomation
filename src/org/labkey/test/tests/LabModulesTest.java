@@ -332,6 +332,9 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
     private void labToolsWebpartTest()
     {
+        log("testing lab tools webpart");
+        _helper.goToLabHome();
+
         waitAndClick(_helper.toolIcon("Import Data"));
         assertElementPresent(Ext4Helper.ext4MenuItem("Sequence"));
         for(Pair<String, String> pair : getAssaysToCreate())
@@ -353,7 +356,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assertElementNotPresent(settings);
         stopImpersonatingRole();
         goToProjectHome();
-
     }
 
     private void workbookCreationTest()

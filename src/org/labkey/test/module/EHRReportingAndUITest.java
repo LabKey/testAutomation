@@ -241,7 +241,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         clickButton("Submit", 0);
         waitForElement(Locator.ext4Button(PROJECT_MEMBER_ID + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
-        waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT * 2);
 
         log("Verify Protocol search");
         waitAndClick(Locator.ext4Radio("Multiple Animals"));

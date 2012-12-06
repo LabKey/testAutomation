@@ -36,7 +36,9 @@ import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
+import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import java.io.BufferedReader;
@@ -58,8 +60,10 @@ import java.util.zip.GZIPInputStream;
 public class SequenceTest extends BaseWebDriverTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
-    private String sequencepipelineLoc =  getLabKeyRoot() + "/sampledata/sequence";
-    private String illuminaPipelineLoc =  getLabKeyRoot() + "/sampledata/genotyping";
+    protected final String _sequencePipelineLoc =  getLabKeyRoot() + "/sampledata/sequence";
+    protected final String _illuminaPipelineLoc =  getLabKeyRoot() + "/sampledata/genotyping";
+    protected final String _readsetPipelineName = "Import sequence data";
+
     private final String TEMPLATE_NAME = "SequenceTest Saved Template";
     private Integer _readsetCt = 14;
     private final String ILLUMINA_CSV = "SequenceImport.csv";
@@ -80,24 +84,15 @@ public class SequenceTest extends BaseWebDriverTest
         importIlluminaTest();
         readsetFeaturesTest();
         analysisPanelTest();
-
-        //TODO: verify pipelines:
-        //setPipelineRoot(sequencePipelineLoc);
-        //importBasicReadsetTest();
-        //importBarcodedReadsetTest();
-        //importMergedReadsetTest();
-
-        //TODO: once we get analyses imported
-        // analysis details page
-        // SNP viewers / other reports
-        // search page
-        // reference sequence management
+        //readsetPanelTest();
     }
 
     protected void setUpTest() throws Exception
     {
         _containerHelper.createProject(getProjectName(), "Sequence Analysis");
         deleteTemplateRow();
+        goToProjectHome();
+        setPipelineRoot(_sequencePipelineLoc);
         goToProjectHome();
     }
 
@@ -106,14 +101,14 @@ public class SequenceTest extends BaseWebDriverTest
      * This method is designed to import an initial set of readset records, which will be used for
      * illumina import
      */
-    protected void importReadsetMetadata()
+    private void importReadsetMetadata()
     {
         //create readset records for illumina run
         goToProjectHome();
         waitForText("Create Readsets");
         _helper.clickNavPanelItem("Create Readsets");
         waitForPageToLoad();
-        waitForText("Run Id");
+        waitForElement(Locator.xpath("//label[contains(text(), 'Sample Id')]"));
         _ext4Helper.clickTabContainingText("Import Spreadsheet");
         waitForText("Copy/Paste Data");
 
@@ -265,7 +260,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         assertTextPresent(prop_name + "," + prop_value);
 
-        File importTemplate = new File(illuminaPipelineLoc, ILLUMINA_CSV);
+        File importTemplate = new File(_illuminaPipelineLoc, ILLUMINA_CSV);
         if (importTemplate.exists())
             importTemplate.delete();
 
@@ -300,43 +295,14 @@ public class SequenceTest extends BaseWebDriverTest
         log("Template rows deleted: " + resp.getRowsAffected());
     }
 
-    protected void importBasicReadsetTest()
-    {
-        selectPipelineJob("Import sequence data", "sample454_SIV.sff");
-
-        readsetPanelTest();
-
-        //TODO: set import options
-
-        //TODO: verify import
-    }
-
-    protected void importBarcodedReadsetTest()
-    {
-        selectPipelineJob("Import sequence data", "dualBarcodes_SIV.fastq");
-
-        //TODO: set import options
-
-        //TODO: verify import
-    }
-
-    protected void importMergedReadsetTest()
-    {
-        selectPipelineJob("Import sequence data", "sample454_SIV.sff", "dualBarcodes_SIV.fastq");
-
-        //TODO: set import options
-
-        //TODO: verify import
-    }
-
     /**
      * This test will kick off a pipeline import using the illumina pipeline.  Verification of the result
      * is performed by readsetFeaturesTest()
      */
-    protected void importIlluminaTest()
+    private void importIlluminaTest()
     {
-        setPipelineRoot(illuminaPipelineLoc);
-        selectPipelineJob("Import Illumina data", ILLUMINA_CSV);
+        setPipelineRoot(_illuminaPipelineLoc);
+        initiatePipelineJob("Import Illumina data", ILLUMINA_CSV);
 
         setFormElement(Locator.name("protocolName"), "TestIlluminaRun" + _helper.getRandomInt());
         setFormElement(Locator.name("runDate"), "08/25/2011");
@@ -878,7 +844,7 @@ public class SequenceTest extends BaseWebDriverTest
         }
     }
 
-    private void selectPipelineJob(String importAction, String... files)
+    protected void initiatePipelineJob(String importAction, String... files)
     {
         goToProjectHome();
         waitForText("Upload Files");
@@ -888,7 +854,7 @@ public class SequenceTest extends BaseWebDriverTest
         _extHelper.selectFileBrowserRoot();
         for (String f : files)
         {
-            _extHelper.selectFileBrowserItem(f);
+            _extHelper.clickFileBrowserFileCheckbox(f);
         }
 
         selectImportDataAction(importAction);
@@ -901,13 +867,135 @@ public class SequenceTest extends BaseWebDriverTest
      */
     private void readsetPanelTest()
     {
-        //TODO: perform extra tests on UI of this panel
+        log("Verifying Readset Import Panel UI");
+
+        goToProjectHome();
+        String filename1 = "sample454_SIV.sff";
+        String filename2 = "dualBarcodes_SIV.fastq";
+        initiatePipelineJob(_readsetPipelineName, filename1, filename2);
+        waitForText("Job Name");
+
+        waitForElement(Locator.linkContainingText(filename1));
+        waitForElement(Locator.linkContainingText(filename2));
+
+        Ext4FieldRefWD barcodeField = Ext4FieldRefWD.getForLabel(this, "Use Barcodes");
+        Ext4FieldRefWD treatmentField = Ext4FieldRefWD.getForLabel(this, "Treatment of Input Files");
+        Ext4FieldRefWD mergeField = Ext4FieldRefWD.getForLabel(this, "Merge Files");
+        Ext4FieldRefWD pairedField = Ext4FieldRefWD.getForLabel(this, "Data Is Paired End");
+        Ext4GridRefWD grid = getSampleGrid();
+
+        Assert.assertEquals("Incorrect starting value for input file-handling field", "delete", (String) treatmentField.getValue());
+
+        barcodeField.setChecked(true);
+        sleep(100);
+        Assert.assertEquals("Incorrect value for input file-handling field after barcode toggle", "compress", (String) treatmentField.getValue());
+        Assert.assertFalse("MID5 column should not be hidden", (Boolean)grid.getEval("columns[2].hidden"));
+        Assert.assertFalse("MID3 column should not be hidden", (Boolean)grid.getEval("columns[3].hidden"));
+
+        barcodeField.setChecked(false);
+        sleep(100);
+        Assert.assertEquals("Incorrect value for input file-handling field after barcode toggle", "delete", (String) treatmentField.getValue());
+        Assert.assertTrue("MID5 column should be hidden", (Boolean) grid.getEval("columns[2].hidden"));
+        Assert.assertTrue("MID3 column should be hidden", (Boolean) grid.getEval("columns[3].hidden"));
+
+        mergeField.setChecked(true);
+        sleep(100);
+        Assert.assertEquals("Incorrect value for input file-handling field after merge toggle", "compress", (String)treatmentField.getValue());
+        Assert.assertTrue("Paired end field should be disabled when merge is checked", pairedField.isDisabled());
+
+        Ext4FieldRefWD mergenameField = Ext4FieldRefWD.getForLabel(this, "Name For Merged File");
+//        Assert.assertTrue("Merge name field should be visible", mergenameField.isVisible());
+//        Assert.assertEquals("Merged file name not set in grid correctly", "MergedFile", grid.getCellContents(1, 1));
+//        mergenameField.setValue("MergeFile2");
+//        sleep(100);
+//        Assert.assertEquals("Merged file name not set in grid correctly", "MergeFile2", grid.getCellContents(1, 1));
+
+        mergeField.setChecked(false);
+        sleep(100);
+        Assert.assertEquals("Incorrect value for input file-handling field after merge toggle", "delete", (String) treatmentField.getValue());
+        Assert.assertFalse("Merge name field should be hidden", mergenameField.isVisible());
+        Assert.assertFalse("Paired end field should be enable when merge is unchecked", pairedField.isDisabled());
+
+        pairedField.setChecked(true);
+        Assert.assertFalse("Paired file column should not be hidden", (Boolean) grid.getEval("columns[1].hidden"));
+
+        pairedField.setChecked(false);
+        Assert.assertTrue("Paired file column should be hidden", (Boolean) grid.getEval("columns[1].hidden"));
+
+        //now set real values
+        click(Locator.ext4Button("Add"));
+        waitForElement(Ext4GridRefWD.locateExt4GridRow(2, grid.getId()));
+
+        //the first field is pre-selected
+        String selector = "div.x4-grid-editor input";
+        waitForElement(Locator.css(selector));
+        WebElement el = _driver.findElement(By.cssSelector(selector));
+        if (el.isDisplayed())
+            el.sendKeys(Keys.ESCAPE);
+
+        grid.setGridCell(1, 1, filename1);
+        grid.setGridCell(2, 1, filename1);
+        waitAndClick(Locator.ext4Button("Import Data"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
+        assertTextPresent("For each file, you must provide either the Id of an existing, unused readset or a name/platform to create a new one");
+        click(Locator.ext4Button("OK"));
+
+        grid.setGridCell(1, 6, "Readset1");
+        grid.setGridCell(1, 7, "ILLUMINA");
+        grid.setGridCell(1, 8, "InputMaterial");
+        grid.setGridCell(1, 9, "Subject1");
+
+        grid.setGridCell(2, 6, "Readset2");
+        grid.setGridCell(2, 7, "LS454");
+        grid.setGridCell(2, 8, "InputMaterial2");
+        grid.setGridCell(2, 9, "Subject2");
+
+        waitAndClick(Locator.ext4Button("Import Data"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
+        assertTextPresent("Duplicate Sample: " + filename1 + " Please remove or edit rows in the 'Readsets' section");
+        click(Locator.ext4Button("OK"));
+
+        //verify paired end
+        pairedField.setChecked(true);
+        waitAndClick(Locator.ext4Button("Import Data"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
+        assertTextPresent("Either choose a file or unchecked paired-end.");
+        click(Locator.ext4Button("OK"));
+        pairedField.setChecked(false);
+
+        //try duplicate barcodes
+        barcodeField.setChecked(true);
+        String barcode = "FLD0376";
+        grid.setGridCell(1, 3, barcode);
+        grid.setGridCell(2, 4, barcode);
+        waitAndClick(Locator.ext4Button("Import Data"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
+        assertTextPresent("Duplicate Sample: " + filename1 + ";" + barcode + "; Please remove or edit rows in the 'Readsets' section");
+        click(Locator.ext4Button("OK"));
+        barcodeField.setChecked(false);
+
+        Ext4CmpRefWD panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRefWD.class);
+        Map<String, Object> params = (Map)panel.getEval("getJsonParams()");
+
+       //TODO: verify JSON under several conditions
     }
 
     @Override
     protected void doCleanup(boolean afterTest)
     {
-        File dir = new File(illuminaPipelineLoc);
+        cleanupDirectory(_illuminaPipelineLoc);
+
+        deleteProject(getProjectName(), afterTest);
+    }
+
+    protected Ext4GridRefWD getSampleGrid()
+    {
+        return _ext4Helper.queryOne("#sampleGrid", Ext4GridRefWD.class);
+    }
+
+    protected void cleanupDirectory(String path)
+    {
+        File dir = new File(path);
         File[] files = dir.listFiles();
         for(File file: files)
         {
@@ -917,8 +1005,6 @@ public class SequenceTest extends BaseWebDriverTest
             if(file.getName().startsWith("SequenceImport"))
                 file.delete();
         }
-
-        deleteProject(getProjectName(), afterTest);
     }
 
     @Override

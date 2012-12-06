@@ -164,7 +164,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(prop)));
 
         clickLinkWithText(FOLDER_NAME);
-        beginAt(getBaseURL() + "/ehr/" + CONTAINER_PATH + "/_initEHR.view");
+        beginAt(getBaseURL()+"/ehr/"+CONTAINER_PATH+"/populateInitialData.view");
         clickButton("Delete All", 0);
         waitForElement(Locator.xpath("//div[text() = 'Delete Complete']"), 200000);
         clickButton("Populate All", 0);
