@@ -22,6 +22,7 @@ import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.WebTestHelper;
+import org.openqa.selenium.UnhandledAlertException;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -626,6 +627,28 @@ public class Crawler
                 }
 
                 throw se;
+            }
+            catch (UnhandledAlertException ex)
+            {
+                if (test.getAlert().startsWith(alertText))
+                    msg = " malicious script executed";
+
+                String html = test.getHtmlSource();
+
+                if (html.contains(maliciousScript))
+                    msg = "page contains injected script";
+
+                // see ConnectionWrapper.java
+                if (html.contains("SQL injection test failed"))
+                    msg = "SQL injection detected";
+
+                if (msg != null)
+                {
+                    String url = test.getCurrentRelativeURL();
+                    Assert.fail(msg + "\n" + url);
+                }
+
+                throw ex;
             }
         }
         catch (RuntimeException re)
