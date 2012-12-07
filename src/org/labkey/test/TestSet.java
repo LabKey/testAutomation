@@ -27,6 +27,7 @@ import org.labkey.test.ms2.MascotTest;
 import org.labkey.test.ms2.QuantitationTest;
 import org.labkey.test.ms2.SequestTest;
 import org.labkey.test.tests.*;
+import org.labkey.test.tests.perf.StudyImportPerfTest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -64,6 +65,10 @@ public enum TestSet
         XTandemTest.class,
         StudyTest.class,
         WebDavTest.class
+    ),
+
+    Perf(
+            StudyImportPerfTest.class
     ),
 
     MS2(

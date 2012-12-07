@@ -719,6 +719,13 @@
         <antcall target="sub-selenium"/>
     </target>
 
+    <target name="perf" description="run build verification tests">
+        <property name="suite" value="Perf"/>
+        <property name="debug.suspend.selenium" value="n"/>
+        <property name="linkCheck" value="true"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
     <target name="bvt" description="run build verification tests">
         <property name="suite" value="BVT"/>
         <property name="debug.suspend.selenium" value="n"/>

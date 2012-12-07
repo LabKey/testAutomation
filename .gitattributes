@@ -302,6 +302,8 @@ src/org/labkey/test/tests/WikiTest.java -text
 src/org/labkey/test/tests/WorkbookTest.java -text
 src/org/labkey/test/tests/XTandemShortTest.java -text
 src/org/labkey/test/tests/XTandemTest.java -text
+src/org/labkey/test/tests/perf/PerformanceTest.java -text
+src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
 src/org/labkey/test/tests/study/DataViewsTester.java -text
 src/org/labkey/test/tests/study/StudyScheduleTester.java -text
 src/org/labkey/test/util/APIAssayHelper.java -text
