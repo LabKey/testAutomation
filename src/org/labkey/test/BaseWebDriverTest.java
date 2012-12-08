@@ -205,6 +205,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     protected static final String PERMISSION_ERROR = "401: User does not have permission to perform this operation";
 
+    protected boolean isPerfTest = false;
+
 
     public BaseWebDriverTest()
     {
@@ -213,6 +215,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _listHelper = new ListHelperWD(this);
         _customizeViewsHelper = new CustomizeViewsHelperWD(this);
         _jsErrors = new ArrayList<JavaScriptError>();
+    }
+
+    protected void setIsPerfTest(boolean isPerfTest)
+    {
+        this.isPerfTest = isPerfTest;
     }
 
     protected boolean useNativeEvents()
@@ -1568,7 +1575,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             checkViews();
 
-            checkActionCoverage();
+
+            if(!isPerfTest)
+                checkActionCoverage();
 
             if (enableLinkCheck())
             {
