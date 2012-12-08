@@ -24,6 +24,11 @@ public abstract class PerformanceTest extends BaseWebDriverTest
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    protected PerformanceTest()
+    {
+        setIsPerfTest(true);
+    }
+
     public void writePerfDataToFile()
     {
         FileWriter writer = null;
