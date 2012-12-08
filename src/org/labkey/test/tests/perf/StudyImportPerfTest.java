@@ -25,10 +25,11 @@ public class StudyImportPerfTest extends PerformanceTest
     @Override
     protected void doTestSteps() throws Exception
     {
+        setIsPerfTest(true);
         _containerHelper.createProject(getProjectName(), "Study");
 
         long startTime = System.currentTimeMillis();
-        importFolderFromZip("C:\\labkey_base\\sampledata\\study\\LabkeyDemoStudy.zip"); //TODO
+        importFolderFromZip(getLabKeyRoot() + "/sampledata/study/LabkeyDemoStudy.zip");
         elapsedTime = System.currentTimeMillis() - startTime;
         writePerfDataToFile();
     }

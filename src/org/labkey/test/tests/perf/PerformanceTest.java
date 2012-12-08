@@ -34,7 +34,7 @@ public abstract class PerformanceTest extends BaseWebDriverTest
         FileWriter writer = null;
         try
         {
-            File xmlFile = new File(getLabKeyRoot(), "perf-info.xml");
+            File xmlFile = new File(getLabKeyRoot(), "teamcity-info.xml");
             xmlFile.createNewFile();
             writer = new FileWriter(xmlFile);
 
