@@ -562,7 +562,7 @@
       <echo message="waiting for the server to shutdown: ${server.url}"/>
       <waitfor maxwait="2" maxwaitunit="minute">
           <or>
-            <not><http url="${server.url}" /></not>
+            <not><socket server="${sysprop.labkey.server}" port="${sysprop.labkey.port}"/></not>
             <not><equals arg1="${sysprop.labkey.server}" arg2="localhost"/></not>
           </or>
       </waitfor>
