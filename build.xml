@@ -1026,14 +1026,14 @@
             <isset property="teamcity.buildType.id"/>
         </condition>
 
-        <condition property="webdriver.ie.driver" value="${test.dir}/bin/linux64/IEDriverServer.exe">
+        <condition property="webdriver.ie.driver" value="${test.dir}/bin/windows/amd64/IEDriverServer.exe">
             <and>
                 <os family="windows"/>
                 <os arch="amd64"/>
             </and>
         </condition>
 
-        <condition property="webdriver.ie.driver" value="${test.dir}/bin/linux32/IEDriverServer.exe">
+        <condition property="webdriver.ie.driver" value="${test.dir}/bin/windows/i386/IEDriverServer.exe">
             <and>
                 <os family="windows"/>
                 <os arch="i386"/>
