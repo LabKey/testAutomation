@@ -1242,7 +1242,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify that the transform script and ruminex versions are as expected
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
         DataRegionTable table = new DataRegionTable("Runs", this);
-        Assert.assertEquals("Unexpected Transform Script Version number", "4.2.20121121", table.getDataAsText(0, "Transform Script Version"));
+        Assert.assertEquals("Unexpected Transform Script Version number", "5.0.20121210", table.getDataAsText(0, "Transform Script Version"));
         Assert.assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
 
         // verify that the lot number value are as expected
@@ -2191,12 +2191,10 @@ public class LuminexTest extends AbstractQCAssayTest
             clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + i), i+","+columnIndex);
         }
         // set start and end date filter
-        setFormElement("start-date-field", "2011-03-26");
-        setFormElement("end-date-field", "2011-03-28");
-        // click a different element on the page to trigger the date change event
-        clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + "5"), "1,"+columnIndex);
-        Locator l = Locator.extButton("Apply", 1);
-        clickAt(l,  "1,1");
+        setFormElement(Locator.name("start-date-field"), "2011-03-26");
+        setFormElement(Locator.name("end-date-field"), "2011-03-28");
+        sleep(1000); // setting the form fields takes a second to enable the Apply button
+        clickAt(Locator.extButton("Apply", 1),  "1,1");
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         // check that only 3 runs are now present
