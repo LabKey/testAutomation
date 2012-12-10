@@ -299,8 +299,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         BrowserInfo browserInfo = BrowserInfo.getBrowserInfo(this);
-        log("Browser: " + browserInfo.getType() + " " + browserInfo.getVersion());
-        if (browserInfo.getType().equals("Firefox") && Float.parseFloat(browserInfo.getVersion()) >= 17f)
+        String version = browserInfo.getVersion();
+        String majorVersion = version.contains(".") ? version.substring(0, version.indexOf(".")) : version;
+        log("Browser: " + browserInfo.getType() + " " + version);
+        if (browserInfo.getType().equals("Firefox") && Integer.parseInt(majorVersion) >= 17)
             Assert.fail("Selenium does not currently support Firefox 17, please install Firefox 16 to run Selenium tests.");
 
         _driver.manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
