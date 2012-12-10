@@ -1026,7 +1026,19 @@
             <isset property="teamcity.buildType.id"/>
         </condition>
 
-        <property name="webdriver.ie.driver" value="${test.dir}/bin/IEDriverServer.exe"/>
+        <condition property="webdriver.ie.driver" value="${test.dir}/bin/linux64/IEDriverServer.exe">
+            <and>
+                <os family="windows"/>
+                <os arch="amd64"/>
+            </and>
+        </condition>
+
+        <condition property="webdriver.ie.driver" value="${test.dir}/bin/linux32/IEDriverServer.exe">
+            <and>
+                <os family="windows"/>
+                <os arch="i386"/>
+            </and>
+        </condition>
 
         <condition property="webdriver.chrome.driver" value="${test.dir}/bin/windows/ChromeDriver.exe">
             <os family="windows"/>
@@ -1036,7 +1048,7 @@
             <os family="mac"/>
         </condition>
 
-        <condition property="webdriver.chrome.driver" value="${test.dir}/bin/linux64/ChromeDriver.exe">
+        <condition property="webdriver.chrome.driver" value="${test.dir}/bin/linux/amd64/chromedriver">
             <and>
                 <os family="unix"/>
                 <os arch="amd64"/>
@@ -1046,7 +1058,7 @@
             </and>
         </condition>
 
-        <condition property="webdriver.chrome.driver" value="${test.dir}/bin/linux32/ChromeDriver.exe">
+        <condition property="webdriver.chrome.driver" value="${test.dir}/bin/linux/i386/chromedriver">
             <and>
                 <os family="unix"/>
                 <os arch="i386"/>

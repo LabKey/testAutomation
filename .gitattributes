@@ -1,9 +1,10 @@
 * text=auto !eol
-bin/IEDriverServer.exe -text
-bin/linux32/chromedriver -text
-bin/linux64/chromedriver -text
+bin/linux/amd64/chromedriver -text
+bin/linux/i386/chromedriver -text
 bin/mac/chromedriver -text
+bin/windows/amd64/IEDriverServer.exe -text
 bin/windows/chromedriver.exe -text
+bin/windows/i386/IEDriverServer.exe -text
 /bootstrap_stress_test.cmd -text
 /build.xml -text
 data/api/EmbeddedQueryWebPart.html -text
