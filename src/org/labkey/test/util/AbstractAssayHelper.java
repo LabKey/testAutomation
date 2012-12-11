@@ -20,17 +20,14 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
-import java.awt.image.LookupTable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 9/14/12
  * Time: 2:41 PM
- * To change this template use File | Settings | File Templates.
  */
 public abstract class AbstractAssayHelper extends AbstractHelper
 {
@@ -65,7 +62,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         _test.clickButton("Manage Assays");
         _test.clickButton("New Assay Design");
 
-        _test.clickLinkWithText("upload the XAR file directly");
+        _test.clickLinkWithText("upload");
         _test.setFormElement(Locator.name("uploadFile"), file);
         _test.click(Locator.xpath("//input[contains(@type, 'SUBMIT') and contains(@value, 'Upload')]"));
         _test.waitForPageToLoad();
