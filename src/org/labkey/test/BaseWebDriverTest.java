@@ -276,9 +276,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             {
                 try
                 {
-                    profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/firebug-1.10.3.xpi"));
+                    profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/firebug-1.11.0.xpi"));
                     profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/fireStarter-0.1a6.xpi"));
-                    profile.setPreference("extensions.firebug.currentVersion", "1.10.3");
+                    profile.setPreference("extensions.firebug.currentVersion", "1.11.0"); // prevent upgrade spash page
                     profile.setPreference("extensions.firebug.allPagesActivation", "on");
                     profile.setPreference("extensions.firebug.previousPlacement", 3);
                     profile.setPreference("extensions.firebug.net.enabledSites", true);
