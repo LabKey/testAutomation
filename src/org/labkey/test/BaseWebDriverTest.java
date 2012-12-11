@@ -4923,7 +4923,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             el.sendKeys(text.substring(text.length()-1));
         }
 
-        if (el.getAttribute("class").contains("gwt-TextBox"))
+        if (el.getAttribute("class").contains("gwt-TextBox") || el.getAttribute("class").contains("gwt-TextArea"))
             fireEvent(l, SeleniumEvent.blur); // Make GWT form elements behave better
     }
 
@@ -6754,6 +6754,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForElement(locButton, WAIT_FOR_JAVASCRIPT);
         if (validateSubfolders)
             checkCheckbox(Locator.id("lk-vq-subfolders"));
+//        if (!skipViewCheck())
+//            checkCheckbox(Locator.id("lk-vq-validatemetadata"));
         checkCheckbox(Locator.id("lk-vq-systemqueries"));
         click(locButton);
         waitForElement(locFinishMsg, 120000);

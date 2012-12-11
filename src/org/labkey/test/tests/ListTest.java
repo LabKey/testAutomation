@@ -1074,17 +1074,23 @@ public class ListTest extends BaseWebDriverTest
 
     void setColumnName(int index, String name)
     {
-        setFormElement(Locator.name("ff_name"+index), name);
-        pressTab(Locator.name("ff_name" + index));
+        Locator nameLoc = Locator.name("ff_name"+index);
+        click(nameLoc);
+        setFormElement(nameLoc, name);
+        pressTab(nameLoc);
     }
     void setColumnLabel(int index, String label)
     {
-        setFormElement(Locator.name("ff_label"+index), label);
-        pressTab(Locator.name("ff_label" + index));
+        Locator labelLoc = Locator.name("ff_label"+index);
+        click(labelLoc);
+        setFormElement(labelLoc, label);
+        pressTab(labelLoc);
     }
     void setColumnType(int index, ListHelper.ListColumnType type)
     {
-        setFormElement(Locator.name("ff_type" + index), type.toString());
-        pressTab(Locator.name("ff_type" + index));
+        Locator typeLoc = Locator.name("ff_type"+index);
+        click(typeLoc);
+        setFormElement(typeLoc, type.toString());
+        pressTab(typeLoc);
     }
 }

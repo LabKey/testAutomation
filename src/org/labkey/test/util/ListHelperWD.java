@@ -19,14 +19,11 @@ package org.labkey.test.util;
 import junit.framework.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Map;
@@ -668,20 +665,18 @@ public class ListHelperWD extends ListHelper
 
             if (lookup.getFolder() != null)
             {
-                _test.click(Locator.xpath("//input[@name = 'lookupContainer']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
-                _test.waitAndClick(Locator.css("div.x-combo-list-item").withText(lookup.getFolder()));
-                _test.waitForElementToDisappear(Locator.css("div.x-combo-list-item"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-                _test.sleep(500);
+                _test.setFormElement(Locator.css("input[name=lookupContainer]"), lookup.getFolder());
+//                _test.fireEvent(Locator.css("input[name=lookupContainer]"), BaseWebDriverTest.SeleniumEvent.change);
+                _test.waitForElement(Locator.xpath("//div[contains(@class,'test-marker-" + lookup.getFolder() + "')]/input[@name='lookupContainer']"));
             }
 
-            _test.click(Locator.xpath("//input[@name = 'schema']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
-            _test.waitAndClick(Locator.css("div.x-combo-list-item").withText(lookup.getSchema()));
-            _test.waitForElementToDisappear(Locator.css("div.x-combo-list-item"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            _test.sleep(500);
+            _test.setFormElement(Locator.css("input[name=schema]"), lookup.getSchema());
+//            _test.fireEvent(Locator.css("input[name=schema]"), BaseWebDriverTest.SeleniumEvent.change);
+            _test.waitForElement(Locator.xpath("//div[contains(@class,'test-marker-" + lookup.getSchema() + "')]/input[@name='schema']"));
 
-            _test.click(Locator.xpath("//input[@name = 'table']/following-sibling::div[contains(@class, 'x-form-trigger-arrow')]"));
-            _test.waitAndClick(Locator.css("div.x-combo-list-item").containing(lookup.getTable() + " ("));
-            _test.waitForElementToDisappear(Locator.css("div.x-combo-list-item"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            _test.setFormElement(Locator.css("input[name=table]"), lookup.getTable());
+//            _test.fireEvent(Locator.css("input[name=table]"), BaseWebDriverTest.SeleniumEvent.change);
+            _test.waitForElement(Locator.xpath("//div[contains(@class,'test-marker-" + lookup.getTable() + "')]/input[@name='table']"));
         }
 
         _test.clickButton("Apply", 0);
