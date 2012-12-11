@@ -314,6 +314,18 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public Object executeScript(String script, Object... arguments)
     {
         JavascriptExecutor exec = (JavascriptExecutor) _driver;
+
+        // As of Selenium 2.27.0, JavascriptExecutor is unable to handle null arguments.
+        // Push null arguments into script body.
+        // Doesn't handle nested lists.
+        for (int i = 0; i < arguments.length; i++)
+        {
+            if (arguments[i] == null)
+            {
+                arguments[i] = ""; // ignored by script
+                script = script.replace("arguments[" + i + "]", "null");
+            }
+        }
         return exec.executeScript(script, arguments);
     }
 
