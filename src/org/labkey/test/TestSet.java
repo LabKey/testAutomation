@@ -67,8 +67,16 @@ public enum TestSet
         WebDavTest.class
     ),
 
+    Unsupported(
+        LabModulesTest.class,
+        SequenceTest.class,
+        ViralLoadAssayTest.class,
+        ELISPOT_AssayTest.class,
+        ElectrochemiluminescenceAssayTest.class
+    ),
+
     Perf(
-            StudyImportPerfTest.class
+        StudyImportPerfTest.class
     ),
 
     MS2(
@@ -174,11 +182,11 @@ public enum TestSet
         CAVDStudyTest.class,
         SampleMindedImportTest.class,
         PivotQueryTest.class,
-        LabModulesTest.class,
-        SequenceTest.class,
-        ViralLoadAssayTest.class,
-        ELISPOT_AssayTest.class,
-        ElectrochemiluminescenceAssayTest.class,
+//        LabModulesTest.class,
+//        SequenceTest.class,
+//        ViralLoadAssayTest.class,
+//        ELISPOT_AssayTest.class,
+//        ElectrochemiluminescenceAssayTest.class,
         StudyPublishTest.class,
         HiddenEmailTest.class,
         ElisaAssayTest.class,
@@ -270,7 +278,7 @@ public enum TestSet
     Assays(
         AssayTest.class,
         MissingValueIndicatorsTest.class,
-        ElispotAssayTest.class,
+//        ElispotAssayTest.class,
         TargetStudyTest.class,
         NabOldTest.class,
         NabAssayTest.class,
