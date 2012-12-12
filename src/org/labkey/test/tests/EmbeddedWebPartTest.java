@@ -80,9 +80,10 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         String rViewName = TRICKY_CHARACTERS + "new R view";
         _customizeViewsHelper.createRView(null, rViewName);
 
+        waitForElement(Locator.xpath("//table[contains(@class, 'labkey-data-region')]"), WAIT_FOR_JAVASCRIPT);
+
         resetTracker.startTrackingRefresh();
 
-        waitForElement(Locator.xpath("//table[contains(@class, 'labkey-data-region')]"), WAIT_FOR_JAVASCRIPT);
         clickMenuButtonAndContinue("Views", rViewName);
 
         resetTracker.assertWasNotRefreshed();

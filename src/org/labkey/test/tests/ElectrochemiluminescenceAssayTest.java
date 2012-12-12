@@ -34,7 +34,7 @@ import java.util.Map;
  * Date: 11/19/12
  * Time: 5:08 PM
  */
-public class ElectrochemiluminescenceAssayTest extends LabModulesTest
+public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTest
 {
     private static final String ASSAY_NAME = "Electrochemiluminescence Test";
     private static final String[][] TEMPLATE_DATA = new String[][]{

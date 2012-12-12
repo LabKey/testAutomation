@@ -39,7 +39,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     }
 
     @Override
-    public void runUITests()
+    public void runUITests() throws Exception
     {
         initProject();
 

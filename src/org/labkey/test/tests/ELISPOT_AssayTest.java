@@ -36,7 +36,7 @@ import java.util.Map;
  * Date: 11/19/12
  * Time: 5:06 PM
  */
-public class ELISPOT_AssayTest extends LabModulesTest
+public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 {
     private static final String ASSAY_NAME = "ELISPOT Test";
     private static final String[][] TEMPLATE_DATA = new String[][]{

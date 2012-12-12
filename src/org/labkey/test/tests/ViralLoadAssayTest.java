@@ -45,7 +45,7 @@ import java.util.Map;
  * Date: 11/6/12
  * Time: 5:43 PM
  */
-public class ViralLoadAssayTest extends LabModulesTest
+public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 {
     private static final String ASSAY_NAME = "Viral Load Test";
     private String DETECTOR_NAME = "PIATAK SIVGAG";

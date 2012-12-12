@@ -187,6 +187,8 @@ public enum TestSet
 //        ViralLoadAssayTest.class,
 //        ELISPOT_AssayTest.class,
 //        ElectrochemiluminescenceAssayTest.class,
+        GenotypeAssaysTest.class,
+        FlowAssaysTest.class,
         StudyPublishTest.class,
         HiddenEmailTest.class,
         ElisaAssayTest.class,

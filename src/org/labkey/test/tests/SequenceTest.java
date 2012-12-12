@@ -26,7 +26,10 @@ import org.json.JSONException;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -46,6 +49,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -60,12 +64,14 @@ import java.util.zip.GZIPInputStream;
 public class SequenceTest extends BaseWebDriverTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
+    protected String _pipelineRoot = null;
     protected final String _sequencePipelineLoc =  getLabKeyRoot() + "/sampledata/sequence";
     protected final String _illuminaPipelineLoc =  getLabKeyRoot() + "/sampledata/genotyping";
     protected final String _readsetPipelineName = "Import sequence data";
 
     private final String TEMPLATE_NAME = "SequenceTest Saved Template";
-    private Integer _readsetCt = 14;
+    private Integer _readsetCt = 0;
+    private int _startedPipelineJobs = 0;
     private final String ILLUMINA_CSV = "SequenceImport.csv";
 
     @Override
@@ -84,7 +90,8 @@ public class SequenceTest extends BaseWebDriverTest
         importIlluminaTest();
         readsetFeaturesTest();
         analysisPanelTest();
-        //readsetPanelTest();
+        readsetPanelTest();
+        readsetImportTest();
     }
 
     protected void setUpTest() throws Exception
@@ -92,7 +99,6 @@ public class SequenceTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), "Sequence Analysis");
         deleteTemplateRow();
         goToProjectHome();
-        setPipelineRoot(_sequencePipelineLoc);
         goToProjectHome();
     }
 
@@ -116,6 +122,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
+        _readsetCt += 14;
         assertTextPresent("Success!");
         clickButton("OK");
         waitForPageToLoad();
@@ -272,13 +279,12 @@ public class SequenceTest extends BaseWebDriverTest
 
     private String getIlluminaNames()
     {
-        _readsetCt = 14;
         String[] barcodes5 = {"N701", "N702", "N703", "N704", "N705", "N706", "N701", "N702", "N701", "N702", "N703", "N704", "N705", "N706"};
         String[] barcodes3 = {"N502", "N502", "N502", "N502", "N502", "N502", "N503", "N503", "N501", "N501", "N501", "N501", "N501", "N501"};
 
         StringBuilder sb = new StringBuilder("Name\tPlatform\tBarcode5\tBarcode3\n");
         int i = 0;
-        while (i < _readsetCt)
+        while (i < barcodes5.length)
         {
             sb.append("Illumina" + (i+1) + "\tILLUMINA\t" + barcodes5[i] + "\t" + barcodes3[i] + "\n");
             i++;
@@ -312,7 +318,8 @@ public class SequenceTest extends BaseWebDriverTest
         waitAndClick(Locator.ext4Button("OK"));
         waitForPageToLoad();
         clickLinkWithText("All");
-        waitForPipelineJobsToComplete(1, "Import Illumina", false);
+        _startedPipelineJobs++;
+        waitForPipelineJobsToComplete(_startedPipelineJobs, "Import Illumina", false);
         assertTextPresent("COMPLETE");
     }
 
@@ -630,7 +637,6 @@ public class SequenceTest extends BaseWebDriverTest
 
         Ext4FieldRefWD.getForLabel(this, "Sequence Based Genotyping").setChecked(true);
 
-        //TODO
 //        Ext4FieldRefWD.getForLabel(this, "Max Alignment Mismatches").setValue(maxAlignMismatch);
 //        Ext4FieldRefWD.getForLabel(this, "Assemble Unaligned Reads").setChecked(true);
 //        Ext4FieldRefWD.getForLabel(this, "Assembly Percent Identity").setValue(assembleUnalignedPct);
@@ -639,7 +645,8 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4CmpRefWD panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRefWD.class);
         Map<String, Object> params = (Map)panel.getEval("getJsonParams()");
 
-        Assert.assertEquals("Incorect param in form JSON", getContainerId(getURL().toString()), params.get("containerId"));
+        String container = (String)executeScript("return LABKEY.Security.currentContainer.id");
+        Assert.assertEquals("Incorect param in form JSON", container, params.get("containerId"));
         Assert.assertEquals("Incorect param in form JSON", getBaseURL() + "/", params.get("baseUrl"));
 
         Long id1 = (Long)executeScript("return LABKEY.Security.currentUser.id");
@@ -653,7 +660,6 @@ public class SequenceTest extends BaseWebDriverTest
         Assert.assertEquals("Incorect param in form JSON", jobName, params.get("protocolName"));
 
         Assert.assertEquals("Incorect param in form JSON", false, params.get("saveProtocol"));
-        Assert.assertEquals("Incorect param in form JSON", false, params.get("recalibrateBam"));
 
         Assert.assertEquals("Incorect param in form JSON", true, params.get("preprocessing.downsample"));
         Assert.assertEquals("Incorect param in form JSON", totalReads, params.get("preprocessing.downsampleReadNumber").toString());
@@ -687,7 +693,6 @@ public class SequenceTest extends BaseWebDriverTest
 
         Assert.assertEquals("Incorect param in form JSON", "Virus", params.get("analysisType"));
         Assert.assertEquals("Incorect param in form JSON", strain, params.get("dna.subset"));
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("qualityMetrics"));
 
         Assert.assertEquals("Incorect param in form JSON", true, params.get("doAlignment"));
         Assert.assertEquals("Incorect param in form JSON", aligner, params.get("aligner"));
@@ -813,16 +818,24 @@ public class SequenceTest extends BaseWebDriverTest
                 br = new BufferedReader(new InputStreamReader(gz));
                 int count = 0;
                 String thisLine;
+                List<String> lines = new ArrayList<String>();
                 while ((thisLine = br.readLine()) != null)
                 {
                     count++;
+                    lines.add(thisLine);
                 }
 
+                //TODO: reenable this check once it can be made to work reliably on team city
                 int expectedLength = 504;
                 log("Response length was " + count + ", expected " + expectedLength);
-                //TODO: reenable this check once it can be made to work reliably on team city
+                if (count != expectedLength)
+                {
+                    for (String line : lines)
+                    {
+                        log("[" + line + "]");
+                    }
+                }
                 //Assert.assertTrue("Length of file doesnt match expected value of "+expectedLength+", was: " + count, count == expectedLength);
-
             }
             finally
             {
@@ -865,15 +878,19 @@ public class SequenceTest extends BaseWebDriverTest
      * The intent of this method is to perform additional tests of this Readset Import Panel,
      * with the goal of exercising all UI options
      */
-    private void readsetPanelTest()
+    private void readsetPanelTest() throws JSONException
     {
         log("Verifying Readset Import Panel UI");
 
         goToProjectHome();
+        setPipelineRoot(_sequencePipelineLoc);
+
         String filename1 = "sample454_SIV.sff";
         String filename2 = "dualBarcodes_SIV.fastq";
         initiatePipelineJob(_readsetPipelineName, filename1, filename2);
         waitForText("Job Name");
+
+        Ext4FieldRefWD.getForLabel(this, "Job Name").setValue("SequenceTest_" + System.currentTimeMillis());
 
         waitForElement(Locator.linkContainingText(filename1));
         waitForElement(Locator.linkContainingText(filename2));
@@ -904,11 +921,12 @@ public class SequenceTest extends BaseWebDriverTest
         Assert.assertTrue("Paired end field should be disabled when merge is checked", pairedField.isDisabled());
 
         Ext4FieldRefWD mergenameField = Ext4FieldRefWD.getForLabel(this, "Name For Merged File");
-//        Assert.assertTrue("Merge name field should be visible", mergenameField.isVisible());
-//        Assert.assertEquals("Merged file name not set in grid correctly", "MergedFile", grid.getCellContents(1, 1));
-//        mergenameField.setValue("MergeFile2");
-//        sleep(100);
-//        Assert.assertEquals("Merged file name not set in grid correctly", "MergeFile2", grid.getCellContents(1, 1));
+
+        Assert.assertTrue("Merge name field should be visible", mergenameField.isVisible());
+        Assert.assertEquals("Merged file name not set in grid correctly", "MergedFile", grid.getFieldValue(1, "fileName"));
+        mergenameField.setValue("MergeFile2");
+        sleep(100);
+        Assert.assertEquals("Merged file name not set in grid correctly", "MergeFile2", grid.getFieldValue(1, "fileName"));
 
         mergeField.setChecked(false);
         sleep(100);
@@ -941,18 +959,18 @@ public class SequenceTest extends BaseWebDriverTest
         click(Locator.ext4Button("OK"));
 
         grid.setGridCell(1, 6, "Readset1");
-        grid.setGridCell(1, 7, "ILLUMINA");
+        grid.setGridCellJS(1, "platform", "ILLUMINA");
         grid.setGridCell(1, 8, "InputMaterial");
         grid.setGridCell(1, 9, "Subject1");
 
         grid.setGridCell(2, 6, "Readset2");
-        grid.setGridCell(2, 7, "LS454");
+        grid.setGridCellJS(2, "platform", "LS454");
         grid.setGridCell(2, 8, "InputMaterial2");
         grid.setGridCell(2, 9, "Subject2");
 
         waitAndClick(Locator.ext4Button("Import Data"));
         waitForElement(Ext4Helper.ext4Window("Error"));
-        assertTextPresent("Duplicate Sample: " + filename1 + " Please remove or edit rows in the 'Readsets' section");
+        waitForElement(Locator.xpath("//div[contains(text(), \"Duplicate Sample: " + filename1 + ". Please remove or edit rows\")]"));
         click(Locator.ext4Button("OK"));
 
         //verify paired end
@@ -966,18 +984,209 @@ public class SequenceTest extends BaseWebDriverTest
         //try duplicate barcodes
         barcodeField.setChecked(true);
         String barcode = "FLD0376";
-        grid.setGridCell(1, 3, barcode);
-        grid.setGridCell(2, 4, barcode);
+        grid.setGridCellJS(1, "mid5", barcode);
+        grid.setGridCellJS(2, "mid3", barcode);
         waitAndClick(Locator.ext4Button("Import Data"));
         waitForElement(Ext4Helper.ext4Window("Error"));
-        assertTextPresent("Duplicate Sample: " + filename1 + ";" + barcode + "; Please remove or edit rows in the 'Readsets' section");
+        assertTextPresent("All samples must either use no barcodes, 5' only, 3' only or both ends");
         click(Locator.ext4Button("OK"));
         barcodeField.setChecked(false);
+        grid.setGridCell(2, 1, filename2);
 
         Ext4CmpRefWD panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRefWD.class);
         Map<String, Object> params = (Map)panel.getEval("getJsonParams()");
+        Map<String, Object> fieldsJson = (Map)params.get("json");
+        //List<Long> fileIds = (List)params.get("distinctIds");
+        //List<String> fieldsNames = (List)params.get("distinctNames");
 
-       //TODO: verify JSON under several conditions
+        String container = (String)executeScript("return LABKEY.Security.currentContainer.id");
+        Assert.assertEquals("Incorect param for containerId", container, fieldsJson.get("containerId"));
+        Assert.assertEquals("Incorect param for baseURL", getBaseURL() + "/", fieldsJson.get("baseUrl"));
+
+        Long id1 = (Long)executeScript("return LABKEY.Security.currentUser.id");
+        Long id2 = (Long)fieldsJson.get("userId");
+        Assert.assertEquals("Incorect param for userId", id1, id2);
+        String containerPath = getURL().getPath().replaceAll("/importReadset.view(.)*", "").replaceAll("(.)*/sequenceanalysis", "");
+        Assert.assertEquals("Incorect param for containerPath", containerPath, fieldsJson.get("containerPath"));
+
+        Assert.assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.pairedend"));
+        Assert.assertEquals("Unexpected value for param", filename1 + ";" + filename2, fieldsJson.get("fileNames"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String)fieldsJson.get("inputfile.barcodeGroups")));
+        Assert.assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.merge"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String)fieldsJson.get("inputfile.merge.basename")));
+        Assert.assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeEditDistance"));
+        Assert.assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeOffset"));
+        Assert.assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeDeletions"));
+        Assert.assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.barcode"));
+        Assert.assertEquals("Unexpected value for param", "delete", fieldsJson.get("inputfile.inputTreatment"));
+        Assert.assertEquals("Unexpected value for param", true, fieldsJson.get("deleteIntermediateFiles"));
+
+        Map<String, Object> sample0 = (Map)fieldsJson.get("sample_0");
+        Map<String, Object> sample1 = (Map)fieldsJson.get("sample_1");
+
+        Assert.assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
+        Assert.assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
+        Assert.assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String)sample0.get("readset")));
+        Assert.assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
+        Assert.assertEquals("Unexpected value for param", "InputMaterial", sample0.get("inputmaterial"));
+        Assert.assertFalse("param shold not be present", sample0.containsKey("mid5"));
+        Assert.assertFalse("param shold not be present", sample0.containsKey("mid3"));
+
+        Assert.assertEquals("Unexpected value for param", filename2, sample1.get("fileName"));
+        Assert.assertEquals("Unexpected value for param", "Readset2", sample1.get("readsetname"));
+        Assert.assertEquals("Unexpected value for param", "Subject2", sample1.get("subjectid"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("readset")));
+        Assert.assertEquals("Unexpected value for param", "LS454", sample1.get("platform"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("fileId")));
+        Assert.assertEquals("Unexpected value for param", "InputMaterial2", sample1.get("inputmaterial"));
+        Assert.assertFalse("param shold not be present", sample1.containsKey("mid5"));
+        Assert.assertFalse("param shold not be present", sample1.containsKey("mid3"));
+
+        barcodeField.setValue(true);
+        Ext4FieldRefWD.getForLabel(this, "Additional Barcodes").setValue("GSMIDs");
+        Ext4FieldRefWD.getForLabel(this, "Mismatches Tolerated").setValue(9);
+        Ext4FieldRefWD.getForLabel(this, "Deletions Tolerated").setValue(9);
+        Ext4FieldRefWD.getForLabel(this, "Allowed Distance From Read End").setValue(9);
+
+        Ext4FieldRefWD.getForLabel(this, "Delete Intermediate Files").setValue(false);
+        treatmentField.setValue("compress");
+
+        mergeField.setValue(true);
+        String mergedName = "MergedFile99";
+        mergenameField.setValue(mergedName);
+
+        params = (Map)panel.getEval("getJsonParams()");
+        fieldsJson = (Map)params.get("json");
+
+        Assert.assertEquals("Unexpected value for param", true, fieldsJson.get("inputfile.barcode"));
+        Assert.assertEquals("Unexpected value for param", Collections.singletonList("GSMIDs"), fieldsJson.get("inputfile.barcodeGroups"));
+        Assert.assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeEditDistance"));
+        Assert.assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeOffset"));
+        Assert.assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeDeletions"));
+
+        Assert.assertEquals("Unexpected value for param", true, fieldsJson.get("inputfile.merge"));
+        Assert.assertEquals("Unexpected value for param", mergedName, fieldsJson.get("inputfile.merge.basename"));
+
+        Assert.assertEquals("Unexpected value for param", "compress", fieldsJson.get("inputfile.inputTreatment"));
+        Assert.assertEquals("Unexpected value for param", false, fieldsJson.get("deleteIntermediateFiles"));
+
+        sample0 = (Map)fieldsJson.get("sample_0");
+        Assert.assertEquals("Unexpected value for param", mergedName, sample0.get("fileName"));
+        Assert.assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
+        Assert.assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
+        Assert.assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
+        Assert.assertEquals("Unexpected value for param", "InputMaterial", sample0.get("inputmaterial"));
+        Assert.assertFalse("param shold not be present", sample0.containsKey("mid5"));
+        Assert.assertFalse("param shold not be present", sample0.containsKey("mid3"));
+
+        mergeField.setValue(false);
+        barcodeField.setValue(false);
+
+        pairedField.setValue(true);
+        grid.setGridCell(1, "fileName", filename1);
+        grid.setGridCellJS(1, "fileName2", filename2);
+        params = (Map)panel.getEval("getJsonParams()");
+        fieldsJson = (Map)params.get("json");
+        sample0 = (Map)fieldsJson.get("sample_0");
+        Assert.assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
+        Assert.assertEquals("Unexpected value for param", filename2, sample0.get("fileName2"));
+
+        pairedField.setValue(false);
+        barcodeField.setValue(true);
+        waitAndClick(Locator.ext4Button("Add"));
+        waitForElement(Ext4GridRefWD.locateExt4GridRow(2, grid.getId()));
+        getDriver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
+        sleep(100);
+
+        grid.setGridCell(1, "fileName", filename1);
+        String readsetNew = "ReadsetNew";
+        grid.setGridCell(1, "readsetname", readsetNew);
+        grid.setGridCellJS(1, "platform", "SANGER");
+        grid.setGridCell(2, "fileName", filename2);
+        String barcode2 = "FLD0374";
+        grid.setGridCellJS(1, "mid5", barcode);
+        grid.setGridCellJS(1, "mid3", barcode2);
+        grid.setGridCellJS(2, "mid3", barcode);
+        grid.setGridCellJS(2, "mid5", barcode2);
+        params = (Map)panel.getEval("getJsonParams()");
+        fieldsJson = (Map)params.get("json");
+        sample0 = (Map)fieldsJson.get("sample_0");
+        Assert.assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileName2")));
+        Assert.assertEquals("Unexpected value for param", barcode, sample0.get("mid5"));
+        Assert.assertEquals("Unexpected value for param", barcode2, sample0.get("mid3"));
+        Assert.assertEquals("Unexpected value for param", "SANGER", sample0.get("platform"));
+        Assert.assertEquals("Unexpected value for param", readsetNew, sample0.get("readsetname"));
+
+        sample1 = (Map)fieldsJson.get("sample_1");
+        Assert.assertEquals("Unexpected value for param", filename2, sample1.get("fileName"));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String)sample1.get("fileName2")));
+        Assert.assertEquals("Unexpected value for param", barcode2, sample1.get("mid5"));
+        Assert.assertEquals("Unexpected value for param", barcode, sample1.get("mid3"));
+    }
+
+    private void readsetImportTest() throws Exception
+    {
+        log("Verifying Readset Import");
+
+        goToProjectHome();
+        setPipelineRoot(_sequencePipelineLoc);
+
+        String filename1 = "paired1.fastq.gz";
+        String filename2 = "dualBarcodes_SIV.fastq";
+        initiatePipelineJob(_readsetPipelineName, filename1, filename2);
+        waitForText("Job Name");
+
+        Ext4FieldRefWD.getForLabel(this, "Job Name").setValue("SequenceTest_" + System.currentTimeMillis());
+
+        waitForElement(Locator.linkContainingText(filename1));
+        waitForElement(Locator.linkContainingText(filename2));
+
+        Ext4FieldRefWD.getForLabel(this, "Treatment of Input Files").setValue("none");
+        Ext4GridRefWD grid = getSampleGrid();
+
+        String readset1 = "ReadsetTest1";
+        String readset2 = "ReadsetTest2";
+
+        grid.setGridCell(1, 6, readset1);
+        grid.setGridCellJS(1, "platform", "ILLUMINA");
+        grid.setGridCell(1, 8, "InputMaterial");
+        grid.setGridCell(1, 9, "Subject1");
+
+        grid.setGridCell(2, 6, readset2);
+        grid.setGridCellJS(2, "platform", "LS454");
+        grid.setGridCell(2, 8, "InputMaterial2");
+        grid.setGridCell(2, 9, "Subject2");
+
+        click(Locator.ext4Button("Import Data"));
+        waitAndClick(Locator.ext4Button("OK"));
+        waitForPageToLoad();
+        clickLinkWithText("All");
+        _startedPipelineJobs++;
+        waitForPipelineJobsToComplete(_startedPipelineJobs, "Import Readsets", false);
+        assertTextPresent("COMPLETE");
+
+        //verify readsets created
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        SelectRowsCommand sr = new SelectRowsCommand("sequenceanalysis", "sequence_readsets");
+        sr.addFilter(new Filter("name", readset1 + ";" + readset2, Filter.Operator.IN));
+        SelectRowsResponse resp = sr.execute(cn, getProjectName());
+        Assert.assertEquals("Incorrect readset number", 2, resp.getRowCount().intValue());
+
+        log("attempting to re-import same files");
+        goToProjectHome();
+        initiatePipelineJob(_readsetPipelineName, filename1, filename2);
+        waitForText("Job Name");
+        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Locator.xpath("//div[contains(text(), 'There are errors with the input files')]"));
+        isTextPresent("File is already used in existing readsets')]");
+        assertElementPresent(Locator.xpath("//td[contains(@style, 'background: red')]"));
+        waitAndClick(Locator.ext4Button("OK"));
+        goToProjectHome();
     }
 
     @Override
@@ -1005,6 +1214,16 @@ public class SequenceTest extends BaseWebDriverTest
             if(file.getName().startsWith("SequenceImport"))
                 file.delete();
         }
+    }
+
+    @Override
+    public void setPipelineRoot(String rootPath)
+    {
+        if (rootPath.equals(_pipelineRoot))
+            return;
+
+        _pipelineRoot = rootPath;
+        super.setPipelineRoot(rootPath);
     }
 
     @Override

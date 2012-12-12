@@ -15,9 +15,19 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.security.AddGroupMembersCommand;
+import org.labkey.remoteapi.security.CreateGroupCommand;
+import org.labkey.remoteapi.security.CreateGroupResponse;
+import org.labkey.remoteapi.security.CreateUserCommand;
+import org.labkey.remoteapi.security.CreateUserResponse;
+import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.module.EHRReportingAndUITest;
+
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -65,6 +75,31 @@ public class EHRTestHelper
         value += "\t"; //force blur event
         _test.setFormElement(Locator.name(fieldName), value);
         _test.sleep(100);
+    }
+
+    public int createUserAPI(String email, String containerPath) throws CommandException, IOException
+    {
+        Connection cn = new Connection(_test.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        CreateUserCommand uc = new CreateUserCommand(email);
+        uc.setSendEmail(true);
+        CreateUserResponse resp = uc.execute(cn, containerPath);
+        return resp.getUserId().intValue();
+    }
+
+    public int createPermissionsGroupAPI(String groupName, String containerPath, Integer... memberIds) throws Exception
+    {
+        Connection cn = new Connection(_test.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        CreateGroupCommand gc = new CreateGroupCommand(groupName);
+        CreateGroupResponse resp = gc.execute(cn, containerPath);
+        Integer groupId = resp.getGroupId().intValue();
+
+        AddGroupMembersCommand mc = new AddGroupMembersCommand(groupId);
+        for (Integer m : memberIds)
+            mc.addPrincipalId(m);
+
+        mc.execute(cn, containerPath);
+
+        return groupId;
     }
 }
 

@@ -259,10 +259,17 @@ public class LabModuleHelper
 
     public void goToAssayResultImport(String assayName)
     {
+        goToAssayResultImport(assayName, true);
+    }
+
+    public void goToAssayResultImport(String assayName, boolean supportsTemplates)
+    {
         goToLabHome();
         clickNavPanelItem(assayName + ":", IMPORT_DATA_TEXT);
-        _test._ext4Helper.clickExt4MenuItem(UPLOAD_RESULTS_TEXT);
-        _test.waitForElement(Ext4Helper.ext4Window(UPLOAD_RESULTS_TEXT));
+        if (supportsTemplates)
+            _test._ext4Helper.clickExt4MenuItem(UPLOAD_RESULTS_TEXT);
+
+        _test.waitForElement(Ext4Helper.ext4Window(supportsTemplates ? UPLOAD_RESULTS_TEXT : IMPORT_DATA_TEXT));
         _test.waitAndClick(Locator.ext4Button("Submit"));
         _test.waitForPageToLoad();
 

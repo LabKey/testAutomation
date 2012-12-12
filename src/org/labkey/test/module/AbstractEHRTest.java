@@ -66,12 +66,12 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     protected static final String TASK_TITLE = "Test weight task";
     protected static final String MPR_TASK_TITLE = "Test MPR task";
 
-    protected static final EHRUser DATA_ADMIN = new EHRUser("admin@ehrstudy.test", "EHR Administrators", EHRRole.DATA_ADMIN);
-    protected static final EHRUser REQUESTER = new EHRUser("requester@ehrstudy.test", "EHR Requestors", EHRRole.REQUESTER);
-    protected static final EHRUser BASIC_SUBMITTER = new EHRUser("basicsubmitter@ehrstudy.test", "EHR Basic Submitters", EHRRole.BASIC_SUBMITTER);
-    protected static final EHRUser FULL_SUBMITTER = new EHRUser("fullsubmitter@ehrstudy.test", "EHR Full Submitters", EHRRole.FULL_SUBMITTER);
-    protected static final EHRUser REQUEST_ADMIN = new EHRUser("request_admin@ehrstudy.test", "EHR Request Admins", EHRRole.REQUEST_ADMIN);
-    protected static final EHRUser FULL_UPDATER = new EHRUser("full_updater@ehrstudy.test", "EHR Full Updaters", EHRRole.FULL_UPDATER);
+    protected static EHRUser DATA_ADMIN = new EHRUser("admin@ehrstudy.test", "EHR Administrators", EHRRole.DATA_ADMIN);
+    protected static EHRUser REQUESTER = new EHRUser("requester@ehrstudy.test", "EHR Requestors", EHRRole.REQUESTER);
+    protected static EHRUser BASIC_SUBMITTER = new EHRUser("basicsubmitter@ehrstudy.test", "EHR Basic Submitters", EHRRole.BASIC_SUBMITTER);
+    protected static EHRUser FULL_SUBMITTER = new EHRUser("fullsubmitter@ehrstudy.test", "EHR Full Submitters", EHRRole.FULL_SUBMITTER);
+    protected static EHRUser REQUEST_ADMIN = new EHRUser("request_admin@ehrstudy.test", "EHR Request Admins", EHRRole.REQUEST_ADMIN);
+    protected static EHRUser FULL_UPDATER = new EHRUser("full_updater@ehrstudy.test", "EHR Full Updaters", EHRRole.FULL_UPDATER);
 
     protected static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -149,7 +149,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
                 FULL_SUBMITTER.getUser());
     }
 
-    protected void initProject()
+    protected void initProject() throws Exception
     {
         enableEmailRecorder();
 
@@ -194,6 +194,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         clickLinkWithText(FOLDER_NAME);
         addWebPart("Quick Search");
 
+        //note: this expects the study to already have been imported
         setupEhrPermissions();
         defineQCStates();
     }
@@ -303,21 +304,14 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         clickButton("Done");
     }
 
-    protected void setupEhrPermissions()
+    protected void setupEhrPermissions() throws Exception
     {
-        clickFolder(PROJECT_NAME);
-        createUserAndNotify(DATA_ADMIN.getUser(), "");
-        clickFolder(PROJECT_NAME);
-        createUserAndNotify(REQUESTER.getUser(), "");
-        clickFolder(PROJECT_NAME);
-        createUserAndNotify(BASIC_SUBMITTER.getUser(), "");
-        clickFolder(PROJECT_NAME);
-        createUserAndNotify(FULL_SUBMITTER.getUser(), "");
-        clickFolder(PROJECT_NAME);
-        createUserAndNotify(FULL_UPDATER.getUser(), "");
-        clickFolder(PROJECT_NAME);
-        createUserAndNotify(REQUEST_ADMIN.getUser(), "");
-        clickFolder(PROJECT_NAME);
+        DATA_ADMIN.setUserId(_helper.createUserAPI(DATA_ADMIN.getUser(), getProjectName()));
+        REQUESTER.setUserId(_helper.createUserAPI(REQUESTER.getUser(), getProjectName()));
+        BASIC_SUBMITTER.setUserId(_helper.createUserAPI(BASIC_SUBMITTER.getUser(), getProjectName()));
+        FULL_SUBMITTER.setUserId(_helper.createUserAPI(FULL_SUBMITTER.getUser(), getProjectName()));
+        FULL_UPDATER.setUserId(_helper.createUserAPI(FULL_UPDATER.getUser(), getProjectName()));
+        REQUEST_ADMIN.setUserId(_helper.createUserAPI(REQUEST_ADMIN.getUser(), getProjectName()));
 
         setInitialPassword(DATA_ADMIN.getUser(), PasswordUtil.getPassword());
         setInitialPassword(REQUESTER.getUser(), PasswordUtil.getPassword());
@@ -326,16 +320,16 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         setInitialPassword(FULL_UPDATER.getUser(), PasswordUtil.getPassword());
         setInitialPassword(REQUEST_ADMIN.getUser(), PasswordUtil.getPassword());
 
+        _helper.createPermissionsGroupAPI(DATA_ADMIN.getGroup(), getProjectName(), DATA_ADMIN.getUserId());
+        _helper.createPermissionsGroupAPI(REQUESTER.getGroup(), getProjectName(), REQUESTER.getUserId());
+        _helper.createPermissionsGroupAPI(BASIC_SUBMITTER.getGroup(), getProjectName(), BASIC_SUBMITTER.getUserId());
+        _helper.createPermissionsGroupAPI(FULL_SUBMITTER.getGroup(), getProjectName(), FULL_SUBMITTER.getUserId());
+        _helper.createPermissionsGroupAPI(FULL_UPDATER.getGroup(), getProjectName(), FULL_UPDATER.getUserId());
+        _helper.createPermissionsGroupAPI(REQUEST_ADMIN.getGroup(), getProjectName(), REQUEST_ADMIN.getUserId());
+
         clickFolder(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
-        pushLocation();
-        createPermissionsGroup(DATA_ADMIN.getGroup(), DATA_ADMIN.getUser());
-        createPermissionsGroup(REQUESTER.getGroup(), REQUESTER.getUser());
-        createPermissionsGroup(BASIC_SUBMITTER.getGroup(), BASIC_SUBMITTER.getUser());
-        createPermissionsGroup(FULL_SUBMITTER.getGroup(), FULL_SUBMITTER.getUser());
-        createPermissionsGroup(FULL_UPDATER.getGroup(), FULL_UPDATER.getUser());
-        createPermissionsGroup(REQUEST_ADMIN.getGroup(), REQUEST_ADMIN.getUser());
-        popLocation();
+
         enterPermissionsUI();
         uncheckInheritedPermissions();
         setPermissions(DATA_ADMIN.getGroup(), "Editor");
@@ -406,20 +400,32 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
 
     public static class EHRUser
     {
-        private final String _userId;
+        private final String _email;
         private final String _groupName;
         private final EHRRole _role;
+        private Integer _userId = null;
 
-        public EHRUser(String userId, String groupName, EHRRole role)
+
+        public EHRUser(String email, String groupName, EHRRole role)
         {
-            _userId = userId;
+            _email = email;
             _groupName = groupName;
             _role = role;
         }
 
         public String getUser()
         {
+            return _email;
+        }
+
+        public Integer getUserId()
+        {
             return _userId;
+        }
+
+        public void setUserId(Integer userId)
+        {
+            _userId = userId;
         }
 
         public String getGroup()

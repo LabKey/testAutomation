@@ -67,4 +67,10 @@ public class Ext4CmpRefWD
         String script = "return Ext4.getCmp('"+_id+"')." + expr + ";";
         return _test.executeScript(script, args);
     }
+
+    public Object getFnEval(String expr, Object... args)
+    {
+        String script = "var cmp = Ext4.getCmp('" + _id + "'); return (function(){" + expr + "}).apply(cmp, arguments);";
+        return _test.executeScript(script, args);
+    }
 }

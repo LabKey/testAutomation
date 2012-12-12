@@ -117,6 +117,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assays.add(Pair.of("Viral Loads", VIRAL_LOAD_ASSAYNAME));
         assays.add(Pair.of("ELISPOT_Assay", "ELISPOT Test"));
         assays.add(Pair.of("Electrochemiluminescence Assay", "Electrochemiluminescence Assay Test"));
+        assays.add(Pair.of("Genotype Assay", "Genotyping Assay Test"));
 
         return assays;
     }
@@ -719,7 +720,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         modules.add("FlowAssays");
         modules.add("GenotypeAssays");
         modules.add("SequenceAnalysis");
-        modules.add("SSP_Assay");
         modules.add("Viral_Load_Assay");
         return modules;
     }
@@ -771,6 +771,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         beginAt(getProjectUrl());
         Alert alert = _driver.switchTo().alert();
         alert.accept();
+        waitForText(LabModuleHelper.LAB_HOME_TEXT);
     }
 
     @Override

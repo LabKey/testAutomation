@@ -141,8 +141,19 @@ public class Crawler
             new ControllerActionId("user", "impersonate"),
             new ControllerActionId("wiki", "download"),
             // Used in the ContainerContext test to check URL generation, but doesn't actually exist
-            new ControllerActionId("fake", "action"));
+            new ControllerActionId("fake", "action"),
 
+            // Actions from unsupported modules
+            new ControllerActionId("targetedms", "downloadDocument"),
+
+            // Script injection exclusions
+            new ControllerActionId("announcements", "update"), // TODO: 16731: Announcements.UpdateAction: AssertionError on bad 'entityId'
+            new ControllerActionId("announcements", "respond"), // TODO: 16732: Announcements.RespondAction: IllegalArgumentsException on bad 'parentId'
+            new ControllerActionId("flow-editscript", "editGateTree"), // TODO: 16733: flow-editscript.EditGateTreeAction: NumberFormatException on bad 'scriptId'
+            new ControllerActionId("project", "customizeWebPart"), // TODO: 16734: Project.CustomizeWebPartAction: ClassNotFoundException on bad 'webPartId'
+            new ControllerActionId("idri", "formulationDetails"), // TODO: 16735: Idri.FormulationDetailsAction: NullPointerException on bad 'rowId'
+            new ControllerActionId("experiment", "deriveSamplesChooseTarget"), // TODO: 16736: Experiment.DeriveSamplesChooseTargetAction: AssertionError on bad 'rowId'
+            new ControllerActionId("user", "deactivateUsers")); // TODO: 16737: User.DeactivateUsersAction: AssertionError on bad 'userId'
 
         return list;
     }

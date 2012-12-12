@@ -448,7 +448,7 @@ public class FilterTest extends ListTest
                 // When switching tabs, the filter is simplified from "In" to "Equal" because only a single value, "true", is selected.
                 if (getFormElement(Locator.name("filterType_1")).equals("Equals"))
                     assertFormElementEquals(Locator.id("value_1"), "true");
-                else
+                else if (!"mssql".equals(System.getProperty("databaseType"))) // 16724: [0,1] are displayed on sql server instances
                     assertFormElementEquals(Locator.id("value_1"), filter1);
             }
             else

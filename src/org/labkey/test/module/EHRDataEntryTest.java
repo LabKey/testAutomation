@@ -34,7 +34,7 @@ import java.util.Date;
 public class EHRDataEntryTest extends AbstractEHRTest
 {
     @Override
-    public void runUITests()
+    public void runUITests() throws Exception
     {
         initProject();
 
@@ -101,6 +101,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         _extHelper.waitForExtDialog("Duplicate Records");
         _extHelper.clickExtButton("Duplicate Records", "Submit", 0);
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        //TODO: verify this worked
 
         clickButton("Save & Close");
 
@@ -249,7 +250,13 @@ public class EHRDataEntryTest extends AbstractEHRTest
         log("Add treatments record.");
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-drug_administration-records-grid')]"), WAIT_FOR_JAVASCRIPT);
         _helper.clickVisibleButton("Add Record");
+
+        //a proxy for when the record has been added and bound to the form
+        waitForElement(Locator.xpath("//div[./div/span[text()='Treatments & Procedures']]//input[@name='enddate' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//div[./div/span[text()='Treatments & Procedures']]//input[@name='enddate']/..//input[contains(@id, 'date')]"), DATE_FORMAT.format(new Date()));
+
+        waitForElement(Locator.xpath("//div[./div/span[text()='Treatments & Procedures']]//input[@name='code' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
+        sleep(100);
         _extHelper.selectComboBoxItem("Code:", "Antibiotic");
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='code']/.."), "amoxicillin (c-54620)\u00a0");
         _extHelper.selectComboBoxItem("Route:", "oral\u00a0");

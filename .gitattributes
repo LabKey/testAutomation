@@ -171,6 +171,7 @@ src/org/labkey/test/testpicker/CheckRenderer.java -text
 src/org/labkey/test/testpicker/TestHelper.java -text
 src/org/labkey/test/tests/AbstractAssayTest.java -text
 src/org/labkey/test/tests/AbstractAssayTestWD.java -text
+src/org/labkey/test/tests/AbstractLabModuleAssayTest.java -text
 src/org/labkey/test/tests/AbstractPlateBasedAssayTest.java -text
 src/org/labkey/test/tests/AbstractQCAssayTest.java -text
 src/org/labkey/test/tests/AbstractQCAssayTestWD.java -text
@@ -201,6 +202,7 @@ src/org/labkey/test/tests/ExtraKeyStudyTest.java -text
 src/org/labkey/test/tests/FieldValidatorTest.java -text
 src/org/labkey/test/tests/FileContentTest.java -text
 src/org/labkey/test/tests/FilterTest.java -text
+src/org/labkey/test/tests/FlowAssaysTest.java -text
 src/org/labkey/test/tests/FlowCBCTest.java -text
 src/org/labkey/test/tests/FlowImportTest.java -text
 src/org/labkey/test/tests/FlowJoQueryTest.java -text
@@ -210,6 +212,7 @@ src/org/labkey/test/tests/FlowTest.java -text
 src/org/labkey/test/tests/FolderExportTest.java -text
 src/org/labkey/test/tests/FolderTest.java -text
 src/org/labkey/test/tests/FormulationsTest.java -text
+src/org/labkey/test/tests/GenotypeAssaysTest.java -text
 src/org/labkey/test/tests/GenotypingTest.java -text
 src/org/labkey/test/tests/GpatAssayTest.java -text
 src/org/labkey/test/tests/GroupTest.java -text
