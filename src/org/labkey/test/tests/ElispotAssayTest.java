@@ -372,6 +372,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
+        waitForElement(Locator.id("dataregion_Runs"));
 
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
         clickLinkWithText(TEST_ASSAY_ELISPOT);
