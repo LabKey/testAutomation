@@ -6303,10 +6303,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     private String setSource(String srcFragment, String wikiName)
     {
-        if (!isTextPresent(wikiName))
-        {
-            Assert.fail("Could not find the Wiki '" + wikiName + "'. Please create the Wiki before attempting to set the source.");
-        }
+        waitForElement(Locator.linkWithText(wikiName));
         clickWebpartMenuItem(wikiName, "Edit");
 
         setWikiBody(srcFragment);
