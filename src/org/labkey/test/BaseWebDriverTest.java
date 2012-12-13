@@ -1600,22 +1600,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             _testFailed = false;
 
-            try
+            if (!skipCleanup())
             {
-                if (!skipCleanup())
-                {
-                    goToHome();
-                    doCleanup(true);
-                }
-                else
-                {
-                    log("Skipping test cleanup as requested.");
-                }
+                goToHome();
+                doCleanup(true);
             }
-            catch (Throwable t)
+            else
             {
-                log("WARNING: an exception occurred while cleaning up: " + t.getMessage());
-                // fall through
+                log("Skipping test cleanup as requested.");
             }
 
             checkLeaksAndErrors();
