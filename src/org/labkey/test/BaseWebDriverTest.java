@@ -2221,7 +2221,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
             String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
 
-            publishArtifact(dumpFullScreen(dumpDir, baseName));
+            // Windows doesn't support OS level screenshots for headless environment
+            if (!(System.getProperty("os.name").toLowerCase().contains("win") & onTeamCity()))
+                publishArtifact(dumpFullScreen(dumpDir, baseName));
+
             publishArtifact(dumpScreen(dumpDir, baseName));
             publishArtifact(dumpHtml(dumpDir, baseName));
         }
