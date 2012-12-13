@@ -56,6 +56,7 @@ public class TestHelper
     private JCheckBox _linkCheck;
     private JCheckBox _memCheck;
     private JCheckBox _loop ;
+    private JCheckBox _haltOnError;
     private DependentCheckBox _cleanOnly ;
     private JTextField _port;
     private JTextField _contextPath;
@@ -168,12 +169,15 @@ public class TestHelper
         _memCheck.setBackground(Color.white);
         _loop = new JCheckBox("Loop");
         _loop.setBackground(Color.white);
+        _haltOnError = new JCheckBox("Halt on Error");
+        _haltOnError.setBackground(Color.white);
         _cleanOnly = new DependentCheckBox("Clean Only", _clean);
         _cleanOnly.setBackground(Color.white);
         optionsChecks.add(_clean, gbcChecks);
         optionsChecks.add(_linkCheck, gbcChecks);
         optionsChecks.add(_memCheck, gbcChecks);
         optionsChecks.add(_loop, gbcChecks);
+//        optionsChecks.add(_haltOnError, gbcChecks);
         optionsChecks.add(_cleanOnly, gbcChecks);
         optionsChecks.setBackground(Color.white);
         options.add(optionsChecks);
@@ -490,7 +494,7 @@ public class TestHelper
     private void saveTestConfig(String name)
     {
         TestConfig config = new TestConfig(name, _clean.isSelected(), _linkCheck.isSelected(), _memCheck.isSelected(), _loop.isSelected(), _cleanOnly.isSelected(), _firefoxButton.isSelected(),
-                _ieButton.isSelected(), _port.getText().trim(), _contextPath.getText().trim(), _server.getText().trim(), _root.getText().trim(), getCheckedNodes(_treeRoot));
+                _ieButton.isSelected(), _port.getText().trim(), _contextPath.getText().trim(), _server.getText().trim(), _root.getText().trim(), getCheckedNodes(_treeRoot), _haltOnError.isSelected());
 
         _savedConfigs = deleteTestConfigFromList(name, _savedConfigs);
         _savedConfigs.add(config);
@@ -595,6 +599,7 @@ public class TestHelper
         _clean.setEnabled(!config.isCleanOnly());
         _linkCheck.setSelected(config.isLinkCheck());
         _memCheck.setSelected(config.isMemCheck());
+        _haltOnError.setSelected(config.isHaltOnError());
         _loop.setSelected(config.isLoop());
         _cleanOnly.setSelected(config.isCleanOnly());
         _firefoxButton.setSelected(config.isFirefox());
@@ -617,6 +622,7 @@ public class TestHelper
         _loop.setSelected(Boolean.valueOf(System.getProperty("loop")));
         _linkCheck.setSelected(Boolean.valueOf(System.getProperty("linkCheck")));
         _memCheck.setSelected(Boolean.valueOf(System.getProperty("memCheck")));
+        _haltOnError.setSelected(Boolean.valueOf(System.getProperty("haltOnError")));
         String port = System.getProperty("labkey.port");
         if (port != null && !port.equals(""))
             _port.setText(port);
@@ -766,6 +772,7 @@ public class TestHelper
             System.setProperty("memCheck", String.valueOf(_memCheck.isSelected()));
             System.setProperty("loop", String.valueOf(_loop.isSelected()));
             System.setProperty("cleanOnly", String.valueOf(_cleanOnly.isSelected()));
+            System.setProperty("haltOnError", String.valueOf(_haltOnError.isSelected()));
             System.setProperty("labkey.port", _port.getText().trim());
             System.setProperty("labkey.contextpath", _contextPath.getText().trim());
             System.setProperty("labkey.server", _server.getText().trim());

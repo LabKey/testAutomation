@@ -41,6 +41,7 @@ public class TestConfig implements Serializable
     boolean _cleanOnly;
     boolean _firefox;
     boolean _ie;
+    boolean _haltOnError;
     String _port;
     String _contextPath;
     String _server;
@@ -48,7 +49,7 @@ public class TestConfig implements Serializable
     List<String> _checkedNodes;
 
 
-    public TestConfig(String name, boolean clean, boolean linkCheck, boolean memCheck, boolean loop, boolean cleanOnly, boolean firefox, boolean ie, String port, String contextPath, String server, String labkeyRoot, List<String> checkedNodes)
+    public TestConfig(String name, boolean clean, boolean linkCheck, boolean memCheck, boolean loop, boolean cleanOnly, boolean firefox, boolean ie, String port, String contextPath, String server, String labkeyRoot, List<String> checkedNodes, Boolean haltOnError)
     {
         _name = name;
         _clean = clean;
@@ -63,6 +64,7 @@ public class TestConfig implements Serializable
         _server = server;
         _root = labkeyRoot;
         _checkedNodes = checkedNodes;
+        _haltOnError = haltOnError;
     }
 
     public TestConfig()
@@ -80,6 +82,7 @@ public class TestConfig implements Serializable
         _server = TestHelper.DEFAULT_SERVER;
         _root = TestHelper.DEFAULT_ROOT;
         _checkedNodes = new ArrayList<String>();
+        _haltOnError = true;
     }
 
     public String getName()
@@ -105,6 +108,11 @@ public class TestConfig implements Serializable
     public boolean isLoop()
     {
         return _loop;
+    }
+
+    public Boolean isHaltOnError()
+    {
+        return _haltOnError;
     }
 
     public boolean isCleanOnly()
