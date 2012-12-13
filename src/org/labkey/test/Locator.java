@@ -26,6 +26,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -37,7 +38,7 @@ import java.util.List;
 public abstract class Locator
 {
     protected String _loc;
-    protected int _index;
+    protected Integer _index;
     protected String _contains;
     protected String _text;
 
@@ -49,7 +50,7 @@ public abstract class Locator
     protected Locator(String loc)
     {
         _loc = loc;
-        _index = 0;
+        _index = null;
     }
 
     private Locator(String loc, int index, String contains, String text)
@@ -83,7 +84,7 @@ public abstract class Locator
     protected String getLoggableDescription()
     {
         return toString() +
-            (_index == 0 ? "" : "\nIndex: " + _index) +
+            (_index == null ? "" : "\nIndex: " + _index) +
             (_contains == null ? "" : "\nContaining: " + _contains) +
             (_text == null ? "" : "\nWith Text: " + _text);
     }
@@ -99,9 +100,9 @@ public abstract class Locator
     public WebElement findElement(WebDriver driver)
     {
         List<WebElement> elements = findElements(driver);
-        if (elements.size() <= _index)
+        if (elements.size() < 1)
             throw new NoSuchElementException("Unable to find element: " + getLoggableDescription());
-        return elements.get(_index);
+        return elements.get(0);
     }
 
     public List<WebElement> findElements(WebDriver driver)
@@ -147,7 +148,16 @@ public abstract class Locator
                 }
             }
         }
-        return elements;
+
+        if (_index == null)
+            return elements;
+        else
+        {
+            List<WebElement> zeroOrOneElement = new ArrayList<WebElement>();
+            if (elements.size() > _index)
+                zeroOrOneElement.add(elements.get(_index));
+            return zeroOrOneElement;
+        }
     }
 
     public WebElement waitForElmement(final WebDriver driver, final int msTimeout)
@@ -169,7 +179,7 @@ public abstract class Locator
         catch (TimeoutException ex)
         {
             Assert.fail("Timeout waiting for element [" + secTimeout + "sec]: " + toString() +
-                    (_index == 0 ? "" : "\nIndex: " + _index) +
+                    (_index == null ? "" : "\nIndex: " + _index) +
                     (_contains == null ? "" : "\nContaining: " + _contains) +
                     (_text == null ? "" : "\nWith Text: " + _text));
             return null; // unreachable
@@ -195,7 +205,7 @@ public abstract class Locator
         catch (TimeoutException ex)
         {
             Assert.fail("Timeout waiting for element to disappear [" + secTimeout + "sec]: " + toString() +
-                    (_index == 0 ? "" : "\nIndex: " + _index) +
+                    (_index == null ? "" : "\nIndex: " + _index) +
                     (_contains == null ? "" : "\nContaining: " + _contains) +
                     (_text == null ? "" : "\nWith Text: " + _text));
         }
@@ -619,7 +629,7 @@ public abstract class Locator
      */
     public static String xq(String value)
     {
-        if (value.indexOf("'") < 0) {
+        if (!value.contains("'")) {
             return "'" + value + "'";
         } else if (value.indexOf('"') < 0) {
             return '"' + value + '"';
@@ -715,7 +725,7 @@ public abstract class Locator
         public String toXpath()
         {
             return "(" + _loc + ")"+
-                    (_index != 0 ? "[" + (_index + 1) + "]" : "") +
+                    (_index != null ? "[" + (_index + 1) + "]" : "") +
                     (_text != null && !_text.equals("") ? "[normalize-space()='" + _text + "']" : "") +
                     (_contains != null && !_contains.equals("") ? "[contains(normalize-space(), '" + _contains + "')]" : "");
         }
@@ -794,7 +804,7 @@ public abstract class Locator
         @Override
         public String toString()
         {
-            return "name=" + _loc + (_index > 0 ? " index=" + _index : "");
+            return "name=" + _loc + (_index != null ? " index=" + _index : "");
         }
 
         protected By toBy()
