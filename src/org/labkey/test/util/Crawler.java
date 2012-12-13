@@ -153,7 +153,9 @@ public class Crawler
             new ControllerActionId("project", "customizeWebPart"), // TODO: 16734: Project.CustomizeWebPartAction: ClassNotFoundException on bad 'webPartId'
             new ControllerActionId("idri", "formulationDetails"), // TODO: 16735: Idri.FormulationDetailsAction: NullPointerException on bad 'rowId'
             new ControllerActionId("experiment", "deriveSamplesChooseTarget"), // TODO: 16736: Experiment.DeriveSamplesChooseTargetAction: AssertionError on bad 'rowId'
-            new ControllerActionId("user", "deactivateUsers")); // TODO: 16737: User.DeactivateUsersAction: AssertionError on bad 'userId'
+            new ControllerActionId("user", "deactivateUsers"), // TODO: 16737: User.DeactivateUsersAction: AssertionError on bad 'userId'
+            new ControllerActionId("user", "deleteUsers"), // TODO: 16769: User.DeleteUsersAction: AssertionError on bad 'userId'
+            new ControllerActionId("study-designer", "designer")); // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
 
         return list;
     }
