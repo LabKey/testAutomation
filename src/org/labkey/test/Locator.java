@@ -50,10 +50,9 @@ public abstract class Locator
     protected Locator(String loc)
     {
         _loc = loc;
-        _index = null;
     }
 
-    private Locator(String loc, int index, String contains, String text)
+    private Locator(String loc, Integer index, String contains, String text)
     {
         _loc = loc;
         _index = index;
@@ -65,7 +64,7 @@ public abstract class Locator
 
     public abstract Locator withText(String text);
 
-    public abstract Locator index(int index);
+    public abstract Locator index(Integer index);
 
     /**
      * Not for direct use with selenium
@@ -233,13 +232,13 @@ public abstract class Locator
     }
 
     /**
-     * @deprecated Use {@link NameLocator} with {@link #index(int)}
+     * @deprecated Use {@link NameLocator} with {@link #index(Integer)}
      * Element by name and index within the set of elements with that name
      * @param name
      * @param index
      * @return
      */
-    @Deprecated public static Locator name(String name, int index)
+    @Deprecated public static Locator name(String name, Integer index)
     {
         return new NameLocator(name).index(index);
     }
@@ -336,7 +335,7 @@ public abstract class Locator
         return xpath("//button/span["+ NOT_HIDDEN +" and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]");
     }
 
-    public static XPathLocator ext4Button(String text, int index)
+    public static XPathLocator ext4Button(String text, Integer index)
     {
         return xpath("(//button/span["+ NOT_HIDDEN +" and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "])[" + (index + 1) + "]");
     }
@@ -351,7 +350,7 @@ public abstract class Locator
         return xpath("//a[@class='x-menu-item' and text() = " + xq(text) + "]");
     }
 
-    public static XPathLocator extButton(String text, int index)
+    public static XPathLocator extButton(String text, Integer index)
     {
         return xpath("(//button[contains(@class, 'x-btn-text') and text() = " + xq(text) + "])[" + (index + 1) + "]");
     }
@@ -381,7 +380,7 @@ public abstract class Locator
         return xpath("//a[normalize-space(@class)='labkey-button' or normalize-space(@class)='labkey-menu-button']/span[contains(text(),  " + xq(text) + ")]");
     }
 
-    public static XPathLocator navButton(String text, int index)
+    public static XPathLocator navButton(String text, Integer index)
     {
         return xpath("(//a[normalize-space(@class)='labkey-button' or @class='labkey-menu-button']/span[text() = " + xq(text) + "])[" + (index + 1) + "]");
     }
@@ -396,12 +395,12 @@ public abstract class Locator
         return xpath("//input[@type='submit' and contains(@value, " + xq(text) + ")]");
     }
 
-    public static XPathLocator navSubmitButton(String text, int index)
+    public static XPathLocator navSubmitButton(String text, Integer index)
     {
         return xpath("(//input[@type='submit' and @value=" + xq(text) + "])[" + (index + 1) + "]");
     }
 
-    public static XPathLocator linkWithImage(String image, int index)
+    public static XPathLocator linkWithImage(String image, Integer index)
     {
         return xpath("(//a/img[contains(@src, " + xq(image) + ")])[" + (index + 1) + "]");
     }
@@ -411,7 +410,7 @@ public abstract class Locator
         return new LinkLocator(text);
     }
 
-    public static XPathLocator linkWithText(String text, int index)
+    public static XPathLocator linkWithText(String text, Integer index)
     {
         return xpath("(//a[string() = " + xq(text) + "])[" + (index + 1) + "]");
     }
@@ -421,7 +420,7 @@ public abstract class Locator
         return xpath("//a[contains(string(), " + xq(text) + ")]");
     }
 
-    public static XPathLocator linkContainingText(String text, int index)
+    public static XPathLocator linkContainingText(String text, Integer index)
     {
         return xpath("(//a[contains(string(), " + xq(text) + ")])[" + (index + 1) + "]");
     }
@@ -461,7 +460,7 @@ public abstract class Locator
         return xpath("//input[@type='image' and contains(@src, " + xq(imgSrc) + ")]");
     }
 
-    public static XPathLocator buttonWithImgSrc(String imgSrc, int index)
+    public static XPathLocator buttonWithImgSrc(String imgSrc, Integer index)
     {
         return xpath("(//input[@type='image' and contains(@src, " + xq(imgSrc) + ")])[" + (index + 1) + "]");
     }
@@ -536,7 +535,7 @@ public abstract class Locator
     }
 
     //Locator for image with src=src (if substringMatch=false
-    public static XPathLocator imageWithSrc(String src, boolean substringMatch, int index)
+    public static XPathLocator imageWithSrc(String src, boolean substringMatch, Integer index)
     {
         if (substringMatch)
             return xpath("(//img[contains(@src, " + xq(src) + ")])[" + index + "]");
@@ -667,7 +666,7 @@ public abstract class Locator
             super(loc);
         }
 
-        private XPathLocator(String loc, int index, String contains, String text)
+        private XPathLocator(String loc, Integer index, String contains, String text)
         {
             super(loc, index, contains, text);
         }
@@ -682,7 +681,7 @@ public abstract class Locator
             return new XPathLocator(_loc, _index, _contains, text);
         }
 
-        public Locator index(int index)
+        public Locator index(Integer index)
         {
             return new XPathLocator(_loc, index, _contains, _text);
         }
@@ -743,7 +742,7 @@ public abstract class Locator
             super(loc);
         }
 
-        private IdLocator(String loc, int index, String contains, String text)
+        private IdLocator(String loc, Integer index, String contains, String text)
         {
             super(loc, index, contains, text);
         }
@@ -758,7 +757,7 @@ public abstract class Locator
             return new IdLocator(_loc, _index, _contains, text);
         }
 
-        public Locator index(int index)
+        public Locator index(Integer index)
         {
             return new IdLocator(_loc, index, _contains, _text);
         }
@@ -781,7 +780,7 @@ public abstract class Locator
             super(loc);
         }
 
-        private NameLocator(String loc, int index, String contains, String text)
+        private NameLocator(String loc, Integer index, String contains, String text)
         {
             super(loc, index, contains, text);
         }
@@ -796,7 +795,7 @@ public abstract class Locator
             return new NameLocator(_loc, _index, _contains, text);
         }
 
-        public Locator index(int index)
+        public Locator index(Integer index)
         {
             return new NameLocator(_loc, index, _contains, _text);
         }
@@ -820,7 +819,7 @@ public abstract class Locator
             super(loc);
         }
 
-        private CssLocator(String loc, int index, String contains, String text)
+        private CssLocator(String loc, Integer index, String contains, String text)
         {
             super(loc, index, contains, text);
         }
@@ -835,7 +834,7 @@ public abstract class Locator
             return new CssLocator(_loc, _index, _contains, text);
         }
 
-        public Locator index(int index)
+        public Locator index(Integer index)
         {
             return new CssLocator(_loc, index, _contains, _text);
         }
@@ -861,7 +860,7 @@ public abstract class Locator
             super(loc);
         }
 
-        private LinkLocator(String loc, int index, String contains, String text)
+        private LinkLocator(String loc, Integer index, String contains, String text)
         {
             super(loc, index, contains, text);
         }
@@ -876,7 +875,7 @@ public abstract class Locator
             return new LinkLocator(_loc, _index, _contains, text);
         }
 
-        public Locator index(int index)
+        public Locator index(Integer index)
         {
             return new LinkLocator(_loc, index, _contains, _text);
         }
@@ -904,7 +903,7 @@ public abstract class Locator
             super(loc);
         }
 
-        private DeprecatedLocator(String loc, int index, String contains, String text)
+        private DeprecatedLocator(String loc, Integer index, String contains, String text)
         {
             super(loc, index, contains, text);
         }
@@ -919,7 +918,7 @@ public abstract class Locator
             throw new UnsupportedOperationException();
         }
 
-        public Locator index(int index)
+        public Locator index(Integer index)
         {
             throw new UnsupportedOperationException();
         }
