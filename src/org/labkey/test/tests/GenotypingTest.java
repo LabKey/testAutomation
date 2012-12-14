@@ -553,7 +553,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         _ext4Helper.clickTabContainingText("Preview Samples");
         waitForText("Sample_ID");
 
-        int expectRows = (11 * (45 +  1));  //11 cols, 45 rows, plus header
+        int expectRows = (11 * (45 +  1)) + 8;  //11 cols, 45 rows, plus header and validation row (which is only 8 cols)
         Assert.assertEquals(expectRows, selenium.getXpathCount("//td[contains(@class, 'x4-table-layout-cell')]"));
 
         //make sure values persisted
