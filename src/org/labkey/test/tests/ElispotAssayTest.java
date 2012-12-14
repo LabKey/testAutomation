@@ -406,6 +406,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         waitForElement(Locator.css("#partdelete_removeTransformScript0 img"));
         click(Locator.css("#partdelete_removeTransformScript0 img"));
         clickButton("Save & Close");
+        waitForElement(Locator.id("dataregion_Runs"));
     }
 
     private final static String FILE4_PLATE_SUMMARY_POST_SUBTRACTION =
