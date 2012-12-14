@@ -461,7 +461,7 @@ public class StudyTest extends StudyBaseTest
      */
     private void startCreateParticipantGroup()
     {
-        clickButtonContainingText("Create", 0);
+        waitAndClick(Locator.buttonContainingText("Create"));
         _extHelper.waitForExtDialog("Define Mouse Group");
         String dataset = getFormElement(Locator.name("infoCombo"));
         if (dataset.length() > 0)
