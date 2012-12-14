@@ -32,8 +32,8 @@ import java.util.concurrent.TimeUnit;
 @Aspect
 public class ImpersonationLoggingAspect
 {
-    private static Stack<Long> _startTimes = new Stack<Long>();
-    private static Stack<String> _impersonatingStack = new Stack<String>();
+    private static Long _startTime;
+    private static String _impersonating;
 
     @Pointcut(value = "execution(void impersonate*(String, ..)) && args(impersonating, ..)")
     void startImpersonation(String impersonating){}
@@ -43,27 +43,45 @@ public class ImpersonationLoggingAspect
     @Before(value = "startImpersonation(impersonating)", argNames = "impersonating")
     public void beforeImpersonation(String impersonating)
     {
-        _impersonatingStack.push(impersonating);
-        _startTimes.push(System.currentTimeMillis());
+        if (_impersonating == null)
+        {
+            TestLogger.log(">>Impersonate - " + impersonating);
+            TestLogger.increaseIndent();
 
-        TestLogger.log(">>Impersonate - "+impersonating);
-        TestLogger.increaseIndent();
+            _impersonating = impersonating;
+            _startTime = System.currentTimeMillis();
+        }
+        else
+        {
+            TestLogger.decreaseIndent();
+            TestLogger.log("><Switch Impersonation : " + _impersonating + " [" + getElapsedString(_startTime) + "] -> " + impersonating);
+            TestLogger.increaseIndent();
+
+            _impersonating = impersonating;
+            _startTime = System.currentTimeMillis();
+        }
     }
 
     @AfterReturning(value = "stopImpersonation()")
     public void afterImpersonation()
     {
-        String impersonating = _impersonatingStack.pop();
-        Long elapsed = System.currentTimeMillis()- _startTimes.pop();
+        String impersonating = _impersonating;
 
-        String elapsedStr = String.format("%dm %d.%ds",
+        String elapsedStr = getElapsedString(_startTime);
+
+        TestLogger.decreaseIndent();
+        TestLogger.log("<<Stop Impersonating - " + impersonating + " [" + elapsedStr + "]");
+
+        _impersonating = null;
+    }
+
+    private String getElapsedString(Long startTime)
+    {
+        Long elapsed = System.currentTimeMillis() - startTime;
+        return String.format("%dm %d.%ds",
                 TimeUnit.MILLISECONDS.toMinutes(elapsed),
                 TimeUnit.MILLISECONDS.toSeconds(elapsed) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
                 elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
-
-        TestLogger.decreaseIndent();
-        TestLogger.log("<<Stop Impersonating - " + impersonating + " [" + elapsedStr + "]");
     }
-
 }
