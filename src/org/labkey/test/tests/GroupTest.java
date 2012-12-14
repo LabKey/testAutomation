@@ -36,7 +36,6 @@ public class GroupTest extends BaseWebDriverTest
     protected static final String[] TEST_USERS_FOR_GROUP = {"user1_grouptest@" + SIMPLE_GROUP + ".group.test", "user2_grouptest@" + SIMPLE_GROUP + ".group.test", "user3_grouptest@" + COMPOUND_GROUP + ".group.test"};
     protected static final String WIKITEST_NAME = "GroupSecurityApiTest";
     protected static final String GROUP_SECURITY_API_FILE = "groupSecurityTest.html";
-    protected static final String API_SITE_GROUP = "API Site Group";
 
     @Override
     protected String getProjectName()
@@ -56,7 +55,6 @@ public class GroupTest extends BaseWebDriverTest
         deleteGroup(COMPOUND_GROUP, afterTest);
         deleteGroup(BAD_GROUP, afterTest);
         deleteGroup(CHILD_GROUP, afterTest);
-        deleteGroup(API_SITE_GROUP, afterTest);
         deleteProject(getProjectName(), afterTest);
         deleteProject(getProject2Name(), afterTest);
     }
