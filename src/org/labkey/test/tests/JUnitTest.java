@@ -17,27 +17,26 @@
 package org.labkey.test.tests;
 
 import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.WebTestHelper;
-import org.labkey.test.Runner;
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONValue;
-import junit.framework.TestSuite;
-import junit.framework.TestResult;
-import junit.framework.TestCase;
-import junit.framework.AssertionFailedError;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Runner;
+import org.labkey.test.WebTestHelper;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 import java.util.List;
-import java.io.IOException;
+import java.util.Map;
 
 /**
  * User: brittp
