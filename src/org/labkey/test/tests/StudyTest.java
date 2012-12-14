@@ -99,7 +99,7 @@ public class StudyTest extends StudyBaseTest
     protected void doCleanup(boolean afterTest) throws Exception //child class cleanup method throws Exception
     {
         super.doCleanup(afterTest);
-        deleteUsers(afterTest, authorUser);
+        deleteUsers(false, authorUser); // Subclasses may not have created this user
     }
 
     protected void emptyParticipantPickerList()
