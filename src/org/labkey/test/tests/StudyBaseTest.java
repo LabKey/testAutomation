@@ -306,9 +306,13 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void goToManageStudyPage(String projectName, String studyName)
     {
         log("Going to Manage Study Page of: " + studyName);
-        waitAndClick(Locator.linkContainingText(projectName));
-        waitAndClick(Locator.linkContainingText(studyName));
-        waitAndClick(Locator.linkContainingText("Manage Study"));
+        if (!getText(Locator.css(".nav-tree-selected")).equals(projectName))
+        {
+            waitAndClick(Locator.linkWithText(projectName));
+            waitForElement(Locator.xpath("//a[contains(@class, 'nav-tree-selected')][text()='" + projectName + "']"));
+        }
+        waitAndClick(Locator.linkWithText(studyName));
+        waitAndClick(Locator.linkWithText("Manage Study"));
         waitForElement(Locator.xpath("id('labkey-nav-trail-current-page')[text()='Manage Study']"));
     }
 

@@ -373,7 +373,7 @@ public class StudyTest extends StudyBaseTest
      */
     private void attemptCreateExpectError(String ids, String expectedError, String listName)
     {
-        createStudy();
+        startCreateParticipantGroup();
 
         setFormElement(Locator.name(LABEL_FIELD), listName);
         setFormElement(Locator.name(ID_FIELD), ids);
@@ -452,20 +452,22 @@ public class StudyTest extends StudyBaseTest
      */
     private void cancelCreateClassificationList()
     {
-        createStudy();
+        startCreateParticipantGroup();
         clickButtonContainingText("Cancel", 0);
     }
 
     /**preconditions: at participant picker main page
      * post-conditions:  at screen for creating new PP list
      */
-    private void createStudy()
+    private void startCreateParticipantGroup()
     {
         clickButtonContainingText("Create", 0);
-        //Issue 12505
-        waitForText("Cancel", defaultWaitForPage);
-        waitForText("Add Selected", defaultWaitForPage);
-        clickButtonContainingText("Create", "Add Selected");
+        _extHelper.waitForExtDialog("Define Mouse Group");
+        String dataset = getFormElement(Locator.name("infoCombo"));
+        if (dataset.length() > 0)
+        {
+            waitForElement(Locator.id("demoDataRegion"));
+        }
     }
 
 
@@ -477,7 +479,7 @@ public class StudyTest extends StudyBaseTest
      */
     private String createListWithAddAll(String listName, boolean filtered)
     {
-        createStudy();
+        startCreateParticipantGroup();
         setFormElement(Locator.name(LABEL_FIELD), listName);
         DataRegionTable table = new DataRegionTable("demoDataRegion", this, true);
 
@@ -511,7 +513,7 @@ public class StudyTest extends StudyBaseTest
         //assert same size
         int columnCount = idsInColumn.size()-2; //the first entry in column count is the name
         int formCount = idsInForm.length() - idsInForm.replace(",", "").length() - 1; //number of commas + 1 = number of entries
-        Assert.assertEquals(columnCount, formCount);
+        Assert.assertEquals("Wrong number of participants selected", columnCount, formCount);
     }
 
     private void goToManageParticipantClassificationPage(String projectName, String studyName, String subjectNoun)
