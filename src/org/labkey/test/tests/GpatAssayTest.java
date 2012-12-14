@@ -95,11 +95,11 @@ public class GpatAssayTest extends BaseWebDriverTest
         // assertAlert("Could not convert the value 'text' from line #202 in column #6 (Primary) to Integer");
         _listHelper.setColumnType(5, ListHelper.ListColumnType.String); // Row 201 is a string
         clickButton("Begin import");
-        clickButton("Next");
-        clickButton("Save and Finish");
-        clickLinkWithText(GPAT_ASSAY_XLS);
+        waitAndClickButton("Next");
+        waitAndClickButton("Save and Finish");
+        waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLS));
+        waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
-        assertElementPresent(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
 
         log("Import XLSX GPAT assay");
         clickLinkWithText(PROJECT_NAME);
