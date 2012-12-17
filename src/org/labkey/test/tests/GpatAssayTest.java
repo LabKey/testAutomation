@@ -125,11 +125,11 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertFormElementEquals("Date", "DrawDt");
         _listHelper.setColumnType(5, ListHelper.ListColumnType.String); // Row 201 is a string
         clickButton("Begin import");
-        clickButton("Next");
-        clickButton("Save and Finish");
-        clickLinkWithText(GPAT_ASSAY_XLSX);
+        waitAndClickButton("Next");
+        waitAndClickButton("Save and Finish");
+        waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLSX));
+        waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
-        assertElementPresent(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
 
         log("Import TSV GPAT assay");
         clickLinkWithText(PROJECT_NAME);
@@ -165,11 +165,11 @@ public class GpatAssayTest extends BaseWebDriverTest
         pressTab(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']"));
 
         clickButton("Save & Close");
-        clickButton("Next");
-        clickButton("Save and Finish");
-        clickLinkWithText(GPAT_ASSAY_TSV);
+        waitAndClickButton("Next");
+        waitAndClickButton("Save and Finish");
+        waitAndClick(Locator.linkWithText(GPAT_ASSAY_TSV));
+        waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
-        assertElementPresent(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
 
         log("Verify standard column aliases");
         clickLinkWithText(PROJECT_NAME);
@@ -219,12 +219,12 @@ public class GpatAssayTest extends BaseWebDriverTest
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
 
         clickButton("Begin import");
-        clickButton("Next");
-        clickButton("Save and Finish");
-        clickLinkWithText(GPAT_ASSAY_FNA);
+        waitAndClickButton("Next");
+        waitAndClickButton("Save and Finish");
+        waitAndClick(Locator.linkWithText(GPAT_ASSAY_FNA));
 
+        waitForText("Sequence");
         assertTextPresent("Header");
-        assertTextPresent("Sequence");
 
         assertTextPresent("HCJDRSZ07IVO6P", "HCJDRSZ07IL1GX", "HCJDRSZ07H5SPZ");
         assertTextPresent("CACCAGACAGGTGTTATGGTGTGTGCCTGTAATCCCAGCTACTTGGGAGGGAGCTCAGGT");
