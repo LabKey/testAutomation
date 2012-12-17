@@ -58,8 +58,12 @@ public class AuditLogTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest)
     {
-        deleteUsers(false, AUDIT_TEST_USER); // Needed for pre-clean only. User is deleted during test.
-        deleteProject(getProjectName(), afterTest);
+        // Needed for pre-clean only. User & project are deleted during test.
+        if (!afterTest)
+        {
+            deleteUsers(false, AUDIT_TEST_USER);
+            deleteProject(getProjectName(), false);
+        }
     }
 
     protected void doTestSteps() throws Exception
