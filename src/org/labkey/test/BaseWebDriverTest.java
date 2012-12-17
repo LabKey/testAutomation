@@ -78,6 +78,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverBackedSelenium;
 import org.openqa.selenium.WebDriverException;
@@ -1611,6 +1612,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
 
             checkLeaksAndErrors();
+        }
+        catch (UnhandledAlertException e)
+        {
+            // Catch so we can record the alert's text
+            throw new RuntimeException("Unexpected Alert: " + e.getAlert().getText(), e);
         }
         catch (Exception e)
         {
