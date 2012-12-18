@@ -1017,6 +1017,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected void clickAdminMenuItem(String... items)
     {
         waitForElement(Locator.xpath(ADMIN_MENU_XPATH));
+        sleep(1000); //TODO
         Ext4HelperWD.clickExt4MenuButton(this, true, Locator.xpath(ADMIN_MENU_XPATH), false, items);
     }
 
@@ -1700,7 +1701,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void ensureSignedInAsAdmin()
     {
         goToHome();
-        if(isTextPresent("Admin"))
+        if(isElementPresent(Locator.id("adminMenuPopupText")))
             return;
 
         if (isElementPresent(Locator.id("userMenuPopupLink")))
@@ -2652,7 +2653,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickButton("Create New Group", 0);
         sleep(500);
         waitForText("Group " + groupName);
-        waitAndClick(Locator.xpath("//div[contains(@class, 'x4-tool')]//img[contains(@class, 'x4-tool-close')]"));
+        _extHelper.clickExtButton(groupName + " Information", "Done");
         waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and text()='" + groupName + "']"), WAIT_FOR_JAVASCRIPT);
     }
 
@@ -3999,6 +4000,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return isElementPresent(Locator.linkWithImage(imageName));
     }
 
+    public void assertNavTrail(String... links)
+    {
+        ///TODO:  Would like this to be more sophisitcated
+        assertTextPresentInThisOrder(links);
+
+    }
     public void assertLinkPresentWithImage(String imageName)
     {
         Assert.assertTrue("Link with image '" + imageName + "' was not present", isLinkPresentWithImage(imageName));
@@ -6363,6 +6370,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void goToProjectHome()
     {
+        click(Locator.imageWithSrc("plus.gif", true, 1));
         clickFolder(getProjectName());
     }
 
@@ -6410,14 +6418,18 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public List<Locator> findAllMatches(Locator.XPathLocator loc)
     {
+        List locs =  loc.findElements(_driver );
         List<Locator> locators = new ArrayList<Locator>();
-        for (int i = 0; ; i++)
+        for (int i = 0; i < locs.size(); i++)
         {
-            if (isElementPresent(loc.index(i)))
-                locators.add(loc.index(i));
-            else
-                return locators;
+            locators.add(loc.index(i));
+//            click(loc.index(i));
+//            if (isElementPresent(loc.index(i)))
+//                locators.add(loc.index(i));
+//            else
+//                return locators;
         }
+        return locators;
     }
 
     protected void startImportStudyFromZip(String studyFile)
@@ -6658,7 +6670,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
         Locator loc = Locator.queryTreeNode(schemaName, queryName);
+        sleep(2000); //TODO
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
+        sleep(10000); //TODO
         click(loc);
         waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + queryName + "']"), 1000);
     }
@@ -6699,7 +6713,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void editQueryProperties(String schemaName, String queryName)
     {
         selectQuery(schemaName, queryName);
-        Locator loc = Locator.linkWithText("edit properties");
+        Locator loc = Locator.tagWithText("a", "edit properties");
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         clickAndWait(loc);
     }

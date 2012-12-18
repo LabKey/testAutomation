@@ -230,8 +230,12 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
             nodePath += fieldKeyParts[i];
             _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
             if (_test.isElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
+            {
                 _test.click(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
+                _test.sleep(1000); //TODO:  replace with wait for animation
+            }
             _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'minus')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 2);
+//            _test._shortWait.until(LabKeyExpectedConditions.animationIsDone());
             nodePath += "/";
         }
 

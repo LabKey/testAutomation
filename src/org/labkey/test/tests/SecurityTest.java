@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -37,7 +38,7 @@ import java.util.Map;
  * User: Mark Igra
  * Date: March 23, 2007
  */
-public class SecurityTest extends BaseSeleniumWebTest
+public class SecurityTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "SecurityVerifyProject";
     protected static final String ADMIN_USER_TEMPLATE = "_admin.template@security.test";
@@ -147,7 +148,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         impersonate(NORMAL_USER);
 
         //admin site link not available
-        assertTextNotPresent("Admin");
+        assertElementNotPresent(Locator.id("adminMenuPopupText"));
 
         //can't reach admin urls directly either
 
@@ -308,7 +309,7 @@ public class SecurityTest extends BaseSeleniumWebTest
 
         clickLinkWithText("Sign In");
         clickLinkContainingText("Forgot your password?");
-        setText("email", username);
+        setFormElement(Locator.id("EmailInput"), username);
         clickButtonContainingText("Submit", 0);
 
 //        clickButtonContainingText("Home");
@@ -373,15 +374,15 @@ public class SecurityTest extends BaseSeleniumWebTest
         assertTextPresent(NORMAL_USER);
         checkCheckbox("delete", NORMAL_USER);
         selenium.chooseOkOnNextConfirmation();
-        clickButton("Update Group Membership");
+        clickButton("Update Group Membership", 0);
         Assert.assertEquals(selenium.getConfirmation(), "Permanently remove selected users from this group?");
         assertElementNotPresent(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
-        clickLinkWithText(PROJECT_NAME);
+        goToProjectHome();
     }
 
     protected void guestTest()
     {
-        clickLinkWithText(PROJECT_NAME);
+        goToProjectHome();
         enterPermissionsUI();
         setSiteGroupPermissions("All Site Users", "Author");
         setSiteGroupPermissions("Guests", "Reader");
@@ -435,8 +436,8 @@ public class SecurityTest extends BaseSeleniumWebTest
         createUserAndNotify(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null, false);
         assertTextPresent("Failed to create user bogus@bogus@bogus: Invalid email address");
         //nav trail check
-        assertTextPresent("Site Users >  ");
-        assertTextPresent(NORMAL_USER_TEMPLATE + " was already a registered system user. Click here to see this user's profile and history.");
+        assertElementPresent(Locator.xpath("//div[@class='labkey-crumb-trail']/span[@id='navTrailAncestors']/a[text()='Site Users']"));
+        assertTextPresent(NORMAL_USER_TEMPLATE + " was already a registered system user.");//here to see this user's profile and history.");
 
         // create the project and set permissions
         _containerHelper.createProject(PROJECT_NAME, null);
@@ -463,7 +464,8 @@ public class SecurityTest extends BaseSeleniumWebTest
         // verify permissions
         checkGroupMembership(PROJECT_ADMIN_USER, "SecurityVerifyProject/Administrators", 2);
         checkGroupMembership(NORMAL_USER, "SecurityVerifyProject/Testers", 1);
-        assertTextPresent("Site Users >  User Details >  Permissions >  ");
+        assertNavTrail("Site Users", "User Details", "Permission");
+//        assertTextPresent("Site Users >  User Details >  Permissions >  ");
     }
 
     protected void checkGroupMembership(String userName, String groupName, int expectedCount)
@@ -486,6 +488,7 @@ public class SecurityTest extends BaseSeleniumWebTest
             clickLink(userAccessLink);
             
             // check for the expected number of group membership links (note: they may be hidden by expandos)
+            click(Locator.xpath("//tr[td/a[text()='" + getProjectName() + "']]//img" ));
             assertLinkPresentWithTextCount(groupName, expectedCount);
             return;
         }
@@ -494,7 +497,7 @@ public class SecurityTest extends BaseSeleniumWebTest
 
     protected void tokenAuthenticationTest()
     {
-        clickLinkWithText(PROJECT_NAME);
+        beginAt("/project/SecurityVerifyProject/begin.view?");
         String homePageUrl = removeUrlParameters(getURL().toString());  // Absolute URL for redirect, get rid of '?'
         String relUrl = getCurrentRelativeURL();
         boolean newSchool = relUrl.contains("project-");
@@ -578,7 +581,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         try
         {
             StringBuilder sb = new StringBuilder();
-            URL url = new URL(WebTestHelper.getBaseURL() + "/" + relativeUrl);
+            URL url = new URL(WebTestHelper.getBaseURL() +  relativeUrl);
             is = url.openStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
@@ -670,7 +673,7 @@ public class SecurityTest extends BaseSeleniumWebTest
         String siteAdminDisplayName = getDisplayName();
         ensureAdminMode();
         goToAdminConsole();
-        assertTextPresent("Already impersonating; click here to change back to " + testUserDisplayName);
+        assertTextPresent("Already impersonating; click ", " to change back to " + testUserDisplayName);
         deleteUsers(true, TO_BE_DELETED_USER);
         stopImpersonating();
 

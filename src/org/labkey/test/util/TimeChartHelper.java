@@ -37,9 +37,11 @@ public class TimeChartHelper
 
     public void save(String reportName)
     {
+        _test.sleep(4000);//tODO
         _test.clickButton("Save", 0);
         _test.waitForText("Viewable By");
         _test.setFormElement(Locator.name("reportName"), reportName);
+        _test.sleep(4000);//tODO
         _test.clickButtonByIndex("Save", 1);
     }
 }

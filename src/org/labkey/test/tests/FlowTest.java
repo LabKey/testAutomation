@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.BaseFlowTest;
+import org.labkey.test.BaseFlowTestWD;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -28,7 +29,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-public class FlowTest extends BaseFlowTest
+public class FlowTest extends BaseFlowTestWD
+
 {
     public static final String SELECT_CHECKBOX_NAME = ".select";
     private static final String QUV_ANALYSIS_SCRIPT = "/sampledata/flow/8color/quv-analysis.xml";
@@ -38,7 +40,7 @@ public class FlowTest extends BaseFlowTest
 
     private void clickButtonWithText(String text)
     {
-        click(Locator.raw("//input[@value = '" + text + "']"));
+        click(Locator.xpath("//input[@value = '" + text + "']"));
     }
 
     public int countEnabledInputs(String name)
@@ -55,7 +57,7 @@ public class FlowTest extends BaseFlowTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest)
     {
         super.doCleanup(afterTest);
     }
@@ -95,10 +97,22 @@ public class FlowTest extends BaseFlowTest
 
             copyAnalysisScriptTest();
 
-            //verifyDiscoverableFCSFiles();
+            removeAnalysisFilter();
+            
+            verifyDiscoverableFCSFiles();
 
 
         }
+
+    }
+
+    private void removeAnalysisFilter()
+    {
+        clickTab("Flow Dashboard");
+        clickLinkContainingText("Other settings");
+        clickLinkContainingText("Edit FCS Analysis Filter");
+        selectOptionByValue(Locator.xpath("//select[@name='ff_field']").index(0),  "");
+        clickButton("Set filter");
 
     }
 
@@ -120,15 +134,16 @@ public class FlowTest extends BaseFlowTest
         assertTextPresent("Matched 0 of 59 samples.");
 
         //TODO:  how many to select?
-        selectOptionByText(Locator.name("resolvedSamples.rows[0.0.1].matchedFile"),"91745.fcs (L02-060120-QUV-JS)" );
-        clickCheckbox("resolvedSamples.rows[0.0.1].selected");
+        selectOptionByText(Locator.name("selectedSamples.rows[0.0.1].matchedFile"),"91745.fcs (L02-060120-QUV-JS)" );
+        clickCheckbox("selectedSamples.rows[0.0.1].selected");
         clickButton("Next");
         clickButton("Next");
         clickButton("Next");
-        clickButton("Next");
+//        clickButton("Next");
         clickButton("Finish", 0);
         sleep(15000);
         waitForText("Ignoring filter");
+        assertTextPresent("88436.fcs-050112-8ColorQualitative-ET");
 
         //TODO:  verify this when it's working
     }
@@ -140,7 +155,7 @@ public class FlowTest extends BaseFlowTest
         beginAt("/query" + getContainerPath() + "/begin.view?schemaName=flow");
         createNewQuery("flow");
         setFormElement(Locator.name("ff_newQueryName"), query1);
-        selectOptionByText("identifier=ff_baseTableName",  analysisName);
+        selectOptionByText(Locator.name("ff_baseTableName"), analysisName);
         clickButton("Create and Edit Source");
 
         // Start Query Editing
@@ -166,7 +181,7 @@ public class FlowTest extends BaseFlowTest
         _extHelper.waitForImportDataEnabled();
         waitForElement(_extHelper.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Import Directory of FCS Files");
-        assertTextPresent("The following directories within '8color'");
+        assertTextPresent("The following directories within",  "8color");
         assertTextPresent(FCS_FILE_1 + " (25 fcs files)");
         assertTextPresent(FCS_FILE_2 + " (14 fcs files)");
         clickButton("Cancel"); // go back to file-browser
@@ -176,7 +191,7 @@ public class FlowTest extends BaseFlowTest
         _extHelper.selectFileBrowserItem("8color/" + FCS_FILE_1 + "/");
         waitForElement(_extHelper.locateGridRowCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Current directory of 25 FCS Files");
-        assertTextPresent("The following directories within '8color" + File.separator + FCS_FILE_1 + "'");
+        assertTextPresent("The following directories within" ,"'8color",  FCS_FILE_1);
         assertTextPresent("Current Directory (25 fcs files)");
         assertTextNotPresent(FCS_FILE_2);
         clickButton("Import Selected Runs");
@@ -216,12 +231,12 @@ public class FlowTest extends BaseFlowTest
         selectOptionByText("selectedRunId", FCS_FILE_1);
         submit();
 
-        selectOptionByText("identifier=positiveKeywordName[3]", "Comp");
-        selectOptionByText("identifier=positiveKeywordValue[3]", "FITC CD4");
+        selectOptionByText(Locator.name("positiveKeywordName[3]"), "Comp");
+        selectOptionByText(Locator.name("positiveKeywordValue[3]"), "FITC CD4");
         submit();
         assertTextPresent("Missing data");
-        selectOptionByText("identifier=negativeKeywordName[0]", "WELL ID");
-        selectOptionByText("identifier=negativeKeywordValue[0]", "H01");
+        selectOptionByText(Locator.name("negativeKeywordName[0]"), "WELL ID");
+        selectOptionByText(Locator.name("negativeKeywordValue[0]"), "H01");
         clickButtonWithText("Universal");
         submit();
         assertTextPresent("compensation calculation may be edited in a number");
@@ -286,7 +301,7 @@ public class FlowTest extends BaseFlowTest
         selectOptionByText("subset", "Singlets/L/Live/3+/4+");
         selectOptionByText("xaxis", "comp-PE Cy7-A IFNg");
         selectOptionByText("yaxis", "comp-PE Green laser-A IL2");
-        submit(Locator.dom("document.forms['chooseGraph']")); // UNDONE: v
+        clickButtonWithText("Show Graph");
 
         // change the name of an analysis
         clickLinkWithText("Flow Dashboard");
@@ -316,12 +331,12 @@ public class FlowTest extends BaseFlowTest
 
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("QUV analysis");
-        clickLinkWithText("Analyze some runs");
-        selectOptionByText("ff_targetExperimentId", "<create new>");
-        waitForPageToLoad();
+        clickLinkWithText("Analyze some runs", false);
+        selectOptionByText(Locator.name("ff_targetExperimentId"), "<create new>");
+//        waitForPageToLoad();
         Assert.assertEquals(2, countEnabledInputs(SELECT_CHECKBOX_NAME));
-        selectOptionByText("ff_targetExperimentId", "FlowExperiment2");
-        waitForPageToLoad();
+        selectOptionByText(Locator.name("ff_targetExperimentId"), "FlowExperiment2");
+//        waitForPageToLoad();
 
         Assert.assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
         selectOptionByText("ff_compensationMatrixOption", "Matrix: " + FCS_FILE_1 + " comp matrix");
@@ -354,8 +369,8 @@ public class FlowTest extends BaseFlowTest
         clickLinkContainingText("49 sample descriptions");
         assertTextPresent("49 sample descriptions");
         assertTextPresent("10 samples are not joined");
-        assertTextPresent("39 FCS Files have been joined");
-        assertTextPresent("0 FCS Files are not joined");
+        assertTextPresent("39 FCS Files", "have been joined");
+        assertTextPresent("0 FCS Files", "are not joined");
     }
 
     public void sampleSetAndMetadataTest()
@@ -366,7 +381,8 @@ public class FlowTest extends BaseFlowTest
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Inline");
 //            sleep(3000);
         assertTextNotPresent("Error generating graph");
-        assertTextPresent("No graph for:\n(<APC-A>)");
+        assertTextPresent("No graph for:", "(<APC-A>)");
+        windowMaximize();
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn("Background/Count");
@@ -430,7 +446,7 @@ public class FlowTest extends BaseFlowTest
         Assert.assertTrue("Expected 'Name' href to go to showWell.view: " + href, href.contains("/" + getFolderName() + "/showWell.view"));
         
         assertTextNotPresent("Error generating graph");
-        assertTextPresent("No graph for:\n(<APC-A>)");
+        assertTextPresent("No graph for:", "(<APC-A>)");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
         Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
 
@@ -573,7 +589,8 @@ public class FlowTest extends BaseFlowTest
     {
         log("** Verifying positivity report was deleted '" + reportName + "'");
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
-        assertTextPresent("Ignoring filter/sort on column '" + reportName + ".Response' because it does not exist.");
+        waitForText("Ignoring filter/sort on column");
+        assertTextPresent("Ignoring filter/sort on column '" , reportName , ".Response' because it does not exist.");
     }
 
 }

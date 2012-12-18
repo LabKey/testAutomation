@@ -110,6 +110,7 @@ modules/simpletest/web/simpletest/testfile2.js -text
 /resetDRT.sh -text
 src/org/labkey/test/AssayAPITest.java -text
 src/org/labkey/test/BaseFlowTest.java -text
+src/org/labkey/test/BaseFlowTestWD.java -text
 src/org/labkey/test/BaseSeleniumWebTest.java -text
 src/org/labkey/test/BaseWebDriverTest.java -text
 src/org/labkey/test/Cleanable.java -text
