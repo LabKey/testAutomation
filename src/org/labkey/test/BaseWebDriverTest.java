@@ -6370,7 +6370,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void goToProjectHome()
     {
-        click(Locator.imageWithSrc("plus.gif", true, 1));
+        Locator projectExpander = Locator.imageWithSrc("plus.gif", true, 1);
+        if(isElementPresent(projectExpander))
+            click(projectExpander);
         clickFolder(getProjectName());
     }
 
