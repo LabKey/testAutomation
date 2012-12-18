@@ -623,12 +623,8 @@ public class ExtHelperWD extends AbstractHelperWD
     public void selectGWTComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
         _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x-form-trigger-arrow')]"));
-        _test.waitForElement(Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        Locator option = Locator.xpath("//div[contains(@style, 'visibility: visible')]/div/div[text()='" + selection + "']");
-
-        _test.mouseDown(option);
-        _test.mouseDown(Locator.xpath("/html/body"));
+        _test.waitAndClick(Locator.css(".x-combo-list-item").containing(selection));
     }
 
     public void closeExtTab(String tabName)
