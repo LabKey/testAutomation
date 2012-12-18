@@ -566,6 +566,7 @@ public class ListHelperWD extends ListHelper
     public void clickImportData()
     {
         _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.navButton("Import Data"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        _test.waitForElement(Locator.id("tsv3"));
     }
 
     public void clickEditDesign()
