@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.WorkbookHelper;
 
 public class WorkbookTest extends BaseWebDriverTest
 {
@@ -110,38 +111,30 @@ public class WorkbookTest extends BaseWebDriverTest
         waitForText("Insert complete", WAIT_FOR_JAVASCRIPT);
         waitForText("Delete complete", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Insert complete - Success.", "Delete complete - Success.");
-
     }
 
-    private enum WorkbookFolderType
+    //TODO
+    public void createWorkbooks(String projectName, String fileWorkbookName, String fileWorkbookDescription,
+                                 String assayWorkbookName, String assayWorkbookDescription, String defaultWorkbookName, String defaultWorkbookDescription)
     {
-        ASSAY_WORKBOOK("Assay Test Workbook"),
-        FILE_WORKBOOK("File Test Workbook"),
-        DEFAULT_WORKBOOK("Workbook");
+        WorkbookHelper workbookHelper = new WorkbookHelper(this);
+        workbookHelper.createFileWorkbook(projectName, fileWorkbookName, fileWorkbookDescription);
 
-        private final String _type;
 
-        WorkbookFolderType(String type)
-        {
-            this._type = type;
-        }
+        // Create Assay Workbook
+        workbookHelper.createWorkbook(projectName, assayWorkbookName, assayWorkbookDescription, WorkbookHelper.WorkbookFolderType.ASSAY_WORKBOOK);
+        assertLinkPresentWithText("Experiment Runs");
+        Assert.assertEquals(assayWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
+        Assert.assertEquals(assayWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
+        assertLinkNotPresentWithText(assayWorkbookName); // Should not appear in folder tree.
 
-        @Override
-        public String toString()
-        {
-            return _type;
-        }
+        // Create Default Workbook
+        workbookHelper.createWorkbook(projectName, defaultWorkbookName, defaultWorkbookDescription, WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK);
+        assertLinkPresentWithText("Files");
+        assertLinkPresentWithText("Experiment Runs");
+        Assert.assertEquals(defaultWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
+        Assert.assertEquals(defaultWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
+        assertLinkNotPresentWithText(defaultWorkbookName); // Should not appear in folder tree.
     }
 
-    private void createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
-    {
-        clickFolder(project);
-        clickButton("Insert New");
-
-        setFormElement(Locator.id("workbookTitle"), title);
-        setFormElement(Locator.id("workbookDescription"), description);
-        selectOptionByValue(Locator.id("workbookFolderType"), folderType.toString());
-
-        clickButton("Create Workbook");
-    }
 }
