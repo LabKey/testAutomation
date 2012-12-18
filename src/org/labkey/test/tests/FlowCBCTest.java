@@ -83,7 +83,7 @@ public class FlowCBCTest extends BaseFlowTest
     {
         log("** Initialize Study Folder");
         createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[]{"Study", "Letvin", "Flow"});
-        importFolderFromZip(getLabKeyRoot() + PIPELINE_PATH + "\\FlowStudy.folder.zip");       //Issue 16697: dataset ignored when importing study archive
+        importFolderFromZip(getLabKeyRoot() + PIPELINE_PATH + "/FlowStudy.folder.zip");       //Issue 16697: dataset ignored when importing study archive
     }
 
     @Override
