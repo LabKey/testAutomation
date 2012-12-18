@@ -49,7 +49,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +64,7 @@ public class SequenceTest extends BaseWebDriverTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
     protected String _pipelineRoot = null;
-    protected final String _sequencePipelineLoc =  getLabKeyRoot() + "/sampledata/sequence";
+    protected final String _sequencePipelineLoc =  getLabKeyRoot() + "/unsupportedModules/labModules/SequenceAnalysis/resources/sampleData";
     protected final String _illuminaPipelineLoc =  getLabKeyRoot() + "/sampledata/genotyping";
     protected final String _readsetPipelineName = "Import sequence data";
 
@@ -827,15 +826,15 @@ public class SequenceTest extends BaseWebDriverTest
 
                 //TODO: reenable this check once it can be made to work reliably on team city
                 int expectedLength = 504;
-                log("Response length was " + count + ", expected " + expectedLength);
                 if (count != expectedLength)
                 {
+                    log("SequenceTest ERROR: Response length was " + count + ", expected " + expectedLength);
                     for (String line : lines)
                     {
                         log("[" + line + "]");
                     }
                 }
-                //Assert.assertTrue("Length of file doesnt match expected value of "+expectedLength+", was: " + count, count == expectedLength);
+                Assert.assertEquals("Length of file doesnt match expected value of " + expectedLength + ", was: " + count, count, expectedLength);
             }
             finally
             {
@@ -886,7 +885,7 @@ public class SequenceTest extends BaseWebDriverTest
         setPipelineRoot(_sequencePipelineLoc);
 
         String filename1 = "sample454_SIV.sff";
-        String filename2 = "dualBarcodes_SIV.fastq";
+        String filename2 = "dualBarcodes_SIV.fastq.gz";
         initiatePipelineJob(_readsetPipelineName, filename1, filename2);
         waitForText("Job Name");
 
@@ -1137,7 +1136,7 @@ public class SequenceTest extends BaseWebDriverTest
         setPipelineRoot(_sequencePipelineLoc);
 
         String filename1 = "paired1.fastq.gz";
-        String filename2 = "dualBarcodes_SIV.fastq";
+        String filename2 = "dualBarcodes_SIV.fastq.gz";
         initiatePipelineJob(_readsetPipelineName, filename1, filename2);
         waitForText("Job Name");
 
