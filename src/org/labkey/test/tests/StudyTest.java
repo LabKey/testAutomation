@@ -92,8 +92,6 @@ public class StudyTest extends StudyBaseTest
 
         // wait for study (but not specimens) to finish loading
         waitForPipelineJobsToComplete(1, "study import", false);
-
-        createUser(authorUser, null, true);
     }
 
     protected void doCleanup(boolean afterTest) throws Exception //child class cleanup method throws Exception
@@ -136,13 +134,13 @@ public class StudyTest extends StudyBaseTest
     private void verifyPermissionsRestrictions()
     {
         clickFolder(getProjectName());
+        createUser(authorUser, null, true);
         setUserPermissions(authorUser, "Author");
         impersonate(authorUser);
         beginAt(specimenUrl);
         clickButton("Request Options", 0);
         assertElementNotPresent(Locator.tagWithText("span", "Create New Request"));
         stopImpersonating();
-
     }
 
     private void verifyParticipantReports()
