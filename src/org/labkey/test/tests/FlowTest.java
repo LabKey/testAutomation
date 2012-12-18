@@ -17,12 +17,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseFlowTest;
 import org.labkey.test.BaseFlowTestWD;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.RReportHelperWD;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -67,7 +66,7 @@ public class FlowTest extends BaseFlowTestWD
     {
         // fail fast if R is not configured
         // R is needed for the positivity report
-        RReportHelper _rReportHelper = new RReportHelper(this);
+        RReportHelperWD _rReportHelper = new RReportHelperWD(this);
         _rReportHelper.ensureRConfig();
 
         super.init();
