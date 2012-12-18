@@ -72,7 +72,9 @@ public enum TestSet
         SequenceTest.class,
         ViralLoadAssayTest.class,
         ELISPOT_AssayTest.class,
-        ElectrochemiluminescenceAssayTest.class
+        ElectrochemiluminescenceAssayTest.class,
+        GenotypeAssaysTest.class,
+        FlowAssaysTest.class
     ),
 
     Perf(
@@ -182,13 +184,6 @@ public enum TestSet
         CAVDStudyTest.class,
         SampleMindedImportTest.class,
         PivotQueryTest.class,
-//        LabModulesTest.class,
-//        SequenceTest.class,
-//        ViralLoadAssayTest.class,
-//        ELISPOT_AssayTest.class,
-//        ElectrochemiluminescenceAssayTest.class,
-        GenotypeAssaysTest.class,
-        FlowAssaysTest.class,
         StudyPublishTest.class,
         HiddenEmailTest.class,
         ElisaAssayTest.class,
