@@ -182,6 +182,7 @@ public class StudyTest extends StudyBaseTest
         clickButton("Save", 0);
         waitForText(reportName);
         assertTextPresent(reportName, 1);
+        _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
     }
 
     protected static final String SUBJECT_NOUN = "Mouse";
