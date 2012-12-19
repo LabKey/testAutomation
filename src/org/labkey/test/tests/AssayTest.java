@@ -144,7 +144,8 @@ public class AssayTest extends AbstractAssayTest
         editAssay();
         viewCrossFolderData();
         verifyStudyList();
-        verifyWebdavTree();
+        // TODO: Turn this on once file browser migration is complete -- see Nick.
+//        verifyWebdavTree();
         goBack();
 
 
