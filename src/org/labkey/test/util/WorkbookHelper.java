@@ -33,6 +33,7 @@ public class WorkbookHelper extends AbstractHelperWD
         _test.selectOptionByValue(Locator.id("workbookFolderType"), folderType.toString());
 
         _test.clickButton("Create Workbook");
+        _test.waitForElement(Locator.css(".wb-name"));
     }
 
 
