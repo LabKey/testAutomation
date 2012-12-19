@@ -50,11 +50,11 @@ public class GroupTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest)
     {
-        deleteUsers(afterTest, TEST_USERS_FOR_GROUP);
         deleteGroup(SIMPLE_GROUP, afterTest);
         deleteGroup(COMPOUND_GROUP, afterTest);
         deleteGroup(BAD_GROUP, afterTest);
         deleteGroup(CHILD_GROUP, afterTest);
+        deleteUsers(afterTest, TEST_USERS_FOR_GROUP);
         deleteProject(getProjectName(), afterTest);
         deleteProject(getProject2Name(), afterTest);
     }
