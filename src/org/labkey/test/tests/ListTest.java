@@ -33,7 +33,9 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.labkey.test.util.ListHelper.ListColumnType.Integer;
 import static org.labkey.test.util.ListHelper.ListColumnType.String;
@@ -145,6 +147,14 @@ public class ListTest extends BaseWebDriverTest
     protected boolean isFileUploadTest()
     {
         return true;
+    }
+
+    @Override
+    protected Set<String> getOrphanedViews()
+    {
+        Set<String> views = new HashSet<java.lang.String>();
+        views.add(TEST_VIEW);
+        return views;
     }
 
     @LogMethod

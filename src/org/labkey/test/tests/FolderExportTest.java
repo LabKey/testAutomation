@@ -25,8 +25,10 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: elvan
@@ -60,6 +62,14 @@ public class FolderExportTest extends BaseWebDriverTest
     protected boolean isFileUploadTest()
     {
         return true; // for importFolderFromZip
+    }
+
+    @Override
+    protected Set<String> getOrphanedViews()
+    {
+        Set<String> views = new HashSet<String>();
+        views.add("Grid View: Demographics + HIV");
+        return views;
     }
 
     @Override

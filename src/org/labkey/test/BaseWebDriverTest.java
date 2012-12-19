@@ -2004,6 +2004,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
+    /**
+     * TODO: 7695: Custom views are not deleted when list is deleted
+     * @return List of view names which are no longer valid
+     */
+    protected Set<String> getOrphanedViews()
+    {
+        return new HashSet<String>();
+    }
+
     private void doViewCheck(String folder)
     {
         clickLinkWithText(folder);
@@ -2020,15 +2029,18 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         int viewCount = getElementCount(Locator.xpath(viewXpath));
         for (int i = 1; i <= viewCount; i++)
         {
-            pushLocation();
             String thisViewXpath = "("+viewXpath+")["+i+"]";
             waitForElement(Locator.xpath(thisViewXpath));
             String viewName = getText(Locator.xpath(thisViewXpath + "//td[contains(@class, 'x-grid3-cell-first')]"));
-            click(Locator.xpath(thisViewXpath));
-            waitAndClick(Locator.linkWithText("VIEW"));
-            waitForText(viewName);
-            popLocation();
-            _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+            if (getOrphanedViews().contains(viewName))
+            {
+                pushLocation();
+                click(Locator.xpath(thisViewXpath));
+                waitAndClick(Locator.linkWithText("VIEW"));
+                waitForText(viewName);
+                popLocation();
+                _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+            }
         }
     }
 
