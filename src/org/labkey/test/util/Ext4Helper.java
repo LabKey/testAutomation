@@ -89,6 +89,19 @@ public class Ext4Helper extends AbstractHelper
         _test.click(l);
     }
 
+    public void waitForComponentNotDirty(final String componentId)
+    {
+
+        _test.waitFor(new BaseSeleniumWebTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return !Boolean.getBoolean(_test.getWrapper().getEval("selenium.browserbot.getCurrentWindow().Ext4.getCmp('" + componentId + "').isDirty();"));
+            }
+        }, "Page still marked as dirty", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
     public void selectRadioButtonById(String labelId)
     {
         Locator l = Locator.xpath("//label[@id='" + labelId + "']");

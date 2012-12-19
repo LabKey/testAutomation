@@ -1073,6 +1073,7 @@ public class ReportTest extends StudyBaseTest
         clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
 
         // verify visiting saved report
         goToManageViews();
@@ -1090,6 +1091,7 @@ public class ReportTest extends StudyBaseTest
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//img[@data-qtip = 'Delete']")); // Delete 'Creatinine' column.
         clickButton("Save", 0);
+        _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
         // Delete a column save a copy of the report (Save As)
@@ -1102,6 +1104,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.setExtFormElementByLabel("Save As", "Report Name", PARTICIPANT_REPORT2_NAME);
         _extHelper.setExtFormElementByLabel("Save As", "Report Description", PARTICIPANT_REPORT2_DESCRIPTION);
         clickButtonByIndex("Save", 1, 0);
+        _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
         waitForTextToDisappear("Severity Grade");
 
         // Verify saving with existing report name.
@@ -1265,6 +1268,7 @@ public class ReportTest extends StudyBaseTest
         clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         _extHelper.waitForExtDialogToDisappear("Saved");
+        _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
 
         //Participant report with multiple demographic fields
         clickLinkWithText("Manage");
@@ -1301,6 +1305,7 @@ public class ReportTest extends StudyBaseTest
         clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
     }
 
     @LogMethod
@@ -1367,6 +1372,7 @@ public class ReportTest extends StudyBaseTest
         clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
 
         //TODO: Test toggling participant/group modes
         //TODO: Blocked: 16110: Participant report filter panel loses state when switching between participant and group modes
