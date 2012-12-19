@@ -2032,7 +2032,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             String thisViewXpath = "("+viewXpath+")["+i+"]";
             waitForElement(Locator.xpath(thisViewXpath));
             String viewName = getText(Locator.xpath(thisViewXpath + "//td[contains(@class, 'x-grid3-cell-first')]"));
-            if (getOrphanedViews().contains(viewName))
+            if (!getOrphanedViews().contains(viewName))
             {
                 pushLocation();
                 click(Locator.xpath(thisViewXpath));
