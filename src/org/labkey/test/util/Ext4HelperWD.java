@@ -95,6 +95,18 @@ public class Ext4HelperWD extends AbstractHelperWD
         _test.click(l);
     }
 
+    public void waitForComponentNotDirty(final String componentId)
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return (Boolean)_test.executeScript("return Ext4.getCmp('" + componentId + "').isDirty();");
+            }
+        }, "Page still marked as dirty", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
     public void clickExt4Tab(String tabname)
     {
         _test.log("Selecting Ext tab " + tabname);
