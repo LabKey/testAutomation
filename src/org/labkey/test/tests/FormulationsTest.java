@@ -377,7 +377,7 @@ public class FormulationsTest extends BaseWebDriverTest
         {
             log("uploading " + file.getName());
             setFormElement(Locator.id("upload-run-field-file"), file);
-            waitForElement(Locator.linkWithText(file.getName()));
+            waitForElement(Locator.linkWithText(file.getName().split("\\.")[0])); // Strip file extension
             assertElementNotPresent(Locator.css(".labkey-error"));
         }
     }
@@ -410,7 +410,7 @@ public class FormulationsTest extends BaseWebDriverTest
 
         waitAndClick(WAIT_FOR_JAVASCRIPT, getButtonLocator("Copy to Study"), 0);
 
-        waitAndClick(Locator.linkWithText(FORMULATION + ".xls"));
+        waitAndClick(Locator.linkWithText(FORMULATION));
 
         waitForElement(Locator.css(".nav-tree-selected").withText(PROJECT_NAME));
         assertElementPresent(Locator.linkWithText("copied"), 99);
