@@ -666,24 +666,19 @@ public abstract class Locator
             super(loc);
         }
 
-        private XPathLocator(String loc, Integer index, String contains, String text)
-        {
-            super(loc, index, contains, text);
-        }
-
         public Locator containing(String contains)
         {
-            return new XPathLocator(_loc, _index, contains, _text);
+            return new XPathLocator("("+_loc+")[contains(normalize-space(), "+xq(contains)+")]");
         }
 
         public Locator withText(String text)
         {
-            return new XPathLocator(_loc, _index, _contains, text);
+            return new XPathLocator("("+_loc+")[normalize-space()="+xq(text)+"]");
         }
 
         public Locator index(Integer index)
         {
-            return new XPathLocator(_loc, index, _contains, _text);
+            return new XPathLocator("("+_loc+")["+(index+1)+"]");
         }
 
         protected By toBy()
@@ -723,10 +718,7 @@ public abstract class Locator
 
         public String toXpath()
         {
-            return "(" + _loc + ")"+
-                    (_index != null ? "[" + (_index + 1) + "]" : "") +
-                    (_text != null && !_text.equals("") ? "[normalize-space()='" + _text + "']" : "") +
-                    (_contains != null && !_contains.equals("") ? "[contains(normalize-space(), '" + _contains + "')]" : "");
+            return _loc;
         }
 
         protected String getLoggableDescription()
@@ -878,6 +870,16 @@ public abstract class Locator
         public Locator index(Integer index)
         {
             return new LinkLocator(_loc, index, _contains, _text);
+        }
+
+        @Override
+        public List<WebElement> findElements(WebDriver driver)
+        {
+            List<WebElement> elements = super.findElements(driver);
+            if (elements.size() == 0 && !_loc.equals(_loc.toUpperCase()))
+                return (new LinkLocator(_loc.toUpperCase(), _index, _contains, _text)).findElements(driver);
+            else
+                return elements;
         }
 
         @Override
