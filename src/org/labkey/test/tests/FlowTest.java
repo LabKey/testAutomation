@@ -142,8 +142,6 @@ public class FlowTest extends BaseFlowTestWD
         sleep(15000);
         waitForText("Ignoring filter");
         assertTextPresent("88436.fcs-050112-8ColorQualitative-ET");
-
-        //TODO:  verify this when it's working
     }
 
     String query1 =  TRICKY_CHARACTERS_NO_QUOTES + "DRTQuery1";
@@ -330,10 +328,12 @@ public class FlowTest extends BaseFlowTestWD
         clickLinkWithText("Flow Dashboard");
         clickLinkWithText("QUV analysis");
         clickLinkWithText("Analyze some runs", false);
-        selectOptionByText(Locator.name("ff_targetExperimentId"), "<create new>");
+        final Locator.NameLocator ff_targetExperimentId = Locator.name("ff_targetExperimentId");
+        waitForElement(ff_targetExperimentId);
+        selectOptionByText(ff_targetExperimentId, "<create new>");
 //        waitForPageToLoad();
         Assert.assertEquals(2, countEnabledInputs(SELECT_CHECKBOX_NAME));
-        selectOptionByText(Locator.name("ff_targetExperimentId"), "FlowExperiment2");
+        selectOptionByText(ff_targetExperimentId, "FlowExperiment2");
 //        waitForPageToLoad();
 
         Assert.assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
