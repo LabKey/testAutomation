@@ -964,12 +964,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void ensureAdminMode()
     {
-        //Now switch to admin mode if available
-        //TODO:  this is causing all kinds of problems
-//        if (!isElementPresent(Locator.id("leftmenupanel")) && !(isElementPresent(Locator.id("Admin ConsoleTab"))))
-//            clickAdminMenuItem("Show Navigation Bar");
-        assertElementPresent(Locator.css("#adminMenuPopupText"));
-        assertElementPresent(Locator.css(".labkey-expandable-nav-panel"));
+        if (!isElementPresent(Locator.css("#adminMenuPopupText")))
+            stopImpersonating();
+        if (!isElementPresent(Locator.css(".labkey-expandable-nav-panel")))
+        {
+            goToHome();
+            waitForElement(Locator.css(".labkey-expandable-nav-panel"));
+        }
     }
 
     public void goToAdminConsole()
@@ -1016,8 +1017,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     // Clicks admin menu items. Tests should use helpers to make admin menu changes less disruptive.
     protected void clickAdminMenuItem(String... items)
     {
-        waitForElement(Locator.xpath(ADMIN_MENU_XPATH));
-        sleep(1000); //TODO
+        waitForElement(Locator.xpath(ADMIN_MENU_XPATH)); //todo: does this need sleep?
         Ext4HelperWD.clickExt4MenuButton(this, true, Locator.xpath(ADMIN_MENU_XPATH), false, items);
     }
 
@@ -2769,7 +2769,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         setFormElement(Locator.name("name"), child);
     }
 
-    public void createSubfolder(String project, String parent, String child, String folderType, String[] tabsToAdd, boolean inheritPermissions)
+    public void createSubfolder(String project, String parent, String child, @Nullable String folderType, @Nullable String[] tabsToAdd, boolean inheritPermissions)
     {
         createSubfolder(project, parent, child, folderType, null, tabsToAdd, inheritPermissions);
     }
@@ -2785,7 +2785,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * @param inheritPermissions should folder inherit permissions from parent?
      */
     @LogMethod
-    public void createSubfolder(String project, String parent, String child, String folderType, String templateFolder, String[] tabsToAdd, boolean inheritPermissions)
+    public void createSubfolder(String project, String parent, String child, @Nullable String folderType, @Nullable String templateFolder, @Nullable String[] tabsToAdd, boolean inheritPermissions)
     {
         startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
@@ -3703,14 +3703,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * @deprecated Use {@link #assertElementPresent(Locator, int)}
-     * @param loc
-     * @param amount
+     * Obscuring super.assertElementPresent(XpathLocator, int)
+     * TODO: remove once WebDriver migration is complete
      */
-    @Deprecated
     public void assertElementPresent(Locator.XPathLocator loc, int amount)
     {
-        Assert.assertEquals("Xpath '" + loc.getPath() + "' not present expected number of times.", amount, getXpathCount(loc));
+        assertElementPresent((Locator) loc, amount);
     }
 
     public void assertElementPresent(Locator loc, int amount)
@@ -3931,33 +3929,43 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
-    /** Find a link with the exact text specified, click it, and wait for the page to load */
-    public void clickLinkWithText(String text)
+    /** Find a link with the exact text specified, click it, and wait for the page to load
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkWithText(String text)
     {
         clickLinkWithText(text, true);
     }
 
-    /** Find nth link with the exact text specified, click it, and wait for the page to load */
-    public void clickLinkWithText(String text, int index)
+    /** Find a link with the exact text specified, click it, and wait for the page to load
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkWithText(String text, int index)
     {
         Locator l = Locator.linkWithText(text, index);
         clickAndWait(l, defaultWaitForPage);
     }
 
-    /** Find a link with the exact text specified and click it, optionally waiting for the page to load */
-    public void clickLinkWithText(String text, boolean wait)
+    /** Find a link with the exact text specified and click it, optionally waiting for the page to load
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkWithText(String text, boolean wait)
     {
         clickLinkWithText(text, 0, wait);
     }
 
-    /** Find nth link with the exact text specified and click it, optionally waiting for the page to load */
-    public void clickLinkWithText(String text, int index, boolean wait)
+    /** Find nth link with the exact text specified and click it, optionally waiting for the page to load
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkWithText(String text, int index, boolean wait)
     {
         clickLinkWithText(text, index, wait ? defaultWaitForPage : 0);
     }
 
-    /** Find nth link with the exact text specified, click it, and wait up to millis for the page to load */
-    public void clickLinkWithText(String text, int index, int millis)
+    /** Find nth link with the exact text specified, click it, and wait up to millis for the page to load
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkWithText(String text, int index, int millis)
     {
         log("Clicking link with text '" + text + "'");
 
@@ -3967,17 +3975,26 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             clickAndWait(Locator.linkWithText(text).index(index), millis);
     }
 
-    public void clickLinkContainingText(String text)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkContainingText(String text)
     {
         clickLinkContainingText(text, true);
     }
 
-    public void clickLinkContainingText(String text, int index)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkContainingText(String text, int index)
     {
         clickLinkContainingText(text, index, true);
     }
 
-    public void clickLinkContainingText(String text, int index, boolean wait)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkContainingText(String text, int index, boolean wait)
     {
         log("Clicking link " + index + " containing text: " + text);
         Locator l = Locator.linkContainingText(text, index);
@@ -3987,7 +4004,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             click(l);
     }
 
-    public void clickLinkContainingText(String text, boolean wait)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkContainingText(String text, boolean wait)
     {
         log("Clicking link containing text: " + text);
         Locator l  = Locator.linkContainingText(text);
@@ -3997,7 +4017,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             click(l);
     }
 
-    public int countLinksWithText(String text)
+    /**
+     * @deprecated Use {@link #getElementCount(Locator)}
+     */
+    @Deprecated public int countLinksWithText(String text)
     {
         return Locator.linkWithText(text).findElements(_driver).size();
     }
@@ -4007,7 +4030,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertEquals("Link with text '" + text + "' was not present the expected number of times", count, countLinksWithText(text));
     }
 
-    public boolean isLinkPresentWithImage(String imageName)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresentWithImage(String imageName)
     {
         return isElementPresent(Locator.linkWithImage(imageName));
     }
@@ -4018,33 +4044,52 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertTextPresentInThisOrder(links);
 
     }
-    public void assertLinkPresentWithImage(String imageName)
+
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertLinkPresentWithImage(String imageName)
     {
         Assert.assertTrue("Link with image '" + imageName + "' was not present", isLinkPresentWithImage(imageName));
     }
 
-    public void assertLinkNotPresentWithImage(String imageName)
+    /**
+     * @deprecated Use {@link #assertElementNotPresent(Locator)}
+     */
+    @Deprecated public void assertLinkNotPresentWithImage(String imageName)
     {
         Assert.assertFalse("Link with image '" + imageName + "' was present", isLinkPresentWithImage(imageName));
     }
 
-    public void clickLinkWithImage(String image)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkWithImage(String image)
     {
         clickLinkWithImage(image, defaultWaitForPage);
     }
 
-    public void clickLinkWithImage(String image, int millis)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator, int)}
+     */
+    @Deprecated public void clickLinkWithImage(String image, int millis)
     {
         log("Clicking link with image: " + image);
         clickAndWait(Locator.linkWithImage(image), millis);
     }
 
-    public void clickLinkWithImageByIndex(String image, int index)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkWithImageByIndex(String image, int index)
     {
         clickLinkWithImageByIndex(image, index, true);
     }
 
-    public void clickLinkWithImageByIndex(String image, int index, boolean wait)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator, int)}
+     */
+    @Deprecated public void clickLinkWithImageByIndex(String image, int index, boolean wait)
     {
         log("Clicking link with image: " + image);
         clickAndWait(Locator.linkWithImage(image, index), wait ? defaultWaitForPage : 0);
@@ -4134,12 +4179,18 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     }
 
-    public void clickLink(String linkId)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLink(String linkId)
     {
         clickLink(Locator.id(linkId));
     }
 
-    public void clickLink(Locator l)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLink(Locator l)
     {
         clickAndWait(l, defaultWaitForPage);
     }
@@ -4149,7 +4200,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         click(Locator.permissionsTreeNode(folderName));
     }
 
-    public void mouseOut(Locator l)
+    /**
+     * @deprecated Use {@link Actions}
+     */
+    @Deprecated public void mouseOut(Locator l)
     {
         selenium.mouseOut(l.toString());
     }
@@ -4161,7 +4215,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * @deprecated Click shenanigans shouldn't be necessary with WebDriver. If click doesn't work, try WebDriver 'Actions'
+     * @deprecated Use {@link #click(Locator)}
      */
     @Deprecated public void mouseDown(Locator l)
     {
@@ -4169,7 +4223,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * @deprecated Click shenanigans shouldn't be necessary with WebDriver. If click doesn't work, try WebDriver 'Actions'
+     * @deprecated Use {@link #clickAt(Locator, int, int)}
      */
     @Deprecated
     public void mouseDownAt(Locator l, int x, int y)
@@ -4226,7 +4280,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '"+caption+"']")));
     }
 
-    public void clickImageWithTitle(String title, int mills)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator, int)}
+     */
+    @Deprecated public void clickImageWithTitle(String title, int mills)
     {
         Locator l = Locator.tagWithAttribute("img", "title", title);
         clickAndWait(l, mills);
@@ -5329,8 +5386,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     /**
      * Executes an Ext.menu.Item's handler.
+     * @deprecated Use {@link ExtHelperWD#clickExtComponent(String)}
      */
-    public boolean runMenuItemHandler(String id)
+    @Deprecated public boolean runMenuItemHandler(String id)
     {
         log("Invoking Ext menu item handler '" + id + "'");
         return _extHelper.clickExtComponent(EscapeUtil.filter(id));
@@ -5338,8 +5396,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     /**
      * Clicks the labkey menu item and optional submenu labels (for cascading menus)
+     * @deprecated Use {@link ExtHelperWD#clickMenuButton(boolean, String, String...)}
      */
-    public void clickMenuButton(String menusLabel, String ... subMenusLabels)
+    @Deprecated public void clickMenuButton(String menusLabel, String ... subMenusLabels)
     {
         _extHelper.clickMenuButton(true, menusLabel, subMenusLabels);
     }
@@ -5347,8 +5406,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     /**
      * Clicks the ext menu item and optional submenu labels's (for cascading menus)
      * Does not wait for page load.
+     * @deprecated Use {@link ExtHelperWD#clickMenuButton(boolean, String, String...)}
      */
-    public void clickMenuButtonAndContinue(String menusLabel, String ... subMenusLabels)
+    @Deprecated public void clickMenuButtonAndContinue(String menusLabel, String ... subMenusLabels)
     {
         _extHelper.clickMenuButton(false, menusLabel, subMenusLabels);
     }
@@ -5429,51 +5489,69 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         uncheckCheckbox(selects.get(index));
     }
 
-    public void clickCheckbox(String name)
+    /**
+     * @deprecated Use {@link #click(Locator)}
+     */
+    @Deprecated public void clickCheckbox(String name)
     {
         click(Locator.checkboxByName(name));
     }
 
-    public void clickRadioButtonById(String id)
+    /**
+     * @deprecated Use {@link #click(Locator)}
+     */
+    @Deprecated public void clickRadioButtonById(String id)
     {
         click(Locator.radioButtonById(id));
     }
 
-    public void clickRadioButtonById(String id, int millis)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator, int)}
+     */
+    @Deprecated public void clickRadioButtonById(String id, int millis)
     {
         clickAndWait(Locator.radioButtonById(id), millis);
 
     }
 
-    public void clickCheckboxById(String id)
+    /**
+     * @deprecated Use {@link #click(Locator)}
+     */
+    @Deprecated public void clickCheckboxById(String id)
     {
         click(Locator.checkboxById(id));
     }
 
-    public void checkRadioButton(String name, String value)
+    /**
+     * @deprecated Use {@link #checkCheckbox(Locator)}
+     */
+    @Deprecated public void checkRadioButton(String name, String value)
     {
         checkCheckbox(Locator.radioButtonByNameAndValue(name, value));
     }
 
-    public void checkCheckbox(String name, String value)
+    /**
+     * @deprecated Use {@link #checkCheckbox(Locator)}
+     */
+    @Deprecated public void checkCheckbox(String name, String value)
     {
         checkCheckbox(Locator.checkboxByNameAndValue(name, value));
     }
 
-    public void checkCheckbox(String name)
+    /**
+     * @deprecated Use {@link #checkCheckbox(Locator)}
+     */
+    @Deprecated public void checkCheckbox(String name)
     {
         checkCheckbox(Locator.checkboxByName(name));
     }
 
-    public void checkCheckboxByNameInDataRegion(String name)
+    /**
+     * @deprecated Use {@link #checkCheckbox(Locator)}
+     */
+    @Deprecated public void checkCheckboxByNameInDataRegion(String name)
     {
         checkCheckbox(Locator.xpath("//a[contains(text(), '" + name + "')]/../..//td/input"));
-    }
-
-    public void checkButtonByText(String text)
-    {
-        Locator l = Locator.xpath("//*[text()='" + text + "']/../input[contains(@type,'button')]");
-        click(l);
     }
 
     public void checkRadioButton(Locator radioButtonLocator)
@@ -5486,7 +5564,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Checking checkbox " + checkBoxLocator);
         if (!isChecked(checkBoxLocator))
             click(checkBoxLocator);
-        logJavascriptAlerts();
         Assert.assertTrue("Checking checkbox failed", isChecked(checkBoxLocator));
     }
 
@@ -5506,17 +5583,26 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-    public void checkRadioButton(String name, int index)
+    /**
+     * @deprecated Use {@link #checkRadioButton(Locator)}
+     */
+    @Deprecated public void checkRadioButton(String name, int index)
     {
         checkCheckbox(Locator.radioButtonByName(name).index(index));
     }
 
-    public void assertRadioButtonSelected(String name, String value)
+    /**
+     * @deprecated Use {@link #assertRadioButtonSelected(Locator)}
+     */
+    @Deprecated public void assertRadioButtonSelected(String name, String value)
     {
         assertRadioButtonSelected(Locator.radioButtonByNameAndValue(name, value));
     }
 
-    public void assertRadioButtonSelected(String name, int index)
+    /**
+     * @deprecated Use {@link #assertRadioButtonSelected(Locator)}
+     */
+    @Deprecated public void assertRadioButtonSelected(String name, int index)
     {
         assertRadioButtonSelected(Locator.radioButtonByName(name).index(index));
     }
@@ -5526,22 +5612,34 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertTrue("Radio Button is not selected at " + radioButtonLocator.toString(), isChecked(radioButtonLocator));
     }
 
-    public void checkCheckbox(String name, int index)
+    /**
+     * @deprecated Use {@link #checkCheckbox(Locator)}
+     */
+    @Deprecated public void checkCheckbox(String name, int index)
     {
         checkCheckbox(Locator.checkboxByName(name).index(index));
     }
 
-    public void uncheckCheckbox(String name)
+    /**
+     * @deprecated Use {@link #uncheckCheckbox(Locator)}
+     */
+    @Deprecated public void uncheckCheckbox(String name)
     {
         uncheckCheckbox(Locator.checkboxByName(name));
     }
 
-    public void uncheckCheckbox(String name, String value)
+    /**
+     * @deprecated Use {@link #uncheckCheckbox(Locator)}
+     */
+    @Deprecated public void uncheckCheckbox(String name, String value)
     {
         uncheckCheckbox(Locator.checkboxByNameAndValue(name, value));
     }
 
-    public void uncheckCheckbox(String name, int index)
+    /**
+     * @deprecated Use {@link #uncheckCheckbox(Locator)}
+     */
+    @Deprecated public void uncheckCheckbox(String name, int index)
     {
         uncheckCheckbox(Locator.checkboxByName(name).index(index));
     }
@@ -6382,9 +6480,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void goToProjectHome()
     {
-        Locator projectExpander = Locator.imageWithSrc("plus.gif", true, 1);
-        if(isElementPresent(projectExpander))
-            click(projectExpander);
+        if(!isLinkPresentWithText(getProjectName()))
+            goToHome();
         clickFolder(getProjectName());
     }
 
@@ -6394,14 +6491,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * go to the project settings page of a project, or of the current project if argument=null
-     * @param project project name, or null if current project
+     * go to the project settings page of a project
+     * @param project project name
      */
     public void goToProjectSettings(String project)
     {
         if(!isLinkPresentWithText(project))
             goToHome();
-        clickLinkWithText(project);
+        clickFolder(project);
+
         goToProjectSettings();
     }
 
