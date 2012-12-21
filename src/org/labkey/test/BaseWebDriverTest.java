@@ -2044,7 +2044,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-    @LogMethod
     private void checkJsErrors()
     {
         if (this.enableScriptCheck())
@@ -3001,7 +3000,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _containerHelper.deleteProject(project, failIfFail, wait);
     }
 
-    @LogMethod
+    @LogMethod (quiet = true)
     public void enableEmailRecorder()
     {
         try {
