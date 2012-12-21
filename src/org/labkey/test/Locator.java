@@ -885,7 +885,7 @@ public abstract class Locator
         @Override
         public String toString()
         {
-            return "link=" + _loc;
+            return "link=" + _loc + (_index != null ? " index=" + _index : "");
         }
 
         protected By toBy()
