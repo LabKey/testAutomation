@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.BaseFlowTest;
+import org.labkey.test.BaseFlowTestWD;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -33,7 +34,7 @@ import org.labkey.test.util.TimeChartHelper;
  *     - verifies URLs go to correct container
  * - custom query combining CBC and Flow datasets with expression columns.
  */
-public class FlowCBCTest extends BaseFlowTest
+public class FlowCBCTest extends BaseFlowTestWD
 {
     public static final String STUDY_FOLDER = "KoStudy";
     public static final String CBC_FOLDER = "CBCFolder";
@@ -95,7 +96,7 @@ public class FlowCBCTest extends BaseFlowTest
 
         verifyQuery();
         
-//        verifyTimeChartFromFlowData();     //TODO: Issue 16709: JS error when creating Time Chart from flow data
+        verifyTimeChartFromFlowData();     //Issue 16709: JS error when creating Time Chart from flow data
     }
 
     private void verifyTimeChartFromFlowData()
