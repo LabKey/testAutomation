@@ -49,7 +49,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         assertTextPresent(specimensToSelect);
 
         clickTab("Manage");
-        assertTextPresent("This study defines 7 Datasets", "This study defines 64 Visits", "This study references 24 labs/sites/repositories");
+        assertTextPresent("This study defines 7 Datasets", "This study defines 64 Visits", "This study references 24 locations (labs/sites/repositories)");
         clickLinkWithText("Manage Datasets");
         assertTextPresent(DOV_DATASET, "APX-1", "DEM-1", "FPX-1", "TM-1", "IV-1", "EVC-1");
     }
