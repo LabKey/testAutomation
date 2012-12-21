@@ -63,7 +63,9 @@ public class UserTest extends SecurityTest
     protected void doCleanup(boolean afterTest)
     {
         super.doCleanup(afterTest);
-        clickButton("Change User Properties");
+        Locator.XPathLocator button = Locator.tagContainingText("span", "Change User Properties");
+        waitForElement(button);
+        click(button);
         checkRequiredField("FirstName", false);
         clickButton("Save");
 
@@ -129,12 +131,12 @@ public class UserTest extends SecurityTest
         assertTextNotPresent(NORMAL_USER);
 
         log("Deactivated users shouldn't show up in issues 'Assign To' list");
-        clickLinkWithText(getProjectName());
+        goToProjectHome();
         goToModule("Issues");
         clickLinkWithText("New Issue");
-        assertElementNotPresent(Locator.css("#assignedTo option[value="+userId+"]"));
+        assertElementNotPresent(createAssignedToOptionLocator(userId));
         assertTextNotPresent(displayNameFromEmail(NORMAL_USER));
-        assertElementPresent(Locator.css("#assignedTo option[value="+adminUserId+"]"));
+        assertElementPresent(createAssignedToOptionLocator(adminUserId));
         assertTextPresent(displayNameFromEmail(PROJECT_ADMIN_USER));
 
         log("Reactivate user");
@@ -152,6 +154,11 @@ public class UserTest extends SecurityTest
         Assert.assertEquals(NORMAL_USER + " should be 'Active'", "true", usersTable.getDataAsText(row, "Active"));
     }
 
+    private Locator createAssignedToOptionLocator(String username)
+    {
+        return Locator.xpath("//select[@id='assignedTo']/option[@value='" + username +  "']");
+    }
+
     /**if user NORMAL_USER2 does not exist, create them,
      * give them password TEST_PASSWORD, and sign them in.
      * @return email address of user
@@ -159,7 +166,7 @@ public class UserTest extends SecurityTest
     private String getEmailChangeableUser()
     {
         createUserAndNotify(NORMAL_USER2, NORMAL_USER);
-        clickLinkContainingText("Home");
+        clickLinkWithText("Home");
         setInitialPassword(NORMAL_USER2, TEST_PASSWORD);
 
         return NORMAL_USER2;
@@ -214,7 +221,8 @@ public class UserTest extends SecurityTest
         waitForPageToLoad();
         clickLinkWithText("Done");
         // View reset password email.
-        clickLinkWithText(PROJECT_NAME);
+//        clickLinkWithText(PROJECT_NAME);
+        goToProjectHome();
         goToModule("Dumbster");
         clickLinkContainingText("Reset Password Notification", false); // Expand message.
 
