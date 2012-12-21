@@ -86,7 +86,7 @@ public class CreateVialsTest extends AbstractViabilityTest
 
         clickTab("Manage");
         log("** Adding new Sites to check null ExternalId (Issue 12074)");
-        clickLinkContainingText("Manage Labs/Sites");
+        clickLinkContainingText("Manage Locations");
         setFormElement(Locator.name("newId"), "100");
         setFormElement(Locator.name("newLabel"), "Alice Lab");
         clickButton("Save");
