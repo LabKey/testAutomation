@@ -611,7 +611,7 @@ public class SequenceTest extends BaseWebDriverTest
         alignerField.eval("fireEvent(\"select\", Ext4.getCmp('" + alignerField.getId() + "'), 'mosaik')");
         waitForText("Mosaik is suitable for longer reads");
 
-        String aligner = "bwa-sw";
+        String aligner = "bwasw";
         alignerField.setValue(aligner);
         alignerField.eval("fireEvent(\"select\", Ext4.getCmp('" + alignerField.getId() + "'), '" + aligner + "')");
         waitForText("BWA-SW uses a different algorithm than BWA");
