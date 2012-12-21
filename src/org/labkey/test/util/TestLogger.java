@@ -27,9 +27,9 @@ public class TestLogger
 {
     private static final int indentStep = 2;
     private static int currentIndent = 0;
+    private static boolean suppressLogging = false;
 
     private static final int MAX_INDENT = 20;
-    private static final int MIN_INDENT = 0;
 
     public static void increaseIndent()
     {
@@ -39,6 +39,11 @@ public class TestLogger
     public static void decreaseIndent()
     {
         currentIndent -= indentStep;
+    }
+
+    public static void suppressLogging(boolean suppress)
+    {
+        suppressLogging = suppress;
     }
 
     private static String getIndentString()
@@ -51,7 +56,10 @@ public class TestLogger
 
     public static void log(String str)
     {
-        String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()); // Include time with log entry.  Use format that matches labkey log.
-        System.out.println(d + " " + getIndentString() + str);
+        if (!suppressLogging)
+        {
+            String d = new SimpleDateFormat("HH:mm:ss,SSS").format(new Date()); // Include time with log entry.  Use format that matches labkey log.
+            System.out.println(d + " " + getIndentString() + str);
+        }
     }
 }

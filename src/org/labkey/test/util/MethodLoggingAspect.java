@@ -21,7 +21,9 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.FieldSignature;
 
+import java.lang.annotation.Annotation;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Stack;
@@ -38,17 +40,25 @@ public class MethodLoggingAspect
 {
     private static Stack<Long> startTimes = new Stack<Long>();
     private static Stack<String> methodStack = new Stack<String>();
+    private static Stack<String> quietMethods = new Stack<String>();
 
     @Pointcut(value = "execution(@org.labkey.test.util.LogMethod * *(..))")
     void loggedMethod(){}
 
-    @Before(value = "loggedMethod()", argNames = "joinPoint")
-    public void beforeLoggedMethod(JoinPoint joinPoint)
+    @Before(value = "loggedMethod() && @annotation(logMethod)", argNames = "joinPoint, logMethod")
+    public void beforeLoggedMethod(JoinPoint joinPoint, LogMethod logMethod)
     {
         String caller = methodStack.isEmpty() ? "" : methodStack.peek();
         String method = joinPoint.getSignature().getName();
         methodStack.push(method);
         startTimes.push(System.currentTimeMillis());
+
+        if (logMethod.quiet())
+        {
+            TestLogger.suppressLogging(true);
+            quietMethods.add(method);
+        }
+
         if (!method.equals(caller)) // Don't double-log overloaded methods
         {
             TestLogger.log(">>" + method);
@@ -56,13 +66,18 @@ public class MethodLoggingAspect
         }
     }
 
-    @AfterReturning(value = "loggedMethod()", argNames = "joinPoint")
-    public void afterLoggedMethod(JoinPoint joinPoint)
+    @AfterReturning(value = "loggedMethod() && @annotation(logMethod)", argNames = "joinPoint, logMethod")
+    public void afterLoggedMethod(JoinPoint joinPoint, LogMethod logMethod)
     {
         methodStack.pop(); // Discard current method
         String caller = methodStack.isEmpty() ? "" : methodStack.peek();
         Long elapsed = System.currentTimeMillis()-startTimes.pop();
         String method = joinPoint.getSignature().getName();
+
+        if (logMethod.quiet())
+            quietMethods.pop();
+        if (quietMethods.empty())
+            TestLogger.suppressLogging(false);
 
         if (!method.equals(caller)) // Don't double-log overloaded methods
         {
@@ -76,11 +91,16 @@ public class MethodLoggingAspect
         }
     }
 
-    @AfterThrowing(value = "loggedMethod()", argNames = "joinPoint")
-    public void afterLoggedMethodException(JoinPoint joinPoint)
+    @AfterThrowing(value = "loggedMethod() && @annotation(logMethod)", argNames = "joinPoint, logMethod")
+    public void afterLoggedMethodException(JoinPoint joinPoint, LogMethod logMethod)
     {
         startTimes.pop();
         methodStack.pop();
         TestLogger.decreaseIndent();
+
+        if (logMethod.quiet())
+            quietMethods.pop();
+        if (quietMethods.empty())
+            TestLogger.suppressLogging(false);
     }
 }
