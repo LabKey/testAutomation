@@ -16,10 +16,9 @@
 package org.labkey.test.ms1.params;
 
 import org.junit.Assert;
+import org.labkey.test.Locator;
 import org.labkey.test.pipeline.AbstractPipelineTestParams;
 import org.labkey.test.pipeline.PipelineWebTestBase;
-import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.Locator;
 
 import java.io.File;
 import java.io.IOException;

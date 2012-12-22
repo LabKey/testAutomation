@@ -15,9 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.test.BaseSeleniumWebTest;
 
 /**

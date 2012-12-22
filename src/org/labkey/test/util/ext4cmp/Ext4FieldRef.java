@@ -16,7 +16,6 @@
 package org.labkey.test.util.ext4cmp;
 
 import org.labkey.test.BaseSeleniumWebTest;
-import org.labkey.test.util.Ext4Helper;
 
 /**
  * User: bbimber

@@ -21,7 +21,6 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.EmailRecordTable;
 import org.labkey.test.util.ExperimentRunTable;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
 

@@ -1,15 +1,12 @@
 package org.labkey.test.util;
 
-import org.labkey.remoteapi.query.BaseSelect;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 12/3/12
  * Time: 1:07 PM
- * To change this template use File | Settings | File Templates.
  */
 public class TimeChartHelper
 {

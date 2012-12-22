@@ -16,9 +16,7 @@
 
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;

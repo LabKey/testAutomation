@@ -17,7 +17,6 @@ package org.labkey.test.util;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
-import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;

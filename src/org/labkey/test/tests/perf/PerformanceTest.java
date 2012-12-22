@@ -1,6 +1,5 @@
 package org.labkey.test.tests.perf;
 
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 
 import java.io.File;

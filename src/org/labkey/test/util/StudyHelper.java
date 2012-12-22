@@ -15,12 +15,8 @@
  */
 package org.labkey.test.util;
 
-import junit.framework.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ext4cmp.Ext4CmpRef;
-
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.

@@ -20,11 +20,9 @@ import org.labkey.test.BaseSeleniumWebTest;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 7/26/12
  * Time: 12:44 PM
- * To change this template use File | Settings | File Templates.
  */
 public class WikiHelper extends AbstractHelper
 {

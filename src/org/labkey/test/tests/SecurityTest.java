@@ -17,7 +17,6 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
