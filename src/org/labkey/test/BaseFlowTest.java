@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.io.IOException;
@@ -375,6 +376,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         importAnalysis_checkErrors(options.getExpectedErrors());
     }
 
+    @LogMethod
     protected void importAnalysis_viaPipeline(String workspacePath)
     {
         log("browse pipeline to begin import analysis wizard");
@@ -385,6 +387,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         selectImportDataAction("Import FlowJo Workspace");
     }
 
+    @LogMethod
     protected void importAnalysis_begin(String containerPath)
     {
         log("begin import analysis wizard");
@@ -393,6 +396,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
     }
 
+    @LogMethod
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
         assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
@@ -400,6 +404,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickButton("Next");
     }
 
+    @LogMethod
     protected void importAnalysis_selectFCSFiles(String containerPath, final SelectFCSFileOption selectFCSFilesOption, List<String> keywordDirs)
     {
         waitForExtReady();
@@ -444,6 +449,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickButton("Next");
     }
 
+    @LogMethod
     protected void importAnalysis_reviewSamples(String containerPath, boolean resolving, List<String> selectedGroupNames, List<String> selectedSampleIds)
     {
         assertTitleEquals("Import Analysis: Review Samples: " + containerPath);
@@ -466,6 +472,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickButton("Next");
     }
 
+    @LogMethod
     protected void importAnalysis_analysisEngine(String containerPath, AnalysisEngine engine)
     {
         assertTitleEquals("Import Analysis: Analysis Engine: " + containerPath);
@@ -474,6 +481,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickButton("Next");
     }
 
+    @LogMethod
     protected void importAnalysis_analysisOptions(String containerPath, boolean rEngineNormalization, String rEngineNormalizationReference, List<String> rEngineNormalizationSubsets, List<String> rEngineNormalizationParameters)
     {
         assertTitleEquals("Import Analysis: Analysis Options: " + containerPath);
@@ -509,6 +517,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickButton("Next");
     }
 
+    @LogMethod
     protected void importAnalysis_analysisFolder(String containerPath, String analysisName, boolean existing)
     {
         assertTitleEquals("Import Analysis: Analysis Folder: " + containerPath);
@@ -537,6 +546,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 analysisFolder, existingAnalysisFolder);
     }
 
+    @LogMethod
     protected void importAnalysis_confirm(String containerPath, String workspacePath,
                                           SelectFCSFileOption selectFCSFilesOption,
                                           List<String> keywordDirs,
