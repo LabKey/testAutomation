@@ -135,9 +135,10 @@ public class FlowTest extends BaseFlowTestWD
         selectOptionByText(Locator.name("selectedSamples.rows[0.0.1].matchedFile"),"91745.fcs (L02-060120-QUV-JS)" );
         clickCheckbox("selectedSamples.rows[0.0.1].selected");
         clickButton("Next");
+        waitForText("Import Analysis: Analysis Engine");
         clickButton("Next");
+        waitForText("Import Analysis: Analysis Folder");
         clickButton("Next");
-//        clickButton("Next");
         clickButton("Finish", 0);
         sleep(15000);
         waitForText("Ignoring filter");

@@ -365,9 +365,11 @@ public class Ext4HelperWD extends AbstractHelperWD
 
     public static void clickExt4MenuButton(BaseWebDriverTest test, boolean wait, Locator menu, boolean onlyOpen, String ... subMenuLabels)
     {
+        test.waitForElement(menu);
         test.click(menu);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
+            test.log("select submenu: " + subMenuLabels[i]);
             Locator parentLocator = ext4MenuItem(subMenuLabels[i]);
             test.waitForElement(parentLocator, 1000);
             test.mouseOver(parentLocator);
