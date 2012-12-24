@@ -54,9 +54,6 @@ public class LuminexTest extends AbstractQCAssayTest
     protected static final String TEST_ASSAY_XAR_NAME = "TestLuminexAssay";
     protected final File TEST_ASSAY_XAR_FILE = new File(getLabKeyRoot() + "/sampledata/Luminex/" + TEST_ASSAY_XAR_NAME + ".xar");
 
-    protected static final String TEST_ASSAY_LUM_ANALYTE_PROP_NAME = "testAssayAnalyteProp";
-    protected static final int TEST_ASSAY_LUM_ANALYTE_PROP_ADD = 5;
-    protected static final String[] TEST_ASSAY_LUM_ANALYTE_PROP_TYPES = { "Text (String)", "Boolean", "Number (Double)", "Integer", "DateTime" };
     protected static final String TEST_ASSAY_LUM_SET_PROP_SPECIES = "testSpecies1";
     protected static final String TEST_ASSAY_LUM_RUN_NAME = "testRunName1";
     protected static final String TEST_ASSAY_LUM_SET_PROP_SPECIES2 = "testSpecies2";
@@ -79,7 +76,6 @@ public class LuminexTest extends AbstractQCAssayTest
     protected final File TEST_ASSAY_MULTIPLE_STANDARDS_2 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (Standard2).xls");
     protected final File TEST_ASSAY_MULTIPLE_STANDARDS_3 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgA-Biot (Standard1).xls");
 
-    protected final String TEST_ASSAY_LUM_ANALYTE_PROP = "testAnalyteProp";
     private static final String THAW_LIST_NAME = "LuminexThawList";
     private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
 
@@ -320,6 +316,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
         clickLinkWithText("Assay List");
         clickLinkWithText(TEST_ASSAY_LUM);
+        // Make sure we have the expected help text
+        assertTextPresent("No runs to show. To add new runs, use the Import Data button.");
         log("Uploading Luminex Runs");
         clickButton("Import Data");
         setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
@@ -2110,6 +2108,8 @@ public class LuminexTest extends AbstractQCAssayTest
         clickLinkContainingText("view data");
         clickLinkContainingText(titrationName);
         waitForText("Levey-Jennings Report: " + titrationName);
+        // Make sure we have the expected help text
+        waitForText("To begin, choose an Antigen, Isotype, and Conjugate from the panel to the left and click the Apply button.");
     }
 
     @LogMethod
