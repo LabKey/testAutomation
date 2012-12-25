@@ -166,7 +166,10 @@ public class ExpTest extends BaseSeleniumWebTest
         assertTextPresent(dateFormat.format(new Date()), 5);
 
         // Since this metadata is shared, clear it out 
-        clickMenuButton("Query", "Edit Metadata");
+        clickLinkWithText("exp Schema");
+        // Wait for query to load
+        waitForText("edit metadata");
+        clickLinkWithText("edit metadata");
         waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         click(Locator.xpath("//span").append(Locator.navButton("Reset to Default")));
         click(Locator.xpath("//span").append(Locator.navButton("OK")));
