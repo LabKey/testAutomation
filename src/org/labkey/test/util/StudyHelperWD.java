@@ -15,17 +15,11 @@
  */
 package org.labkey.test.util;
 
-import junit.framework.Assert;
-import org.bouncycastle.crypto.digests.LongDigest;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ext4cmp.Ext4CmpRef;
-import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
-
-import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Treygdor
  * Date: Aug 16, 2011
  * Time: 3:45:02 PM
@@ -45,35 +39,35 @@ public class StudyHelperWD extends AbstractHelperWD
 
     @LogMethod
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
-                                                    Boolean shared, String... ptids)
+                                             @Nullable Boolean shared, String... ptids)
     {
         createCustomParticipantGroup(projectName, studyFolder, groupName, participantString, null, false, shared, ptids);
     }
 
     @LogMethod
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
-                                                    Boolean shared, Boolean demographicsPresent, String... ptids)
+                                             @Nullable Boolean shared, Boolean demographicsPresent, String... ptids)
     {
         createCustomParticipantGroup(projectName, studyFolder, groupName, participantString, null, false, shared, demographicsPresent, ptids);
     }
 
     @LogMethod
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
-                                                    String categoryName, boolean isCategoryNameNew, Boolean shared, String... ptids)
+                                             @Nullable String categoryName, boolean isCategoryNameNew, @Nullable Boolean shared, String... ptids)
     {
         createCustomParticipantGroup(projectName, studyFolder, groupName, participantString, categoryName, isCategoryNameNew, shared, true, ptids);
     }
 
     @LogMethod
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
-                                                    String categoryName, boolean isCategoryNameNew, Boolean shared, Boolean demographicsPresent, String... ptids)
+                                             @Nullable String categoryName, boolean isCategoryNameNew, @Nullable Boolean shared, Boolean demographicsPresent, String... ptids)
     {
         if( !_test.isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
         {
             _test.clickFolder(projectName);
             _test.clickFolder(studyFolder);
             _test.clickTab("Manage");
-            _test.clickLinkWithText("Manage " + participantString + " Groups");
+            _test.click(Locator.linkWithText("Manage " + participantString + " Groups"));
             _test.waitForText("groups allow");
         }
         _test.log("Create "+participantString+" Group: " + groupName);
@@ -115,15 +109,8 @@ public class StudyHelperWD extends AbstractHelperWD
     }
 
     @LogMethod
-    public void editCustomParticipantGroup(String groupName, String participantString, String categoryName,
-                                           Boolean isCategoryNameNew, Boolean shared, String... newPtids)
-    {
-        editCustomParticipantGroup(groupName, participantString, categoryName, isCategoryNameNew, shared, false, newPtids);
-    }
-
-    @LogMethod
     public void editCustomParticipantGroup(String groupName, String participantString,
-                                                  String categoryName, Boolean isCategoryNameNew, Boolean shared, Boolean containsDemographics, String... newPtids)
+                                                  String categoryName, Boolean isCategoryNameNew, Boolean shared, String... newPtids)
     {
         _test.log("Edit " + participantString + " Group: " + groupName);
 
@@ -191,8 +178,8 @@ public class StudyHelperWD extends AbstractHelperWD
         _test.assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings", "Participant Groups", "Protocol Documents");
         // NOTE: these have moved to the folder archive export: "Queries", "Custom Views", "Reports", "Lists"
 
-        _test.checkRadioButton("format", useXmlFormat ? "new" : "old");
-        _test.checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
+        _test.checkRadioButton(Locator.radioButtonByNameAndValue("format", useXmlFormat ? "new" : "old"));
+        _test.checkRadioButton(Locator.radioButtonByNameAndValue("location", zipFile ? "1" : "0"));  // zip file vs. individual files
         _test.clickButton("Export");
     }
 
