@@ -3694,7 +3694,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void clickTab(String tabname)
     {
         log("Selecting tab " + tabname);
-        clickLink(getTabLinkId(tabname));
+        clickAndWait(Locator.folderTab(tabname));
     }
 
     public void verifyTabSelected(String caption)
@@ -4122,12 +4122,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void assertTabPresent(String tabText)
     {
-        assertLinkPresent(getTabLinkId(tabText));
+        assertElementPresent(Locator.folderTab(tabText));
     }
 
     public void assertTabNotPresent(String tabText)
     {
-        assertLinkNotPresent(getTabLinkId(tabText));
+        assertElementNotPresent(Locator.folderTab(tabText));
     }
 
     public boolean isButtonPresent(String text)

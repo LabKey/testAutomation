@@ -137,7 +137,6 @@ import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.getHttpGetResponse;
-import static org.labkey.test.WebTestHelper.getTabLinkId;
 import static org.labkey.test.WebTestHelper.getTargetServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
 import static org.labkey.test.WebTestHelper.logToServer;
@@ -4271,7 +4270,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void clickTab(String tabname)
     {
         log("Selecting tab " + tabname);
-        clickLink(getTabLinkId(tabname));
+        clickAndWait(Locator.folderTab(tabname));
     }
 
     public void verifyTabSelected(String caption)
@@ -4710,12 +4709,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertTabPresent(String tabText)
     {
-        assertLinkPresent(getTabLinkId(tabText));
+        assertElementPresent(Locator.folderTab(tabText));
     }
 
     public void assertTabNotPresent(String tabText)
     {
-        assertLinkNotPresent(getTabLinkId(tabText));
+        assertElementPresent(Locator.folderTab(tabText));
     }
 
     public boolean isButtonPresent(String text)

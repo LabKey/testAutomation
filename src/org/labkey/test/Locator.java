@@ -57,7 +57,7 @@ public abstract class Locator
         _loc = loc;
         _index = index;
         _contains = contains;
-        _text = text;
+        _text = text == null ? null : text.trim();
     }
 
     public abstract Locator containing(String contains);
@@ -117,7 +117,7 @@ public abstract class Locator
                 String text;
                 try
                 {
-                    text = el.getText();
+                    text = el.getText().trim();
                     if (!text.equals(_text))
                         it.remove();
                 }
@@ -618,6 +618,11 @@ public abstract class Locator
     public static XPathLocator permissionsTreeNode(String folderName)
     {
         return xpath("//a[@class='x-tree-node-anchor']/span[text()='" + folderName + "' or text()='" + folderName + "*']");
+    }
+
+    public static IdLocator folderTab(String text)
+    {
+        return Locator.id(text + "Tab");
     }
 
     /**

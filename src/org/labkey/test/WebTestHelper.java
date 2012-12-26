@@ -218,11 +218,6 @@ public class WebTestHelper
         return parameter.replaceAll(" ", "%20");
     }
 
-    public static String getTabLinkId(String tabName)
-    {
-        return tabName + "Tab";
-    }
-
     public static DefaultHttpClient getHttpClient()
     {
         return getHttpClient(PasswordUtil.getUsername(), PasswordUtil.getPassword());
