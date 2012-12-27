@@ -95,7 +95,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
 
         // verify legend text and ordering
-        assertTextPresentInThisOrder("specimen collected", "specimen received by lab", "specimen received but invalid", "assay results available"); //, "query"); appears too many times on page!
+        assertTextPresentInThisOrder("specimen expected", "specimen received by lab", "specimen not collected",
+                "specimen collected", "specimen received but invalid", "assay results available"); // "query" appears too many times on page!
 
         // verify setting the PCR additional grouping column
         verifyAdditionalGroupingColumn(assay1, "gene");
