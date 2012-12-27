@@ -144,6 +144,7 @@ public class AssayTest extends AbstractAssayTest
         editAssay();
         viewCrossFolderData();
         verifyStudyList();
+        verifyRunDeletionRecallsDatasetRows();
         // TODO: Turn this on once file browser migration is complete -- see Nick.
 //        verifyWebdavTree();
         goBack();
@@ -151,6 +152,31 @@ public class AssayTest extends AbstractAssayTest
 
         // Now that the test is done, ensure that system maintenance is complete...
         waitForSystemMaintenanceCompletion();
+    }
+
+    private void verifyRunDeletionRecallsDatasetRows()
+    {
+        clickLinkWithText(getProjectName());
+        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
+        clickLinkWithText(TEST_ASSAY);
+        checkDataRegionCheckbox("Runs", 0);
+        clickButton("Delete");
+        // Make sure that it shows that the data is part of study datasets
+        assertTextPresent("SecondRun", "2 dataset(s)", TEST_ASSAY);
+        assertTextNotPresent("FirstRun");
+        // Do the delete
+        clickButton("Confirm Delete");
+
+        // Be sure that we have a special audit record
+        clickLinkWithText("view copy-to-study history");
+        assertTextPresent("3 row(s) were recalled to the assay: ");
+
+        // Verify that the deleted run data is gone from the dataset
+        clickLinkWithText(TEST_ASSAY_FLDR_STUDY2);
+        clickLinkWithText("1 dataset");
+        clickLinkWithText(TEST_ASSAY);
+        assertTextPresent("AAA07XMC-04", "FirstRun");
+        assertTextNotPresent("BAQ00051-09", "SecondRun");
     }
 
     //Issue 12203: Incorrect files are visible from pipeline directory

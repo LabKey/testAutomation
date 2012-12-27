@@ -39,7 +39,7 @@ public class StudyReloadTest extends StudyBaseTest
     protected void doVerifySteps()
     {
         clickLinkWithText(getFolderName());
-        clickLinkWithText("1 datasets");
+        clickLinkWithText("1 dataset");
         clickLinkWithText("update_test");
         assertTextPresent("id006", "additional_column");
         //text that was present in original but removed in the update

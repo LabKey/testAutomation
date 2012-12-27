@@ -235,7 +235,7 @@ public class FolderExportTest extends BaseWebDriverTest
         if (fromTemplate)
             assertElementPresent(Locator.css("#bodypanel .labkey-wp-body p").withText("This folder does not contain a study."));
         else
-            assertElementPresent(Locator.css(".study-properties").withText("Study Label for Subfolder2 tracks data in 1 datasets over 1 visits. Data is present for 2 Monkeys."));
+            assertElementPresent(Locator.css(".study-properties").withText("Study Label for Subfolder2 tracks data in 1 dataset over 1 visit. Data is present for 2 Monkeys."));
 
         log("verify container tabs were imported");
         clickLinkWithText("Subfolder1", subfolderIndex);
