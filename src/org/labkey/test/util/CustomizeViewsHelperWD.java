@@ -61,6 +61,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
                 }
             });
         }
+        _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void closeCustomizeViewPanel()
@@ -106,6 +107,8 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     public void saveCustomView(String name, boolean shared)
     {
         _test.clickButton("Save", 0);
+
+        _test._extHelper.waitForExtDialog("Save Custom View");
         
         if(shared)
             _test.checkCheckbox("saveCustomView_shared");
@@ -128,7 +131,10 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         {
             _test.log("Saving current custom view");
         }
-        _test.clickButtonByIndex("Save", 1);
+        _test.clickButtonByIndex("Save", 1, 0);
+
+        _test.waitForElementToDisappear(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT); // Panel will be gone after a page load
+        _test.waitForElement(Locator.css(".labkey-data-region"));
     }
 
     public void deleteView()
