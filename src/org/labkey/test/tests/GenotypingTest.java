@@ -486,6 +486,8 @@ public class GenotypingTest extends BaseSeleniumWebTest
         clickLinkWithText("Samples");
         waitForPageToLoad();
         DataRegionTable d = new DataRegionTable("query", this);
+        String viewName = "Yellow Peas";
+        createCusomizedView(viewName, new String[]{"Created"}, new String[] {"fivemid"});
         d.checkAllOnPage();
         clickButton("Create Illumina Sample Sheet");
         waitForPageToLoad();
@@ -526,10 +528,14 @@ public class GenotypingTest extends BaseSeleniumWebTest
         textarea.eval("this.setValue(this.getValue() + \"\\\\n" + newValue + "\")");
         clickButton("Done Editing", 0);
 
+        assertTextPresent("Warning: Sample indexes do not support both color channels at each position. See Preview Samples tab for more information.");
 
         //verify template has changed
         _ext4Helper.clickTabContainingText("General Info");
         Assert.assertEquals("Custom", Ext4FieldRef.getForLabel(this, "Template").getValue());
+
+        //set custom view
+        _ext4Helper.selectComboBoxItem("Custom View", viewName);
 
         //verify values persisted
         _ext4Helper.clickTabContainingText("Preview Header");
@@ -551,9 +557,9 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
         //verify samples present
         _ext4Helper.clickTabContainingText("Preview Samples");
-        waitForText("Sample_ID");
+        waitForText("Sample Name");
 
-        int expectRows = (11 * (45 +  1)) + 8;  //11 cols, 45 rows, plus header and validation row (which is only 8 cols)
+        int expectRows =  966; //(16 * (49 +  1)) + 16;  //11 cols, 45 rows, plus header and validation row (which is only 8 cols)
         Assert.assertEquals(expectRows, selenium.getXpathCount("//td[contains(@class, 'x4-table-layout-cell')]"));
 
         //make sure values persisted
@@ -588,6 +594,23 @@ public class GenotypingTest extends BaseSeleniumWebTest
         assertTextPresent(prop_name + "," + prop_value);
         goToHome();
         goToProjectHome();
+    }
+
+    private void createCusomizedView(String viewName, String[] columnsToAdd, String[] columnsToRemove )
+    {
+        _customizeViewsHelper.openCustomizeViewPanel();
+
+        for(String column : columnsToAdd)
+        {
+            _customizeViewsHelper.addCustomizeViewColumn(column);
+        }
+
+        for(String column : columnsToRemove)
+        {
+            _customizeViewsHelper.removeCustomizeViewColumn(column);
+        }
+
+        _customizeViewsHelper.saveCustomView(viewName);
     }
 
     private void assertExportButtonPresent()
