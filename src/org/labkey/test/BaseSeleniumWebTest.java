@@ -341,7 +341,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void tearDown() throws Exception
     {
         if (this.enableScriptCheck())
+        {
+            dismissAlerts();
             endJsErrorChecker();
+        }
 
         boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
         if (!skipTearDown || onTeamCity())
