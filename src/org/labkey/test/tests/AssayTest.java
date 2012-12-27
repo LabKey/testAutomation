@@ -162,7 +162,7 @@ public class AssayTest extends AbstractAssayTest
         checkDataRegionCheckbox("Runs", 0);
         clickButton("Delete");
         // Make sure that it shows that the data is part of study datasets
-        assertTextPresent("SecondRun", "2 dataset(s)", TEST_ASSAY);
+        assertTextPresent("SecondRun", "3 dataset(s)", TEST_ASSAY);
         assertTextNotPresent("FirstRun");
         // Do the delete
         clickButton("Confirm Delete");
