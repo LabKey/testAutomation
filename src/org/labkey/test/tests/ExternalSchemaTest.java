@@ -148,9 +148,9 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
         if (!isTextPresent("reload"))
         {
-            clickLinkWithText("define new schema");
+            clickLinkWithText("new external schema");
             setFormElement(Locator.name("userSchemaName"), USER_SCHEMA_NAME);
-            setFormElement(Locator.name("dbSchemaName"), DB_SCHEMA_NAME);
+            setFormElement(Locator.name("sourceSchemaName"), DB_SCHEMA_NAME);
             setFormElement(Locator.name("metaData"), getFileContents("server/modules/core/resources/schemas/test.xml"));
             clickButton("Create");
         }

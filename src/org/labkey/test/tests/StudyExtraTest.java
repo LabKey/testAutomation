@@ -171,9 +171,9 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkWithText(STUDY_FOLDER + " Study");
         goToModule("Query");
         _extHelper.clickExtButton(this, "Schema Administration");
-		clickLinkWithText("define new schema");
+		clickLinkWithText("new external schema");
 		setFormElement("userSchemaName", "VerifySnapshot");
-		setFormElement("dbSchemaName", "verifysnapshot");
+		setFormElement("sourceSchemaName", "verifysnapshot");
         clickButton("Create");
 		assertTextPresent("VerifySnapshot");
         clickLinkWithText("Query Schema Browser");
