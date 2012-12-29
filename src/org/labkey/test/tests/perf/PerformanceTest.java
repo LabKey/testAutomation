@@ -53,9 +53,7 @@ public abstract class PerformanceTest extends BaseWebDriverTest
             writer = new FileWriter(xmlFile);
 
             writer.write("<build>\n");
-            writer.write("\t<statisticValue key=\"totalActions\" value=\"" + elapsedTime + "\"/>\n");
-//            writer.write("\t<statisticValue key=\"coveredActions\" value=\"" + coveredActions + "\"/>\n");
-//            writer.write("\t<statisticValue key=\"actionCoveragePercent\" value=\"" + actionCoveragePercent + "\"/>\n");
+            writer.write("\t<statisticValue key=\"actionTime\" value=\"" + elapsedTime + "\"/>\n");
             writer.write("</build>");
         }
         catch (IOException e)
