@@ -35,6 +35,12 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         super(test);
     }
+
+    public void clickMenuButton(String menusLabel, String... subMenuLabels)
+    {
+        clickMenuButton(true, menusLabel, subMenuLabels);
+    }
+
     /**
      * Clicks the Ext or labkey menu item from the submenu specified by the menu object's text
      */
@@ -46,6 +52,11 @@ public class ExtHelperWD extends AbstractHelperWD
         if (!_test.isElementPresent(menu))
             Assert.fail("No Ext or LabKey menu for label '" + menusLabel + "' found");
         clickExtMenuButton(wait, menu, subMenuLabels);
+    }
+
+    public void clickExtMenuButton(Locator menu, String... subMenuLabels)
+    {
+        clickExtMenuButton(true, menu, subMenuLabels);
     }
 
     /**
@@ -596,19 +607,22 @@ public class ExtHelperWD extends AbstractHelperWD
         _test.waitForElement(file, 60000);
     }
 
-    public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
+    @LogMethod(quiet = true)
+    public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
         _test.click(Locator.xpath(parentLocator.getPath() + "//*[contains(@class, 'x-form-arrow-trigger')]"));
         _test.waitAndClick(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"));
         _test.waitForElementToDisappear(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public void selectComboBoxItem(String label, String selection)
+    @LogMethod(quiet = true)
+    public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
         selectComboBoxItem(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='"+label+"']]/div/div"), selection);
     }
 
-    public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, String selection)
+    @LogMethod(quiet = true)
+    public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
         _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"));
         _test.waitAndClick(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"));

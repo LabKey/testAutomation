@@ -63,6 +63,7 @@ import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.ExtHelperWD;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.StudyHelperWD;
 import org.labkey.test.util.TestLogger;
@@ -2609,7 +2610,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     @LogMethod
-    public void startCreateGlobalPermissionsGroup(String groupName, boolean failIfAlreadyExists)
+    public void startCreateGlobalPermissionsGroup(@LoggedParam String groupName, boolean failIfAlreadyExists)
     {
 
         goToHome();
@@ -2635,7 +2636,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         createGlobalPermissionsGroup(groupName, true, users);
     }
 
-    public void createGlobalPermissionsGroup(String groupName, boolean failIfAlreadyExists, String... users )
+    @LogMethod
+    public void createGlobalPermissionsGroup(@LoggedParam String groupName, boolean failIfAlreadyExists, @LoggedParam String... users )
     {
         startCreateGlobalPermissionsGroup(groupName, failIfAlreadyExists);
         StringBuilder namesList = new StringBuilder();
@@ -2783,7 +2785,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * @param inheritPermissions should folder inherit permissions from parent?
      */
     @LogMethod
-    public void createSubfolder(String project, String parent, String child, @Nullable String folderType, @Nullable String templateFolder, @Nullable String[] tabsToAdd, boolean inheritPermissions)
+    public void createSubfolder(String project, String parent, @LoggedParam String child, @Nullable String folderType, @Nullable String templateFolder, @Nullable String[] tabsToAdd, boolean inheritPermissions)
     {
         startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
@@ -2871,7 +2873,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     @LogMethod
-    public void deleteFolder(String project, String folderName)
+    public void deleteFolder(String project, @LoggedParam String folderName)
     {
         log("Deleting folder " + folderName + " under project " + project);
         clickLinkWithText(project);
@@ -2909,7 +2911,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     @LogMethod
-    public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
+    public void renameFolder(String project, @LoggedParam String folderName, @LoggedParam String newFolderName, boolean createAlias)
     {
         log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
         clickLinkWithText(project);
@@ -4342,14 +4344,23 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertTrue(isImagePresentWithSrc(src, substringMatch));
     }
 
+    /**
+     * @deprecated Use {@link #getTableCellText(org.labkey.test.Locator.XPathLocator, int, int)}
+     */
+    @Deprecated
     public String getTableCellText(String tableId, int row, int column)
     {
-        return getText(Locator.xpath("//table[@id="+Locator.xq(tableId)+"]/tbody/tr["+(row+1)+"]/*[(name()='TH' or name()='TD' or name()='th' or name()='td') and position() = "+(column+1)+"]"));
+        return getTableCellText(Locator.xpath("//table[@id="+Locator.xq(tableId)+"]"), row, column);
+    }
+
+    public String getTableCellText(Locator.XPathLocator table, int row, int column)
+    {
+        return getText(table.append("/tbody/tr[" + (row + 1) + "]/*[(name()='TH' or name()='TD' or name()='th' or name()='td') and position() = " + (column + 1) + "]"));
     }
 
     public Locator getSimpleTableCell(Locator.XPathLocator table, int row, int column)
     {
-        return Locator.xpath(table.toXpath() + "/tbody/tr["+(row+1)+"]/td[" + (column +1)  + "]");
+        return Locator.xpath(table.toXpath() + "/tbody/tr[" + (row + 1) + "]/td[" + (column + 1) + "]");
     }
 
     public String getTableCellText(String tableName, int row, String columnTitle)
@@ -5758,19 +5769,19 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     @LogMethod
-    public void setPermissions(String groupName, String permissionString)
+    public void setPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
     {
         _setPermissions(groupName, permissionString, "pGroup");
     }
 
     @LogMethod
-    public void setSiteGroupPermissions(String groupName, String permissionString)
+    public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
     {
         _setPermissions(groupName, permissionString, "pSite");
     }
 
     @LogMethod
-    public void setUserPermissions(String userName, String permissionString)
+    public void setUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
     {
         log(new Date().toString());
         _setPermissions(userName, permissionString, "pUser");
@@ -6035,8 +6046,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         deleteGroup(groupName, false);
     }
 
-    @LogMethod
-    public void deleteGroup(String groupName, boolean failIfNotFound)
+    @LogMethod(quiet = true)
+    public void deleteGroup(@LoggedParam String groupName, boolean failIfNotFound)
     {
         log("Attempting to delete group: " + groupName);
         if (selectGroup(groupName, failIfNotFound))
@@ -6107,7 +6118,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     @LogMethod
-    public void deleteUsers(boolean failIfNotFound, String... userEmails)
+    public void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails)
     {
         int checked = 0;
         List<String> displayNames = new ArrayList<String>();
@@ -7290,7 +7301,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     // Wait until the pipeline UI shows the requested number of complete jobs.  Fail if any job status becomes "ERROR".
     @LogMethod
-    public void waitForPipelineJobsToComplete(int completeJobsExpected, String description, boolean expectError)
+    public void waitForPipelineJobsToComplete(@LoggedParam int completeJobsExpected, @LoggedParam String description, boolean expectError)
     {
         log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
         List<String> statusValues = getPipelineStatusValues();
@@ -7317,7 +7328,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
     @LogMethod
-    protected void waitForPipelineJobsToFinish(int jobsExpected)
+    protected void waitForPipelineJobsToFinish(@LoggedParam int jobsExpected)
     {
         log("Waiting for " + jobsExpected + " pipeline jobs to finish");
         List<String> statusValues = getPipelineStatusValues();
@@ -7383,8 +7394,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      *
      * @param actionName
      */
-    @LogMethod
-    public void selectImportDataAction(String actionName)
+    @LogMethod(quiet = true)
+    public void selectImportDataAction(@LoggedParam String actionName)
     {
         sleep(100);
         _extHelper.waitForFileGridReady();

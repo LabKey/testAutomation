@@ -39,8 +39,8 @@ public class Ext4HelperWD extends AbstractHelperWD
         super(test);
     }
 
-    @LogMethod
-    public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
+    @LogMethod(quiet = true)
+    public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
         Locator l = Locator.xpath(parentLocator.getPath()+"//div[contains(@class,'arrow')]");
         _test.waitForElement(l);
@@ -65,20 +65,21 @@ public class Ext4HelperWD extends AbstractHelperWD
         }
     }
 
-    public void selectComboBoxItem(String label, String selection)
+    @LogMethod(quiet = true)
+    public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
        Ext4FieldRefWD.getForLabel(_test, label).setValue(selection);
     }
 
-    @LogMethod
-    public void selectComboBoxItemById(String labelId, String selection)
+    @LogMethod(quiet = true)
+    public void selectComboBoxItemById(@LoggedParam String labelId, @LoggedParam String selection)
     {
         Locator.XPathLocator loc = Locator.xpath("//tbody[./tr/td/label[@id='" + labelId + "-labelEl']]");
         selectComboBoxItem(loc, selection);
     }
 
-    @LogMethod
-    public void selectRadioButton(String label, String selection)
+    @LogMethod(quiet = true)
+    public void selectRadioButton(@LoggedParam String label, @LoggedParam String selection)
     {
         Locator l = Locator.xpath("//div[div/label[text()='" + label + "']]//label[text()='" + selection + "']");
         if (!_test.isElementPresent(l))
@@ -89,13 +90,15 @@ public class Ext4HelperWD extends AbstractHelperWD
         _test.click(l);
     }
 
-    public void selectRadioButtonById(String labelId)
+    @LogMethod(quiet = true)
+    public void selectRadioButtonById(@LoggedParam String labelId)
     {
         Locator l = Locator.xpath("//label[@id='" + labelId + "']");
         _test.click(l);
     }
 
-    public void waitForComponentNotDirty(final String componentId)
+    @LogMethod(quiet = true)
+    public void waitForComponentNotDirty(@LoggedParam final String componentId)
     {
         _test.waitFor(new BaseWebDriverTest.Checker()
         {
@@ -107,14 +110,15 @@ public class Ext4HelperWD extends AbstractHelperWD
         }, "Page still marked as dirty", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public void clickExt4Tab(String tabname)
+    @LogMethod(quiet = true)
+    public void clickExt4Tab(@LoggedParam String tabname)
     {
-        _test.log("Selecting Ext tab " + tabname);
         Locator l = Locator.xpath("//span[contains(@class, 'x4-tab') and text() = '" + tabname + "']");
         _test.click(l);
     }
 
-    public void checkCheckbox(String label)
+    @LogMethod(quiet = true)
+    public void checkCheckbox(@LoggedParam String label)
     {
         if (!isChecked(label))
         {
@@ -123,7 +127,8 @@ public class Ext4HelperWD extends AbstractHelperWD
         }
     }
 
-    public void uncheckCheckbox(String label)
+    @LogMethod(quiet = true)
+    public void uncheckCheckbox(@LoggedParam String label)
     {
         if (isChecked(label))
         {
@@ -156,7 +161,7 @@ public class Ext4HelperWD extends AbstractHelperWD
      * @param cellText Exact text from any cell in the desired row
      * @param index 0-based index of rows with matching cellText
      */
-    @LogMethod
+    @LogMethod(quiet = true)
     public void checkGridRowCheckbox(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
@@ -180,7 +185,7 @@ public class Ext4HelperWD extends AbstractHelperWD
      * @param cellText Exact text from any cell in the desired row
      * @param index 0-based index of rows with matching cellText
      */
-    @LogMethod
+    @LogMethod(quiet = true)
     public void uncheckGridRowCheckbox(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
@@ -194,7 +199,7 @@ public class Ext4HelperWD extends AbstractHelperWD
      * @param cellText Exact text from any cell in the desired row
      * @param index 0-based index of rows with matching cellText
      */
-    @LogMethod
+    @LogMethod(quiet = true)
     public void clickGridRowText(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
