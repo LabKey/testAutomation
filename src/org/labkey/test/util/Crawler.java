@@ -147,8 +147,6 @@ public class Crawler
             new ControllerActionId("targetedms", "downloadDocument"),
 
             // Script injection exclusions
-            new ControllerActionId("announcements", "update"), // TODO: 16731: Announcements.UpdateAction: AssertionError on bad 'entityId'
-            new ControllerActionId("announcements", "respond"), // TODO: 16732: Announcements.RespondAction: IllegalArgumentsException on bad 'parentId'
             new ControllerActionId("flow-editscript", "editGateTree"), // TODO: 16733: flow-editscript.EditGateTreeAction: NumberFormatException on bad 'scriptId'
             new ControllerActionId("project", "customizeWebPart"), // TODO: 16734: Project.CustomizeWebPartAction: ClassNotFoundException on bad 'webPartId'
             new ControllerActionId("idri", "formulationDetails"), // TODO: 16735: Idri.FormulationDetailsAction: NullPointerException on bad 'rowId'
