@@ -30,7 +30,7 @@ import java.util.List;
 public class HaplotypeAssayTest extends GenotypingTest
 {
     private static final String PROJECT_NAME = "HaplotypeAssayVerifyProject";
-    private static final String ASSAY_NAME = "HaplotypeAssay" + TRICKY_CHARACTERS_NO_QUOTES;
+    private static final String ASSAY_NAME = "HaplotypeAssay";// + TRICKY_CHARACTERS_NO_QUOTES;
     private static final File FIRST_RUN_FILE = new File(getSampledataPath(), "genotyping/haplotypeAssay/firstRunData.txt");
     private static final File SECOND_RUN_FILE = new File(getSampledataPath(), "genotyping/haplotypeAssay/secondRunData.txt");
     private static final File ERROR_RUN_FILE = new File(getSampledataPath(), "genotyping/haplotypeAssay/errorRunData.txt");
@@ -53,6 +53,13 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyExtraHaplotypeAssignment();
         verifyAssignmentReport();
         verifyDuplicateRecords();
+        verifyAribitraryHaplotypeAssay();
+
+    }
+
+    private void verifyAribitraryHaplotypeAssay()
+    {
+        setupHaplotypeAssay();
     }
 
     @Override
@@ -72,7 +79,8 @@ public class HaplotypeAssayTest extends GenotypingTest
         _listHelper.addField("Field Properties", 1, "animalIntTest", "Animal Integer Test", ListHelper.ListColumnType.Integer);
         clickButton("Save");
         clickLinkWithText("Animal");
-        assertTextPresent("Animal String Test");
+        _customizeViewsHelper.openCustomizeViewPanel();
+        waitForText("Animal String Test");
         assertTextPresent("Animal Integer Test");
 
         log("Configure extensible Haplotype table");
@@ -84,11 +92,17 @@ public class HaplotypeAssayTest extends GenotypingTest
         _listHelper.addField("Field Properties", 1, "haplotypeIntTest", "Haplotype Integer Test", ListHelper.ListColumnType.Integer);
         clickButton("Save");
         clickLinkWithText("Haplotype");
+        _customizeViewsHelper.openCustomizeViewPanel(); //TODO:  should this be necessary?
         assertTextPresent("Haplotype String Test");
         assertTextPresent("Haplotype Integer Test");
     }
 
     private void setupHaplotypeAssay()
+    {
+        setupHaplotypeAssay(ASSAY_NAME, null);
+    }
+
+    private void setupHaplotypeAssay(String name, String[] extraHaplotypes)
     {
         log("Setting up Haplotype assay");
         goToProjectHome();
@@ -98,12 +112,13 @@ public class HaplotypeAssayTest extends GenotypingTest
         clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.id("AssayDesignerName"), ASSAY_NAME);
+        setFormElement(Locator.id("AssayDesignerName"), name);
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         checkCheckbox(Locator.name("editableRunProperties"));
 
         clickButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
+
     }
 
     private void verifyAssayUploadErrors()
@@ -113,6 +128,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         clickButton("Save and Finish");
         waitForText("Data contained zero data rows");
         setFormElement(Locator.name("data"), getFileContents(ERROR_RUN_FILE));
+        sleep(1000);
         clickButton("Save and Finish");
         waitForText("Column header mapping missing for: Lab Animal ID");
         waitForElementToDisappear(Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Mamu-B Haplotype 2 *:']"), WAIT_FOR_JAVASCRIPT);
@@ -390,6 +406,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         setFormElement(Locator.name("name"), assayId);
         checkCheckbox("enabled");
         setDataAndColumnHeaderProperties(dataFile);
+        sleep(3500); //TODO
         clickButton("Save and Finish");
         waitForText(ASSAY_NAME + " Runs");
         assertLinkPresentWithText(assayId);
@@ -398,7 +415,7 @@ public class HaplotypeAssayTest extends GenotypingTest
     private void setDataAndColumnHeaderProperties(File dataFile)
     {
         // adding text to the data text area triggers the events to enable the comboboxes and load their stores
-        Locator cb = Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Mamu-B Haplotype 2 *:']");
+        Locator cb = Locator.xpath("//table[contains(@class,'disabled')]//label[text() = 'Mamu-B Haplotype 2:']");
         if (!isElementPresent(cb))
             Assert.fail("The Haplotype column header mapping comboboxes should be disbabled until the data is pasted in.");
 
