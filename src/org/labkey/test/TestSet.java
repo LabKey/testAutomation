@@ -50,6 +50,7 @@ public enum TestSet
         WikiTest.class,
         ExpTest.class,
         AssayTest.class,
+        ICEMRModuleTest.class,
         PipelineTest.class,
         FileContentTest.class,
         ClientAPITest.class,
@@ -63,7 +64,7 @@ public enum TestSet
         SecurityTest.class,
         FlowTest.class,
         XTandemTest.class,
-        StudyTest.class,
+//        StudyWDTest.class,
         WebDavTest.class
     ),
 

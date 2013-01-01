@@ -111,4 +111,20 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
 
     public abstract void importAssay(String assayName, String file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
+
+    public void createAssayWithDefaults(String type, String name)
+    {
+        _test.clickButton("New Assay Design");
+        _test.click(Locator.id("providerName_"+ type));
+        _test.sleep(10000);
+        _test.clickButton("Next");
+        _test.waitForText("Assay Designer");
+        Locator assayDesignerName = Locator.id("AssayDesignerName");
+        _test.waitForElement(assayDesignerName);
+        _test.setFormElement(assayDesignerName, name);
+        _test.sleep(10000);
+        _test.clickButton("Save & Close");
+        if(_test.isTextPresent("ICEMR Diagnostics Assay Designer"))
+            _test.clickButton("Save & Close");
+    }
 }
