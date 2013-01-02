@@ -197,7 +197,7 @@ public class StudyExportTest extends StudyManualTest
         selectOptionByText("newPerSite", "One Per Study");
         clickButton("Save");
         clickLinkWithText("Update Members");
-        clickLinkWithText("FHCRC - Seattle");
+        clickLinkWithText("FHCRC - Seattle (Endpoint Lab, Site Affiliated Lab, Clinic)");
         assertTextPresent("Institutional Review Board, FHCRC - Seattle");
         assertTextPresent("This group currently has no members.");
         clickTab("Manage");
