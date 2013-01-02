@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 
 import static org.labkey.test.util.ListHelper.ListColumnType;
@@ -162,8 +163,7 @@ public class AssayTest extends AbstractAssayTest
         checkDataRegionCheckbox("Runs", 0);
         clickButton("Delete");
         // Make sure that it shows that the data is part of study datasets
-        // TODO - figure out why the test sometimes shows 3 datasets and sometimes shows 2
-        assertTextPresent("SecondRun", "dataset(s)", TEST_ASSAY);
+        assertTextPresent("SecondRun", "2 dataset(s)", TEST_ASSAY);
         assertTextNotPresent("FirstRun");
         // Do the delete
         clickButton("Confirm Delete");
@@ -579,11 +579,16 @@ public class AssayTest extends AbstractAssayTest
         clickLinkWithText(TEST_ASSAY);
         clickLinkWithText("view copy-to-study history");
 
+        // Set a filter so that we know we're recalling SecondRun
+        setFilter("audit", "Comment", "Starts With", "3 row(s) were copied to a study from the assay");
         clickLinkWithText("details");
         checkCheckbox(Locator.checkboxByName(".toggle"));
         clickButton("Recall Rows", 0);
         getConfirmationAndWait();
         assertTextPresent("row(s) were recalled to the assay: " + TEST_ASSAY);
+
+        // Set a filter so that we know we're looking at the copy event for SecondRun again
+        setFilter("audit", "Comment", "Starts With", "3 row(s) were copied to a study from the assay");
 
         // verify audit entry was adjusted
         clickLinkWithText("details");
