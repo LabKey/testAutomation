@@ -18,11 +18,9 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 11/21/12
  * Time: 12:52 PM
- * To change this template use File | Settings | File Templates.
  */
 public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 {
@@ -88,7 +86,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
     {
         clickMenuButton("Request Options", "Create New Request");
 
-        selectOptionByText("destinationSite", "Aurum Health KOSH Lab, Orkney, South Africa (Repository)");
+        selectOptionByText("destinationSite", "Aurum Health KOSH Lab, Orkney, South Africa (Endpoint Lab, Repository)");
         setFormElement("input0", "Assay Plan");
         setFormElement("input2", "Comments");
         setFormElement("input1", "Shipping");
