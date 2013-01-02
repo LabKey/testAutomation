@@ -94,7 +94,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
         catch (IOException e)
         {
-            Assert.fail(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }
