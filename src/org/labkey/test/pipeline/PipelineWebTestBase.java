@@ -16,6 +16,7 @@
 package org.labkey.test.pipeline;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.TestTimeoutException;
 
 /**
  * @author brendanx
@@ -34,7 +35,7 @@ abstract public class PipelineWebTestBase extends BaseSeleniumWebTest
         return _projectName;
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
     }

@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.SearchHelper;
@@ -113,7 +114,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
     private int _pipelineJobs = 0;
 
-    public void doCleanup(boolean afterTest) throws Exception
+    public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
         deleteProject(PUB2_NAME, afterTest);

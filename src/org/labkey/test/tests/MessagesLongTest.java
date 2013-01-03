@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PasswordUtil;
 
@@ -77,7 +78,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         stopImpersonating();
     }
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsers(afterTest, USER1, USER2, USER3, RESPONDER);
         deleteProject(PROJECT_NAME, afterTest);

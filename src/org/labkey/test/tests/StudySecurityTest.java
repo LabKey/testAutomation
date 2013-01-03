@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 
 /*
 * User: dave
@@ -250,7 +251,7 @@ public class StudySecurityTest extends StudyBaseTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
         deleteUsers(afterTest, READER, EDITOR, LIMITED, NONE);

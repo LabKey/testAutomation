@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 
@@ -61,7 +62,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         return PERM_PROJECT_NAME;
     }
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         log(this.getClass().getName() + " Cleaning Up");
         deleteProject(PERM_PROJECT_NAME, afterTest);

@@ -30,6 +30,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONValue;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
@@ -78,7 +79,8 @@ public class JUnitTest extends TestSuite
 
         protected String getProjectName() {return null;}
         protected void doTestSteps() throws Exception { }
-        protected void doCleanup(boolean afterTest) { }
+        protected void doCleanup(boolean afterTest) throws TestTimeoutException
+        { }
         public String getAssociatedModuleDirectory() { return null; }
     }
 

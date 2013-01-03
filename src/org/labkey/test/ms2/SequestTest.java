@@ -19,9 +19,9 @@ package org.labkey.test.ms2;
 import junit.framework.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestTimeoutException;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * User: billnelson@uky.edu
@@ -44,7 +44,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
     protected static final String SEARCH_BUTTON = "Sequest";
     protected static final String SEARCH_NAME = "SEQUEST";
 
-    protected void doCleanup(boolean afterTest) throws IOException
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         try {
             deleteViews(VIEW); } catch (Throwable t) {}

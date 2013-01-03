@@ -20,6 +20,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestTimeoutException;
 
 import java.io.File;
 
@@ -57,7 +58,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         return true;
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteDir(getTestTempDir());
         deleteProject(getProjectName(), afterTest);

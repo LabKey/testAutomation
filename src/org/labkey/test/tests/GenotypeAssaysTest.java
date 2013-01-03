@@ -26,6 +26,7 @@ import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PasswordUtil;
@@ -33,6 +34,7 @@ import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,7 +120,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         if (afterTest)
         {
@@ -143,6 +145,10 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
             {
                 //ignore, since this will fail when this runs prior to the project being created
                 throw new RuntimeException(e);
+            }
+            catch (SocketTimeoutException e)
+            {
+                throw new TestTimeoutException(e);
             }
             catch (IOException e)
             {

@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -506,7 +507,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         waitForPageToLoad();
     }
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteDir(new File(getSampleRoot(), "assaydata"));
         deleteProject(getProjectName(), afterTest);

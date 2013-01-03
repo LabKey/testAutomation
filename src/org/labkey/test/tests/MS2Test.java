@@ -20,11 +20,11 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.ms2.MS2TestBase;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +85,7 @@ public class MS2Test extends MS2TestBase
     protected static final String RUN_GROUP2_NAME = "Test Run Group 2";
     protected static final String RUN_GROUP3_NAME = "Test Run Group 3";
 
-    protected void doCleanup(boolean afterTest) throws IOException
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         cleanPipe(SEARCH_TYPE);
         deleteProject(getProjectName(), afterTest);

@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.EmailRecordTable;
 import org.labkey.test.util.EmailRecordTable.EmailMessage;
 import org.labkey.test.util.PasswordUtil;
@@ -67,7 +68,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsers(afterTest, USER1, USER2);
         deleteProject(PROJECT_NAME, afterTest);

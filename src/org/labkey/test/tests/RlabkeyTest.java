@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.RReportHelper;
 
@@ -135,7 +136,7 @@ public class RlabkeyTest extends SimpleApiTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
         deleteProject(PROJECT_NAME_2, afterTest);

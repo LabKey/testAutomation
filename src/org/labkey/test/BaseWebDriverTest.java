@@ -1619,6 +1619,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             // Catch so we can record the alert's text
             throw new RuntimeException("Unexpected Alert: " + e.getAlert().getText(), e);
         }
+        catch (TestTimeoutException e)
+        {
+            _testTimeout = true;
+            _testFailed = true;
+            e.printStackTrace();
+            throw e;
+        }
         catch (Exception e)
         {
             // Log the failure before we attempt any other cleanup in the finally block below
@@ -1713,7 +1720,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected abstract void doTestSteps() throws Exception;
 
     // Standard cleanup: delete the project
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         String projectName = getProjectName();
 
@@ -2986,17 +2993,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * Note: Use {@link #deleteProject(String, boolean)} for test cleanup
      * @param project Project display name
      */
-    public void deleteProject(String project)
+    public void deleteProject(String project) throws TestTimeoutException
     {
         deleteProject(project, true, 90000); // Wait for 90 seconds for project deletion
     }
 
-    public void deleteProject(String project, boolean failIfFail)
+    public void deleteProject(String project, boolean failIfFail) throws TestTimeoutException
     {
         deleteProject(project, failIfFail, 90000); // Wait for 90 seconds for project deletion
     }
 
-    public void deleteProject(String project, Boolean failIfFail, int wait)
+    public void deleteProject(String project, boolean failIfFail, int wait) throws TestTimeoutException
     {
         _containerHelper.deleteProject(project, failIfFail, wait);
     }

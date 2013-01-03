@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.TestTimeoutException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,10 +60,10 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         _createdProjects.add(projectName);
     }
 
-    public void deleteProject(String projectName)
+    public void deleteProject(String projectName) throws TestTimeoutException
     {
         deleteProject(projectName, true, 90000);
     }
 
-    public abstract void deleteProject(String projectName, boolean failIfNotFound, int wait);
+    public abstract void deleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException;
 }

@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.StringHelper;
@@ -48,7 +49,7 @@ public class GroupTest extends BaseWebDriverTest
         return getProjectName() + "2";
     }
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteGroup(SIMPLE_GROUP, afterTest);
         deleteGroup(COMPOUND_GROUP, afterTest);

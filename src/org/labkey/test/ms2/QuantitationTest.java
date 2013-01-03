@@ -108,7 +108,7 @@ public class QuantitationTest extends AbstractXTandemTest
     }
 
     @Override
-    protected void cleanPipe(String search_type) throws IOException
+    protected void cleanPipe(String search_type)
     {
         File rootDir = new File(_pipelinePath);
         delete(new File(rootDir, ".labkey/protocols/"+search_type+"/" + LIBRA_PROTOCOL_NAME + ".xml"));

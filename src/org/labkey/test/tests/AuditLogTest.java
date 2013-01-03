@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 
 /**
@@ -56,7 +57,7 @@ public class AuditLogTest extends BaseWebDriverTest
     @Override
     protected void checkViews(){} // Skip.  Project is deleted as part of test
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         // Needed for pre-clean only. User & project are deleted during test.
         if (!afterTest)

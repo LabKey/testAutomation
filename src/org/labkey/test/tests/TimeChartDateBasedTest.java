@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.labkey.test.TestTimeoutException;
+
 /**
  * User: cnathe
  * Date: 11/5/12
@@ -58,7 +60,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
     }
 
     @Override
-    public void doCleanup(boolean afterTest) throws Exception
+    public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsers(afterTest, USER1, USER2);
         super.doCleanup(afterTest);

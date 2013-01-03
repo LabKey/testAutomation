@@ -92,7 +92,7 @@ public class PipelineTestsBase
         _test.beginAt("/labkey/Project/" + _test.getProjectName() + "/" + _folder.getFolderName() + "/begin.view");        
     }
     
-    public void clean() throws IOException
+    public void clean()
     {
         if (_folder == null)
             return;

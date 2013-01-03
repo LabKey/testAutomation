@@ -20,6 +20,7 @@ import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 
 import java.io.File;
@@ -141,7 +142,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         return new File[0]; 
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
 

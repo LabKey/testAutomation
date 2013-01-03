@@ -19,6 +19,7 @@ package org.labkey.test.ms2;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestTimeoutException;
 
 import java.io.IOException;
 import java.io.File;
@@ -59,7 +60,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
     protected static final String SEARCH_BUTTON = "Mascot";
     protected static final String SEARCH_NAME = "MASCOT";
 
-    protected void doCleanup(boolean afterTest) throws IOException
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         try {
             deleteViews(VIEW); } catch (Throwable t) {}
@@ -349,7 +350,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         assertTextPresent("No data to show");
     }
 
-    protected void cleanPipe(String search_type) throws IOException
+    protected void cleanPipe(String search_type)
     {
         super.cleanPipe(search_type);
 

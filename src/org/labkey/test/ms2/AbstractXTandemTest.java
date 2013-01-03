@@ -15,7 +15,7 @@
  */
 package org.labkey.test.ms2;
 
-import java.io.IOException;
+import org.labkey.test.TestTimeoutException;
 
 /**
  * User: jeckels
@@ -33,7 +33,7 @@ public abstract class AbstractXTandemTest extends AbstractMS2SearchEngineTest
     protected static final String PEPTIDE5 = "K.LHRIEAGVMPR.N";
     protected static final String PROTEIN = "gi|18311790|phosphoribosylfor";
     
-    protected void doCleanup(boolean afterTest) throws IOException
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         try {
             deleteViews(VIEW); } catch (Throwable t) {}

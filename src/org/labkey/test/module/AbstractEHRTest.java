@@ -22,6 +22,7 @@ import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.tests.SimpleApiTestWD;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.EHRTestHelper;
@@ -124,7 +125,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     }
 
     @Override
-    public void doCleanup(boolean afterTest)
+    public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         long startTime = System.currentTimeMillis();
         deleteProject(getProjectName(), afterTest);

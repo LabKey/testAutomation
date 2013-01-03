@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.DataRegionTable;
 
@@ -60,7 +61,7 @@ public class UserTest extends SecurityTest
     }
 
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
         Locator.XPathLocator button = Locator.tagContainingText("span", "Change User Properties");

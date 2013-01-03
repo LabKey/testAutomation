@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import junit.framework.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 
@@ -54,7 +55,7 @@ public class SampleMindedImportTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         File specimenDir = new File(getLabKeyRoot() + "/sampledata/study/specimens");
         File specimenArchive = new File(specimenDir, "SampleMindedExport.specimens");

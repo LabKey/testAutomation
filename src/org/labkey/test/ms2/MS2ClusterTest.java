@@ -17,6 +17,7 @@ package org.labkey.test.ms2;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.pipeline.PipelineFolder;
 import org.labkey.test.pipeline.PipelineTestParams;
@@ -75,7 +76,7 @@ public class MS2ClusterTest extends PipelineWebTestBase
         return USE_GLOBUS;
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         if (CLEAN_DATA)
         {

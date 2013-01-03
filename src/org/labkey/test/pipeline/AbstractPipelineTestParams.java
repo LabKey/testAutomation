@@ -219,12 +219,12 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
             Assert.fail("Pipeline files were not cleaned up; "+ analysisDir.toString() + " directory still exists");
     }
 
-    public void clean(File rootDir) throws IOException
+    public void clean(File rootDir)
     {
         delete(new File(rootDir, getDataPath() + File.separatorChar + getProtocolType()));
     }
 
-    protected void delete(File file) throws IOException
+    protected void delete(File file)
     {
         if (file.isDirectory())
         {

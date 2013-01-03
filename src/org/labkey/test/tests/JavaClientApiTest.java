@@ -20,6 +20,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.*;
 import org.labkey.remoteapi.query.*;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 
@@ -295,7 +296,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         log("Completed test of maxrows=0");
     }
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
     }

@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import com.sun.istack.internal.NotNull;
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.tests.study.DataViewsTester;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
@@ -118,7 +119,7 @@ public class ReportTest extends StudyBaseTest
     private final static String R_SCRIPT2_TEXT2 = "999320672";
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsers(false, TEST_USER, R_USER, AUTHOR_USER, DEVELOPER_USER, ATTACHMENT_USER);
         super.doCleanup(afterTest);

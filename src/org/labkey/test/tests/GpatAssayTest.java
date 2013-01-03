@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
 
 /**
@@ -56,7 +57,7 @@ public class GpatAssayTest extends BaseWebDriverTest
     }
 
     @Override
-    public void doCleanup(boolean afterTest)
+    public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
     }

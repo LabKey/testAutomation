@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -43,7 +44,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
     }
 
     @Override
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
 

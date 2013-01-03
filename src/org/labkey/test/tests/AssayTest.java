@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 
 import static org.labkey.test.util.ListHelper.ListColumnType;
@@ -104,7 +104,7 @@ public class AssayTest extends AbstractAssayTest
      * Cleanup entry point.
      * @param afterTest
      */
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(TEST_ASSAY_PRJ_SECURITY, afterTest); //should also delete the groups
 

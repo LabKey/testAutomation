@@ -1328,6 +1328,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
             checkLeaksAndErrors();
         }
+        catch (TestTimeoutException e)
+        {
+            _testTimeout = true;
+            e.printStackTrace();
+            throw e;
+        }
         catch (Exception e)
         {
             // Log the failure before we try attempt any other cleanup in the finally block below
@@ -1402,7 +1408,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     protected abstract void doTestSteps() throws Exception;
 
-    protected abstract void doCleanup(boolean afterTest) throws Exception;
+    protected abstract void doCleanup(boolean afterTest) throws TestTimeoutException;
 
     public void cleanup() throws Exception
     {
@@ -2490,17 +2496,17 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * Note: Use {@link #deleteProject(String, boolean)} for test cleanup
      * @param project Project display name
      */
-    public void deleteProject(String project)
+    public void deleteProject(String project) throws TestTimeoutException
     {
         deleteProject(project, true, 90000); // Wait for 90 seconds for project deletion
     }
 
-    public void deleteProject(String project, boolean failIfFail)
+    public void deleteProject(String project, boolean failIfFail) throws TestTimeoutException
     {
         deleteProject(project, failIfFail, WAIT_FOR_PAGE);
     }
 
-    public void deleteProject(String project, Boolean failIfFail, int wait)
+    public void deleteProject(String project, boolean failIfFail, int wait) throws TestTimeoutException
     {
         _containerHelper.deleteProject(project, failIfFail, wait);
     }

@@ -21,6 +21,7 @@ import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.IOException;
@@ -120,7 +121,7 @@ public class WebDavTest extends BaseSeleniumWebTest
 
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
     }

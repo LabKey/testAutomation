@@ -20,7 +20,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
@@ -121,7 +120,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         popLocation(longWaitForPage);
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
         deletePipelineWorkDirectory();

@@ -20,7 +20,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -120,7 +119,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         popLocation(longWaitForPage);
     }
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
         deletePipelineWorkDirectory();
@@ -131,7 +130,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
             setFormElement("workingDirectory", "");
             clickButton("update");
         }
-        catch (Throwable t) {}
+        catch (Throwable ignored) {}
     }
 
     @Override

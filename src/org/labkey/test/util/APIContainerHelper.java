@@ -21,8 +21,10 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateContainerCommand;
 import org.labkey.remoteapi.security.DeleteContainerCommand;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.TestTimeoutException;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 /**
  * User: jeckels
@@ -72,10 +74,10 @@ public class APIContainerHelper extends AbstractContainerHelper
     }
 
     @Override
-    //wait is irrelevant for the API version
-    public void deleteProject(String projectName, boolean failIfNotFound, int wait)
+    public void deleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException
     {
         DeleteContainerCommand dcc = new DeleteContainerCommand();
+        dcc.setTimeout(wait);
         try
         {
             dcc.execute(_test.getDefaultConnection(), "/" + projectName);
@@ -91,6 +93,10 @@ public class APIContainerHelper extends AbstractContainerHelper
             {
                 Assert.fail(e.getMessage());
             }
+        }
+        catch (SocketTimeoutException e)
+        {
+            throw new TestTimeoutException(e);
         }
         catch (IOException e)
         {

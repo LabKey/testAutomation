@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -54,7 +55,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     }
 
     @Override
-    public void doCleanup(boolean afterTest)
+    public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
         deleteDir(new File(getPipelinePath(), "export"));

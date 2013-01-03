@@ -24,6 +24,7 @@ import org.labkey.remoteapi.query.*;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PasswordUtil;
 
@@ -170,7 +171,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         clickButton("Update");
     }
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
     }

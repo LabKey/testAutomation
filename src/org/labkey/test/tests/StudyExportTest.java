@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 
 import java.io.File;
 
@@ -618,7 +619,7 @@ public class StudyExportTest extends StudyManualTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
 

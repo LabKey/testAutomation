@@ -25,6 +25,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
@@ -94,7 +95,7 @@ public class StudyTest extends StudyBaseTest
         waitForPipelineJobsToComplete(1, "study import", false);
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception //child class cleanup method throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException //child class cleanup method throws Exception
     {
         super.doCleanup(afterTest);
         deleteUsers(false, authorUser); // Subclasses may not have created this user

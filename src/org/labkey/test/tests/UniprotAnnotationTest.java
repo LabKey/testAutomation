@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 
 /**
  * User: jeckels
@@ -109,7 +110,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         selenium.selectWindow(null);
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
     }

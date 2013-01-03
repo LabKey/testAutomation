@@ -22,6 +22,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 
 import java.io.File;
 import java.util.Arrays;
@@ -58,7 +59,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         return true;
     }
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsers(afterTest, user);
         deleteProject(PROJECT_NAME, false);

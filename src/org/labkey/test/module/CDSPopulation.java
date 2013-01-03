@@ -17,6 +17,7 @@ package org.labkey.test.module;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
@@ -44,7 +45,7 @@ public class CDSPopulation extends BaseSeleniumWebTest implements PostgresOnlyTe
     }
 
     @Override
-    public void doCleanup(boolean afterTest)
+    public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
     }

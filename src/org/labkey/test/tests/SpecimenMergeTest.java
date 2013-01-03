@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 
 import java.io.File;
 
@@ -59,7 +60,7 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _studyDataRoot = getLabKeyRoot() + "/sampledata/study";
         File tempDir = new File(getLabKeyRoot() + SPECIMEN_TEMP_DIR);

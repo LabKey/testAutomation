@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import junit.framework.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
@@ -1129,7 +1130,7 @@ public class LuminexTest extends AbstractQCAssayTest
      * Cleanup entry point.
      * @param afterTest
      */
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         revertToAdmin();
         deleteProject(getProjectName(), afterTest);

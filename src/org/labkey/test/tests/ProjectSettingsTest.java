@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 
 /**
  * User: elvan
@@ -106,7 +107,7 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         goToSiteLookAndFeel();
         checkCheckbox("enableHelpMenu");

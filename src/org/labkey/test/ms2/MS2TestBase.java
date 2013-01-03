@@ -17,8 +17,8 @@
 package org.labkey.test.ms2;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.TestTimeoutException;
 
-import java.io.IOException;
 import java.io.File;
 
 /**
@@ -62,7 +62,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup(boolean afterTest) throws IOException
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         cleanPipe(_pipelinePath);
         deleteProject(getProjectName(), afterTest);
@@ -131,7 +131,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         assertTextNotPresent(SAMPLE_BASE_NAME);
     }
 
-    protected void delete(File file) throws IOException
+    protected void delete(File file)
     {
         if (file.isDirectory())
         {
@@ -144,7 +144,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         file.delete();
     }
 
-    protected void cleanPipe(String search_type) throws IOException
+    protected void cleanPipe(String search_type)
     {
         if (_pipelinePath == null)
             return;

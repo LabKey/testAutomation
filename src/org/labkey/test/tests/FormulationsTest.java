@@ -20,6 +20,7 @@ import org.apache.http.HttpException;
 import org.apache.http.HttpStatus;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -115,7 +116,7 @@ public class FormulationsTest extends BaseWebDriverTest
     private static final String HPLC_METHOD = "QDEMUL3.M";
 
     @Override
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
     }

@@ -64,7 +64,7 @@ public interface PipelineTestParams
 
     void verifyClean(File rootDir);
 
-    void clean(File rootDir) throws IOException;
+    void clean(File rootDir);
 
     void startProcessing();
 

@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.labkey.test.TestTimeoutException;
+
 import java.io.File;
 
 /*
@@ -56,7 +58,7 @@ public class SecurityApiTest extends SimpleApiTest
         exitPermissionsUI();
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(PROJECT_NAME, afterTest);
         deleteUsers(afterTest, USER_1, USER_2, "api-created-user@securityapi.test");

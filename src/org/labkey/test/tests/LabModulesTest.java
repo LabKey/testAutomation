@@ -734,13 +734,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest)
-    {
-        //TODO
-        super.doCleanup(afterTest);
-    }
-
-    @Override
     public String getAssociatedModuleDirectory()
     {
         return null;

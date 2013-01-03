@@ -72,7 +72,7 @@ abstract public class AbstractInspectTestParams extends AbstractPipelineTestPara
         return new File(rootDir, getDataPath());
     }
 
-    public void clean(File rootDir) throws IOException
+    public void clean(File rootDir)
     {
         super.clean(rootDir);
 

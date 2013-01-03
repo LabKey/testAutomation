@@ -80,7 +80,7 @@ public class AssayAPITest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
         //To change body of implemented methods use File | Settings | File Templates.

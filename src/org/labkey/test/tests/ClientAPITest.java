@@ -29,6 +29,7 @@ import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelperWD;
@@ -152,7 +153,7 @@ public class ClientAPITest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteUsers(afterTest, EMAIL_RECIPIENTS);
 

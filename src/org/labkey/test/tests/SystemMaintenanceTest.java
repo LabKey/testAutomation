@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.TestTimeoutException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,7 +57,7 @@ public class SystemMaintenanceTest extends BaseSeleniumWebTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         //To change body of implemented methods use File | Settings | File Templates.
     }

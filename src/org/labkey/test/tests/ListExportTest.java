@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -74,7 +75,7 @@ public class ListExportTest extends ListTest
     }
 
     @Override
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
        deleteProject(getProjectName(), afterTest);
     }

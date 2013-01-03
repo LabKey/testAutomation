@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.ms2.MS2PipelineFolder;
 import org.labkey.test.ms2.params.MS2EmailSuccessParams;
 import org.labkey.test.pipeline.PipelineFolder;
@@ -85,7 +86,7 @@ public class PipelineTest extends PipelineWebTestBase
         return "server/modules/pipeline";  // + ms2 and ms1
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _testSetMS2.clean();
         _testSetMS1.clean();

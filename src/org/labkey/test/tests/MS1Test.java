@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
@@ -479,7 +480,7 @@ public class MS1Test extends BaseSeleniumWebTest
         selenium.open(urlCur);
     }
 
-    protected void doCleanup(boolean afterTest) throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         log("Cleaning up MS1 BVT...");
         deleteProject(getProjectName(), afterTest);

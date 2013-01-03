@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
 
 /**
@@ -63,7 +64,7 @@ public class QuerySnapshotTest extends StudyBaseTest
     }
 
     @Override
-    public void doCleanup(boolean afterTest) throws Exception
+    public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         //Check for errors before cleanup to avoid SQLException from deleting study so soon after updating it
         super.checkLeaksAndErrors();

@@ -18,11 +18,11 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.UIContainerHelper;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.HashSet;
@@ -254,7 +254,7 @@ public class FolderExportTest extends BaseWebDriverTest
 
 
     @Override
-    protected void doCleanup(boolean afterTest)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName() + TRICKY_CHARACTERS_FOR_PROJECT_NAMES, false);
         deleteProject(getProjectName(), false);

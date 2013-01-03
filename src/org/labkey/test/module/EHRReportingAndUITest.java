@@ -18,6 +18,7 @@ package org.labkey.test.module;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
@@ -32,7 +33,7 @@ import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 public class EHRReportingAndUITest extends AbstractEHRTest
 {
     @Override
-    public void doCleanup(boolean afterTest)
+    public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         try{deleteRecords();}catch(Throwable T){}
         super.doCleanup(afterTest);
