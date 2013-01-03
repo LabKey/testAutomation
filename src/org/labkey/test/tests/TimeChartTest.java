@@ -782,7 +782,7 @@ public class TimeChartTest extends StudyBaseTest
 
     private void sqlTest(String htmlPage, String[] testTitles, String[] testNumRows, String[][] columnHeaders, String[][] stringCheck, double[][] numbercheck, String[] measure, double[][] measureValue)
     {
-        // check multi-measure calls to LABKEY.Visualization.getData API requesting date information
+        // check multi-measure calls to LABKEY.Query.Visualization.getData API requesting date information
         clickLinkWithText(PROJECT_NAME);
         clickLinkWithText(FOLDER_NAME);
         // create new wiki to add to Demo study folder, or edit existing one

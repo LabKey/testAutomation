@@ -215,7 +215,7 @@ function init() {
         configForm.getForm().findField('configCount').setValue(configs.length);
 
         // call the getData API with the new config measures
-        LABKEY.Visualization.getData({
+        LABKEY.Query.Visualization.getData({
             success: function(data){
                 // show the results in a query webpart using the temp queryName provided in the result
                 var qwp = new LABKEY.QueryWebPart({
