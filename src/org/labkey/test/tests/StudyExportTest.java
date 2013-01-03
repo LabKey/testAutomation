@@ -240,7 +240,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("HAQ0003Y-09");
         assertTextPresent("BAQ00051-09");
         assertTextNotPresent("KAQ0003Q-01");
-        selectOptionByText("destinationSite", "Duke University");
+        selectOptionByText("destinationSite", "Duke University (Repository, Site Affiliated Lab, Clinic)");
         setFormElements("textarea", "inputs", new String[] { "An Assay Plan", "Duke University, NC", "My comments" });
         clickButton("Create and View Details");
 
@@ -265,7 +265,7 @@ public class StudyExportTest extends StudyManualTest
         String inputs = selenium.getValue("inputs");
         System.out.println(inputs);
         assertFormElementNotEquals(Locator.dom("document.forms[1].inputs[1]"), "Duke University, NC");
-        selectOptionByText("destinationSite", "Duke University");
+        selectOptionByText("destinationSite", "Duke University (Repository, Site Affiliated Lab, Clinic)");
         assertFormElementEquals(Locator.dom("document.forms[1].inputs[1]"), "Duke University, NC");
         clickButton("Cancel");
 
