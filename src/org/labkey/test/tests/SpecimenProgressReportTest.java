@@ -78,19 +78,124 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         setFormElement(Locator.name("label"), "SR");
         clickLinkWithText("Save");
 
+        // study folder specimen configuration
+        manageSpecimenConfiguration();
+
         createAssayFolder();
         waitForText("This assay is unlocked");
         assertTextPresent("33 collections have occurred.",  "48 results from " + assay1 + " have been uploaded", "46 " + assay1 + " queries");
         assertTextNotPresent("Configuration error:",
                 "You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report.");
 
+        // verify setting an assay result as flagged for review (i.e. invalid)
+        verifyAssayResultInvalid(assay1, assay1File);
+
+        // verify setting the PCR additional grouping column
+        verifyAdditionalGroupingColumn(assay1, "gene");
+
+        // verify unscheduled visit ordering for the RNA assay
+        verifyUnscheduledVisitDisplay(assay2);
+    }
+
+    private void manageSpecimenConfiguration()
+    {
+        clickLinkWithText(studyFolder);
+        addWebPart("Query");
+        selectOptionByValue(Locator.name("schemaName"), "rho");
+        submit();
+
+        // add the specimen configurations to the manage page
+        String containerId = selenium.getEval("selenium.getContainerId()"); // NOTE: using this because the beginAt doesn't work with the special chars in the project/folder name
+        beginAt("/rho/" + containerId + "/manageSpecimenConfiguration.view?");
+        addSpecimenConfiguration("PCR", "R", 1400, "CEF-R Cryovial");
+        addSpecimenConfiguration("PCR", "R", 1400, "UPR Micro Tube");
+        addSpecimenConfiguration("RNA", "R", 1400, "TGE Cryovial");
+        sleep(1000); // give the store a second to save the configurations
+
+        // lookup the config IDs to use in setting the visits
+        clickLinkWithText(studyFolder);
+        clickLinkWithText("SpecimenConfiguration");
+        DataRegionTable drt = new DataRegionTable("query", this);
+        String pcr1RowId = drt.getDataAsText(drt.getRow("Tubetype", "CEF-R Cryovial"), "Rowid");
+        String pcr2RowId = drt.getDataAsText(drt.getRow("Tubetype", "UPR Micro Tube"), "Rowid");
+        String rnaRowId = drt.getDataAsText(drt.getRow("Tubetype", "TGE Cryovial"), "Rowid");
+        // set the specimen configuration visits (by checking the checkboxes on the manage page
+        beginAt("/rho/" + containerId + "/manageSpecimenConfiguration.view?");
+        setSpecimenConfigurationVisit(pcr1RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
+        setSpecimenConfigurationVisit(pcr2RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
+        setSpecimenConfigurationVisit(rnaRowId, new String[]{"0", "6", "20", "SR"});
+        sleep(1000); // give the store a second to save the configurations
+        clickLinkWithText(studyFolder);
+        clickLinkWithText("SpecimenConfigurationVisit");
+        waitForText("1 - 34 of 34");
+
+        // TODO: this will be replaced by the automatic import of this data as part of the study folder import (SampleMindedImportTask)
+        manuallySetMissingSpecimensAndVisits(rnaRowId, pcr1RowId);
+    }
+
+    private void manuallySetMissingSpecimensAndVisits(String firstConfigId, String secondConfigId)
+    {
+        clickLinkWithText(studyFolder);
+        clickLinkWithText("MissingVisit");
+        insertNewMissingSpecimenOrVisit("Study0100100", 18.0, 1400, "Unknown Staff turn over; unknown reason");
+        insertNewMissingSpecimenOrVisit("Study0100100", 20, 1400, "Unknown Staff turn over; unknown reason");
+        insertNewMissingSpecimenOrVisit("Study0100200", 6.0, 1400, "Unknown Staff turn over; unknown reason");
+
+        clickLinkWithText(studyFolder);
+        clickLinkWithText("MissingSpecimen");
+        insertNewMissingSpecimenOrVisit("Study0100200", 20.0, firstConfigId, 1400, "Unknown reason (please describe as comment) : Have not received specimen from histologist yet.");
+        insertNewMissingSpecimenOrVisit("Study0100200", 16.0, secondConfigId, 1400, "Unable to obtain required volume :");
+    }
+
+    private void insertNewMissingSpecimenOrVisit(String ptid, double visit, int locationId, String comment)
+    {
+        insertNewMissingSpecimenOrVisit(ptid, visit, null, locationId, comment);
+    }
+
+    private void insertNewMissingSpecimenOrVisit(String ptid, double visit, String configId, int locationId, String comment)
+    {
+        clickButton("Insert New");
+        setFormElement(Locator.name("quf_participantid"), ptid);
+        setFormElement(Locator.name("quf_sequencenum"), String.valueOf(visit));
+        setFormElement(Locator.name("quf_locationid"), String.valueOf(locationId));
+        setFormElement(Locator.name("quf_comments"), comment);
+        if (configId != null)
+            setFormElement(Locator.name("quf_specimenconfiguration"), configId);
+
+        clickButton("Submit");
+    }
+
+    private void addSpecimenConfiguration(String assayName, String source, int locationId, String tubeType)
+    {
+        clickButton("Add Specimen Configuration", 0);
+        setFormElement(Locator.name("assayname"), assayName);
+        setFormElement(Locator.name("description"), assayName + " " + tubeType);
+        setFormElement(Locator.name("source"), source);
+        setFormElement(Locator.name("locationid"), String.valueOf(locationId)); // TODO: look this up based on the imported study folder (i.e. Site table for Seattle site)
+        setFormElement(Locator.name("tubetype"), tubeType);
+        clickButton("Update", 0);
+    }
+
+    private void setSpecimenConfigurationVisit(String scRowId, String[] labels)
+    {
+        for (String label : labels)
+        {
+            checkCheckbox(Locator.name("sc" + scRowId + "v" + label));
+        }
+    }
+
+    private void verifyAssayResultInvalid(String assayName, String runName)
+    {
+        clickLinkWithText(assayFolder);
         waitForElement(tableLoc);
         Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
         Assert.assertEquals(22, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
         Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
         Assert.assertEquals(0, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
+        Assert.assertEquals(54, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        Assert.assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
 
-        flagSpecimenForReview(assay1, assay1File, null);
+        flagSpecimenForReview(assayName, runName, null);
 
         waitForElement(tableLoc);
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
@@ -98,12 +203,6 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         // verify legend text and ordering
         assertTextPresentInThisOrder("specimen expected", "specimen received by lab", "specimen not collected",
                 "specimen collected", "specimen received but invalid", "assay results available"); // "query" appears too many times on page!
-
-        // verify setting the PCR additional grouping column
-        verifyAdditionalGroupingColumn(assay1, "gene");
-
-        // verify unscheduled visit ordering for the RNA assay
-        verifyUnscheduledVisitDisplay(assay2);
     }
 
     private void verifyAdditionalGroupingColumn(String assayName, String groupCol)
@@ -136,6 +235,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
         Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
+        Assert.assertEquals(7, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        Assert.assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
 
         clickLinkWithText("7 results from " + assayName + " have been uploaded.");
         assertTextPresent("Participant Visit not found", 1);
