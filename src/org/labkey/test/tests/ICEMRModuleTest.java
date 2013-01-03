@@ -42,7 +42,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     private void verifyDataInAssay()
     {
         click(Locator.linkContainingText(ASSAY_NAME));
-        click(Locator.linkContainingText("Untitled"));
+        click(Locator.linkContainingText(ID));
         assertTextPresent(ID, SCIENTIST);
         goToProjectHome();
     }
