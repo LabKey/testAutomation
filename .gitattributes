@@ -114,6 +114,7 @@ modules/simpletest/scripts/validationTest/exportTest.js -text
 modules/simpletest/scripts/validationTest/filterTest.js -text
 modules/simpletest/scripts/validationTest/messageTest.js -text
 modules/simpletest/scripts/validationTest/queryTest.js -text
+modules/simpletest/scripts/validationTest/reportTest.js -text
 modules/simpletest/scripts/validationTest/securityTest.js -text
 modules/simpletest/scripts/validationTest/simpleQueryTest.js -text
 modules/simpletest/scripts/validationTest/utilsTest.js -text

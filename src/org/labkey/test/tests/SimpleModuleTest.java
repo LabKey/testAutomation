@@ -642,6 +642,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         waitForText("Console output", WAIT_FOR_JAVASCRIPT);
         waitForText("Less cool than expected. Loaded dependent scripts.", 2, WAIT_FOR_JAVASCRIPT);
         assertTextPresent("JS Module Report");
+        assertTextPresent("Hello, Bob!");
 
         log("Testing module-based reports...");
         clickLinkWithText(LIST_NAME);
