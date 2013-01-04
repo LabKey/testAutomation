@@ -91,7 +91,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestTabbedFolder();
         doTestContainerTabConversion();
 
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         doTestCustomFolder();
         doTestSchemas();
         doTestTableAudit();
@@ -624,7 +624,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickMenuButton("Views", "Want To Be Cool");
         waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
 
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         addWebPart("Report");
         setFormElement("title", "Report Tester Part");
         selectOptionByValue("reportId", "module:simpletest/reports/schemas/lists/People/Less Cool JS Report.js");
@@ -903,7 +903,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         final String ASSAYTAB_NAME = "Assay Container";
         final String COLLABFOLDER_PATH = getProjectName() + "/" + COLLAB_FOLDER;
         final String EXTRA_ASSAY_WEBPART = "Run Groups";
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         _containerHelper.createSubfolder(getProjectName(), COLLAB_FOLDER, "Collaboration");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, STUDYCONTAINER_NAME, "Study");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, ASSAYCONTAINER_NAME, "Assay");

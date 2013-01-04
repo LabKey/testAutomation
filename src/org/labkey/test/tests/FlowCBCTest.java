@@ -157,7 +157,7 @@ public class FlowCBCTest extends BaseFlowTestWD
     private void copyCBCResultsToStudy()
     {
         log("** Upload CBC Data");
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         clickLinkWithText(CBC_FOLDER);
         clickLinkWithText(ASSAY_NAME);
         clickButton("Import Data");

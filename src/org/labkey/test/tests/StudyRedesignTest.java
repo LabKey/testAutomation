@@ -256,8 +256,8 @@ public class StudyRedesignTest extends StudyBaseTest
     private void participantListWebpartTest()
     {
         log("Participant List Webpart Test");
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText("Overview");
         addWebPart("Mouse List");
         waitForElement(Locator.css(".participant-filter-panel"));

@@ -156,8 +156,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Set some specimen fields as protected to test exclusion with snapshot and refresh
         setSpecimenFieldsProtected(SPECIMEN_KEY_FIELDS, SPECIMEN_PROTECTED_FIELDS);
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         // Publish the study in a few different ways
         publishStudy(PUB1_NAME, PUB1_DESCRIPTION, PUB1_CONTAINER, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true);
         publishStudy(PUB2_NAME, PUB2_DESCRIPTION, PUB2_CONTAINER, PUB2_GROUPS, PUB2_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false);
@@ -224,7 +224,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
 
         // Go to published study
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         clickLinkWithText(name);
 
         // Verify published participant count
@@ -728,8 +728,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
     {
         String ptidFilter = createOneOfFilterString(ptids);
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
 
         clickLinkWithText(dataset);
         _customizeViewsHelper.openCustomizeViewPanel();

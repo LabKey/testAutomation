@@ -71,7 +71,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         //createQuery(PROJECT_NAME, "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);
         createQuery(PROJECT_NAME, "COMP", getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), getFileContents("/sampledata/flow/flowjoquery/query/COMP.xml"), true);
         createQuery(PROJECT_NAME, "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), true);
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText("1 run");
         clickMenuButton("Query", "PassFailQuery");
         assertTextPresent("LO_CD8", 1);

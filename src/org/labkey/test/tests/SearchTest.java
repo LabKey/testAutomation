@@ -195,7 +195,7 @@ public class SearchTest extends StudyTest
 
     private void addSearchableContainers()
     {
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         createSubfolder(getProjectName(), getProjectName(), FOLDER_B, "None", null);
     }
 
@@ -255,7 +255,7 @@ public class SearchTest extends StudyTest
     {
         WikiHelper _wikiHelper = new WikiHelper(this);
         
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         addWebPart("Wiki");
         _wikiHelper.createWikiPage("RADEOX", WIKI_NAME, WIKI_TITLE, WIKI_CONTENT, new File(getLabKeyRoot() + "/server/module.template.properties"));
         addWebPart("Wiki");
@@ -274,7 +274,7 @@ public class SearchTest extends StudyTest
     {
         createPermissionsGroup(GROUP_NAME, USER1);
         clickButton("Save and Finish");
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         addWebPart("Issues Summary");
 
         // Setup issues options.
@@ -314,7 +314,7 @@ public class SearchTest extends StudyTest
 
     private void addSearchableMessages()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         addWebPart("Messages");
         clickWebpartMenuItem("Messages", "New");
         setFormElement("title", MESSAGE_TITLE);
@@ -334,7 +334,7 @@ public class SearchTest extends StudyTest
 
     private void addSearchableFiles()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         goToModule("FileContent");
         File file = new File(getLabKeyRoot() + "/sampledata/security", "InlineFile.html");
         File MLfile = new File(getLabKeyRoot() + "/sampledata/mzxml", "test_nocompression.mzXML");

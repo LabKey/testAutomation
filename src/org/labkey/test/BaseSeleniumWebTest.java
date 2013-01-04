@@ -1642,7 +1642,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             return;
         if(getProjectName() != null)
         {
-            clickLinkWithText(getProjectName());
+            clickFolder(getProjectName());
             if(!"Query Schema Browser".equals(selenium.getTitle()))
                 goToSchemaBrowser();
             validateQueries(true);
@@ -5855,7 +5855,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void goToProjectHome()
     {
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
     }
 
     public void goToHome()

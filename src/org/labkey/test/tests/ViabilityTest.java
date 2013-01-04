@@ -225,8 +225,8 @@ public class ViabilityTest extends AbstractViabilityTest
         // add the transform script to the assay
         log("** Uploading Viability Runs with a transform script");
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText(getAssayName());
         clickEditAssayDesign(true);
 
@@ -282,8 +282,8 @@ public class ViabilityTest extends AbstractViabilityTest
 
         log("** Test Target Study as Result Domain Field");
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText(getAssayName());
         clickEditAssayDesign(true);
         waitForElement(Locator.navButton("Add Script"));
@@ -293,8 +293,8 @@ public class ViabilityTest extends AbstractViabilityTest
         addField("Result Fields", 13, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
         clickButton("Save & Close");
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText(getAssayName());
         clickButton("Import Data");
 

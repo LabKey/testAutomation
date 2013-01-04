@@ -62,7 +62,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", tabs, true);
         
         log("** Create Study");
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickButton("Create Study");
         clickButton("Create Study");
     }
@@ -89,7 +89,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     protected void createViabilityAssay()
     {
         log("** Create viability assay");
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         addWebPart("Assay List");
         clickButton("Manage Assays");
         clickButton("New Assay Design");
@@ -123,7 +123,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     protected void uploadViabilityRun(String path, String runName, boolean setBatchTargetStudy)
     {
         log("** Upload viability run " + (runName != null ? runName : "<unnamed>"));
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText(getAssayName());
         clickButton("Import Data");
         if (setBatchTargetStudy)

@@ -41,14 +41,14 @@ public class LibraTest extends MS2Test
     {
         _containerHelper.createProject(getProjectName(), "MS2");
         setPipelineRoot(getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe/iTRAQ/");
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
 
         clickButton("Process and Import Data");
         _extHelper.selectFileBrowserItem("xtandem/Libra/iTRAQ.search.xar.xml");
         selectImportDataAction("Import Experiment");
         goToModule("Pipeline");
         waitForPipelineJobsToComplete(1, "Experiment Import - iTRAQ.search.xar.xml", false);
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         for (int i = 0; i < 10; i++)
         {
             refresh();
@@ -90,7 +90,7 @@ public class LibraTest extends MS2Test
 
     private void spectraCountTest()
     {
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         checkAllOnPage("MS2SearchRuns");
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);

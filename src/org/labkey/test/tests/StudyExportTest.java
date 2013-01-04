@@ -128,7 +128,7 @@ public class StudyExportTest extends StudyManualTest
         super.verifyStudyAndDatasets();
 
         // verify reordered, categorized, & hidden datasets.
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText("47 datasets");
         assertTextBefore(REORDERED_DATASET2, REORDERED_DATASET1);
         assertLinkNotPresentWithText(HIDDEN_DATASET);
@@ -152,11 +152,11 @@ public class StudyExportTest extends StudyManualTest
         // TODO: verify lookup
 
         // verify manual cohorts
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Manage Cohorts");
         assertFormElementEquals(Locator.id("manualCohortAssignmentEnabled"), "on");
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText("47 datasets");
         clickLinkWithText(DEMOGRAPHICS_DATASET);
         clickMenuButton("Mouse Groups", "Cohorts", GROUP_2);
@@ -164,7 +164,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent(MODIFIED_PARTICIPANT);
 
         // verify visit display order
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Manage Visits");
         assertTextBefore("Cycle 3", MODIFIED_VISIT);
@@ -309,8 +309,8 @@ public class StudyExportTest extends StudyManualTest
         if (isFileUploadAvailable())
             assertTextPresent(VISIT_MAP.substring(VISIT_MAP.lastIndexOf("/") + 1));
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         enterStudySecurity();
 
         // enable advanced study security
@@ -321,7 +321,7 @@ public class StudyExportTest extends StudyManualTest
         clickAndWait(Locator.id("groupUpdateButton"));
 
         // set the QC state 
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText("47 datasets");
         clickLinkWithText(DEMOGRAPHICS_DATASET);
         clickMenuButton("QC State", "All data");
@@ -417,15 +417,15 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("BAQ00051-11");
 
         log("Test editing rows in a dataset");
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
 
         enterStudySecurity();
 
         selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
         waitForPageToLoad(30000);
 
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText("47 datasets");
         clickLinkWithText("DEM-1: Demographics");
 
@@ -495,7 +495,7 @@ public class StudyExportTest extends StudyManualTest
 
     private void changeDatasetOrder(String value)
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Change Display Order");
@@ -506,13 +506,13 @@ public class StudyExportTest extends StudyManualTest
 
     protected void hideDataset(String dataset)
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         setVisibleBit(dataset, false);
     }
 
     protected void setDatasetCategory(String dataset, String category)
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(dataset);
@@ -539,7 +539,7 @@ public class StudyExportTest extends StudyManualTest
 
     private void modifyDatasetColumn(String dataset)
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText(dataset);
@@ -556,7 +556,7 @@ public class StudyExportTest extends StudyManualTest
 
     private void setFormatStrings()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         setText("dateFormat", DATE_FORMAT);
@@ -566,7 +566,7 @@ public class StudyExportTest extends StudyManualTest
 
     private void setManualCohorts()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Manage Cohorts");
         clickRadioButtonById("manualCohortAssignmentEnabled");
@@ -590,8 +590,8 @@ public class StudyExportTest extends StudyManualTest
         if (!isFileUploadAvailable())
             return;
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");

@@ -140,7 +140,7 @@ public class StudyManualTest extends StudyTest
 
     protected void hideSceeningVisit()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         hideVisits("Screening Cycle", "Cycle 1");
     }
 
@@ -186,7 +186,7 @@ public class StudyManualTest extends StudyTest
 
     protected void setDemographicsDescription()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("DEM-1: Demographics");
@@ -199,7 +199,7 @@ public class StudyManualTest extends StudyTest
 
     protected void setDemographicsBit()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         setDemographicsBit("DEM-1: Demographics", true);
     }
 
@@ -244,7 +244,7 @@ public class StudyManualTest extends StudyTest
 
     protected void createCustomAssays()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
         clickLinkWithText("Create New Dataset");

@@ -45,7 +45,7 @@ public class StudyDemoModeTest extends StudyBaseTest
     protected void doVerifySteps()
     {
         enterDemoMode();
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         DemoModeCrawler crawler = new DemoModeCrawler(this);
         crawler.crawlAllLinks(false);
         log("No participant IDs found");
@@ -73,8 +73,8 @@ public class StudyDemoModeTest extends StudyBaseTest
 
     private void enterDemoMode()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Demo Mode");
         verifyNotInDemoMode();
@@ -84,8 +84,8 @@ public class StudyDemoModeTest extends StudyBaseTest
 
     private void leaveDemoMode()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Demo Mode");
         verifyInDemoMode();

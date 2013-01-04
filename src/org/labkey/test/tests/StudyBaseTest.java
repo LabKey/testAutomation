@@ -176,7 +176,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
         // Start importing study.xml to create the study and load all the datasets.  We'll wait for this import to
         // complete before doing any further tests.
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickButton("Process and Import Data");
         _extHelper.waitForImportDataEnabled();
         _extHelper.clickFileBrowserFileCheckbox("study.xml");

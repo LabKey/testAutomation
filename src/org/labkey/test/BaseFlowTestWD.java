@@ -193,11 +193,9 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         if (!isLinkPresentWithText(getProjectName()))
             return;
 
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         if (!isLinkPresentWithText(getFolderName()))
             return;
-
-        clickLinkWithText(getFolderName());
 
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Runs");
         DataRegionTable table = new DataRegionTable("query", this);

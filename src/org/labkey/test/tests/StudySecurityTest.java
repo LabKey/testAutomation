@@ -69,7 +69,7 @@ public class StudySecurityTest extends StudyBaseTest
         createUser(READER, null);
         createUser(EDITOR, null);
         createUser(LIMITED, null);
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
 
         //create groups for dataset reader, writer, and no-access
         createPermissionsGroup(GROUP_READERS, READER);
@@ -83,7 +83,7 @@ public class StudySecurityTest extends StudyBaseTest
         setPermissions(GROUP_NONE, "Reader");
         exitPermissionsUI();
 
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText("Manage Files");
         waitForPipelineJobsToComplete(1, "study import", false);
     }
@@ -118,7 +118,7 @@ public class StudySecurityTest extends StudyBaseTest
 
         //revoke limited's permissions and verify
         adjustGroupDatasetPerms(GROUP_LIMITED, GroupSetting.none);
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         verifyPerms(LIMITED, none, all, none, all, false);
 
         //reinstate read to limited to verify that per-dataset settings were preserved
@@ -143,8 +143,8 @@ public class StudySecurityTest extends StudyBaseTest
 
     protected void adjustGroupDatasetPerms(String groupName, GroupSetting setting, String[] datasets, PerDatasetPerm perm)
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         enterStudySecurity();
 
         click(getRadioButtonLocator(groupName, setting));
@@ -159,7 +159,7 @@ public class StudySecurityTest extends StudyBaseTest
             clickButton("Save");
         }
 
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
     }
 
     protected String getPerDatasetSelectId(String dsName)
@@ -172,8 +172,8 @@ public class StudySecurityTest extends StudyBaseTest
         if (null != userName)
             impersonate(userName);
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
 
         if (canSetupPipeline)
             assertNavButtonPresent("Setup");
@@ -198,7 +198,7 @@ public class StudySecurityTest extends StudyBaseTest
             assertLinkPresentWithText("edit");
             assertNavButtonPresent("Insert New");
             assertNavButtonPresent("Import Data");
-            clickLinkWithText(getFolderName());
+            clickFolder(getFolderName());
         }
 
         for (String dsName : dsCannotEdit)
@@ -210,7 +210,7 @@ public class StudySecurityTest extends StudyBaseTest
                 assertLinkNotPresentWithText("edit");
                 assertNavButtonNotPresent("Insert New");
                 assertNavButtonNotPresent("Import Data");
-                clickLinkWithText(getFolderName());
+                clickFolder(getFolderName());
             }
         }
 
@@ -240,7 +240,7 @@ public class StudySecurityTest extends StudyBaseTest
         selectOptionByText(Locator.name("dataset.2"), "Read");
         clickButton("Save");
 
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
     }
 
     protected Locator getRadioButtonLocator(String groupName, GroupSetting setting)

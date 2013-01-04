@@ -38,7 +38,7 @@ public class StudyReloadTest extends StudyBaseTest
     @Override
     protected void doVerifySteps()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText("1 dataset");
         clickLinkWithText("update_test");
         assertTextPresent("id006", "additional_column");

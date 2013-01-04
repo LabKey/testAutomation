@@ -122,7 +122,7 @@ public class FlowTest extends BaseFlowTestWD
      */
     private void verifyDiscoverableFCSFiles()     //TODO
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
 
 
         importAnalysis_begin( getContainerPath());

@@ -75,7 +75,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     private void createAncillaryStudy()
     {
         clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickTab("Manage");
 
         log("Create Special Emphasis Study.");
@@ -207,7 +207,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         //INSERT
         log("Insert rows into source dataset");
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText(DATASETS[0]);
         clickButton("Import Data");
         setFormElement(Locator.name("text"), EXTRA_DATASET_ROWS);
@@ -231,7 +231,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         //UPDATE
         log("Modify row in source dataset");
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText(DATASETS[0]);
         clickLinkWithText("edit", 1);
         setFormElement(Locator.name("quf_SequenceNum"), SEQ_NUMBER2);
@@ -254,7 +254,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         //DELETE
         log("Delete row from source dataset");
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText(DATASETS[0]);
         checkCheckbox(".select", 1);
         clickButton("Delete");
@@ -299,7 +299,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     private void verifyDatasets()
     {
         log("Verify Linked Datasets");
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText(DEPENDENT_DATASETS[0]);
         clickLinkWithText("edit");
         setFormElement(Locator.name("quf_formlang"), UPDATED_DATASET_VAL);

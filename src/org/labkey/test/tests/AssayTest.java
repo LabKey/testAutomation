@@ -157,7 +157,7 @@ public class AssayTest extends AbstractAssayTest
 
     private void verifyRunDeletionRecallsDatasetRows()
     {
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
         clickLinkWithText(TEST_ASSAY);
         checkDataRegionCheckbox("Runs", 0);

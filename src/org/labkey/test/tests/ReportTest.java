@@ -147,7 +147,7 @@ public class ReportTest extends StudyBaseTest
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), SPECIMEN_GROUP_TWO, "Mouse", SPEC_PTID_TWO);
 
         // need this to turn off the demographic bit in the DEM-1 dataset
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         setDemographicsBit("DEM-1: Demographics", false);
     }
 
@@ -337,8 +337,8 @@ public class ReportTest extends StudyBaseTest
         log("Create an R Report");
 
         click(Locator.linkWithText("Projects"));
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText(DATA_SET);
         clickMenuButton("Views", "Create", "R View");
         setQueryEditorValue("script", "");
@@ -415,12 +415,12 @@ public class ReportTest extends StudyBaseTest
         log("Test user permissions");
         pushLocation();
         createSiteDeveloper(AUTHOR_USER);
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         enterPermissionsUI();
         setUserPermissions(AUTHOR_USER, "Author");
         impersonate(AUTHOR_USER);
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText(DATA_SET);
         createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true, new String[0]);
         stopImpersonating();
@@ -458,8 +458,8 @@ public class ReportTest extends StudyBaseTest
         impersonate(R_USER);
 
         log("Access shared R script");
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText(DATA_SET);
         pushLocation();
         assertElementNotPresent(Locator.xpath("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
@@ -470,7 +470,7 @@ public class ReportTest extends StudyBaseTest
         popLocation();
         log("Change user permission");
         stopImpersonating();
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         if (isTextPresent("Enable Admin"))
             clickLinkWithText("Enable Admin");
         enterPermissionsUI();
@@ -478,8 +478,8 @@ public class ReportTest extends StudyBaseTest
         exitPermissionsUI();
 
         log("Create a new R script that uses other R scripts");
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText(DATA_SET);
         clickMenuButton("Views", "Create", "R View");
         click(Locator.xpath("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
@@ -494,8 +494,8 @@ public class ReportTest extends StudyBaseTest
         log("Test editing R scripts");
         signOut();
         signIn();
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickReportGridLink(R_SCRIPTS[0], "edit");
         if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
@@ -504,8 +504,8 @@ public class ReportTest extends StudyBaseTest
         waitForPageToLoad();
 
         log("Check that edit worked");
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickReportGridLink(R_SCRIPTS[1], "edit");
 
         clickViewTab();
@@ -572,8 +572,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doAttachmentReportTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         goToManageViews();
         clickMenuButton("Create", "Attachment Report");
         clickButton("Cancel");
@@ -625,8 +625,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doUpdateAttachmentReportTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
 
         //
         // verify edit URL works, share the local attachment report (REPORT)
@@ -653,12 +653,12 @@ public class ReportTest extends StudyBaseTest
         // server attachment report
         //
         createUser(ATTACHMENT_USER, null);
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         enterPermissionsUI();
         setUserPermissions(ATTACHMENT_USER, "Editor");
         impersonate(ATTACHMENT_USER);
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
 
         // can edit local
         if (isFileUploadAvailable())
@@ -684,8 +684,8 @@ public class ReportTest extends StudyBaseTest
         Assert.assertTrue("Expected 'Edit Report' button to not be present", l == null);
         stopImpersonating();
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         goToManageViews();
 
         //
@@ -742,8 +742,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doLinkReportTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         goToManageViews();
 
         clickMenuButton("Create", "Link Report");
@@ -824,8 +824,8 @@ public class ReportTest extends StudyBaseTest
     protected void deleteRReports()
     {
         log("Clean up R Reports");
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         goToManageViews();
         for (String script : R_SCRIPTS)
         {
@@ -842,8 +842,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     protected void cleanPipelineItem(String item)
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText("Manage Files");
         if (isTextPresent(item))
         {
@@ -858,7 +858,7 @@ public class ReportTest extends StudyBaseTest
     {
         click(Locator.linkWithText("Projects"));
         sleep(3000);
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         clickLinkWithText("My Study");
 
         // create a test group and give it container read perms
@@ -895,8 +895,8 @@ public class ReportTest extends StudyBaseTest
     protected void doReportSecurity()
     {
         // create charts
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
 
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
         clickMenuButton("Charts", "Create Chart View");
@@ -931,7 +931,7 @@ public class ReportTest extends StudyBaseTest
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
 
         // create grid view
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         goToManageViews();
 
         createReport(GRID_VIEW);
@@ -942,7 +942,7 @@ public class ReportTest extends StudyBaseTest
         // test security
         click(Locator.linkWithText("Projects"));
         sleep(3000);
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         clickLinkWithText("My Study");
 
         clickReportGridLink("participant chart", "permissions");
@@ -957,13 +957,13 @@ public class ReportTest extends StudyBaseTest
 
         goToAdminConsole();
         impersonate(TEST_USER);
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         clickLinkWithText("My Study");
 
         assertLinkNotPresentWithText("APX-1: Abbreviated Physical Exam");
         clickLinkWithText("participant chart");
 
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText(TEST_GRID_VIEW);
         assertTextPresent("999320016");
         pushLocation();
@@ -1007,8 +1007,8 @@ public class ReportTest extends StudyBaseTest
     {
         log("Testing Participant Report");
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         goToManageViews();
         clickMenuButton("Create", "Mouse Report");
 
@@ -1319,8 +1319,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doParticipantReportFilterTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickTab("Clinical and Assay Data");
         waitAndClick(Locator.linkWithText(PARTICIPANT_REPORT5_NAME));
         waitForPageToLoad();
@@ -1382,8 +1382,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doParticipantListFilterTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickTab("Mice");
         waitForElement(Locator.css(".participant-filter-panel"));
 
@@ -1464,8 +1464,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doReportDiscussionTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickReportGridLink(R_SCRIPTS[0], "edit");
 
         _extHelper.clickExtDropDownMenu("discussionMenuToggle", "Start new discussion");
@@ -1531,8 +1531,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doManageViewsBoxPlotTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText("Manage Views");
         clickMenuButton("Create", "Box Plot");
 
@@ -1609,8 +1609,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doDataRegionBoxPlotTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText("RCH-1: Reactogenicity-Day 1");
         setFilter("Dataset", "RCHtempc", "Is Less Than", "39");
         clickMenuButton("Charts", "Create Box Plot");
@@ -1650,8 +1650,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doQuickChartBoxPlotTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText("Types");
 
         createQuickChart("Dataset", "dbl");
@@ -1685,8 +1685,8 @@ public class ReportTest extends StudyBaseTest
         doPointClickScatterPlotTest(); // Uses scatter plot created by doManageViewsScatterPlotTest()
 
         log("Verify saved scatter plots");
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickTab("Clinical and Assay Data");
         for(int i = 0; i < _scatterPlots.size(); i++)
         {
@@ -1706,8 +1706,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doManageViewsScatterPlotTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText("Manage Views");
         clickMenuButton("Create", "Scatter Plot");
 
@@ -1789,8 +1789,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doDataRegionScatterPlotTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText("APX-1: Abbreviated Physical Exam");
         setFilter("Dataset", "APXpulse", "Is Less Than", "100");
         clickMenuButton("Charts", "Create Scatter Plot");
@@ -1825,8 +1825,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doQuickChartScatterPlotTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText("Types");
 
         createQuickChart("Dataset", "dbl");
@@ -1981,12 +1981,12 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("APX-1: Abbreviated Physical Exam");
         // verify that only developers can see the button to add point click function
         createUser(DEVELOPER_USER, null);
-        clickLinkWithText(getProjectName());
+        clickFolder(getProjectName());
         enterPermissionsUI();
         setUserPermissions(DEVELOPER_USER, "Editor");
         impersonate(DEVELOPER_USER);
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         clickLinkWithText(SCATTER_PLOT_NAME_MV + " PointClickFn");
         waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
         waitForText("Test Title");
@@ -2060,8 +2060,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doParticipantGroupCategoriesTest()
     {
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
 
         setDemographicsBit("DEM-1: Demographics", true);
 
@@ -2075,7 +2075,7 @@ public class ReportTest extends StudyBaseTest
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), MICE_B, "Mouse", "Cat Mice Let", false, true, "999320565,999320576,999320582,999320609");
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), MICE_C, "Mouse", "Cat Mice Let", false, true, "999320613,999320671,999320687");
 
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         setDemographicsBit("DEM-1: Demographics", false);
 
         // Check that groups have correct number of members
@@ -2159,8 +2159,8 @@ public class ReportTest extends StudyBaseTest
     {
         log("Create a query report.");
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
         goToManageViews();
 
         createReport(QUERY_VIEW);
@@ -2182,8 +2182,8 @@ public class ReportTest extends StudyBaseTest
         waitForText("1 - 100 of 138");
         goBack();
 
-        clickLinkWithText(getProjectName());
-        clickLinkWithText(getFolderName());
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
 
         clickLinkWithText("AE-1:(VTN) AE Log");
         _customizeViewsHelper.openCustomizeViewPanel();

@@ -146,7 +146,7 @@ public class StudyTest extends StudyBaseTest
 
     private void verifyParticipantReports()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         addWebPart("Study Data Tools");
         clickLinkWithImage("/labkey/study/tools/participant_report.png");
         clickButton("Choose Measures", 0);
@@ -773,7 +773,7 @@ public class StudyTest extends StudyBaseTest
 
     private void verifyDemographics()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText("Study Navigator");
         clickLinkWithText("24");
         assertTextPresent(DEMOGRAPHICS_DESCRIPTION);
@@ -860,7 +860,7 @@ public class StudyTest extends StudyBaseTest
 
     protected void verifyManageDatasetsPage()
     {
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickLinkWithText("Manage Datasets");
 
@@ -929,7 +929,7 @@ public class StudyTest extends StudyBaseTest
         Assert.assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", false));
         Assert.assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 0, countTableCells("ConMeds Log #%{S.3.2}", true));
 
-        clickLinkWithText(getFolderName());
+        clickFolder(getFolderName());
         clickLinkWithText("47 datasets");
         clickLinkWithText("Types");
         log("Verifying sequence numbers and visit names imported correctly");
