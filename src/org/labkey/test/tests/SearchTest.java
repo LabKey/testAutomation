@@ -105,7 +105,7 @@ public class SearchTest extends StudyTest
         _listHelper.importListArchive(FOLDER_A, new File(getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip"));
 
 
-        clickLinkWithText(listToDelete);
+        clickAndWait(Locator.linkWithText(listToDelete));
         _listHelper.deleteList();
 
         _searchHelper.enqueueSearchItem("BoarQPine");
@@ -139,8 +139,8 @@ public class SearchTest extends StudyTest
 
     private void alterListsAndReSearch()
     {
-        clickLinkWithText(FOLDER_C);
-        clickLinkWithText(listIndexAsWhole);
+        clickAndWait(Locator.linkWithText(FOLDER_C));
+        clickAndWait(Locator.linkWithText(listIndexAsWhole));
         HashMap<String, String> data = new HashMap<String, String>();
         String newAnimal = "Zebra Seal";
         data.put("Animal", newAnimal);
@@ -211,8 +211,8 @@ public class SearchTest extends StudyTest
 
     private void addSearchableReports()
     {
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("DEM-1: Demographics");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
         clickMenuButton("Views", "Create", "Crosstab View");
         selectOptionByValue("rowField",  "DEMsex");
@@ -234,8 +234,8 @@ public class SearchTest extends StudyTest
         clickButton("Create View");
 
         // create new external report
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("DEM-1: Demographics");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickMenuButton("Views", "Create", "Advanced View");
         selectOptionByText("queryName", "DEM-1: Demographics");
         String java = System.getProperty("java.home") + "/bin/java";
@@ -278,7 +278,7 @@ public class SearchTest extends StudyTest
         addWebPart("Issues Summary");
 
         // Setup issues options.
-        clickLinkWithText("Issues Summary");
+        clickAndWait(Locator.linkWithText("Issues Summary"));
         clickButton("Admin");
 
         // Add Area

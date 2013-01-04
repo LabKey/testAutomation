@@ -253,7 +253,7 @@ public class TimeChartTest extends StudyBaseTest
         createSubfolder(PROJECT_NAME, PROJECT_NAME, VISIT_FOLDER_NAME, "Study", null);
         initializePipeline();
 
-        clickLinkWithText(VISIT_FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(VISIT_FOLDER_NAME));
         clickButton("Process and Import Data");
         _extHelper.waitForImportDataEnabled();
         _extHelper.clickFileBrowserFileCheckbox("study.xml");
@@ -363,7 +363,7 @@ public class TimeChartTest extends StudyBaseTest
     private void goToNewTimeChart()
     {
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         goToManageViews();
         clickMenuButton("Create", "Time Chart");
         clickChooseInitialMeasure();
@@ -403,8 +403,8 @@ public class TimeChartTest extends StudyBaseTest
 
     public void createChartTest()
     {
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         addWebPart("Views");
         addWebPart("Datasets");
         addWebPart("Specimens");
@@ -432,9 +432,9 @@ public class TimeChartTest extends StudyBaseTest
     {
         log("Test time chart from a filtered grid");
         
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("Physical Exam");
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickAndWait(Locator.linkWithText("Physical Exam"));
 
         String ptid = "249318596";
         setFacetedFilter("Dataset", "ParticipantId", ptid);
@@ -457,7 +457,7 @@ public class TimeChartTest extends StudyBaseTest
     public void visitBasedChartTest()
     {
         log("Create multi-measure time chart.");
-        clickLinkWithText(VISIT_FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(VISIT_FOLDER_NAME));
         goToManageViews();
         clickMenuButton("Create", "Time Chart");
         clickChooseInitialMeasure();
@@ -526,7 +526,7 @@ public class TimeChartTest extends StudyBaseTest
     public void filteredViewQueryMeasureTest()
     {
         log("Create query over " + QUERY_MEASURE_DATASET + " dataset.");
-        clickLinkWithText(VISIT_FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(VISIT_FOLDER_NAME));
         goToModule("Query");
         createNewQuery("study");
         setFormElement(Locator.name("ff_newQueryName"), "My APX Query");
@@ -729,8 +729,8 @@ public class TimeChartTest extends StudyBaseTest
     public void multiMeasureTimeChartTest()
     {
         log("Create multi-measure time chart.");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         goToManageViews();
         clickMenuButton("Create", "Time Chart");
         clickChooseInitialMeasure();
@@ -759,10 +759,10 @@ public class TimeChartTest extends StudyBaseTest
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 2); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         goToManageViews();
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
-        clickLinkWithText("edit");
+        clickAndWait(Locator.linkWithText("edit"));
         waitForText(CHART_TITLE);
         assertTextPresent("Days Since Start Date", 2); // X-Axis labels for each measure
         assertTextPresent(CHART_TITLE+": Lymphs (cells/mm3)", 1); // Title
@@ -783,8 +783,8 @@ public class TimeChartTest extends StudyBaseTest
     private void sqlTest(String htmlPage, String[] testTitles, String[] testNumRows, String[][] columnHeaders, String[][] stringCheck, double[][] numbercheck, String[] measure, double[][] measureValue)
     {
         // check multi-measure calls to LABKEY.Query.Visualization.getData API requesting date information
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         // create new wiki to add to Demo study folder, or edit existing one
         if(isTextPresent(WIKIPAGE_NAME))
         {
@@ -801,7 +801,7 @@ public class TimeChartTest extends StudyBaseTest
         setWikiBody(getFileContents(htmlPage));
         saveWikiPage();
         waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
-        clickLinkWithText(WIKIPAGE_NAME);
+        clickAndWait(Locator.linkWithText(WIKIPAGE_NAME));
         waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
 
         // loop through the getData calls to check grid for: # rows, column headers, and data values (for a single ptid)
@@ -901,10 +901,10 @@ public class TimeChartTest extends StudyBaseTest
     {
         log("Test charting with participant groups");
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         goToManageViews();
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
-        clickLinkWithText("edit");
+        clickAndWait(Locator.linkWithText("edit"));
         waitForText(CHART_TITLE);
 
         // kbl : TODO, filter panel behavior has changed and it's still not certain what the proper AND / OR behavior for categories is
@@ -988,13 +988,13 @@ public class TimeChartTest extends StudyBaseTest
 
         openSaveMenu();
         saveReport(false);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
         modifyParticipantGroups();
 
         log("Verify report after modifying participant groups.");
-        clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText(REPORT_NAME_3);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickAndWait(Locator.linkWithText(REPORT_NAME_3));
         waitForText(REPORT_NAME_3);
         waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
         waitForText("One or more of the participant groups originally saved with this chart are not currently visible", WAIT_FOR_JAVASCRIPT);
@@ -1096,24 +1096,24 @@ public class TimeChartTest extends StudyBaseTest
     {
         log("Remove a participant from one group.");
         clickTab("Manage");
-        clickLinkWithText("Manage Participant Groups");
+        clickAndWait(Locator.linkWithText("Manage Participant Groups"));
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _studyHelper.editCustomParticipantGroup(GROUP1_NAME, "Participant", null, false, null, true, true, GROUP1_PTIDS[0]);
 
         log("Delete one group.");
         clickTab("Manage");
-        clickLinkWithText("Manage Participant Groups");
+        clickAndWait(Locator.linkWithText("Manage Participant Groups"));
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _studyHelper.deleteCustomParticipantGroup(GROUP3_NAME, "Participant");
     }
 
     public void multiAxisTimeChartTest()
     {
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         goToManageViews();
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
-        clickLinkWithText("edit");
+        clickAndWait(Locator.linkWithText("edit"));
         waitForText(CHART_TITLE);
 
         waitForText("Group 1: Accute HIV-1");
@@ -1171,8 +1171,8 @@ public class TimeChartTest extends StudyBaseTest
     {
         log("Check Time Chart Permissions");
         createUser(USER1, null);
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         enterPermissionsUI();
         setUserPermissions(USER1, "Reader");
         setSiteGroupPermissions("Guests", "Reader");
@@ -1183,7 +1183,7 @@ public class TimeChartTest extends StudyBaseTest
         assertElementNotPresent(Locator.button("Edit"));
         assertElementNotPresent(Locator.button("Save"));
         assertElementPresent(Locator.button("Save As"));
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         assertTextNotPresent(REPORT_NAME_2);
         stopImpersonating();
         signOut();
@@ -1197,8 +1197,8 @@ public class TimeChartTest extends StudyBaseTest
     public void pointClickFunctionTest()
     {
         log("Check Time Chart Point Click Function (Developer Only)");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         goToManageViews();
         waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
         click(Locator.tagWithText("div", REPORT_NAME_1));
@@ -1249,17 +1249,17 @@ public class TimeChartTest extends StudyBaseTest
         pushLocation(); // for impersonation test
         pushLocation(); // for impersonation test
 
-        clickLinkWithText("Clinical and Assay Data");
+        clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
         waitForText(REPORT_NAME_1);
-        clickLinkWithText(REPORT_NAME_1);
+        clickAndWait(Locator.linkWithText(REPORT_NAME_1));
         waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
         clickAndWait(Locator.css("svg a circle"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Participant - 249318596");
 
         // verify that only developers can see the button to add point click function
         createUser(USER2, null);
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         enterPermissionsUI();
         setUserPermissions(USER2, "Editor");
         // USER2 is not yet a developer, so shouldn't have permissions to this feature

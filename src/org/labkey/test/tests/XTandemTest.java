@@ -56,14 +56,14 @@ public class XTandemTest extends AbstractXTandemTest
         goToModule("Query");
         selectQuery("ms2", "Fractions");
         waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
-        clickLinkWithText("view data");
+        clickAndWait(Locator.linkWithText("view data"));
         assertTextPresent("CAexample_mini.mzXML");
         // There should be 200 scans total
         assertTextPresent("200");
         // There should be 100 MS1 scans and 100 MS2 scans
         assertTextPresent("100");
 
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
 
         // Make sure we're not using a custom default view for the current user
@@ -102,11 +102,11 @@ public class XTandemTest extends AbstractXTandemTest
         popLocation();
 
         log("Test Comparing Peptides");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         click(Locator.name(".toggle"));
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
-        clickLinkWithText("Peptide (Legacy)");
+        clickAndWait(Locator.linkWithText("Peptide (Legacy)"));
         selectOptionByText("viewParams", VIEW);
         clickButton("Compare");
         assertTextPresent("(Mass > 1000)");
@@ -118,7 +118,7 @@ public class XTandemTest extends AbstractXTandemTest
         assertTextBefore(PEPTIDE5, PEPTIDE4);
 
 
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         verifyPeptideCrosstab();
         verifyComparePeptides();
 
@@ -126,7 +126,7 @@ public class XTandemTest extends AbstractXTandemTest
 
     private void verifyComparePeptides()
     {
-        clickLinkWithText("Setup Compare Peptides");
+        clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
         clickRadioButtonById(PEPTIDE_CROSSTAB_RADIO_PROBABILITY_ID);
         setFormElement(PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME, "0.75");
         clickButton("Compare");
@@ -135,7 +135,7 @@ public class XTandemTest extends AbstractXTandemTest
         assertTextNotPresent(PEPTIDE);
 
         log("Navigate to folder Portal");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         log("Verify experiment information in MS2 runs.");
         assertLinkPresentWithText(PROTOCOL);
@@ -186,7 +186,7 @@ public class XTandemTest extends AbstractXTandemTest
         click(Locator.name(".toggle"));
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
-        clickLinkWithText("Peptide");
+        clickAndWait(Locator.linkWithText("Peptide"));
 
         checkRadioButton(PEPTIDE_CROSSTAB_RADIO_NAME, PEPTIDE_CROSSTAB_RADIO_VALUE_NONE);
         clickButton("Compare");

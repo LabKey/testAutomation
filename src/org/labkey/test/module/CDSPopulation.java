@@ -71,10 +71,10 @@ public class CDSPopulation extends BaseSeleniumWebTest implements PostgresOnlyTe
     private void verifyCDSApplication()
     {
 //        selenium.windowMaximize(); // Count bars don't render properly when hidden.
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         goToModule("CDS");
 
-        clickLinkWithText("Application");
+        clickAndWait(Locator.linkWithText("Application"));
 
         assertLinkNotPresentWithText("Home");
         assertLinkNotPresentWithText("Admin");
@@ -83,7 +83,7 @@ public class CDSPopulation extends BaseSeleniumWebTest implements PostgresOnlyTe
     private void importCDSData(String query, File dataFile)
     {
         goToModule("CDS");
-        clickLinkWithText(query);
+        clickAndWait(Locator.linkWithText(query));
         _listHelper.clickImportData();
 
         setFormElement(Locator.id("tsv3"), getFileContents(dataFile), true);
@@ -93,7 +93,7 @@ public class CDSPopulation extends BaseSeleniumWebTest implements PostgresOnlyTe
     private void populateFactTable()
     {
         goToModule("CDS");
-        clickLinkWithText("Populate Fact Table");
+        clickAndWait(Locator.linkWithText("Populate Fact Table"));
         submit();
     }
 

@@ -105,7 +105,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     {
         log("Defining a QC test assay at the project level");
 
-        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
+        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
         addWebPart("Assay List");
 
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/ProgrammaticQC/QC Assay.xar", 1, "QC Assay.xar");
@@ -145,7 +145,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     {
         log("Defining a transform test assay at the project level");
 
-        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
+        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
         addWebPart("Assay List");
 
         clickButton("Manage Assays");
@@ -177,9 +177,9 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     private void uploadQCRuns()
     {
         log("uploading runs");
-        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
-        clickLinkWithText("Assay List");
-        clickLinkWithText(QC_ASSAY);
+        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(QC_ASSAY));
 
         clickButton("Import Data");
         clickButton("Next");
@@ -196,8 +196,8 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickButton("Save and Finish");
 
         // verify the log entry
-        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
-        clickLinkWithText("QC Log");
+        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        clickAndWait(Locator.linkWithText("QC Log"));
 
         assertTextPresent("Programmatic QC was run and 2 errors were found");
         assertTextPresent("Programmatic QC was run and 0 errors were found");
@@ -206,9 +206,9 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     private void uploadTransformRuns()
     {
         log("uploading transform runs");
-        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
-        clickLinkWithText("Assay List");
-        clickLinkWithText(TRANSFORM_ASSAY);
+        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TRANSFORM_ASSAY));
 
         clickButton("Import Data");
         clickButton("Next");
@@ -224,14 +224,14 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
         clickButton("Save and Finish");
 
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText("view results"));
 
         assertTextPresent("monkey");
         assertTextPresent("hamster");
 
         // verify the log entry
-        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
-        clickLinkWithText("QC Log");
+        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        clickAndWait(Locator.linkWithText("QC Log"));
 
         assertTextPresent("Programmatic Data Transform was run and 2 errors were found");
         assertTextPresent("Programmatic Data Transform was run and 0 errors were found");
@@ -240,9 +240,9 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     private void uploadTransformQCRuns()
     {
         log("uploading transform & QC runs");
-        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
-        clickLinkWithText("Assay List");
-        clickLinkWithText(TRANSFORM_QC_ASSAY);
+        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TRANSFORM_QC_ASSAY));
 
         clickButton("Import Data");
         clickButton("Next");
@@ -257,15 +257,15 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
         clickButton("Save and Finish");
 
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText("view results"));
 
         assertTextPresent("monkey");
         assertTextPresent("hamster");
         assertTextPresent("goat");
 
         // verify the log entry
-        clickLinkWithText(TEST_PROGRAMMATIC_QC_PRJ);
-        clickLinkWithText("QC Log");
+        clickAndWait(Locator.linkWithText(TEST_PROGRAMMATIC_QC_PRJ));
+        clickAndWait(Locator.linkWithText("QC Log"));
 
         assertTextPresent("Programmatic QC was run and 1 errors were found");
     }

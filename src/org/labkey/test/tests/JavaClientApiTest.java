@@ -20,6 +20,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.*;
 import org.labkey.remoteapi.query.*;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
@@ -137,7 +138,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         exitPermissionsUI();
 
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(LIST_NAME);
+        clickAndWait(Locator.linkWithText(LIST_NAME));
         doCRUDtTest();
         doCommandFromResponseTest();
         doExtendedFormatTest();

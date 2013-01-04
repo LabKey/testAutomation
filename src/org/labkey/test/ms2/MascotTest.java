@@ -98,7 +98,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         log("Testing your Mascot settings");
         addUrlParameter("testInPage=true");
         pushLocation();
-        clickLinkWithText("Test Mascot settings");
+        clickAndWait(Locator.linkWithText("Test Mascot settings"));
         assertTextPresent("Test passed.");
         log("Return to customize page.");
         popLocation();
@@ -109,7 +109,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             setFormElement("mascotUserAccount", "nonexistent");
             setFormElement("mascotUserPassword", mascotUserPassword);
             pushLocation();
-            clickLinkWithText("Test Mascot settings");
+            clickAndWait(Locator.linkWithText("Test Mascot settings"));
             assertTextPresent("Test failed.");
             log("Return to customize page.");
             popLocation();
@@ -123,7 +123,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             setFormElement("mascotUserAccount", mascotUserAccount);
             setFormElement("mascotUserPassword", "wrongpassword");
             pushLocation();
-            clickLinkWithText("Test Mascot settings");
+            clickAndWait(Locator.linkWithText("Test Mascot settings"));
             assertTextPresent("Test failed.");
             log("Return to customize page.");
             popLocation();
@@ -157,7 +157,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 //        setFormElement("mascotUserAccount", mascotUserAccount);
 //        setFormElement("mascotUserPassword", mascotUserPassword);
 //        pushLocation();
-//        clickLinkWithText("Test Mascot settings");
+//        clickAndWait(Locator.linkWithText("Test Mascot settings"));
 //        assertTextPresent("Test passed.");
 //        log("Return to customize page.");
 //        popLocation();
@@ -169,7 +169,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             setFormElement("mascotUserAccount", "nonexistent");
             setFormElement("mascotUserPassword", mascotUserPassword);
             pushLocation();
-            clickLinkWithText("Test Mascot settings");
+            clickAndWait(Locator.linkWithText("Test Mascot settings"));
             assertTextPresent("Test failed.");
             log("Return to customize page.");
             popLocation();
@@ -184,7 +184,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             setFormElement("mascotUserAccount", mascotUserAccount);
             setFormElement("mascotUserPassword", "wrongpassword");
             pushLocation();
-            clickLinkWithText("Test Mascot settings");
+            clickAndWait(Locator.linkWithText("Test Mascot settings"));
             assertTextPresent("Test failed.");
             log("Return to customize page.");
             popLocation();
@@ -199,7 +199,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         setFormElement("mascotUserAccount", mascotUserAccount);
         setFormElement("mascotUserPassword", mascotUserPassword);
         pushLocation();
-        clickLinkWithText("Test Mascot settings");
+        clickAndWait(Locator.linkWithText("Test Mascot settings"));
         assertTextPresent("Test failed.");
         assertTextPresent("Failed to interact with Mascot Server");
         log("Return to customize page.");
@@ -210,7 +210,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
         // test import of .dat file
         log("Upload existing Mascot .dat result file.");
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         clickButton("Process and Import Data");
         _extHelper.selectFileBrowserItem("bov_sample/" + SEARCH_TYPE + "/test3/");
         selectImportDataAction("Import Results");
@@ -221,7 +221,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
         pushLocation();
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
 /*
         Commented out because .dat is not loaded as part of an experiment, so it won't appear in the dashboard
@@ -231,12 +231,12 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
         assertLinkPresentWithText("MS2 Runs");
         log("Navigate to MS2 runs.");
-        clickLinkWithText("MS2 Runs");
+        clickAndWait(Locator.linkWithText("MS2 Runs"));
 
         log("Navigate to Pipeline status.");
         //was: clickTab("Pipeline");
-        clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText("All");
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickAndWait(Locator.linkWithText("All"));
         int sec = 300;
         while (!isLinkPresentWithText("COMPLETE", 1) && sec-- > 0)
         {
@@ -250,7 +250,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         popLocation();
 
         log("Spot check results loaded from .dat file");
-        clickLinkWithText("CAexample_mini.dat (none)");
+        clickAndWait(Locator.linkWithText("CAexample_mini.dat (none)"));
         assertTextPresent("sampledata/xarfiles/ms2pipe/databases/Bovine_mini.fasta");
         assertTextPresent("MASCOT");
         assertTextPresent("CAexample_mini.dat");
@@ -270,7 +270,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
     protected void basicChecks()
     {
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
 
         // Make sure we're not using a custom default view for the current user
@@ -306,11 +306,11 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         popLocation();
 
         log("Test Comparing Peptides");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         click(Locator.name(".toggle"));
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
-        clickLinkWithText("Peptide");
+        clickAndWait(Locator.linkWithText("Peptide"));
         selectOptionByText("viewParams", VIEW);
         clickButton("Go");
         assertTextPresent("(Mass > 1000)");
@@ -322,7 +322,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         assertTextBefore(PEPTIDE5, PEPTIDE4);
 
         log("Navigate to folder Portal");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         log("Verify experiment information in MS2 runs.");
         assertLinkPresentWithText(PROTOCOL);

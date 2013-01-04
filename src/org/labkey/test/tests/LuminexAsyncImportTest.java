@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 
 import java.io.File;
@@ -57,7 +58,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         uploadPositivityFile("No Fold Change", "1", "", true);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(3);
-        clickLinkWithText("ERROR");
+        clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent("An error occurred when running the script (exit code: 1).", 3);
         assertTextPresent("output lines omitted, see full output in log for details]", 2);
         assertTextPresent("Error: No value provided for 'Positivity Fold Change'.", 3);

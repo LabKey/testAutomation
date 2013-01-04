@@ -172,7 +172,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
         createWiki();
 
@@ -208,7 +208,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private void clearTestPage(String message)
     {
         if (!isTextPresent(WIKIPAGE_NAME))
-            clickLinkWithText(FOLDER_NAME);
+            clickAndWait(Locator.linkWithText(FOLDER_NAME));
         clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
         setWikiBody("<p>" + message + "</p>");
         saveWikiPage();
@@ -553,7 +553,7 @@ public class ClientAPITest extends BaseWebDriverTest
         clickButton("Create Study");
         // next page
         clickButton("Create Study");
-        clickLinkWithText("Edit Definition");
+        clickAndWait(Locator.linkWithText("Edit Definition"));
         waitForText("No fields have been defined.", 10000);
 
         clickButton("Add Field", 0);
@@ -603,7 +603,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private String setSource(String srcFragment, boolean excludeTags)
     {
         if (!isTextPresent(WIKIPAGE_NAME))
-            clickLinkWithText(FOLDER_NAME);
+            clickAndWait(Locator.linkWithText(FOLDER_NAME));
         clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
 
         String fullSource = srcFragment;

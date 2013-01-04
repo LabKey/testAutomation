@@ -94,14 +94,14 @@ public class LibraTest extends MS2Test
         checkAllOnPage("MS2SearchRuns");
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
-        clickLinkWithText("Spectra Count");
+        clickAndWait(Locator.linkWithText("Spectra Count"));
         clickRadioButtonById("SpectraCountPeptide");
         clickButton("Compare");
         assertTextPresent("-.MM'EILRGSPALSAFR.I");
         assertLinkPresentWithTextCount("itraq/iTRAQ (Libra)", 27);
 
         // Try setting a target protein
-        clickLinkWithText("Spectra Count Options");
+        clickAndWait(Locator.linkWithText("Spectra Count Options"));
         setFormElement("targetProtein", "gi|34392343");
         clickButton("Compare");
         assertLinkPresentWithTextCount("itraq/iTRAQ (Libra)", 1);
@@ -126,7 +126,7 @@ public class LibraTest extends MS2Test
 
         // Try filtering based on a custom view using a different grouping
         goBack();
-        clickLinkWithText("Spectra Count Options");
+        clickAndWait(Locator.linkWithText("Spectra Count Options"));
         clickLinkWithText("Create or Edit View", false);
         waitForElement(Locator.xpath("//button[text()='Save']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _customizeViewsHelper.addCustomizeViewFilter("Hyper", "Hyper", "Is Greater Than", "250");
@@ -148,7 +148,7 @@ public class LibraTest extends MS2Test
 
         // Validate that it remembers our options
         goBack();
-        clickLinkWithText("Spectra Count Options");
+        clickAndWait(Locator.linkWithText("Spectra Count Options"));
         assertRadioButtonSelected("spectraConfig", "SpectraCountPeptideCharge");
         assertFormElementEquals(Locator.id("PeptidesFilter.viewName"), "HyperFilter");
     }

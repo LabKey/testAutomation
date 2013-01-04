@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.ms2.MS2PipelineFolder;
 import org.labkey.test.ms2.params.MS2EmailSuccessParams;
@@ -164,7 +165,7 @@ public class PipelineTest extends PipelineWebTestBase
         for (String sampleExp : tpRetry.getExperimentLinks())
         {
             pushLocation();
-            clickLinkWithText("All");
+            clickAndWait(Locator.linkWithText("All"));
             log("Trying to view status info for " + sampleExp);
             // Create a fresh PipelineStatusTable every time through the loop so that we're looking at a current set
             // of cached table info

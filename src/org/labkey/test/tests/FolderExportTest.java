@@ -119,7 +119,7 @@ public class FolderExportTest extends BaseWebDriverTest
         importFolderFromPipeline( "" + fileImport);
 
 
-        clickLinkWithText(folderName);
+        clickAndWait(Locator.linkWithText(folderName));
         verifyFolderImportAsExpected(subfolderIndex);
         verifyFolderExportAsExpected(folderName);
     }
@@ -131,11 +131,11 @@ public class FolderExportTest extends BaseWebDriverTest
         // create one of the subfolders, to be imported, to test merge on import of subfolders
         _containerHelper.createSubfolder(folderFromZip, "Subfolder1", "Collaboration");
 
-        clickLinkWithText(folderFromZip);
+        clickAndWait(Locator.linkWithText(folderFromZip));
         importFolderFromZip(new File(dataDir, folderZip).getAbsolutePath());
         beginAt(getCurrentRelativeURL()); //work around linux issue
         waitForPipelineJobsToComplete(1, "Folder import", false);
-        clickLinkWithText(folderFromZip);
+        clickAndWait(Locator.linkWithText(folderFromZip));
         verifyFolderImportAsExpected(0);
         verifyFolderExportAsExpected(folderFromZip);
     }
@@ -144,9 +144,9 @@ public class FolderExportTest extends BaseWebDriverTest
     private void verifyFolderExportAsExpected(String folderName)
     {
         log("Exporting folder to pipeline as individual files");
-        clickLinkWithText(folderName);
+        clickAndWait(Locator.linkWithText(folderName));
         goToFolderManagement();
-        clickLinkWithText("Export");
+        clickAndWait(Locator.linkWithText("Export"));
         click(Locator.name("includeSubfolders"));
         click(Locator.name("location")); // first locator with this name is "Pipeline root export directory, as individual files
         clickButton("Export");
@@ -190,7 +190,7 @@ public class FolderExportTest extends BaseWebDriverTest
         log("Verify import of list");
         String listName = "safe list";
         assertTextPresent(listName);
-        clickLinkWithText(listName);
+        clickAndWait(Locator.linkWithText(listName));
         assertTextPresent("persimmon");
         assertImagePresentWithSrc("/labkey/_images/mv_indicator.gif");
         assertTextNotPresent("grapefruit");//this has been filtered out.  if "grapefruit" is present, the filter wasn't preserved
@@ -204,7 +204,7 @@ public class FolderExportTest extends BaseWebDriverTest
 
         log("verify search settings as expected");
         goToFolderManagement();
-        clickLinkWithText("Search");
+        clickAndWait(Locator.linkWithText("Search"));
         Assert.assertFalse("Folder search settings not imported", isChecked(Locator.checkboxById("searchable")));
 
         log("verify folder type was overwritten on import");
@@ -212,7 +212,7 @@ public class FolderExportTest extends BaseWebDriverTest
         Assert.assertTrue("Folder type not overwritten on import", isChecked(Locator.radioButtonByNameAndValue("folderType", "None")));
 
         log("verify notification default settings as expected");
-        clickLinkWithText("Notifications");
+        clickAndWait(Locator.linkWithText("Notifications"));
         waitForText("Email Notification Settings");
         click(Locator.navButton("Update Settings"));
         waitForElement(Locator.xpath("//li/a[text()='files']"), WAIT_FOR_JAVASCRIPT);
@@ -243,9 +243,9 @@ public class FolderExportTest extends BaseWebDriverTest
         assertLinkPresentWithText("Tab 2");
         assertLinkPresentWithText("Study Container");
         assertLinkNotPresentWithText("Tab 1");
-        clickLinkWithText("Tab 2");
+        clickAndWait(Locator.linkWithText("Tab 2"));
         assertTextPresentInThisOrder("A customized web part", "Experiment Runs", "Assay List");
-        clickLinkWithText("Study Container");
+        clickAndWait(Locator.linkWithText("Study Container"));
         if (fromTemplate)
             assertElementPresent(Locator.css("#bodypanel .labkey-wp-body p").withText("This folder does not contain a study."));
         else

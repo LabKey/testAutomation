@@ -101,14 +101,14 @@ public class MS2Test extends MS2TestBase
         super.doTestSteps();
 
         log("Upload existing MS2 data.");
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         clickButton("Process and Import Data");
         _extHelper.selectFileBrowserItem("bov_sample/" + SEARCH_TYPE + "/" + testFile1 + "/" + SAMPLE_BASE_NAME + ".search.xar.xml");
 
         selectImportDataAction("Import Experiment");
 
         log("Going to the list of all pipeline jobs");
-        clickLinkWithText("All");
+        clickAndWait(Locator.linkWithText("All"));
 
         log("Verify upload started.");
         assertTextPresent(SAMPLE_BASE_NAME + ".search.xar.xml");
@@ -123,7 +123,7 @@ public class MS2Test extends MS2TestBase
             sleep(1000);
             refresh();
         }
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         assertElementPresent(Locator.linkWithSpan("MS2 Runs"));
         assertLinkPresentContainingText(SAMPLE_BASE_NAME);
 
@@ -293,7 +293,7 @@ public class MS2Test extends MS2TestBase
 //        assertTextPresent("gi|29650192|ribosomal_protein");
 //        assertTextPresent("56");
 //        assertTextPresent("0.000");
-//        clickLinkWithText("Next");
+//        clickAndWait(Locator.linkWithText("Next"));
 //        assertTextPresent("R.GGNEESTK.T");
 //        assertTextPresent("gi|442754|A_Chain_A,_Superoxi");
 //
@@ -813,7 +813,7 @@ public class MS2Test extends MS2TestBase
         assertTextBefore("0.74", "0.78");
         assertTextPresent("\n", 3);
         popLocation();
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         log("Upload second MS2 Run");
         clickButton("Process and Import Data");
@@ -823,7 +823,7 @@ public class MS2Test extends MS2TestBase
 
         log("Verify upload finished.");
         seconds = 0;
-        clickLinkWithText("Data Pipeline");
+        clickAndWait(Locator.linkWithText("Data Pipeline"));
         while (countLinksWithText("COMPLETE") < 2 && seconds++ < MAX_WAIT_SECONDS)
         {
             log("Waiting upload to complete");
@@ -834,7 +834,7 @@ public class MS2Test extends MS2TestBase
             sleep(1000);
             refresh();
         }
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
         log("Test export 2 runs together");
         pushLocation();
@@ -871,7 +871,7 @@ public class MS2Test extends MS2TestBase
 
         if ("DRT2".equals(testFile1) || "DRT2".equals(testFile2))
         {
-            clickLinkWithText("drt/CAexample_mini (DRT2)");
+            clickAndWait(Locator.linkWithText("drt/CAexample_mini (DRT2)"));
 
             selectOptionByText("viewParams", "<Standard View>");
             clickButton("Go");
@@ -934,7 +934,7 @@ public class MS2Test extends MS2TestBase
             }
 
             popLocation();
-            clickLinkWithText("MS2 Dashboard");
+            clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
             log("Test Compare MS2 Runs");
 
@@ -942,7 +942,7 @@ public class MS2Test extends MS2TestBase
             searchRunsTable.checkAllOnPage();
             waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
             clickButton("Compare", 0);
-            clickLinkWithText("Peptide");
+            clickAndWait(Locator.linkWithText("Peptide"));
             click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
             setFormElement(Locator.input("targetProtein"), "");
             clickButton("Compare");
@@ -968,7 +968,7 @@ public class MS2Test extends MS2TestBase
             assertTextPresent("peptide-marker", 117);
             popLocation();
 
-            clickLinkWithText("Setup Compare Peptides");
+            clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
             click(Locator.radioButtonByNameAndValue("peptideFilterType", "probability"));
             setFormElement(Locator.input("peptideProphetProbability"), "0.9");
             clickButton("Compare");
@@ -994,7 +994,7 @@ public class MS2Test extends MS2TestBase
             assertTextPresent(" 1  / 1(Q^) ", 1); // TODO: how do we verify the location of the match in the coverage map table?
             popLocation();
 
-            clickLinkWithText("Setup Compare Peptides");
+            clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
             setFormElement(Locator.input("targetProtein"), "gi|18311790|phosphoribosylfor");
             clickButton("Compare");
             assertTextPresent("R.Q^YALHVDGVGTK.A");
@@ -1022,7 +1022,7 @@ public class MS2Test extends MS2TestBase
             assertTextPresent(" 1  / 1(Q^) ", 1); // TODO: how do we verify the location of the match in the coverage map table?
             popLocation();            
 
-            clickLinkWithText("Setup Compare Peptides");
+            clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
             setFormElement(Locator.input("targetProtein"), "gi|15645924|ribosomal_protein");
             click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
             clickButton("Compare");
@@ -1054,14 +1054,14 @@ public class MS2Test extends MS2TestBase
             assertTextPresent("peptide-marker", 2);
             popLocation();
 
-            clickLinkWithText("MS2 Dashboard");
+            clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         }
 
         log("Test Protein Prophet Compare");
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
-        clickLinkWithText("ProteinProphet (Legacy)");
+        clickAndWait(Locator.linkWithText("ProteinProphet (Legacy)"));
         selectOptionByText("viewParams", VIEW3);
         clickButton("Compare");
         assertTextPresent("(GroupProbability > 0.7)");
@@ -1076,12 +1076,12 @@ public class MS2Test extends MS2TestBase
         assertTextBefore("gi|13470573|ref|NP_102142.1|", "gi|13442951|dbj|BAB39767.1|");
 
         log("Test adding columns");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
-        clickLinkWithText("ProteinProphet (Legacy)");
+        clickAndWait(Locator.linkWithText("ProteinProphet (Legacy)"));
         checkCheckbox("light2HeavyRatioMean");
         uncheckCheckbox("groupProbability");
         clickButton("Compare");
@@ -1089,12 +1089,12 @@ public class MS2Test extends MS2TestBase
         assertTextNotPresent("GroupProbability");
 
         log("Test Compare Search Engine Proteins");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
-        clickLinkWithText("Search Engine Protein");
+        clickAndWait(Locator.linkWithText("Search Engine Protein"));
         selectOptionByText("viewParams", VIEW2);
         checkCheckbox("total");
         clickButton("Compare");
@@ -1109,12 +1109,12 @@ public class MS2Test extends MS2TestBase
         assertTextBefore("gi|11499506|ref|NP_070747.1|", "gi|13507919|");
 
         log("Test Compare Peptides (Legacy)");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
-        clickLinkWithText("Peptide (Legacy)");
+        clickAndWait(Locator.linkWithText("Peptide (Legacy)"));
         selectOptionByText("viewParams", VIEW2);
         clickButton("Compare");
         assertTextPresent("(DeltaMass > 0)");
@@ -1129,7 +1129,7 @@ public class MS2Test extends MS2TestBase
         assertTextBefore("-.MELFSNELLYK.T", "K.EIRQRQGDDLDGLSFAELR.G");
 
         log("Test creating run groups");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickLinkWithImage(getContextPath() + "/Experiment/images/graphIcon.gif");
         clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
         clickButton("Create new group");
@@ -1143,10 +1143,10 @@ public class MS2Test extends MS2TestBase
         assertTextPresent(RUN_GROUP1_NAME1);
         assertTextPresent(RUN_GROUP1_HYPOTHESIS);
         assertTextPresent(RUN_GROUP1_COMMENTS);
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         assertTextPresent(RUN_GROUP1_NAME1);
 
-        clickLinkWithText("Run Groups");
+        clickAndWait(Locator.linkWithText("Run Groups"));
         clickButton("Create Run Group");
         clickButton("Submit");
         setFormElement("name", RUN_GROUP3_NAME);
@@ -1157,7 +1157,7 @@ public class MS2Test extends MS2TestBase
         clickButton("Submit");
 
         log("Test editing run group info");
-        clickLinkWithText(RUN_GROUP1_NAME1);
+        clickAndWait(Locator.linkWithText(RUN_GROUP1_NAME1));
         assertTextPresent(RUN_GROUP1_NAME1);
         assertTextPresent(RUN_GROUP1_CONTACT);
         assertTextPresent(RUN_GROUP1_DESCRIPTION);
@@ -1168,8 +1168,8 @@ public class MS2Test extends MS2TestBase
         clickButton("Submit");
 
         log("Test customizing view to include the run groups");
-        clickLinkWithText("MS2 Dashboard");
-        clickLinkWithText("MS2 Runs");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
+        clickAndWait(Locator.linkWithText("MS2 Runs"));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("RunGroupToggle/" + RUN_GROUP1_NAME2, "Run Groups " + RUN_GROUP1_NAME2);
         _customizeViewsHelper.addCustomizeViewColumn("RunGroupToggle/" + RUN_GROUP2_NAME, "Run Groups " + RUN_GROUP2_NAME);
@@ -1188,9 +1188,9 @@ public class MS2Test extends MS2TestBase
         checkCheckbox("experimentMembership", 5);
 
         log("Test editing a run group's runs");
-        clickLinkWithText("MS2 Dashboard");
-        clickLinkWithText("Run Groups");
-        clickLinkWithText(RUN_GROUP2_NAME);
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
+        clickAndWait(Locator.linkWithText("Run Groups"));
+        clickAndWait(Locator.linkWithText(RUN_GROUP2_NAME));
         assertTextPresent(RUN_GROUP1_NAME2);
         assertTextPresent(RUN_GROUP2_NAME);
         assertTextPresent(DEFAULT_EXPERIMENT);
@@ -1199,13 +1199,13 @@ public class MS2Test extends MS2TestBase
         assert(!isTextPresent(testFile1) || !isTextPresent(testFile2));
 
         verifyRunGroupMap(testFile1, testFile2);
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         log("Test that the compare run groups works");
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
-        clickLinkWithText("ProteinProphet");
+        clickAndWait(Locator.linkWithText("ProteinProphet"));
         clickButton("Compare");
 
         clickLinkWithText("Comparison Overview", false);
@@ -1246,15 +1246,15 @@ public class MS2Test extends MS2TestBase
         popLocation();
 
         log("Test delete run groups");
-        clickLinkWithText("MS2 Dashboard");
-        clickLinkWithText("Run Groups");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
+        clickAndWait(Locator.linkWithText("Run Groups"));
         checkAllOnPage("RunGroupWide");
         clickButton("Delete");
         clickButton("Confirm Delete");
         assertTextNotPresent(RUN_GROUP1_NAME2);
         assertTextNotPresent(RUN_GROUP2_NAME);
         assertTextNotPresent(DEFAULT_EXPERIMENT);
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         assertTextNotPresent(RUN_GROUP1_NAME2);
 
 
@@ -1270,7 +1270,7 @@ public class MS2Test extends MS2TestBase
 
 /*      DISABLED, as we're not shipping with query-based peptides comparison for now
         log("Test Compare Runs using Query Peptides");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         click(Locator.name(".toggle"));
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare");
@@ -1281,7 +1281,7 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("PepProphet");
 
         log("Test Customize View in Query Peptides");
-        clickLinkWithText("Customize View");
+        clickAndWait(Locator.linkWithText("Customize View"));
         selenium.click("expand_Run");
         addCustomizeViewColumn("Run/IonPercent", "Run Ion%");
         removeCustomizeViewColumn("Run Count");
@@ -1295,10 +1295,10 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("34");
 
         log("Check Ignore/Apply View Filter");
-        clickLinkWithText("Ignore View Filter");
+        clickAndWait(Locator.linkWithText("Ignore View Filter"));
         assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
         assertTextPresent("Ion%");
-        clickLinkWithText("Apply View Filter");
+        clickAndWait(Locator.linkWithText("Apply View Filter"));
         assertTextNotPresent("K.EIRQRQGDDLDGLSFAELR.G");
 
         log("Check sorting");
@@ -1358,7 +1358,7 @@ public class MS2Test extends MS2TestBase
         selectImportDataAction("Import Search Results");
         String ms2Run = "ms2pipe/truncated (pepXML)";
         waitForTextWithRefresh(ms2Run, defaultWaitForPage);
-        clickLinkWithText(ms2Run);
+        clickAndWait(Locator.linkWithText(ms2Run));
         String windowName = "peptideProphetSummary";
         selenium.openWindow("", windowName);
         clickLinkWithText("Show Peptide Prophet Details", false);

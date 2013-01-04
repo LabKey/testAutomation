@@ -181,7 +181,7 @@ public class LuminexTest extends AbstractQCAssayTest
             _assayHelper.uploadXarFileAsAssayDesign(TEST_ASSAY_XAR_FILE, 1, "foo");
             // since we want to test special characters in the assay name, copy the assay design to rename
             goToManageAssays();
-            clickLinkWithText(TEST_ASSAY_XAR_NAME);
+            clickAndWait(Locator.linkWithText(TEST_ASSAY_XAR_NAME));
             _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'manage assay design']"), "copy assay design");
             clickButton("Copy to Current Folder", WAIT_FOR_PAGE);
             waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
@@ -315,8 +315,8 @@ public class LuminexTest extends AbstractQCAssayTest
 //                "4\tListParticipant4\t1001.4");
         clickFolder(TEST_ASSAY_PRJ_LUMINEX);
 
-        clickLinkWithText("Assay List");
-        clickLinkWithText(TEST_ASSAY_LUM);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         // Make sure we have the expected help text
         assertTextPresent("No runs to show. To add new runs, use the Import Data button.");
         log("Uploading Luminex Runs");
@@ -327,7 +327,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE1);
         clickButton("Next", 60000);
         clickButton("Save and Import Another Run");
-        clickLinkWithText(TEST_ASSAY_LUM);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
         clickButton("Import Data");
         Assert.assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES, selenium.getValue("species"));
@@ -380,11 +380,11 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Save and Finish");
 
         log("Check that upload worked");
-        clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM_RUN_NAME));
         assertTextPresent("Hu IL-1b (32)");
 
-        clickLinkWithText(TEST_ASSAY_LUM + " Runs");
-        clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME3);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM + " Runs"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM_RUN_NAME3));
         assertTextPresent("IL-1b (1)");
         assertTextPresent("ParticipantID1");
         assertTextPresent("ParticipantID2");
@@ -394,8 +394,8 @@ public class LuminexTest extends AbstractQCAssayTest
         setFilter("Data", "ParticipantID", "Equals", "ParticipantID2");
         assertTextPresent("1.2");
 
-        clickLinkWithText(TEST_ASSAY_LUM + " Runs");
-        clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME4);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM + " Runs"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM_RUN_NAME4));
         assertTextPresent("IL-1b (1)");
         assertTextPresent("ListParticipant1");
         assertTextPresent("ListParticipant2");
@@ -406,8 +406,8 @@ public class LuminexTest extends AbstractQCAssayTest
         setFilter("Data", "ParticipantID", "Equals", "ListParticipant2");
         assertTextPresent("1001.2");
 
-        clickLinkWithText(TEST_ASSAY_LUM + " Runs");
-        clickLinkWithText(TEST_ASSAY_LUM_RUN_NAME2);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM + " Runs"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM_RUN_NAME2));
         assertTextPresent("IL-1b (1)");
         assertTextPresent("9011-04");
 
@@ -428,7 +428,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // Upload another run that has both Raw and Summary data in the same excel file
         clickFolder(TEST_ASSAY_PRJ_LUMINEX);
-        clickLinkWithText(TEST_ASSAY_LUM);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         clickButton("Import Data");
         clickButton("Next");
         setFormElement("name", "raw and summary");
@@ -436,7 +436,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Next", 60000);
         clickButton("Save and Finish");
 
-        clickLinkWithText("raw and summary");
+        clickAndWait(Locator.linkWithText("raw and summary"));
         // make sure the Summary, StdDev, and DV columns are visible
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("Summary");
@@ -445,7 +445,7 @@ public class LuminexTest extends AbstractQCAssayTest
         _customizeViewsHelper.applyCustomView();
         // show all rows (> 100 in full data file)
         clickButton("Page Size", 0);
-        clickLinkWithText("Show All");
+        clickAndWait(Locator.linkWithText("Show All"));
 
         // check that both the raw and summary data were uploaded together
         DataRegionTable table = new DataRegionTable("Data", this);
@@ -635,7 +635,7 @@ public class LuminexTest extends AbstractQCAssayTest
         excludeAnalyteForAllWellsTest(analytes[1]);
 
         // Check out the exclusion report
-        clickLinkWithText("view excluded data");
+        clickAndWait(Locator.linkWithText("view excluded data"));
         assertTextPresent("Changed for all analytes", "exclude single analyte for single well", "ENV7 (93)", "ENV6 (97)");
         assertTextPresent("multipleCurvesTestRun", 2);
     }
@@ -893,7 +893,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
 
         clickButton("Save and Finish", 2*WAIT_FOR_PAGE);
-        clickLinkWithText(name);
+        clickAndWait(Locator.linkWithText(name));
 
         //edit view to show Analyte Standard
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -1155,7 +1155,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //TODO:  goToTestRunList
         clickFolder(TEST_ASSAY_PRJ_LUMINEX);
-        clickLinkWithText(TEST_ASSAY_LUM);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         clickEditAssayDesign(false);
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
@@ -1171,7 +1171,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Save and Finish");
 
         // verify the description error was generated by the transform script
-        clickLinkWithText("transformed assayId");
+        clickAndWait(Locator.linkWithText("transformed assayId"));
         DataRegionTable table = new DataRegionTable("Data", this);
         for(int i = 1; i <= 40; i++)
         {
@@ -1183,7 +1183,7 @@ public class LuminexTest extends AbstractQCAssayTest
     protected void goToTestAssayHome()
     {
         clickFolder(TEST_ASSAY_PRJ_LUMINEX);
-        clickLinkWithText(TEST_ASSAY_LUM);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
     }
 
     protected boolean R_TRANSFORM_SET = false;
@@ -1210,7 +1210,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // upload the sample data file
         clickFolder(TEST_ASSAY_PRJ_LUMINEX);
-        clickLinkWithText(TEST_ASSAY_LUM);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         clickButton("Import Data");
         clickButton("Next");
         setFormElement("name", "r script transformed assayId");
@@ -1245,7 +1245,7 @@ public class LuminexTest extends AbstractQCAssayTest
         Assert.assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
 
         // verify that the lot number value are as expected
-        clickLinkWithText("r script transformed assayId");
+        clickAndWait(Locator.linkWithText("r script transformed assayId"));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("Analyte/Properties/LotNumber");
         _customizeViewsHelper.applyCustomView();
@@ -1433,7 +1433,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void verifyHighlightUpdatesAfterQCFlagChange()
     {
         goToTestRunList();
-        clickLinkWithText("Guide Set plate 4");
+        clickAndWait(Locator.linkWithText("Guide Set plate 4"));
         _customizeViewsHelper.openCustomizeViewPanel();
         String expectedHMFI=  "9173.8";
 
@@ -1652,7 +1652,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void verifyQCFlags()
     {
         goToProjectHome();
-        clickLinkWithText(TEST_ASSAY_LUM);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         verifyQCFlagsInRunGrid();
         verifyQCFlagsSchema();
     }
@@ -1749,10 +1749,10 @@ public class LuminexTest extends AbstractQCAssayTest
     private void goToQCAnalysisPage()
     {
         clickFolder(getProjectName());
-        clickLinkWithText(TEST_ASSAY_LUM);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
         String qcUrlInRuns = getQCLink();
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText("view results"));
         String qcUrlInResults = getQCLink();
         clickLinkContainingText("view qc report");
 
@@ -2222,7 +2222,7 @@ public class LuminexTest extends AbstractQCAssayTest
         DataRegionTable table = new DataRegionTable("Runs", this);
         table.setFilter("Name", "Equals", "Guide Set plate " + index);
         clickAndWait(Locator.tagWithAttribute("img", "src", "/labkey/Experiment/images/graphIcon.gif"));
-        clickLinkWithText("Text View");
+        clickAndWait(Locator.linkWithText("Text View"));
         waitForText("Protocol Applications"); // bottom section of the "Text View" tab for the run details page
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_4PL.pdf", 3);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_5PL.pdf", 3);
@@ -2248,6 +2248,6 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Next");
         clickButton("Save and Finish");
         if (!isBackgroundUpload && !isTextPresent("Error"))
-            clickLinkWithText(assayName);
+            clickAndWait(Locator.linkWithText(assayName));
     }    
 }

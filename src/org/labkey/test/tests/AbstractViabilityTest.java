@@ -76,10 +76,10 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     protected void importSpecimens(String studyFolder, String specimensPath)
     {
         log("** Import specimens");
-        clickLinkWithText(studyFolder);
-        clickLinkWithText("Specimen Data");
+        clickAndWait(Locator.linkWithText(studyFolder));
+        clickAndWait(Locator.linkWithText("Specimen Data"));
         addWebPart("Specimens");
-        clickLinkWithText("By Vial Group");
+        clickAndWait(Locator.linkWithText("By Vial Group"));
         clickButton("Import Specimens");
         setFormElement(Locator.id("tsv"), getFileContents(specimensPath));
         submit();
@@ -124,7 +124,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     {
         log("** Upload viability run " + (runName != null ? runName : "<unnamed>"));
         clickFolder(getFolderName());
-        clickLinkWithText(getAssayName());
+        clickAndWait(Locator.linkWithText(getAssayName()));
         clickButton("Import Data");
         if (setBatchTargetStudy)
             selectOptionByText("targetStudy", "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
@@ -140,7 +140,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     {
         // we should be already viewing the assay results page
         assertTitleContains(getAssayName() + " Results");
-        clickLinkWithText("rerun");
+        clickAndWait(Locator.linkWithText("rerun"));
 
         // No need to change batch fields (TargetStudy) for now, click Next
         clickButton("Next");

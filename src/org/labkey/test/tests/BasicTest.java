@@ -142,7 +142,7 @@ public class BasicTest extends BaseWebDriverTest
 
 //        // Verify scheduled system maintenance is disabled.
         goToAdminConsole();
-        clickLinkWithText("running threads");
+        clickAndWait(Locator.linkWithText("running threads"));
         assertTextNotPresent("SystemMaintenance");
     }
 

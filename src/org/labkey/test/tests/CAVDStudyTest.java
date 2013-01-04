@@ -84,7 +84,7 @@ public class CAVDStudyTest extends StudyBaseTest
     private void doVerifyEmptyStudy()
     {
         log("Verifying that the study is empty.");
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
         // Make sure a study was made.
         assertTextNotPresent("No study is active in the current container.");
@@ -94,7 +94,7 @@ public class CAVDStudyTest extends StudyBaseTest
         assertTabNotPresent("Data");
 
         // Change timepoint type.
-        clickLinkWithText("Edit");
+        clickAndWait(Locator.linkWithText("Edit"));
         waitForText("Timepoint Type");
         //Can't simply use the checkRadioButton method, it doens't work with Ext 4 yet.
         if(!_ext4Helper.isChecked("VISIT")){
@@ -105,7 +105,7 @@ public class CAVDStudyTest extends StudyBaseTest
         waitForPageToLoad();
 
         //Check to see if date is checked.
-        clickLinkWithText("Edit");
+        clickAndWait(Locator.linkWithText("Edit"));
         waitForText("Timepoint Type");
         Assert.assertTrue(_ext4Helper.isChecked("VISIT"));
 
@@ -113,9 +113,9 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void doVerifyStudyDesign()
     {
-        clickLinkWithText(STUDY_NAME);
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
 
-        clickLinkWithText("Vaccine Design");
+        clickAndWait(Locator.linkWithText("Vaccine Design"));
         clickEditDesign();
         // clear defaults
         deleteStudyDesignRow(RowType.Immunogen, 1);
@@ -133,7 +133,7 @@ public class CAVDStudyTest extends StudyBaseTest
         saveRevision();
         assertElementPresent(Locator.xpath("//a[@class='labkey-disabled-button']/span[text()='Save']"));
 
-        clickLinkWithText("Vaccine Design");
+        clickAndWait(Locator.linkWithText("Vaccine Design"));
         waitForText("Immunogens");
         assertTextPresent(_expectedVaccineDesignText);
 
@@ -149,7 +149,7 @@ public class CAVDStudyTest extends StudyBaseTest
         waitForText("Immunogens");
         assertTextPresent(_expectedVaccineDesignText);
 
-        clickLinkWithText("Immunizations");
+        clickAndWait(Locator.linkWithText("Immunizations"));
         clickEditDesign();
         // clear defaults
         deleteStudyDesignRow(RowType.Immunization, 1);
@@ -166,8 +166,8 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void doVerifyAssaySchedule()
     {
-        clickLinkWithText(STUDY_NAME);
-        clickLinkWithText("Assays");
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickAndWait(Locator.linkWithText("Assays"));
         clickEditDesign();
         deleteStudyDesignRow(RowType.Assay, 1);
         deleteStudyDesignRow(RowType.Assay, 1);
@@ -215,7 +215,7 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void doVerifyDatasets()
     {
-        clickLinkWithText(STUDY_NAME);
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
         clickLinkWithText("Assays", true);
 
         waitAndClickButton("Create Assay Datasets", 0);
@@ -224,8 +224,8 @@ public class CAVDStudyTest extends StudyBaseTest
         waitAndClickButton("Create Study Timepoints", 0);
         waitForAlert("2 timepoints created.", WAIT_FOR_JAVASCRIPT);
 
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Datasets");
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
 
         assertTextPresent("Placeholder", 4);
         assertLinkPresentWithText("ELISPOT");
@@ -233,19 +233,19 @@ public class CAVDStudyTest extends StudyBaseTest
         assertLinkPresentWithText("ICS");
         assertLinkPresentWithText("CAVDTestAssay");
 
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Timepoints");
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Manage Timepoints"));
 
         assertTextPresent("Study Start: 0 days");
         assertTextPresent("CAVDTestTimepoint: 13 days");
 //
 //        addDataset();
 //
-//        clickLinkWithText("Overview");
+//        clickAndWait(Locator.linkWithText("Overview"));
 //
 //        assertTabPresent("Data");
 //
-//        clickLinkWithText("Edit");
+//        clickAndWait(Locator.linkWithText("Edit"));
 //
 //        waitForText("Timepoint Type");
 //        Assert.assertEquals(2, getXpathCount(Locator.xpath("//input[@type='radio'][@name='TimepointType'][@disabled]")));
@@ -270,38 +270,38 @@ public class CAVDStudyTest extends StudyBaseTest
         String study3name = FOLDER_NAME3 + " Study";
 
         log("Set study name for " + FOLDER_NAME2 + " and verify datasets exist.");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME2);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME2));
         // workaround for issue 15023: go to manage views page to initialize study dataset properties
         goToManageViews();
         waitForText("Manage Views");
-        clickLinkWithText("Manage");
-        clickLinkWithText("Change Study Properties");
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Change Study Properties"));
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", study2name);
         clickButton("Submit");
         waitForText("General Study Settings");
         assertTextPresent(study2name);
-        clickLinkWithText("Manage Datasets");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
         for (Map.Entry<Integer, String> dataset : DATASETS.entrySet())
         {
             assertTextPresentInThisOrder(dataset.getKey().toString(), dataset.getValue());
         }
 
         log("Set study name for " + FOLDER_NAME3 + " and verify datasets exist.");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME3);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME3));
         // workaround for issue 15023: go to manage views page to initialize study dataset properties
         goToManageViews();
         waitForText("Manage Views");
-        clickLinkWithText("Manage");
-        clickLinkWithText("Change Study Properties");
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Change Study Properties"));
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", study3name);
         clickButton("Submit");
         waitForText("General Study Settings");
         assertTextPresent(study3name);
-        clickLinkWithText("Manage Datasets");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
         for (Map.Entry<Integer, String> dataset : DATASETS.entrySet())
         {
             assertTextPresentInThisOrder(dataset.getKey().toString(), dataset.getValue());
@@ -322,8 +322,8 @@ public class CAVDStudyTest extends StudyBaseTest
         }
 
         log("Change study dataset status for " + FOLDER_NAME2 + " and verify changes in study list query.");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME2);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME2));
         waitForText("Study Schedule");
         // wait for the study schedule grid to load, any dataset name will do
         waitForText(DATASETS.values().iterator().next());
@@ -342,8 +342,8 @@ public class CAVDStudyTest extends StudyBaseTest
         }
 
         log("Create list in " + FOLDER_NAME4 + " with lookup to the studies list query.");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME4);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME4));
         addWebPart("Lists");
         ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
                 new ListHelper.ListColumn("MyStudyName", "MyStudyName", ListHelper.ListColumnType.String, ""),
@@ -353,8 +353,8 @@ public class CAVDStudyTest extends StudyBaseTest
         clickButton("Done");
 
         log("Add records to list for each study.");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME4);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME4));
         clickLinkWithText("AllStudiesList", true);
         clickButton("Insert New");
         setFormElement("quf_MyStudyName", "Something");
@@ -366,8 +366,8 @@ public class CAVDStudyTest extends StudyBaseTest
         clickButton("Submit");
 
         log("Verify that the list lookup displays dataset status values.");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME4);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME4));
         clickLinkWithText("AllStudiesList", true);
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn("StudyLookup");
@@ -434,8 +434,8 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void goToViscStudiesQuery(String folderName)
     {
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(folderName);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(folderName));
         goToSchemaBrowser();
         selectQuery("viscstudies", "studies");
         waitForText("view data");
@@ -555,8 +555,8 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void addDataset()
     {
-        clickLinkWithText("Manage");
-        clickLinkWithText("Study Schedule");
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Study Schedule"));
 
         log("adding dataset: " + "ImportedDataset");
 

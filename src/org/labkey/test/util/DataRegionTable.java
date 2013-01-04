@@ -265,7 +265,7 @@ public class DataRegionTable
         Integer colIndex = _mapColumns.get(name);
         if (colIndex != null)
             return colIndex.intValue();
-        
+
         try
         {
             for (int col = 0; col < _columnCount; col++)
@@ -285,7 +285,7 @@ public class DataRegionTable
             }
         }
         catch (Exception e)
-        {            
+        {
             // _test.log("Failed to get column named " + name);
         }
 
@@ -517,12 +517,12 @@ public class DataRegionTable
 
     public void showAll()
     {
-        _test.clickLinkWithText("Show All");
+        _test.clickAndWait(Locator.linkWithText("Show All"));
     }
 
     public void setPageSize(int size)
     {
-        _test.clickLinkWithText(size + " per page");
+        _test.clickAndWait(Locator.linkWithText(size + " per page"));
     }
 
     /**

@@ -128,7 +128,7 @@ public class AuditLogTest extends BaseWebDriverTest
             instance.ensureAdminMode();
 
             instance.goToAdminConsole();
-            instance.clickLinkWithText("audit log");
+            instance.clickAndWait(Locator.linkWithText("audit log"));
         }
 
         if (!instance.getSelectedOptionText(Locator.name("view")).equals(eventType))

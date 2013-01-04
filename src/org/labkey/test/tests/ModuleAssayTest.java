@@ -78,7 +78,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         uploadBatch(batchName, "run01.tsv", "run02.tsv");
 
         log("Visit batches page");
-        clickLinkWithText(ASSAY_NAME + " Batches");
+        clickAndWait(Locator.linkWithText(ASSAY_NAME + " Batches"));
         assertTitleEquals(ASSAY_NAME + " Batches: /" + PROJECT_NAME);
 
         // Verify file-based view associated with assay design shows up, with expected columns
@@ -95,7 +95,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickMenuButton("Views", "default");
 
         log("Visit batch details page");
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertTitleEquals(batchName + " Details: /" + PROJECT_NAME);
         waitForElement(Locator.id("RunName_0"), WAIT_FOR_JAVASCRIPT);
         assertElementContains(Locator.id("RunName_0"), "run01");
@@ -109,7 +109,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         // back to batches page
         selenium.goBack();
         waitForPageToLoad();
-        clickLinkWithText(batchName);
+        clickAndWait(Locator.linkWithText(batchName));
         assertTitleEquals(ASSAY_NAME + " Runs: /" + PROJECT_NAME);
 
         // Verify file-based view associated with assay design shows up, with expected columns
@@ -127,7 +127,7 @@ public class ModuleAssayTest extends AbstractAssayTest
 
         log("Visit run details page");
         setSort("Runs", "Name", SortDirection.ASC);
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertTitleEquals("run01.tsv Details: /" + PROJECT_NAME);
         assertElementContains(Locator.id("SampleId_0"), "Monkey 1");
         assertElementContains(Locator.id("DoubleData_0"), String.valueOf(3.2));
@@ -136,7 +136,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         // back to runs page
         selenium.goBack();
         waitForPageToLoad();
-        clickLinkWithText("run01.tsv");
+        clickAndWait(Locator.linkWithText("run01.tsv"));
         assertTitleEquals(ASSAY_NAME + " Results: /" + PROJECT_NAME);
 
                 // Verify file-based view associated with assay design shows up, with expected columns
@@ -153,7 +153,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickMenuButton("Views", "default");
 
         log("Visit result details page");
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertElementContains(Locator.id("SampleId_div"), "Monkey 1");
         assertElementContains(Locator.id("TimePoint_div"), "2008/11/01 11:22:33");
         assertElementContains(Locator.id("DoubleData_div"), String.valueOf(3.2));
@@ -175,10 +175,10 @@ public class ModuleAssayTest extends AbstractAssayTest
         goToSchemaBrowser();
         selectQuery("assay.simple." + ASSAY_NAME, "AssayProviderScopedRunQuery");
         waitForText("view data");
-        clickLinkWithText("view data");
+        clickAndWait(Locator.linkWithText("view data"));
         assertTextPresent("Prefixrun01.tsvSuffix", "Prefixrun02.tsvSuffix");
         // Check that the ${schemaName} substitution works as expected and that query metadata got applied
-        clickLinkWithText("Prefixrun02.tsvSuffix");
+        clickAndWait(Locator.linkWithText("Prefixrun02.tsvSuffix"));
         assertTextPresent("Monkey 1", "Monkey 2", "Monkey 3");
         assertTextNotPresent("Monkey 4");
 
@@ -186,13 +186,13 @@ public class ModuleAssayTest extends AbstractAssayTest
         goToSchemaBrowser();
         selectQuery("assay", "LegacyAssayRunQueryName");
         waitForText("view data");
-        clickLinkWithText("view data");
+        clickAndWait(Locator.linkWithText("view data"));
         assertTextPresent("LegacyPrefixrun01.tsvSuffix", "LegacyPrefixrun02.tsvSuffix");
 
         goToSchemaBrowser();
         selectQuery("assay", "LegacyAssayDataQueryName");
         waitForText("view data");
-        clickLinkWithText("view data");
+        clickAndWait(Locator.linkWithText("view data"));
         assertTextPresent("LegacyPrefixsuper secret!Suffix", "LegacyPrefixwakka wakkaSuffix");
     }
 
@@ -215,7 +215,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     protected void createAssayDesign()
     {
         log("Creating assay design");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
 
         addWebPart("Assay List");
         clickButton("Manage Assays");
@@ -237,7 +237,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     protected void createSampleSet()
     {
         log("Creating sample set");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
 
         addWebPart("Sample Sets");
         clickButton("Import Sample Set");
@@ -253,7 +253,7 @@ public class ModuleAssayTest extends AbstractAssayTest
 
         log("Uploading batch: " + batchName);
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(ASSAY_NAME);
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
 
         clickButton("Import Data");
         assertTitleEquals("Data Import: /" + PROJECT_NAME);

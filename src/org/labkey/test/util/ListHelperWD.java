@@ -513,7 +513,7 @@ public class ListHelperWD extends ListHelper
             _test.addWebPart("Lists");
         }
 
-        _test.clickLinkWithText("manage lists");
+        _test.clickAndWait(Locator.linkWithText("manage lists"));
 
         _test.log("Add List");
         _test.clickButton("Create New List");
@@ -551,7 +551,7 @@ public class ListHelperWD extends ListHelper
             _test.addWebPart("Lists");
         }
 
-        _test.clickLinkWithText("manage lists");
+        _test.clickAndWait(Locator.linkWithText("manage lists"));
 
         _test.log("Import List Archive");
         _test.clickButton("Import List Archive");

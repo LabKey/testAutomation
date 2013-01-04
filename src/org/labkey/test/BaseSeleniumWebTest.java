@@ -549,7 +549,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             assertFormPresent("login");
             setText("email", PasswordUtil.getUsername());
             setText("password", PasswordUtil.getPassword());
-            clickLinkWithText("Sign In");
+            clickAndWait(Locator.linkWithText("Sign In"));
 
             if (isTextPresent("Type in your email address and password"))
                 Assert.fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
@@ -571,7 +571,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if ( !isLinkPresentWithText("Sign In") )
             Assert.fail("You need to be logged out to log in.  Please log out to log in.");
 
-        clickLinkWithText("Sign In");
+        clickAndWait(Locator.linkWithText("Sign In"));
 
         attemptSignIn(email, password);
 
@@ -587,13 +587,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void attemptSignIn(String email, String password)
     {
-        clickLinkWithText("Sign In");
+        clickAndWait(Locator.linkWithText("Sign In"));
 
         assertTitleEquals("Sign In");
         assertFormPresent("login");
         setText("email", email);
         setText("password", password);
-        clickLinkWithText("Sign In");
+        clickAndWait(Locator.linkWithText("Sign In"));
     }
 
     public void signInShouldFail(String email, String password, String... expectedMessages)
@@ -758,7 +758,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (enableDevMode())
         {
             goToAdminConsole();
-            clickLinkWithText("system maintenance");
+            clickAndWait(Locator.linkWithText("system maintenance"));
 
             if (enable)
                 checkCheckbox("enableSystemMaintenance");
@@ -786,13 +786,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void goToSiteSettings()
     {
         goToAdminConsole();
-        clickLinkWithText("site settings");
+        clickAndWait(Locator.linkWithText("site settings"));
     }
 
     public void goToAuditLog()
     {
         goToAdminConsole();
-        clickLinkWithText("audit log");
+        clickAndWait(Locator.linkWithText("audit log"));
     }
 
     public void hideNavigationBar()
@@ -1053,7 +1053,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             }
 
             // Will fail if left navbar is not enabled in Home project. TODO: allow this, see #xxxx
-            clickLinkWithText("Home");
+            clickAndWait(Locator.linkWithText("Home"));
         }
     }
 
@@ -1069,7 +1069,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (null != password2)
             setFormElement("password2", password2);
 
-        clickLinkWithText("Next");
+        clickAndWait(Locator.linkWithText("Next"));
 
         if (null != expectedText)
             assertTextPresent(expectedText);
@@ -1122,7 +1122,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void startSystemMaintenance(String task)
     {
         goToAdminConsole();
-        clickLinkWithText("system maintenance");
+        clickAndWait(Locator.linkWithText("system maintenance"));
         selenium.openWindow("", "systemMaintenance");
         clickLinkWithText(task, false);
         smStart = System.currentTimeMillis();
@@ -1675,7 +1675,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             }
             if(!checked.contains(folder))
             {
-                clickLinkWithText(project);
+                clickAndWait(Locator.linkWithText(project));
                 if(isLinkPresentWithText(folder))
                 {
                     doViewCheck(folder);
@@ -1687,7 +1687,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     private void doViewCheck(String folder)
     {
-        clickLinkWithText(folder);
+        clickAndWait(Locator.linkWithText(folder));
         try{
             goToManageViews();
         }
@@ -2286,7 +2286,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertLinkNotPresentWithText(child);
         log("Creating subfolder " + child + " under project " + parent);
         String _active = (!parent.equals(project)? parent : project);
-        clickLinkWithText(_active);
+        clickAndWait(Locator.linkWithText(_active));
         goToFolderManagement();
         waitForExt4FolderTreeNode(parent, 10000);
         clickButton("Create Subfolder");
@@ -2364,7 +2364,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (null != folderType && !folderType.equals("None"))
         {
             goToFolderManagement();
-            clickLinkWithText("Folder Type");
+            clickAndWait(Locator.linkWithText("Folder Type"));
 
             for (String tabname : tabsToAdd)
                 checkCheckbox(Locator.checkboxByTitle(tabname));
@@ -2402,8 +2402,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void deleteFolder(String project, String folderName)
     {
         log("Deleting folder " + folderName + " under project " + project);
-        clickLinkWithText(project);
-        clickLinkWithText(folderName);
+        clickAndWait(Locator.linkWithText(project));
+        clickAndWait(Locator.linkWithText(folderName));
         ensureAdminMode();
         goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
@@ -2440,8 +2440,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
     {
         log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
-        clickLinkWithText(project);
-        clickLinkWithText(folderName);
+        clickAndWait(Locator.linkWithText(project));
+        clickAndWait(Locator.linkWithText(folderName));
         ensureAdminMode();
         goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
@@ -2462,8 +2462,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void moveFolder(String projectName, String folderName, String newParent, boolean createAlias)
     {
         log("Moving folder [" + folderName + "] under project [" + projectName + "] to [" + newParent + "]");
-        clickLinkWithText(projectName);
-        clickLinkWithText(folderName);
+        clickAndWait(Locator.linkWithText(projectName));
+        clickAndWait(Locator.linkWithText(folderName));
         ensureAdminMode();
         goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
@@ -2488,7 +2488,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public void clickFolder(String project)
     {
-        clickLinkWithText(project);
+        clickAndWait(Locator.linkWithText(project));
     }
 
     /**
@@ -3003,7 +3003,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected void exportFolderAsZip()
     {
         goToFolderManagement();
-        clickLinkWithText("Export");
+        clickAndWait(Locator.linkWithText("Export"));
         checkRadioButton("location", 1);
 
     }
@@ -3012,7 +3012,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         goToFolderManagement();
         log("setting module properties");
-        clickLinkWithText("Module Properties");
+        clickAndWait(Locator.linkWithText("Module Properties"));
         waitForText("Save Changes");
         boolean changed = false;
         for (String moduleName : props.keySet())
@@ -3447,12 +3447,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void assertLinkNotPresentWithTitle(String title)
     {
         Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
-    }
-
-    /** Find a link with the exact text specified, click it, and wait for the page to load */
-    public void clickLinkWithText(String text)
-    {
-        clickLinkWithText(text, true);
     }
 
     /** Find nth link with the exact text specified, click it, and wait for the page to load */
@@ -3984,9 +3978,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (isLinkPresentWithText("override"))
         {
             if (inherit)
-                clickLinkWithText("modify the setting for all folders");
+                clickAndWait(Locator.linkWithText("modify the setting for all folders"));
             else
-                clickLinkWithText("override");
+                clickAndWait(Locator.linkWithText("override"));
         }
         clickRadioButtonById("pipeOptionProjectSpecified");
         setFormElement("pipeProjectRootPath", rootPath);
@@ -4634,7 +4628,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         log("Attempting to enable feature: " + feature);
         goToAdminConsole();
-        clickLinkWithText("experimental features");
+        clickAndWait(Locator.linkWithText("experimental features"));
 
         String xpath = "//div[div[text()='Create Specimen Study']]/a";
         if(!isElementPresent(Locator.xpath(xpath)))
@@ -5195,7 +5189,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (isElementPresent(Locator.permissionRendered()))
         {
             exitPermissionsUI();
-            clickLinkWithText(projectName);
+            clickAndWait(Locator.linkWithText(projectName));
         }
         enterPermissionsUI();
         clickManageGroup(groupName);
@@ -5279,7 +5273,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Impersonate");
         selectOptionByText(Locator.id("email"), fakeUser);
-        clickLinkWithText("Impersonate");
+        clickAndWait(Locator.linkWithText("Impersonate"));
         _impersonationStack.push(fakeUser);
     }
 
@@ -5307,7 +5301,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (projectName == null)
             goToProjectHome();
         else
-            clickLinkWithText(projectName);
+            clickAndWait(Locator.linkWithText(projectName));
 
         setUserPermissions(userName, permissions);
     }
@@ -5454,7 +5448,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToSiteUsers();
 
         if(isLinkPresentWithText("include inactive users"))
-            clickLinkWithText("include inactive users");
+            clickAndWait(Locator.linkWithText("include inactive users"));
 
         DataRegionTable usersTable = new DataRegionTable("Users", this, true, true);
 
@@ -5469,7 +5463,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             if (!isPresent && isLinkPresentContainingText("Next") && isLinkPresentContainingText("Last"))
             {
                 clickButton("Page Size", 0);
-                clickLinkWithText("Show All");
+                clickAndWait(Locator.linkWithText("Show All"));
                 row = usersTable.getRow("Email", userEmail);
                 isPresent = row != -1;
             }
@@ -5507,7 +5501,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public boolean doesGroupExist(String groupName, String projectName)
     {
         ensureAdminMode();
-        clickLinkWithText(projectName);
+        clickAndWait(Locator.linkWithText(projectName));
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Project Groups");
         waitForText("Member Groups");
@@ -5648,11 +5642,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void createNewWikiPage(String format)
     {
         if(isLinkPresentWithText("new page"))
-            clickLinkWithText("new page");
+            clickAndWait(Locator.linkWithText("new page"));
         else if(isLinkPresentWithText("Create a new wiki page"))
-            clickLinkWithText("Create a new wiki page");
+            clickAndWait(Locator.linkWithText("Create a new wiki page"));
         else if(isLinkPresentWithText("add content"))
-            clickLinkWithText("add content");
+            clickAndWait(Locator.linkWithText("add content"));
         else if(isTextPresent("Pages"))
             clickWebpartMenuItem("Pages", "New");
         else
@@ -5728,9 +5722,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public DataRegionTable getCohortDataRegionTable(String projectName)
     {
-        clickLinkWithText(projectName);
+        clickAndWait(Locator.linkWithText(projectName));
         clickTab("Manage");
-        clickLinkWithText("Manage Cohorts");
+        clickAndWait(Locator.linkWithText("Manage Cohorts"));
         return new DataRegionTable("Cohort", this, false);
     }
 
@@ -5822,7 +5816,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void enableModule(String projectName, String moduleName)
     {
         ensureAdminMode();
-        clickLinkWithText(projectName);
+        clickAndWait(Locator.linkWithText(projectName));
         enableModule(moduleName, true);
     }
 
@@ -5834,7 +5828,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void enableModules(List<String> moduleNames, boolean isProject)
     {
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         for (String moduleName : moduleNames)
         {
             checkCheckbox(Locator.checkboxByTitle(moduleName));
@@ -5845,7 +5839,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void disableModules(List<String> moduleNames)
     {
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         for (String moduleName : moduleNames)
         {
             uncheckCheckbox(Locator.checkboxByTitle(moduleName));
@@ -5871,7 +5865,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         if(!isLinkPresentWithText(project))
             goToHome();
-        clickLinkWithText(project);
+        clickAndWait(Locator.linkWithText(project));
         goToProjectSettings();
     }
 
@@ -5929,7 +5923,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected void importFolderFromZip(String folderFile)
     {
         goToFolderManagement();
-        clickLinkWithText("Import");
+        clickAndWait(Locator.linkWithText("Import"));
         sleep(2000);
         setFormElement(Locator.name("folderZip"), new File(folderFile));
         clickButtonContainingText("Import Folder From Local Zip Archive");
@@ -5940,7 +5934,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected void importFolderFromPipeline(String folderFile)
     {
         goToFolderManagement();
-        clickLinkWithText("Import");
+        clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Import Folder Using Pipeline");
         _extHelper.selectFileBrowserItem(folderFile);
         selectImportDataAction("Import Folder");
@@ -5994,7 +5988,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void searchFor(String projectName, String searchFor, int expectedResults, String titleName)
     {
         log("Searching Project : " + projectName + " for \"" + searchFor + "\".  Expecting to find : " + expectedResults + " results");
-        clickLinkWithText(projectName);
+        clickAndWait(Locator.linkWithText(projectName));
         assertElementPresent(Locator.name("q"));
         setFormElement("query", searchFor);
         clickButton("Search");
@@ -6687,7 +6681,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 copyFile(specimenArchive, _copiedArchives[i]);
             }
 
-            clickLinkWithText(_studyFolderName);
+            clickAndWait(Locator.linkWithText(_studyFolderName));
 
             int total = 0;
             while( !isLinkPresentWithText("Manage Files") && total < WAIT_FOR_PAGE)
@@ -6698,7 +6692,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 refresh();
             }
 
-            clickLinkWithText("Manage Files");
+            clickAndWait(Locator.linkWithText("Manage Files"));
             waitAndClickButton("Process and Import Data");
 
             // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
@@ -6729,8 +6723,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             log("Waiting for completion of specimen archives");
 
-            clickLinkWithText(_studyFolderName);
-            clickLinkWithText("Manage Files");
+            clickAndWait(Locator.linkWithText(_studyFolderName));
+            clickAndWait(Locator.linkWithText("Manage Files"));
 
             waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import", _expectError);
 

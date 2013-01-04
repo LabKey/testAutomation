@@ -239,9 +239,9 @@ public class StudyTest extends StudyBaseTest
 
         // test creating a participant group directly from a data grid
         waitForElement(Locator.linkContainingText(STUDY_NAME));
-        clickLinkWithText(STUDY_NAME);
-        clickLinkWithText("47 datasets");
-        clickLinkWithText("DEM-1: Demographics");
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickAndWait(Locator.linkWithText("47 datasets"));
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
 
         // verify warn on no selection
@@ -544,9 +544,9 @@ public class StudyTest extends StudyBaseTest
         verifyCohorts();
 
         // configure QC state management before importing duplicate data
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Dataset QC States");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("Manage Study"));
+        clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         setFormElement("newLabel", "unknown QC");
         setFormElement("newDescription", "Unknown data is neither clean nor dirty.");
         clickCheckboxById("dirty_public");
@@ -557,9 +557,9 @@ public class StudyTest extends StudyBaseTest
         clickButton("Save");
 
         // return to dataset import page
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("47 datasets");
-        clickLinkWithText("verifyAssay");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("47 datasets"));
+        clickAndWait(Locator.linkWithText("verifyAssay"));
         assertTextPresent("QC State");
         assertTextNotPresent("1234_B");
         clickMenuButton("QC State", "All data");
@@ -609,10 +609,10 @@ public class StudyTest extends StudyBaseTest
 
     protected void verifySpecimens()
     {
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         addWebPart("Specimens");
         waitForText("Blood (Whole)");
-        clickLinkWithText("Blood (Whole)");
+        clickAndWait(Locator.linkWithText("Blood (Whole)"));
         specimenUrl = getCurrentRelativeURL();
 
 
@@ -624,10 +624,10 @@ public class StudyTest extends StudyBaseTest
     private void verifyParticipantComments()
     {
         log("creating the participant/visit comment dataset");
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("Create New Dataset");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("Manage Study"));
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("Create New Dataset"));
 
         setFormElement("typeName", PARTICIPANT_CMT_DATASET);
         clickButton("Next");
@@ -643,8 +643,8 @@ public class StudyTest extends StudyBaseTest
         clickButton("Save");
 
         log("creating the participant/visit comment dataset");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("Create New Dataset");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("Create New Dataset"));
 
         setFormElement("typeName", PARTICIPANT_VISIT_CMT_DATASET);
         clickButton("Next");
@@ -658,19 +658,19 @@ public class StudyTest extends StudyBaseTest
 
         log("configure comments");
         clickTab("Manage");
-        clickLinkWithText("Manage Comments");
+        clickAndWait(Locator.linkWithText("Manage Comments"));
         if (isTextPresent("Comments can only be configured for studies with editable datasets"))
         {
             log("configure editable datasets");
             clickTab("Manage");
-            clickLinkWithText("Manage Security");
+            clickAndWait(Locator.linkWithText("Manage Security"));
             selectOptionByText(Locator.name("securityString"), "Basic security with editable datasets");
             waitForPageToLoad();
 
             log("configure comments");
-            clickLinkWithText(getStudyLabel());
+            clickAndWait(Locator.linkWithText(getStudyLabel()));
             clickTab("Manage");
-            clickLinkWithText("Manage Comments");
+            clickAndWait(Locator.linkWithText("Manage Comments"));
         }
         selectOptionByText("participantCommentDataSetId", PARTICIPANT_CMT_DATASET);
         waitForPageToLoad();
@@ -681,9 +681,9 @@ public class StudyTest extends StudyBaseTest
         selectOptionByText("participantVisitCommentProperty", PARTICIPANT_VISIT_COMMENT_LABEL);
         clickButton("Save");
 
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         waitForText("Blood (Whole)");
-        clickLinkWithText("Blood (Whole)");
+        clickAndWait(Locator.linkWithText("Blood (Whole)"));
         clickButton("Enable Comments/QC");
         log("manage participant comments directly");
         clickMenuButton("Comments and QC", "Manage Mouse Comments");
@@ -696,9 +696,9 @@ public class StudyTest extends StudyBaseTest
         //Issue 14894: Datasets no longer audit row insertion
         verifyAuditEventAdded(datasetAuditEventCount);
 
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         waitForText("Blood (Whole)");
-        clickLinkWithText("Blood (Whole)");
+        clickAndWait(Locator.linkWithText("Blood (Whole)"));
         setFilter("SpecimenDetail", "MouseId", "Equals", "999320812");
 
         assertTextPresent("Mouse Comment");
@@ -774,12 +774,12 @@ public class StudyTest extends StudyBaseTest
     private void verifyDemographics()
     {
         clickFolder(getFolderName());
-        clickLinkWithText("Study Navigator");
-        clickLinkWithText("24");
+        clickAndWait(Locator.linkWithText("Study Navigator"));
+        clickAndWait(Locator.linkWithText("24"));
         assertTextPresent(DEMOGRAPHICS_DESCRIPTION);
         assertTextPresent("Male");
         assertTextPresent("African American or Black");
-        clickLinkWithText("999320016");
+        clickAndWait(Locator.linkWithText("999320016"));
         clickLinkWithText("125: EVC-1: Enrollment Vaccination", false);
         assertTextPresent("right deltoid");
         
@@ -819,9 +819,9 @@ public class StudyTest extends StudyBaseTest
 
     protected void verifyVisitMapPage()
     {
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Visits");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("Manage Study"));
+        clickAndWait(Locator.linkWithText("Manage Visits"));
 
         // test optional/required/not associated
         clickLinkWithText("edit", 0);
@@ -862,16 +862,16 @@ public class StudyTest extends StudyBaseTest
     {
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
 
-        clickLinkWithText("489");
+        clickAndWait(Locator.linkWithText("489"));
         assertTextPresent("ESIdt");
         assertTextPresent("Form Completion Date");
         assertTableCellTextEquals("details", 4, 1, "false");     // "Demographics Data" should be false
 
         // Verify that "Demographics Data" is checked and description is set
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("DEM-1: Demographics");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         assertTableCellTextEquals("details", 4, 1, "true");
         assertTableCellTextEquals("details", 3, 3, DEMOGRAPHICS_DESCRIPTION);
 
@@ -886,12 +886,12 @@ public class StudyTest extends StudyBaseTest
 
     private void verifyHiddenVisits()
     {
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Study Navigator");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("Study Navigator"));
         assertTextNotPresent("Screening Cycle");
         assertTextNotPresent("Cycle 1");
         assertTextPresent("Pre-exist Cond");
-        clickLinkWithText("Show All Datasets");
+        clickAndWait(Locator.linkWithText("Show All Datasets"));
         assertTextPresent("Screening Cycle");
         assertTextPresent("Cycle 1");
         assertTextPresent("Pre-exist Cond");
@@ -899,9 +899,9 @@ public class StudyTest extends StudyBaseTest
 
     private void verifyVisitImportMapping()
     {
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Visits");
-        clickLinkWithText("Visit Import Mapping");
+        clickAndWait(Locator.linkWithText("Manage Study"));
+        clickAndWait(Locator.linkWithText("Manage Visits"));
+        clickAndWait(Locator.linkWithText("Visit Import Mapping"));
         assertTableRowsEqual("customMapping", 2, VISIT_IMPORT_MAPPING.replace("SequenceNum", "Sequence Number Mapping"));
 
         Assert.assertEquals("Incorrect number of gray cells", 60, countTableCells(null, true));
@@ -914,7 +914,7 @@ public class StudyTest extends StudyBaseTest
 
         // Replace custom visit mapping and verify
         String replaceMapping = "Name\tSequenceNum\nBarBar\t4839\nFoofoo\t9732";
-        clickLinkWithText("Replace Custom Mapping");
+        clickAndWait(Locator.linkWithText("Replace Custom Mapping"));
         setFormElement(Locator.id("tsv"), replaceMapping);
         clickButton("Submit");
         assertTableRowsEqual("customMapping", 2, replaceMapping.replace("SequenceNum", "Sequence Number Mapping"));
@@ -930,8 +930,8 @@ public class StudyTest extends StudyBaseTest
         Assert.assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 0, countTableCells("ConMeds Log #%{S.3.2}", true));
 
         clickFolder(getFolderName());
-        clickLinkWithText("47 datasets");
-        clickLinkWithText("Types");
+        clickAndWait(Locator.linkWithText("47 datasets"));
+        clickAndWait(Locator.linkWithText("Types"));
         log("Verifying sequence numbers and visit names imported correctly");
 
         DataRegionTable table = new DataRegionTable("Dataset", this, true, true);
@@ -978,9 +978,9 @@ public class StudyTest extends StudyBaseTest
 
     protected void verifyCohorts()
     {
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Study Navigator");
-        clickLinkWithText("24");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("Study Navigator"));
+        clickAndWait(Locator.linkWithText("24"));
 
         // verify that cohorts are working
         assertTextPresent("999320016");
@@ -996,16 +996,16 @@ public class StudyTest extends StudyBaseTest
 
         // verify that the participant view respects the cohort filter:
         setSort("Dataset", "MouseId", SortDirection.ASC);
-        clickLinkWithText("999320518");
+        clickAndWait(Locator.linkWithText("999320518"));
         clickLinkWithText("125: EVC-1: Enrollment Vaccination", false);
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        clickLinkWithText("Next Mouse");
+        clickAndWait(Locator.linkWithText("Next Mouse"));
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        clickLinkWithText("Next Mouse");
+        clickAndWait(Locator.linkWithText("Next Mouse"));
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        clickLinkWithText("Next Mouse");
+        clickAndWait(Locator.linkWithText("Next Mouse"));
     }
 }

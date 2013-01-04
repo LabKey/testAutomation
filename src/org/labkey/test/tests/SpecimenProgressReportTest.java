@@ -72,11 +72,11 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         importFolderFromZip(STUDY_PIPELINE_ROOT + "/Study.folder.zip");
 
         // set the label for the unscheduled visit
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Visits");
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.xpath("//td[contains(text(),'999.0-999.9999')]/../td/a[contains(text(), 'edit')]"));
         setFormElement(Locator.name("label"), "SR");
-        clickLinkWithText("Save");
+        clickAndWait(Locator.linkWithText("Save"));
 
         // study folder specimen configuration
         manageSpecimenConfiguration();
@@ -99,7 +99,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
     private void manageSpecimenConfiguration()
     {
-        clickLinkWithText(studyFolder);
+        clickAndWait(Locator.linkWithText(studyFolder));
         addWebPart("Query");
         selectOptionByValue(Locator.name("schemaName"), "rho");
         submit();
@@ -113,8 +113,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         sleep(1000); // give the store a second to save the configurations
 
         // lookup the config IDs to use in setting the visits
-        clickLinkWithText(studyFolder);
-        clickLinkWithText("SpecimenConfiguration");
+        clickAndWait(Locator.linkWithText(studyFolder));
+        clickAndWait(Locator.linkWithText("SpecimenConfiguration"));
         DataRegionTable drt = new DataRegionTable("query", this);
         String pcr1RowId = drt.getDataAsText(drt.getRow("Tubetype", "CEF-R Cryovial"), "Rowid");
         String pcr2RowId = drt.getDataAsText(drt.getRow("Tubetype", "UPR Micro Tube"), "Rowid");
@@ -125,8 +125,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         setSpecimenConfigurationVisit(pcr2RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
         setSpecimenConfigurationVisit(rnaRowId, new String[]{"0", "6", "20", "SR"});
         sleep(1000); // give the store a second to save the configurations
-        clickLinkWithText(studyFolder);
-        clickLinkWithText("SpecimenConfigurationVisit");
+        clickAndWait(Locator.linkWithText(studyFolder));
+        clickAndWait(Locator.linkWithText("SpecimenConfigurationVisit"));
         waitForText("1 - 34 of 34");
 
         // TODO: this will be replaced by the automatic import of this data as part of the study folder import (SampleMindedImportTask)
@@ -135,14 +135,14 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
     private void manuallySetMissingSpecimensAndVisits(String firstConfigId, String secondConfigId)
     {
-        clickLinkWithText(studyFolder);
-        clickLinkWithText("MissingVisit");
+        clickAndWait(Locator.linkWithText(studyFolder));
+        clickAndWait(Locator.linkWithText("MissingVisit"));
         insertNewMissingSpecimenOrVisit("Study0100100", 18.0, 1400, "Unknown Staff turn over; unknown reason");
         insertNewMissingSpecimenOrVisit("Study0100100", 20, 1400, "Unknown Staff turn over; unknown reason");
         insertNewMissingSpecimenOrVisit("Study0100200", 6.0, 1400, "Unknown Staff turn over; unknown reason");
 
-        clickLinkWithText(studyFolder);
-        clickLinkWithText("MissingSpecimen");
+        clickAndWait(Locator.linkWithText(studyFolder));
+        clickAndWait(Locator.linkWithText("MissingSpecimen"));
         insertNewMissingSpecimenOrVisit("Study0100200", 20.0, firstConfigId, 1400, "Unknown reason (please describe as comment) : Have not received specimen from histologist yet.");
         insertNewMissingSpecimenOrVisit("Study0100200", 16.0, secondConfigId, 1400, "Unable to obtain required volume :");
     }
@@ -186,7 +186,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
     private void verifyAssayResultInvalid(String assayName, String runName)
     {
-        clickLinkWithText(assayFolder);
+        clickAndWait(Locator.linkWithText(assayFolder));
         waitForElement(tableLoc);
         Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
         Assert.assertEquals(22, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
@@ -207,25 +207,25 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
     private void verifyAdditionalGroupingColumn(String assayName, String groupCol)
     {
-        clickLinkWithText(assayFolder);
+        clickAndWait(Locator.linkWithText(assayFolder));
         waitForText("46 " + assayName + " queries");
         configureGroupingColumn(assayName, groupCol);
         waitForElement(tableLoc);
-        clickLinkWithText("48 results from " + assayName + " have been uploaded.");
+        clickAndWait(Locator.linkWithText("48 results from " + assayName + " have been uploaded."));
         assertTextPresent("Participant Visit not found", 8);
         assertTextPresent("2 duplicates found", 4);
     }
 
     private void verifyUnscheduledVisitDisplay(String assayName)
     {
-        clickLinkWithText(assayFolder);
+        clickAndWait(Locator.linkWithText(assayFolder));
         waitForElement(tableLoc);
         configureAssayProgressDashboard(assay2);
         configureAssaySchema(assayName);
 
         flagSpecimenForReview(assayName, assay2File, "2011-03-02");
 
-        clickLinkWithText(assayFolder);
+        clickAndWait(Locator.linkWithText(assayFolder));
         waitForElement(tableLoc);
 
         _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
@@ -238,17 +238,17 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         Assert.assertEquals(7, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
         Assert.assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
 
-        clickLinkWithText("7 results from " + assayName + " have been uploaded.");
+        clickAndWait(Locator.linkWithText("7 results from " + assayName + " have been uploaded."));
         assertTextPresent("Participant Visit not found", 1);
         assertTextPresent("Specimen type is not expected by this Assay", 1);
     }
 
     private void flagSpecimenForReview(String assayName, String runName, @Nullable String collectionDateFilterStr)
     {
-        clickLinkWithText(assayFolder);
+        clickAndWait(Locator.linkWithText(assayFolder));
 
-        clickLinkWithText(assayName);
-        clickLinkWithText(runName);
+        clickAndWait(Locator.linkWithText(assayName));
+        clickAndWait(Locator.linkWithText(runName));
 
         if (collectionDateFilterStr != null)
         {
@@ -260,7 +260,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         clickButton("OK", 0);
         waitForElement(Locator.tagWithAttribute("img", "title", "Flagged for review"));
 
-        clickLinkWithText(assayFolder);
+        clickAndWait(Locator.linkWithText(assayFolder));
     }
 
     private void createAssayFolder() throws CommandException, IOException
@@ -271,19 +271,19 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
         _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + assay1XarPath, ++pipelineCount, assay1);
         _assayHelper.importAssay(assay1, STUDY_PIPELINE_ROOT + "/assays/" + assay1File,  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
-        clickLinkWithText(assayFolder);
+        clickAndWait(Locator.linkWithText(assayFolder));
         _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + assay2XarPath, ++pipelineCount, assay2);
         _assayHelper.importAssay(assay2, STUDY_PIPELINE_ROOT + "/assays/" + assay2File,  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
 
 
-        clickLinkWithText(assayFolder);
+        clickAndWait(Locator.linkWithText(assayFolder));
         addWebPart("Assay Progress Dashboard");
         addWebPart("Assay Progress Report");
         assertTextPresent("You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report", 2);
 
         configureAssayProgressDashboard(assay1);
         configureAssaySchema(assay1);
-        clickLinkWithText(assayFolder);
+        clickAndWait(Locator.linkWithText(assayFolder));
     }
 
     private void configureAssaySchema(String assayName)

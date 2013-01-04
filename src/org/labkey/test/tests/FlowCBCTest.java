@@ -57,7 +57,7 @@ public class FlowCBCTest extends BaseFlowTestWD
         log("** Initialize CBC Assay");
         createSubfolder(getProjectName(), getProjectName(), CBC_FOLDER, "Assay", null);
 
-        clickLinkWithText(CBC_FOLDER);
+        clickAndWait(Locator.linkWithText(CBC_FOLDER));
         if (!isLinkPresentWithText("Assay List"))
             addWebPart("Assay List");
         clickButton("New Assay Design");
@@ -148,7 +148,7 @@ public class FlowCBCTest extends BaseFlowTestWD
         popLocation();
 
         pushLocation();
-        clickLinkWithText("assay");
+        clickAndWait(Locator.linkWithText("assay"));
         assertTitleContains("FCSAnalysis");
         Assert.assertTrue("Expected assay button to go to flow container", getCurrentRelativeURL().contains("/" + getFolderName()));
         popLocation();
@@ -158,8 +158,8 @@ public class FlowCBCTest extends BaseFlowTestWD
     {
         log("** Upload CBC Data");
         clickFolder(getProjectName());
-        clickLinkWithText(CBC_FOLDER);
-        clickLinkWithText(ASSAY_NAME);
+        clickAndWait(Locator.linkWithText(CBC_FOLDER));
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
 
         setFormElement("name", "run01");
@@ -168,7 +168,7 @@ public class FlowCBCTest extends BaseFlowTestWD
         clickButton("Save and Finish", 8000);
 
         // filter to rows we'd like to copy
-        clickLinkWithText("run01");
+        clickAndWait(Locator.linkWithText("run01"));
         DataRegionTable table = new DataRegionTable("Data", this);
         table.setFilter("SampleId", "Equals One Of (e.g. \"a;b;c\")", "241-03A;317-03A");
         table.checkAllOnPage();

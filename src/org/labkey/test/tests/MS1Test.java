@@ -93,7 +93,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void setupPipeline(String project, String path)
     {
         log("Setting up pipeline for project " + project + "...");
-        clickLinkWithText(project);
+        clickAndWait(Locator.linkWithText(project));
 
         //test invalid path
         setPipelineRoot(path + "-invalid");
@@ -121,8 +121,8 @@ public class MS1Test extends BaseSeleniumWebTest
         importPepTsvFile(project, PIPELINE_FIND_FEATURES_PROTOCOL);
 
         //go back to the portal/data pipeline page and wait for all four experiments to be complete
-        clickLinkWithText(project);
-        clickLinkWithText("Data Pipeline");
+        clickAndWait(Locator.linkWithText(project));
+        clickAndWait(Locator.linkWithText("Data Pipeline"));
         waitForPipelineJobsToComplete(5, "Experiment Import", false);
 
         log("Sample data imported.");
@@ -138,7 +138,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void importXtandemExps(String project, String xProtocol)
     {
         //go back to the portal page
-        clickLinkWithText(project);
+        clickAndWait(Locator.linkWithText(project));
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
@@ -150,7 +150,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void importFeaturesExp(String project, String xProtocol, String featuresProtocol)
     {
         //go back to the portal page
-        clickLinkWithText(project);
+        clickAndWait(Locator.linkWithText(project));
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
@@ -162,7 +162,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void importPepTsvFile(String project, String protocol)
     {
         //go back to the portal page
-        clickLinkWithText(project);
+        clickAndWait(Locator.linkWithText(project));
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
@@ -188,8 +188,8 @@ public class MS1Test extends BaseSeleniumWebTest
     {
         log("Verifying features view rendered in folder " + folder + "...");
 
-        clickLinkWithText(folder);
-        clickLinkWithText(getRunTitle("ms1-data", BASE_FILE_NAME_3, PIPELINE_FIND_FEATURES_PROTOCOL));
+        clickAndWait(Locator.linkWithText(folder));
+        clickAndWait(Locator.linkWithText(getRunTitle("ms1-data", BASE_FILE_NAME_3, PIPELINE_FIND_FEATURES_PROTOCOL)));
 
         assertTextNotPresent("No data to show");
         assertTextPresent("1,432.8550");
@@ -201,7 +201,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void testCompareView(String project)
     {
         log("Testing Compare Runs view");
-        clickLinkWithText(project);
+        clickAndWait(Locator.linkWithText(project));
         checkAllOnPage("MSInspectFeatureRuns");
         clickButton("Compare", 60000);
         assertTextPresent("-.TMITDSLAVVLQR.R");
@@ -210,13 +210,13 @@ public class MS1Test extends BaseSeleniumWebTest
         //test links
         pushLocation();
         //run title
-        clickLinkWithText(getRunTitle(BASE_FILE_NAME_1, FEATURES_PROTOCOL));
+        clickAndWait(Locator.linkWithText(getRunTitle(BASE_FILE_NAME_1, FEATURES_PROTOCOL)));
         assertTextPresent("229.8220"); //time value in first row
         popLocation();
 
         pushLocation();
         //measure value
-        clickLinkWithText("236.9828");
+        clickAndWait(Locator.linkWithText("236.9828"));
         assertTextPresent("2146"); //scan
         popLocation();
 
@@ -244,7 +244,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void testPepSearchView(String project)
     {
         log("Testing peptide search view");
-        clickLinkWithText(project);
+        clickAndWait(Locator.linkWithText(project));
         ensureAdminMode();
         addWebPart("Peptide Search");
 
@@ -265,8 +265,8 @@ public class MS1Test extends BaseSeleniumWebTest
         assertTextNotPresent("K.E^ASGDLPEAQIVK.H");
 
         //jump to details
-        clickLinkWithText("details");
-        clickLinkWithText("features with same");
+        clickAndWait(Locator.linkWithText("details"));
+        clickAndWait(Locator.linkWithText("features with same"));
         assertTextPresent("K.AVVQDPALKPLALVYGEATSR.R");
 
         log("Peptide search OK.");
@@ -276,12 +276,12 @@ public class MS1Test extends BaseSeleniumWebTest
     {
         log("Testing Similar Search View...");
 
-        clickLinkWithText(project);
-        clickLinkWithText(getRunTitle(BASE_FILE_NAME_2, FEATURES_PROTOCOL));
+        clickAndWait(Locator.linkWithText(project));
+        clickAndWait(Locator.linkWithText(getRunTitle(BASE_FILE_NAME_2, FEATURES_PROTOCOL)));
 
         setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
         setFilter(DATAREGION_FEATURES, "Scan", "Equals", "1948");
-        clickLinkWithText("similar");
+        clickAndWait(Locator.linkWithText("similar"));
         assertFormElementEquals("mzSource", "733.4119");
         assertFormElementEquals("timeSource", "1928.3200");
         assertTextPresent("1904");
@@ -318,7 +318,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
     protected void testFeaturesView(String project)
     {
-        clickLinkWithText(project);
+        clickAndWait(Locator.linkWithText(project));
         String run1Title = getRunTitle(BASE_FILE_NAME_1, FEATURES_PROTOCOL);
         String run2Title = getRunTitle(BASE_FILE_NAME_2, FEATURES_PROTOCOL);
         assertTextPresent(run1Title);
@@ -418,7 +418,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         //Peaks View
         log("Testing showPeaks.view...");
-        clickLinkWithText("peaks");
+        clickAndWait(Locator.linkWithText("peaks"));
 
         //test filtering
         setFilter(DATAREGION_PEAKS, "MZ", "Is Greater Than or Equal To", "1500");
@@ -437,11 +437,11 @@ public class MS1Test extends BaseSeleniumWebTest
         //Feature Details View
         //go back to the features list and make sure next and prev features work
         log("Testing showFeatureDetails...");
-        clickLinkWithText(project);
-        clickLinkWithText(run2Title);
+        clickAndWait(Locator.linkWithText(project));
+        clickAndWait(Locator.linkWithText(run2Title));
         setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
         setFilter(DATAREGION_FEATURES, "Scan", "Equals", "1948");
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
 
         assertCharts();
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
@@ -458,7 +458,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         log("showFeatureDetails.view OK");
 
-        clickLinkWithText(project);
+        clickAndWait(Locator.linkWithText(project));
         log("Finsihed testing features views.");
     }
 
@@ -492,7 +492,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void purgeFiles()
     {
         goToAdminConsole();
-        clickLinkWithText("ms1");
+        clickAndWait(Locator.linkWithText("ms1"));
         if(isNavButtonPresent("Purge Deleted MS1 Data Now"))
         {
             log("Purging MS1 Test data files...");

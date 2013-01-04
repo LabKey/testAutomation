@@ -72,7 +72,7 @@ public class HTTPApiTest extends SimpleApiTest
     {
         log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         addWebPart("Lists");
 
         log("Create List");
@@ -87,7 +87,7 @@ public class HTTPApiTest extends SimpleApiTest
         clickButton("Import Data");
         _listHelper.submitTsvData(LIST_DATA);
         
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         addWebPart("Query");
         setFormElement("title", "Query");
         selectOptionByValue("schemaName", "lists");

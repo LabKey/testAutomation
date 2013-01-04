@@ -85,7 +85,7 @@ public class StudyProtectedExportTest extends StudyExportTest
 
     private void verifyParticipantGroups(String originalID, String newID)
     {
-        clickLinkWithText("Mice");
+        clickAndWait(Locator.linkWithText("Mice"));
         assertTextNotPresent(originalID);
         assertTextPresent(newID);
 

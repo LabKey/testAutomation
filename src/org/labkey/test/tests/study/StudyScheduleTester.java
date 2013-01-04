@@ -184,7 +184,7 @@ public class StudyScheduleTester
         createPlaceholderDataset(GHOST_DATASET_6, GHOST_CATEGORY, false);
 
         _test.goToManageStudy();
-        _test.clickLinkWithText("Manage Datasets");
+        _test.clickAndWait(Locator.linkWithText("Manage Datasets"));
 
         linkDatasetFromDetails(GHOST_DATASET_4, DatasetType.linkeToExisting, GHOST_DATASET_1);
         _test.assertElementPresent(Locator.xpath("//a[text()='" + GHOST_DATASET_4 + "']"));
@@ -204,10 +204,10 @@ public class StudyScheduleTester
         if (verify)
         {
             // verify a placeholder dataset cannot be edited from the manage dataset page
-            _test.clickLinkWithText(_folderName);
+            _test.clickAndWait(Locator.linkWithText(_folderName));
             _test.goToManageStudy();
-            _test.clickLinkWithText("Manage Datasets");
-            _test.clickLinkWithText(name);
+            _test.clickAndWait(Locator.linkWithText("Manage Datasets"));
+            _test.clickAndWait(Locator.linkWithText(name));
 
             _test.assertTextNotPresent("View Data", "Edit Definition");
             goToStudySchedule();
@@ -377,9 +377,9 @@ public class StudyScheduleTester
     @LogMethod
     private void goToStudySchedule()
     {
-        _test.clickLinkWithText(_folderName);
+        _test.clickAndWait(Locator.linkWithText(_folderName));
         _test.goToManageStudy();
-        _test.clickLinkWithText("Study Schedule");
+        _test.clickAndWait(Locator.linkWithText("Study Schedule"));
 
         // wait for grid to load
         _test.waitForText("verifyAssay"); // verify dataset column

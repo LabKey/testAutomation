@@ -102,7 +102,7 @@ public class UIContainerHelper extends AbstractContainerHelper
             }
         }
 
-        _test.clickLinkWithText(project);
+        _test.clickAndWait(Locator.linkWithText(project));
 
         //Delete even if terms of use is required
         if (_test.isElementPresent(Locator.name("approvedTermsOfUse")))

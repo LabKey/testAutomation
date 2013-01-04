@@ -173,14 +173,14 @@ public class FormulationsTest extends BaseWebDriverTest
         _listHelper.clickImportData();
         _listHelper.submitTsvData(TEMPERATURE_HEADER + TEMPERATURE_DATA);
 
-        clickLinkWithText("Lists");
+        clickAndWait(Locator.linkWithText("Lists"));
 
         log("Add list -- " + TIME_LIST);
         _listHelper.createList(PROJECT_NAME, TIME_LIST, LIST_KEY_TYPE, "time", LIST_COL_SORT);
         _listHelper.clickImportData();
         _listHelper.submitTsvData(TIME_HEADER + TIME_DATA);
 
-        clickLinkWithText("Lists");
+        clickAndWait(Locator.linkWithText("Lists"));
 
         log("Add list -- " + TYPES_LIST);
         _listHelper.createList(PROJECT_NAME, TYPES_LIST, LIST_KEY_TYPE, "type");
@@ -192,7 +192,7 @@ public class FormulationsTest extends BaseWebDriverTest
 
         waitForElement(Locator.id("query"));
         assertTextPresent(TYPES_DATA.split("\n"));
-        clickLinkWithText("Lists");
+        clickAndWait(Locator.linkWithText("Lists"));
 
         log("Add list -- " + MATERIAL_TYPES_LIST);
         _listHelper.createList(PROJECT_NAME, MATERIAL_TYPES_LIST, ListHelper.ListColumnType.AutoInteger, "key", MATERIAL_COL_TYPE, MATERIAL_COL_UNITS);
@@ -206,10 +206,10 @@ public class FormulationsTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
 
         log("Entering compound information");
-        clickLinkWithText(COMPOUNDS_NAME);
+        clickAndWait(Locator.linkWithText(COMPOUNDS_NAME));
 
         // Add compound lookup
-        clickLinkWithText("Edit Fields");
+        clickAndWait(Locator.linkWithText("Edit Fields"));
 
         _listHelper.addField(new ListColumn("CompoundLookup", "Type of Material", null, null, new ListHelper.LookupInfo(PROJECT_NAME, "lists", "MaterialTypes")));
         clickButton("Save");
@@ -240,7 +240,7 @@ public class FormulationsTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
 
         log("Enterting raw material information");
-        clickLinkWithText(RAWMATERIALS_SET_NAME);
+        clickAndWait(Locator.linkWithText(RAWMATERIALS_SET_NAME));
         clickButton("Import More Samples");
         clickRadioButtonById("insertOnlyChoice");
         setFormElement(Locator.id("textbox"), RAWMATERIALS_HEADER + RAWMATERIALS_DATA_1 + RAWMATERIALS_DATA_2 + RAWMATERIALS_DATA_3 + RAWMATERIALS_DATA_4);
@@ -255,7 +255,7 @@ public class FormulationsTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
 
         log("Inserting a Formulation");
-        clickLinkWithText("Sample Sets");
+        clickAndWait(Locator.linkWithText("Sample Sets"));
         clickLinkWithText(FORMULATIONS_NAME, 1); // skip nav trail
         clickButton("Insert New");
 
@@ -326,7 +326,7 @@ public class FormulationsTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
         
         log("Defining Particle Size Assay");
-        clickLinkWithText("Manage Assays");
+        clickAndWait(Locator.linkWithText("Manage Assays"));
         clickButton("New Assay Design");
 
         assertTextPresent("Particle Size Data");
@@ -360,7 +360,7 @@ public class FormulationsTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
 
         log("Uploading Particle Size Data");
-        clickLinkWithText(PS_ASSAY);
+        clickAndWait(Locator.linkWithText(PS_ASSAY));
         clickButton("Import Data");
 
         assertTextPresent("Must have working sets of size");
@@ -387,7 +387,7 @@ public class FormulationsTest extends BaseWebDriverTest
     private void validateParticleSizeCopyToStudy()
     {
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(PS_ASSAY);
+        clickAndWait(Locator.linkWithText(PS_ASSAY));
 
         DataRegionTable runs = new DataRegionTable("Runs", this);
         Assert.assertEquals("Wrong number of " + PS_ASSAY + " runs", 1, runs.getDataRowCount());
@@ -423,7 +423,7 @@ public class FormulationsTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
 
         log("Defining Visual Assay");
-        clickLinkWithText("Manage Assays");
+        clickAndWait(Locator.linkWithText("Manage Assays"));
         clickButton("New Assay Design");
 
         assertTextPresent("Visual Formulation Time-Point Data");
@@ -456,7 +456,7 @@ public class FormulationsTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
 
         log("Uploading Visual Data");
-        clickLinkWithText(VIS_ASSAY);
+        clickAndWait(Locator.linkWithText(VIS_ASSAY));
         clickButton("Import Data");
 
         waitForText("What is the Lot Number?", WAIT_FOR_JAVASCRIPT);
@@ -501,7 +501,7 @@ public class FormulationsTest extends BaseWebDriverTest
         clickButton("Submit", 0);
 
         waitForText("Updated successfully.");
-        clickLinkWithText("MORE VISUAL INSPECTION");
+        clickAndWait(Locator.linkWithText("MORE VISUAL INSPECTION"));
         waitForText("Formulation Lot Information");
         waitAndClick(Locator.xpath("//div[@id='wizard-window']//div[contains(@class,'x-tool-close')]"));
     }
@@ -510,9 +510,9 @@ public class FormulationsTest extends BaseWebDriverTest
     protected void validateVisualAssayData()
     {
         // Assumes starting where uploadVisualAssayData left
-        clickLinkWithText("Visual Batches");
-        clickLinkWithText("view runs");
-        clickLinkWithText(FORMULATION);
+        clickAndWait(Locator.linkWithText("Visual Batches"));
+        clickAndWait(Locator.linkWithText("view runs"));
+        clickAndWait(Locator.linkWithText(FORMULATION));
 
         assertTextPresent("Color changed.");
         assertTextPresent(TRICKY_CHARACTERS);
@@ -525,7 +525,7 @@ public class FormulationsTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
 
         log("Defining HPLC Assay");
-        clickLinkWithText("Manage Assays");
+        clickAndWait(Locator.linkWithText("Manage Assays"));
         clickButton("New Assay Design");
 
         assertTextPresent("High performance liquid chromotography assay");
@@ -567,7 +567,7 @@ public class FormulationsTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
 
         log("Uploading HPLC Data");
-        clickLinkWithText(HPLC_ASSAY);
+        clickAndWait(Locator.linkWithText(HPLC_ASSAY));
         assertElementPresent(Locator.css("#dataregion_Runs > tbody > tr").containing("No runs to show."));
 
         clickButton("Import Data");

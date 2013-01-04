@@ -139,7 +139,7 @@ public class DataViewsTester
         _test.setFormElement(Locator.name("description"), NEW_DESCRIPTION);
         _test._extHelper.clickExtButton(EDITED_DATASET, "Save", 0);
         _test.waitForText(NEW_CATEGORY);
-        _test.clickLinkWithText(EDITED_DATASET);
+        _test.clickAndWait(Locator.linkWithText(EDITED_DATASET));
         _test.assertTextPresent(NEW_DESCRIPTION);
     }
 
@@ -256,7 +256,7 @@ public class DataViewsTester
         _test.mouseOver(Locator.linkWithText(EDITED_DATASET));
         _test.waitForText("Data Cut Date:");
         _test.assertTextPresent("2012-03-01");
-        _test.clickLinkWithText(EDITED_DATASET);
+        _test.clickAndWait(Locator.linkWithText(EDITED_DATASET));
         _test.assertTextPresent("2012-03-01");
     }
 }

@@ -79,7 +79,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Experiment" });
 
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         addWebPart("Sample Sets");
 
         clickButton("Import Sample Set");
@@ -91,7 +91,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
                 "SampleSetBVT4\t400\td\t4/4/2000\tFALSE");
         clickButton("Submit");
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         addWebPart("Sample Sets");
         clickButton("Import Sample Set");
         setFormElement("name", FOLDER_SAMPLE_SET_NAME);
@@ -104,7 +104,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clickButton("Submit");
 
         // Do some manual derivation
-        clickLinkWithText("Sample Sets");
+        clickAndWait(Locator.linkWithText("Sample Sets"));
         assertTextPresent(PROJECT_SAMPLE_SET_NAME);
         assertTextPresent(FOLDER_NAME);
 
@@ -120,10 +120,10 @@ public class SampleSetTest extends BaseSeleniumWebTest
             setPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         }
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         assertTextPresent(FOLDER_SAMPLE_SET_NAME);
         assertTextPresent(PROJECT_SAMPLE_SET_NAME);
-        clickLinkWithText(FOLDER_SAMPLE_SET_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_SAMPLE_SET_NAME));
         clickCheckbox(".toggle");
         clickButton("Derive Samples");
 
@@ -183,13 +183,13 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("SampleSetBVT13");
         assertLinkPresentWithText("SampleSetBVT14");
 
-        clickLinkWithText("SampleSetBVT11");
+        clickAndWait(Locator.linkWithText("SampleSetBVT11"));
 
         assertLinkPresentWithText("Derive sample from SampleSetBVT16");
         assertLinkPresentWithText("Derive 2 samples from SampleSetBVT11, SampleSetBVT12, SampleSetBVT13, SampleSetBVT14, SampleSetBVT4");
 
-        clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText(FOLDER_SAMPLE_SET_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_SAMPLE_SET_NAME));
 
         assertTextPresent("aa");
         assertTextPresent("bb");
@@ -198,14 +198,14 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertTextPresent("firstOutput");
         assertTextPresent("secondOutput");
 
-        clickLinkWithText("Sample Sets");
+        clickAndWait(Locator.linkWithText("Sample Sets"));
         clickButton("Show All Materials");
         assertTextPresent("ProjectSampleSet");
         assertTextPresent("200");
 
         // Try to derive samples using the parent column
         clickTab("Experiment");
-        clickLinkWithText("Sample Sets");
+        clickAndWait(Locator.linkWithText("Sample Sets"));
         clickButton("Import Sample Set");
         setFormElement("name", FOLDER_CHILDREN_SAMPLE_SET_NAME);
         setFormElement("data", AMBIGUOUS_CHILD_SAMPLE_SET_TSV);
@@ -220,19 +220,19 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertTextPresent("SampleSetBVTChildA");
 
         fileAttachmentTest();
-        clickLinkWithText("FolderChildrenSampleSet");
-        clickLinkWithText("SampleSetBVTChildB");
+        clickAndWait(Locator.linkWithText("FolderChildrenSampleSet"));
+        clickAndWait(Locator.linkWithText("SampleSetBVTChildB"));
 
         // Make sure that the parent got wired up
-        clickLinkWithText("SampleSetBVT4");
+        clickAndWait(Locator.linkWithText("SampleSetBVT4"));
         // Check out the run
-        clickLinkWithText("Derive sample from SampleSetBVT4");
+        clickAndWait(Locator.linkWithText("Derive sample from SampleSetBVT4"));
         assertLinkPresentWithText("SampleSetBVT4");
         assertLinkPresentWithText("SampleSetBVTChildB");
 
         // Make a grandchild set, but first try to insert as a duplicate set name
         clickTab("Experiment");
-        clickLinkWithText("Sample Sets");
+        clickAndWait(Locator.linkWithText("Sample Sets"));
         clickButton("Import Sample Set");
         setFormElement("name", FOLDER_CHILDREN_SAMPLE_SET_NAME);
         setFormElement("data", GRANDCHILD_SAMPLE_SET_TSV);
@@ -243,7 +243,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         setFormElement("name", FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
         clickButton("Submit");
 
-        clickLinkWithText("SampleSetBVTGrandchildA");
+        clickAndWait(Locator.linkWithText("SampleSetBVTGrandchildA"));
         // Filter out any child materials, though there shouldn't be any
         setFilter("childMaterials", "Name", "Is Blank");
         // Check for parents and grandparents
@@ -252,7 +252,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertTextPresent("SampleSetBVT11");
 
         // Verify that we've chained things together properly
-        clickLinkWithText("SampleSetBVTChildA");
+        clickAndWait(Locator.linkWithText("SampleSetBVTChildA"));
         // Filter out any child materials so we can just check for parents
         setFilter("childMaterials", "Name", "Is Blank");
         assertTextPresent("SampleSetBVT11");
@@ -265,7 +265,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
 
         // Go up the chain one more hop
         clearAllFilters("parentMaterials", "Name");
-        clickLinkWithText("SampleSetBVT11");
+        clickAndWait(Locator.linkWithText("SampleSetBVT11"));
         // Filter out any child materials so we can just check for parents
         setFilter("childMaterials", "Name", "Is Blank");
         assertLinkNotPresentWithText("SampleSetBVTChildA");
@@ -276,13 +276,13 @@ public class SampleSetTest extends BaseSeleniumWebTest
         assertTextPresent("SampleSetBVTChildA");
         assertTextPresent("SampleSetBVTGrandchildA");
 
-        clickLinkWithText(FOLDER_CHILDREN_SAMPLE_SET_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_CHILDREN_SAMPLE_SET_NAME));
         clickButton("Import More Samples");
         clickRadioButtonById("insertOrUpdateChoice");
         setFormElement("data", REPARENTED_CHILD_SAMPLE_SET_TSV);
         clickButton("Submit");
 
-        clickLinkWithText("SampleSetBVTChildB");
+        clickAndWait(Locator.linkWithText("SampleSetBVTChildB"));
         assertTextPresent("2.222");
         assertLinkNotPresentWithText("SampleSetBVT4");
         // Filter out any child materials so we can just check for parents
@@ -299,7 +299,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
         goToModule("Query");
         selectQuery("auditLog", "SampleSetAuditEvent");
         waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
-        clickLinkWithText("view data");
+        clickAndWait(Locator.linkWithText("view data"));
         assertTextPresent("Samples inserted or updated in: " + FOLDER_SAMPLE_SET_NAME,
             "Samples inserted or updated in: " + FOLDER_CHILDREN_SAMPLE_SET_NAME,
             "Samples inserted or updated in: " + FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);

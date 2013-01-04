@@ -388,7 +388,7 @@ public class ListHelper extends AbstractHelper
         _test.waitForFormElementToEqual(Locator.name("ff_name0"), listKeyName);
 
         _test.log("Add columns");
-//        test.clickLinkWithText("edit fields");
+//        test.clickAndWait(Locator.linkWithText("edit fields"));
 
         // i==0 is the key column
         for (int i = 1; i <= cols.length; i++)
@@ -494,13 +494,13 @@ public class ListHelper extends AbstractHelper
     // initial "create list" steps common to both manual and import from file scenarios
     public void beginCreateList(String folderName, String listName)
     {
-        _test.clickLinkWithText(folderName);
+        _test.clickAndWait(Locator.linkWithText(folderName));
         if (!_test.isLinkPresentWithText("Lists"))
         {
             _test.addWebPart("Lists");
         }
 
-        _test.clickLinkWithText("manage lists");
+        _test.clickAndWait(Locator.linkWithText("manage lists"));
 
         _test.log("Add List");
         _test.clickButton("Create New List");
@@ -531,13 +531,13 @@ public class ListHelper extends AbstractHelper
     {
         Assert.assertTrue("Unable to locate input file: " + inputFile, inputFile.exists());
 
-        _test.clickLinkWithText(folderName);
+        _test.clickAndWait(Locator.linkWithText(folderName));
         if (!_test.isLinkPresentWithText("Lists"))
         {
             _test.addWebPart("Lists");
         }
 
-        _test.clickLinkWithText("manage lists");
+        _test.clickAndWait(Locator.linkWithText("manage lists"));
 
         _test.log("Import List Archive");
         _test.clickButton("Import List Archive");

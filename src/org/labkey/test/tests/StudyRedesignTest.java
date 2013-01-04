@@ -68,7 +68,7 @@ public class StudyRedesignTest extends StudyBaseTest
         log("Create report for data view webpart test.");
         goToModule("StudyRedesign");
         clickTab("Manage");
-        clickLinkWithText("Manage Views");
+        clickAndWait(Locator.linkWithText("Manage Views"));
         clickMenuButton("Create", "R View");
         clickButton("Save", "Please enter a view name:");
         setFormElement(Locator.xpath("//div[./span[.='Please enter a view name:']]/div/input"), REPORT_NAME);
@@ -107,7 +107,7 @@ public class StudyRedesignTest extends StudyBaseTest
         Assert.assertTrue("Manage".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[5]//a[1]")))); // Verify Manage did not swap with +
         removeTab("Specimens");
         addTab("TEST TAB 1");
-        clickLinkWithText("TEST TAB 1");
+        clickAndWait(Locator.linkWithText("TEST TAB 1"));
         addWebPart("Wiki");
         removeTab("TEST TAB 1");
     }
@@ -136,7 +136,7 @@ public class StudyRedesignTest extends StudyBaseTest
     private void addTab(String tabName)
     {
         log("Adding tab with name " + tabName);
-        clickLinkWithText("+");
+        clickAndWait(Locator.linkWithText("+"));
         waitForText("Add Tab");
         setFormElement(Locator.input("tabName"), tabName);
         clickButton("save");
@@ -212,9 +212,9 @@ public class StudyRedesignTest extends StudyBaseTest
 
     private void setupDatasetCategories()
     {
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("Change Properties");
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("Change Properties"));
 
         int dsCount = getXpathCount(Locator.xpath("//input[@name='extraData']"));
         Assert.assertEquals("Unexpected number of Datasets.", 47, dsCount);
@@ -258,7 +258,7 @@ public class StudyRedesignTest extends StudyBaseTest
         log("Participant List Webpart Test");
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText("Overview");
+        clickAndWait(Locator.linkWithText("Overview"));
         addWebPart("Mouse List");
         waitForElement(Locator.css(".participant-filter-panel"));
         waitForText("Showing all 138 mice."); // Wait for participant list to appear.
@@ -344,7 +344,7 @@ public class StudyRedesignTest extends StudyBaseTest
 
         waitForPipelineJobsToComplete(3, "Study import", false);
 
-        clickLinkWithText("Data & Reports");
+        clickAndWait(Locator.linkWithText("Data & Reports"));
 
         log("Verify export-import of refresh date settings");
         waitForText(REFRESH_DATE, 1, WAIT_FOR_JAVASCRIPT);
@@ -352,7 +352,7 @@ public class StudyRedesignTest extends StudyBaseTest
         mouseOver(Locator.linkWithText(EDITED_DATASET));
         waitForText("Data Cut Date:");
         assertTextPresent(REFRESH_DATE);
-        clickLinkWithText(EDITED_DATASET);
+        clickAndWait(Locator.linkWithText(EDITED_DATASET));
         assertTextPresent(REFRESH_DATE);
     }
 }

@@ -108,7 +108,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Insert row into lookup target list");
         goToProjectHome();
         clickFolder(SUB_FOLDER_A);
-        clickLinkWithText(lookupTargetListName);
+        clickAndWait(Locator.linkWithText(lookupTargetListName));
         _listHelper.insertNewRow(Maps.<String, String>of(
                 "LookupName", "MyLookupItem1",
                 "LookupAge", "100"
@@ -130,7 +130,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Insert row into list");
         goToProjectHome();
-        clickLinkWithText(lookupSourceListName);
+        clickAndWait(Locator.linkWithText(lookupSourceListName));
         clickButton("Insert New");
         setFormElement(Locator.name("quf_MyName"), "MyName");
         selectOptionByText(Locator.name("quf_ListLookup"), "MyLookupItem2");
@@ -178,7 +178,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Creating study in " + SUB_FOLDER_B);
         goToProjectHome();
-        clickLinkWithText(SUB_FOLDER_B);
+        clickAndWait(Locator.linkWithText(SUB_FOLDER_B));
         goToManageStudy();
         clickButton("Create Study");
         setFormElement(Locator.name("label"), SUB_FOLDER_B + "-Study");
@@ -193,7 +193,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Insering row into list");
         goToProjectHome();
-        clickLinkWithText("Issue15610-List");
+        clickAndWait(Locator.linkWithText("Issue15610-List"));
         clickButton("Insert New");
         selectOptionByText(Locator.name("quf_StudyLookup"), SUB_FOLDER_A + "-Study");
         clickButton("Submit");
@@ -248,8 +248,8 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Creating background R script");
         goToProjectHome();
-        clickLinkWithText(folder);
-        clickLinkWithText(listName);
+        clickAndWait(Locator.linkWithText(folder));
+        clickAndWait(Locator.linkWithText(listName));
         clickMenuButton("Views", "Create", "R View");
         clickCheckboxById("runInBackground");
         clickButton("Save", 0);
@@ -409,7 +409,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     {
         beginAt("/query/" + container + "/schema.view?schemaName=" + schemaName + "&queryName=" + queryName);
         waitForText("edit metadata", 10000);
-        clickLinkWithText("edit metadata");
+        clickAndWait(Locator.linkWithText("edit metadata"));
         waitForText("Label", 10000);
         clickButton("Edit Source");
         _extHelper.clickExtTab("XML Metadata");

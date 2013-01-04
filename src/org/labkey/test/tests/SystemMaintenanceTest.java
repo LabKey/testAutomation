@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
 /**
@@ -51,7 +52,7 @@ public class SystemMaintenanceTest extends BaseSeleniumWebTest
 
         // Verify scheduled system maintenance is disabled.
         goToAdminConsole();
-        clickLinkWithText("running threads");
+        clickAndWait(Locator.linkWithText("running threads"));
         assertTextNotPresent("SystemMaintenance");
 
     }

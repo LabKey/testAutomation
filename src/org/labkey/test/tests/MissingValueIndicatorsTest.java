@@ -127,9 +127,9 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         clickButton("Create Study");
         selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
         clickButton("Create Study");
-        clickLinkWithText(PROJECT_NAME + " Study");
+        clickAndWait(Locator.linkWithText(PROJECT_NAME + " Study"));
         setPipelineRoot(getSampleRoot());
-        clickLinkWithText(PROJECT_NAME + " Study");
+        clickAndWait(Locator.linkWithText(PROJECT_NAME + " Study"));
 
         setupIndicators();
 
@@ -143,7 +143,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         log("Setting MV indicators");
         
         goToFolderManagement();
-        clickLinkWithText("Missing Values");
+        clickAndWait(Locator.linkWithText("Missing Values"));
         clickCheckboxById("inherit");
 
         // Delete all site-level settings
@@ -246,17 +246,17 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     private void checkDataset() throws Exception
     {
         log("Create dataset");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         clickTab("Manage");
-        clickLinkWithText("Manage Visits");
-        clickLinkWithText("Import Visit Map");
+        clickAndWait(Locator.linkWithText("Manage Visits"));
+        clickAndWait(Locator.linkWithText("Import Visit Map"));
         // Dummy visit map data (probably non-sensical), but enough to get a placeholder created for dataset #1:
         setFormElement(Locator.name("content"), "20|S|Only Visit|1|1|1|1|1|1|1");
         clickButton("Import");
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("Define Dataset Schemas");
-        clickLinkWithText("Bulk Import Schemas");
+        clickAndWait(Locator.linkWithText("Manage Study"));
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("Define Dataset Schemas"));
+        clickAndWait(Locator.linkWithText("Bulk Import Schemas"));
         setFormElement(Locator.name("typeNameColumn"), "datasetName");
         setFormElement(Locator.name("labelColumn"), "datasetLabel");
         setFormElement(Locator.name("typeIdColumn"), "datasetId");
@@ -266,7 +266,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         assertTextPresent("MV Dataset");
 
         log("Import dataset data");
-        clickLinkWithText("MV Dataset");
+        clickAndWait(Locator.linkWithText("MV Dataset"));
         clickButton("View Data");
         clickButton("Import Data");
 
@@ -345,7 +345,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         defineAssay();
 
         log("Import single column MV data");
-        clickLinkWithText(ASSAY_NAME);
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         String targetStudyValue = "/" + PROJECT_NAME + " (" + PROJECT_NAME + " Study)";
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
@@ -362,12 +362,12 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_SINGLE_COLUMN_ASSAY);
         clickButton("Save and Finish");
         assertNoLabkeyErrors();
-        clickLinkWithText(ASSAY_RUN_SINGLE_COLUMN);
+        clickAndWait(Locator.linkWithText(ASSAY_RUN_SINGLE_COLUMN));
         validateSingleColumnData();
 
         log("Import two column MV data");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(ASSAY_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
 
@@ -383,13 +383,13 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         setFormElement(Locator.name("TextAreaDataCollector.textArea"), TEST_DATA_TWO_COLUMN_ASSAY);
         clickButton("Save and Finish");
         assertNoLabkeyErrors();
-        clickLinkWithText(ASSAY_RUN_TWO_COLUMN);
+        clickAndWait(Locator.linkWithText(ASSAY_RUN_TWO_COLUMN));
         validateTwoColumnData("Data", "ParticipantID");
 
         log("Copy to study");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(ASSAY_NAME);
-        clickLinkWithText(ASSAY_RUN_SINGLE_COLUMN);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        clickAndWait(Locator.linkWithText(ASSAY_RUN_SINGLE_COLUMN));
         validateSingleColumnData();
         checkCheckbox(".toggle");
         clickButton("Copy to Study");
@@ -402,8 +402,8 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         if (isFileUploadAvailable())
         {
             log("Import from Excel in single-column format");
-            clickLinkWithText(PROJECT_NAME);
-            clickLinkWithText(ASSAY_NAME);
+            clickAndWait(Locator.linkWithText(PROJECT_NAME));
+            clickAndWait(Locator.linkWithText(ASSAY_NAME));
             clickButton("Import Data");
             selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
 
@@ -421,12 +421,12 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
             setFormElement(Locator.name("__primaryFile__"), file);
             clickButton("Save and Finish");
             assertNoLabkeyErrors();
-            clickLinkWithText(ASSAY_EXCEL_RUN_SINGLE_COLUMN);
+            clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_SINGLE_COLUMN));
             validateSingleColumnData();
 
             log("Import from Excel in two-column format");
-            clickLinkWithText(PROJECT_NAME);
-            clickLinkWithText(ASSAY_NAME);
+            clickAndWait(Locator.linkWithText(PROJECT_NAME));
+            clickAndWait(Locator.linkWithText(ASSAY_NAME));
             clickButton("Import Data");
             selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
 
@@ -443,7 +443,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
             setFormElement(Locator.name("__primaryFile__"), file);
             clickButton("Save and Finish");
             assertNoLabkeyErrors();
-            clickLinkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN);
+            clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN));
             validateTwoColumnData("Data", "ParticipantID");
         }
     }
@@ -469,7 +469,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         log("Defining a test assay at the project level");
         //define a new assay at the project level
         //the pipeline must already be setup
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         addWebPart("Assay List");
 
         //copied from old test

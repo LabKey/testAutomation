@@ -79,7 +79,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         _listHelper.addField("Field Properties", 0, "animalStrTest", "Animal String Test", ListHelper.ListColumnType.String);
         _listHelper.addField("Field Properties", 1, "animalIntTest", "Animal Integer Test", ListHelper.ListColumnType.Integer);
         clickButton("Save");
-        clickLinkWithText("Animal");
+        clickAndWait(Locator.linkWithText("Animal"));
         _customizeViewsHelper.openCustomizeViewPanel();
         waitForText("Animal String Test");
         assertTextPresent("Animal Integer Test");
@@ -92,7 +92,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         _listHelper.addField("Field Properties", 0, "haplotypeStrTest", "Haplotype String Test", ListHelper.ListColumnType.String);
         _listHelper.addField("Field Properties", 1, "haplotypeIntTest", "Haplotype Integer Test", ListHelper.ListColumnType.Integer);
         clickButton("Save");
-        clickLinkWithText("Haplotype");
+        clickAndWait(Locator.linkWithText("Haplotype"));
         _customizeViewsHelper.openCustomizeViewPanel(); //TODO:  should this be necessary?
         assertTextPresent("Haplotype String Test");
         assertTextPresent("Haplotype Integer Test");
@@ -311,7 +311,7 @@ public class HaplotypeAssayTest extends GenotypingTest
     {
         // verify that the two duplicates show up on the duplicates report
         goToAssayRun("first run");
-        clickLinkWithText("view duplicates");
+        clickAndWait(Locator.linkWithText("view duplicates"));
         waitForText("# Active Assignments");
         assertLinkPresentWithText("ID-4");
         assertLinkPresentWithText("ID-5");
@@ -320,7 +320,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         goToAssayRun("first run");
         drt = new DataRegionTable("Data", this);
         drt.setFilter("AnimalId", "Equals", "ID-4");
-        clickLinkWithText("edit");
+        clickAndWait(Locator.linkWithText("edit"));
         waitForText("Mamu-B Haplotype", 2, WAIT_FOR_JAVASCRIPT);
         _ext4Helper.uncheckCheckbox("Enabled:");
         clickButton("Submit");
@@ -333,10 +333,10 @@ public class HaplotypeAssayTest extends GenotypingTest
 
         // test disabling a run and clearing the other duplicate for ID-5
         goToManageAssays();
-        clickLinkWithText(ASSAY_NAME);
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
         drt = new DataRegionTable("Runs", this);
         drt.setFilter("Name", "Equals", "second run");
-        clickLinkWithText("edit");
+        clickAndWait(Locator.linkWithText("edit"));
         uncheckCheckbox(Locator.name("quf_enabled"));
         clickButton("Submit");
         goToAssayRun("second run");
@@ -345,7 +345,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         assertTextPresentInThisOrder("A001","A002a","B002");
 
         // verify that the duplicates report is now clear
-        clickLinkWithText("view duplicates");
+        clickAndWait(Locator.linkWithText("view duplicates"));
         waitForText("# Active Assignments");
         assertTextNotPresent("ID-4", "ID-5");
     }
@@ -433,8 +433,8 @@ public class HaplotypeAssayTest extends GenotypingTest
         log("Navigating to Haplotype assay run");
         goToProjectHome();
         goToManageAssays();
-        clickLinkWithText(ASSAY_NAME);
-        clickLinkWithText(assayId);
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        clickAndWait(Locator.linkWithText(assayId));
         waitForText(ASSAY_NAME + " Results");
     }
 
@@ -443,7 +443,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         log("Navigating to Haplotype Assay Import");
         goToProjectHome();
         goToManageAssays();
-        clickLinkWithText(ASSAY_NAME);
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         waitForText("Copy/Paste the header rows into the text area below:");
         waitForText("Match the column headers from the tab-delimited data with the key fields:");

@@ -757,7 +757,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void attemptSignIn(String email, String password)
     {
-        clickLinkWithText("Sign In");
+        clickAndWait(Locator.linkWithText("Sign In"));
 
         assertTitleEquals("Sign In");
         assertFormPresent("login");
@@ -951,7 +951,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (enableDevMode())
         {
             goToAdminConsole();
-            clickLinkWithText("system maintenance");
+            clickAndWait(Locator.linkWithText("system maintenance"));
 
             if (enable)
                 checkCheckbox("enableSystemMaintenance");
@@ -982,13 +982,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void goToSiteSettings()
     {
         goToAdminConsole();
-        clickLinkWithText("site settings");
+        clickAndWait(Locator.linkWithText("site settings"));
     }
 
     public void goToAuditLog()
     {
         goToAdminConsole();
-        clickLinkWithText("audit log");
+        clickAndWait(Locator.linkWithText("audit log"));
     }
 
     public void hideNavigationBar()
@@ -1245,7 +1245,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
 
             // Will fail if left navbar is not enabled in Home project. TODO: allow this, see #xxxx
-            clickLinkWithText("Home");
+            clickAndWait(Locator.linkWithText("Home"));
         }
     }
 
@@ -1261,7 +1261,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (null != password2)
             setFormElement(Locator.id("password2"), password2);
 
-        clickLinkWithText("Next");
+        clickAndWait(Locator.linkWithText("Next"));
 
         if (null != expectedText)
             Assert.assertEquals("Wrong error message.", expectedText, Locator.css(".labkey-error").findElement(_driver).getText());
@@ -1410,7 +1410,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void startSystemMaintenance(String task)
     {
         goToAdminConsole();
-        clickLinkWithText("system maintenance");
+        clickAndWait(Locator.linkWithText("system maintenance"));
         clickLinkWithText(task, false);
         smStart = System.currentTimeMillis();
     }
@@ -2001,7 +2001,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
             if(!checked.contains(folder))
             {
-                clickLinkWithText(project);
+                clickAndWait(Locator.linkWithText(project));
                 if(isLinkPresentWithText(folder))
                 {
                     doViewCheck(folder);
@@ -2022,7 +2022,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     private void doViewCheck(String folder)
     {
-        clickLinkWithText(folder);
+        clickAndWait(Locator.linkWithText(folder));
         try{
             goToManageViews();
         }
@@ -2768,7 +2768,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Creating subfolder " + child + " under project " + parent);
         String _active = (!parent.equals(project)? parent : project);
         if (!getText(Locator.css(".nav-tree-selected")).equals(_active))
-            clickLinkWithText(_active);
+            clickAndWait(Locator.linkWithText(_active));
         goToFolderManagement();
         waitForExt4FolderTreeNode(parent, 10000);
         clickButton("Create Subfolder", 0);
@@ -2845,7 +2845,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (null != folderType && !folderType.equals("None")) // Added in the wizard for custom folders
         {
             goToFolderManagement();
-            clickLinkWithText("Folder Type");
+            clickAndWait(Locator.linkWithText("Folder Type"));
 
             for (String tabname : tabsToAdd)
                 checkCheckbox(Locator.checkboxByTitle(tabname));
@@ -2883,8 +2883,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void deleteFolder(String project, @LoggedParam String folderName)
     {
         log("Deleting folder " + folderName + " under project " + project);
-        clickLinkWithText(project);
-        clickLinkWithText(folderName);
+        clickAndWait(Locator.linkWithText(project));
+        clickAndWait(Locator.linkWithText(folderName));
         ensureAdminMode();
         goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
@@ -2921,8 +2921,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void renameFolder(String project, @LoggedParam String folderName, @LoggedParam String newFolderName, boolean createAlias)
     {
         log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
-        clickLinkWithText(project);
-        clickLinkWithText(folderName);
+        clickAndWait(Locator.linkWithText(project));
+        clickAndWait(Locator.linkWithText(folderName));
         ensureAdminMode();
         goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
@@ -2943,8 +2943,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void moveFolder(String projectName, String folderName, String newParent, boolean createAlias)
     {
         log("Moving folder [" + folderName + "] under project [" + projectName + "] to [" + newParent + "]");
-        clickLinkWithText(projectName);
-        clickLinkWithText(folderName);
+        clickAndWait(Locator.linkWithText(projectName));
+        clickAndWait(Locator.linkWithText(folderName));
         ensureAdminMode();
         goToFolderManagement();
         waitForExt4FolderTreeNode(folderName, 10000);
@@ -2985,7 +2985,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void clickFolder(String folder)
     {
         expandFolder(folder);
-        clickLinkWithText(folder);
+        clickAndWait(Locator.linkWithText(folder));
     }
 
     /**
@@ -3487,7 +3487,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected void exportFolderAsZip()
     {
         goToFolderManagement();
-        clickLinkWithText("Export");
+        clickAndWait(Locator.linkWithText("Export"));
         checkRadioButton("location", 1);
 
     }
@@ -3496,7 +3496,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         goToFolderManagement();
         log("setting module properties");
-        clickLinkWithText("Module Properties");
+        clickAndWait(Locator.linkWithText("Module Properties"));
         waitForText("Save Changes");
         boolean changed = false;
         for (String moduleName : props.keySet())
@@ -3934,14 +3934,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void assertLinkNotPresentWithTitle(String title)
     {
         Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
-    }
-
-    /** Find a link with the exact text specified, click it, and wait for the page to load
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLinkWithText(String text)
-    {
-        clickLinkWithText(text, true);
     }
 
     /** Find a link with the exact text specified, click it, and wait for the page to load
@@ -4579,9 +4571,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (isLinkPresentWithText("override"))
         {
             if (inherit)
-                clickLinkWithText("modify the setting for all folders");
+                clickAndWait(Locator.linkWithText("modify the setting for all folders"));
             else
-                clickLinkWithText("override");
+                clickAndWait(Locator.linkWithText("override"));
         }
         clickRadioButtonById("pipeOptionProjectSpecified");
         setFormElement("pipeProjectRootPath", rootPath);
@@ -5878,7 +5870,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (isElementPresent(Locator.permissionRendered()))
         {
             exitPermissionsUI();
-            clickLinkWithText(projectName);
+            clickAndWait(Locator.linkWithText(projectName));
         }
         enterPermissionsUI();
         clickManageGroup(groupName);
@@ -5961,7 +5953,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Impersonate");
         selectOptionByText(Locator.id("email"), fakeUser);
-        clickLinkWithText("Impersonate");
+        clickAndWait(Locator.linkWithText("Impersonate"));
         _impersonationStack.push(fakeUser);
     }
 
@@ -5988,7 +5980,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if(projectName==null)
             goToProjectHome();
         else
-            clickLinkWithText(projectName);
+            clickAndWait(Locator.linkWithText(projectName));
         setUserPermissions(userName, permissions);
 
     }
@@ -6133,7 +6125,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         goToSiteUsers();
 
         if(isLinkPresentWithText("INCLUDE INACTIVE USERS"))
-            clickLinkWithText("INCLUDE INACTIVE USERS");
+            clickAndWait(Locator.linkWithText("INCLUDE INACTIVE USERS"));
 
         DataRegionTable usersTable = new DataRegionTable("Users", this, true, true);
 
@@ -6147,7 +6139,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             if (!isPresent && isLinkPresentContainingText("Next") && isLinkPresentContainingText("Last"))
             {
                 clickButton("Page Size", 0);
-                clickLinkWithText("Show All");
+                clickAndWait(Locator.linkWithText("Show All"));
                 row = usersTable.getRow("Email", userEmail);
                 isPresent = row != -1;
             }
@@ -6185,7 +6177,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public boolean doesGroupExist(String groupName, String projectName)
     {
         ensureAdminMode();
-        clickLinkWithText(projectName);
+        clickAndWait(Locator.linkWithText(projectName));
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Project Groups");
         waitForText("Member Groups");
@@ -6213,7 +6205,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public boolean isUserInGroup(String email, String groupName, String projectName)
     {
         ensureAdminMode();
-        clickLinkWithText(projectName);
+        clickAndWait(Locator.linkWithText(projectName));
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Project Groups");
         waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
@@ -6292,11 +6284,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void createNewWikiPage(String format)
     {
         if(isLinkPresentWithText("new page"))
-            clickLinkWithText("new page");
+            clickAndWait(Locator.linkWithText("new page"));
         else if(isLinkPresentWithText("Create a new wiki page"))
-            clickLinkWithText("Create a new wiki page");
+            clickAndWait(Locator.linkWithText("Create a new wiki page"));
         else if(isLinkPresentWithText("add content"))
-            clickLinkWithText("add content");
+            clickAndWait(Locator.linkWithText("add content"));
         else if(isTextPresent("Pages"))
             clickWebpartMenuItem("Pages", "New");
         else
@@ -6374,7 +6366,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         clickFolder(projectName);
         clickTab("Manage");
-        clickLinkWithText("Manage Cohorts");
+        clickAndWait(Locator.linkWithText("Manage Cohorts"));
         return new DataRegionTable("Cohort", this, false);
     }
 
@@ -6463,7 +6455,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void enableModule(String projectName, String moduleName)
     {
         ensureAdminMode();
-        clickLinkWithText(projectName);
+        clickAndWait(Locator.linkWithText(projectName));
         enableModule(moduleName, true);
     }
 
@@ -6475,7 +6467,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void enableModules(List<String> moduleNames, boolean isProject)
     {
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         for (String moduleName : moduleNames)
         {
             checkCheckbox(Locator.checkboxByTitle(moduleName));
@@ -6486,7 +6478,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void disableModules(List<String> moduleNames)
     {
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         for (String moduleName : moduleNames)
         {
             uncheckCheckbox(Locator.checkboxByTitle(moduleName));
@@ -6577,7 +6569,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected void importFolderFromZip(String folderFile)
     {
         goToFolderManagement();
-        clickLinkWithText("Import");
+        clickAndWait(Locator.linkWithText("Import"));
         sleep(2000);
         setFormElement(Locator.name("folderZip"), new File(folderFile));
         clickButtonContainingText("Import Folder From Local Zip Archive");
@@ -6588,7 +6580,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected void importFolderFromPipeline(String folderFile)
     {
         goToFolderManagement();
-        clickLinkWithText("Import");
+        clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Import Folder Using Pipeline");
         _extHelper.selectFileBrowserItem(folderFile);
         selectImportDataAction("Import Folder");
@@ -6643,7 +6635,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void searchFor(String projectName, String searchFor, int expectedResults, String titleName)
     {
         log("Searching Project : " + projectName + " for \"" + searchFor + "\".  Expecting to find : " + expectedResults + " results");
-        clickLinkWithText(projectName);
+        clickAndWait(Locator.linkWithText(projectName));
         assertElementPresent(Locator.name("q"));
         setFormElement(Locator.id("query"), searchFor);
         clickButton("Search");
@@ -7252,7 +7244,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 copyFile(specimenArchive, _copiedArchives[i]);
             }
 
-            clickLinkWithText(_studyFolderName);
+            clickAndWait(Locator.linkWithText(_studyFolderName));
 
             int total = 0;
             while( !isLinkPresentWithText("Manage Files") && total < WAIT_FOR_PAGE)
@@ -7263,7 +7255,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 refresh();
             }
 
-            clickLinkWithText("Manage Files");
+            clickAndWait(Locator.linkWithText("Manage Files"));
             waitAndClickButton("Process and Import Data");
 
             // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
@@ -7294,8 +7286,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             log("Waiting for completion of specimen archives");
 
-            clickLinkWithText(_studyFolderName);
-            clickLinkWithText("Manage Files");
+            clickAndWait(Locator.linkWithText(_studyFolderName));
+            clickAndWait(Locator.linkWithText("Manage Files"));
 
             waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import", _expectError);
 

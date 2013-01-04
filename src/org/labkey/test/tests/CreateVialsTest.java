@@ -127,7 +127,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         clickButton("OK", 0);
 
         // Delete run
-        clickLinkWithText("view runs");
+        clickAndWait(Locator.linkWithText("view runs"));
         checkAllOnPage("Runs");
         clickButton("Delete"); clickButton("Confirm Delete");
 
@@ -290,7 +290,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         
 
         log("** Copy to study");
-        clickLinkWithText("view runs");
+        clickAndWait(Locator.linkWithText("view runs"));
         click(Locator.name(".toggle"));
         clickButton("Copy to Study");
         clickButton("Next");

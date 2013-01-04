@@ -61,9 +61,9 @@ public class FlowJoQueryTest extends BaseFlowTest
         _customizeViewsHelper.addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S4+:Count", "4+:Count");
         _customizeViewsHelper.addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
         _customizeViewsHelper.applyCustomView();
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         toggleCheckboxByTitle("Query");
         toggleCheckboxByTitle("Flow");
         createQuery(PROJECT_NAME, "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
@@ -72,7 +72,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         createQuery(PROJECT_NAME, "COMP", getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), getFileContents("/sampledata/flow/flowjoquery/query/COMP.xml"), true);
         createQuery(PROJECT_NAME, "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), true);
         clickFolder(getFolderName());
-        clickLinkWithText("1 run");
+        clickAndWait(Locator.linkWithText("1 run"));
         clickMenuButton("Query", "PassFailQuery");
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
@@ -103,19 +103,19 @@ public class FlowJoQueryTest extends BaseFlowTest
         // Copy the generated 'workspaceScript1' from one of the sample wells (not one of the comp wells)
         setFilter("query", "Name", "Equals", "118795.fcs");
         clickLinkContainingText("workspaceScript");
-        clickLinkWithText("Make a copy of this analysis script");
+        clickAndWait(Locator.linkWithText("Make a copy of this analysis script"));
         setFormElement("name", "LabKeyScript");
         checkCheckbox("copyAnalysis");
         submit();
 
         // Only run LabKeyScript on sample wells
         // NOTE: we use 'Contains' since it is case-insensitive. Some values are Non-comp and other are Non-Comp.
-        clickLinkWithText("Edit Settings");
+        clickAndWait(Locator.linkWithText("Edit Settings"));
         selectOptionByText(Locator.name("ff_filter_field", 0), "Comp");
         selectOptionByText(Locator.name("ff_filter_op", 0), "Contains");
         setFormElement(Locator.name("ff_filter_value", 0), "non-comp"); clickButton("Update");
 
-        clickLinkWithText("Analyze some runs");
+        clickAndWait(Locator.linkWithText("Analyze some runs"));
         selectOptionByValue("ff_targetExperimentId", "");
         waitForPageToLoad();
         // select mini-fcs.xml Analysis run
@@ -125,7 +125,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickButton("Analyze runs");
         waitForPipeline(getContainerPath());
         goToFlowDashboard();
-        clickLinkWithText("LabKeyAnalysis");
+        clickAndWait(Locator.linkWithText("LabKeyAnalysis"));
         clickMenuButton("Query", "Comparison");
         waitForPageToLoad(longWaitForPage);
         assertTextNotPresent("No data to show");
@@ -146,7 +146,7 @@ public class FlowJoQueryTest extends BaseFlowTest
     {
         //verify workspaces with booleans-within-booleans
         importAnalysis(getContainerPath(), "/flowjoquery/Workspaces/boolean-sub-populations.xml", SelectFCSFileOption.Previous, Arrays.asList("miniFCS"), "BooleanOfBooleanAnalysis", false, true);
-        clickLinkWithText("118795.fcs");
+        clickAndWait(Locator.linkWithText("118795.fcs"));
         sleep(2000);
         waitForElement(Locator.xpath("//table/tbody/tr/td/a/span[text()='A&B']"), defaultWaitForPage);
         assertElementPresent(Locator.xpath("//tbody/tr/td/a/span[text()='C|D']"));

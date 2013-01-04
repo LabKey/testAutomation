@@ -15,6 +15,7 @@
  */
 package org.labkey.test.ms2;
 
+import org.labkey.test.Locator;
 import org.labkey.test.pipeline.PipelineFolder;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 
@@ -58,7 +59,7 @@ public class MS2PipelineFolder extends PipelineFolder
         if (_fastaPath != null)
         {
             _test.log("Set FASTA root");
-            _test.clickLinkWithText("Set FASTA root");
+            _test.clickAndWait(Locator.linkWithText("Set FASTA root"));
 
             _test.setFormElement("localPathRoot", _fastaPath);
             _test.submit();

@@ -120,9 +120,9 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void importCDSData(String query, String dataFilePath)
     {
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         waitForTextWithRefresh("Fact Table", defaultWaitForPage*4);  //wait for study to fully load
-        clickLinkWithText(query);
+        clickAndWait(Locator.linkWithText(query));
         _listHelper.clickImportData();
 
         setFormElement(Locator.id("tsv3"), getFileContents(new File(getSampledataPath(), "CDS/"+dataFilePath)), true);
@@ -131,8 +131,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void populateFactTable()
     {
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Populate Fact Table");
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText("Populate Fact Table"));
         uncheckCheckbox("dataset", "HIV Test Results");
         uncheckCheckbox("dataset", "Physical Exam");
         uncheckCheckbox("dataset", "ParticipantVaccines");
@@ -147,16 +147,16 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void verifyFactTable()
     {
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Verify");
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText("Verify"));
         waitForText("No data to show.", CDS_WAIT);
     }
 
     private static final String COUNTS_FEEDBACK_STATE = "{\"activeView\":\"singleaxis\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Participant\",\"yHierarchyIdx\":2},\"views\":{},\"filters\":[],\"selections\":[{\"phantom\":true,\"internalId\":\"ext-record-589\",\"data\":{\"hierarchy\":\"Participant.Country\",\"members\":[{\"uname\":[\"Participant.Country\",\"Thailand\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"UNION\"},\"modified\":{\"operator\":\"\"},\"events\":{},\"editing\":false,\"dirty\":true,\"id\":\"Connector.model.Filter-ext-record-589\"}],\"detail\":{},\"id\":60}";
     private void verifyCounts()
     {
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Application");
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText("Application"));
 
         assertLinkNotPresentWithText("Home");
         assertLinkNotPresentWithText("Admin");

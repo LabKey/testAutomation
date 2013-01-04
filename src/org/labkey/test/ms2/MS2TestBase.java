@@ -17,6 +17,7 @@
 package org.labkey.test.ms2;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
 import java.io.File;
@@ -91,8 +92,8 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
 
     protected void deleteViews(String... viewNames)
     {
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         if (isLinkPresentWithImage(getContextPath() + "/MS2/images/runIcon.gif"))
         {
             clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
@@ -112,10 +113,10 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
     protected void deleteRuns()
     {
         log("Delete runs.");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
-        clickLinkWithText("MS2 Runs");
+        clickAndWait(Locator.linkWithText("MS2 Runs"));
         selectOptionByText("experimentRunFilter", "All Runs");
         waitForPageToLoad();
         if (!isTextPresent("No data to show"))

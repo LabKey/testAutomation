@@ -84,7 +84,7 @@ public class StudySecurityTest extends StudyBaseTest
         exitPermissionsUI();
 
         clickFolder(getFolderName());
-        clickLinkWithText("Manage Files");
+        clickAndWait(Locator.linkWithText("Manage Files"));
         waitForPipelineJobsToComplete(1, "study import", false);
     }
 
@@ -193,7 +193,7 @@ public class StudySecurityTest extends StudyBaseTest
         for (String dsName : dsCanEdit)
         {
             assertLinkPresentWithText(dsName);
-            clickLinkWithText(dsName);
+            clickAndWait(Locator.linkWithText(dsName));
             assertTextPresent(dsName);
             assertLinkPresentWithText("edit");
             assertNavButtonPresent("Insert New");
@@ -205,7 +205,7 @@ public class StudySecurityTest extends StudyBaseTest
         {
             if (isLinkPresentWithText(dsName))
             {
-                clickLinkWithText(dsName);
+                clickAndWait(Locator.linkWithText(dsName));
                 assertTextPresent(dsName);
                 assertLinkNotPresentWithText("edit");
                 assertNavButtonNotPresent("Insert New");

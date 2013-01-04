@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class UIAssayHelper extends AbstractAssayHelper
     {
         String[] folders = projectPath.split("/");
         for(String folder : folders)
-            _test.clickLinkWithText(folder);
+            _test.clickAndWait(Locator.linkWithText(folder));
         _test.clickLinkContainingText(assayName);
         _test.clickButton("Import Data");
         _test.clickButton("Next");

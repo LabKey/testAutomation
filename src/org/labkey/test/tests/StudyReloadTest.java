@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.labkey.test.Locator;
+
 import java.io.File;
 
 /**
@@ -39,8 +41,8 @@ public class StudyReloadTest extends StudyBaseTest
     protected void doVerifySteps()
     {
         clickFolder(getFolderName());
-        clickLinkWithText("1 dataset");
-        clickLinkWithText("update_test");
+        clickAndWait(Locator.linkWithText("1 dataset"));
+        clickAndWait(Locator.linkWithText("update_test"));
         assertTextPresent("id006", "additional_column");
         //text that was present in original but removed in the update
         assertTextNotPresent("id005", "original_column_numeric");

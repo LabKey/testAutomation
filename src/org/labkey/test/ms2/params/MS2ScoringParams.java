@@ -15,6 +15,7 @@
  */
 package org.labkey.test.ms2.params;
 
+import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 import org.labkey.test.util.DataRegionTable;
@@ -66,7 +67,7 @@ class MS2ScoringParams extends MS2TestParams
         _test.log("***** " + link + " *****");
 
         // Navigate to the peptides view by clicking the experiment name link.
-        _test.clickLinkWithText(link);
+        _test.clickAndWait(Locator.linkWithText(link));
 
         setGrouping("Peptides (Legacy)");
         _test.clearAllFilters("MS2Peptides", "Scan");

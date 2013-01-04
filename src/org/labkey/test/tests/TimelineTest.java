@@ -109,7 +109,7 @@ public class TimelineTest extends BaseSeleniumWebTest
         _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Timeline"});
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
         createWiki();
 
@@ -145,7 +145,7 @@ public class TimelineTest extends BaseSeleniumWebTest
     private void apiTest()
     {
         setSource(TIMELINE_TEST_SRC);
-        clickLinkWithText(WIKIPAGE_NAME);
+        clickAndWait(Locator.linkWithText(WIKIPAGE_NAME));
         waitForElement(Locator.tagContainingText("div", "Jane Janeson"), 10000);
         selenium.mouseDown(Locator.tagContainingText("div", "Jane Janeson").toString());
         assertTextPresent("Hi Jane I am the description");
@@ -155,7 +155,7 @@ public class TimelineTest extends BaseSeleniumWebTest
     {
         if (enableLinkCheck())
         {
-            clickLinkWithText(FOLDER_NAME);
+            clickAndWait(Locator.linkWithText(FOLDER_NAME));
             removeWebPart(WIKIPAGE_NAME);
         }
     }
@@ -190,7 +190,7 @@ public class TimelineTest extends BaseSeleniumWebTest
                 assertTextPresent(rowData[col]);
             }
         }
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
     }
 
     private String waitForDivPopulation()
@@ -226,7 +226,7 @@ public class TimelineTest extends BaseSeleniumWebTest
     private String setSource(String srcFragment)
     {
         if (!isTextPresent(WIKIPAGE_NAME))
-            clickLinkWithText(FOLDER_NAME);
+            clickAndWait(Locator.linkWithText(FOLDER_NAME));
         clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
 
         String fullSource = getFullSource(srcFragment);

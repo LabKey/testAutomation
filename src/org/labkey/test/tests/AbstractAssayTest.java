@@ -131,7 +131,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         setFormElement(Locator.xpath("//input[@name='startDate']"), "2000-01-01");
         clickButton("Create Study");
 
-        clickLinkWithText("Manage Timepoints");
+        clickAndWait(Locator.linkWithText("Manage Timepoints"));
         setFormElement(Locator.xpath("//input[@name='defaultTimepointDuration']"), "8");
         clickButton("Update");
 
@@ -180,8 +180,8 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         log("Setting permissions for group '" + group + "' on subfolder '" + project + "/" + subfolder + "' to '" + perms + "'");
         if (isElementPresent(Locator.permissionRendered()) && isNavButtonPresent("Save and Finish"))
             clickButton("Save and Finish");
-        clickLinkWithText(project);
-        clickLinkWithText(subfolder);
+        clickAndWait(Locator.linkWithText(project));
+        clickAndWait(Locator.linkWithText(subfolder));
         enterPermissionsUI();
         uncheckInheritedPermissions();
         waitAndClickButton("Save", 0);
@@ -209,8 +209,8 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         log("Setting study-level read permissions for group " + group + " in project " + project + " to " + perms);
         if (isElementPresent(Locator.permissionRendered()) && isNavButtonPresent("Save and Finish"))
             clickButton("Save and Finish");
-        clickLinkWithText(project);
-        clickLinkWithText(folder);
+        clickAndWait(Locator.linkWithText(project));
+        clickAndWait(Locator.linkWithText(folder));
         enterStudySecurity();
 
         selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
@@ -225,10 +225,10 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     private void setStudyQCStates(String project, String folder)
     {
         log("Setting QC states in study " + folder + ".");
-        clickLinkWithText(project);
-        clickLinkWithText(folder);
+        clickAndWait(Locator.linkWithText(project));
+        clickAndWait(Locator.linkWithText(folder));
         clickTab("Manage");
-        clickLinkWithText("Manage Dataset QC States");
+        clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         setFormElement("newLabel", "Approved");
         setFormElement("newDescription", "We all like approval.");
         clickButton("Save");

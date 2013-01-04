@@ -70,7 +70,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         submit();
         addWebPart("Search");
@@ -87,7 +87,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         enableEmailRecorder();
 
         log("Check that Plain Text message works and is added everywhere");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         clickButton("New");
 
         // Check defaults for uncustomized message board
@@ -113,14 +113,14 @@ public class MessagesTest extends BaseSeleniumWebTest
         if (isFileUploadAvailable())
             assertTextPresent("common.properties");
         assertTextPresent(MSG1_BODY_FIRST);
-        clickLinkWithText("view message or respond");
-        clickLinkWithText("view list");
+        clickAndWait(Locator.linkWithText("view message or respond"));
+        clickAndWait(Locator.linkWithText("view list"));
         assertTextPresent(MSG1_TITLE);
         goToModule("Messages");
-        clickLinkWithText(MSG1_TITLE);
+        clickAndWait(Locator.linkWithText(MSG1_TITLE));
 
         log("test edit messages");
-        clickLinkWithText("edit");
+        clickAndWait(Locator.linkWithText("edit"));
         setFormElement("body", MSG1_BODY);
         if (isFileUploadAvailable())
         {
@@ -144,7 +144,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         click(subscribeButton);
         click(Locator.tagWithText("span", "thread"));
         waitForPageToLoad();
-        clickLinkWithText("unsubscribe");
+        clickAndWait(Locator.linkWithText("unsubscribe"));
         assertElementPresent(subscribeButton);
 
         click(subscribeButton);
@@ -159,13 +159,13 @@ public class MessagesTest extends BaseSeleniumWebTest
 
 
         log("test customize");
-        clickLinkWithText("Messages");
-        clickLinkWithText("Customize");
+        clickAndWait(Locator.linkWithText("Messages"));
+        clickAndWait(Locator.linkWithText("Customize"));
         checkCheckbox("expires");
         clickButton("Save");
 
         log("test add response");
-        clickLinkWithText("view message or respond");
+        clickAndWait(Locator.linkWithText("view message or respond"));
         clickButton("Respond");
         setFormElement("expires", EXPIRES);
         setFormElement("title", RESP1_TITLE);
@@ -179,11 +179,11 @@ public class MessagesTest extends BaseSeleniumWebTest
 
 
         log("test the search module on messages");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         searchFor(PROJECT_NAME, "Banana", 1, MSG1_TITLE);
 
         log("test filtering of messages grid");
-        clickLinkWithText("view list");
+        clickAndWait(Locator.linkWithText("view list"));
         setFilterAndWait("Announcements", "Title", "Equals", "foo", 0);
         waitForPageToLoad();
 
@@ -193,7 +193,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
         log("test delete message works and is recognized");
         goToProjectHome();
-        clickLinkWithText(RESP1_TITLE);
+        clickAndWait(Locator.linkWithText(RESP1_TITLE));
         waitForPageToLoad();
         clickButton("Delete Message");
         clickButton("Delete");

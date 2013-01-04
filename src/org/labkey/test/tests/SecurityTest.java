@@ -211,7 +211,7 @@ public class SecurityTest extends BaseWebDriverTest
 
     private void assertNoDumbsterPermission(String user)
     {
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         goToModule("Dumbster");
         pushLocation();
         impersonate(user);
@@ -307,7 +307,7 @@ public class SecurityTest extends BaseWebDriverTest
         goToHome();
         ensureSignedOut();
 
-        clickLinkWithText("Sign In");
+        clickAndWait(Locator.linkWithText("Sign In"));
         clickLinkContainingText("Forgot your password?");
         setFormElement(Locator.id("EmailInput"), username);
         clickButtonContainingText("Submit", 0);
@@ -393,13 +393,13 @@ public class SecurityTest extends BaseWebDriverTest
         pushLocation();
         signOut();
         popLocation();
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         assertNavButtonNotPresent("New");
         signIn();
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         assertNavButtonPresent("New");
         impersonate(NORMAL_USER);
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         assertNavButtonPresent("New");
         stopImpersonating();
     }
@@ -479,7 +479,7 @@ public class SecurityTest extends BaseWebDriverTest
         if (!isPresent && isLinkPresentContainingText("Next") && isLinkPresentContainingText("Last"))
         {
             clickButton("Page Size", 0);
-            clickLinkWithText("Show All");
+            clickAndWait(Locator.linkWithText("Show All"));
             isPresent = isElementPresent(userAccessLink);
         }
 
@@ -679,7 +679,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         ensureAdminMode();
         goToAdminConsole();
-        clickLinkWithText("audit log");
+        clickAndWait(Locator.linkWithText("audit log"));
 
         selectOptionByText("view", "User events");
         waitForPageToLoad();

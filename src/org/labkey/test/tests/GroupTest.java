@@ -127,7 +127,7 @@ public class GroupTest extends BaseWebDriverTest
     @LogMethod
     private void permissionsReportTest()
     {
-        clickLinkWithText("view permissions report");
+        clickAndWait(Locator.linkWithText("view permissions report"));
         DataRegionTable drt = new DataRegionTable("access", this, false, false);
 
         waitForText("Access Modification History For This Folder");
@@ -180,7 +180,7 @@ public class GroupTest extends BaseWebDriverTest
         goBack();
 
         //confirm username link leads to right user, page
-        clickLinkWithText(displayNameFromEmail(TEST_USERS_FOR_GROUP[0]));
+        clickAndWait(Locator.linkWithText(displayNameFromEmail(TEST_USERS_FOR_GROUP[0])));
         assertTextPresent("User Access Details: "  + TEST_USERS_FOR_GROUP[0]);
         goBack();
 
@@ -289,7 +289,7 @@ public class GroupTest extends BaseWebDriverTest
     private void verifyExportFunction()
     {
         selectGroup(COMPOUND_GROUP, true);
-        clickLinkWithText("manage group");
+        clickAndWait(Locator.linkWithText("manage group"));
         //Selenium can't handle file exports, so there's nothing to be done here.
         assertElementPresent(getButtonLocatorContainingText("Export All to Excel"));
 

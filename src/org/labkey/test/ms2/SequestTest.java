@@ -66,7 +66,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         log("Testing your Sequest settings");
         addUrlParameter("testInPage=true");
         pushLocation();
-        clickLinkWithText("Test Sequest settings");
+        clickAndWait(Locator.linkWithText("Test Sequest settings"));
         assertTextPresent("test passed.");
         popLocation();
 
@@ -74,7 +74,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         log("Testing wrong Sequest server via " + altSequestServer);
         setFormElement("sequestServer", altSequestServer);
         pushLocation();
-        clickLinkWithText("Test Sequest settings");
+        clickAndWait(Locator.linkWithText("Test Sequest settings"));
         assertTextPresent("Test failed.");
         assertTextPresent("Failed to interact with SequestQueue application");
         log("Return to customize page.");
@@ -96,7 +96,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
 
     protected void basicChecks()
     {
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
 
         // Make sure we're not using a custom default view for the current user
@@ -132,11 +132,11 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         popLocation();
 
         log("Test Comparing Peptides");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         click(Locator.name(".toggle"));
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
-        clickLinkWithText("Peptide");
+        clickAndWait(Locator.linkWithText("Peptide"));
         selectOptionByText("viewParams", VIEW);
         clickButton("Compare");
         assertTextPresent("(Mass > 1000)");
@@ -148,7 +148,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         assertTextBefore(PEPTIDE5, PEPTIDE4);
 
         log("Navigate to folder Portal");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         log("Verify experiment information in MS2 runs.");
         assertLinkPresentWithText(PROTOCOL);

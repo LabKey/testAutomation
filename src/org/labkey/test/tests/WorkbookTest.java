@@ -78,7 +78,7 @@ public class WorkbookTest extends BaseWebDriverTest
         assertTextPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
         waitForText("No description provided. Click to add one.", WAIT_FOR_JAVASCRIPT); // Takes a moment to appear.
 
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
 
         // Check for all workbooks in list.
         assertLinkPresentWithText("Renamed"+DEFAULT_WORKBOOK_NAME);
@@ -95,7 +95,7 @@ public class WorkbookTest extends BaseWebDriverTest
         // Test Workbook APIs
 
         // Initialize the Creation Wiki
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         addWebPart("Wiki");
 
         createNewWikiPage();

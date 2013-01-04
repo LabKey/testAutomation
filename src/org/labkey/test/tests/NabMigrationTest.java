@@ -52,20 +52,20 @@ public class NabMigrationTest extends NabOldTest
     private void verifyMigration()
     {
         log("Verify that the data didn't transfer to the first assay");
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         clickTab("Nab");
-        clickLinkWithText(NEW_ASSAY_NAME);
+        clickAndWait(Locator.linkWithText(NEW_ASSAY_NAME));
         Assert.assertEquals("Data present in NAb assay that should be unused", 0, new DataRegionTable("Runs", this).getDataRowCount());
         goBack();
 
         log("verify data present in second assay");
-        clickLinkWithText(NEW_ASSAY_NAME2);
+        clickAndWait(Locator.linkWithText(NEW_ASSAY_NAME2));
         Assert.assertEquals("Newly added value incorrect.", newFieldVal, new DataRegionTable("Runs", this).getDataAsText(1, newField));
         Assert.assertEquals("No present in NAb assay", 2, new DataRegionTable("Runs", this).getDataRowCount());
         DataRegionTable drt = new DataRegionTable("Runs", this);
         Assert.assertTrue("LegacyID not present in new assay run list", drt.getIndexWhereDataAppears(assayRowId, "LegacyID") > -1);
 //        Assert.assertEquals("RowID from original second nab run not copied into legacyID field", assayRowId, first);
-        clickLinkWithText("run details");
+        clickAndWait(Locator.linkWithText("run details"));
         assertElementPresent(Locator.xpath("//img[@alt='Neutralization Graph']"));
         Assert.assertEquals("Specimen 1 Dilution Factor incorrect", "3.0", getText(Locator.xpath("//tr[td[text()='Specimen 1']]//td[2]")));
         Assert.assertEquals("Specimen 4 Initial Dilution incorrect", "20.0", getText(Locator.xpath("//tr[td[text()='Specimen 4']]//td[3]")));
@@ -89,7 +89,7 @@ public class NabMigrationTest extends NabOldTest
 
     private void createAssay(String assayName)
     {
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         clickTab("Nab");
         startCreateNabAssay(assayName);
         addRunField("LegacyID", "LegacyID", ListHelper.ListColumnType.Integer);

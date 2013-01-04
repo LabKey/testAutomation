@@ -39,7 +39,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
         ensureAdminMode();
 
         goToAdminConsole();
-        clickLinkWithText("views and scripting");
+        clickAndWait(Locator.linkWithText("views and scripting"));
         log("setup a java engine");
 
         if (!isEngineConfigured())
@@ -140,7 +140,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
         ensureAdminMode();
 
         goToAdminConsole();
-        clickLinkWithText("views and scripting");
+        clickAndWait(Locator.linkWithText("views and scripting"));
 
         if (isEngineConfigured())
         {

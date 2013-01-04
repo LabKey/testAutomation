@@ -94,7 +94,7 @@ public class FileContentTest extends BaseWebDriverTest
         // Setup notificaiton emails
         // as they are now digest based.
         goToFolderManagement();
-        clickLinkWithText("Notifications");
+        clickAndWait(Locator.linkWithText("Notifications"));
         click(Locator.navButton("Update Settings"));
         _shortWait.until(LabKeyExpectedConditions.animationIsDone(Locator.css(".labkey-ribbon > div")));
         // Set folder default
@@ -117,7 +117,7 @@ public class FileContentTest extends BaseWebDriverTest
         // Create list for lookup custom file property
         _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, COLUMN_NAME);
         _listHelper.uploadData(PROJECT_NAME, LIST_NAME, COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         // Setup custom file properties
         _extHelper.waitForFileGridReady();
         _extHelper.waitForFileAdminEnabled();
@@ -201,7 +201,7 @@ public class FileContentTest extends BaseWebDriverTest
 
         // Check custom actions as non-administrator.
         impersonate(TEST_USER);
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         waitForElementToDisappear(Locator.xpath("//button[text()='Import Data']"), WAIT_FOR_JAVASCRIPT);
 
         stopImpersonating();
@@ -218,7 +218,7 @@ public class FileContentTest extends BaseWebDriverTest
 
         assertTextPresent("antidisestablishmentarianism");
 
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
 
         _searchHelper.enqueueSearchItem(filename, true, Locator.linkContainingText(filename));
         _searchHelper.enqueueSearchItem(FILE_DESCRIPTION, true, Locator.linkContainingText(filename));
@@ -227,7 +227,7 @@ public class FileContentTest extends BaseWebDriverTest
         _searchHelper.verifySearchResults("/" + PROJECT_NAME + "/@files/" + folderName, false);
 
         // Delete file.
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         click(Locator.css("button.iconFolderTree"));
         _shortWait.until(ExpectedConditions.visibilityOf(Locator.xpath("id('fileBrowser')//div[contains(@id, 'xsplit')]").findElement(_driver)));
         _extHelper.selectFileBrowserItem(folderName + "/" + filename);

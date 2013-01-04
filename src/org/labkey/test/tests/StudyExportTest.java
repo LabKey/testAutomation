@@ -129,13 +129,13 @@ public class StudyExportTest extends StudyManualTest
 
         // verify reordered, categorized, & hidden datasets.
         clickFolder(getFolderName());
-        clickLinkWithText("47 datasets");
+        clickAndWait(Locator.linkWithText("47 datasets"));
         assertTextBefore(REORDERED_DATASET2, REORDERED_DATASET1);
         assertLinkNotPresentWithText(HIDDEN_DATASET);
         assertTextBefore(CATEGORY, MODIFIED_DATASET);
 
         // verify format strings
-        clickLinkWithText("Manage Datasets");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
         assertFormElementEquals(Locator.id("dateFormat"), DATE_FORMAT);
         assertFormElementEquals(Locator.id("numberFormat"), NUMBER_FORMAT);
 
@@ -144,7 +144,7 @@ public class StudyExportTest extends StudyManualTest
         assertElementContains(Locator.xpath("//tr[./td/a[text() = '" + MODIFIED_DATASET + "']]/td[4]"), CATEGORY);
 
         // verify dataset columns
-        clickLinkWithText(MODIFIED_DATASET);
+        clickAndWait(Locator.linkWithText(MODIFIED_DATASET));
         assertChecked(Locator.xpath("//tr[9]/td[6]/input"));
         assertElementContains(Locator.xpath("//tr[9]/td[7]"), COLUMN_DESC);
         assertTextPresent(CATEGORY);
@@ -154,11 +154,11 @@ public class StudyExportTest extends StudyManualTest
         // verify manual cohorts
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Manage Cohorts");
+        clickAndWait(Locator.linkWithText("Manage Cohorts"));
         assertFormElementEquals(Locator.id("manualCohortAssignmentEnabled"), "on");
         clickFolder(getFolderName());
-        clickLinkWithText("47 datasets");
-        clickLinkWithText(DEMOGRAPHICS_DATASET);
+        clickAndWait(Locator.linkWithText("47 datasets"));
+        clickAndWait(Locator.linkWithText(DEMOGRAPHICS_DATASET));
         clickMenuButton("Mouse Groups", "Cohorts", GROUP_2);
         clickMenuButton("QC State", "All data");
         assertTextPresent(MODIFIED_PARTICIPANT);
@@ -166,7 +166,7 @@ public class StudyExportTest extends StudyManualTest
         // verify visit display order
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Manage Visits");
+        clickAndWait(Locator.linkWithText("Manage Visits"));
         assertTextBefore("Cycle 3", MODIFIED_VISIT);
 
         // verify visit modifications
@@ -181,33 +181,33 @@ public class StudyExportTest extends StudyManualTest
         super.verifySpecimens();
 
         // configure specimen tracking
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
-        clickLinkWithText("Manage Request Statuses");
+        clickAndWait(Locator.linkWithText("Manage Request Statuses"));
         setFormElement("newLabel", "New Request");
         clickButton("Save");
         setFormElement("newLabel", "Pending Approval");
         clickButton("Save");
         setFormElement("newLabel", "Complete");
         clickButton("Done");
-        clickLinkWithText("Manage Actors and Groups");
+        clickAndWait(Locator.linkWithText("Manage Actors and Groups"));
         setFormElement("newLabel", "Institutional Review Board");
         selectOptionByText("newPerSite", "Multiple Per Study (Location Affiliated)");
         clickButton("Save");
         setFormElement("newLabel", "Scientific Leadership Group");
         selectOptionByText("newPerSite", "One Per Study");
         clickButton("Save");
-        clickLinkWithText("Update Members");
-        clickLinkWithText("FHCRC - Seattle (Endpoint Lab, Site Affiliated Lab, Clinic)");
+        clickAndWait(Locator.linkWithText("Update Members"));
+        clickAndWait(Locator.linkWithText("FHCRC - Seattle (Endpoint Lab, Site Affiliated Lab, Clinic)"));
         assertTextPresent("Institutional Review Board, FHCRC - Seattle");
         assertTextPresent("This group currently has no members.");
         clickTab("Manage");
-        clickLinkWithText("Manage Default Requirements");
+        clickAndWait(Locator.linkWithText("Manage Default Requirements"));
         selectOptionByText("providerActor", "Institutional Review Board");
         setFormElement("providerDescription", "To be deleted");
         clickButtonByIndex("Add Requirement", 1);
         assertTextPresent("To be deleted");
-        clickLinkWithText("Delete");
+        clickAndWait(Locator.linkWithText("Delete"));
         assertTextNotPresent("To be deleted");
         selectOptionByText("providerActor", "Institutional Review Board");
         setFormElement("providerDescription", "Providing lab approval");
@@ -221,19 +221,19 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
 
         // create specimen request
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Study Navigator");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("Study Navigator"));
 
         assertLinkNotPresentWithText("24");
         selectOptionByText("QCState", "All data");
         waitForPageToLoad();
 
-        clickLinkWithText("24");
+        clickAndWait(Locator.linkWithText("24"));
         checkCheckbox(Locator.checkboxByName(".toggle"));
         clickButton("View Specimens");
         assertLinkPresentWithText("999320016");
         assertLinkPresentWithText("999320518");
-        clickLinkWithText("Show individual vials");
+        clickAndWait(Locator.linkWithText("Show individual vials"));
         assertLinkPresentWithText("999320016");
         checkCheckbox(Locator.checkboxByName(".toggle"));
         clickMenuButton("Request Options", "Create New Request");
@@ -247,7 +247,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("This request has not been submitted");
         assertNavButtonPresent("Cancel Request");
         assertNavButtonPresent("Submit Request");
-        clickLinkWithText("Specimen Requests");
+        clickAndWait(Locator.linkWithText("Specimen Requests"));
 
         assertNavButtonPresent("Submit");
         assertNavButtonPresent("Cancel");
@@ -255,7 +255,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("Not Yet Submitted");
         clickButton("Submit", 0);
         getConfirmationAndWait();
-        clickLinkWithText("Specimen Requests");
+        clickAndWait(Locator.linkWithText("Specimen Requests"));
         assertNavButtonNotPresent("Submit");
         assertNavButtonPresent("Details");
         assertTextPresent("New Request");
@@ -275,7 +275,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextNotPresent("WARNING: Missing Specimens");
         assertTextPresent("New Request");
         assertTextNotPresent("Pending Approval");
-        clickLinkWithText("Update Request");
+        clickAndWait(Locator.linkWithText("Update Request"));
         selectOptionByText("status", "Pending Approval");
         setFormElement("comments", "Request is now pending.");
         clickButton("Save Changes and Send Notifications");
@@ -297,12 +297,12 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Delete Requirement");
         assertTextNotPresent("Receiving lab approval");
 
-        clickLinkWithText("Originating Location Specimen Lists");
+        clickAndWait(Locator.linkWithText("Originating Location Specimen Lists"));
         assertTextPresent("WARNING: The requirements for this request are incomplete");
         assertTextPresent("KCMC, Moshi, Tanzania");
         clickButton("Cancel");
 
-        clickLinkWithText("View History");
+        clickAndWait(Locator.linkWithText("View History"));
         assertTextPresent("Request is now pending.");
         assertTextPresent("Approval granted.");
         assertTextPresent("Institutional Review Board (Duke University), Receiving lab approval");
@@ -322,8 +322,8 @@ public class StudyExportTest extends StudyManualTest
 
         // set the QC state 
         clickFolder(getFolderName());
-        clickLinkWithText("47 datasets");
-        clickLinkWithText(DEMOGRAPHICS_DATASET);
+        clickAndWait(Locator.linkWithText("47 datasets"));
+        clickAndWait(Locator.linkWithText(DEMOGRAPHICS_DATASET));
         clickMenuButton("QC State", "All data");
         checkAllOnPage("Dataset");
         clickMenuButton("QC State", "Update state of selected rows");
@@ -333,10 +333,10 @@ public class StudyExportTest extends StudyManualTest
         clickMenuButton("QC State", "clean");
 
         // test specimen comments
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickLinkWithText("Vials by Derivative", false);
         waitForText("Plasma, Unknown Processing");
-        clickLinkWithText("Plasma, Unknown Processing");
+        clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
         clickButton("Enable Comments/QC");
         checkAllOnPage("SpecimenDetail");
         clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
@@ -357,18 +357,18 @@ public class StudyExportTest extends StudyManualTest
         importer.importAndWaitForComplete();
 
         // verify that comments remain after second specimen load
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickLinkWithText("Vials by Derivative", false);
         waitForText("Plasma, Unknown Processing");
-        clickLinkWithText("Plasma, Unknown Processing");
+        clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
         assertTextPresent("These vials are very important.", 2);
 
         // check to see that data in the specimen archive was merged correctly:
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("By Individual Vial");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("By Individual Vial"));
         clickMenuButton("Page Size", "Show All");
         assertTextPresent("DRT000XX-01");
-        clickLinkWithText("Search");
+        clickAndWait(Locator.linkWithText("Search"));
         waitForTextToDisappear("Loading");
         waitForText("Additive Type");
         _ext4Helper.selectRadioButton("Search Type:", "Grouped Vials");
@@ -388,21 +388,21 @@ public class StudyExportTest extends StudyManualTest
 
         clickButton("Search");
         assertTextPresent("999320528");
-        clickLinkWithText("Show individual vials");
+        clickAndWait(Locator.linkWithText("Show individual vials"));
         // if our search worked, we'll only have six vials:
         assertTextPresent("[history]", 6);
         assertLinkPresentWithTextCount("999320528", 6);
         assertTextNotPresent("DRT000XX-01");
-        clickLinkWithText("[history]");
+        clickAndWait(Locator.linkWithText("[history]"));
         assertTextPresent("GAA082NH-01");
         assertTextPresent("BAD");
         assertTextPresent("1.0&nbsp;ML");
         assertTextPresent("Added Comments");
         assertTextPresent("Johannesburg, South Africa");
 
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickLinkWithText("Specimen Requests", false);
-        clickLinkWithText("View Current Requests");
+        clickAndWait(Locator.linkWithText("View Current Requests"));
         clickButton("Details");
         assertTextPresent("WARNING: Missing Specimens");
         clickButton("Delete missing specimens", 0);
@@ -426,10 +426,10 @@ public class StudyExportTest extends StudyManualTest
         waitForPageToLoad(30000);
 
         clickFolder(getFolderName());
-        clickLinkWithText("47 datasets");
-        clickLinkWithText("DEM-1: Demographics");
+        clickAndWait(Locator.linkWithText("47 datasets"));
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
-        clickLinkWithText("edit");
+        clickAndWait(Locator.linkWithText("edit"));
         setFormElement("quf_DEMbdt", "2001-11-11");
         clickButton("Submit");
         clickMenuButton("QC State", "unknown QC");
@@ -447,7 +447,7 @@ public class StudyExportTest extends StudyManualTest
 
         // Make sure that we can view its participant page immediately
         pushLocation();
-        clickLinkWithText(TEST_ADD_ENTRY);
+        clickAndWait(Locator.linkWithText(TEST_ADD_ENTRY));
         assertTextPresent("Mouse - " + TEST_ADD_ENTRY);
         assertTextPresent("DEM-1: Demographics");
         popLocation();
@@ -459,9 +459,9 @@ public class StudyExportTest extends StudyManualTest
         assertTextNotPresent("999320529");
 
         // configure QC state management to show all data by default so the next steps don't have to keep changing the state:
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
-        clickLinkWithText("Manage Dataset QC States");
+        clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         selectOptionByText("showPrivateDataByDefault", "All data");
         clickButton("Save");
 
@@ -497,8 +497,8 @@ public class StudyExportTest extends StudyManualTest
     {
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("Change Display Order");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("Change Display Order"));
         selectOptionByValue("items", value);
         clickButton("Move Down", 0);
         clickButton("Save");
@@ -514,8 +514,8 @@ public class StudyExportTest extends StudyManualTest
     {
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText(dataset);
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText(dataset));
         clickButton("Edit Definition");
         waitForElement(Locator.name("dsCategory"), WAIT_FOR_PAGE);
         setFormElement("dsCategory", category);
@@ -525,7 +525,7 @@ public class StudyExportTest extends StudyManualTest
     private void modifyVisits()
     {
         hideSceeningVisit();
-        clickLinkWithText("Change Visit Order");
+        clickAndWait(Locator.linkWithText("Change Visit Order"));
         checkCheckbox("explicitDisplayOrder");
         selectOptionByText("displayOrderItems", MODIFIED_VISIT);
         clickButton("Move Down", 0);
@@ -541,8 +541,8 @@ public class StudyExportTest extends StudyManualTest
     {
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText(dataset);
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText(dataset));
         clickButton("Edit Definition");
         waitForElement(Locator.name("ff_name0"), WAIT_FOR_PAGE);
         click(Locator.name("ff_name0"));
@@ -558,7 +558,7 @@ public class StudyExportTest extends StudyManualTest
     {
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
         setText("dateFormat", DATE_FORMAT);
         setText("numberFormat", NUMBER_FORMAT);
         clickButton("Submit");
@@ -568,7 +568,7 @@ public class StudyExportTest extends StudyManualTest
     {
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Manage Cohorts");
+        clickAndWait(Locator.linkWithText("Manage Cohorts"));
         clickRadioButtonById("manualCohortAssignmentEnabled");
         waitForPageToLoad();
         setParticipantCohort(MODIFIED_PARTICIPANT, GROUP_2);
@@ -593,8 +593,8 @@ public class StudyExportTest extends StudyManualTest
         clickFolder(getProjectName());
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("Create New Dataset");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("Create New Dataset"));
         setFormElement("typeName", "fileImportDataset");
         clickCheckbox("fileImport");
         clickButton("Next");

@@ -152,7 +152,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
         clickButton("Done");
-        clickLinkWithText(LIST_NAME);
+        clickAndWait(Locator.linkWithText(LIST_NAME));
         assertNavButtonNotPresent(METADATA_OVERRIDE_BUTTON);
         clickButton("Insert New");
         setFormElement(Locator.name("quf_name"), "Seattle");
@@ -165,7 +165,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");
         selectQuery("lists", "Cities");
         waitForText("edit metadata", 10000);
-        clickLinkWithText("edit metadata");
+        clickAndWait(Locator.linkWithText("edit metadata"));
         // wait for the domain editor to appear:
         waitForText("Label", 10000);
         clickButton("Edit Source");
@@ -186,7 +186,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");
         selectQuery("lists", "Cities");
         waitForText("edit metadata", 10000);
-        clickLinkWithText("edit metadata");
+        clickAndWait(Locator.linkWithText("edit metadata"));
         waitForText("Edit Source", 10000);
         clickButton("Edit Source");
         _extHelper.clickExtTab("XML Metadata");
@@ -198,7 +198,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         verifyMetadataButtons();
 
         // Create a wiki page to hold a query webpart with JavaScript-based button customization:
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         addWebPart("Wiki");
         createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "buttonTest");
@@ -216,7 +216,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         waitForText(JAVASCRIPT_LINK_BUTTON_TEXT, 10000);
         clickButton(JAVASCRIPT_LINK_BUTTON_TEXT);
         assertTextPresent("No messages");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
 
         waitForText(JAVASCRIPT_ONCLICK_BUTTON_TEXT, 10000);
         clickButton(JAVASCRIPT_ONCLICK_BUTTON_TEXT, 0);

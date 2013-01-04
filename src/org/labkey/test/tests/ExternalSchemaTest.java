@@ -149,7 +149,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
         if (!isTextPresent("reload"))
         {
-            clickLinkWithText("new external schema");
+            clickAndWait(Locator.linkWithText("new external schema"));
             setFormElement(Locator.name("userSchemaName"), USER_SCHEMA_NAME);
             setFormElement(Locator.name("sourceSchemaName"), DB_SCHEMA_NAME);
             setFormElement(Locator.name("metaData"), getFileContents("server/modules/core/resources/schemas/test.xml"));
@@ -163,7 +163,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     void setEditable(String containerPath, boolean editable)
     {
         beginAt("/query/" + containerPath + "/admin.view");
-        clickLinkWithText("edit definition");
+        clickAndWait(Locator.linkWithText("edit definition"));
         if (editable)
             checkCheckbox("editable");
         else

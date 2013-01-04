@@ -134,7 +134,7 @@ public class RReportHelperWD extends AbstractHelperWD
         // createSiteDeveloper(PasswordUtil.getUsername());
 
         _test.goToAdminConsole();
-        _test.clickLinkWithText("views and scripting");
+        _test.clickAndWait(Locator.linkWithText("views and scripting"));
         _test.log("Check if R already is configured");
 
         try

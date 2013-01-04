@@ -86,8 +86,8 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
         clickButton("Create Study");
 
         setPipelineRoot(_studyDataRoot);
-        clickLinkWithText("My Study");
-        clickLinkWithText("Manage Files");
+        clickAndWait(Locator.linkWithText("My Study"));
+        clickAndWait(Locator.linkWithText("Manage Files"));
 
         File[] archives = new File[] {
                 new File(getLabKeyRoot(), LAB19_SPECIMENS),
@@ -99,7 +99,7 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
         importer.importAndWaitForComplete();
 
         // Check there was an error in the specimen merge.
-        clickLinkWithText("ERROR");
+        clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent("lab20");
         assertTextPresent("Conflicting specimens found for GlobalUniqueId 'AAA07XK5-02'");
         checkExpectedErrors(2);

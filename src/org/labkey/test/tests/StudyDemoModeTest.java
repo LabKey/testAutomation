@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.labkey.test.Locator;
 import org.labkey.test.util.Crawler;
 
 import java.util.Arrays;
@@ -76,7 +77,7 @@ public class StudyDemoModeTest extends StudyBaseTest
         clickFolder(getProjectName());
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Demo Mode");
+        clickAndWait(Locator.linkWithText("Demo Mode"));
         verifyNotInDemoMode();
         clickButton("Enter Demo Mode");
         verifyInDemoMode();
@@ -87,7 +88,7 @@ public class StudyDemoModeTest extends StudyBaseTest
         clickFolder(getProjectName());
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Demo Mode");
+        clickAndWait(Locator.linkWithText("Demo Mode"));
         verifyInDemoMode();
         clickButton("Leave Demo Mode");
         verifyNotInDemoMode();

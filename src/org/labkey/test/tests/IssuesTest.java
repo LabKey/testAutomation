@@ -89,7 +89,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         enableModule(PROJECT_NAME, "Dumbster");
 
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         addWebPart("Issues Summary");
         addWebPart("Search");
         assertTextPresent("Open");
@@ -104,8 +104,8 @@ public class IssuesTest extends BaseSeleniumWebTest
     {
         initProject();
 
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("view open Issues");
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText("view open Issues"));
         assertNavButtonPresent("New Issue");
 
         // quick security test
@@ -128,16 +128,16 @@ public class IssuesTest extends BaseSeleniumWebTest
         addKeywordsAndVerify("type", "Type", "UFO", "SPEC", "TODO", "AAA");
 
         //SetKeywordDefaultAction
-        clickLinkWithText("set");
+        clickAndWait(Locator.linkWithText("set"));
         // check that AAA is bold and [clear] link is on that row
         assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[1]/b"), "AAA");
         assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[2]/a[2]"), "clear");
         //SetKeywordDefaultAction
-        clickLinkWithText("clear");
+        clickAndWait(Locator.linkWithText("clear"));
         // check that AAA is not bold and [set] link is now on that row
         assertElementNotPresent(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[1]/b"));
         assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[2]/a[2]"), "set");
-        clickLinkWithText("delete");
+        clickAndWait(Locator.linkWithText("delete"));
         assertTextNotPresent("AAA");
 
         // Check that non-integer priority results in an error message
@@ -180,10 +180,10 @@ public class IssuesTest extends BaseSeleniumWebTest
         Assert.assertEquals(assignedToText, "");
 
         // Add to group so user appears
-        clickLinkWithText("IssuesVerifyProject");
+        clickAndWait(Locator.linkWithText("IssuesVerifyProject"));
         addUserToProjGroup(PasswordUtil.getUsername(), PROJECT_NAME, TEST_GROUP);
-        clickLinkWithText("IssuesVerifyProject");
-        clickLinkWithText("view open Issues");
+        clickAndWait(Locator.linkWithText("IssuesVerifyProject"));
+        clickAndWait(Locator.linkWithText("view open Issues"));
 
         // InsertAction
         clickButton("New Issue");
@@ -224,10 +224,10 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertLinkPresentWithText("http://www.issues.test");
 
         // ListAction
-        clickLinkWithText("return to grid");
+        clickAndWait(Locator.linkWithText("return to grid"));
 
         //Click the issue id based on the text issue title
-        clickLinkWithText("" + issueId);
+        clickAndWait(Locator.linkWithText("" + issueId));
 
         // UpdateAction
         updateIssue();
@@ -236,19 +236,19 @@ public class IssuesTest extends BaseSeleniumWebTest
         searchFor(PROJECT_NAME, "2012", 1, ISSUE_TITLE_0);
 
         // ResolveAction
-        clickLinkWithText("resolve");
+        clickAndWait(Locator.linkWithText("resolve"));
         clickButton("Save");
 
         // ReopenAction
-        clickLinkWithText("reopen");
+        clickAndWait(Locator.linkWithText("reopen"));
         clickButton("Save");
 
         // ResolveAction
-        clickLinkWithText("resolve");
+        clickAndWait(Locator.linkWithText("resolve"));
         clickButton("Save");
 
         // CloseAction
-        clickLinkWithText("close");
+        clickAndWait(Locator.linkWithText("close"));
         clickButton("Save");
         assertTextPresent("Issues List"); //we should be back at the issues list now
 
@@ -262,7 +262,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextNotPresent("Invalid");
 
         // SearchAction
-        clickLinkWithText("return to grid");
+        clickAndWait(Locator.linkWithText("return to grid"));
         pushLocation();
         String index = getContextPath() + "/search/" + PROJECT_NAME + "/index.view?wait=1";
         log(index);
@@ -278,7 +278,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         queryTest();
 
         // back to grid view
-        clickLinkWithText("Issues Summary");
+        clickAndWait(Locator.linkWithText("Issues Summary"));
 
         requiredFieldsTest();
         viewSelectedDetailsTest();
@@ -334,7 +334,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         addUserToProjGroup(USER1, PROJECT_NAME, TEST_GROUP);
         createUser(USER2, null, false);
 
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         goToModule("Dumbster");
         assertTextPresent("No email recorded.");
 
@@ -353,23 +353,23 @@ public class IssuesTest extends BaseSeleniumWebTest
         goToModule("Portal");
 
        // EmailPrefsAction
-        clickLinkWithText("Issues Summary");
+        clickAndWait(Locator.linkWithText("Issues Summary"));
         clickButton("Email Preferences");
         checkCheckbox("emailPreference", "8"); // self enter/edit an issue
         clickButton("Update");
 
         impersonate(USER1);
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Issues Summary");
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText("Issues Summary"));
         clickButton("Email Preferences");
         uncheckCheckbox("emailPreference", "2"); // issue assigned to me is modified
         clickButton("Update");
         stopImpersonating();
 
         enableEmailRecorder();
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
 
-        clickLinkWithText("Issues Summary");
+        clickAndWait(Locator.linkWithText("Issues Summary"));
         clickButton("New Issue");
         setFormElement("title", ISSUE_TITLE_2);
         selectOptionByText("assignedTo", displayNameFromEmail(USER1));
@@ -405,9 +405,9 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextNotPresent("This line shouldn't appear");
 
         impersonate(USER1);
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("Issues Summary");
-        clickLinkWithText(ISSUE_TITLE_2);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText("Issues Summary"));
+        clickAndWait(Locator.linkWithText(ISSUE_TITLE_2));
         updateIssue();
         selectOptionByText("priority", "0");
         setFormElement("notifyList", USER3);
@@ -428,7 +428,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     private void updateIssue()
     {
-        clickLinkWithText("update");
+        clickAndWait(Locator.linkWithText("update"));
     }
 
     private void entryTypeNameTest()
@@ -443,7 +443,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertFormElementEquals("entryPluralName", "Tickets");
 
         assertTextPresent("Tickets Admin Page");
-        clickLinkWithText("Back to Tickets");
+        clickAndWait(Locator.linkWithText("Back to Tickets"));
 
         assertTextPresent("Tickets List");
         assertTextNotPresent("Issues List");
@@ -517,7 +517,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickButton("View Details");
         assertTextPresent("a bright flash of light");
         assertTextPresent("don't believe the hype");
-        clickLinkWithText("view grid");
+        clickAndWait(Locator.linkWithText("view grid"));
     }
 
     public void testLastFilter(int issueId)
@@ -525,7 +525,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         log("Testing .lastFilter");
 
         // insert a new issue
-        clickLinkWithText("New Issue");
+        clickAndWait(Locator.linkWithText("New Issue"));
         setFormElement(Locator.id("title"), ISSUE_TITLE_1);
         selectOptionByText(Locator.id("type"), "UFO");
         selectOptionByText(Locator.id("area"), "Area51");
@@ -538,7 +538,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickButton("Save");
 
         // assert both issues are present
-        clickLinkWithText("return to grid");
+        clickAndWait(Locator.linkWithText("return to grid"));
         clearAllFilters("Issues", "IssueId");
         assertTextPresent(ISSUE_TITLE_0);
         assertTextPresent(ISSUE_TITLE_1);
@@ -549,10 +549,10 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextNotPresent(ISSUE_TITLE_1);
 
         // view an issue
-        clickLinkWithText(String.valueOf(issueId));
+        clickAndWait(Locator.linkWithText(String.valueOf(issueId)));
 
         // assert .lastFilter is applied
-        clickLinkWithText("return to grid");
+        clickAndWait(Locator.linkWithText("return to grid"));
         assertTextPresent(ISSUE_TITLE_0);
         assertTextNotPresent(ISSUE_TITLE_1);
 
@@ -561,19 +561,19 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     protected void queryTest()
     {
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         addWebPart("Query");
         selenium.select("//select[@name='schemaName']", "issues");
 //        setFormElement("schemaName", "issues");
         submit();
-        clickLinkWithText("Issues Queries");
+        clickAndWait(Locator.linkWithText("Issues Queries"));
         createNewQuery("issues");
         setFormElement("ff_newQueryName", "xxyzzy");
         clickButton("Create and Edit Source");
         _extHelper.clickExtTab("Data");
         waitForText(ISSUE_TITLE_0, WAIT_FOR_JAVASCRIPT);
         waitForText(ISSUE_TITLE_1, WAIT_FOR_JAVASCRIPT);
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
 
 
     }
@@ -589,8 +589,8 @@ public class IssuesTest extends BaseSeleniumWebTest
     public void subFolderIssuesTest()
     {
         log("Testing issues in sub-folders");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(SUB_FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(SUB_FOLDER_NAME));
 
         //Issue 15550: Better tests for view details, admin, and email preferences
         for(String button : new String[] {"Admin", "Email Preferences"})
@@ -607,7 +607,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickButton("Save");
 
         clickLinkContainingText(PROJECT_NAME);
-        clickLinkWithText("Issues Summary");
+        clickAndWait(Locator.linkWithText("Issues Summary"));
         // Set the container filter to include subfolders
         clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
 

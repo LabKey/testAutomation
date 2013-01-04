@@ -241,7 +241,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test edit and adding new field with imported data present");
         clickTab("List");
-        clickLinkWithText("view design");
+        clickAndWait(Locator.linkWithText("view design"));
         clickEditDesign();
         setColumnName(1,_listCol1.getName());
         setColumnLabel(1, _listCol1.getLabel());
@@ -282,7 +282,7 @@ public class ListTest extends BaseWebDriverTest
         selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
         clickDone();
 
-        clickLinkWithText(LIST_NAME_COLORS);
+        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         assertTextPresent(TEST_DATA[0][0]);
         assertTextPresent(TEST_DATA[1][1]);
         assertTextPresent(TEST_DATA[3][2]);
@@ -305,7 +305,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent(TEST_DATA[5][2]);
 
         log("Check that hidden column is hidden.");
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
         if(!getBrowserType().contains("iexplore"))
             assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
@@ -357,7 +357,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("Check that hidden column is hidden.");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from grid view.
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
         assertTextBefore(_listCol2.getLabel(), _listCol3.getLabel());
         clickButton("Edit");
@@ -379,7 +379,7 @@ public class ListTest extends BaseWebDriverTest
         clickDone();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
@@ -398,7 +398,7 @@ public class ListTest extends BaseWebDriverTest
         clickDone();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
         clickButton("Edit");
         assertTextPresent(HIDDEN_TEXT); // Not hidden from update view.
@@ -417,7 +417,7 @@ public class ListTest extends BaseWebDriverTest
         clickDone();
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from grid view.
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertTextPresent(HIDDEN_TEXT); // Not hidden from details view.
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
@@ -491,8 +491,8 @@ public class ListTest extends BaseWebDriverTest
                 source.indexOf(TEST_DATA[1][1], index) < source.indexOf(TEST_DATA[1][2], index));
 
         log("Test list history");
-        clickLinkWithText("manage lists");
-        clickLinkWithText("view history");
+        clickAndWait(Locator.linkWithText("manage lists"));
+        clickAndWait(Locator.linkWithText("view history"));
         assertTextPresent(":History");
         assertTextPresent("modified", 10);
         assertTextPresent("Bulk inserted", 2);
@@ -501,7 +501,7 @@ public class ListTest extends BaseWebDriverTest
         Assert.assertEquals("details Links", 6, countLinksWithText("DETAILS"));
         Assert.assertEquals("Project Links", 17 + 3, countLinksWithText(PROJECT_VERIFY)); // Table links + header & sidebar links
         Assert.assertEquals("List Links", 17 + 1, countLinksWithText(LIST_NAME_COLORS)); // Table links + header link
-        clickLinkWithText("DETAILS");
+        clickAndWait(Locator.linkWithText("DETAILS"));
         assertTextPresent("List Item Details");
         assertTextNotPresent("No details available for this event.");
         assertTextNotPresent("Unable to find the audit history detail for this event");
@@ -605,12 +605,12 @@ public class ListTest extends BaseWebDriverTest
 
         log("Get URL to test exporting deleted list.");
         clickTab("List");
-        clickLinkWithText(LIST_NAME_COLORS);
+        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         clickButton("Export", 0);
         _extHelper.clickSideTab("Text");
         String exportButtonScript = getAttribute(Locator.xpath(Locator.navButton("Export to Text").getPath() + "/..") , "onclick");
         String exportUrl = exportButtonScript.substring(exportButtonScript.indexOf("window.location=") + 17, exportButtonScript.indexOf("document.getElementById") - 11);
-        clickLinkWithText("View Design");
+        clickAndWait(Locator.linkWithText("View Design"));
 
         log("Test deleting data");
         clickDeleteList();
@@ -618,13 +618,13 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test that deletion happened");
         assertTextNotPresent(LIST_NAME_COLORS);
-        clickLinkWithText(LIST2_NAME_CARS);
+        clickAndWait(Locator.linkWithText(LIST2_NAME_CARS));
         pushLocation();
         _customizeViewsHelper.openCustomizeViewPanel();
         assertElementNotPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST_KEY_NAME + "']"));
         assertElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST3_KEY_NAME + "']"));
         popLocation();
-        clickLinkWithText(PROJECT_VERIFY);
+        clickAndWait(Locator.linkWithText(PROJECT_VERIFY));
         assertTextPresent("query not found");
 
         log("Test exporting a nonexistent list returns a 404");
@@ -740,8 +740,8 @@ public class ListTest extends BaseWebDriverTest
         File tsvFile = new File(TSV_DATA_FILE);
         //Cancel test disabled because teamcity is too slow to run it successfully
         /*log("Infer from tsv file, but cancel before completion");
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText("manage lists");
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText("manage lists"));
         clickButton("Create New List");
         waitForElement(Locator.id("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("ff_name"),  TSV_LIST_NAME);
@@ -1010,7 +1010,7 @@ public class ListTest extends BaseWebDriverTest
 
             pushLocation();
             {
-                clickLinkWithText("one A");
+                clickAndWait(Locator.linkWithText("one A"));
                 assertElementPresent(inputWithValue("table","A"));
                 assertElementPresent(inputWithValue("title","one A"));
                 assertElementPresent(inputWithValue("key","1"));
@@ -1019,7 +1019,7 @@ public class ListTest extends BaseWebDriverTest
 
             pushLocation();
             {
-                clickLinkWithText("one B");
+                clickAndWait(Locator.linkWithText("one B"));
                 assertLinkPresentWithText("one B");
                 assertLinkPresentWithText("one C");
             }

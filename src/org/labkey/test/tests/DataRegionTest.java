@@ -240,7 +240,7 @@ public class DataRegionTest extends BaseWebDriverTest
             Thread.sleep(1000);
         assertTextPresent("Selected 5 of 15 rows.");
         clickButton("Page Size", 0);
-        clickLinkWithText("Show Selected");
+        clickAndWait(Locator.linkWithText("Show Selected"));
         Assert.assertEquals(5, table.getDataRowCount());
         assertLinkNotPresentWithTitle(FIRST_LINK);
         assertLinkNotPresentWithTitle(PREV_LINK);
@@ -249,7 +249,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Show All");
         clickButton("Page Size", 0);
-        clickLinkWithText("Show All");
+        clickAndWait(Locator.linkWithText("Show All"));
         Assert.assertEquals(15, table.getDataRowCount());
         assertLinkNotPresentWithTitle(FIRST_LINK);
         assertLinkNotPresentWithTitle(PREV_LINK);
@@ -258,7 +258,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Test 1000 per page");
         clickButton("Page Size", 0);
-        clickLinkWithText("1000 per page");
+        clickAndWait(Locator.linkWithText("1000 per page"));
         assertLinkNotPresentWithTitle(FIRST_LINK);
         assertLinkNotPresentWithTitle(PREV_LINK);
         assertLinkNotPresentWithTitle(NEXT_LINK);

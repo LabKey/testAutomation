@@ -47,7 +47,7 @@ public class QuantitationTest extends AbstractXTandemTest
         createProjectAndFolder();
 
         log("Start analysis running.");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickButton("Process and Import Data");
 
         _extHelper.selectFileBrowserItem("bov_sample/" + SAMPLE_BASE_NAME + ".mzXML");
@@ -68,12 +68,12 @@ public class QuantitationTest extends AbstractXTandemTest
         waitForPageToLoad();
         waitForElement(Locator.linkWithText("Data Pipeline"), WAIT_FOR_JAVASCRIPT);
         sleep(5000); // without this sleep, some machines try to redirect back to the begin.view page after the Data Pipeline link is clicked
-        clickLinkWithText("Data Pipeline");
+        clickAndWait(Locator.linkWithText("Data Pipeline"));
 
         String runDescription = SAMPLE_BASE_NAME + " (" + LIBRA_PROTOCOL_NAME + ")";
         waitForPipelineJobsToComplete(1, runDescription, false);
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         clickLinkContainingText(runDescription);
         selectOptionByText("viewParams", "<Standard View>");
         clickButton("Go");
@@ -82,18 +82,18 @@ public class QuantitationTest extends AbstractXTandemTest
         assertTextPresent(PEPTIDE4);
         assertTextPresent(PEPTIDE5);
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
         // Jump to the flow chart view
-        clickLinkWithText("Data Pipeline");
-        clickLinkWithText("COMPLETE");
+        clickAndWait(Locator.linkWithText("Data Pipeline"));
+        clickAndWait(Locator.linkWithText("COMPLETE"));
         clickButton("Data");
         
         pushLocation();
         clickImageMapLinkByTitle("graphmap", "Data: " + SAMPLE_BASE_NAME + ".libra.tsv (Run Output)");
         assertLinkPresentWithText("libra Protein Quantitation");
 
-        clickLinkWithText("Lineage for " + SAMPLE_BASE_NAME + ".libra.tsv");
+        clickAndWait(Locator.linkWithText("Lineage for " + SAMPLE_BASE_NAME + ".libra.tsv"));
         clickImageMapLinkByTitle("graphmap", "libra Peptide Quantitation");
         // Check to see that arguments to xinteract are showing
         assertTextPresent("-LLibraConfig1.xml-2");

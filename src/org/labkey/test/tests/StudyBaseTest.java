@@ -50,9 +50,9 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void setupSpecimenManagement()
     {
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Request Statuses");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("Manage Study"));
+        clickAndWait(Locator.linkWithText("Manage Request Statuses"));
         setFormElement("newLabel", "New Request");
         clickButton("Save");
         setFormElement("newLabel", "Processing");
@@ -196,7 +196,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected,
                                boolean useAlternateIDs, boolean useAlternateDates, Set<String> uncheckObjects)
     {
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
         clickButton("Export Study");
 
@@ -218,7 +218,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void deleteStudy(String studyLabel)
     {
-        clickLinkWithText(studyLabel);
+        clickAndWait(Locator.linkWithText(studyLabel));
         clickTab("Manage");
         clickButton("Delete Study");
         checkCheckbox("confirm");
@@ -236,7 +236,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
             pipelinePath = getPipelinePath();
 
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         toggleCheckboxByTitle("Pipeline");
         submit();
         addWebPart("Data Pipeline");
@@ -254,8 +254,8 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void setDemographicsBit(String datasetName, boolean demographics)
     {
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText(datasetName);
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText(datasetName));
         clickButtonContainingText("Edit Definition");
         waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
@@ -271,8 +271,8 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void setVisibleBit(String datasetName, boolean showByDefault)
     {
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText(datasetName);
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText(datasetName));
         clickButtonContainingText("Edit Definition");
         waitForElement(Locator.name("description"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
@@ -321,7 +321,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     protected void setStudyRedesign()
     {
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", "Study Redesign (ITN)");
         clickButton("Update Folder");
     }

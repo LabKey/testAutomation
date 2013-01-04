@@ -106,8 +106,8 @@ public class ElisaAssayTest extends ElispotAssayTest
         waitForText("Save successful.", 20000);
 //
         clickFolder(TEST_ASSAY_PRJ_ELISA);
-        clickLinkWithText("Assay List");
-        clickLinkWithText(TEST_ASSAY_ELISA);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISA));
 
         log("Uploading ELISA Runs");
         clickButton("Import Data");
@@ -128,7 +128,7 @@ public class ElisaAssayTest extends ElispotAssayTest
     {
         clickButton("Manage Assays");
         clickButton("Configure Plate Templates");
-        clickLinkWithText("new 96 well (8x12) ELISA default template");
+        clickAndWait(Locator.linkWithText("new 96 well (8x12) ELISA default template"));
         Locator nameField = Locator.id("templateName");
         waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
         setFormElement(nameField, PLATE_TEMPLATE_NAME);
@@ -161,7 +161,7 @@ public class ElisaAssayTest extends ElispotAssayTest
         if (!testPrepopulation)
         {
             clickButton(finalButton); // cause errors
-            clickLinkWithText("Too many errors to display (click to show all).\n");
+            clickAndWait(Locator.linkWithText("Too many errors to display (click to show all).\n"));
             _extHelper.waitForExtDialog("All Errors");
             allErrors = Locator.css(".x-window-body").findElement(_driver).getText();
             _extHelper.clickExtButton("All Errors", "Close", 0);

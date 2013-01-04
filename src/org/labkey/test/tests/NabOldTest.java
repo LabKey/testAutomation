@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
 import java.io.File;
@@ -66,14 +67,14 @@ public class NabOldTest extends AbstractQCAssayTestWD
     {
         log("Verify saved run");
         clickTab("Nab");
-        clickLinkWithText("Deprecated NAb Run");
-        clickLinkWithText("Previous Runs");
+        clickAndWait(Locator.linkWithText("Deprecated NAb Run"));
+        clickAndWait(Locator.linkWithText("Previous Runs"));
         assertTextPresent("First run");
         assertTextPresent("Second run");
         assertTextPresent(TEST_FILE_NAME);
 
         log("Verify saved sample results");
-        clickLinkWithText("Previous Runs By Sample");
+        clickAndWait(Locator.linkWithText("Previous Runs By Sample"));
         assertTextPresent("Specimen 1");
 
         log("Verify EC50 Values");
@@ -84,10 +85,10 @@ public class NabOldTest extends AbstractQCAssayTestWD
         assertTextPresent("357.04");
         assertTextPresent("353.6");
 
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertTextPresent(TEST_FILE_NAME);
 
-        clickLinkWithText("Previous Runs By Sample");
+        clickAndWait(Locator.linkWithText("Previous Runs By Sample"));
         checkCheckbox(".select", 0);
         clickButton("Copy to Study");
         selectOptionByText("targetContainerId", "/NabVerifyProject/NabFolder (NabFolder Study)");
@@ -100,8 +101,8 @@ public class NabOldTest extends AbstractQCAssayTestWD
         assertTextPresent("100.1");
 
         clickTab("Nab");
-        clickLinkWithText("Deprecated NAb Run");
-        clickLinkWithText("Previous Runs");
+        clickAndWait(Locator.linkWithText("Deprecated NAb Run"));
+        clickAndWait(Locator.linkWithText("Previous Runs"));
         log("Delete run");
         clickImgButtonNoNav("Select All");
         clickButton("Delete");
@@ -126,7 +127,7 @@ public class NabOldTest extends AbstractQCAssayTestWD
         clickButton("Create Study");
         clickButton("Create Study");
         clickTab("Nab");
-        clickLinkWithText("Deprecated NAb Run");
+        clickAndWait(Locator.linkWithText("Deprecated NAb Run"));
         File testFile = new File(getLabKeyRoot() + TEST_FILE_PATH);
         setFormElement("dataFile", testFile);
         setFormElement("metadata.virusName", "First run");
@@ -137,7 +138,7 @@ public class NabOldTest extends AbstractQCAssayTestWD
         assertTextPresent("109935");
 
         clickTab("Nab");
-        clickLinkWithText("Deprecated NAb Run");
+        clickAndWait(Locator.linkWithText("Deprecated NAb Run"));
         setFormElement("dataFile", testFile);
         setFormElement("metadata.virusName", "Second run");
         clickButton("Calculate");

@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.BaseFlowTest;
+import org.labkey.test.Locator;
 import org.labkey.test.util.RReportHelper;
 
 import java.util.Arrays;
@@ -69,7 +70,7 @@ public class FlowNormalizationTest extends BaseFlowTest
 
         goToFlowDashboard();
         clickLinkContainingText("Show Jobs");
-        clickLinkWithText("COMPLETE");
+        clickAndWait(Locator.linkWithText("COMPLETE"));
         assertTextPresent("/flowjoquery/miniFCS/mini-fcs.xml and loading group Sample Order 5: Gag1&2");
         assertTextPresent("finished parsing 2 samples");
         assertTextPresent("finished normalizing 2 samples");

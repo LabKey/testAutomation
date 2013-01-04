@@ -38,9 +38,9 @@ public class ModuleTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         log("Test module created from moduleTemplate");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         checkCheckbox(Locator.xpath("//input[@value='" + TEST_MODULE_TEMPLATE_FOLDER_NAME + "']"));
         clickButton("Update Folder");
         clickTab(TEST_MODULE_TEMPLATE_FOLDER_NAME);

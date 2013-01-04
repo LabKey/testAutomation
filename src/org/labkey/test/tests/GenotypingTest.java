@@ -135,7 +135,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         clickButton("Load Sequences");
 
         log("Configure Galaxy Server Key");
-        clickLinkWithText("My Settings");
+        clickAndWait(Locator.linkWithText("My Settings"));
         setFormElement(Locator.name("galaxyKey"), "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         clickButton("Submit");
     }
@@ -166,7 +166,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         goToProjectHome();
         startImportRun("secondRead/reads.txt", "Import 454 Reads", second454importNum);
         waitForPipelineJobsToComplete(++pipelineJobCount, "Import reads for 454 run", true);
-        clickLinkWithText("COMPLETE");
+        clickAndWait(Locator.linkWithText("COMPLETE"));
         clickButton("Data");
         assertTextPresent("G3BTA6P01BEVU9", "G3BTA6P01BD5P9");
     }
@@ -195,7 +195,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void getToRunScreen()
     {
         clickFolder(getProjectName());
-        clickLinkWithText("View Runs");
+        clickAndWait(Locator.linkWithText("View Runs"));
         clickRunLink(first454importNum);
     }
 
@@ -204,7 +204,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         DataRegionTable dr = new DataRegionTable("Runs", this);
         int rowNum = dr.getRow("runs", runId);
         String rowId = dr.getColumnDataAsText("Run").get(rowNum);
-        clickLinkWithText(rowId);
+        clickAndWait(Locator.linkWithText(rowId));
     }
 
     private void verifyAnalysis()
@@ -213,8 +213,8 @@ public class GenotypingTest extends BaseSeleniumWebTest
             return;
         goToProjectHome();
 
-        clickLinkWithText("View Analyses");
-        clickLinkWithText("" + getRunNumber());  // TODO: This is probably still too permissive... need a more specific way to get the run link
+        clickAndWait(Locator.linkWithText("View Analyses"));
+        clickAndWait(Locator.linkWithText("" + getRunNumber()));  // TODO: This is probably still too permissive... need a more specific way to get the run link
 
         assertTextPresent("Reads", "Sample Id", "Percent");
 
@@ -381,7 +381,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         assertTextNotPresent("ERROR");
 
         goToProjectHome();
-        clickLinkWithText("View Runs");
+        clickAndWait(Locator.linkWithText("View Runs"));
         clickRunLink(illuminaImportNum);
 
         verifyIlluminaSamples();
@@ -484,7 +484,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void verifyIlluminaSampleSheet()
     {
         goToProjectHome();
-        clickLinkWithText("Samples");
+        clickAndWait(Locator.linkWithText("Samples"));
         waitForPageToLoad();
         DataRegionTable d = new DataRegionTable("query", this);
         String viewName = "Yellow Peas";
@@ -640,7 +640,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         waitForPipelineJobsToComplete(++pipelineJobCount, "Import Run", false);
 
         goToProjectHome();
-        clickLinkWithText("View Runs");
+        clickAndWait(Locator.linkWithText("View Runs"));
         clickRunLink(first454importNum);
 
         verifySamples();

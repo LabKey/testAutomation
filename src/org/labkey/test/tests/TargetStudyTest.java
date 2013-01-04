@@ -170,8 +170,8 @@ public class TargetStudyTest extends AbstractAssayTestWD
         log("** Upload Data");
         clickFolder(TEST_ASSAY_PRJ_SECURITY);
 
-        clickLinkWithText("Assay List");
-        clickLinkWithText(ASSAY_NAME);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
 
         selenium.type("name", TEST_RUN1);
@@ -190,7 +190,7 @@ public class TargetStudyTest extends AbstractAssayTestWD
         assertNoLabkeyErrors();
 
         log("** Test the TargetStudy renderer resolved all studies");
-        clickLinkWithText(TEST_RUN1);
+        clickAndWait(Locator.linkWithText(TEST_RUN1));
         // all target study values should render as either [None] or the name of the study
         assertTextNotPresent("/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1);
         assertTextNotPresent("/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2);

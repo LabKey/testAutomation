@@ -64,13 +64,13 @@ public class ExpTest extends BaseSeleniumWebTest
         addWebPart("Run Groups");
         clickButton("Setup");
         setPipelineRoot(getLabKeyRoot() + "/sampledata/xarfiles/expVerify");
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         clickButton("Process and Import Data");
 
         _extHelper.waitForImportDataEnabled();
         _extHelper.clickFileBrowserFileCheckbox("experiment.xar.xml");
         selectImportDataAction("Import Experiment");
-        clickLinkWithText("Data Pipeline");
+        clickAndWait(Locator.linkWithText("Data Pipeline"));
         assertLinkNotPresentWithText("ERROR");
         int seconds = 0;
         while (!isLinkPresentWithText("COMPLETE") && seconds++ < MAX_WAIT_SECONDS)
@@ -82,11 +82,11 @@ public class ExpTest extends BaseSeleniumWebTest
         if (!isLinkPresentWithText("COMPLETE"))
             Assert.fail("Import did not complete.");
 
-        clickLinkWithText(FOLDER_NAME);
-        clickLinkWithText(EXPERIMENT_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickAndWait(Locator.linkWithText(EXPERIMENT_NAME));
         assertTextPresent("Example 5 Run");
-        clickLinkWithText(RUN_NAME);
-        clickLinkWithText("Graph Summary View");
+        clickAndWait(Locator.linkWithText(RUN_NAME));
+        clickAndWait(Locator.linkWithText("Graph Summary View"));
         clickImageMapLinkByTitle("graphmap", RUN_NAME_IMAGEMAP);
         clickImageMapLinkByTitle("graphmap", DATA_OBJECT_TITLE);
         assertTextPresent("CAexample_mini.mzXML");
@@ -142,7 +142,7 @@ public class ExpTest extends BaseSeleniumWebTest
         clickTab("Query");
         selectQuery("exp", "Data"); // Select the one we want to edit
         waitForElement(Locator.linkWithText("edit metadata"), WAIT_FOR_JAVASCRIPT); //on Ext panel
-        clickLinkWithText("edit metadata");
+        clickAndWait(Locator.linkWithText("edit metadata"));
         waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         click(Locator.xpath("//span").append(Locator.navButton("Alias Field")));
         selectOptionByText(Locator.name("sourceColumn"), "RowId");
@@ -167,10 +167,10 @@ public class ExpTest extends BaseSeleniumWebTest
         assertTextPresent(dateFormat.format(new Date()), 5);
 
         // Since this metadata is shared, clear it out 
-        clickLinkWithText("exp Schema");
+        clickAndWait(Locator.linkWithText("exp Schema"));
         // Wait for query to load
         waitForText("edit metadata");
-        clickLinkWithText("edit metadata");
+        clickAndWait(Locator.linkWithText("edit metadata"));
         waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
         click(Locator.xpath("//span").append(Locator.navButton("Reset to Default")));
         click(Locator.xpath("//span").append(Locator.navButton("OK")));

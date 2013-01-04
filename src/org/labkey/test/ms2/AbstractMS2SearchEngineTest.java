@@ -43,7 +43,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         super.doTestSteps();
 
         log("Start analysis running.");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickButton("Process and Import Data");
 
         _extHelper.selectFileBrowserItem("bov_sample/CAexample_mini.mzXML");
@@ -61,7 +61,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickButton("Save", 0);
         waitForText("Save successful.", 20000);
 
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickButton("Process and Import Data");
         _extHelper.selectFileBrowserItem("bov_sample/CAexample_mini.mzXML");
         selectImportDataAction("Use " + TEST_ASSAY_NAME);
@@ -85,7 +85,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickButton("Save and Finish");
 
         log("Return to search page");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         assertLinkPresentWithText(ANNOTATION_RUN_NAME);
 
@@ -113,7 +113,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         waitForElement(Locator.linkWithText("Data Pipeline"), WAIT_FOR_JAVASCRIPT);
         sleep(5000); // without this sleep, some machines try to redirect back to the begin.view page after the Data Pipeline link is clicked
         log("View the analysis log.");
-        clickLinkWithText("Data Pipeline");
+        clickAndWait(Locator.linkWithText("Data Pipeline"));
 
         waitForPipelineJobsToComplete(1, SAMPLE_BASE_NAME + " (test2)", false);
 
@@ -122,7 +122,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         log("View log file.");
 
         pushLocation();
-        clickLinkWithText(LOG_BASE_NAME + ".log");
+        clickAndWait(Locator.linkWithText(LOG_BASE_NAME + ".log"));
 
         log("Verify log.");
         assertTextPresent("search");
@@ -132,7 +132,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
             return;
 
         log("Analyze again.");
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickButton("Process and Import Data");
         _extHelper.selectFileBrowserItem("bov_sample/");
 
@@ -149,17 +149,17 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertNavButtonNotPresent("Search");
 
         log("View full status.");
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
         assertTextPresent(SAMPLE_BASE_NAME + " (test2)");
 
-        clickLinkWithText("Data Pipeline");
+        clickAndWait(Locator.linkWithText("Data Pipeline"));
 
         // Since the list of jobs is sorted by creation time in descending
         // order and we know that the job we want to click on is the one
         // that was submitted last, and that all the jobs have completed,
         // we can safely click on the first link
-        clickLinkWithText("COMPLETE");
+        clickAndWait(Locator.linkWithText("COMPLETE"));
         clickButton("Data");
 
         log("Verify msPicture");
@@ -184,13 +184,13 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertTextPresent("Data File CAexample_mini.mzXML");
         assertTextPresent("AutomatedTestAssay");
 
-        clickLinkWithText(ANNOTATION_RUN_NAME);
+        clickAndWait(Locator.linkWithText(ANNOTATION_RUN_NAME));
         clickImageMapLinkByTitle("graphmap", "Material: verify:001");
 
         assertTextPresent("verify:001");
         assertTextPresent("Not a member of a sample set");
 
-        clickLinkWithText("MS2 Dashboard");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
 
         // Make sure we're not using a custom default view for the current user

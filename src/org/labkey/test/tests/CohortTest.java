@@ -198,8 +198,8 @@ public class CohortTest extends BaseWebDriverTest
         // Check that switching visit order changes cohort.
         clickFolder(PROJECT_NAME);
         clickTab("Manage");
-        clickLinkWithText("Manage Visits");
-        clickLinkWithText("Change Visit Order");
+        clickAndWait(Locator.linkWithText("Manage Visits"));
+        clickAndWait(Locator.linkWithText("Change Visit Order"));
         checkCheckbox("explicitChronologicalOrder");
         checkCheckbox("explicitDisplayOrder");
         selectOptionByText(Locator.name("displayOrderItems"), "Visit 3");
@@ -211,7 +211,7 @@ public class CohortTest extends BaseWebDriverTest
         clickButton("Save");
         clickFolder(PROJECT_NAME);
         click(Locator.tagContainingText("span", "Specimen Reports")); // expand
-        clickLinkWithText("View Available Reports");
+        clickAndWait(Locator.linkWithText("View Available Reports"));
         clickButtonByIndex("View", 2);
         checkCheckbox("viewPtidList");
         clickButton("Refresh");
@@ -229,12 +229,12 @@ public class CohortTest extends BaseWebDriverTest
         // Check that deleting a vistit changes the cohort.
         clickFolder(PROJECT_NAME);
         clickTab("Manage");
-        clickLinkWithText("Manage Visits");
+        clickAndWait(Locator.linkWithText("Manage Visits"));
         clickLinkWithText("edit", 4); // Visit 4
         clickButton("Delete visit");
         clickButton("Delete");
         clickTab("Manage");
-        clickLinkWithText("Manage Cohorts");
+        clickAndWait(Locator.linkWithText("Manage Cohorts"));
         selenium.assignId(Locator.xpath(XPATH_COHORT_ASSIGNMENT_TABLE).toString(), COHORT_TABLE);
         assertTableCellTextEquals(COHORT_TABLE, 4, 1, "Negative"); // Infected4
 
@@ -260,19 +260,19 @@ public class CohortTest extends BaseWebDriverTest
 
         // Check that participant view respects filter.
         clickFolder(PROJECT_NAME);
-        clickLinkWithText("2 datasets");
-        clickLinkWithText("Test Results");
+        clickAndWait(Locator.linkWithText("2 datasets"));
+        clickAndWait(Locator.linkWithText("Test Results"));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewSort("ParticipantId", "Ascending");
         _customizeViewsHelper.applyCustomView();
 
         setCohortFilter("Positive", AdvancedCohortType.DATA_COLLECTION);
-        clickLinkWithText("Infected1");
+        clickAndWait(Locator.linkWithText("Infected1"));
         assertLinkNotPresentWithText("Previous Participant");
-        clickLinkWithText("Next Participant");
+        clickAndWait(Locator.linkWithText("Next Participant"));
         assertTextPresent("Infected2");
         assertLinkPresentWithText("Previous Participant");
-        clickLinkWithText("Next Participant");
+        clickAndWait(Locator.linkWithText("Next Participant"));
         assertTextPresent("Infected3");
         assertLinkPresentWithText("Previous Participant");
         assertLinkNotPresentWithText("Next Participant"); // Participant 4 should be filtered out
@@ -281,7 +281,7 @@ public class CohortTest extends BaseWebDriverTest
         log("Check basic cohort features.");
         clickFolder(PROJECT_NAME);
         clickTab("Manage");
-        clickLinkWithText("Manage Cohorts");
+        clickAndWait(Locator.linkWithText("Manage Cohorts"));
         clickRadioButtonById("simpleCohorts");
         _driver.switchTo().alert().accept();
 
@@ -290,7 +290,7 @@ public class CohortTest extends BaseWebDriverTest
 
         waitForText("Positive", 12, WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Negative", 4);
-        clickLinkWithText("Reports");
+        clickAndWait(Locator.linkWithText("Reports"));
 
         clickButtonByIndex("View", 2); // Specimen Report: By Cohort
         assertTextPresent("Specimen Report: By Cohort");
@@ -429,7 +429,7 @@ public class CohortTest extends BaseWebDriverTest
         // Verify "Enrolled" filtering with advanced cohorts
         log("Check enrolled filtering with advanced cohorts");
         clickTab("Manage");
-        clickLinkWithText("Manage Cohorts");
+        clickAndWait(Locator.linkWithText("Manage Cohorts"));
         clickRadioButtonById("advancedCohorts");
         _driver.switchTo().alert().accept();
         waitForPageToLoad();
@@ -545,8 +545,8 @@ public class CohortTest extends BaseWebDriverTest
     private DataRegionTable verifyUnfilteredDataset(String datasetName, int allRowCount)
     {
         clickTab("Overview");
-        clickLinkWithText("2 datasets");
-        clickLinkWithText(datasetName);
+        clickAndWait(Locator.linkWithText("2 datasets"));
+        clickAndWait(Locator.linkWithText(datasetName));
 
         assertTextNotPresent("Current cohort is enrolled or unassigned");
 

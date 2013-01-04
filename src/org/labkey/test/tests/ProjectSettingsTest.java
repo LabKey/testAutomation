@@ -55,7 +55,7 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
     protected void checkHelpLinks(String projectName, boolean supportLinkPresent, boolean helpLinkPresent)
     {
         if(projectName!=null)
-            clickLinkWithText(projectName);
+            clickAndWait(Locator.linkWithText(projectName));
         click(helpMenuLink);
         Assert.assertEquals("Support link state unexpected.", supportLinkPresent, isElementPresent(supportLink));
         Assert.assertEquals("Help link state unexpected.", helpLinkPresent, isElementPresent(helpLink));

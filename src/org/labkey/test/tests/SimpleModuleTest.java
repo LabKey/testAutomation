@@ -201,14 +201,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("** Testing vehicle.Manufacturers default queryDetailsRow.view url link...");
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=" + VEHICLE_SCHEMA + "&query.queryName=Manufacturers&query.Name~eq=Toyota");
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertTextPresent("Name");
         assertTextPresent("Toyota");
 
         log("** Testing vehicle.Model RowId url link...");
         beginAt("/query/" + getProjectName() + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
         viewQueryData(VEHICLE_SCHEMA, "Models");
-        clickLinkWithText("Prius");
+        clickAndWait(Locator.linkWithText("Prius"));
         assertTextPresent("Hooray!");
         String rowidStr = getText(Locator.id("model.rowid"));
         int rowid = Integer.parseInt(rowidStr);
@@ -224,7 +224,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         // Issue 15595: Generic query details links for tables and queries
         // reenable this check once default details links are provided for queries.
         //log(".. generic details link should include _RowId as pk");
-        //clickLinkWithText("details");
+        //clickAndWait(Locator.linkWithText("details"));
         //assertTextPresent("Name");
         //assertTextPresent("Toyota");
 
@@ -303,7 +303,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Testing vehicle.Vehicles details url link...");
         beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertTextPresent("Hooray!");
         rowidStr = getText(Locator.id("vehicle.rowid"));
         rowid = Integer.parseInt(rowidStr);
@@ -511,7 +511,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("This is the begin view from the test module");
 
         //navigate to other view
-        clickLinkWithText("other view");
+        clickAndWait(Locator.linkWithText("other view"));
         assertTextPresent("This is another view in the simple test module");
     }
 
@@ -590,7 +590,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     {
         log("Testing module-based custom query views...");
         clickFolder(getProjectName());
-        clickLinkWithText(LIST_NAME);
+        clickAndWait(Locator.linkWithText(LIST_NAME));
 
         clickMenuButton("Views", "Crazy People");
         assertTextPresent("Adam");
@@ -620,7 +620,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Testing module-based JS reports...");
         clickFolder(getProjectName());
-        clickLinkWithText(LIST_NAME);
+        clickAndWait(Locator.linkWithText(LIST_NAME));
         clickMenuButton("Views", "Want To Be Cool");
         waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
 
@@ -645,7 +645,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Hello, Bob!");
 
         log("Testing module-based reports...");
-        clickLinkWithText(LIST_NAME);
+        clickAndWait(Locator.linkWithText(LIST_NAME));
         clickMenuButton("Views", "Super Cool R Report");
         waitForText("Console output", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("\"name\"");
@@ -753,7 +753,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestParameterizedQueries()
     {
         log("Create embedded QWP to test parameterized query.");
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         goToModule("Wiki");
         createNewWikiPage();
         setFormElement("wiki-input-name", "Parameterized QWP");
@@ -855,7 +855,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Run Groups", "Sample Sets", "Assay List", "Messages");
 
         //there is a selector for the assay controller and tab2
-        clickLinkWithText("New Assay Design");
+        clickAndWait(Locator.linkWithText("New Assay Design"));
         waitForPageToLoad();
         verifyTabSelected("Tab 2");
 
@@ -873,7 +873,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickFolder(FOLDER_NAME);
         waitForPageToLoad();
         addWebPart("Sample Sets");
-        clickLinkWithText("Import Sample Set");
+        clickAndWait(Locator.linkWithText("Import Sample Set"));
         waitForPageToLoad();
         verifyTabSelected("Tab 1");
 
@@ -883,12 +883,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Assay List");
         clickTab("Study Container");
         assertTextPresent("Study Overview");
-        clickLinkWithText("Create Study");
+        clickAndWait(Locator.linkWithText("Create Study"));
         waitForPageToLoad();
-        clickLinkWithText("Create Study");
+        clickAndWait(Locator.linkWithText("Create Study"));
         waitForPageToLoad();
         assertTextPresent("Manage Study", "Study Container", "Overview", "Specimen Data");
-        clickLinkWithText("Specimen Data");
+        clickAndWait(Locator.linkWithText("Specimen Data"));
         assertTextPresent("Vial Search", "Specimens");
     }
 
@@ -907,56 +907,56 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), COLLAB_FOLDER, "Collaboration");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, STUDYCONTAINER_NAME, "Study");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, ASSAYCONTAINER_NAME, "Assay");
-        clickLinkWithText(COLLAB_FOLDER);
-        clickLinkWithText(STUDYCONTAINER_NAME);
+        clickAndWait(Locator.linkWithText(COLLAB_FOLDER));
+        clickAndWait(Locator.linkWithText(STUDYCONTAINER_NAME));
         assertTextPresent("Study Overview");
-        clickLinkWithText("Create Study");
-        clickLinkWithText("Create Study");
-        clickLinkWithText(COLLAB_FOLDER);
-        clickLinkWithText(ASSAYCONTAINER_NAME);
+        clickAndWait(Locator.linkWithText("Create Study"));
+        clickAndWait(Locator.linkWithText("Create Study"));
+        clickAndWait(Locator.linkWithText(COLLAB_FOLDER));
+        clickAndWait(Locator.linkWithText(ASSAYCONTAINER_NAME));
         addWebPart(EXTRA_ASSAY_WEBPART);
 
         // Change folder type to XML Tabbed
-        clickLinkWithText(COLLAB_FOLDER);
+        clickAndWait(Locator.linkWithText(COLLAB_FOLDER));
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", TABBED_FOLDER_TYPE);
-        clickLinkWithText("Update Folder");
+        clickAndWait(Locator.linkWithText("Update Folder"));
 
         // Verify that subfolders got moved into tabs
         assertTextPresent(STUDYTAB_NAME, ASSAYTAB_NAME);
-        clickLinkWithText(STUDYTAB_NAME);
+        clickAndWait(Locator.linkWithText(STUDYTAB_NAME));
         assertTextPresent("Study Overview");
-        clickLinkWithText("Specimen Data");
+        clickAndWait(Locator.linkWithText("Specimen Data"));
         assertTextPresent("Vial Search", "Import Specimens");
-        clickLinkWithText(ASSAYTAB_NAME);
+        clickAndWait(Locator.linkWithText(ASSAYTAB_NAME));
         assertTextPresent("Assay List");
         assertTextPresent(EXTRA_ASSAY_WEBPART);
 
         // Change back to Collab
-        clickLinkWithText(COLLAB_FOLDER);
+        clickAndWait(Locator.linkWithText(COLLAB_FOLDER));
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", "Collaboration");
-        clickLinkWithText("Update Folder");
+        clickAndWait(Locator.linkWithText("Update Folder"));
 
         // Study and Assay should be hidden now
         assertTextNotPresent(STUDYTAB_NAME, ASSAYTAB_NAME, STUDYCONTAINER_NAME, ASSAYCONTAINER_NAME);
 
         // Now change back to TABBED
-        clickLinkWithText(COLLAB_FOLDER);
+        clickAndWait(Locator.linkWithText(COLLAB_FOLDER));
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", TABBED_FOLDER_TYPE);
-        clickLinkWithText("Update Folder");
+        clickAndWait(Locator.linkWithText("Update Folder"));
 
         // Verify that folder tabs are back
         assertTextPresent(STUDYTAB_NAME, ASSAYTAB_NAME);
-        clickLinkWithText(STUDYTAB_NAME);
+        clickAndWait(Locator.linkWithText(STUDYTAB_NAME));
         assertTextPresent("Study Overview");
-        clickLinkWithText("Specimen Data");
+        clickAndWait(Locator.linkWithText("Specimen Data"));
         assertTextPresent("Vial Search", "Import Specimens");
-        clickLinkWithText(ASSAYTAB_NAME);
+        clickAndWait(Locator.linkWithText(ASSAYTAB_NAME));
         assertTextPresent("Assay List");
         assertTextPresent(EXTRA_ASSAY_WEBPART);
 
@@ -974,7 +974,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     {
         log("Ensuring that that '" + moduleName + "' module is enabled");
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         assertElementPresent(Locator.xpath("//input[@type='checkbox' and @checked and @disabled and @title='" + moduleName + "']"));
     }
 

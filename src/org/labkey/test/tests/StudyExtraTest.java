@@ -135,13 +135,13 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 		clickButton("Next");
         clickButton("Finish");
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         checkCheckbox(Locator.checkboxByTitle("Experiment"));
         checkCheckbox(Locator.checkboxByTitle("Query"));
         clickButton("Update Folder");
 
         addWebPart("Lists");
-        clickLinkWithText("manage lists");
+        clickAndWait(Locator.linkWithText("manage lists"));
 
         clickButton("Create New List");
         waitForElement(Locator.id("ff_name"), defaultWaitForPage);
@@ -153,7 +153,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickButton("Save", 0);
         waitForElement(Locator.navButton("Done"), 30000);
         clickButton("Done");
-        clickLinkWithText(LIST_NAME);
+        clickAndWait(Locator.linkWithText(LIST_NAME));
         clickButton("Insert New");
         //
 		selenium.type("firstInputField", "1");
@@ -163,21 +163,21 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 /*
         Snapshot Study Data feature has been removed
 
-        clickLinkWithText(STUDY_FOLDER + " Study");
-        clickLinkWithText("Manage Study");
+        clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
+        clickAndWait(Locator.linkWithText("Manage Study"));
         clickButton("Snapshot Study Data");
         setFormElement("schemaName", "VerifySnapshot");
         clickButton("Create Snapshot");
         assertTextPresent("Snapshot completed successfully");
-        clickLinkWithText(STUDY_FOLDER + " Study");
+        clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
         goToModule("Query");
         _extHelper.clickExtButton(this, "Schema Administration");
-		clickLinkWithText("new external schema");
+		clickAndWait(Locator.linkWithText("new external schema"));
 		setFormElement("userSchemaName", "VerifySnapshot");
 		setFormElement("sourceSchemaName", "verifysnapshot");
         clickButton("Create");
 		assertTextPresent("VerifySnapshot");
-        clickLinkWithText("Query Schema Browser");
+        clickAndWait(Locator.linkWithText("Query Schema Browser"));
         selectSchema("VerifySnapshot");
 		Assert.assertTrue(isQueryPresent("VerifySnapshot", LIST_NAME, 3000) || isQueryPresent("VerifySnapshot", LIST_NAME));
         if (isQueryPresent("VerifySnapshot", "Subjects"))
@@ -190,7 +190,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
        */
 
-		clickLinkWithText(STUDY_FOLDER + " Study");
+		clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
         setupPipeline(PROJECT_NAME);
         defineAssay(PROJECT_NAME);
         uploadRun();
@@ -203,7 +203,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         clickLinkContainingText(STUDY_FOLDER + " Study");
 
         addWebPart("Datasets");
-        clickLinkWithText("TestAssay1");
+        clickAndWait(Locator.linkWithText("TestAssay1"));
         assertTextPresent("P1");
         assertTextPresent("V3");
         assertTextPresent("V4-8");
@@ -214,14 +214,14 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         //Resnapshot the data & pick up the new table
         clickButton("Snapshot Study Data");
         clickButton("Create Snapshot");
-        clickLinkWithText(STUDY_FOLDER +" Study");
+        clickAndWait(Locator.linkWithText(STUDY_FOLDER +" Study"));
 
         //Now refresh the schema metadata from the server & make sure we pick up new table
         goToModule("Query");
         _extHelper.clickExtButton(this, "Schema Administration");
-        clickLinkWithText("reload");
+        clickAndWait(Locator.linkWithText("reload"));
         assertTextPresent("Schema VerifySnapshot was reloaded successfully.");
-        clickLinkWithText("Query Schema Browser");
+        clickAndWait(Locator.linkWithText("Query Schema Browser"));
         selectSchema("VerifySnapshot");
         if (isQueryPresent("VerifySnapshot", "TestAssay1"))
             viewQueryData("VerifySnapshot", "TestAssay1");
@@ -231,12 +231,12 @@ public class StudyExtraTest extends BaseSeleniumWebTest
             Assert.fail("TestAssay1 table not present");
 */
 
-        clickLinkWithText(STUDY_FOLDER + " Study");
-        clickLinkWithText("Study Navigator");
+        clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
+        clickAndWait(Locator.linkWithText("Study Navigator"));
         assertTextPresent("Day 12");
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("Create New Dataset");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("Create New Dataset"));
         setFormElement("typeName", "Simple");
         clickButton("Next");
         waitForElement(Locator.raw("ff_name0"), WAIT_FOR_JAVASCRIPT);
@@ -252,23 +252,23 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         _customizeViewsHelper.applyCustomView();
         assertTextPresent("-120");
         assertTextPresent("320");
-        clickLinkWithText(STUDY_FOLDER + " Study");
-        clickLinkWithText("Study Navigator");
+        clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
+        clickAndWait(Locator.linkWithText("Study Navigator"));
         assertTextPresent("Day 320");
         clickTab("Manage");
-        clickLinkWithText("Manage Timepoints");
+        clickAndWait(Locator.linkWithText("Manage Timepoints"));
         setFormElement("startDate", "2007-11-01");
         submit();
-        clickLinkWithText(STUDY_FOLDER + " Study");
-        clickLinkWithText("Study Navigator");
+        clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
+        clickAndWait(Locator.linkWithText("Study Navigator"));
         //Make sure our guy picked up the new study start date
         assertTextPresent("Day 16");
-        clickLinkWithText(STUDY_FOLDER + " Study");
-        clickLinkWithText("Subjects");
+        clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
+        clickAndWait(Locator.linkWithText("Subjects"));
         clickButton("Import Data");
         _listHelper.submitTsvData("participantid\tDate\tCohort\tStartDate\nPnew\t11/7/2007\tPlacebo\t11/7/2007");
-        clickLinkWithText(STUDY_FOLDER + " Study");
-        clickLinkWithText("Study Navigator");
+        clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
+        clickAndWait(Locator.linkWithText("Study Navigator"));
         //Make sure our guy picked up the his personal start date
         assertTextPresent("Day 10");
     }
@@ -290,7 +290,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
     protected void setupPipeline(String project)
     {
         log("Setting up data pipeline for project " + project);
-        clickLinkWithText(project);
+        clickAndWait(Locator.linkWithText(project));
         addWebPart("Data Pipeline");
         clickButton("Setup");
         File dir = getTestTempDir();
@@ -315,7 +315,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         log("Defining a test assay at the project level");
         //define a new assay at the project level
         //the pipeline must already be setup
-        clickLinkWithText(projectName);
+        clickAndWait(Locator.linkWithText(projectName));
         addWebPart("Assay List");
 
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/studyextra/TestAssay1.xar", 1, "TestAssay1.xar");
@@ -347,8 +347,8 @@ public class StudyExtraTest extends BaseSeleniumWebTest
 
     protected void uploadRun()
     {
-        clickLinkWithText("Assay List");
-        clickLinkWithText(TEST_ASSAY);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
 
         clickButton("Import Data");
         selenium.select("//select[@name='targetStudy']", getTargetStudyOptionText(PROJECT_NAME, FOLDER_NAME, STUDY_FOLDER));

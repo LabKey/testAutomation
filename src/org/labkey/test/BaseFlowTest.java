@@ -43,8 +43,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     public void setFlowFilter(String[] fields, String[] ops, String[] values)
     {
         goToFlowDashboard();
-        clickLinkWithText("Other settings");
-        clickLinkWithText("Edit FCS Analysis Filter");
+        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
 
         for(int i=0; i<fields.length; i++)
         {
@@ -127,7 +127,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         try
         {
             beginAt("/admin/begin.view");
-            clickLinkWithText("flow cytometry");
+            clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
             setFormElement("workingDirectory", "");
             clickButton("update");
         }
@@ -152,7 +152,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void init()
     {
         beginAt("/admin/begin.view");
-        clickLinkWithText("flow cytometry");
+        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
         deletePipelineWorkDirectory();
         setFormElement("workingDirectory", getPipelineWorkDirectory().toString());
         clickButton("update");
@@ -231,7 +231,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             // All flow pages have a link back to the Flow Dashboard
             if (isLinkPresentWithText("Flow Dashboard"))
             {
-                clickLinkWithText("Flow Dashboard");
+                clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
             }
             else
             {
@@ -249,7 +249,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void goToFolder(String... folderPath)
     {
         for (String folderName : folderPath)
-            clickLinkWithText(folderName);
+            clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
     }
 
 
@@ -263,15 +263,15 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         log("** Uploading sample set");
         goToFlowDashboard();
-        clickLinkWithText("Upload Sample Descriptions");
+        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
         setFormElement("data", getFileContents(sampleFilePath));
         for (int i = 0; i < idCols.length; i++)
             selectOptionByText("idColumn" + (i+1), idCols[i]);
         submit();
 
         log("** Join sample set with FCSFile keywords");
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Define sample description join fields");
+        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
         for (int i = 0; i < idCols.length; i++)
             selectOptionByText(Locator.name("ff_samplePropertyURI", i), idCols[i]);
         for (int i = 0; i < keywordCols.length; i++)
@@ -283,8 +283,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         log("** Specify ICS metadata");
         goToFlowDashboard();
-        clickLinkWithText("Other settings");
-        clickLinkWithText("Edit ICS Metadata");
+        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
 
         // specify PTID and Visit/Date columns
         selectOptionByText("ff_participantColumn", participantColumn);
@@ -391,7 +391,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         log("begin import analysis wizard");
         goToFlowDashboard();
-        clickLinkWithText("Import FlowJo Workspace Analysis");
+        clickAndWait(Locator.linkWithText("Import FlowJo Workspace Analysis"));
         assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
     }
 
@@ -601,7 +601,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         {
             goToFlowDashboard();
             clickLinkContainingText("Show Jobs");
-            clickLinkWithText("ERROR");
+            clickAndWait(Locator.linkWithText("ERROR"));
 
             for (String errorText : expectedErrors)
                 assertTextPresent(errorText);

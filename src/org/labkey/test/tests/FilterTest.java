@@ -86,7 +86,7 @@ public class FilterTest extends ListTest
         clickEditDesign();
         selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
         clickDone();
-        clickLinkWithText(LIST_NAME_COLORS);
+        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         clickImportData();
         setFormElement(Locator.name("text"), testDataFull.toString());
         submitImportTsv();

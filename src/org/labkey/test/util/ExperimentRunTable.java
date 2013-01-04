@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import junit.framework.Assert;
+import org.labkey.test.Locator;
 
 /**
  * <code>ExperimentRunTable</code>
@@ -98,7 +99,7 @@ public class ExperimentRunTable extends DataRegionTable
 
     public void clickRunLink(int row)
     {
-        _test.clickLinkWithText(getRunName(row));
+        _test.clickAndWait(Locator.linkWithText(getRunName(row)));
     }
 
     public void clickGraphLink(String name)

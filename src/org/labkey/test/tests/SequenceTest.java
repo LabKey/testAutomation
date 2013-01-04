@@ -317,7 +317,7 @@ public class SequenceTest extends BaseWebDriverTest
         click(Locator.ext4Button("Import Data"));
         waitAndClick(Locator.ext4Button("OK"));
         waitForPageToLoad();
-        clickLinkWithText("All");
+        clickAndWait(Locator.linkWithText("All"));
         _startedPipelineJobs++;
         waitForPipelineJobsToComplete(_startedPipelineJobs, "Import Illumina", false);
         assertTextPresent("COMPLETE");
@@ -1165,7 +1165,7 @@ public class SequenceTest extends BaseWebDriverTest
         click(Locator.ext4Button("Import Data"));
         waitAndClick(Locator.ext4Button("OK"));
         waitForPageToLoad();
-        clickLinkWithText("All");
+        clickAndWait(Locator.linkWithText("All"));
         _startedPipelineJobs++;
         waitForPipelineJobsToComplete(_startedPipelineJobs, "Import Readsets", false);
         assertTextPresent("COMPLETE");

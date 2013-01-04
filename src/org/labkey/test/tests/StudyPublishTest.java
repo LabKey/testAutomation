@@ -225,10 +225,10 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Go to published study
         clickFolder(getProjectName());
-        clickLinkWithText(name);
+        clickAndWait(Locator.linkWithText(name));
 
         // Verify published participant count
-        clickLinkWithText("Mice");
+        clickAndWait(Locator.linkWithText("Mice"));
         // TODO: 15978: Too many participants published with study
         // assertTextPresent("Showing all "+ptids.length+" mice.");
         if (alternateIDs)
@@ -238,7 +238,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Verify correct published datasets
         goToManageStudy();
-        clickLinkWithText("Manage Datasets");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
         if (datasets.length > 0)
             Assert.assertEquals("Unexpected number of datasets", datasets.length + dependentDatasets.length, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
         else // All visits were published
@@ -246,7 +246,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         for (String dataset: datasets)
         {
             pushLocation();
-            clickLinkWithText(dataset);
+            clickAndWait(Locator.linkWithText(dataset));
             clickButton("View Data");
             if (alternateIDs)
                 assertTextNotPresent(ptids);
@@ -255,7 +255,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         for (String dataset: dependentDatasets)
         {
             pushLocation();
-            clickLinkWithText(dataset);
+            clickAndWait(Locator.linkWithText(dataset));
             clickButton("View Data");
             if (alternateIDs)
                 assertTextNotPresent(ptids);
@@ -264,7 +264,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         //Verify correct published visits
         goToManageStudy();
-        clickLinkWithText("Manage Visits");
+        clickAndWait(Locator.linkWithText("Manage Visits"));
         if (visits.length > 0)
             Assert.assertEquals("Unexpected number of visits", visits.length, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
         else // All visits were published
@@ -383,11 +383,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
 
         // Verify published specimens
-        clickLinkWithText("Specimen Data");
+        clickAndWait(Locator.linkWithText("Specimen Data"));
         if (includeSpecimens)
         {
             waitForText("By Vial Group");
-            clickLinkWithText("By Individual Vial");
+            clickAndWait(Locator.linkWithText("By Individual Vial"));
             waitForText("1 - " + expectedSpecimenCount + " of " + expectedSpecimenCount);
 
             // verify that the alternate IDs are used
@@ -422,8 +422,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
             t2.clearFilter("SequenceNum");
 
             // verify that the request related specimen reports are hidden
-            clickLinkWithText("Specimen Data");
-            clickLinkWithText("View Available Reports");
+            clickAndWait(Locator.linkWithText("Specimen Data"));
+            clickAndWait(Locator.linkWithText("View Available Reports"));
             assertTextNotPresent("Requested Vials by Type and Timepoint");
             assertLinkPresentWithTextCount("show options", 6);
         }
@@ -455,9 +455,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // verify specimen refresh for PUB1 study
         goToProjectHome();
-        clickLinkWithText(PUB1_NAME);
-        clickLinkWithText("Specimen Data");
-        clickLinkWithText("By Individual Vial");
+        clickAndWait(Locator.linkWithText(PUB1_NAME));
+        clickAndWait(Locator.linkWithText("Specimen Data"));
+        clickAndWait(Locator.linkWithText("By Individual Vial"));
         waitForText("1 - 37 of 37"); // updated number of total specimens
         assertTextNotPresent("BAQ00051-10"); // GUID removed via refresh
         assertTextPresent("PUBLISHED-", 2*37); // transformations still applied
@@ -468,9 +468,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // verify that specimens were not refreshed for PUB3 study
         goToProjectHome();
-        clickLinkWithText(PUB3_NAME);
-        clickLinkWithText("Specimen Data");
-        clickLinkWithText("By Individual Vial");
+        clickAndWait(Locator.linkWithText(PUB3_NAME));
+        clickAndWait(Locator.linkWithText("Specimen Data"));
+        clickAndWait(Locator.linkWithText("By Individual Vial"));
         table = new DataRegionTable("SpecimenDetail", this);
         table.setFilter("Clinic", "Is Blank", null); // Clinic column should NOT be empty
         assertTextPresent("No data to show.");
@@ -705,8 +705,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private void createRView(String name, String dataset, boolean shareView)
     {
         goToManageStudy();
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText(dataset);
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText(dataset));
         clickButton("View Data");
         _customizeViewsHelper.createRView(null, name, shareView);
     }
@@ -731,7 +731,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickFolder(getProjectName());
         clickFolder(getFolderName());
 
-        clickLinkWithText(dataset);
+        clickAndWait(Locator.linkWithText(dataset));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewFilter("MouseId", "Mouse Id", "Equals One Of", ptidFilter);
         _customizeViewsHelper.saveCustomView(name, shared);
@@ -775,7 +775,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private void setStudyProperties(String label, String investigator, String grant, String description)
     {
         clickTab("Manage");
-        clickLinkWithText("Change Study Properties");
+        clickAndWait(Locator.linkWithText("Change Study Properties"));
 
         waitForElement(Locator.name("Label"));
         setFormElement(Locator.name("Label"), label);

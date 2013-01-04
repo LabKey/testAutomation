@@ -69,7 +69,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Microarray"));
         submit();
 
@@ -94,7 +94,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
         setPipelineRoot(getLabKeyRoot() + "/sampledata/Microarray");
         assertTextPresent("The pipeline root was set to");
-        clickLinkWithText("Microarray Dashboard");
+        clickAndWait(Locator.linkWithText("Microarray Dashboard"));
 
         log("Create Sample Set");
         addWebPart("Sample Sets");
@@ -104,7 +104,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         submit();
 
         // First try importing the runs individually
-        clickLinkWithText("Microarray Dashboard");
+        clickAndWait(Locator.linkWithText("Microarray Dashboard"));
         clickButton("Process and Import Data");
 
         _extHelper.waitForImportDataEnabled();
@@ -208,37 +208,37 @@ public class MicroarrayTest extends BaseSeleniumWebTest
     private void validateRuns()
     {
         log("Test run inputs");
-        clickLinkWithText(MAGEML_FILE1);
+        clickAndWait(Locator.linkWithText(MAGEML_FILE1));
         assertTextPresent("115468001");
-        clickLinkWithText("First");
+        clickAndWait(Locator.linkWithText("First"));
         assertTextPresent(MAGEML_FILE1);
         assertTextNotPresent(MAGEML_FILE2);
         assertTextPresent(SAMPLE_SET);
 
         log("Test run outputs/ data files");
         clickTab("Microarray Dashboard");
-        clickLinkWithText(ASSAY_NAME);
-        clickLinkWithText(MAGEML_FILE2);
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        clickAndWait(Locator.linkWithText(MAGEML_FILE2));
         assertTextPresent("115468002");
         clickLink(Locator.raw("//a[contains(text(), '" + MAGEML_FILE2 + "')]/../..//td/a[contains(text(), 'view')]"));
         waitForText(ASSAY_NAME + " Description", 30000);
         assertTextPresent(DATA_FIELD_TEST_NAME);
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText("view results"));
         waitForText(ASSAY_NAME + " Description", 30000);
         assertTextPresent(DATA_FIELD_TEST_NAME);
 
         log("Test graph views");
-        clickLinkWithText("Microarray Dashboard");
-        clickLinkWithText(MAGEML_FILE1);
-        clickLinkWithText("Graph Summary View");
-        clickLinkWithText("Graph Detail View");
+        clickAndWait(Locator.linkWithText("Microarray Dashboard"));
+        clickAndWait(Locator.linkWithText(MAGEML_FILE1));
+        clickAndWait(Locator.linkWithText("Graph Summary View"));
+        clickAndWait(Locator.linkWithText("Graph Detail View"));
 
         log("Test assay view");
-        clickLinkWithText(ASSAY_NAME);
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
         assertTextPresent(ASSAY_NAME + " Protocol");
-        clickLinkWithText("Microarray Dashboard");
-        clickLinkWithText("Assay List");
-        clickLinkWithText(ASSAY_NAME);
+        clickAndWait(Locator.linkWithText("Microarray Dashboard"));
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
         assertTextPresent("Agilent Feature Extraction Software");
     }
 }

@@ -62,7 +62,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         _test.clickButton("Manage Assays");
         _test.clickButton("New Assay Design");
 
-        _test.clickLinkWithText("upload");
+        _test.clickAndWait(Locator.linkWithText("upload"));
         _test.setFormElement(Locator.name("uploadFile"), file);
         _test.click(Locator.xpath("//input[contains(@type, 'SUBMIT') and contains(@value, 'Upload')]"));
         _test.waitForPageToLoad();
@@ -79,7 +79,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
         //edit metadata
         _test.waitForText("edit metadata");
-        _test.clickLinkWithText("edit metadata");
+        _test.clickAndWait(Locator.linkWithText("edit metadata"));
         _test.sleep(5000); //TODO;
         _test.clickButton("Alias Field", "Choose a field");
 

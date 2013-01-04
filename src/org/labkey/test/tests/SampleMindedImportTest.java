@@ -82,20 +82,20 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         click(Locator.radioButtonByNameAndValue("simpleRepository", "true"));
         clickButton("Create Study");
 
-        clickLinkWithText("manage visits");
-        clickLinkWithText("create new visit");
+        clickAndWait(Locator.linkWithText("manage visits"));
+        clickAndWait(Locator.linkWithText("create new visit"));
         setFormElement(Locator.name("label"),"Visit SE");
         setFormElement(Locator.name("sequenceNumMin"),"999.0000");
         setFormElement(Locator.name("sequenceNumMax"),"999.9999");
         selectOptionByValue(Locator.name("sequenceNumHandling"),"logUniqueByDate");
-        clickLinkWithText("save");
+        clickAndWait(Locator.linkWithText("save"));
 
         // "overview" is a dumb place for this link
-        clickLinkWithText("Overview");
-        clickLinkWithText("manage files");
+        clickAndWait(Locator.linkWithText("Overview"));
+        clickAndWait(Locator.linkWithText("manage files"));
         setPipelineRoot(getLabKeyRoot() + "/sampledata/study");
-        clickLinkWithText(PROJECT_NAME + " Study");
-        clickLinkWithText("Manage Files");
+        clickAndWait(Locator.linkWithText(PROJECT_NAME + " Study"));
+        clickAndWait(Locator.linkWithText("Manage Files"));
 
         clickButton("Process and Import Data");
         _extHelper.selectFileBrowserItem("specimens/" + FILE);
@@ -106,7 +106,7 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText("BAL"));
         assertLinkPresentWithText("BAL");
         assertLinkPresentWithText("Blood");
-        clickLinkWithText("By Individual Vial");
+        clickAndWait(Locator.linkWithText("By Individual Vial"));
         assertLinkPresentWithTextCount("P1000001", 6);
         assertLinkPresentWithTextCount("P2000001", 3);
         assertLinkPresentWithTextCount("P20043001", 5);
@@ -116,19 +116,19 @@ public class SampleMindedImportTest extends BaseWebDriverTest
 
         clickTab("Specimen Data");
         waitForElement(Locator.linkWithText("NewSpecimenType"));
-        clickLinkWithText("NewSpecimenType");
+        clickAndWait(Locator.linkWithText("NewSpecimenType"));
         assertTextPresent("EARL (003)");
         assertTextPresent("REF-A Cytoplasm Beaker");
 
         clickTab("Specimen Data");
         waitForElement(Locator.linkWithText("BAL"));
-        clickLinkWithText("BAL");
+        clickAndWait(Locator.linkWithText("BAL"));
         assertTextPresent("BAL Supernatant");
         assertTextPresent("FREE (007)");
         DataRegionTable specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
         Assert.assertEquals("Incorrect number of vials.", "Count:  5", specimenTable.getTotal("Global Unique Id"));
 
-        clickLinkWithText("Group vials");
+        clickAndWait(Locator.linkWithText("Group vials"));
         assertLinkPresentWithTextCount("P20043001", 2);
         assertTextPresent("Visit SE");
 

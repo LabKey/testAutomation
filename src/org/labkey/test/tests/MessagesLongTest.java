@@ -62,7 +62,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
     protected void permissionCheck(String permission, boolean readAbility)
     {
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         enterPermissionsUI();
         removePermission("Users","Reader");
         removePermission("Users","Author");
@@ -70,7 +70,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         setPermissions("Users", permission);
         exitPermissionsUI();
         impersonate(USER1);
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         if (readAbility)
             assertTextPresent(MSG1_BODY);
         else
@@ -107,7 +107,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         doTestEmailPrefsMine();
 
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         log("Check email preferences");
         clickWebpartMenuItem("Messages", "Email", "Preferences");
         checkRadioButton("emailPreference", "1");
@@ -135,7 +135,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertTextPresent("All conversations");
 
         waitForExtMaskToDisappear();
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
 
         log("Check message works in Wiki");
         clickWebpartMenuItem("Messages", "New");
@@ -145,7 +145,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         selectOptionByText("rendererType", "Wiki Page");
         submit();
         assertTextPresent(MSG1_TITLE);
-        clickLinkWithText("view message or respond");
+        clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(EXPIRES1);
         assertTextPresent("<b>first message testing</b>");
         clickButton("Delete Message");
@@ -161,8 +161,8 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertLinkPresentWithText(HTML_BODY_WEBPART_TEST);
 
         log("Check that edit works");
-        clickLinkWithText("view message or respond");
-        clickLinkWithText("edit");
+        clickAndWait(Locator.linkWithText("view message or respond"));
+        clickAndWait(Locator.linkWithText("edit"));
         setFormElement("body", MSG1_BODY);
         submit();
         assertTextPresent(MSG1_BODY);
@@ -184,7 +184,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         setFormElement("body", RESP2_BODY);
         submit();
         assertTextPresent(RESP2_BODY);
-        clickLinkWithText("Messages");
+        clickAndWait(Locator.linkWithText("Messages"));
         assertTextPresent("2 responses");
 
         log("Create fake user for permissions check");
@@ -199,7 +199,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         permissionCheck("Editor", true);
 
         log("Check with security");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         clickWebpartMenuItem("Messages", "Customize");
         checkRadioButton("secure", 1);
         clickButton("Save");
@@ -207,7 +207,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         permissionCheck("Editor", true);
 
         log("Check if the customized names work");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         clickWebpartMenuItem("Messages", "Customize");
         setFormElement("boardName", "Notes");
         setFormElement("conversationName", "Thread");
@@ -223,23 +223,23 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickWebpartMenuItem("Messages", "New");
         setFormElement("title", MSG2_TITLE);
         submit();
-        clickLinkWithText("Messages");
-        clickLinkWithText("view message or respond");
+        clickAndWait(Locator.linkWithText("Messages"));
+        clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(MSG2_TITLE);
-        clickLinkWithText("Messages");
+        clickAndWait(Locator.linkWithText("Messages"));
         clickLinkWithText("view message or respond", 1);
         clickButton("Respond");
         submit();
-        clickLinkWithText("Messages");
-        clickLinkWithText("Customize");
+        clickAndWait(Locator.linkWithText("Messages"));
+        clickAndWait(Locator.linkWithText("Customize"));
         checkRadioButton("sortOrderIndex", 1);
         clickButton("Save");
-        clickLinkWithText("view message or respond");
+        clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(MSG1_TITLE);
 
         log("Edit other customize options");
-        clickLinkWithText("Messages");
-        clickLinkWithText("Customize");
+        clickAndWait(Locator.linkWithText("Messages"));
+        clickAndWait(Locator.linkWithText("Customize"));
         uncheckCheckbox("titleEditable");
         checkCheckbox("memberList");
         checkCheckbox("status");
@@ -253,7 +253,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickButton("New");
         assertTextPresent(displayNameFromEmail(USER1));
         clickButton("Cancel");
-        clickLinkWithText(MSG2_TITLE);
+        clickAndWait(Locator.linkWithText(MSG2_TITLE));
         clickButton("Respond");
         selectOptionByText("status", "Closed");
         assertFormElementEquals("assignedTo", "");
@@ -261,10 +261,10 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertTextPresent("Status: Closed");
         assertTextNotPresent("Expires:");
         impersonate(USER1);
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         assertTextNotPresent(MSG2_TITLE);
         stopImpersonating();
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
 
         // USER1 is now a reader
         log("Test member list");
@@ -279,7 +279,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         setFormElement("newUsers", USER2);
         uncheckCheckbox("sendMail");
         clickButton("Add Users");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
 
         // USER3 is a Project Administrator
         enterPermissionsUI();
@@ -288,7 +288,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         uncheckCheckbox("sendEmail");
         clickButton("Update Group Membership");
 
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         clickWebpartMenuItem("Messages", "New");
         setFormElement("emailList", USER2);
         clickButtonContainingText("Submit", "Title must not be blank");
@@ -300,37 +300,37 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         setFormElement("emailList", USER1);
         selectOptionByText("assignedTo", displayNameFromEmail(USER3));
         submit();
-        clickLinkWithText("view message or respond");
+        clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent("Members: "+USER1);
         assertTextPresent("Assigned To: "+ displayNameFromEmail(USER3));
         impersonate(USER1);
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         assertTextPresent(MSG3_TITLE);
         stopImpersonating();
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         clickWebpartMenuItem("Messages", "Customize");
         checkRadioButton("secure", 0);
         clickButton("Save");
-        clickLinkWithText(MSG3_TITLE);
+        clickAndWait(Locator.linkWithText(MSG3_TITLE));
         clickButton("Delete Message");
         clickButton("Delete");
 
         log("Check delete response works and is recognized");
         clickLinkWithText("view message or respond", 1);
-        clickLinkWithText("delete");
+        clickAndWait(Locator.linkWithText("delete"));
         clickButton("Delete");
         assertTextNotPresent(RESP1_BODY);
-        clickLinkWithText("Messages");
+        clickAndWait(Locator.linkWithText("Messages"));
         assertTextPresent("2 response");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         assertTextNotPresent(MSG2_TITLE);
-        clickLinkWithText("view message or respond");
+        clickAndWait(Locator.linkWithText("view message or respond"));
 
         log("Check delete message works fully");
         clickButton("Delete Message");
         clickButton("Delete");
         assertTextNotPresent(MSG1_TITLE);
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         assertTextNotPresent(MSG1_TITLE);
 
         log("Check emailed messages");
@@ -352,7 +352,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         String _messageTitle = "Mine Message";
         String _messageBody = "test";
 
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
         clickButton("Done");
 
@@ -365,8 +365,8 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         impersonate(RESPONDER);
 
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(_messageTitle);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(_messageTitle));
         clickButton("Respond");
         setFormElement("title", _messageTitle + " response");
         setFormElement("body", _messageBody + " response");
@@ -374,7 +374,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         stopImpersonating();
 
-        clickLinkWithText(PROJECT_NAME);        
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         goToModule("Dumbster");
         DataRegionTable record = new DataRegionTable("EmailRecord", this, false, false);
         List<String> subject = record.getColumnDataAsText("Message");

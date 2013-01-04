@@ -110,8 +110,8 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         waitForText("Save successful.", 20000);
 
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickLinkWithText("Assay List");
-        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
 
         log("Uploading Elispot Runs");
         clickButton("Import Data");
@@ -185,7 +185,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     @LogMethod
     private void assertElispotData()
     {
-        clickLinkWithText("Zeiss_datafile.txt");
+        clickAndWait(Locator.linkWithText("Zeiss_datafile.txt"));
         
         assertTextPresent("ptid 1 C");
         assertTextPresent("ptid 2 C");
@@ -197,8 +197,8 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         assertTextPresent("atg_3C");
         assertTextPresent("atg_4C");
 
-        clickLinkWithText("view runs");
-        clickLinkWithText("AID_0161456 W4.txt");
+        clickAndWait(Locator.linkWithText("view runs"));
+        clickAndWait(Locator.linkWithText("AID_0161456 W4.txt"));
 
         assertTextPresent("ptid 1 B");
         assertTextPresent("ptid 2 B");
@@ -235,7 +235,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.revertUnsavedView();
 
-        clickLinkWithText("view runs");
+        clickAndWait(Locator.linkWithText("view runs"));
         clickLinkContainingText("details");
 
         assertTextPresent("Plate Summary Information");
@@ -311,7 +311,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     {
         clickButton("Manage Assays");
         clickButton("Configure Plate Templates");
-        clickLinkWithText("new 96 well (8x12) ELISpot default template");
+        clickAndWait(Locator.linkWithText("new 96 well (8x12) ELISpot default template"));
         Locator nameField = Locator.id("templateName");
         waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
 
@@ -368,7 +368,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         log("Uploading Elispot Runs with a transform script");
 
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickEditAssayDesign();
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
@@ -376,7 +376,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         waitForElement(Locator.id("dataregion_Runs"));
 
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickButton("Import Data");
         clickButton("Next");
 
@@ -385,7 +385,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         uploadFile(TEST_ASSAY_ELISPOT_FILE4, "D", "Save and Finish", false);
 
         // verify there is a spot count value of 747.747 and a custom column added by the transform
-        clickLinkWithText("AID_0161456 W5.txt");
+        clickAndWait(Locator.linkWithText("AID_0161456 W5.txt"));
         assertTextPresent("747.7");
         assertTextPresent("Custom Elispot Column");
         assertTextPresent("transformed!");
@@ -402,7 +402,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     protected void removeTransformScript()
     {
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickEditAssayDesign();
         waitForElement(Locator.css("#partdelete_removeTransformScript0 img"));
         click(Locator.css("#partdelete_removeTransformScript0 img"));
@@ -423,7 +423,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     protected void verifyBackgroundSubtractionOnExistingRun()
     {
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         assertTextPresent("Background Subtraction");
         DataRegionTable runTable = new DataRegionTable("Runs", this, true, true);
         List<String> column = runTable.getColumnDataAsText("Background Subtraction");
@@ -439,7 +439,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         // Check well counts for TEST_ASSAY_ELISPOT_FILE4
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickLinkWithText("run details", 3);
         waitForElement(Locator.css("#plate-summary-div-1 table"));
 
@@ -457,7 +457,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         // Check that all runs have been subtracted
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         column = runTable.getColumnDataAsText("Background Subtraction");
         for(String item : column)
         {
@@ -478,7 +478,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     protected void verifyBackgroundSubtractionOnNewRun()
     {
         clickFolder(TEST_ASSAY_PRJ_ELISPOT);
-        clickLinkWithText(TEST_ASSAY_ELISPOT);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickButton("Import Data");
         clickButton("Next");
 
@@ -492,7 +492,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
             Assert.assertEquals("Background subtraction should be true for all runs.", "true", item);
         }
 
-        clickLinkWithText("run details");
+        clickAndWait(Locator.linkWithText("run details"));
         waitForElement(Locator.css("#plate-summary-div-1 table"));
         //Assert.assertEquals("Incorrect spot counts after background subtraction.", FILE5_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 

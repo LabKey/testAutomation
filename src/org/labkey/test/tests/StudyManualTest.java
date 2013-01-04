@@ -67,7 +67,7 @@ public class StudyManualTest extends StudyTest
         clickButton("Create Study");
 
         // change study label
-        clickLinkWithText("Change Study Properties");
+        clickAndWait(Locator.linkWithText("Change Study Properties"));
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", getStudyLabel());
         clickButton("Submit");
@@ -75,8 +75,8 @@ public class StudyManualTest extends StudyTest
 
         // import visit map
         clickTab("Manage");
-        clickLinkWithText("Manage Visits");
-        clickLinkWithText("Import Visit Map");
+        clickAndWait(Locator.linkWithText("Manage Visits"));
+        clickAndWait(Locator.linkWithText("Import Visit Map"));
         String visitMapData = getFileContents(VISIT_MAP);
         setLongTextField("content", visitMapData);
         clickButton("Import");
@@ -86,9 +86,9 @@ public class StudyManualTest extends StudyTest
 
         // define forms
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("Define Dataset Schemas");
-        clickLinkWithText("Bulk Import Schemas");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("Define Dataset Schemas"));
+        clickAndWait(Locator.linkWithText("Bulk Import Schemas"));
         setFormElement("typeNameColumn", "platename");
         setFormElement("labelColumn", "platelabel");
         setFormElement("typeIdColumn", "plateno");
@@ -97,24 +97,24 @@ public class StudyManualTest extends StudyTest
 
         // setup cohorts:
         clickTab("Manage");
-        clickLinkWithText("Manage Cohorts");
+        clickAndWait(Locator.linkWithText("Manage Cohorts"));
         selectOptionByText("participantCohortDataSetId", "EVC-1: Enrollment Vaccination");
         waitForPageToLoad();
         selectOptionByText("participantCohortProperty", "2. Enrollment group");
         clickButton("Update Assignments");
 
         // configure QC state management so that all data is displayed by default (we'll test with hidden data later):
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
-        clickLinkWithText("Manage Dataset QC States");
+        clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         selectOptionByText("showPrivateDataByDefault", "All data");
         clickButton("Save");
 
         // upload datasets:
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         setPipelineRoot(getPipelinePath());
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("Manage Files");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("Manage Files"));
         clickButton("Process and Import Data");
         _extHelper.selectFileBrowserItem("datasets/Study001.dataset");
         if (isNavButtonPresent("Delete log"))
@@ -151,8 +151,8 @@ public class StudyManualTest extends StudyTest
         importCustomVisitMapping();
 
         // Test clearing the custom mapping
-        clickLinkWithText("Clear Custom Mapping");
-        clickLinkWithText("OK");
+        clickAndWait(Locator.linkWithText("Clear Custom Mapping"));
+        clickAndWait(Locator.linkWithText("OK"));
         assertTextPresent("The custom mapping is currently empty");
         assertNavButtonPresent("Import Custom Mapping");
         assertNavButtonNotPresent("Replace Custom Mapping");
@@ -172,10 +172,10 @@ public class StudyManualTest extends StudyTest
         if (!isLinkPresentContainingText("Visit Import Mapping"))
         {
             clickTab("Manage");
-            clickLinkWithText("Manage Visits");
+            clickAndWait(Locator.linkWithText("Manage Visits"));
         }
 
-        clickLinkWithText("Visit Import Mapping");
+        clickAndWait(Locator.linkWithText("Visit Import Mapping"));
         clickButton("Import Custom Mapping");
         setFormElement(Locator.id("tsv"), VISIT_IMPORT_MAPPING);
         clickButton("Submit");
@@ -188,8 +188,8 @@ public class StudyManualTest extends StudyTest
     {
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("DEM-1: Demographics");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButtonContainingText("Edit Definition");
         waitForElement(Locator.name("description"), WAIT_FOR_JAVASCRIPT);
         setFormElement("description", DEMOGRAPHICS_DESCRIPTION);
@@ -208,7 +208,7 @@ public class StudyManualTest extends StudyTest
     protected void hideVisits(String... visitLabel)
     {
         clickTab("Manage");
-        clickLinkWithText("Manage Visits");
+        clickAndWait(Locator.linkWithText("Manage Visits"));
 
         Set<String> labels = new HashSet<String>(Arrays.asList(visitLabel));
         int row = 2;  // Skip header row (row index is one-based)
@@ -246,8 +246,8 @@ public class StudyManualTest extends StudyTest
     {
         clickFolder(getFolderName());
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("Create New Dataset");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("Create New Dataset"));
         setFormElement("typeName", "verifyAssay");
         clickButton("Next");
 

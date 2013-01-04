@@ -70,14 +70,14 @@ public class WikiTest extends BaseWebDriverTest
         log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
         goToFolderManagement();
-        clickLinkWithText("Folder Type");
+        clickAndWait(Locator.linkWithText("Folder Type"));
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
         enableModule(PROJECT_NAME, "MS2");
 
         goToAdminConsole();
-        clickLinkWithText("full-text search");
+        clickAndWait(Locator.linkWithText("full-text search"));
         if (isTextPresent("pause crawler"))
             clickButton("pause crawler");
         beginAt(_driver.getCurrentUrl().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
@@ -106,7 +106,7 @@ public class WikiTest extends BaseWebDriverTest
         searchFor(PROJECT_NAME, "Wiki", 1, WIKI_PAGE_TITLE);
 
         log("test edit wiki");
-        clickLinkWithText("Edit");
+        clickAndWait(Locator.linkWithText("Edit"));
         setFormElement(Locator.name("title"), WIKI_PAGE_ALTTITLE);
         String wikiPageContentEdited =
             "<b>Some HTML content</b><br>\n" +
@@ -132,7 +132,7 @@ public class WikiTest extends BaseWebDriverTest
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);
 
         log("verify second wiki part pointing to first handled delete well");
-        clickLinkWithText(getSubolderName());
+        clickAndWait(Locator.linkWithText(getSubolderName()));
         assertTextPresent("This folder does not currently contain any wiki pages to display");
     }
 

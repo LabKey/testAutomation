@@ -45,7 +45,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
 
         ensureAdminMode();
         goToAdminConsole();
-        clickLinkWithText("protein databases");
+        clickAndWait(Locator.linkWithText("protein databases"));
         assertTextNotPresent(UNIPROT_FILENAME);
 
         clickButton("Load New Annot File");
@@ -66,7 +66,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         assertTextPresent(UNIPROT_FILENAME);
 
         _containerHelper.createProject(PROJECT_NAME, "MS2");
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         setFormElement("identifier", "Ppia");
         uncheckCheckbox("restrictProteins");
         clickButton("Search");
@@ -87,7 +87,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         selenium.close();
         selenium.selectWindow(null);
 
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         setFormElement("identifier", "Defa1");
         uncheckCheckbox("restrictProteins");
         clickButton("Search");

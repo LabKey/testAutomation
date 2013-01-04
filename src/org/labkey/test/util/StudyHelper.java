@@ -64,10 +64,10 @@ public class StudyHelper extends AbstractHelper
     {
         if( !_test.isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
         {
-            _test.clickLinkWithText(projectName);
-            _test.clickLinkWithText(studyFolder);
+            _test.clickAndWait(Locator.linkWithText(projectName));
+            _test.clickAndWait(Locator.linkWithText(studyFolder));
             _test.clickTab("Manage");
-            _test.clickLinkWithText("Manage " + participantString + " Groups");
+            _test.clickAndWait(Locator.linkWithText("Manage " + participantString + " Groups"));
             _test.waitForText("groups allow");
         }
         _test.log("Create "+participantString+" Group: " + groupName);
@@ -215,7 +215,7 @@ public class StudyHelper extends AbstractHelper
     @LogMethod
     public void exportStudy(String folder, boolean useXmlFormat, boolean zipFile)
     {
-        _test.clickLinkWithText(folder);
+        _test.clickAndWait(Locator.linkWithText(folder));
         _test.clickTab("Manage");
         _test.clickButton("Export Study");
 

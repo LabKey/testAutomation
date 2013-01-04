@@ -193,7 +193,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     protected void deleteReport(String reportName)
     {
-        clickLinkWithText("Manage Views");
+        clickAndWait(Locator.linkWithText("Manage Views"));
         final Locator report = Locator.tagContainingText("div", reportName);
 
         // select the report and click the delete button
@@ -266,8 +266,8 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doCreateCharts()
     {
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("DEM-1: Demographics");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
         clickMenuButton("Views", "Create", "Crosstab View");
         selectOptionByValue("rowField",  "DEMsex");
@@ -281,14 +281,14 @@ public class ReportTest extends StudyBaseTest
         setFormElement("label", "TestReport");
         clickButton("Save");
 
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         assertTextPresent("TestReport");
-        clickLinkWithText("TestReport");
+        clickAndWait(Locator.linkWithText("TestReport"));
 
         assertTableCellTextEquals("report", 2, 0, "Female");
 
         //Delete the report
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
         deleteReport("TestReport");
 
@@ -300,13 +300,13 @@ public class ReportTest extends StudyBaseTest
         clickButton("Create View");
         assertLinkPresentWithText("999320016");
         assertNavButtonNotPresent("go");
-        clickLinkWithText(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
         deleteReport(viewName);
 
         // create new external report
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("DEM-1: Demographics");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickMenuButton("Views", "Create", "Advanced View");
         selectOptionByText("queryName", "DEM-1: Demographics");
         String java = System.getProperty("java.home") + "/bin/java";
@@ -320,8 +320,8 @@ public class ReportTest extends StudyBaseTest
         setFormElement("label", "tsv");
         selectOptionByText("showWithDataset", "DEM-1: Demographics");
         clickButton("Save");
-        clickLinkWithText(getStudyLabel());
-        clickLinkWithText("tsv");
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickAndWait(Locator.linkWithText("tsv"));
         assertTextPresent("Female");
     }
 
@@ -339,7 +339,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.linkWithText("Projects"));
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText(DATA_SET);
+        clickAndWait(Locator.linkWithText(DATA_SET));
         clickMenuButton("Views", "Create", "R View");
         setQueryEditorValue("script", "");
 
@@ -401,7 +401,7 @@ public class ReportTest extends StudyBaseTest
         clickMenuButton("Views", "default");
         pushLocation();
         //clickButton("Reports >>", 0);
-        //clickLinkWithText(R_SCRIPTS[0]);
+        //clickAndWait(Locator.linkWithText(R_SCRIPTS[0]));
         clickMenuButton("Views", R_SCRIPTS[0]);
         waitForText("Console output", WAIT_FOR_PAGE);
         assertTextPresent("null device");
@@ -421,7 +421,7 @@ public class ReportTest extends StudyBaseTest
         impersonate(AUTHOR_USER);
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText(DATA_SET);
+        clickAndWait(Locator.linkWithText(DATA_SET));
         createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true, new String[0]);
         stopImpersonating();
         popLocation();
@@ -460,7 +460,7 @@ public class ReportTest extends StudyBaseTest
         log("Access shared R script");
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText(DATA_SET);
+        clickAndWait(Locator.linkWithText(DATA_SET));
         pushLocation();
         assertElementNotPresent(Locator.xpath("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
         clickMenuButton("Views", R_SCRIPTS[1]);
@@ -472,7 +472,7 @@ public class ReportTest extends StudyBaseTest
         stopImpersonating();
         clickFolder(getProjectName());
         if (isTextPresent("Enable Admin"))
-            clickLinkWithText("Enable Admin");
+            clickAndWait(Locator.linkWithText("Enable Admin"));
         enterPermissionsUI();
         setPermissions("Users", "Project Administrator");
         exitPermissionsUI();
@@ -480,7 +480,7 @@ public class ReportTest extends StudyBaseTest
         log("Create a new R script that uses other R scripts");
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText(DATA_SET);
+        clickAndWait(Locator.linkWithText(DATA_SET));
         clickMenuButton("Views", "Create", "R View");
         click(Locator.xpath("//td[contains(text(),'" + R_SCRIPTS[0] + "')]/input"));
         click(Locator.xpath("//td[contains(text(),'" + R_SCRIPTS[1] + "')]/input"));
@@ -844,7 +844,7 @@ public class ReportTest extends StudyBaseTest
     {
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText("Manage Files");
+        clickAndWait(Locator.linkWithText("Manage Files"));
         if (isTextPresent(item))
         {
             checkCheckbox(Locator.xpath("//td/a[contains(text(), '" + item + "')]/../../td/input"));
@@ -859,7 +859,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.linkWithText("Projects"));
         sleep(3000);
         clickFolder(getProjectName());
-        clickLinkWithText("My Study");
+        clickAndWait(Locator.linkWithText("My Study"));
 
         // create a test group and give it container read perms
         enterPermissionsUI();
@@ -877,7 +877,7 @@ public class ReportTest extends StudyBaseTest
         clickButton("Save and Finish");
 
         // give the test group read access to only the DEM-1 dataset
-        clickLinkWithText("My Study");
+        clickAndWait(Locator.linkWithText("My Study"));
         enterStudySecurity();
 
         // enable advanced study security
@@ -898,7 +898,7 @@ public class ReportTest extends StudyBaseTest
         clickFolder(getProjectName());
         clickFolder(getFolderName());
 
-        clickLinkWithText("APX-1: Abbreviated Physical Exam");
+        clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         clickMenuButton("Charts", "Create Chart View");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
         selectOptionByText("columnsX", "1. Weight");
@@ -943,7 +943,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.linkWithText("Projects"));
         sleep(3000);
         clickFolder(getProjectName());
-        clickLinkWithText("My Study");
+        clickAndWait(Locator.linkWithText("My Study"));
 
         clickReportGridLink("participant chart", "permissions");
         selenium.click("useCustom");
@@ -958,13 +958,13 @@ public class ReportTest extends StudyBaseTest
         goToAdminConsole();
         impersonate(TEST_USER);
         clickFolder(getProjectName());
-        clickLinkWithText("My Study");
+        clickAndWait(Locator.linkWithText("My Study"));
 
         assertLinkNotPresentWithText("APX-1: Abbreviated Physical Exam");
-        clickLinkWithText("participant chart");
+        clickAndWait(Locator.linkWithText("participant chart"));
 
         clickFolder(getFolderName());
-        clickLinkWithText(TEST_GRID_VIEW);
+        clickAndWait(Locator.linkWithText(TEST_GRID_VIEW));
         assertTextPresent("999320016");
         pushLocation();
         clickMenuButton("Views", "default");
@@ -1272,9 +1272,9 @@ public class ReportTest extends StudyBaseTest
         _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
 
         //Participant report with multiple demographic fields
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText("DEM-1: Demographics");
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButtonContainingText("Edit Definition");
         waitForElement(Locator.xpath("//input[@name='demographicData']"));
         checkCheckbox(Locator.xpath("//input[@name='demographicData']"));
@@ -1533,7 +1533,7 @@ public class ReportTest extends StudyBaseTest
     {
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText("Manage Views");
+        clickAndWait(Locator.linkWithText("Manage Views"));
         clickMenuButton("Create", "Box Plot");
 
         _extHelper.waitForExtDialog("Select Chart Query");
@@ -1611,7 +1611,7 @@ public class ReportTest extends StudyBaseTest
     {
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText("RCH-1: Reactogenicity-Day 1");
+        clickAndWait(Locator.linkWithText("RCH-1: Reactogenicity-Day 1"));
         setFilter("Dataset", "RCHtempc", "Is Less Than", "39");
         clickMenuButton("Charts", "Create Box Plot");
 
@@ -1652,7 +1652,7 @@ public class ReportTest extends StudyBaseTest
     {
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText("Types");
+        clickAndWait(Locator.linkWithText("Types"));
 
         createQuickChart("Dataset", "dbl");
 
@@ -1708,7 +1708,7 @@ public class ReportTest extends StudyBaseTest
     {
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText("Manage Views");
+        clickAndWait(Locator.linkWithText("Manage Views"));
         clickMenuButton("Create", "Scatter Plot");
 
         _extHelper.waitForExtDialog("Select Chart Query");
@@ -1791,7 +1791,7 @@ public class ReportTest extends StudyBaseTest
     {
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText("APX-1: Abbreviated Physical Exam");
+        clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         setFilter("Dataset", "APXpulse", "Is Less Than", "100");
         clickMenuButton("Charts", "Create Scatter Plot");
 
@@ -1827,7 +1827,7 @@ public class ReportTest extends StudyBaseTest
     {
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText("Types");
+        clickAndWait(Locator.linkWithText("Types"));
 
         createQuickChart("Dataset", "dbl");
 
@@ -1987,7 +1987,7 @@ public class ReportTest extends StudyBaseTest
         impersonate(DEVELOPER_USER);
         clickFolder(getProjectName());
         clickFolder(getFolderName());
-        clickLinkWithText(SCATTER_PLOT_NAME_MV + " PointClickFn");
+        clickAndWait(Locator.linkWithText(SCATTER_PLOT_NAME_MV + " PointClickFn"));
         waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
         waitForText("Test Title");
         pushLocation();
@@ -2065,8 +2065,8 @@ public class ReportTest extends StudyBaseTest
 
         setDemographicsBit("DEM-1: Demographics", true);
 
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Mouse Groups");
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Manage Mouse Groups"));
         _extHelper.clickExtButton("Create", 0);
         _extHelper.waitForExtDialog("Define Mouse Group");
 
@@ -2079,7 +2079,7 @@ public class ReportTest extends StudyBaseTest
         setDemographicsBit("DEM-1: Demographics", false);
 
         // Check that groups have correct number of members
-        clickLinkWithText("Mice");
+        clickAndWait(Locator.linkWithText("Mice"));
         waitForText("Cohorts"); // Wait for participant list to appear.
         sleep(500); // Sleep because the list takes a while to populate.
 
@@ -2095,7 +2095,7 @@ public class ReportTest extends StudyBaseTest
 
         // Test changing category and changing it back
         clickTab("Manage");
-        clickLinkWithText("Manage Mouse Groups");
+        clickAndWait(Locator.linkWithText("Manage Mouse Groups"));
         _extHelper.waitForLoadingMaskToDisappear(10000);
         _studyHelper.editCustomParticipantGroup(MICE_C, "Mouse", "Cat Mice Foo", true, true);
         waitForText("Cat Mice Foo");
@@ -2106,7 +2106,7 @@ public class ReportTest extends StudyBaseTest
         _studyHelper.editCustomParticipantGroup(MICE_C, "Mouse", null, false, true, "999320703,999320719");
 
         // Check that group has correct number of participants
-        clickLinkWithText("Mice");
+        clickAndWait(Locator.linkWithText("Mice"));
         waitForText("Filter"); // Wait for participant list to appear.
         deselectAllFilterGroups();
         waitForText("No matching Mice");
@@ -2185,7 +2185,7 @@ public class ReportTest extends StudyBaseTest
         clickFolder(getProjectName());
         clickFolder(getFolderName());
 
-        clickLinkWithText("AE-1:(VTN) AE Log");
+        clickAndWait(Locator.linkWithText("AE-1:(VTN) AE Log"));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewFilter("MouseId", "Mouse Id", "Equals One Of", "999320533;999320541;999320529;999320518");
         _customizeViewsHelper.saveCustomView(QUERY_REPORT_VIEW_NAME_2);
@@ -2210,7 +2210,7 @@ public class ReportTest extends StudyBaseTest
 
         clickTab("Clinical and Assay Data");
         waitForText(datasetName);
-        clickLinkWithText(datasetName);
+        clickAndWait(Locator.linkWithText(datasetName));
 
         clickMenuButton("Views", QUERY_REPORT_NAME_2);
 

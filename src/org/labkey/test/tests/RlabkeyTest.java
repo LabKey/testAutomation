@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.RReportHelper;
@@ -70,7 +71,7 @@ public class RlabkeyTest extends SimpleApiTest
         clickButton("Save");
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[0]);
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         addWebPart("Issues List");
         clickButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
@@ -80,7 +81,7 @@ public class RlabkeyTest extends SimpleApiTest
         setFormElement("title", ISSUE_TITLE_1);
         clickButton("Save");
 
-        clickLinkWithText(PROJECT_NAME_2);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME_2));
         addWebPart("Issues List");
         clickButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
@@ -105,7 +106,7 @@ public class RlabkeyTest extends SimpleApiTest
             if (!tests.isEmpty())
             {
                 clickFolder(PROJECT_NAME);
-                clickLinkWithText(LIST_NAME);
+                clickAndWait(Locator.linkWithText(LIST_NAME));
                 clickMenuButton("Views", "Create", "R View");
 
                 // we want to load the Rlabkey package from the override location

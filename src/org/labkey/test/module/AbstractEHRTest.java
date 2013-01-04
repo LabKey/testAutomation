@@ -164,7 +164,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         String[] prop = {"/" + PROJECT_NAME, "EHRStudyContainer", "/" + CONTAINER_PATH};
         setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(prop)));
 
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         beginAt(getBaseURL()+"/ehr/"+CONTAINER_PATH+"/populateInitialData.view");
         clickButton("Delete All", 0);
         waitForElement(Locator.xpath("//div[text() = 'Delete Complete']"), 200000);
@@ -192,7 +192,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
 
         log("Remove all webparts");
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         addWebPart("Quick Search");
 
         //note: this expects the study to already have been imported
@@ -289,9 +289,9 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     {
         log("Define QC states for EHR study");
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         goToManageStudy();
-        clickLinkWithText("Manage Dataset QC States");
+        clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
 
         for(EHRQCState qcState : EHRQCState.values())
         {
@@ -329,7 +329,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         _helper.createPermissionsGroupAPI(REQUEST_ADMIN.getGroup(), getProjectName(), REQUEST_ADMIN.getUserId());
 
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
         enterPermissionsUI();
         uncheckInheritedPermissions();

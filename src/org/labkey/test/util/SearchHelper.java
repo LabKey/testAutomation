@@ -177,7 +177,7 @@ public class SearchHelper extends AbstractHelper
     {
         _test.ensureAdminMode();
         _test.goToAdmin();
-        _test.clickLinkWithText("full-text search");
+        _test.clickAndWait(Locator.linkWithText("full-text search"));
         _test.clickButton("Delete Index");
     }
 

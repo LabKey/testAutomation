@@ -158,8 +158,8 @@ public class AssayTest extends AbstractAssayTest
     private void verifyRunDeletionRecallsDatasetRows()
     {
         clickFolder(getProjectName());
-        clickLinkWithText(TEST_ASSAY_FLDR_LAB1);
-        clickLinkWithText(TEST_ASSAY);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_LAB1));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
         checkDataRegionCheckbox("Runs", 0);
         clickButton("Delete");
         // Make sure that it shows that the data is part of study datasets
@@ -169,13 +169,13 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Confirm Delete");
 
         // Be sure that we have a special audit record
-        clickLinkWithText("view copy-to-study history");
+        clickAndWait(Locator.linkWithText("view copy-to-study history"));
         assertTextPresent("3 row(s) were recalled to the assay: ");
 
         // Verify that the deleted run data is gone from the dataset
-        clickLinkWithText(TEST_ASSAY_FLDR_STUDY2);
-        clickLinkWithText("1 dataset");
-        clickLinkWithText(TEST_ASSAY);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY2));
+        clickAndWait(Locator.linkWithText("1 dataset"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
         assertTextPresent("AAA07XMC-04", "FirstRun");
         assertTextNotPresent("BAQ00051-09", "SecondRun");
     }
@@ -195,8 +195,8 @@ public class AssayTest extends AbstractAssayTest
     {
         // Verify that the results aren't editable by default
         clickFolder(TEST_ASSAY_FLDR_LAB1);
-        clickLinkWithText(TEST_ASSAY);
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
+        clickAndWait(Locator.linkWithText("view results"));
         assertLinkNotPresentWithText("edit");
         assertNavButtonNotPresent("Delete");
 
@@ -208,10 +208,10 @@ public class AssayTest extends AbstractAssayTest
 
         // Try an edit
         clickFolder(TEST_ASSAY_FLDR_LAB1);
-        clickLinkWithText(TEST_ASSAY);
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
+        clickAndWait(Locator.linkWithText("view results"));
         assertElementPresent(Locator.xpath("//img[@src='/labkey/Experiment/unflagDefault.gif'][@title='Flag for review']"), 9);
-        clickLinkWithText("edit");
+        clickAndWait(Locator.linkWithText("edit"));
         setFormElement(Locator.name("quf_SpecimenID"), "EditedSpecimenID");
         setFormElement(Locator.name("quf_VisitID"), "601.5");
         setFormElement(Locator.name("quf_testAssayDataProp5"), "a");
@@ -234,7 +234,7 @@ public class AssayTest extends AbstractAssayTest
         goToModule("Query");
         selectQuery("auditLog", "ExperimentAuditEvent");
         waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
-        clickLinkWithText("view data");
+        clickAndWait(Locator.linkWithText("view data"));
         assertTextPresent("Data row, id ", ", edited in " + TEST_ASSAY + ".",
                 "Specimen ID changed from 'AAA07XK5-05' to 'EditedSpecimenID'",
                 "Visit ID changed from '601.0' to '601.5",
@@ -328,8 +328,8 @@ public class AssayTest extends AbstractAssayTest
         clickFolder(TEST_ASSAY_PRJ_SECURITY);
         clickFolder(folder);
 
-        clickLinkWithText("Assay List");
-        clickLinkWithText(TEST_ASSAY);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
 
         //nav trail check
         assertTextPresent("Assay List >  " + TEST_ASSAY + " Batches >  ");
@@ -408,7 +408,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent(TEST_ASSAY_RUN_PROP1);
         assertTextPresent(TEST_ASSAY_SET_PROPERTIES[0]);
         assertTextPresent(TEST_ASSAY_SET_PROPERTIES[3]);
-        clickLinkWithText(TEST_RUN1);
+        clickAndWait(Locator.linkWithText(TEST_RUN1));
         isTextPresent("2.0");
         assertTextNotPresent("7.0");
         // Make sure that our specimen IDs resolved correctly
@@ -448,7 +448,7 @@ public class AssayTest extends AbstractAssayTest
         Assert.assertEquals(0, totalTrues);
 
         log("Check out the data for all of the runs");
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText("view results"));
         clearAllFilters("Data", "SpecimenID");
         assertTextPresent("7.0");
         assertTextPresent("18");
@@ -486,10 +486,10 @@ public class AssayTest extends AbstractAssayTest
     private void publishData()
     {
         log("Prepare visit map to check PTID counts in study navigator.");
-        clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Visits");
-        clickLinkWithText("Import Visit Map");
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1));
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Manage Visits"));
+        clickAndWait(Locator.linkWithText("Import Visit Map"));
         setFormElement("content", "301-302|X|Test Visit");
         clickButton("Import");
 
@@ -501,8 +501,8 @@ public class AssayTest extends AbstractAssayTest
 
         //select the Lab1 folder and view all the data for the test assay
         clickFolder(TEST_ASSAY_FLDR_LAB1);
-        clickLinkWithText(TEST_ASSAY);
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
+        clickAndWait(Locator.linkWithText("view results"));
 
         //select all the data rows and click publish
         selenium.click(".toggle");
@@ -544,7 +544,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent(TEST_RUN1_COMMENTS);
         assertTextPresent("2000-01-01");
         clickTab("Overview");
-        clickLinkWithText("Study Navigator");
+        clickAndWait(Locator.linkWithText("Study Navigator"));
 
         log("Test participant counts and row counts in study overview");
         String[] row2 = new String[]{TEST_ASSAY, "7", "1", "1", "1", "1", "1", "2"};
@@ -559,7 +559,7 @@ public class AssayTest extends AbstractAssayTest
         row2 = new String[]{TEST_ASSAY, "8", "1", "1", "1", "1", "1", "3"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
 
-        clickLinkWithText("8");
+        clickAndWait(Locator.linkWithText("8"));
 
         assertTextPresent("301.0");
         assertTextPresent("9.0");
@@ -576,12 +576,12 @@ public class AssayTest extends AbstractAssayTest
 
         // test recall
         clickFolder(TEST_ASSAY_FLDR_LAB1);
-        clickLinkWithText(TEST_ASSAY);
-        clickLinkWithText("view copy-to-study history");
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
+        clickAndWait(Locator.linkWithText("view copy-to-study history"));
 
         // Set a filter so that we know we're recalling SecondRun
         setFilter("audit", "Comment", "Starts With", "3 row(s) were copied to a study from the assay");
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         checkCheckbox(Locator.checkboxByName(".toggle"));
         clickButton("Recall Rows", 0);
         getConfirmationAndWait();
@@ -591,7 +591,7 @@ public class AssayTest extends AbstractAssayTest
         setFilter("audit", "Comment", "Starts With", "3 row(s) were copied to a study from the assay");
 
         // verify audit entry was adjusted
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         assertTextPresent("All rows that were previously copied in this event have been recalled");
 
         stopImpersonating();
@@ -610,9 +610,9 @@ public class AssayTest extends AbstractAssayTest
         clickFolder(TEST_ASSAY_PRJ_SECURITY);
         clickFolder(TEST_ASSAY_FLDR_STUDY3);
 
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Timepoints");
-        clickLinkWithText("Create New Timepoint");
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Manage Timepoints"));
+        clickAndWait(Locator.linkWithText("Create New Timepoint"));
         setFormElement("label", "Preexisting Timepoint");
         setFormElement("sequenceNumMin", "50");
         setFormElement("sequenceNumMax", "89");
@@ -622,8 +622,8 @@ public class AssayTest extends AbstractAssayTest
 
         //select the Lab1 folder and view all the data for the test assay
         clickFolder(TEST_ASSAY_FLDR_LAB1);
-        clickLinkWithText(TEST_ASSAY);
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
+        clickAndWait(Locator.linkWithText("view results"));
 
         //select all the data rows and click publish
         selenium.click(".toggle");
@@ -671,7 +671,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent(TEST_RUN1_COMMENTS);
         assertTextPresent("2000-01-01");
         clickTab("Overview");
-        clickLinkWithText("Study Navigator");
+        clickAndWait(Locator.linkWithText("Study Navigator"));
 
         log("Test participant counts and row counts in study overview");
         String[] row2 = new String[]{TEST_ASSAY, "8", "1", "2", "2", "1", "1", "1"};
@@ -685,8 +685,8 @@ public class AssayTest extends AbstractAssayTest
         log("Test that correct timepoints were created");
 
         clickTab("Overview");
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Timepoints");
+        clickAndWait(Locator.linkWithText("Manage Study"));
+        clickAndWait(Locator.linkWithText("Manage Timepoints"));
         Assert.assertTrue(isTextPresent("Day 0 - 7"));
         Assert.assertTrue(isTextPresent("Day 32 - 39"));
         Assert.assertTrue(isTextPresent("Day 90 - 95"));
@@ -708,9 +708,9 @@ public class AssayTest extends AbstractAssayTest
         clickFolder(TEST_ASSAY_PRJ_SECURITY);
         clickFolder(TEST_ASSAY_FLDR_STUDY2);
 
-        clickLinkWithText("Manage");
-        clickLinkWithText("Manage Visits");
-        clickLinkWithText("Import Visit Map");
+        clickAndWait(Locator.linkWithText("Manage"));
+        clickAndWait(Locator.linkWithText("Manage Visits"));
+        clickAndWait(Locator.linkWithText("Import Visit Map"));
         setFormElement("content",
             "6-13|X|Test Visit1\n" +
             "50-70|X|Test Visit2\n" +
@@ -720,8 +720,8 @@ public class AssayTest extends AbstractAssayTest
 
         //select the Lab1 folder and view all the data for the test assay
         clickFolder(TEST_ASSAY_FLDR_LAB1);
-        clickLinkWithText(TEST_ASSAY);
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
+        clickAndWait(Locator.linkWithText("view results"));
 
         //select all the data rows and click publish
         selenium.click(".toggle");
@@ -770,7 +770,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent(TEST_RUN1_COMMENTS);
         assertTextPresent("2000-01-01");
         clickTab("Overview");
-        clickLinkWithText("Study Navigator");
+        clickAndWait(Locator.linkWithText("Study Navigator"));
 
         log("Test participant counts and row counts in study overview");
         String[] row2 = new String[]{TEST_ASSAY, "8", "", "", "", "", "", "", "1", "", "", "4", "", "", "", "", "1", "1", "", "", "", "1", "", "", "", "", ""};
@@ -784,8 +784,8 @@ public class AssayTest extends AbstractAssayTest
         log("Test that correct timepoints were created");
 
         clickTab("Overview");
-        clickLinkWithText("Manage Study");
-        clickLinkWithText("Manage Visits");
+        clickAndWait(Locator.linkWithText("Manage Study"));
+        clickAndWait(Locator.linkWithText("Manage Visits"));
         Assert.assertTrue(isTextPresent("Test Visit1"));
         Assert.assertTrue(isTextPresent("6.0-13.0"));
         Assert.assertTrue(isTextPresent("Test Visit2"));
@@ -803,7 +803,7 @@ public class AssayTest extends AbstractAssayTest
 
         clickFolder(TEST_ASSAY_PRJ_SECURITY);
 
-        clickLinkWithText(TEST_ASSAY);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
         clickEditAssayDesign(false);
         waitForElement(Locator.xpath(getPropertyXPath("Data Fields") + "//td//input[@name='ff_name5']"), WAIT_FOR_JAVASCRIPT);
         _listHelper.setColumnName(getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
@@ -814,8 +814,8 @@ public class AssayTest extends AbstractAssayTest
 
         //ensure that label has changed in run data in Lab 1 folder
         clickFolder(TEST_ASSAY_FLDR_LAB1);
-        clickLinkWithText(TEST_ASSAY);
-        clickLinkWithText(TEST_RUN1);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
+        clickAndWait(Locator.linkWithText(TEST_RUN1));
         assertTextPresent(TEST_ASSAY_DATA_PROP_NAME + "edit");
         assertTextNotPresent(TEST_ASSAY_DATA_PROP_NAME + 4);
 
@@ -858,26 +858,26 @@ public class AssayTest extends AbstractAssayTest
 
         log("Testing clicking on a run");
         clickFolder(TEST_ASSAY_PRJ_SECURITY);
-        clickLinkWithText("FirstRun");
+        clickAndWait(Locator.linkWithText("FirstRun"));
         verifySpecimensPresent(3, 2, 0);
 
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText("view results"));
         clearAllFilters("Data", "SpecimenID");
         verifySpecimensPresent(3, 2, 3);
 
         log("Testing assay-study linkage");
-        clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1));
         addWebPart("Datasets");
-        clickLinkWithText(TEST_ASSAY);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY));
         clickButton("View Source Assay", defaultWaitForPage);
 
         assertTextPresent("FirstRun");
         assertTextPresent("SecondRun");
 
-        clickLinkWithText("FirstRun");
+        clickAndWait(Locator.linkWithText("FirstRun"));
         verifySpecimensPresent(3, 2, 0);
 
-        clickLinkWithText("view results");
+        clickAndWait(Locator.linkWithText("view results"));
         clearAllFilters("Data", "SpecimenID");
         verifySpecimensPresent(3, 2, 3);
 
@@ -886,7 +886,7 @@ public class AssayTest extends AbstractAssayTest
 
         log("Testing copy to study availability");
         clickFolder(TEST_ASSAY_PRJ_SECURITY);
-        clickLinkWithText("SecondRun");
+        clickAndWait(Locator.linkWithText("SecondRun"));
 
         clickCheckbox(".toggle");
         clickButton("Copy to Study", defaultWaitForPage);
@@ -904,7 +904,7 @@ public class AssayTest extends AbstractAssayTest
 
     private void verifyStudyList()
     {
-        clickLinkWithText(TEST_ASSAY_FLDR_STUDIES);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDIES));
         addWebPart("Study List");
         assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY1 + " Study");
         assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY2 + " Study");
@@ -917,7 +917,7 @@ public class AssayTest extends AbstractAssayTest
         assertLinkNotPresentWithText("edit");
 
         //edit study properties
-        clickLinkWithText(TEST_ASSAY_FLDR_STUDY1 + " Study");
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1 + " Study"));
         click(Locator.tagWithAttribute("img", "title", "Edit"));
         waitForElement(Locator.name("Investigator"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Investigator", INVESTIGATOR);
@@ -926,7 +926,7 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Submit");
 
         //verify study properties (grid view)
-        clickLinkWithText(TEST_ASSAY_FLDR_STUDIES);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDIES));
         DataRegionTable table = new DataRegionTable("qwpStudies", this, false);
         Assert.assertEquals("Studies not sorted correctly.", TEST_ASSAY_FLDR_STUDY1 + " Study", table.getDataAsText(0, "Label"));
         Assert.assertEquals("Failed to set study investigator.", INVESTIGATOR, table.getDataAsText(0, "Investigator"));

@@ -43,7 +43,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         log("here");
         setupSpecimenManagement();
         clickTab("Specimen Data");
-        clickLinkWithText("By Individual Vial");
+        clickAndWait(Locator.linkWithText("By Individual Vial"));
         
         selectSpecimens();
         createRequest();
@@ -55,7 +55,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 
     private void verifyAncillaryStudy()
     {
-        clickLinkWithText(ANCILLARY_STUDY_NAME);
+        clickAndWait(Locator.linkWithText(ANCILLARY_STUDY_NAME));
         assertTextPresent(ANCILLARY_STUDY_DESC);
         clickTab("Mice");
         assertTextPresent("Showing all " + specimensToSelect.length + " mice");
@@ -63,7 +63,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 
         clickTab("Manage");
         assertTextPresent("This study defines 7 Datasets", "This study defines 64 Visits", "This study references 24 locations (labs/sites/repositories)");
-        clickLinkWithText("Manage Datasets");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
         assertTextPresent(DOV_DATASET, "APX-1", "DEM-1", "FPX-1", "TM-1", "IV-1", "EVC-1");
     }
 

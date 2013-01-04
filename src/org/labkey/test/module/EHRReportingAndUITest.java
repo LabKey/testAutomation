@@ -58,8 +58,8 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     {
         String VIEW_TEXT = "Browse All";
 
-        clickLinkWithText(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForPageToLoad();
         waitAndClick(Locator.linkWithText("Browse All Datasets"));
         waitForPageToLoad();
@@ -204,7 +204,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     {
         String dataRegionName;
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
         waitAndClick(Locator.linkWithText("Animal History"));
         waitForPageToLoad();
@@ -378,7 +378,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     {
         log("Quick Search - Show Animal");
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("animal"), MORE_ANIMAL_IDS[0]);
         clickButton("Show Animal");
@@ -386,7 +386,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
 //        log("Quick Search - Show Group");
 //        clickFolder(PROJECT_NAME);
-//        clickLinkWithText(FOLDER_NAME);
+//        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 //        waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
 //        _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='animalGroup']/.."), "Alive, at Center");
 //        clickButton("Show Group");
@@ -394,7 +394,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         log("Quick Search - Show Project");
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='projectField']/.."), PROJECT_ID);
         clickButton("Show Project");
@@ -402,7 +402,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         log("Quick Search - Show Protocol");
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='protocolField']/.."), PROTOCOL_ID);
         clickButton("Show Protocol");
@@ -410,7 +410,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         log("Quick Search - Show Room");
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("room"), ROOM_ID);
         clickButton("Show Room");
@@ -453,7 +453,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         //Clear out lingering text on report pages
         clickFolder(PROJECT_NAME);
-        clickLinkWithText(FOLDER_NAME);
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitAndClick(Locator.linkWithText("Animal History"));
         waitForPageToLoad();
     }

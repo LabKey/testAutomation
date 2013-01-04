@@ -74,7 +74,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
     private void createAncillaryStudy()
     {
-        clickLinkWithText(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         clickFolder(getFolderName());
         clickTab("Manage");
 
@@ -147,7 +147,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickButton("Finish");
 
         waitForPipelineJobsToFinish(3);
-        clickLinkWithText("Create Ancillary Study");
+        clickAndWait(Locator.linkWithText("Create Ancillary Study"));
     }
 
     @Override
@@ -156,13 +156,13 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertTextPresent("Ancillary study created by AncillaryStudyTest");
         clickTab("Manage");
         assertTextPresent((DATASETS.length + DEPENDENT_DATASETS.length) + " Datasets");
-        clickLinkWithText("Manage Datasets");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
         for( String str : DATASETS )
         {
             assertLinkPresentWithText(str);
         }
 
-        clickLinkWithText("Mice");
+        clickAndWait(Locator.linkWithText("Mice"));
         waitForText(PTIDS[0]);
         for( String str : PTIDS )
         {
@@ -182,10 +182,10 @@ public class AncillaryStudyTest extends StudyBaseTest
 
     private void verifyModifyParticipantGroup(String study)
     {
-        clickLinkWithText(study);
+        clickAndWait(Locator.linkWithText(study));
         log("Modify " + study + " participant group.");
         clickTab("Manage");
-        clickLinkWithText("Manage Mouse Groups");
+        clickAndWait(Locator.linkWithText("Manage Mouse Groups"));
         waitForText(PARTICIPANT_GROUP);
         String csp = PTIDS[0];
         for( int i = 1; i < PTIDS.length - 1; i++ )
@@ -193,8 +193,8 @@ public class AncillaryStudyTest extends StudyBaseTest
         _studyHelper.editCustomParticipantGroup(PARTICIPANT_GROUP, "Mouse", null, null, true, true, true, csp);
 
         log("Verify that modified participant group has no effect on ancillary study.");
-        clickLinkWithText(STUDY_NAME);
-        clickLinkWithText("Mice");
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickAndWait(Locator.linkWithText("Mice"));
         waitForText("Filter"); // Wait for participant list to appear.
 
         for( String str : PTIDS )
@@ -208,17 +208,17 @@ public class AncillaryStudyTest extends StudyBaseTest
         //INSERT
         log("Insert rows into source dataset");
         clickFolder(getFolderName());
-        clickLinkWithText(DATASETS[0]);
+        clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("Import Data");
         setFormElement(Locator.name("text"), EXTRA_DATASET_ROWS);
         clickButton("Submit", 0);
         waitAndClickButton("OK");
 
         log("Verify changes in Ancillary Study. (insert)");
-        clickLinkWithText(STUDY_NAME);
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText(DATASETS[0]);
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Update Snapshot", 0);
@@ -232,16 +232,16 @@ public class AncillaryStudyTest extends StudyBaseTest
         //UPDATE
         log("Modify row in source dataset");
         clickFolder(getFolderName());
-        clickLinkWithText(DATASETS[0]);
+        clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickLinkWithText("edit", 1);
         setFormElement(Locator.name("quf_SequenceNum"), SEQ_NUMBER2);
         clickButton("Submit");
 
         log("Verify changes in Ancillary Study. (modify)");
-        clickLinkWithText(STUDY_NAME);
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText(DATASETS[0]);
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Update Snapshot", 0);
@@ -255,16 +255,16 @@ public class AncillaryStudyTest extends StudyBaseTest
         //DELETE
         log("Delete row from source dataset");
         clickFolder(getFolderName());
-        clickLinkWithText(DATASETS[0]);
+        clickAndWait(Locator.linkWithText(DATASETS[0]));
         checkCheckbox(".select", 1);
         clickButton("Delete");
         assertConfirmation("Delete selected row from this dataset?");
 
         log("Verify changes in Ancillary Study. (delete)");
-        clickLinkWithText(STUDY_NAME);
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
         clickTab("Manage");
-        clickLinkWithText("Manage Datasets");
-        clickLinkWithText(DATASETS[0]);
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Update Snapshot", 0);
@@ -277,7 +277,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
     private void verifyProtocolDocument()
     {
-        clickLinkWithText(STUDY_NAME);
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
         assertTextPresent(STUDY_DESCRIPTION);
         assertElementPresent(Locator.xpath("//a[contains(@href, 'name="+PROTOCOL_DOC.getName()+"')]"));
         clickAndWait(Locator.xpath("//a[./img[@title='Edit']]"));
@@ -300,13 +300,13 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         log("Verify Linked Datasets");
         clickFolder(getFolderName());
-        clickLinkWithText(DEPENDENT_DATASETS[0]);
-        clickLinkWithText("edit");
+        clickAndWait(Locator.linkWithText(DEPENDENT_DATASETS[0]));
+        clickAndWait(Locator.linkWithText("edit"));
         setFormElement(Locator.name("quf_formlang"), UPDATED_DATASET_VAL);
         clickButton("Submit");
 
-        clickLinkWithText(STUDY_NAME);
-        clickLinkWithText("Clinical and Assay Data");
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
         for(String dataset : DATASETS)
         {
             waitForText(dataset);
@@ -315,7 +315,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         {
             assertLinkPresentWithText(dataset);
         }
-        clickLinkWithText(DEPENDENT_DATASETS[0]);
+        clickAndWait(Locator.linkWithText(DEPENDENT_DATASETS[0]));
         assertTextNotPresent(UPDATED_DATASET_VAL);
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Update Snapshot");
@@ -326,19 +326,19 @@ public class AncillaryStudyTest extends StudyBaseTest
     private void verifySpecimens(int specimenCount, int vialCount)
     {
         log("Verify copied specimens");
-        clickLinkWithText(STUDY_NAME);
-        clickLinkWithText("Specimen Data");
-        clickLinkWithText("By Vial Group");
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickAndWait(Locator.linkWithText("Specimen Data"));
+        clickAndWait(Locator.linkWithText("By Vial Group"));
         DataRegionTable table = new DataRegionTable("SpecimenSummary", this, false, true);
         Assert.assertEquals("Did not find expected number of specimens.", specimenCount, table.getDataRowCount() - 1); // n specimens + 1 total row
         Assert.assertEquals("Incorrect total vial count.", String.valueOf(vialCount), table.getDataAsText(specimenCount, "Vial Count"));
-        clickLinkWithText("Specimen Data");
-        clickLinkWithText("By Individual Vial");
+        clickAndWait(Locator.linkWithText("Specimen Data"));
+        clickAndWait(Locator.linkWithText("By Individual Vial"));
         table = new DataRegionTable("SpecimenDetail", this, false, true);
         Assert.assertEquals("Did not find expected number of vials.", vialCount, table.getDataRowCount() - 1); // m vials + 1 total row
 
         log("Verify that Ancillary study doesn't support requests.");
-        clickLinkWithText("Manage");
+        clickAndWait(Locator.linkWithText("Manage"));
         assertTextNotPresent("Specimen Repository Settings");
         assertTextNotPresent("Specimen Request Settings");
         assertTextPresent("NOTE: specimen repository and request settings are not available for ancillary or published studies.");

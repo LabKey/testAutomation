@@ -42,8 +42,8 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     public void setFlowFilter(String[] fields, String[] ops, String[] values)
     {
         goToFlowDashboard();
-        clickLinkWithText("Other settings");
-        clickLinkWithText("Edit FCS Analysis Filter");
+        clickAndWait(Locator.linkWithText("Other settings"));
+        clickAndWait(Locator.linkWithText("Edit FCS Analysis Filter"));
 
         for(int i=0; i<fields.length; i++)
         {
@@ -126,7 +126,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         try
         {
             beginAt("/admin/begin.view");
-            clickLinkWithText("flow cytometry");
+            clickAndWait(Locator.linkWithText("flow cytometry"));
             setFormElement("workingDirectory", "");
             clickButton("update");
         }
@@ -151,7 +151,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     protected void init()
     {
         beginAt("/admin/begin.view");
-        clickLinkWithText("flow cytometry");
+        clickAndWait(Locator.linkWithText("flow cytometry"));
         deletePipelineWorkDirectory();
         setFormElement("workingDirectory", getPipelineWorkDirectory().toString());
         clickButton("update");
@@ -228,7 +228,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
             // All flow pages have a link back to the Flow Dashboard
             if (isLinkPresentWithText("Flow Dashboard"))
             {
-                clickLinkWithText("Flow Dashboard");
+                clickAndWait(Locator.linkWithText("Flow Dashboard"));
             }
             else
             {
@@ -246,7 +246,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     protected void goToFolder(String... folderPath)
     {
         for (String folderName : folderPath)
-            clickLinkWithText(folderName);
+            clickAndWait(Locator.linkWithText(folderName));
     }
 
 
@@ -260,7 +260,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     {
         log("** Uploading sample set");
         goToFlowDashboard();
-        clickLinkWithText("Upload Sample Descriptions");
+        clickAndWait(Locator.linkWithText("Upload Sample Descriptions"));
         setFormElement("data", getFileContents(sampleFilePath));
         click(Locator.name("idColumn1")); //need to trigger an event to populate the columns
         for (int i = 0; i < idCols.length; i++)
@@ -268,8 +268,8 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         submit();
 
         log("** Join sample set with FCSFile keywords");
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Define sample description join fields");
+        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        clickAndWait(Locator.linkWithText("Define sample description join fields"));
         for (int i = 0; i < idCols.length; i++)
             selectOptionByText(Locator.name("ff_samplePropertyURI", i), idCols[i]);
         for (int i = 0; i < keywordCols.length; i++)
@@ -281,8 +281,8 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     {
         log("** Specify ICS metadata");
         goToFlowDashboard();
-        clickLinkWithText("Other settings");
-        clickLinkWithText("Edit ICS Metadata");
+        clickAndWait(Locator.linkWithText("Other settings"));
+        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
 
         // specify PTID and Visit/Date columns
         selectOptionByText("ff_participantColumn", participantColumn);
@@ -387,7 +387,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     {
         log("begin import analysis wizard");
         goToFlowDashboard();
-        clickLinkWithText("Import FlowJo Workspace Analysis");
+        clickAndWait(Locator.linkWithText("Import FlowJo Workspace Analysis"));
         assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
     }
 
@@ -593,7 +593,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         {
             goToFlowDashboard();
             clickLinkContainingText("Show Jobs");
-            clickLinkWithText("ERROR");
+            clickAndWait(Locator.linkWithText("ERROR"));
 
             for (String errorText : expectedErrors)
                 assertTextPresent(errorText);

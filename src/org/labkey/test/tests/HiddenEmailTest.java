@@ -111,7 +111,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         ListHelper.ListColumn userColumn = new ListHelper.ListColumn("user", "user", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(getProjectName(), "core", "Users"));
         _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
         clickButton("Done");
-        clickLinkWithText(EMAIL_TEST_LIST);
+        clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
         clickButton("Insert New");
         selectOptionByText(Locator.name("quf_user"), displayNameFromEmail(CHECKED_USER));
         clickButton("Submit");
@@ -165,7 +165,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         assertTextNotPresent(CHECKED_USER, ADMIN_USER);
 
         log("Verify that emails cannot be seen in list via lookup");
-        clickLinkWithText(EMAIL_TEST_LIST);
+        clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
         clickMenuButton("Views", EMAIL_VIEW);
         assertTextNotPresent(CHECKED_USER, ADMIN_USER);
 

@@ -134,7 +134,7 @@ public class UserTest extends SecurityTest
         log("Deactivated users shouldn't show up in issues 'Assign To' list");
         goToProjectHome();
         goToModule("Issues");
-        clickLinkWithText("New Issue");
+        clickAndWait(Locator.linkWithText("New Issue"));
         assertElementNotPresent(createAssignedToOptionLocator(userId));
         assertTextNotPresent(displayNameFromEmail(NORMAL_USER));
         assertElementPresent(createAssignedToOptionLocator(adminUserId));
@@ -143,7 +143,7 @@ public class UserTest extends SecurityTest
         log("Reactivate user");
         goToSiteUsers();
         assertTextNotPresent(NORMAL_USER);
-        clickLinkWithText("include inactive users");
+        clickAndWait(Locator.linkWithText("include inactive users"));
         usersTable = new DataRegionTable("Users", this, true, true);
         row = usersTable.getRow("Email", NORMAL_USER);
         Assert.assertEquals(NORMAL_USER + " should not be 'Active'", "false", usersTable.getDataAsText(row, "Active"));
@@ -167,7 +167,7 @@ public class UserTest extends SecurityTest
     private String getEmailChangeableUser()
     {
         createUserAndNotify(NORMAL_USER2, NORMAL_USER);
-        clickLinkWithText("Home");
+        clickAndWait(Locator.linkWithText("Home"));
         setInitialPassword(NORMAL_USER2, TEST_PASSWORD);
 
         return NORMAL_USER2;
@@ -215,14 +215,14 @@ public class UserTest extends SecurityTest
         enableEmailRecorder();
 
         goToSiteUsers();
-        clickLinkWithText(displayNameFromEmail(NORMAL_USER));
+        clickAndWait(Locator.linkWithText(displayNameFromEmail(NORMAL_USER)));
         selenium.chooseOkOnNextConfirmation();
         clickButtonContainingText("Reset Password", 0);
         Assert.assertTrue(selenium.getConfirmation().startsWith("You are about to clear the user's current password"));
         waitForPageToLoad();
-        clickLinkWithText("Done");
+        clickAndWait(Locator.linkWithText("Done"));
         // View reset password email.
-//        clickLinkWithText(PROJECT_NAME);
+//        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         goToProjectHome();
         goToModule("Dumbster");
         clickLinkContainingText("Reset Password Notification", false); // Expand message.
@@ -235,7 +235,7 @@ public class UserTest extends SecurityTest
         clickButton("Set Password");
 
         clickUserMenuItem("Sign Out");
-        clickLinkWithText("Sign In");
+        clickAndWait(Locator.linkWithText("Sign In"));
         setText("email", NORMAL_USER);
         setText("password", TEST_PASSWORD);
         clickButton("Sign In");

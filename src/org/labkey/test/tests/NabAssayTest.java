@@ -140,9 +140,9 @@ public class NabAssayTest extends AbstractQCAssayTest
             clickButton("Save", 0);
             waitForText("Save successful.", 20000);
 
-            clickLinkWithText("configure templates");
+            clickAndWait(Locator.linkWithText("configure templates"));
 
-            clickLinkWithText("new 96 well (8x12) NAb single-plate template");
+            clickAndWait(Locator.linkWithText("new 96 well (8x12) NAb single-plate template"));
 
             waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -174,7 +174,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertTextPresent("NAb: 5 specimens in duplicate");
 
             clickFolder(TEST_ASSAY_PRJ_NAB);
-            clickLinkWithText(TEST_ASSAY_NAB);
+            clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
             clickEditAssayDesign(false);
             waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_JAVASCRIPT);
@@ -184,7 +184,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             clickButton("Save", 0);
             waitForText("Save successful.", 20000);
 
-            clickLinkWithText("configure templates");
+            clickAndWait(Locator.linkWithText("configure templates"));
 
             clickLinkWithText("delete", 0, false);
 
@@ -200,8 +200,8 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickFolder(TEST_ASSAY_FLDR_NAB);
         addWebPart("Assay List");
 
-        clickLinkWithText("Assay List");
-        clickLinkWithText(TEST_ASSAY_NAB);
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         if (isFileUploadAvailable())
         {
@@ -285,11 +285,11 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             // Test editing runs
             // Set the design to allow editing
-            clickLinkWithText("View Runs");
+            clickAndWait(Locator.linkWithText("View Runs"));
             assertLinkNotPresentWithText("edit");
             click(Locator.linkWithText("manage assay design"));
             selenium.chooseOkOnNextConfirmation();
-            clickLinkWithText("edit assay design");
+            clickAndWait(Locator.linkWithText("edit assay design"));
             assertConfirmation("This assay is defined in the /Nab Test Verify Project folder. Would you still like to edit it?");
 
             waitForElement(Locator.xpath("//span[@id='id_editable_run_properties']"), WAIT_FOR_JAVASCRIPT);
@@ -298,8 +298,8 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             // Edit the first run
             clickFolder(TEST_ASSAY_FLDR_NAB);
-            clickLinkWithText(TEST_ASSAY_NAB);
-            clickLinkWithText("edit");
+            clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+            clickAndWait(Locator.linkWithText("edit"));
             // Make sure that the properties that affect calculations aren't shown
             assertTextNotPresent("Cutoff");
             assertTextNotPresent("Curve Fit Method");
@@ -314,7 +314,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             goToModule("Query");
             selectQuery("auditLog", "ExperimentAuditEvent");
             waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
-            clickLinkWithText("view data");
+            clickAndWait(Locator.linkWithText("view data"));
             assertTextPresent("Run edited",
                     "Plate Number changed from blank to 'EditedPlateNumber'",
                     "Host Cell changed from blank to 'EditedHostCell'",
@@ -322,7 +322,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             // Return to the run list
             clickFolder(TEST_ASSAY_FLDR_NAB);
-            clickLinkWithText(TEST_ASSAY_NAB);
+            clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
             // test creating a custom details view via a "magic" named run-level view:
             _customizeViewsHelper.openCustomizeViewPanel();
@@ -332,7 +332,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             clickLinkContainingText("details", 1);
             assertNabData(true);
 
-            clickLinkWithText("View Results");
+            clickAndWait(Locator.linkWithText("View Results"));
 
             assertAUCColumnsHidden();
             addAUCColumns();
@@ -357,12 +357,12 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             assertAliasedAUCStudyData();
 
-            clickLinkWithText("assay");
+            clickAndWait(Locator.linkWithText("assay"));
             assertNabData(true);
 
             // create user with read permissions to study and dataset, but no permissions to source assay
             clickFolder(TEST_ASSAY_PRJ_NAB);
-            clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
+            clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1));
             pushLocation();  // Save our location because impersonatied user won't have permission to project
             createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
             setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
@@ -373,11 +373,11 @@ public class NabAssayTest extends AbstractQCAssayTest
             popLocation();
             assertTextPresent(TEST_ASSAY_PRJ_NAB);
             assertTextNotPresent(TEST_ASSAY_FLDR_NAB); // assert no read permissions to nabassay container
-            clickLinkWithText(TEST_ASSAY_FLDR_STUDY1);
-            clickLinkWithText("Study Navigator");
-            clickLinkWithText("2");
+            clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1));
+            clickAndWait(Locator.linkWithText("Study Navigator"));
+            clickAndWait(Locator.linkWithText("2"));
             assertStudyData(1);
-            clickLinkWithText("assay");
+            clickAndWait(Locator.linkWithText("assay"));
             assertNabData(false); // CustomDetailsView not enabled for all users so "Virus Name" is present
 
             // no permission to details page for "ptid 1 C"; it wasn't copied to the study
@@ -400,8 +400,8 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         log("rename assay folder and verify source file still findable");
         renameFolder(getProjectName(), TEST_ASSAY_FLDR_NAB, TEST_ASSAY_FLDR_NAB_RENAME, false);
-        clickLinkWithText(TEST_ASSAY_FLDR_NAB_RENAME);
-        clickLinkWithText(TEST_ASSAY_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_NAB_RENAME));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickLinkContainingText("run details");
 
         assertTextPresent("Description for NAb assay");
@@ -607,14 +607,14 @@ public class NabAssayTest extends AbstractQCAssayTest
         // add the transform script to the assay
         log("Uploading NAb Runs with a transform script");
         clickFolder(TEST_ASSAY_PRJ_NAB);
-        clickLinkWithText(TEST_ASSAY_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickEditAssayDesign(false);
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
 
         clickFolder(TEST_ASSAY_FLDR_NAB);
-        clickLinkWithText(TEST_ASSAY_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickButton("Import Data");
         clickButton("Next");
 
@@ -625,11 +625,11 @@ public class NabAssayTest extends AbstractQCAssayTest
         uploadFile(TEST_ASSAY_NAB_FILE1, "E", "Save and Finish");
 
         // verify the run property FileID was generated by the transform script
-        clickLinkWithText("View Runs");
+        clickAndWait(Locator.linkWithText("View Runs"));
         assertTextPresent("transformed FileID");
 
         // verify the fit error was generated by the transform script
-        clickLinkWithText("transformed assayId");
+        clickAndWait(Locator.linkWithText("transformed assayId"));
 
         DataRegionTable table = new DataRegionTable("Data", this);
         for(int i = 0; i < 5; i++)

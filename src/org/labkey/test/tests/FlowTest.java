@@ -172,7 +172,7 @@ public class FlowTest extends BaseFlowTestWD
     protected void importFiles()
     {
         goToFlowDashboard();
-        clickLinkWithText("Browse for FCS files to be imported");
+        clickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
 
         // Should allow for import all directories containing FCS Files
         _extHelper.selectFileBrowserItem("8color/");
@@ -194,18 +194,18 @@ public class FlowTest extends BaseFlowTestWD
         assertTextNotPresent(FCS_FILE_2);
         clickButton("Import Selected Runs");
         waitForPipeline(getContainerPath());
-        clickLinkWithText("Flow Dashboard");
+        clickAndWait(Locator.linkWithText("Flow Dashboard"));
         // Drill into the run, and see that it was uploaded, and keywords were read.
-        clickLinkWithText("1 run");
+        clickAndWait(Locator.linkWithText("1 run"));
         setSelectedFields(getContainerPath(), "flow", "Runs", null, new String[] { "Flag","Name","ProtocolStep","AnalysisScript","CompensationMatrix","WellCount","Created","RowId","FilePathRoot" } );
 
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
         setSelectedFields(getContainerPath(), "flow", "FCSFiles", null, new String[] { "Keyword/ExperimentName", "Keyword/Stim","Keyword/Comp","Keyword/PLATE NAME","Flag","Name","RowId"});
         assertTextPresent("PerCP-Cy5.5 CD8");
 
         assertLinkNotPresentWithImage("/flagFCSFile.gif");
         pushLocation();
-        clickLinkWithText("91761.fcs");
+        clickAndWait(Locator.linkWithText("91761.fcs"));
         assertTextPresent(FCS_FILE_1); // "experiment name" keyword
 
         clickButton("edit");
@@ -220,12 +220,12 @@ public class FlowTest extends BaseFlowTestWD
         assertLinkPresentWithText("FlowTest New Name");
         assertTextPresent("FlowTest Keyword Plate Name");
 
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Create a new Analysis script");
+        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        clickAndWait(Locator.linkWithText("Create a new Analysis script"));
         setFormElement("ff_name", "FlowTestAnalysis");
         submit();
 
-        clickLinkWithText("Define compensation calculation from scratch");
+        clickAndWait(Locator.linkWithText("Define compensation calculation from scratch"));
         selectOptionByText("selectedRunId", FCS_FILE_1);
         submit();
 
@@ -239,11 +239,11 @@ public class FlowTest extends BaseFlowTestWD
         submit();
         assertTextPresent("compensation calculation may be edited in a number");
 
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Create a new Analysis script");
+        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        clickAndWait(Locator.linkWithText("Create a new Analysis script"));
         setFormElement("ff_name", "QUV analysis");
         submit();
-        clickLinkWithText("View Source");
+        clickAndWait(Locator.linkWithText("View Source"));
         setLongTextField("script", this.getFileContents(QUV_ANALYSIS_SCRIPT));
         submit();
     }
@@ -252,17 +252,17 @@ public class FlowTest extends BaseFlowTestWD
     {
         setFlowFilter(new String[] {"Keyword/Stim"}, new String[] {"isnonblank"}, new String[] {""});
 
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("QUV analysis");
-        clickLinkWithText("Analyze some runs");
+        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        clickAndWait(Locator.linkWithText("QUV analysis"));
+        clickAndWait(Locator.linkWithText("Analyze some runs"));
 
         checkCheckbox(".toggle");
         clickButton("Analyze selected runs");
         setFormElement("ff_analysisName", "FlowExperiment2");
         submit();
         waitForPipeline(getContainerPath());
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("FlowExperiment2");
+        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        clickAndWait(Locator.linkWithText("FlowExperiment2"));
         URL urlBase = getURL();
         URL urlCompensation;
         URL urlAnalysis;
@@ -277,46 +277,46 @@ public class FlowTest extends BaseFlowTestWD
         }
 
         beginAt(urlCompensation.getFile());
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
 
         setSelectedFields(getContainerPath(), "flow", "CompensationControls", null, new String[] {"Name","Flag","Created","Run","FCSFile","RowId"});
 
         assertLinkPresentWithText("PE Green laser-A+");
         assertLinkNotPresentWithText("91918.fcs");
-        clickLinkWithText("PE Green laser-A+");
+        clickAndWait(Locator.linkWithText("PE Green laser-A+"));
         pushLocation();
-        clickLinkWithText("Keywords from the FCS file");
+        clickAndWait(Locator.linkWithText("Keywords from the FCS file"));
         assertTextPresent("PE CD8");
         popLocation();
-        clickLinkWithText("FlowExperiment2");
+        clickAndWait(Locator.linkWithText("FlowExperiment2"));
         beginAt(urlAnalysis.getFile());
 
 
-        clickLinkWithText("details");
+        clickAndWait(Locator.linkWithText("details"));
 
-        clickLinkWithText("91918.fcs");
-        clickLinkWithText("More Graphs");
+        clickAndWait(Locator.linkWithText("91918.fcs"));
+        clickAndWait(Locator.linkWithText("More Graphs"));
         selectOptionByText("subset", "Singlets/L/Live/3+/4+");
         selectOptionByText("xaxis", "comp-PE Cy7-A IFNg");
         selectOptionByText("yaxis", "comp-PE Green laser-A IL2");
         clickButtonWithText("Show Graph");
 
         // change the name of an analysis
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Other settings");
-        clickLinkWithText("Change FCS Analyses Names");
+        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        clickAndWait(Locator.linkWithText("Other settings"));
+        clickAndWait(Locator.linkWithText("Change FCS Analyses Names"));
         selectOptionByValue(Locator.xpath("//select[@name='ff_keyword']").index(1), "Keyword/EXPERIMENT NAME");
         submit();
 
         beginAt(urlAnalysis.getFile());
-        clickLinkWithText("details");
-        clickLinkWithText("91918.fcs-" + FCS_FILE_1);
+        clickAndWait(Locator.linkWithText("details"));
+        clickAndWait(Locator.linkWithText("91918.fcs-" + FCS_FILE_1));
         assertTextPresent("91918.fcs-" + FCS_FILE_1);
 
 
         // Now, let's add another run:
-         clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("Browse for more FCS files to be imported");
+         clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        clickAndWait(Locator.linkWithText("Browse for more FCS files to be imported"));
 
         _extHelper.selectFileBrowserItem("8color/");
         _extHelper.waitForImportDataEnabled();
@@ -327,8 +327,8 @@ public class FlowTest extends BaseFlowTestWD
         clickButton("Import Selected Runs");
         waitForPipeline(getContainerPath());
 
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("QUV analysis");
+        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        clickAndWait(Locator.linkWithText("QUV analysis"));
         clickLinkWithText("Analyze some runs", false);
         final Locator.NameLocator ff_targetExperimentId = Locator.name("ff_targetExperimentId");
         waitForElement(ff_targetExperimentId);
@@ -346,8 +346,8 @@ public class FlowTest extends BaseFlowTestWD
         clickButton("Analyze selected runs");
         waitForPipeline(getContainerPath());
 
-        clickLinkWithText("Flow Dashboard");
-        clickLinkWithText("FlowExperiment2");
+        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        clickAndWait(Locator.linkWithText("FlowExperiment2"));
         clickMenuButton("Query", query1);
         assertTextPresent("File Path Root");
 
@@ -377,7 +377,7 @@ public class FlowTest extends BaseFlowTestWD
     {
         // verify sample set and background values can be displayed in the FCSAnalysis grid
         goToFlowDashboard();
-        clickLinkWithText("29 FCS files");
+        clickAndWait(Locator.linkWithText("29 FCS files"));
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Inline");
 //            sleep(3000);
         assertTextNotPresent("Error generating graph");
@@ -421,8 +421,8 @@ public class FlowTest extends BaseFlowTestWD
         // UNDONE: assert background values are correctly calculated
 
         // check well details page for FCSFile has link to the sample
-        clickLinkWithText("91779.fcs-" + FCS_FILE_1);
-        clickLinkWithText("91779.fcs");
+        clickAndWait(Locator.linkWithText("91779.fcs-" + FCS_FILE_1));
+        clickAndWait(Locator.linkWithText("91779.fcs"));
         assertLinkPresentWithText(FCS_FILE_1 + "-C01");
     }
 
@@ -460,8 +460,8 @@ public class FlowTest extends BaseFlowTestWD
         // bug 4625
         log("** Check analysis script copy must have unique name");
         goToFlowDashboard();
-        clickLinkWithText("QUV analysis");
-        clickLinkWithText("Make a copy of this analysis script");
+        clickAndWait(Locator.linkWithText("QUV analysis"));
+        clickAndWait(Locator.linkWithText("Make a copy of this analysis script"));
         setFormElement("name", "QUV analysis");
         submit();
         assertTextPresent("There is already a protocol named 'QUV analysis'");
@@ -492,7 +492,7 @@ public class FlowTest extends BaseFlowTestWD
         goToFlowDashboard();
         addWebPart("Flow Reports");
 
-        clickLinkWithText("create positivity report");
+        clickAndWait(Locator.linkWithText("create positivity report"));
 
         setFormElement("reportName", reportName);
         setFormElement("reportDescription", description);
@@ -536,7 +536,7 @@ public class FlowTest extends BaseFlowTestWD
         log("** Executing positivity report '" + reportName + "'");
         goToFlowDashboard();
 
-        clickLinkWithText(reportName);
+        clickAndWait(Locator.linkWithText(reportName));
         clickButton("Execute Report");
         waitForPipeline(getContainerPath());
     }
@@ -548,7 +548,7 @@ public class FlowTest extends BaseFlowTestWD
         goToFlowDashboard();
         waitForPipeline("/" + getProjectName() + "/" + getFolderName());
         clickLinkContainingText("Show Jobs");
-        clickLinkWithText("ERROR");
+        clickAndWait(Locator.linkWithText("ERROR"));
 
         assertTitleContains(reportName);
         assertTextPresent(errorText);
