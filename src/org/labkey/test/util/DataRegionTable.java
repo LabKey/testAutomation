@@ -545,6 +545,17 @@ public class DataRegionTable
         _test.beginAt(url);
     }
 
+    @LogMethod
+    public void createQuickChart(String columnName)
+    {
+        Locator header = Locator.id(EscapeUtil.filter(getTableName() + ":" + columnName + ":header"));
+        Locator quickChart = Locator.id(EscapeUtil.filter(getTableName() + ":" + columnName + ":quick-chart"));
+
+        _test.click(header);
+        _test.waitAndClick(quickChart);
+        _test.waitForElement(Locator.css("svg"));
+    }
+
     private String replaceParameter(String param, String newValue)
     {
         URL url = _test.getURL();

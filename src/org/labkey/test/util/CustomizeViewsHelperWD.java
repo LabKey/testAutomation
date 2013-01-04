@@ -208,13 +208,13 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     {
         if (_test.isElementPresent(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]")))
             // Tab hasn't rendered yet
-            _test.mouseDown(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]"));
+            _test.click(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]"));
         else
             // Tab has rendered
-            _test.mouseDown(Locator.xpath("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab.toString() + "')]]"));
+            _test.click(Locator.xpath("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab.toString() + "')]]"));
     }
 
-    private enum ViewItemType
+    public static enum ViewItemType
     {
         Columns,
         Filter,
@@ -502,14 +502,44 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         _test.assertAttributeNotContains(loc, "class", "x-btn-pressed");
     }
 
-    public void clipFilter(String column_id)
+    public void clipFilter(String fieldkey)
     {
-        throw new RuntimeException("not yet implemented");
+        changeTab(ViewItemType.Filter);
+        Locator itemClip = Locators.viewItemClip(ViewItemType.Filter, fieldkey);
+        if (!itemClip.findElement(_test._driver).getAttribute("class").contains("pressed"))
+        {
+            _test.click(itemClip);
+        }
     }
 
-    public void clipSort(String column_id)
+    public void unclipFilter(String fieldkey)
     {
-        throw new RuntimeException("not yet implemented");
+        changeTab(ViewItemType.Filter);
+        Locator itemClip = Locators.viewItemClip(ViewItemType.Filter, fieldkey);
+        if (itemClip.findElement(_test._driver).getAttribute("class").contains("pressed"))
+        {
+            _test.click(itemClip);
+        }
+    }
+
+    public void clipSort(String fieldkey)
+    {
+        changeTab(ViewItemType.Sort);
+        Locator itemClip = Locators.viewItemClip(ViewItemType.Sort, fieldkey);
+        if (!itemClip.findElement(_test._driver).getAttribute("class").contains("pressed"))
+        {
+            _test.click(itemClip);
+        }
+    }
+
+    public void unclipSort(String fieldkey)
+    {
+        changeTab(ViewItemType.Sort);
+        Locator itemClip = Locators.viewItemClip(ViewItemType.Sort, fieldkey);
+        if (itemClip.findElement(_test._driver).getAttribute("class").contains("pressed"))
+        {
+            _test.click(itemClip);
+        }
     }
 
     public void moveCustomizeViewColumn(String fieldKey, boolean moveUp)
@@ -717,4 +747,11 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
             return !liStyle.contains("display: none");
     }
 
+    public static class Locators
+    {
+        public static Locator.CssLocator viewItemClip(ViewItemType itemType, String fieldkey)
+        {
+            return Locator.css("table.labkey-customview-" + itemType.toString().toLowerCase() + "-item[fieldkey='" + fieldkey + "'] button.labkey-paperclip");
+        }
+    }
 }
