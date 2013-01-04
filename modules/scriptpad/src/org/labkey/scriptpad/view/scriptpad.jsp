@@ -29,9 +29,10 @@
 </div>
 <script type="text/javascript">
 
-    function reset()
+    function preparePage()
     {
         document.getElementById('divOutput').innerHTML = "";
+        maskGraph.show();
     }
 
     function renderFinal(htmlOut)
@@ -156,8 +157,8 @@
         // setup to execute the report as a script
         //
         var scriptParams = {
-            param1 : 'Dax',
-            param2 : 42,
+            param1 : 'This is my parameter 1 value',
+            param2 : 42
         };
 
         var scriptConfig = {
@@ -173,6 +174,8 @@
             title: 'webpart result'
 
         };
+        webpartReportConfig.param1 = scriptParams.param1;
+        webpartReportConfig.param2 = scriptParams.param2;
 
         var webpartReport = new LABKEY.WebPart({
             failure: onFailure,
@@ -204,19 +207,15 @@
                buttons: [{
                    text: 'Execute as Script',
                    handler: function() {
+                       preparePage();
                        scriptConfig.reportId = 'module:/scriptpad/' + textField.value;
-                       reset();
-                       maskGraph.show();
                        LABKEY.Report.execute(scriptConfig);
                    }},
                    {
                    text: 'Execute as Webpart',
                    handler: function() {
-                       webpartReportConfig.param1 = scriptParams.param1;
-                       webpartReportConfig.param2 = scriptParams.param2;
+                       preparePage();
                        webpartReportConfig.reportId = 'module:/scriptpad/' + textField.value;
-                       reset();
-                       maskGraph.show();
                        webpartReport.render();
                     }}
                ]

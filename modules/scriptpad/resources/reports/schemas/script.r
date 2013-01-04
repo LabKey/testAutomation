@@ -1,31 +1,84 @@
-# This sample code returns the query data in tab-separated values format, which LabKey then
+#
+# This sample code shows the new JSON output parameter type.
 # renders as HTML. Replace this code with your R script. See the Help tab for more details.
+#
 require("RJSONIO");
-
 datafile <- paste(labkey.url.base, "input_data.tsv", sep="");
 labkey.data <- read.table(datafile, header=TRUE, sep="\t", quote="\"", comment.char="")
-png(filename="${imgout:foo.jpg}");
+
+#
+# plot 1
+#
+png(filename="${imgout:Blood Pressure/Single.jpg}");
 plot(labkey.data$diastolicbloodpressure, labkey.data$systolicbloodpressure, 
 main="Diastolic vs. Systolic Pressures: All Visits", 
 ylab="Systolic (mm Hg)", xlab="Diastolic (mm Hg)", ylim =c(60, 200));
 abline(lsfit(labkey.data$diastolicbloodpressure, labkey.data$systolicbloodpressure));
 dev.off();
-print("I am console output - hear me roar!");
-param1 <- labkey.url.params$param1;
-param2 <- labkey.url.params$param2;
 
+#
+# plot 2
+#
+library(Cairo);
+data_means <- aggregate(labkey.data, list(ParticipantID =
+ labkey.data$participantid), mean, na.rm = TRUE);
+Cairo(file="${imgout:Blood Pressure/Multiple.png}", type="png")
+op <- par(mfcol = c(2, 2)) # 2 x 2 pictures on one plot
+c11 <- plot(data_means$diastolicbloodpressure, data_means$weight_kg, ,
+ xlab="Diastolic Blood Pressure (mm Hg)", ylab="Weight (kg)",
+ mfg=c(1, 1))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$weight_kg))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$systolicbloodpressure, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Systolic Blood Pressure (mm Hg)", mfg= c(2, 1))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$systolicbloodpressure))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$pulse, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Pulse Rate (Beats/Minute)", mfg= c(1, 2))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$pulse))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$temp_c, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Temperature (Degrees C)", mfg= c(2, 2))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$temp_c))
+par(op); #Restore graphics parameters
+dev.off();
+
+#
+# csv
+#
+write.csv(labkey.data, file = "${txtout:csvfile}");
+
+#
+# JSON output parameter examples
+#
+
+# named array
 write(toJSON(list(myArray=c(1:10))), "${jsonout:myArray}");
+
+# unnamed array
 write(toJSON(c(1:10)), "${jsonout:myAnonArray}");
+
+# scalar
 write(toJSON(list(myNum=42)), "${jsonout:myNum}");
-# note that this is a vector so it is persisted as [42] and decoded as an array.
+
+# unnamed scalar
 write(toJSON(42), "${jsonout:myAnonNum}");
-write(toJSON(list(myRecord = list(firstName = "Dax", lastName = "Hawkins", age = 41))), "${jsonout:myRecord}");
-write(toJSON(list(firstName = "Dax", lastName = "Hawkins", age = 41)), "${jsonout:myAnonRecord}");
 
-# give a sample of writing out everything in one file
-# note that the anon array c(1:10) doesn't decode correctly
-allParams <- list(myArray=c(1:10),c(1:10),mynum=42,42,myRecord=list(firstName="Dax",lastName="Hawkins",age=41),list(firstName="Dax",lastName="Hawkins",age=41));
-write(toJSON(allParams), "${jsonout:allParams}");
+# record
+write(toJSON(list(myRecord = list(firstName = "Dax", lastName = "Hawkins", favoriteNumber = 42))), "${jsonout:myRecord}");
 
-print(param1);
+# unnamed record
+write(toJSON(list(firstName = "Dax", lastName = "Hawkins", favoriteNumber = 42)), "${jsonout:myAnonRecord}");
+
+# combine outputs into one output parameter
+allParams <- list(myArray=c(1:10), myNum=42,myRecord=list(firstName="Dax",lastName="Hawkins",favoriteNumber=42));
+write(toJSON(allParams), "${jsonout:combineParams}");
+
+#
+# console output
+#
+param1 <- paste("param1: ", labkey.url.params$param1);
+param2 <- paste("param2: ", labkey.url.params$param2);
+print("Console output text");
+print (param1);
 print(param2);
