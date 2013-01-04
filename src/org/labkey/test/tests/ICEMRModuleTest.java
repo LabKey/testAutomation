@@ -41,7 +41,6 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void verifyDataInAssay()
     {
-        click(Locator.linkContainingText(ASSAY_NAME));
         click(Locator.linkContainingText(ID));
         assertTextPresent(ID, SCIENTIST);
         goToProjectHome();
@@ -59,17 +58,23 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     }
 
+    private void verifyError()
+    {
+        clickButton("Submit");
+        waitForText("> Errors in your submission. See below.");
+    }
+
     private void enterData()
     {
         Map<String, String> fieldAndValue = new HashMap<String, String>();
         fieldAndValue.put("scientist", SCIENTIST);
         fieldAndValue.put("id", ID);
         fieldAndValue.put("initparasitemia", (".3"));
-        fieldAndValue.put("parasitedensity", "-34");      //Issue 16875: decimals in certain icemr module fields causes js exception
+        fieldAndValue.put("parasitedensity", "-34"); // invalid: can't have negative number
         fieldAndValue.put("initgametocytemia", "3.5");
-        fieldAndValue.put("gametocytedensity", "34");
+        fieldAndValue.put("gametocytedensity", "3.4"); // invalid: can't have a float for an int
         fieldAndValue.put("patienthemoglobin", "300.4");
-        fieldAndValue.put("hematocrit", "5");
+        fieldAndValue.put("hematocrit", "500"); // invalid: can't have percentage > 100
 //        fieldAndValue.put("thinbloodsmear", "3.4");
         fieldAndValue.put("rdt", "3.4"); //this should be ignored
         fieldAndValue.put("freezerproid", "3.4");
@@ -79,11 +84,22 @@ public class ICEMRModuleTest extends BaseWebDriverTest
             setICEMRField(field, fieldAndValue.get(field));
         }
 
+        // we have 3 errors total, fix one at a time
+        verifyError();
+
+        // correct negative number error
+        setICEMRField("parasitedensity", "34");
+        verifyError();
+
+        // correct float in int column error
+        setICEMRField("gametocytedensity", "34");
+        verifyError();
+
+        // correct > 100 percent error
+        // the form should submit now
+        setICEMRField("hematocrit", "5");
         clickButton("Submit");
-        _ext4Helper.waitForMask();//waitForExtMask(defaultWaitForPage);
-        waitForText("Successfully uploaded result for patient id:  " + ID);
-        _extHelper.clickExtButton("OK", 0);
-        waitForText("Add Diagnostics");
+        waitForText("Diagnostics Runs");
     }
 
     private void createDiagnosticAssay()
