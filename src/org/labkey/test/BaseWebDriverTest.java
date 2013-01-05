@@ -3936,19 +3936,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
-    /** Find nth link with the exact text specified, click it, and wait up to millis for the page to load
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLinkWithText(String text, int index, int millis)
-    {
-        log("Clicking link with text '" + text + "'");
-
-        if (_driver.findElements(By.linkText(text)).size() == 0 && _driver.findElements(By.linkText(text.toUpperCase())).size() > 0)
-            clickAndWait(Locator.linkWithText(text.toUpperCase()).index(index), millis); // Links might be all caps after CSS is applied
-        else
-            clickAndWait(Locator.linkWithText(text).index(index), millis);
-    }
-
     /**
      * @deprecated Use {@link #clickAndWait(Locator)}
      */
