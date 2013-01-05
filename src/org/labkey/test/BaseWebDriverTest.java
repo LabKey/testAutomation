@@ -1411,7 +1411,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("system maintenance"));
-        clickLinkWithText(task, false);
+        click(Locator.linkWithText(task));
         smStart = System.currentTimeMillis();
     }
 
@@ -3945,14 +3945,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickAndWait(l, defaultWaitForPage);
     }
 
-    /** Find a link with the exact text specified and click it, optionally waiting for the page to load
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLinkWithText(String text, boolean wait)
-    {
-        clickLinkWithText(text, 0, wait);
-    }
-
     /** Find nth link with the exact text specified and click it, optionally waiting for the page to load
      * @deprecated Use {@link #clickAndWait(Locator)}
      */
@@ -5181,8 +5173,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         // Clear selections.
         Assert.assertEquals("Faceted filter tab should be selected.", "Choose Values", getText(Locator.css(".x-tab-strip-active")));
         if(!isElementPresent(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]")))
-            clickLinkWithText("[All]", false);
-        clickLinkWithText("[All]", false);
+            click(Locator.linkWithText("[All]"));
+        click(Locator.linkWithText("[All]"));
 
         if(values.length > 1)
         {

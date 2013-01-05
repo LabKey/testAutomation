@@ -75,7 +75,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         assertTextPresent("Peptidyl-prolyl cis-trans isomerase A");
 
         selenium.openWindow("", "prot");
-        clickLinkWithText("PPIA_MOUSE", false);
+        click(Locator.linkWithText("PPIA_MOUSE"));
         //opens in separate window
         selenium.waitForPopUp("prot", "10000");
         selenium.selectWindow("prot");
@@ -96,7 +96,7 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         assertTextPresent("Defensin-1 precursor");
 
         selenium.openWindow("", "prot");
-        clickLinkWithText("DEF1_MOUSE", false);
+        click(Locator.linkWithText("DEF1_MOUSE"));
         //opens in separate window
         selenium.waitForPopUp("prot", "10000");
         selenium.selectWindow("prot");

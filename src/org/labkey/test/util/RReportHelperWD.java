@@ -247,7 +247,7 @@ public class RReportHelperWD extends AbstractHelperWD
     @LogMethod
     public void saveReport(String name)
     {
-        _test.clickLinkWithText("Source", false);
+        _test.click(Locator.linkWithText("Source"));
         _test.clickButton("Save", 0);
         _test._extHelper.setExtFormElement(name);
         _test._extHelper.clickExtButton("Save");

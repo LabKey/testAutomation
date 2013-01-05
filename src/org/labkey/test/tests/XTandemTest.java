@@ -168,7 +168,7 @@ public class XTandemTest extends AbstractXTandemTest
 
         log("Test peptide details page");
         selenium.openWindow("", "pep");
-        clickLinkWithText(PEPTIDE2, false);
+        click(Locator.linkWithText(PEPTIDE2));
         selenium.waitForPopUp("pep", "10000");
         selenium.selectWindow("pep");
         assertTextPresent("gi|4689022|ribosomal_protein_");  // Check for protein

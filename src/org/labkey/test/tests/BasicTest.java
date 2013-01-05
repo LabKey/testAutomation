@@ -107,7 +107,7 @@ public class BasicTest extends BaseWebDriverTest
             assertTextNotPresent("Development"); // Unless we're not supposed to be.
 
         // Navigate to the credits page and verify that all external components are documented
-        clickLinkWithText("credits", false);
+        click(Locator.linkWithText("credits"));
         waitForExtReady();
         assertTextNotPresent("WARNING:");
 

@@ -780,7 +780,7 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("Male");
         assertTextPresent("African American or Black");
         clickAndWait(Locator.linkWithText("999320016"));
-        clickLinkWithText("125: EVC-1: Enrollment Vaccination", false);
+        click(Locator.linkWithText("125: EVC-1: Enrollment Vaccination"));
         assertTextPresent("right deltoid");
         
         verifyDemoCustomizeOptions();
@@ -997,7 +997,7 @@ public class StudyTest extends StudyBaseTest
         // verify that the participant view respects the cohort filter:
         setSort("Dataset", "MouseId", SortDirection.ASC);
         clickAndWait(Locator.linkWithText("999320518"));
-        clickLinkWithText("125: EVC-1: Enrollment Vaccination", false);
+        click(Locator.linkWithText("125: EVC-1: Enrollment Vaccination"));
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
         clickAndWait(Locator.linkWithText("Next Mouse"));

@@ -334,7 +334,7 @@ public class StudyExportTest extends StudyManualTest
 
         // test specimen comments
         clickAndWait(Locator.linkWithText(getStudyLabel()));
-        clickLinkWithText("Vials by Derivative", false);
+        click(Locator.linkWithText("Vials by Derivative"));
         waitForText("Plasma, Unknown Processing");
         clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
         clickButton("Enable Comments/QC");
@@ -358,7 +358,7 @@ public class StudyExportTest extends StudyManualTest
 
         // verify that comments remain after second specimen load
         clickAndWait(Locator.linkWithText(getStudyLabel()));
-        clickLinkWithText("Vials by Derivative", false);
+        click(Locator.linkWithText("Vials by Derivative"));
         waitForText("Plasma, Unknown Processing");
         clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
         assertTextPresent("These vials are very important.", 2);
@@ -401,7 +401,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("Johannesburg, South Africa");
 
         clickAndWait(Locator.linkWithText(getStudyLabel()));
-        clickLinkWithText("Specimen Requests", false);
+        click(Locator.linkWithText("Specimen Requests"));
         clickAndWait(Locator.linkWithText("View Current Requests"));
         clickButton("Details");
         assertTextPresent("WARNING: Missing Specimens");

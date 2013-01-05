@@ -144,7 +144,7 @@ public class MS2Test extends MS2TestBase
 
         log("Test Navigation Bar for Run");
         log("Test Show Modifications");
-        clickLinkWithText("Show Modifications", false);
+        click(Locator.linkWithText("Show Modifications"));
         // Wait for tooltip to show up
         sleep(2000);
         assertTextPresent("Variable");
@@ -1208,7 +1208,7 @@ public class MS2Test extends MS2TestBase
         clickAndWait(Locator.linkWithText("ProteinProphet"));
         clickButton("Compare");
 
-        clickLinkWithText("Comparison Overview", false);
+        click(Locator.linkWithText("Comparison Overview"));
         waitForText(RUN_GROUP1_NAME2, 1000);
         assertTextPresent(RUN_GROUP1_NAME2);
         assertTextPresent(RUN_GROUP2_NAME);
@@ -1361,7 +1361,7 @@ public class MS2Test extends MS2TestBase
         clickAndWait(Locator.linkWithText(ms2Run));
         String windowName = "peptideProphetSummary";
         selenium.openWindow("", windowName);
-        clickLinkWithText("Show Peptide Prophet Details", false);
+        click(Locator.linkWithText("Show Peptide Prophet Details"));
         selenium.waitForPopUp(windowName, "10000");
         selenium.selectWindow(windowName);
         assertElementPresent(Locator.imageWithAltText("Charge 3+ Cumulative Observed vs. Model", false));

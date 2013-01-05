@@ -247,14 +247,14 @@ public class FileContentTest extends BaseWebDriverTest
         // All notifications might not appear in one digest
         if (isElementPresent(Locator.linkWithText("File Management Notification").index(1)))
         {
-            clickLinkWithText("File Management Notification", false);
+            click(Locator.linkWithText("File Management Notification"));
             click(Locator.linkWithText("File Management Notification").index(1));
             assertTextBefore("File deleted", "File uploaded"); // Deletion notification in most recent notification
             assertTextBefore("File uploaded", "annotations updated"); // Upload and update in the older notification
         }
         else
         {
-            clickLinkWithText("File Management Notification", false);
+            click(Locator.linkWithText("File Management Notification"));
             assertTextBefore("File uploaded", "annotations updated"); // All notifications in one email
             assertTextBefore("annotations updated", "File deleted");
         }

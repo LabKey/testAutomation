@@ -279,14 +279,14 @@ public class WikiLongTest extends BaseSeleniumWebTest
         log("Check that discussion board works");
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
         waitForExtReady();
-        clickLinkWithText("discussion", false);
+        click(Locator.linkWithText("discussion"));
         waitForElement(Locator.linkWithText("Start new discussion"), defaultWaitForPage);
         clickAndWait(Locator.linkWithText("Start new discussion"));
         setFormElement("title", DISC1_TITLE);
         setFormElement("body", DISC1_BODY);
         submit();
         waitForExtReady();
-        clickLinkWithText("see discussions (1)", false);
+        click(Locator.linkWithText("see discussions (1)"));
         clickAndWait(Locator.linkWithText(DISC1_TITLE));
         assertTextPresent(DISC1_TITLE);
         assertTextPresent(DISC1_BODY);
@@ -363,7 +363,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickWebpartMenuItem("Wiki", "Customize");
         log("check that container is set to current project");
         selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
-        clickLinkWithText("Reset to Folder Default Page", false);
+        click(Locator.linkWithText("Reset to Folder Default Page"));
         assertOptionEquals("webPartContainer", "/" + PROJECT2_NAME);
         log("set container and page");
 

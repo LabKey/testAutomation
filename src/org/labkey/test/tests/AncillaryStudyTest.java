@@ -285,7 +285,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement("Label", "Extra " + STUDY_NAME);
         setFormElement("Description", "Extra " + STUDY_DESCRIPTION);
-        clickLinkWithText("Attach a file", false);
+        click(Locator.linkWithText("Attach a file"));
         waitForElement(Locator.xpath("//div[contains(@class, 'protocolPanel')]//input[@type='file']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//div[contains(@class, 'protocolPanel')]//input[@type='file']"), PROTOCOL_DOC2.toString());
         clickButton("Submit");

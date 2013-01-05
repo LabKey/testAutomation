@@ -329,7 +329,7 @@ public class FlowTest extends BaseFlowTestWD
 
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
         clickAndWait(Locator.linkWithText("QUV analysis"));
-        clickLinkWithText("Analyze some runs", false);
+        click(Locator.linkWithText("Analyze some runs"));
         final Locator.NameLocator ff_targetExperimentId = Locator.name("ff_targetExperimentId");
         waitForElement(ff_targetExperimentId);
         selectOptionByText(ff_targetExperimentId, "<create new>");

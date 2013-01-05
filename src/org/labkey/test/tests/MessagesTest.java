@@ -103,7 +103,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         log("test attachments too");
         if (isFileUploadAvailable())
         {
-            clickLinkWithText("Attach a file", false);
+            click(Locator.linkWithText("Attach a file"));
             File file = new File(getLabKeyRoot() + "/common.properties");
             setFormElement("formFiles[00]", file);
         }
@@ -125,7 +125,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         if (isFileUploadAvailable())
         {
             assertTextPresent("remove");
-            clickLinkWithText("remove", false);
+            click(Locator.linkWithText("remove"));
             waitForText("This cannot be undone");
             clickButton("OK", 0);
             waitForTextToDisappear("common.properties");

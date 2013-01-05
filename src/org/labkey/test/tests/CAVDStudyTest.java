@@ -216,7 +216,7 @@ public class CAVDStudyTest extends StudyBaseTest
     private void doVerifyDatasets()
     {
         clickAndWait(Locator.linkWithText(STUDY_NAME));
-        clickLinkWithText("Assays", true);
+        clickAndWait(Locator.linkWithText("Assays"));
 
         waitAndClickButton("Create Assay Datasets", 0);
         waitForAlert("Placeholder datasets created. Use Manage/Study Schedule to define datasets or link to assay data.", WAIT_FOR_JAVASCRIPT);
@@ -355,7 +355,7 @@ public class CAVDStudyTest extends StudyBaseTest
         log("Add records to list for each study.");
         clickAndWait(Locator.linkWithText(PROJECT_NAME));
         clickAndWait(Locator.linkWithText(FOLDER_NAME4));
-        clickLinkWithText("AllStudiesList", true);
+        clickAndWait(Locator.linkWithText("AllStudiesList"));
         clickButton("Insert New");
         setFormElement("quf_MyStudyName", "Something");
         selectOptionByText("quf_StudyLookup", study2name);
@@ -368,7 +368,7 @@ public class CAVDStudyTest extends StudyBaseTest
         log("Verify that the list lookup displays dataset status values.");
         clickAndWait(Locator.linkWithText(PROJECT_NAME));
         clickAndWait(Locator.linkWithText(FOLDER_NAME4));
-        clickLinkWithText("AllStudiesList", true);
+        clickAndWait(Locator.linkWithText("AllStudiesList"));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn("StudyLookup");
         _customizeViewsHelper.addCustomizeViewColumn("StudyLookup/Dataset Status");
@@ -380,7 +380,7 @@ public class CAVDStudyTest extends StudyBaseTest
             assertElementPresent(Locator.tagWithAttribute("img", "src", status[1]), 1);
         }
         log("Verify that you can navigate to study and set status from study list.");
-        clickLinkWithText(study3name, true);
+        clickAndWait(Locator.linkWithText(study3name));
         // wait for the study schedule grid to load, any dataset name will do
         waitForText(DATASETS.values().iterator().next());
         // set the status to Locked for all of the datasets

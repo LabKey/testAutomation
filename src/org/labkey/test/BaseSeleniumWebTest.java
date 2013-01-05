@@ -1124,7 +1124,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("system maintenance"));
         selenium.openWindow("", "systemMaintenance");
-        clickLinkWithText(task, false);
+        click(Locator.linkWithText("[All]"));
         smStart = System.currentTimeMillis();
     }
 
@@ -3456,12 +3456,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickAndWait(l, defaultWaitForPage);
     }
 
-    /** Find a link with the exact text specified and click it, optionally waiting for the page to load */
-    public void clickLinkWithText(String text, boolean wait)
-    {
-        clickLinkWithText(text, 0, wait);
-    }
-
     /** Find nth link with the exact text specified and click it, optionally waiting for the page to load */
     public void clickLinkWithText(String text, int index, boolean wait)
     {
@@ -4557,8 +4551,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         // Clear selections.
         Assert.assertEquals("Faceted filter tab should be selected.", "Choose Values", getText(Locator.css(".x-tab-strip-active")));
         if(!isElementPresent(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]")))
-            clickLinkWithText("[All]", false);
-        clickLinkWithText("[All]", false);
+            click(Locator.linkWithText("[All]"));
+        click(Locator.linkWithText("[All]"));
 
         if(values.length > 1)
         {

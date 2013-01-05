@@ -298,7 +298,7 @@ public class SearchTest extends StudyTest
         selectOptionByText("assignedTo", USER1_DISPLAY_NAME);
         if (isFileUploadAvailable())
         {
-            clickLinkWithText("Attach a file", false);
+            click(Locator.linkWithText("Attach a file"));
             File file = new File(getLabKeyRoot() + "/common.properties");
             setFormElement("formFiles[00]", file);
         }
@@ -321,7 +321,7 @@ public class SearchTest extends StudyTest
         setFormElement("body", MESSAGE_BODY);
         if (isFileUploadAvailable())
         {
-            clickLinkWithText("Attach a file", false);
+            click(Locator.linkWithText("Attach a file"));
             File file = new File(getLabKeyRoot() + "/sampledata/dataloading/excel/fruits.tsv");
             setFormElement("formFiles[0]", file);
         }

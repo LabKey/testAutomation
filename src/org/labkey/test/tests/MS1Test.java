@@ -326,7 +326,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         //Features View
         log("Tesitng showFeatures.view....");
-        clickLinkWithText(run2Title, true);
+        clickAndWait(Locator.linkWithText(run2Title));
 
         //test filtering
         log("Testing filtering...");
