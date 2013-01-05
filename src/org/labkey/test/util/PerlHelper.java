@@ -37,7 +37,7 @@ public class PerlHelper extends AbstractHelper
     {
 
         _test.goToAdminConsole();
-        _test.clickLinkWithText("views and scripting");
+        _test.clickAndWait(Locator.linkWithText("views and scripting"));
         _test.log("Check if Perl already is configured");
 
 
