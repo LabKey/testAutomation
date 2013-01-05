@@ -186,7 +186,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             clickAndWait(Locator.linkWithText("configure templates"));
 
-            clickLinkWithText("delete", 0, false);
+            click(Locator.linkWithText("delete", 0));
 
             assertConfirmation("Permanently delete this plate template?");
 

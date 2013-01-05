@@ -336,10 +336,10 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         log("Check emailed messages");
         goToModule("Dumbster");
         assertTextPresent("RE: " + MSG1_TITLE, 4); // TODO: switch to 3 when empty messages are emailed
-        clickLinkWithText(MSG1_TITLE, 0, false);
+        click(Locator.linkWithText(MSG1_TITLE, 0));
         assertTextPresent("1 <b>x</b>");
         assertTextPresent("<a href=\"/labkey/list/MessagesVerifyProject/begin.view?\" class=\"labkey-text-link\">manage lists</a>");
-        clickLinkWithText(MSG1_TITLE, 1, false);
+        click(Locator.linkWithText(MSG1_TITLE, 1));
         assertTextPresent("first message testing");
         assertLinkNotPresentWithText(MSG3_TITLE);
         assertLinkNotPresentWithText(MSG2_TITLE);
@@ -387,7 +387,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         assertLinkPresentWithText(_messageTitle);
         assertLinkPresentWithText("RE: "+_messageTitle);
-        clickLinkWithText("RE: "+_messageTitle, 1, false);
+        click(Locator.linkWithText("RE: "+_messageTitle, 1));
     }
 
     private void createNewMessage(String title, String body)
