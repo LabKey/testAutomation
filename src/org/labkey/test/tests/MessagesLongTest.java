@@ -227,7 +227,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(MSG2_TITLE);
         clickAndWait(Locator.linkWithText("Messages"));
-        clickLinkWithText("view message or respond", 1);
+        clickAndWait(Locator.linkWithText("view message or respond", 1));
         clickButton("Respond");
         submit();
         clickAndWait(Locator.linkWithText("Messages"));
@@ -316,7 +316,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickButton("Delete");
 
         log("Check delete response works and is recognized");
-        clickLinkWithText("view message or respond", 1);
+        clickAndWait(Locator.linkWithText("view message or respond", 1));
         clickAndWait(Locator.linkWithText("delete"));
         clickButton("Delete");
         assertTextNotPresent(RESP1_BODY);

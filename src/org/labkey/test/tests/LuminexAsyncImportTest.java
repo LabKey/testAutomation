@@ -48,7 +48,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         importRunForTestLuminexConfig(TEST_ASSAY_LUM_FILE5, Calendar.getInstance(), 0);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(2);
-        clickLinkWithText("COMPLETE", 0);
+        clickAndWait(Locator.linkWithText("COMPLETE", 0));
         assertTextNotPresent("ERROR"); //Issue 14082
         assertTextPresent("Starting assay upload", "Finished assay upload");
         clickButton("Data"); // data button links to the run results

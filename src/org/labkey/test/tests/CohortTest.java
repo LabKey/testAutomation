@@ -230,7 +230,7 @@ public class CohortTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Visits"));
-        clickLinkWithText("edit", 4); // Visit 4
+        clickAndWait(Locator.linkWithText("edit", 4)); // Visit 4
         clickButton("Delete visit");
         clickButton("Delete");
         clickTab("Manage");

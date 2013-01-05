@@ -219,7 +219,7 @@ public class StudyManualTest extends StudyTest
         {
             if (labels.contains(currentLabel))
             {
-                clickLinkWithText("edit", row - 2);   // Zero-based, plus the header row doesn't have an edit link
+                clickAndWait(Locator.linkWithText("edit", row - 2));   // Zero-based, plus the header row doesn't have an edit link
                 uncheckCheckbox("showByDefault");
                 clickButton("Save");
                 labels.remove(currentLabel);

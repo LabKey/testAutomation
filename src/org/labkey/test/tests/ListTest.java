@@ -223,13 +223,13 @@ public class ListTest extends BaseWebDriverTest
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
         Assert.assertEquals(1,table.getRow(TEST_DATA[0][1]));
-        clickLinkWithText("edit", 1);
+        clickAndWait(Locator.linkWithText("edit", 1));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
         checkCheckbox("quf_JewelTone");
         submit();
         // Third row (Red)
         Assert.assertEquals(2,table.getRow(TEST_DATA[0][2]));
-        clickLinkWithText("edit", 2);
+        clickAndWait(Locator.linkWithText("edit", 2));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox("quf_JewelTone");
         submit();
@@ -507,7 +507,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent("Unable to find the audit history detail for this event");
 
         clickButton("Done");
-        clickLinkWithText(PROJECT_VERIFY, 3);
+        clickAndWait(Locator.linkWithText(PROJECT_VERIFY, 3));
 
         log("Test single list web part");
         addWebPart("List - Single");
@@ -586,7 +586,7 @@ public class ListTest extends BaseWebDriverTest
         popLocation();
 
         log("Test edit row");
-        clickLinkWithText("edit", 0);
+        clickAndWait(Locator.linkWithText("edit", 0));
         selectOptionByText(Locator.name("quf_Color"), TEST_DATA[1][1]);
         selectOptionByText(Locator.name("quf_Owner"), LIST2_FOREIGN_KEY_OUTSIDE);
         submit();
@@ -1034,7 +1034,7 @@ public class ListTest extends BaseWebDriverTest
             _customizeViewsHelper.addCustomizeViewColumn("Bfk/Cfk/title", "Bfk Cfk Title");
             _customizeViewsHelper.saveCustomView("allColumns");
 
-            clickLinkWithText("one C", 1);
+            clickAndWait(Locator.linkWithText("one C", 1));
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));

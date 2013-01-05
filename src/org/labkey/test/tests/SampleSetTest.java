@@ -344,7 +344,7 @@ public class SampleSetTest extends BaseSeleniumWebTest
 
     private void setFileAttachment(int index, File attachment)
     {
-        clickLinkWithText("edit", index);
+        clickAndWait(Locator.linkWithText("edit", index));
         setFormElement("quf_FileAttachment",  attachment);
         clickButton("Submit");
 

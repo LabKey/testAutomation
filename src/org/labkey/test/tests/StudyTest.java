@@ -596,11 +596,11 @@ public class StudyTest extends StudyBaseTest
         _customizeViewsHelper.addCustomizeViewColumn("Bad Name", "Bad Name");
         _customizeViewsHelper.applyCustomView();
         clickMenuButton("QC State", "All data");
-        clickLinkWithText("edit", 0);
+        clickAndWait(Locator.linkWithText("edit", 0));
         setFormElement(Locator.input("quf_Bad Name"), "Updatable Value");
         clickButton("Submit");
         assertTextPresent("Updatable Value");
-        clickLinkWithText("edit", 0);
+        clickAndWait(Locator.linkWithText("edit", 0));
         assertFormElementEquals(Locator.input("quf_Bad Name"), "Updatable Value");
         setFormElement(Locator.input("quf_Bad Name"), "Updatable Value11");
         clickButton("Submit");
@@ -824,7 +824,7 @@ public class StudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Visits"));
 
         // test optional/required/not associated
-        clickLinkWithText("edit", 0);
+        clickAndWait(Locator.linkWithText("edit", 0));
         selectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
         selectOption("dataSetStatus", 1, "NOT_ASSOCIATED");
         selectOption("dataSetStatus", 2, "NOT_ASSOCIATED");
@@ -835,7 +835,7 @@ public class StudyTest extends StudyBaseTest
         selectOption("dataSetStatus", 7, "REQUIRED");
         selectOption("dataSetStatus", 8, "REQUIRED");
         clickButton("Save");
-        clickLinkWithText("edit", 0);
+        clickAndWait(Locator.linkWithText("edit", 0));
         selectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
         selectOption("dataSetStatus", 1, "OPTIONAL");
         selectOption("dataSetStatus", 2, "REQUIRED");
@@ -846,7 +846,7 @@ public class StudyTest extends StudyBaseTest
         selectOption("dataSetStatus", 7, "OPTIONAL");
         selectOption("dataSetStatus", 8, "REQUIRED");
         clickButton("Save");
-        clickLinkWithText("edit", 0);
+        clickAndWait(Locator.linkWithText("edit", 0));
         assertSelectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
         assertSelectOption("dataSetStatus", 1, "OPTIONAL");
         assertSelectOption("dataSetStatus", 2, "REQUIRED");

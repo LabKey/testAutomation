@@ -3449,13 +3449,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
-    /** Find nth link with the exact text specified, click it, and wait for the page to load */
-    public void clickLinkWithText(String text, int index)
-    {
-        Locator l = Locator.linkWithText(text, index);
-        clickAndWait(l, defaultWaitForPage);
-    }
-
     /** Find nth link with the exact text specified and click it, optionally waiting for the page to load */
     public void clickLinkWithText(String text, int index, boolean wait)
     {

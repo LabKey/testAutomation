@@ -233,7 +233,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         log("Modify row in source dataset");
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATASETS[0]));
-        clickLinkWithText("edit", 1);
+        clickAndWait(Locator.linkWithText("edit", 1));
         setFormElement(Locator.name("quf_SequenceNum"), SEQ_NUMBER2);
         clickButton("Submit");
 

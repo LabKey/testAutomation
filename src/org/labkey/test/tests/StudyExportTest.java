@@ -281,7 +281,7 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Save Changes and Send Notifications");
         assertTextNotPresent("New Request");
         assertTextPresent("Pending Approval");
-        clickLinkWithText("Details", 0);
+        clickAndWait(Locator.linkWithText("Details", 0));
         assertTextPresent("Duke University");
         assertTextPresent("Providing lab approval");
         checkCheckbox("complete");
@@ -293,7 +293,7 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Save Changes and Send Notifications");
         assertTextPresent("Complete");
 
-        clickLinkWithText("Details", 1);
+        clickAndWait(Locator.linkWithText("Details", 1));
         clickButton("Delete Requirement");
         assertTextNotPresent("Receiving lab approval");
 

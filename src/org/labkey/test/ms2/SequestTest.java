@@ -125,7 +125,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         pushLocation();
         addUrlParameter("exportAsWebPage=true");
         clickButton("Export All", 0);
-        clickLinkWithText("TSV", 0);
+        clickAndWait(Locator.linkWithText("TSV", 0));
         assertTextNotPresent(PEPTIDE);
         assertTextBefore(PEPTIDE2, PEPTIDE3);
         assertTextPresent(PROTEIN);

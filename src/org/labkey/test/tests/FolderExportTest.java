@@ -227,18 +227,18 @@ public class FolderExportTest extends BaseWebDriverTest
     private void verifySubfolderImport(int subfolderIndex, boolean fromTemplate)
     {
         log("verify child containers were imported");
-        clickLinkWithText("Subfolder1", subfolderIndex);
+        clickAndWait(Locator.linkWithText("Subfolder1", subfolderIndex));
         assertTextPresent("My Test Container Tab Query");
-        clickLinkWithText("_hidden", subfolderIndex);
+        clickAndWait(Locator.linkWithText("_hidden", subfolderIndex));
         assertTextPresentInThisOrder("Lists", "Hidden Folder List");
-        clickLinkWithText("Subfolder2", subfolderIndex);
+        clickAndWait(Locator.linkWithText("Subfolder2", subfolderIndex));
         if (fromTemplate)
             assertElementPresent(Locator.css("#bodypanel .labkey-wp-body p").withText("This folder does not contain a study."));
         else
             assertElementPresent(Locator.css(".study-properties").withText("Study Label for Subfolder2 tracks data in 1 dataset over 1 visit. Data is present for 2 Monkeys."));
 
         log("verify container tabs were imported");
-        clickLinkWithText("Subfolder1", subfolderIndex);
+        clickAndWait(Locator.linkWithText("Subfolder1", subfolderIndex));
         assertLinkPresentWithText("Assay Container");
         assertLinkPresentWithText("Tab 2");
         assertLinkPresentWithText("Study Container");

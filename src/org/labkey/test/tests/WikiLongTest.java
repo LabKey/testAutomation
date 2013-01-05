@@ -333,7 +333,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
 
         clickAndWait(Locator.linkWithText("Header"));
         assertTextPresent(HEADER_CONTENT);
-        clickLinkWithText("Edit", 0);
+        clickAndWait(Locator.linkWithText("Edit", 0));
         deleteWikiPage();
         assertTextNotPresent(HEADER_CONTENT);
 

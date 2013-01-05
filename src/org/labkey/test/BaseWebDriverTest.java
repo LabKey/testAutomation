@@ -3936,15 +3936,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
-    /** Find a link with the exact text specified, click it, and wait for the page to load
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLinkWithText(String text, int index)
-    {
-        Locator l = Locator.linkWithText(text, index);
-        clickAndWait(l, defaultWaitForPage);
-    }
-
     /** Find nth link with the exact text specified and click it, optionally waiting for the page to load
      * @deprecated Use {@link #clickAndWait(Locator)}
      */

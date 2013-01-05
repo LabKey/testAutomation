@@ -1795,7 +1795,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
 
         //verify the Levey-Jennings plot
-        clickLinkWithText("graph",0);
+        clickAndWait(Locator.linkWithText("graph", 0));
         waitForText(" - " + isotype + " " + conjugate);
         assertTextPresent("Levey-Jennings Report: Standard1");
     }
