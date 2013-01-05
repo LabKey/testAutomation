@@ -439,7 +439,7 @@ public class CAVDStudyTest extends StudyBaseTest
         goToSchemaBrowser();
         selectQuery("viscstudies", "studies");
         waitForText("view data");
-        clickLinkContainingText("view data", true);
+        clickAndWait(Locator.linkContainingText("view data"));
     }
 
     private void clickEditDatasetIcon(String dataset)

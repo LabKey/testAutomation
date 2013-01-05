@@ -3937,19 +3937,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLinkContainingText(String text, boolean wait)
-    {
-        log("Clicking link containing text: " + text);
-        Locator l  = Locator.linkContainingText(text);
-        if ( wait )
-            clickAndWait(l, defaultWaitForPage);
-        else
-            click(l);
-    }
-
-    /**
      * @deprecated Use {@link #getElementCount(Locator)}
      */
     @Deprecated public int countLinksWithText(String text)

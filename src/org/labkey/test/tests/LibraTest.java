@@ -156,7 +156,7 @@ public class LibraTest extends MS2Test
     protected void newWindowTest(String linkToClick, String verificationString, String... additionalChecks)
     {
         selenium.openWindow("", "prot");
-        clickLinkContainingText(linkToClick,false);
+        click(Locator.linkContainingText(linkToClick));
         selenium.selectWindow("prot");
         waitForPageToLoad();
         waitForText(verificationString);
