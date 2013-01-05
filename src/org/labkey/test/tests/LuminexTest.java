@@ -1709,7 +1709,7 @@ public class LuminexTest extends AbstractQCAssayTest
     @LogMethod
     private void verifyQCFlagLink()
     {
-        clickLinkContainingText(expectedFlags[0], 0, false);
+        click(Locator.linkContainingText(expectedFlags[0], 0));
         waitForExtMask();
         sleep(1500);
         assertTextPresent("CV", 4); // 3 occurances of PCV and 1 of %CV

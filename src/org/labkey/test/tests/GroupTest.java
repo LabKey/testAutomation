@@ -174,7 +174,7 @@ public class GroupTest extends BaseWebDriverTest
         }
 
         //confirm details link leads to right user, page
-        clickLinkContainingText("details", rowIndex);
+        clickAndWait(Locator.linkContainingText("details", rowIndex));
         assertTextPresent(TEST_USERS_FOR_GROUP[0]);
         Assert.assertTrue("details link for user did not lead to folder access page", getURL().getFile().contains("folderAccess.view"));
         goBack();

@@ -3449,21 +3449,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
-    public void clickLinkContainingText(String text, int index)
-    {
-        clickLinkContainingText(text, index, true);
-    }
-
-    public void clickLinkContainingText(String text, int index, boolean wait)
-    {
-        log("Clicking link " + index + " containing text: " + text);
-        Locator l = Locator.linkContainingText(text, index);
-        if ( wait )
-            clickAndWait(l, defaultWaitForPage);
-        else
-            click(l);
-    }
-
     public void clickLinkContainingText(String text, boolean wait)
     {
         log("Clicking link containing text: " + text);

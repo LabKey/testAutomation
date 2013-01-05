@@ -70,7 +70,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         //embed query part in wiki page
         addWebPart("Wiki");
         createNewWikiPage();
-        clickLinkContainingText("Source", 0, false);
+        click(Locator.linkContainingText("Source", 0));
         setFormElement(Locator.name("name"), TRICKY_CHARACTERS + "wiki page");
 
         setWikiBody(getFileContents("server/test/data/api/EmbeddedQueryWebPart.html"));

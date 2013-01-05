@@ -329,7 +329,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             _customizeViewsHelper.removeCustomizeViewColumn("VirusName");
             _customizeViewsHelper.saveCustomView("CustomDetailsView");
 
-            clickLinkContainingText("details", 1);
+            clickAndWait(Locator.linkContainingText("details", 1));
             assertNabData(true);
 
             clickAndWait(Locator.linkWithText("View Results"));

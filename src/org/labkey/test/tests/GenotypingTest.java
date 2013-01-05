@@ -122,7 +122,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         String[] listVals = {"sequences", "runs", samples};
         for(int i=0; i<3; i++)
         {
-            clickLinkContainingText("configure",i, false);
+            click(Locator.linkContainingText("configure",i));
             _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
             _extHelper.clickExtDropDownMenu("userQuery_schema", "lists");
             _extHelper.clickExtDropDownMenu("userQuery_query", listVals[i]);
