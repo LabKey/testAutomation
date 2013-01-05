@@ -134,7 +134,7 @@ public class DataRegionTest extends BaseWebDriverTest
             log("Checking column: "+ columnAndValue[0]);
             Assert.assertEquals(columnAndValue[1], auditTable.getDataAsText(0, columnAndValue[0]));
         }
-        clickLinkContainingText("details");
+        clickAndWait(Locator.linkContainingText("details"));
         assertTextPresent(LIST_NAME);
     }
 

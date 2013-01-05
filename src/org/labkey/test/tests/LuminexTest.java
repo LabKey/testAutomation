@@ -498,7 +498,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToSchemaBrowser();
         selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "CurveFit");
         waitForText("view data");
-        clickLinkContainingText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
         assertTextPresent("Four Parameter");
 
         waitForText("3.45399");
@@ -613,7 +613,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
          ensureMultipleCurveDataPresent();
 
-         clickLinkContainingText(MULTIPLE_CURVE_ASSAY_RUN_NAME);
+         clickAndWait(Locator.linkContainingText(MULTIPLE_CURVE_ASSAY_RUN_NAME));
 
         //ensure multiple curve data present
         //there was a bug (never filed) that showed up with multiple curve data, so best to use that.
@@ -856,8 +856,8 @@ public class LuminexTest extends AbstractQCAssayTest
     private void goToTestRunList()
     {
         goToHome();
-        clickLinkContainingText(TEST_ASSAY_PRJ_LUMINEX);
-        clickLinkContainingText(TEST_ASSAY_LUM);
+        clickAndWait(Locator.linkContainingText(TEST_ASSAY_PRJ_LUMINEX));
+        clickAndWait(Locator.linkContainingText(TEST_ASSAY_LUM));
     }
 
     private String startCreateMultipleCurveAssayRun()
@@ -917,7 +917,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToSchemaBrowser();
         selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "CurveFit");
         waitForText("view data");
-        clickLinkContainingText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
 
         // We're OK with grabbing the footer curve fit from any of the files, under normal usage they should all share
         // the same curve fits
@@ -1454,9 +1454,9 @@ public class LuminexTest extends AbstractQCAssayTest
         String expectedEC50 = "36676.656";
 //        assertElementPresent(Locator.xpath("//span[contains(@style, 'red') and text()=" + expectedEC50 + "]"));
 
-        clickLinkContainingText("view runs");
+        clickAndWait(Locator.linkContainingText("view runs"));
         enableDisableQCFlags("Guide Set plate 4", "AUC", "HMFI");
-        clickLinkContainingText("view results");
+        clickAndWait(Locator.linkContainingText("view results"));
         //turn off flags
         assertElementPresent(Locator.xpath("//td[contains(@style, 'white-space') and text()=" + expectedHMFI + "]"));
         assertElementPresent(Locator.xpath("//td[contains(@style, 'white-space') and text()=" + expectedEC50 + "]"));
@@ -1754,7 +1754,7 @@ public class LuminexTest extends AbstractQCAssayTest
         String qcUrlInRuns = getQCLink();
         clickAndWait(Locator.linkWithText("view results"));
         String qcUrlInResults = getQCLink();
-        clickLinkContainingText("view qc report");
+        clickAndWait(Locator.linkContainingText("view qc report"));
 
     }
 
@@ -1809,7 +1809,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     protected void excludeWellFromRun(String run, String well)
     {
-        clickLinkContainingText(run);
+        clickAndWait(Locator.linkContainingText(run));
 
         log("Exclude well from run");
         clickExclusionMenuIconForWell(well);
@@ -1820,7 +1820,7 @@ public class LuminexTest extends AbstractQCAssayTest
     //re-include an excluded well
     protected void includeWellFromRun(String run, String well)
     {
-        clickLinkContainingText(run);
+        clickAndWait(Locator.linkContainingText(run));
 
         log("Exclude well from from run");
         clickExclusionMenuIconForWell(well);
@@ -1835,7 +1835,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void excludableWellsWithTransformTest()
     {
         clickFolder(getProjectName());
-        clickLinkContainingText(TEST_ASSAY_LUM);
+        clickAndWait(Locator.linkContainingText(TEST_ASSAY_LUM));
         excludeWellFromRun("Guide Set plate 5", "A6,B6");
         goToLeveyJenningsGraphPage("Standard1");
         setUpGuideSet("GS Analyte (2)");
@@ -1941,7 +1941,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToSchemaBrowser();
         selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "AnalyteTitration");
         waitForText("view data");
-        clickLinkContainingText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
         DataRegionTable table = new DataRegionTable("query", this);
         table.setFilter("GuideSet/Created", "Is Not Blank", "");
         // check that the table contains one row that reads "No data to show."
@@ -1957,7 +1957,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToSchemaBrowser();
         selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "AnalyteTitration");
         waitForText("view data");
-        clickLinkContainingText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("Analyte/RowId");
         _customizeViewsHelper.addCustomizeViewColumn("Titration/RowId");
@@ -1978,7 +1978,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToSchemaBrowser();
         selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "GuideSet");
         waitForText("view data");
-        clickLinkContainingText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
         Map<String, Integer> guideSetIds = new HashMap<String, Integer>();
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("RowId");
@@ -2106,8 +2106,8 @@ public class LuminexTest extends AbstractQCAssayTest
         goToSchemaBrowser();
         selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "Titration");
         waitForText("view data");
-        clickLinkContainingText("view data");
-        clickLinkContainingText(titrationName);
+        clickAndWait(Locator.linkContainingText("view data"));
+        clickAndWait(Locator.linkContainingText(titrationName));
         waitForText("Levey-Jennings Report: " + titrationName);
         // Make sure we have the expected help text
         waitForText("To begin, choose an Antigen, Isotype, and Conjugate from the panel to the left and click the Apply button.");
@@ -2121,7 +2121,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToSchemaBrowser();
         selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "GuideSetCurveFit");
         waitForText("view data");
-        clickLinkContainingText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("GuideSetId/RowId");
         _customizeViewsHelper.applyCustomView();

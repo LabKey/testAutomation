@@ -74,7 +74,7 @@ public class QuantitationTest extends AbstractXTandemTest
         waitForPipelineJobsToComplete(1, runDescription, false);
 
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
-        clickLinkContainingText(runDescription);
+        clickAndWait(Locator.linkContainingText(runDescription));
         selectOptionByText("viewParams", "<Standard View>");
         clickButton("Go");
         assertTextPresent(PEPTIDE2);

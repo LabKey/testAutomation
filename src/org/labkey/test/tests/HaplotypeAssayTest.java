@@ -367,7 +367,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         goToSchemaBrowser();
         selectQuery("genotyping", queryName);
         waitForText("view data");
-        clickLinkContainingText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
     }
 
     private void verifyHaplotypeRecordsByType(int total, int typeACount, int typeBCount)

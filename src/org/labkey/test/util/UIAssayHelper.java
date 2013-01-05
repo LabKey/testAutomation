@@ -48,7 +48,7 @@ public class UIAssayHelper extends AbstractAssayHelper
         String[] folders = projectPath.split("/");
         for(String folder : folders)
             _test.clickAndWait(Locator.linkWithText(folder));
-        _test.clickLinkContainingText(assayName);
+        _test.clickAndWait(Locator.linkContainingText(assayName));
         _test.clickButton("Import Data");
         _test.clickButton("Next");
 

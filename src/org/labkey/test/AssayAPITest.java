@@ -74,8 +74,8 @@ public class AssayAPITest extends BaseSeleniumWebTest
 
         log("verify import worked");
         goToProjectHome();
-        clickLinkContainingText(assayName);
-        clickLinkContainingText(runName);
+        clickAndWait(Locator.linkContainingText(assayName));
+        clickAndWait(Locator.linkContainingText(runName));
         assertTextPresent(textToCheck);
     }
 

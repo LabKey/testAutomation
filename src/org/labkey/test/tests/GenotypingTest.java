@@ -94,7 +94,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         _containerHelper.createProject(getProjectName(), "Genotyping");
         setUpLists();
         configureAdmin();
-        clickLinkContainingText(getProjectName());
+        clickAndWait(Locator.linkContainingText(getProjectName()));
         setPipelineRoot(pipelineLoc);
     }
 
@@ -102,7 +102,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void setUpLists()
     {
         log("Import genotyping list");
-        clickLinkContainingText(getProjectName());
+        clickAndWait(Locator.linkContainingText(getProjectName()));
         _listHelper.importListArchive(getProjectName(), new File(pipelineLoc, "sequencing.lists.zip"));
         assertTextPresent(
                 samples,
@@ -115,7 +115,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     private void configureAdmin()
     {
-        clickLinkContainingText(getProjectName());
+        clickAndWait(Locator.linkContainingText(getProjectName()));
         waitForPageToLoad();
         clickLink("adminSettings");
 
@@ -686,7 +686,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     private void startImportRun(String file, String importAction, String associatedRun)
     {
-        clickLinkContainingText("Import Run");
+        clickAndWait(Locator.linkContainingText("Import Run"));
         _extHelper.selectFileBrowserItem(file);
 
         selectImportDataAction(importAction);
@@ -697,7 +697,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     private void startImportIlluminaRun(String file, String importAction)
     {
-        clickLinkContainingText("Import Run");
+        clickAndWait(Locator.linkContainingText("Import Run"));
         _extHelper.selectFileBrowserItem(file);
 
         selectImportDataAction(importAction);
@@ -715,11 +715,11 @@ public class GenotypingTest extends BaseSeleniumWebTest
 //        goToHome();
 //        if(isTextPresent(getProjectName()))
 //        {
-//            clickLinkContainingText(getProjectName());
+//            clickAndWait(Locator.linkContainingText(getProjectName()));
 //
 //            if(isTextPresent("View Runs"))
 //            {
-//                clickLinkContainingText("View Runs");
+//                clickAndWait(Locator.linkContainingText("View Runs"));
 //                click(Locator.name(".select"));
 //                clickButton("Delete");
 //                getConfirmationAndWait();

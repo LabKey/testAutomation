@@ -54,7 +54,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         waitForTextWithRefresh(SKY_FILE, defaultWaitForPage);
 
         assertTextPresent("Transitions");
-        clickLinkContainingText(SKY_FILE);
+        clickAndWait(Locator.linkContainingText(SKY_FILE));
 
         log("Verifying expected summary counts ");
         assertElementPresent(Locator.xpath("//tr[td[text()='Peptide Group Count']][td[text()='24']]"));
@@ -68,7 +68,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
 
 //        Click on a peptide.
         String targetProtein  = "LTSLNVVAGSDLR";
-        clickLinkContainingText(targetProtein);
+        clickAndWait(Locator.linkContainingText(targetProtein));
         //Verify it’s associated with the right protein and other values from details view.
         //protein name, portien, neutral mass, avg. RT , precursor
         assertTextPresent(targetProtein, "YAL038W", "1343.7408", "27.9232", "677.8818++ (heavy)");
@@ -86,7 +86,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         assertElementPresent(Locator.xpath("//img[contains(@src, 'Chromatogram')]"));
 
         goBack();
-        clickLinkContainingText("YAL038W");
+        clickAndWait(Locator.linkContainingText("YAL038W"));
         //Verify summary info
         assertTextPresent("CDC19 SGDID:S000000036, Chr I from 71787-73289, Verified ORF, \"Pyruvate kinase, functions as a homotetramer in glycolysis to convert phosphoenolpyruvate to pyruvate,");
 
@@ -95,7 +95,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
                 "Peak Areas");
 
         goBack();
-        clickLinkContainingText(SKY_FILE);
+        clickAndWait(Locator.linkContainingText(SKY_FILE));
         //Toggle to Transition view (click on down arrow in Precursor List webpart header)
         click(Locator.xpath("//th[span[contains(text(), 'Precursor List')]]/span/a/img"));
         clickLink(Locator.tagContainingText("span","Transition List"));
@@ -118,7 +118,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         selenium.mouseOver(xpath);
         selenium.mouseMoveAt(xpath, "1,1");
         waitForText("Search for other references to this protein");
-        clickLinkContainingText("Search for other references to this protein");
+        clickAndWait(Locator.linkContainingText("Search for other references to this protein"));
 
         //Verify TargetedMS Peptides section of page.
         //Click on Details link.

@@ -111,7 +111,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/ProgrammaticQC/QC Assay.xar", 1, "QC Assay.xar");
 
         goToProjectHome();
-        clickLinkContainingText("QC Assay");
+        clickAndWait(Locator.linkContainingText("QC Assay"));
         clickEditAssayDesign(false);
 //        clickButton("Manage Assays");
 //        clickButton("New Assay Design");

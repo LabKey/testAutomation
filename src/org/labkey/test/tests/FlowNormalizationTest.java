@@ -69,7 +69,7 @@ public class FlowNormalizationTest extends BaseFlowTest
         importAnalysis(options);
 
         goToFlowDashboard();
-        clickLinkContainingText("Show Jobs");
+        clickAndWait(Locator.linkContainingText("Show Jobs"));
         clickAndWait(Locator.linkWithText("COMPLETE"));
         assertTextPresent("/flowjoquery/miniFCS/mini-fcs.xml and loading group Sample Order 5: Gag1&2");
         assertTextPresent("finished parsing 2 samples");

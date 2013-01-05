@@ -670,7 +670,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
 
         goToSiteUsers();
-        clickLinkContainingText(displayNameFromEmail(userEmail));
+        clickAndWait(Locator.linkContainingText(displayNameFromEmail(userEmail)));
 
         clickButton("Change Email");
 
@@ -1048,7 +1048,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
                 if (isLinkPresentContainingText("Go directly to the server's Home page"))
                 {
-                    clickLinkContainingText("Go directly to the server's Home page");
+                    clickAndWait(Locator.linkContainingText("Go directly to the server's Home page"));
                 }
             }
 
@@ -3449,11 +3449,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
-    public void clickLinkContainingText(String text)
-    {
-        clickLinkContainingText(text, true);
-    }
-
     public void clickLinkContainingText(String text, int index)
     {
         clickLinkContainingText(text, index, true);
@@ -5133,7 +5128,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
         waitForElement(groupLoc, defaultWaitForPage);
         mouseDown(groupLoc);
-        clickLinkContainingText("manage group");
+        clickAndWait(Locator.linkContainingText("manage group"));
         addUserToGroupFromGroupScreen(userName);
     }
 
@@ -5976,7 +5971,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
         else
         {
-            clickLinkContainingText(titleName);
+            clickAndWait(Locator.linkContainingText(titleName));
             assertTextPresent(searchFor);
         }
     }
@@ -6831,7 +6826,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void clickManageSubjectCategory(String subjectNoun)
     {
-        clickLinkContainingText("Manage " + subjectNoun + " Groups");
+        clickAndWait(Locator.linkContainingText("Manage " + subjectNoun + " Groups"));
     }
 
     public void ensureSignedOut()

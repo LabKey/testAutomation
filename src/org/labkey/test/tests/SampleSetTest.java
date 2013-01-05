@@ -152,15 +152,15 @@ public class SampleSetTest extends BaseSeleniumWebTest
         setFormElement("outputSample1_IntColFolder", "500");
         clickButton("Submit");
 
-        clickLinkContainingText("Derive 2 samples");
-        clickLinkContainingText("Text View");
+        clickAndWait(Locator.linkContainingText("Derive 2 samples"));
+        clickAndWait(Locator.linkContainingText("Text View"));
         assertTextPresent("FirstRole");
         assertTextPresent("SecondRole");
         assertTextPresent("ThirdRole");
         assertTextPresent("FourthRole");
 
-        clickLinkContainingText("16");
-        clickLinkContainingText("derive samples from this sample");
+        clickAndWait(Locator.linkContainingText("16"));
+        clickAndWait(Locator.linkContainingText("derive samples from this sample"));
 
         selectOptionByText("inputRole0", "FirstRole");
         selenium.select("targetSampleSetId", "label=ProjectSampleSet in /SampleSetTestProject");

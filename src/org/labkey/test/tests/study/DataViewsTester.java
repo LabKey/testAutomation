@@ -68,7 +68,7 @@ public class DataViewsTester
     public void basicTest()
     {
         _test.log("Data Views Test");
-        _test.clickLinkContainingText("Data & Reports");
+        _test.clickAndWait(Locator.linkContainingText("Data & Reports"));
         _test.waitForText(someDataSets[3]);
         _test.assertTextPresent("Data Views", "Name", "Type", "Access");
 
@@ -147,14 +147,14 @@ public class DataViewsTester
     public void datasetStatusTest()
     {
         _test.log("Testing status settings for datasets");
-        _test.clickLinkContainingText("Data & Reports");
+        _test.clickAndWait(Locator.linkContainingText("Data & Reports"));
         _test.waitForText(someDataSets[3]);
         _test.assertTextPresent("Data Views", "Name", "Type", "Access");
 
         openCustomizePanel();
         _test._extHelper.checkCheckbox("Status");
         _test.clickButton("Save", 0);
-        _test.clickLinkContainingText("Data & Reports");
+        _test.clickAndWait(Locator.linkContainingText("Data & Reports"));
 
         for (String[] entry : datasets)
         {
@@ -173,7 +173,7 @@ public class DataViewsTester
             _test.click(Locator.xpath("//a[contains(text(), '" + entry[0] + "')]"));
 
             _test.waitForElement(Locator.xpath("//td[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-            _test.clickLinkContainingText("Data & Reports");
+            _test.clickAndWait(Locator.linkContainingText("Data & Reports"));
         }
     }
 
@@ -230,7 +230,7 @@ public class DataViewsTester
     {
         _test.log("Verify refresh date");
         String refreshDate = "2012-03-01";
-        _test.clickLinkContainingText("Data & Reports");
+        _test.clickAndWait(Locator.linkContainingText("Data & Reports"));
         _test.waitForText(someDataSets[3]);
         // Refresh date not present when not set.
         _test.mouseOver(Locator.linkWithText(EDITED_DATASET));

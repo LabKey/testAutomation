@@ -138,7 +138,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         log("verify a user can subscribe to a thread");
         impersonate(user);
         goToProjectHome();
-        clickLinkContainingText("view message");
+        clickAndWait(Locator.linkContainingText("view message"));
         Locator subscribeButton = Locator.tagWithText("span", "subscribe");
         assertElementPresent(subscribeButton);
         click(subscribeButton);

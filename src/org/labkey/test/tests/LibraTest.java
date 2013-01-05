@@ -60,7 +60,7 @@ public class LibraTest extends MS2Test
             sleep(1000);
         }
 
-        clickLinkContainingText(runName);
+        clickAndWait(Locator.linkContainingText(runName));
     }
 
 
@@ -106,7 +106,7 @@ public class LibraTest extends MS2Test
         clickButton("Compare");
         assertLinkPresentWithTextCount("itraq/iTRAQ (Libra)", 1);
         assertTextPresent("R.TDTGEPM'GR.G");
-        clickLinkContainingText("gi|34392343");
+        clickAndWait(Locator.linkContainingText("gi|34392343"));
         assertTextPresent("84,731");
         goBack();
 

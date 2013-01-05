@@ -114,7 +114,7 @@ public class ViabilityTest extends AbstractViabilityTest
                         "TotalCells", "ViableCells", "Viability", "OriginalCells", "Recovery",
                         "SpecimenIDs", "SpecimenCount", "SpecimenMatchCount", "SpecimenMatches", "Unreliable", "IntValue"});
 
-        clickLinkContainingText(".VIA.csv"); // run name (small.VIA.csv or small-XXX.VIA.csv)
+        clickAndWait(Locator.linkContainingText(".VIA.csv")); // run name (small.VIA.csv or small-XXX.VIA.csv)
         DataRegionTable table = new DataRegionTable("Data", this);
         String runName = table.getDataAsText(0, "Run");
         Assert.assertTrue(runName.contains("small") && runName.contains(".VIA.csv"));

@@ -811,12 +811,12 @@ public class StudyPublishTest extends StudyProtectedExportTest
         if (!viewMetadata)
         {
             waitForText("view data");
-            clickLinkContainingText("view data");
+            clickAndWait(Locator.linkContainingText("view data"));
         }
         else
         {
             waitForText("edit metadata");
-            clickLinkContainingText("edit metadata");
+            clickAndWait(Locator.linkContainingText("edit metadata"));
         }
     }
 }

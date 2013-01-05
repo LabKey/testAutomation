@@ -208,7 +208,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         setPermissions(GAMMA_ADMIN_GROUP_NAME, "Project Administrator");
         createUserInProjectForGroup(GAMMA_PROJECT_ADMIN_USER, PERM_PROJECT_NAME, GAMMA_ADMIN_GROUP_NAME, true);
         clickLinkWithTextNoTarget("here");
-        clickLinkContainingText("setPassword.view");
+        clickAndWait(Locator.linkContainingText("setPassword.view"));
         setFormElement(Locator.id("password"), PasswordUtil.getPassword());
         setFormElement(Locator.id("password2"), PasswordUtil.getPassword());
         clickButton("Set Password");

@@ -308,7 +308,7 @@ public class SecurityTest extends BaseWebDriverTest
         ensureSignedOut();
 
         clickAndWait(Locator.linkWithText("Sign In"));
-        clickLinkContainingText("Forgot your password?");
+        clickAndWait(Locator.linkContainingText("Forgot your password?"));
         setFormElement(Locator.id("EmailInput"), username);
         clickButtonContainingText("Submit", 0);
 
@@ -338,7 +338,7 @@ public class SecurityTest extends BaseWebDriverTest
     {
         String newPassword = password +"1";
         goToSiteUsers();
-        clickLinkContainingText(displayNameFromEmail(username));
+        clickAndWait(Locator.linkContainingText(displayNameFromEmail(username)));
         clickButtonContainingText("Reset Password", 0);
         getConfirmationAndWait();
         clickButton("Done");

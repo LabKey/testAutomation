@@ -248,9 +248,9 @@ public class StudyTest extends StudyBaseTest
         if(!isQuickTest)
         {
             //nav trail check
-            clickLinkContainingText("999320016");
+            clickAndWait(Locator.linkContainingText("999320016"));
             assertTextPresent("Dataset: DEM-1: Demographics, All Visits");
-            clickLinkContainingText("Dataset:");
+            clickAndWait(Locator.linkContainingText("Dataset:"));
 
             _extHelper.clickMenuButton(false, SUBJECT_NOUN + " Groups", "Create " + SUBJECT_NOUN + " Group", "From Selected " + SUBJECT_NOUN_PLURAL);
             _extHelper.waitForExtDialog("Selection Error");
@@ -804,7 +804,7 @@ public class StudyTest extends StudyBaseTest
             log("Checking column: "+ columnAndValue[0]);
             Assert.assertEquals(columnAndValue[1], auditTable.getDataAsText(0, columnAndValue[0]));
         }
-        clickLinkContainingText("details");
+        clickAndWait(Locator.linkContainingText("details"));
 
         popLocation();
     }
@@ -812,7 +812,7 @@ public class StudyTest extends StudyBaseTest
     private void verifyDemoCustomizeOptions()
     {
         log("verify demographic data set not present");
-        clickLinkContainingText(DEMOGRAPHICS_TITLE);
+        clickAndWait(Locator.linkContainingText(DEMOGRAPHICS_TITLE));
         _customizeViewsHelper.openCustomizeViewPanel();
         Assert.assertFalse(_customizeViewsHelper.isColumnPresent("MouseVisit/DEM-1"));
     }

@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 
 import java.io.File;
 
@@ -40,7 +41,7 @@ public class PipelineCancelTest  extends BaseWebDriverTest
 
         log("Cancel import");
         waitForText("Delaying import");
-        clickLinkContainingText("Delaying import");
+        clickAndWait(Locator.linkContainingText("Delaying import"));
         clickButton("Cancel");
 
         log("Verify cancel succeeded");

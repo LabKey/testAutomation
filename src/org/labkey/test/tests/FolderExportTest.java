@@ -208,7 +208,7 @@ public class FolderExportTest extends BaseWebDriverTest
         Assert.assertFalse("Folder search settings not imported", isChecked(Locator.checkboxById("searchable")));
 
         log("verify folder type was overwritten on import");
-        clickLinkContainingText("Folder Type");
+        clickAndWait(Locator.linkContainingText("Folder Type"));
         Assert.assertTrue("Folder type not overwritten on import", isChecked(Locator.radioButtonByNameAndValue("folderType", "None")));
 
         log("verify notification default settings as expected");

@@ -230,14 +230,14 @@ public class GroupTest extends BaseWebDriverTest
         createGlobalPermissionsGroup(CHILD_GROUP, "");
         addUserToSiteGroup(CHILD_GROUP, SIMPLE_GROUP);
         impersonateGroup(CHILD_GROUP, true);
-        clickLinkContainingText(getProjectName());
+        clickAndWait(Locator.linkContainingText(getProjectName()));
         verifyEditorPermission(nameTitleBody);
         stopImpersonatingGroup();
     }
 
     private void verifyAuthorPermission(String[][] nameTitleBody)
     {
-        clickLinkContainingText(getProjectName());
+        clickAndWait(Locator.linkContainingText(getProjectName()));
         Assert.assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP,canSeePages(nameTitleBody));
         Assert.assertFalse("Was able to edit wiki page when impersonating group without privileges", canEditPages(nameTitleBody));
         sleep(500);
@@ -245,7 +245,7 @@ public class GroupTest extends BaseWebDriverTest
 
     private void verifyEditorPermission(String[][] nameTitleBody)
     {
-        clickLinkContainingText(getProjectName());
+        clickAndWait(Locator.linkContainingText(getProjectName()));
         Assert.assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP, canSeePages(nameTitleBody));
         Assert.assertTrue("could not edit wiki pages when impersonating " + SIMPLE_GROUP, canEditPages(nameTitleBody));
         sleep(500);

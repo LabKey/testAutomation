@@ -73,7 +73,7 @@ public class StudyProtectedExportTest extends StudyExportTest
     protected void setParticipantIdPreface(String idPreface, int idLength)
     {
         clickTab("Manage");
-        clickLinkContainingText("Manage Alternate");
+        clickAndWait(Locator.linkContainingText("Manage Alternate"));
         _extHelper.setExtFormElementByLabel("Prefix", idPreface);
         setFormElement("numberOfDigits", "" + idLength);
         clickButton("Change Alternate IDs", 0);
@@ -105,7 +105,7 @@ public class StudyProtectedExportTest extends StudyExportTest
 
         log("verify sorting by groups works properly");
         goToDatasets();
-        clickLinkContainingText("LLS-2");
+        clickAndWait(Locator.linkContainingText("LLS-2"));
         DataRegionTable drt = new DataRegionTable( "Dataset", this);
         Assert.assertEquals("unexpected number of rows on initial viewing", 5, drt.getDataRowCount());
         clickMenuButton("Mouse Groups", "Cohorts", "Group 1");
@@ -159,13 +159,13 @@ public class StudyProtectedExportTest extends StudyExportTest
     private void goToDatasetWithProtectedColum()
     {
         goToDatasets();
-        clickLinkContainingText(datasetWithProtectedColumn);
+        clickAndWait(Locator.linkContainingText(datasetWithProtectedColumn));
     }
 
     private void goToDatasets()
     {
-        clickLinkContainingText(getFolderName());
-        clickLinkContainingText("datasets");
+        clickAndWait(Locator.linkContainingText(getFolderName()));
+        clickAndWait(Locator.linkContainingText("datasets"));
     }
 
     String datasetWithProtectedColumn =  "PT-1: Participant Transfer";
@@ -204,7 +204,7 @@ public class StudyProtectedExportTest extends StudyExportTest
     public Map<String, String> getFirstMouseStats()
     {
         goToDatasets();
-        clickLinkContainingText("DEM-1");
+        clickAndWait(Locator.linkContainingText("DEM-1"));
         DataRegionTable drt = new DataRegionTable("Dataset", this);
         Map stats = new HashMap();
 

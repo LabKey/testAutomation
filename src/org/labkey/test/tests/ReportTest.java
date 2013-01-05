@@ -1492,7 +1492,7 @@ public class ReportTest extends StudyBaseTest
 
         assertTextPresent(DISCUSSION_BODY_2);
 
-        clickLinkContainingText("edit");
+        clickAndWait(Locator.linkContainingText("edit"));
         waitForPageToLoad();
         waitForElement(Locator.id("body"));
         setFormElement("body", DISCUSSION_BODY_3);

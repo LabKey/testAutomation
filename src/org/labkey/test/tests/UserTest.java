@@ -227,7 +227,7 @@ public class UserTest extends SecurityTest
         goToModule("Dumbster");
         clickLinkContainingText("Reset Password Notification", false); // Expand message.
 
-        clickLinkContainingText("setPassword"); // Set Password URL
+        clickAndWait(Locator.linkContainingText("setPassword")); // Set Password URL
         assertTextPresent(NORMAL_USER);
         setFormElement("password", TEST_PASSWORD);
         setFormElement("password2", TEST_PASSWORD);

@@ -102,7 +102,7 @@ public class FlowJoQueryTest extends BaseFlowTest
 
         // Copy the generated 'workspaceScript1' from one of the sample wells (not one of the comp wells)
         setFilter("query", "Name", "Equals", "118795.fcs");
-        clickLinkContainingText("workspaceScript");
+        clickAndWait(Locator.linkContainingText("workspaceScript"));
         clickAndWait(Locator.linkWithText("Make a copy of this analysis script"));
         setFormElement("name", "LabKeyScript");
         checkCheckbox("copyAnalysis");

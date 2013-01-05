@@ -236,7 +236,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         _customizeViewsHelper.revertUnsavedView();
 
         clickAndWait(Locator.linkWithText("view runs"));
-        clickLinkContainingText("details");
+        clickAndWait(Locator.linkContainingText("details"));
 
         assertTextPresent("Plate Summary Information");
         assertTextPresent("Antigen 7 Mean");

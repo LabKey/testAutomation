@@ -43,7 +43,7 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
     protected void goToSiteLookAndFeel()
     {
         goToAdmin();
-        clickLinkContainingText("look and feel settings");
+        clickAndWait(Locator.linkContainingText("look and feel settings"));
     }
 
     //this project's properties will be altered and so should not copy site properties

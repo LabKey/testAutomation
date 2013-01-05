@@ -863,7 +863,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
 
         goToSiteUsers();
-        clickLinkContainingText(displayNameFromEmail(userEmail));
+        clickAndWait(Locator.linkContainingText(displayNameFromEmail(userEmail)));
 
         clickButton("Change Email");
 
@@ -1240,7 +1240,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
                 if (isLinkPresentContainingText("Go directly to the server's Home page"))
                 {
-                    clickLinkContainingText("Go directly to the server's Home page");
+                    clickAndWait(Locator.linkContainingText("Go directly to the server's Home page"));
                 }
             }
 
@@ -3939,14 +3939,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     /**
      * @deprecated Use {@link #clickAndWait(Locator)}
      */
-    @Deprecated public void clickLinkContainingText(String text)
-    {
-        clickLinkContainingText(text, true);
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
     @Deprecated public void clickLinkContainingText(String text, int index)
     {
         clickLinkContainingText(text, index, true);
@@ -5808,7 +5800,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
         waitForElement(groupLoc, defaultWaitForPage);
         click(groupLoc);
-        clickLinkContainingText("manage group");
+        clickAndWait(Locator.linkContainingText("manage group"));
         addUserToGroupFromGroupScreen(userName);
     }
 
@@ -6618,7 +6610,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         else
         {
-            clickLinkContainingText(titleName);
+            clickAndWait(Locator.linkContainingText(titleName));
             assertTextPresent(searchFor);
         }
     }
@@ -7389,7 +7381,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void clickManageSubjectCategory(String subjectNoun)
     {
-        clickLinkContainingText("Manage " + subjectNoun + " Groups");
+        clickAndWait(Locator.linkContainingText("Manage " + subjectNoun + " Groups"));
     }
 
     public void ensureSignedOut()

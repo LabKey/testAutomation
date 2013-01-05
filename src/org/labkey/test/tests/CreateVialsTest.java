@@ -87,7 +87,7 @@ public class CreateVialsTest extends AbstractViabilityTest
 
         clickTab("Manage");
         log("** Adding new Sites to check null ExternalId (Issue 12074)");
-        clickLinkContainingText("Manage Locations");
+        clickAndWait(Locator.linkContainingText("Manage Locations"));
         setFormElement(Locator.name("newId"), "100");
         setFormElement(Locator.name("newLabel"), "Alice Lab");
         clickButton("Save");
@@ -118,7 +118,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         uploadViabilityRun("/sampledata/viability/122810.EP5.CSV", "run1", false);
         clickButton("Save and Finish");
         getConfirmationAndWait();
-        clickLinkContainingText("run1");
+        clickAndWait(Locator.linkContainingText("run1"));
 
         DataRegionTable table = new DataRegionTable("Data", this);
         table.checkAllOnPage();
@@ -140,7 +140,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         clickButton("Save and Finish");
         getConfirmationAndWait();
 
-        clickLinkContainingText("run2");
+        clickAndWait(Locator.linkContainingText("run2"));
         table = new DataRegionTable("Data", this);
 
         table.checkAllOnPage();

@@ -311,7 +311,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void importExternalAnalysis(String containerPath, String analysisZipPath)
     {
         goToFlowDashboard();
-        clickLinkContainingText("FCS files to be imported");
+        clickAndWait(Locator.linkContainingText("FCS files to be imported"));
         selectPipelineFileAndImportAction(analysisZipPath, "Import External Analysis");
 
         importAnalysis_selectFCSFiles(containerPath, SelectFCSFileOption.None, null);
@@ -380,7 +380,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         log("browse pipeline to begin import analysis wizard");
         goToFlowDashboard();
-        clickLinkContainingText("FCS files to be imported");
+        clickAndWait(Locator.linkContainingText("FCS files to be imported"));
         _extHelper.selectFileBrowserItem(workspacePath);
 
         selectImportDataAction("Import FlowJo Workspace");
@@ -600,7 +600,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         else
         {
             goToFlowDashboard();
-            clickLinkContainingText("Show Jobs");
+            clickAndWait(Locator.linkContainingText("Show Jobs"));
             clickAndWait(Locator.linkWithText("ERROR"));
 
             for (String errorText : expectedErrors)

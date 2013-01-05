@@ -697,7 +697,7 @@ public class ListTest extends BaseWebDriverTest
         setFilter("qwp3", _listCol4.getName(), "Is Less Than", "10");
         assertTextPresent(TEST_DATA[1][0], 1);
 
-        clickLinkContainingText(LIST_NAME_COLORS);
+        clickAndWait(Locator.linkContainingText(LIST_NAME_COLORS));
     }
 
     /*  Issue 11825: Create test for "Clear Sort"

@@ -195,12 +195,12 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         defineAssay(PROJECT_NAME);
         uploadRun();
 
-        clickLinkContainingText(TEST_RUN1);
+        clickAndWait(Locator.linkContainingText(TEST_RUN1));
         selenium.click(".toggle");
         clickButton("Copy to Study");
         clickButton("Next");
         clickButton("Copy to Study");
-        clickLinkContainingText(STUDY_FOLDER + " Study");
+        clickAndWait(Locator.linkContainingText(STUDY_FOLDER + " Study"));
 
         addWebPart("Datasets");
         clickAndWait(Locator.linkWithText("TestAssay1"));
@@ -209,7 +209,7 @@ public class StudyExtraTest extends BaseSeleniumWebTest
         assertTextPresent("V4-8");
 
 /*
-        clickLinkContainingText("Manage Study");
+        clickAndWait(Locator.linkContainingText("Manage Study"));
 
         //Resnapshot the data & pick up the new table
         clickButton("Snapshot Study Data");

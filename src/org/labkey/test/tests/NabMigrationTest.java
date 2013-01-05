@@ -74,8 +74,8 @@ public class NabMigrationTest extends NabOldTest
 
     private void copyAssay()
     {
-        clickLinkContainingText("eprecated");
-        clickLinkContainingText("Migrate");
+        clickAndWait(Locator.linkContainingText("eprecated"));
+        clickAndWait(Locator.linkContainingText("Migrate"));
         int index=-1;
         if(isPresentInThisOrder(NEW_ASSAY_NAME, NEW_ASSAY_NAME2)==null)
             index=1;

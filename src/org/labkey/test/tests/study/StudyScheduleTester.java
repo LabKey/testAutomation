@@ -291,14 +291,14 @@ public class StudyScheduleTester
     {
         _test.log("linking dataset: " + name + " to type: " + type + "from dataset details.");
 
-        _test.clickLinkContainingText(name);
+        _test.clickAndWait(Locator.linkContainingText(name));
         _test.click(Locator.xpath("//span[text()='Link or Define Dataset']"));
         _test.waitForElement(Locator.xpath("//div[contains(@class, 'x4-form-display-field')][text()='Define " + name + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
         linkDataset(name, type, targetDataset);
 
         _test.clickTab("Manage");
-        _test.clickLinkContainingText("Manage Datasets");
+        _test.clickAndWait(Locator.linkContainingText("Manage Datasets"));
     }
 
     @LogMethod

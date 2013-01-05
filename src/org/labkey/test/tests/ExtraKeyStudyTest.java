@@ -90,9 +90,9 @@ public class ExtraKeyStudyTest extends StudyBaseTest
     protected void doVerifySteps()
     {
         log("TODO");
-        clickLinkContainingText(getProjectName());
-        clickLinkContainingText(getFolderName());
-        clickLinkContainingText("datasets");
+        clickAndWait(Locator.linkContainingText(getProjectName()));
+        clickAndWait(Locator.linkContainingText(getFolderName()));
+        clickAndWait(Locator.linkContainingText("datasets"));
 
         for (int i = 0; i < datasets.length; i++)
         {
@@ -105,7 +105,7 @@ public class ExtraKeyStudyTest extends StudyBaseTest
     {
         pushLocation();
         log("** Verifying visibility of other datasets from " + datasetName);
-        clickLinkContainingText(datasetName);
+        clickAndWait(Locator.linkContainingText(datasetName));
         _customizeViewsHelper.openCustomizeViewPanel();
 
         // Participant columns should be visible, old "Participant/DataSet" lookup should be hidden.

@@ -378,7 +378,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         selectQuery(VEHICLE_SCHEMA, "Manufacturers");
 
         assertLinkPresentWithText("view history");
-        clickLinkContainingText("view history");
+        clickAndWait(Locator.linkContainingText("view history"));
 
         DataRegionTable table = new DataRegionTable("audit", this, false, true);
         Assert.assertEquals("3 row(s) were inserted.", table.getDataAsText(0, "Comment"));
@@ -390,7 +390,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         pushLocation();
 
         assertLinkPresentWithText("view history");
-        clickLinkContainingText("view history");
+        clickAndWait(Locator.linkContainingText("view history"));
 
         table = new DataRegionTable("audit", this, false, true);
         Assert.assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
@@ -412,7 +412,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         selectSchema(VEHICLE_SCHEMA);
         selectQuery(VEHICLE_SCHEMA, "Models");
         assertLinkPresentWithText("view data");
-        clickLinkContainingText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
 
         table = new DataRegionTable("query", this, true, true);
         table.clickLink(0,1);

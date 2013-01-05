@@ -402,7 +402,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         renameFolder(getProjectName(), TEST_ASSAY_FLDR_NAB, TEST_ASSAY_FLDR_NAB_RENAME, false);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_NAB_RENAME));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        clickLinkContainingText("run details");
+        clickAndWait(Locator.linkContainingText("run details"));
 
         assertTextPresent("Description for NAb assay");
     }

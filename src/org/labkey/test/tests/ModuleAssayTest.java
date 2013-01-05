@@ -163,7 +163,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         log("Issue 13404: Test assay query metadata is available when module is active or inactive");
         selenium.goBack();
         waitForPageToLoad();
-        clickLinkContainingText("view runs");
+        clickAndWait(Locator.linkContainingText("view runs"));
         assertTextPresent("Simple Assay Button");
         pushLocation();
         enableModule(PROJECT_NAME, "miniassay");

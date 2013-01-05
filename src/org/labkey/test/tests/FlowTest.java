@@ -108,8 +108,8 @@ public class FlowTest extends BaseFlowTestWD
     private void removeAnalysisFilter()
     {
         clickTab("Flow Dashboard");
-        clickLinkContainingText("Other settings");
-        clickLinkContainingText("Edit FCS Analysis Filter");
+        clickAndWait(Locator.linkContainingText("Other settings"));
+        clickAndWait(Locator.linkContainingText("Edit FCS Analysis Filter"));
         selectOptionByValue(Locator.xpath("//select[@name='ff_field']").index(0),  "");
         clickButton("Set filter");
 
@@ -366,7 +366,7 @@ public class FlowTest extends BaseFlowTestWD
         setProtocolMetadata("Sample PTID", null, "Sample Visit", true);
 
         goToFlowDashboard();
-        clickLinkContainingText("49 sample descriptions");
+        clickAndWait(Locator.linkContainingText("49 sample descriptions"));
         assertTextPresent("49 sample descriptions");
         assertTextPresent("10 samples are not joined");
         assertTextPresent("39 FCS Files", "have been joined");
@@ -547,7 +547,7 @@ public class FlowTest extends BaseFlowTestWD
         waitForPipeline("/" + getProjectName() + "/" + getFolderName());
         goToFlowDashboard();
         waitForPipeline("/" + getProjectName() + "/" + getFolderName());
-        clickLinkContainingText("Show Jobs");
+        clickAndWait(Locator.linkContainingText("Show Jobs"));
         clickAndWait(Locator.linkWithText("ERROR"));
 
         assertTitleContains(reportName);
