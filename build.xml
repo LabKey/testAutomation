@@ -1229,9 +1229,15 @@
 
     <!-- Check if the QC validators JAR needs to be rebuilt, and if so rebuild it -->
     <target name="build-qc-validator">
-        <uptodate targetfile="${project.root}/sampledata/qc/classes" property="qc.build.uptodate">
-            <srcfiles dir="${project.root}/sampledata/qc/src" />
-        </uptodate>
+        <condition property="qc.build.uptodate">
+            <and>
+                <uptodate targetfile="${project.root}/sampledata/qc/classes">
+                    <srcfiles dir="${project.root}/sampledata/qc/src" />
+                </uptodate>
+                <available file="${project.root}/sampledata/qc/transform.jar"/>
+                <available file="${project.root}/sampledata/qc/validator.jar"/>
+            </and>
+        </condition>
         <antcall target="build-qc-validator-if-dirty" />
     </target>
 
