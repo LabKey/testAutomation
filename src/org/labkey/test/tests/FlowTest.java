@@ -140,6 +140,7 @@ public class FlowTest extends BaseFlowTestWD
         clickButton("Next");
         waitForText("Import Analysis: Analysis Folder");
         clickButton("Next");
+        waitForText("Import Analysis: Confirm");
         clickButton("Finish", 0);
         sleep(15000);
         waitForText("Ignoring filter");
