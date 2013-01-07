@@ -97,8 +97,6 @@ public class SequenceTest extends BaseWebDriverTest
     protected void setUpTest() throws Exception
     {
         _containerHelper.createProject(getProjectName(), "Sequence Analysis");
-        deleteTemplateRow();
-        goToProjectHome();
         goToProjectHome();
     }
 
@@ -150,13 +148,22 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("You have chosen to export " + _readsetCt + " samples");
         _helper.waitForField("Investigator Name");
 
+        //this is used later to view the download
+        String url = getCurrentRelativeURL();
+        url += "&exportAsWebPage=1";
+        beginAt(url);
+        waitForText("You have chosen to export " + _readsetCt + " samples");
+        _helper.waitForField("Investigator Name");
+
         Ext4FieldRefWD.getForLabel(this, "Reagent Cassette Id").setValue("FlowCell");
 
         String[][] fieldPairs = {
                 {"Investigator Name", "Investigator"},
                 {"Experiment Name", "Experiment"},
                 {"Project Name", "Project"},
-                {"Description", "Description"}
+                {"Description", "Description"},
+                {"Application", "FASTQ Only"},
+                {"Sample Kit", "Nextera XT", "Assay"},
         };
 
         for (String[] a : fieldPairs)
@@ -164,22 +171,20 @@ public class SequenceTest extends BaseWebDriverTest
             Ext4FieldRefWD.getForLabel(this, a[0]).setValue(a[1]);
         }
 
-        //save combo record count for later use
-        Ext4FieldRefWD templateCombo = Ext4FieldRefWD.getForLabel(this, "Template");
-        Long originalCount = (Long)templateCombo.getEval("store.getCount()");
-
         _ext4Helper.clickTabContainingText("Preview Header");
         waitForText("Edit Sheet");
         for (String[] a : fieldPairs)
         {
-            Assert.assertEquals(a[1], Ext4FieldRefWD.getForLabel(this, a[0]).getValue());
+            String propName = a.length == 3 ? a[2] : a[0];
+            Assert.assertEquals(a[1], Ext4FieldRefWD.getForLabel(this, propName).getValue());
         }
 
         clickButton("Edit Sheet", 0);
         waitForText("Done Editing");
         for (String[] a : fieldPairs)
         {
-            assertTextPresent(a[0] + "," + a[1]);
+            String propName = a.length == 3 ? a[2] : a[0];
+            assertTextPresent(propName + "," + a[1]);
         }
 
         //add new values
@@ -194,25 +199,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         //verify template has changed
         _ext4Helper.clickTabContainingText("General Info");
-        Assert.assertEquals("Custom", Ext4FieldRefWD.getForLabel(this, "Template").getValue());
-
-        //verify values persisted
-        _ext4Helper.clickTabContainingText("Preview Header");
-        waitForText("Edit Sheet");
-        Assert.assertEquals(prop_value, Ext4FieldRefWD.getForLabel(this, prop_name).getValue());
-
-        //save template
-        clickButton("Save As Template", 0);
-        waitForElement(Ext4Helper.ext4Window("Choose Name"));
-        Ext4FieldRefWD textfield = _ext4Helper.queryOne("textfield", Ext4FieldRefWD.class);
-        textfield.setValue(TEMPLATE_NAME);
-        clickButton("OK", 0);
-        _ext4Helper.clickTabContainingText("General Info");
-        Assert.assertEquals(TEMPLATE_NAME, Ext4FieldRefWD.getForLabel(this, "Template").getValue());
-
-        //if we navigate too quickly, before the insertRows has returned, the test can get a JS error
-        //therefore we sleep
-        sleep(500);
+        Assert.assertEquals("Custom", Ext4FieldRefWD.getForLabel(this, "Application").getValue());
 
         //verify samples present
         _ext4Helper.clickTabContainingText("Preview Samples");
@@ -220,31 +207,6 @@ public class SequenceTest extends BaseWebDriverTest
 
         int expectRows = (11 * (14 +  1));  //11 cols, 14 rows, plus header
         Assert.assertEquals(expectRows, getXpathCount(Locator.xpath("//td[contains(@class, 'x4-table-layout-cell')]")));
-
-        //make sure values persisted
-        refresh();
-        String url = getCurrentRelativeURL();
-        url += "&exportAsWebPage=1";
-        beginAt(url);
-
-        waitForText("Template");
-
-        _helper.waitForField("Investigator Name");
-        for (String[] a : fieldPairs)
-        {
-            Ext4FieldRefWD.getForLabel(this, a[0]).setValue(a[1]);
-        }
-
-        templateCombo.setValue(TEMPLATE_NAME);
-
-        Long count = (Long)templateCombo.getEval("store.getCount()");
-        Long expected = originalCount + 1;
-        Assert.assertEquals("Combo store does not have correct record number", expected, count);
-        sleep(50);
-        Assert.assertEquals("Field value not set correctly", TEMPLATE_NAME, Ext4FieldRefWD.getForLabel(this, "Template").getValue());
-        _ext4Helper.clickTabContainingText("Preview Header");
-        waitForText("Edit Sheet");
-        Assert.assertEquals(prop_value, Ext4FieldRefWD.getForLabel(this, prop_name).getValue());
 
         //NOTE: hitting download will display the text in the browser; however, this replaces newlines w/ spaces.  therefore we use selenium
         //to directly get the output
@@ -259,7 +221,8 @@ public class SequenceTest extends BaseWebDriverTest
         String text = _helper.getPageText();
         for (String[] a : fieldPairs)
         {
-            String line = a[0] + "," + a[1];
+            String propName = a.length == 3 ? a[2] : a[0];
+            String line = propName + "," + a[1];
             assertTextPresent(line);
 
             text.replaceAll(line, line + System.getProperty("line.separator"));
@@ -290,15 +253,6 @@ public class SequenceTest extends BaseWebDriverTest
             i++;
         }
         return sb.toString();
-    }
-
-    private void deleteTemplateRow() throws Exception
-    {
-        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        DeleteRowsCommand cmd = new DeleteRowsCommand("sequenceanalysis", "illumina_templates");
-        cmd.addRow(Collections.singletonMap("Name", (Object) TEMPLATE_NAME));
-        SaveRowsResponse resp = cmd.execute(cn, getProjectName());
-        log("Template rows deleted: " + resp.getRowsAffected());
     }
 
     /**
@@ -825,17 +779,18 @@ public class SequenceTest extends BaseWebDriverTest
                     lines.add(thisLine);
                 }
 
-                //TODO: reenable this check once it can be made to work reliably on team city
                 int expectedLength = 504;
                 if (count != expectedLength)
                 {
                     log("SequenceTest ERROR: Response length was " + count + ", expected " + expectedLength);
+                    int idx = 1;
                     for (String line : lines)
                     {
-                        log("[" + line + "]");
+                        log(idx + ": [" + line + "]");
+                        idx++;
                     }
                 }
-                Assert.assertEquals("Length of file doesnt match expected value of " + expectedLength + ", was: " + count, count, expectedLength);
+                Assert.assertEquals("Length of file doesnt match expected value", expectedLength, count);
             }
             finally
             {

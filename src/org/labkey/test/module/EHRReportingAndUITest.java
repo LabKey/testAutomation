@@ -64,38 +64,39 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitAndClick(Locator.linkWithText("Browse All Datasets"));
         waitForPageToLoad();
 
-        waitForText("Biopsies");
-        waitAndClick(LabModuleHelper.getNavPanelItem("Biopsies:", VIEW_TEXT));
-        waitForPageToLoad();
+        //TODO: places these in a WNPRC_EHRTest if one if ever created
+//        waitForText("Biopsies");
+//        waitAndClick(LabModuleHelper.getNavPanelItem("Biopsies:", VIEW_TEXT));
+//        waitForPageToLoad();
+//
+//        waitForText("details");
+//        DataRegionTable dr = new DataRegionTable("query", this);
+//        dr.clickLink(0, 0);
+//        //these are the sections we expect
+//        waitForText("Biopsy Details");
+//        waitForText("Morphologic Diagnoses");
+//        waitForText("Histology");
+//        assertNoErrorText();
 
-        waitForText("details");
-        DataRegionTable dr = new DataRegionTable("query", this);
-        dr.clickLink(0, 0);
-        //these are the sections we expect
-        waitForText("Biopsy Details");
-        waitForText("Morphologic Diagnoses");
-        waitForText("Histology");
-        assertNoErrorText();
-
-        beginAt("/ehr/" + CONTAINER_PATH + "/datasets.view");
-        waitForText("Necropsies");
-        waitAndClick(LabModuleHelper.getNavPanelItem("Necropsies:", VIEW_TEXT));
-        waitForPageToLoad();
-        waitForText("details");
-        dr = new DataRegionTable("query", this);
-        dr.clickLink(0, 0);
-        //these are the sections we expect
-        waitForText("Necropsy Details");
-        waitForText("Morphologic Diagnoses");
-        waitForText("Histology");
-        assertNoErrorText();
+//        beginAt("/ehr/" + CONTAINER_PATH + "/datasets.view");
+//        waitForText("Necropsies");
+//        waitAndClick(LabModuleHelper.getNavPanelItem("Necropsies:", VIEW_TEXT));
+//        waitForPageToLoad();
+//        waitForText("details");
+//        dr = new DataRegionTable("query", this);
+//        dr.clickLink(0, 0);
+//        //these are the sections we expect
+//        waitForText("Necropsy Details");
+//        waitForText("Morphologic Diagnoses");
+//        waitForText("Histology");
+//        assertNoErrorText();
 
         beginAt("/ehr/" + CONTAINER_PATH + "/datasets.view");
         waitForText("Drug Administration");
         waitAndClick(LabModuleHelper.getNavPanelItem("Drug Administration:", VIEW_TEXT));
         waitForPageToLoad();
         waitForText("details");
-        dr = new DataRegionTable("query", this);
+        DataRegionTable dr = new DataRegionTable("query", this);
         dr.clickLink(0, 0);
         //these are the sections we expect
         waitForText("Drug Details");
