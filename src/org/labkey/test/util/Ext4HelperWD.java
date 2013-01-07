@@ -120,7 +120,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     {
         if (!isChecked(label))
         {
-            Locator l = Locators.checkbox(label);
+            Locator l = Locators.checkbox(_test, label);
             _test.click(l);
         }
     }
@@ -130,14 +130,14 @@ public class Ext4HelperWD extends AbstractHelperWD
     {
         if (isChecked(label))
         {
-            Locator l = Locators.checkbox(label);
+            Locator l = Locators.checkbox(_test, label);
             _test.click(l);
         }
     }
 
     public boolean isChecked(String label)
     {
-        Locator.XPathLocator checkbox = Locators.checkbox(label);
+        Locator.XPathLocator checkbox = Locators.checkbox(_test, label);
         _test.assertElementPresent(checkbox);
         Locator l = checkbox.append("[./ancestor-or-self::*[contains(@class, 'checked')]]");
         return _test.isElementPresent(l);
@@ -405,9 +405,12 @@ public class Ext4HelperWD extends AbstractHelperWD
 
     public static class Locators
     {
-        public static Locator.XPathLocator checkbox(String label)
+        public static Locator.XPathLocator checkbox(BaseWebDriverTest test, String label)
         {
-            return Locator.xpath("//input[contains(@class,'x4-form-checkbox')][../label[text()='" + label + "']]");
+            Locator.XPathLocator l = Locator.xpath("//input[contains(@class,'x4-form-checkbox')][../label[text()='" + label + "']]");
+            if (!test.isElementPresent(l))
+                l = Locator.xpath("//input[contains(@class,'x4-form-checkbox')][../../td/label[text()='" + label + "']]");
+            return l;
         }
     }
 }

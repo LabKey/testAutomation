@@ -188,7 +188,8 @@ public enum TestSet
         StudyPublishTest.class,
         HiddenEmailTest.class,
         ElisaAssayTest.class,
-        ContainerContextTest.class
+        ContainerContextTest.class,
+        SurveyTest.class
     ),
 
     Daily(600000, DailyA, DailyB.tests),
