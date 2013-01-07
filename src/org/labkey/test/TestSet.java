@@ -50,7 +50,6 @@ public enum TestSet
         WikiTest.class,
         ExpTest.class,
         AssayTest.class,
-        ICEMRModuleTest.class,
         PipelineTest.class,
         FileContentTest.class,
         ClientAPITest.class,
@@ -189,6 +188,7 @@ public enum TestSet
         HiddenEmailTest.class,
         ElisaAssayTest.class,
         ContainerContextTest.class,
+        ICEMRModuleTest.class,
         SurveyTest.class
     ),
 
