@@ -43,8 +43,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     public void setFlowFilter(String[] fields, String[] ops, String[] values)
     {
         goToFlowDashboard();
-        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
-        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+        clickAndWait(Locator.linkWithText("Other settings"));
+        clickAndWait(Locator.linkWithText("Edit FCS Analysis Filter"));
 
         for(int i=0; i<fields.length; i++)
         {
@@ -127,7 +127,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         try
         {
             beginAt("/admin/begin.view");
-            clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+            clickAndWait(Locator.linkWithText("flow cytometry"));
             setFormElement("workingDirectory", "");
             clickButton("update");
         }
@@ -152,7 +152,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void init()
     {
         beginAt("/admin/begin.view");
-        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+        clickAndWait(Locator.linkWithText("flow cytometry"));
         deletePipelineWorkDirectory();
         setFormElement("workingDirectory", getPipelineWorkDirectory().toString());
         clickButton("update");
@@ -231,7 +231,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             // All flow pages have a link back to the Flow Dashboard
             if (isLinkPresentWithText("Flow Dashboard"))
             {
-                clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+                clickAndWait(Locator.linkWithText("Flow Dashboard"));
             }
             else
             {
@@ -249,7 +249,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void goToFolder(String... folderPath)
     {
         for (String folderName : folderPath)
-            clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+            clickAndWait(Locator.linkWithText(folderName));
     }
 
 
@@ -263,15 +263,15 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         log("** Uploading sample set");
         goToFlowDashboard();
-        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+        clickAndWait(Locator.linkWithText("Upload Sample Descriptions"));
         setFormElement("data", getFileContents(sampleFilePath));
         for (int i = 0; i < idCols.length; i++)
             selectOptionByText("idColumn" + (i+1), idCols[i]);
         submit();
 
         log("** Join sample set with FCSFile keywords");
-        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
-        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+        clickAndWait(Locator.linkWithText("Flow Dashboard"));
+        clickAndWait(Locator.linkWithText("Define sample description join fields"));
         for (int i = 0; i < idCols.length; i++)
             selectOptionByText(Locator.name("ff_samplePropertyURI", i), idCols[i]);
         for (int i = 0; i < keywordCols.length; i++)
@@ -283,7 +283,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         log("** Specify ICS metadata");
         goToFlowDashboard();
-        clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
+        clickAndWait(Locator.linkWithText("Other settings"));
         clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
 
         // specify PTID and Visit/Date columns
