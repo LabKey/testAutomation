@@ -19,8 +19,8 @@ function doTest()
     });
     console.log("LABKEY.Report.execute response: ", result);
 
-    if (result.console[0].indexOf("Hello, Bob!") != 0)
-        throw new Error("Expected console to start with 'Hello, Bob!', got: " + result.console[0]);
+    if (result.console[0].indexOf("Hello, Bob!") == -1)
+        throw new Error("Expected console to contain 'Hello, Bob!', got: " + result.console[0]);
 
     if (result.errors.length != 0)
         throw new Error("Expected empty errors array");
