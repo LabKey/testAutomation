@@ -1124,7 +1124,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("system maintenance"));
         selenium.openWindow("", "systemMaintenance");
-        click(Locator.linkWithText("[All]"));
+        click(Locator.linkWithText(task));
         smStart = System.currentTimeMillis();
     }
 
