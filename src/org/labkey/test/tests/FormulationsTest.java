@@ -501,7 +501,7 @@ public class FormulationsTest extends BaseWebDriverTest
         clickButton("Submit", 0);
 
         waitForText("Updated successfully.");
-        clickAndWait(Locator.linkWithText("MORE VISUAL INSPECTION"));
+        waitAndClick(Locator.linkWithText("MORE VISUAL INSPECTION"));
         waitForText("Formulation Lot Information");
         waitAndClick(Locator.xpath("//div[@id='wizard-window']//div[contains(@class,'x-tool-close')]"));
     }
