@@ -63,7 +63,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void enterDataPoint()
     {
-        Locator.XPathLocator link = Locator.linkContainingText("Go to my assay");
+        Locator.XPathLocator link = Locator.linkContainingText("Upload data");
         waitForElement(link);
         sleep(500);
         clickAt(link, 1, 1);
