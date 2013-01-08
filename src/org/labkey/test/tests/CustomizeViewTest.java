@@ -140,7 +140,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         log("** Clear column title and SUM aggregate");
         setColumnProperties("Age", null, null);
         assertTextNotPresent("Oldness Factor");
-        assertTextNotPresent("Total:");
+        assertTextNotPresent("Total Age:");
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.saveCustomView("Saved-" + INJECT_CHARS_1);

@@ -73,6 +73,11 @@ public abstract class Locator
      */
     public abstract String toString();
 
+    public String getLocatorString()
+    {
+        return _loc;
+    }
+
     @Deprecated
     public String toXpath()
     {
@@ -671,17 +676,17 @@ public abstract class Locator
             super(loc);
         }
 
-        public Locator containing(String contains)
+        public XPathLocator containing(String contains)
         {
             return new XPathLocator("("+_loc+")[contains(normalize-space(), "+xq(contains)+")]");
         }
 
-        public Locator withText(String text)
+        public XPathLocator withText(String text)
         {
             return new XPathLocator("("+_loc+")[normalize-space()="+xq(text)+"]");
         }
 
-        public Locator index(Integer index)
+        public XPathLocator index(Integer index)
         {
             return new XPathLocator("("+_loc+")["+(index+1)+"]");
         }
@@ -836,6 +841,11 @@ public abstract class Locator
             return new CssLocator(_loc, index, _contains, _text);
         }
 
+        public CssLocator append(String clause)
+        {
+            return new CssLocator(_loc + " " + clause);
+        }
+
         @Override
         public String toString()
         {
@@ -845,7 +855,7 @@ public abstract class Locator
         protected By toBy()
         {
             if (_loc.contains(":contains("))
-                throw new IllegalArgumentException("CSS3 has does not support the ':contains' pseudo-class: '" + _loc + "'");
+                throw new IllegalArgumentException("CSS3 does not support the ':contains' pseudo-class: '" + _loc + "'");
             return By.cssSelector(_loc);
         }
     }

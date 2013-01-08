@@ -2020,7 +2020,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return new HashSet<String>();
     }
 
-    private void doViewCheck(String folder)
+    @LogMethod
+    private void doViewCheck(@LoggedParam String folder)
     {
         clickAndWait(Locator.linkWithText(folder));
         try{
@@ -2028,26 +2029,35 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (SeleniumException e)
         {
-            return; // No manage views option
+            log("No manage views option");
+            return;
         }
 
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        String viewXpath = "//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]";
-        int viewCount = getElementCount(Locator.xpath(viewXpath));
-        for (int i = 1; i <= viewCount; i++)
+        Locator.XPathLocator view = Locator.xpath("//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]");
+        int viewCount = getElementCount(view);
+        for (int i = 1; i < viewCount; i++)
         {
-            String thisViewXpath = "("+viewXpath+")["+i+"]";
-            waitForElement(Locator.xpath(thisViewXpath));
-            String viewName = getText(Locator.xpath(thisViewXpath + "//td[contains(@class, 'x-grid3-cell-first')]"));
+            Locator.XPathLocator thisView = view.index(i);
+            waitForElement(thisView);
+            String viewName = getText(thisView.append("//td[contains(@class, 'x-grid3-cell-first')]"));
             if (!getOrphanedViews().contains(viewName))
             {
                 pushLocation();
-                click(Locator.xpath(thisViewXpath));
+                click(thisView);
+
+                String schemaName = getText(Locator.xpath("//div[contains(@class, 'x-grid3-row-expanded')]//div[contains(@class, 'x-grid3-row-body')]//td[normalize-space()='schema name']/following-sibling::td"));
+                String queryName = getText(Locator.xpath("//div[contains(@class, 'x-grid3-row-expanded')]//div[contains(@class, 'x-grid3-row-body')]//td[normalize-space()='query name']/following-sibling::td"));
+                String viewString = viewName + " of " + schemaName + "." + queryName;
+                log("Checking view: " + viewString);
+
                 waitAndClick(Locator.linkWithText("VIEW"));
                 waitForText(viewName);
                 popLocation();
                 _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
             }
+            else
+                log("Skipping manually excluded view: " + viewName);
         }
     }
 

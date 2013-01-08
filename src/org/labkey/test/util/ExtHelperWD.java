@@ -534,11 +534,9 @@ public class ExtHelperWD extends AbstractHelperWD
         _test.mouseDown(file);
     }
 
-    @LogMethod
-    public void selectFileBrowserItem(String path)
+    @LogMethod(quiet = true)
+    public void selectFileBrowserItem(@LoggedParam String path)
     {
-        _test.log("selectFileBrowserItem path: " + path);
-
         String[] parts = {};
         StringBuilder nodeId = new StringBuilder();
         if (path.startsWith("/"))
