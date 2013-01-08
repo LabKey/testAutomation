@@ -5451,7 +5451,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         while(isElementPresent(l))
         {
-            int i = getXpathCount(l);
+            int i = getXpathCount(l) - 1;
             click(l);
             waitForElementToDisappear(l.index(i), WAIT_FOR_JAVASCRIPT);
         }

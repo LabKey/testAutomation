@@ -6063,7 +6063,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         while(isElementPresent(l))
         {
-            int i = getElementCount(l);
+            int i = getElementCount(l) - 1;
             click(l);
             waitForElementToDisappear(l.index(i), WAIT_FOR_JAVASCRIPT);
         }
