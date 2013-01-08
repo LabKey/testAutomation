@@ -66,7 +66,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         Locator.XPathLocator link = Locator.linkContainingText("Upload data");
         waitForElement(link);
         sleep(500);
-        clickAt(link, 1, 1);
+        click(link);
         waitForText("Data Import");
 
         enterData();
@@ -100,6 +100,8 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         }
 
         // we have 3 errors total, fix one at a time
+        // Issue 16875: decimals in certain icemr module fields causes js exception
+        // Issue 16876: need to screen invalid entries in ICEMR module
         verifyError();
 
         // correct negative number error
