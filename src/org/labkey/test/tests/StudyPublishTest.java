@@ -442,7 +442,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForText(includeSpecimens ? "1 - 99 of 99" : "No data to show.");
         goToQueryView("study", "SpecimenPrimaryType", false);
         waitForText(includeSpecimens ? "1 - 59 of 59" : "No data to show.");
-        goToQueryView("study", "Site", false);
+        goToQueryView("study", "Location", false);
         waitForText(includeSpecimens ? "1 - 24 of 24" : "No data to show.");
         goToProjectHome();
     }
