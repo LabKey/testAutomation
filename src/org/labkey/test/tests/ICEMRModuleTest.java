@@ -31,7 +31,7 @@ import java.util.Map;
 public class ICEMRModuleTest extends BaseWebDriverTest
 {
     public static final String ID = "myid";
-    public static final String ASSAY_NAME = "Diagnostics";
+    public static final String ASSAY_NAME = "Diagnostics Assay";
     public static final String SCIENTIST = "Torruk";
 
     @Override
@@ -114,7 +114,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         // the form should submit now
         setICEMRField("hematocrit", "5");
         clickButton("Submit");
-        waitForText("Diagnostics Runs");
+        waitForText(ASSAY_NAME + " Runs");
     }
 
     private void createDiagnosticAssay()
