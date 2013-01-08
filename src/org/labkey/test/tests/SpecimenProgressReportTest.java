@@ -168,6 +168,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     private void addSpecimenConfiguration(String assayName, String source, int locationId, String tubeType)
     {
         clickButton("Add Specimen Configuration", 0);
+        waitForElement(Locator.name("assayname"));
         setFormElement(Locator.name("assayname"), assayName);
         setFormElement(Locator.name("description"), assayName + " " + tubeType);
         setFormElement(Locator.name("source"), source);
