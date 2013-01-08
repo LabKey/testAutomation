@@ -194,8 +194,8 @@ public class UserTest extends SecurityTest
             verifyFieldChecked(field);
             checkRequiredField(field, false);
         }
-        clickButton("Save");
-        clickButton("Change User Properties");
+        clickButton("Save", 0);
+        waitAndClickButton("Change User Properties");
 
         checkRequiredField("FirstName", true);
         clickButton("Save");
