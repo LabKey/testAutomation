@@ -50,14 +50,14 @@ public class SchemaBrowserTest extends BaseSeleniumWebTest
         assertTextPresent("TitleId");
 
         //test lookup links, tab management
-        clickLookupLink("lists", AUTHORS_LIST, "AuthorId");
+        click(Locator.lookupLink("lists", AUTHORS_LIST, "AuthorId"));
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_AUTHORS + "')]"), WAIT_FOR_JAVASCRIPT);
 
         _extHelper.closeExtTab("lists." + AUTHORS_LIST);
         sleep(500);
         assertTextNotPresent(TEST_DESC_AUTHORS);
 
-        clickLookupLink("lists", PUBLISHERS_LIST, "PublisherId");
+        click(Locator.lookupLink("lists", PUBLISHERS_LIST, "PublisherId"));
         waitForElement(Locator.xpath("//td[contains(text(), '" + TEST_DESC_PUBLISHERS + "')]"), WAIT_FOR_JAVASCRIPT);
 
         _extHelper.closeExtTab("lists." + PUBLISHERS_LIST);

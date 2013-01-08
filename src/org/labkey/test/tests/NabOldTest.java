@@ -104,7 +104,7 @@ public class NabOldTest extends AbstractQCAssayTestWD
         clickAndWait(Locator.linkWithText("Deprecated NAb Run"));
         clickAndWait(Locator.linkWithText("Previous Runs"));
         log("Delete run");
-        clickImgButtonNoNav("Select All");
+        clickButton("Select All", 0);
         clickButton("Delete");
         log("Verify deleted run");
         assertTextPresent("Incubation Time");

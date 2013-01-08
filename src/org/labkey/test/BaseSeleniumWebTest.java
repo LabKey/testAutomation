@@ -2577,7 +2577,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertTrue("Page title: '"+title+"' doesn't contain '"+match+"'", title.contains(match));
     }
 
-    public boolean isFormPresent(String form)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isFormPresent(String form)
     {
         boolean present = isElementPresent(Locator.tagWithName("form", form));
         if (!present)
@@ -2586,7 +2589,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return present;
     }
 
-    public void assertFormPresent(String form)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertFormPresent(String form)
     {
         Assert.assertTrue("Form '" + form + "' was not present", isFormPresent(form));
     }
@@ -3382,22 +3388,34 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertFalse("Element was visible in page: " + loc, selenium.isVisible(loc.toString()));
     }
 
-    public boolean isLinkPresent(String linkId)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresent(String linkId)
     {
         return isElementPresent(Locator.tagWithId("a", linkId));
     }
 
-    public void assertLinkPresent(String linkId)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertLinkPresent(String linkId)
     {
         Assert.assertTrue("Link with id '" + linkId + "' was not present", isLinkPresent(linkId));
     }
 
-    public void assertLinkNotPresent(String linkId)
+    /**
+     * @deprecated Use {@link #assertElementNotPresent(Locator)}
+     */
+    @Deprecated public void assertLinkNotPresent(String linkId)
     {
         Assert.assertFalse("Link with id '" + linkId + "' was present", isLinkPresent(linkId));
     }
 
-    public boolean isLinkPresentWithText(String text)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresentWithText(String text)
     {
         log("Checking for link with exact text '" + text + "'");
         return isElementPresent(Locator.linkWithText(text));
@@ -3409,29 +3427,43 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return countLinksWithText(text) == count;
     }
 
-    // TODO: Clarify or fix this.  Requires number of links > index!?
-    public boolean isLinkPresentWithText(String text, int index)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresentWithText(String text, int index)
     {
         return countLinksWithText(text) > index;
     }
 
-    public boolean isLinkPresentContainingText(String text)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresentContainingText(String text)
     {
         log("Checking for link containing text '" + text + "'");
         return isElementPresent(Locator.linkContainingText(text));
     }
 
-    public void assertLinkPresentContainingText(String text)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertLinkPresentContainingText(String text)
     {
         Assert.assertTrue("Could not find link containing text '" + text + "'", isLinkPresentContainingText(text));
     }
 
-    public void assertLinkPresentWithText(String text)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertLinkPresentWithText(String text)
     {
         Assert.assertTrue("Could not find link with text '" + text + "'", isLinkPresentWithText(text));
     }
 
-    public void assertLinkNotPresentWithText(String text)
+    /**
+     * @deprecated Use {@link #assertElementNotPresent(Locator)}
+     */
+    @Deprecated public void assertLinkNotPresentWithText(String text)
     {
         Assert.assertFalse("Found a link with text '" + text + "'", isLinkPresentWithText(text));
     }
@@ -3442,23 +3474,35 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertTitleEquals("401: Error Page -- 401: User does not have permission to perform this operation");
     }
 
-    public boolean isLinkPresentWithTitle(String title)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresentWithTitle(String title)
     {
         log("Checking for link with exact title '" + title + "'");
         return isElementPresent(Locator.linkWithTitle(title));
     }
 
-    public void assertLinkPresentWithTitle(String title)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertLinkPresentWithTitle(String title)
     {
         Assert.assertTrue("Could not find link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
-    public void assertLinkNotPresentWithTitle(String title)
+    /**
+     * @deprecated Use {@link #assertElementNotPresent(Locator)}
+     */
+    @Deprecated public void assertLinkNotPresentWithTitle(String title)
     {
         Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
-    public int countLinksWithText(String text)
+    /**
+     * @deprecated Use {@link #getXpathCount(org.labkey.test.Locator.XPathLocator)}
+     */
+    @Deprecated public int countLinksWithText(String text)
     {
         return selenium.getXpathCount("//a[text() = "+Locator.xq(text)+"]").intValue();
     }
@@ -3468,38 +3512,51 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertEquals("Link with text '" + text + "' was not present the expected number of times", count, countLinksWithText(text));
     }
 
-    public boolean isLinkPresentWithImage(String imageName)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresentWithImage(String imageName)
     {
         return isElementPresent(Locator.linkWithImage(imageName));
     }
 
-    public void assertLinkPresentWithImage(String imageName)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertLinkPresentWithImage(String imageName)
     {
         Assert.assertTrue("Link with image '" + imageName + "' was not present", isLinkPresentWithImage(imageName));
     }
 
-    public void assertLinkNotPresentWithImage(String imageName)
+    /**
+     * @deprecated Use {@link #assertElementNotPresent(Locator)}
+     */
+    @Deprecated public void assertLinkNotPresentWithImage(String imageName)
     {
         Assert.assertFalse("Link with image '" + imageName + "' was present", isLinkPresentWithImage(imageName));
     }
 
-    public void clickLinkWithImage(String image)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLinkWithImage(String image)
     {
         clickLinkWithImage(image, defaultWaitForPage);
     }
 
-    public void clickLinkWithImage(String image, int millis)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator, int)}
+     */
+    @Deprecated public void clickLinkWithImage(String image, int millis)
     {
         log("Clicking link with image: " + image);
         clickAndWait(Locator.linkWithImage(image), millis);
     }
 
-    public void clickLinkWithImageByIndex(String image, int index)
-    {
-        clickLinkWithImageByIndex(image, index, true);
-    }
-
-    public void clickLinkWithImageByIndex(String image, int index, boolean wait)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator, int)}
+     */
+    @Deprecated public void clickLinkWithImageByIndex(String image, int index, boolean wait)
     {
         log("Clicking link with image: " + image);
         clickAndWait(Locator.linkWithImage(image, index), wait ? defaultWaitForPage : 0);
@@ -3509,8 +3566,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         clickAndWait(l, 0);
     }
-
-
 
     public void clickAt(Locator l, String coord)
     {
@@ -3555,12 +3610,18 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     }
 
-    public void clickLink(String linkId)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLink(String linkId)
     {
         clickLink(Locator.id(linkId));
     }
 
-    public void clickLink(Locator l)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickLink(Locator l)
     {
         clickAndWait(l, defaultWaitForPage);
     }
@@ -3651,18 +3712,19 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '"+caption+"']")));
     }
 
-    public void clickImageWithTitle(String title, int mills)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator, int)}
+     */
+    @Deprecated public void clickImageWithTitle(String title, int mills)
     {
         Locator l = Locator.tagWithAttribute("img", "title", title);
         clickAndWait(l, mills);
     }
 
-//    public void clickImageWithSrc(String src)
-//    {
-//        Locator l = Locator.tagWithAttribute("img", "title", title);
-//    }
-
-    public void clickImageWithAltText(String altText, int millis)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator, int)}
+     */
+    @Deprecated public void clickImageWithAltText(String altText, int millis)
     {
         log("Clicking first image with alt text " + altText );
         Locator l = Locator.tagWithAttribute("img", "alt", altText);
@@ -3670,11 +3732,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (!present)
             Assert.fail("Unable to find image with altText " + altText);
         clickAndWait(l, millis);
-    }
-
-    public void clickImageWithAltText(String altText)
-    {
-        clickImageWithAltText(altText, defaultWaitForPage);
     }
 
     public int getImageWithAltTextCount(String altText)
@@ -3685,22 +3742,34 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return Integer.parseInt(count);
     }
 
-    public boolean isImagePresentWithSrc(String src)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isImagePresentWithSrc(String src)
     {
         return isImagePresentWithSrc(src, false);
     }
 
-    public boolean isImagePresentWithSrc(String src, boolean substringMatch)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isImagePresentWithSrc(String src, boolean substringMatch)
     {
         return isElementPresent(Locator.imageWithSrc(src, substringMatch));
     }
 
-    public void assertImagePresentWithSrc(String src)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertImagePresentWithSrc(String src)
     {
         Assert.assertTrue(isImagePresentWithSrc(src));
     }
 
-    public void assertImagePresentWithSrc(String src, boolean substringMatch)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertImagePresentWithSrc(String src, boolean substringMatch)
     {
         Assert.assertTrue(isImagePresentWithSrc(src, substringMatch));
     }
@@ -4053,28 +4122,43 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return getXpathCount(Locator.xpath("//table[@id="+Locator.xq(tableId)+"]/colgroup/col"));
     }
 
-    public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
     {
         clickAndWait(Locator.imageMapLinkByTitle(imageMapName, areaTitle), defaultWaitForPage);
     }
 
-    public boolean isImageMapAreaPresent(String imageMapName, String areaTitle)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isImageMapAreaPresent(String imageMapName, String areaTitle)
     {
         System.out.println("Checking for image map area " + imageMapName + ":" + areaTitle);
         return isElementPresent(Locator.imageMapLinkByTitle(imageMapName, areaTitle));
     }
 
-    public void assertImageMapAreaPresent(String imageMapName, String areaTitle)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertImageMapAreaPresent(String imageMapName, String areaTitle)
     {
         Assert.assertTrue("Image map '" + imageMapName + "' did not have an area title of '" + areaTitle + "'", isImageMapAreaPresent(imageMapName, areaTitle));
     }
 
-    public void assertTabPresent(String tabText)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertTabPresent(String tabText)
     {
         assertElementPresent(Locator.folderTab(tabText));
     }
 
-    public void assertTabNotPresent(String tabText)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertTabNotPresent(String tabText)
     {
         assertElementNotPresent(Locator.folderTab(tabText));
     }
@@ -4084,7 +4168,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return (getButtonLocator(text) != null);
     }
 
-    public boolean isButtonDisabled(String text)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isButtonDisabled(String text)
     {
         return (isElementPresent(Locator.navButtonDisabled(text)));
     }
@@ -4311,11 +4398,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 address = address.substring(location + 1);
         }
         return address;
-    }
-
-    public void clickImgButtonNoNav(String buttonText)
-    {
-        clickButton(buttonText, 0);
     }
 
     /**
@@ -4673,11 +4755,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }, elementName + " was not set.", WAIT_FOR_JAVASCRIPT);
     }
 
-    public void setLongTextField(Locator loc, String text)
+    /**
+     * @deprecated Use {@link #setFormElement(Locator, String)}
+     */
+    @Deprecated public void setLongTextField(Locator loc, String text)
     {
         setLongTextField(loc.toString(), text);
     }
-
 
     public boolean isNavButtonPresent(String buttonText)
     {
@@ -4817,38 +4901,59 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         click(l);
     }
 
-    public void clickCheckbox(String name)
+    /**
+     * @deprecated Use {@link #click(Locator)}
+     */
+    @Deprecated public void clickCheckbox(String name)
     {
         click(Locator.checkboxByName(name));
     }
 
-    public void clickRadioButtonById(String id)
+    /**
+     * @deprecated Use {@link #click(Locator)}
+     */
+    @Deprecated public void clickRadioButtonById(String id)
     {
         click(Locator.radioButtonById(id));
     }
 
-    public void clickRadioButtonById(String id, int millis)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator, int)}
+     */
+    @Deprecated public void clickRadioButtonById(String id, int millis)
     {
         clickAndWait(Locator.radioButtonById(id), millis);
 
     }
 
-    public void clickCheckboxById(String id)
+    /**
+     * @deprecated Use {@link #click(Locator)}
+     */
+    @Deprecated public void clickCheckboxById(String id)
     {
         click(Locator.checkboxById(id));
     }
 
-    public void checkRadioButton(String name, String value)
+    /**
+     * @deprecated Use {@link #checkCheckbox(Locator)}
+     */
+    @Deprecated public void checkRadioButton(String name, String value)
     {
         checkCheckbox(Locator.radioButtonByNameAndValue(name, value));
     }
 
-    public void checkCheckbox(String name, String value)
+    /**
+     * @deprecated Use {@link #checkCheckbox(Locator)}
+     */
+    @Deprecated public void checkCheckbox(String name, String value)
     {
         checkCheckbox(Locator.checkboxByNameAndValue(name, value));
     }
 
-    public void checkCheckbox(String name)
+    /**
+     * @deprecated Use {@link #checkCheckbox(Locator)}
+     */
+    @Deprecated public void checkCheckbox(String name)
     {
         checkCheckbox(Locator.checkboxByName(name));
     }
@@ -4879,19 +4984,20 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertTrue("Checking checkbox failed", isChecked(checkBoxLocator));
     }
 
-    public void checkRadioButton(String name, int index)
+    /**
+     * @deprecated Use {@link #checkRadioButton(Locator)}
+     */
+    @Deprecated public void checkRadioButton(String name, int index)
     {
         checkCheckbox(Locator.radioButtonByName(name).index(index));
     }
 
-    public void assertRadioButtonSelected(String name, String value)
+    /**
+     * @deprecated Use {@link #assertRadioButtonSelected(Locator)}
+     */
+    @Deprecated public void assertRadioButtonSelected(String name, String value)
     {
         assertRadioButtonSelected(Locator.radioButtonByNameAndValue(name, value));
-    }
-
-    public void assertRadioButtonSelected(String name, int index)
-    {
-        assertRadioButtonSelected(Locator.radioButtonByName(name).index(index));
     }
 
     public void assertRadioButtonSelected(Locator radioButtonLocator)
@@ -4899,22 +5005,34 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertTrue("Radio Button is not selected at " + radioButtonLocator.toString(), isChecked(radioButtonLocator));
     }
 
-    public void checkCheckbox(String name, int index)
+    /**
+     * @deprecated Use {@link #checkCheckbox(Locator)}
+     */
+    @Deprecated public void checkCheckbox(String name, int index)
     {
         checkCheckbox(Locator.checkboxByName(name).index(index));
     }
 
-    public void uncheckCheckbox(String name)
+    /**
+     * @deprecated Use {@link #uncheckCheckbox(Locator)}
+     */
+    @Deprecated public void uncheckCheckbox(String name)
     {
         uncheckCheckbox(Locator.checkboxByName(name));
     }
 
-    public void uncheckCheckbox(String name, String value)
+    /**
+     * @deprecated Use {@link #uncheckCheckbox(Locator)}
+     */
+    @Deprecated public void uncheckCheckbox(String name, String value)
     {
         uncheckCheckbox(Locator.checkboxByNameAndValue(name, value));
     }
 
-    public void uncheckCheckbox(String name, int index)
+    /**
+     * @deprecated Use {@link #uncheckCheckbox(Locator)}
+     */
+    @Deprecated public void uncheckCheckbox(String name, int index)
     {
         uncheckCheckbox(Locator.checkboxByName(name).index(index));
     }
@@ -5055,7 +5173,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         log(new Date().toString());
     }
 
-    public void _setPermissions(String userOrGroupName, String permissionString, String className)
+    private void _setPermissions(String userOrGroupName, String permissionString, String className)
     {
         String role = toRole(permissionString);
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
@@ -6076,11 +6194,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         selectSchema(schemaName);
         Locator loc = Locator.queryTreeNode(schemaName, queryName);
-        try
-        {
-            waitForElement(loc, wait);
-        }
-        catch(AssertionFailedError ignore){}
+        waitForElement(loc, wait, false);
         return isElementPresent(loc);
     }
 
@@ -6094,14 +6208,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForElement(Locator.linkWithText(schemaName + "." + queryName));
     }
 
-    public boolean isLookupLinkPresent(String schemaName, String queryName, String pkName)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLookupLinkPresent(String schemaName, String queryName, String pkName)
     {
         return isElementPresent(Locator.lookupLink(schemaName, queryName, pkName));
-    }
-
-    public void clickLookupLink(String schemaName, String queryName, String pkName)
-    {
-        click(Locator.lookupLink(schemaName, queryName, pkName));
     }
 
     public void clickFkExpando(String schemaName, String queryName, String columnName)
@@ -6806,11 +6918,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction' and not(@disabled)]/../label[text()=" + Locator.xq(actionName) + "]"));
         String id = _extHelper.getExtElementId("btn_submit");
         clickAndWait(Locator.id(id));
-    }
-
-    public void clickManageSubjectCategory(String subjectNoun)
-    {
-        clickAndWait(Locator.linkContainingText("Manage " + subjectNoun + " Groups"));
     }
 
     public void ensureSignedOut()

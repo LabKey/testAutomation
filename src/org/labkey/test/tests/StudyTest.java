@@ -28,6 +28,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
@@ -115,6 +116,7 @@ public class StudyTest extends StudyBaseTest
         doVerifyStepsSetDepth(false);
     }
 
+    @LogMethod
     protected void doVerifyStepsSetDepth(boolean quickTest)
     {
         this.quickTest = quickTest;
@@ -132,6 +134,7 @@ public class StudyTest extends StudyBaseTest
         }
     }
 
+    @LogMethod
     private void verifyPermissionsRestrictions()
     {
         clickFolder(getProjectName());
@@ -144,6 +147,7 @@ public class StudyTest extends StudyBaseTest
         stopImpersonating();
     }
 
+    @LogMethod
     private void verifyParticipantReports()
     {
         clickFolder(getFolderName());
@@ -197,6 +201,7 @@ public class StudyTest extends StudyBaseTest
     /**
      * This is a test of the participant picker/classification creation UI.
      */
+    @LogMethod
     protected void manageSubjectClassificationTest()
     {
 
@@ -322,6 +327,7 @@ public class StudyTest extends StudyBaseTest
      * @param listName
      * @return new name of list
      */
+    @LogMethod
     private String changeListName(String listName)
     {
         String newListName = listName.substring(0, 1) + "CHANGE" + listName.substring(2);
@@ -343,6 +349,7 @@ public class StudyTest extends StudyBaseTest
      * post-conditions:  list listName does not exist
      * @param listName list to delete
      */
+    @LogMethod
     private void deleteListTest(String listName)
     {
         sleep(1000);
@@ -374,6 +381,7 @@ public class StudyTest extends StudyBaseTest
      * @param expectedError error message to expect
      * @param listName name to enter in classification label
      */
+    @LogMethod
     private void attemptCreateExpectError(String ids, String expectedError, String listName)
     {
         startCreateParticipantGroup();
@@ -395,6 +403,7 @@ public class StudyTest extends StudyBaseTest
      * @param listName
      * @param pIDs
      */
+    @LogMethod
     private void editClassificationList(String listName, String pIDs)
     {
         sleep(1000);
@@ -480,6 +489,7 @@ public class StudyTest extends StudyBaseTest
      * @param filtered should list be filtered?  If so, only participants with DEMasian=0 will be included
      * @return ids in new list
      */
+    @LogMethod
     private String createListWithAddAll(String listName, boolean filtered)
     {
         startCreateParticipantGroup();
@@ -524,11 +534,10 @@ public class StudyTest extends StudyBaseTest
         //else
         sleep(1000);
         goToManageStudyPage(projectName, studyName);
-        clickManageSubjectCategory(subjectNoun);
+        clickAndWait(Locator.linkContainingText("Manage " + subjectNoun + " Groups"));
     }
 
-
-
+    @LogMethod
     protected void verifyStudyAndDatasets()
     {
         verifyDemographics();
@@ -607,6 +616,7 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("Updatable Value11");
     }
 
+    @LogMethod
     protected void verifySpecimens()
     {
         clickAndWait(Locator.linkWithText(getStudyLabel()));
@@ -621,6 +631,7 @@ public class StudyTest extends StudyBaseTest
         assertElementPresent(Locator.tagWithText("span", "Create New Request"));
     }
 
+    @LogMethod
     private void verifyParticipantComments()
     {
         log("creating the participant/visit comment dataset");
@@ -738,12 +749,10 @@ public class StudyTest extends StudyBaseTest
         Assert.assertEquals("Unexpected size of datasetAuditEvent log", previousCount + 1, rows.size());
         log("Dataset audit log contents: " + rows);
         Assert.assertEquals("A new dataset record was inserted", rows.get(rows.size() - 1).get("Comment"));
-
     }
 
     private SelectRowsResponse getDatasetAuditLog()
     {
-
         SelectRowsCommand selectCmd = new SelectRowsCommand("auditLog", "DatasetAuditEvent");
 
         selectCmd.setMaxRows(-1);
@@ -761,7 +770,6 @@ public class StudyTest extends StudyBaseTest
             Assert.fail("Error when attempting to verify audit trail: " + e.getMessage());
         }
         return selectResp;
-
     }
 
     private int getDatasetAuditEventCount()
@@ -771,6 +779,7 @@ public class StudyTest extends StudyBaseTest
         return rows.size();
     }
 
+    @LogMethod
     private void verifyDemographics()
     {
         clickFolder(getFolderName());
@@ -787,6 +796,7 @@ public class StudyTest extends StudyBaseTest
         verifyDatasetExport();
     }
 
+    @LogMethod
     private void verifyDatasetExport()
     {
         pushLocation();
@@ -817,6 +827,7 @@ public class StudyTest extends StudyBaseTest
         Assert.assertFalse(_customizeViewsHelper.isColumnPresent("MouseVisit/DEM-1"));
     }
 
+    @LogMethod
     protected void verifyVisitMapPage()
     {
         clickAndWait(Locator.linkWithText(getStudyLabel()));
@@ -858,6 +869,7 @@ public class StudyTest extends StudyBaseTest
         assertSelectOption("dataSetStatus", 8, "REQUIRED");
     }
 
+    @LogMethod
     protected void verifyManageDatasetsPage()
     {
         clickFolder(getFolderName());
@@ -884,6 +896,7 @@ public class StudyTest extends StudyBaseTest
         Assert.assertTrue("Could not find column \"MouseVisit/DEM-1\"", _customizeViewsHelper.isColumnPresent("MouseVisit/DEM-1"));
     }
 
+    @LogMethod
     private void verifyHiddenVisits()
     {
         clickAndWait(Locator.linkWithText(getStudyLabel()));
@@ -897,6 +910,7 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("Pre-exist Cond");
     }
 
+    @LogMethod
     private void verifyVisitImportMapping()
     {
         clickAndWait(Locator.linkWithText("Manage Study"));
@@ -976,6 +990,7 @@ public class StudyTest extends StudyBaseTest
         return getXpathCount(Locator.xpath(path));
     }
 
+    @LogMethod
     protected void verifyCohorts()
     {
         clickAndWait(Locator.linkWithText(getStudyLabel()));

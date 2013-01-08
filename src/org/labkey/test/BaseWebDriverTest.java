@@ -303,7 +303,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String version = browserInfo.getVersion();
         log("Browser: " + browserInfo.getType() + " " + version);
 
-        _driver.manage().timeouts().implicitlyWait(100, TimeUnit.MILLISECONDS);
+        _driver.manage().timeouts().implicitlyWait(1000, TimeUnit.MILLISECONDS);
 
         selenium = new DefaultSeleniumWrapper(_driver, WebTestHelper.getBaseURL());
         selenium.setTimeout(Integer.toString(defaultWaitForPage));
@@ -3061,7 +3061,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertTrue("Page title: '"+title+"' doesn't contain '"+match+"'", title.contains(match));
     }
 
-    public boolean isFormPresent(String form)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isFormPresent(String form)
     {
         boolean present = isElementPresent(Locator.tagWithName("form", form));
         if (!present)
@@ -3070,7 +3073,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return present;
     }
 
-    public void assertFormPresent(String form)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertFormPresent(String form)
     {
         Assert.assertTrue("Form '" + form + "' was not present", isFormPresent(form));
     }
@@ -3870,25 +3876,37 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertTrue("Element was not visible: " + loc, loc.findElement(_driver).isDisplayed());
     }
 
-    public boolean isLinkPresent(String linkId)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresent(String linkId)
     {
         return isElementPresent(Locator.tagWithId("a", linkId));
     }
 
-    public void assertLinkPresent(String linkId)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertLinkPresent(String linkId)
     {
         Assert.assertTrue("Link with id '" + linkId + "' was not present", isLinkPresent(linkId));
     }
 
-    public void assertLinkNotPresent(String linkId)
+    /**
+     * @deprecated Use {@link #assertElementNotPresent(Locator)}
+     */
+    @Deprecated public void assertLinkNotPresent(String linkId)
     {
         Assert.assertFalse("Link with id '" + linkId + "' was present", isLinkPresent(linkId));
     }
 
-    public boolean isLinkPresentWithText(String text)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresentWithText(String text)
     {
         log("Checking for link with exact text '" + text + "'");
-        return isElementPresent(Locator.linkWithText(text)) || isElementPresent(Locator.linkWithText(text.toUpperCase()));
+        return isElementPresent(Locator.linkWithText(text));
     }
 
     public boolean isLinkPresentWithTextCount(String text, int count)
@@ -3897,29 +3915,43 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return countLinksWithText(text) == count;
     }
 
-    // TODO: Clarify or fix this.  Requires number of links > index!?
-    public boolean isLinkPresentWithText(String text, int index)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresentWithText(String text, int index)
     {
         return countLinksWithText(text) > index;
     }
 
-    public boolean isLinkPresentContainingText(String text)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresentContainingText(String text)
     {
         log("Checking for link containing text '" + text + "'");
         return isElementPresent(Locator.linkContainingText(text));
     }
 
-    public void assertLinkPresentContainingText(String text)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertLinkPresentContainingText(String text)
     {
         Assert.assertTrue("Could not find link containing text '" + text + "'", isLinkPresentContainingText(text));
     }
 
-    public void assertLinkPresentWithText(String text)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertLinkPresentWithText(String text)
     {
         Assert.assertTrue("Could not find link with text '" + text + "'", isLinkPresentWithText(text));
     }
 
-    public void assertLinkNotPresentWithText(String text)
+    /**
+     * @deprecated Use {@link #assertElementNotPresent(Locator)}
+     */
+    @Deprecated public void assertLinkNotPresentWithText(String text)
     {
         Assert.assertFalse("Found a link with text '" + text + "'", isLinkPresentWithText(text));
     }
@@ -3930,18 +3962,27 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertTitleEquals("401: Error Page -- 401: User does not have permission to perform this operation");
     }
 
-    public boolean isLinkPresentWithTitle(String title)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public boolean isLinkPresentWithTitle(String title)
     {
         log("Checking for link with exact title '" + title + "'");
         return isElementPresent(Locator.linkWithTitle(title));
     }
 
-    public void assertLinkPresentWithTitle(String title)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertLinkPresentWithTitle(String title)
     {
         Assert.assertTrue("Could not find link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
-    public void assertLinkNotPresentWithTitle(String title)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertLinkNotPresentWithTitle(String title)
     {
         Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
@@ -4223,7 +4264,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 //        Locator l = Locator.tagWithAttribute("img", "title", title);
 //    }
 
-    public void clickImageWithAltText(String altText, int millis)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator, int)}
+     */
+    @Deprecated public void clickImageWithAltText(String altText, int millis)
     {
         log("Clicking first image with alt text " + altText );
         Locator l = Locator.tagWithAttribute("img", "alt", altText);
@@ -4233,7 +4277,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickAndWait(l, millis);
     }
 
-    public void clickImageWithAltText(String altText)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickImageWithAltText(String altText)
     {
         clickImageWithAltText(altText, defaultWaitForPage);
     }
@@ -4253,22 +4300,34 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return Integer.parseInt(executeScript(js).toString());
     }
 
-    public boolean isImagePresentWithSrc(String src)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isImagePresentWithSrc(String src)
     {
         return isImagePresentWithSrc(src, false);
     }
 
-    public boolean isImagePresentWithSrc(String src, boolean substringMatch)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isImagePresentWithSrc(String src, boolean substringMatch)
     {
         return isElementPresent(Locator.imageWithSrc(src, substringMatch));
     }
 
-    public void assertImagePresentWithSrc(String src)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertImagePresentWithSrc(String src)
     {
         Assert.assertTrue(isImagePresentWithSrc(src));
     }
 
-    public void assertImagePresentWithSrc(String src, boolean substringMatch)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertImagePresentWithSrc(String src, boolean substringMatch)
     {
         Assert.assertTrue(isImagePresentWithSrc(src, substringMatch));
     }
@@ -4631,30 +4690,45 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return getXpathCount(Locator.xpath("//table[@id="+Locator.xq(tableId)+"]/colgroup/col"));
     }
 
-    public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
+    /**
+     * @deprecated Use {@link #clickAndWait(Locator)}
+     */
+    @Deprecated public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
     {
         clickAndWait(Locator.imageMapLinkByTitle(imageMapName, areaTitle), defaultWaitForPage);
     }
 
-    public boolean isImageMapAreaPresent(String imageMapName, String areaTitle)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isImageMapAreaPresent(String imageMapName, String areaTitle)
     {
         System.out.println("Checking for image map area " + imageMapName + ":" + areaTitle);
         return isElementPresent(Locator.imageMapLinkByTitle(imageMapName, areaTitle));
     }
 
-    public void assertImageMapAreaPresent(String imageMapName, String areaTitle)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertImageMapAreaPresent(String imageMapName, String areaTitle)
     {
         Assert.assertTrue("Image map '" + imageMapName + "' did not have an area title of '" + areaTitle + "'", isImageMapAreaPresent(imageMapName, areaTitle));
     }
 
-    public void assertTabPresent(String tabText)
+    /**
+     * @deprecated Use {@link #assertElementPresent(Locator)}
+     */
+    @Deprecated public void assertTabPresent(String tabText)
     {
         assertElementPresent(Locator.folderTab(tabText));
     }
 
-    public void assertTabNotPresent(String tabText)
+    /**
+     * @deprecated Use {@link #assertElementNotPresent(Locator)}
+     */
+    @Deprecated public void assertTabNotPresent(String tabText)
     {
-        assertElementPresent(Locator.folderTab(tabText));
+        assertElementNotPresent(Locator.folderTab(tabText));
     }
 
     public boolean isButtonPresent(String text)
@@ -4662,7 +4736,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return (getButtonLocator(text) != null);
     }
 
-    public boolean isButtonDisabled(String text)
+    /**
+     * @deprecated Use {@link #isElementPresent(Locator)}
+     */
+    @Deprecated public boolean isButtonDisabled(String text)
     {
         return (isElementPresent(Locator.navButtonDisabled(text)));
     }
@@ -4893,11 +4970,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 address = address.substring(location + 1);
         }
         return address;
-    }
-
-    public void clickImgButtonNoNav(String buttonText)
-    {
-        clickButton(buttonText, 0);
     }
 
     /**
@@ -5250,12 +5322,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-    /**
-     * @deprecated Use explicit Locator: {@link #setLongTextField(Locator, String)}
-     * @param element
-     * @param text
-     */
-    @Deprecated public void setFormElementAndVerify(final Locator element, final String text)
+    public void setFormElementAndVerify(final Locator element, final String text)
     {
         setFormElement(element, text, true);
 
@@ -5273,7 +5340,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * @param loc Selenium locator of text field to be set
      * @param text Value to be inserted into text field
      */
-    public void setLongTextField(final Locator loc, final String text)
+    /**
+     * @deprecated Use {@link #setFormElementAndVerify(Locator, String)}
+     */
+    @Deprecated public void setLongTextField(final Locator loc, final String text)
     {
         setFormElement(loc, text, true);
 
@@ -5718,7 +5788,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log(new Date().toString());
     }
 
-    public void _setPermissions(String userOrGroupName, String permissionString, String className)
+    private void _setPermissions(String userOrGroupName, String permissionString, String className)
     {
         String role = toRole(permissionString);
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
@@ -6732,11 +6802,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return isElementPresent(Locator.lookupLink(schemaName, queryName, pkName));
     }
 
-    public void clickLookupLink(String schemaName, String queryName, String pkName)
-    {
-        click(Locator.lookupLink(schemaName, queryName, pkName));
-    }
-
     public void clickFkExpando(String schemaName, String queryName, String columnName)
     {
         String queryLabel = schemaName + "." + queryName;
@@ -7353,11 +7418,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction' and not(@disabled)]/../label[text()=" + Locator.xq(actionName) + "]"));
         String id = _extHelper.getExtElementId("btn_submit");
         clickAndWait(Locator.id(id));
-    }
-
-    public void clickManageSubjectCategory(String subjectNoun)
-    {
-        clickAndWait(Locator.linkContainingText("Manage " + subjectNoun + " Groups"));
     }
 
     public void ensureSignedOut()

@@ -246,7 +246,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     protected void goToFolder(String... folderPath)
     {
         for (String folderName : folderPath)
-            clickAndWait(Locator.linkWithText(folderName));
+            clickFolder(folderName);
     }
 
 
