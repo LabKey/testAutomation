@@ -86,7 +86,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
     {
         clickMenuButton("Request Options", "Create New Request");
 
-        selectOptionByText("destinationSite", "Aurum Health KOSH Lab, Orkney, South Africa (Endpoint Lab, Repository)");
+        selectOptionByText("destinationLocation", "Aurum Health KOSH Lab, Orkney, South Africa (Endpoint Lab, Repository)");
         setFormElement("input0", "Assay Plan");
         setFormElement("input2", "Comments");
         setFormElement("input1", "Shipping");
