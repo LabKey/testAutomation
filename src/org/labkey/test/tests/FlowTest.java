@@ -120,7 +120,7 @@ public class FlowTest extends BaseFlowTestWD
      * find files that match their workspace and suggest the user include them (final curating
      * to be done by the user).  This tests that feature
      */
-    private void verifyDiscoverableFCSFiles()     //TODO
+    private void verifyDiscoverableFCSFiles()
     {
         clickFolder(getFolderName());
 
@@ -139,7 +139,12 @@ public class FlowTest extends BaseFlowTestWD
         waitForText("Import Analysis: Analysis Engine");
         clickButton("Next");
         waitForText("Import Analysis: Analysis Folder");
-        clickButton("Next");
+        int count = 0;
+        while(isTextPresent("Import Analysis: Analysis Folder") && count++<10)
+        {
+            sleep(5000); //see if this fixes the ongoing flow problem.
+            clickButton("Next");
+        }
         waitForText("Import Analysis: Confirm");
         clickButton("Finish", 0);
         sleep(15000);
