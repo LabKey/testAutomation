@@ -65,7 +65,7 @@ public class FlowCBCTest extends BaseFlowTestWD
         clickButton("Next");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
-        selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), ASSAY_NAME);
         sleep(1000);
 
         // Remove TargetStudy field from the Batch domain

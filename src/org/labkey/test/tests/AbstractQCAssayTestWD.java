@@ -143,14 +143,14 @@ public abstract class AbstractQCAssayTestWD extends AbstractAssayTestWD
         if (isEngineConfigured())
         {
             Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='jar']");
-            selenium.mouseDown(engine.toString());
+            click(engine);
 
             String id = _extHelper.getExtElementId("btn_deleteEngine");
             click(Locator.id(id));
 
             _extHelper.waitForExtDialog("Delete Engine Configuration", WAIT_FOR_JAVASCRIPT);
 
-            String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
+            String btnId = (String)executeScript("return Ext.MessageBox.getDialog().buttons[1].getId();");
             click(Locator.id(btnId));
         }
     }
@@ -161,7 +161,7 @@ public abstract class AbstractQCAssayTestWD extends AbstractAssayTestWD
         {
             waitForElement(Locator.navButton("Add Script"));
             clickButton("Add Script", 0);
-            selenium.type("//input[@id='AssayDesignerTransformScript" + index + "']", transformScript.getAbsolutePath());
+            setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
         }
         else
             Assert.fail("unable to locate the Transform script");
@@ -174,7 +174,7 @@ public abstract class AbstractQCAssayTestWD extends AbstractAssayTestWD
         clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-        selenium.type("//input[@id='AssayDesignerName']", name);
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), name);
 
         log("Setting up NAb assay");
     }

@@ -94,7 +94,7 @@ public class PivotQueryTest extends BaseWebDriverTest
 
         // First "ConcInRange_CONCAT" data cell
         Locator ConcInRange_CONCAT_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[6]");
-        String contents = selenium.getText(ConcInRange_CONCAT_cell.toString());
+        String contents = getText(ConcInRange_CONCAT_cell);
         Assert.assertNotNull("The GROUP_CONCAT cell is empty", contents);
         String[] concats = contents.split(", *");
         Assert.assertTrue("Expected 5 GROUP_CONCAT values", concats.length == 5);

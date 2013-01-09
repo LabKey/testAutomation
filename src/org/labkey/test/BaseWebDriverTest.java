@@ -154,7 +154,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     /**
      * @deprecated Refactor usages to use {@link #_driver}
      */
-    @Deprecated protected DefaultSeleniumWrapper selenium;
+    @Deprecated private WebDriverBackedSelenium selenium;
     public WebDriver _driver; // TODO: Refactor to private with getter
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
@@ -305,8 +305,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         _driver.manage().timeouts().implicitlyWait(1000, TimeUnit.MILLISECONDS);
 
-        selenium = new DefaultSeleniumWrapper(_driver, WebTestHelper.getBaseURL());
-        selenium.setTimeout(Integer.toString(defaultWaitForPage));
+        selenium = new WebDriverBackedSelenium(_driver, WebTestHelper.getBaseURL());
 
         _shortWait = new WebDriverWait(_driver, WAIT_FOR_JAVASCRIPT/1000);
         _longWait = new WebDriverWait(_driver, WAIT_FOR_PAGE/1000);
@@ -592,7 +591,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         return links.toArray(new String[links.size()]);
     }
-
 
     public String getCurrentRelativeURL()
     {
@@ -2574,16 +2572,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-    public void logJavascriptAlerts()
-    {
-        while (isAlertPresent())
-        {
-            Alert alert = _driver.switchTo().alert();
-            log("JavaScript Alert Ignored: " + alert.getText());
-            alert.accept();
-        }
-    }
-
 	public boolean isAlertPresent()
 	{
         try {
@@ -4182,7 +4170,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void mouseOut(Locator l)
     {
-        selenium.mouseOut(l.toString());
+        throw new IllegalStateException("This method is no longer supported. Refactor test to use WebDriver actions");
     }
 
     public void mouseOver(Locator l)
@@ -4205,12 +4193,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @Deprecated
     public void mouseDownAt(Locator l, int x, int y)
     {
-        selenium.mouseDownAt(l.toString(), x + "," + y);
+        throw new IllegalStateException("This method is no longer supported. Use clickAt(Locator, int, int)");
     }
 
-    public int getElementIndex(Locator l)
+    public int getElementIndex(Locator.XPathLocator l)
     {
-        return selenium.getElementIndex(l.toString()).intValue();
+        return getElementCount(l.child("preceding-sibling::*"));
     }
 
     public void dragAndDrop(Locator from, Locator to)
@@ -5664,7 +5652,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Unchecking checkbox " + checkBoxLocator);
         if (isChecked(checkBoxLocator))
             click(checkBoxLocator);
-        logJavascriptAlerts();
     }
 
     public void assertChecked(Locator checkBoxLocator)
@@ -6917,275 +6904,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         WebElement el = l.findElement(_driver);
         el.sendKeys(Keys.DOWN);
     }
-
-    public class DefaultSeleniumWrapper extends WebDriverBackedSelenium
-    {
-        DefaultSeleniumWrapper()
-        {
-            super(getBrowser().startsWith("*ie") ? new InternetExplorerDriver() : new FirefoxDriver(), WebTestHelper.getBaseURL());
-        }
-
-        public DefaultSeleniumWrapper(com.google.common.base.Supplier<org.openqa.selenium.WebDriver> maker, java.lang.String baseUrl)
-        {
-            super(maker, baseUrl);
-        }
-
-        public DefaultSeleniumWrapper(WebDriver baseDriver, java.lang.String baseUrl)
-        {
-            super(baseDriver, baseUrl);
-        }
-
-        private void log(String s)
-        {
-            BaseWebDriverTest.this.log("selenium - " + s);
-        }
-
-        @Override
-        public void fireEvent(String locator, String eventName)
-        {
-            log("Firing event " + eventName + " on element: " + locator);
-            super.fireEvent(locator, eventName);
-        }
-
-        public void mouseClick(String locator)
-        {
-            log("MouseClick: " + locator);
-            super.mouseOver(locator);
-            super.mouseDown(locator);
-            super.mouseUp(locator);
-        }
-
-        @Override
-        public void mouseOver(String locator)
-        {
-            log("MouseOver: " + locator);
-            super.mouseOver(locator);
-        }
-
-        @Override
-        public void mouseOut(String locator)
-        {
-            log("MouseOut: " + locator);
-            super.mouseOut(locator);
-        }
-
-        @Override
-        public void mouseDown(String locator)
-        {
-            log("MouseDown: " + locator);
-            super.mouseDown(locator);
-        }
-
-        @Override
-        public void mouseDownAt(String locator, String coordString)
-        {
-            log("MouseDownAt " + coordString + " for element "+ locator);
-            super.mouseDownAt(locator, coordString);
-        }
-
-        @Override
-        public void mouseUp(String locator)
-        {
-            log("MouseUp: " + locator);
-            super.mouseUp(locator);
-        }
-
-        public void mouseUp(Locator l)
-        {
-            mouseUp(l.toString());
-        }
-
-        @Override
-        public void mouseUpAt(String locator, String coordString)
-        {
-            log("MouseUpAt " + coordString + " for element "+ locator);
-            super.mouseUpAt(locator, coordString);
-        }
-
-        @Override
-        public void mouseMove(String locator)
-        {
-            log("MouseMove: "+ locator);
-            super.mouseMove(locator);
-        }
-
-        @Override
-        public void mouseMoveAt(String locator, String coordString)
-        {
-            log("MouseMoveAt " + coordString + " for element "+ locator);
-            super.mouseMoveAt(locator, coordString);
-        }
-
-        public void typeSilent(String locator, String value)
-        {
-            super.type(locator, value);
-        }
-
-        @Override
-        public void type(String locator, String value)
-        {
-            type(locator, value, false);
-        }
-
-        public void type(String locator, String value, boolean suppressValueLogging)
-        {
-            log("Set value of element " + locator + " to "+ (suppressValueLogging ? "[logging suppressed]" : value));
-            super.type(locator, value);
-        }
-
-        @Override
-        public void check(String locator)
-        {
-            log("Check: " + locator);
-            super.check(locator);
-        }
-
-        @Override
-        public void uncheck(String locator)
-        {
-            log("Uncheck: " + locator);
-            super.uncheck(locator);
-        }
-
-        @Override
-        public void select(String selectLocator, String optionLocator)
-        {
-            log("Select " + optionLocator + " from element " + selectLocator);
-            super.select(selectLocator, optionLocator);
-        }
-
-        @Override
-        public void addSelection(String locator, String optionLocator)
-        {
-            log("Add Selection " + optionLocator + " from element " + locator);
-            super.addSelection(locator, optionLocator);
-        }
-
-        @Override
-        public void removeSelection(String locator, String optionLocator)
-        {
-            log("Remove Selection " + optionLocator + " from element " + locator);
-            super.removeSelection(locator, optionLocator);
-        }
-
-        @Override
-        public void submit(String formLocator)
-        {
-            log("Submit form " + formLocator);
-            super.submit(formLocator);
-        }
-
-        @Override
-        public void open(String url)
-        {
-            open(url, BaseWebDriverTest.this.defaultWaitForPage);
-        }
-
-        public void open(String url, int millis)
-        {
-            setTimeout("" + millis);
-            _testTimeout = true;
-            try
-            {
-                super.open(url);
-            }
-            catch (SeleniumException e)
-            {
-                // fall through if we get a 'livemark' exception, which occurs when running offline
-                if (e.getMessage() == null || !e.getMessage().contains("Livemark Service"))
-                    throw e;
-            }
-            // commandProcessor.doCommand("open", new String[] {url,"true"}); // Workaround for XHR errors. http://code.google.com/p/selenium/issues/detail?id=408
-            _testTimeout = false;
-        }
-
-        @Override
-        public void openWindow(String url, String windowID)
-        {
-            log("Open window " + windowID + " for url " + url);
-            super.openWindow(url, windowID);
-        }
-
-        @Override
-        public void selectWindow(String windowID)
-        {
-            log("Select window " + windowID);
-            super.selectWindow(windowID);
-        }
-
-        @Override
-        public void selectFrame(String locator)
-        {
-            log("Select frame " + locator);
-            super.selectFrame(locator);
-        }
-
-        @Override
-        public void waitForPopUp(String windowID, String timeout)
-        {
-            log("Waiting " + timeout + " ms for pop up " + windowID);
-            super.waitForPopUp(windowID, timeout);
-        }
-
-        @Override
-        public void goBack()
-        {
-            log("Go back");
-            super.goBack();
-        }
-
-        @Override
-        public void refresh()
-        {
-            log("Refresh ");
-            super.refresh();
-        }
-
-        @Override
-        public String getConfirmation()
-        {
-            Alert alert = _driver.switchTo().alert();
-            String confirmation = alert.getText();
-            alert.accept();
-            return confirmation;
-        }
-
-        @Override
-        public String getValue(String locator)
-        {
-            return super.getValue(locator);
-        }
-
-        @Override
-        public void dragdrop(String locator, String movementsString)
-        {
-            log("dragdrop element " + locator + " movements: " + movementsString);
-            super.dragdrop(locator, movementsString);
-        }
-
-        @Override
-        public void dragAndDrop(String locator, String movementsString)
-        {
-            log("dragAndDrop element " + locator + " movements: " + movementsString);
-            super.dragAndDrop(locator, movementsString);
-        }
-
-        @Override
-        public void dragAndDropToObject(String locatorOfObjectToBeDragged, String locatorOfDragDestinationObject)
-        {
-            log("dragAndDrop element " + locatorOfObjectToBeDragged + " to element " + locatorOfDragDestinationObject);
-            super.dragAndDropToObject(locatorOfObjectToBeDragged, locatorOfDragDestinationObject);
-        }
-
-        @Override
-        public void setCursorPosition(String locator, String position)
-        {
-            log("Set cursor position for " + locator + " to " + position);
-            super.setCursorPosition(locator, position);
-        }
-
-    }
-
 
     // This class makes it easier to start a specimen import early in a test and wait for completion later.
     public class SpecimenImporter

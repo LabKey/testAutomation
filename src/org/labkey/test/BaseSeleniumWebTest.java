@@ -3656,7 +3656,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selenium.mouseDownAt(l.toString(), x + "," + y);
     }
 
-    public int getElementIndex(Locator l)
+    public int getElementIndex(Locator.XPathLocator l)
     {
         return selenium.getElementIndex(l.toString()).intValue();
     }

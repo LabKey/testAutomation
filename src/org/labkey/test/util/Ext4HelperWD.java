@@ -49,7 +49,7 @@ public class Ext4HelperWD extends AbstractHelperWD
         {
             _test.sleep(500);
             _test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
-            _test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
+            _test.clickAt(Locator.xpath("/html/body"), 1,1);
         }
         else
         {

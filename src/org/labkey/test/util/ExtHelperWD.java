@@ -642,7 +642,7 @@ public class ExtHelperWD extends AbstractHelperWD
     public void closeExtTab(String tabName)
     {
         _test.log("Closing Ext tab " + tabName);
-        _test.mouseDownAt(Locator.xpath("//a[contains(@class, 'x-tab-strip-close') and ..//span[contains(@class, 'x-tab-strip-text') and text()='" + tabName + "']]"), 1, 1);
+        _test.click(Locator.xpath("//a[contains(@class, 'x-tab-strip-close') and ..//span[contains(@class, 'x-tab-strip-text') and text()='" + tabName + "']]"));
     }
 
     public void clickExtTab(String tabname)
@@ -652,8 +652,7 @@ public class ExtHelperWD extends AbstractHelperWD
         _test.waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         if(_test.getBrowser().startsWith(BaseWebDriverTest.IE_BROWSER))
         {
-            _test.mouseDownAt(l,  1,1);
-            _test.clickAt(l, "1,1");
+            _test.clickAt(l, 1, 1);
         }
         else
         {

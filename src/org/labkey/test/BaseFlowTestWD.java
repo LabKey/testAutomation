@@ -203,9 +203,8 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         {
             // Delete all runs
             table.checkAllOnPage();
-            selenium.chooseOkOnNextConfirmation();
             click(Locator.tagContainingText("span", "Delete"));
-            Assert.assertTrue(selenium.getConfirmation().contains("Are you sure you want to delete the selected row"));
+            assertAlertContains("Are you sure you want to delete the selected row");
             waitForPageToLoad();
             Assert.assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
 
@@ -222,7 +221,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     // if we aren't already on the Flow Dashboard, try to get there.
     protected void goToFlowDashboard()
     {
-        String title = selenium.getTitle();
+        String title = _driver.getTitle();
         if (!title.startsWith("Flow Dashboard: "))
         {
             // All flow pages have a link back to the Flow Dashboard

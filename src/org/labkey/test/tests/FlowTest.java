@@ -48,7 +48,7 @@ public class FlowTest extends BaseFlowTestWD
         int ret = 0;
         for (Locator l : inputs)
         {
-            if (!selenium.isEditable(l.toString()))
+            if (!l.findElement(_driver).isEnabled())
                 continue;
             ret ++;
         }
@@ -505,8 +505,7 @@ public class FlowTest extends BaseFlowTestWD
 
         Locator l = Locator.name("subset");
         click(l);
-        //selenium.typeKeys(l.toString(), "Singlets/L/Live/3+/4+/(IFNg+|IL2+)");
-        setFormElement("subset", "Singlets/L/Live/3+/4+/(IFNg+|IL2+)");
+        setFormElement(l, "Singlets/L/Live/3+/4+/(IFNg+|IL2+)");
 
         // click on TriggerField trigger image
         click(Locator.xpath("//input[@name='filter[4].property_subset']/../img"));
@@ -514,7 +513,7 @@ public class FlowTest extends BaseFlowTestWD
         Locator CD4 = Locator.xpath("//div[contains(@class, 'x-tree-node-el') and @*='Singlets/L/Live/3+/4+']");
         waitForElement(CD4, WAIT_FOR_JAVASCRIPT);
         click(CD4);
-        selenium.fireEvent(Locator.name("filter[4].property_subset").toString(), "blur");
+        fireEvent(Locator.name("filter[4].property_subset"), SeleniumEvent.blur);
 
 //        Issue 12630: add stat/threshold fo TCell filter to positivity report
         _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='filter[4].property_stat']]"), "Count");

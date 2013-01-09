@@ -216,9 +216,8 @@ public class UserTest extends SecurityTest
 
         goToSiteUsers();
         clickAndWait(Locator.linkWithText(displayNameFromEmail(NORMAL_USER)));
-        selenium.chooseOkOnNextConfirmation();
         clickButtonContainingText("Reset Password", 0);
-        Assert.assertTrue(selenium.getConfirmation().startsWith("You are about to clear the user's current password"));
+        assertAlertContains("You are about to clear the user's current password");
         waitForPageToLoad();
         clickAndWait(Locator.linkWithText("Done"));
         // View reset password email.

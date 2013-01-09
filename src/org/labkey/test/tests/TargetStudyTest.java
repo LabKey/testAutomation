@@ -174,18 +174,18 @@ public class TargetStudyTest extends AbstractAssayTestWD
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
 
-        selenium.type("name", TEST_RUN1);
-        selenium.click("//input[@value='textAreaDataProvider']");
+        setFormElement(Locator.name("name"), TEST_RUN1);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
         String data1 = TEST_RUN1_DATA1
                 .replace("${Study1ContainerID}", _study1ContainerId)
                 .replace("${Study1Label}", _study1Label);
-        selenium.type("TextAreaDataCollector.textArea", data1);
+        setFormElement(Locator.name("TextAreaDataCollector.textArea"), data1);
         clickButton("Save and Finish");
         assertTextPresent("Couldn't resolve TargetStudy 'StudyNotExist' to a study folder.");
 
-        selenium.click("//input[@value='textAreaDataProvider']");
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
         String data2 = data1.replace("StudyNotExist", "");
-        selenium.type("TextAreaDataCollector.textArea", data2);
+        setFormElement(Locator.name("TextAreaDataCollector.textArea"), data2);
         clickButton("Save and Finish");
         assertNoLabkeyErrors();
 
