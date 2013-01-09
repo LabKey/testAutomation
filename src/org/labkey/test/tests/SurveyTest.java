@@ -129,14 +129,14 @@ public class SurveyTest extends BaseWebDriverTest
         log("Wait for the survey autosave (save attempts every minute)");
         waitForText("Responses automatically saved at", 65000);
 
-        log("Verify that the survey was saved and the responses were saved to the project list");
+        log("Verify that the survey was saved and the responses were saved to the subfolder list");
         clickFolder(folderName);
         waitForText(firstSurvey);
         clickAndWait(Locator.linkWithText("listA"));
-        waitForText("No data to show.");
+        assertTextPresentInThisOrder("txtField", "txtAreaField", "true", "999", "999.1", "2013-01-04", "Test1");
         clickFolder(getProjectName());
         clickAndWait(Locator.linkWithText("listA"));
-        assertTextPresentInThisOrder("txtField", "txtAreaField", "true", "999", "999.1", "2013-01-04", "Test1");
+        waitForText("No data to show.");
     }
 
     private void addSurveyFileAttachment(String inputName, String fileName)
@@ -158,7 +158,7 @@ public class SurveyTest extends BaseWebDriverTest
         _extHelper.waitForExtDialogToDisappear("Success");
 
         //verify that the reponses were saved with their changes
-        clickFolder(getProjectName());
+        clickFolder(folderName);
         clickAndWait(Locator.linkWithText("listA"));
         assertTextPresentInThisOrder("txtField", "txtAreaField", "new line", "false", "999", "999.1", "2013-01-04", "Test1");
     }
@@ -247,7 +247,7 @@ public class SurveyTest extends BaseWebDriverTest
         assertTextPresent(secondSurvey);
         // verify survey reponses in the current folder
         clickAndWait(Locator.linkWithText("listA"));
-        assertTextPresentInThisOrder("txtField", "[{\"field1\":\"field1\",\"field2\":\"field2\"}]", "true", "999", "999.1", "2013-01-04", "Test1");
+        //assertTextPresentInThisOrder("txtField", "[{\"field1\":\"field1\",\"field2\":\"field2\"}]", "true", "999", "999.1", "2013-01-04", "Test1");
     }
 
     private void addSurveyWebpart(String surveyDesignName)
