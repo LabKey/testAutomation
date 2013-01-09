@@ -1701,7 +1701,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         Locator.XPathLocator view = Locator.xpath("//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]");
         int viewCount = getXpathCount(view);
-        for (int i = 1; i < viewCount; i++)
+        for (int i = 0; i < viewCount; i++)
         {
             Locator.XPathLocator thisView = view.index(i);
             waitForElement(thisView);

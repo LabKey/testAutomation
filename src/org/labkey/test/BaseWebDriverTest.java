@@ -2036,7 +2036,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         Locator.XPathLocator view = Locator.xpath("//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]");
         int viewCount = getElementCount(view);
-        for (int i = 1; i < viewCount; i++)
+        for (int i = 0; i < viewCount; i++)
         {
             Locator.XPathLocator thisView = view.index(i);
             waitForElement(thisView);
@@ -2555,6 +2555,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         Alert alert = _driver.switchTo().alert();
         Assert.assertEquals(msg, alert.getText());
+        alert.accept();
+    }
+
+    public void assertAlertContains(String partialMessage)
+    {
+        Alert alert = _driver.switchTo().alert();
+        Assert.assertTrue(alert.getText().contains(partialMessage));
         alert.accept();
     }
 
