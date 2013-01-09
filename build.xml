@@ -1040,11 +1040,11 @@
             </and>
         </condition>
 
-        <condition property="webdriver.chrome.driver" value="${test.dir}/bin/windows/ChromeDriver.exe">
+        <condition property="webdriver.chrome.driver" value="${test.dir}/bin/windows/chromedriver.exe">
             <os family="windows"/>
         </condition>
 
-        <condition property="webdriver.chrome.driver" value="${test.dir}/bin/mac/ChromeDriver.exe">
+        <condition property="webdriver.chrome.driver" value="${test.dir}/bin/mac/chromedriver">
             <os family="mac"/>
         </condition>
 
