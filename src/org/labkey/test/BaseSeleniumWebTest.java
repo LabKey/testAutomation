@@ -1715,7 +1715,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             String viewString = viewName + " of " + schemaName + "." + queryName;
             log("Checking view: " + viewString);
 
-            waitAndClick(Locator.linkWithText("VIEW"));
+            waitAndClick(Locator.linkWithText("View"));
             waitForText(viewName);
             popLocation();
             _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
