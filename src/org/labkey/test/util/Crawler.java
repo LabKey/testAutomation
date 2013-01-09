@@ -520,7 +520,6 @@ public class Crawler
         {
             // Go to the site
             _test.beginAt(relativeURL);
-            _test.dismissAlerts();
 
             int depth = urlToCheck.getDepth();
             URL origin = urlToCheck.getOrigin();
