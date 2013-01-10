@@ -26,6 +26,9 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.module.EHRReportingAndUITest;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
 import java.io.IOException;
 
@@ -47,7 +50,7 @@ public class EHRTestHelper
     public String getAnimalHistoryDataRegionName(String title)
     {
         // Specific to the EHR Animal History page.
-        _test.waitForElement(Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='"+title+"' or starts-with(text(), '"+title+":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), _test.WAIT_FOR_JAVASCRIPT * 3);
+        _test.waitForElement(Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='"+title+"' or starts-with(text(), '"+title+":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), _test.WAIT_FOR_JAVASCRIPT * 6);
         return _test.getAttribute(Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='" + title + "' or starts-with(text(), '" + title + ":')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), "id").substring(11);
     }
 
@@ -100,6 +103,18 @@ public class EHRTestHelper
         mc.execute(cn, containerPath);
 
         return groupId;
+    }
+
+    public void waitForCmp(final String query)
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+              return null != _test._ext4Helper.queryOne(query, Ext4CmpRef.class);
+            }
+        }, "Component did not appear for query: " + query, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 }
 

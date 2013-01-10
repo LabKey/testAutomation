@@ -22,7 +22,9 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: cnathe
@@ -35,6 +37,9 @@ public class HaplotypeAssayTest extends GenotypingTest
     private static final File FIRST_RUN_FILE = new File(getSampledataPath(), "genotyping/haplotypeAssay/firstRunData.txt");
     private static final File SECOND_RUN_FILE = new File(getSampledataPath(), "genotyping/haplotypeAssay/secondRunData.txt");
     private static final File ERROR_RUN_FILE = new File(getSampledataPath(), "genotyping/haplotypeAssay/errorRunData.txt");
+    private static final File DRB_RUN_FILE = new File(getSampledataPath(), "genotyping/haplotypeAssay/dbrRunData.txt");
+    public static final String DBR_ASSAY = "DBR assay";
+    public static final String DRB_RUN = "drb run";
 
     @Override
     protected String getProjectName()
@@ -60,9 +65,20 @@ public class HaplotypeAssayTest extends GenotypingTest
 
     private void verifyAribitraryHaplotypeAssay()
     {
-        setupHaplotypeAssay();
-    }
+        setupHaplotypeAssay(DBR_ASSAY,  new String[][] {{"DRBHaplotype", "DRB Haplotype" }});
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(DBR_ASSAY));
+        importRun(DRB_RUN, DBR_ASSAY, DRB_RUN_FILE);
 
+        clickAndWait(Locator.linkWithText(DRB_RUN));
+        DataRegionTable drt = new DataRegionTable("Data", this);
+//        String[] DR?B1 =
+        verifyColumnDataValues(drt, "Mamu-AHaplotype1", "A001,A023,A001,A004,A002a");
+        verifyColumnDataValues(drt, "Mamu-AHaplotype2", "A023,A025,A001,A023,A002a");
+        verifyColumnDataValues(drt, "DRB Haplotype 1", "D015c,D012b,D001c,D012b,D002");
+        verifyColumnDataValues(drt, "DRB Haplotype 2", "D025a,D017a,D017a,D012b,D002");
+    }
+ 
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
@@ -103,7 +119,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         setupHaplotypeAssay(ASSAY_NAME, null);
     }
 
-    private void setupHaplotypeAssay(String name, String[] extraHaplotypes)
+    private void setupHaplotypeAssay(String name, String[][] extraHaplotypes)
     {
         log("Setting up Haplotype assay");
         goToProjectHome();
@@ -111,8 +127,23 @@ public class HaplotypeAssayTest extends GenotypingTest
         clickButton("New Assay Design");
         checkRadioButton("providerName", "Haplotype");
         clickButton("Next");
-
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+
+        if(extraHaplotypes!=null)
+        {
+            int columnIndex = 9;
+            for(String[] haplotype : extraHaplotypes)
+            {
+                addRunField(haplotype[0] + "1", haplotype[1] + " 1", columnIndex++, ListHelper.ListColumnType.String);
+                click(Locator.xpath("(//span[@id='propertyShownInInsert']/input)[2]"));
+                click(Locator.xpath("(//span[@id='propertyShownInUpdate']/input)[2]"));
+
+                addRunField(haplotype[0] + "2", haplotype[1]  + " 2", columnIndex++, ListHelper.ListColumnType.String);
+                click(Locator.xpath("(//span[@id='propertyShownInInsert']/input)[2]"));
+                click(Locator.xpath("(//span[@id='propertyShownInUpdate']/input)[2]"));
+            }
+        }
+
         setFormElement(Locator.id("AssayDesignerName"), name);
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
         checkCheckbox(Locator.name("editableRunProperties"));
@@ -125,7 +156,7 @@ public class HaplotypeAssayTest extends GenotypingTest
     private void verifyAssayUploadErrors()
     {
         log("Test errors with Haplotype assay upload");
-        goToHaplotypeAssayImport();
+        goToAssayImport(ASSAY_NAME);
         clickButton("Save and Finish");
         waitForText("Data contained zero data rows");
         setFormElement(Locator.name("data"), getFileContents(ERROR_RUN_FILE));
@@ -141,7 +172,7 @@ public class HaplotypeAssayTest extends GenotypingTest
 
     private void verifyFirstRun()
     {
-        importRun("first run", FIRST_RUN_FILE);
+        importRun("first run", ASSAY_NAME, FIRST_RUN_FILE);
 
         log("Verify Haplotype Assignment data for the first run");
         goToAssayRun("first run");
@@ -182,7 +213,7 @@ public class HaplotypeAssayTest extends GenotypingTest
 
     private void verifySecondRun()
     {
-        importRun("second run", SECOND_RUN_FILE);
+        importRun("second run", ASSAY_NAME, SECOND_RUN_FILE);
 
         log("Verify Haplotype Assignment data for the second run");
         goToAssayRun("second run");
@@ -321,7 +352,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         drt = new DataRegionTable("Data", this);
         drt.setFilter("AnimalId", "Equals", "ID-4");
         clickAndWait(Locator.linkWithText("edit"));
-        waitForText("Mamu-B Haplotype", 2, WAIT_FOR_JAVASCRIPT);
+        waitForText("mamuB Haplotype", 2, WAIT_FOR_JAVASCRIPT);
         _ext4Helper.uncheckCheckbox("Enabled:");
         clickButton("Submit");
         drt = new DataRegionTable("Data", this);
@@ -375,10 +406,10 @@ public class HaplotypeAssayTest extends GenotypingTest
         goToQuery("Haplotype");
         drt = new DataRegionTable("query", this);
         Assert.assertEquals("Unexpected number of Haplotype records", total, drt.getDataRowCount());
-        drt.setFilter("Type", "Equals", "Mamu-A");
+        drt.setFilter("Type", "Equals", "mamuA");
         Assert.assertEquals("Unexpected number of filtered Haplotype records", typeACount, drt.getDataRowCount());
         drt.clearFilter("Type");
-        drt.setFilter("Type", "Equals", "Mamu-B");
+        drt.setFilter("Type", "Equals", "mamuB");
         Assert.assertEquals("Unexpected number of filtered Haplotype records", typeBCount, drt.getDataRowCount());
         drt.clearFilter("Type");
     }
@@ -400,16 +431,16 @@ public class HaplotypeAssayTest extends GenotypingTest
         return str;
     }
 
-    private void importRun(String assayId, File dataFile)
+    private void importRun(String assayId, String assayName, File dataFile)
     {
         log("Importing Haplotype Run: " + assayId);
-        goToHaplotypeAssayImport();
+        goToAssayImport(assayName);
         setFormElement(Locator.name("name"), assayId);
         checkCheckbox("enabled");
         setDataAndColumnHeaderProperties(dataFile);
         sleep(3500); //TODO
         clickButton("Save and Finish");
-        waitForText(ASSAY_NAME + " Runs");
+        waitForText(assayName + " Runs");
         assertLinkPresentWithText(assayId);
     }
 
@@ -438,7 +469,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         waitForText(ASSAY_NAME + " Results");
     }
 
-    private void goToHaplotypeAssayImport()
+    private void goToAssayImport(String assayName)
     {
         log("Navigating to Haplotype Assay Import");
         goToProjectHome();

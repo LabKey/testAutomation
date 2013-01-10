@@ -211,10 +211,15 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForPageToLoad();
 
         log("Verify Single animal history");
-        waitForElement(Locator.name("subjectBox"));
-        setFormElement(Locator.name("subjectBox"), PROTOCOL_MEMBER_IDS[0]);
+        String query = "textfield[itemId=subjArea]";
+        _helper.waitForCmp(query);
+        Ext4FieldRefWD subjField = _ext4Helper.queryOne("#subjArea", Ext4FieldRefWD.class);
+        subjField.setValue(PROTOCOL_MEMBER_IDS[0]);
+
         refreshAnimalHistoryReport();
-        waitForElement(Locator.linkWithText(PROTOCOL_MEMBER_IDS[0]), WAIT_FOR_JAVASCRIPT);
+        _helper.waitForCmp(query);
+        subjField = _ext4Helper.queryOne("#subjArea", Ext4FieldRefWD.class);
+        Assert.assertEquals("Incorrect value in subject ID field", PROTOCOL_MEMBER_IDS[0], subjField.getValue());
 
         //crawlReportTabs(); // TOO SLOW. TODO: Enable when performance is better.
 
@@ -267,7 +272,8 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         Assert.assertEquals("Did not find the expected number of Animals", PROTOCOL_MEMBER_IDS.length - 1, getDataRegionRowCount(dataRegionName));
 
         // Re-add animal.
-        setFormElement(Locator.name("subjectBox"),  PROTOCOL_MEMBER_IDS[0]);
+        subjField = _ext4Helper.queryOne("#subjArea", Ext4FieldRefWD.class);
+        subjField.setValue(PROTOCOL_MEMBER_IDS[0]);
         waitAndClick(Locator.ext4Button("Append -->"));
         waitForElement(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
@@ -347,15 +353,17 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         clickMenuButton("More Actions", "Jump To History");
         assertTitleContains("Animal History");
         waitAndClick(Locator.ext4Button("Append -->"));
-        setFormElement(Locator.name("subjectBox"), PROTOCOL_MEMBER_IDS[2]);
+        //page has loaded, so we re-query
+        subjField = _ext4Helper.queryOne("#subjArea", Ext4FieldRefWD.class);
+        subjField.setValue(PROTOCOL_MEMBER_IDS[2]);
         waitAndClick(Locator.ext4Button("Append -->"));
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", 2, getDataRegionRowCount(dataRegionName));
         assertTextPresent(PROTOCOL_MEMBER_IDS[0], PROTOCOL_MEMBER_IDS[2]);
 
-        log("Check subjectBox parsing");
-        setFormElement(Locator.name("subjectBox"),  MORE_ANIMAL_IDS[0]+","+MORE_ANIMAL_IDS[1]+";"+MORE_ANIMAL_IDS[2]+" "+MORE_ANIMAL_IDS[3]+"\n"+MORE_ANIMAL_IDS[4]);
+        log("Check subjectField parsing");
+        subjField.setValue(MORE_ANIMAL_IDS[0] + "," + MORE_ANIMAL_IDS[1] + ";" + MORE_ANIMAL_IDS[2] + " " + MORE_ANIMAL_IDS[3] + "\n" + MORE_ANIMAL_IDS[4]);
         waitAndClick(Locator.ext4Button("Replace -->"));
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");

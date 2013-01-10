@@ -4682,14 +4682,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * @param label
      * @param type
      */
-    public void addRunField(String name, String label, ListHelper.ListColumnType type)
+    public void addRunField(String name, String label, int index, ListHelper.ListColumnType type)
     {
-        String xpath = ("//input[starts-with(@name, 'ff_name");
-        int newFieldIndex = getXpathCount(Locator.xpath(xpath + "')]"));
+//        String xpath = ("//input[starts-with(@name, 'ff_name");
+//        int newFieldIndex = getXpathCount(Locator.xpath(xpath + "')]"));
         clickButtonByIndex("Add Field", 1, 0);
-        _listHelper.setColumnName(newFieldIndex, name);
-        _listHelper.setColumnLabel(newFieldIndex, label);
-        _listHelper.setColumnType(newFieldIndex, type);
+        _listHelper.setColumnName(index, name);
+        _listHelper.setColumnLabel(index, label);
+        _listHelper.setColumnType(index, type);
     }
 
     // UNDONE: move usages to use ListHelper
