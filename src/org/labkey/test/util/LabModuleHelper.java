@@ -144,7 +144,6 @@ public class LabModuleHelper
         _test.setFormElement(Locator.name("title"), workbookTitle);
         _test.setFormElement(Locator.name("description"), workbookDescription);
         _test.clickButton("Submit");
-        _test.waitForPageToLoad();
 
         try
         {
@@ -270,8 +269,7 @@ public class LabModuleHelper
             _test._ext4Helper.clickExt4MenuItem(UPLOAD_RESULTS_TEXT);
 
         _test.waitForElement(Ext4Helper.ext4Window(supportsTemplates ? UPLOAD_RESULTS_TEXT : IMPORT_DATA_TEXT));
-        _test.waitAndClick(Locator.ext4Button("Submit"));
-        _test.waitForPageToLoad();
+        _test.waitAndClickAndWait(Locator.ext4Button("Submit"));
 
     }
 

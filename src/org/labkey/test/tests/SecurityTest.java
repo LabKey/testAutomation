@@ -340,7 +340,8 @@ public class SecurityTest extends BaseWebDriverTest
         goToSiteUsers();
         clickAndWait(Locator.linkContainingText(displayNameFromEmail(username)));
         clickButtonContainingText("Reset Password", 0);
-        getConfirmationAndWait();
+        getAlert();
+        waitForPageToLoad();
         clickButton("Done");
 
         String url = getPasswordResetUrl(username);

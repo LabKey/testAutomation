@@ -281,9 +281,7 @@ public class UserTest extends SecurityTest
     {
         Locator details = Locator.xpath("//td[.='" + userName + "']/..//td[contains(@class, 'labkey-details')]/a");
         waitForElement(details);
-        click(details);
-
-        waitForPageToLoad(30000);
+        clickAndWait(details);
     }
 
     private static final String PROP_NAME1 = "Institution";

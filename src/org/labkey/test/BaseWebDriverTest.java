@@ -149,10 +149,11 @@ import static org.labkey.test.WebTestHelper.logToServer;
  */
 public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements Cleanable, WebTest
 {
-    public static final String ADMIN_MENU_XPATH = "//a/span[text() = 'Admin']";
+    public static final String ADMIN_MENU_XPATH = "id('adminMenuPopupText')";
     public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
     /**
      * @deprecated Refactor usages to use {@link #_driver}
+     * private in order to block access of object in BSWT and force full migration
      */
     @Deprecated private WebDriverBackedSelenium selenium;
     public WebDriver _driver; // TODO: Refactor to private with getter
@@ -303,7 +304,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String version = browserInfo.getVersion();
         log("Browser: " + browserInfo.getType() + " " + version);
 
-        _driver.manage().timeouts().implicitlyWait(1000, TimeUnit.MILLISECONDS);
+        _driver.manage().timeouts().setScriptTimeout(WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS);
 
         selenium = new WebDriverBackedSelenium(_driver, WebTestHelper.getBaseURL());
 
@@ -2659,8 +2660,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         log("Adding\n" + namesList.toString() + " to group " + groupName + "...");
-        waitAndClick(Locator.tagContainingText("a","manage group"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.tagContainingText("a","manage group"));
         setFormElement("names", namesList.toString());
         uncheckCheckbox("sendEmail");
         clickButton("Update Group Membership");
@@ -2712,8 +2712,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void clickManageGroup(String groupName)
     {
         openGroupPermissionsDisplay(groupName);
-        waitAndClick(Locator.tagContainingText("a","manage group"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.tagContainingText("a","manage group"));
     }
 
     public void clickManageSiteGroup(String groupName)
@@ -2725,8 +2724,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
         ref.eval("getSelectionModel().select(" + idx + ")");
-        waitAndClick(Locator.tagContainingText("a","manage group"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.tagContainingText("a","manage group"));
     }
 
     public void dragGroupToRole(String group, String srcRole, String destRole)
@@ -3330,7 +3328,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * @deprecated Wait for specific elements on the the target page. selenium.waitForPageToLoad is unpredictable under WebDriver
+     * @deprecated Wait for specific elements on the the target page or Use {@link #prepForPageLoad()} and {@link #newWaitForPageToLoad(int)}
      * @param millis milliseconds to wait before timing out
      */
     @Deprecated public void waitForPageToLoad(int millis)
@@ -3341,13 +3339,62 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * @deprecated Wait for specific elements on the the target page. selenium.waitForPageToLoad is unpredictable under WebDriver
+     * @deprecated Wait for specific elements on the the target page or Use {@link #prepForPageLoad()} and {@link #newWaitForPageToLoad(int)}
      */
     @Deprecated public void waitForPageToLoad()
     {
         waitForPageToLoad(defaultWaitForPage);
     }
 
+//TODO: New, experimental method for waiting for pages to load without invoking selenium.waitForPagetoLoad
+//Acceptable performance needs to be verified before rollout
+    private Boolean _preppedForPageLoad = false;
+    public void prepForPageLoad()
+    {
+        executeScript("window.preppedForPageLoadMarker = true;");
+        _preppedForPageLoad = true;
+    }
+
+    public void newWaitForPageToLoad(int millis)
+    {
+        if (!_preppedForPageLoad) throw new IllegalStateException("Please call prepForPageLoad() before performing the action that would trigger this page load.");
+        _testTimeout = true;
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                // Wait for marker to disappear
+                return (Boolean)executeScript("if(window.preppedForPageLoadMarker) return false; else return true;");
+            }
+        }, "Page failed to load", millis);
+        _testTimeout = false;
+        _preppedForPageLoad = false;
+    }
+
+    public void waitForExtOnReady()
+    {
+        try
+        {
+            ((JavascriptExecutor)_driver).executeAsyncScript(
+                "var callback = arguments[arguments.length - 1];" +
+                "if(window['Ext4'])" +
+                "   Ext4.onReady(callback);" +
+                "else if(window['Ext'])" +
+                "   Ext.onReady(callback);" +
+                "else" +
+                "   callback();");
+        }
+        catch (TimeoutException to)
+        {
+            Assert.fail("Page failed to load");
+        }
+    }
+
+    public void newWaitForPageToLoad()
+    {
+        newWaitForPageToLoad(defaultWaitForPage);
+    }
 
     public void waitForExtReady()
     {
@@ -3696,8 +3743,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         Assert.assertTrue("Button with name '" + buttonName + "' not found", null != l);
 
-        click(l);
-        waitForPageToLoad();
+        clickAndWait(l);
     }
 
     public Locator findButton(String name)
@@ -3987,7 +4033,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public int countLinksWithText(String text)
     {
-        return Locator.linkWithText(text).findElements(_driver).size();
+        return getElementCount(Locator.linkWithText(text));
     }
 
     public void assertLinkPresentWithTextCount(String text, int count)
@@ -4928,6 +4974,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitAndClick(WAIT_FOR_JAVASCRIPT, l, 0);
     }
 
+    /**
+     *  wait for element, click it, return immediately
+     */
+    public void waitAndClickAndWait(Locator l)
+    {
+        waitAndClick(WAIT_FOR_JAVASCRIPT, l, WAIT_FOR_PAGE);
+    }
 
     /**
      *  wait for element, click it, wait for page to load
@@ -5246,7 +5299,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @Deprecated
     public int getXpathCount(Locator.XPathLocator xpath)
     {
-        return xpath.findElements(_driver).size();
+        return getElementCount(xpath);
     }
 
     public int getElementCount(Locator locator)

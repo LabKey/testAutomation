@@ -686,8 +686,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     public void createRView(String view, String name, boolean shareView)
     {
         _test.waitForText(("Views"));
-        _test.clickMenuButtonAndContinue("Views", "Create", "R View");
-        _test.waitForPageToLoad();
+        _test.clickMenuButton("Views", "Create", "R View");
 
         if(view!=null)
             Assert.fail("Unimplemented");

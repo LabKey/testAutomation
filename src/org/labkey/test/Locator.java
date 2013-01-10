@@ -29,6 +29,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * User: Mark Igra
@@ -99,6 +100,16 @@ public abstract class Locator
     public static Locator raw(String str)
     {
         return new DeprecatedLocator(str);
+    }
+
+    private void turnOnImplicitWait(WebDriver driver)
+    {
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+    }
+
+    private void turnOffImplicitWait(WebDriver driver)
+    {
+        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
     }
 
     public WebElement findElement(WebDriver driver)
