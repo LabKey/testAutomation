@@ -174,10 +174,10 @@ public class SurveyTest extends BaseWebDriverTest
         assertElementPresent(Locator.button("Save"));
         assertElementPresent(Locator.button("Submit completed form"));
         clickButton("Submit completed form");
-        // go back to the submitted survey and verify the save/submit buttons are gone
+        // go back to the submitted survey and verify the submit button is gone
+        // TODO: add verification that site/project admins can still see Save button but other users can not for a submitted survey
         clickEditForLabel(surveyName);
         _ext4Helper.waitForMaskToDisappear();
-        assertElementNotPresent(Locator.button("Save"));
         assertElementNotPresent(Locator.button("Submit completed form"));
     }
 
@@ -205,7 +205,6 @@ public class SurveyTest extends BaseWebDriverTest
         assertElementPresent(Locator.xpath("//li[text()='End Survey']"));
         assertElementPresent(Locator.button("Previous"));
         assertElementPresent(Locator.button("Next"));
-        assertElementNotPresent(Locator.button("Save"));
         assertElementNotPresent(Locator.button("Submit completed form"));
 
         // set form field values
