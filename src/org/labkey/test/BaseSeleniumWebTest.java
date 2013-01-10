@@ -2138,7 +2138,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void dismissAlerts()
     {
         boolean present = false;
-        while (selenium.isAlertPresent())
+        while (selenium != null && selenium.isAlertPresent())
             log("Found unexpected alert: " + selenium.getAlert());
     }
 
