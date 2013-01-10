@@ -16,7 +16,9 @@
 package org.labkey.test.util;
 
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -38,11 +40,28 @@ public class LabKeyExpectedConditions
      */
     public static ExpectedCondition<Boolean> animationIsDone(final Locator loc) {
           return new ExpectedCondition<Boolean>() {
+              @Override
               public Boolean apply(WebDriver driver)
               {
                   return loc.findElement(driver).getCssValue("position").equals("static");
               }
           };
+    }
+
+    /**
+     * An expectation for checking that a row of the dumbster data region is expanded
+     *
+     * @param emailIndex one-based index of the expanding email table row
+     * @return true when email body is visible
+     */
+    public static ExpectedCondition<Boolean> emailIsExpanded(final int emailIndex) {
+        return new ExpectedCondition<Boolean>(){
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                return !driver.findElement(By.id("email_body_" + emailIndex)).getCssValue("display").equals("none");
+            }
+        };
     }
 
 }
