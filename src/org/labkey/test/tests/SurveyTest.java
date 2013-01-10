@@ -220,8 +220,14 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name("dblField"), "999.1");
         // set the date to an invalid format
         setFormElement(Locator.name("dtField"), "01/04/2013");
-        addSurveyFileAttachment("attField", pipelineLoc + "/TestAttachment.txt");
+        // check survey skip logic that attachment field appears with selectin of lkField = Test1
+        assertElementPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
         _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test1");
+        assertElementNotPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test2");
+        assertElementPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test1");
+        addSurveyFileAttachment("attField", pipelineLoc + "/TestAttachment.txt");
         clickButton("Next", 0);
         // check submit button text about invalid fields
         waitForText("Note: The following fields must be valid before you can submit the form");
@@ -246,7 +252,7 @@ public class SurveyTest extends BaseWebDriverTest
         assertTextPresent(secondSurvey);
         // verify survey reponses in the current folder
         clickAndWait(Locator.linkWithText("listA"));
-        //assertTextPresentInThisOrder("txtField", "[{\"field1\":\"field1\",\"field2\":\"field2\"}]", "true", "999", "999.1", "2013-01-04", "Test1");
+        assertTextPresentInThisOrder("[{\"field1\":\"field1\",\"field2\":\"field2\"}]", "true");
     }
 
     private void addSurveyWebpart(String surveyDesignName)
