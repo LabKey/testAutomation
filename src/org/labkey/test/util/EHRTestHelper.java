@@ -27,6 +27,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.module.EHRReportingAndUITest;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
@@ -63,7 +64,7 @@ public class EHRTestHelper
 
     public void clickVisibleButton(String text)
     {
-        _test.click(Locator.xpath("//button[text()='"+text+"' and "+ EHRReportingAndUITest.VISIBLE+" and not(contains(@class, 'x-hide-display'))]"));
+        _test.click(Locator.xpath("//button[text()='" + text + "' and " + EHRReportingAndUITest.VISIBLE + " and not(contains(@class, 'x-hide-display'))]"));
     }
 
     public void setDataEntryFieldInTab(String tabName, String fieldName, String value)
@@ -112,7 +113,7 @@ public class EHRTestHelper
             @Override
             public boolean check()
             {
-              return null != _test._ext4Helper.queryOne(query, Ext4CmpRef.class);
+              return null != _test._ext4Helper.queryOne(query, Ext4CmpRefWD.class);
             }
         }, "Component did not appear for query: " + query, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
