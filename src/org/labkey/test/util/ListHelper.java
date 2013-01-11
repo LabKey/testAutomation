@@ -552,6 +552,7 @@ public class ListHelper extends AbstractHelper
     public void clickImportData()
     {
         _test.waitAndClick(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT, Locator.navButton("Import Data"), BaseSeleniumWebTest.WAIT_FOR_PAGE);
+        _test.waitForElement(Locator.id("tsv3"));
     }
 
     public void clickEditDesign()
