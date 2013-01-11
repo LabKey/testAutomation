@@ -187,7 +187,8 @@ public class UserTest extends SecurityTest
             checkRequiredField(field, true);
 
         clickButton("Save");
-        clickButton("Change User Properties");
+        waitAndClickButton("Change User Properties");
+        waitForPageToLoad();
 
         for (String field : REQUIRED_FIELDS)
         {
