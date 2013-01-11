@@ -122,7 +122,6 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
-        deletePipelineWorkDirectory();
         try
         {
             beginAt("/admin/begin.view");
@@ -131,6 +130,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
             clickButton("update");
         }
         catch (Throwable ignored) {}
+        deletePipelineWorkDirectory();
     }
 
     @Override
