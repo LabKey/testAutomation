@@ -2265,9 +2265,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForPageToLoad();
     }
 
-    public void createSubFolderFromTemplate(String project, String child, String template, String[] objectsToCopy)
+    public void createSubFolderFromTemplate(String project, String child, String template, String[] objectsToSkip)
     {
-        createSubfolder(project, project, child, "Create From Template Folder", template, objectsToCopy, false);
+        createSubfolder(project, project, child, "Create From Template Folder", template, objectsToSkip, false);
 
     }
 
@@ -2300,7 +2300,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForExt4FolderTreeNode(parent, 10000);
         clickButton("Create Subfolder");
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
-        setText("name", child);
+        setFormElement(Locator.name("name"), child);
 
 
     }
@@ -2310,6 +2310,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         createSubfolder(project, parent, child, folderType, null, tabsToAdd, inheritPermissions);
     }
 
+
+    public void createSubfolder(String project, String parent, String child, String folderType, String templateFolder, String[] tabsToAdd, boolean inheritPermissions)
+    {
+        createSubfolder(project, parent, child, folderType, templateFolder, null, tabsToAdd, inheritPermissions);
+    }
     /**
      *
      * @param project project in which to create new folder
@@ -2321,7 +2326,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * @param inheritPermissions should folder inherit permissions from parent?
      */
     @LogMethod
-    public void createSubfolder(String project, String parent, String child, String folderType, String templateFolder, String[] tabsToAdd, boolean inheritPermissions)
+    public void createSubfolder(String project, String parent, String child, String folderType, String templateFolder, String[] templatePartsToUncheck, String[] tabsToAdd, boolean inheritPermissions)
     {
         startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
@@ -2335,8 +2340,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 Locator.XPathLocator l = Locator.xpath("//tr[./td/input[@name='templateSourceId']]");
                 _ext4Helper.selectComboBoxItem(l, templateFolder);
                 _ext4Helper.checkCheckbox("Include Subfolders");
+                for(String part : templatePartsToUncheck)
+                {
+                    click(Locator.xpath("//td[label[text()='" +  part + "']]/input"));
+                }
 
-                //TODO:  the checkboxes.  I don't need this right now so I haven't written it, but my intention is to use tabsToAdd
             }
         }
         else {
@@ -4682,6 +4690,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * @param label
      * @param type
      */
+    public void addRunField(String name, String label, ListHelper.ListColumnType type)
+    {
+        String xpath = ("//input[starts-with(@name, 'ff_name");
+        int newFieldIndex = getXpathCount(Locator.xpath(xpath + "')]"));
+        clickButtonByIndex("Add Field", 1, 0);
+        _listHelper.setColumnName(newFieldIndex, name);
+        _listHelper.setColumnLabel(newFieldIndex, label);
+        _listHelper.setColumnType(newFieldIndex, type);
+    }
+
     public void addRunField(String name, String label, int index, ListHelper.ListColumnType type)
     {
 //        String xpath = ("//input[starts-with(@name, 'ff_name");
@@ -4691,7 +4709,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         _listHelper.setColumnLabel(index, label);
         _listHelper.setColumnType(index, type);
     }
-
     // UNDONE: move usages to use ListHelper
     @Deprecated
     public void addField(String areaTitle, int index, String name, String label, ListHelper.ListColumnType type)
@@ -6795,34 +6812,29 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     // Wait until the pipeline UI shows the requested number of complete jobs.  Fail if any job status becomes "ERROR".
     @LogMethod
-    public void waitForPipelineJobsToComplete(final int completeJobsExpected, final String description, final boolean expectError)
+    public void waitForPipelineJobsToComplete(int completeJobsExpected, String description, boolean expectError)
     {
         log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
+        List<String> statusValues = getPipelineStatusValues();
 
         // Short circuit in case we already have too many COMPLETE jobs
-        Assert.assertTrue("Number of COMPLETE jobs already exceeds desired count", getCompleteCount(getPipelineStatusValues()) <= completeJobsExpected);
+        Assert.assertTrue("Number of COMPLETE jobs already exceeds desired count", getCompleteCount(statusValues) <= completeJobsExpected);
 
-        waitFor(new Checker()
+        startTimer();
+
+        while (getCompleteCount(statusValues) < completeJobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
         {
-            @Override
-            public boolean check()
-            {
-                log("Waiting for " + description);
-                List<String> statusValues = getPipelineStatusValues();
-                if (!expectError)
-                {
-                    assertElementNotPresent(Locator.linkWithText("ERROR"));
-                }
-                if (statusValues.size() < completeJobsExpected || statusValues.size() != getCompleteCount(statusValues))
-                {
-                    refresh();
-                    return false;
-                }
-                return true;
-            }
-        }, "Pipeline jobs did not complete.", MAX_WAIT_SECONDS * 1000);
+            if (!expectError && hasError(statusValues))
+                break;
+            log("Waiting for " + description);
+            sleep(1000);
+            refresh();
+            statusValues = getPipelineStatusValues();
+        }
 
-        Assert.assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, getCompleteCount(getPipelineStatusValues()));
+        if (!expectError)
+            assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
+        Assert.assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, getCompleteCount(statusValues));
     }
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
@@ -6923,6 +6935,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction' and not(@disabled)]/../label[text()=" + Locator.xq(actionName) + "]"));
         String id = _extHelper.getExtElementId("btn_submit");
         clickAndWait(Locator.id(id));
+    }
+
+    public void clickManageSubjectCategory(String subjectNoun)
+    {
+        clickAndWait(Locator.linkContainingText("Manage " + subjectNoun + " Groups"));
     }
 
     public void ensureSignedOut()

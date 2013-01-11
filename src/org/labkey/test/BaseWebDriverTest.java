@@ -155,7 +155,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * @deprecated Refactor usages to use {@link #_driver}
      * private in order to block access of object in BSWT and force full migration
      */
-    @Deprecated private WebDriverBackedSelenium selenium;
+    @Deprecated protected WebDriverBackedSelenium selenium;
     public WebDriver _driver; // TODO: Refactor to private with getter
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
@@ -2740,9 +2740,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForElement(Locator.permissionButton(group, destRole));
     }
 
-    public void createSubFolderFromTemplate(String project, String child, String template, @Nullable String[] objectsToCopy)
+    public void createSubFolderFromTemplate(String project, String child, String template, @Nullable String[] objectsToSkip)
     {
-        createSubfolder(project, project, child, "Create From Template Folder", template, objectsToCopy, false);
+        createSubfolder(project, project, child, "Create From Template Folder", template, objectsToSkip, null, false);
 
     }
 

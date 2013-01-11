@@ -93,7 +93,7 @@ public class FolderExportTest extends BaseWebDriverTest
     @LogMethod
     private void verifyCreateFolderFromTemplate()
     {
-        createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, null);
+        createSubFolderFromTemplate(getProjectName(), folderFromTemplate, "/" + getProjectName() + "/" + folderFromZip, new String[] {"Reports"});
         verifyExpectedWebPartsPresent();
         verifySubfolderImport(3, true);
         verifyFolderExportAsExpected(folderFromTemplate);
