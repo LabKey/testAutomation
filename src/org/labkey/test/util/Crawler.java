@@ -520,6 +520,7 @@ public class Crawler
         {
             // Go to the site
             _test.beginAt(relativeURL);
+            try{ _test.dismissAlerts(); } catch(SeleniumException ignore){}
 
             int depth = urlToCheck.getDepth();
             URL origin = urlToCheck.getOrigin();
