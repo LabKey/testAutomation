@@ -75,7 +75,9 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         setFormElement("studyDescription", ANCILLARY_STUDY_DESC);
         clickButton("Next", WAIT_FOR_EXT_MASK_TO_APPEAR);
 
-        clickAt(Locator.tagContainingText("div", DOV_DATASET), "1,1");
+        Locator datasetRow = Locator.tagContainingText("div", DOV_DATASET);
+        waitForElement(datasetRow);
+        clickAt(datasetRow, "1,1");
         clickButton("Finish");
         waitForPipelineJobsToFinish(3);
 
