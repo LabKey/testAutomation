@@ -4154,7 +4154,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         WebElement el;
         el = l.findElement(_driver);
 
-        el.click();
+        try
+        {
+            el.click();
+        }
+        catch (StaleElementReferenceException e)
+        { // Try it again
+            log("WARNING: Element was stale, trying to relocate it. Consider a timing investigation to prevent this.");
+            el = l.findElement(_driver);
+            el.click();
+        }
 
         if (pageTimeoutMs > 0)
             waitForPageToLoad(pageTimeoutMs);
