@@ -6795,29 +6795,34 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     // Wait until the pipeline UI shows the requested number of complete jobs.  Fail if any job status becomes "ERROR".
     @LogMethod
-    public void waitForPipelineJobsToComplete(int completeJobsExpected, String description, boolean expectError)
+    public void waitForPipelineJobsToComplete(final int completeJobsExpected, final String description, final boolean expectError)
     {
         log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
-        List<String> statusValues = getPipelineStatusValues();
 
         // Short circuit in case we already have too many COMPLETE jobs
-        Assert.assertTrue("Number of COMPLETE jobs already exceeds desired count", getCompleteCount(statusValues) <= completeJobsExpected);
+        Assert.assertTrue("Number of COMPLETE jobs already exceeds desired count", getCompleteCount(getPipelineStatusValues()) <= completeJobsExpected);
 
-        startTimer();
-
-        while (getCompleteCount(statusValues) < completeJobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
+        waitFor(new Checker()
         {
-            if (!expectError && hasError(statusValues))
-                break;
-            log("Waiting for " + description);
-            sleep(1000);
-            refresh();
-            statusValues = getPipelineStatusValues();
-        }
+            @Override
+            public boolean check()
+            {
+                log("Waiting for " + description);
+                List<String> statusValues = getPipelineStatusValues();
+                if (!expectError)
+                {
+                    assertElementNotPresent(Locator.linkWithText("ERROR"));
+                }
+                if (statusValues.size() < completeJobsExpected || statusValues.size() != getCompleteCount(statusValues))
+                {
+                    refresh();
+                    return false;
+                }
+                return true;
+            }
+        }, "Pipeline jobs did not complete.", MAX_WAIT_SECONDS * 1000);
 
-        if (!expectError)
-            assertLinkNotPresentWithText("ERROR");  // Must be surrounded by an anchor tag.
-        Assert.assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, getCompleteCount(statusValues));
+        Assert.assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, getCompleteCount(getPipelineStatusValues()));
     }
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
