@@ -95,7 +95,7 @@ public class WorkbookTest extends BaseWebDriverTest
         // Test Workbook APIs
 
         // Initialize the Creation Wiki
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickFolder(PROJECT_NAME);
         addWebPart("Wiki");
 
         createNewWikiPage();
