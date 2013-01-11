@@ -345,7 +345,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         defineAssay();
 
         log("Import single column MV data");
-        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        waitAndClickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         String targetStudyValue = "/" + PROJECT_NAME + " (" + PROJECT_NAME + " Study)";
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
