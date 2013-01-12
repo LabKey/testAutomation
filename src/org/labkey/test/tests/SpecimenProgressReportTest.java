@@ -116,9 +116,9 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText(studyFolder));
         clickAndWait(Locator.linkWithText("SpecimenConfiguration"));
         DataRegionTable drt = new DataRegionTable("query", this);
-        String pcr1RowId = drt.getDataAsText(drt.getRow("Tubetype", "CEF-R Cryovial"), "Rowid");
-        String pcr2RowId = drt.getDataAsText(drt.getRow("Tubetype", "UPR Micro Tube"), "Rowid");
-        String rnaRowId = drt.getDataAsText(drt.getRow("Tubetype", "TGE Cryovial"), "Rowid");
+        String pcr1RowId = drt.getDataAsText(drt.getRow("TubeType", "CEF-R Cryovial"), "RowId");
+        String pcr2RowId = drt.getDataAsText(drt.getRow("TubeType", "UPR Micro Tube"), "RowId");
+        String rnaRowId = drt.getDataAsText(drt.getRow("TubeType", "TGE Cryovial"), "RowId");
         // set the specimen configuration visits (by checking the checkboxes on the manage page
         beginAt("/rho/" + containerId + "/manageSpecimenConfiguration.view?");
         setSpecimenConfigurationVisit(pcr1RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
@@ -155,12 +155,12 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     private void insertNewMissingSpecimenOrVisit(String ptid, double visit, String configId, int locationId, String comment)
     {
         clickButton("Insert New");
-        setFormElement(Locator.name("quf_participantid"), ptid);
-        setFormElement(Locator.name("quf_sequencenum"), String.valueOf(visit));
-        setFormElement(Locator.name("quf_locationid"), String.valueOf(locationId));
-        setFormElement(Locator.name("quf_comments"), comment);
+        setFormElement(Locator.name("quf_ParticipantId"), ptid);
+        setFormElement(Locator.name("quf_SequenceNum"), String.valueOf(visit));
+        setFormElement(Locator.name("quf_LocationId"), String.valueOf(locationId));
+        setFormElement(Locator.name("quf_Comments"), comment);
         if (configId != null)
-            setFormElement(Locator.name("quf_specimenconfiguration"), configId);
+            setFormElement(Locator.name("quf_SpecimenConfiguration"), configId);
 
         clickButton("Submit");
     }
@@ -168,12 +168,12 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     private void addSpecimenConfiguration(String assayName, String source, int locationId, String tubeType)
     {
         clickButton("Add Specimen Configuration", 0);
-        waitForElement(Locator.name("assayname"));
-        setFormElement(Locator.name("assayname"), assayName);
-        setFormElement(Locator.name("description"), assayName + " " + tubeType);
-        setFormElement(Locator.name("source"), source);
-        setFormElement(Locator.name("locationid"), String.valueOf(locationId)); // TODO: look this up based on the imported study folder (i.e. Site table for Seattle site)
-        setFormElement(Locator.name("tubetype"), tubeType);
+        waitForElement(Locator.name("AssayName"));
+        setFormElement(Locator.name("AssayName"), assayName);
+        setFormElement(Locator.name("Description"), assayName + " " + tubeType);
+        setFormElement(Locator.name("Source"), source);
+        setFormElement(Locator.name("LocationId"), String.valueOf(locationId)); // TODO: look this up based on the imported study folder (i.e. Site table for Seattle site)
+        setFormElement(Locator.name("TubeType"), tubeType);
         clickButton("Update", 0);
     }
 
