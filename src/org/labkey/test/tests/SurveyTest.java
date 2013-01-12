@@ -149,7 +149,7 @@ public class SurveyTest extends BaseWebDriverTest
     {
         log("Edit the survey in the specified folder");
         clickFolder(folder);
-        clickEditForLabel(surveyName);
+        clickEditForLabel(surveyName, true);
         _ext4Helper.waitForMaskToDisappear();
         setFormElement(Locator.name("txtAreaField"), "txtAreaField\nnew line");
         _ext4Helper.uncheckCheckbox("Bool Field");
@@ -169,14 +169,14 @@ public class SurveyTest extends BaseWebDriverTest
 
         log("Submit the completed survey in the specified folder");
         clickFolder(folder);
-        clickEditForLabel(surveyName);
+        clickEditForLabel(surveyName, true);
         _ext4Helper.waitForMaskToDisappear();
         assertElementPresent(Locator.button("Save"));
         assertElementPresent(Locator.button("Submit completed form"));
         clickButton("Submit completed form");
         // go back to the submitted survey and verify the submit button is gone
         // TODO: add verification that site/project admins can still see Save button but other users can not for a submitted survey
-        clickEditForLabel(surveyName);
+        clickEditForLabel(surveyName, true);
         _ext4Helper.waitForMaskToDisappear();
         assertElementNotPresent(Locator.button("Submit completed form"));
     }
@@ -185,7 +185,7 @@ public class SurveyTest extends BaseWebDriverTest
     {
         log("Customize the survey design metadata (card layout, multiple sections, show question counts, etc.)");
         clickFolder(folderName);
-        clickEditForLabel(subfolderSurveyDesign);
+        clickEditForLabel(subfolderSurveyDesign, false);
         String json = getFileContents(pipelineLoc + "/CustomSurveyMetadata.json");
         // hack: since we are not able to update the CodeMirror input field via selenium, we reshow the
         // textarea and enter the value there, the SurveyDesignPanel will then use that value instead of the CodeMirror value
@@ -301,9 +301,12 @@ public class SurveyTest extends BaseWebDriverTest
         assertTextNotPresent("tobedeleted");
     }
 
-    private void clickEditForLabel(String label)
+    private void clickEditForLabel(String label, boolean link)
     {
         Locator l = Locator.xpath("//a[text()='edit'][../../td[text()='" + label + "']]");
+        if (link)
+            l = Locator.xpath("//a[text()='edit'][../..//a[text()='" + label + "']]");
+
         waitForElement(l);
         clickAndWait(l);
     }
