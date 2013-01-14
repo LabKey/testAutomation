@@ -48,7 +48,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         clickFolder(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         saveLocation();
-        impersonate(FULL_SUBMITTER.getUser());
+        impersonate(FULL_SUBMITTER.getEmail());
         recallLocation();
         waitAndClick(Locator.linkWithText("Enter Data"));
         waitForPageToLoad();
@@ -119,7 +119,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         stopImpersonating();
 
         log("Fulfil measurement task");
-        impersonate(BASIC_SUBMITTER.getUser());
+        impersonate(BASIC_SUBMITTER.getEmail());
         recallLocation();
         waitAndClick(Locator.linkWithText("Enter Data"));
         waitForPageToLoad();
@@ -154,7 +154,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
 
         log("Verify Measurements");
         sleep(1000); // Weird
-        impersonate(DATA_ADMIN.getUser());
+        impersonate(DATA_ADMIN.getEmail());
         recallLocation();
         waitAndClick(Locator.linkWithText("Enter Data"));
         waitForPageToLoad();
@@ -195,7 +195,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         clickFolder(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         saveLocation();
-        impersonate(FULL_SUBMITTER.getUser());
+        impersonate(FULL_SUBMITTER.getEmail());
         recallLocation();
         waitAndClick(Locator.linkWithText("Enter Data"));
         waitForPageToLoad();
@@ -229,7 +229,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         stopImpersonating();
 
         log("Fulfil MPR task");
-        impersonate(BASIC_SUBMITTER.getUser());
+        impersonate(BASIC_SUBMITTER.getEmail());
         recallLocation();
         waitAndClick(Locator.linkWithText("Enter Data"));
         waitForPageToLoad();
@@ -245,7 +245,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         _extHelper.selectComboBoxItem("Project:", PROJECT_ID + " (" + DUMMY_PROTOCOL + ")\u00A0");
         _extHelper.selectComboBoxItem("Type:", "Physical Exam\u00A0");
         _helper.setDataEntryField("remark", "Bonjour");
-        _helper.setDataEntryField("performedby", BASIC_SUBMITTER.getUser());
+        _helper.setDataEntryField("performedby", BASIC_SUBMITTER.getEmail());
 
         log("Add treatments record.");
         waitForElement(Locator.xpath("/*//*[contains(@class,'ehr-drug_administration-records-grid')]"), WAIT_FOR_JAVASCRIPT);

@@ -636,7 +636,7 @@ public class EHRApiTest extends AbstractEHRTest
     private String doSaveRows(EHRUser user, List<JSONObject> commands, JSONObject extraContext, boolean expectSuccess)
     {
         long start = System.currentTimeMillis();
-        HttpClient client = WebTestHelper.getHttpClient(user.getUser(), PasswordUtil.getPassword());
+        HttpClient client = WebTestHelper.getHttpClient(user.getEmail(), PasswordUtil.getPassword());
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpPost method = null;
         HttpResponse response = null;

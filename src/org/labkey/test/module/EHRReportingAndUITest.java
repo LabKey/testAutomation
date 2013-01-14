@@ -213,7 +213,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         log("Verify Single animal history");
         String query = "textfield[itemId=subjArea]";
         _helper.waitForCmp(query);
-        Ext4FieldRefWD subjField = _ext4Helper.queryOne("#subjArea", Ext4FieldRefWD.class);
+        Ext4FieldRefWD subjField = getAnimalHistorySubjField();
         subjField.setValue(PROTOCOL_MEMBER_IDS[0]);
 
         refreshAnimalHistoryReport();
@@ -272,8 +272,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         Assert.assertEquals("Did not find the expected number of Animals", PROTOCOL_MEMBER_IDS.length - 1, getDataRegionRowCount(dataRegionName));
 
         // Re-add animal.
-        subjField = _ext4Helper.queryOne("#subjArea", Ext4FieldRefWD.class);
-        subjField.setValue(PROTOCOL_MEMBER_IDS[0]);
+        getAnimalHistorySubjField().setValue(PROTOCOL_MEMBER_IDS[0]);
         waitAndClick(Locator.ext4Button("Append -->"));
         waitForElement(Locator.button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
@@ -354,8 +353,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         assertTitleContains("Animal History");
         waitAndClick(Locator.ext4Button("Append -->"));
         //page has loaded, so we re-query
-        subjField = _ext4Helper.queryOne("#subjArea", Ext4FieldRefWD.class);
-        subjField.setValue(PROTOCOL_MEMBER_IDS[2]);
+        getAnimalHistorySubjField().setValue(PROTOCOL_MEMBER_IDS[2]);
         waitAndClick(Locator.ext4Button("Append -->"));
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
@@ -363,7 +361,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         assertTextPresent(PROTOCOL_MEMBER_IDS[0], PROTOCOL_MEMBER_IDS[2]);
 
         log("Check subjectField parsing");
-        subjField.setValue(MORE_ANIMAL_IDS[0] + "," + MORE_ANIMAL_IDS[1] + ";" + MORE_ANIMAL_IDS[2] + " " + MORE_ANIMAL_IDS[3] + "\n" + MORE_ANIMAL_IDS[4]);
+        getAnimalHistorySubjField().setValue(MORE_ANIMAL_IDS[0] + "," + MORE_ANIMAL_IDS[1] + ";" + MORE_ANIMAL_IDS[2] + " " + MORE_ANIMAL_IDS[3] + "\t" + MORE_ANIMAL_IDS[4]);
         waitAndClick(Locator.ext4Button("Replace -->"));
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
@@ -373,8 +371,15 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         waitAndClick(Locator.ext4Button("Clear"));
         refreshAnimalHistoryReport();
-        assertAlert("Error: Must Enter At Least 1 Animal ID");
+        waitForElement(Ext4Helper.ext4Window("Error"));
         assertElementNotPresent(Locator.buttonContainingText("(X)"));
+        assertTextPresent("Must enter at least one subject");
+        click(Locator.ext4Button("OK"));
+    }
+
+    private Ext4FieldRefWD getAnimalHistorySubjField()
+    {
+        return _ext4Helper.queryOne("#subjArea", Ext4FieldRefWD.class);
     }
 
     private void refreshAnimalHistoryReport()

@@ -217,6 +217,7 @@ public class LabModuleHelper
         if (expectedColumns != null)
         {
             Ext4CmpRefWD win = _test._ext4Helper.queryOne("window", Ext4CmpRefWD.class);
+            _test.sleep(1000);
             String fields = (String)win.getEval("getFieldsInTemplateTest()");
             String[] fieldArray = fields.split(";");
             Assert.assertEquals("Incorrect column number in template", expectedColumns.size(), fieldArray.length);

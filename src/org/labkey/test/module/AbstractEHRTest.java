@@ -33,6 +33,7 @@ import org.openqa.selenium.support.ui.Select;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -142,12 +143,12 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         }
 
         deleteUsers(afterTest,
-                DATA_ADMIN.getUser(),
-                REQUESTER.getUser(),
-                BASIC_SUBMITTER.getUser(),
-                REQUEST_ADMIN.getUser(),
-                FULL_UPDATER.getUser(),
-                FULL_SUBMITTER.getUser());
+                DATA_ADMIN.getEmail(),
+                REQUESTER.getEmail(),
+                BASIC_SUBMITTER.getEmail(),
+                REQUEST_ADMIN.getEmail(),
+                FULL_UPDATER.getEmail(),
+                FULL_SUBMITTER.getEmail());
     }
 
     protected void initProject() throws Exception
@@ -162,7 +163,8 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(dummyProps)));
 
         String[] prop = {"/" + PROJECT_NAME, "EHRStudyContainer", "/" + CONTAINER_PATH};
-        setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(prop)));
+        String[] prop2 = {"/" + PROJECT_NAME, "EHRAdminUser", DATA_ADMIN._email};
+        setModuleProperties(Collections.singletonMap("EHR", Arrays.asList(prop, prop2)));
 
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         beginAt(getBaseURL()+"/ehr/"+CONTAINER_PATH+"/populateInitialData.view");
@@ -307,19 +309,19 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
 
     protected void setupEhrPermissions() throws Exception
     {
-        DATA_ADMIN.setUserId(_helper.createUserAPI(DATA_ADMIN.getUser(), getProjectName()));
-        REQUESTER.setUserId(_helper.createUserAPI(REQUESTER.getUser(), getProjectName()));
-        BASIC_SUBMITTER.setUserId(_helper.createUserAPI(BASIC_SUBMITTER.getUser(), getProjectName()));
-        FULL_SUBMITTER.setUserId(_helper.createUserAPI(FULL_SUBMITTER.getUser(), getProjectName()));
-        FULL_UPDATER.setUserId(_helper.createUserAPI(FULL_UPDATER.getUser(), getProjectName()));
-        REQUEST_ADMIN.setUserId(_helper.createUserAPI(REQUEST_ADMIN.getUser(), getProjectName()));
+        DATA_ADMIN.setUserId(_helper.createUserAPI(DATA_ADMIN.getEmail(), getProjectName()));
+        REQUESTER.setUserId(_helper.createUserAPI(REQUESTER.getEmail(), getProjectName()));
+        BASIC_SUBMITTER.setUserId(_helper.createUserAPI(BASIC_SUBMITTER.getEmail(), getProjectName()));
+        FULL_SUBMITTER.setUserId(_helper.createUserAPI(FULL_SUBMITTER.getEmail(), getProjectName()));
+        FULL_UPDATER.setUserId(_helper.createUserAPI(FULL_UPDATER.getEmail(), getProjectName()));
+        REQUEST_ADMIN.setUserId(_helper.createUserAPI(REQUEST_ADMIN.getEmail(), getProjectName()));
 
-        setInitialPassword(DATA_ADMIN.getUser(), PasswordUtil.getPassword());
-        setInitialPassword(REQUESTER.getUser(), PasswordUtil.getPassword());
-        setInitialPassword(BASIC_SUBMITTER.getUser(), PasswordUtil.getPassword());
-        setInitialPassword(FULL_SUBMITTER.getUser(), PasswordUtil.getPassword());
-        setInitialPassword(FULL_UPDATER.getUser(), PasswordUtil.getPassword());
-        setInitialPassword(REQUEST_ADMIN.getUser(), PasswordUtil.getPassword());
+        setInitialPassword(DATA_ADMIN.getEmail(), PasswordUtil.getPassword());
+        setInitialPassword(REQUESTER.getEmail(), PasswordUtil.getPassword());
+        setInitialPassword(BASIC_SUBMITTER.getEmail(), PasswordUtil.getPassword());
+        setInitialPassword(FULL_SUBMITTER.getEmail(), PasswordUtil.getPassword());
+        setInitialPassword(FULL_UPDATER.getEmail(), PasswordUtil.getPassword());
+        setInitialPassword(REQUEST_ADMIN.getEmail(), PasswordUtil.getPassword());
 
         _helper.createPermissionsGroupAPI(DATA_ADMIN.getGroup(), getProjectName(), DATA_ADMIN.getUserId());
         _helper.createPermissionsGroupAPI(REQUESTER.getGroup(), getProjectName(), REQUESTER.getUserId());
@@ -414,7 +416,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
             _role = role;
         }
 
-        public String getUser()
+        public String getEmail()
         {
             return _email;
         }

@@ -80,6 +80,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         overviewUITest();
         reportsTest();
         settingsTest();
+        siteSettingsTest();
         defaultAssayImportMethodTest();
 
         labToolsWebpartTest();
@@ -168,39 +169,13 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         log("Testing Settings");
         _helper.goToLabHome();
         waitAndClick(_helper.toolIcon("Settings"));
-        waitForPageToLoad();
-        waitForText("Reference Sequences"); //proxy for page load
 
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Assay Types:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Instruments:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Peptide Pools:"));
 
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Diluents:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Roche E411 Tests:"));
-
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Cell Populations:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Units:"));
-
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Reference AA Features:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Reference NT Features:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Virus Strains:"));
-
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Cell Types:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Genders:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Sample Types:"));
+        waitForElement(Locator.linkContainingText("Control Item Visibility"));
         assertElementPresent(LabModuleHelper.getNavPanelRow("Manage Freezers:"));
 
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Barcodes:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("DNA Loci:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Haplotype Definitions:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Input Material Types:"));
-
-        assertElementPresent(LabModuleHelper.getNavPanelRow("ABI7500 Detectors:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Fluors:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Techniques:"));
-
         waitAndClick(Locator.linkContainingText("Control Item Visibility"));
-        waitForPageToLoad();
+
         waitForText("Sequence"); //proxy for page load
         waitForText("TruCount"); //proxy for page load
 
@@ -301,6 +276,43 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         click(Locator.ext4Button("Submit"));
         waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
+
+
+    }
+
+    private void siteSettingsTest()
+    {
+        log("Testing Site Settings");
+        goToAdminConsole();
+        waitAndClick(Locator.linkContainingText("laboratory module admin"));
+
+        waitForText("Reference Sequences"); //proxy for page load
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Assay Types:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Instruments:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Peptide Pools:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Diluents:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Roche E411 Tests:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Cell Populations:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Units:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Reference AA Features:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Reference NT Features:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Virus Strains:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Cell Types:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Genders:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Sample Types:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Barcodes:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("DNA Loci:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Haplotype Definitions:"));
+
+        assertElementPresent(LabModuleHelper.getNavPanelRow("ABI7500 Detectors:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Fluors:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Techniques:"));
     }
 
     private void reportsTest()
@@ -317,10 +329,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             assertElementPresent(Locator.linkContainingText(pair.getValue() + ": Raw Data"));
         }
         assertElementPresent(Locator.linkContainingText("TruCount Test: Results Pivoted"));
-        assertElementPresent(Locator.linkContainingText("SSP Test: SSP_Summary"));
-        assertElementPresent(Locator.linkContainingText("SSP Test: SSP_Pivot"));
+        assertElementPresent(Locator.linkContainingText("SSP Test: SSP Summary"));
+        assertElementPresent(Locator.linkContainingText("SSP Test: SSP Pivot"));
         assertElementPresent(Locator.linkContainingText("ICS Test: Results Pivoted"));
-        assertElementPresent(Locator.linkContainingText(VIRAL_LOAD_ASSAYNAME + ": Viral_Load_Summary"));
+        assertElementPresent(Locator.linkContainingText(VIRAL_LOAD_ASSAYNAME + ": Viral Load Summary"));
 
         assertElementPresent(Locator.linkContainingText("View All DNA Oligos"));
         assertElementPresent(Locator.linkContainingText("View All Peptides"));

@@ -244,9 +244,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
     {
         log("Verifying results");
         _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
-        waitForPageToLoad();
         waitAndClick(Locator.linkContainingText("view results"));
-        waitForPageToLoad();
 
         DataRegionTable results = new DataRegionTable("Data", this);
 
