@@ -603,7 +603,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private String setSource(String srcFragment, boolean excludeTags)
     {
         if (!isTextPresent(WIKIPAGE_NAME))
-            clickAndWait(Locator.linkWithText(FOLDER_NAME));
+            clickFolder(FOLDER_NAME);
         clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
 
         String fullSource = srcFragment;
