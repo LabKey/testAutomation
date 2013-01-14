@@ -999,16 +999,20 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
+     * @deprecated Use {@link org.labkey.test.util.PortalHelper#clickWebpartMenuItem(String, String...)}
      * Allows test code to navigate to a Webpart Ext-based navigation menu.
      * @param webPartTitle title (not name) of webpart to be clicked.  Multiple web parts with the same title not supported.
      * @param items
      */
-    public void clickWebpartMenuItem(String webPartTitle, String... items)
+    @Deprecated public void clickWebpartMenuItem(String webPartTitle, String... items)
     {
         clickWebpartMenuItem(webPartTitle, true, items);
     }
 
-    public void clickWebpartMenuItem(String webPartTitle, boolean wait, String... items)
+    /**
+     * @deprecated Use {@link org.labkey.test.util.PortalHelper#clickWebpartMenuItem(String, boolean, String...)}
+     */
+    @Deprecated public void clickWebpartMenuItem(String webPartTitle, boolean wait, String... items)
     {
         _extHelper.clickExtMenuButton(wait, Locator.xpath("//img[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
     }
@@ -3022,7 +3026,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             Assert.fail("Failed to enable email recorder");}
     }
 
-    public void addWebPart(String webPartName)
+    /**
+     * @deprecated Use {@link org.labkey.test.util.PortalHelper#addWebPart(String)}
+     */
+    @Deprecated public void addWebPart(String webPartName)
     {
         Locator.css("option").withText(webPartName).waitForElmement(_driver, WAIT_FOR_JAVASCRIPT);
         Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
@@ -3030,7 +3037,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         submit(form);
     }
 
-    public void removeWebPart(String webPartTitle)
+    /**
+     * @deprecated Use {@link org.labkey.test.util.PortalHelper#removeWebPart(String)}
+     */
+    @Deprecated public void removeWebPart(String webPartTitle)
     {
         Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[img[@title='Remove From Page']]");
         int startCount = getElementCount(removeButton);

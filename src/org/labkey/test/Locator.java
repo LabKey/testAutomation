@@ -68,9 +68,7 @@ public abstract class Locator
     public abstract Locator index(Integer index);
 
     /**
-     * Not for direct use with selenium
-     * Converts a locator into a format suitable for logging
-     * @return Human-readable version of Locator
+     * For direct use with selenium RC
      */
     public abstract String toString();
 
@@ -638,7 +636,10 @@ public abstract class Locator
 
     public static IdLocator folderTab(String text)
     {
-        return Locator.id(text + "Tab");
+        if ("+".equals(text))
+            return Locator.id("addTab");
+        else
+            return Locator.id(text + "Tab");
     }
 
     /**

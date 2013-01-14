@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIContainerHelper;
 
 /**
@@ -71,9 +72,11 @@ public class BasicTest extends BaseWebDriverTest
         assertTextPresent("Wiki");
         assertLinkPresentWithText("Create a new wiki page");
         addWebPart("Wiki Table of Contents");
+
         // move messages below wiki:
-        clickLinkWithImage("/_images/partdown.png", 0);
-        _ext4Helper.waitForMaskToDisappear(30000);
+        assertTextBefore(MESSAGES_WEBPART_TEXT, WIKI_WEBPART_TEXT);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.moveWebPart("Messages", PortalHelper.Direction.DOWN);
         assertTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
 
         refresh();
@@ -125,8 +128,7 @@ public class BasicTest extends BaseWebDriverTest
         clickWebpartMenuItem("Messages", "Customize");      
         assertTextPresent("Customize");
         clickButton("Cancel");
-        clickLinkWithImage(getContextPath() + "/_images/partdown.png", 0);
-        _ext4Helper.waitForMaskToDisappear();
+        portalHelper.moveWebPart("Messages", PortalHelper.Direction.DOWN);
         assertTextBefore("No data to show", "No messages");
         
         refresh();
