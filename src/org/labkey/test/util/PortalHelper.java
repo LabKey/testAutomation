@@ -51,7 +51,7 @@ public class PortalHelper extends AbstractHelper
             }
         }
 
-        _test.assertElementPresent(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab')]["+(expectedEndIndex+1)+"][./a[@id="+Locator.xq(tabId)+"]]"));
+        _test.waitForElement(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab')]["+(expectedEndIndex+1)+"][./a[@id="+Locator.xq(tabId)+"]]"));
     }
 
     @LogMethod(quiet = true)
