@@ -138,7 +138,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                     "\"schemaName\":\"vehicle\"," +
                     "\"queryName\":\"Colors\"," +
                     "\"exception\":\"single message\"," +
-                    "\"rowNumber\":0," +
+                    "\"rowNumber\":1," +
                     "\"row\":{" +
                         "\"Name\":\"TestFieldErrorMessage!\"," +
                         "\"Hex\":null" +
@@ -171,7 +171,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                     "\"schemaName\":\"vehicle\"," +
                     "\"queryName\":\"Colors\"," +
                     "\"exception\":\"one error message\"," +
-                    "\"rowNumber\":0," +
+                    "\"rowNumber\":1," +
                     "\"row\":{" +
                         "\"Name\":\"TestFieldErrorArray!\"," +
                         "\"Hex\":null" +
@@ -234,7 +234,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                     "\"schemaName\":\"vehicle\"," +
                     "\"queryName\":\"Colors\"," +
                     "\"exception\":\"beforeInsert validation failed\"," +
-                    "\"rowNumber\":0," +
+                    "\"rowNumber\":1," +
                     "\"row\":{" +
                         "\"Name\":\"TestReturnFalse\"," +
                         "\"Hex\":\"\"" +
@@ -275,7 +275,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                     "\"schemaName\":\"vehicle\"," +
                     "\"queryName\":\"Colors\"," +
                     "\"exception\":\"TestErrorInComplete error field two\"," +
-                    "\"rowNumber\":2," +
+                    "\"rowNumber\":3," +
                     "\"row\":{" +
                         "\"Name\":\"TestErrorInComplete!\"," +
                         "\"Hex\":\"\"" +
@@ -288,7 +288,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                         "\"msg\":\"TestErrorInComplete error global four!\"" +
                     "}]," +
                     "\"exception\":\"TestErrorInComplete error global four!\"," +
-                    "\"rowNumber\":2," +
+                    "\"rowNumber\":3," +
                     "\"row\":{" +
                         "\"a\":\"A\"," +
                         "\"b\":\"B\"" +
@@ -328,7 +328,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                         "\"msg\":\"three error message\"" +
                     "}]," +
                     "\"exception\":\"one error message\"," +
-                    "\"rowNumber\":0" +
+                    "\"rowNumber\":1" +
                 "},{" +
                    "\"errors\":[{" +
                        "\"id\":\"Hex\"," +
@@ -337,7 +337,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                        "\"msg\":\"four error message\"" +
                     "}]," +
                     "\"exception\":\"four error message\"," +
-                    "\"rowNumber\":0" +
+                    "\"rowNumber\":1" +
                 "}]" +
             "}");
             json.assertEquals("FAILED", expected, properties);
