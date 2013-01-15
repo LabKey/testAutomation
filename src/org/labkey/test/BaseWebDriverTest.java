@@ -1603,8 +1603,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 resumeJsErrorChecker();
             }
 
-            _testFailed = false;
-
             if (!skipCleanup())
             {
                 goToHome();
@@ -1616,6 +1614,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
 
             checkLeaksAndErrors();
+
+            _testFailed = false;
         }
         catch (UnhandledAlertException e)
         {

@@ -1314,8 +1314,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 resumeJsErrorChecker();
             }
 
-            _testFailed = false;
-
             if (!skipCleanup())
             {
                 goToHome();
@@ -1327,6 +1325,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             }
 
             checkLeaksAndErrors();
+
+            _testFailed = false;
         }
         catch (TestTimeoutException e)
         {
