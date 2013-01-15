@@ -131,7 +131,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         waitForText(ASSAY_NAME + " Runs", 30000);
         assertTextPresent("SingleRunProperties");
 
-        verifyCanCreateCustomView();
+        verifyCanCreateAndSaveCustomView();
         validateRuns();
 
         // Now try doing the runs in bulk, so delete the existing runs
@@ -206,12 +206,20 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         validateRuns();
     }
 
-    //Issue 16934: Assay schema names too long for query.customview
-    private void verifyCanCreateCustomView()
+    private void verifyCanCreateAndSaveCustomView()
     {
+        //Issue 16934: Assay schema names too long for query.customview
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.saveCustomView("unneeded view");
+        String name = "unneeded view";
+        _customizeViewsHelper.saveCustomView(name);
         assertTextNotPresent(("Error"));
+        assertTextPresent("View: " + name);
+
+        //Issue 16936: Microarray, Viability, Elispot, and other assays fail to find custom run view
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.closeCustomizeViewPanel();
+
+
     }
 
 
