@@ -16,11 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseFlowTest;
 import org.labkey.test.BaseFlowTestWD;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.TimeChartHelper;
 
 /**
@@ -52,7 +52,8 @@ public class FlowCBCTest extends BaseFlowTestWD
         initializeStudyFolder();
     }
 
-    void initializeAssayFolder()
+    @LogMethod
+    private void initializeAssayFolder()
     {
         log("** Initialize CBC Assay");
         createSubfolder(getProjectName(), getProjectName(), CBC_FOLDER, "Assay", null);
@@ -80,7 +81,8 @@ public class FlowCBCTest extends BaseFlowTestWD
 
     public boolean isFileUploadTest(){return true;}
 
-    void initializeStudyFolder()
+    @LogMethod
+    private void initializeStudyFolder()
     {
         log("** Initialize Study Folder");
         createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[]{"Study", "Letvin", "Flow"});
@@ -99,20 +101,11 @@ public class FlowCBCTest extends BaseFlowTestWD
         verifyTimeChartFromFlowData();     //Issue 16709: JS error when creating Time Chart from flow data
     }
 
-    private void verifyTimeChartFromFlowData()
-    {
-        beginAt("/visualization/Flow Verify Project/KoStudy/timeChartWizard.view?edit=true&queryName=mem naive CBCFlow&schemaName=study&dataRegionName=query&filterUrl=%2Flabkey%2Fquery%2FFlow%2520Verify%2520Project%2FKoStudy%2FexecuteQuery.view%3Fquery.queryName%3Dmem%2520naive%2520CBCFlow%26query.sort%3DParticipantId%26schemaName%3Dstudy");
-        TimeChartHelper tch = new TimeChartHelper(this);
-        tch.addAMeasure("CD3+ Lymph");
-        Assert.assertFalse("OK button appeared, indicating a problem with the graph", isElementPresent(Locator.button("OK")));
-        assertTextNotPresent("There are no demographic date options available in this study");
-        tch.save("Flow Report");
-    }
-
+    @LogMethod
     private void copyFlowResultsToStudy()
     {
         importExternalAnalysis(getContainerPath(), "/analysis.zip");
-        setProtocolMetadata("Keyword SAMPLE ID", "Keyword $DATE", null, false);
+        setProtocolMetadata(null, "Keyword SAMPLE ID", "Keyword $DATE", null, false);
 
         // Copy the sample wells to the STUDY_FOLDER
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
@@ -154,6 +147,7 @@ public class FlowCBCTest extends BaseFlowTestWD
         popLocation();
     }
 
+    @LogMethod
     private void copyCBCResultsToStudy()
     {
         log("** Upload CBC Data");
@@ -184,6 +178,7 @@ public class FlowCBCTest extends BaseFlowTestWD
         clickButton("Copy to Study");
     }
 
+    @LogMethod
     private void verifyQuery()
     {
         log("** Verify mem naive query");
@@ -206,4 +201,16 @@ public class FlowCBCTest extends BaseFlowTestWD
         Assert.assertEquals("87.0%", table.getDataAsText(0, "CD3+ Percent"));
         Assert.assertEquals("2680.09", table.getDataAsText(0, "CD3+ Lymph"));
     }
+
+    @LogMethod
+    private void verifyTimeChartFromFlowData()
+    {
+        beginAt("/visualization/Flow Verify Project/KoStudy/timeChartWizard.view?edit=true&queryName=mem naive CBCFlow&schemaName=study&dataRegionName=query&filterUrl=%2Flabkey%2Fquery%2FFlow%2520Verify%2520Project%2FKoStudy%2FexecuteQuery.view%3Fquery.queryName%3Dmem%2520naive%2520CBCFlow%26query.sort%3DParticipantId%26schemaName%3Dstudy");
+        TimeChartHelper tch = new TimeChartHelper(this);
+        tch.addAMeasure("CD3+ Lymph");
+        Assert.assertFalse("OK button appeared, indicating a problem with the graph", isElementPresent(Locator.button("OK")));
+        assertTextNotPresent("There are no demographic date options available in this study");
+        tch.save("Flow Report");
+    }
+
 }
