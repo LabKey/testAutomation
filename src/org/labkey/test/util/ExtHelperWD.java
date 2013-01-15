@@ -24,6 +24,10 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
+import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
+import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.Locator.NOT_HIDDEN;
+
 /**
  * User: klum
  * Date: Apr 6, 2009
@@ -68,11 +72,11 @@ public class ExtHelperWD extends AbstractHelperWD
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             Locator parentLocator = Locator.menuItem(subMenuLabels[i]);
-            _test.waitForElement(parentLocator, 1000);
+            _test.waitForElement(parentLocator, WAIT_FOR_JAVASCRIPT);
             _test.mouseOver(parentLocator);
         }
         Locator itemLocator = Locator.menuItem(subMenuLabels[subMenuLabels.length - 1]);
-        _test.waitForElement(itemLocator, 1000);
+        _test.waitForElement(itemLocator, WAIT_FOR_JAVASCRIPT);
         if (wait)
             _test.clickAndWait(itemLocator);
         else
@@ -92,7 +96,7 @@ public class ExtHelperWD extends AbstractHelperWD
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             Locator parentLocator = Locator.menuItem(subMenuLabels[i]);
-            _test.waitForElement(parentLocator, 1000);
+            _test.waitForElement(parentLocator, WAIT_FOR_JAVASCRIPT);
             _test.mouseOver(parentLocator);
         }
 
@@ -133,7 +137,7 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         _test.click(menuLocator);
         Locator element = Locator.xpath("//*[(self::li[contains(@class, 'x4-boundlist-item')] or self::div[contains(@class, 'x-combo-list-item')] or self::span[contains(@class, 'x-menu-item-text')]) and text()='" + value + "']");
-        _test.waitForElement(element, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(element, WAIT_FOR_JAVASCRIPT);
         _test.click(element);
     }
 
@@ -248,12 +252,12 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public void waitForExtDialog(final String title)
     {
-        waitForExtDialog(title, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForExtDialog(title, WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForExtDialog(final String title, int timeout)
     {
-        final Locator locator = Locator.xpath("//span["+Locator.NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
+        final Locator locator = Locator.xpath("//span["+NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
 
         _test.waitFor(new BaseWebDriverTest.Checker()
         {
@@ -266,12 +270,12 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public void waitForExtDialogToDisappear(String title)
     {
-        waitForExtDialogToDisappear(title, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForExtDialogToDisappear(title, WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForExtDialogToDisappear(String title, int timeout)
     {
-        final Locator locator = Locator.xpath("//span["+Locator.NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
+        final Locator locator = Locator.xpath("//span["+NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
 
         _test.waitFor(new BaseWebDriverTest.Checker()
         {
@@ -284,7 +288,7 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public String getExtMsgBoxText(String title)
     {
-        return getExtMsgBoxText(title, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        return getExtMsgBoxText(title, WAIT_FOR_JAVASCRIPT);
     }
 
     public String getExtMsgBoxText(String title, int timeout)
@@ -341,9 +345,9 @@ public class ExtHelperWD extends AbstractHelperWD
     public String getExtDialogXPath(String windowTitle)
     {
         if (windowTitle == null) return "";
-        String ext3Dialog = "//div[contains(@class, 'x-window') and " + Locator.NOT_HIDDEN + " and "+
+        String ext3Dialog = "//div[contains(@class, 'x-window') and " + NOT_HIDDEN + " and "+
             "./div/div/div/div/span[contains(@class, 'x-window-header-text') and contains(string(), '" + windowTitle + "')]]";
-        String ext4Dialog = "//div[contains(@class, 'x4-window') and " + Locator.NOT_HIDDEN + " and "+
+        String ext4Dialog = "//div[contains(@class, 'x4-window') and " + NOT_HIDDEN + " and "+
             "./div/div/div/div/div/span[contains(@class, 'x4-window-header-text') and contains(string(), '" + windowTitle + "')]]";
         if( _test.isElementPresent(Locator.xpath(ext3Dialog)) )
             return ext3Dialog;
@@ -396,15 +400,15 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public void clickFileBrowserFileCheckbox(String fileName)
     {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-filecontent-grid')]"), 60000);
-        _test.waitForElement(locateBrowserFileName(fileName), 60000);
+        _test.waitForElement(Locator.css("div.labkey-filecontent-grid"), WAIT_FOR_PAGE);
+        _test.waitForElement(locateBrowserFileName(fileName), WAIT_FOR_PAGE);
         _test.sleep(100); // Avoid race condition for file selection.
         selectExtGridItem("name", fileName, -1, "labkey-filecontent-grid", true);
     }
 
     public void clickXGridPanelCheckbox(int index, boolean keepExisting)
     {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-grid-panel')]"), 60000);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-grid-panel')]"), WAIT_FOR_PAGE);
         selectExtGridItem(null, null, index, "x-grid-panel", keepExisting);
     }
 
@@ -491,7 +495,7 @@ public class ExtHelperWD extends AbstractHelperWD
 
     protected void clickX4GridPanelCheckbox(String colName, String colValue, int rowIndex, String markerCls, boolean keepExisting)
     {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid')]"), 60000);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid')]"), WAIT_FOR_PAGE);
         selectExt4GridItem(colName, colValue, rowIndex, markerCls, keepExisting);
     }
 
@@ -530,7 +534,7 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         Locator file = locateGridRowCheckbox(fileName);
 
-        _test.waitForElement(file, 60000);
+        _test.waitForElement(file, WAIT_FOR_PAGE);
         _test.mouseDown(file);
     }
 
@@ -550,7 +554,7 @@ public class ExtHelperWD extends AbstractHelperWD
 
         // expand root tree node
         _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), WAIT_FOR_JAVASCRIPT);
 
         for (int i = 0; i < parts.length; i++)
         {
@@ -565,7 +569,7 @@ public class ExtHelperWD extends AbstractHelperWD
             {
                 // expand tree node: click on expand/collapse icon
                 _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + nodeId + "']"));
-                _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='" + nodeId + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='" + nodeId + "']"), WAIT_FOR_JAVASCRIPT);
             }
         }
     }
@@ -577,12 +581,12 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public void waitForImportDataEnabled()
     {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForFileAdminEnabled()
     {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-admin-enabled')]"), 6 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-admin-enabled')]"), 6 * WAIT_FOR_JAVASCRIPT);
     }
 
     /**
@@ -590,46 +594,46 @@ public class ExtHelperWD extends AbstractHelperWD
      */
     public void waitForFileGridReady()
     {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-file-grid-initialized')]"), 6 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-file-grid-initialized')]"), 6 * WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod
     public void selectAllFileBrowserFiles()
     {
-        Locator file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-checker']");
-        _test.waitForElement(file, 60000);
+        Locator file = Locator.css("tr.x-grid3-hd-row div.x-grid3-hd-checker");
+        _test.waitForElement(file, WAIT_FOR_PAGE);
         _test.sleep(1000);
         _test.click(file);
 
         file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-inner x-grid3-hd-checker x-grid3-hd-checker-on']");
-        _test.waitForElement(file, 60000);
+        _test.waitForElement(file, WAIT_FOR_PAGE);
     }
 
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
         _test.click(Locator.xpath(parentLocator.getPath() + "//*[contains(@class, 'x-form-arrow-trigger')]"));
-        _test.waitAndClick(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"));
-        _test.waitForElementToDisappear(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitAndClick(Locator.xpath("//div["+NOT_HIDDEN+"]/div/div[text()='" + selection + "']"));
+        _test.waitForElementToDisappear(Locator.xpath("//div["+NOT_HIDDEN+"]/div/div[text()='" + selection + "']"), WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
-        selectComboBoxItem(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='"+label+"']]/div/div"), selection);
+        selectComboBoxItem(Locator.xpath("//div["+NOT_HIDDEN+" and ./label/span[text()='"+label+"']]/div/div"), selection);
     }
 
     @LogMethod(quiet = true)
     public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
         _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"));
-        _test.waitAndClick(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"));
+        _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"));
         _test.mouseDown(Locator.xpath("/html/body"));
     }
 
     public void selectExt4ComboBoxItem(String label, String selection)
     {
-        selectExt4ComboBoxItem(Locator.xpath("//tr["+Locator.NOT_HIDDEN+" and ./td/label[text()='"+label+"']]"), selection);
+        selectExt4ComboBoxItem(Locator.xpath("//tr["+NOT_HIDDEN+" and ./td/label[text()='"+label+"']]"), selection);
     }
 
     public void selectGWTComboBoxItem(Locator.XPathLocator parentLocator, String selection)
@@ -649,7 +653,7 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         _test.log("Selecting Ext tab " + tabname);
         Locator l = Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']");
-        _test.waitForElement(l, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(l, WAIT_FOR_JAVASCRIPT);
         if(_test.getBrowser().startsWith(BaseWebDriverTest.IE_BROWSER))
         {
             _test.clickAt(l, 1, 1);
@@ -678,7 +682,7 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public void clickExtButton(String caption)
     {
-        clickExtButton(caption, BaseWebDriverTest.WAIT_FOR_PAGE);
+        clickExtButton(caption, WAIT_FOR_PAGE);
     }
 
     public void clickExtButton(String caption, int wait)
@@ -688,7 +692,7 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public void clickExtButton(String windowTitle, String caption)
     {
-        clickExtButton(windowTitle, caption, BaseWebDriverTest.WAIT_FOR_PAGE);
+        clickExtButton(windowTitle, caption, WAIT_FOR_PAGE);
     }
 
      public void clickExtButton(String windowTitle, String caption, int wait)
@@ -708,7 +712,7 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         _test.log("Clicking Ext button with caption: " + caption);
         Locator loc = Locator.xpath((windowTitle!=null?getExtDialogXPath(windowTitle):"")+"//button[(contains(@class, 'x-btn-text') and text()='" + caption + "') or (@role='button' and ./span[text()='" + caption + "'])]["+index+"]");
-        _test.waitForElement(loc, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         _test.clickAndWait(loc, wait);
     }
 
