@@ -22,6 +22,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.RReportHelperWD;
 
 import java.net.MalformedURLException;
@@ -76,6 +78,8 @@ public class FlowTest extends BaseFlowTestWD
     {
         _doTestStepsSetDepth(false);
     }
+
+    @LogMethod
     protected void _doTestStepsSetDepth(boolean quickTest)
     {
         setupQuery();
@@ -105,6 +109,7 @@ public class FlowTest extends BaseFlowTestWD
 
     }
 
+    @LogMethod
     private void removeAnalysisFilter()
     {
         clickTab("Flow Dashboard");
@@ -120,6 +125,7 @@ public class FlowTest extends BaseFlowTestWD
      * find files that match their workspace and suggest the user include them (final curating
      * to be done by the user).  This tests that feature
      */
+    @LogMethod
     private void verifyDiscoverableFCSFiles()
     {
         clickFolder(getFolderName());
@@ -149,6 +155,7 @@ public class FlowTest extends BaseFlowTestWD
 
     String query1 =  TRICKY_CHARACTERS_NO_QUOTES + "DRTQuery1";
     String analysisName = "FCSAnalyses";
+    @LogMethod
     protected void setupQuery()
     {
         beginAt("/query" + getContainerPath() + "/begin.view?schemaName=flow");
@@ -170,6 +177,7 @@ public class FlowTest extends BaseFlowTestWD
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);
     }
 
+    @LogMethod
     protected void importFiles()
     {
         goToFlowDashboard();
@@ -249,6 +257,7 @@ public class FlowTest extends BaseFlowTestWD
         submit();
     }
 
+    @LogMethod
     protected void analysisFilterTest()
     {
         setFlowFilter(new String[] {"Keyword/Stim"}, new String[] {"isnonblank"}, new String[] {""});
@@ -361,6 +370,7 @@ public class FlowTest extends BaseFlowTestWD
     }
 
     // Test sample set and ICS metadata
+    @LogMethod
     protected void configureSampleSetAndMetadata()
     {
         uploadSampleDescriptions("/sampledata/flow/8color/sample-set.tsv", new String[] { "Exp Name", "Well Id" }, new String[] { "EXPERIMENT NAME", "WELL ID"});
@@ -374,16 +384,17 @@ public class FlowTest extends BaseFlowTestWD
         assertTextPresent("0 FCS Files", "are not joined");
     }
 
+    @LogMethod
     public void sampleSetAndMetadataTest()
     {
         // verify sample set and background values can be displayed in the FCSAnalysis grid
+        windowMaximize();
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("29 FCS files"));
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Inline");
-//            sleep(3000);
+        waitForElement(Locator.css(".labkey-flow-graph"));
         assertTextNotPresent("Error generating graph");
         assertTextPresent("No graph for:", "(<APC-A>)");
-        windowMaximize();
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn("Background/Count");
@@ -428,6 +439,7 @@ public class FlowTest extends BaseFlowTestWD
     }
 
     //Issue 16304: query over flow.FCSFiles doesn't copy include URL for Name column
+    @LogMethod
     public void customGraphQuery()
     {
         log("** Creating custom query with Graph columns");
@@ -456,6 +468,7 @@ public class FlowTest extends BaseFlowTestWD
         Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
     }
 
+    @LogMethod
     public void copyAnalysisScriptTest()
     {
         // bug 4625
@@ -469,6 +482,7 @@ public class FlowTest extends BaseFlowTestWD
     }
 
 
+    @LogMethod
     public void positivityReportTest()
     {
         String reportName = TRICKY_CHARACTERS + " positivity report";
@@ -487,6 +501,7 @@ public class FlowTest extends BaseFlowTestWD
         verifyDeleted(reportName);
     }
 
+    @LogMethod
     private void createPositivityReport(String reportName, String description)
     {
         log("** Creating positivity report '" + reportName + "'");
@@ -520,6 +535,7 @@ public class FlowTest extends BaseFlowTestWD
         clickButton("Save");
     }
 
+    @LogMethod(quiet = true)
     private void updatePositivityReportFilter(String reportName)
     {
         log("** Updating positivity report filter '" + reportName + "'");
@@ -531,6 +547,7 @@ public class FlowTest extends BaseFlowTestWD
         clickButton("Save");
     }
 
+    @LogMethod(quiet = true)
     private void executeReport(String reportName)
     {
         log("** Executing positivity report '" + reportName + "'");
@@ -541,9 +558,9 @@ public class FlowTest extends BaseFlowTestWD
         waitForPipeline(getContainerPath());
     }
 
-    private void verifyReportError(String reportName, String errorText)
+    @LogMethod
+    private void verifyReportError(@LoggedParam String reportName, String errorText)
     {
-        log("** Checking for expected error in report '" + reportName + "'");
         waitForPipeline("/" + getProjectName() + "/" + getFolderName());
         goToFlowDashboard();
         waitForPipeline("/" + getProjectName() + "/" + getFolderName());
@@ -555,9 +572,9 @@ public class FlowTest extends BaseFlowTestWD
         checkExpectedErrors(2);
     }
 
-    private void verifyReport(String reportName)
+    @LogMethod
+    private void verifyReport(@LoggedParam String reportName)
     {
-        log("** Verifying positivity report '" + reportName + "'");
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
 
         String reportNameEscaped = EscapeUtil.fieldKeyEncodePart(reportName);
@@ -575,9 +592,9 @@ public class FlowTest extends BaseFlowTestWD
         Assert.assertEquals("91926.fcs-" + FCS_FILE_1, table.getDataAsText(0, "Name"));
     }
 
-    private void deleteReport(String reportName)
+    @LogMethod(quiet = true)
+    private void deleteReport(@LoggedParam String reportName)
     {
-        log("** Deleting positivity report '" + reportName + "'");
         goToFlowDashboard();
 
         // Should only be one 'manage' menu since we've only created one flow report.
@@ -585,9 +602,10 @@ public class FlowTest extends BaseFlowTestWD
         clickButton("OK");
     }
 
-    private void verifyDeleted(String reportName)
+    @LogMethod(quiet = true)
+    private void verifyDeleted(@LoggedParam String reportName)
     {
-        log("** Verifying positivity report was deleted '" + reportName + "'");
+
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         waitForText("Ignoring filter/sort on column");
         assertTextPresent("Ignoring filter/sort on column '" , reportName , ".Response' because it does not exist.");
