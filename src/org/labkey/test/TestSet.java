@@ -29,8 +29,12 @@ import org.labkey.test.ms2.SequestTest;
 import org.labkey.test.tests.*;
 import org.labkey.test.tests.perf.StudyImportPerfTest;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public enum TestSet
 {
@@ -141,7 +145,8 @@ public enum TestSet
         JavaClientApiTest.class,
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
-        SpecimenProgressReportTest.class
+        SpecimenProgressReportTest.class,
+        DatabaseDiagnosticsTest.class
     ),
 
     DailyB(600000,
@@ -186,6 +191,7 @@ public enum TestSet
         SampleMindedImportTest.class,
         PivotQueryTest.class,
         StudyPublishTest.class,
+                DatabaseDiagnosticsTest.class,
         HiddenEmailTest.class,
         ElisaAssayTest.class,
         ContainerContextTest.class,
@@ -193,7 +199,7 @@ public enum TestSet
         SurveyTest.class
     ),
 
-    Daily(600000, DailyA, DailyB.tests),
+    Daily(600000, DailyA.getTestList(), DailyB.getTestList()),
 
     MiniTest(
         LuminexUploadAndCopyTest.class,
@@ -321,7 +327,7 @@ public enum TestSet
         FormulationsTest.class
     ),
 
-    BVTnDaily(BVT, Daily.tests),
+    BVTnDaily(BVT, Daily._tests),
 
     Weekly(600000, BVTnDaily,
         // Add special test classes, not in daily or BVT.
@@ -362,42 +368,46 @@ public enum TestSet
     ;
 
 
-    public Class[] tests;
+    private List<Class> _tests;
     private static final int DEFAULT_CRAWLER_TIMEOUT = 90000;
     private int crawlerTimeout;
 
-    TestSet(int timeout, TestSet set, Class... tests)
+    TestSet(int timeout, List<Class>... testLists)
     {
-        Class[] all = new Class[set.tests.length + tests.length];
-        System.arraycopy(set.tests, 0, all, 0, set.tests.length);
-        System.arraycopy(tests, 0, all, set.tests.length, tests.length);
-        setTests(timeout, all);
+        HashSet<Class> all = new HashSet<Class>();
+
+        for (List<Class> tests: testLists)
+        {
+            all.addAll(tests);
+        }
+
+        _tests = new ArrayList<Class>(all);
+        crawlerTimeout = timeout;
     }
 
-    TestSet(TestSet set, Class... tests)
+    TestSet(int timeout, TestSet set, Class... tests)
     {
-        this(DEFAULT_CRAWLER_TIMEOUT, set, tests);
+        this(timeout, set.getTestList(), Arrays.asList(tests));
+    }
+
+    TestSet(TestSet set, List<Class> tests)
+    {
+        this(DEFAULT_CRAWLER_TIMEOUT, set.getTestList(), tests);
     }
 
     TestSet(int timeout, Class... tests)
     {
-        setTests(timeout, tests);
+        this(timeout, Arrays.asList(tests));
     }
 
     TestSet(Class... tests)
     {
-        setTests(DEFAULT_CRAWLER_TIMEOUT, tests);
+        this(DEFAULT_CRAWLER_TIMEOUT, Arrays.asList(tests));
     }
 
-    void setTests(Class... tests)
+    void setTests(List<Class> tests)
     {
-        setTests(DEFAULT_CRAWLER_TIMEOUT, tests);
-    }
-
-    void setTests(int timeout, Class... tests)
-    {
-        this.tests = tests;
-        crawlerTimeout = timeout;
+        _tests = tests;
     }
 
     public boolean isSuite()
@@ -412,6 +422,31 @@ public enum TestSet
 
     public List<Class> getTestList()
     {
-        return Arrays.asList(tests);
+        return _tests;
+    }
+
+    public List<String> getTestNames()
+    {
+        ArrayList<String> testNames = new ArrayList<String>();
+        for (Class test : _tests)
+            testNames.add(test.getSimpleName());
+        return testNames;
+    }
+
+    // Move the named test to the Nth position in the list, maintaining the order of all other tests.
+    public boolean prioritizeTest(Class priorityTest, int N)
+    {
+        if (_tests.contains(priorityTest))
+        {
+            _tests.remove(priorityTest);
+            _tests.add(N, priorityTest);
+            return true;
+        }
+        return false;
+    }
+
+    public void randomizeTests()
+    {
+        Collections.shuffle(_tests);
     }
 }

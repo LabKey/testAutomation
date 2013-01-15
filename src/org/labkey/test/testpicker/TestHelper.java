@@ -252,17 +252,11 @@ public class TestHelper
             if (suite.isSuite())
             {
                 CheckNode suiteNode = new CheckNode(suite);
-                Class[] tests = suite.tests;
-                Arrays.sort(tests, new Comparator<Class>()
+                List<String> testNames = suite.getTestNames();
+                Collections.sort(testNames);
+                for (String test : testNames)
                 {
-                    public int compare(Class o1, Class o2)
-                    {
-                        return o1.getSimpleName().compareTo(o2.getSimpleName());
-                    }
-                });
-                for (Class test : suite.tests)
-                {
-                    CheckNode testNode = new CheckNode(test.getSimpleName(), false, false);
+                    CheckNode testNode = new CheckNode(test, false, false);
                     suiteNode.add(testNode);
                 }
                 _treeRoot.add(suiteNode);

@@ -27,6 +27,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.labkey.test.testpicker.TestHelper;
+import org.labkey.test.tests.BasicTest;
+import org.labkey.test.tests.DatabaseDiagnosticsTest;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.JUnitFooter;
@@ -129,7 +131,7 @@ public class Runner extends TestSuite
         }
    }
 
-    private static Class[] readClasses(File file)
+    private static List<Class> readClasses(File file)
     {
         List<Class> testClasses = new ArrayList<Class>();
 
@@ -173,33 +175,23 @@ public class Runner extends TestSuite
             }
         }
 
-        return testClasses.toArray(new Class[testClasses.size()]);
+        return testClasses;
     }
 
-    private static Class[] readClasses(File recentlyFailedTestsFile, Class[] tests)
+    private static Class[] readClasses(File recentlyFailedTestsFile, List<Class> tests)
     {
-        Class[] recentlyFailedTests = readClasses(recentlyFailedTestsFile);
+        List<Class> recentlyFailedTests = readClasses(recentlyFailedTestsFile);
         ArrayList<Class> filteredRecentlyFailedTests = new ArrayList<Class>();
 
         for (Class item: recentlyFailedTests)
         {
-            if (arrayContains(tests, item))
+            if (tests.contains(item))
             {
                 filteredRecentlyFailedTests.add(item);
             }
         }
         
         return filteredRecentlyFailedTests.toArray(new Class[filteredRecentlyFailedTests.size()]);
-    }
-
-    private static boolean arrayContains(Class[] array, Class clazz)
-    {
-        for(Class item : array)
-        {
-            if(item.equals(clazz))
-                return true;
-        }
-        return false;
     }
 
     private static File getRemainingTestsFile()
@@ -333,7 +325,7 @@ public class Runner extends TestSuite
     private static List<Class> getTestClasses(TestSet testSet, List<String> testNames)
     {
         Map<String, Class> nameMap = new HashMap<String, Class>();
-        for (Class testClass : testSet.tests)
+        for (Class testClass : testSet.getTestList())
         {
             String simpleName = testClass.getSimpleName().toLowerCase();
             nameMap.put(simpleName, testClass);
@@ -357,17 +349,12 @@ public class Runner extends TestSuite
             if (testClass == null)
             {
                 System.err.println("Couldn't find test '" + testName + "' in suite '" + testSet.name() + "'.  Valid tests are:");
-                Class[] sortedTests = new Class[testSet.tests.length];
-                System.arraycopy(testSet.tests, 0, sortedTests, 0, testSet.tests.length);
-                Arrays.sort(sortedTests, new Comparator<Class>(){
-                    public int compare(Class c1, Class c2)
-                    {
-                        return c1.getSimpleName().compareTo(c2.getSimpleName());
-                    }
-                });
 
-                for (Class c : sortedTests)
-                    System.err.println("    " + c.getSimpleName());
+                List<String> sortedTests = testSet.getTestNames();
+                Collections.sort(sortedTests);
+
+                for (String c : sortedTests)
+                    System.err.println("    " + c);
                 System.exit(1);
             }
             testClasses.add(testClass);
@@ -631,18 +618,18 @@ public class Runner extends TestSuite
         return result.toString();
     }
 
-    public static Class[] getAllTests()
+    public static List<Class> getAllTests()
     {
         List<Class> tests = new ArrayList<Class>();
         for (TestSet testSet : TestSet.values())
         {
-            for (Class testClass : testSet.tests)
+            for (Class testClass : testSet.getTestList())
             {
                 if (!tests.contains(testClass))
                     tests.add(testClass);
             }
         }
-        return tests.toArray(new Class[tests.size()]);
+        return tests;
     }
 
     protected static TestSet getTestSet()
@@ -745,13 +732,13 @@ public class Runner extends TestSuite
         {
             throw new RuntimeException("Invalid parameters: 'memCheck = true' and 'disableAssertions = true'.  Unable to do leak check with assertions disabled.");
         }
-        
+
         if (TestSet.CONTINUE == set)
         {
             set.setTests(readClasses(getRemainingTestsFile()));
             if (shuffleTests)
             {
-                randomizeTests(set.tests);
+                set.randomizeTests();
             }
         }
         else if (TestSet.TEST == set && !testNames.isEmpty())
@@ -762,27 +749,26 @@ public class Runner extends TestSuite
         {
             if (shuffleTests)
             {
-                randomizeTests(set.tests);
+                set.randomizeTests();
             }
             if (testNewAndModified)
             {
-                frontLoadTestsOfModifiedModules(set.tests, changedFilesFile);
+                frontLoadTestsOfModifiedModules(set, changedFilesFile);
             }
             if (testRecentlyFailed && 0<recentlyFailedTestsFile.length())
             {
                 //put previously failed tests at the front of the test queue (determined by TeamCity).
-                Class[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile), set.tests);
-                if (recentlyFailedTests.length > 0)
+                Class[] recentlyFailedTests = readClasses(new File(recentlyFailedTestsFile), set.getTestList());
+                for (Class test: recentlyFailedTests)
                 {
-                    Class[] all = new Class[set.tests.length + recentlyFailedTests.length];
-                    System.arraycopy(recentlyFailedTests, 0, all, 0, recentlyFailedTests.length);
-                    System.arraycopy(set.tests, 0, all, recentlyFailedTests.length, set.tests.length);
-                    set.setTests(set.getCrawlerTimeout(), all);
+                    set.prioritizeTest(test, 0);
                 }
             }
         }
 
-        prioritizeTest("BasicTest", set.tests, 0); // Always start with BasicTest (if present)
+        set.prioritizeTest(BasicTest.class, 0); // Always start with BasicTest (if present)
+
+        set.prioritizeTest(DatabaseDiagnosticsTest.class, set.getTestList().size() - 1); // Always end with DatabaseDiagnosticsTest (if present)
 
         List<Class> testClasses = testNames.isEmpty() ? set.getTestList() : getTestClasses(set, testNames);
 
@@ -811,21 +797,7 @@ public class Runner extends TestSuite
         return suite;
     }
 
-    private static void randomizeTests(Class[] tests)
-    {
-        java.util.Random rand = new java.util.Random();
-
-        for (int i = 0; i < tests.length; i++)
-        {
-            Class temp;
-            int j = Math.abs(rand.nextInt()) % tests.length;
-            temp = tests[i];
-            tests[i] = tests[j];
-            tests[j] = temp;
-        }
-    }
-
-    private static void frontLoadTestsOfModifiedModules(Class[] testClasses, String changedFilesFile)
+    private static void frontLoadTestsOfModifiedModules(TestSet set, String changedFilesFile)
     {
         List<String> moduleDirs = getModifiedModuleDirectories(changedFilesFile);
 
@@ -835,7 +807,7 @@ public class Runner extends TestSuite
             TestMap tm = new TestMap(); // Stores Tests, keyed by associated module directory.
 
             // Record the associated module directories for all selected tests.
-            for (Class testClass : testClasses)
+            for (Class testClass : set.getTestList())
             {
                 if (!WebTest.class.isAssignableFrom(testClass))
                     continue;
@@ -884,7 +856,7 @@ public class Runner extends TestSuite
                     for (Class test : associatedTests)
                     {
                         // Bubble up associated Test, if present.
-                        if (prioritizeTest(test.getSimpleName(), testClasses, movedTests))
+                        if (set.prioritizeTest(test, movedTests))
                         {
                             movedTests++;
                         }
@@ -951,26 +923,6 @@ public class Runner extends TestSuite
         }
 
         return Collections.emptyList();
-    }
-
-    // Move the named test to the Nth position in the list, maintaining the order of all other tests.     
-    private static boolean prioritizeTest(String priorityTest, Class[] testList, int N)
-    {
-        for(int i = N; i < testList.length; i++)
-        {
-            if (testList[i].getSimpleName().equals(priorityTest))
-            {
-                Class temp;
-                for(int j = i; j > N; j--)
-                {
-                    temp = testList[j];
-                    testList[j] = testList[j-1];
-                    testList[j-1] = temp;
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
     private static Class getTestClass(Test test)
