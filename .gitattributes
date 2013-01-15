@@ -295,12 +295,14 @@ src/org/labkey/test/tests/SecurityTestExtended.java -text
 src/org/labkey/test/tests/SequenceTest.java -text
 src/org/labkey/test/tests/SimpleApiTest.java -text
 src/org/labkey/test/tests/SimpleApiTestWD.java -text
+src/org/labkey/test/tests/SimpleApiWDTest.java -text
 src/org/labkey/test/tests/SimpleModuleTest.java -text
 src/org/labkey/test/tests/SpecimenMergeTest.java -text
 src/org/labkey/test/tests/SpecimenProgressReportTest.java -text
 src/org/labkey/test/tests/SpecimenTest.java -text
 src/org/labkey/test/tests/StudyBaseTest.java -text
 src/org/labkey/test/tests/StudyBaseTestWD.java -text
+src/org/labkey/test/tests/StudyBaseWDTest.java -text
 src/org/labkey/test/tests/StudyCohortExportTest.java -text
 src/org/labkey/test/tests/StudyDemoModeTest.java -text
 src/org/labkey/test/tests/StudyExportTest.java -text
@@ -313,6 +315,7 @@ src/org/labkey/test/tests/StudyReloadTest.java -text
 src/org/labkey/test/tests/StudySecurityTest.java -text
 src/org/labkey/test/tests/StudyShortTest.java -text
 src/org/labkey/test/tests/StudyTest.java -text
+src/org/labkey/test/tests/StudyWDTest.java -text
 src/org/labkey/test/tests/SurveyTest.java -text
 src/org/labkey/test/tests/SystemMaintenanceTest.java -text
 src/org/labkey/test/tests/TargetStudyTest.java -text
