@@ -30,7 +30,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "MicroarrayBVTProject";
     private static final String EXTRACTION_SERVER = "http://www.google.com";
-    private static final String ASSAY_NAME = "Test Assay 1";
+    private static final String ASSAY_NAME = "Agilent mRNA 1-Color Microarray v10.";
     private static final String IMPORT_MAGEML = "Import MAGE-ML";
     private static final String ASSAY_DESCRIPTION = "Test Assay 1 Description";
     private static final String MAGEML_FILE1 = "test1_MAGEML.xml";
@@ -40,7 +40,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
     private static final String RUN_INTEGER_FIELD = "RunIntegerField";
     private static final String XPATH_TEST = "/MAGE-ML/Descriptions_assnlist/Description/Annotations_assnlist/OntologyEntry[@category='Producer']/@value";
     private static final String DATA_FIELD_TEST_NAME = "TestDataField1";
-    private static final String SAMPLE_SET = "Test Sample Set";   
+    private static final String SAMPLE_SET = "Test Sample Set";
     private static final String SAMPLE_SET_ROWS = "Name\tBarcode\n" +
             "First\t251379110131_A01\n" +
             "Second\t251379110131_A01\n" +
@@ -89,7 +89,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickButton("Save", 0);
         waitForText("Save successful.", 20000);
         clickButton("Save & Close");
-        
+
         log("Setup the pipeline");
 
         setPipelineRoot(getLabKeyRoot() + "/sampledata/Microarray");
@@ -131,6 +131,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         waitForText(ASSAY_NAME + " Runs", 30000);
         assertTextPresent("SingleRunProperties");
 
+        verifyCanCreateCustomView();
         validateRuns();
 
         // Now try doing the runs in bulk, so delete the existing runs
@@ -147,7 +148,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         selectImportDataAction("Use " + ASSAY_NAME);
 
         setFormElement("batchStringField", "BulkProperties");
-        
+
         assertFormElementEquals("batchStringField", "BulkProperties");
         checkRadioButton("__enableBulkProperties", "on");
         // Try with an invalid sample name first
@@ -205,6 +206,15 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         validateRuns();
     }
 
+    //Issue 16934: Assay schema names too long for query.customview
+    private void verifyCanCreateCustomView()
+    {
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.saveCustomView("unneeded view");
+        assertTextNotPresent(("Error"));
+    }
+
+
     private void validateRuns()
     {
         log("Test run inputs");
@@ -221,10 +231,10 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText(MAGEML_FILE2));
         assertTextPresent("115468002");
         clickLink(Locator.raw("//a[contains(text(), '" + MAGEML_FILE2 + "')]/../..//td/a[contains(text(), 'view')]"));
-        waitForText(ASSAY_NAME + " Description", 30000);
+        waitForText(ASSAY_DESCRIPTION, 30000);
         assertTextPresent(DATA_FIELD_TEST_NAME);
         clickAndWait(Locator.linkWithText("view results"));
-        waitForText(ASSAY_NAME + " Description", 30000);
+        waitForText(ASSAY_DESCRIPTION, 30000);
         assertTextPresent(DATA_FIELD_TEST_NAME);
 
         log("Test graph views");
