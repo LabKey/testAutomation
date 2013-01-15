@@ -102,6 +102,7 @@ public enum TestSet
         FlowImportTest.class,
         FlowNormalizationTest.class,
         FlowCBCTest.class,
+        FlowSpecimenTest.class,
         DataRegionTest.class,
         UserPermissionsTest.class,
         SampleSetTest.class,
@@ -241,7 +242,8 @@ public enum TestSet
         FlowJoQueryTest.class,
         FlowImportTest.class,
         FlowNormalizationTest.class,
-        FlowCBCTest.class
+        FlowCBCTest.class,
+        FlowSpecimenTest.class
     ),
 
     // Many (but not all) of the tests that use wiki functionality

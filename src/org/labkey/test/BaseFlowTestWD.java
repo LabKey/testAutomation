@@ -276,7 +276,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         submit();
     }
 
-    protected void setProtocolMetadata(String participantColumn, String dateColumn, String visitColumn, boolean setBackground)
+    protected void setProtocolMetadata(String specimenIdColumn, String participantColumn, String dateColumn, String visitColumn, boolean setBackground)
     {
         log("** Specify ICS metadata");
         goToFlowDashboard();
@@ -284,7 +284,10 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
 
         // specify PTID and Visit/Date columns
-        selectOptionByText("ff_participantColumn", participantColumn);
+        if (specimenIdColumn != null)
+            selectOptionByText("ff_specimenIdColumn", specimenIdColumn);
+        if (participantColumn != null)
+            selectOptionByText("ff_participantColumn", participantColumn);
         if (dateColumn != null)
             selectOptionByText("ff_dateColumn", dateColumn);
         if (visitColumn != null)
@@ -552,7 +555,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     {
         assertTitleEquals("Import Analysis: Confirm: " + containerPath);
 
-        assertTextPresent("Workspace: " + workspacePath);
+        assertTextPresent(workspacePath);
 
         if (analysisEngine.equals("FlowJoWorkspace"))
             assertTextPresent("Analysis Engine: No analysis engine selected");
@@ -567,13 +570,13 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         }
 
         if (existingAnalysisFolder)
-            assertTextPresent("Existing Analysis Folder: " + analysisFolder);
+            assertTextPresent("Existing Analysis Folder:", analysisFolder);
         else
-            assertTextPresent("New Analysis Folder: " + analysisFolder);
+            assertTextPresent("New Analysis Folder:", analysisFolder);
 
-        // XXX: assert fcsPath is present: need to normalize windows path backslashes
-        if (keywordDirs == null)
-            assertTextPresent("FCS File Path: none set");
+//        // XXX: assert fcsPath is present: need to normalize windows path backslashes
+//        if (keywordDirs == null)
+//            assertTextPresent("FCS File Path: none set");
 
         clickButton("Finish");
         waitForPipeline(containerPath);

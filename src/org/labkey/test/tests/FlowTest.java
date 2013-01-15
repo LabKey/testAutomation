@@ -374,7 +374,7 @@ public class FlowTest extends BaseFlowTestWD
     protected void configureSampleSetAndMetadata()
     {
         uploadSampleDescriptions("/sampledata/flow/8color/sample-set.tsv", new String[] { "Exp Name", "Well Id" }, new String[] { "EXPERIMENT NAME", "WELL ID"});
-        setProtocolMetadata("Sample PTID", null, "Sample Visit", true);
+        setProtocolMetadata(null, "Sample PTID", null, "Sample Visit", true);
 
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("49 sample descriptions"));

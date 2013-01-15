@@ -231,6 +231,7 @@ src/org/labkey/test/tests/FlowImportTest.java -text
 src/org/labkey/test/tests/FlowJoQueryTest.java -text
 src/org/labkey/test/tests/FlowNormalizationTest.java -text
 src/org/labkey/test/tests/FlowShortTest.java -text
+src/org/labkey/test/tests/FlowSpecimenTest.java -text
 src/org/labkey/test/tests/FlowTest.java -text
 src/org/labkey/test/tests/FolderExportTest.java -text
 src/org/labkey/test/tests/FolderTest.java -text
