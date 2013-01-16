@@ -1625,16 +1625,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         catch (TestTimeoutException e)
         {
             _testTimeout = true;
-            _testFailed = true;
-            e.printStackTrace();
-            throw e;
-        }
-        catch (Exception e)
-        {
-            // Log the failure before we attempt any other cleanup in the finally block below
-            // This ensures that we don't lose the original failure if the cleanup fails for
-            // some reason with a new exception
-            e.printStackTrace();
             throw e;
         }
         finally

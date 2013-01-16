@@ -1330,15 +1330,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         catch (TestTimeoutException e)
         {
             _testTimeout = true;
-            e.printStackTrace();
-            throw e;
-        }
-        catch (Exception e)
-        {
-            // Log the failure before we try attempt any other cleanup in the finally block below
-            // This ensures that we don't lose the original failure if the cleanup fails for some reason
-            // with a new exception
-            e.printStackTrace();
             throw e;
         }
         finally
