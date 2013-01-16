@@ -148,7 +148,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
         //TODO: need to fix 454/genotyping tests
         importRunTest();
-////        importRunAgainTest(); //bug Issue 13695
+        importRunAgainTest(); //Issue 13695
         runAnalysisTest();
         importSecondRunTest();
         verifyIlluminaSampleSheet();
