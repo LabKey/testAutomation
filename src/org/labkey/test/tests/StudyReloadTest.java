@@ -20,11 +20,9 @@ import org.labkey.test.Locator;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 4/5/12
  * Time: 3:16 PM
- * To change this template use File | Settings | File Templates.
  */
 public class StudyReloadTest extends StudyBaseTest
 {
@@ -46,6 +44,5 @@ public class StudyReloadTest extends StudyBaseTest
         assertTextPresent("id006", "additional_column");
         //text that was present in original but removed in the update
         assertTextNotPresent("id005", "original_column_numeric");
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 }

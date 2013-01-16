@@ -23,11 +23,9 @@ import java.util.ArrayList;
 import java.io.Serializable;
 
 /**
- * Created by IntelliJ IDEA.
  * User: ulberge
  * Date: Aug 27, 2007
  * Time: 4:41:27 PM
- * To change this template use File | Settings | File Templates.
  */
 public class TestConfig implements Serializable
 {

@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 /**
- * Created with IntelliJ IDEA.
  * User: bimber
  * Date: 12/12/12
  * Time: 12:17 PM

@@ -34,7 +34,7 @@ public class LibraTest extends MS2Test
     @Override
     protected String getProjectName()
     {
-        return "LibraTest" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;  //To change body of implemented methods use File | Settings | File Templates.
+        return "LibraTest" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
     protected void configure()
@@ -241,6 +241,6 @@ public class LibraTest extends MS2Test
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "server/modules/ms2";
     }
 }

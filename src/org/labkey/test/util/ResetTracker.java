@@ -16,11 +16,9 @@
 package org.labkey.test.util;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 8/5/11
  * Time: 11:13 AM
- * To change this template use File | Settings | File Templates.
  */
 
 import org.junit.Assert;

@@ -22,11 +22,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 6/14/12
  * Time: 1:58 PM
- * To change this template use File | Settings | File Templates.
  */
 public class TargetedMSTest extends BaseSeleniumWebTest
 {

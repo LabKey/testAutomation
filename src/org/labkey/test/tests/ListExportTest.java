@@ -23,11 +23,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 1/11/12
  * Time: 7:04 PM
- * To change this template use File | Settings | File Templates.
  */
 public class ListExportTest extends ListTest
 {
@@ -83,7 +81,7 @@ public class ListExportTest extends ListTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "server/modules/list";
     }
 
     private class FilterOnName implements FilenameFilter

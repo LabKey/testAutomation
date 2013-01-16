@@ -22,11 +22,9 @@ import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.BaseSeleniumWebTest;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 9/12/12
  * Time: 11:52 AM
- * To change this template use File | Settings | File Templates.
  */
 public class APIUserHelper extends AbstractUserHelper
 {

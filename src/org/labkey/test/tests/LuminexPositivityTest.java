@@ -24,11 +24,9 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 2/21/12
  * Time: 1:37 PM
- * To change this template use File | Settings | File Templates.
  */
 public class LuminexPositivityTest extends LuminexTest
 {

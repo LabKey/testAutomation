@@ -22,11 +22,9 @@ import java.io.File;
 import java.util.Calendar;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 2/20/12
  * Time: 1:02 PM
- * To change this template use File | Settings | File Templates.
  */
 public class LuminexAsyncImportTest extends LuminexTest
 {

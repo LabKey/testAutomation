@@ -22,7 +22,6 @@ import org.labkey.test.util.LabModuleHelper;
 import java.util.Date;
 
 /**
- * Created with IntelliJ IDEA.
  * User: bimber
  * Date: 11/27/12
  * Time: 1:15 PM

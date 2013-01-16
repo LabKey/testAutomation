@@ -21,11 +21,9 @@ import org.labkey.test.util.APIAssayHelper;
 import java.util.Collections;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 9/14/12
  * Time: 2:06 PM
- * To change this template use File | Settings | File Templates.
  */
 public class AssayAPITest extends BaseSeleniumWebTest
 {
@@ -83,12 +81,11 @@ public class AssayAPITest extends BaseSeleniumWebTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "server/modules/assay";
     }
 }

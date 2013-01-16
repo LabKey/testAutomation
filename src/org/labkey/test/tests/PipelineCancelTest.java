@@ -58,6 +58,6 @@ public class PipelineCancelTest  extends BaseWebDriverTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "server/modules/pipeline";
     }
 }

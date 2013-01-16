@@ -20,11 +20,9 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 9/12/12
  * Time: 12:09 PM
- * To change this template use File | Settings | File Templates.
  */
 public class UIUserHelper extends AbstractUserHelper
 {

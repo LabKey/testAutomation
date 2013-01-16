@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
  * User: bimber
  * Date: 11/7/12
  * Time: 8:48 PM

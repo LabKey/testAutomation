@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * Created with IntelliJ IDEA.
  * User: bimber
  * Date: 11/27/12
  * Time: 2:22 PM

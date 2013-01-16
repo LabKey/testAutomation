@@ -18,11 +18,9 @@ package org.labkey.test.util;
 import org.labkey.test.BaseSeleniumWebTest;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 9/12/12
  * Time: 11:45 AM
- * To change this template use File | Settings | File Templates.
  */
 public abstract class AbstractUserHelper extends AbstractHelper
 {

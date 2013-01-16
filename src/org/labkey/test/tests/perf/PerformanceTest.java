@@ -22,11 +22,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 12/5/12
  * Time: 11:48 AM
- * To change this template use File | Settings | File Templates.
  */
 public abstract class PerformanceTest extends BaseWebDriverTest
 {
@@ -35,7 +33,7 @@ public abstract class PerformanceTest extends BaseWebDriverTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     protected PerformanceTest()

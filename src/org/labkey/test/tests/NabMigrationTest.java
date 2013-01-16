@@ -21,11 +21,9 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 5/10/12
  * Time: 6:26 PM
- * To change this template use File | Settings | File Templates.
  */
 public class NabMigrationTest extends NabOldTest
 {

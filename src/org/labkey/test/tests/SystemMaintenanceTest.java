@@ -20,18 +20,16 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 8/25/12
  * Time: 6:23 PM
- * To change this template use File | Settings | File Templates.
  */
 public class SystemMaintenanceTest extends BaseSeleniumWebTest
 {
     @Override
     protected String getProjectName()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 
     @Override
@@ -60,12 +58,12 @@ public class SystemMaintenanceTest extends BaseSeleniumWebTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+
     }
 
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return null;
     }
 }

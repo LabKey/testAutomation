@@ -37,7 +37,7 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
     //this project will remain unaltered and copy every property from the site.
     protected String getProjectName()
     {
-        return "Copycat Project";  //To change body of implemented methods use File | Settings | File Templates.
+        return "Copycat Project";
     }
 
     protected void goToSiteLookAndFeel()
@@ -120,6 +120,6 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "server/modules/core";
     }
 }

@@ -22,11 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 12/27/12
  * Time: 7:02 PM
- * To change this template use File | Settings | File Templates.
  */
 public class ICEMRModuleTest extends BaseWebDriverTest
 {
@@ -37,7 +35,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     @Override
     protected String getProjectName()
     {
-        return "ICEMR assay test";  //To change body of implemented methods use File | Settings | File Templates.
+        return "ICEMR assay test";
     }
 
     @Override
@@ -128,7 +126,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "server/customModules/icemr";
     }
 
     protected void setICEMRField(String field, String value)

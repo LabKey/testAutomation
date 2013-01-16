@@ -24,11 +24,9 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 9/18/12
  * Time: 1:36 PM
- * To change this template use File | Settings | File Templates.
  */
 public class UIAssayHelper extends AbstractAssayHelper
 {
@@ -39,7 +37,7 @@ public class UIAssayHelper extends AbstractAssayHelper
 
     public void importAssay(int assayID, String file, String projectPath) throws CommandException, IOException
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new RuntimeException("Not implemented");
     }
 
     @Override
@@ -55,9 +53,6 @@ public class UIAssayHelper extends AbstractAssayHelper
         _test.checkRadioButton("dataCollectorName", "File upload");
         _test.setFormElement("__primaryFile__", new File(file));
         _test.clickButton("Save and Finish");
-
-
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

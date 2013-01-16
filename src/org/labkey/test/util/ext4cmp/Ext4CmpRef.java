@@ -21,11 +21,9 @@ import org.labkey.test.util.Ext4Helper;
 import java.util.List;
 
 /**
-* Created by IntelliJ IDEA.
 * User: markigra
 * Date: 5/31/12
 * Time: 10:43 PM
-* To change this template use File | Settings | File Templates.
 */
 public class Ext4CmpRef
 {

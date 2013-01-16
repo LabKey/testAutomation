@@ -27,11 +27,9 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 9/14/12
  * Time: 2:45 PM
- * To change this template use File | Settings | File Templates.
  */
 
 public class APIAssayHelper extends AbstractAssayHelper
