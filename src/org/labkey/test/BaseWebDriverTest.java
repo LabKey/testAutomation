@@ -2530,6 +2530,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         pauseJsErrorChecker();
         _driver.navigate().to(getBaseURL() + relativeURL);
+        waitForExtOnReady();
         resumeJsErrorChecker();
     }
 
@@ -3364,8 +3365,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForPageToLoad(defaultWaitForPage);
     }
 
-//TODO: New, experimental method for waiting for pages to load without invoking selenium.waitForPagetoLoad
-//Acceptable performance needs to be verified before rollout
     private Boolean _preppedForPageLoad = false;
     public void prepForPageLoad()
     {
@@ -3375,7 +3374,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void newWaitForPageToLoad(int millis)
     {
-        if (!_preppedForPageLoad) throw new IllegalStateException("Please call prepForPageLoad() before performing the action that would trigger this page load.");
+        if (!_preppedForPageLoad) throw new IllegalStateException("Please call prepForPageLoad() before performing the action that would trigger the expected page load.");
         _testTimeout = true;
         waitFor(new Checker()
         {
@@ -3387,6 +3386,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
         }, "Page failed to load", millis);
         _testTimeout = false;
+        waitForExtOnReady();
         _preppedForPageLoad = false;
     }
 
@@ -4172,6 +4172,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         WebElement el;
         el = l.findElement(_driver);
 
+        if (pageTimeoutMs > 0)
+            prepForPageLoad();
+
         try
         {
             el.click();
@@ -4184,7 +4187,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         if (pageTimeoutMs > 0)
-            waitForPageToLoad(pageTimeoutMs);
+            newWaitForPageToLoad(pageTimeoutMs);
         else if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_APPEAR)
             _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
         else if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
@@ -4932,11 +4935,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Locator.XPathLocator buttonLocator = getButtonLocator(text);
         if (buttonLocator != null)
             clickAndWait(buttonLocator, waitMillis);
-        else if(waitMillis==WAIT_FOR_EXT_MASK_TO_APPEAR)
-            _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
-
-        else if(waitMillis==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
-            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         else
             Assert.fail("No button found with text \"" + text + "\"");
     }
