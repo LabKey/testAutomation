@@ -196,6 +196,7 @@ public enum TestSet
         ElisaAssayTest.class,
         ContainerContextTest.class,
         ICEMRModuleTest.class,
+        FlowAnalysisResolverTest.class,
         SurveyTest.class
     ),
 

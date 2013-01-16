@@ -308,6 +308,18 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         submit();
     }
 
+
+    protected void importFCSFiles()
+    {
+        clickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
+
+
+        _extHelper.selectFileBrowserItem("flowjoquery/microFCS");
+        selectImportDataAction("Import Directory of FCS Files");
+        clickButton("Import Selected Runs");
+        waitForPipeline(getContainerPath());
+    }
+
     protected void importExternalAnalysis(String containerPath, String analysisZipPath)
     {
         goToFlowDashboard();
@@ -555,7 +567,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     {
         assertTitleEquals("Import Analysis: Confirm: " + containerPath);
 
-        assertTextPresent(workspacePath);
+        assertTextPresent("Workspace:", workspacePath);
 
         if (analysisEngine.equals("FlowJoWorkspace"))
             assertTextPresent("Analysis Engine: No analysis engine selected");
@@ -573,7 +585,8 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
             assertTextPresent("Existing Analysis Folder:", analysisFolder);
         else
             assertTextPresent("New Analysis Folder:", analysisFolder);
-
+        if (keywordDirs == null)
+            assertTextPresent("FCS File Path:","none set");
 //        // XXX: assert fcsPath is present: need to normalize windows path backslashes
 //        if (keywordDirs == null)
 //            assertTextPresent("FCS File Path: none set");
