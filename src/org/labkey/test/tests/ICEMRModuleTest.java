@@ -80,17 +80,18 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     private void enterData()
     {
         Map<String, String> fieldAndValue = new HashMap<String, String>();
-        fieldAndValue.put("scientist", SCIENTIST);
-        fieldAndValue.put("id", ID);
-        fieldAndValue.put("initparasitemia", (".3"));
-        fieldAndValue.put("parasitedensity", "-34"); // invalid: can't have negative number
-        fieldAndValue.put("initgametocytemia", "3.5");
-        fieldAndValue.put("gametocytedensity", "3.4"); // invalid: can't have a float for an int
-        fieldAndValue.put("patienthemoglobin", "300.4");
-        fieldAndValue.put("hematocrit", "500"); // invalid: can't have percentage > 100
+        fieldAndValue.put("Scientist", SCIENTIST);
+        fieldAndValue.put("ParticipantID", ID);
+        fieldAndValue.put("ProcessingProtocol", "1");
+        fieldAndValue.put("InitParasitemia", (".3"));
+        fieldAndValue.put("ParasiteDensity", "-34"); // invalid: can't have negative number
+        fieldAndValue.put("InitGametocytemia", "3.5");
+        fieldAndValue.put("GametocyteDensity", "3.4"); // invalid: can't have a float for an int
+        fieldAndValue.put("PatientHemoglobin", "300.4");
+        fieldAndValue.put("Hematocrit", "500"); // invalid: can't have percentage > 100
 //        fieldAndValue.put("thinbloodsmear", "3.4");
-        fieldAndValue.put("rdt", "3.4"); //this should be ignored
-        fieldAndValue.put("freezerproid", "3.4");
+        fieldAndValue.put("RDT", "3.4"); //this should be ignored
+        fieldAndValue.put("FreezerProID", "3.4");
 
         for(String field : fieldAndValue.keySet())
         {
@@ -103,16 +104,16 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         verifyError();
 
         // correct negative number error
-        setICEMRField("parasitedensity", "34");
+        setICEMRField("ParasiteDensity", "34");
         verifyError();
 
         // correct float in int column error
-        setICEMRField("gametocytedensity", "34");
+        setICEMRField("GametocyteDensity", "34");
         verifyError();
 
         // correct > 100 percent error
         // the form should submit now
-        setICEMRField("hematocrit", "5");
+        setICEMRField("Hematocrit", "5");
         clickButton("Submit");
         waitForText(ASSAY_NAME + " Runs");
     }
