@@ -1668,7 +1668,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 }
                 try
                 {
-                    dump();
+                    dumpPageSnapshot();
                     if (onTeamCity())
                     {
                         dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
@@ -1688,14 +1688,20 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     {
                         resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
                     }
-                    catch(Throwable t){log("Failed to reset DB login config after test failure");}
+                    catch(Throwable t){
+                        log("Failed to reset DB login config after test failure");
+                        dumpPageSnapshot("resetDbLogin");
+                    }
 
                     try
                     {
                         if (isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
                             fixPipelineToolsDirectory();
                     }
-                    catch(Throwable t){log("Failed to fix pipeline tools directory after test failure");}
+                    catch(Throwable t){
+                        log("Failed to fix pipeline tools directory after test failure");
+                        dumpPageSnapshot("fixPipelineToolsDir");
+                    }
                 }
             }
 
@@ -2243,11 +2249,22 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return dumpDir;
     }
 
-    public void dump()
+    public void dumpPageSnapshot()
+    {
+        dumpPageSnapshot(null);
+    }
+
+    public void dumpPageSnapshot(@Nullable String subdir)
     {
         try
         {
             File dumpDir = ensureDumpDir();
+            if (subdir != null && subdir.length() > 0)
+            {
+                dumpDir = new File(dumpDir, subdir);
+                if ( !dumpDir.exists() )
+                    dumpDir.mkdirs();
+            }
             FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
             String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
 
@@ -2260,7 +2277,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (Exception e)
         {
-            log("Error executing dump()");
+            log("Error executing dumpPageSnapshot()");
         }
     }
 

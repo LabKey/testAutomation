@@ -18,7 +18,6 @@ package org.labkey.test;
 
 import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.SeleniumException;
-import junit.framework.AssertionFailedError;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -1357,7 +1356,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             {
                 try
                 {
-                    dump();
+                    dumpPageSnapshot();
                     if (onTeamCity())
                     {
                         dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
@@ -1376,13 +1375,19 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                     try{
                         resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
                     }
-                    catch(Throwable t){log("Failed to reset DB long config after test failure");}
+                    catch(Throwable t){
+                        log("Failed to reset DB long config after test failure");
+                        dumpPageSnapshot("resetDbLogin");
+                    }
 
                     try{
                         if (isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
                             fixPipelineToolsDirectory();
                     }
-                    catch(Throwable t){log("Failed to fix pipeline tools directory after test failure");}
+                    catch(Throwable t){
+                        log("Failed to fix pipeline tools directory after test failure");
+                        dumpPageSnapshot("fixPipelineToolsDir");
+                    }
                 }
             }
 
@@ -1856,11 +1861,22 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return dumpDir;
     }
 
-    public void dump()
+    public void dumpPageSnapshot()
+    {
+        dumpPageSnapshot(null);
+    }
+
+    public void dumpPageSnapshot(@Nullable String subdir)
     {
         try
         {
             File dumpDir = ensureDumpDir();
+            if (subdir != null && subdir.length() > 0)
+            {
+                dumpDir = new File(dumpDir, subdir);
+                if ( !dumpDir.exists() )
+                    dumpDir.mkdirs();
+            }
             FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
             String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
 
@@ -1870,7 +1886,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
         catch (Exception e)
         {
-            log("Error executing dump()");
+            log("Error executing dumpPageSnapshot()");
         }
     }
 

@@ -84,7 +84,7 @@ public class JUnitTest extends TestSuite
         public String getAssociatedModuleDirectory() { return null; }
     }
 
-    // uck. use BaseSeleniumWebTest to ensure we're upgraded
+    // Use WebDriver to ensure we're upgraded
     private static void upgradeHelper() throws Exception
     {
         // TODO: remove upgrade helper from JUnitTest and run before suite starts.
@@ -98,12 +98,12 @@ public class JUnitTest extends TestSuite
         }
         catch (Exception e)
         {
-            helper.dump();
+            helper.dumpPageSnapshot();
             throw e;
         }
         catch (AssertionError a)
         {
-            helper.dump();
+            helper.dumpPageSnapshot();
             throw a;
         }
         finally
