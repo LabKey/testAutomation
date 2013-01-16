@@ -25,6 +25,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONValue;
@@ -155,15 +156,18 @@ public class JUnitTest extends TestSuite
                 if (json == null || !(json instanceof Map))
                     throw new AssertionFailedError("Can't parse or cast json response: " + responseBody);
 
-                Map<String, List<String>> obj = (Map<String, List<String>>)json;
-                for (Map.Entry<String, List<String>> entry : obj.entrySet())
+                Map<String, List<Map<String, Object>>> obj = (Map<String, List<Map<String, Object>>>)json;
+                for (Map.Entry<String, List<Map<String, Object>>> entry : obj.entrySet())
                 {
                     String suiteName = entry.getKey();
-                    List<String> arr = entry.getValue();
                     TestSuite testsuite = new TestSuite(suiteName);
-                    for (String test : arr)
+                    // Individual tests include both the class name and the requested timeout
+                    for (Map<String, Object> testClass : entry.getValue())
                     {
-                        testsuite.addTest(new RemoteTest(test));
+                        String className = (String)testClass.get("className");
+                        // Timeout is represented in seconds
+                        int timeout = ((Number)testClass.get("timeout")).intValue();
+                        testsuite.addTest(new RemoteTest(className, timeout));
                     }
                     remotesuite.addTest(testsuite);
                 }
@@ -189,11 +193,14 @@ public class JUnitTest extends TestSuite
     public static class RemoteTest extends TestCase
     {
         String _remoteClass;
+        /** Timeout in seconds to wait for the whole testcase to finish on the server */
+        private final int _timeout;
 
-        public RemoteTest(String remoteClass)
+        public RemoteTest(String remoteClass, int timeout)
         {
             super(remoteClass);
             _remoteClass = remoteClass;
+            _timeout = timeout;
         }
 
         @Override
@@ -201,12 +208,12 @@ public class JUnitTest extends TestSuite
         {
             HttpClient client = WebTestHelper.getHttpClient();
             HttpContext context = WebTestHelper.getBasicHttpContext();
-            HttpGet method = null;
             HttpResponse response = null;
             try
             {
                 String url = WebTestHelper.getBaseURL() + "/junit/go.view?testCase=" + _remoteClass;
-                method = new HttpGet(url);
+                HttpGet method = new HttpGet(url);
+                client.getParams().setParameter("http.socket.timeout", _timeout * 1000);
                 response = client.execute(method, context);
                 int status = response.getStatusLine().getStatusCode();
                 String responseBody = WebTestHelper.getHttpResponseBody(response);
