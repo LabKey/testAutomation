@@ -82,7 +82,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         manageSpecimenConfiguration();
 
         createAssayFolder();
-        waitForText("This assay is unlocked");
+        waitForElement(Locator.linkWithText("Specimen Report Study Folder Study specimens"));
         assertTextPresent("33 collections have occurred.",  "48 results from " + assay1 + " have been uploaded", "46 " + assay1 + " queries");
         assertTextNotPresent("Configuration error:",
                 "You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report.");
