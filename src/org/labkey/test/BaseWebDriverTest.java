@@ -1771,7 +1771,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean enableScriptCheck()
     {
-        return false; //"true".equals(System.getProperty("scriptCheck")) && getBrowser().startsWith("*firefox"); TODO: hanging tests on TeamCity
+        return !onTeamCity() && "true".equals(System.getProperty("scriptCheck")) && getBrowser().startsWith("*firefox"); //TODO: hanging tests on TeamCity
     }
 
     public boolean enableDevMode()
@@ -3352,6 +3352,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         _testTimeout = true;
         selenium.waitForPageToLoad(Integer.toString(millis));
+        waitForExtOnReady();
         _testTimeout = false;
     }
 
@@ -6577,7 +6578,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void goToProjectSettings(String project)
     {
-        if(!isLinkPresentWithText(project))
+        if(!isElementPresent(Locator.linkWithText(project)))
             goToHome();
         clickFolder(project);
 
