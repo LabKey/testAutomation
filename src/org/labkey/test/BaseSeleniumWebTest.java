@@ -339,17 +339,20 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @After
     public void tearDown() throws Exception
     {
-        if (this.enableScriptCheck())
+        if (selenium != null)
         {
-            dismissAlerts();
-            endJsErrorChecker();
-        }
+            if (this.enableScriptCheck())
+            {
+                dismissAlerts();
+                endJsErrorChecker();
+            }
+            boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
 
-        boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
-        if (!skipTearDown || onTeamCity())
-        {
-            //selenium.close(); // unnecessary since selenium.stop will close windows.
-            selenium.stop();
+            if (!skipTearDown || onTeamCity())
+            {
+                //selenium.close(); // unnecessary since selenium.stop will close windows.
+                selenium.stop();
+            }
         }
     }
 
