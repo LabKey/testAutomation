@@ -15,10 +15,13 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.http.HttpStatus;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.WikiHelper;
+import org.testng.Assert;
 
 import java.io.File;
 import java.util.HashMap;
@@ -104,7 +107,6 @@ public class SearchTest extends StudyTest
         addWebPart("Lists");
         _listHelper.importListArchive(FOLDER_A, new File(getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip"));
 
-
         clickAndWait(Locator.linkWithText(listToDelete));
         _listHelper.deleteList();
 
@@ -122,11 +124,11 @@ public class SearchTest extends StudyTest
 
     protected void doVerifySteps()
     {
-        sleep(10000); // wait for indexer
+        waitForIndexer();
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
         renameFolder(getProjectName(), getFolderName(), FOLDER_C, false);
         FOLDER_NAME = FOLDER_C;
-        sleep(10000); // wait for indexer
+        waitForIndexer();
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
         moveFolder(getProjectName(), getFolderName(), FOLDER_B, false);
         alterListsAndReSearch();
@@ -157,6 +159,21 @@ public class SearchTest extends StudyTest
         /* No API tests */
     }
     
+    private void waitForIndexer()
+    {
+        try
+        {
+            log("Waiting for indexer");
+            // Invoke a special server action that waits until all previous indexer tasks are complete
+            int response = WebTestHelper.getHttpGetResponse(getBaseURL() + "/search/waitForIndexer.view");
+            Assert.assertEquals(HttpStatus.SC_OK, response, "WaitForIndexer action timed out");
+        }
+        catch (Exception e)
+        {
+            Assert.fail("WaitForIndexer action failed", e);
+        }
+    }
+
     private void verifySyntaxErrorMessages()
     {
         _searchHelper.searchFor("age()");
@@ -188,7 +205,7 @@ public class SearchTest extends StudyTest
         super.doCleanup(afterTest);
         if (afterTest)
         {
-            sleep(5000); // wait for index to update.
+            waitForIndexer();
             _searchHelper.verifyNoSearchResults();
         }
     }
@@ -260,8 +277,7 @@ public class SearchTest extends StudyTest
         _wikiHelper.createWikiPage("RADEOX", WIKI_NAME, WIKI_TITLE, WIKI_CONTENT, new File(getLabKeyRoot() + "/server/module.template.properties"));
         addWebPart("Wiki");
         //Issue 9454: Don't index option for wiki page
-        _wikiHelper.createWikiPage("RADEOX", WIKI_NAME+"UNSEARCHABLE", WIKI_TITLE, WIKI_CONTENT, false, null);
-
+        _wikiHelper.createWikiPage("RADEOX", WIKI_NAME + "UNSEARCHABLE", WIKI_TITLE, WIKI_CONTENT, false, null);
 
         _searchHelper.enqueueSearchItem(WIKI_NAME, Locator.linkWithText(WIKI_TITLE));
         _searchHelper.enqueueSearchItem(WIKI_NAME + "UNSEARCHABLE");
