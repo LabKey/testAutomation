@@ -50,6 +50,7 @@ public class StudyDemoModeTest extends StudyBaseTest
         DemoModeCrawler crawler = new DemoModeCrawler(this);
         crawler.crawlAllLinks(false);
         log("No participant IDs found");
+        goToHome(); // Crawler endpoint in not deterministic
         leaveDemoMode();
     }
 
