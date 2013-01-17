@@ -2687,9 +2687,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _ext4Helper.clickTabContainingText("Project Groups");
         setFormElement(Locator.xpath("//input[contains(@name, 'projectgroupsname')]"), groupName);
         clickButton("Create New Group", 0);
-        sleep(500);
-        waitForText("Group " + groupName);
-        _extHelper.clickExtButton(groupName + " Information", "Done");
+        _extHelper.waitForExtDialog(groupName + " Information");
+        assertTextPresent("Group " + groupName);
+        _extHelper.clickExtButton(groupName + " Information", "Done", 0);
         waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and text()='" + groupName + "']"), WAIT_FOR_JAVASCRIPT);
     }
 
