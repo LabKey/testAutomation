@@ -153,7 +153,7 @@ public class SurveyTest extends BaseWebDriverTest
         _ext4Helper.waitForMaskToDisappear();
         setFormElement(Locator.name("txtAreaField"), "txtAreaField\nnew line");
         _ext4Helper.uncheckCheckbox("Bool Field");
-        clickButton("Save");
+        clickButton("Save", 0);
         _extHelper.waitForExtDialog("Success");
         _extHelper.waitForExtDialogToDisappear("Success");
 
