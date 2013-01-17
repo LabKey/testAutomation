@@ -25,6 +25,7 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.RReportHelperWD;
+import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -46,13 +47,12 @@ public class FlowTest extends BaseFlowTestWD
 
     public int countEnabledInputs(String name)
     {
-        List<Locator> inputs = findAllMatches(Locator.xpath("//input[@name='" + name + "']"));
+        List<WebElement> inputs = Locator.xpath("//input[@name='" + name + "']").findElements(getDriver());
         int ret = 0;
-        for (Locator l : inputs)
+        for (WebElement el : inputs)
         {
-            if (!l.findElement(_driver).isEnabled())
-                continue;
-            ret ++;
+            if (el.isEnabled())
+                ret ++;
         }
         return ret;
     }

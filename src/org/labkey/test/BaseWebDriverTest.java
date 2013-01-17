@@ -2612,8 +2612,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.indexOf(text) != -1);
     }
 
-    public enum SeleniumEvent
-    {blur,change,mousedown,mouseup,click,reset,select,submit,abort,error,load,mouseout,mouseover,unload,keyup}
+    // TODO: Enable once WebDriver conversion is complete
+//    public enum SeleniumEvent
+//    {blur,change,mousedown,mouseup,click,reset,select,submit,abort,error,load,mouseout,mouseover,unload,keyup}
 
     /**
      * Create and fire a JavaScript UIEvent
@@ -3780,7 +3781,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertElementPresent(Locator loc)
     {
-        Assert.assertTrue("Element '" + loc + "' is not present", isElementPresent(loc));
+        Assert.assertTrue("Element is not present: " + loc.getLoggableDescription(), isElementPresent(loc));
     }
 
     /**
@@ -6612,11 +6613,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         for (int i = 0; i < locs.size(); i++)
         {
             locators.add(loc.index(i));
-//            click(loc.index(i));
-//            if (isElementPresent(loc.index(i)))
-//                locators.add(loc.index(i));
-//            else
-//                return locators;
         }
         return locators;
     }

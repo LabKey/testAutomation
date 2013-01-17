@@ -54,36 +54,42 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void verifyDataInAssay()
     {
-        click(Locator.linkContainingText(ID));
-        assertTextPresent(ID, SCIENTIST);
+        waitForElement(Locator.id("dataregion_Data"));
+        for (String value: fieldAndValue.values())
+        {
+            assertElementPresent(Locator.css("#dataregion_Data td").withText(value));
+        }
         goToProjectHome();
     }
 
     private void enterDataPoint()
     {
         Locator.XPathLocator link = Locator.linkContainingText("Upload data");
-        waitForElement(link);
-        sleep(500);
-        click(link);
-        waitForText("Data Import");
+        waitAndClick(link);
+        waitForElement(Locator.id("upload-diagnostic-form-body"));
 
         enterData();
-
     }
 
-    private void verifyError()
+    private void verifyError(int errorCount)
     {
-        clickButton("Submit");
-        waitForText("> Errors in your submission. See below.");
+        clickButton("Submit", 0);
+        waitForElementToDisappear(Locator.css(".x4-form-invalid-field").index(errorCount), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.css(".x4-form-invalid-field").index(errorCount - 1), WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.id("error-div").withText("> Errors in your submission. See below."));
     }
 
+    private Map<String, String> fieldAndValue = new HashMap<String, String>();
     private void enterData()
     {
-        Map<String, String> fieldAndValue = new HashMap<String, String>();
+        verifyError(10);
+
+        fieldAndValue = new HashMap<String, String>();
+
         fieldAndValue.put("Scientist", SCIENTIST);
         fieldAndValue.put("ParticipantID", ID);
         fieldAndValue.put("ProcessingProtocol", "1");
-        fieldAndValue.put("InitParasitemia", (".3"));
+        fieldAndValue.put("InitParasitemia", "0.3");
         fieldAndValue.put("ParasiteDensity", "-34"); // invalid: can't have negative number
         fieldAndValue.put("InitGametocytemia", "3.5");
         fieldAndValue.put("GametocyteDensity", "3.4"); // invalid: can't have a float for an int
@@ -98,30 +104,28 @@ public class ICEMRModuleTest extends BaseWebDriverTest
             setICEMRField(field, fieldAndValue.get(field));
         }
 
-        // we have 3 errors total, fix one at a time
         // Issue 16875: decimals in certain icemr module fields causes js exception
+        assertFormElementEquals(Locator.name("GametocyteDensity"), "34"); // '.' can't be entered
+        fieldAndValue.put("GametocyteDensity", "34"); // update value
+
+        // we have 2 errors total, fix one at a time
         // Issue 16876: need to screen invalid entries in ICEMR module
-        verifyError();
+        verifyError(2);
 
         // correct negative number error
         setICEMRField("ParasiteDensity", "34");
-        verifyError();
-
-        // correct float in int column error
-        setICEMRField("GametocyteDensity", "34");
-        verifyError();
+        verifyError(1);
 
         // correct > 100 percent error
         // the form should submit now
-        setICEMRField("Hematocrit", "5");
+        setICEMRField("Hematocrit", "5.0");
         clickButton("Submit");
-        waitForText(ASSAY_NAME + " Runs");
+        waitForElement(Locator.css(".labkey-nav-page-header").withText(ASSAY_NAME + " Results"));
     }
 
     private void createDiagnosticAssay()
     {
         _assayHelper.createAssayWithDefaults("ICEMR Diagnostics", ASSAY_NAME);
-        waitForText(getProjectName());
     }
 
     @Override
@@ -132,15 +136,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     protected void setICEMRField(String field, String value)
     {
-
-        Locator l =  Locator.xpath("//tr[@id='" + field + "-inputRow']/td/input");
-
-        if(!isElementPresent(l))
-        {
-            l =  Locator.xpath("//td[@id='" + field + "-inputCell']/input");
-
-        }
-        setFormElement(l, value);
-
+        setFormElement(Locator.name(field), value);
+        fieldAndValue.put(field, value);
     }
 }

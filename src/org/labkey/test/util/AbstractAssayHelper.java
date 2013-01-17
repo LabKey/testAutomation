@@ -55,6 +55,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
      * @param pipelineCount  expected count of succesful pipeline jobs including thise one
      * @param name  name of assay file (rest of path removed)
      */
+    @LogMethod
     public void uploadXarFileAsAssayDesign(File file, int pipelineCount, String name)
     {
         Assert.assertTrue("XAR file does not exist: " + file.toString(), file.exists());
@@ -69,6 +70,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + name, false);
     }
 
+    @LogMethod
     public void addAliasedFieldToMetadata(String schemaName, String tableName, String aliasedColumn, String columnName, ListHelper.LookupInfo lookupInfo)
     {
         //go to schema browser
@@ -112,19 +114,20 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
     public abstract void importAssay(String assayName, String file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
+    @LogMethod
     public void createAssayWithDefaults(String type, String name)
     {
         _test.clickButton("New Assay Design");
-        _test.click(Locator.id("providerName_"+ type));
-        _test.sleep(10000);
-        _test.clickButton("Next");
-        _test.waitForText("Assay Designer");
-        Locator assayDesignerName = Locator.id("AssayDesignerName");
-        _test.waitForElement(assayDesignerName);
-        _test.setFormElement(assayDesignerName, name);
-        _test.sleep(10000);
+        _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
+        _test.clickButton("Next", 0);
+
+        _test.waitForElement(Locator.id("AssayDesignerName"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.setFormElement(Locator.id("AssayDesignerName"), name);
+        _test.fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseSeleniumWebTest.SeleniumEvent.change); // GWT compensation
+        _test.clickButton("Save", 0); // GWT compensation
+        _test.waitForText("Save successful.", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.clickButton("Save & Close");
-        if(_test.isTextPresent("ICEMR Diagnostics Assay Designer"))
-            _test.clickButton("Save & Close");
+
+        _test.waitForElement(Locator.id("AssayList"));
     }
 }
