@@ -2683,14 +2683,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Creating permissions group " + groupName);
         if (!isElementPresent(Locator.permissionRendered()))
             enterPermissionsUI();
-        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
         _ext4Helper.clickTabContainingText("Project Groups");
         setFormElement(Locator.xpath("//input[contains(@name, 'projectgroupsname')]"), groupName);
         clickButton("Create New Group", 0);
         _extHelper.waitForExtDialog(groupName + " Information");
         assertTextPresent("Group " + groupName);
         _extHelper.clickExtButton(groupName + " Information", "Done", 0);
-        waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and text()='" + groupName + "']"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.css(".groupPicker .x4-grid-cell-inner").withText(groupName), WAIT_FOR_JAVASCRIPT);
     }
 
     public void createPermissionsGroup(String groupName, String... memberNames)
@@ -5875,16 +5874,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 enterPermissionsUI();
             _ext4Helper.clickTabContainingText("Permissions");
 
-            waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
             String group = userOrGroupName;
             if (className.equals("pSite"))
                 group = "Site: " + group;
-            click(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]//div[contains(@class, 'x4-form-trigger')]"));
-            click(Locator.xpath("//div[contains(@class, 'x4-boundlist')]//li[contains(@class, '" + className + "') and text()='" + group + "']"));
+            _extHelper.selectExt4ComboBoxItem(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]"), group);
             waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
             savePermissions();
-            assertPermissionSetting(userOrGroupName, permissionString);
             _ext4Helper.waitForMaskToDisappear();
+            assertPermissionSetting(userOrGroupName, permissionString);
         }
     }
 

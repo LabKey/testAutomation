@@ -628,7 +628,6 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"));
         _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"));
-        _test.mouseDown(Locator.xpath("/html/body"));
     }
 
     public void selectExt4ComboBoxItem(String label, String selection)
