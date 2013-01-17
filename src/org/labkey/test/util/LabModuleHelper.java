@@ -144,6 +144,7 @@ public class LabModuleHelper
         _test.setFormElement(Locator.name("title"), workbookTitle);
         _test.setFormElement(Locator.name("description"), workbookDescription);
         _test.clickButton("Submit");
+        _test.waitForText("Workbook Summary");
 
         try
         {
@@ -270,7 +271,8 @@ public class LabModuleHelper
             _test._ext4Helper.clickExt4MenuItem(UPLOAD_RESULTS_TEXT);
 
         _test.waitForElement(Ext4Helper.ext4Window(supportsTemplates ? UPLOAD_RESULTS_TEXT : IMPORT_DATA_TEXT));
-        _test.waitAndClickAndWait(Locator.ext4Button("Submit"));
+        _test.waitAndClick(Locator.ext4Button("Submit"));
+        _test.waitForText("Data Import");
 
     }
 
@@ -294,5 +296,10 @@ public class LabModuleHelper
     public Locator toolIcon(String name)
     {
         return Locator.xpath("//div[contains(@class, 'tool-icon')]//span[text() = '" + name + "']");
+    }
+
+    public void waitForDataRegion(String name)
+    {
+        _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq("dataregion_" + name) + "]"));
     }
 }

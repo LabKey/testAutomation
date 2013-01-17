@@ -210,7 +210,6 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _ext4Helper.clickExt4MenuItem("Prepare Run");
         waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
-        waitForPageToLoad();
 
         List<String> expectedCols = new ArrayList<String>();
         expectedCols.add("well");
@@ -249,17 +248,14 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("Save and Close"));
         waitForText("Save Complete");
         waitAndClick(Locator.ext4Button("OK"));
-        waitForPageToLoad();
 
         //verify template created
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
-        waitForPageToLoad();
 
         log("Reopening saved run plan");
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.clickLink(0, 0);
-        waitForPageToLoad();
 
         //ensure previous run loads correctly
         waitForElement(_helper.getAssayWell("G1", LabModuleHelper.NEG_COLOR), WAIT_FOR_PAGE);
@@ -296,7 +292,6 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         waitForElement(_helper.getAssayWell("G1", LabModuleHelper.NEG_COLOR), WAIT_FOR_PAGE);
 
         waitAndClick(Locator.ext4Button("Download"));
-        waitForPageToLoad();
 
         int i = 1;
 
@@ -306,6 +301,8 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         categoryMap.put("Pos Control", "UNKN");
         categoryMap.put("Neg Control", "NTC");
         String delim = "\t";
+
+        waitForText("SDS Setup File");
 
         while (i < TEMPLATE_DATA.length)
         {
@@ -352,12 +349,10 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
-        waitForPageToLoad();
 
         log("Entering results for saved run");
         DataRegionTable templates = new DataRegionTable("query", this);
         templates.clickLink(0, 1);
-        waitForPageToLoad();
         
         //use the same data included with this assay
         Locator btn = Locator.xpath("//span[text() = 'Download Example Data']");
@@ -372,8 +367,8 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         String text = _helper.getExampleData();
 
         log("Trying to save invalid data");
-        String errorText = text.replaceAll("A1=231841", "");
-        errorText = errorText.replaceAll("A3=432947\tDETECTOR1", "A3=432947\tDETECTOR2");
+        String errorText = text.replaceAll("Subject1", "");
+        errorText = errorText.replaceAll("Subject2\tDETECTOR1", "Subject2\tDETECTOR2");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Upload Failed"));
@@ -388,14 +383,11 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
-        waitForPageToLoad();
         waitForText("Import Samples");
 
         log("Verifying results");
         _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
-        waitForPageToLoad();
         waitAndClick(Locator.linkContainingText("view results"));
-        waitForPageToLoad();
 
         DataRegionTable results = new DataRegionTable("Data", this);
 
@@ -465,10 +457,10 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         expected.put("61", new String[]{"Subject29", "Unknown", "2012-04-08", "10670"});
         expected.put("62", new String[]{"Subject30", "Unknown", "2012-04-10", "670300"});
         expected.put("63", new String[]{"Subject30", "Unknown", "2012-04-10", "569600"});
-        expected.put("64", new String[]{"Positive Control-1", "Unknown", "2012-04-12", "117800"});
-        expected.put("65", new String[]{"Positive Control-1", "Unknown", "2012-04-12", "140700"});
-        expected.put("66", new String[]{"Positive Control-2", "Unknown", "2012-04-14", "90090"});
-        expected.put("67", new String[]{"Positive Control-2", "Unknown", "2012-04-14", "128700"});
+        expected.put("64", new String[]{"Positive Control-1", "Pos Control", "2012-04-12", "117800"});
+        expected.put("65", new String[]{"Positive Control-1", "Pos Control", "2012-04-12", "140700"});
+        expected.put("66", new String[]{"Positive Control-2", "Pos Control", "2012-04-14", "90090"});
+        expected.put("67", new String[]{"Positive Control-2", "Pos Control", "2012-04-14", "128700"});
         expected.put("68", new String[]{"NTC", "Neg Control", "", "0"});
         expected.put("69", new String[]{"NTC", "Neg Control", "", "0"});
         expected.put("70", new String[]{"STD_1000000", "Standard", "", "8328000"});
@@ -508,7 +500,6 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
-        waitForPageToLoad();
         DataRegionTable dr2 = new DataRegionTable("query", this);
         Assert.assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
     }
@@ -552,14 +543,11 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
-        waitForPageToLoad();
         waitForText("Import Samples");
 
         log("Verifying results");
         _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
-        waitForPageToLoad();
         waitAndClick(Locator.linkContainingText("view results"));
-        waitForPageToLoad();
 
         DataRegionTable results = new DataRegionTable("Data", this);
 
@@ -646,14 +634,11 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
-        waitForPageToLoad();
         waitForText("Import Samples");
 
         log("Verifying results");
         _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
-        waitForPageToLoad();
         waitAndClick(Locator.linkContainingText("view results"));
-        waitForPageToLoad();
 
         DataRegionTable results = new DataRegionTable("Data", this);
         int totalRows = 28;

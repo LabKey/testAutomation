@@ -183,7 +183,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Upload Failed"));
-        click(Locator.ext4Button("OK"));
+        waitAndClick(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for result: NotRealResult for primer: TestPrimer2");
 
@@ -191,15 +191,12 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
-        waitForPageToLoad();
+        waitAndClick(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");
         _helper.clickNavPanelItem(SSP_ASSAY_NAME + " Runs:", 1);
-        waitForPageToLoad();
         waitAndClick(Locator.linkContainingText("view results"));
-        waitForPageToLoad();
 
         List<String[]> expected = new ArrayList<String[]>();
         expected.add(new String[]{"Subj1", "<3>", "2011-01-01", "POS", "TestPrimer1"});
@@ -272,7 +269,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Upload Failed"));
-        click(Locator.ext4Button("OK"));
+        waitAndClick(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for result: NotRealResult for primer: TestPrimer1");
 
@@ -282,7 +279,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Upload Failed"));
-        click(Locator.ext4Button("OK"));
+        waitAndClick(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: " + fakePrimer);
 
@@ -290,15 +287,12 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
-        waitForPageToLoad();
+        waitAndClick(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");
         _helper.clickNavPanelItem(SSP_ASSAY_NAME + " Runs:", 1);
-        waitForPageToLoad();
         waitAndClick(Locator.linkContainingText("view results"));
-        waitForPageToLoad();
 
         List<String[]> expected = new ArrayList<String[]>();
         expected.add(new String[]{"Subj1", "<1>", "2011-01-02", "POS", "TestPrimer1"});

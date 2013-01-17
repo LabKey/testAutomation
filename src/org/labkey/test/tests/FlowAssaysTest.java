@@ -126,22 +126,19 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
-        waitForPageToLoad();
         waitForText("Import Samples");
 
         log("Verifying results");
         _helper.clickNavPanelItem(PHENOTYPE_ASSAY_NAME + " Runs:", 1);
-        waitForPageToLoad();
         waitAndClick(Locator.linkContainingText("view results"));
-        waitForPageToLoad();
 
         List<String[]> expected = new ArrayList<String[]>();
-        expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD4 T-cells", "103.0", "cells/uL", "<1>", " ", "Comment"});
-        expected.add(new String[]{"Subj2", "2011-05-06", "PBMC", "CD8+ NK Cells", "102.0", " ", "<2>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-04-05", "PBMC", "CD14 Mono", "2.0", "%", "<3>", "Lymphocytes", " "});
-        expected.add(new String[]{"Subj3", "2012-04-06", "PBMC", "CD8 T-cells", "342.0", " ", "<4>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-08-05", "PBMC", "CD8 T-cells", "5321.0", " ", "<5>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-07-05", "PBMC", "CD8 T-cells", "4521.0", "cells/uL", "<6>", " ", "Comment4"});
+        expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD4 T-cells", "103", "cells/uL", "<1>", " ", "Comment"});
+        expected.add(new String[]{"Subj2", "2011-05-06", "PBMC", "CD8+ NK Cells", "102", " ", "<2>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-04-05", "PBMC", "CD14 Mono", "2", "%", "<3>", "Lymphocytes", " "});
+        expected.add(new String[]{"Subj3", "2012-04-06", "PBMC", "CD8 T-cells", "342", " ", "<4>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-08-05", "PBMC", "CD8 T-cells", "5321", " ", "<5>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-07-05", "PBMC", "CD8 T-cells", "4521", "cells/uL", "<6>", " ", "Comment4"});
 
         verifyResults(expected);
     }
@@ -185,40 +182,37 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
-        waitForPageToLoad();
         waitForText("Import Samples");
 
         log("Verifying results");
         _helper.clickNavPanelItem(PHENOTYPE_ASSAY_NAME + " Runs:", 1);
-        waitForPageToLoad();
         waitAndClick(Locator.linkContainingText("view results"));
-        waitForPageToLoad();
 
         List<String[]> expected = new ArrayList<String[]>();
-        expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD4 T-cells", "103.0", "cells/uL", "<1>", " ", "Comment"});
-        expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD8+ NK Cells", "206.0", "cells/uL", "<1>", " ", "Comment"});
-        expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD4 T-cells", "412.0", "cells/uL", "<1>", " ", "Comment"});
-        expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD8 T-cells", "824.0", "cells/uL", "<1>", " ", "Comment"});
-        expected.add(new String[]{"Subj2", "2011-05-06", "PBMC", "CD4 T-cells", "102.0", " ", "<2>", " ", " "});
-        expected.add(new String[]{"Subj2", "2011-05-06", "PBMC", "CD8+ NK Cells", "204.0", " ", "<2>", " ", " "});
-        expected.add(new String[]{"Subj2", "2011-05-06", "PBMC", "CD4 T-cells", "408.0", " ", "<2>", " ", " "});
-        expected.add(new String[]{"Subj2", "2011-05-06", "PBMC", "CD8 T-cells", "816.0", " ", "<2>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-04-05", "PBMC", "CD4 T-cells", "2.0", "%", "<3>", "Lymphocytes", " "});
-        expected.add(new String[]{"Subj3", "2012-04-05", "PBMC", "CD8+ NK Cells", "4.0", "%", "<3>", "Lymphocytes", " "});
-        expected.add(new String[]{"Subj3", "2012-04-05", "PBMC", "CD4 T-cells", "8.0", "%", "<3>", "Lymphocytes", " "});
-        expected.add(new String[]{"Subj3", "2012-04-05", "PBMC", "CD8 T-cells", "16.0", "%", "<3>", "Lymphocytes", " "});
-        expected.add(new String[]{"Subj3", "2012-04-06", "PBMC", "CD4 T-cells", "342.0", " ", "<4>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-04-06", "PBMC", "CD8+ NK Cells", "684.0", " ", "<4>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-04-06", "PBMC", "CD4 T-cells", "1368.0", " ", "<4>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-04-06", "PBMC", "CD8 T-cells", "2736.0", " ", "<4>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-08-05", "PBMC", "CD4 T-cells", "5321.0", " ", "<5>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-08-05", "PBMC", "CD8+ NK Cells", "10642.0", " ", "<5>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-08-05", "PBMC", "CD4 T-cells", "21284.0", " ", "<5>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-08-05", "PBMC", "CD8 T-cells", "42568.0", " ", "<5>", " ", " "});
-        expected.add(new String[]{"Subj3", "2012-07-05", "PBMC", "CD4 T-cells", "4521.0", "cells/uL", "<6>", " ", "Comment4"});
-        expected.add(new String[]{"Subj3", "2012-07-05", "PBMC", "CD8+ NK Cells", "9042.0", "cells/uL", "<6>", " ", "Comment4"});
-        expected.add(new String[]{"Subj3", "2012-07-05", "PBMC", "CD4 T-cells", "18084.0", "cells/uL", "<6>", " ", "Comment4"});
-        expected.add(new String[]{"Subj3", "2012-07-05", "PBMC", "CD8 T-cells", "36168.0", "cells/uL", "<6>", " ", "Comment4"});
+        expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD4 T-cells", "103", "cells/uL", "<1>", " ", "Comment"});
+        expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD8+ NK Cells", "206", "cells/uL", "<1>", " ", "Comment"});
+        expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD4 T-cells", "412", "cells/uL", "<1>", " ", "Comment"});
+        expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD8 T-cells", "824", "cells/uL", "<1>", " ", "Comment"});
+        expected.add(new String[]{"Subj2", "2011-05-06", "PBMC", "CD4 T-cells", "102", " ", "<2>", " ", " "});
+        expected.add(new String[]{"Subj2", "2011-05-06", "PBMC", "CD8+ NK Cells", "204", " ", "<2>", " ", " "});
+        expected.add(new String[]{"Subj2", "2011-05-06", "PBMC", "CD4 T-cells", "408", " ", "<2>", " ", " "});
+        expected.add(new String[]{"Subj2", "2011-05-06", "PBMC", "CD8 T-cells", "816", " ", "<2>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-04-05", "PBMC", "CD4 T-cells", "2", "%", "<3>", "Lymphocytes", " "});
+        expected.add(new String[]{"Subj3", "2012-04-05", "PBMC", "CD8+ NK Cells", "4", "%", "<3>", "Lymphocytes", " "});
+        expected.add(new String[]{"Subj3", "2012-04-05", "PBMC", "CD4 T-cells", "8", "%", "<3>", "Lymphocytes", " "});
+        expected.add(new String[]{"Subj3", "2012-04-05", "PBMC", "CD8 T-cells", "16", "%", "<3>", "Lymphocytes", " "});
+        expected.add(new String[]{"Subj3", "2012-04-06", "PBMC", "CD4 T-cells", "342", " ", "<4>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-04-06", "PBMC", "CD8+ NK Cells", "684", " ", "<4>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-04-06", "PBMC", "CD4 T-cells", "1368", " ", "<4>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-04-06", "PBMC", "CD8 T-cells", "2736", " ", "<4>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-08-05", "PBMC", "CD4 T-cells", "5321", " ", "<5>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-08-05", "PBMC", "CD8+ NK Cells", "10642", " ", "<5>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-08-05", "PBMC", "CD4 T-cells", "21284", " ", "<5>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-08-05", "PBMC", "CD8 T-cells", "42568", " ", "<5>", " ", " "});
+        expected.add(new String[]{"Subj3", "2012-07-05", "PBMC", "CD4 T-cells", "4521", "cells/uL", "<6>", " ", "Comment4"});
+        expected.add(new String[]{"Subj3", "2012-07-05", "PBMC", "CD8+ NK Cells", "9042", "cells/uL", "<6>", " ", "Comment4"});
+        expected.add(new String[]{"Subj3", "2012-07-05", "PBMC", "CD4 T-cells", "18084", "cells/uL", "<6>", " ", "Comment4"});
+        expected.add(new String[]{"Subj3", "2012-07-05", "PBMC", "CD8 T-cells", "36168", "cells/uL", "<6>", " ", "Comment4"});
 
         verifyResults(expected);
     }
@@ -258,14 +252,11 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
-        waitForPageToLoad();
         waitForText("Import Samples");
 
         log("Verifying results");
         _helper.clickNavPanelItem(ICS_ASSAY_NAME + " Runs:", 1);
-        waitForPageToLoad();
         waitAndClick(Locator.linkContainingText("view results"));
-        waitForPageToLoad();
 
         List<String[]> expected = new ArrayList<String[]>();
 

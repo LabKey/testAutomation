@@ -258,9 +258,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //restore defaults
         clickTab("Settings");
-        waitForPageToLoad();
         waitAndClick(Locator.linkContainingText("Control Item Visibility"));
-        waitForPageToLoad();
         waitForText("Sequence"); //proxy for page load
         waitForText("TruCount"); //proxy for page load
 
@@ -399,7 +397,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         }
         //NOTE: we are in a workbook here
         _ext4Helper.clickExt4MenuItem("DNA_Oligos");
-        waitForPageToLoad();
         waitForElement(Locator.name("name"));
         waitForElement(Locator.name("purification"));
 
@@ -412,7 +409,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assertTextPresent("Your upload was successful");
         _oligosTotal++;
         clickButton("OK", 0);
-        waitForPageToLoad();
 
         _helper.goToLabHome();
     }
@@ -470,9 +466,9 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         //verify row imported
         _helper.goToLabHome();
         _helper.clickNavPanelItem("DNA_Oligos:", "Browse All");
-        waitForPageToLoad();
-
-        Assert.assertTrue("Sequence was not formatted properly on import", isTextPresent(sequence.toUpperCase().replaceAll(" ", "")));
+        String text = sequence.toUpperCase().replaceAll(" ", "");
+        waitForText(text);
+        Assert.assertTrue("Sequence was not formatted properly on import", isTextPresent(text));
         Assert.assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
     }
 
@@ -550,7 +546,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.goToLabHome();
         _helper.clickNavPanelItem("Samples:", "Browse All");
-        waitForPageToLoad();
+        _helper.waitForDataRegion("query");
         DataRegionTable dr = new DataRegionTable("query", this);
 
         i = 0;
@@ -593,8 +589,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         //Test DetailsPanel:
         log("Testing details panel");
         dr.clickLink(1, 1);
-        waitForPageToLoad();
-        //waitForText("Back");
+        waitForText("Whole Blood");
         assertTextPresent("Sample1", "DNA", "Whole Blood", "Freezer");
 
         verifyFreezerColOrder();
@@ -619,7 +614,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         click(locator);
         //NOTE: we are in a workbook
         _ext4Helper.clickExt4MenuItem("Samples");
-        waitForPageToLoad();
 
         waitForElement(Locator.name("freezer"));
         _helper.setFormField("samplename", "Sample" + suffix);
@@ -635,7 +629,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assertTextPresent("Your upload was successful");
         _samplesTotal++;
         clickButton("OK", 0);
-        waitForPageToLoad();
 
         _helper.goToLabHome();
     }
@@ -673,13 +666,12 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assertTextPresent("Your upload was successful");
         _peptideTotal = 1;
         clickButton("OK", 0);
-        waitForPageToLoad();
 
         _helper.goToLabHome();
         _helper.clickNavPanelItem("Peptides:", "Browse All");
-        waitForPageToLoad();
-
-        Assert.assertTrue("Sequence was not formatted properly on import", isTextPresent(sequence.toUpperCase().replaceAll(" ", "")));
+        String text = sequence.toUpperCase().replaceAll(" ", "");
+        waitForText(text);
+        Assert.assertTrue("Sequence was not formatted properly on import", isTextPresent(text));
         Assert.assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
         Assert.assertTrue("MW not set correctly", isTextPresent("1036.1"));
     }
@@ -688,13 +680,11 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     {
         _helper.goToLabHome();
         _helper.clickNavPanelItem("DNA_Oligos:", "Search");
-        waitForPageToLoad();
         waitForTextToDisappear("Loading...");
         waitForElement(Locator.name("name"));
         sleep(50);
         _helper.setFormField("name", "TestPrimer");
         click(Locator.ext4Button("Submit"));
-        waitForPageToLoad();
         DataRegionTable table = new DataRegionTable("query", this);
         Assert.assertEquals("Wrong number of rows found", _oligosTotal, table.getDataRowCount());
 
@@ -710,7 +700,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         log("Testing samples webpart");
 
         clickTab("Materials");
-        waitForPageToLoad();
         waitForText("Samples and Materials:");
         String msg = "Sample type missing or sample count incorrect";
 
@@ -756,10 +745,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         log("verifying ability to set default import method");
         _helper.goToLabHome();
         click(Locator.xpath("//a//span[text() = 'Settings']"));
-        waitForPageToLoad();
         waitForText("Set Assay Defaults");
         _helper.clickNavPanelItem("Set Assay Defaults");
-        waitForPageToLoad();
         String defaultVal = "LC480";
         _helper.waitForField(VIRAL_LOAD_ASSAYNAME);
         Ext4FieldRefWD.getForLabel(this, VIRAL_LOAD_ASSAYNAME).setValue(defaultVal);
@@ -767,7 +754,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         waitForElement(Ext4Helper.ext4Window("Success"));
         waitAndClick(Locator.ext4Button("OK"));
-        waitForPageToLoad();
         waitForText("Types of Data");
         _helper.goToAssayResultImport(VIRAL_LOAD_ASSAYNAME);
         _helper.waitForField("Source Material");

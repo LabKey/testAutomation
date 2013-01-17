@@ -157,7 +157,6 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
         _ext4Helper.clickExt4MenuItem("Prepare Run");
         waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
-        waitForPageToLoad();
 
         List<String> expectedCols = new ArrayList<String>();
         expectedCols.add("well");
@@ -201,12 +200,10 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
-        waitForPageToLoad();
 
         log("Entering results for saved run");
         DataRegionTable templates = new DataRegionTable("query", this);
         templates.clickLink(0, 1);
-        waitForPageToLoad();
 
         //use the same data included with this assay
         Locator btn = Locator.xpath("//span[text() = 'Download Example Data']");
@@ -224,7 +221,6 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
-        waitForPageToLoad();
         waitForText("Import Samples");
 
         verifyResults();
@@ -233,7 +229,6 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
-        waitForPageToLoad();
         DataRegionTable dr2 = new DataRegionTable("query", this);
         Assert.assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
     }
@@ -242,9 +237,7 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
     {
         log("Verifying results");
         _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
-        waitForPageToLoad();
         waitAndClick(Locator.linkContainingText("view results"));
-        waitForPageToLoad();
 
         DataRegionTable results = new DataRegionTable("Data", this);
 

@@ -163,7 +163,8 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
 
         String[] prop = {"/" + PROJECT_NAME, "EHRStudyContainer", "/" + CONTAINER_PATH};
         String[] prop2 = {"/" + PROJECT_NAME, "EHRAdminUser", DATA_ADMIN._email};
-        setModuleProperties(Collections.singletonMap("EHR", Arrays.asList(prop, prop2)));
+        String[] prop3 = {"/" + PROJECT_NAME, "DefaultAnimalHistoryReport", "abstract"};
+        setModuleProperties(Collections.singletonMap("EHR", Arrays.asList(prop, prop2, prop3)));
 
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         beginAt(getBaseURL()+"/ehr/"+CONTAINER_PATH+"/populateInitialData.view");

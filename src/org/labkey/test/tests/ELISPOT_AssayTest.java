@@ -156,7 +156,6 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         _ext4Helper.clickExt4MenuItem("Prepare Run");
         waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
-        waitForPageToLoad();
 
         List<String> expectedCols = new ArrayList<String>();
         expectedCols.add("well");
@@ -190,7 +189,6 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("Save and Close"));
         waitForText("Save Complete");
         waitAndClick(Locator.ext4Button("OK"));
-        waitForPageToLoad();
         waitForText(LabModuleHelper.LAB_HOME_TEXT);
     }
 
@@ -200,12 +198,10 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
-        waitForPageToLoad();
 
         log("Entering results for saved run");
         DataRegionTable templates = new DataRegionTable("query", this);
         templates.clickLink(0, 1);
-        waitForPageToLoad();
 
         //use the same data included with this assay
         Locator btn = Locator.xpath("//span[text() = 'Download Example Data']");
@@ -225,7 +221,6 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
-        waitForPageToLoad();
         waitForText("Import Samples");
 
         verifyExpectedValues();
@@ -234,7 +229,6 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
-        waitForPageToLoad();
         DataRegionTable dr2 = new DataRegionTable("query", this);
         Assert.assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
     }

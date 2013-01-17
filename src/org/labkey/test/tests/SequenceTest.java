@@ -25,9 +25,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
-import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
@@ -111,7 +109,7 @@ public class SequenceTest extends BaseWebDriverTest
         goToProjectHome();
         waitForText("Create Readsets");
         _helper.clickNavPanelItem("Create Readsets");
-        waitForPageToLoad();
+
         waitForElement(Locator.xpath("//label[contains(text(), 'Sample Id')]"));
         _ext4Helper.clickTabContainingText("Import Spreadsheet");
         waitForText("Copy/Paste Data");
@@ -123,7 +121,6 @@ public class SequenceTest extends BaseWebDriverTest
         _readsetCt += 14;
         assertTextPresent("Success!");
         clickButton("OK");
-        waitForPageToLoad();
 
         log("verifying readset count correct");
         waitForText("Total Readsets Imported");
@@ -138,13 +135,13 @@ public class SequenceTest extends BaseWebDriverTest
     {
         goToProjectHome();
         _helper.clickNavPanelItem("Total Readsets Imported:", 1);
-        waitForPageToLoad();
+        _helper.waitForDataRegion("query");
 
         //verify CSV file creation
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
         clickMenuButton("More Actions", "Create Illumina Sample Sheet");
-        waitForPageToLoad();
+
         waitForText("You have chosen to export " + _readsetCt + " samples");
         _helper.waitForField("Investigator Name");
 
@@ -270,8 +267,8 @@ public class SequenceTest extends BaseWebDriverTest
 
         click(Locator.ext4Button("Import Data"));
         waitAndClick(Locator.ext4Button("OK"));
-        waitForPageToLoad();
-        clickAndWait(Locator.linkWithText("All"));
+
+        waitAndClick(Locator.linkContainingText("All"));
         _startedPipelineJobs++;
         waitForPipelineJobsToComplete(_startedPipelineJobs, "Import Illumina", false);
         assertTextPresent("COMPLETE");
@@ -288,7 +285,7 @@ public class SequenceTest extends BaseWebDriverTest
         //verify import and instrument run creation
         goToProjectHome();
         _helper.clickNavPanelItem("Total Readsets Imported:", 1);
-        waitForPageToLoad();
+        _helper.waitForDataRegion("query");
 
         DataRegionTable dr = new DataRegionTable("query", this);
         for (int i = 0; i < dr.getDataRowCount(); i++)
@@ -306,7 +303,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("Verifying instrument run and details page");
         dr.clickLink(2, "Instrument Run");
-        waitForPageToLoad();
+
         waitForText("Instrument Run Details");
         waitForText("Run Id"); //crude proxy for loading of the details panel
         waitForText("Readsets");
@@ -322,10 +319,9 @@ public class SequenceTest extends BaseWebDriverTest
         log("Verifying readset details page");
         goToProjectHome();
         _helper.clickNavPanelItem("Total Readsets Imported:", 1);
-        waitForPageToLoad();
+        _helper.waitForDataRegion("query");
         dr = new DataRegionTable("query", this);
-        dr.clickLink(1,1);
-        waitForPageToLoad();
+        dr.clickLink(1, 1);
 
         waitForText("Readset Details");
         waitForText("Readset Id:"); //crude proxy for details panel
@@ -342,10 +338,10 @@ public class SequenceTest extends BaseWebDriverTest
         log("Verifying FASTQ Export");
         goToProjectHome();
         _helper.clickNavPanelItem("Total Readsets Imported:", 1);
-        waitForPageToLoad();
+        _helper.waitForDataRegion("query");
         dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" +Locator.navButton("More Actions").getPath()), "Download Sequence Files");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "Download Sequence Files");
         waitForElement(Ext4Helper.ext4Window("Export Files"));
         waitForText("Export Files As");
         Ext4CmpRefWD window = _ext4Helper.queryOne("#exportFilesWin", Ext4CmpRefWD.class);
@@ -371,14 +367,14 @@ public class SequenceTest extends BaseWebDriverTest
         dr.uncheckAllOnPage();
         dr.checkCheckbox(2);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "View FASTQC Report");
-        waitForPageToLoad();
+
         waitForText("File Summary");
         assertTextPresent("Per base sequence quality");
 
         log("Verifying View Analyses");
         goToProjectHome();
         _helper.clickNavPanelItem("Total Readsets Imported:", 1);
-        waitForPageToLoad();
+
         waitForText("Instrument Run"); //proxy for dataRegion loading
         dr = new DataRegionTable("query", this);
         dr.uncheckAllOnPage();
@@ -390,8 +386,8 @@ public class SequenceTest extends BaseWebDriverTest
         dr.checkCheckbox(2);
         String id2 = dr.getDataAsText(2, "Readset Id");
 
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" +Locator.navButton("More Actions").getPath()), "View Analyses");
-        waitForPageToLoad();
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "View Analyses");
+
         waitForText("Analysis Type"); //proxy for dataRegion loading
 
         assertTextPresent("readset IS ONE OF (");
@@ -400,10 +396,10 @@ public class SequenceTest extends BaseWebDriverTest
         log("Verifying Readset Edit");
         goToProjectHome();
         _helper.clickNavPanelItem("Total Readsets Imported:", 1);
-        waitForPageToLoad();
+
         waitForText("Instrument Run"); //proxy for dataRegion loading
-        dr.clickLink(1,0);
-        waitForPageToLoad();
+        dr.clickLink(1, 0);
+
         waitForText("Run Id:");
         String newName = "ChangedSample";
         Ext4FieldRefWD.getForLabel(this, "Name").setValue(newName);
@@ -412,7 +408,8 @@ public class SequenceTest extends BaseWebDriverTest
         waitForElement(Ext4Helper.ext4Window("Success"));
         assertTextPresent("Your upload was successful!");
         clickButton("OK");
-        waitForPageToLoad();
+
+        _helper.waitForDataRegion("query");
         Assert.assertEquals("Changed sample name not applied", newName, dr.getDataAsText(1, "Name"));
 
         //note: 'Analyze Selected' option is verified separately
@@ -429,7 +426,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         goToProjectHome();
         _helper.clickNavPanelItem("Total Readsets Imported:", 1);
-        waitForPageToLoad();
+        _helper.waitForDataRegion("query");
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.uncheckAllOnPage();
         dr.checkCheckbox(2);
@@ -438,11 +435,10 @@ public class SequenceTest extends BaseWebDriverTest
         dr.checkCheckbox(6);
         rowIds.add(dr.getDataAsText(6, "Readset Id"));
 
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" +Locator.navButton("More Actions").getPath()), "Analyze Selected");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "Analyze Selected");
         waitForElement(Ext4Helper.ext4Window("Import Data"));
         waitForText("Description");
         waitAndClick(Locator.ext4Button("Submit"));
-        waitForPageToLoad();
 
         log("Verifying analysis UI");
 
@@ -694,7 +690,7 @@ public class SequenceTest extends BaseWebDriverTest
         String url = getURL().toString();
         url += "&debugMode=1";
         beginAt(url);
-        waitForPageToLoad();
+        waitForText("Specialized Analysis");
 
         Ext4FieldRefWD analysisField = Ext4FieldRefWD.getForLabel(this, "Specialized Analysis");
         analysisField.setValue("SBT");
@@ -817,7 +813,7 @@ public class SequenceTest extends BaseWebDriverTest
         goToProjectHome();
         waitForText("Upload Files");
         _helper.clickNavPanelItem("Upload Files / Start Analysis");
-        waitForPageToLoad();
+
         waitForText("fileset");
         _extHelper.selectFileBrowserRoot();
         for (String f : files)
@@ -826,7 +822,7 @@ public class SequenceTest extends BaseWebDriverTest
         }
 
         selectImportDataAction(importAction);
-        waitForPageToLoad();
+
     }
 
     /**
@@ -922,6 +918,7 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCellJS(2, "platform", "LS454");
         grid.setGridCell(2, 8, "InputMaterial2");
         grid.setGridCell(2, 9, "Subject2");
+        grid.setGridCell(2, 10, "2010-10-20");
 
         waitAndClick(Locator.ext4Button("Import Data"));
         waitForElement(Ext4Helper.ext4Window("Error"));
@@ -966,9 +963,9 @@ public class SequenceTest extends BaseWebDriverTest
 
         Assert.assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.pairedend"));
         Assert.assertEquals("Unexpected value for param", filename1 + ";" + filename2, fieldsJson.get("fileNames"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String)fieldsJson.get("inputfile.barcodeGroups")));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) fieldsJson.get("inputfile.barcodeGroups")));
         Assert.assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.merge"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String)fieldsJson.get("inputfile.merge.basename")));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) fieldsJson.get("inputfile.merge.basename")));
         Assert.assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeEditDistance"));
         Assert.assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeOffset"));
         Assert.assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeDeletions"));
@@ -982,7 +979,7 @@ public class SequenceTest extends BaseWebDriverTest
         Assert.assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
         Assert.assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
         Assert.assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String)sample0.get("readset")));
+        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
         Assert.assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
         Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
         Assert.assertEquals("Unexpected value for param", "InputMaterial", sample0.get("inputmaterial"));
@@ -992,6 +989,7 @@ public class SequenceTest extends BaseWebDriverTest
         Assert.assertEquals("Unexpected value for param", filename2, sample1.get("fileName"));
         Assert.assertEquals("Unexpected value for param", "Readset2", sample1.get("readsetname"));
         Assert.assertEquals("Unexpected value for param", "Subject2", sample1.get("subjectid"));
+        Assert.assertTrue("Unexpected value for param", sample1.get("sampledate") instanceof Map); //this is a JS date object.  not worth trying to figure out the value.  it's either null or not
         Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("readset")));
         Assert.assertEquals("Unexpected value for param", "LS454", sample1.get("platform"));
         Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("fileId")));
@@ -1111,6 +1109,7 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCellJS(1, "platform", "ILLUMINA");
         grid.setGridCell(1, 8, "InputMaterial");
         grid.setGridCell(1, 9, "Subject1");
+        grid.setGridCell(1, 10, "2011-02-03");
 
         grid.setGridCell(2, 6, readset2);
         grid.setGridCellJS(2, "platform", "LS454");
@@ -1119,8 +1118,8 @@ public class SequenceTest extends BaseWebDriverTest
 
         click(Locator.ext4Button("Import Data"));
         waitAndClick(Locator.ext4Button("OK"));
-        waitForPageToLoad();
-        clickAndWait(Locator.linkWithText("All"));
+
+        waitAndClick(Locator.linkWithText("All"));
         _startedPipelineJobs++;
         waitForPipelineJobsToComplete(_startedPipelineJobs, "Import Readsets", false);
         assertTextPresent("COMPLETE");
