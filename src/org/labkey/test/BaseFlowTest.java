@@ -123,7 +123,6 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
-        deletePipelineWorkDirectory();
         try
         {
             beginAt("/admin/begin.view");
@@ -132,6 +131,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             clickButton("update");
         }
         catch (Throwable t) {}
+        deletePipelineWorkDirectory();
     }
 
     @Override
@@ -279,7 +279,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         submit();
     }
 
-    protected void setProtocolMetadata(String participantColumn, String dateColumn, String visitColumn, boolean setBackground)
+    protected void setProtocolMetadata(String specimenIdColumn, String participantColumn, String dateColumn, String visitColumn, boolean setBackground)
     {
         log("** Specify ICS metadata");
         goToFlowDashboard();
@@ -287,7 +287,10 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("Edit ICS Metadata"));
 
         // specify PTID and Visit/Date columns
-        selectOptionByText("ff_participantColumn", participantColumn);
+        if (specimenIdColumn != null)
+            selectOptionByText("ff_specimenIdColumn", specimenIdColumn);
+        if (participantColumn != null)
+            selectOptionByText("ff_participantColumn", participantColumn);
         if (dateColumn != null)
             selectOptionByText("ff_dateColumn", dateColumn);
         if (visitColumn != null)
@@ -494,7 +497,10 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             {
                 checkCheckbox("rEngineNormalization");
                 if (rEngineNormalizationReference != null)
+                {
                     selectOptionByText("rEngineNormalizationReference", rEngineNormalizationReference);
+                    Assert.assertEquals(rEngineNormalizationReference, getFormElement("rEngineNormalizationReference"));
+                }
 
                 if (rEngineNormalizationSubsets != null)
                     setFormElement("rEngineNormalizationSubsets", StringUtils.join(rEngineNormalizationSubsets, ImportAnalysisOptions.PARAMETER_SEPARATOR));
@@ -581,7 +587,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             assertTextPresent("New Analysis Folder: " + analysisFolder);
 
         // XXX: assert fcsPath is present: need to normalize windows path backslashes
-        if (keywordDirs == null)
+        if (selectFCSFilesOption == SelectFCSFileOption.Browse && keywordDirs == null)
             assertTextPresent("FCS File Path: none set");
 
         clickButton("Finish");

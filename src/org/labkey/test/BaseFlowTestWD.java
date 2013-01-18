@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.io.IOException;
@@ -196,6 +197,8 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         clickFolder(getProjectName());
         if (!isLinkPresentWithText(getFolderName()))
             return;
+
+        clickFolder(getFolderName());
 
         beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Runs");
         DataRegionTable table = new DataRegionTable("query", this);
@@ -387,6 +390,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         importAnalysis_checkErrors(options.getExpectedErrors());
     }
 
+    @LogMethod
     protected void importAnalysis_viaPipeline(String workspacePath)
     {
         log("browse pipeline to begin import analysis wizard");
@@ -397,6 +401,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         selectImportDataAction("Import FlowJo Workspace");
     }
 
+    @LogMethod
     protected void importAnalysis_begin(String containerPath)
     {
         log("begin import analysis wizard");
@@ -405,6 +410,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
     }
 
+    @LogMethod
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
         assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
@@ -412,6 +418,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         clickButton("Next");
     }
 
+    @LogMethod
     protected void importAnalysis_selectFCSFiles(String containerPath, final SelectFCSFileOption selectFCSFilesOption, List<String> keywordDirs)
     {
         waitForExtReady();
@@ -456,6 +463,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         clickButton("Next");
     }
 
+    @LogMethod
     protected void importAnalysis_reviewSamples(String containerPath, boolean resolving, List<String> selectedGroupNames, List<String> selectedSampleIds)
     {
         assertTitleEquals("Import Analysis: Review Samples: " + containerPath);
@@ -478,6 +486,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         clickButton("Next");
     }
 
+    @LogMethod
     protected void importAnalysis_analysisEngine(String containerPath, AnalysisEngine engine)
     {
         assertTitleEquals("Import Analysis: Analysis Engine: " + containerPath);
@@ -486,6 +495,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         clickButton("Next");
     }
 
+    @LogMethod
     protected void importAnalysis_analysisOptions(String containerPath, boolean rEngineNormalization, String rEngineNormalizationReference, List<String> rEngineNormalizationSubsets, List<String> rEngineNormalizationParameters)
     {
         assertTitleEquals("Import Analysis: Analysis Options: " + containerPath);
@@ -585,11 +595,10 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
             assertTextPresent("Existing Analysis Folder:", analysisFolder);
         else
             assertTextPresent("New Analysis Folder:", analysisFolder);
-        if (keywordDirs == null)
+
+        // XXX: assert fcsPath is present: need to normalize windows path backslashes
+        if (selectFCSFilesOption == SelectFCSFileOption.Browse && keywordDirs == null)
             assertTextPresent("FCS File Path:","none set");
-//        // XXX: assert fcsPath is present: need to normalize windows path backslashes
-//        if (keywordDirs == null)
-//            assertTextPresent("FCS File Path: none set");
 
         clickButton("Finish");
         waitForPipeline(containerPath);
