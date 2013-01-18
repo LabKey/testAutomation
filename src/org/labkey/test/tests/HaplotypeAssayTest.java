@@ -66,8 +66,6 @@ public class HaplotypeAssayTest extends GenotypingTest
     private void verifyAribitraryHaplotypeAssay()
     {
         setupHaplotypeAssay(DBR_ASSAY,  new String[][] {{"DRBHaplotype", "DRB Haplotype" }});
-        clickAndWait(Locator.linkWithText("Assay List"));
-        clickAndWait(Locator.linkWithText(DBR_ASSAY));
         importRun(DRB_RUN, DBR_ASSAY, DRB_RUN_FILE);
 
         clickAndWait(Locator.linkWithText(DRB_RUN));
@@ -474,7 +472,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         log("Navigating to Haplotype Assay Import");
         goToProjectHome();
         goToManageAssays();
-        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        clickAndWait(Locator.linkWithText(assayName));
         clickButton("Import Data");
         waitForText("Copy/Paste the header rows into the text area below:");
         waitForText("Match the column headers from the tab-delimited data with the key fields:");
