@@ -51,8 +51,8 @@ public class GroupTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteGroup(SIMPLE_GROUP, afterTest);
         deleteGroup(COMPOUND_GROUP, afterTest);
+        deleteGroup(SIMPLE_GROUP, afterTest);
         deleteGroup(BAD_GROUP, afterTest);
         deleteGroup(CHILD_GROUP, afterTest);
         deleteUsers(afterTest, TEST_USERS_FOR_GROUP);
