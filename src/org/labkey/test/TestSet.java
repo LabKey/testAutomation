@@ -342,6 +342,8 @@ public enum TestSet
         EHRApiTest.class
     ),
 
+    ONPRC(Unsupported, EHR.getTestList()),
+
     CDSPopulation(
         CDSPopulation.class
     ),
