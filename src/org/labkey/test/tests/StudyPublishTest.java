@@ -429,7 +429,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
         else
         {
-            waitForText("No specimens found.", 2, WAIT_FOR_JAVASCRIPT);
+            waitForText("No specimens found.", 1, WAIT_FOR_JAVASCRIPT);
         }
         // verify that the specimen request options are hidden from the manage study page
         goToManageStudy();
