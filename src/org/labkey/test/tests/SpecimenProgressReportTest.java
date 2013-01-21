@@ -128,6 +128,9 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText(studyFolder));
         clickAndWait(Locator.linkWithText("SpecimenConfigurationVisit"));
         waitForText("1 - 34 of 34");
+        clickAndWait(Locator.linkWithText(studyFolder));
+        clickAndWait(Locator.linkWithText("AssaySpecimenMap"));
+        waitForText("1 - 34 of 34");
 
         // TODO: this will be replaced by the automatic import of this data as part of the study folder import (SampleMindedImportTask)
         manuallySetMissingSpecimensAndVisits(rnaRowId, pcr1RowId);
