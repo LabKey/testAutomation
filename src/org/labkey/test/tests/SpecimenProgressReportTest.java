@@ -104,18 +104,31 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         selectOptionByValue(Locator.name("schemaName"), "rho");
         submit();
 
+        // lookup the locationId for the Main site from the study.Locations table
+        goToSchemaBrowser();
+        selectQuery("study", "Location");
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
+        DataRegionTable drt = new DataRegionTable("query", this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        //TODO: why can't we get the value from the RowId column when it is first in the data region?
+        _customizeViewsHelper.removeCustomizeViewColumn("RowId");
+        _customizeViewsHelper.addCustomizeViewColumn("RowId");
+        _customizeViewsHelper.applyCustomView();
+        int locationId = Integer.parseInt(drt.getDataAsText(drt.getRow("Label", "Main"), "RowId"));
+
         // add the specimen configurations to the manage page
         String containerId = selenium.getEval("selenium.getContainerId()"); // NOTE: using this because the beginAt doesn't work with the special chars in the project/folder name
         beginAt("/rho/" + containerId + "/manageSpecimenConfiguration.view?");
-        addSpecimenConfiguration("PCR", "R", 1400, "CEF-R Cryovial");
-        addSpecimenConfiguration("PCR", "R", 1400, "UPR Micro Tube");
-        addSpecimenConfiguration("RNA", "R", 1400, "TGE Cryovial");
+        addSpecimenConfiguration("PCR", "R", locationId, "CEF-R Cryovial");
+        addSpecimenConfiguration("PCR", "R", locationId, "UPR Micro Tube");
+        addSpecimenConfiguration("RNA", "R", locationId, "TGE Cryovial");
         sleep(1000); // give the store a second to save the configurations
 
         // lookup the config IDs to use in setting the visits
         clickAndWait(Locator.linkWithText(studyFolder));
         clickAndWait(Locator.linkWithText("SpecimenConfiguration"));
-        DataRegionTable drt = new DataRegionTable("query", this);
+        drt = new DataRegionTable("query", this);
         String pcr1RowId = drt.getDataAsText(drt.getRow("TubeType", "CEF-R Cryovial"), "RowId");
         String pcr2RowId = drt.getDataAsText(drt.getRow("TubeType", "UPR Micro Tube"), "RowId");
         String rnaRowId = drt.getDataAsText(drt.getRow("TubeType", "TGE Cryovial"), "RowId");
@@ -125,29 +138,36 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         setSpecimenConfigurationVisit(pcr2RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
         setSpecimenConfigurationVisit(rnaRowId, new String[]{"0", "6", "20", "SR"});
         sleep(1000); // give the store a second to save the configurations
-        clickAndWait(Locator.linkWithText(studyFolder));
-        clickAndWait(Locator.linkWithText("SpecimenConfigurationVisit"));
-        waitForText("1 - 34 of 34");
-        clickAndWait(Locator.linkWithText(studyFolder));
-        clickAndWait(Locator.linkWithText("AssaySpecimenMap"));
-        waitForText("1 - 34 of 34");
+        checkRhoQueryRowCount("SpecimenConfigurationVisit", 34);
+        checkRhoQueryRowCount("AssaySpecimenMap", 34);
+        checkRhoQueryRowCount("MissingSpecimen", 2);
+        checkRhoQueryRowCount("MissingVisit", 3);
 
         // TODO: this will be replaced by the automatic import of this data as part of the study folder import (SampleMindedImportTask)
-        manuallySetMissingSpecimensAndVisits(rnaRowId, pcr1RowId);
+        manuallySetMissingSpecimensAndVisits(rnaRowId, pcr1RowId, locationId);
     }
 
-    private void manuallySetMissingSpecimensAndVisits(String firstConfigId, String secondConfigId)
+    private void checkRhoQueryRowCount(String name, int expectedCount)
+    {
+        clickAndWait(Locator.linkWithText(studyFolder));
+        clickAndWait(Locator.linkWithText(name));
+        waitForElement(Locator.id("dataregion_query"));
+        DataRegionTable drt = new DataRegionTable("query", this);
+        Assert.assertEquals("Unexpected number of rows in the query", expectedCount, drt.getDataRowCount());
+    }
+
+    private void manuallySetMissingSpecimensAndVisits(String firstConfigId, String secondConfigId, int locationId)
     {
         clickAndWait(Locator.linkWithText(studyFolder));
         clickAndWait(Locator.linkWithText("MissingVisit"));
-        insertNewMissingSpecimenOrVisit("Study0100100", 18.0, 1400, "Unknown Staff turn over; unknown reason");
-        insertNewMissingSpecimenOrVisit("Study0100100", 20, 1400, "Unknown Staff turn over; unknown reason");
-        insertNewMissingSpecimenOrVisit("Study0100200", 6.0, 1400, "Unknown Staff turn over; unknown reason");
+        insertNewMissingSpecimenOrVisit("Study0100100", 18.0, locationId, "Unknown Staff turn over; unknown reason");
+        insertNewMissingSpecimenOrVisit("Study0100100", 20, locationId, "Unknown Staff turn over; unknown reason");
+        insertNewMissingSpecimenOrVisit("Study0100200", 6.0, locationId, "Unknown Staff turn over; unknown reason");
 
         clickAndWait(Locator.linkWithText(studyFolder));
         clickAndWait(Locator.linkWithText("MissingSpecimen"));
-        insertNewMissingSpecimenOrVisit("Study0100200", 20.0, firstConfigId, 1400, "Unknown reason (please describe as comment) : Have not received specimen from histologist yet.");
-        insertNewMissingSpecimenOrVisit("Study0100200", 16.0, secondConfigId, 1400, "Unable to obtain required volume :");
+        insertNewMissingSpecimenOrVisit("Study0100200", 20.0, firstConfigId, locationId, "Unknown reason (please describe as comment) : Have not received specimen from histologist yet.");
+        insertNewMissingSpecimenOrVisit("Study0100200", 16.0, secondConfigId, locationId, "Unable to obtain required volume :");
     }
 
     private void insertNewMissingSpecimenOrVisit(String ptid, double visit, int locationId, String comment)
@@ -175,7 +195,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         setFormElement(Locator.name("AssayName"), assayName);
         setFormElement(Locator.name("Description"), assayName + " " + tubeType);
         setFormElement(Locator.name("Source"), source);
-        setFormElement(Locator.name("LocationId"), String.valueOf(locationId)); // TODO: look this up based on the imported study folder (i.e. Site table for Seattle site)
+        setFormElement(Locator.name("LocationId"), String.valueOf(locationId));
         setFormElement(Locator.name("TubeType"), tubeType);
         clickButton("Update", 0);
     }
@@ -237,7 +257,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         assertTextPresentInThisOrder("SR1", "SR2", "SR3");
         Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
         Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
-        Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
+        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
+        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'received')]")));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
         Assert.assertEquals(7, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
         Assert.assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
