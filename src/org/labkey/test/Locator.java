@@ -642,6 +642,11 @@ public abstract class Locator
             return Locator.id(text + "Tab");
     }
 
+    public static XPathLocator pageHeader(String headerText)
+    {
+        return Locator.xpath("id('labkey-nav-trail-current-page')").withText(headerText);
+    }
+
     /**
      * Quote text to be used as literal string in xpath expression
      *     Direct port from attibuteValue function in selenium IDE locatorBuilders.js
