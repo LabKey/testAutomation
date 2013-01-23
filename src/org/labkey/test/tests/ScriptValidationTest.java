@@ -142,6 +142,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                     "\"row\":{" +
                         "\"Name\":\"TestFieldErrorMessage!\"," +
                         "\"Hex\":null" +
+                        "\"_rowNumber\":1" +
                     "}" +
                 "}]" +
             "}");
@@ -175,6 +176,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                     "\"row\":{" +
                         "\"Name\":\"TestFieldErrorArray!\"," +
                         "\"Hex\":null" +
+                        "\"_rowNumber\":1" +
                     "}" +
                 "}]" +
             "}");
@@ -207,6 +209,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                     "\"row\":{" +
                         "\"Name\":\"TestRowError!\"," +
                         "\"Hex\":null" +
+                        "\"_rowNumber\":1" +
                     "}" +
                 "}]" +
             "}");
@@ -238,6 +241,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                     "\"row\":{" +
                         "\"Name\":\"TestReturnFalse\"," +
                         "\"Hex\":\"\"" +
+                        "\"_rowNumber\":1" +
                     "}" +
                 "}]" +
             "}");
@@ -260,6 +264,7 @@ public class ScriptValidationTest extends SimpleModuleTest
             JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = (JSONObject)JSONValue.parse("{" +
                 "\"exception\":\"TestErrorInComplete error field two\"," +
+                "\"success\":false" +
                 "\"errors\":[{" +
                     "\"errors\":[{" +
                         "\"id\":\"Hex\"," +
@@ -279,6 +284,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                     "\"row\":{" +
                         "\"Name\":\"TestErrorInComplete!\"," +
                         "\"Hex\":\"\"" +
+                        "\"_rowNumber\":3" +
                     "}" +
                 "},{" +
                     "\"errors\":[{" +
@@ -288,7 +294,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                         "\"msg\":\"TestErrorInComplete error global four!\"" +
                     "}]," +
                     "\"exception\":\"TestErrorInComplete error global four!\"," +
-                    "\"rowNumber\":3," +
+                    "\"rowNumber\":2," +
                     "\"row\":{" +
                         "\"a\":\"A\"," +
                         "\"b\":\"B\"" +
@@ -310,6 +316,7 @@ public class ScriptValidationTest extends SimpleModuleTest
             JSONObject properties = (JSONObject)e.getProperties();
             JSONObject expected = (JSONObject)JSONValue.parse("{" +
                 "\"exception\":\"one error message\"," +
+                "\"success\":false" +
                 "\"errors\":[{" +
                     "\"errors\":[{" +
                         "\"id\":\"Name\"," +
@@ -328,7 +335,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                         "\"msg\":\"three error message\"" +
                     "}]," +
                     "\"exception\":\"one error message\"," +
-                    "\"rowNumber\":1" +
+                    "\"rowNumber\":0" +
                 "},{" +
                    "\"errors\":[{" +
                        "\"id\":\"Hex\"," +
@@ -337,7 +344,7 @@ public class ScriptValidationTest extends SimpleModuleTest
                        "\"msg\":\"four error message\"" +
                     "}]," +
                     "\"exception\":\"four error message\"," +
-                    "\"rowNumber\":1" +
+                    "\"rowNumber\":0" +
                 "}]" +
             "}");
             json.assertEquals("FAILED", expected, properties);
