@@ -143,8 +143,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         checkRhoQueryRowCount("MissingSpecimen", 2);
         checkRhoQueryRowCount("MissingVisit", 3);
 
-        // TODO: this will be replaced by the automatic import of this data as part of the study folder import (SampleMindedImportTask)
-        manuallySetMissingSpecimensAndVisits(rnaRowId, pcr1RowId, locationId);
+        // TODO: remove when issue 16959 is fixed for MissingSpecimen import
+        manuallySetSpecimenConfigId(rnaRowId, pcr1RowId);
     }
 
     private void checkRhoQueryRowCount(String name, int expectedCount)
@@ -156,35 +156,19 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         Assert.assertEquals("Unexpected number of rows in the query", expectedCount, drt.getDataRowCount());
     }
 
-    private void manuallySetMissingSpecimensAndVisits(String firstConfigId, String secondConfigId, int locationId)
+    private void manuallySetSpecimenConfigId(String firstConfigId, String secondConfigId)
     {
-        clickAndWait(Locator.linkWithText(studyFolder));
-        clickAndWait(Locator.linkWithText("MissingVisit"));
-        insertNewMissingSpecimenOrVisit("Study0100100", 18.0, locationId, "Unknown Staff turn over; unknown reason");
-        insertNewMissingSpecimenOrVisit("Study0100100", 20, locationId, "Unknown Staff turn over; unknown reason");
-        insertNewMissingSpecimenOrVisit("Study0100200", 6.0, locationId, "Unknown Staff turn over; unknown reason");
-
         clickAndWait(Locator.linkWithText(studyFolder));
         clickAndWait(Locator.linkWithText("MissingSpecimen"));
-        insertNewMissingSpecimenOrVisit("Study0100200", 20.0, firstConfigId, locationId, "Unknown reason (please describe as comment) : Have not received specimen from histologist yet.");
-        insertNewMissingSpecimenOrVisit("Study0100200", 16.0, secondConfigId, locationId, "Unable to obtain required volume :");
-    }
-
-    private void insertNewMissingSpecimenOrVisit(String ptid, double visit, int locationId, String comment)
-    {
-        insertNewMissingSpecimenOrVisit(ptid, visit, null, locationId, comment);
-    }
-
-    private void insertNewMissingSpecimenOrVisit(String ptid, double visit, String configId, int locationId, String comment)
-    {
-        clickButton("Insert New");
-        setFormElement(Locator.name("quf_ParticipantId"), ptid);
-        setFormElement(Locator.name("quf_SequenceNum"), String.valueOf(visit));
-        setFormElement(Locator.name("quf_LocationId"), String.valueOf(locationId));
-        setFormElement(Locator.name("quf_Comments"), comment);
-        if (configId != null)
-            setFormElement(Locator.name("quf_SpecimenConfiguration"), configId);
-
+        DataRegionTable drt = new DataRegionTable("query", this);
+        drt.setFilter("SequenceNum", "Equals", "20");
+        clickAndWait(Locator.linkWithText("edit"));
+        setFormElement(Locator.name("quf_SpecimenConfiguration"), firstConfigId);
+        clickButton("Submit");
+        drt.clearFilter("SequenceNum");
+        drt.setFilter("SequenceNum", "Equals", "16");
+        clickAndWait(Locator.linkWithText("edit"));
+        setFormElement(Locator.name("quf_SpecimenConfiguration"), secondConfigId);
         clickButton("Submit");
     }
 
