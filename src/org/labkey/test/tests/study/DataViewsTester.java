@@ -119,10 +119,10 @@ public class DataViewsTester
         _test._extHelper.waitForExtDialog("Delete Category");
         _test.clickButton("OK", 0);
         _test._extHelper.waitForExtDialogToDisappear("Delete Category");
-        _test.waitForElementToDisappear(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])["+CATEGORIES.length+"]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElementToDisappear(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + CATEGORIES.length + "]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.clickButton("New Category", 0);
-        _test.waitForElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])["+CATEGORIES.length+"]"));
-        _test.setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])["+CATEGORIES.length+"]"), "testcategory");
+        _test.waitForElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + CATEGORIES.length + "]"));
+        _test.setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + CATEGORIES.length + "]"), NEW_CATEGORY);
         _test.clickButton("Done", 0);
         _test.clickButton("Save", 0);
         _test.waitForText(CATEGORIES[1], BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
@@ -136,9 +136,12 @@ public class DataViewsTester
         _test.click(Locator.xpath("//span[contains(@class, 'edit-views-link')]"));
         _test._extHelper.waitForExtDialog(EDITED_DATASET);
         _test.setFormElement(Locator.xpath("//label[text() = 'Category']/../..//input"), NEW_CATEGORY);
+        _test.waitAndClick(Locator.css("li.x4-boundlist-item").withText(NEW_CATEGORY));
         _test.setFormElement(Locator.name("description"), NEW_DESCRIPTION);
         _test._extHelper.clickExtButton(EDITED_DATASET, "Save", 0);
-        _test.waitForText(NEW_CATEGORY);
+        _test.waitForElement(Locator.css("div.x4-grid-group-title").withText(NEW_CATEGORY));
+        _test.mouseOver(Locator.linkWithText(EDITED_DATASET));
+        _test.waitForElement(Locator.css(".data-views-tip-content").containing(NEW_CATEGORY));
         _test.clickAndWait(Locator.linkWithText(EDITED_DATASET));
         _test.assertTextPresent(NEW_DESCRIPTION);
     }
