@@ -2267,7 +2267,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (Exception e)
         {
-            log("Error executing dumpPageSnapshot()");
+            log("Error executing dumpPageSnapshot(): " + e.getMessage());
         }
     }
 
