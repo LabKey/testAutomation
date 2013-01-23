@@ -446,7 +446,7 @@ public abstract class Locator
 
     public static XPathLocator menuBarItem(String text)
     {
-        return xpath("//table[@id='menubar']//a/span[contains(text(), " + xq(text) + ")]");
+        return xpath("//div[@id='menubar']//a[contains(text()," + xq(text) + ")]");
     }
 
     public static XPathLocator linkWithTitle(String title)
