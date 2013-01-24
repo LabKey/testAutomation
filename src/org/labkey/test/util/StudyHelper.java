@@ -62,7 +62,7 @@ public class StudyHelper extends AbstractHelper
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
                                                     String categoryName, boolean isCategoryNameNew, Boolean shared, Boolean demographicsPresent, String... ptids)
     {
-        if( !_test.isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
+        if( !_test.isElementPresent(Locator.xpath("id('labkey-nav-trail-current-page')[text() = 'Manage "+participantString+" Groups']")) )
         {
             _test.clickAndWait(Locator.linkWithText(projectName));
             _test.clickAndWait(Locator.linkWithText(studyFolder));
@@ -73,6 +73,7 @@ public class StudyHelper extends AbstractHelper
         _test.log("Create "+participantString+" Group: " + groupName);
         _test.clickButton("Create", 0);
         _test._extHelper.waitForExtDialog("Define "+participantString+" Group");
+        _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
         if (demographicsPresent)
             _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(Locator.xpath("//input[@name='groupLabel']"), groupName);
@@ -96,7 +97,7 @@ public class StudyHelper extends AbstractHelper
         }
         if ( shared != null )
         {
-            _test.sleep(100);
+            _test.waitForElement(Locator.css(".share-group-rendered"));
             if( shared )
             {
                 _test._ext4Helper.checkCheckbox("Share Category?");
@@ -165,7 +166,7 @@ public class StudyHelper extends AbstractHelper
         }
         if ( shared != null )
         {
-            _test.sleep(100);
+            _test.waitForElement(Locator.css(".share-group-rendered"));
             if( shared )
             {
                 _test._ext4Helper.checkCheckbox("Share Category?");
@@ -175,7 +176,6 @@ public class StudyHelper extends AbstractHelper
                 _test._ext4Helper.uncheckCheckbox("Share Category?");
             }
         }
-        _test.sleep(100);
         _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
         _test._extHelper.waitForExt3MaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
