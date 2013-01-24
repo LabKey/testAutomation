@@ -142,9 +142,6 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         checkRhoQueryRowCount("AssaySpecimenMap", 34);
         checkRhoQueryRowCount("MissingSpecimen", 2);
         checkRhoQueryRowCount("MissingVisit", 3);
-
-        // TODO: remove when issue 16959 is fixed for MissingSpecimen import
-        manuallySetSpecimenConfigId(rnaRowId, pcr1RowId);
     }
 
     private void checkRhoQueryRowCount(String name, int expectedCount)
@@ -154,22 +151,6 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable drt = new DataRegionTable("query", this);
         Assert.assertEquals("Unexpected number of rows in the query", expectedCount, drt.getDataRowCount());
-    }
-
-    private void manuallySetSpecimenConfigId(String firstConfigId, String secondConfigId)
-    {
-        clickAndWait(Locator.linkWithText(studyFolder));
-        clickAndWait(Locator.linkWithText("MissingSpecimen"));
-        DataRegionTable drt = new DataRegionTable("query", this);
-        drt.setFilter("SequenceNum", "Equals", "20");
-        clickAndWait(Locator.linkWithText("edit"));
-        setFormElement(Locator.name("quf_SpecimenConfiguration"), firstConfigId);
-        clickButton("Submit");
-        drt.clearFilter("SequenceNum");
-        drt.setFilter("SequenceNum", "Equals", "16");
-        clickAndWait(Locator.linkWithText("edit"));
-        setFormElement(Locator.name("quf_SpecimenConfiguration"), secondConfigId);
-        clickButton("Submit");
     }
 
     private void addSpecimenConfiguration(String assayName, String source, int locationId, String tubeType)
