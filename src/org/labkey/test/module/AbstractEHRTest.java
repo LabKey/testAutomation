@@ -26,6 +26,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.tests.SimpleApiTestWD;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.EHRTestHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.Select;
@@ -150,6 +151,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
                 FULL_SUBMITTER.getEmail());
     }
 
+    @LogMethod
     protected void initProject() throws Exception
     {
         enableEmailRecorder();
@@ -202,6 +204,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         defineQCStates();
     }
 
+    @LogMethod
     protected void populateRecords() throws Exception
     {
         log("Inserting initial records into EHR hard tables");
@@ -231,6 +234,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         saveResp = insertCmd.execute(cn, CONTAINER_PATH);
     }
 
+    @LogMethod
     protected void deleteRecords() throws Exception
     {
         log("Deleting initial records from EHR hard tables");
@@ -287,6 +291,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         return true;
     }
 
+    @LogMethod
     protected void defineQCStates()
     {
         log("Define QC states for EHR study");
@@ -307,6 +312,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         clickButton("Done");
     }
 
+    @LogMethod
     protected void setupEhrPermissions() throws Exception
     {
         DATA_ADMIN.setUserId(_helper.createUserAPI(DATA_ADMIN.getEmail(), getProjectName()));
@@ -315,13 +321,6 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         FULL_SUBMITTER.setUserId(_helper.createUserAPI(FULL_SUBMITTER.getEmail(), getProjectName()));
         FULL_UPDATER.setUserId(_helper.createUserAPI(FULL_UPDATER.getEmail(), getProjectName()));
         REQUEST_ADMIN.setUserId(_helper.createUserAPI(REQUEST_ADMIN.getEmail(), getProjectName()));
-
-        setInitialPassword(DATA_ADMIN.getEmail(), PasswordUtil.getPassword());
-        setInitialPassword(REQUESTER.getEmail(), PasswordUtil.getPassword());
-        setInitialPassword(BASIC_SUBMITTER.getEmail(), PasswordUtil.getPassword());
-        setInitialPassword(FULL_SUBMITTER.getEmail(), PasswordUtil.getPassword());
-        setInitialPassword(FULL_UPDATER.getEmail(), PasswordUtil.getPassword());
-        setInitialPassword(REQUEST_ADMIN.getEmail(), PasswordUtil.getPassword());
 
         _helper.createPermissionsGroupAPI(DATA_ADMIN.getGroup(), getProjectName(), DATA_ADMIN.getUserId());
         _helper.createPermissionsGroupAPI(REQUESTER.getGroup(), getProjectName(), REQUESTER.getUserId());
@@ -376,6 +375,17 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         }, "Per-dataset permission not set", WAIT_FOR_JAVASCRIPT);
 
         clickButton("Save");
+    }
+
+    @LogMethod
+    public void setEhrUserPasswords()
+    {
+        setInitialPassword(DATA_ADMIN.getEmail(), PasswordUtil.getPassword());
+        setInitialPassword(REQUESTER.getEmail(), PasswordUtil.getPassword());
+        setInitialPassword(BASIC_SUBMITTER.getEmail(), PasswordUtil.getPassword());
+        setInitialPassword(FULL_SUBMITTER.getEmail(), PasswordUtil.getPassword());
+        setInitialPassword(FULL_UPDATER.getEmail(), PasswordUtil.getPassword());
+        setInitialPassword(REQUEST_ADMIN.getEmail(), PasswordUtil.getPassword());
     }
 
     public void setPDP(EHRUser user)

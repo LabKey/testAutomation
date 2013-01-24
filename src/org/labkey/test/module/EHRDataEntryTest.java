@@ -18,6 +18,7 @@ package org.labkey.test.module;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.LabModuleHelper;
+import org.labkey.test.util.LogMethod;
 
 import java.util.Date;
 
@@ -41,6 +42,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         mprDataEntryTest();
     }
 
+    @LogMethod
     private void weightDataEntryTest()
     {
         log("Test weight data entry");
@@ -188,6 +190,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         assertTextPresent("Completed", 3);
     }
 
+    @LogMethod
     private void mprDataEntryTest()
     {
         log("Test MPR data entry.");
@@ -196,22 +199,20 @@ public class EHRDataEntryTest extends AbstractEHRTest
         saveLocation();
         impersonate(FULL_SUBMITTER.getEmail());
         recallLocation();
-        waitAndClick(Locator.linkWithText("Enter Data"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.linkWithText("Enter Data"));
 
         log("Create weight measurement task.");
-        waitAndClick(Locator.linkWithText("Enter MPR"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.linkWithText("Enter MPR"));
         // Wait for page to fully render.
         waitForText("Treatments", WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.name("Id"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.name("title"), WAIT_FOR_JAVASCRIPT);
-        _extHelper.setExtFormElementByLabel("Id:", PROJECT_MEMBER_ID);
+        _extHelper.selectComboBoxItem("Assigned To:", BASIC_SUBMITTER.getGroup() + "\u00A0"); // appended with a nbsp (Alt+0160)
+        _extHelper.setExtFormElementByLabel("Id:", PROJECT_MEMBER_ID + "\t");
+        click(Locator.xpath("//div[./label[normalize-space()='Id:']]//input"));
         waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("title"), MPR_TASK_TITLE);
-        _extHelper.selectComboBoxItem("Assigned To:", BASIC_SUBMITTER.getGroup() + "\u00A0"); // appended with a nbsp (Alt+0160)
-
-        sleep(1000);
+        click(Locator.name("title"));
 
         clickButton("Save & Close");
 
@@ -230,8 +231,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         log("Fulfil MPR task");
         impersonate(BASIC_SUBMITTER.getEmail());
         recallLocation();
-        waitAndClick(Locator.linkWithText("Enter Data"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.linkWithText("Enter Data"));
         waitForElement(Locator.xpath("//div[contains(@class, 'my-tasks-marker') and "+VISIBLE+"]//table"), WAIT_FOR_JAVASCRIPT);
         String href = getAttribute(Locator.linkWithText(MPR_TASK_TITLE), "href");
         beginAt(href);

@@ -33,6 +33,8 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.IOException;
@@ -50,7 +52,6 @@ import java.util.Random;
 import java.util.UUID;
 
 /**
- * Created by IntelliJ IDEA.
  * User: bbimber
  * Date: 8/6/12
  * Time: 6:05 PM
@@ -89,6 +90,7 @@ public class EHRApiTest extends AbstractEHRTest
     public void runApiTests() throws Exception
     {
         initProject();
+        setEhrUserPasswords();
 
         goToProjectHome();
         createTestSubjects();
@@ -97,6 +99,7 @@ public class EHRApiTest extends AbstractEHRTest
         doTriggerScriptTests();
     }
 
+    @LogMethod
     private void doSecurityTest() throws Exception
     {
         testUserAgainstAllStates(DATA_ADMIN);
@@ -110,6 +113,7 @@ public class EHRApiTest extends AbstractEHRTest
         resetErrors(); //note: inserting records without permission will log errors by design.  the UI should prevent this from happening, so we want to be aware if it does occur
     }
 
+    @LogMethod
     private void doTriggerScriptTests() throws Exception
     {
         _saveRowsTimes = new ArrayList<Long>();
@@ -141,6 +145,7 @@ public class EHRApiTest extends AbstractEHRTest
         calculateAverage();
     }
 
+    @LogMethod
     private void createTestSubjects()
     {
         try
@@ -198,6 +203,7 @@ public class EHRApiTest extends AbstractEHRTest
         }
     }
 
+    @LogMethod
     private void weightValidationTest()
     {
         //expect weight out of range
@@ -227,6 +233,7 @@ public class EHRApiTest extends AbstractEHRTest
         //TODO: test error threshold
     }
 
+    @LogMethod
     private void arrivalDepartureTest()
     {
         try
@@ -482,7 +489,8 @@ public class EHRApiTest extends AbstractEHRTest
         }
     }
 
-    private void testUserAgainstAllStates(EHRUser user) throws Exception
+    @LogMethod
+    private void testUserAgainstAllStates(@LoggedParam EHRUser user) throws Exception
     {
         JSONObject extraContext = new JSONObject();
         extraContext.put("errorThreshold", "ERROR");
