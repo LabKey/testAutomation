@@ -25,7 +25,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONValue;
@@ -35,6 +34,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -47,6 +47,8 @@ import java.util.Map;
  */
 public class JUnitTest extends TestSuite
 {
+    private static final DecimalFormat commaf0 = new DecimalFormat("#,##0");
+
     public JUnitTest() throws Exception
     {
     }
@@ -214,18 +216,19 @@ public class JUnitTest extends TestSuite
                 String url = WebTestHelper.getBaseURL() + "/junit/go.view?testCase=" + _remoteClass;
                 HttpGet method = new HttpGet(url);
                 client.getParams().setParameter("http.socket.timeout", _timeout * 1000);
+                long startTime = System.currentTimeMillis();
                 response = client.execute(method, context);
                 int status = response.getStatusLine().getStatusCode();
                 String responseBody = WebTestHelper.getHttpResponseBody(response);
 
                 if (status == HttpStatus.SC_OK)
                 {
-                    log("remote junit successful: " + _remoteClass);
+                    logTest("successful", startTime);
                     log(dump(responseBody));
                 }
                 else
                 {
-                    log("remote junit failed: " + _remoteClass);
+                    logTest("failed", startTime);
                     Assert.fail("remote junit failed: " + _remoteClass + "\n" + dump(responseBody));
                 }
             }
@@ -240,6 +243,11 @@ public class JUnitTest extends TestSuite
                 if (client != null)
                     client.getConnectionManager().shutdown();
             }
+        }
+
+        private void logTest(String message, long startTime)
+        {
+            log("remote junit " + message + ": " + _remoteClass + " [" + commaf0.format(System.currentTimeMillis() - startTime) + " ms]");
         }
 
         static String dump(String response)
