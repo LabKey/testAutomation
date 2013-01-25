@@ -4172,19 +4172,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         WebElement el;
         el = l.findElement(_driver);
 
+        clickAndWait(el, pageTimeoutMs);
+    }
+
+    public void clickAndWait(WebElement el, int pageTimeoutMs)
+    {
         if (pageTimeoutMs > 0)
             prepForPageLoad();
 
-        try
-        {
-            el.click();
-        }
-        catch (StaleElementReferenceException e)
-        { // Try it again
-            log("WARNING: Element was stale, trying to relocate it. Consider a timing investigation to prevent this.");
-            el = l.findElement(_driver);
-            el.click();
-        }
+        el.click();
 
         if (pageTimeoutMs > 0)
             newWaitForPageToLoad(pageTimeoutMs);
@@ -5000,7 +4996,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     *  wait for element, click it, return immediately
+     *  wait for element, click it, wait for page to load
      */
     public void waitAndClickAndWait(Locator l)
     {
@@ -5012,8 +5008,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void waitAndClick(int waitFor, Locator l, int waitForPageToLoad)
     {
-        waitForElement(l, waitFor);
-        clickAndWait(l, waitForPageToLoad);
+        WebElement el = l.waitForElmement(getDriver(), waitForPageToLoad);
+        clickAndWait(el, waitForPageToLoad);
     }
 
     /** @return target of link */
@@ -5211,7 +5207,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String columnLabel = getText(header);
         runMenuItemHandler(id);
         _extHelper.waitForExtDialog("Show Rows Where " + columnLabel + "...");
-        waitForTextToDisappear("Loading...");
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         if (isTextPresent("Choose Values"))
         {

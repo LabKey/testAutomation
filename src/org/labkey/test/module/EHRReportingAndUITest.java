@@ -25,7 +25,6 @@ import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Treygdor
  * Date: Mar 21, 2011
  * Time: 1:59:12 PM
@@ -248,7 +247,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         clickButton("Submit", 0);
         waitForElement(Locator.ext4Button(PROJECT_MEMBER_ID + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
-        waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT * 2);
+        waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT * 3);
 
         log("Verify Protocol search");
         waitAndClick(Locator.ext4Radio("Multiple Animals"));
@@ -297,7 +296,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         clickButton("Close", 0);
 
         log("Return Distinct Values - filtered");
-        waitForTextToDisappear("Loading...");
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT * 3);
         setFilterAndWait(dataRegionName, "Id", "Does Not Equal", PROTOCOL_MEMBER_IDS[1], 0);
         waitForText("(Id <> " + PROTOCOL_MEMBER_IDS[1] + ")", WAIT_FOR_JAVASCRIPT * 5);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Return Distinct Values");
