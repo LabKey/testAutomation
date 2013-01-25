@@ -118,8 +118,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         int locationId = Integer.parseInt(drt.getDataAsText(drt.getRow("Label", "Main"), "RowId"));
 
         // add the specimen configurations to the manage page
-        String containerId = selenium.getEval("selenium.getContainerId()"); // NOTE: using this because the beginAt doesn't work with the special chars in the project/folder name
-        beginAt("/rho/" + containerId + "/manageSpecimenConfiguration.view?");
+        goToModule("rho"); // for containers with a study, the rho beginAction will redirect to manageSpecimenConfiguration
         addSpecimenConfiguration("PCR", "R", locationId, "CEF-R Cryovial");
         addSpecimenConfiguration("PCR", "R", locationId, "UPR Micro Tube");
         addSpecimenConfiguration("RNA", "R", locationId, "TGE Cryovial");
@@ -133,7 +132,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         String pcr2RowId = drt.getDataAsText(drt.getRow("TubeType", "UPR Micro Tube"), "RowId");
         String rnaRowId = drt.getDataAsText(drt.getRow("TubeType", "TGE Cryovial"), "RowId");
         // set the specimen configuration visits (by checking the checkboxes on the manage page
-        beginAt("/rho/" + containerId + "/manageSpecimenConfiguration.view?");
+        goToModule("rho"); // for containers with a study, the rho beginAction will redirect to manageSpecimenConfiguration
         setSpecimenConfigurationVisit(pcr1RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
         setSpecimenConfigurationVisit(pcr2RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
         setSpecimenConfigurationVisit(rnaRowId, new String[]{"0", "6", "20", "SR"});
