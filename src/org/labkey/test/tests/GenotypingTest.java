@@ -156,7 +156,23 @@ public class GenotypingTest extends BaseSeleniumWebTest
         importIlluminaRunTest();
         verifyIlluminaExport();
         verifyAnalysis();
+        verifyCleanIlluminaSampleSheets();
 
+    }
+
+    //verify that with good data, there is no QC warning when creating an illumina sample sheet
+    //https://docs.google.com/a/labkey.com/file/d/0B45Fm0-0-NLtdmpDR1hKaW5jSWc/edit
+    private void verifyCleanIlluminaSampleSheets()
+    {
+        importFolderFromZip(pipelineLoc + "/genoCleanSamples.folder.zip", 6);
+        goToProjectHome();
+        click(Locator.linkWithText("Samples"));
+        waitForText("SIVkcol2");
+        DataRegionTable d = new DataRegionTable("query", this);
+        d.checkAllOnPage();
+        clickButton("Create Illumina Sample Sheet");
+        waitForText("You have chosen to export 6 samples");
+        assertTextNotPresent("Warning");
     }
 
     private void importSecondRunTest()

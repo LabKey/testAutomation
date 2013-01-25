@@ -6011,7 +6011,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 
+
     protected void importFolderFromZip(String folderFile)
+    {
+        importFolderFromZip(folderFile, 1);
+    }
+
+    protected void importFolderFromZip(String folderFile, int completedJobs)
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
@@ -6019,7 +6025,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         setFormElement(Locator.name("folderZip"), new File(folderFile));
         clickButtonContainingText("Import Folder From Local Zip Archive");
         waitForText("Data Pipeline");
-        waitForPipelineJobsToComplete(1, "Folder import", false);
+        waitForPipelineJobsToComplete(completedJobs, "Folder import", false);
     }
 
     protected void importFolderFromPipeline(String folderFile)
