@@ -432,8 +432,8 @@ public class ListHelperWD extends ListHelper
 
     public void addField(ListColumn col)
     {
-        int i = _test.getElementCount(Locator.css(".labkey-pad-cells > tbody > tr")) - 1;
         _test.waitForElement(Locator.id("button_Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        int i = _test.getElementCount(Locator.css(".labkey-pad-cells > tbody > tr")) - 1;
         _test.clickButton("Add Field", 0);
         _test.setFormElement(Locator.name("ff_name" + i),  col.getName());
         _test.setFormElement(Locator.name("ff_label" + i), col.getLabel());
