@@ -294,7 +294,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 //            log("sampleIdToWorkbookId.put(\"" + sampleIds[i] + "\", \"" + workbookIds[i] + "\");");
 
 
-        verifySimpleModuleTables("Samples", "detailsQueryRow.view", "detailsQueryRow.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, true, true);
+        verifySimpleModuleTables("Samples", "recordDetails.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, true, true);
 
 
         // Verify Issue 16243: Details URL creating URLs with null container unless the container column is actually added to current view
@@ -305,7 +305,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         cv.removeCustomizeViewColumn("container");
         cv.saveCustomView();
 
-        verifySimpleModuleTables("Samples", "detailsQueryRow.view", "detailsQueryRow.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, true);
+        verifySimpleModuleTables("Samples", "recordDetails.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, true);
 
 
         log("** Override detailsURL in metadata...");
@@ -316,7 +316,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 "    <!--<ns:javaCustomizer>org.labkey.ldk.query.BuiltInColumnsCustomizer</ns:javaCustomizer>-->\n" +
                 "    <ns:titleColumn>rowid</ns:titleColumn>\n" +
                 "    <ns:updateUrl>/query/manageRecord.view?schemaName=laboratory&amp;query.queryName=samples&amp;keyField=rowid&amp;key=${rowid}</ns:updateUrl>\n" +
-                "    <ns:tableUrl>/query/XXX.view?schemaName=laboratory&amp;query.queryName=samples&amp;rowid=${rowid}</ns:tableUrl>\n" +
+                "    <ns:tableUrl>/query/XXX.view?schemaName=laboratory&amp;query.queryName=samples&amp;keyField=rowid&amp;key=${rowid}</ns:tableUrl>\n" +
                 "    <ns:insertUrl></ns:insertUrl>\n" +
                 "    <ns:importUrl>/query/importData.view?schemaName=laboratory&amp;query.queryName=samples&amp;keyField=rowid&amp;key=${rowid}&amp;query.columns=*</ns:importUrl>\n" +
                 "  </ns:table>\n" +
@@ -339,7 +339,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 "FROM samples";
 
         createQuery(getProjectName(), "Samples With Container", "laboratory", customQueryWithContainer, customMetadata, false);
-        verifySimpleModuleTables("Samples With Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, true, false);
+        verifySimpleModuleTables("Samples With Container", "XXX.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, true, false);
 
 
         log("** Create custom query over laboratory.samples table WITH container AS folder");
@@ -354,7 +354,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 "FROM samples";
 
         createQuery(getProjectName(), "Samples With Folder", "laboratory", customQueryFolderContainer, customMetadata, false);
-        verifySimpleModuleTables("Samples With Folder", "XXX.view", "detailsQueryRow.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, false);
+        verifySimpleModuleTables("Samples With Folder", "XXX.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, false);
 
 
         // Container context won't work if the container column is named something other than container or folder.
@@ -388,7 +388,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 "FROM samples";
 
         createQuery(getProjectName(), "Samples Without Container", "laboratory", customQueryWithoutContainer, customMetadata, false);
-        verifySimpleModuleTables("Samples Without Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, false);
+        verifySimpleModuleTables("Samples Without Container", "XXX.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, false);
     }
 
     private void deleteQuery(String container, String schemaName, String queryName)
@@ -468,7 +468,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             // sample ID link
             href = dr.getHref(i, "Sample Id");
             log("  Sample Id column href = " + href);
-            expectedHref = "/query/" + workbookContainer + "/" + detailsAction + "?schemaName=laboratory&query.queryName=samples&rowid=" + sampleIds[i];
+            expectedHref = "/query/" + workbookContainer + "/" + detailsAction + "?schemaName=laboratory&query.queryName=samples&keyField=rowid&key=" + sampleIds[i];
             Assert.assertTrue("Expected Sample Id column URL to go to " + expectedHref + ", got href=" + href,
                     href.contains(expectedHref));
 
@@ -477,7 +477,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             {
                 String parentSampleWorkbookId = sampleIdToWorkbookId.get(parentSampleIds[i]);
                 String parentSampleContainer = EscapeUtil.encode(getProjectName()) + "/workbook-" + parentSampleWorkbookId;
-                expectedHref = "/query/" + parentSampleContainer + "/" + parentDetailsAction + "?schemaName=laboratory&query.queryName=samples&rowid=" + parentSampleIds[i];
+                expectedHref = "/query/" + parentSampleContainer + "/" + parentDetailsAction + "?schemaName=laboratory&query.queryName=samples&keyField=rowid&key=" + parentSampleIds[i];
 
                 href = dr.getHref(i, "Parent Sample");
                 log("  Parent Sample column href = " + href);
@@ -488,14 +488,14 @@ public class ContainerContextTest extends BaseWebDriverTest
             // sample source lookup (table has no container so URL should go to current container)
             href = dr.getHref(i, "Sample Source");
             log("  Sample Source column href = " + href);
-            expectedHref = "/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_type";
+            expectedHref = "/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type";
             Assert.assertTrue("Expected sample source column URL to go to " + getProjectName() + " container, got href=" + href,
                     href.contains(expectedHref));
 
             // sample type lookup (table has no container so URL should go to current container)
             href = dr.getHref(i, "Sample Type");
             log("  Sample Type column href = " + href);
-            expectedHref = "/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_type";
+            expectedHref = "/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type";
             Assert.assertTrue("Expected sample type column URL to go to " + getProjectName() + " container, got href=" + href,
                     href.contains(expectedHref));
 
