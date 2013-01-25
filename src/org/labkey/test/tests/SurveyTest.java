@@ -20,6 +20,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
 import java.io.File;
@@ -36,6 +37,11 @@ public class SurveyTest extends BaseWebDriverTest
     private final String subfolderSurveyDesign = "My Subfolder Survey Design";
     private final String firstSurvey = "First Survey";
     private final String secondSurvey = "Second Survey";
+    private final String headerWikiBody = "Header wiki content to appear above the survey form panel.";
+    private final String footerWikiBody = "Footer wiki content to appear below the survey form panel.";
+    public static final String EDITOR = "editor_survey@survey.test";
+
+    private final PortalHelper portalHelper = new PortalHelper(this);
 
     @Override
     protected String getProjectName()
@@ -50,8 +56,8 @@ public class SurveyTest extends BaseWebDriverTest
         setupSubfolder();
 
         verifySurveyFromProject();
-        verifyEditSurvey(folderName, firstSurvey);
-        verifySubmitSurvey(folderName, firstSurvey);
+        verifyEditSurvey();
+        verifySubmitSurvey();
         verifySurveyFromSubfolder();
         verifySurveyContainerPermissions();
     }
@@ -69,7 +75,7 @@ public class SurveyTest extends BaseWebDriverTest
         log("Create survey disign at the project level");
         _listHelper.importListArchive(getProjectName(), new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         enableModule(getProjectName(), "Survey");
-        addWebPart("Survey Designs");
+        portalHelper.addWebPart("Survey Designs");
         createSurveyDesign(getProjectName(), projectSurveyDesign, "listA");
     }
 
@@ -80,8 +86,16 @@ public class SurveyTest extends BaseWebDriverTest
         log("Create survey disign at the subfolder level");
         _listHelper.importListArchive(folderName, new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         enableModule(folderName, "Survey");
-        addWebPart("Survey Designs");
+        portalHelper.addWebPart("Survey Designs");
         createSurveyDesign(folderName, subfolderSurveyDesign, "listA");
+
+        log("Add users that will be used for permissions testing");
+        createUser(EDITOR, null);
+        clickFolder(getProjectName());
+        clickFolder(folderName);
+        enterPermissionsUI();
+        setUserPermissions(EDITOR, "Editor");
+        clickButton("Save and Finish");
     }
 
     private void createSurveyDesign(String folder, String designName, String listName)
@@ -145,11 +159,11 @@ public class SurveyTest extends BaseWebDriverTest
         //setFormElement(Locator.name(inputName), new File(getLabKeyRoot() + fileName));
     }
 
-    private void verifyEditSurvey(String folder, String surveyName)
+    private void verifyEditSurvey()
     {
         log("Edit the survey in the specified folder");
-        clickFolder(folder);
-        clickEditForLabel(surveyName, true);
+        clickFolder(folderName);
+        clickEditForLabel(firstSurvey, true);
         _ext4Helper.waitForMaskToDisappear();
         setFormElement(Locator.name("txtAreaField"), "txtAreaField\nnew line");
         _ext4Helper.uncheckCheckbox("Bool Field");
@@ -163,26 +177,63 @@ public class SurveyTest extends BaseWebDriverTest
         assertTextPresentInThisOrder("txtField", "txtAreaField", "new line", "false", "999", "999.1", "2013-01-04", "Test1");
     }
 
-    private void verifySubmitSurvey(String folder, String surveyName)
+    private void verifySubmitSurvey()
     {
         // TODO: add a required field to the survey and verify the submit button disables when it doesn't have a value
 
         log("Submit the completed survey in the specified folder");
-        clickFolder(folder);
-        clickEditForLabel(surveyName, true);
+        clickFolder(folderName);
+        clickEditForLabel(firstSurvey, true);
         _ext4Helper.waitForMaskToDisappear();
         assertElementPresent(Locator.button("Save"));
         assertElementPresent(Locator.button("Submit completed form"));
         clickButton("Submit completed form");
         // go back to the submitted survey and verify the submit button is gone
         // TODO: add verification that site/project admins can still see Save button but other users can not for a submitted survey
-        clickEditForLabel(surveyName, true);
+        clickEditForLabel(firstSurvey, true);
         _ext4Helper.waitForMaskToDisappear();
         assertElementNotPresent(Locator.button("Submit completed form"));
+        assertTextPresent("This survey was submitted by");
+
+        log("Verify that only admins can make changes to a submitted survey");
+        // we should currently be logged in as site admin
+        assertTextPresent("You are allowed to make changes to this form because you are a project/site administrator.");
+        Assert.assertTrue("Save button should be disabled", isElementPresent(Locator.xpath("//div[contains(@class,'item-disabled')]//span[text() = 'Save']")));
+        setFormElement(Locator.name("txtAreaField"), "edit by admin after submit");
+        Assert.assertTrue("Save button should not be disabled", !isElementPresent(Locator.xpath("//div[contains(@class,'item-disabled')]//span[text() = 'Save']")));
+        clickButton("Save", 0);
+        _extHelper.waitForExtDialog("Success");
+        _extHelper.waitForExtDialogToDisappear("Success");
+
+        log("Verify that non-admin can't edit a submitted survey");
+        pushLocation();
+        impersonate(EDITOR);
+        popLocation();
+        waitForText("Survey Label*");
+        Assert.assertTrue(getFormElement(Locator.name("txtAreaField")).equals("edit by admin after submit"));
+        assertTextPresent("This survey was submitted by");
+        assertTextNotPresent("You are allowed to make changes to this form");
+        assertElementNotPresent(Locator.button("Save"));
+        assertElementNotPresent(Locator.button("Submit completed form"));
+        stopImpersonating();
+        clickFolder(getProjectName());
     }
 
     private void verifySurveyFromSubfolder()
     {
+        log("Create wikis for survey header/footer");
+        clickFolder(folderName);
+        goToModule("Wiki");
+        createNewWikiPage();
+        setFormElement(Locator.name("name"), "header_wiki");
+        setWikiBody(headerWikiBody);
+        saveWikiPage();
+        goToModule("Wiki");
+        createNewWikiPage();
+        setFormElement(Locator.name("name"), "footer_wiki");
+        setWikiBody(footerWikiBody);
+        saveWikiPage();
+
         log("Customize the survey design metadata (card layout, multiple sections, show question counts, etc.)");
         clickFolder(folderName);
         clickEditForLabel(subfolderSurveyDesign, false);
@@ -198,14 +249,15 @@ public class SurveyTest extends BaseWebDriverTest
 
         log("Verify the card layout (i.e. has section headers on left, not all questions visible, etc.)");
         clickButtonByIndex("Create New Survey", 1, WAIT_FOR_JAVASCRIPT);
-        waitForText("Begin Survey");
-        assertElementPresent(Locator.xpath("//li[text()='Begin Survey']"));
+        waitForText("Start");
+        assertElementPresent(Locator.xpath("//li[text()='Start']"));
         assertElementPresent(Locator.xpath("//li[text()='Section 1']"));
         assertElementPresent(Locator.xpath("//li[text()='Section 2']"));
-        assertElementPresent(Locator.xpath("//li[text()='End Survey']"));
+        assertElementPresent(Locator.xpath("//li[text()='Finish']"));
         assertElementPresent(Locator.button("Previous"));
         assertElementPresent(Locator.button("Next"));
         assertElementNotPresent(Locator.button("Submit completed form"));
+        assertTextPresentInThisOrder(headerWikiBody, footerWikiBody);
 
         // set form field values
         setFormElement(Locator.name("_surveyLabel_"), secondSurvey);
@@ -258,7 +310,7 @@ public class SurveyTest extends BaseWebDriverTest
     private void addSurveyWebpart(String surveyDesignName)
     {
         log("Configure Surveys webpart");
-        addWebPart("Surveys");
+        portalHelper.addWebPart("Surveys");
         _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Survey Design:']]"), surveyDesignName);
         clickButton("Submit");
         waitForText("Surveys: " + surveyDesignName);
@@ -266,13 +318,19 @@ public class SurveyTest extends BaseWebDriverTest
 
     private void verifySurveyContainerPermissions()
     {
+        log("Verify survey designs (current and parent container)");
+        clickFolder(folderName);
+        assertTextPresentInThisOrder("My Project Survey Design", "My Subfolder Survey Design");
+        clickFolder(getProjectName());
+        assertTextPresent("My Project Survey Design");
+        assertTextNotPresent("My Subfolder Survey Design");
+
         log("Add Survey webpart to project and verify subfolder survey is not present");
         clickFolder(getProjectName());
         addSurveyWebpart(projectSurveyDesign);
         assertTextPresent("No data to show.");
         assertTextNotPresent(firstSurvey);
-
-        // TODO: more to be added here once we implement more of the role based permissions
+        assertTextNotPresent(secondSurvey);
     }
 
     private void addSurveyGridQuestionRecord(String val1, String val2)
@@ -309,6 +367,13 @@ public class SurveyTest extends BaseWebDriverTest
 
         waitForElement(l);
         clickAndWait(l);
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        deleteUsers(afterTest, EDITOR);
+        super.doCleanup(afterTest);
     }
 
     @Override
