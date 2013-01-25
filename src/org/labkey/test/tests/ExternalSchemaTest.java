@@ -163,7 +163,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
     void setEditable(String containerPath, boolean editable)
     {
         beginAt("/query/" + containerPath + "/admin.view");
-        clickAndWait(Locator.linkWithText("edit definition"));
+        clickAndWait(Locator.linkWithText("edit"));
         if (editable)
             checkCheckbox("editable");
         else
