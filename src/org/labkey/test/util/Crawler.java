@@ -515,6 +515,9 @@ public class Crawler
 
     private void crawlLink(UrlToCheck urlToCheck, String relativeURL)
     {
+        URL origin = null;
+        RuntimeException re = null;
+        AssertionError ae = null;
         // Helps breadth first crawl
         try
         {
@@ -523,7 +526,7 @@ public class Crawler
             try{ _test.dismissAlerts(); } catch(SeleniumException ignore){}
 
             int depth = urlToCheck.getDepth();
-            URL origin = urlToCheck.getOrigin();
+            origin = urlToCheck.getOrigin();
             URL currentPageUrl = _test.getURL();
 
             // Find all the links at the site
@@ -544,11 +547,32 @@ public class Crawler
 			testInjection(urlToCheck, currentPageUrl);
             testNavTrail(urlToCheck);
         }
-        catch (RuntimeException re)
+        catch (RuntimeException delay) {re = delay;}
+        catch (AssertionError delay) {ae = delay;}
+
+        // Collect origin page snapshot for failure and rethrow original failure
+        if (ae != null || re != null)
         {
-            // ignore javascript errors (HTTPUnit has a poor engine) and non-HTML download links:
-            if (re.getMessage().indexOf("ScriptException") < 0 && !re.getClass().getSimpleName().equals("NotHTMLException"))
+            try
+            {
+                if (origin != null){
+                    _test.log("Crawl failure: collecting origin page info.");
+                    _test.pushLocation();
+                    String originUrl = origin.toString();
+                    int relativeURLStart = originUrl.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
+                    _test.beginAt(originUrl.substring(relativeURLStart));
+                    _test.dumpPageSnapshot("crawlOrigin");
+                    _test.popLocation();
+                }
+            }
+            catch (Exception ignore) {}
+
+            if (ae != null)
+                throw ae;
+            if (re != null)
                 throw re;
+            else
+                throw new IllegalStateException("WTF");
         }
     }
 
