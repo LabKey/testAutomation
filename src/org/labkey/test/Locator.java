@@ -642,6 +642,16 @@ public abstract class Locator
             return Locator.id(text + "Tab");
     }
 
+    public static XPathLocator paginationText(int firstRow, int lastRow, int maxRows)
+    {
+        return paginationText(firstRow + " - " + lastRow + " of " + maxRows);
+    }
+
+    public static XPathLocator paginationText(String text)
+    {
+        return Locator.xpath("//div[contains(@class, 'labkey-pagination')]").withText(text);
+    }
+
     public static XPathLocator pageHeader(String headerText)
     {
         return Locator.xpath("id('labkey-nav-trail-current-page')").withText(headerText);

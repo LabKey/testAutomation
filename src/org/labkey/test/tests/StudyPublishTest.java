@@ -15,17 +15,23 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: tchadick
@@ -47,15 +53,21 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String GROUP0_NAME = "Unshared Group";
     private final String[] GROUP0_PTIDS = {"1234"};
     private final String GROUP1_NAME = "Group 1";
-    private final String[] GROUP1_PTIDS = {"999321029", "999320016", "999320485", "999320518", "999320529", "999320533"};
+    private final String[] GROUP1_PTIDS = {"999320016", "999321029", "999320485", "999320518", "999320529", "999320533"};
     private final String GROUP2_NAME = "Group 2";
-    private final String[] GROUP2_PTIDS = {"999320541", "999320557", "999320565", "999320576", "999320582", "999320590"};
+    private final String[] GROUP2_PTIDS = {"999320016", "999320719", "999320565", "999320576", "999320582", "999320590"};
     private final String GROUP3_NAME = "Group 3";
-    private final String[] GROUP3_PTIDS = {"999320609", "999320613", "999320624", "999320638", "999320646", "999320652"};
+    private final String[] GROUP3_PTIDS = {"999321033", "999320613", "999320624", "999320638", "999320646", "999320652"};
 
-    private final String[] DATASETS = {"RCB-1: Reactogenicity-Baseline", "RCM-1: Reactogenicity-Early Assessment", "RCE-1: Reactogenicity-Day 0", "RCH-1: Reactogenicity-Day 1", "RCF-1: Reactogenicity-Day 2", "RCT-1: Reactogenicity-Day 3", "RCP-1: Reactogenicity-Resolution", "DEM-1: Demographics"};
+    private final String[] DATASETS = {"RCB-1: Reactogenicity-Baseline", "RCM-1: Reactogenicity-Early Assessment", "RCE-1: Reactogenicity-Day 0", "RCH-1: Reactogenicity-Day 1", "RCF-1: Reactogenicity-Day 2", "RCT-1: Reactogenicity-Day 3", "CPS-1: Screening Chemistry Panel", "DEM-1: Demographics"};
     private final String REPORT_DATASET = "RCB-1: Reactogenicity-Baseline";
     private final String UNPUBLISHED_REPORT_DATASET = "AE-1:(VTN) AE Log";
+    private final String DATE_SHIFT_DATASET = "CPS-1: Screening Chemistry Panel";
+    private final String DATE_SHIFT_REQUIRED_VISIT = "101";
+    private final ImmutablePair<String, String> UNSHIFTED_DATE_FIELD = new ImmutablePair<String, String>("CPSdt", "Initial Spec Collect Date");
+    private final ImmutablePair<String, String> SHIFTED_DATE_FIELD = new ImmutablePair<String, String>("CPScredt", "2a.Alt Creat Coll Date");
+    private HashMap<String, Set<String>> unshiftedDatesByStudy = new HashMap<String, Set<String>>();
+    private HashMap<String, Set<String>> preshiftedDatesByStudy = new HashMap<String, Set<String>>();
     private final String[] VISITS = {"101", "201", "601", "1301"};
     private final String R_VIEW = "Shared R View";
     private final String R_VIEW2 = "R View on Unpublished Dataset";
@@ -101,12 +113,12 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String PUB3_CONTAINER = "/" + getProjectName();
     private final String[] PUB3_GROUPS = {GROUP2_NAME, GROUP3_NAME};
     private final String[] PUB3_DATASETS = {DATASETS[0], DATASETS[1], DATASETS[2], DATASETS[4], DATASETS[5], DATASETS[6]}; // DAY 1 omitted
-    private final String[] PUB3_DEPENDENT_DATASETS = {"APX-1: Abbreviated Physical Exam", "EVC-1: Enrollment Vaccination"}; // Visit dates are defined here.
-    private final String[] PUB3_VISITS = {VISITS[1], VISITS[2]};
+    private final String[] PUB3_DEPENDENT_DATASETS = {"APX-1: Abbreviated Physical Exam", "EVC-1: Enrollment Vaccination", DATASETS[7]}; // Visit dates are defined here.
+    private final String[] PUB3_VISITS = {VISITS[0], VISITS[1], VISITS[2]};
     private final String[] PUB3_VIEWS = {}; // none
     private final String[] PUB3_REPORTS = {}; // none
     private final String[] PUB3_LISTS = {}; // none
-    private final int PUB3_EXPECTED_SPECIMENS = 6;
+    private final int PUB3_EXPECTED_SPECIMENS = 29;
 
     private final String SPECIMEN_ARCHIVE_B = "/sampledata/study/specimens/sample_b.specimens";
     private final String[] SPECIMEN_KEY_FIELDS = {"SpecimenNumber", "MouseId"};
@@ -156,12 +168,14 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Set some specimen fields as protected to test exclusion with snapshot and refresh
         setSpecimenFieldsProtected(SPECIMEN_KEY_FIELDS, SPECIMEN_PROTECTED_FIELDS);
 
+        setUnshiftedDateField(DATE_SHIFT_DATASET, UNSHIFTED_DATE_FIELD.getKey());
+
         clickFolder(getProjectName());
         clickFolder(getFolderName());
         // Publish the study in a few different ways
         publishStudy(PUB1_NAME, PUB1_DESCRIPTION, PUB1_CONTAINER, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true);
         publishStudy(PUB2_NAME, PUB2_DESCRIPTION, PUB2_CONTAINER, PUB2_GROUPS, PUB2_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false);
-        publishStudy(PUB3_NAME, PUB3_DESCRIPTION, PUB3_CONTAINER, PUB3_GROUPS, PUB3_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, false, false, false);
+        publishStudy(PUB3_NAME, PUB3_DESCRIPTION, PUB3_CONTAINER, PUB3_GROUPS, PUB3_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, false, true, false);
 
         // load specimen set B to test the specimen refresh for the published studies
         startSpecimenImport(++_pipelineJobs, SPECIMEN_ARCHIVE_B);
@@ -177,7 +191,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         ArrayList<String> group2and3ptids = new ArrayList<String>();
         group2and3ptids.addAll(Arrays.asList(GROUP2_PTIDS));
         group2and3ptids.addAll(Arrays.asList(GROUP3_PTIDS));
-        verifyPublishedStudy(PUB3_NAME, group2and3ptids.toArray(new String[group2and3ptids.size()]), PUB3_DATASETS, PUB3_DEPENDENT_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, PUB3_EXPECTED_SPECIMENS, false, false, false);
+        verifyPublishedStudy(PUB3_NAME, group2and3ptids.toArray(new String[group2and3ptids.size()]), PUB3_DATASETS, PUB3_DEPENDENT_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, PUB3_EXPECTED_SPECIMENS, false, true, false);
 
         verifySpecimenRefresh();
     }
@@ -207,7 +221,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         verifyPublishedStudy(name, ptids, datasets, dependentDatasets, visits, views, reports, lists, includeSpecimens, refreshSpecimens, expectedSpecimenCount, true, true, true);
     }
 
-    protected void verifyPublishedStudy(final String name, final String[] ptids, final String[] datasets, final String[] dependentDatasets,
+    @LogMethod
+    protected void verifyPublishedStudy(@LoggedParam final String name, final String[] ptids, final String[] datasets, final String[] dependentDatasets,
                                         final String[] visits, final String[] views, final String[] reports, final String[] lists,
                                         final boolean includeSpecimens, final boolean refreshSpecimens, final int expectedSpecimenCount,
                                         final boolean removeProtected, final boolean shiftDates, final boolean alternateIDs)
@@ -272,6 +287,31 @@ public class StudyPublishTest extends StudyProtectedExportTest
         for (String visit: visits)
         {
             assertTextPresent(visit);
+        }
+
+        if (Arrays.asList(visits).contains(DATE_SHIFT_REQUIRED_VISIT))
+        {
+            log("Verify expected date shifting");
+            goToQueryView("study", DATE_SHIFT_DATASET, false);
+            Set<String> unshiftedDates = new HashSet<String>();
+            Set<String> shiftedDates = new HashSet<String>();
+            DataRegionTable datasetTable = new DataRegionTable("Dataset", this, true, true);
+            unshiftedDates.addAll(datasetTable.getColumnDataAsText(UNSHIFTED_DATE_FIELD.getValue()));
+            shiftedDates.addAll(datasetTable.getColumnDataAsText(SHIFTED_DATE_FIELD.getValue()));
+            Assert.assertTrue("Column '" + UNSHIFTED_DATE_FIELD.getValue() + "' should not be shifted", unshiftedDatesByStudy.get(name).containsAll(unshiftedDates));
+
+            if (shiftDates)
+            {
+                Assert.assertFalse("Column '" + SHIFTED_DATE_FIELD.getValue() + "' should be shifted", preshiftedDatesByStudy.get(name).containsAll(shiftedDates));
+            }
+            else
+            {
+                Assert.assertTrue("Column '" + SHIFTED_DATE_FIELD.getValue() + "' should not be shifted", preshiftedDatesByStudy.get(name).containsAll(shiftedDates));
+            }
+        }
+        else if (visits.length > 0)
+        {
+            Assert.fail("Test error: Please export visit [" + DATE_SHIFT_REQUIRED_VISIT + "] to allow verification of date shifting");
         }
 
         if (reports.length > 0 || views.length > 0)
@@ -437,13 +477,13 @@ public class StudyPublishTest extends StudyProtectedExportTest
         assertTextPresent("NOTE: specimen repository and request settings are not available for ancillary or published studies.");
         // verify that the additive, derivative, etc. tables were populated correctly
         goToQueryView("study", "SpecimenAdditive", false);
-        waitForText(includeSpecimens ? "1 - 42 of 42" : "No data to show.");
+        assertElementPresent(includeSpecimens ? Locator.paginationText(1, 42, 42) : Locator.xpath("//tr/td/em[text() = 'No data to show.']"));
         goToQueryView("study", "SpecimenDerivative", false);
-        waitForText(includeSpecimens ? "1 - 99 of 99" : "No data to show.");
+        assertElementPresent(includeSpecimens ? Locator.paginationText(1, 99, 99) : Locator.xpath("//tr/td/em[text() = 'No data to show.']"));
         goToQueryView("study", "SpecimenPrimaryType", false);
-        waitForText(includeSpecimens ? "1 - 59 of 59" : "No data to show.");
+        assertElementPresent(includeSpecimens ? Locator.paginationText(1, 59, 59) : Locator.xpath("//tr/td/em[text() = 'No data to show.']"));
         goToQueryView("study", "Location", false);
-        waitForText(includeSpecimens ? "1 - 24 of 24" : "No data to show.");
+        assertElementPresent(includeSpecimens ? Locator.paginationText(1, 24, 24) : Locator.xpath("//tr/td/em[text() = 'No data to show.']"));
         goToProjectHome();
     }
 
@@ -484,10 +524,35 @@ public class StudyPublishTest extends StudyProtectedExportTest
     }
 
     // Test should be in an existing study.
-    private void publishStudy(String name, String description, String parentContainer, String[] groups, String[] datasets,
+    @LogMethod
+    private void publishStudy(@LoggedParam String name, String description, String parentContainer, String[] groups, String[] datasets,
                               String[] visits, String[] views, String[] reports, String[] lists, boolean includeSpecimens, boolean refreshSpecimens,
                               boolean removeProtected, boolean shiftDates, boolean alternateIDs)
     {
+        pushLocation();
+        goToQueryView("study", DATE_SHIFT_DATASET, false);
+        Set<String> unshiftedDates = new HashSet<String>();
+        Set<String> preshiftedDates = new HashSet<String>();
+        if (groups != null && groups.length > 0)
+        {
+            for (String group : groups)
+            {
+                _extHelper.clickMenuButton(true, "Mouse Groups", group);
+                DataRegionTable datasetTable = new DataRegionTable("Dataset", this, true, true);
+                unshiftedDates.addAll(datasetTable.getColumnDataAsText(UNSHIFTED_DATE_FIELD.getValue()));
+                preshiftedDates.addAll(datasetTable.getColumnDataAsText(SHIFTED_DATE_FIELD.getValue()));
+            }
+        }
+        else
+        {
+            DataRegionTable datasetTable = new DataRegionTable("Dataset", this, true, true);
+            unshiftedDates.addAll(datasetTable.getColumnDataAsText(UNSHIFTED_DATE_FIELD.getValue()));
+            preshiftedDates.addAll(datasetTable.getColumnDataAsText(SHIFTED_DATE_FIELD.getValue()));
+        }
+        unshiftedDatesByStudy.put(name, unshiftedDates);
+        preshiftedDatesByStudy.put(name, preshiftedDates);
+        popLocation();
+
         pushLocation();
         clickTab("Manage");
 
@@ -790,7 +855,6 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private void setSpecimenFieldsProtected(String[] keyFields, String[] protectedFields)
     {
         goToQueryView("study", "SpecimenEvent", true);
-        waitForTextToDisappear("Loading...");
         List<String> fields = new ArrayList<String>();
         fields.addAll(Arrays.asList(keyFields));
         fields.addAll(Arrays.asList(protectedFields));
@@ -798,8 +862,19 @@ public class StudyPublishTest extends StudyProtectedExportTest
         {
             click(Locator.tagContainingText("div", field));
             click(Locator.tagContainingText("span", "Additional Properties"));
-            checkCheckbox("protected");
+            checkCheckbox(Locator.name("protected"));
         }
+        clickButton("Save", 0);
+        waitForText("Save successful.");
+    }
+
+    private void setUnshiftedDateField(String dataset, String fieldName)
+    {
+        goToQueryView("study", dataset, true);
+
+        click(Locator.tagContainingText("div", fieldName));
+        checkCheckbox(Locator.name("excludeFromShifting"));
+
         clickButton("Save", 0);
         waitForText("Save successful.");
     }
@@ -812,11 +887,13 @@ public class StudyPublishTest extends StudyProtectedExportTest
         {
             waitForText("view data");
             clickAndWait(Locator.linkContainingText("view data"));
+            waitForElement(Locator.css(".labkey-data-region"));
         }
         else
         {
             waitForText("edit metadata");
             clickAndWait(Locator.linkContainingText("edit metadata"));
+            waitForElement(Locator.xpath("id('org.labkey.query.metadata.MetadataEditor-Root')//td[contains(@class, 'labkey-wp-title-left')]").withText("Metadata Properties"));
         }
     }
 }

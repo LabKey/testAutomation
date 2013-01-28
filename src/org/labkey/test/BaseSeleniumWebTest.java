@@ -4379,6 +4379,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitAndClick(WAIT_FOR_JAVASCRIPT, l, 0);
     }
 
+    /**
+     *  wait for element, click it, wait for page to load
+     */
+    public void waitAndClickAndWait(Locator l)
+    {
+        waitAndClick(WAIT_FOR_JAVASCRIPT, l, WAIT_FOR_PAGE);
+    }
 
     /**
      *  wait for element, click it, wait for page to load
