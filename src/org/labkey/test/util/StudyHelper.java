@@ -109,7 +109,7 @@ public class StudyHelper extends AbstractHelper
         }
 
         _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
-        _test._extHelper.waitForExt3MaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test._ext4Helper.waitForMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod
@@ -177,7 +177,7 @@ public class StudyHelper extends AbstractHelper
             }
         }
         _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
-        _test._extHelper.waitForExt3MaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test._ext4Helper.waitForMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod
