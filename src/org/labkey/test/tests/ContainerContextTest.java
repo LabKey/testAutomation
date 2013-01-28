@@ -327,7 +327,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         removeMetadata(getProjectName(), "laboratory", "Samples");
 
         
-        log("** Create custom query over laboratory.samples table WITH container");
+        log("** Create custom query with custom metadata over laboratory.samples table WITH container");
         String customQueryWithContainer =
                 "SELECT samples.rowid,\n" +
                 "samples.samplename,\n" +
@@ -342,7 +342,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         verifySimpleModuleTables("Samples With Container", "XXX.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, true, false);
 
 
-        log("** Create custom query over laboratory.samples table WITH container AS folder");
+        log("** Create custom query with custom metadata over laboratory.samples table WITH container AS folder");
         String customQueryFolderContainer =
                 "SELECT samples.rowid,\n" +
                 "samples.samplename,\n" +
@@ -359,7 +359,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         // Container context won't work if the container column is named something other than container or folder.
         /*
-        log("** Create custom query over laboratory.samples table WITH RENAMED container");
+        log("** Create custom query with custom metadata over laboratory.samples table WITH RENAMED container");
         String customQueryXXXContainer =
                 "SELECT samples.rowid,\n" +
                 "samples.samplename,\n" +
@@ -375,7 +375,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         */
 
 
-        log("** Create custom query over laboratory.samples table WITHOUT container.");
+        log("** Create custom query with custom metadata over laboratory.samples table WITHOUT container.");
         log("** The container column should be added as a suggested column.");
         String customQueryWithoutContainer =
                 "SELECT samples.rowid,\n" +
@@ -454,7 +454,9 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href = dr.getUpdateHref(i);
                 log("  [edit] column href = " + href);
                 expectedHref = "/query/" + workbookContainer + "/manageRecord.view?schemaName=laboratory&query.queryName=samples&keyField=rowid&key=" + sampleIds[i];
-                Assert.assertTrue("Expected [edit] link to go to " + expectedHref + ", got href=" + href,
+                Assert.assertTrue("Expected and actual [edit] links differ:\n" +
+                        "Expected: " + expectedHref + "\n" +
+                        "Actual  : " + href,
                         href.contains(expectedHref));
             }
 
@@ -462,14 +464,18 @@ public class ContainerContextTest extends BaseWebDriverTest
             href = dr.getDetailsHref(i);
             log("  [details] column href = " + href);
             expectedHref = "/query/" + workbookContainer + "/" + detailsAction;
-            Assert.assertTrue("Expected [details] link to go to " + expectedHref + ", got href=" + href,
+            Assert.assertTrue("Expected and actual [details] links differ:\n" +
+                    "Expected: " + expectedHref + "\n" +
+                    "Actual:   " + href,
                     href.contains(expectedHref));
 
             // sample ID link
             href = dr.getHref(i, "Sample Id");
             log("  Sample Id column href = " + href);
             expectedHref = "/query/" + workbookContainer + "/" + detailsAction + "?schemaName=laboratory&query.queryName=samples&keyField=rowid&key=" + sampleIds[i];
-            Assert.assertTrue("Expected Sample Id column URL to go to " + expectedHref + ", got href=" + href,
+            Assert.assertTrue("Expected and actual Sample Id column URL differ:\n" +
+                    "Expected: " + expectedHref + "\n" +
+                    "Actual:   " + href,
                     href.contains(expectedHref));
 
             // parent sample ID link (table has a container so URL should go to lookup's container)
@@ -481,7 +487,9 @@ public class ContainerContextTest extends BaseWebDriverTest
 
                 href = dr.getHref(i, "Parent Sample");
                 log("  Parent Sample column href = " + href);
-                Assert.assertTrue("Expected parent sample column URL to go to " + expectedHref + ", got href=" + href,
+                Assert.assertTrue("Expected and actual parent sample column URL differ:\n" +
+                        "Expected: " + expectedHref + "\n" +
+                        "Actual:   " + href,
                         href.contains(expectedHref));
             }
 
@@ -489,14 +497,18 @@ public class ContainerContextTest extends BaseWebDriverTest
             href = dr.getHref(i, "Sample Source");
             log("  Sample Source column href = " + href);
             expectedHref = "/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type";
-            Assert.assertTrue("Expected sample source column URL to go to " + getProjectName() + " container, got href=" + href,
+            Assert.assertTrue("Expected and actual sample source column URL differ:\n" +
+                    "Expected container: " + getProjectName() + "\n" +
+                    "Actual URL        : " + href,
                     href.contains(expectedHref));
 
             // sample type lookup (table has no container so URL should go to current container)
             href = dr.getHref(i, "Sample Type");
             log("  Sample Type column href = " + href);
             expectedHref = "/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type";
-            Assert.assertTrue("Expected sample type column URL to go to " + getProjectName() + " container, got href=" + href,
+            Assert.assertTrue("Expected and actual sample type column URL differ:\n" +
+                    "Expected container: " + getProjectName() + "\n" +
+                    "Actual URL:         " + href,
                     href.contains(expectedHref));
 
             // container column
@@ -505,7 +517,9 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href = dr.getHref(i, "Folder");
                 log("  Folder column href = " + href);
                 expectedHref = "/project/" + workbookContainer + "/begin.view?";
-                Assert.assertTrue("Expected container column to go to " + workbookContainer + " container, got href=" + href,
+                Assert.assertTrue("Expected and actual container column URL differ:\n" +
+                        "Expected container: " + workbookContainer + "\n" +
+                        "Actual URL        : " + href,
                         href.contains(expectedHref));
             }
 
