@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
@@ -76,7 +77,7 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(getProjectName(), new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         enableModule(getProjectName(), "Survey");
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(getProjectName(), projectSurveyDesign, "listA");
+        createSurveyDesign(getProjectName(), projectSurveyDesign, null, "lists", "listA");
     }
 
     private void setupSubfolder()
@@ -87,7 +88,7 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(folderName, new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         enableModule(folderName, "Survey");
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(folderName, subfolderSurveyDesign, "listA");
+        createSurveyDesign(folderName, subfolderSurveyDesign, null, "lists", "listA");
 
         log("Add users that will be used for permissions testing");
         createUser(EDITOR, null);
@@ -98,7 +99,7 @@ public class SurveyTest extends BaseWebDriverTest
         clickButton("Save and Finish");
     }
 
-    private void createSurveyDesign(String folder, String designName, String listName)
+    protected void createSurveyDesign(String folder, String designName, @Nullable String description, String schemaName, String queryName)
     {
         log("Create new survey design");
         clickFolder(folder);
@@ -106,10 +107,11 @@ public class SurveyTest extends BaseWebDriverTest
         clickButton("Add New Survey");
         waitForElement(Locator.name("label"));
         setFormElement(Locator.name("label"), designName);
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Schema']]"), "lists");
+        if (description != null) setFormElement(Locator.name("description"), description);
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Schema']]"), schemaName);
         // the schema selection enables the query combo, so wait for it to enable
         waitForElementToDisappear(Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Query']"), WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Query']]"), listName);
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Query']]"), queryName);
         clickButton("Generate Survey Questions", 0);
         sleep(1000); // give it a second to generate the metadata
         String metadataValue = getFormElement(Locator.name("metadata"));
@@ -200,6 +202,7 @@ public class SurveyTest extends BaseWebDriverTest
         assertTextPresent("You are allowed to make changes to this form because you are a project/site administrator.");
         Assert.assertTrue("Save button should be disabled", isElementPresent(Locator.xpath("//div[contains(@class,'item-disabled')]//span[text() = 'Save']")));
         setFormElement(Locator.name("txtAreaField"), "edit by admin after submit");
+        _ext4Helper.checkCheckbox("Bool Field");
         Assert.assertTrue("Save button should not be disabled", !isElementPresent(Locator.xpath("//div[contains(@class,'item-disabled')]//span[text() = 'Save']")));
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Success");
@@ -304,7 +307,7 @@ public class SurveyTest extends BaseWebDriverTest
         assertTextPresent(secondSurvey);
         // verify survey reponses in the current folder
         clickAndWait(Locator.linkWithText("listA"));
-        assertTextPresentInThisOrder("[{\"field1\":\"field1\",\"field2\":\"field2\"}]", "true");
+        assertTextPresent("[{\"field1\":\"field1\",\"field2\":\"field2\"}]");
     }
 
     private void addSurveyWebpart(String surveyDesignName)
