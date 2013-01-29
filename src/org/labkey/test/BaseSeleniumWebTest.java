@@ -147,6 +147,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         File path = new File(getLabKeyRoot(), "sampledata");
         return path.toString();
     }
+
+    /**
+     *
+     * @return
+     */
+    public static File getApiScriptFolder()
+    {
+        return new File(getLabKeyRoot(), "server/test/data/api");
+    }
+
     public static String getContextPath()
     {
         return WebTestHelper.getContextPath();

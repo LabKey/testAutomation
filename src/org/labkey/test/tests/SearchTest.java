@@ -277,7 +277,7 @@ public class SearchTest extends StudyTest
         _wikiHelper.createWikiPage("RADEOX", WIKI_NAME, WIKI_TITLE, WIKI_CONTENT, new File(getLabKeyRoot() + "/server/module.template.properties"));
         addWebPart("Wiki");
         //Issue 9454: Don't index option for wiki page
-        _wikiHelper.createWikiPage("RADEOX", WIKI_NAME + "UNSEARCHABLE", WIKI_TITLE, WIKI_CONTENT, false, null);
+        _wikiHelper.createWikiPage(WIKI_NAME + "UNSEARCHABLE", "RADEOX", WIKI_TITLE, WIKI_CONTENT, false, null);
 
         _searchHelper.enqueueSearchItem(WIKI_NAME, Locator.linkWithText(WIKI_TITLE));
         _searchHelper.enqueueSearchItem(WIKI_NAME + "UNSEARCHABLE");

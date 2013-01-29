@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 
@@ -171,6 +172,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertTextPresent("10 mice");
 
         verifySpecimens(5, 44);
+        verifyContainerPathFilter();
         verifyModifyParticipantGroup(STUDY_NAME);
         verifyModifyParticipantGroup(getFolderName());
         verifyModifyDataset();
@@ -350,6 +352,21 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertElementNotPresent(Locator.linkWithText("Manage New Request Form"));
         assertElementNotPresent(Locator.linkWithText("Manage Notifications"));
         assertElementNotPresent(Locator.linkWithText("Manage Requestability Rules"));
+    }
+
+    /**
+     * Regression test for #17021. Requires Ancillary study.
+     */
+    public void verifyContainerPathFilter()
+    {
+        clickFolder(getFolderName());
+        clickTab("Mice");
+        addWebPart("Wiki");
+        WikiHelper wh = new WikiHelper(this);
+        wh.createWikiPage("17021", "17021 Regression", new File(getApiScriptFolder(), "filterTest.html"));
+        setUpFacetedFilter("test17021", "PrimaryType", "Blood (Whole)");
+        assertElementNotPresent(Locator.linkWithText("Semen"));
+        clickButton("CANCEL",0);
     }
 
     private void verifyExportImport()

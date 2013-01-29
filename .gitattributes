@@ -14,6 +14,7 @@ data/api/chartTest.js -text
 data/api/chartingAPITest.js -text
 data/api/domainTest.js -text
 data/api/extIntegrationTest.html -text
+data/api/filterTest.html -text
 data/api/folderTest.html -text
 data/api/getDataAggregateTest.html -text
 data/api/getDataDateTest.html -text

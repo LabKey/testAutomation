@@ -15,7 +15,9 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 
 import java.io.File;
 
@@ -31,39 +33,70 @@ public class WikiHelper extends AbstractHelper
         super(test);
     }
 
-    /**
-     *
-     * @param format
-     * @param name
-     * @param title
-     * @param body
-     * @param index
-     * @param file
-     */
-
-    public void createWikiPage(String format, String name, String title, String body, boolean index, File file)
+    private void create(String name, @Nullable String format, @Nullable String title)
     {
+        if (null != format)
+            _test.createNewWikiPage(format);
+        else
+            _test.createNewWikiPage();
 
-        _test.createNewWikiPage(format);
+        _test.setFormElement(Locator.name("name"), name);
+        if (null != title)
+            _test.setFormElement(Locator.name("title"), title);
+    }
 
-        _test.setFormElement("name", name);
-        _test.setFormElement("title", title);
-        _test.setFormElement("body", body);
+    public void createWikiPage(String name, @Nullable String title, File srcFile)
+    {
+        create(name, null, title);
+
+        setSourceFromFile(srcFile);
+
+        _test.saveWikiPage();
+    }
+
+    public void createWikiPage(String name, @Nullable String format, @Nullable String title, String body, boolean index, @Nullable File attachment)
+    {
+        create(name, format, title);
+
+        setWikiVisualBody(body);
 
         if(index)
             _test.checkCheckbox("shouldIndex");
         else
             _test.uncheckCheckbox("shouldIndex");
 
-        if(file!=null)
+        if (null != attachment)
         {
-            _test.setFormElement("formFiles[0]", file);
+            _test.setFormElement("formFiles[0]", attachment);
         }
         _test.saveWikiPage();
     }
 
-    public void createWikiPage(String format, String name, String title, String body, File file)
+    public void createWikiPage(String name, @Nullable String format, @Nullable String title, String body, File file)
     {
         createWikiPage(format, name, title, body, true, file);
+    }
+
+    private void setSourceFromFile(File file)
+    {
+        setSource(_test.getFileContents(file));
+    }
+
+    private void setSource(String srcFragment)
+    {
+        setWikiSourceTab(srcFragment);
+    }
+
+    // assumes on Wiki edit page -- Visual tab
+    private void setWikiVisualBody(String body)
+    {
+        _test.setFormElement(Locator.name("body"), body);
+    }
+
+    // assumes on Wiki edit page -- Source tab
+    private void setWikiSourceTab(String srcFragment)
+    {
+        _test.switchWikiToSourceView();
+        _test.setFormElement(Locator.name("body"), srcFragment);
     }
 }
