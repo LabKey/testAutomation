@@ -45,7 +45,7 @@ public class ONPRC_EHRTest extends AbstractEHRTest
     {
         _containerHelper.createProject(PROJECT_NAME, "ONPRC EHR");
 
-        setModuleProperties();
+//        setModuleProperties();
 
         //note: we create the users prior to study import, b/c that user is used by TableCustomizers
         createUsersandPermissions();
