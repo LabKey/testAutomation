@@ -498,8 +498,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 checkCheckbox("rEngineNormalization");
                 if (rEngineNormalizationReference != null)
                 {
-                    selectOptionByText("rEngineNormalizationReference", rEngineNormalizationReference);
-                    Assert.assertEquals(rEngineNormalizationReference, getFormElement("rEngineNormalizationReference"));
+                    selectOptionByText(Locator.id("rEngineNormalizationReference"), rEngineNormalizationReference);
+                    String formValue = getFormElement(Locator.id("rEngineNormalizationReference"));
+                    Assert.assertEquals(rEngineNormalizationReference, getText(Locator.xpath("id('rEngineNormalizationReference')/option[@value='" + formValue + "']")));
                 }
 
                 if (rEngineNormalizationSubsets != null)
