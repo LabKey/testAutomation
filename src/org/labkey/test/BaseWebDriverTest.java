@@ -2246,29 +2246,20 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void dumpPageSnapshot(@Nullable String subdir)
     {
-        try
+        File dumpDir = ensureDumpDir();
+        if (subdir != null && subdir.length() > 0)
         {
-            File dumpDir = ensureDumpDir();
-            if (subdir != null && subdir.length() > 0)
-            {
-                dumpDir = new File(dumpDir, subdir);
-                if ( !dumpDir.exists() )
-                    dumpDir.mkdirs();
-            }
-            FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
-            String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
-
-            // Windows doesn't support OS level screenshots for headless environment
-            if (!(System.getProperty("os.name").toLowerCase().contains("win") & onTeamCity()))
-                publishArtifact(dumpFullScreen(dumpDir, baseName));
-
-            publishArtifact(dumpScreen(dumpDir, baseName));
-            publishArtifact(dumpHtml(dumpDir, baseName));
+            dumpDir = new File(dumpDir, subdir);
+            if ( !dumpDir.exists() )
+                dumpDir.mkdirs();
         }
-        catch (Exception e)
-        {
-            log("Error executing dumpPageSnapshot(): " + e.getMessage());
-        }
+
+        FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
+        String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
+
+        publishArtifact(dumpFullScreen(dumpDir, baseName));
+        publishArtifact(dumpScreen(dumpDir, baseName));
+        publishArtifact(dumpHtml(dumpDir, baseName));
     }
 
     public void dumpHeap()
@@ -2351,6 +2342,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             log("Failed to copy screenshot file: " + ioe.getMessage());
         }
+        catch (Exception ignore)
+        {
+            try
+            {
+                // Use alternate method for screen grab. Page might be too tall for TakesScreenshot.getScreenshotAs()
+                windowMaximize();
+                return dumpFullScreen(dir, baseName);
+            }
+            catch (Exception ex) { log("Failed to take screenshot: " + ex.getMessage()); }
+        }
 
         return null;
     }
@@ -2364,17 +2365,21 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         File screenFile = new File(dir, baseName + "Fullscreen.png");
 
-        try
+        // Windows doesn't support OS level screenshots for headless environment
+        if (!onTeamCity() || !System.getProperty("os.name").toLowerCase().contains("win"))
         {
-            // capture entire screen
-            BufferedImage fullscreen = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-            ImageIO.write(fullscreen, "png", screenFile);
+            try
+            {
+                // capture entire screen
+                BufferedImage fullscreen = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+                ImageIO.write(fullscreen, "png", screenFile);
 
-            return screenFile;
-        }
-        catch (Exception e)
-        {
-            log("Failed to take full screenshot: " + e.getMessage());
+                return screenFile;
+            }
+            catch (Exception e)
+            {
+                log("Failed to take full screenshot: " + e.getMessage());
+            }
         }
 
         return null;
