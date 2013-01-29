@@ -51,17 +51,17 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        //super.doCleanup(afterTest);
+        super.doCleanup(afterTest);
     }
 
     @Override
     protected void doTestSteps() throws Exception
     {
-        //setupProject();
-        //createList();
+        setupProject();
+        createList();
 
-        //createLinkedSchema();
-        //verifyLinkedSchema();
+        createLinkedSchema();
+        verifyLinkedSchema();
 
         createLinkedSchemaUsingTemplate();
         verifyLinkedSchemaUsingTemplate();
@@ -72,17 +72,17 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER, null);
+        // Enable simpletest in source folder so the "BPeopleTemplate" is visible.
         enableModule(SOURCE_FOLDER, "simpletest");
 
         _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER, null);
-        enableModule(TARGET_FOLDER, "simpletest");
     }
 
     @LogMethod
     void createList()
     {
         log("Importing some data...");
-        _listHelper.createList(TARGET_FOLDER, LIST_NAME,
+        _listHelper.createList(SOURCE_FOLDER, LIST_NAME,
                 ListHelperWD.ListColumnType.AutoInteger, "Key",
                 new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
                 new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
@@ -110,6 +110,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("query", this);
         Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
         Assert.assertEquals("Expected to filter table to only Adam", "Adam", table.getDataAsText(0, "Name"));
+
+        // Check generic details page is available
+        clickAndWait(table.detailsLink(0));
+        assertTextPresent("Details", "Adam");
     }
 
     @LogMethod
@@ -129,6 +133,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         DataRegionTable table = new DataRegionTable("query", this);
         Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
         Assert.assertEquals("Expected to filter table to only Britt", "Britt", table.getDataAsText(0, "Name"));
+
+        // Check generic details page is available
+        clickAndWait(table.detailsLink(0));
+        assertTextPresent("Details", "Britt");
     }
 
 
@@ -145,6 +153,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         if (schemaTemplate != null)
         {
+            // UNDONE: Can't seem to get the timing right -- so just set the schemaTemplate on the form element
             _extHelper.selectComboBoxItem("Schema Template:", schemaTemplate);
         }
         else

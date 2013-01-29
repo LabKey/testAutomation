@@ -5013,7 +5013,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void waitAndClick(int waitFor, Locator l, int waitForPageToLoad)
     {
-        WebElement el = l.waitForElmement(getDriver(), waitForPageToLoad);
+        WebElement el = l.waitForElmement(getDriver(), waitFor);
         clickAndWait(el, waitForPageToLoad);
     }
 
