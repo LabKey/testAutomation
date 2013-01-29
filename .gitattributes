@@ -99,6 +99,7 @@ modules/simpletest/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS[!!-~]Repo
 modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
 modules/simpletest/reports/schemas/lists/People/Uncool[!!-~]Query.report.xml -text
 modules/simpletest/reports/schemas/schemaFolderReport.r -text
+modules/simpletest/schemas/BPeopleTemplate.template.xml -text
 modules/simpletest/schemas/LinkedVehicle.template.xml -text
 modules/simpletest/schemas/dbscripts/postgresql/obsolete/vehicle-11.30-11.31.sql -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-0.00-1.00.sql -text
@@ -251,6 +252,7 @@ src/org/labkey/test/tests/JUnitTest.java -text
 src/org/labkey/test/tests/JavaClientApiTest.java -text
 src/org/labkey/test/tests/LabModulesTest.java -text
 src/org/labkey/test/tests/LibraTest.java -text
+src/org/labkey/test/tests/LinkedSchemaTest.java -text
 src/org/labkey/test/tests/ListExportTest.java -text
 src/org/labkey/test/tests/ListTest.java -text
 src/org/labkey/test/tests/LuminexAsyncImportTest.java -text

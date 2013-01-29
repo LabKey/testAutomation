@@ -130,6 +130,7 @@ public enum TestSet
         NabOldTest.class,
         TimelineTest.class,
         ExternalSchemaTest.class,
+        LinkedSchemaTest.class,
         MenuBarTest.class,
         AssayAPITest.class,
         LuminexUploadAndCopyTest.class,
@@ -317,6 +318,7 @@ public enum TestSet
     Data(
         DataRegionTest.class,
         ExternalSchemaTest.class,
+        LinkedSchemaTest.class,
         ListTest.class,
         IssuesTest.class,
         ScriptValidationTest.class,
