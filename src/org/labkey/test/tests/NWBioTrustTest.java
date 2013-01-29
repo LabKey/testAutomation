@@ -132,7 +132,7 @@ public class NWBioTrustTest extends SurveyTest
         for (String requestLabel : submittedRequestLabels)
         {
             clickAndWait(Locator.linkWithText("Click Here"));
-            submitSampleRequest(requestLabel, Collections.singletonMap("testField1", "Text Field Value"));
+            submitSampleRequest(requestLabel, Collections.singletonMap("testfield1", "Text Field Value"));
         }
         waitForRequestGridToLoad(1); // all request should be in the Submitted group
         assertTextPresent("No sample requests to show", 1); // draft grid should still be empty
@@ -169,7 +169,7 @@ public class NWBioTrustTest extends SurveyTest
         sleep(500); // give the save button a split second to be enabled on form change
         clickButton("Save");
         waitForText("Edit Fields in " + provisionTableName);
-        _listHelper.addField(new ListHelper.ListColumn("testField1", "Test Field 1", ListHelper.ListColumnType.String, null));
+        _listHelper.addField(new ListHelper.ListColumn("testfield1", "Test Field 1", ListHelper.ListColumnType.String, null));
         clickButton("Save");
         goToProjectHome();
         assertElementPresent(Locator.linkWithText(provisionTableName));
@@ -182,7 +182,8 @@ public class NWBioTrustTest extends SurveyTest
         goToSurveysTable("create definition");
         waitForText("Extensible Table 'Surveys'");
         waitForText("No fields have been defined.");
-        _listHelper.addField(new ListHelper.ListColumn("Category", "Category", null, null, new ListHelper.LookupInfo("", "biotrust", "RequestCategory")));
+        _listHelper.addField("Field Properties", 0, "Category", "Category", ListHelper.ListColumnType.Integer);
+        _listHelper.setColumnType(0, new ListHelper.LookupInfo("", "biotrust", "RequestCategory"));
         clickButton("Save");
 
         log("Verify that the subfolders use the same Surveys domain");
