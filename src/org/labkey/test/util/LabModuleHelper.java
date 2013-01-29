@@ -20,8 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
+import org.labkey.test.util.ext4cmp.Ext4ComboRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
+import org.openqa.selenium.Alert;
 
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -195,6 +197,18 @@ public class LabModuleHelper
         }, "Field did not appear: " + label, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
+    public void waitForDisabled(final Ext4CmpRefWD cmp, final boolean state)
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return (Boolean)cmp.getEval("isDisabled() == arguments[0]", state);
+            }
+        }, "Component did not change to disabled = " + state, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
     public void addRecordsToAssayTemplate(String[][] data)
     {
         addRecordsToAssayTemplate(data, null);
@@ -301,5 +315,121 @@ public class LabModuleHelper
     public void waitForDataRegion(String name)
     {
         _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq("dataregion_" + name) + "]"));
+    }
+
+    public void addDataSource(String type, String label, String category, String containerPath, String schema, String query)
+    {
+        Ext4CmpRefWD addBtn = _test._ext4Helper.queryOne("#manageDataSources button[text='Add New']", Ext4CmpRefWD.class);
+        _test.waitAndClick(Locator.id(addBtn.getId()));
+        _test.waitForElement(Ext4HelperWD.ext4Window("Add Data Source"));
+
+        _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), _test.WAIT_FOR_JAVASCRIPT);
+        waitForField("Item Type");
+        Ext4FieldRefWD.getForLabel(_test, "Item Type").setValue(type);
+        Ext4FieldRefWD.getForLabel(_test, "Label").setValue(label);
+        Ext4FieldRefWD.getForLabel(_test, "Category").setValue(category);
+        if (containerPath != null)
+        {
+            Ext4ComboRefWD combo = new Ext4ComboRefWD(Ext4FieldRefWD.getForLabel(_test, "Container (optional)"), _test);
+            combo.setComboByDisplayValue(containerPath);
+            _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), _test.WAIT_FOR_JAVASCRIPT);
+        }
+
+        Ext4FieldRefWD.getForLabel(_test, "Schema").setValue(schema);
+        _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), _test.WAIT_FOR_JAVASCRIPT);
+        Ext4FieldRefWD.getForLabel(_test, "Query").setValue(query);
+        _test.waitAndClick(Locator.ext4Button("Save"));
+        _test.waitForElement(Ext4HelperWD.ext4Window("Success"));
+        _test.click(Locator.ext4Button("OK"));
+
+        if (containerPath == null)
+            _test.waitForElement(Locator.linkContainingText(schema + "." + query));
+        else
+            _test.waitForElement(Locator.linkContainingText(schema + "." + query + " (" + containerPath + ")"));
+    }
+
+    public void addDemographicsSource(String label, String containerPath, String schema, String query, String targetColumn, boolean expectSuccess, boolean isDuplicate)
+    {
+        Ext4CmpRefWD addBtn = _test._ext4Helper.queryOne("#manageDemographicsSources button[text='Add New']", Ext4CmpRefWD.class);
+        _test.waitAndClick(Locator.id(addBtn.getId()));
+        _test.waitForElement(Ext4HelperWD.ext4Window("Add Demographics Source"));
+
+        _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), _test.WAIT_FOR_JAVASCRIPT);
+        waitForField("Label");
+        Ext4FieldRefWD.getForLabel(_test, "Label").setValue(label);
+
+        if (containerPath != null)
+        {
+            Ext4ComboRefWD combo = new Ext4ComboRefWD(Ext4FieldRefWD.getForLabel(_test, "Container (optional)"), _test);
+            combo.setComboByDisplayValue(containerPath);
+            _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), _test.WAIT_FOR_JAVASCRIPT);
+        }
+
+        Ext4FieldRefWD.getForLabel(_test, "Schema").setValue(schema);
+        _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), _test.WAIT_FOR_JAVASCRIPT);
+
+        Ext4FieldRefWD.getForLabel(_test, "Query").setValue(query);
+        _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), _test.WAIT_FOR_JAVASCRIPT);
+
+        if (targetColumn != null)
+            Ext4FieldRefWD.getForLabel(_test, "Target Column").setValue(targetColumn);
+
+        _test.waitAndClick(Locator.ext4Button("Save"));
+
+        if (expectSuccess)
+        {
+            _test.waitForElement(Ext4HelperWD.ext4Window("Success"));
+            _test.click(Locator.ext4Button("OK"));
+
+            if (containerPath == null)
+                _test.waitForElement(Locator.linkContainingText(schema + "." + query));
+            else
+                _test.waitForElement(Locator.linkContainingText(schema + "." + query + " (" + containerPath + ")"));
+        }
+        else
+        {
+            if (!isDuplicate)
+            {
+                //this indicates we did not expect this to be successful, so we make sure the right errors are shown
+                _test.waitForElement(Ext4HelperWD.ext4Window("Error"));
+                _test.click(Locator.ext4Button("OK"));
+                _test.click(Locator.ext4Button("Cancel"));
+            }
+            else
+            {
+                Alert alert = _test.getDriver().switchTo().alert();
+                alert.accept();
+                _test.click(Locator.ext4Button("Cancel"));
+            }
+        }
+    }
+
+    public String getLegalNameFromName(String name)
+    {
+        if (name == null)
+            return null;
+
+        if (name.length() == 0)
+            return null;
+
+        StringBuilder buf = new StringBuilder(name.length());
+        char[] chars = new char[name.length()];
+        name.getChars(0, name.length(), chars, 0);
+        //Different rule for first character
+        int i = 0;
+        while (i < name.length() && !Character.isJavaIdentifierStart(chars[i]))
+            i++;
+        //If no characters are identifier start (i.e. numeric col name), prepend "col" and try again..
+        if (i == name.length())
+        {
+            buf.append("column");
+            i = 0;
+        }
+
+        for (; i < name.length(); i++)
+            if (Character.isJavaIdentifierPart(chars[i]))
+                buf.append(chars[i]);
+
+        return buf.toString();
     }
 }

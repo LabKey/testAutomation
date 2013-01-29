@@ -49,7 +49,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
 {
     protected String PROJECT_NAME = "EHR_TestProject";
     protected String FOLDER_NAME = "EHR";
-    protected String CONTAINER_PATH = PROJECT_NAME + "/" + FOLDER_NAME;
+    protected String CONTAINER_PATH = getProjectName() + "/" + FOLDER_NAME;
     protected String STUDY_ZIP = "/sampledata/study/EHR Study Anon.zip";
     protected static final String STUDY_ZIP_NO_DATA = "/sampledata/study/EHR Study Anon Small.zip";
 
@@ -94,6 +94,11 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         return PROJECT_NAME;
     }
 
+    public String getContainerPath()
+    {
+        return CONTAINER_PATH;
+    }
+
     @Override
     public boolean enableLinkCheck()
     {
@@ -130,15 +135,15 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     {
         long startTime = System.currentTimeMillis();
         deleteProject(getProjectName(), afterTest);
-        if(isTextPresent(PROJECT_NAME))
+        if(isTextPresent(getProjectName()))
         {
             log("Wait extra long for folder to finish deleting.");
-            while (isTextPresent(PROJECT_NAME) && System.currentTimeMillis() - startTime < 300000) // 5 minutes max.
+            while (isTextPresent(getProjectName()) && System.currentTimeMillis() - startTime < 300000) // 5 minutes max.
             {
                 sleep(5000);
                 refresh();
             }
-            if (!isTextPresent(PROJECT_NAME)) log("Test Project deleted in " + (System.currentTimeMillis() - startTime) + "ms");
+            if (!isTextPresent(getProjectName())) log("Test Project deleted in " + (System.currentTimeMillis() - startTime) + "ms");
             else Assert.fail("Test Project not finished deleting after 5 minutes");
         }
 
@@ -154,22 +159,13 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     @LogMethod
     protected void initProject() throws Exception
     {
-        enableEmailRecorder();
+        _containerHelper.createProject(getProjectName(), "EHR");
+        createSubfolder(getProjectName(), getProjectName(), FOLDER_NAME, "EHR", null);
 
-        _containerHelper.createProject(PROJECT_NAME, "EHR");
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "EHR", null);
+        setEHRModuleProperties();
+        createUsersandPermissions();  //note: we create the users prior to study import, b/c that user is used by TableCustomizers
 
-        //set dummy values first, to test the admin UI
-        String[] dummyProps = {"/" +  PROJECT_NAME, "EHRStudyContainer", "/fakeContainer"};
-        setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(dummyProps)));
-
-        String[] prop = {"/" + PROJECT_NAME, "EHRStudyContainer", "/" + CONTAINER_PATH};
-        String[] prop2 = {"/" + PROJECT_NAME, "EHRAdminUser", DATA_ADMIN._email};
-        String[] prop3 = {"/" + PROJECT_NAME, "DefaultAnimalHistoryReport", "abstract"};
-        setModuleProperties(Collections.singletonMap("EHR", Arrays.asList(prop, prop2, prop3)));
-
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
-        beginAt(getBaseURL()+"/ehr/"+CONTAINER_PATH+"/populateInitialData.view");
+        beginAt(getBaseURL()+"/ehr/"+getContainerPath()+"/populateInitialData.view");
         clickButton("Delete All", 0);
         waitForElement(Locator.xpath("//div[text() = 'Delete Complete']"), 200000);
         clickButton("Populate All", 0);
@@ -195,15 +191,26 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         }
 
         log("Remove all webparts");
-        clickFolder(PROJECT_NAME);
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        goToEHRFolder();
         addWebPart("Quick Search");
 
         //note: this expects the study to already have been imported
-        setupEhrPermissions();
+        setupStudyPermissions();
         defineQCStates();
     }
 
+    protected void setEHRModuleProperties()
+    {
+        //set dummy values first, to test the admin UI
+        String[] dummyProps = {"/" +  getProjectName(), "EHRStudyContainer", "/fakeContainer"};
+        setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(dummyProps)));
+
+        String[] prop = {"/" + getProjectName(), "EHRStudyContainer", "/" + getContainerPath()};
+        String[] prop2 = {"/" + getProjectName(), "EHRAdminUser", DATA_ADMIN._email};
+        String[] prop3 = {"/" + getProjectName(), "DefaultAnimalHistoryReport", "abstract"};
+        setModuleProperties(Collections.singletonMap("EHR", Arrays.asList(prop, prop2, prop3)));
+    }
+    
     @LogMethod
     protected void populateRecords() throws Exception
     {
@@ -219,7 +226,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         rowMap = new HashMap<String,Object>();
         rowMap.put("protocol", DUMMY_PROTOCOL);
         insertCmd.addRow(rowMap);
-        SaveRowsResponse saveResp = insertCmd.execute(cn, CONTAINER_PATH);
+        SaveRowsResponse saveResp = insertCmd.execute(cn, getContainerPath());
 
         //then ehr.project
         insertCmd = new InsertRowsCommand("ehr", "project");
@@ -231,7 +238,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         rowMap.put("project", PROJECT_ID);
         rowMap.put("protocol", DUMMY_PROTOCOL);
         insertCmd.addRow(rowMap);
-        saveResp = insertCmd.execute(cn, CONTAINER_PATH);
+        saveResp = insertCmd.execute(cn, getContainerPath());
     }
 
     @LogMethod
@@ -249,7 +256,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         rowMap = new HashMap<String,Object>();
         rowMap.put("protocol", DUMMY_PROTOCOL);
         deleteCmd.addRow(rowMap);
-        SaveRowsResponse deleteResp = deleteCmd.execute(cn, CONTAINER_PATH);
+        SaveRowsResponse deleteResp = deleteCmd.execute(cn, getContainerPath());
 
         //then ehr.project
         deleteCmd = new DeleteRowsCommand("ehr", "project");
@@ -261,7 +268,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         rowMap.put("project", PROJECT_ID);
         rowMap.put("protocol", DUMMY_PROTOCOL);
         deleteCmd.addRow(rowMap);
-        deleteResp = deleteCmd.execute(cn, CONTAINER_PATH);
+        deleteResp = deleteCmd.execute(cn, getContainerPath());
     }
 
     protected void assertNoErrorText()
@@ -295,8 +302,8 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     protected void defineQCStates()
     {
         log("Define QC states for EHR study");
-        clickFolder(PROJECT_NAME);
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        goToEHRFolder();
+
         goToManageStudy();
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
 
@@ -313,8 +320,10 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     }
 
     @LogMethod
-    protected void setupEhrPermissions() throws Exception
+    protected void createUsersandPermissions() throws Exception
     {
+        enableEmailRecorder();
+
         DATA_ADMIN.setUserId(_helper.createUserAPI(DATA_ADMIN.getEmail(), getProjectName()));
         REQUESTER.setUserId(_helper.createUserAPI(REQUESTER.getEmail(), getProjectName()));
         BASIC_SUBMITTER.setUserId(_helper.createUserAPI(BASIC_SUBMITTER.getEmail(), getProjectName()));
@@ -329,11 +338,12 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         _helper.createPermissionsGroupAPI(FULL_UPDATER.getGroup(), getProjectName(), FULL_UPDATER.getUserId());
         _helper.createPermissionsGroupAPI(REQUEST_ADMIN.getGroup(), getProjectName(), REQUEST_ADMIN.getUserId());
 
-        clickFolder(PROJECT_NAME);
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        goToEHRFolder();
 
         enterPermissionsUI();
-        uncheckInheritedPermissions();
+        if (!getContainerPath().equals(getProjectName()))
+            uncheckInheritedPermissions();
+
         setPermissions(DATA_ADMIN.getGroup(), "Editor");
         setPermissions(REQUESTER.getGroup(), "Editor");
         setPermissions(BASIC_SUBMITTER.getGroup(), "Editor");
@@ -341,6 +351,17 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         setPermissions(FULL_UPDATER.getGroup(), "Editor");
         setPermissions(REQUEST_ADMIN.getGroup(), "Editor");
         savePermissions();
+    }
+
+    protected void goToEHRFolder()
+    {
+        clickFolder(getProjectName());
+        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+    }
+
+    protected void setupStudyPermissions() throws Exception
+    {
+        enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Study Security");
         waitAndClickButton("Study Security");
 

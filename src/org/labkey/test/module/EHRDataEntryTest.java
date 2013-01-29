@@ -46,7 +46,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
     private void weightDataEntryTest()
     {
         log("Test weight data entry");
-        clickFolder(PROJECT_NAME);
+        clickFolder(getProjectName());
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         saveLocation();
         impersonate(FULL_SUBMITTER.getEmail());

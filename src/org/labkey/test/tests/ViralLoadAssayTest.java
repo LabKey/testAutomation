@@ -27,6 +27,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.UIContainerHelper;
@@ -208,7 +209,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("Prepare Run");
-        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<String>();
@@ -224,7 +225,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.addRecordsToAssayTemplate(TEMPLATE_DATA, expectedCols);
 
         waitAndClick(Locator.ext4Button("Plate Layout"));
-        waitForElement(Ext4Helper.ext4Window("Configure Plate"));
+        waitForElement(Ext4HelperWD.ext4Window("Configure Plate"));
         waitForText("Group By Category");
         Ext4FieldRefWD.getForLabel(this, "Group By Category").setChecked(true);
         waitForText("Below are the sample categories");
@@ -371,7 +372,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         errorText = errorText.replaceAll("Subject2\tDETECTOR1", "Subject2\tDETECTOR2");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 9");
@@ -381,7 +382,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -533,7 +534,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         errorText = errorText.replaceAll("d56053_2010.04.21_1_JBS", "");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 17");
@@ -541,7 +542,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -623,7 +624,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         errorText = errorText.replaceAll("de0115_2008.09.08_1_JG\t\t\t0", "");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 23");
@@ -632,7 +633,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 

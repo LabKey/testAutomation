@@ -57,13 +57,13 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     {
         String VIEW_TEXT = "Browse All";
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickAndWait(Locator.linkWithText(getProjectName()));
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForPageToLoad();
         waitAndClick(Locator.linkWithText("Browse All Datasets"));
         waitForPageToLoad();
 
-        //TODO: places these in a WNPRC_EHRTest if one if ever created
+        //TODO: place these in a WNPRC_EHRTest if one if ever created
 //        waitForText("Biopsies");
 //        waitAndClick(LabModuleHelper.getNavPanelItem("Biopsies:", VIEW_TEXT));
 //        waitForPageToLoad();
@@ -77,7 +77,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 //        waitForText("Histology");
 //        assertNoErrorText();
 
-//        beginAt("/ehr/" + CONTAINER_PATH + "/datasets.view");
+//        beginAt("/ehr/" + getContainerPath() + "/datasets.view");
 //        waitForText("Necropsies");
 //        waitAndClick(LabModuleHelper.getNavPanelItem("Necropsies:", VIEW_TEXT));
 //        waitForPageToLoad();
@@ -90,7 +90,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 //        waitForText("Histology");
 //        assertNoErrorText();
 
-        beginAt("/ehr/" + CONTAINER_PATH + "/datasets.view");
+        beginAt("/ehr/" + getContainerPath() + "/datasets.view");
         waitForText("Drug Administration");
         waitAndClick(LabModuleHelper.getNavPanelItem("Drug Administration:", VIEW_TEXT));
         waitForPageToLoad();
@@ -102,7 +102,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForText("Clinical Remarks From ");
         assertNoErrorText();
 
-        beginAt("/ehr/" + CONTAINER_PATH + "/datasets.view");
+        beginAt("/ehr/" + getContainerPath() + "/datasets.view");
         waitForText("Housing");
         waitAndClick(LabModuleHelper.getNavPanelItem("Housing:", VIEW_TEXT));
         waitForPageToLoad();
@@ -117,7 +117,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForText("All Animals Ever Housed");
         assertNoErrorText();
 
-        beginAt("/ehr/" + CONTAINER_PATH + "/datasets.view");
+        beginAt("/ehr/" + getContainerPath() + "/datasets.view");
         waitForText("Clinpath Runs");
         waitAndClick(LabModuleHelper.getNavPanelItem("Clinpath Runs:", VIEW_TEXT));
         waitForPageToLoad();
@@ -156,14 +156,14 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     public void viewsTest()
     {
         //housing queries
-        beginAt("/project/" + CONTAINER_PATH + "/begin.view");
+        beginAt("/project/" + getContainerPath() + "/begin.view");
         waitAndClick(Locator.linkWithText("Housing Queries"));
         waitForPageToLoad();
         waitForText("View:"); //a proxy for the search panel loading
 
 
         //animal queries
-        beginAt("/project/" + CONTAINER_PATH + "/begin.view");
+        beginAt("/project/" + getContainerPath() + "/begin.view");
         waitAndClick(Locator.linkWithText("Animal Search"));
         waitForPageToLoad();
         waitForTextToDisappear("Loading");
@@ -172,7 +172,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         //TODO: test search plus specific queries
 
         //project, protocol queries
-        beginAt("/project/" + CONTAINER_PATH + "/begin.view");
+        beginAt("/project/" + getContainerPath() + "/begin.view");
         waitAndClick(Locator.linkWithText("Protocol and Project Queries"));
         waitForPageToLoad();
         waitForTextToDisappear("Loading");
@@ -181,7 +181,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         //TODO: test search plus specific queries
 
         //population overview
-        beginAt("/project/" + CONTAINER_PATH + "/begin.view");
+        beginAt("/project/" + getContainerPath() + "/begin.view");
         waitAndClick(Locator.linkWithText("Population Summary"));
         waitForPageToLoad();
         waitForText("Current Population Counts");
@@ -203,7 +203,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     private void animalHistoryTest()
     {
         String dataRegionName;
-        clickFolder(PROJECT_NAME);
+        clickFolder(getProjectName());
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
 
         waitAndClick(Locator.linkWithText("Animal History"));
@@ -390,7 +390,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     private void quickSearchTest()
     {
         log("Quick Search - Show Animal");
-        clickFolder(PROJECT_NAME);
+        clickFolder(getProjectName());
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("animal"), MORE_ANIMAL_IDS[0]);
@@ -398,7 +398,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         assertTitleContains("Animal - "+MORE_ANIMAL_IDS[0]);
 
 //        log("Quick Search - Show Group");
-//        clickFolder(PROJECT_NAME);
+//        clickFolder(getProjectName());
 //        clickAndWait(Locator.linkWithText(FOLDER_NAME));
 //        waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
 //        _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='animalGroup']/.."), "Alive, at Center");
@@ -406,7 +406,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 //        waitForText("1 - 36 of 36", WAIT_FOR_JAVASCRIPT);
 
         log("Quick Search - Show Project");
-        clickFolder(PROJECT_NAME);
+        clickFolder(getProjectName());
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='projectField']/.."), PROJECT_ID);
@@ -414,7 +414,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForElement(Locator.linkWithText(PROJECT_ID), WAIT_FOR_JAVASCRIPT);
 
         log("Quick Search - Show Protocol");
-        clickFolder(PROJECT_NAME);
+        clickFolder(getProjectName());
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='protocolField']/.."), PROTOCOL_ID);
@@ -422,7 +422,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForElement(Locator.linkWithText(PROTOCOL_ID), WAIT_FOR_JAVASCRIPT);
 
         log("Quick Search - Show Room");
-        clickFolder(PROJECT_NAME);
+        clickFolder(getProjectName());
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("room"), ROOM_ID);
@@ -465,7 +465,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         }
 
         //Clear out lingering text on report pages
-        clickFolder(PROJECT_NAME);
+        clickFolder(getProjectName());
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitAndClick(Locator.linkWithText("Animal History"));
         waitForPageToLoad();

@@ -154,6 +154,7 @@ src/org/labkey/test/module/EHRApiTest.java -text
 src/org/labkey/test/module/EHRDataEntryTest.java -text
 src/org/labkey/test/module/EHRReportingAndUITest.java -text
 src/org/labkey/test/module/ModuleTest.java -text
+src/org/labkey/test/module/ONPRC_EHRTest.java -text
 src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text
 src/org/labkey/test/ms1/params/FeaturesTestParams.java -text
 src/org/labkey/test/ms1/params/PepMatchTestParams.java -text
@@ -410,6 +411,7 @@ src/org/labkey/test/util/WikiHelper.java -text
 src/org/labkey/test/util/WorkbookHelper.java -text
 src/org/labkey/test/util/ext4cmp/Ext4CmpRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4CmpRefWD.java -text
+src/org/labkey/test/util/ext4cmp/Ext4ComboRefWD.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FieldRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FieldRefWD.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FileFieldRef.java -text

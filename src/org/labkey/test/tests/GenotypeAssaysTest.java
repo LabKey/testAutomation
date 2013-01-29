@@ -29,6 +29,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
@@ -182,7 +183,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("Positive", "NotRealResult");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
         waitAndClick(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for result: NotRealResult for primer: TestPrimer2");
@@ -190,7 +191,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         waitAndClick(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -268,7 +269,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("Positive", "NotRealResult");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
         waitAndClick(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for result: NotRealResult for primer: TestPrimer1");
@@ -278,7 +279,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         errorText = text.replaceAll(originalPrimer, fakePrimer);
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
         waitAndClick(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: " + fakePrimer);
@@ -286,7 +287,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         waitAndClick(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 

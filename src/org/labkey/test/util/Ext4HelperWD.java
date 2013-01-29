@@ -400,7 +400,7 @@ public class Ext4HelperWD extends AbstractHelperWD
 
     public static Locator.XPathLocator ext4Window(String title)
     {
-        return Locator.xpath("//div[contains(@class, 'x4-window-header')]//span[text() = '" + title + "']");
+        return Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x4-window-header')]//span[text() = '" + title + "']");
     }
 
     public static class Locators
@@ -412,5 +412,10 @@ public class Ext4HelperWD extends AbstractHelperWD
                 l = Locator.xpath("//input[contains(@class,'x4-form-checkbox')][../../td/label[text()='" + label + "']]");
             return l;
         }
+    }
+
+    public static Locator.XPathLocator ext4Tab(String label)
+    {
+        return Locator.xpath("//span[contains(@class, 'x4-tab-inner') and text() = '" + label + "']");
     }
 }

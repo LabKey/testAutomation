@@ -255,7 +255,7 @@ public class EHRApiTest extends AbstractEHRTest
             SelectRowsCommand cmd = new SelectRowsCommand("study", "demographics");
             cmd.setFilters(Collections.singletonList(new Filter("Id", subject)));
             Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
-            SelectRowsResponse resp = cmd.execute(cn, CONTAINER_PATH);
+            SelectRowsResponse resp = cmd.execute(cn, getContainerPath());
             Assert.assertEquals("Id not inserted into demographics", 1, resp.getRowCount().intValue());
             Map<String, Object> row = resp.getRows().get(0);
             Assert.assertEquals("Dam not set", "dam", row.get("dam"));
@@ -265,7 +265,7 @@ public class EHRApiTest extends AbstractEHRTest
             //verify cascade insert into housing
             cmd = new SelectRowsCommand("study", "housing");
             cmd.setFilters(Collections.singletonList(new Filter("Id", subject)));
-            resp = cmd.execute(cn, CONTAINER_PATH);
+            resp = cmd.execute(cn, getContainerPath());
             Assert.assertEquals("Id not inserted into housing", 1, resp.getRowCount().intValue());
             row = resp.getRows().get(0);
             Assert.assertEquals("Room not set", ROOMS[0], row.get("room"));
@@ -281,7 +281,7 @@ public class EHRApiTest extends AbstractEHRTest
             //verify demographics record created with correct field values
             cmd = new SelectRowsCommand("study", "demographics");
             cmd.setFilters(Collections.singletonList(new Filter("Id", subject)));
-            resp = cmd.execute(cn, CONTAINER_PATH);
+            resp = cmd.execute(cn, getContainerPath());
             row = resp.getRows().get(0);
             Assert.assertEquals("Status not correct", "Shipped", row.get("calculated_status"));
 
@@ -654,7 +654,7 @@ public class EHRApiTest extends AbstractEHRTest
             json.put("commands", commands);
             json.put("extraContext", extraContext);
 
-            String requestUrl = WebTestHelper.getBaseURL() + "/query/" + CONTAINER_PATH +"/saveRows.view";
+            String requestUrl = WebTestHelper.getBaseURL() + "/query/" + getContainerPath() +"/saveRows.view";
             method = new HttpPost(requestUrl);
             method.addHeader("Content-Type", "application/json");
             method.setEntity(new StringEntity(json.toString(), "application/json", "UTF-8"));

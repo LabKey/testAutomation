@@ -3063,6 +3063,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             for (String[] array : props.get(moduleName))
             {
                 log("setting property: " + array[1] + " for container: " + array[0] + " to value: " + array[2]);
+                waitForText("Property: " + array[1]);
                 Map<String, String> map = new HashMap<String, String>();
                 map.put("moduleName", moduleName);
                 map.put("containerPath", array[0]);

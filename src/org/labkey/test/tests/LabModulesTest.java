@@ -16,21 +16,37 @@
 package org.labkey.test.tests;
 
 import junit.framework.Assert;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.json.simple.JSONArray;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LabModuleHelper;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.UIContainerHelper;
+import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.openqa.selenium.Alert;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,11 +66,107 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     protected String PROJECT_NAME = "LaboratoryVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private String VIRAL_LOAD_ASSAYNAME = "Viral Load Test";
 
+    private final String DATA_SOURCE = "Source_" + replaceNonVisibleChars(getProjectName());
+    private final String SUBJECT_LIST = "Subject List_" + replaceNonVisibleChars(getProjectName());
+    private final String ELISPOT_SOURCE = "ELISPOT_" + replaceNonVisibleChars(getProjectName());
+    private final String GROUP_SOURCE = "GroupsQuery_" + replaceNonVisibleChars(getProjectName());
+    private final String REMOVED_SOURCE = "To Remove_" + replaceNonVisibleChars(getProjectName());
+
     private int _oligosTotal = 0;
     private int _samplesTotal = 0;
     private int _peptideTotal = 0;
 
     protected static final String IMPORT_DATA_TEXT = "Import Data";
+
+    private static final String[][] SUBJECTS = new String[][]{
+        {"Participant0001","m","02/03/2001"},
+        {"Participant0002","f","02/04/2001"},
+        {"Participant0003","f","02/05/2001"},
+        {"Participant0004","f","02/06/2001"},
+        {"Participant0005","m","02/07/2001"},
+        {"Participant0006","m","02/08/2002"},
+        {"Participant0007","m","02/09/2001"},
+        {"Participant0008","f","02/10/2001"},
+        {"Participant0009","m","02/11/2001"},
+        {"Participant0010","m","02/12/2001"},
+        {"Participant0011","f","02/13/2001"},
+        {"Participant0012","f","02/14/2001"},
+        {"Participant0013","f","02/15/2001"},
+        {"Participant0014","f","02/16/2010"},
+        {"Participant0015","f","02/17/2001"},
+        {"Participant0016","f","02/18/2001"},
+        {"Participant0017","f","02/19/2001"},
+        {"Participant0018","m","02/20/2001"},
+        {"Participant0019","m","02/21/2001"},
+        {"Participant0020","m","02/22/2001"}
+    };
+
+    private static final String[][] SAMPLE_DATA = new String[][]{
+            {"Participant0001_RNA","Participant0001","RNA","06/23/2009","Freezer1"},
+            {"Participant0002_DNA","Participant0002","DNA","06/23/2005","Freezer1"},
+            {"Participant0003_gDNA","Participant0003","gDNA","08/21/2007","Freezer1"},
+            {"Participant0004_RNA","Participant0004","RNA","","Freezer1"},
+            {"Participant0005_DNA","Participant0005","DNA","08/21/2007","Freezer1"},
+            {"Participant0006_gDNA","Participant0006","gDNA","06/23/2009","Freezer1"},
+            {"Participant0007_RNA","Participant0007","RNA","","Freezer1"},
+            {"Participant0008_DNA","Participant0008","DNA","06/23/2009","Freezer1"},
+            {"Participant0009_gDNA","Participant0009","gDNA","","Freezer1"},
+            {"Participant0010_RNA","Participant0010","RNA","08/21/2007","Freezer1"},
+            {"Participant0011_DNA","Participant0011","DNA","","Freezer1"},
+            {"Participant0012_gDNA","Participant0012","gDNA","08/21/2007","Freezer1"},
+            {"Participant0013_RNA","Participant0013","RNA","","Freezer1"},
+            {"OtherSample","","DNA","","Freezer1"},
+            {"Participant0015_gDNA","Participant0015","gDNA","06/23/2009","Freezer1"},
+            {"Participant0016_RNA","Participant0016","RNA","08/21/2007","Freezer1"},
+            {"Participant0017_DNA","Participant0017","DNA","08/21/2007","Freezer1"},
+            {"Participant0018_gDNA","Participant0018","gDNA","02/03/2012","Freezer1"},
+            {"OtherSample2","","RNA","","Freezer1"},
+            {"Participant0020_DNA","Participant0020","DNA","02/03/2012","Freezer1"},
+            {"Participant0001_gDNA","Participant0001","gDNA","04/23/2008","Freezer1"},
+            {"Participant0002_RNA","Participant0002","RNA","10/23/2009","Freezer1"},
+            {"Participant0003_DNA","Participant0003","DNA","05/02/2001","Freezer1"},
+            {"Participant0004_gDNA","Participant0004","gDNA","04/23/2008","Freezer1"}
+    };
+
+    private static final String[][] PROJECT_ENROLLMENT = new String[][]{
+            {"Participant0001","Project1","Controls","01/02/2004","08/31/2007"},
+            {"Participant0002","Project1","Controls","01/02/2004",""},
+            {"Participant0003","Project1","Group A","01/02/2004","9/31/2007"},
+            {"Participant0004","Project1","Group A","01/02/2004",""},
+            {"Participant0005","Project1","Group A","01/02/2004",""},
+            {"Participant0006","Project1","Group B","01/16/2004","9/31/2007"},
+            {"Participant0007","Project1","Group B","01/16/2004","12/14/2006"},
+            {"Participant0008","Project2","Controls","01/16/2004","12/14/2006"},
+            {"Participant0009","Project2","Controls","07/21/2002",""},
+            {"Participant0010","Project2","Group A","07/21/2002",""},
+            {"Participant0011","Project2","Group A","09/09/2002","09/09/2003"},
+            {"Participant0012","Project2","Group A","09/09/2002",""},
+            {"Participant0013","Project2","Group B","03/25/2004",""},
+            {"Participant0014","Project2","Group B","03/25/2004","03/25/2005"},
+            {"Participant0015","Project22","","03/25/2004","03/25/2005"},
+            {"Participant0016","Project22","","04/08/2004","04/08/2005"},
+            {"Participant0017","Project13","","04/08/2004","04/08/2005"},
+            {"Participant0018","Project13","","04/08/2004",""},
+            {"Participant0019","Project13","","10/12/2002","10/12/2003"},
+            {"Participant0020","Project13","","01/02/2004","01/01/2005"},
+            {"Participant0001","Project3","","01/02/2003",""},
+            {"Participant0002","Project3","","01/02/2003","08/31/2007"},
+            {"Participant0003","Project3","","01/02/2003",""},
+            {"Participant0004","Project3","","01/02/2003","9/31/2007"}
+    };
+
+    private static final String[][] MAJOR_EVENTS = new String[][]{
+            {"Participant0001","09/26/2002","Appendectomy","Surgery"},
+            {"Participant0002","09/27/2002","Appendectomy","Surgery"},
+            {"Participant0003","09/28/2002","Gave Birth","Medical"},
+            {"Participant0004","09/29/2002","Vaccination","Medical"},
+            {"Participant0005","09/30/2002","Biopsy",""},
+            {"Participant0001","11/04/2006","Influenza Infection",""},
+            {"Participant0002","11/05/2006","Influenza Infection",""},
+            {"Participant0003","11/06/2006","Influenza Infection",""},
+            {"Participant0004","11/07/2006","Influenza Infection",""},
+            {"Participant0005","11/08/2006","Influenza Infection",""}
+    };
 
     @Override
     protected String getProjectName()
@@ -77,20 +189,23 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     protected void doTestSteps() throws Exception
     {
         setUpTest();
+
         overviewUITest();
         reportsTest();
         settingsTest();
         siteSettingsTest();
         defaultAssayImportMethodTest();
-
+        calculatedColumnsTest();
+        tabbedReportsTest();
         labToolsWebpartTest();
+
+        dataSourcesTest(); //this needs to run after calculatedColumnsTest()
         workbookCreationTest();
         dnaOligosTableTest();
         samplesTableTest();
         urlGenerationTest();
         peptideTableTest();
         searchPanelTest();
-        queryMetadataTest();
     }
 
     protected void setUpTest() throws Exception
@@ -121,6 +236,183 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assays.add(Pair.of("Genotype Assay", "Genotyping Assay Test"));
 
         return assays;
+    }
+
+    private void calculatedColumnsTest() throws Exception
+    {
+        log("Testing calculated columns on data sources");
+        _helper.goToLabHome();
+
+        insertSubjects();
+        insertProjectEnrollment();
+        insertSamples();
+        insertMajorEvents();
+
+        //test expected values
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        SelectRowsCommand sr = new SelectRowsCommand("laboratory", "samples");
+        List<String> columns = Arrays.asList("samplename", "subjectId", "gender", "sampletype", "sampleDate",
+            "overlappingProjects/projects", "overlappingProjects/groups",
+            "allProjects/projects", "allProjects/groups",
+            "majorEvents/Appendectomy::DaysPostEvent", "majorEvents/Appendectomy::YearsPostEvent", "majorEvents/Gave Birth::DaysPostEvent", "majorEvents/Vaccination::YearsPostEventDecimal", "majorEvents/Biopsy::MonthsPostEvent", "majorEvents/Influenza Infection::DaysPostEvent",
+            "relativeDates/Project1::DaysPostStart", "relativeDates/Project2::MonthsPostStart", "relativeDates/Project3::YearsPostStartDecimal");
+        sr.setColumns(columns);
+        sr.setSorts(Arrays.asList(new Sort("samplename"), new Sort("sampleDate"), new Sort("sampleType")));
+
+        SelectRowsResponse resp = sr.execute(cn, getProjectName());
+        Assert.assertEquals("Incorrect number of rows returned", SAMPLE_DATA.length, resp.getRowCount().intValue());
+
+        List<String> colOrder = Arrays.asList(new String[]{"samplename","subjectId","sampledate","sampletype","overlappingProjects/projects","overlappingProjects/groups","allProjects/projects","allProjects/groups","majorEvents/Appendectomy::DaysPostEvent","majorEvents/Appendectomy::YearsPostEvent","majorEvents/Gave Birth::DaysPostEvent","majorEvents/Vaccination::YearsPostEventDecimal","majorEvents/Biopsy::MonthsPostEvent","majorEvents/Influenza Infection::DaysPostEvent","relativeDates/Project1::DaysPostStart","relativeDates/Project2::MonthsPostStart","relativeDates/Project3::YearsPostStartDecimal"});
+
+        List<String[]> expected = new ArrayList<String[]>();
+        expected.add(new String[]{"OtherSample",null,null,"DNA",null,null,null,null,null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"OtherSample2",null,null,"RNA",null,null,null,null,null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0001_gDNA","Participant0001","04/23/2008","gDNA","Project3",null,"Project1\nProject3","Project1 (Controls)","2036","5",null,null,null,"536",null,null,"5.3",null});
+        expected.add(new String[]{"Participant0001_RNA","Participant0001","06/23/2009","RNA","Project3",null,"Project1\nProject3","Project1 (Controls)","2462","6",null,null,null,"962",null,null,"6.4",null});
+        expected.add(new String[]{"Participant0002_DNA","Participant0002","06/23/2005","DNA","Project1\nProject3","Project1 (Controls)","Project1\nProject3","Project1 (Controls)","1000","2",null,null,null,"-500","538",null,"2.4",null});
+        expected.add(new String[]{"Participant0002_RNA","Participant0002","10/23/2009","RNA","Project1","Project1 (Controls)","Project1\nProject3","Project1 (Controls)","2583","7",null,null,null,"1083","2121",null,null,null});
+        expected.add(new String[]{"Participant0003_DNA","Participant0003","05/02/2001","DNA",null,null,"Project1\nProject3","Project1 (Group A)",null,null,"-514",null,null,"-2014",null,null,null,null});
+        expected.add(new String[]{"Participant0003_gDNA","Participant0003","08/21/2007","gDNA","Project1\nProject3","Project1 (Group A)","Project1\nProject3","Project1 (Group A)",null,null,"1788",null,null,"288","1327",null,"4.6",null});
+        expected.add(new String[]{"Participant0004_gDNA","Participant0004","04/23/2008","gDNA","Project1","Project1 (Group A)","Project1\nProject3","Project1 (Group A)",null,null,null,"5.5",null,"533","1573",null,null,null});
+        expected.add(new String[]{"Participant0004_RNA","Participant0004",null,"RNA",null,null,"Project1\nProject3","Project1 (Group A)",null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0005_DNA","Participant0005","08/21/2007","DNA","Project1","Project1 (Group A)","Project1","Project1 (Group A)",null,null,null,null,"58","286","1327",null,null,null});
+        expected.add(new String[]{"Participant0006_gDNA","Participant0006","06/23/2009","gDNA",null,null,"Project1","Project1 (Group B)",null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0007_RNA","Participant0007",null,"RNA",null,null,"Project1","Project1 (Group B)",null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0008_DNA","Participant0008","06/23/2009","DNA",null,null,"Project2","Project2 (Controls)",null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0009_gDNA","Participant0009",null,"gDNA",null,null,"Project2","Project2 (Controls)",null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0010_RNA","Participant0010","08/21/2007","RNA","Project2","Project2 (Group A)","Project2","Project2 (Group A)",null,null,null,null,null,null,null,"61",null,null});
+        expected.add(new String[]{"Participant0011_DNA","Participant0011",null,"DNA",null,null,"Project2","Project2 (Group A)",null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0012_gDNA","Participant0012","08/21/2007","gDNA","Project2","Project2 (Group A)","Project2","Project2 (Group A)",null,null,null,null,null,null,null,"59",null,null});
+        expected.add(new String[]{"Participant0013_RNA","Participant0013",null,"RNA",null,null,"Project2","Project2 (Group B)",null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0015_gDNA","Participant0015","06/23/2009","gDNA",null,null,"Project22",null,null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0016_RNA","Participant0016","08/21/2007","RNA",null,null,"Project22",null,null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0017_DNA","Participant0017","08/21/2007","DNA",null,null,"Project13",null,null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0018_gDNA","Participant0018","02/03/2012","gDNA","Project13",null,"Project13",null,null,null,null,null,null,null,null,null,null,null});
+        expected.add(new String[]{"Participant0020_DNA","Participant0020","02/03/2012","DNA",null,null,"Project13",null,null,null,null,null,null,null,null,null,null,null});
+
+        Assert.assertEquals("Test has bad values for expected data", SAMPLE_DATA.length, expected.size());
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        int i = 0;
+        for (Map<String, Object> row : resp.getRows())
+        {
+            Assert.assertTrue("Insufficient column number", row.keySet().size() >= columns.size());
+
+            String[] expectations = expected.get(i);
+            int idx = 0;
+            for (String col : colOrder)
+            {
+                Assert.assertTrue("Row " + idx + " is missing value for column: " + col, row.containsKey(col));
+
+                Object serverVal = row.get(col);
+                if (serverVal instanceof JSONArray)
+                {
+                    JSONArray arr = ((JSONArray)serverVal);
+                    String value = arr.size() == 0 ? null : StringUtils.trimToNull(StringUtils.join(arr, "\n"));
+                    Assert.assertEquals("Incorrect value for: " + col, expectations[idx], value);
+                }
+                else if (serverVal instanceof Date)
+                {
+                    Date d = dateFormat.parse(expectations[idx]);
+                    Assert.assertEquals("Incorrect value for: " + col + " on row " + idx, d, serverVal);
+                }
+                else if (serverVal != null && (serverVal instanceof Integer || serverVal instanceof Double))
+                {
+                    Double d = Double.parseDouble(expectations[idx]);
+                    Assert.assertEquals("Incorrect value for: " + col + " on row " + idx, d, Double.parseDouble(serverVal.toString()));
+                }
+                else
+                {
+                    String value = serverVal == null ? null : StringUtils.trimToNull(serverVal.toString());
+                    Assert.assertEquals("Incorrect value for: " + col + " on row " + i, expectations[idx], value);
+                }
+
+                idx++;
+            }
+
+            i++;
+        }
+    }
+
+    private void insertSubjects() throws Exception
+    {
+        log("Inserting sample subject records");
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        InsertRowsCommand insertCmd = new InsertRowsCommand("laboratory", "subjects");
+
+        for (String[] arr : SUBJECTS)
+        {
+            Map<String,Object> rowMap = new HashMap<String,Object>();
+            rowMap.put("subjectname", arr[0]);
+            rowMap.put("gender", arr[1]);
+            rowMap.put("birth", arr[2]);
+            insertCmd.addRow(rowMap);
+        }
+
+        SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
+        Assert.assertEquals("Incorrect number of rows created", SUBJECTS.length, saveResp.getRowsAffected().intValue());
+    }
+
+    private void insertProjectEnrollment() throws Exception
+    {
+        log("Inserting enrollment records");
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        InsertRowsCommand insertCmd = new InsertRowsCommand("laboratory", "project_usage");
+
+        for (String[] arr : PROJECT_ENROLLMENT)
+        {
+            Map<String,Object> rowMap = new HashMap<String,Object>();
+            rowMap.put("subjectId", arr[0]);
+            rowMap.put("project", arr[1]);
+            rowMap.put("groupname", arr[2]);
+            rowMap.put("startdate", arr[3]);
+            rowMap.put("enddate", arr[4]);
+            insertCmd.addRow(rowMap);
+        }
+
+        SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
+        Assert.assertEquals("Incorrect number of rows created", PROJECT_ENROLLMENT.length, saveResp.getRowsAffected().intValue());
+    }
+
+    private void insertSamples() throws Exception
+    {
+        log("Inserting test samples");
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        InsertRowsCommand insertCmd = new InsertRowsCommand("laboratory", "samples");
+
+        for (String[] arr : SAMPLE_DATA)
+        {
+            Map<String,Object> rowMap = new HashMap<String,Object>();
+            rowMap.put("samplename", arr[0]);
+            rowMap.put("subjectId", arr[1]);
+            rowMap.put("sampleType", arr[2]);
+            rowMap.put("sampleDate", arr[3]);
+            rowMap.put("location", arr[4]);
+            insertCmd.addRow(rowMap);
+        }
+
+        SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
+        Assert.assertEquals("Incorrect number of rows created", SAMPLE_DATA.length, saveResp.getRowsAffected().intValue());
+    }
+
+    private void insertMajorEvents() throws Exception
+    {
+        log("Inserting test major event records");
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        InsertRowsCommand insertCmd = new InsertRowsCommand("laboratory", "major_events");
+
+        for (String[] arr : MAJOR_EVENTS)
+        {
+            Map<String,Object> rowMap = new HashMap<String,Object>();
+            rowMap.put("subjectId", arr[0]);
+            rowMap.put("date", arr[1]);
+            rowMap.put("event", arr[2]);
+            rowMap.put("category", arr[3]);
+            insertCmd.addRow(rowMap);
+        }
+
+        SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
+        Assert.assertEquals("Incorrect number of rows created", MAJOR_EVENTS.length, saveResp.getRowsAffected().intValue());
     }
 
     private void overviewUITest()
@@ -154,14 +446,211 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("Sequence:", IMPORT_DATA_TEXT);
-        assertElementPresent(Ext4Helper.ext4MenuItem("Create Readsets"));
-        assertElementPresent(Ext4Helper.ext4MenuItem("Upload Raw Data"));
+        assertElementPresent(Ext4HelperWD.ext4MenuItem("Create Readsets"));
+        assertElementPresent(Ext4HelperWD.ext4MenuItem("Upload Raw Data"));
 
         _ext4Helper.clickExt4MenuItem("Create Readsets");
-        waitForElement(Ext4Helper.ext4Window("Create Readsets"));
+        waitForElement(Ext4HelperWD.ext4Window("Create Readsets"));
         waitForElement(Locator.ext4Button("Close"));
         click(Locator.ext4Button("Close"));
 
+    }
+
+    /**
+     * This is a fairly superficial test, but this code is shared w/ EHR which has a better test
+     */
+    private void tabbedReportsTest()
+    {
+        _helper.goToLabHome();
+        clickTab("Data Browser");
+        waitForText("Type of Search");
+        
+        waitForElement(Ext4HelperWD.ext4Tab("Samples"));
+
+        Ext4FieldRefWD ref = _ext4Helper.queryOne("textfield[itemId='subjArea']", Ext4FieldRefWD.class);
+        ref.setValue("12345,23456");
+
+        waitAndClick(Locator.ext4Button("Refresh"));
+        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        assertTextPresent("You must select a report to display by clicking the one of the 2nd tier tabs below");
+        waitAndClick(Locator.ext4Button("OK"));
+
+        //NOTE: this is turned off by earlier test steps
+//        waitAndClick(Ext4HelperWD.ext4Tab("Sequence Data"));
+//        waitForElement(Ext4HelperWD.ext4Tab("Sequence Readsets"));
+//        waitAndClick(Ext4HelperWD.ext4Tab("Sequence Readsets"));
+//        waitForText("Sequence Readsets - 12345, 23456");
+        assertElementNotPresent(Ext4HelperWD.ext4Tab("Sequence Data"));
+
+        //now walk assay tabs
+        for (Pair<String, String> pair : getAssaysToCreate())
+        {
+            waitAndClick(Ext4HelperWD.ext4Tab(pair.getKey()));
+            waitForElement(Ext4HelperWD.ext4Tab(pair.getValue() + ": Raw Data"));
+        }
+    }
+
+    /**
+     * requires that the subject/project info was populated by calculatedColumnsTest() in order to run
+     */
+
+    private String manageDemographicsSources = "manageDemographicsSources";
+    private String manageDataSources = "manageDataSources";
+
+    private void dataSourcesTest()
+    {
+        goToAdminConsole();
+        waitAndClick(Locator.linkContainingText("laboratory module admin"));
+        waitAndClick(Locator.xpath("//span[contains(text(), 'Manage Default Data and Demographics Sources')]"));
+        waitForText("You are currently editing the data and demographics sources for the Shared project");  //proxy for data loading
+
+        cleanupDataSources();
+
+        //data sources first
+        List<Ext4CmpRefWD> btns = getRemoveBtns(manageDataSources);
+        int initialDataBtns = btns == null ? 0 : btns.size();
+
+        _helper.addDataSource("misc", GROUP_SOURCE, "New Data Sources", null, "core", "Groups");
+        _helper.addDataSource("data", DATA_SOURCE, "New Data Sources", "/home", "core", "Users");
+        _helper.addDataSource("data", REMOVED_SOURCE, "Will Be Removed", "/" + getProjectName(), "laboratory", "subject_list");
+        Assert.assertEquals("Incorrect number of remove buttons", initialDataBtns + 3, getRemoveBtns(manageDataSources).size());
+
+        deleteSourceByLabel(REMOVED_SOURCE, manageDataSources);
+        Assert.assertEquals("Incorrect number of remove buttons", initialDataBtns + 2, getRemoveBtns(manageDataSources).size());
+
+        //now add demographics sources
+        btns = getRemoveBtns(manageDemographicsSources);
+        int initialDemographicsBtns = btns == null ? 0 : btns.size();
+
+        _helper.addDemographicsSource(SUBJECT_LIST, null, "laboratory", "subject_list", "subjectname", true, false);
+        _helper.addDemographicsSource(SUBJECT_LIST, null, "laboratory", "subject_list", "subjectname", false, true);
+        _helper.addDemographicsSource(ELISPOT_SOURCE, "/" + getProjectName(), "elispot_assay", "elispot_targets", "target", true, false);
+        _helper.addDemographicsSource("Failure", null, "core", "containers", null, false, false);
+        Assert.assertEquals("Incorrect number of remove buttons", initialDemographicsBtns + 2, getRemoveBtns(manageDemographicsSources).size());
+
+        deleteSourceByLabel(ELISPOT_SOURCE, manageDemographicsSources);
+        Assert.assertEquals("Incorrect number of remove buttons", initialDemographicsBtns + 1, getRemoveBtns(manageDemographicsSources).size());
+
+        //now go to folder and make sure it worked
+        _helper.goToLabHome();
+        waitAndClick(_helper.toolIcon("Settings"));
+        _helper.clickNavPanelItem("Manage Data and Demographics Sources");
+        waitForText("Below are the extra data and sample sources registered for this folder");  //proxy for data loading
+        waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), WAIT_FOR_JAVASCRIPT);
+
+        //precaution mainly important to resuming a test in the middle
+        cleanupDataSources();
+
+        //add data source
+        Ext4CmpRefWD addDataSourceBtn = _ext4Helper.queryOne("#" + manageDataSources + " button[text='Add Default Sources']", Ext4CmpRefWD.class);
+        waitAndClick(Locator.id(addDataSourceBtn.getId()));
+        waitAndClick(Ext4HelperWD.ext4MenuItem(DATA_SOURCE + " (\"/home\".core.Users)"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        click(Locator.ext4Button("OK"));
+
+        addDataSourceBtn = _ext4Helper.queryOne("#" + manageDataSources + " button[text='Add Default Sources']", Ext4CmpRefWD.class);
+        waitAndClick(Locator.id(addDataSourceBtn.getId()));
+        waitAndClick(Ext4HelperWD.ext4MenuItem(GROUP_SOURCE+ " (core.Groups)"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        click(Locator.ext4Button("OK"));
+
+        waitForText("Item Type");
+        Assert.assertEquals("Incorrect number of remove buttons", 2, getRemoveBtns(manageDataSources).size());
+
+        //add demographics source
+        Ext4CmpRefWD addDemographicsSourceBtn = _ext4Helper.queryOne("#" + manageDemographicsSources + " button[text='Add Default Sources']", Ext4CmpRefWD.class);
+        waitAndClick(Locator.id(addDemographicsSourceBtn.getId()));
+        waitAndClick(Ext4HelperWD.ext4MenuItem(SUBJECT_LIST + " (laboratory.subjects)"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        click(Locator.ext4Button("OK"));
+
+        waitForText("Table Name");
+        Assert.assertEquals("Incorrect number of remove buttons", 1, getRemoveBtns(manageDemographicsSources).size());
+
+        _helper.goToLabHome();
+
+        //assert custom data element present.  core.users cannot be edited, so it should hide the import UI
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Users:"));
+        assertElementNotPresent(LabModuleHelper.getNavPanelItem("Users:", IMPORT_DATA_TEXT));
+        assertElementPresent(LabModuleHelper.getNavPanelRow("Groups:"));
+
+        //verify that the demographics source has been added
+        String fieldKey = _helper.getLegalNameFromName(SUBJECT_LIST);
+
+        _helper.clickNavPanelItem(VIRAL_LOAD_ASSAYNAME + ":", "Browse All");
+        waitForText(VIRAL_LOAD_ASSAYNAME + " Results");
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn(fieldKey + "/gender");
+        _customizeViewsHelper.applyCustomView();
+        assertTextPresent("Gender");
+
+        _helper.goToLabHome();
+        _helper.clickNavPanelItem("Samples:", "Browse All");
+        String subj1 = "Participant0001";
+        waitForText(subj1);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn(fieldKey + "/gender");
+        _customizeViewsHelper.applyCustomView();
+        DataRegionTable dr = new DataRegionTable("query", this);
+        Assert.assertEquals("Incorrect values for gender field", subj1, dr.getDataAsText(3, "Subject Id"));
+        Assert.assertEquals("Incorrect values for gender field", "m", dr.getDataAsText(3, "Gender"));
+
+        _customizeViewsHelper.revertUnsavedViewGridClosed();
+
+        //now validate site-summary reports
+        goToAdminConsole();
+        waitAndClick(Locator.linkContainingText("laboratory module admin"));
+        waitAndClick(Locator.xpath("//span[contains(text(), 'Manage Default Data and Demographics Sources')]"));
+
+        waitAndClick(Locator.ext4Button("View Summary of Data Sources"));
+        waitForText("The following sources have been defined:");
+        assertTextPresent("/" + getProjectName());
+        assertTextPresent(DATA_SOURCE + " (\"/home\".core.Users)");
+
+        waitAndClick(Locator.ext4Button("View Summary of Demographics Sources"));
+        waitForText("The following sources have been defined:");
+        assertTextPresent("/" + getProjectName());
+        assertTextPresent(SUBJECT_LIST + " (laboratory.subjects)");
+
+        cleanupDataSources();
+    }
+
+    private void cleanupDataSources()
+    {
+        deleteSourceByLabel(REMOVED_SOURCE, manageDataSources);
+        deleteSourceByLabel(GROUP_SOURCE, manageDataSources);
+        deleteSourceByLabel(DATA_SOURCE, manageDataSources);
+        deleteSourceByLabel(ELISPOT_SOURCE, manageDemographicsSources);
+        deleteSourceByLabel(SUBJECT_LIST, manageDemographicsSources);
+    }
+
+    private List<Ext4CmpRefWD> getRemoveBtns(String parentItemId)
+    {
+        return _ext4Helper.componentQuery("#" + parentItemId + " button[text='Remove']", Ext4CmpRefWD.class);
+    }
+
+    private String replaceNonVisibleChars(String value)
+    {
+        //the DB might not store unicode chars correctly, so we just elinimate them here
+        String ret = value.replaceAll("[^\\p{Print}]", "?");
+        ret = ret.replaceAll("\\$", ""); //fieldkeys encode these
+        return ret;
+    }
+
+    private void deleteSourceByLabel(String label, String parentItemId)
+    {
+        Ext4CmpRefWD panel = _ext4Helper.queryOne("#" + parentItemId, Ext4CmpRefWD.class);
+        Long idx = (Long)panel.getFnEval("return this.getSourceIdx(arguments[0])", label);
+        if (idx == null)
+            return;
+
+        List<Ext4CmpRefWD> removeBtns = _ext4Helper.componentQuery("#" + parentItemId + " button[text='Remove']", Ext4CmpRefWD.class);
+        click(Locator.id(removeBtns.get(idx.intValue()).getId()));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        click(Locator.ext4Button("OK"));
+
+        waitForText("Loading...");
+        waitForElementToDisappear(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(text(), 'Loading...')]"), WAIT_FOR_JAVASCRIPT);
     }
 
     private void settingsTest()
@@ -217,7 +706,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Peptides").getValue());
 
         click(Locator.ext4Button("Submit"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
 
         //should redirect to lab home
@@ -257,7 +746,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assertElementNotPresent(Locator.linkContainingText("Browse Sequence Data"));
 
         //restore defaults
-        clickTab("Settings");
+        _helper.goToLabHome();
+        waitAndClick(_helper.toolIcon("Settings"));
         waitAndClick(Locator.linkContainingText("Control Item Visibility"));
         waitForText("Sequence"); //proxy for page load
         waitForText("TruCount"); //proxy for page load
@@ -272,7 +762,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Ext4FieldRefWD.getForBoxLabel(this, "Peptides").setValue(true);
 
         click(Locator.ext4Button("Submit"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
 
 
@@ -338,7 +828,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assertElementPresent(Locator.linkContainingText("Freezer Summary"));
 
         assertElementPresent(Locator.linkContainingText("Browse Sequence Data"));
-
     }
 
     private void labToolsWebpartTest()
@@ -347,17 +836,19 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         waitAndClick(_helper.toolIcon("Import Data"));
-        assertElementPresent(Ext4Helper.ext4MenuItem("Sequence"));
+        assertElementPresent(Ext4HelperWD.ext4MenuItem("Sequence"));
         for(Pair<String, String> pair : getAssaysToCreate())
         {
-            assertElementPresent(Ext4Helper.ext4MenuItem(pair.getValue()));
+            assertElementPresent(Ext4HelperWD.ext4MenuItem(pair.getValue()));
         }
 
         waitAndClick(_helper.toolIcon("Import Samples"));
         for (String s : getSampleItems())
         {
-            assertElementPresent(Ext4Helper.ext4MenuItem(s));
+            assertElementPresent(Ext4HelperWD.ext4MenuItem(s));
         }
+
+        assertElementPresent(_helper.toolIcon("Data Browser"));
 
         //verify settings hidden for readers
         Locator settings = _helper.toolIcon("Settings");
@@ -374,11 +865,11 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("View and Edit Workbooks:", "Create New Workbook");
-        waitForElement(Ext4Helper.ext4Window("Create Workbook"));
+        waitForElement(Ext4HelperWD.ext4Window("Create Workbook"));
         assertElementNotPresent(Locator.ext4Radio("Add To Existing Workbook"));
         waitForElement(Locator.ext4Button("Close"));
         click(Locator.ext4Button("Close"));
-        assertElementNotPresent(Ext4Helper.ext4Window("Create Workbook"));
+        assertElementNotPresent(Ext4HelperWD.ext4Window("Create Workbook"));
 
         String workbookTitle = "NewWorkbook_" + INJECT_CHARS_1;
         String workbookDescription = "I am a workbook.  I am trying to inject javascript into your page.  " + INJECT_CHARS_1 + INJECT_CHARS_2;
@@ -393,7 +884,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitAndClick(_helper.toolIcon("Import Samples"));
         for (String s : getSampleItems())
         {
-            assertElementPresent(Ext4Helper.ext4MenuItem(s));
+            assertElementPresent(Ext4HelperWD.ext4MenuItem(s));
         }
         //NOTE: we are in a workbook here
         _ext4Helper.clickExt4MenuItem("DNA_Oligos");
@@ -405,7 +896,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
 
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         assertTextPresent("Your upload was successful");
         _oligosTotal++;
         clickButton("OK", 0);
@@ -419,7 +910,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("DNA_Oligos:", IMPORT_DATA_TEXT);
-        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
         waitForElement(Locator.name("purification"));
@@ -434,7 +925,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         //eventually test import views
 
         String errorMsg = "Sequence can only contain valid bases: ATGCN or IUPAC bases: RYSWKMBDHV";
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4HelperWD.ext4Window("Error"));
         assertTextPresent(errorMsg);
         clickButton("OK", 0);
 
@@ -443,7 +934,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         setFormElementJS(Locator.name("text"), "Name\tSequence\nTestPrimer1\tatg\nTestPrimer2\tABCDEFG");
         click(Locator.ext4Button("Upload"));
 
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4HelperWD.ext4Window("Error"));
         waitForText(errorMsg);
         clickButton("OK", 0);
 
@@ -459,7 +950,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //TODO: import more data
 
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         assertTextPresent("Success! 2 rows inserted.");
         clickButton("OK");
 
@@ -478,7 +969,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("Samples:", IMPORT_DATA_TEXT);
-        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
         waitForElement(Locator.name("samplespecies"));
@@ -496,20 +987,20 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.setFormField("samplespecies", "Species");
 
-        assertElementNotPresent(Ext4Helper.invalidField());
+        assertElementNotPresent(Ext4HelperWD.invalidField());
         clickButton("Submit", 0);
 
         //test error conditions in trigger script
-        waitForElement(Ext4Helper.ext4Window("Error"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Ext4HelperWD.ext4Window("Error"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Must enter either a location or freezer");
         clickButton("OK", 0);
-        waitForElement(Ext4Helper.invalidField());
+        waitForElement(Ext4HelperWD.invalidField());
 
         _helper.setFormField("box_row", "-100");
         _helper.setFormField("location", "Location1");
         clickButton("Submit", 0);
 
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4HelperWD.ext4Window("Error"));
         waitForText("Cannot have a negative value for box_row");
         clickButton("OK", 0);
 
@@ -548,6 +1039,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.clickNavPanelItem("Samples:", "Browse All");
         _helper.waitForDataRegion("query");
         DataRegionTable dr = new DataRegionTable("query", this);
+        dr.setFilter("container", "Does Not Equal", getProjectName());
+        dr.setSort("rowid", SortDirection.ASC);
 
         i = 0;
         while (i < max)
@@ -571,12 +1064,12 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             //sample source: this is the current container
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("Whole Blood", rowNum), "href"), "UTF-8");
             Assert.assertTrue("Expected sample source column URL to go to the container: " + getProjectName() + ", href was: " + href,
-                    href.contains("/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_type&type=Whole Blood"));
+                    href.contains("/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type&keyField=type&key=Whole Blood"));
 
             //sample type
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA", rowNum), "href"), "UTF-8");
             Assert.assertTrue("Expected sample type column URL to go to the container: " + getProjectName() + ", href was: " + href,
-                    href.contains("/query/" + getProjectName() + "/detailsQueryRow.view?schemaName=laboratory&query.queryName=sample_type&type=DNA"));
+                    href.contains("/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type&keyField=type&key=DNA"));
 
             //container column
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("Workbook" + i), "href"), "UTF-8");
@@ -616,8 +1109,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _ext4Helper.clickExt4MenuItem("Samples");
 
         waitForElement(Locator.name("freezer"));
+        _helper.waitForField("Quantity");
+
         _helper.setFormField("samplename", "Sample" + suffix);
-        _helper.setFormField("freezer", "freezer_" + _helper.getRandomInt());
+        _helper.setFormField("location", "location_" + _helper.getRandomInt());
 
         _ext4Helper.selectComboBoxItem("Sample Type", "DNA");
         _ext4Helper.selectComboBoxItem("Sample Source", "Whole Blood");
@@ -625,7 +1120,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
 
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         assertTextPresent("Your upload was successful");
         _samplesTotal++;
         clickButton("OK", 0);
@@ -639,7 +1134,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("Peptides:", IMPORT_DATA_TEXT);
-        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
         waitForElement(Locator.name("sequence"));
@@ -654,7 +1149,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //test error conditions in trigger script
         String errorMsg = "Sequence can only contain valid amino acid characters: ARNDCQEGHILKMFPSTWYV*";
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4HelperWD.ext4Window("Error"));
         assertTextPresent(errorMsg);
         clickButton("OK", 0);
 
@@ -662,7 +1157,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
 
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         assertTextPresent("Your upload was successful");
         _peptideTotal = 1;
         clickButton("OK", 0);
@@ -708,11 +1203,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Assert.assertTrue(msg, isTextPresent("Samples" + (_samplesTotal > 0 ? " (" + _samplesTotal + ")" : "") + ":"));
     }
 
-    private void queryMetadataTest()
-    {
-        //TODO: test URL generation, shownInInsertView, etc.
-    }
-
     protected List<String> getEnabledModules()
     {
         List<String> modules = new ArrayList<String>();
@@ -752,15 +1242,15 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Ext4FieldRefWD.getForLabel(this, VIRAL_LOAD_ASSAYNAME).setValue(defaultVal);
         waitAndClick(Locator.ext4Button("Submit"));
 
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         waitAndClick(Locator.ext4Button("OK"));
         waitForText("Types of Data");
         _helper.goToAssayResultImport(VIRAL_LOAD_ASSAYNAME);
         _helper.waitForField("Source Material");
         Boolean state = (Boolean)Ext4FieldRefWD.getForBoxLabel(this, defaultVal).getValue();
         Assert.assertTrue("Default method not correct", state);
-        beginAt(getProjectUrl());
-        Alert alert = _driver.switchTo().alert();
+        waitAndClick(Locator.xpath("//span[contains(@class, 'x4-btn-inner') and text() = 'Cancel']"));
+        Alert alert = getDriver().switchTo().alert();
         alert.accept();
         waitForText(LabModuleHelper.LAB_HOME_TEXT);
     }

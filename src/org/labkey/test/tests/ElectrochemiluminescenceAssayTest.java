@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
@@ -155,7 +156,7 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("Prepare Run");
-        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<String>();
@@ -181,7 +182,7 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
 
         waitAndClick(Locator.ext4Button("Save and Close"));
 
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4HelperWD.ext4Window("Error"));
         assertElementPresent(Locator.xpath("//div[contains(text(), 'Unknown value for field category: " + category + "')]"));
         click(Locator.ext4Button("OK"));
 
@@ -219,7 +220,7 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
         log("Trying to save data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 

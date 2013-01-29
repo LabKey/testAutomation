@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
@@ -154,7 +155,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("Prepare Run");
-        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<String>();
@@ -179,7 +180,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 
         //The sample data is missing required values
         click(Locator.ext4Button("Save"));
-        waitForElement(Ext4Helper.ext4Window("Error"));
+        waitForElement(Ext4HelperWD.ext4Window("Error"));
         assertTextPresent("One or more required fields are missing from the sample records");
         waitAndClick(Locator.ext4Button("OK"));
 
@@ -219,7 +220,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         log("Trying to save data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 

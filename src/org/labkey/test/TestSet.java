@@ -22,6 +22,7 @@ import org.labkey.test.module.EHRApiTest;
 import org.labkey.test.module.EHRDataEntryTest;
 import org.labkey.test.module.EHRReportingAndUITest;
 import org.labkey.test.module.ModuleTest;
+import org.labkey.test.module.ONPRC_EHRTest;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
 import org.labkey.test.ms2.QuantitationTest;
@@ -169,6 +170,7 @@ public enum TestSet
         EHRReportingAndUITest.class,
         EHRDataEntryTest.class,
         EHRApiTest.class,
+        ONPRC_EHRTest.class,
         ComplianceTrainingTest.class,
         GpatAssayTest.class,
         FolderTest.class,
@@ -342,7 +344,8 @@ public enum TestSet
     EHR(
         EHRReportingAndUITest.class,
         EHRDataEntryTest.class,
-        EHRApiTest.class
+        EHRApiTest.class,
+        ONPRC_EHRTest.class
     ),
 
     ONPRC(Unsupported, EHR.getTestList()),

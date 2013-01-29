@@ -20,8 +20,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.UIContainerHelper;
+import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
 import java.util.ArrayList;
@@ -116,7 +117,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("CD14 Mono", "NotRealPopulation");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for population: NotRealPopulation");
@@ -124,7 +125,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -171,8 +172,12 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Trying to save invalid data");
         String errorText = text.replaceAll("CD4 T-Cells", "NotRealPopulation");
         textarea.setValue(errorText);
+
+        Ext4CmpRefWD uploadBtn = _ext4Helper.queryOne("#upload", Ext4CmpRefWD.class);
+        _helper.waitForDisabled(uploadBtn, false);
+
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: NotRealPopulation");
@@ -180,7 +185,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -242,7 +247,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("CD14 Mono", "NotRealPopulation");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
+        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for population: NotRealPopulation");
@@ -250,7 +255,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
