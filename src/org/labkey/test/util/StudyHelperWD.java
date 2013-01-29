@@ -73,6 +73,7 @@ public class StudyHelperWD extends AbstractHelperWD
         _test.log("Create "+participantString+" Group: " + groupName);
         _test.clickButton("Create", 0);
         _test._extHelper.waitForExtDialog("Define "+participantString+" Group");
+        _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
         if (demographicsPresent)
             _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(Locator.name("groupLabel"), groupName);
@@ -143,6 +144,7 @@ public class StudyHelperWD extends AbstractHelperWD
         }
         if ( shared != null )
         {
+            _test.waitForElement(Locator.css(".share-group-rendered"));
             if( shared )
             {
                 _test._ext4Helper.checkCheckbox("Share Category?");

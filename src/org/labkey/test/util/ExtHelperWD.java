@@ -257,31 +257,27 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public void waitForExtDialog(final String title, int timeout)
     {
-        final Locator locator = Locator.xpath("//span["+NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
-
         _test.waitFor(new BaseWebDriverTest.Checker()
         {
             public boolean check()
             {
-                return _test.isElementPresent(locator);
+                return _test.isElementPresent(Locators.extDialog(title));
             }
         }, "Ext Dialog with title '" + title + "' did not appear after " + timeout + "ms", timeout);
     }
 
     public void waitForExtDialogToDisappear(String title)
     {
-        waitForExtDialogToDisappear(title, WAIT_FOR_JAVASCRIPT);
+        waitForExtDialogToDisappear(title, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public void waitForExtDialogToDisappear(String title, int timeout)
+    public void waitForExtDialogToDisappear(final String title, int timeout)
     {
-        final Locator locator = Locator.xpath("//span["+NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
-
         _test.waitFor(new BaseWebDriverTest.Checker()
         {
             public boolean check()
             {
-                return !_test.isElementPresent(locator);
+                return !_test.isElementPresent(Locators.extDialog(title));
             }
         }, "Ext Dialog with title '" + title + "' was still present after " + timeout + "ms", timeout);
     }
@@ -780,5 +776,13 @@ public class ExtHelperWD extends AbstractHelperWD
         }
         js.append("'");
         return js.toString();
+    }
+
+    public static class Locators
+    {
+        public static Locator.XPathLocator extDialog(String title)
+        {
+            return Locator.xpath("//span["+Locator.NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
+        }
     }
 }

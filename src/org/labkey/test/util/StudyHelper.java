@@ -62,6 +62,8 @@ public class StudyHelper extends AbstractHelper
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
                                                     String categoryName, boolean isCategoryNameNew, Boolean shared, Boolean demographicsPresent, String... ptids)
     {
+        if (_test.isElementPresent(ExtHelper.Locators.extDialog("Define "+participantString+" Group")))
+            throw new IllegalStateException("Already in the middle of Creating a participant group");
         if( !_test.isElementPresent(Locator.xpath("id('labkey-nav-trail-current-page')[text() = 'Manage "+participantString+" Groups']")) )
         {
             _test.clickAndWait(Locator.linkWithText(projectName));
@@ -81,18 +83,16 @@ public class StudyHelper extends AbstractHelper
         {
             String csp = ptids[0];
             for( int i = 1; i < ptids.length; i++ )
-            {
                 csp = csp.concat("," + ptids[i]);
-            }
             _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), csp);
         }
         if( categoryName != null )
         {
             if (isCategoryNameNew)
-                _test.setFormElement(Locator.xpath("//input[@name='participantCategory']"), categoryName);
+                _test.setFormElement(Locator.name("participantCategory"), categoryName);
             else
                 _test._ext4Helper.selectComboBoxItem(participantString + " Category", categoryName);
-            _test.pressTab(Locator.xpath("//input[@name='participantCategory']").toString());
+            _test.pressTab(Locator.name("participantCategory"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
         if ( shared != null )

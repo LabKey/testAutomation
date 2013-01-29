@@ -2065,11 +2065,6 @@ public class ReportTest extends StudyBaseTest
 
         setDemographicsBit("DEM-1: Demographics", true);
 
-        clickAndWait(Locator.linkWithText("Manage"));
-        clickAndWait(Locator.linkWithText("Manage Mouse Groups"));
-        _extHelper.clickExtButton("Create", 0);
-        _extHelper.waitForExtDialog("Define Mouse Group");
-
         // Create category with 3 groups
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), MICE_A, "Mouse", "Cat Mice Let", true, true, "999320016,999320518,999320529,999320557");
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), MICE_B, "Mouse", "Cat Mice Let", false, true, "999320565,999320576,999320582,999320609");
