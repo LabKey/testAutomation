@@ -62,7 +62,7 @@ public class StudyHelper extends AbstractHelper
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
                                                     String categoryName, boolean isCategoryNameNew, Boolean shared, Boolean demographicsPresent, String... ptids)
     {
-        if (_test.isElementPresent(ExtHelper.Locators.extDialog("Define "+participantString+" Group")))
+        if (_test.isElementPresent(ExtHelperWD.Locators.extDialog("Define "+participantString+" Group")))
             throw new IllegalStateException("Already in the middle of Creating a participant group");
         if( !_test.isElementPresent(Locator.xpath("id('labkey-nav-trail-current-page')[text() = 'Manage "+participantString+" Groups']")) )
         {
