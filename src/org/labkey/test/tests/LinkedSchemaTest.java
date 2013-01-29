@@ -119,7 +119,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     @LogMethod
     void createLinkedSchemaUsingTemplate()
     {
-        createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "B_People", SOURCE_FOLDER, "BPeople", null, null, null);
+        createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "B_People", SOURCE_FOLDER, "BPeopleTemplate", null, null, null);
     }
 
     @LogMethod
