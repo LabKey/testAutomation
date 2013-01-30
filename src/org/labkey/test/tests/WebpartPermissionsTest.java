@@ -7,21 +7,19 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 1/16/13
  * Time: 2:37 PM
- * To change this template use File | Settings | File Templates.
  */
 public class WebpartPermissionsTest extends BaseWebDriverTest
 {
 
     protected static final String DUMMY_PROJECT_NAME = "Dummy Project";
-    protected static final String[] users = {"read@labkey.org", "edit@labkey.org", "admin@labkey.org"};
+    protected static final String[] users = {"read@webpartpermissions.test", "edit@webpartpermissions.test", "admin@webpartpermissions.test"};
     @Override
     protected String getProjectName()
     {
-        return "Webpart Perms project";  //To change body of implemented methods use File | Settings | File Templates.
+        return "Webpart Perms project";
     }
 
     @Override
@@ -150,39 +148,17 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
 
     }
 
-    public void doCleanup(boolean afterTest)
+    public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        //delete second folder
-        try
-        {
-            _containerHelper.deleteProject(DUMMY_PROJECT_NAME, false, defaultWaitForPage);
-        }
-        catch (TestTimeoutException e)
-        {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        try
-        {
-            _containerHelper.deleteProject(getProjectName(), false, defaultWaitForPage);
-        }
-        catch (TestTimeoutException e)
-        {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
+        deleteProject(getProjectName(), afterTest);
+        deleteProject(DUMMY_PROJECT_NAME, false); // Project should be deleted during test
 
-        if(afterTest)
-        //delete users
-            for(String user: users)
-                try
-                {
-                        deleteUser(user);
-                }
-                catch(Exception e){}
+        deleteUsers(afterTest, users);
     }
 
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "server/modules/core";
     }
 }
