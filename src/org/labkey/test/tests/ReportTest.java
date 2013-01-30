@@ -1071,10 +1071,7 @@ public class ReportTest extends StudyBaseTest
         // save the report for real
         _extHelper.setExtFormElementByLabel("Report Name", PARTICIPANT_REPORT_NAME);
         _extHelper.setExtFormElementByLabel("Report Description", PARTICIPANT_REPORT_DESCRIPTION);
-        clickButton("Save", 0);
-        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
+        clickSaveParticipantReport();
 
         // verify visiting saved report
         goToManageViews();
@@ -1091,9 +1088,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//img[@data-qtip = 'Delete']")); // Delete 'Creatinine' column.
-        clickButton("Save", 0);
-        _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
-        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        clickSaveParticipantReport();
 
         // Delete a column save a copy of the report (Save As)
         // Not testing column reorder. Ext4 and selenium don't play well together for drag & drop
@@ -1221,8 +1216,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByLabel("Report Name", PARTICIPANT_REPORT3_NAME);
-        clickButton("Save", 0);
-        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
+        clickSaveParticipantReport();
 
         //Participant report with specimen fields.
         goToManageViews();
@@ -1266,10 +1260,7 @@ public class ReportTest extends StudyBaseTest
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByLabel("Report Name", PARTICIPANT_REPORT4_NAME);
-        clickButton("Save", 0);
-        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
-        _extHelper.waitForExtDialogToDisappear("Saved");
-        _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
+        clickSaveParticipantReport();
 
         //Participant report with multiple demographic fields
         clickAndWait(Locator.linkWithText("Manage"));
@@ -1303,9 +1294,15 @@ public class ReportTest extends StudyBaseTest
         assertTextPresentInThisOrder("1965-03-06", "Female", "heterosexual");
 
         _extHelper.setExtFormElementByLabel("Report Name", PARTICIPANT_REPORT5_NAME);
+        clickSaveParticipantReport();
+    }
+
+    private void clickSaveParticipantReport()
+    {
         clickButton("Save", 0);
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialogToDisappear("Saved");
         _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
     }
 
@@ -1370,10 +1367,7 @@ public class ReportTest extends StudyBaseTest
 
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[" + Locator.NOT_HIDDEN + "]"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Save", 0);
-        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.waitForComponentNotDirty("participant-report-panel-1");
+        clickSaveParticipantReport();
 
         //TODO: Test toggling participant/group modes
         //TODO: Blocked: 16110: Participant report filter panel loses state when switching between participant and group modes
