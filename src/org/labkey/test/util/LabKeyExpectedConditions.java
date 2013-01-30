@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 
-import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
