@@ -48,25 +48,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.test.util.APIAssayHelper;
-import org.labkey.test.util.APIContainerHelper;
-import org.labkey.test.util.APIUserHelper;
-import org.labkey.test.util.AbstractAssayHelper;
-import org.labkey.test.util.AbstractContainerHelper;
-import org.labkey.test.util.AbstractUserHelper;
-import org.labkey.test.util.ComponentQuery;
-import org.labkey.test.util.Crawler;
-import org.labkey.test.util.CustomizeViewsHelperWD;
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.Ext4HelperWD;
-import org.labkey.test.util.ExtHelperWD;
-import org.labkey.test.util.ListHelperWD;
-import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.StudyHelperWD;
-import org.labkey.test.util.TestLogger;
+import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.openqa.selenium.Alert;
@@ -184,6 +166,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public ListHelperWD _listHelper = new ListHelperWD(this);
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
+    public SecurityHelperWD _securityHelper = new SecurityHelperWD(this);
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
@@ -1695,13 +1678,26 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void ensureSignedInAsAdmin()
     {
         goToHome();
+
+        if(isElementPresent(Locator.tagWithText("span", "Stop Impersonating")))
+            stopImpersonatingRole();
+
         if(isElementPresent(Locator.id("adminMenuPopupText")))
             return;
 
-        if (isElementPresent(Locator.id("userMenuPopupLink")))
-            signOut();
+        Locator.IdLocator userMenuPopupLink = Locator.id("userMenuPopupLink");
+        if (isElementPresent(userMenuPopupLink))
+        {
+            click(userMenuPopupLink);
 
-        signIn();
+            if(isElementPresent(Locator.tagWithText("span", "Stop Impersonating")))
+                stopImpersonatingRole();
+            else
+                signOut();
+        }
+
+        if(!isElementPresent(Locator.id("adminMenuPopupText")))
+            signIn();
     }
 
     protected abstract void doTestSteps() throws Exception;
@@ -5833,12 +5829,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
     }
 
+    @Deprecated
+    //use _securityHelperWD.setPermissions
     @LogMethod
     public void setPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
     {
         _setPermissions(groupName, permissionString, "pGroup");
     }
 
+    @Deprecated
+    //use _securityHelperWD.setSiteGroupPermissions
     @LogMethod
     public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
     {
@@ -6952,6 +6952,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
+
     public void pressTab(Locator l)
     {
         WebElement el = l.findElement(_driver);
@@ -7014,6 +7015,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             startImport();
             waitForComplete();
         }
+
 
         @LogMethod
         public void startImport()

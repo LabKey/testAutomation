@@ -66,7 +66,11 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
-       Ext4FieldRefWD.getForLabel(_test, label).setValue(selection);
+        _test.click(Locator.xpath("//tr[td/label[text()='" + label + "']]//input"));
+        Locator.XPathLocator listItem = Locator.tagWithText("li", selection);
+        _test.waitForElement(listItem);
+        _test.click(listItem);
+//       Ext4FieldRefWD.getForLabel(_test, label).setValue(selection);
     }
 
     @LogMethod(quiet = true)

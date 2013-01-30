@@ -200,8 +200,9 @@ public enum TestSet
         ContainerContextTest.class,
         ICEMRModuleTest.class,
         FlowAnalysisResolverTest.class,
+        WebpartPermissionsTest.class,
         SurveyTest.class,
-        NWBioTrustTest.class
+       NWBioTrustTest.class
     ),
 
     Daily(600000, DailyA.getTestList(), DailyB.getTestList()),
