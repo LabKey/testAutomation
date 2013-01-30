@@ -203,7 +203,6 @@ public class SurveyTest extends BaseWebDriverTest
         Assert.assertTrue("Save button should be disabled", isElementPresent(Locator.xpath("//div[contains(@class,'item-disabled')]//span[text() = 'Save']")));
         setFormElement(Locator.name("txtAreaField"), "edit by admin after submit");
         _ext4Helper.checkCheckbox("Bool Field");
-        Assert.assertTrue("Save button should not be disabled", !isElementPresent(Locator.xpath("//div[contains(@class,'item-disabled')]//span[text() = 'Save']")));
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Success");
         _extHelper.waitForExtDialogToDisappear("Success");

@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.*;
@@ -1770,16 +1771,19 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName)
     {
-        return executeSelectRowCommand(schemaName, queryName, ContainerFilter.CurrentAndSubfolders, "/" + getProjectName());
+        return executeSelectRowCommand(schemaName, queryName, ContainerFilter.CurrentAndSubfolders, "/" + getProjectName(), null);
     }
 
-    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path)
+    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path, @Nullable List<Filter> filters)
     {
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         SelectRowsCommand selectCmd = new SelectRowsCommand(schemaName, queryName);
         selectCmd.setMaxRows(-1);
         selectCmd.setContainerFilter(containerFilter);
         selectCmd.setColumns(Arrays.asList("*"));
+        if (filters != null)
+            selectCmd.setFilters(filters);
+
         SelectRowsResponse selectResp = null;
 
 //        selectCmd.setQueryName(subQuery);

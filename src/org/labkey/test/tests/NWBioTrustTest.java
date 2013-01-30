@@ -1,17 +1,28 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.Filter;
+import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.tests.study.DataViewsTester;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -109,7 +120,7 @@ public class NWBioTrustTest extends SurveyTest
         // verify that we navigated to the appropriate subfolder for the manage document set page
         assertTextPresent("NW BioTrust Specimen Requestor Dashboard");
         assertTextNotPresent("NW BioTrust Research Coordinator Dashboard");
-        Locator loc = DataViewsTester.getEditLinkLocator(TEST_FILE_1.getName());
+        Locator loc = getEditLinkLocator(TEST_FILE_1.getName());
         click(loc);
         _extHelper.waitForExtDialog("Edit Document");
         assertTextPresentInThisOrder("File Name:", "Document Type:", "Created By:", "Created:");
@@ -234,15 +245,20 @@ public class NWBioTrustTest extends SurveyTest
 
     private void setRequestStatusAndCategory(int index, String label, String status, String category)
     {
-        Locator loc = DataViewsTester.getEditLinkLocator(label);
+        Locator loc = getEditLinkLocator(label);
         click(loc);
         _extHelper.waitForExtDialog("Edit Request");
         sleep(1000); // this is tricky because there is a loading mask for the combos, but they can load very quickly so that the test misses it if we wait for the mask to disappear
         _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='NWBT Resource:']]"), category);
         _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Status:']]"), status);
         clickButton("Update", 0);
-        waitForText(category);
+        waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid-group-title') and contains(text(), '" + category + "')]"));
         assertTextPresent(status);
+    }
+
+    private Locator getEditLinkLocator(String label)
+    {
+        return Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(),'" + label + "')]/../../..//td//div//span[contains(@class, 'edit-views-link')]");
     }
 
     private void populateSurveyDesignsAndRequests()
@@ -334,41 +350,71 @@ public class NWBioTrustTest extends SurveyTest
 
     private void setupProjectAdminProperties()
     {
-        // TODO: could we do this via API calls instead to speed things up?
-
         // NOTE: these tables are site wide (i.e. no container field), so we have to track which ones we add so we can delete them
+
         log("Populate the Request Category dashboard lookup table");
-        goToDashboardLookupTable("Request Category", NWBT_REQUEST_CATEGORIES);
-        clickButton("Import Data");
-        String importData = "Category\tSortOrder\n";
+        goToProjectHome();
+        checkForValuesToInsert("RequestCategory", "Category", NWBT_REQUEST_CATEGORIES);
+        List<Map<String,Object>> rows = new ArrayList<Map<String, Object>>();
         for (int index = 0; index < NWBT_REQUEST_CATEGORIES.length; index++)
-            importData += NWBT_REQUEST_CATEGORIES[index] + "\t0." + index + "\n";
-        _listHelper.submitTsvData(importData);
+        {
+            Map<String, Object> rowMap = new HashMap<String, Object>();
+            rowMap.put("Category", NWBT_REQUEST_CATEGORIES[index]);
+            rowMap.put("SortOrder", index / 10.0);
+            rows.add(rowMap);
+        }
+        insertLookupTableRecords("RequestCategory", rows);
 
         log("Populate the Request Status dashboard lookup table");
-        goToDashboardLookupTable("Request Status", NWBT_REQUEST_STATUSES);
-        clickButton("Import Data");
-        importData = "Status\tSortOrder\n";
+        checkForValuesToInsert("RequestStatus", "Status", NWBT_REQUEST_STATUSES);
+        rows = new ArrayList<Map<String, Object>>();
         for (int index = 0; index < NWBT_REQUEST_STATUSES.length; index++)
-            importData += NWBT_REQUEST_STATUSES[index] + "\t0." + index + "\n";
-        _listHelper.submitTsvData(importData);
+        {
+            Map<String, Object> rowMap = new HashMap<String, Object>();
+            rowMap.put("Status", NWBT_REQUEST_STATUSES[index]);
+            rowMap.put("SortOrder", index / 10.0);
+            rows.add(rowMap);
+        }
+        insertLookupTableRecords("RequestStatus", rows);
 
         log("Populate the Document Types lookup table");
-        goToDashboardLookupTable("Document Types", NWBT_DOCUMENT_TYPES);
-        clickButton("Import Data");
-        importData = "Name\tAllowMultipleUpload\n";
-        // set the first doc type as not allowing multiple uploads
+        checkForValuesToInsert("DocumentTypes", "Name", NWBT_DOCUMENT_TYPES);
+        rows = new ArrayList<Map<String, Object>>();
         for (int index = 0; index < NWBT_DOCUMENT_TYPES.length; index++)
-            importData += NWBT_DOCUMENT_TYPES[index] + "\t" + (index == 0 ? "false" : "true") + "\n";
-        _listHelper.submitTsvData(importData);
+        {
+            Map<String, Object> rowMap = new HashMap<String, Object>();
+            rowMap.put("Name", NWBT_DOCUMENT_TYPES[index]);
+            // set the first doc type as not allowing multiple uploads
+            rowMap.put("AllowMultipleUpload", index != 0);
+            rows.add(rowMap);
+        }
+        insertLookupTableRecords("DocumentTypes", rows);
     }
 
-    private void goToDashboardLookupTable(String tableName, String[] valuesToBeAdded)
+    private void insertLookupTableRecords(String queryName, List<Map<String,Object>> rowsMap)
     {
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(tableName));
-        // verify that the values we are about to add don't already exist
-        assertTextNotPresent(valuesToBeAdded);
+        log("Inserting values into the lookup table via InsertRows API");
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        InsertRowsCommand insertCommand = new InsertRowsCommand("biotrust", queryName);
+        insertCommand.setRows(rowsMap);
+        try
+        {
+            SaveRowsResponse saveResp = insertCommand.execute(cn, getProjectName());
+            Assert.assertEquals("Problem inserting records", saveResp.getRowsAffected(), (long)rowsMap.size());
+        }
+        catch (Exception e)
+        {
+           Assert.fail(e.getMessage());
+        }
+    }
+
+    private void checkForValuesToInsert(String queryName, String colName, String[] values)
+    {
+        log("Checking for values to be inserted via SelectRows API");
+        Filter filter = new Filter(colName, StringUtils.join(values, ";"), Filter.Operator.IN);
+        SelectRowsResponse response = executeSelectRowCommand("biotrust", queryName, ContainerFilter.Current, "/" + getProjectName(), Collections.singletonList(filter));
+        if (response.getRows().size() > 0)
+            Assert.fail("The " + colName + " to be inserted already exist in the biotrust." + queryName + " table.");
     }
 
     private void verifyFolderTypes()
@@ -443,19 +489,25 @@ public class NWBioTrustTest extends SurveyTest
         _containerHelper.createSubfolder(getProjectName(), requestorFolder2, "NW BioTrust Specimen Requestor");
     }
 
-    private void deleteDashboardLookupRows(String tableName, String keyColName, String[] valuesToBeDeleted)
+    private void deleteDashboardLookupRows(String tableName, String filterColName, String[] valuesToBeDeleted)
     {
-        goToProjectHome();
-        clickAndWait(Locator.linkWithText(tableName));
-        if (isTextPresent(valuesToBeDeleted))
+        log("Deleting values from lookup table via DeleteRows API");
+        Filter filter = new Filter(filterColName, StringUtils.join(valuesToBeDeleted, ";"), Filter.Operator.IN);
+        SelectRowsResponse response = executeSelectRowCommand("biotrust", tableName, ContainerFilter.Current, "/" + getProjectName(), Collections.singletonList(filter));
+        if (response.getRows().size() > 0)
         {
-            DataRegionTable table = new DataRegionTable("query", this);
-            table.setFilter(keyColName, "Equals One Of (e.g. \"a;b;c\")", StringUtils.join(valuesToBeDeleted, ";"));
-            checkAllOnPage("query");
-            waitForText("Selected all " + valuesToBeDeleted.length + " rows.");
-            clickButton("Delete", 0);
-            assertAlert("Are you sure you want to delete the selected rows?");
-            waitForText("No data to show.");
+            Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+            DeleteRowsCommand deleteCommand = new DeleteRowsCommand("biotrust", tableName);
+            deleteCommand.setRows(response.getRows());
+            try
+            {
+                SaveRowsResponse saveResp = deleteCommand.execute(cn, getProjectName());
+                Assert.assertEquals("Problem deleting records", saveResp.getRowsAffected(), (long)response.getRows().size());
+            }
+            catch (Exception e)
+            {
+               Assert.fail(e.getMessage());
+            }
         }
     }
 
@@ -465,10 +517,9 @@ public class NWBioTrustTest extends SurveyTest
         goToHome();
         if(isElementPresent(Locator.linkWithText(getProjectName())))
         {
-            // TODO: could we do this via API calls instead to speed things up?
-            deleteDashboardLookupRows("Request Category", "Category", NWBT_REQUEST_CATEGORIES);
-            deleteDashboardLookupRows("Request Status", "Status", NWBT_REQUEST_STATUSES);
-            deleteDashboardLookupRows("Document Types", "Name", NWBT_DOCUMENT_TYPES);
+            deleteDashboardLookupRows("RequestCategory", "Category", NWBT_REQUEST_CATEGORIES);
+            deleteDashboardLookupRows("RequestStatus", "Status", NWBT_REQUEST_STATUSES);
+            deleteDashboardLookupRows("DocumentTypes", "Name", NWBT_DOCUMENT_TYPES);
         }
         //deleteUsers(afterTest, NWBT_USERS);
         deleteProject(getProjectName(), afterTest);
