@@ -43,8 +43,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
         Locator l = Locator.xpath(parentLocator.getPath()+"//div[contains(@class,'arrow')]");
-        _test.waitForElement(l);
-        _test.click(l);
+        _test.waitAndClick(l);
         if(_test.getBrowser().startsWith(BaseWebDriverTest.IE_BROWSER))
         {
             _test.sleep(500);
@@ -54,9 +53,10 @@ public class Ext4HelperWD extends AbstractHelperWD
         else
         {
             Locator listItem = Locator.css("li.x4-boundlist-item");
+            _test._shortWait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.x4-boundlist-item")));
 
             // wait for and select the list item
-            _test.waitAndClick(listItem.withText(selection));
+            _test.click(listItem.withText(selection));
 
             // menu should disappear
             _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("li.x4-boundlist-item")));
