@@ -665,7 +665,6 @@ public class SecurityTest extends BaseWebDriverTest
         String testUserDisplayName = getDisplayName();
 
         impersonate(TO_BE_DELETED_USER);
-        String deletedUserDisplayName = getDisplayName();
         assertTextNotPresent("Admin Console");
         stopImpersonating();
 
@@ -696,6 +695,16 @@ public class SecurityTest extends BaseWebDriverTest
         Assert.assertEquals("Incorrect log entry for deleted user",
                 siteAdminDisplayName + '|' + testUserDisplayName + '|' + user + '|' + TO_BE_DELETED_USER + " was deleted from the system",
                 createdBy + '|' + impersonatedBy + '|' + user + '|' + comment);
+
+        // 17037 Regression
+        impersonate(PROJECT_ADMIN_USER);
+        clickFolder(PROJECT_NAME);
+        enterPermissionsUI();
+        _ext4Helper.clickTabContainingText("Impersonate");
+        assertTextPresent("Already impersonating; click");
+        _ext4Helper.clickTabContainingText("Project Groups");
+        assertTextPresent("Total Users");
+        stopImpersonating();
     }
 
 
