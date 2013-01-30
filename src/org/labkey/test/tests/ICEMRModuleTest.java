@@ -29,7 +29,41 @@ import java.util.Map;
 public class ICEMRModuleTest extends BaseWebDriverTest
 {
     public static final String ID = "myid";
-    public static final String ASSAY_NAME = "Diagnostics Assay";
+    public static final String DIAGNOSTICS_ASSAY_DESIGN = "ICEMR Diagnostics";
+    public static final String ADAPTATION_ASSAY_DESIGN = "ICEMR Adaptation";
+    public static final String DIAGNOSTIC_ASSAY_NAME = "Diagnostics Assay";
+    public static final String ADAPTATION_ASSAY_NAME = "Adaptation Assay";
+    public static final String FLASKS_SAMPLESET_NAME = "Flasks";
+    public static final String FLASK_SAMPLESET_COLS  =
+    "Property\tLabel\tRangeURI\tFormat\tNotNull\tHidden\tMvEnabled\tDescription\n" +
+    "PatientID\tPatient ID\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
+    "SampleID\tSample ID\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
+    "Scientist\tScientist\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
+    "Stage\tStage\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
+    "Parasitemia\t\thttp://www.w3.org/2001/XMLSchema#double\t\tTRUE\tFALSE\tFALSE\n" +
+    "Gametocytemia\thttp://www.w3.org/2001/XMLSchema#double\t\tTRUE\tFALSE\tFALSE\n" +
+    "PatientpRBCs\tPatient pRBCs\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
+    "Hematocrit\thttp://www.w3.org/2001/XMLSchema#double\t\tTRUE\tFALSE\tFALSE\tHematocrit %\n" +
+    "CultureMedia\tCulture Media\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
+    "SerumBatchID\tSerum Batch ID\thttp://www.w3.org/2001/XMLSchema#int\t\tFALSE\tFALSE\tFALSE\n" +
+    "AlbumaxBatchID\tAlbumax Batch ID\thttp://www.w3.org/2001/XMLSchema#int\t\tFALSE\tFALSE\tFALSE\n" +
+    "FoldIncrease1\tFold-Increase Test 1\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
+    "FoldIncrease2\tFold-Increase Test 2\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
+    "FoldIncrease3\tFold-Increase Test 3\thttp://www.w3.org/2001/XMLSchema#int\tTRUE\tFALSE\tFALSE\n" +
+    "AdaptationCriteria\tAdaptation Criteria\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
+    "Comments\thttp://www.w3.org/2001/XMLSchema#multiLine\t\tFALSE\tFALSE\tFALSE\n" +
+    "MaintenanceDate\tMaintenance Date\thttp://www.w3.org/2001/XMLSchema#dateTime\t\tFALSE\tFALSE\tFALSE\n" +
+    "MaintenanceStopped\tMaintenance Stopped\thttp://www.w3.org/2001/XMLSchema#dateTime\t\tFALSE\tFALSE\tFALSE\n" +
+    "StartParasitemia1\tParasitemia Test 1 Start\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
+    "FinishParasitemia1\tParasitemia Test 1 Finish\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
+    "StartParasitemia2\tParasitemia Test 2 Start\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
+    "FinishParasitemia2\tParasitemia Test 2 Finish\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
+    "StartParasitemia3\tParasitemia Test 3 Start\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
+    "FinishParasitemia3\tParasitemia Test 3 Finish\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
+    "StartDate1\tStart Date Test 1\thttp://www.w3.org/2001/XMLSchema#dateTime\t\tFALSE\tFALSE\tFALSE\n" +
+    "FinishDate1\tFinish Date Test 1\thttp://www.w3.org/2001/XMLSchema#dateTime\t\tFALSE\tFALSE\tFALSE\n" +
+    "AdaptationDate\tAdaptation Date\thttp://www.w3.org/2001/XMLSchema#dateTime\t\tFALSE\tFALSE\tFALSE";
+
     public static final String SCIENTIST = "Torruk";
 
     @Override
@@ -43,11 +77,10 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     {
 
         log("Create ICEMR with appropriate web parts");
-        _containerHelper.createProject(getProjectName(), "Assay");
-        enableModule("icemr", true);
-        addWebPart("Add Diagnostics");
-
+        _containerHelper.createProject(getProjectName(), "ICEMR");
+        createAdaptationAssay();
         createDiagnosticAssay();
+        createFlasksSampleSet();
         enterDataPoint();
         verifyDataInAssay();
     }
@@ -120,12 +153,49 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         // the form should submit now
         setICEMRField("Hematocrit", "5.0");
         clickButton("Submit");
-        waitForElement(Locator.css(".labkey-nav-page-header").withText(ASSAY_NAME + " Results"));
+        waitForElement(Locator.css(".labkey-nav-page-header").withText(DIAGNOSTIC_ASSAY_NAME + " Results"));
     }
 
     private void createDiagnosticAssay()
     {
-        _assayHelper.createAssayWithDefaults("ICEMR Diagnostics", ASSAY_NAME);
+        _assayHelper.createAssayWithDefaults(DIAGNOSTICS_ASSAY_DESIGN, DIAGNOSTIC_ASSAY_NAME);
+    }
+
+    private void createAdaptationAssay()
+    {
+        _assayHelper.createAssayWithDefaults(ADAPTATION_ASSAY_DESIGN, ADAPTATION_ASSAY_NAME);
+    }
+    private void createFlasksSampleSet()
+    {
+        clickAndWait(Locator.linkWithText(getProjectName()));
+        clickButton("Import Sample Set");
+        setFormElement("name", FLASKS_SAMPLESET_NAME);
+        setFormElement("data", "SampleID\n" + "1");
+        clickButton("Submit");
+
+        deleteSample("1");
+
+        // now add our real fields with rich metadata
+        clickButton("Edit Fields");
+        clickButton("Import Fields", 0);
+        waitForElement(Locator.xpath("//textarea[@id='schemaImportBox']"), WAIT_FOR_JAVASCRIPT);
+
+        setFormElement("schemaImportBox", FLASK_SAMPLESET_COLS);
+
+        clickButton("Import", 0);
+        waitForElement(Locator.xpath("//input[@name='ff_label3']"), WAIT_FOR_JAVASCRIPT);
+        clickButton("Save");
+        clickAndWait(Locator.linkWithText(getProjectName()));
+    }
+
+    private void deleteSample(String sample)
+    {
+        if (isTextPresent(sample))
+        {
+            checkCheckbox(Locator.xpath("//td/a[contains(text(), '" + sample + "')]/../../td/input"));
+            clickButton("Delete");
+            clickButton("Confirm Delete");
+        }
     }
 
     @Override
