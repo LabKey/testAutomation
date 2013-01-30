@@ -211,12 +211,12 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         setWikiBody(PARAM_ECHO_JAVASCRIPT);
         clickButton("Save & Close");
 
-        waitForText(JAVASCRIPT_LINK_BUTTON_TEXT, 10000);
+        waitForElement(Locator.id("aqwp3"));
         clickButton(JAVASCRIPT_LINK_BUTTON_TEXT);
         assertTextPresent("No messages");
         clickAndWait(Locator.linkWithText(PROJECT_NAME));
 
-        waitForText(JAVASCRIPT_ONCLICK_BUTTON_TEXT, 10000);
+        waitForElement(Locator.id("aqwp3"));
         clickButton(JAVASCRIPT_ONCLICK_BUTTON_TEXT, 0);
         assertAlert(JAVASCRIPT_MENU_ONCLICK_ALERT_TEXT);
 
