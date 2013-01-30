@@ -177,7 +177,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
         // now add our real fields with rich metadata
         clickButton("Edit Fields");
-        clickButton("Import Fields", 0);
+        waitAndClickButton("Import Fields", 0);
         waitForElement(Locator.xpath("//textarea[@id='schemaImportBox']"), WAIT_FOR_JAVASCRIPT);
 
         setFormElement("schemaImportBox", FLASK_SAMPLESET_COLS);
