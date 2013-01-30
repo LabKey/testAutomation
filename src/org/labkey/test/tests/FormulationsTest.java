@@ -460,6 +460,7 @@ public class FormulationsTest extends BaseWebDriverTest
         clickButton("Import Data");
 
         waitForText("What is the Lot Number?", WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("lot-field"));
         setFormElement(Locator.name("lot"), FORMULATION);
         clickButton("Next", 0);
 
