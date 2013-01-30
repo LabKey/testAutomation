@@ -52,7 +52,7 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
         {
             Assert.fail("Unable to delete dummy project");
         }
-        verifyCorrectWebpartsVisible();
+        assertTextNotPresent("Flow Script");
 
 
     }
@@ -86,13 +86,13 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
 
     private void verifyCorrectWebpartsVisible()
     {
-        String[] webparts = {"Flow Summary", "Flow Scripts", "Flow Experiment Management", "Flow Analyses"};
-//        verifyReadEditUpdate(webparts);
+        String[] webparts = {"Flow Summary", "Flow Scripts", "Flow Analyses", "Flow Experiment Management"};
+        verifyReadEditUpdate(webparts);
     }
 
     private void verifyReadEditUpdate(String[] webparts)
     {
-        for(int i=0; i<3; i++) //TODO:  up to 3 when fix checked in Issue 16987
+        for(int i=0; i<3; i++)
         {
             impersonate(users[i]);
             goToProjectHome();
