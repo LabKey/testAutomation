@@ -170,7 +170,7 @@ public enum TestSet
         EHRReportingAndUITest.class,
         EHRDataEntryTest.class,
         EHRApiTest.class,
-        ONPRC_EHRTest.class,
+        //ONPRC_EHRTest.class,
         ComplianceTrainingTest.class,
         GpatAssayTest.class,
         FolderTest.class,
@@ -345,8 +345,8 @@ public enum TestSet
     EHR(
         EHRReportingAndUITest.class,
         EHRDataEntryTest.class,
-        EHRApiTest.class,
-        ONPRC_EHRTest.class
+        EHRApiTest.class
+        //ONPRC_EHRTest.class
     ),
 
     ONPRC(Unsupported, EHR.getTestList()),
