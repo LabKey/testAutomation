@@ -1232,6 +1232,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.clickX4GridPanelCheckbox("label", "Blood (Whole):AvailableCount", "measuresGridPanel", true);
 
         clickButton("Select", 0);
+        waitForElement(Locator.linkWithText(PTIDS_ONE[0]));
 
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
