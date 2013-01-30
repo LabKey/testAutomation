@@ -1,6 +1,5 @@
 package org.labkey.test.tests;
 
-import junit.framework.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -10,6 +9,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,11 +23,15 @@ public class NWBioTrustTest extends SurveyTest
     private static final String requestorFolder1 = "Requestor 1";
     private static final String requestorFolder2 = "Requestor 2";
     private static final String provisionTableName = "Sample Request Responses";
+    private static final String designLabel = "ProspectiveTest";
+    private static final String description = "Request specimens from surgeries or clinic procedures";
     private static final String[] submittedRequestLabels = {"first request", "second request", "third request"};
+    private static final File TEST_FILE_1 = new File( getLabKeyRoot() + "/sampledata/survey/TestAttachment.txt");
+    private static final File TEST_FILE_2 = new File( getLabKeyRoot() + "/sampledata/survey/TestAttachment2.txt");
 
     private static final String[] NWBT_REQUEST_CATEGORIES = {"_NWBT RC1", "_NWBT RC2", "_NWBT Repository"};
     private static final String[] NWBT_REQUEST_STATUSES = {"_NWBT Submission Review", "_NWBT Approved", "_NWBT Routed"};
-    private static final String[] NWBT_DOCUMENT_TYPES = {"_NWBT IRB Approval Packet", "_NWBT Specimen Processing Protocol", "_NWBT Blank Unique Consent Form (by Study)"};
+    private static final String[] NWBT_DOCUMENT_TYPES = {"_NWBT Blank Unique Consent Form (by Study)", "_NWBT IRB Approval Packet", "_NWBT Specimen Processing Protocol"};
 
     private static final String NWBT_PRINCIPAL_INVESTIGATOR = "pi_nwbiotrust@nwbiotrust.test";
     private static final String NWBT_STUDY_CONTACT = "sc_nwbiotrust@nwbiotrust.test";
@@ -36,6 +40,8 @@ public class NWBioTrustTest extends SurveyTest
     private static final String NWBT_FACULTY_REVIEWER = "fr_nwbiotrust@nwbiotrust.test";
     private static final String[] NWBT_USERS = {NWBT_PRINCIPAL_INVESTIGATOR, NWBT_STUDY_CONTACT, NWBT_RESEARCH_COORD,
                                                 NWBT_FACULTY_CHAIR, NWBT_FACULTY_REVIEWER};
+
+    private int fileCount = 0;
 
     private final PortalHelper portalHelper = new PortalHelper(this);
 
@@ -57,13 +63,136 @@ public class NWBioTrustTest extends SurveyTest
         populateSurveyDesignsAndRequests();
         verifyResearchCoordDashboard();
         verifyRequestorDashboard();
+        verifySecondRequestorDashboard();
+        populateDocumentSetForReqeusts();
+        verifyDocumentSetFromDashboard();
+        deleteSurveyDesign();
+    }
+
+    private void deleteSurveyDesign()
+    {
+        log("Delete the survey design for this project (which will delete the document set and requests");
+        goToProjectHome();
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("RowId");
+        _customizeViewsHelper.applyCustomView();
+        DataRegionTable drt = new DataRegionTable("query", this);
+        String rowId = drt.getDataAsText(drt.getRow("Label", designLabel), "RowId");
+        checkDataRegionCheckbox("query", rowId);
+        clickButton("Delete", 0);
+        assertAlert("Are you sure you want to delete this survey design and its associated surveys?");
+        waitForText("No sample requests to show", WAIT_FOR_PAGE);
+        assertTextNotPresent(designLabel);
+        clickFolder(requestorFolder1);
+        waitForText("No sample requests to show");
+        assertTextPresent("No sample requests to show", 2);
+        assertTextNotPresent(submittedRequestLabels);
+    }
+
+    private void verifyDocumentSetFromDashboard()
+    {
+        log("Verify documents and types via RC Dashboard");
+        goToProjectHome();
+        waitForGridToLoad("div", "x4-grid-group-title", NWBT_REQUEST_CATEGORIES.length);
+        assertElementPresent(Locator.linkWithText("Document Set (0)"), 2);
+        assertElementPresent(Locator.linkWithText("Document Set (3)"), 1);
+        click(Locator.linkWithText("Document Set (3)")); // link for the first request
+        waitForText(TEST_FILE_1.getName());
+        assertElementPresent(Locator.linkWithText(TEST_FILE_1.getName()), NWBT_DOCUMENT_TYPES.length);
+        assertElementPresent(Locator.linkWithText(TEST_FILE_2.getName()), NWBT_DOCUMENT_TYPES.length - 1); // first doc type doesn't allow multiple file upload
+        for (int index = 0; index < NWBT_DOCUMENT_TYPES.length; index++)
+            assertTextPresent(NWBT_DOCUMENT_TYPES[index], index == 0 ? 1 : 2);
+
+        log("Verify removing documents from document set");
+        clickButton("Manage");
+        waitForGridToLoad("tr", "x4-grid-row", fileCount);
+        // verify that we navigated to the appropriate subfolder for the manage document set page
+        assertTextPresent("NW BioTrust Specimen Requestor Dashboard");
+        assertTextNotPresent("NW BioTrust Research Coordinator Dashboard");
+        Locator loc = DataViewsTester.getEditLinkLocator(TEST_FILE_1.getName());
+        click(loc);
+        _extHelper.waitForExtDialog("Edit Document");
+        assertTextPresentInThisOrder("File Name:", "Document Type:", "Created By:", "Created:");
+        clickButton("Remove", 0);
+        fileCount--;
+        waitForTextToDisappear(NWBT_DOCUMENT_TYPES[0]);
+        waitForGridToLoad("tr", "x4-grid-row", fileCount);
+    }
+
+    private void populateDocumentSetForReqeusts()
+    {
+        log("Add documents to a document set for requests");
+        clickFolder(requestorFolder1);
+        waitForGridToLoad("div", "x4-grid-group-title", NWBT_REQUEST_STATUSES.length);
+        assertElementPresent(Locator.linkWithText("Document Set (0)"), 3);
+        click(Locator.linkWithText("Document Set (0)")); // link for the first request
+        waitForText("No documents to show");
+        assertTextPresent(submittedRequestLabels[0], NWBT_REQUEST_STATUSES[0]);
+        clickButton("Manage");
+        waitForText("No documents to show");
+        assertTextPresent(submittedRequestLabels[0], NWBT_REQUEST_STATUSES[0]);
+        fileCount = 0;
+        for (int index = 0; index < NWBT_DOCUMENT_TYPES.length; index++)
+        {
+            String documentType = NWBT_DOCUMENT_TYPES[index];
+            clickButton("Add Document(s)", 0);
+            _extHelper.waitForExtDialog("Add Document(s)");
+            _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Document Type:']]"), documentType);
+            waitForElement(Locator.name("attachmentfile0"));
+            setFormElement(Locator.name("attachmentfile0"), TEST_FILE_1.toString());
+            fileCount++;
+            // the first doc type was set to not allow multiple file uploads
+            if (index > 0)
+            {
+                assertElementPresent(Locator.linkContainingText("Attach a file"));
+                click(Locator.linkContainingText("Attach a file"));
+                waitForElement(Locator.name("attachmentfile1"));
+                setFormElement(Locator.name("attachmentfile1"), TEST_FILE_2.toString());
+                fileCount++;
+            }
+            else
+                assertElementNotPresent(Locator.linkContainingText("Attach a file"));
+            clickButton("Submit", 0);
+            waitForGridToLoad("tr", "x4-grid-row", fileCount);
+        }
+
+        log("Verify file attachment links and document types exist");
+        assertElementPresent(Locator.linkWithText(TEST_FILE_1.getName()), NWBT_DOCUMENT_TYPES.length);
+        assertElementPresent(Locator.linkWithText(TEST_FILE_2.getName()), NWBT_DOCUMENT_TYPES.length - 1); // first doc type doesn't allow multiple file upload
+        for (int index = 0; index < NWBT_DOCUMENT_TYPES.length; index++)
+            assertTextPresent(NWBT_DOCUMENT_TYPES[index], index == 0 ? 1 : 2);
+
+        log("Test document type allow multiple file setting");
+        clickButton("Add Document(s)", 0);
+        _extHelper.waitForExtDialog("Add Document(s)");
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Document Type:']]"), NWBT_DOCUMENT_TYPES[0]);
+        waitForElement(Locator.name("attachmentfile0"));
+        setFormElement(Locator.name("attachmentfile0"), TEST_FILE_2.toString());
+        clickButton("Submit", 0);
+        waitForText("This document type does not allow multiple files and one already exists in this document set.");
+        clickButton("OK", 0);
+        setFormElement(Locator.name("attachmentfile0"), TEST_FILE_1.toString());
+        clickButton("Submit", 0);
+        waitForText("A document with the following name already exists for this document type: " + TEST_FILE_1.getName());
+        clickButton("OK", 0);
+        clickButton("Close", 0);
+    }
+
+    private void verifySecondRequestorDashboard()
+    {
+        // TODO: this will be put to better use once we implement the NWBT security roles/permissions
+        log("Verify that the 2nd requestor folder does not contain data from the first requestor");
+        clickFolder(requestorFolder2);
+        waitForText("No sample requests to show");
+        assertTextPresent("No sample requests to show", 2);
+        assertElementNotPresent(Locator.linkWithText("Click Here"));
     }
 
     private void verifyRequestorDashboard()
     {
         log("Verify updated reqeusts show up in Requestor Dashboard");
         clickFolder(requestorFolder1);
-        waitForRequestGridToLoad(NWBT_REQUEST_STATUSES.length);
+        waitForGridToLoad("div", "x4-grid-group-title", NWBT_REQUEST_STATUSES.length);
         assertElementNotPresent(getGroupingTitleLocator("Submitted"));
         for (String category : NWBT_REQUEST_STATUSES)
             assertElementPresent(getGroupingTitleLocator(category));
@@ -73,7 +202,7 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Verify submitted requests show up in RC Dashboard");
         goToProjectHome();
-        waitForRequestGridToLoad(1); // all request should still be in the Unassigned category
+        waitForGridToLoad("div", "x4-grid-group-title", 1); // all request should still be in the Unassigned category
         assertTextNotPresent("No sample requests to show");
         assertElementPresent(getGroupingTitleLocator("Unassigned"));
         assertTextPresentInThisOrder(submittedRequestLabels);
@@ -82,18 +211,20 @@ public class NWBioTrustTest extends SurveyTest
         for (int i = 0; i < submittedRequestLabels.length; i++)
             setRequestStatusAndCategory(i, submittedRequestLabels[i], NWBT_REQUEST_STATUSES[i], NWBT_REQUEST_CATEGORIES[i]);
         clickFolder(getProjectName());
-        waitForRequestGridToLoad(NWBT_REQUEST_CATEGORIES.length);
+        waitForGridToLoad("div", "x4-grid-group-title", NWBT_REQUEST_CATEGORIES.length);
         assertElementNotPresent(getGroupingTitleLocator("Unassigned"));
         for (String category : NWBT_REQUEST_CATEGORIES)
             assertElementPresent(getGroupingTitleLocator(category));
         assertTextPresentInThisOrder(NWBT_REQUEST_STATUSES);
     }
 
-    private void waitForRequestGridToLoad(int expectedCategories)
+    private void waitForGridToLoad(String tag, String className, int expectedCount)
     {
-        Locator l = Locator.xpath("//div[contains(@class, 'x4-grid-group-title')]");
-        waitForElement(l);
-        assertElementPresent(l, expectedCategories);
+        Locator l = Locator.xpath("//" + tag + "[contains(@class, '" + className + "')]");
+        startTimer();
+        while (getElementCount(l) < expectedCount && elapsedSeconds() < WAIT_FOR_JAVASCRIPT)
+            sleep(1000);
+        assertElementPresent(l, expectedCount);
     }
 
     private Locator getGroupingTitleLocator(String title)
@@ -116,10 +247,8 @@ public class NWBioTrustTest extends SurveyTest
 
     private void populateSurveyDesignsAndRequests()
     {
-        String designLabel = "Prospective";
-        String description = "Request specimens from surgeries or clinic procedures";
-
         log("Create survey design in project folder and configure dashboard");
+        assertTextNotPresent(designLabel);
         createSurveyDesign(getProjectName(), designLabel, description, "biotrust", provisionTableName);
         waitForText("No sample requests to show");
         customizeDashboard("RC Dashboard - Study Registrations", designLabel);
@@ -134,7 +263,7 @@ public class NWBioTrustTest extends SurveyTest
             clickAndWait(Locator.linkWithText("Click Here"));
             submitSampleRequest(requestLabel, Collections.singletonMap("testfield1", "Text Field Value"));
         }
-        waitForRequestGridToLoad(1); // all request should be in the Submitted group
+        waitForGridToLoad("div", "x4-grid-group-title", 1); // all request should be in the Submitted group
         assertTextPresent("No sample requests to show", 1); // draft grid should still be empty
         assertTextPresentInThisOrder(submittedRequestLabels);
     }
@@ -205,6 +334,8 @@ public class NWBioTrustTest extends SurveyTest
 
     private void setupProjectAdminProperties()
     {
+        // TODO: could we do this via API calls instead to speed things up?
+
         // NOTE: these tables are site wide (i.e. no container field), so we have to track which ones we add so we can delete them
         log("Populate the Request Category dashboard lookup table");
         goToDashboardLookupTable("Request Category", NWBT_REQUEST_CATEGORIES);
@@ -334,6 +465,7 @@ public class NWBioTrustTest extends SurveyTest
         goToHome();
         if(isElementPresent(Locator.linkWithText(getProjectName())))
         {
+            // TODO: could we do this via API calls instead to speed things up?
             deleteDashboardLookupRows("Request Category", "Category", NWBT_REQUEST_CATEGORIES);
             deleteDashboardLookupRows("Request Status", "Status", NWBT_REQUEST_STATUSES);
             deleteDashboardLookupRows("Document Types", "Name", NWBT_DOCUMENT_TYPES);
