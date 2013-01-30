@@ -19,6 +19,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -43,7 +44,14 @@ public class LabKeyExpectedConditions
               @Override
               public Boolean apply(WebDriver driver)
               {
-                  return loc.findElement(driver).getCssValue("position").equals("static");
+                  try
+                  {
+                      return loc.findElement(driver).getCssValue("position").equals("static");
+                  }
+                  catch (StaleElementReferenceException ignore)
+                  {
+                      return false;
+                  }
               }
           };
     }
