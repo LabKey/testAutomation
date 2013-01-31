@@ -161,7 +161,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         setFormElement(Locator.name("Source"), source);
         setFormElement(Locator.name("LocationId"), String.valueOf(locationId));
         setFormElement(Locator.name("TubeType"), tubeType);
-        clickButton("Update", 0);
+        clickButton("Submit");
     }
 
     private void setSpecimenConfigurationVisit(String scRowId, String[] labels)
