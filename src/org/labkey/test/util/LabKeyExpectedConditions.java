@@ -39,20 +39,26 @@ public class LabKeyExpectedConditions
      * @return true when animation is complete
      */
     public static ExpectedCondition<Boolean> animationIsDone(final Locator loc) {
-          return new ExpectedCondition<Boolean>() {
-              @Override
-              public Boolean apply(WebDriver driver)
-              {
-                  try
-                  {
-                      return loc.findElement(driver).getCssValue("position").equals("static");
-                  }
-                  catch (StaleElementReferenceException ignore)
-                  {
-                      return false;
-                  }
-              }
-          };
+        return new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                try
+                {
+                    return loc.findElement(driver).getCssValue("position").equals("static");
+                }
+                catch (StaleElementReferenceException ignore)
+                {
+                    return false;
+                }
+            }
+
+            @Override
+            public String toString()
+            {
+                return "animation of element: " + loc.getLoggableDescription();
+            }
+        };
     }
 
     /**
@@ -67,6 +73,12 @@ public class LabKeyExpectedConditions
             public Boolean apply(WebDriver driver)
             {
                 return !driver.findElement(By.id("email_body_" + emailIndex)).getCssValue("display").equals("none");
+            }
+
+            @Override
+            public String toString()
+            {
+                return "expansion of dumbster row " + emailIndex;
             }
         };
     }
