@@ -15,7 +15,7 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
 {
 
     protected static final String DUMMY_PROJECT_NAME = "Dummy Project";
-    protected static final String[] users = {"read@webpartpermissions.test", "edit@webpartpermissions.test", "admin@webpartpermissions.test"};
+    protected static final String[] users = {"read_webpart@webpartpermissions.test", "edit_webpart@webpartpermissions.test", "admin_webpart@webpartpermissions.test"};
     @Override
     protected String getProjectName()
     {
