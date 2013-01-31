@@ -108,10 +108,10 @@ public class SurveyTest extends BaseWebDriverTest
         waitForElement(Locator.name("label"));
         setFormElement(Locator.name("label"), designName);
         if (description != null) setFormElement(Locator.name("description"), description);
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Schema']]"), schemaName);
+        _ext4Helper.selectComboBoxItem("Schema", schemaName);
         // the schema selection enables the query combo, so wait for it to enable
         waitForElementToDisappear(Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Query']"), WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Query']]"), queryName);
+        _ext4Helper.selectComboBoxItem("Query", queryName);
         clickButton("Generate Survey Questions", 0);
         sleep(1000); // give it a second to generate the metadata
         String metadataValue = getFormElement(Locator.name("metadata"));
@@ -313,7 +313,7 @@ public class SurveyTest extends BaseWebDriverTest
     {
         log("Configure Surveys webpart");
         portalHelper.addWebPart("Surveys");
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Survey Design:']]"), surveyDesignName);
+        _ext4Helper.selectComboBoxItem("Survey Design:", surveyDesignName);
         clickButton("Submit");
         waitForText("Surveys: " + surveyDesignName);
     }

@@ -148,7 +148,7 @@ public class NWBioTrustTest extends SurveyTest
             String documentType = NWBT_DOCUMENT_TYPES[index];
             clickButton("Add Document(s)", 0);
             _extHelper.waitForExtDialog("Add Document(s)");
-            _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Document Type:']]"), documentType);
+            _ext4Helper.selectComboBoxItem("Document Type:", documentType);
             waitForElement(Locator.name("attachmentfile0"));
             setFormElement(Locator.name("attachmentfile0"), TEST_FILE_1.toString());
             fileCount++;
@@ -176,7 +176,7 @@ public class NWBioTrustTest extends SurveyTest
         log("Test document type allow multiple file setting");
         clickButton("Add Document(s)", 0);
         _extHelper.waitForExtDialog("Add Document(s)");
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Document Type:']]"), NWBT_DOCUMENT_TYPES[0]);
+        _ext4Helper.selectComboBoxItem("Document Type:", NWBT_DOCUMENT_TYPES[0]);
         waitForElement(Locator.name("attachmentfile0"));
         setFormElement(Locator.name("attachmentfile0"), TEST_FILE_2.toString());
         clickButton("Submit", 0);
@@ -249,8 +249,8 @@ public class NWBioTrustTest extends SurveyTest
         click(loc);
         _extHelper.waitForExtDialog("Edit Request");
         sleep(1000); // this is tricky because there is a loading mask for the combos, but they can load very quickly so that the test misses it if we wait for the mask to disappear
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='NWBT Resource:']]"), category);
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Status:']]"), status);
+        _ext4Helper.selectComboBoxItem("NWBT Resource:", category);
+        _ext4Helper.selectComboBoxItem("Status:", status);
         clickButton("Update", 0);
         waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid-group-title') and contains(text(), '" + category + "')]"));
         assertTextPresent(status);
