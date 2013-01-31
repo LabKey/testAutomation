@@ -77,7 +77,7 @@ public class UIContainerHelper extends AbstractContainerHelper
 
     @LogMethod
     @Override
-    public void deleteProject(String project, boolean failIfNotFound, int wait)
+    public void doDeleteProject(String project, boolean failIfNotFound, int wait)
     {
         // Ensure that projects menu is expanded so test project can be seen
         Locator minus = Locator.xpath("id('expandCollapse-projectsMenu')/img[contains(@src, 'minus.gif')]");

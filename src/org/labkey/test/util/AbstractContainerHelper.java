@@ -60,10 +60,16 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         _createdProjects.add(projectName);
     }
 
-    public void deleteProject(String projectName) throws TestTimeoutException
+    public final void deleteProject(String projectName) throws TestTimeoutException
     {
         deleteProject(projectName, true, 90000);
     }
 
-    public abstract void deleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException;
+    public final void deleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException
+    {
+        doDeleteProject(projectName, failIfNotFound, wait);
+        _createdProjects.remove(projectName);
+    }
+
+    public abstract void doDeleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException;
 }

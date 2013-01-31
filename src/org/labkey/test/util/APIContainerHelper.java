@@ -74,7 +74,7 @@ public class APIContainerHelper extends AbstractContainerHelper
     }
 
     @Override
-    public void deleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException
+    public void doDeleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException
     {
         DeleteContainerCommand dcc = new DeleteContainerCommand();
         dcc.setTimeout(wait);
