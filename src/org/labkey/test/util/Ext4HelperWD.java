@@ -52,11 +52,10 @@ public class Ext4HelperWD extends AbstractHelperWD
         }
         else
         {
-            Locator listItem = Locator.css("li.x4-boundlist-item");
-            _test._shortWait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("li.x4-boundlist-item")));
+            Locator listItem = Locator.xpath("//li[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
 
             // wait for and select the list item
-            _test.click(listItem.withText(selection));
+            _test.waitAndClick(listItem);
 
             // menu should disappear
             _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("li.x4-boundlist-item")));
