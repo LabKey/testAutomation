@@ -84,7 +84,7 @@ public abstract class Locator
         return xpath;
     }
 
-    protected String getLoggableDescription()
+    public String getLoggableDescription()
     {
         return toString() +
             (_index == null ? "" : "\nIndex: " + _index) +
@@ -748,6 +748,11 @@ public abstract class Locator
             return new XPathLocator(getPath() + child.getPath());
         }
 
+        public XPathLocator notHidden()
+        {
+            return this.append("["+NOT_HIDDEN+"]");
+        }
+
         public String getPath()
         {
             return _loc;
@@ -763,9 +768,9 @@ public abstract class Locator
             return _loc;
         }
 
-        protected String getLoggableDescription()
+        public String getLoggableDescription()
         {
-            return toXpath();
+            return toString();
         }
     }
 
