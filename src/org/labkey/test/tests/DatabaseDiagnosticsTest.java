@@ -54,7 +54,7 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
         else
             click(Locator.linkWithText("COMPLETE"));
 
-        waitForText("Check complete");
+        waitForTextWithRefresh("Check complete", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Check complete, 0 errors found");
     }
 
