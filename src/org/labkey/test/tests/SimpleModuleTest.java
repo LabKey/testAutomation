@@ -36,7 +36,9 @@ import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.SecurityHelperWD;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -112,12 +114,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestCustomFolder()
     {
-        assertTextPresent("A customized web part");
-        assertTextPresent("Data Pipeline");
-        assertTextPresent("Experiment Runs");
-        assertTextPresent("Sample Sets");
+        SecurityHelperWD securityHelper = new SecurityHelperWD(this);
+
+        assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Sample Sets", "Assay List");
         assertTextPresent("Run Groups");
         assertLinkNotPresentWithText("Create Run Group"); // Not in small Run Groups web-part.
+        securityHelper.checkWebpartPermission("A customized web part", "Read", null);
+        securityHelper.checkWebpartPermission("Data Pipeline", "Read", null);
     }
 
     @LogMethod

@@ -3,6 +3,7 @@ package org.labkey.test.util;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.WebElement;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,9 +14,12 @@ import org.labkey.test.Locator;
  */
 public class SecurityHelperWD extends AbstractHelperWD
 {
+    private PortalHelper _portalHelper;
+
     public SecurityHelperWD(BaseWebDriverTest test)
     {
         super(test);
+        _portalHelper = new PortalHelper(test);
     }
 
     public void setSiteGroupPermissions(String groupName, String permissionString)
@@ -23,6 +27,12 @@ public class SecurityHelperWD extends AbstractHelperWD
         _test.setSiteGroupPermissions(groupName, permissionString);
     }
 
+    public void openWebpartPermissionWindow(String webpart)
+    {
+        _portalHelper.clickWebpartMenuItem(webpart, false, "Permissions");
+        _test._ext4Helper.waitForMask();
+        _test.waitForText("Check Permission");
+    }
 
     /**
      *
@@ -32,12 +42,8 @@ public class SecurityHelperWD extends AbstractHelperWD
      */
     public void setWebpartPermission(String webpart, String permission, String folder)
     {
-        _test.click(Locator.xpath("//th[@title='" + webpart + "']/span/a/img"));
-        Locator permissions = Locator.tagWithText("span", "Permissions");
-        _test.waitForElement(permissions);
-        _test.click(permissions);
-        _test._ext4Helper.waitForMask();
-        _test.waitForText("Check Permission");
+        openWebpartPermissionWindow(webpart);
+        
         _test._ext4Helper.selectComboBoxItem("Required Permission:", permission);
 
         if(folder==null)
@@ -48,6 +54,31 @@ public class SecurityHelperWD extends AbstractHelperWD
             _test.click(Locator.tagWithText("div", folder));
         }
         _test.click(Locator.tagWithText("span", "Save"));
+    }
+
+    /**
+     *
+     * @param webpart
+     * @param expectedPermission The permission that is expected to be set.
+     * @param expectedFolder The folder that is expected to be selected, null=current folder
+     */
+    public void checkWebpartPermission(String webpart, String expectedPermission, String expectedFolder)
+    {
+        openWebpartPermissionWindow(webpart);
+        
+        _test.assertFormElementEquals("permission", expectedPermission);
+
+        if(expectedFolder == null)
+        {
+            _test.assertFormElementEquals("permissionContainer", "");
+        }
+        else
+        {
+            _test.assertFormElementEquals("permissionContainer", expectedFolder);
+        }
+
+        _test.click(Locator.tagWithText("span", "Cancel"));
+        _test._ext4Helper.waitForMaskToDisappear();
     }
 
     public void setProjectPerm(String userOrGroupName, String permission)

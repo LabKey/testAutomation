@@ -8,10 +8,12 @@
            <ft:property name="title" value="A customized web part" />
            <ft:property name="schemaName" value="study" />
            <ft:property name="queryName" value="StudyProperties" />
+           <ft:permission>org.labkey.api.security.permissions.ReadPermission</ft:permission>
        </ft:webPart>
        <ft:webPart>
            <ft:name>Data Pipeline</ft:name>
            <ft:location>body</ft:location>
+           <ft:permission>Read</ft:permission>
        </ft:webPart>
        <ft:webPart>
            <ft:name>Experiment Runs</ft:name>
