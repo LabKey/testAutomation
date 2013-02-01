@@ -69,7 +69,7 @@ public class Ext4Helper extends AbstractHelper
             _test.waitAndClick(listItem);
 
             // menu should disappear
-            _test.waitForElementToDisappear(listItem.notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            _test.waitForElementToDisappear(listItem, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
     }
 
