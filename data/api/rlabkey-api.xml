@@ -3,14 +3,14 @@
         <url>
             <![CDATA[
                 library(Rlabkey)
-                print("Latest Rlabkey version: 2.1.120")
+                print("Latest Rlabkey version: 2.1.121")
                 print(paste("Found Rlabkey version:", installed.packages()["Rlabkey","Version"]))
             ]]>
         </url>
         <response>
             <![CDATA[
-                [1] "Latest Rlabkey version: 2.1.120"
-                [1] "Found Rlabkey version: 2.1.120"
+                [1] "Latest Rlabkey version: 2.1.121"
+                [1] "Found Rlabkey version: 2.1.121"
             ]]>
         </response>
     </test>
@@ -102,9 +102,7 @@
                 2nd level lookup 3
                 1 Punctuation
                 4 TypeRange
-                7 2nd level lookup 3 BasicTest
-
-
+                2nd level lookup 3 BasicTest
             ]]>
         </response>
     </test>
@@ -233,6 +231,23 @@
                 Required Integer Category Lookup
                 0 <NA>
             ]]>            
+        </response>
+    </test>
+    <test name="executeSql" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
+
+                selectedRow<-labkey.executeSql("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists",
+                    sql="select DisplayFld, TextFld from AllTypes where DisplayFld = 'Row 1'")
+                selectedRow
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                DisplayName Text Field
+                1 Row 1 some text here
+            ]]>
         </response>
     </test>
     <test name="ContainerFilter1" type="post">
