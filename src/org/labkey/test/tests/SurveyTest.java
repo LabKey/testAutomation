@@ -141,7 +141,7 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name("dblField"), "999.1");
         setFormElement(Locator.name("dtField"), "2013-01-04");
         addSurveyFileAttachment("attField", pipelineLoc + "/TestAttachment.txt");
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test1");
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test1", true);
         log("Wait for the survey autosave (save attempts every minute)");
         waitForText("Responses automatically saved at", 65000);
 
@@ -276,11 +276,11 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name("dtField"), "01/04/2013");
         // check survey skip logic that attachment field appears with selectin of lkField = Test1
         assertElementPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test1");
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test1", true);
         assertElementNotPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test2");
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test2", true);
         assertElementPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test1");
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test1", true);
         addSurveyFileAttachment("attField", pipelineLoc + "/TestAttachment.txt");
         clickButton("Next", 0);
         // check submit button text about invalid fields

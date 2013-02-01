@@ -41,6 +41,12 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
+        selectComboBoxItem(parentLocator, selection, false);
+    }
+
+    @LogMethod(quiet = true)
+    public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection, boolean containsText)
+    {
         Locator l = Locator.xpath(parentLocator.getPath()+"//div[contains(@class,'arrow')]");
         _test.waitAndClick(l);
         if(_test.getBrowser().startsWith(BaseWebDriverTest.IE_BROWSER))
@@ -51,7 +57,11 @@ public class Ext4HelperWD extends AbstractHelperWD
         }
         else
         {
-            Locator listItem = Locator.xpath("//li[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
+            Locator listItem;
+            if (containsText)
+                listItem = Locator.xpath("//li[contains(@class, 'x4-boundlist-item')]").notHidden().containing(selection);
+            else
+                listItem = Locator.xpath("//li[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
 
             // wait for and select the list item
             _test.waitAndClick(listItem);
