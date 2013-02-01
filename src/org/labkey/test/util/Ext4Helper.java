@@ -40,12 +40,17 @@ public class Ext4Helper extends AbstractHelper
         super(test);
     }
 
-    @LogMethod
-    public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
+    @LogMethod(quiet = true)
+    public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
+    {
+        selectComboBoxItem(parentLocator, selection, false);
+    }
+
+    @LogMethod(quiet = true)
+    public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection, boolean containsText)
     {
         Locator l = Locator.xpath(parentLocator.getPath()+"//div[contains(@class,'arrow')]");
-        _test.waitForElement(l);
-        _test.clickAt(l, "1,1");
+        _test.waitAndClick(l);
         if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
         {
             _test.sleep(500);
@@ -54,19 +59,23 @@ public class Ext4Helper extends AbstractHelper
         }
         else
         {
-            // wait for the dropdown to open
-            Locator listItem =     Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains( text(), '" + selection + "')]");
-            _test.waitForElement(listItem);
+            Locator.XPathLocator listItem;
+            if (containsText)
+                listItem = Locator.xpath("//li[contains(@class, 'x4-boundlist-item')]").notHidden().containing(selection);
+            else
+                listItem = Locator.xpath("//li[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
 
-            // select the list item
-            _test.click(listItem);
-            //test.mouseDown(Locator.xpath("/html/body"));
+            // wait for and select the list item
+            _test.waitAndClick(listItem);
+
+            // menu should disappear
+            _test.waitForElementToDisappear(listItem.notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
     }
 
     public void selectComboBoxItem(String label, String selection)
     {
-       Ext4FieldRef.getForLabel(_test, label).setValue(selection);
+        selectComboBoxItem(Locator.xpath("//tr[td/label[normalize-space()='" + label + "']]"), selection);
     }
 
     @LogMethod
