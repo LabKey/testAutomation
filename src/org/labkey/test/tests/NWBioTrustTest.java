@@ -77,12 +77,11 @@ public class NWBioTrustTest extends SurveyTest
         verifySecondRequestorDashboard();
         populateDocumentSetForReqeusts();
         verifyDocumentSetFromDashboard();
-        deleteSurveyDesign();
     }
 
     private void deleteSurveyDesign()
     {
-        log("Delete the survey design for this project (which will delete the document set and requests");
+        log("Delete the survey design for this project (which will delete the document sets and requests");
         goToProjectHome();
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("RowId");
@@ -421,7 +420,7 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Verify folder type default webparts");
         goToProjectHome();
-        verifyWebpartTitleOrder(new String[]{"NW BioTrust Administration", "Survey Designs", "RC Dashboard - Study Registrations"});
+        verifyWebpartTitleOrder(new String[]{"RC Dashboard - Study Registrations", "Survey Designs", "NW BioTrust Administration"});
         clickFolder(requestorFolder1);
         verifyWebpartTitleOrder(new String[]{"Requestor Dashboard - Study Registrations"});
         clickFolder(requestorFolder2);
@@ -517,6 +516,7 @@ public class NWBioTrustTest extends SurveyTest
         goToHome();
         if(isElementPresent(Locator.linkWithText(getProjectName())))
         {
+            deleteSurveyDesign();
             deleteDashboardLookupRows("RequestCategory", "Category", NWBT_REQUEST_CATEGORIES);
             deleteDashboardLookupRows("RequestStatus", "Status", NWBT_REQUEST_STATUSES);
             deleteDashboardLookupRows("DocumentTypes", "Name", NWBT_DOCUMENT_TYPES);
