@@ -313,19 +313,19 @@ public class DataViewsTester
         _test.click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").containingClass("x4-form-arrow-trigger"));
         Assert.assertEquals("Available categories are not as expected", CATEGORY_LIST, _test.getText(Locator.css(".x4-boundlist")));
         _test.click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").containingClass("x4-form-arrow-trigger")); // close combo-box
-        _test._extHelper.selectExt4ComboBoxItem("Category", "Subcategory1-" + CATEGORIES[1]);
+        _test._ext4Helper.selectComboBoxItem("Category", "Subcategory1-" + CATEGORIES[1]);
         saveDatasetProperties(datasets[0][0]);
 
         editDatasetProperties(datasets[1][0]);
-        _test._extHelper.selectExt4ComboBoxItem("Category", "Subcategory2-" + CATEGORIES[1]);
+        _test._ext4Helper.selectComboBoxItem("Category", "Subcategory2-" + CATEGORIES[1]);
         saveDatasetProperties(datasets[1][0]);
 
         editDatasetProperties(datasets[2][0]);
-        _test._extHelper.selectExt4ComboBoxItem("Category", "Subcategory1-" + CATEGORIES[2]);
+        _test._ext4Helper.selectComboBoxItem("Category", "Subcategory1-" + CATEGORIES[2]);
         saveDatasetProperties(datasets[2][0]);
 
         editDatasetProperties(datasets[3][0]);
-        _test._extHelper.selectExt4ComboBoxItem("Category", "Subcategory2-" + CATEGORIES[2]);
+        _test._ext4Helper.selectComboBoxItem("Category", "Subcategory2-" + CATEGORIES[2]);
         saveDatasetProperties(datasets[3][0]);
 
         _test.assertTextPresentInThisOrder(
