@@ -623,7 +623,7 @@ public class ExtHelperWD extends AbstractHelperWD
     public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
         _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"));
-        _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"));
+        _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and normalize-space()='" + selection + "']"));
     }
 
     public void selectExt4ComboBoxItem(String label, String selection)
@@ -780,9 +780,24 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public static class Locators
     {
+        /**
+         * Locates title bar of an Ext 3 or 4 window
+         * @param title exact text of window title
+         * @return Locator for window's title bar
+         */
         public static Locator.XPathLocator extDialog(String title)
         {
             return Locator.xpath("//span["+Locator.NOT_HIDDEN + " and contains(@class, 'window-header-text') and contains(string(), '" + title + "')]");
+        }
+
+        /**
+         * Locates an Ext 3 window
+         * @param title Exact text of window title
+         * @return Locator for Ext 3 window
+         */
+        public static Locator.XPathLocator window(String title)
+        {
+            return Locator.xpath("//div").containingClass("x-window").notHidden().withDescendant(Locator.xpath("//span").containingClass("x-window-header-text").withText(title));
         }
     }
 }

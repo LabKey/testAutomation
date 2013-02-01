@@ -457,12 +457,12 @@ public class ExtHelper extends AbstractHelper
         if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
         {
             _test.sleep(500);
-            _test.clickAt(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"), "1,1");
+            _test.clickAt(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and normalize-space()='" + selection + "']"), "1,1");
             _test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
         }
         else
         {
-            _test.waitAndClick(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and text()='" + selection + "']"));
+            _test.waitAndClick(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and normalize-space()='" + selection + "']"));
             _test.mouseDown(Locator.xpath("/html/body"));
         }
     }

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: Jan 3, 2012
  * Time: 3:34:16 PM
@@ -65,11 +64,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
-        _test.click(Locator.xpath("//tr[td/label[text()='" + label + "']]//input"));
-        Locator.XPathLocator listItem = Locator.tagWithText("li", selection);
-        _test.waitForElement(listItem);
-        _test.click(listItem);
-//       Ext4FieldRefWD.getForLabel(_test, label).setValue(selection);
+        selectComboBoxItem(Locator.xpath("//tr[td/label[normalize-space()='" + label + "']]"), selection);
     }
 
     @LogMethod(quiet = true)
@@ -414,6 +409,11 @@ public class Ext4HelperWD extends AbstractHelperWD
             if (!test.isElementPresent(l))
                 l = Locator.xpath("//input[contains(@class,'x4-form-checkbox')][../../td/label[text()='" + label + "']]");
             return l;
+        }
+
+        public static Locator.XPathLocator window(String title)
+        {
+            return Locator.xpath("//div").containingClass("x4-window").notHidden().withDescendant(Locator.xpath("//span").containingClass("x4-window-header-text").withText(title));
         }
     }
 

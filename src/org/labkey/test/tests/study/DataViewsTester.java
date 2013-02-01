@@ -19,10 +19,10 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.tests.StudyBaseTest;
+import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: Feb 29, 2012
  */
@@ -261,5 +261,117 @@ public class DataViewsTester
         _test.assertTextPresent("2012-03-01");
         _test.clickAndWait(Locator.linkWithText(EDITED_DATASET));
         _test.assertTextPresent("2012-03-01");
+    }
+
+    private static final String CATEGORY_LIST =
+            CATEGORIES[0]+
+            CATEGORIES[1]+
+                "Subcategory1-"+CATEGORIES[1]+
+                "Subcategory2-"+CATEGORIES[1]+
+            CATEGORIES[2]+
+                "Subcategory1-"+CATEGORIES[2]+
+                "Subcategory2-"+CATEGORIES[2]+
+            CATEGORIES[3]+
+            CATEGORIES[4];
+    @LogMethod
+    public void subcategoryTest()
+    {
+        _test.clickAndWait(Locator.linkContainingText("Data & Reports"));
+        openCustomizePanel();
+        _test.clickButton("Manage Categories", 0);
+        _test._extHelper.waitForExtDialog("Manage Categories");
+
+        _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").containingClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
+        _test._extHelper.waitForExtDialog("Subcategories");
+        _test.assertElementPresent(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").containingClass("x4-grid-row-selected").withText(CATEGORIES[1]));
+
+        _test.clickButton("New Subcategory", 0);
+        _test.waitForElement(Locator.xpath("//input[@name='label']["+Locator.NOT_HIDDEN+"]"));
+        _test.setFormElement(Locator.name("label"), "Subcategory1-" + CATEGORIES[1]);
+        _test.clickButton("New Subcategory", 0);
+        _test.waitForElement(Locator.xpath("//input[@name='label']["+Locator.NOT_HIDDEN+"]"));
+        _test.setFormElement(Locator.name("label"), "Subcategory2-" + CATEGORIES[1]);
+
+        _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").containingClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
+        _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").containingClass("x4-grid-row-selected").withText(CATEGORIES[2]));
+        _test.assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1]);
+
+        _test.clickButton("New Subcategory", 0);
+        _test.waitForElement(Locator.xpath("//input[@name='label']["+Locator.NOT_HIDDEN+"]"));
+        _test.setFormElement(Locator.name("label"), "Subcategory1-" + CATEGORIES[2]);
+        _test.clickButton("New Subcategory", 0);
+        _test.waitForElement(Locator.xpath("//input[@name='label']["+Locator.NOT_HIDDEN+"]"));
+        _test.setFormElement(Locator.name("label"), "Subcategory2-" + CATEGORIES[2]);
+
+        _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").containingClass("x4-grid-cell-inner").withText(CATEGORIES[3])));
+        _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").containingClass("x4-grid-row-selected").withText(CATEGORIES[3]));
+        _test.assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1], "Subcategory1-" + CATEGORIES[2], "Subcategory2-" + CATEGORIES[2]);
+
+        _test._extHelper.clickExtButton("Manage Categories", "Done", 0);
+        _test._extHelper.waitForExtDialogToDisappear("Manage Categories");
+        editDatasetProperties(datasets[0][0]);
+        _test.click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").containingClass("x4-form-arrow-trigger"));
+        Assert.assertEquals("Available categories are not as expected", CATEGORY_LIST, _test.getText(Locator.css(".x4-boundlist")));
+        _test.click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").containingClass("x4-form-arrow-trigger")); // close combo-box
+        _test._extHelper.selectExt4ComboBoxItem("Category", "Subcategory1-" + CATEGORIES[1]);
+        saveDatasetProperties(datasets[0][0]);
+
+        editDatasetProperties(datasets[1][0]);
+        _test._extHelper.selectExt4ComboBoxItem("Category", "Subcategory2-" + CATEGORIES[1]);
+        saveDatasetProperties(datasets[1][0]);
+
+        editDatasetProperties(datasets[2][0]);
+        _test._extHelper.selectExt4ComboBoxItem("Category", "Subcategory1-" + CATEGORIES[2]);
+        saveDatasetProperties(datasets[2][0]);
+
+        editDatasetProperties(datasets[3][0]);
+        _test._extHelper.selectExt4ComboBoxItem("Category", "Subcategory2-" + CATEGORIES[2]);
+        saveDatasetProperties(datasets[3][0]);
+
+        _test.assertTextPresentInThisOrder(
+            CATEGORIES[0],
+            CATEGORIES[1],
+                "Subcategory1-"+CATEGORIES[1],
+                datasets[0][0],
+                "Subcategory2-"+CATEGORIES[1],
+                datasets[1][0],
+            CATEGORIES[2],
+                "Subcategory1-"+CATEGORIES[2],
+                datasets[2][0],
+                "Subcategory2-"+CATEGORIES[2],
+                datasets[3][0],
+            CATEGORIES[3],
+            CATEGORIES[4]);
+    }
+
+    @LogMethod
+    public void categoryReorderTest()
+    {
+        throw new IllegalStateException("Not yet implemented");
+//        _test.clickAndWait(Locator.linkContainingText("Data & Reports"));
+//        openCustomizePanel();
+//        _test.clickButton("Manage Categories", 0);
+//        _test._extHelper.waitForExtDialog("Manage Categories");
+    }
+
+    private void editDatasetProperties(String dataset)
+    {
+        _test.waitAndClick(Locators.editViewsLink(dataset));
+        _test._extHelper.waitForExtDialog(dataset);
+    }
+
+    public void saveDatasetProperties(String dataset)
+    {
+        _test._extHelper.clickExtButton(dataset, "Save", 0);
+        _test._extHelper.waitForExtDialogToDisappear(dataset);
+        _test._ext4Helper.waitForMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public static class Locators
+    {
+        public static Locator.XPathLocator editViewsLink(String dataset)
+        {
+            return Locator.xpath("//tr").containingClass("x4-grid-tree-node-leaf").withDescendant(Locator.xpath("td/div/a[normalize-space()="+Locator.xq(dataset)+"]")).append("//span").containingClass("edit-views-link");
+        }
     }
 }

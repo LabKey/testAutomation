@@ -710,12 +710,12 @@ public abstract class Locator
 
         public XPathLocator containing(String contains)
         {
-            return new XPathLocator("("+_loc+")[contains(normalize-space(), "+xq(contains)+")]");
+            return this.withPredicate("contains(normalize-space(), "+xq(contains)+")");
         }
 
         public XPathLocator withText(String text)
         {
-            return new XPathLocator("("+_loc+")[normalize-space()="+xq(text)+"]");
+            return this.withPredicate("normalize-space()="+xq(text));
         }
 
         public XPathLocator index(Integer index)
@@ -750,7 +750,22 @@ public abstract class Locator
 
         public XPathLocator notHidden()
         {
-            return this.append("["+NOT_HIDDEN+"]");
+            return this.withPredicate(NOT_HIDDEN);
+        }
+
+        public XPathLocator withDescendant(XPathLocator descendant)
+        {
+            return this.withPredicate(descendant.getPath());
+        }
+
+        public XPathLocator withPredicate(String predicate)
+        {
+            return this.append("["+predicate+"]");
+        }
+
+        public XPathLocator containingClass(String cssClass)
+        {
+            return this.withPredicate("contains(concat(' ',normalize-space(@class),' '),' "+cssClass+" ')");
         }
 
         public String getPath()
