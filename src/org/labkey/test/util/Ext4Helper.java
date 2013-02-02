@@ -49,7 +49,7 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection, boolean containsText)
     {
-        Locator l = Locator.xpath(parentLocator.getPath()+"//div[contains(@class,'arrow')]");
+        Locator l = parentLocator.append("//div").containingClass("x4-form-arrow-trigger");
         _test.waitAndClick(l);
         if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
         {
@@ -61,9 +61,9 @@ public class Ext4Helper extends AbstractHelper
         {
             Locator.XPathLocator listItem;
             if (containsText)
-                listItem = Locator.xpath("//li[contains(@class, 'x4-boundlist-item')]").notHidden().containing(selection);
+                listItem = Locator.xpath("//li").containingClass("x4-boundlist-item").notHidden().containing(selection);
             else
-                listItem = Locator.xpath("//li[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
+                listItem = Locator.xpath("//li").containingClass("x4-boundlist-item").notHidden().withText(selection);
 
             // wait for and select the list item
             _test.waitAndClick(listItem);

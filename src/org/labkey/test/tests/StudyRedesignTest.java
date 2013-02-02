@@ -139,7 +139,7 @@ public class StudyRedesignTest extends StudyBaseTest
         DataViewsTester test = new DataViewsTester(this, getFolderName());
 
         //TODO: enable once data views tree is enabled
-        //test.subcategoryTest();
+        test.subcategoryTest();
         test.basicTest();
         test.datasetStatusTest();
         test.refreshDateTest();
