@@ -389,8 +389,18 @@ public class NabAssayTest extends AbstractQCAssayTest
             runTransformTest();
 
             moveAssayFolderTest();
+
+            directBrowserQueryTest();
         }
     } //doTestSteps()
+
+
+    //Issue 17050: UnsupportedOperationException from org.labkey.nab.query.NabProtocolSchema$NabResultsQueryView.createDataView
+    private void directBrowserQueryTest()
+    {
+        beginAt("/query/Nab%20Test%20Verify%20Project/selectRows.api?schemaName=assay&queryName=TestAssayNab%20Data");
+        assertTextPresent("metaData");
+    }
 
     /**
      * previously, assays sometimes failed to find their source files after a folder move
