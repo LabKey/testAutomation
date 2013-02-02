@@ -273,6 +273,7 @@ public class DataViewsTester
                 "Subcategory2-"+CATEGORIES[2]+
             CATEGORIES[3]+
             CATEGORIES[4];
+
     @LogMethod
     public void subcategoryTest()
     {
@@ -288,20 +289,24 @@ public class DataViewsTester
         _test.clickButton("New Subcategory", 0);
         _test.waitForElement(Locator.xpath("//input[@name='label']["+Locator.NOT_HIDDEN+"]"));
         _test.setFormElement(Locator.name("label"), "Subcategory1-" + CATEGORIES[1]);
+        _test.pressEnter(Locator.name("label"));
         _test.clickButton("New Subcategory", 0);
         _test.waitForElement(Locator.xpath("//input[@name='label']["+Locator.NOT_HIDDEN+"]"));
         _test.setFormElement(Locator.name("label"), "Subcategory2-" + CATEGORIES[1]);
+        _test.pressEnter(Locator.name("label"));
 
         _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").containingClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
         _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").containingClass("x4-grid-row-selected").withText(CATEGORIES[2]));
         _test.assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1]);
 
         _test.clickButton("New Subcategory", 0);
-        _test.waitForElement(Locator.xpath("//input[@name='label']["+Locator.NOT_HIDDEN+"]"));
+        _test.waitForElement(Locator.xpath("//input[@name='label'][" + Locator.NOT_HIDDEN + "]"));
         _test.setFormElement(Locator.name("label"), "Subcategory1-" + CATEGORIES[2]);
+        _test.pressEnter(Locator.name("label"));
         _test.clickButton("New Subcategory", 0);
-        _test.waitForElement(Locator.xpath("//input[@name='label']["+Locator.NOT_HIDDEN+"]"));
+        _test.waitForElement(Locator.xpath("//input[@name='label'][" + Locator.NOT_HIDDEN + "]"));
         _test.setFormElement(Locator.name("label"), "Subcategory2-" + CATEGORIES[2]);
+        _test.pressEnter(Locator.name("label"));
 
         _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").containingClass("x4-grid-cell-inner").withText(CATEGORIES[3])));
         _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").containingClass("x4-grid-row-selected").withText(CATEGORIES[3]));
