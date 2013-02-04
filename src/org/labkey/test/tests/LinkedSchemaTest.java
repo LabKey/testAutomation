@@ -1,12 +1,30 @@
 package org.labkey.test.tests;
 
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PasswordUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: kevink
@@ -34,6 +52,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             "                </dat:filters>\n" +
             "            </dat:table>\n" +
             "        </dat:tables>";
+
+    private String _sourceContainerId;
+    private String _targetContainerId;
 
 
     @Override
@@ -74,8 +95,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER, null);
         // Enable simpletest in source folder so the "BPeopleTemplate" is visible.
         enableModule(SOURCE_FOLDER, "simpletest");
+        _sourceContainerId = getContainerId();
 
         _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER, null);
+        _targetContainerId = getContainerId();
     }
 
     @LogMethod
@@ -96,7 +119,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     @LogMethod
     void createLinkedSchema()
     {
-        createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "A_People", SOURCE_FOLDER, null, "lists", "People", A_PEOPLE_METADATA);
+        if (_sourceContainerId == null)
+            _sourceContainerId = getContainerId(getBaseURL() + "/project/" + getProjectName() + "/" + SOURCE_FOLDER + "/begin.view");
+        createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "A_People", _sourceContainerId, null, "lists", "People", A_PEOPLE_METADATA);
     }
 
     @LogMethod
@@ -119,7 +144,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     @LogMethod
     void createLinkedSchemaUsingTemplate()
     {
-        createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "B_People", SOURCE_FOLDER, "BPeopleTemplate", null, null, null);
+        createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "B_People", _sourceContainerId, "BPeopleTemplate", null, null, null);
     }
 
     @LogMethod
@@ -142,13 +167,16 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
 
     @LogMethod
-    void createLinkedSchema(String containerPath, String name, String sourceContainer, String schemaTemplate, String sourceSchema, String tables, String metadata)
+    void createLinkedSchema(String containerPath, String name, String sourceContainerId, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
     {
         beginAt("/query/" + containerPath + "/admin.view");
         assertTextNotPresent(name);
 
+        // UNDONE: Use web ui to insert the linked schema ...
+        /*
         clickAndWait(Locator.linkWithText("new linked schema"));
-        setFormElement(Locator.name("userSchemaName"), name);
+        _extHelper.setExtFormElementByLabel("Schema Name:", name);
+        //setFormElement(Locator.name("userSchemaName"), name);
         _extHelper.selectComboBoxItem("Source Container:", sourceContainer);
 
         if (schemaTemplate != null)
@@ -158,7 +186,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         }
         else
         {
-            _extHelper.selectComboBoxItem("LabKey Schema Name:", sourceSchema);
+            _extHelper.selectComboBoxItem("Source Schema:", sourceSchema);
 
             // UNDONE
             //if (tables != null)
@@ -169,9 +197,56 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         }
 
         clickButton("Create");
+        */
 
-        // On success, we go back to admin.view
-        assertTitleContains("Schema Administration");
+        HttpClient client = WebTestHelper.getHttpClient(PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpPost method = null;
+        HttpResponse response = null;
+        try
+        {
+            method = new HttpPost(getBaseURL() + "/query/" + containerPath + "/insertLinkedSchema.post");
+            List<NameValuePair> args = new ArrayList<NameValuePair>();
+            args.add(new BasicNameValuePair("schemaType", "linked"));
+            args.add(new BasicNameValuePair("userSchemaName", name));
+            args.add(new BasicNameValuePair("dataSource", sourceContainerId));
+            args.add(new BasicNameValuePair("schemaTemplate", schemaTemplate));
+            args.add(new BasicNameValuePair("sourceSchemaName", sourceSchemaName));
+            args.add(new BasicNameValuePair("tables", tables));
+            args.add(new BasicNameValuePair("metaData", metadata));
+            method.setEntity(new UrlEncodedFormEntity(args));
+
+            log("** Inserting linked schema by POST to " + method.getURI());
+            response = client.execute(method, context);
+
+            StatusLine statusLine = response.getStatusLine();
+            log("  " + statusLine);
+            Assert.assertTrue("Expected to success code 200 or 302: " + statusLine,
+                    HttpStatus.SC_OK == statusLine.getStatusCode() || HttpStatus.SC_MOVED_TEMPORARILY == statusLine.getStatusCode());
+            String html = EntityUtils.toString(response.getEntity());
+            int err = html.indexOf("<div class=\"labkey-error\"");
+            if (err > -1)
+            {
+                String msg = "ERROR inserting linked schema";
+                int end = html.indexOf("</div>", err+1);
+                if (end > -1)
+                    msg = html.substring(err, end);
+                Assert.fail(msg);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            if (client != null)
+                client.getConnectionManager().shutdown();
+        }
+
+        // On success, we are returned to admin.view (XXX: well, in the web ui version we will be...)
+        //assertTitleContains("Schema Administration");
+        beginAt("/query/" + containerPath + "/admin.view");
         assertTextPresent(name);
     }
 

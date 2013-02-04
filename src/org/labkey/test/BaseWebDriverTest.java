@@ -2523,11 +2523,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         resumeJsErrorChecker();
     }
 
+    // Get the container id of the current page
+    public String getContainerId()
+    {
+        return (String)executeScript("return LABKEY.container.id;");
+    }
+
     public String getContainerId(String url)
     {
         pushLocation();
         beginAt(url);
-        String containerId = (String)executeScript("return LABKEY.container.id;");
+        String containerId = getContainerId();
         popLocation();
         return containerId;
     }
