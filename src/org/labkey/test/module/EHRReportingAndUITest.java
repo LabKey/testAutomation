@@ -342,7 +342,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Jump To Other Dataset");
         _extHelper.selectComboBoxItem("Dataset:", "Blood Draws");
         _extHelper.selectComboBoxItem("Filter On:", "Animal Id");
-        clickButton("Submit");
+        clickButton("Submit", 0);
         waitForElement(Locator.linkWithText(PROTOCOL_MEMBER_IDS[0]), WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
 

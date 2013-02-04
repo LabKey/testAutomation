@@ -401,6 +401,7 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("Instrument Run"); //proxy for dataRegion loading
         dr.clickLink(1, 0);
 
+        waitForText("3-Barcode:");
         waitForText("Run Id:");
         String newName = "ChangedSample";
         Ext4FieldRefWD.getForLabel(this, "Name").setValue(newName);

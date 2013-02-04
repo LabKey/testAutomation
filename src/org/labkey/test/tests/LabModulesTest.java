@@ -267,7 +267,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         List<String[]> expected = new ArrayList<String[]>();
         expected.add(new String[]{"OtherSample",null,null,"DNA",null,null,null,null,null,null,null,null,null,null,null,null,null,null});
         expected.add(new String[]{"OtherSample2",null,null,"RNA",null,null,null,null,null,null,null,null,null,null,null,null,null,null});
-        expected.add(new String[]{"Participant0001_gDNA","Participant0001","04/23/2008","gDNA","Project3",null,"Project1\nProject3","Project1 (Controls)","2036","5",null,null,null,"536",null,null,"5.3",null});
+        expected.add(new String[]{"Participant0001_gDNA","Participant0001","04/23/2008","gDNA","Project3",null,"Project1\nProject3","Project1 (Controls)","2036","5",null,null,null,"536",null,null,"5.2",null});
         expected.add(new String[]{"Participant0001_RNA","Participant0001","06/23/2009","RNA","Project3",null,"Project1\nProject3","Project1 (Controls)","2462","6",null,null,null,"962",null,null,"6.4",null});
         expected.add(new String[]{"Participant0002_DNA","Participant0002","06/23/2005","DNA","Project1\nProject3","Project1 (Controls)","Project1\nProject3","Project1 (Controls)","1000","2",null,null,null,"-500","538",null,"2.4",null});
         expected.add(new String[]{"Participant0002_RNA","Participant0002","10/23/2009","RNA","Project1","Project1 (Controls)","Project1\nProject3","Project1 (Controls)","2583","7",null,null,null,"1083","2121",null,null,null});
@@ -512,7 +512,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.addDataSource("misc", GROUP_SOURCE, "New Data Sources", null, "core", "Groups");
         _helper.addDataSource("data", DATA_SOURCE, "New Data Sources", "/home", "core", "Users");
-        _helper.addDataSource("data", REMOVED_SOURCE, "Will Be Removed", "/" + getProjectName(), "laboratory", "subject_list");
+        _helper.addDataSource("data", REMOVED_SOURCE, "Will Be Removed", "/" + getProjectName(), "laboratory", "subjects");
         Assert.assertEquals("Incorrect number of remove buttons", initialDataBtns + 3, getRemoveBtns(manageDataSources).size());
 
         deleteSourceByLabel(REMOVED_SOURCE, manageDataSources);
@@ -522,8 +522,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         btns = getRemoveBtns(manageDemographicsSources);
         int initialDemographicsBtns = btns == null ? 0 : btns.size();
 
-        _helper.addDemographicsSource(SUBJECT_LIST, null, "laboratory", "subject_list", "subjectname", true, false);
-        _helper.addDemographicsSource(SUBJECT_LIST, null, "laboratory", "subject_list", "subjectname", false, true);
+        _helper.addDemographicsSource(SUBJECT_LIST, null, "laboratory", "subjects", "subjectname", true, false);
+        _helper.addDemographicsSource(SUBJECT_LIST, null, "laboratory", "subjects", "subjectname", false, true);
         _helper.addDemographicsSource(ELISPOT_SOURCE, "/" + getProjectName(), "elispot_assay", "elispot_targets", "target", true, false);
         _helper.addDemographicsSource("Failure", null, "core", "containers", null, false, false);
         Assert.assertEquals("Incorrect number of remove buttons", initialDemographicsBtns + 2, getRemoveBtns(manageDemographicsSources).size());
@@ -592,7 +592,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _customizeViewsHelper.addCustomizeViewColumn(fieldKey + "/gender");
         _customizeViewsHelper.applyCustomView();
         DataRegionTable dr = new DataRegionTable("query", this);
-        Assert.assertEquals("Incorrect values for gender field", subj1, dr.getDataAsText(3, "Subject Id"));
+        //dr.setSort("samplename", SortDirection.ASC);
+        Assert.assertEquals("Incorrect values for subject field", subj1, dr.getDataAsText(3, "Subject Id"));
         Assert.assertEquals("Incorrect values for gender field", "m", dr.getDataAsText(3, "Gender"));
 
         _customizeViewsHelper.revertUnsavedViewGridClosed();
