@@ -15,8 +15,10 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.PortalHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,8 +47,8 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     "PatientpRBCs\tPatient pRBCs\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
     "Hematocrit\t\thttp://www.w3.org/2001/XMLSchema#double\t\tTRUE\tFALSE\tFALSE\tHematocrit %\n" +
     "CultureMedia\tCulture Media\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
-    "SerumBatchID\tSerum Batch ID\thttp://www.w3.org/2001/XMLSchema#int\t\tFALSE\tFALSE\tFALSE\n" +
-    "AlbumaxBatchID\tAlbumax Batch ID\thttp://www.w3.org/2001/XMLSchema#int\t\tFALSE\tFALSE\tFALSE\n" +
+    "SerumBatchID\tSerum Batch ID\thttp://www.w3.org/2001/XMLSchema#string\t\tFALSE\tFALSE\tFALSE\n" +
+    "AlbumaxBatchID\tAlbumax Batch ID\thttp://www.w3.org/2001/XMLSchema#string\t\tFALSE\tFALSE\tFALSE\n" +
     "FoldIncrease1\tFold-Increase Test 1\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
     "FoldIncrease2\tFold-Increase Test 2\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
     "FoldIncrease3\tFold-Increase Test 3\thttp://www.w3.org/2001/XMLSchema#int\tTRUE\tFALSE\tFALSE\n" +
@@ -81,6 +83,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         createAdaptationAssay();
         createDiagnosticAssay();
         createFlasksSampleSet();
+        testJavaScript();
         enterDataPoint();
         verifyDataInAssay();
     }
@@ -186,6 +189,28 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//input[@name='ff_label3']"), WAIT_FOR_JAVASCRIPT);
         clickButton("Save");
         clickAndWait(Locator.linkWithText(getProjectName()));
+    }
+
+    private void testJavaScript()
+    {
+        int i = 0;
+        PortalHelper ph = new PortalHelper(this);
+        ph.addWebPart("ICEMR Upload Tests");
+        // run the test script
+        clickButton("Start Test", 0);
+        while (i < WAIT_FOR_JAVASCRIPT)
+        {
+            String s = Locator.id("log-info").findElement(_driver).getText();
+            if (s.contains("DONE:"))
+                break;
+            sleep(1000);
+            i += 1000;
+        }
+
+        if (i >= WAIT_FOR_JAVASCRIPT)
+            Assert.assertTrue("Test did not finish!", false);
+        else
+            Assert.assertFalse("At least one of the javascript tests failed", Locator.id("log-info").findElement(_driver).getText().contains("FAILED"));
     }
 
     private void deleteSample(String sample)
