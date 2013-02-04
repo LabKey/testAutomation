@@ -24,6 +24,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
@@ -98,20 +99,23 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Delete the survey design for this project (which will delete the document sets and requests");
         goToProjectHome();
-        _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("RowId");
-        _customizeViewsHelper.applyCustomView();
-        DataRegionTable drt = new DataRegionTable("query", this);
-        String rowId = drt.getDataAsText(drt.getRow("Label", designLabel), "RowId");
-        checkDataRegionCheckbox("query", rowId);
-        clickButton("Delete", 0);
-        assertAlert("Are you sure you want to delete this survey design and its associated surveys?");
-        waitForText("No sample requests to show", WAIT_FOR_PAGE);
-        assertTextNotPresent(designLabel);
-        clickFolder(requestorFolder1);
-        waitForText("No sample requests to show");
-        assertTextPresent("No sample requests to show", 2);
-        assertTextNotPresent(submittedRequestLabels);
+        if (isTextPresent(designLabel))
+        {
+            _customizeViewsHelper.openCustomizeViewPanel();
+            _customizeViewsHelper.addCustomizeViewColumn("RowId");
+            _customizeViewsHelper.applyCustomView();
+            DataRegionTable drt = new DataRegionTable("query", this);
+            String rowId = drt.getDataAsText(drt.getRow("Label", designLabel), "RowId");
+            checkDataRegionCheckbox("query", rowId);
+            clickButton("Delete", 0);
+            assertAlert("Are you sure you want to delete this survey design and its associated surveys?");
+            waitForText("No sample requests to show", WAIT_FOR_PAGE);
+            assertTextNotPresent(designLabel);
+            clickFolder(requestorFolder1);
+            waitForText("No sample requests to show");
+            assertTextPresent("No sample requests to show", 2);
+            assertTextNotPresent(submittedRequestLabels);
+        }
     }
 
     private void verifyDocumentSetFromDashboard()
@@ -243,8 +247,17 @@ public class NWBioTrustTest extends SurveyTest
         assertTextPresentInThisOrder(NWBT_REQUEST_STATUSES);
     }
 
-    private void waitForGridToLoad(String tag, String className, int expectedCount)
+    private void waitForGridToLoad(final String tag, final String className, final int expectedCount)
     {
+//        waitFor(new BaseWebDriverTest.Checker()
+//        {
+//            public boolean check()
+//            {
+//                Locator l = Locator.xpath("//" + tag + "[contains(@class, '" + className + "')]");
+//                return getElementCount(l) == expectedCount;
+//            }
+//        }, "Expected number of grid elements did not appear after " + WAIT_FOR_JAVASCRIPT + "ms", WAIT_FOR_JAVASCRIPT);
+
         Locator l = Locator.xpath("//" + tag + "[contains(@class, '" + className + "')]");
         startTimer();
         while (getElementCount(l) < expectedCount && elapsedMilliseconds() < WAIT_FOR_JAVASCRIPT)
@@ -306,6 +319,7 @@ public class NWBioTrustTest extends SurveyTest
         {
             setFormElement(Locator.name(field.getKey()), field.getValue());
         }
+        sleep(500); // give the submit button a split second to enable base on form changes
         clickButton("Submit completed form");
     }
 

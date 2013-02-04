@@ -169,6 +169,7 @@ public class SurveyTest extends BaseWebDriverTest
         _ext4Helper.waitForMaskToDisappear();
         setFormElement(Locator.name("txtAreaField"), "txtAreaField\nnew line");
         _ext4Helper.uncheckCheckbox("Bool Field");
+        sleep(500); // give the save button a split second to enable based on form changes
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Success");
         _extHelper.waitForExtDialogToDisappear("Success");
@@ -203,6 +204,7 @@ public class SurveyTest extends BaseWebDriverTest
         Assert.assertTrue("Save button should be disabled", isElementPresent(Locator.xpath("//div[contains(@class,'item-disabled')]//span[text() = 'Save']")));
         setFormElement(Locator.name("txtAreaField"), "edit by admin after submit");
         _ext4Helper.checkCheckbox("Bool Field");
+        sleep(500); // give the save button a split second to enable based on form changes
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Success");
         _extHelper.waitForExtDialogToDisappear("Success");
