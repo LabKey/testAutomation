@@ -162,7 +162,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         clickButton("Save and Finish");
         waitForText("Column header mapping missing for: Lab Animal ID");
         waitForElementToDisappear(Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Mamu-B Haplotype 2 *:']"), WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.selectComboBoxItem("Lab Animal ID *", "OC ID");
+        _ext4Helper.selectComboBoxItem("Lab Animal ID *:", "OC ID");
         clickButton("Save and Finish");
         waitForText("Column header mapping missing for: Total # Reads Evaluated");
         clickButton("Cancel");
