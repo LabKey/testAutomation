@@ -6342,6 +6342,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return (int)((System.currentTimeMillis() - start) / 1000);
     }
 
+    protected int elapsedMilliseconds()
+    {
+        return (int)(System.currentTimeMillis() - start);
+    }
+
     /**
      * Creates a new wiki page, assuming that the [new page] link is available
      * somewhere on the current page. This link is typically displayed above

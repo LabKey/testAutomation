@@ -247,7 +247,7 @@ public class NWBioTrustTest extends SurveyTest
     {
         Locator l = Locator.xpath("//" + tag + "[contains(@class, '" + className + "')]");
         startTimer();
-        while (getElementCount(l) < expectedCount && elapsedSeconds() < WAIT_FOR_JAVASCRIPT)
+        while (getElementCount(l) < expectedCount && elapsedMilliseconds() < WAIT_FOR_JAVASCRIPT)
             sleep(1000);
         assertElementPresent(l, expectedCount);
     }
