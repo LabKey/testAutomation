@@ -74,7 +74,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
-        selectComboBoxItem(Locator.xpath("//tr[td/label[normalize-space()='" + label + "']]"), selection);
+        selectComboBoxItem(Locator.xpath("//table[tbody/tr/td/label[normalize-space()='" + label + "']]"), selection);
     }
 
     @LogMethod(quiet = true)
