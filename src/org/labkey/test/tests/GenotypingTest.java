@@ -552,7 +552,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         Assert.assertEquals("Custom", Ext4FieldRef.getForLabel(this, "Template").getValue());
 
         //set custom view
-        _ext4Helper.selectComboBoxItem("Custom View", viewName);
+        _ext4Helper.selectComboBoxItem("Custom View:", viewName);
 
         //verify values persisted
         _ext4Helper.clickTabContainingText("Preview Header");
