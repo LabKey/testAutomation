@@ -289,6 +289,7 @@ public class DataViewsTester
         _test.clickButton("Manage Categories", 0);
         _test._extHelper.waitForExtDialog("Manage Categories");
 
+        _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").containingClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
         _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").containingClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
         _test._extHelper.waitForExtDialog("Subcategories");
         _test.assertElementPresent(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").containingClass("x4-grid-row-selected").withText(CATEGORIES[1]));
