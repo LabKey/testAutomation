@@ -75,7 +75,7 @@ public class Ext4Helper extends AbstractHelper
 
     public void selectComboBoxItem(String label, String selection)
     {
-        selectComboBoxItem(Locator.xpath("//tr[td/label[normalize-space()='" + label + "']]"), selection);
+        selectComboBoxItem(Locator.xpath("//table").withPredicate("tbody/tr/td/label[normalize-space()='" + label + "']").notHidden(), selection);
     }
 
     @LogMethod
@@ -363,23 +363,23 @@ public class Ext4Helper extends AbstractHelper
     }
 
     @LogMethod
-    public static void clickExt4MenuButton(BaseSeleniumWebTest test, boolean wait, Locator menu, boolean onlyOpen, String ... subMenuLabels)
+    public void clickExt4MenuButton(boolean wait, Locator menu, boolean onlyOpen, String ... subMenuLabels)
     {
-        test.click(menu);
+        _test.waitAndClick(menu);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
             Locator parentLocator = ext4MenuItem(subMenuLabels[i]);
-            test.waitForElement(parentLocator, 1000);
-            test.mouseOver(parentLocator);
+            _test.waitForElement(parentLocator, 1000);
+            _test.mouseOver(parentLocator);
         }
         Locator itemLocator = ext4MenuItem(subMenuLabels[subMenuLabels.length - 1]);
-        test.waitForElement(itemLocator, 1000);
+        _test.waitForElement(itemLocator, 1000);
         if (onlyOpen)
             return;
         if (wait)
-            test.clickAndWait(itemLocator);
+            _test.clickAndWait(itemLocator);
         else
-            test.click(itemLocator);
+            _test.click(itemLocator);
     }
 
     public void clickExt4MenuItem(String text)

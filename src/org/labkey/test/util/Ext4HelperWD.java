@@ -74,7 +74,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
-        selectComboBoxItem(Locator.xpath("//table[tbody/tr/td/label[normalize-space()='" + label + "']]"), selection);
+        selectComboBoxItem(Locator.xpath("//table").withPredicate("tbody/tr/td/label[normalize-space()='" + label + "']").notHidden(), selection);
     }
 
     @LogMethod(quiet = true)
@@ -375,25 +375,26 @@ public class Ext4HelperWD extends AbstractHelperWD
         return Locator.xpath("//input[contains(@class, 'x4-form-field') and contains(@class, 'x4-form-invalid-field')]");
     }
 
-    public static void clickExt4MenuButton(BaseWebDriverTest test, boolean wait, Locator menu, boolean onlyOpen, String ... subMenuLabels)
+    @LogMethod
+    public void clickExt4MenuButton(boolean wait, Locator menu, boolean onlyOpen, String ... subMenuLabels)
     {
-        test.waitForElement(menu);
-        test.click(menu);
+        _test.waitAndClick(menu);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
-            test.log("select submenu: " + subMenuLabels[i]);
             Locator parentLocator = ext4MenuItem(subMenuLabels[i]);
-            test.waitForElement(parentLocator, 1000);
-            test.mouseOver(parentLocator);
+            _test.waitForElement(parentLocator, 1000);
+            _test.mouseOver(parentLocator);
         }
         Locator itemLocator = ext4MenuItem(subMenuLabels[subMenuLabels.length - 1]);
-        test.waitForElement(itemLocator, 1000);
         if (onlyOpen)
+        {
+            _test.waitForElement(itemLocator, 1000);
             return;
+        }
         if (wait)
-            test.clickAndWait(itemLocator);
+            _test.waitAndClickAndWait(itemLocator);
         else
-            test.click(itemLocator);
+            _test.waitAndClick(itemLocator);
     }
 
     public void clickExt4MenuItem(String text)

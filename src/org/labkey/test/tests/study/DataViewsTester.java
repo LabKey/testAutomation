@@ -326,10 +326,14 @@ public class DataViewsTester
 
         _test._extHelper.clickExtButton("Manage Categories", "Done", 0);
         _test._extHelper.waitForExtDialogToDisappear("Manage Categories");
-        editDatasetProperties(datasets[0][0]);
+        editDatasetProperties("DEM-1: Demographics");
         _test.click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").containingClass("x4-form-arrow-trigger"));
         Assert.assertEquals("Available categories are not as expected", CATEGORY_LIST, _test.getText(Locator.css(".x4-boundlist")));
         _test.click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").containingClass("x4-form-arrow-trigger")); // close combo-box
+        _test.waitForElementToDisappear(Locator.xpath("//li").containingClass("x4-boundlist-item").notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        saveDatasetProperties("DEM-1: Demographics");
+
+        editDatasetProperties(datasets[0][0]);
         _test._ext4Helper.selectComboBoxItem("Category", "Subcategory1-" + CATEGORIES[1]);
         saveDatasetProperties(datasets[0][0]);
 
@@ -376,6 +380,7 @@ public class DataViewsTester
         _test.waitAndClick(Locators.editViewsLink(dataset));
         _test._extHelper.waitForExtDialog(dataset);
         _test.waitForElement(Locator.xpath("//table").containingClass("category-loaded-marker").notHidden());
+        _test.sleep(500); // TODO: Not sure what to wait for. The category combo box can be unresponsive without this.
     }
 
     public void saveDatasetProperties(String dataset)

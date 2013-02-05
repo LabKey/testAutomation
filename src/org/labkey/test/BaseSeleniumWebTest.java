@@ -835,7 +835,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected void clickAdminMenuItem(String... items)
     {
         waitForElement(Locator.xpath(ADMIN_MENU_XPATH));
-        Ext4Helper.clickExt4MenuButton(this, true, Locator.xpath(ADMIN_MENU_XPATH), false, items);
+        _ext4Helper.clickExt4MenuButton(true, Locator.xpath(ADMIN_MENU_XPATH), false, items);
     }
 
     public void clickUserMenuItem(String... items)
@@ -846,7 +846,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void clickUserMenuItem(boolean wait, boolean onlyOpen, String... items)
     {
         waitForElement(USER_MENU_LOC);
-        Ext4Helper.clickExt4MenuButton(this, true, USER_MENU_LOC, onlyOpen, items);
+        _ext4Helper.clickExt4MenuButton(true, USER_MENU_LOC, onlyOpen, items);
     }
 
     // Click on a module listed on the admin menu
