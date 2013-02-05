@@ -228,6 +228,7 @@ public class FileContentTest extends BaseWebDriverTest
 
         // Delete file.
         clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        _extHelper.waitForFileGridReady();
         click(Locator.css("button.iconFolderTree"));
         _shortWait.until(ExpectedConditions.visibilityOf(Locator.xpath("id('fileBrowser')//div[contains(@id, 'xsplit')]").findElement(_driver)));
         _extHelper.selectFileBrowserItem(folderName + "/" + filename);
