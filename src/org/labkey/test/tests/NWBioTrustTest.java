@@ -181,6 +181,7 @@ public class NWBioTrustTest extends SurveyTest
             }
             else
                 assertElementNotPresent(Locator.linkContainingText("Attach a file"));
+            sleep(500); // give the submit button a split second to enable base on form changes
             clickButton("Submit", 0);
             waitForGridToLoad("tr", "x4-grid-row", fileCount);
         }
@@ -197,10 +198,12 @@ public class NWBioTrustTest extends SurveyTest
         _ext4Helper.selectComboBoxItem("Document Type:", NWBT_DOCUMENT_TYPES[0]);
         waitForElement(Locator.name("attachmentfile0"));
         setFormElement(Locator.name("attachmentfile0"), TEST_FILE_2.toString());
+        sleep(500); // give the submit button a split second to enable base on form changes
         clickButton("Submit", 0);
         waitForText("This document type does not allow multiple files and one already exists in this document set.");
         clickButton("OK", 0);
         setFormElement(Locator.name("attachmentfile0"), TEST_FILE_1.toString());
+        sleep(500); // give the submit button a split second to enable base on form changes
         clickButton("Submit", 0);
         waitForText("A document with the following name already exists for this document type: " + TEST_FILE_1.getName());
         clickButton("OK", 0);
