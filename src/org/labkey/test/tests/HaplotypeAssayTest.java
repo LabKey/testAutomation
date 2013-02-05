@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ public class HaplotypeAssayTest extends GenotypingTest
 
     }
 
+    @LogMethod
     private void verifyAribitraryHaplotypeAssay()
     {
         setupHaplotypeAssay(DBR_ASSAY,  new String[][] {{"DRBHaplotype", "DRB Haplotype" }});
@@ -83,6 +85,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         deleteProject(getProjectName(), afterTest);
     }
 
+    @LogMethod
     private void configureExtensibleTables()
     {
         log("Configure extensible Animal table");
@@ -117,6 +120,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         setupHaplotypeAssay(ASSAY_NAME, null);
     }
 
+    @LogMethod
     private void setupHaplotypeAssay(String name, String[][] extraHaplotypes)
     {
         log("Setting up Haplotype assay");
@@ -151,6 +155,7 @@ public class HaplotypeAssayTest extends GenotypingTest
 
     }
 
+    @LogMethod
     private void verifyAssayUploadErrors()
     {
         log("Test errors with Haplotype assay upload");
@@ -168,6 +173,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         clickButton("Cancel");
     }
 
+    @LogMethod
     private void verifyFirstRun()
     {
         importRun("first run", ASSAY_NAME, FIRST_RUN_FILE);
@@ -209,6 +215,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyHaplotypeRecordsByType(11, 5, 6);
     }
 
+    @LogMethod
     private void verifySecondRun()
     {
         importRun("second run", ASSAY_NAME, SECOND_RUN_FILE);
@@ -243,6 +250,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyHaplotypeRecordsByType(13, 6, 7);
     }
 
+    @LogMethod
     private void verifyExtraHaplotypeAssignment()
     {
         log("Verify Animal Haplotype Assignment with > 4 assignments");
@@ -280,6 +288,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         drt.clearFilter("AnimalId");
     }
 
+    @LogMethod
     private void verifyAssignmentReport()
     {
         log("Verify Haplotype Assignment Report");
@@ -299,7 +308,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         DataRegionTable drt = new DataRegionTable("report", this);
         assertTextPresentInThisOrder("A001", "B001c", "B017a");
         verifyColumnDataValues(drt, "ID-3", "2,1,1");
-        _ext4Helper.selectComboBoxItem("Show report column headers as", "ClientAnimalID");
+        _ext4Helper.selectComboBoxItem("Show report column headers as:", "ClientAnimalID");
         clickButton("Submit", 0);
         waitForText("x345");
         drt = new DataRegionTable("report", this);
@@ -307,8 +316,8 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyColumnDataValues(drt, "x345", "2,1,1");
 
         // test with IDs that only have one result
-        _ext4Helper.selectComboBoxItem("Search for animal IDs by", "ClientAnimalID");
-        _ext4Helper.selectComboBoxItem("Show report column headers as", "LabAnimalID");
+        _ext4Helper.selectComboBoxItem("Search for animal IDs by:", "ClientAnimalID");
+        _ext4Helper.selectComboBoxItem("Show report column headers as:", "LabAnimalID");
         setFormElement(Locator.name("idsTextArea"), "x123,x234;x345 x678 x789");
         clickButton("Submit", 0);
         waitForText("1 - 11 of 11");
@@ -326,8 +335,8 @@ public class HaplotypeAssayTest extends GenotypingTest
         drt.clearFilter("ID-6::Counts", 0);
 
         // test with IDs that have duplicate reocrds
-        _ext4Helper.selectComboBoxItem("Search for animal IDs by", "LabAnimalID");
-        _ext4Helper.selectComboBoxItem("Show report column headers as", "LabAnimalID");
+        _ext4Helper.selectComboBoxItem("Search for animal IDs by:", "LabAnimalID");
+        _ext4Helper.selectComboBoxItem("Show report column headers as:", "LabAnimalID");
         setFormElement(Locator.name("idsTextArea"), "ID-4,ID-5");
         clickButton("Submit", 0);
         waitForText("1 - 8 of 8");
@@ -337,6 +346,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyColumnDataValues(drt, "ID-5", "1,2,,,3,,,");
     }
 
+    @LogMethod
     private void verifyDuplicateRecords()
     {
         // verify that the two duplicates show up on the duplicates report
@@ -400,6 +410,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         clickAndWait(Locator.linkContainingText("view data"));
     }
 
+    @LogMethod
     private void verifyHaplotypeRecordsByType(int total, int typeACount, int typeBCount)
     {
         goToQuery("Haplotype");
@@ -430,6 +441,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         return str;
     }
 
+    @LogMethod
     private void importRun(String assayId, String assayName, File dataFile)
     {
         log("Importing Haplotype Run: " + assayId);
@@ -443,6 +455,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         assertLinkPresentWithText(assayId);
     }
 
+    @LogMethod
     private void setDataAndColumnHeaderProperties(File dataFile)
     {
         // adding text to the data text area triggers the events to enable the comboboxes and load their stores
@@ -452,10 +465,10 @@ public class HaplotypeAssayTest extends GenotypingTest
 
         setFormElement(Locator.name("data"), getFileContents(dataFile));
         waitForElementToDisappear(cb, WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.selectComboBoxItem("Lab Animal ID *", "OC ID");
-        _ext4Helper.selectComboBoxItem("Client Animal ID", "Animal ID");
-        _ext4Helper.selectComboBoxItem("Total # Reads Evaluated *", "# Reads Merged");
-        _ext4Helper.selectComboBoxItem("Total # Reads Identified *", "# Reads Identified");
+        _ext4Helper.selectComboBoxItem("Lab Animal ID *:", "OC ID");
+        _ext4Helper.selectComboBoxItem("Client Animal ID:", "Animal ID");
+        _ext4Helper.selectComboBoxItem("Total # Reads Evaluated *:", "# Reads Merged");
+        _ext4Helper.selectComboBoxItem("Total # Reads Identified *:", "# Reads Identified");
     }
 
     private void goToAssayRun(String assayId)
