@@ -131,7 +131,7 @@ public enum TestSet
         NabOldTest.class,
         TimelineTest.class,
         ExternalSchemaTest.class,
-        //LinkedSchemaTest.class,
+        LinkedSchemaTest.class,
         MenuBarTest.class,
         AssayAPITest.class,
         LuminexUploadAndCopyTest.class,
