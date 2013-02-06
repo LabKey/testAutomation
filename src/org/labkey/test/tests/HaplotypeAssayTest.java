@@ -209,8 +209,8 @@ public class HaplotypeAssayTest extends GenotypingTest
         goToQuery("Animal");
         drt = new DataRegionTable("query", this);
         Assert.assertEquals("Unexpected number of Animal records", 5, drt.getDataRowCount());
-        verifyColumnDataValues(drt, "LabAnimalId", "ID-1,ID-2,ID-3,ID-4,ID-5");
-        verifyColumnDataValues(drt, "ClientAnimalId", "x123,x234,x345,x456,x567");
+        verifyColumnDataValues(drt, "Lab Animal Id", "ID-1,ID-2,ID-3,ID-4,ID-5");
+        verifyColumnDataValues(drt, "Client Animal Id", "x123,x234,x345,x456,x567");
 
         verifyHaplotypeRecordsByType(11, 5, 6);
     }
@@ -308,7 +308,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         DataRegionTable drt = new DataRegionTable("report", this);
         assertTextPresentInThisOrder("A001", "B001c", "B017a");
         verifyColumnDataValues(drt, "ID-3", "2,1,1");
-        _ext4Helper.selectComboBoxItem("Show report column headers as:", "ClientAnimalID");
+        _ext4Helper.selectComboBoxItem("Show report column headers as:", "Client Animal ID");
         clickButton("Submit", 0);
         waitForText("x345");
         drt = new DataRegionTable("report", this);
@@ -316,8 +316,8 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyColumnDataValues(drt, "x345", "2,1,1");
 
         // test with IDs that only have one result
-        _ext4Helper.selectComboBoxItem("Search for animal IDs by:", "ClientAnimalID");
-        _ext4Helper.selectComboBoxItem("Show report column headers as:", "LabAnimalID");
+        _ext4Helper.selectComboBoxItem("Search for animal IDs by:", "Client Animal ID");
+        _ext4Helper.selectComboBoxItem("Show report column headers as:", "Lab Animal ID");
         setFormElement(Locator.name("idsTextArea"), "x123,x234;x345 x678 x789");
         clickButton("Submit", 0);
         waitForText("1 - 11 of 11");
@@ -335,8 +335,8 @@ public class HaplotypeAssayTest extends GenotypingTest
         drt.clearFilter("ID-6::Counts", 0);
 
         // test with IDs that have duplicate reocrds
-        _ext4Helper.selectComboBoxItem("Search for animal IDs by:", "LabAnimalID");
-        _ext4Helper.selectComboBoxItem("Show report column headers as:", "LabAnimalID");
+        _ext4Helper.selectComboBoxItem("Search for animal IDs by:", "Lab Animal ID");
+        _ext4Helper.selectComboBoxItem("Show report column headers as:", "Lab Animal ID");
         setFormElement(Locator.name("idsTextArea"), "ID-4,ID-5");
         clickButton("Submit", 0);
         waitForText("1 - 8 of 8");
