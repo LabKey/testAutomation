@@ -112,8 +112,7 @@ public class NWBioTrustTest extends SurveyTest
             waitForText("No sample requests to show", WAIT_FOR_PAGE);
             assertTextNotPresent(designLabel);
             clickFolder(requestorFolder1);
-            waitForText("No sample requests to show");
-            assertTextPresent("No sample requests to show", 2);
+            waitForText("No sample requests to show", 2, WAIT_FOR_PAGE);
             assertTextNotPresent(submittedRequestLabels);
         }
     }
@@ -156,10 +155,10 @@ public class NWBioTrustTest extends SurveyTest
         assertElementPresent(Locator.linkWithText("Document Set (0)"), 3);
         click(Locator.linkWithText("Document Set (0)")); // link for the first request
         waitForText("No documents to show");
-        assertTextPresent(submittedRequestLabels[0], NWBT_REQUEST_STATUSES[0]);
+        waitForText(submittedRequestLabels[0]);
         clickButton("Manage");
         waitForText("No documents to show");
-        assertTextPresent(submittedRequestLabels[0], NWBT_REQUEST_STATUSES[0]);
+        waitForText(NWBT_REQUEST_STATUSES[0]);
         fileCount = 0;
         for (int index = 0; index < NWBT_DOCUMENT_TYPES.length; index++)
         {
@@ -215,8 +214,7 @@ public class NWBioTrustTest extends SurveyTest
         // TODO: this will be put to better use once we implement the NWBT security roles/permissions
         log("Verify that the 2nd requestor folder does not contain data from the first requestor");
         clickFolder(requestorFolder2);
-        waitForText("No sample requests to show");
-        assertTextPresent("No sample requests to show", 2);
+        waitForText("No sample requests to show", 2, WAIT_FOR_PAGE);
         assertElementNotPresent(Locator.linkWithText("Click Here"));
     }
 
@@ -303,14 +301,14 @@ public class NWBioTrustTest extends SurveyTest
         clickFolder(requestorFolder1);
         customizeDashboard("Requestor Dashboard - Study Registrations", designLabel);
         assertTextPresentInThisOrder(designLabel, description, "Draft Requests", "Submitted Requests");
-        assertTextPresent("No sample requests to show", 2); // both draft and submitted should be empty
+        waitForText("No sample requests to show", 2, WAIT_FOR_PAGE); // both draft and submitted should be empty
         for (String requestLabel : submittedRequestLabels)
         {
             clickAndWait(Locator.linkWithText("Click Here"));
             submitSampleRequest(requestLabel, Collections.singletonMap("testfield1", "Text Field Value"));
         }
         waitForGridToLoad("div", "x4-grid-group-title", 1); // all request should be in the Submitted group
-        assertTextPresent("No sample requests to show", 1); // draft grid should still be empty
+        waitForText("No sample requests to show", 1, WAIT_FOR_PAGE); // draft grid should still be empty
         assertTextPresentInThisOrder(submittedRequestLabels);
     }
 
