@@ -89,7 +89,7 @@ public class StudyHelperWD extends AbstractHelperWD
             if (isCategoryNameNew)
                 _test.setFormElement(Locator.name("participantCategory"), categoryName);
             else
-                _test._ext4Helper.selectComboBoxItem(participantString + " Category", categoryName);
+                _test._ext4Helper.selectComboBoxItem(participantString + " Category:", categoryName);
             _test.pressTab(Locator.name("participantCategory"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
@@ -138,7 +138,7 @@ public class StudyHelperWD extends AbstractHelperWD
             if (isCategoryNameNew)
                 _test.setFormElement(Locator.name("participantCategory"), categoryName);
             else
-                _test._ext4Helper.selectComboBoxItem(participantString + " Category", categoryName);
+                _test._ext4Helper.selectComboBoxItem(participantString + " Category:", categoryName);
             _test.pressTab(Locator.name("participantCategory"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }

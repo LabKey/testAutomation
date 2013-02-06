@@ -160,7 +160,7 @@ public class StudyHelper extends AbstractHelper
             if (isCategoryNameNew)
                 _test.setFormElement(Locator.xpath("//input[@name='participantCategory']"), categoryName);
             else
-                _test._ext4Helper.selectComboBoxItem(participantString + " Category", categoryName);
+                _test._ext4Helper.selectComboBoxItem(participantString + " Category:", categoryName);
             _test.pressTab(Locator.xpath("//input[@name='participantCategory']").toString());
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
