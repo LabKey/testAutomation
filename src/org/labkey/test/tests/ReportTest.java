@@ -156,8 +156,8 @@ public class ReportTest extends StudyBaseTest
     {
         doParticipantGroupCategoriesTest();
         doScatterPlotTests();
-        doQueryReportTests();
         doBoxPlotTests();
+        doQueryReportTests();
         doCreateCharts();
         doCreateRReports();
         doReportDiscussionTest();
