@@ -198,7 +198,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         ph.addWebPart("ICEMR Upload Tests");
         // run the test script
         clickButton("Start Test", 0);
-        while (i < WAIT_FOR_JAVASCRIPT)
+        while (i < WAIT_FOR_PAGE)
         {
             String s = Locator.id("log-info").findElement(_driver).getText();
             if (s.contains("DONE:"))
@@ -207,7 +207,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
             i += 1000;
         }
 
-        if (i >= WAIT_FOR_JAVASCRIPT)
+        if (i >= WAIT_FOR_PAGE)
             Assert.assertTrue("Test did not finish!", false);
         else
             Assert.assertFalse("At least one of the javascript tests failed", Locator.id("log-info").findElement(_driver).getText().contains("FAILED"));
