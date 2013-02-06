@@ -2157,9 +2157,9 @@ public class ReportTest extends StudyBaseTest
 
         setFormElement("viewName", QUERY_REPORT_NAME);
         setFormElement("description", QUERY_REPORT_DESCRIPTION);
-        _ext4Helper.selectComboBoxItem("Schema", QUERY_REPORT_SCHEMA_NAME);
+        _ext4Helper.selectComboBoxItem("Schema:", QUERY_REPORT_SCHEMA_NAME);
         waitForTextToDisappear("loading..."); // Ext4Helper.waitForMaskToDisappear(this) doesn't seem to work.
-        _ext4Helper.selectComboBoxItem("Query", QUERY_REPORT_QUERY_NAME);
+        _ext4Helper.selectComboBoxItem("Query:", QUERY_REPORT_QUERY_NAME);
         waitForTextToDisappear("loading...");
         setFormElement("selectedQueryName", QUERY_REPORT_QUERY_NAME);
 
@@ -2186,11 +2186,11 @@ public class ReportTest extends StudyBaseTest
 
         setFormElement("viewName", QUERY_REPORT_NAME_2);
         setFormElement("description", QUERY_REPORT_DESCRIPTION_2);
-        _ext4Helper.selectComboBoxItem("Schema", QUERY_REPORT_SCHEMA_NAME_2);
+        _ext4Helper.selectComboBoxItem("Schema:", QUERY_REPORT_SCHEMA_NAME_2);
         waitForTextToDisappear("loading...");
-        _ext4Helper.selectComboBoxItem("Query", QUERY_REPORT_QUERY_NAME_2);
+        _ext4Helper.selectComboBoxItem("Query:", QUERY_REPORT_QUERY_NAME_2);
         waitForTextToDisappear("loading...");
-        _ext4Helper.selectComboBoxItem("View", QUERY_REPORT_VIEW_NAME_2);
+        _ext4Helper.selectComboBoxItem("View:", QUERY_REPORT_VIEW_NAME_2);
 
         clickButton("Save");
         waitForText("Manage Views");
