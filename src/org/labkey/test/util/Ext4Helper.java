@@ -47,15 +47,15 @@ public class Ext4Helper extends AbstractHelper
     }
 
     @LogMethod(quiet = true)
-    public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection, boolean containsText)
+    public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String selection, boolean containsText)
     {
-        Locator l = parentLocator.append("//div").containingClass("x4-form-arrow-trigger");
+        Locator l = comboBox.append("//div").containingClass("x4-form-arrow-trigger");
         _test.waitAndClick(l);
         if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
         {
             _test.sleep(500);
             _test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
-            _test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
+            _test.mouseDownAt(Locator.xpath("/html/body"), 1, 1);
         }
         else
         {

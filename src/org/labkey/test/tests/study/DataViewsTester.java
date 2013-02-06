@@ -329,8 +329,6 @@ public class DataViewsTester
         editDatasetProperties("DEM-1: Demographics");
         _test.click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").containingClass("x4-form-arrow-trigger"));
         Assert.assertEquals("Available categories are not as expected", CATEGORY_LIST, _test.getText(Locator.css(".x4-boundlist")));
-        _test.click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").containingClass("x4-form-arrow-trigger")); // close combo-box
-        _test.waitForElementToDisappear(Locator.xpath("//li").containingClass("x4-boundlist-item").notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         saveDatasetProperties("DEM-1: Demographics");
 
         editDatasetProperties(datasets[0][0]);
@@ -380,7 +378,6 @@ public class DataViewsTester
         _test.waitAndClick(Locators.editViewsLink(dataset));
         _test._extHelper.waitForExtDialog(dataset);
         _test.waitForElement(Locator.xpath("//table").containingClass("category-loaded-marker").notHidden());
-        _test.sleep(500); // TODO: Not sure what to wait for. The category combo box can be unresponsive without this.
     }
 
     public void saveDatasetProperties(String dataset)
@@ -388,7 +385,7 @@ public class DataViewsTester
         _test._extHelper.clickExtButton(dataset, "Save", 0);
         _test._extHelper.waitForExtDialogToDisappear(dataset);
         _test._ext4Helper.waitForMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElement(Locator.css("table[name='data-browser-table']"));
+        _test.waitForElement(Locator.css("table[name='data-browser-table'] .x4-grid-row"));
     }
 
     public static class Locators
