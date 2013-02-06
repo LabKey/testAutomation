@@ -101,6 +101,7 @@ public class Crawler
             new ControllerActionId("assay", "assayDetailRedirect"),
             new ControllerActionId("core", "downloadFileLink"),
             new ControllerActionId("experiment", "showFile"),
+            new ControllerActionId("flow-editscript", "download"),
             new ControllerActionId("flow-run", "download"),
             new ControllerActionId("issues", "download"),
             new ControllerActionId("login", "logout"),
