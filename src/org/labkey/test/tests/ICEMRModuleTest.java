@@ -16,9 +16,14 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -193,24 +198,22 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void testJavaScript()
     {
-        int i = 0;
         PortalHelper ph = new PortalHelper(this);
         ph.addWebPart("ICEMR Upload Tests");
         // run the test script
         clickButton("Start Test", 0);
-        while (i < WAIT_FOR_PAGE)
-        {
-            String s = Locator.id("log-info").findElement(_driver).getText();
-            if (s.contains("DONE:"))
-                break;
-            sleep(1000);
-            i += 1000;
-        }
 
-        if (i >= WAIT_FOR_PAGE)
-            Assert.assertTrue("Test did not finish!", false);
-        else
-            Assert.assertFalse("At least one of the javascript tests failed", Locator.id("log-info").findElement(_driver).getText().contains("FAILED"));
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                String s = Locator.id("log-info").findElement(_driver).getText();
+                return s.contains("DONE:");
+            }
+        }, "Test did not finish!", WAIT_FOR_PAGE);
+
+        Assert.assertFalse("At least one of the javascript tests failed", Locator.id("log-info").findElement(_driver).getText().contains("FAILED"));
     }
 
     private void deleteSample(String sample)
