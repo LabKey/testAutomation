@@ -25,14 +25,13 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelperWD;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -277,9 +276,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         for (int i = 0; i < max; i++)
         {
             String workbookName = "Workbook" + i;
-//            LabModuleHelper labModuleHelper = new LabModuleHelper(this);
-//            String id = labModuleHelper.createWorkbook(workbookName, "Description");
-            String id = createWorkbook(workbookName, "Description");
+            LabModuleHelper labModuleHelper = new LabModuleHelper(this);
+            String id = labModuleHelper.createWorkbook(workbookName, "Description");
             workbookIds[i] = id;
             parentSampleIds[i] = i > 0 ? sampleIds[i-1] : null;
             sampleIds[i] = insertLabSample(id, String.valueOf(i), parentSampleIds[i]);
@@ -552,30 +550,6 @@ public class ContainerContextTest extends BaseWebDriverTest
             return rowId.toString();
         }
         catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // TODO: Use LabModuleHelper.createWorkbook() after merging to trunk
-    public String createWorkbook(String workbookTitle, String workbookDescription)
-    {
-        goToProjectHome();
-        clickButton("Create New Workbook", 0);
-        waitForElement(Ext4Helper.ext4Window("Create Workbook"));
-        setFormElement(Locator.name("title"), workbookTitle);
-        setFormElement(Locator.name("description"), workbookDescription);
-        clickButton("Submit");
-        waitForElement(Locator.css("span.wb-name + span").withText(workbookTitle));
-
-        try
-        {
-            String path = getURL().toURI().getPath();
-            path = path.replaceAll(".*/workbook-", "");
-            path = path.replaceAll("/begin.view", "");
-            return path;
-        }
-        catch (URISyntaxException e)
         {
             throw new RuntimeException(e);
         }
