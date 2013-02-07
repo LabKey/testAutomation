@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import junit.framework.Assert;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -111,8 +112,12 @@ public class StudyHelperWD extends AbstractHelperWD
 
     @LogMethod
     public void editCustomParticipantGroup(String groupName, String participantString,
-                                                  String categoryName, Boolean isCategoryNameNew, Boolean shared, String... newPtids)
+                                                  String categoryName, Boolean isCategoryNameNew, Boolean shared, Boolean demographicsPresent,
+                                                  Boolean replaceExistingPtids,  String... newPtids)
     {
+       // Caller must already be on Manage <participantString> Groups page
+        // And there should be NO DEMOGRAPHICS DATASETS!
+
         _test.log("Edit " + participantString + " Group: " + groupName);
 
         // Select row
@@ -121,17 +126,25 @@ public class StudyHelperWD extends AbstractHelperWD
         _test.clickButton("Edit Selected", 0);
         _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
         _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
+        if (demographicsPresent)
+            _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         if( newPtids != null && newPtids.length > 0 )
         {
-            String csp = newPtids[0];
+            StringBuilder csp = new StringBuilder(newPtids[0]);
             for( int i = 1; i < newPtids.length; i++ )
-                csp += ","+newPtids[i];
-            String currentIds = _test.getFormElement(Locator.name("participantIdentifiers"));
-            if (currentIds != null && currentIds.length() > 0)
-                _test.setFormElement(Locator.name("participantIdentifiers"), currentIds + "," + csp);
+                csp.append(",").append(newPtids[i]);
+
+            if (replaceExistingPtids)
+            {
+                _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), csp.toString());
+            }
             else
-                _test.setFormElement(Locator.name("participantIdentifiers"), csp);
+            {
+                String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
+                if (currentIds != null && currentIds.length() > 0)
+                    _test.setFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"), currentIds + "," + csp.toString());
+            }
         }
         if( categoryName != null )
         {
@@ -141,6 +154,7 @@ public class StudyHelperWD extends AbstractHelperWD
                 _test._ext4Helper.selectComboBoxItem(participantString + " Category:", categoryName);
             _test.pressTab(Locator.name("participantCategory"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            Assert.assertEquals("Mouse category not set", categoryName, _test.getFormElement(Ext4HelperWD.Locators.formItemWithLabel(participantString + " Category:").append("//input")));
         }
         if ( shared != null )
         {
@@ -154,7 +168,6 @@ public class StudyHelperWD extends AbstractHelperWD
                 _test._ext4Helper.uncheckCheckbox("Share Category?");
             }
         }
-
         _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
         _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
