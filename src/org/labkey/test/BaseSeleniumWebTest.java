@@ -64,7 +64,7 @@ import static org.labkey.test.WebTestHelper.*;
 @Deprecated
 public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 {
-    public static final String ADMIN_MENU_XPATH = "//a/span[text() = 'Admin']";
+    public static final String ADMIN_MENU_XPATH = "id('adminMenuPopupLink')[@onclick]";
     public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
     @Deprecated protected DefaultSeleniumWrapper selenium;
     private static final int DEFAULT_SELENIUM_PORT = 4444;

@@ -131,7 +131,7 @@ import static org.labkey.test.WebTestHelper.logToServer;
  */
 public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements Cleanable, WebTest
 {
-    public static final String ADMIN_MENU_XPATH = "id('adminMenuPopupText')";
+    public static final String ADMIN_MENU_XPATH = "id('adminMenuPopupLink')[@onclick]";
     public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
     /**
      * @deprecated Refactor usages to use {@link #_driver}
