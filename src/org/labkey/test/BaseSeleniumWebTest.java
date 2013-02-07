@@ -2528,6 +2528,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public void clickFolder(String project)
     {
+        waitForElement(Locator.css(".labkey-expandable-nav-panel"));
         clickAndWait(Locator.linkWithText(project));
     }
 
