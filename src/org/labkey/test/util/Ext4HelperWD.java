@@ -429,7 +429,7 @@ public class Ext4HelperWD extends AbstractHelperWD
 
         public static Locator.XPathLocator formItemWithLabel(String label)
         {
-            return Locator.xpath("//table").containingClass("x4-form-item").withPredicate("tbody/tr/td/label[normalize-space()='" + label + "']").notHidden();
+            return Locator.xpath("(//table|//tbody)").containingClass("x4-form-item").withPredicate("(tbody/tr|tr)/td/label[normalize-space()='" + label + "']").notHidden();
         }
     }
 
