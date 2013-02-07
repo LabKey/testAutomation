@@ -383,8 +383,8 @@ public class StudyExportTest extends StudyManualTest
 //        setFormElement(globalUniqueIDValueElems[0], "1416");
 //        setFormElement(participantIDFormElems[2], "999320528");
 
-        _ext4Helper.selectComboBoxItem("Mouse", "999320528");
-        _ext4Helper.selectComboBoxItem("Visit", "201.0"); //use the raw value for: "Enroll/Vacc #1"
+        _ext4Helper.selectComboBoxItem("Mouse:", "999320528");
+        _ext4Helper.selectComboBoxItem("Visit:", "201.0"); //use the raw value for: "Enroll/Vacc #1"
 
         clickButton("Search");
         assertTextPresent("999320528");
