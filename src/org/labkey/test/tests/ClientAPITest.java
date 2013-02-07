@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import net.sf.cglib.core.Local;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.HttpResponse;
@@ -36,6 +37,7 @@ import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +52,8 @@ public class ClientAPITest extends BaseWebDriverTest
     private static final String FOLDER_NAME = "api folder";
     private static final String SUBFOLDER_NAME = "subfolder";
     private final static String LIST_NAME = "People";
+    private final static String QUERY_LIST_NAME = "NewPeople";
+    private final static String TEST_XLS_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/ClientAPITestList.xls";
     private final static String SUBFOLDER_LIST = "subfolderList"; // for cross-folder query test
     private static final String OTHER_PROJECT_LIST = "otherProjectList"; // for cross-project query test
     private final static ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.AutoInteger;
@@ -192,6 +196,8 @@ public class ClientAPITest extends BaseWebDriverTest
 
         queryTest();
 
+        queryRegressionTest();
+
         domainTest();
 
         emailApiTest();
@@ -246,6 +252,11 @@ public class ClientAPITest extends BaseWebDriverTest
                 assertTextPresent(rowData[col]);
             }
         }
+
+        // Create Larger list for query test.
+        File listFile = new File(TEST_XLS_DATA_FILE);
+        _listHelper.createListFromFile(FOLDER_NAME, QUERY_LIST_NAME, listFile);
+        waitForElement(Locator.linkWithText("Norbert"));
 
         // Create lists for cross-folder query test.
         _listHelper.createList(SUBFOLDER_NAME, SUBFOLDER_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
@@ -388,11 +399,11 @@ public class ClientAPITest extends BaseWebDriverTest
         click(Locator.id("add-record-button"));
         String prevActiveCellId;
         // enter a new first name
-//        sleep(50);
+
         String activeCellId = getActiveEditorId();
         setFormElement(Locator.id(activeCellId), "Abe");
         pressTab(Locator.id(activeCellId));
-//        sleep(50);
+
         // enter a new last name
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
@@ -400,7 +411,7 @@ public class ClientAPITest extends BaseWebDriverTest
             Assert.fail("Failed to advance to next edit field");
         setFormElement(Locator.id(activeCellId), "Abeson");
         pressTab(Locator.id(activeCellId));
-//        sleep(50);
+
         // enter a new age
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
@@ -420,14 +431,14 @@ public class ClientAPITest extends BaseWebDriverTest
             Assert.fail("Failed to advance to next edit field");
         setFormElement(Locator.id(activeCellId), "Billy");
         pressTab(Locator.id(activeCellId));
-//        sleep(50);
+
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             Assert.fail("Failed to advance to next edit field");
         setFormElement(Locator.id(activeCellId), "Billyson");
         pressTab(Locator.id(activeCellId));
-//        sleep(50);
+
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
@@ -437,9 +448,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         // delete the row below Billy (which should contain Jane)
         click(Locator.id("delete-records-button"));
-//        sleep(50);
         click(Locator.xpath("//div[contains(@class, 'x-window-dlg')]//button[text()='Delete']"));
-//        sleep(50);
 
         int limit = 30;
         while (isTextPresent("Jane") && limit-- > 0)
@@ -634,6 +643,18 @@ public class ClientAPITest extends BaseWebDriverTest
         assertElementContains(loc, "SUCCESS: cross-folder executeSql succeeded");
         assertElementContains(loc, "SUCCESS: cross-project executeSql succeeded");
         clearTestPage("Query portion of test page complete");
+    }
+
+    @LogMethod
+    private void queryRegressionTest()
+    {
+        setSourceFromFile("queryRegressionTest.js");
+        Locator loc = Locator.id(TEST_DIV_NAME);
+        assertElementContains(loc, "SUCCESS: executeSql 0 returned 125 rows");
+        assertElementContains(loc, "SUCCESS: executeSql 1 returned 93 rows");
+        assertElementContains(loc, "SUCCESS: executeSql 2 returned 10 rows");
+        assertElementContains(loc, "SUCCESS: executeSql 2 returned with requested v9.1");
+        clearTestPage("Query Regression portion of test complete");
     }
 
     private static final String EMAIL_SUBJECT = "Testing the email API";

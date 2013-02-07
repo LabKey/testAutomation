@@ -534,7 +534,7 @@ public class ListHelperWD extends ListHelper
 
         _test.waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        _test.setFormElement("uploadFormElement", inputFile);
+        _test.setFormElement(Locator.name("uploadFormElement"), inputFile);
 
         _test.waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
