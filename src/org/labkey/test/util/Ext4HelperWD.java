@@ -17,7 +17,6 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
-import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -39,9 +38,9 @@ public class Ext4HelperWD extends AbstractHelperWD
     }
 
     @LogMethod(quiet = true)
-    public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
+    public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String selection)
     {
-        selectComboBoxItem(parentLocator, selection, false);
+        selectComboBoxItem(comboBox, selection, false);
     }
 
     @LogMethod(quiet = true)
@@ -75,7 +74,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
-        selectComboBoxItem(Locator.xpath("//table").withPredicate("tbody/tr/td/label[normalize-space()='" + label + "']").notHidden(), selection);
+        selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(label), selection);
     }
 
     @LogMethod(quiet = true)
@@ -426,6 +425,11 @@ public class Ext4HelperWD extends AbstractHelperWD
         public static Locator.XPathLocator window(String title)
         {
             return Locator.xpath("//div").containingClass("x4-window").notHidden().withDescendant(Locator.xpath("//span").containingClass("x4-window-header-text").withText(title));
+        }
+
+        public static Locator.XPathLocator formItemWithLabel(String label)
+        {
+            return Locator.xpath("//table").containingClass("x4-form-item").withPredicate("tbody/tr/td/label[normalize-space()='" + label + "']").notHidden();
         }
     }
 

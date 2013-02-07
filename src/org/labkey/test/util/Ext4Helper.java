@@ -41,9 +41,9 @@ public class Ext4Helper extends AbstractHelper
     }
 
     @LogMethod(quiet = true)
-    public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
+    public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String selection)
     {
-        selectComboBoxItem(parentLocator, selection, false);
+        selectComboBoxItem(comboBox, selection, false);
     }
 
     @LogMethod(quiet = true)
@@ -77,7 +77,7 @@ public class Ext4Helper extends AbstractHelper
 
     public void selectComboBoxItem(String label, String selection)
     {
-        selectComboBoxItem(Locator.xpath("//table").withPredicate("tbody/tr/td/label[normalize-space()='" + label + "']").notHidden(), selection);
+        selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(label), selection);
     }
 
     @LogMethod
