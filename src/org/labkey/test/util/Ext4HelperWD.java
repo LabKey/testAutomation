@@ -49,6 +49,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     {
         Locator l = Locator.xpath(comboBox.getPath()+"//div[contains(@class,'arrow')]");
         _test.waitAndClick(l);
+        _test.waitForElement(comboBox.append("//td").containingClass("x4-pickerfield-open"));
         if(_test.getBrowser().startsWith(BaseWebDriverTest.IE_BROWSER))
         {
             _test.sleep(500);

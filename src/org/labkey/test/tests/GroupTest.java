@@ -325,7 +325,7 @@ public class GroupTest extends BaseWebDriverTest
 
         //second page of the wizard
         waitAndClick(Locator.xpath("//td[./label[text()='Copy From Existing Project']]/input"));
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject-triggerWrap']"), getProjectName());
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());
         waitAndClickButton("Next");
 
         //third page of wizard

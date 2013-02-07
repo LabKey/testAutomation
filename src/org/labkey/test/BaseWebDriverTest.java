@@ -5880,8 +5880,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 group = "Site: " + group;
             _extHelper.selectExt4ComboBoxItem(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]"), group);
             waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
+            String oldId = getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
             savePermissions();
             _ext4Helper.waitForMaskToDisappear();
+            waitForElementToDisappear(Locator.id(oldId), WAIT_FOR_JAVASCRIPT); // Elements get new ids after save
             assertPermissionSetting(userOrGroupName, permissionString);
         }
     }
@@ -6522,9 +6524,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void switchWikiToSourceView()
     {
-        Locator sourceTab = Locator.xpath("//li[@id='wiki-tab-source']/a");
-        if(null != sourceTab)
-            click(sourceTab);
+        if (isElementPresent(Locator.css("#wiki-tab-source.labkey-tab-inactive")))
+        {
+            click(Locator.css("#wiki-tab-source > a"));
+            waitForElement(Locator.css("#wiki-tab-source.labkey-tab-active"));
+        }
     }
 
     public void enableModule(String projectName, String moduleName)
