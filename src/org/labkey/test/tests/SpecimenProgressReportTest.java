@@ -300,7 +300,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     private void configureGroupingColumn(String label, String name)
     {
         clickWebpartMenuItem("Assay Progress Dashboard", true, "Customize");
-        setFormElement(Locator.xpath("//td/label[contains(text(),'" + label + ":')]/../../td/input[@name='groupingColumn']"), name);
+        setFormElement(Locator.xpath("//td/label[contains(text(),'" + label + "')]/../..//td/input[@name='groupingColumn']"), name);
         clickButton("Save");
     }
 
