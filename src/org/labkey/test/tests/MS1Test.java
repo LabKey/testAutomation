@@ -27,7 +27,6 @@ import java.io.File;
 
 /**
  * MS1 BVT
- * Created by IntelliJ IDEA.
  * User: Dave
  * Date: Nov 7, 2007
  * Time: 9:33:52 AM

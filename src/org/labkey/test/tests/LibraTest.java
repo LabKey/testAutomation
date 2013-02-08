@@ -20,7 +20,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 8/19/11
  * Time: 3:32 PM

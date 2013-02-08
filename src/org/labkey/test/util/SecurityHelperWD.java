@@ -21,7 +21,6 @@ import org.labkey.test.Locator;
 import org.openqa.selenium.WebElement;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 1/17/13
  * Time: 11:21 AM

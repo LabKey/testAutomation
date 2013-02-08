@@ -21,7 +21,6 @@ import org.labkey.test.BaseFlowTestWD;
 import org.labkey.test.Locator;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 1/10/13
  * Time: 4:40 PM

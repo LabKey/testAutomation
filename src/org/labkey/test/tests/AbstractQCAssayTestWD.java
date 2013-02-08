@@ -25,7 +25,6 @@ import org.labkey.test.WebTestHelper;
 import java.io.*;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: Oct 27, 2009
  */

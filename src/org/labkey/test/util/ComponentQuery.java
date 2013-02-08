@@ -18,7 +18,6 @@ package org.labkey.test.util;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
  * User: bbimber
  * Date: 6/21/12
  * Time: 11:09 AM

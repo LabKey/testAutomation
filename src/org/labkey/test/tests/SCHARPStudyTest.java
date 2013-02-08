@@ -22,7 +22,6 @@ import org.labkey.test.Locator;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: dave
  * Date: Aug 4, 2009
  * Time: 1:59:39 PM

@@ -23,7 +23,6 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Mark Griffith
  * Date: Jan 18, 2006
  */

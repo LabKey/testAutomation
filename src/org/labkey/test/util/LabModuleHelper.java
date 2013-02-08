@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Created by IntelliJ IDEA.
  * User: bbimber
  * Date: 5/28/12
  * Time: 8:56 PM

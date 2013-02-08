@@ -38,7 +38,6 @@ import org.apache.commons.io.IOUtils;
 
 
 /**
- * Created by IntelliJ IDEA.
  * User: newton
  * Date: Oct 27, 2010
  * Time: 11:09:34 AM

@@ -22,7 +22,6 @@ import org.labkey.test.util.ListHelper;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Erik
  * Date: Jul 2, 2008
  * Time: 2:03:39 PM

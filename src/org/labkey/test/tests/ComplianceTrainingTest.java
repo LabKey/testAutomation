@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
  * User: bbimber
  * Date: 8/24/12
  * Time: 7:02 AM

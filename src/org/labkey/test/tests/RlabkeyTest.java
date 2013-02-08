@@ -25,7 +25,6 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: Mar 9, 2010
  * Time: 3:44:04 PM

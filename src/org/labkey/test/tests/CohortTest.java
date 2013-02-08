@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Trey Chadick
  * Date: Jan 13, 2010
  * Time: 4:50:24 PM

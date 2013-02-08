@@ -22,7 +22,6 @@ import org.labkey.test.TestTimeoutException;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: marki
  * Date: May 18, 2009
  * Time: 12:44:03 PM

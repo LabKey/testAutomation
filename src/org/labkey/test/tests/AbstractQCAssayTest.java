@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: Oct 27, 2009
  */

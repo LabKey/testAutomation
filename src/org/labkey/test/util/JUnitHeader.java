@@ -19,7 +19,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Treygdor
  * Date: May 3, 2011
  * Time: 3:34:58 PM

@@ -20,7 +20,6 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Treygdor
  * Date: Aug 16, 2011
  * Time: 3:45:02 PM

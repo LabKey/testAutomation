@@ -23,7 +23,6 @@ import org.labkey.test.util.PostgresOnlyTest;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: kristinf
  * Date: April 26, 2012
  */

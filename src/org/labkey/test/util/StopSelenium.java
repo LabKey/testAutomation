@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Mark Igra
  * Date: Mar 22, 2007
  * Time: 1:32:25 PM

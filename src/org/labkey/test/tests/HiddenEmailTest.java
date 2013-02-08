@@ -23,7 +23,6 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: 11/14/12
  */

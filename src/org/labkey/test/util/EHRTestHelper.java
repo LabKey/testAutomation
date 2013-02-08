@@ -31,7 +31,6 @@ import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import java.io.IOException;
 
 /**
- * Created by IntelliJ IDEA.
  * User: bbimber
  * Date: 8/6/12
  * Time: 10:49 AM

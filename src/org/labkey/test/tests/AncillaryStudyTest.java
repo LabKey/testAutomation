@@ -24,7 +24,6 @@ import org.labkey.test.util.WikiHelper;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Treygdor
  * Date: Sep 8, 2011
  * Time: 1:55:05 PM

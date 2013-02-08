@@ -22,7 +22,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
 
 /**
- * Created by IntelliJ IDEA.
  * User: ulberge
  * Date: Jul 6, 2007
  * Time: 1:08:37 PM

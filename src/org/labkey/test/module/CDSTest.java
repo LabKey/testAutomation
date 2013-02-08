@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Treygdor
  * Date: Mar 23, 2012
  * Time: 12:47:27 PM

@@ -23,7 +23,6 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.DataRegionTable;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Karl Lum
  * Date: Jan 11, 2007
  */

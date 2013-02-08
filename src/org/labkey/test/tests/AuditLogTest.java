@@ -24,7 +24,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Karl Lum
  * Date: Mar 13, 2008
  */

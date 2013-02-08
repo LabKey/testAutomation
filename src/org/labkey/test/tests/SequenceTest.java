@@ -55,7 +55,6 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 /**
- * Created by IntelliJ IDEA.
  * User: bbimber
  * Date: 5/28/12
  * Time: 7:12 PM

@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
  * User: Nick
  * Date: Jan 21, 2011
  * Time: 11:36:22 AM
