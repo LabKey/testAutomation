@@ -20,7 +20,6 @@ import org.json.simple.JSONValue;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
-import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -49,9 +48,9 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String selection, boolean containsText)
     {
-        Locator l = comboBox.append("//div").containingClass("x4-form-arrow-trigger");
+        Locator l = comboBox.append("//div").withClass("x4-form-arrow-trigger");
         _test.waitAndClick(l);
-        _test.waitForElement(comboBox.append("//td").containingClass("x4-pickerfield-open"));
+        _test.waitForElement(comboBox.append("//td").withClass("x4-pickerfield-open"));
         _test.sleep(100);
         if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
         {
@@ -63,9 +62,9 @@ public class Ext4Helper extends AbstractHelper
         {
             Locator.XPathLocator listItem;
             if (containsText)
-                listItem = Locator.xpath("//li").containingClass("x4-boundlist-item").notHidden().containing(selection);
+                listItem = Locator.xpath("//li").withClass("x4-boundlist-item").notHidden().containing(selection);
             else
-                listItem = Locator.xpath("//li").containingClass("x4-boundlist-item").notHidden().withText(selection);
+                listItem = Locator.xpath("//li").withClass("x4-boundlist-item").notHidden().withText(selection);
 
             // wait for and select the list item
             _test.waitAndClick(listItem);

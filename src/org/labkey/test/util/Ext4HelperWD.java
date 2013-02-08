@@ -48,7 +48,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     {
         Locator l = Locator.xpath(comboBox.getPath()+"//div[contains(@class,'arrow')]");
         _test.waitAndClick(l);
-        _test.waitForElement(comboBox.append("//td").containingClass("x4-pickerfield-open"));
+        _test.waitForElement(comboBox.append("//td").withClass("x4-pickerfield-open"));
         if(_test.getBrowser().startsWith(BaseWebDriverTest.IE_BROWSER))
         {
             _test.sleep(500);
@@ -424,12 +424,12 @@ public class Ext4HelperWD extends AbstractHelperWD
 
         public static Locator.XPathLocator window(String title)
         {
-            return Locator.xpath("//div").containingClass("x4-window").notHidden().withDescendant(Locator.xpath("//span").containingClass("x4-window-header-text").withText(title));
+            return Locator.xpath("//div").withClass("x4-window").notHidden().withDescendant(Locator.xpath("//span").withClass("x4-window-header-text").withText(title));
         }
 
         public static Locator.XPathLocator formItemWithLabel(String label)
         {
-            return Locator.xpath("(//table|//tbody)").containingClass("x4-form-item").withPredicate("(tbody/tr|tr)/td/label[normalize-space()='" + label + "']").notHidden();
+            return Locator.xpath("(//table|//tbody)").withClass("x4-form-item").withPredicate("(tbody/tr|tr)/td/label[normalize-space()='" + label + "']").notHidden();
         }
     }
 

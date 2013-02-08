@@ -763,7 +763,7 @@ public abstract class Locator
             return this.append("["+predicate+"]");
         }
 
-        public XPathLocator containingClass(String cssClass)
+        public XPathLocator withClass(String cssClass)
         {
             return this.withPredicate("contains(concat(' ',normalize-space(@class),' '),' "+cssClass+" ')");
         }

@@ -797,7 +797,7 @@ public class ExtHelperWD extends AbstractHelperWD
          */
         public static Locator.XPathLocator window(String title)
         {
-            return Locator.xpath("//div").containingClass("x-window").notHidden().withDescendant(Locator.xpath("//span").containingClass("x-window-header-text").withText(title));
+            return Locator.xpath("//div").withClass("x-window").notHidden().withDescendant(Locator.xpath("//span").withClass("x-window-header-text").withText(title));
         }
     }
 }

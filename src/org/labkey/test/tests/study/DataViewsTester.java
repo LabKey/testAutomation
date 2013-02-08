@@ -84,24 +84,24 @@ public class DataViewsTester
         _test.assertTextNotPresent(CATEGORIES[0]);
         _test.assertTextNotPresent(CATEGORIES[1]);
         _test.assertTextNotPresent(CATEGORIES[4]);
-        Assert.assertEquals("Incorrect number of dataset categories visible.", 4, _test.getXpathCount(Locator.xpath("//td").containingClass("dvcategory").notHidden())); // Two categories contain filter text.
-        Assert.assertEquals("Incorrect number of datasets after filter", 22, _test.getXpathCount(Locator.xpath("//tr").containingClass("x4-grid-tree-node-leaf").notHidden()));
+        Assert.assertEquals("Incorrect number of dataset categories visible.", 4, _test.getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden())); // Two categories contain filter text.
+        Assert.assertEquals("Incorrect number of datasets after filter", 22, _test.getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
         collapseCategory("Subcategory1-" + CATEGORIES[2]);
-        Assert.assertEquals("Incorrect number of datasets after collapsing subcategory.", 21, _test.getXpathCount(Locator.xpath("//tr").containingClass("x4-grid-tree-node-leaf").notHidden()));
-        Assert.assertEquals("Incorrect number of dataset categories visible after collapsing subcategory.", 4, _test.getXpathCount(Locator.xpath("//td").containingClass("dvcategory").notHidden()));
+        Assert.assertEquals("Incorrect number of datasets after collapsing subcategory.", 21, _test.getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        Assert.assertEquals("Incorrect number of dataset categories visible after collapsing subcategory.", 4, _test.getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
         collapseCategory(CATEGORIES[2]);
-        Assert.assertEquals("Incorrect number of datasets after collapsing category.", 10, _test.getXpathCount(Locator.xpath("//tr").containingClass("x4-grid-tree-node-leaf").notHidden()));
-        Assert.assertEquals("Incorrect number of dataset categories visible after collapsing category.", 2, _test.getXpathCount(Locator.xpath("//td").containingClass("dvcategory").notHidden()));
+        Assert.assertEquals("Incorrect number of datasets after collapsing category.", 10, _test.getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        Assert.assertEquals("Incorrect number of dataset categories visible after collapsing category.", 2, _test.getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
         openCustomizePanel();
         _test._extHelper.uncheckCheckbox("datasets");
         _test.setFormElement(Locator.name("webpart.title"), WEBPART_TITLE);
         _test.clickButton("Save", 0);
         _test._extHelper.waitForLoadingMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         setDataBrowseSearch("");
-        _test.waitForElement(Locator.xpath("//tr").containingClass("x4-grid-tree-node-leaf").notHidden());
+        _test.waitForElement(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden());
         _test.waitForElement(Locator.linkWithText(REPORT_NAME), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.assertTextPresent(WEBPART_TITLE);
-        Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr").containingClass("x4-grid-tree-node-leaf").notHidden()));
+        Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
         _test.log("Verify cancel button");
         openCustomizePanel();
@@ -114,7 +114,7 @@ public class DataViewsTester
         _test.waitForText(REPORT_NAME); //TODO: /
         _test.assertTextNotPresent("nothing");
         _test.assertTextPresent(WEBPART_TITLE);
-        Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr").containingClass("x4-grid-tree-node-leaf").notHidden()));
+        Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
         _test.log("Verify category management");
         openCustomizePanel();
@@ -218,20 +218,20 @@ public class DataViewsTester
     @LogMethod
     private void collapseCategory(@LoggedParam String category)
     {
-        Locator.XPathLocator dataViewRow = Locator.xpath("//tr").containingClass("x4-grid-tree-node-leaf").notHidden();
+        Locator.XPathLocator dataViewRow = Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden();
         int dataViewCount = _test.getXpathCount(dataViewRow);
-        _test.assertElementPresent(Locator.xpath("//tr").containingClass("x4-grid-tree-node-expanded").append("/td/div").withText(category));
-        _test.click(Locator.xpath("//div").withText(category).append("/img").containingClass("x4-tree-expander"));
+        _test.assertElementPresent(Locator.xpath("//tr").withClass("x4-grid-tree-node-expanded").append("/td/div").withText(category));
+        _test.click(Locator.xpath("//div").withText(category).append("/img").withClass("x4-tree-expander"));
         _test.waitForElementToDisappear(dataViewRow.index(dataViewCount - 1), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod
     private void expandCategory(@LoggedParam String category)
     {
-        Locator.XPathLocator dataViewRow = Locator.xpath("//tr").containingClass("x4-grid-tree-node-leaf").notHidden();
+        Locator.XPathLocator dataViewRow = Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden();
         int dataViewCount = _test.getXpathCount(dataViewRow);
-        _test.assertElementNotPresent(Locator.xpath("//tr").containingClass("x4-grid-tree-node-expanded").append("/td/div").withText(category));
-        _test.click(Locator.xpath("//div").withText(category).append("/img").containingClass("x4-tree-expander"));
+        _test.assertElementNotPresent(Locator.xpath("//tr").withClass("x4-grid-tree-node-expanded").append("/td/div").withText(category));
+        _test.click(Locator.xpath("//div").withText(category).append("/img").withClass("x4-tree-expander"));
         _test.waitForElement(dataViewRow.index(dataViewCount));
     }
 
@@ -289,10 +289,10 @@ public class DataViewsTester
         _test.clickButton("Manage Categories", 0);
         _test._extHelper.waitForExtDialog("Manage Categories");
 
-        _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").containingClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
-        _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").containingClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
+        _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
+        _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
         _test._extHelper.waitForExtDialog("Subcategories");
-        _test.assertElementPresent(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").containingClass("x4-grid-row-selected").withText(CATEGORIES[1]));
+        _test.assertElementPresent(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[1]));
 
         _test.clickButton("New Subcategory", 0);
         _test.waitForElement(Locator.xpath("//input[@name='label']").notHidden());
@@ -305,8 +305,8 @@ public class DataViewsTester
         _test.pressEnter(Locator.name("label"));
         _test.waitForElementToDisappear(Locator.xpath("//input[@name='label']").notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
-        _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").containingClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
-        _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").containingClass("x4-grid-row-selected").withText(CATEGORIES[2]));
+        _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
+        _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[2]));
         _test.assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1]);
 
         _test.clickButton("New Subcategory", 0);
@@ -320,14 +320,14 @@ public class DataViewsTester
         _test.pressEnter(Locator.name("label"));
         _test.waitForElementToDisappear(Locator.xpath("//input[@name='label']").notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
-        _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").containingClass("x4-grid-cell-inner").withText(CATEGORIES[3])));
-        _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").containingClass("x4-grid-row-selected").withText(CATEGORIES[3]));
+        _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[3])));
+        _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[3]));
         _test.assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1], "Subcategory1-" + CATEGORIES[2], "Subcategory2-" + CATEGORIES[2]);
 
         _test._extHelper.clickExtButton("Manage Categories", "Done", 0);
         _test._extHelper.waitForExtDialogToDisappear("Manage Categories");
         editDatasetProperties("DEM-1: Demographics");
-        _test.click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").containingClass("x4-form-arrow-trigger"));
+        _test.click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").withClass("x4-form-arrow-trigger"));
         Assert.assertEquals("Available categories are not as expected", CATEGORY_LIST, _test.getText(Locator.css(".x4-boundlist")));
         saveDatasetProperties("DEM-1: Demographics");
 
@@ -377,7 +377,7 @@ public class DataViewsTester
     {
         _test.waitAndClick(Locators.editViewsLink(dataset));
         _test._extHelper.waitForExtDialog(dataset);
-        _test.waitForElement(Locator.xpath("//table").containingClass("category-loaded-marker").notHidden());
+        _test.waitForElement(Locator.xpath("//table").withClass("category-loaded-marker").notHidden());
     }
 
     public void saveDatasetProperties(String dataset)
@@ -392,7 +392,7 @@ public class DataViewsTester
     {
         public static Locator.XPathLocator editViewsLink(String dataset)
         {
-            return Locator.xpath("//tr").containingClass("x4-grid-tree-node-leaf").withDescendant(Locator.xpath("td/div/a[normalize-space()="+Locator.xq(dataset)+"]")).append("//span").containingClass("edit-views-link");
+            return Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").withDescendant(Locator.xpath("td/div/a[normalize-space()="+Locator.xq(dataset)+"]")).append("//span").withClass("edit-views-link");
         }
     }
 }
