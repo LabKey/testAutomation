@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.tests.study.DataViewsTester;
 import org.labkey.test.tests.study.StudyScheduleTester;
@@ -212,10 +213,25 @@ public class StudyRedesignTest extends StudyBaseTest
 
         int dsCount = getXpathCount(Locator.xpath("//input[@name='extraData']"));
         Assert.assertEquals("Unexpected number of Datasets.", 47, dsCount);
-        int i;
-        for (i = 0; i < dsCount; i++)
+
+        // create new categories, then assign them out
+        for (String category : CATEGORIES)
         {
-            setFormElement(Locator.name("extraData", i), CATEGORIES[i/10]);
+            clickButton("Manage Categories", 0);
+            _extHelper.waitForExtDialog("Manage Categories");
+            clickButton("New Category", 0);
+            waitForElement(Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden());
+            setFormElement(Locator.xpath("//input[contains(@id, 'textfield') and @name='label']"), category);
+
+            clickButton("Done", 0);
+            _extHelper.waitForExtDialogToDisappear("Manage Categories");
+        }
+
+        // assign them to each dataset
+        for (int i = 0; i < dsCount; i++)
+        {
+            Locator.XPathLocator combo = Locator.xpath("(//div[contains(@id, '-viewcategory')]//table[contains(@class, 'x4-form-item')])[" + (i+1) + "]");
+            _ext4Helper.selectComboBoxItem(combo, CATEGORIES[i / 10]);
         }
         uncheckCheckbox("visible", dsCount - 1); // Set last dataset to not be visible.
         clickButton("Save");
