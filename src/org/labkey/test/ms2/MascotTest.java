@@ -21,7 +21,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 
-import java.io.IOException;
 import java.io.File;
 import java.net.URL;
 import java.net.MalformedURLException;
@@ -72,7 +71,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
     protected void doTestSteps()
     {
         log("Verifying that pipeline files were cleaned up properly");
-        File test2 = new File(_pipelinePath + "/bov_sample/" + SEARCH_TYPE + "/test2");
+        File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
             Assert.fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
@@ -354,10 +353,10 @@ public class MascotTest extends AbstractMS2SearchEngineTest
     {
         super.cleanPipe(search_type);
 
-        if (_pipelinePath == null)
+        if (PIPELINE_PATH == null)
             return;
 
-        File rootDir = new File(_pipelinePath);
+        File rootDir = new File(PIPELINE_PATH);
         delete(new File(rootDir, "databases/mascot"));
     }
 }

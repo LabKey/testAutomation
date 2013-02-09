@@ -22,6 +22,7 @@ import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.tests.SimpleApiTestWD;
 import org.labkey.test.util.AdvancedSqlTest;
@@ -202,13 +203,13 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     protected void setEHRModuleProperties()
     {
         //set dummy values first, to test the admin UI
-        String[] dummyProps = {"/" +  getProjectName(), "EHRStudyContainer", "/fakeContainer"};
-        setModuleProperties(Collections.singletonMap("EHR", Collections.singletonList(dummyProps)));
+        ModulePropertyValue dummyValue = new ModulePropertyValue("EHR", "/" +  getProjectName(), "EHRStudyContainer", "/fakeContainer");
+        setModuleProperties(Arrays.asList(dummyValue));
 
-        String[] prop = {"/" + getProjectName(), "EHRStudyContainer", "/" + getContainerPath()};
-        String[] prop2 = {"/" + getProjectName(), "EHRAdminUser", DATA_ADMIN._email};
-        String[] prop3 = {"/" + getProjectName(), "DefaultAnimalHistoryReport", "abstract"};
-        setModuleProperties(Collections.singletonMap("EHR", Arrays.asList(prop, prop2, prop3)));
+        ModulePropertyValue prop = new ModulePropertyValue("EHR", "/" + getProjectName(), "EHRStudyContainer", "/" + getContainerPath());
+        ModulePropertyValue prop2 = new ModulePropertyValue("EHR", "/" + getProjectName(), "EHRAdminUser", DATA_ADMIN._email);
+        ModulePropertyValue prop3 = new ModulePropertyValue("EHR", "/" + getProjectName(), "DefaultAnimalHistoryReport", "abstract");
+        setModuleProperties(Arrays.asList(prop, prop2, prop3));
     }
     
     @LogMethod

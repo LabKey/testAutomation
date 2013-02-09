@@ -50,7 +50,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         "</bioml>";
     protected static final int MAX_WAIT_SECONDS = 60*5;
 
-    protected final String _pipelinePath = getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe";
+    public final static String PIPELINE_PATH = getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe";
 
     public String getAssociatedModuleDirectory()
     {
@@ -65,7 +65,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        cleanPipe(_pipelinePath);
+        cleanPipe(PIPELINE_PATH);
         deleteProject(getProjectName(), afterTest);
     }
 
@@ -87,7 +87,7 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         assertTextPresent("does not exist");
 
         log("Set good pipeline root.");
-        setPipelineRoot(_pipelinePath);
+        setPipelineRoot(PIPELINE_PATH);
     }
 
     protected void deleteViews(String... viewNames)
@@ -147,10 +147,10 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
 
     protected void cleanPipe(String search_type)
     {
-        if (_pipelinePath == null)
+        if (PIPELINE_PATH == null)
             return;
 
-        File rootDir = new File(_pipelinePath);
+        File rootDir = new File(PIPELINE_PATH);
         delete(new File(rootDir, "bov_sample/xars"));
         delete(new File(rootDir, "bov_sample/"+search_type+"/test1/CAexample_mini.log"));
         delete(new File(rootDir, "bov_sample/"+search_type+"/test2"));

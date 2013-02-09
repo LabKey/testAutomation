@@ -145,6 +145,7 @@ src/org/labkey/test/BaseSeleniumWebTest.java -text
 src/org/labkey/test/BaseWebDriverTest.java -text
 src/org/labkey/test/Cleanable.java -text
 src/org/labkey/test/Locator.java -text
+src/org/labkey/test/ModulePropertyValue.java -text
 src/org/labkey/test/Runner.java -text
 src/org/labkey/test/SortDirection.java -text
 src/org/labkey/test/TestConfig.java -text
@@ -172,6 +173,7 @@ src/org/labkey/test/ms2/MS2PipelineFolder.java -text
 src/org/labkey/test/ms2/MS2TestBase.java -text
 src/org/labkey/test/ms2/MascotTest.java -text
 src/org/labkey/test/ms2/QuantitationTest.java -text
+src/org/labkey/test/ms2/SequestImportTest.java -text
 src/org/labkey/test/ms2/SequestTest.java -text
 src/org/labkey/test/ms2/params/MS2EmailSuccessParams.java -text
 src/org/labkey/test/ms2/params/MS2QuantParams.java -text

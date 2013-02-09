@@ -3055,32 +3055,28 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     }
 
-    public void setModuleProperties(Map<String, List<String[]>> props)
+    public void setModuleProperties(List<ModulePropertyValue> values)
     {
         goToFolderManagement();
         log("setting module properties");
         clickAndWait(Locator.linkWithText("Module Properties"));
         waitForText("Save Changes");
         boolean changed = false;
-        for (String moduleName : props.keySet())
+        for (ModulePropertyValue value : values)
         {
-            for (String[] array : props.get(moduleName))
+            log("setting property: " + value.getPropertyName() + " for container: " + value.getContainerPath() + " to value: " + value.getValue());
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("moduleName", value.getModuleName());
+            map.put("containerPath", value.getContainerPath());
+            map.put("propName", value.getPropertyName());
+            waitForText(value.getPropertyName()); //wait for the property name to appear
+            String query = ComponentQuery.fromAttributes("field", map);
+            Ext4FieldRef ref = _ext4Helper.queryOne(query, Ext4FieldRef.class);
+            String val = ref.getValue();
+            if(StringUtils.isEmpty(val) || !val.equals(value.getValue()))
             {
-                log("setting property: " + array[1] + " for container: " + array[0] + " to value: " + array[2]);
-                waitForText("Property: " + array[1]);
-                Map<String, String> map = new HashMap<String, String>();
-                map.put("moduleName", moduleName);
-                map.put("containerPath", array[0]);
-                map.put("propName", array[1]);
-                waitForText(array[1]); //wait for the property name to appear
-                String query = ComponentQuery.fromAttributes("field", map);
-                Ext4FieldRef ref = _ext4Helper.queryOne(query, Ext4FieldRef.class);
-                String val = ref.getValue();
-                if(StringUtils.isEmpty(val) || !val.equals(array[2]))
-                {
-                    changed = true;
-                    ref.setValue(array[2]);
-                }
+                changed = true;
+                ref.setValue(value.getValue());
             }
         }
         if (changed)

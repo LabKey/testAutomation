@@ -25,6 +25,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.DataRegionTable;
@@ -33,7 +34,7 @@ import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,8 +115,7 @@ public class ComplianceTrainingTest extends BaseWebDriverTest implements Advance
         _containerHelper.createProject(getProjectName(), "Compliance and Training");
         goToProjectHome();
 
-        String[] props = {"/", "EmployeeContainer", "/" + getProjectName()};
-        setModuleProperties(Collections.singletonMap("EHR_ComplianceDB", Collections.singletonList(props)));
+        setModuleProperties(Arrays.asList(new ModulePropertyValue("EHR_ComplianceDB", "/", "EmployeeContainer", "/" + getProjectName())));
 
         log("Creating Lists");
         _listHelper.importListArchive(getProjectName(), new File(listZIP));

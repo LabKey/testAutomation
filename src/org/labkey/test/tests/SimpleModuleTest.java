@@ -30,13 +30,13 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.UpdateRowsCommand;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.SecurityHelperWD;
 
@@ -815,13 +815,11 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Assert.assertEquals("Module context not set propertly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
 
         Map<String, List<String[]>> props = new HashMap<String, List<String[]>>();
-        List<String[]> propList = new ArrayList<String[]>();
-        propList.add(new String[]{"/", prop1, prop1Value});
+        List<ModulePropertyValue> propList = new ArrayList<ModulePropertyValue>();
+        propList.add(new ModulePropertyValue("simpletest", "/", prop1, prop1Value));
+        propList.add(new ModulePropertyValue("simpletest", "/" + getProjectName() + "/" + FOLDER_NAME, prop2 , "FolderValue"));
 
-        propList.add(new String[]{"/" + getProjectName() + "/" + FOLDER_NAME, prop2 , "FolderValue"});
-
-        props.put("simpletest", propList);
-        setModuleProperties(props);
+        setModuleProperties(propList);
 
         beginAt("/project/" + getProjectName() + "/" + FOLDER_NAME +"/begin.view?");
 

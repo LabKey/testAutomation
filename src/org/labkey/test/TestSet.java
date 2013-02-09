@@ -26,6 +26,7 @@ import org.labkey.test.module.ONPRC_EHRTest;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
 import org.labkey.test.ms2.QuantitationTest;
+import org.labkey.test.ms2.SequestImportTest;
 import org.labkey.test.ms2.SequestTest;
 import org.labkey.test.tests.*;
 import org.labkey.test.tests.perf.StudyImportPerfTest;
@@ -93,7 +94,8 @@ public enum TestSet
         MS2Test.class,
         MS2GZTest.class,
         LibraTest.class,
-        TargetedMSTest.class
+        TargetedMSTest.class,
+        SequestImportTest.class
     ),
 
     DailyA(600000,
@@ -202,7 +204,8 @@ public enum TestSet
         FlowAnalysisResolverTest.class,
         WebpartPermissionsTest.class,
         SurveyTest.class,
-       NWBioTrustTest.class
+       NWBioTrustTest.class,
+       SequestImportTest.class
     ),
 
     Daily(600000, DailyA.getTestList(), DailyB.getTestList()),

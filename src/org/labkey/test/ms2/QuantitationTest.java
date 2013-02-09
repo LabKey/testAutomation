@@ -16,10 +16,8 @@
 package org.labkey.test.ms2;
 
 import org.labkey.test.Locator;
-import org.labkey.test.util.ExtHelper;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * User: jeckels
@@ -110,7 +108,7 @@ public class QuantitationTest extends AbstractXTandemTest
     @Override
     protected void cleanPipe(String search_type)
     {
-        File rootDir = new File(_pipelinePath);
+        File rootDir = new File(PIPELINE_PATH);
         delete(new File(rootDir, ".labkey/protocols/"+search_type+"/" + LIBRA_PROTOCOL_NAME + ".xml"));
         delete(new File(rootDir, "bov_sample/"+search_type+"/" + LIBRA_PROTOCOL_NAME));
     }
