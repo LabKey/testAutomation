@@ -23,15 +23,16 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.ListHelper;
 import org.junit.Assert;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.UIAssayHelper;
 
 import java.io.IOException;
 import java.util.Collections;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 9/11/12
  * Time: 2:42 PM
@@ -95,8 +96,14 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
         // verify unscheduled visit ordering for the RNA assay
         verifyUnscheduledVisitDisplay(assay2);
+
+        // verify RNA assay with ignored sampleminded data
+        clickFolder(assayFolder);
+        ignoreSampleMindedData(assay2);
+        verifyProgressReport(assay2, true);
     }
 
+    @LogMethod
     private void manageSpecimenConfiguration()
     {
         clickAndWait(Locator.linkWithText(studyFolder));
@@ -133,6 +140,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         String rnaRowId = drt.getDataAsText(drt.getRow("TubeType", "TGE Cryovial"), "RowId");
         // set the specimen configuration visits (by checking the checkboxes on the manage page
         goToModule("rho"); // for containers with a study, the rho beginAction will redirect to manageSpecimenConfiguration
+        waitForElement(Locator.css("#SpecimenVisitPanel table.x4-grid-table"));
         setSpecimenConfigurationVisit(pcr1RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
         setSpecimenConfigurationVisit(pcr2RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
         setSpecimenConfigurationVisit(rnaRowId, new String[]{"0", "6", "20", "SR"});
@@ -154,6 +162,9 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
     private void addSpecimenConfiguration(String assayName, String source, int locationId, String tubeType)
     {
+        Locator.XPathLocator configGridRow = Locator.xpath("id('SpecimenConfigGrid')//table").withClass("x4-grid-table").append("/tbody/tr");
+        waitForElement(configGridRow);
+        int rowCount = getXpathCount(configGridRow) - 1;
         clickButton("Add Specimen Configuration", 0);
         waitForElement(Locator.name("AssayName"));
         setFormElement(Locator.name("AssayName"), assayName);
@@ -162,6 +173,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         setFormElement(Locator.name("LocationId"), String.valueOf(locationId));
         setFormElement(Locator.name("TubeType"), tubeType);
         clickButton("Submit");
+        waitForElement(configGridRow.index(rowCount));
     }
 
     private void setSpecimenConfigurationVisit(String scRowId, String[] labels)
@@ -172,6 +184,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         }
     }
 
+    @LogMethod
     private void verifyAssayResultInvalid(String assayName, String runName)
     {
         clickAndWait(Locator.linkWithText(assayFolder));
@@ -193,6 +206,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
                 "specimen collected", "specimen received but invalid", "assay results available"); // "query" appears too many times on page!
     }
 
+    @LogMethod
     private void verifyAdditionalGroupingColumn(String assayName, String groupCol)
     {
         clickAndWait(Locator.linkWithText(assayFolder));
@@ -204,6 +218,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         assertTextPresent("2 duplicates found", 4);
     }
 
+    @LogMethod
     private void verifyUnscheduledVisitDisplay(String assayName)
     {
         clickAndWait(Locator.linkWithText(assayFolder));
@@ -216,22 +231,30 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText(assayFolder));
         waitForElement(tableLoc);
 
-        _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
-        waitForElement(tableLoc);
-        assertTextPresentInThisOrder("SR1", "SR2", "SR3");
-        Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
-        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
-        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
-        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'received')]")));
-        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
-        Assert.assertEquals(7, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
-        Assert.assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
+        verifyProgressReport(assayName, false);
 
         clickAndWait(Locator.linkWithText("7 results from " + assayName + " have been uploaded."));
         assertTextPresent("Participant Visit not found", 1);
         assertTextPresent("Specimen type is not expected by this Assay", 1);
     }
 
+    private void verifyProgressReport(String assayName, boolean ignoreSampleminded)
+    {
+        int ignored = ignoreSampleminded ? 0 : 2;
+
+        _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
+        waitForElement(tableLoc);
+        assertTextPresentInThisOrder("SR1", "SR2", "SR3");
+        Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
+        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
+        Assert.assertEquals(2 - ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
+        Assert.assertEquals(2 - ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'received')]")));
+        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
+        Assert.assertEquals(7 + ignored, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        Assert.assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
+    }
+
+    @LogMethod
     private void flagSpecimenForReview(String assayName, String runName, @Nullable String collectionDateFilterStr)
     {
         clickAndWait(Locator.linkWithText(assayFolder));
@@ -252,6 +275,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText(assayFolder));
     }
 
+    @LogMethod
     private void createAssayFolder() throws CommandException, IOException
     {
         goToProjectHome();
@@ -275,6 +299,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText(assayFolder));
     }
 
+    @LogMethod
     private void configureAssaySchema(String assayName)
     {
         ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo("", "rho", assayName + " Query");
@@ -301,6 +326,16 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     {
         clickWebpartMenuItem("Assay Progress Dashboard", true, "Customize");
         setFormElement(Locator.xpath("//td/label[contains(text(),'" + label + "')]/../..//td/input[@name='groupingColumn']"), name);
+        clickButton("Save");
+    }
+
+    private void ignoreSampleMindedData(String assayName)
+    {
+        clickWebpartMenuItem("Assay Progress Report", true, "Customize");
+        Locator ignoreSamplemindedCheckbox = Locator.css("table.ignoreSampleminded" + assayName + " input.x4-form-checkbox");
+        Locator ignoreSamplemindedCheckboxChecked = Locator.css("table.x4-form-cb-checked.ignoreSampleminded" + assayName + " input.x4-form-checkbox");
+        click(ignoreSamplemindedCheckbox);
+        assertElementPresent(ignoreSamplemindedCheckboxChecked);
         clickButton("Save");
     }
 
