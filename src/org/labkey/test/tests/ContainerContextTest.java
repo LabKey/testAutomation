@@ -277,7 +277,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         {
             String workbookName = "Workbook" + i;
             LabModuleHelper labModuleHelper = new LabModuleHelper(this);
-            String id = labModuleHelper.createWorkbook(workbookName, "Description");
+            goToProjectHome();
+            String id = labModuleHelper.createWorkbook(workbookName, "Description", false);
             workbookIds[i] = id;
             parentSampleIds[i] = i > 0 ? sampleIds[i-1] : null;
             sampleIds[i] = insertLabSample(id, String.valueOf(i), parentSampleIds[i]);
@@ -292,19 +293,17 @@ public class ContainerContextTest extends BaseWebDriverTest
 //            log("sampleIdToWorkbookId.put(\"" + sampleIds[i] + "\", \"" + workbookIds[i] + "\");");
 
 
-        verifySimpleModuleTables("Samples", "recordDetails.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, true, true);
-
-
-        // Verify Issue 16243: Details URL creating URLs with null container unless the container column is actually added to current view
-        log("** Removing container column and rehecking lookup URLs...");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=laboratory&query.queryName=samples&query.sort=RowId");
-        CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
-        cv.openCustomizeViewPanel();
-        cv.removeCustomizeViewColumn("container");
-        cv.saveCustomView();
-
+        //the default view lacks the container column
         verifySimpleModuleTables("Samples", "recordDetails.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, true);
 
+        // Verify Issue 16243: Details URL creating URLs with null container unless the container column is actually added to current view
+        log("** Adding container column and rehecking lookup URLs...");
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=laboratory&query.queryName=samples&query.sort=RowId");
+
+        verifySimpleModuleTables("Samples", "recordDetails.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, true, true);
+
+        log("** Removing container column and rehecking lookup URLs...");
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=laboratory&query.queryName=samples&query.sort=RowId");
 
         log("** Override detailsURL in metadata...");
         String customMetadata =
@@ -439,6 +438,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=laboratory&query.queryName=" + queryName + "&query.sort=RowId");
 
         DataRegionTable dr = new DataRegionTable("query", this);
+        boolean shouldRevert = false;
 
         for (int i = 0; i < max; i++)
         {
@@ -484,11 +484,27 @@ public class ContainerContextTest extends BaseWebDriverTest
                 expectedHref = "/query/" + parentSampleContainer + "/" + parentDetailsAction + "?schemaName=laboratory&query.queryName=samples&keyField=rowid&key=" + parentSampleIds[i];
 
                 href = dr.getHref(i, "Parent Sample");
-                log("  Parent Sample column href = " + href);
-                Assert.assertTrue("Expected and actual parent sample column URL differ:\n" +
-                        "Expected: " + expectedHref + "\n" +
-                        "Actual:   " + href,
-                        href.contains(expectedHref));
+                if (href == null)
+                {
+                    log(" adding parent sample column to current view");
+                    CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
+                    cv.openCustomizeViewPanel();
+                    cv.showHiddenItems();
+                    cv.addCustomizeViewColumn("parentsample");
+                    cv.applyCustomView();
+                    shouldRevert = true;
+
+                    href = dr.getHref(i, "Parent Sample");
+                }
+
+                if (href != null)
+                {
+                    log("  Parent Sample column href = " + href);
+                    Assert.assertTrue("Expected and actual parent sample column URL differ:\n" +
+                            "Expected: " + expectedHref + "\n" +
+                            "Actual:   " + href,
+                            href.contains(expectedHref));
+                }
             }
 
             // sample source lookup (table has no container so URL should go to current container)
@@ -513,6 +529,21 @@ public class ContainerContextTest extends BaseWebDriverTest
             if (hasContainer)
             {
                 href = dr.getHref(i, "Folder");
+
+                //if we URL is found, the column isnt being displayed, so we add it
+                if (href == null)
+                {
+                    log(" adding container column to current view");
+                    CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
+                    cv.openCustomizeViewPanel();
+                    cv.showHiddenItems();
+                    cv.addCustomizeViewColumn("container");
+                    cv.applyCustomView();
+                    shouldRevert = true;
+
+                    href = dr.getHref(i, "Folder");
+                }
+
                 log("  Folder column href = " + href);
                 expectedHref = "/project/" + workbookContainer + "/begin.view?";
                 Assert.assertTrue("Expected and actual container column URL differ:\n" +
@@ -522,6 +553,13 @@ public class ContainerContextTest extends BaseWebDriverTest
             }
 
             log("");
+        }
+
+        if (shouldRevert)
+        {
+            CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
+            cv.openCustomizeViewPanel();
+            cv.revertUnsavedView();
         }
 
         log("** Checked containers on lookup URLs for query '" + queryName + "'\n");

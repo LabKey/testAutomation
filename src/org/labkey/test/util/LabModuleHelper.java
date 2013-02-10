@@ -139,7 +139,14 @@ public class LabModuleHelper
 
     public String createWorkbook(String workbookTitle, String workbookDescription)
     {
-        _test.clickTab("Workbooks");
+        return createWorkbook(workbookTitle, workbookDescription, true);
+    }
+
+    public String createWorkbook(String workbookTitle, String workbookDescription, boolean shouldNavigateToTab)
+    {
+        if (shouldNavigateToTab)
+            _test.clickTab("Workbooks");
+
         _test.clickButton("Create New Workbook", 0);
         _test.waitForElement(Ext4Helper.ext4Window("Create Workbook"));
         _test.setFormElement(Locator.name("title"), workbookTitle);
