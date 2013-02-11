@@ -307,6 +307,7 @@ public class DataViewsTester
 
         _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
         _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[2]));
+        _test.waitForTextToDisappear("Subcategory1-" + CATEGORIES[1]);
         _test.assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1]);
 
         _test.clickButton("New Subcategory", 0);
