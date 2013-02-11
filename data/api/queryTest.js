@@ -219,7 +219,7 @@ var testFunctions = [
         else
             html += '8b)FAILURE: executeSql returned unsorted data: ' + testResults[8].rows[1].age + ' before ' + testResults[8].rows[1].age + '<br>';
 
-        if (testResults[8].queryName && testResults[8].queryName.indexOf('lists-temp') > -1)
+        if (testResults[8].queryName && testResults[8].queryName.indexOf('lists_temp') > -1)
             html += '8c)SUCCESS: executeSql returned a session-based query<br>';
         else
             html += '8c)FAILURE: executeSql returned \'' + testResults[8].queryName + '\'. Was expecting a session-based query to be returned.';

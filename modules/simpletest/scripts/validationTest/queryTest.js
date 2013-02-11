@@ -218,7 +218,7 @@ var testFunctions = [
         else
             html += 'FAILURE: executeSql returned ' + testResults[8].rowCount + ' rows, expected 7. Error value = ' + testResults[8].exception + '<br>';
 
-        if (testResults[8].queryName && testResults[8].queryName.indexOf('lists-temp') > -1)
+        if (testResults[8].queryName && testResults[8].queryName.indexOf('lists_temp') > -1)
             html += 'SUCCESS: executeSql returned a session-based query<br>';
         else
             html += 'FAILURE: executeSql returned \'' + testResults[8].queryName + '\'. Was expecting a session-based query to be returned.';

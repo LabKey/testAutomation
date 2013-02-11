@@ -1620,7 +1620,7 @@ public class ReportTest extends StudyBaseTest
 
         //Change filter and check box plot again
         clickButton("View Data", 0);
-        clearFilter("aqwp3", "RCHtempc", 0);
+        clearFilter("aqwp2", "RCHtempc", 0);
         waitForText("40.0");
         clickButton("View Chart", 0);
         assertSVG(BOX_PLOT_DR_2);
@@ -1804,7 +1804,7 @@ public class ReportTest extends StudyBaseTest
 
         //Change filter and check scatter plot again
         clickButton("View Data", 0);
-        clearFilter("aqwp3", "APXpulse", 0);
+        clearFilter("aqwp2", "APXpulse", 0);
         waitForText("36.0"); // Body temp for filtered out row
         clickButton("View Chart", 0);
         assertSVG(SCATTER_PLOT_DR_2);
