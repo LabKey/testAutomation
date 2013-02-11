@@ -240,7 +240,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
     private void verifyProgressReport(String assayName, boolean ignoreSampleminded)
     {
-        int ignored = ignoreSampleminded ? 0 : 2;
+        int ignored = ignoreSampleminded ? 2 : 0;
 
         _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
         waitForElement(tableLoc);
