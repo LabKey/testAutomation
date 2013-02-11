@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.Ext4HelperWD;
 
 import java.io.File;
 
@@ -383,7 +384,7 @@ public class StudyExportTest extends StudyManualTest
 //        setFormElement(globalUniqueIDValueElems[0], "1416");
 //        setFormElement(participantIDFormElems[2], "999320528");
 
-        _ext4Helper.selectComboBoxItem("Mouse:", "\u00A0999320528");
+        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Mouse:"), "618005775", true);
         _ext4Helper.selectComboBoxItem("Visit:", "201.0"); //use the raw value for: "Enroll/Vacc #1"
 
         clickButton("Search");
