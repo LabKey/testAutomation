@@ -2361,7 +2361,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 log("create from template");
                 click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]"));
                 _ext4Helper.waitForMaskToDisappear();
-                _ext4Helper.selectComboBoxItem("Choose Template Folder:", templateFolder);
+                _ext4Helper.selectComboBoxItem(Locator.xpath("//div").withClass("labkey-wizard-header").withText("Choose Template Folder:").append("/following-sibling::table[contains(@id, 'combobox')]"), templateFolder);
                 _ext4Helper.checkCheckbox("Include Subfolders");
                 for(String part : templatePartsToUncheck)
                 {
