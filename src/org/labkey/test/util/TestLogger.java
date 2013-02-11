@@ -38,7 +38,8 @@ public class TestLogger
 
     public static void decreaseIndent()
     {
-        currentIndent -= indentStep;
+        if (currentIndent > 0)
+            currentIndent -= indentStep;
     }
 
     public static void suppressLogging(boolean suppress)
