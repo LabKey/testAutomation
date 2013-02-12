@@ -2183,13 +2183,12 @@ public class LuminexTest extends AbstractQCAssayTest
     private void applyStartAndEndDateFilter()
     {
         String colValuePrefix = "NETWORK";
-        int columnIndex = 2;
 
         setUpGuideSet("GS Analyte (2)");
         // check that all 5 runs are present in the grid by clicking on them
-        for (int i = 5; i > 0; i--)
+        for (int i = 1; i <= 5; i++)
         {
-            clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + i), i+","+columnIndex);
+            assertElementPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + i));
         }
         // set start and end date filter
         setFormElement(Locator.name("start-date-field"), "2011-03-26");
@@ -2199,12 +2198,12 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         // check that only 3 runs are now present
-        for (int i = 4; i > 1; i--)
+        waitForElementToDisappear(ExtHelper.locateGridRowCheckbox(colValuePrefix + "1"), WAIT_FOR_JAVASCRIPT);
+        for (int i = 2; i <= 4; i++)
         {
-            clickAt(ExtHelper.locateGridRowCheckbox(colValuePrefix + i), (i-3)+","+columnIndex);
+            assertElementPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + i));
         }
         assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + "5"));
-        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + "1"));
     }
 
     private void applyLogYAxisScale()
