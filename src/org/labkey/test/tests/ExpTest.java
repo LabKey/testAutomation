@@ -129,8 +129,8 @@ public class ExpTest extends BaseSeleniumWebTest
         sleep(1000);
         _extHelper.clickExtTab("XML Metadata");
         toggleMetadataQueryEditor();
-        assertTextPresent("<ns:columnTitle>editedCreated</ns:columnTitle>");
-        assertTextPresent("<ns:formatString>ddd MMM dd yyyy</ns:formatString>");
+        assertTextPresent("<columnTitle>editedCreated</columnTitle>");
+        assertTextPresent("<formatString>ddd MMM dd yyyy</formatString>");
 
         // Run it and see if we used the format correctly
         _extHelper.clickExtTab("Data");
