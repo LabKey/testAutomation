@@ -18,10 +18,13 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.ChartHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: Treygdor
@@ -234,9 +237,9 @@ public class AncillaryStudyTest extends StudyBaseTest
         log("Modify row in source dataset");
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATASETS[0]));
-        clickAndWait(Locator.linkWithText("edit", 1));
-        setFormElement(Locator.name("quf_SequenceNum"), SEQ_NUMBER2);
-        clickButton("Submit");
+        Map nameAndValue = new HashMap(1);
+        nameAndValue.put("quf_SequenceNum", SEQ_NUMBER2);
+        (new ChartHelper(this)).editDrtRow(1, nameAndValue);
 
         log("Verify changes in Ancillary Study. (modify)");
         clickAndWait(Locator.linkWithText(STUDY_NAME));
@@ -276,11 +279,12 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertTextNotPresent(SEQ_NUMBER + ".0", SEQ_NUMBER2 + ".0");
     }
 
+
     private void verifyProtocolDocument()
     {
         clickAndWait(Locator.linkWithText(STUDY_NAME));
         assertTextPresent(STUDY_DESCRIPTION);
-        assertElementPresent(Locator.xpath("//a[contains(@href, 'name="+PROTOCOL_DOC.getName()+"')]"));
+        assertElementPresent(Locator.xpath("//a[contains(@href, 'name=" + PROTOCOL_DOC.getName() + "')]"));
         clickAndWait(Locator.xpath("//a[./img[@title='Edit']]"));
 
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
