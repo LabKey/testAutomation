@@ -151,6 +151,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         importRunAgainTest(); //Issue 13695
         runAnalysisTest();
         importSecondRunTest();
+        //TODO:  split illumina and 454 into separate tests, since they have so little overlap.
         verifyIlluminaSampleSheet();
         goToProjectHome();
         importIlluminaRunTest();
