@@ -1611,7 +1611,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             if (_testFailed)
             {
-                if (_lastPageTitle != null && !_lastPageTitle.startsWith("404"))
+                if (_lastPageTitle != null && !_lastPageTitle.startsWith("404") && _lastPageURL != null)
                 {
                     try
                     {
