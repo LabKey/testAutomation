@@ -2530,6 +2530,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         waitForElement(Locator.css(".labkey-expandable-nav-panel"));
         clickAndWait(Locator.linkWithText(project));
+        waitForElement(Locator.css(".labkey-expandable-nav-panel"));
     }
 
     /**

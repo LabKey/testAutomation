@@ -376,7 +376,7 @@ public class StudyScheduleTester
     @LogMethod
     private void goToStudySchedule()
     {
-        _test.clickAndWait(Locator.linkWithText(_folderName));
+        _test.clickFolder(_folderName);
         _test.goToManageStudy();
         _test.clickAndWait(Locator.linkWithText("Study Schedule"));
 
