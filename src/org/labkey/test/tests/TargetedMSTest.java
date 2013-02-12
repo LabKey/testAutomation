@@ -99,10 +99,11 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         clickLink(Locator.tagContainingText("span","Transition List"));
         waitForText("Transition List");
         DataRegionTable drt = new DataRegionTable("transitions_view", this);
-        drt.getDataAsText(5, "Precursor");
-        Assert.assertEquals("LTSLNVVAGSDLR", drt.getDataAsText(5, "Precursor"));
+        drt.getDataAsText(5, "Label");
         Assert.assertEquals("heavy", drt.getDataAsText(5, "Label"));
+        Assert.assertEquals("1353.7491", drt.getDataAsText(5, "Precursor Neutral Mass"));
         Assert.assertEquals("677.8818", drt.getDataAsText(5, "Q1 m/z"));
+        Assert.assertEquals("y7", drt.getDataAsText(5, "Fragment"));
         Assert.assertEquals("727.3973", drt.getDataAsText(5, "Q3 m/z"));
         // We don't find these values based on their column headers because DataRegionTable gets confused with the
         // nested data regions having the same id in the HTML. The checks above happen to work because
