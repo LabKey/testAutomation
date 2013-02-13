@@ -130,4 +130,23 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
         _test.waitForElement(Locator.id("AssayList"));
     }
+
+    @LogMethod
+    public void createAssayWithEditableRunFields(String type, String name)
+    {
+        _test.clickButton("New Assay Design");
+        _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
+        _test.clickButton("Next", 0);
+
+        _test.waitForElement(Locator.xpath("//input[@type='checkbox' and @name='editableRunProperties']"));
+        _test.checkCheckbox(Locator.xpath("//input[@type='checkbox' and @name='editableRunProperties']"));
+        _test.waitForElement(Locator.id("AssayDesignerName"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.setFormElement(Locator.id("AssayDesignerName"), name);
+        _test.fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseSeleniumWebTest.SeleniumEvent.change); // GWT compensation
+        _test.clickButton("Save", 0); // GWT compensation
+        _test.waitForText("Save successful.", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.clickButton("Save & Close");
+
+        _test.waitForElement(Locator.id("AssayList"));
+    }
 }
