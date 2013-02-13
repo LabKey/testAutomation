@@ -816,6 +816,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             clickAndWait(Locator.tagContainingText("span", "Hide Navigation Bar"));
     }
 
+    public void showNavigationBar()
+    {
+        clickAndWait(Locator.xpath("//a/span[text() = 'Admin']"), 0);
+        waitForElement(Locator.tagContainingText("span", "Navigation Bar"), 1000);
+        if (isElementPresent(Locator.tagContainingText("span", "Show Navigation Bar")))
+            clickAndWait(Locator.tagContainingText("span", "Show Navigation Bar"));
+    }
+
     /**
      * Allows test code to navigate to a Webpart Ext-based navigation menu.
      * @param webPartTitle title (not name) of webpart to be clicked.  Multiple web parts with the same title not supported.

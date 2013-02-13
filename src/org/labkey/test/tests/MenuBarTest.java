@@ -175,6 +175,8 @@ public class MenuBarTest extends BaseSeleniumWebTest
 
         clickAndWait(Locator.linkWithText("DemStudyFolder"));
         assertTextPresent("Demo Study", "Study Overview");
+
+        showNavigationBar();
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
