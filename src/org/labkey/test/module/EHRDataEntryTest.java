@@ -255,7 +255,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         setFormElementJS(Locator.xpath("//div[./div/span[text()='Treatments & Procedures']]//input[@name='enddate']/..//input[contains(@id, 'date')]"), DATE_FORMAT.format(new Date()));
 
         waitForElement(Locator.xpath("//div[./div/span[text()='Treatments & Procedures']]//input[@name='code' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
-        sleep(100);
+        sleep(250);
         _extHelper.selectComboBoxItem("Code:", "Antibiotic");
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='code']/.."), "amoxicillin (c-54620)\u00a0");
         _extHelper.selectComboBoxItem("Route:", "oral\u00a0");
