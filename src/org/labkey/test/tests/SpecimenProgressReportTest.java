@@ -247,10 +247,10 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         assertTextPresentInThisOrder("SR1", "SR2", "SR3");
         Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
         Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
-        Assert.assertEquals(2 - ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
+        Assert.assertEquals(2 + ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
         Assert.assertEquals(2 - ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'received')]")));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
-        Assert.assertEquals(7 + ignored, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        Assert.assertEquals(7, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
         Assert.assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
     }
 
