@@ -40,6 +40,8 @@ public abstract class StudyBaseTest extends SimpleApiTest
 {
     protected static final String ARCHIVE_TEMP_DIR = getStudySampleDataPath() + "drt_temp";
     protected static final String SPECIMEN_ARCHIVE_A = getStudySampleDataPath() + "specimens/sample_a.specimens";
+    protected int datasetCount = 48;
+    protected int visitCount = 65;
 
     private SpecimenImporter _specimenImporter;
 
@@ -177,10 +179,12 @@ public abstract class StudyBaseTest extends SimpleApiTest
         // Start importing study.xml to create the study and load all the datasets.  We'll wait for this import to
         // complete before doing any further tests.
         clickFolder(getFolderName());
-        clickButton("Process and Import Data");
-        _extHelper.waitForImportDataEnabled();
-        _extHelper.clickFileBrowserFileCheckbox("study.xml");
-        selectImportDataAction("Import Study");
+
+        importFolderFromPipeline("AltIdStudy.folder.zip");
+//        clickButton("Process and Import Data");
+//        _extHelper.waitForImportDataEnabled();
+//        _extHelper.clickFileBrowserFileCheckbox("study.xml");
+//        selectImportDataAction("Import Study");
     }
 
     protected void exportStudy(boolean useXmlFormat, boolean zipFile)

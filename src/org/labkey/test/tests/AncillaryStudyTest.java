@@ -238,7 +238,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         Map nameAndValue = new HashMap(1);
-        nameAndValue.put("quf_SequenceNum", SEQ_NUMBER2);
+        nameAndValue.put("Sequence Num", SEQ_NUMBER2);
         (new ChartHelper(this)).editDrtRow(1, nameAndValue);
 
         log("Verify changes in Ancillary Study. (modify)");

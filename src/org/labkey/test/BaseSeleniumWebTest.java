@@ -1149,6 +1149,26 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         smStart = System.currentTimeMillis();
     }
 
+
+    public void pauseSearchCrawler()
+    {
+        goToAdminConsole();
+        clickAndWait(Locator.linkWithText("full-text search"));
+        if (isTextPresent("pause crawler"))
+            clickButton("pause crawler");
+    }
+
+
+
+    public void unpauseSearchCrawler()
+    {
+        goToAdminConsole();
+        clickAndWait(Locator.linkWithText("full-text search"));
+        if (isTextPresent("unpause crawler"))
+            clickButton("unpause crawler");
+    }
+
+
     public void waitForSystemMaintenanceCompletion()
     {
         Assert.assertTrue("Must call startSystemMaintenance() before waiting for completion", smStart > 0);
@@ -2543,12 +2563,22 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     /**
      * Delete specified project during test
+     * Note: Use {@link #deleteProject(String, boolean)} for test cleanup
      * @param project Project display name
-     * @param failIfFail if false, silently ignore any failures (if the project doesn't exist, for example)
      */
+    public void deleteProject(String project) throws TestTimeoutException
+    {
+        deleteProject(project, true, 90000); // Wait for 90 seconds for project deletion
+    }
+
     public void deleteProject(String project, boolean failIfFail) throws TestTimeoutException
     {
-        _containerHelper.deleteProject(project, failIfFail, 90000); // Wait for 90 seconds for project deletion
+        deleteProject(project, failIfFail, WAIT_FOR_PAGE);
+    }
+
+    public void deleteProject(String project, boolean failIfFail, int wait) throws TestTimeoutException
+    {
+        _containerHelper.deleteProject(project, failIfFail, wait);
     }
 
     @LogMethod

@@ -79,7 +79,7 @@ public class StudyScheduleTester
         // check required timepoints
         goToStudySchedule();
 //        getXpathCount(Locator.xpath("//div[./span[@class='x4-column-header-text']]//div[text()='" + visit +"']"));
-        _test.assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[5]//div[@class='checked']"));
+        _test.assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[6]//div[@class='checked']"));
 
         // change a required visit to optional
         _test.clickWebpartMenuItem("Study Schedule", "Manage Visits");

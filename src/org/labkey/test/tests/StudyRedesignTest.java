@@ -212,7 +212,7 @@ public class StudyRedesignTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Change Properties"));
 
         int dsCount = getXpathCount(Locator.xpath("//input[@name='extraData']"));
-        Assert.assertEquals("Unexpected number of Datasets.", 47, dsCount);
+        Assert.assertEquals("Unexpected number of Datasets.", datasetCount, dsCount);
 
         // create new categories, then assign them out
         for (String category : CATEGORIES)

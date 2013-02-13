@@ -26,14 +26,17 @@ import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.ChartHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +52,7 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
  */
 public class StudyTest extends StudyBaseTest
 {
+    public final String DATASETS = datasetCount + " datasets";
     protected boolean quickTest = true;
     protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some \u2018special symbols\u2019 - they help test that we're roundtripping in UTF-8.";
     protected static final String DEMOGRAPHICS_TITLE = "DEM-1: Demographics";
@@ -88,7 +92,9 @@ public class StudyTest extends StudyBaseTest
 
     protected void doCreateSteps()
     {
+        pauseSearchCrawler(); //necessary for the alternate ID testing
         enableEmailRecorder();
+
         importStudy();
         startSpecimenImport(2);
 
@@ -100,6 +106,7 @@ public class StudyTest extends StudyBaseTest
     {
         super.doCleanup(afterTest);
         deleteUsers(false, authorUser); // Subclasses may not have created this user
+        unpauseSearchCrawler();
     }
 
     protected void emptyParticipantPickerList()
@@ -245,7 +252,7 @@ public class StudyTest extends StudyBaseTest
         // test creating a participant group directly from a data grid
         waitForElement(Locator.linkContainingText(STUDY_NAME));
         clickAndWait(Locator.linkWithText(STUDY_NAME));
-        clickAndWait(Locator.linkWithText("47 datasets"));
+        clickAndWait(Locator.linkWithText(DATASETS));
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
 
@@ -540,6 +547,7 @@ public class StudyTest extends StudyBaseTest
     @LogMethod
     protected void verifyStudyAndDatasets()
     {
+        goToProjectHome();
         verifyDemographics();
         verifyVisitMapPage();
         verifyManageDatasetsPage();
@@ -547,6 +555,8 @@ public class StudyTest extends StudyBaseTest
 
         if(quickTest)
             return;
+
+        verifyAlternateIDs();
 
         verifyHiddenVisits();
         verifyVisitImportMapping();
@@ -567,7 +577,7 @@ public class StudyTest extends StudyBaseTest
 
         // return to dataset import page
         clickAndWait(Locator.linkWithText(getStudyLabel()));
-        clickAndWait(Locator.linkWithText("47 datasets"));
+        clickAndWait(Locator.linkWithText(DATASETS));
         clickAndWait(Locator.linkWithText("verifyAssay"));
         assertTextPresent("QC State");
         assertTextNotPresent("1234_B");
@@ -614,6 +624,34 @@ public class StudyTest extends StudyBaseTest
         setFormElement(Locator.input("quf_Bad Name"), "Updatable Value11");
         clickButton("Submit");
         assertTextPresent("Updatable Value11");
+    }
+
+    private void verifyAlternateIDs()
+    {
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickAndWait(Locator.linkWithText("Alt ID mapping"));
+        assertTextPresent("Contains up to one row of Alt ID mapping data for each ");
+        click(Locator.tagWithText("span", "Import Data"));
+        waitForText("This is the Alias Dataset. You do not need to include information for the date column");
+
+        //the crawler should be paused (this is done in create) to verify
+        log("Verify searching for alternate ID returns participant page");
+        SearchHelper searchHelper = new SearchHelper(this);
+        searchHelper.searchFor("888208905");
+        assertTextPresent("Study Study 001 -- Mouse 999320016");
+        goBack();
+        goBack();
+
+        //edit an entry, search for that
+        log("TODO");
+
+        Map nameAndValue = new HashMap(1);
+        nameAndValue.put("Alt ID", "191919");
+        (new ChartHelper(this)).editDrtRow(4, nameAndValue);
+        searchHelper.searchFor("191919");
+//        assertTextPresent("Study Study 001 -- Mouse 999320687");
+
+
     }
 
     @LogMethod
@@ -835,7 +873,7 @@ public class StudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Visits"));
 
         // test optional/required/not associated
-        clickAndWait(Locator.linkWithText("edit", 0));
+        clickAndWait(Locator.linkWithText("edit", 1));
         selectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
         selectOption("dataSetStatus", 1, "NOT_ASSOCIATED");
         selectOption("dataSetStatus", 2, "NOT_ASSOCIATED");
@@ -846,7 +884,7 @@ public class StudyTest extends StudyBaseTest
         selectOption("dataSetStatus", 7, "REQUIRED");
         selectOption("dataSetStatus", 8, "REQUIRED");
         clickButton("Save");
-        clickAndWait(Locator.linkWithText("edit", 0));
+        clickAndWait(Locator.linkWithText("edit", 1));
         selectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
         selectOption("dataSetStatus", 1, "OPTIONAL");
         selectOption("dataSetStatus", 2, "REQUIRED");
@@ -857,7 +895,7 @@ public class StudyTest extends StudyBaseTest
         selectOption("dataSetStatus", 7, "OPTIONAL");
         selectOption("dataSetStatus", 8, "REQUIRED");
         clickButton("Save");
-        clickAndWait(Locator.linkWithText("edit", 0));
+        clickAndWait(Locator.linkWithText("edit", 1));
         assertSelectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
         assertSelectOption("dataSetStatus", 1, "OPTIONAL");
         assertSelectOption("dataSetStatus", 2, "REQUIRED");
@@ -944,7 +982,7 @@ public class StudyTest extends StudyBaseTest
         Assert.assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 0, countTableCells("ConMeds Log #%{S.3.2}", true));
 
         clickFolder(getFolderName());
-        clickAndWait(Locator.linkWithText("47 datasets"));
+        clickAndWait(Locator.linkWithText(DATASETS));
         clickAndWait(Locator.linkWithText("Types"));
         log("Verifying sequence numbers and visit names imported correctly");
 
@@ -1012,6 +1050,7 @@ public class StudyTest extends StudyBaseTest
         // verify that the participant view respects the cohort filter:
         setSort("Dataset", "MouseId", SortDirection.ASC);
         clickAndWait(Locator.linkWithText("999320518"));
+        assertTextPresent("b: 888209407"); //Alternate ID
         click(Locator.linkWithText("125: EVC-1: Enrollment Vaccination"));
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");

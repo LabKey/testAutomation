@@ -2,6 +2,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.internal.seleniumemulation.WaitForPageToLoad;
 
 import java.util.Map;
 
@@ -27,8 +28,9 @@ public class ChartHelper  extends AbstractHelper
     public void editDrtRow(int row, Map<String, String> nameAndValue)
     {
         _test.clickAndWait(Locator.linkWithText("edit", row));
+//        _test.waitForElement(Locator.name(nameAndValue.keySet().));
         for(String name : nameAndValue.keySet())
-            _test.setFormElement(Locator.name(name), nameAndValue.get(name));
+            _test.setFormElement(Locator.xpath("//tr[td[contains(text(),'" + name + "')]]/td/input"), nameAndValue.get(name));
         _test.clickButton("Submit");
     }
 }

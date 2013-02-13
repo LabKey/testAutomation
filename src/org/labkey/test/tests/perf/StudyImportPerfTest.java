@@ -42,8 +42,7 @@ public class StudyImportPerfTest extends PerformanceTest
         _containerHelper.createProject(getProjectName(), "Study");
 
         long startTime = System.currentTimeMillis();
-//        importFolderFromZip(getLabKeyRoot() + "/sampledata/study/LabkeyDemoStudy.zip");
-        sleep(4000); //TODO:  // Issue 16877: error importing demo study
+        importFolderFromZip(getLabKeyRoot() + "/sampledata/study/LabkeyDemoStudy.zip");
         elapsedTime = System.currentTimeMillis() - startTime;
         writePerfDataToFile();
     }
