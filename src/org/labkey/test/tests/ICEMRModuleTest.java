@@ -19,12 +19,14 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,7 +58,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     "AlbumaxBatchID\tAlbumax Batch ID\thttp://www.w3.org/2001/XMLSchema#string\t\tFALSE\tFALSE\tFALSE\n" +
     "FoldIncrease1\tFold-Increase Test 1\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
     "FoldIncrease2\tFold-Increase Test 2\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
-    "FoldIncrease3\tFold-Increase Test 3\thttp://www.w3.org/2001/XMLSchema#int\tTRUE\tFALSE\tFALSE\n" +
+    "FoldIncrease3\tFold-Increase Test 3\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
     "AdaptationCriteria\tAdaptation Criteria\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
     "Comments\t\thttp://www.w3.org/2001/XMLSchema#multiLine\t\tFALSE\tFALSE\tFALSE\n" +
     "MaintenanceDate\tMaintenance Date\thttp://www.w3.org/2001/XMLSchema#dateTime\t\tFALSE\tFALSE\tFALSE\n" +
@@ -91,6 +93,9 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         testJavaScript();
         enterDataPoint();
         verifyDataInAssay();
+        enterDataPointAdaptation();
+        enterDailyAdaptationData();
+        checkResultsPage();
     }
 
     private void verifyDataInAssay()
@@ -110,6 +115,149 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         waitForElement(Locator.id("upload-diagnostic-form-body"));
 
         enterData();
+    }
+
+    private void enterDataPointAdaptation()
+    {
+        Locator.XPathLocator link = Locator.linkContainingText("Adaptation Assay");
+        waitAndClick(link);
+        link = Locator.navButtonContainingText("Import Data");
+        waitAndClick(link);
+        waitForElement(Locator.id("SampleID1"));
+        enterAdaptationData();
+
+    }
+
+    private void enterAdaptationData()
+    {
+        verifyError(11);
+
+        fieldAndValue = new HashMap<String, String>();
+
+        fieldAndValue.put("PatientID", "100101");
+        fieldAndValue.put("ExperimentID", "12345");
+        fieldAndValue.put("SampleID1", "15243");
+        fieldAndValue.put("Scientist1", "Dr. Helvetica");
+        fieldAndValue.put("Gametocytemia1", "20");
+        fieldAndValue.put("Hematocrit1", "24");
+        fieldAndValue.put("Parasitemia1", "");
+        fieldAndValue.put("SerumBatchID1", "00123");
+        fieldAndValue.put("AlbumaxBatchID1", "10213");
+        fieldAndValue.put("FoldIncrease11", "10");
+        fieldAndValue.put("FoldIncrease21", "11");
+        fieldAndValue.put("FoldIncrease31", "12");
+        fieldAndValue.put("AdaptationCriteria1", "24");
+        fieldAndValue.put("Comments1", "Lorem ipsum");
+
+        for(String field : fieldAndValue.keySet())
+        {
+            setICEMRField(field, fieldAndValue.get(field));
+        }
+
+        //Verify a missing field (parasitemia)
+        verifyError(1);
+
+        //Verify fields out of acceptable bounds
+        setICEMRField("Hematocrit1", "101");
+        setICEMRField("Gametocytemia1", "101");
+        setICEMRField("Parasitemia1", "101");
+        verifyError(2);
+
+        setICEMRField("Hematocrit1", "20");
+        setICEMRField("Gametocytemia1", "22");
+        setICEMRField("Parasitemia1", "25");
+
+        clickButton("Add Flask", "Flask 2");
+
+        makeAdaptationFlask(2);
+
+        clickButtonContainingText("Submit");
+        waitForElement(Locator.css(".labkey-nav-page-header").withText(ADAPTATION_ASSAY_NAME + " Runs"));
+    }
+
+    private void makeAdaptationFlask(int flaskNum)
+    {
+        verifyError(9);
+
+        fieldAndValue = new HashMap<String, String>();
+
+        fieldAndValue.put("SampleID" + flaskNum, "15258");
+        fieldAndValue.put("Scientist"+ flaskNum, "Dr. Helvetica");
+        fieldAndValue.put("Gametocytemia"+ flaskNum, "24");
+        fieldAndValue.put("Hematocrit"+ flaskNum, "28");
+        fieldAndValue.put("Parasitemia"+ flaskNum, "27");
+        fieldAndValue.put("SerumBatchID"+ flaskNum, "00123");
+        fieldAndValue.put("AlbumaxBatchID"+ flaskNum, "10213");
+        fieldAndValue.put("FoldIncrease1"+ flaskNum, "12");
+        fieldAndValue.put("FoldIncrease2"+ flaskNum, "13");
+        fieldAndValue.put("FoldIncrease3"+ flaskNum, "14");
+        fieldAndValue.put("AdaptationCriteria"+ flaskNum, "20");
+        fieldAndValue.put("Comments"+ flaskNum, "Lorem ipsum");
+
+        for(String field : fieldAndValue.keySet())
+        {
+            setICEMRField(field, fieldAndValue.get(field));
+        }
+        sleep(1000);
+    }
+
+    private void enterDailyAdaptationData(){
+
+        //Navigate to Daily Upload page
+        Locator.XPathLocator link = Locator.xpath("//a[@class='labkey-text-link' and text()='edit']");
+        waitAndClick(link);
+        waitForElement(Locator.name("dailyUpload"));
+
+        //Try to upload a form with bad columns
+        setFormElement(Locator.name("dailyUpload"), getLabKeyRoot() + "/sampledata/icemr/missingColumns.xls");
+        clickButtonContainingText("Upload", "The data file header row does not match the daily results schema");
+        _extHelper.waitForExtDialog("Daily Upload Failed");
+        clickButtonContainingText("OK", "Daily Upload");
+        _extHelper.waitForExtDialogToDisappear("Daily Upload Failed");
+
+        //Try to upload a form with bad flasks (invalid IDs)
+        setFormElement(Locator.name("dailyUpload"), getLabKeyRoot() + "/sampledata/icemr/badFlasks.xls");
+        clickButtonContainingText("Upload", "Submit");
+        sleep(500);
+        clickButtonContainingText("Submit", "Invalid flask specified");
+        _extHelper.waitForExtDialog("Daily Maintenance Error");
+        clickButtonContainingText("OK", "Result");
+        _extHelper.waitForExtDialogToDisappear("Daily Maintenance Error");
+
+        //Upload test
+        refresh();
+        waitForText("Daily Upload");
+        setFormElement(Locator.name("dailyUpload"), getLabKeyRoot() + "/sampledata/icemr/dailyUploadFilled.xls");
+        clickButtonContainingText("Upload", "Scientist Name");
+        sleep(500);
+        clickButton("Submit");
+
+        //Ensure that you can't add flasks if maintenance has been stopped on that flask.
+        waitAndClick(link);
+        waitForElement(Locator.name("dailyUpload"));
+        setFormElement(Locator.name("dailyUpload"), getLabKeyRoot() + "/sampledata/icemr/dailyUploadFilled.xls");
+        clickButtonContainingText("Upload", "Scientist Name");
+        sleep(500);
+        clickButtonContainingText("Submit", "Invalid flask specified");
+        _extHelper.waitForExtDialog("Daily Maintenance Error");
+        clickButtonContainingText("OK", "Result");
+        _extHelper.waitForExtDialogToDisappear("Daily Maintenance Error");
+        clickButton("Cancel");
+    }
+
+    private void checkResultsPage(){
+        Locator.XPathLocator link = Locator.xpath("//a[text()='100101']");
+        waitAndClick(link);
+        //Make sure the header is there and we are in the right place
+        waitForText("12345");
+        //Make sure the flasks we'd expect are there
+        waitForText("15243");
+        waitForText("15258");
+        //Hop into one of the flasks to make sure that they have data
+        link = Locator.xpath("//a[text()='15243']");
+        waitAndClick(link);
+        waitForText("100101");
+        waitForText("15243");
     }
 
     private void verifyError(int errorCount)
@@ -171,7 +319,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void createAdaptationAssay()
     {
-        _assayHelper.createAssayWithDefaults(ADAPTATION_ASSAY_DESIGN, ADAPTATION_ASSAY_NAME);
+        _assayHelper.createAssayWithEditableRunFields(ADAPTATION_ASSAY_DESIGN, ADAPTATION_ASSAY_NAME);
     }
     private void createFlasksSampleSet()
     {

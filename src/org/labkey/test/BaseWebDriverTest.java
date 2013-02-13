@@ -167,6 +167,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelperWD _securityHelper = new SecurityHelperWD(this);
+    public File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
@@ -200,6 +201,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _listHelper = new ListHelperWD(this);
         _customizeViewsHelper = new CustomizeViewsHelperWD(this);
         _jsErrors = new ArrayList<JavaScriptError>();
+        _downloadDir = new File(ensureDumpDir(), "downloads");
     }
 
     protected void setIsPerfTest(boolean isPerfTest)
@@ -227,6 +229,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return WebTestHelper.getContextPath();
     }
 
+
     protected abstract @Nullable String getProjectName();
 
     @Before
@@ -250,6 +253,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             profile.setPreference("app.update.auto", false);
             profile.setPreference("extensions.update.autoUpdate", false);
             profile.setPreference("extensions.update.enabled", false);
+
+            profile.setPreference("browser.download.folderList", 2);
+            profile.setPreference("browser.download.useDownloadDir", false);
+            profile.setPreference("browser.download.downloadDir", _downloadDir.getAbsolutePath());
+            profile.setPreference("browser.download.dir", _downloadDir.getAbsolutePath());
+            profile.setPreference("browser.helperApps.alwaysAsk.force", "False");
+            profile.setPreference("browser.download.manager.showWhenStarting",false);
             if (enableScriptCheck())
             {
                 try
@@ -267,6 +277,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     profile.setPreference("extensions.firebug.allPagesActivation", "on");
                     profile.setPreference("extensions.firebug.previousPlacement", 3);
                     profile.setPreference("extensions.firebug.net.enabledSites", true);
+
                     if (firebugPanelsEnabled()) // Enabling Firebug panels slows down test and is usually not needed
                     {
                         profile.setPreference("extensions.firebug.net.enableSites", true);
