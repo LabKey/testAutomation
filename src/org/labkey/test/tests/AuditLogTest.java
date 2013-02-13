@@ -108,7 +108,7 @@ public class AuditLogTest extends BaseWebDriverTest
         uncheckCheckbox("sendEmail");
         clickButton("Update Group Membership");
         deleteUser(AUDIT_TEST_USER);
-        deleteProject(AUDIT_TEST_PROJECT);
+        deleteProject(AUDIT_TEST_PROJECT, true);
 
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "A new security group named Testers was created", 10);
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "The user/group Testers was assigned to the security role Editor.", 10);

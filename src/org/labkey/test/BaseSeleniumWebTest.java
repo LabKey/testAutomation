@@ -2543,22 +2543,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     /**
      * Delete specified project during test
-     * Note: Use {@link #deleteProject(String, boolean)} for test cleanup
      * @param project Project display name
+     * @param failIfFail if false, silently ignore any failures (if the project doesn't exist, for example)
      */
-    public void deleteProject(String project) throws TestTimeoutException
-    {
-        deleteProject(project, true, 90000); // Wait for 90 seconds for project deletion
-    }
-
     public void deleteProject(String project, boolean failIfFail) throws TestTimeoutException
     {
-        deleteProject(project, failIfFail, WAIT_FOR_PAGE);
-    }
-
-    public void deleteProject(String project, boolean failIfFail, int wait) throws TestTimeoutException
-    {
-        _containerHelper.deleteProject(project, failIfFail, wait);
+        _containerHelper.deleteProject(project, failIfFail, 90000); // Wait for 90 seconds for project deletion
     }
 
     @LogMethod
