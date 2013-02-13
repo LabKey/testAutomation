@@ -74,7 +74,7 @@ public class SequestImportTest extends BaseWebDriverTest
         selectImportDataActionNoWaitForGrid("Import Search Results");
 
         click(Locator.linkWithText("MS2 Dashboard"));
-        click(Locator.linkWithText("Data Pipeline"));
+        waitAndClick(Locator.linkWithText("Data Pipeline"));
         waitForPipelineJobsToComplete(1, "Experiment Import", false);
     }
 
