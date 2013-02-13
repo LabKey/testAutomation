@@ -6804,6 +6804,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
             clickAndWait(Locator.linkWithText("Manage Files"));
             waitAndClickButton("Process and Import Data");
+            _extHelper.waitForFileGridReady();
 
             // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
             File testDir = _tempDir;

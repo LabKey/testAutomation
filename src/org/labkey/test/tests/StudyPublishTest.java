@@ -175,7 +175,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Publish the study in a few different ways
         publishStudy(PUB1_NAME, PUB1_DESCRIPTION, PUB1_CONTAINER, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true);
         publishStudy(PUB2_NAME, PUB2_DESCRIPTION, PUB2_CONTAINER, PUB2_GROUPS, PUB2_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false);
-        publishStudy(PUB3_NAME, PUB3_DESCRIPTION, PUB3_CONTAINER, PUB3_GROUPS, PUB3_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, false, true, false);
+        publishStudy(PUB3_NAME, PUB3_DESCRIPTION, PUB3_CONTAINER, PUB3_GROUPS, PUB3_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, false, true, false, true);
 
         // load specimen set B to test the specimen refresh for the published studies
         startSpecimenImport(++_pipelineJobs, SPECIMEN_ARCHIVE_B);
@@ -191,7 +191,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         ArrayList<String> group2and3ptids = new ArrayList<String>();
         group2and3ptids.addAll(Arrays.asList(GROUP2_PTIDS));
         group2and3ptids.addAll(Arrays.asList(GROUP3_PTIDS));
-        verifyPublishedStudy(PUB3_NAME, group2and3ptids.toArray(new String[group2and3ptids.size()]), PUB3_DATASETS, PUB3_DEPENDENT_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, PUB3_EXPECTED_SPECIMENS, false, true, false);
+        verifyPublishedStudy(PUB3_NAME, group2and3ptids.toArray(new String[group2and3ptids.size()]), PUB3_DATASETS, PUB3_DEPENDENT_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, PUB3_EXPECTED_SPECIMENS, false, true, false, true);
 
         verifySpecimenRefresh();
     }
@@ -218,14 +218,14 @@ public class StudyPublishTest extends StudyProtectedExportTest
                                         String[] visits, String[] views, String[] reports, String[] lists,
                                         boolean includeSpecimens, boolean refreshSpecimens, int expectedSpecimenCount)
     {
-        verifyPublishedStudy(name, ptids, datasets, dependentDatasets, visits, views, reports, lists, includeSpecimens, refreshSpecimens, expectedSpecimenCount, true, true, true);
+        verifyPublishedStudy(name, ptids, datasets, dependentDatasets, visits, views, reports, lists, includeSpecimens, refreshSpecimens, expectedSpecimenCount, true, true, true, false);
     }
 
     @LogMethod
     protected void verifyPublishedStudy(@LoggedParam final String name, final String[] ptids, final String[] datasets, final String[] dependentDatasets,
                                         final String[] visits, final String[] views, final String[] reports, final String[] lists,
                                         final boolean includeSpecimens, final boolean refreshSpecimens, final int expectedSpecimenCount,
-                                        final boolean removeProtected, final boolean shiftDates, final boolean alternateIDs)
+                                        final boolean removeProtected, final boolean shiftDates, final boolean alternateIDs, final boolean maskClinicNames)
     {
         SearchHelper searchHelper = new SearchHelper(this);
         // Verify alternate IDs (or lack thereof)
@@ -484,6 +484,63 @@ public class StudyPublishTest extends StudyProtectedExportTest
         assertElementPresent(includeSpecimens ? Locator.paginationText(1, 59, 59) : Locator.xpath("//tr/td/em[text() = 'No data to show.']"));
         goToQueryView("study", "Location", false);
         assertElementPresent(includeSpecimens ? Locator.paginationText(1, 24, 24) : Locator.xpath("//tr/td/em[text() = 'No data to show.']"));
+
+        // verify masked clinic information
+        if (maskClinicNames)
+        {
+            goToSchemaBrowser();
+            selectQuery("study", "Location");
+            clickAndWait(Locator.linkWithText("view data"));
+            DataRegionTable query = new DataRegionTable("query", this);
+            int labelCol = query.getColumn("Label");
+            int labCodeCol = query.getColumn("Labware Lab Code");
+            int clinicCol = query.getColumn("Clinic");
+            int rowCount = query.getDataRowCount();
+            int clinicCount = 0;
+            for (int i = 0; i < rowCount; i++)
+            {
+                if (query.getDataAsText(i, clinicCol).equals("true"))
+                {
+                    clinicCount++;
+                    Assert.assertTrue("Clinic Location name was not masked", query.getDataAsText(i, labelCol).equals("Clinic"));
+                    Assert.assertTrue("Clinic Labware Lab Code was not masked", query.getDataAsText(i, labCodeCol).equals(""));
+                }
+                else // non-clinic
+                {
+                    Assert.assertFalse("Non-clinic Location name was masked", query.getDataAsText(i, labelCol).equals("Clinic"));
+                }
+            }
+            Assert.assertEquals("Unexpected number of clinics", 8, clinicCount);
+
+            clickTab("Manage");
+            clickAndWait(Locator.linkWithText("Manage Locations"));
+            clinicCount = 0;
+            rowCount = getXpathCount(Locator.xpath("id('manageLocationsTable')/tbody/tr"));
+            for (int i = 2; i <= rowCount - 2; i++) // skip header row; Stop before Add Location row & Save/Cancel button row
+            {
+                Locator.XPathLocator rowLoc = Locator.xpath("id('manageLocationsTable')/tbody/tr["+i+"]");
+                String locName = getFormElement(rowLoc.append("/td/input[@name='labels']"));
+                String locTypes = getText(rowLoc.append("/td[4]"));
+                if (locTypes.contains("Clinic"))
+                {
+                    Assert.assertTrue("Clinic Location name not masked", locName.equals("Clinic"));
+                    clinicCount++;
+                }
+                else
+                    Assert.assertFalse("Clinic Location name not masked", locName.equals("Clinic"));
+            }
+            Assert.assertEquals("Unexpected number of clinics", 8, clinicCount);
+
+            clickTab("Specimen Data");
+            clickAndWait(Locator.linkWithText("Blood (Whole)"));
+            DataRegionTable vialsTable = new DataRegionTable("SpecimenDetail", this);
+            List<String> procLocs = vialsTable.getColumnDataAsText("Processing Location");
+            procLocs.remove(procLocs.size() - 1); // Skip aggregate row
+            for (String procLoc : procLocs)
+            {
+                Assert.assertTrue("Processing Locations was not masked", procLoc.equals("Clinic"));
+            }
+        }
         goToProjectHome();
     }
 
@@ -520,14 +577,14 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private void publishStudy(String name, String description, String parentContainer, String[] groups, String[] datasets,
                               String[] visits, String[] views, String[] reports, String[] lists, boolean includeSpecimens, boolean refreshSpecimens)
     {
-        publishStudy(name, description, parentContainer, groups, datasets, visits, views, reports, lists, includeSpecimens, refreshSpecimens, true, true, true);
+        publishStudy(name, description, parentContainer, groups, datasets, visits, views, reports, lists, includeSpecimens, refreshSpecimens, true, true, true, false);
     }
 
     // Test should be in an existing study.
     @LogMethod
     private void publishStudy(@LoggedParam String name, String description, String parentContainer, String[] groups, String[] datasets,
                               String[] visits, String[] views, String[] reports, String[] lists, boolean includeSpecimens, boolean refreshSpecimens,
-                              boolean removeProtected, boolean shiftDates, boolean alternateIDs)
+                              boolean removeProtected, boolean shiftDates, boolean alternateIDs, boolean maskClinicNames)
     {
         pushLocation();
         goToQueryView("study", DATE_SHIFT_DATASET, false);
@@ -658,6 +715,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         if (!removeProtected) uncheckCheckbox(Locator.name("removeProtected"));
         if (!shiftDates) uncheckCheckbox(Locator.name("shiftDates"));
         if (!alternateIDs) uncheckCheckbox(Locator.name("alternateids"));
+        if (maskClinicNames) checkCheckbox(Locator.name("maskClinic"));
         clickButton("Finish");
 
         _pipelineJobs++;
