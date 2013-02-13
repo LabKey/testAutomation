@@ -74,7 +74,13 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
-        selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(label), selection);
+        selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(label), selection, false);
+    }
+
+    @LogMethod(quiet = true)
+    public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection, boolean containsText)
+    {
+        selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(label), selection, containsText);
     }
 
     @LogMethod(quiet = true)

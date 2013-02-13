@@ -232,7 +232,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         log("Verify location based history");
         waitAndClick(Locator.ext4Radio("Current Location"));
-        _ext4Helper.selectComboBoxItem("Area:", AREA_ID);
+        _ext4Helper.selectComboBoxItem("Area:", AREA_ID, true);
         _ext4Helper.queryOne("#roomField", Ext4FieldRefWD.class).setValue(ROOM_ID);
         _ext4Helper.queryOne("#cageField", Ext4FieldRefWD.class).setValue(CAGE_ID);
         _ext4Helper.clickTabContainingText("Abstract");
