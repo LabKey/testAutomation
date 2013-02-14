@@ -17,11 +17,13 @@
 package org.labkey.test.tests;
 
 import org.apache.http.HttpStatus;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -194,11 +196,12 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected)
     {
-        exportStudy(useXmlFormat, zipFile, exportProtected, false, false, Collections.<String>emptySet());
+        exportStudy(useXmlFormat, zipFile, exportProtected, false, false, false, Collections.<String>emptySet());
     }
 
-    protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected,
-                               boolean useAlternateIDs, boolean useAlternateDates, Set<String> uncheckObjects)
+    @LogMethod protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected,
+                               boolean useAlternateIDs, boolean useAlternateDates, boolean maskClinic,
+                               @Nullable Set<String> uncheckObjects)
     {
         clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
@@ -207,16 +210,21 @@ public abstract class StudyBaseTest extends SimpleApiTest
         assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings");
         // TODO: these have moved to the folder archive, be sure to test there: "Queries", "Custom Views", "Reports", "Lists"
 
-        for (String uncheckObject : uncheckObjects)
-            uncheckCheckbox("types", uncheckObject);
-        checkRadioButton("format", useXmlFormat ? "new" : "old");
-        checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
+        if (uncheckObjects != null)
+        {
+            for (String uncheckObject : uncheckObjects)
+                uncheckCheckbox(Locator.checkboxByNameAndValue("types", uncheckObject));
+        }
+        checkRadioButton(Locator.radioButtonByNameAndValue("format", useXmlFormat ? "new" : "old"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("location", zipFile ? "1" : "0"));  // zip file vs. individual files
         if(!exportProtected)
-            checkCheckbox("removeProtected");
+            checkCheckbox(Locator.name("removeProtected"));
         if(useAlternateIDs)
-            checkCheckbox("alternateIds");
+            checkCheckbox(Locator.name("alternateIds"));
         if(useAlternateDates)
-            checkCheckbox("shiftDates");
+            checkCheckbox(Locator.name("shiftDates"));
+        if(maskClinic)
+            checkCheckbox(Locator.name("maskClinic"));
         clickButton("Export");
     }
 

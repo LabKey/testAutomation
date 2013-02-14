@@ -488,58 +488,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // verify masked clinic information
         if (maskClinicNames)
         {
-            goToSchemaBrowser();
-            selectQuery("study", "Location");
-            clickAndWait(Locator.linkWithText("view data"));
-            DataRegionTable query = new DataRegionTable("query", this);
-            int labelCol = query.getColumn("Label");
-            int labCodeCol = query.getColumn("Labware Lab Code");
-            int clinicCol = query.getColumn("Clinic");
-            int rowCount = query.getDataRowCount();
-            int clinicCount = 0;
-            for (int i = 0; i < rowCount; i++)
-            {
-                if (query.getDataAsText(i, clinicCol).equals("true"))
-                {
-                    clinicCount++;
-                    Assert.assertTrue("Clinic Location name was not masked", query.getDataAsText(i, labelCol).equals("Clinic"));
-                    Assert.assertTrue("Clinic Labware Lab Code was not masked", query.getDataAsText(i, labCodeCol).equals(""));
-                }
-                else // non-clinic
-                {
-                    Assert.assertFalse("Non-clinic Location name was masked", query.getDataAsText(i, labelCol).equals("Clinic"));
-                }
-            }
-            Assert.assertEquals("Unexpected number of clinics", 8, clinicCount);
-
-            clickTab("Manage");
-            clickAndWait(Locator.linkWithText("Manage Locations"));
-            clinicCount = 0;
-            rowCount = getXpathCount(Locator.xpath("id('manageLocationsTable')/tbody/tr"));
-            for (int i = 2; i <= rowCount - 2; i++) // skip header row; Stop before Add Location row & Save/Cancel button row
-            {
-                Locator.XPathLocator rowLoc = Locator.xpath("id('manageLocationsTable')/tbody/tr["+i+"]");
-                String locName = getFormElement(rowLoc.append("/td/input[@name='labels']"));
-                String locTypes = getText(rowLoc.append("/td[4]"));
-                if (locTypes.contains("Clinic"))
-                {
-                    Assert.assertTrue("Clinic Location name not masked", locName.equals("Clinic"));
-                    clinicCount++;
-                }
-                else
-                    Assert.assertFalse("Clinic Location name not masked", locName.equals("Clinic"));
-            }
-            Assert.assertEquals("Unexpected number of clinics", 8, clinicCount);
-
-            clickTab("Specimen Data");
-            clickAndWait(Locator.linkWithText("Blood (Whole)"));
-            DataRegionTable vialsTable = new DataRegionTable("SpecimenDetail", this);
-            List<String> procLocs = vialsTable.getColumnDataAsText("Processing Location");
-            procLocs.remove(procLocs.size() - 1); // Skip aggregate row
-            for (String procLoc : procLocs)
-            {
-                Assert.assertTrue("Processing Locations was not masked", procLoc.equals("Clinic"));
-            }
+            verifyMaskedClinics(8);
         }
         goToProjectHome();
     }

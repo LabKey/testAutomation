@@ -18,10 +18,11 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelper;
+import org.labkey.test.util.LogMethod;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,40 +35,18 @@ public class StudyProtectedExportTest extends StudyExportTest
     int pipelineJobCount = 1;
     private String idPreface = "P!@#$%^&*(";
     private int idLength = 7;
+    private Map<String,String> _originalFirstMouseStats;
 
     @Override
     protected void doCreateSteps()
     {
         createStudyManually();
 
-        Map<String, String> originalFirstMouseStats = getFirstMouseStats();
+        _originalFirstMouseStats = getFirstMouseStats();
         setParticipantIdPreface(idPreface, idLength);
         
         setUpTrickyExport();
-        exportStudy(true, true, false, true, true, Collections.singleton("Specimens"));
-
-        deleteStudy(getStudyLabel());
-        importAlteredStudy();
-        goToDatasetWithProtectedColum();
-        assertTextNotPresent(protectedColumnLabel);
-        Map<String, String> alteredFirstMouseStats = getFirstMouseStats();
-        Assert.assertTrue(alteredFirstMouseStats.get("Mouse Id").startsWith(idPreface));
-        Assert.assertEquals(idPreface.length() + idLength,  alteredFirstMouseStats.get("Mouse Id").length());
-        DataRegionTable drt = new DataRegionTable( "Dataset", this);
-        /* DOB doesn't change because it's a text field, not a true date.
-           since it's the most unique thing on the page, we can use it to see a specific user and verify that
-           the date fields did change
-         */
-        Assert.assertNotSame("2005-01-01", drt.getDataAsText(drt.getRow("1.Date of Birth", "1965-03-06"), "Contact Date"));
-        verifyStatsDoNotMatch(originalFirstMouseStats, alteredFirstMouseStats);
-        verifyParticipantGroups(originalFirstMouseStats.get("Mouse Id"), alteredFirstMouseStats.get("Mouse Id"));
-
-
-        deleteStudy(getStudyLabel());
-        importAlteredStudy();
-        Map reimportedFirstMouseStats = getFirstMouseStats();
-        verifyStatsMatch(alteredFirstMouseStats, reimportedFirstMouseStats);
-
+        exportStudy(true, true, false, true, true, false, null);
     }
 
     protected void setParticipantIdPreface(String idPreface, int idLength)
@@ -130,13 +109,17 @@ public class StudyProtectedExportTest extends StudyExportTest
         }
     }
 
+    @LogMethod
     private void importAlteredStudy()
     {
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
         waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));//TODO: Bad cookie. Marker class won't appear without this step.
         _extHelper.selectFileBrowserItem("export/");
-        Locator checkbox = Locator.xpath("(//div[contains(text(), 'My Study_')])[1]");
+        Locator.XPathLocator checkbox = Locator.xpath("//div[contains(text(), 'My Study_')]");
+        waitForElement(checkbox);
+        int exportCount = getXpathCount(checkbox);
+        checkbox = checkbox.index(exportCount - 1); // get most recent export
         waitForElement(checkbox);
         clickAt(checkbox, "1,1");
 
@@ -145,15 +128,43 @@ public class StudyProtectedExportTest extends StudyExportTest
     }
 
     @Override
-    protected void doVerifySteps   ()
+    protected void doVerifySteps()
     {
+        deleteStudy(getStudyLabel());
+        importAlteredStudy();
+        goToDatasetWithProtectedColum();
+        assertTextNotPresent(protectedColumnLabel);
 
-    }
+        Map<String,String> alteredFirstMouseStats = getFirstMouseStats();
+        Assert.assertTrue(alteredFirstMouseStats.get("Mouse Id").startsWith(idPreface));
+        Assert.assertEquals(idPreface.length() + idLength, alteredFirstMouseStats.get("Mouse Id").length());
+        DataRegionTable drt = new DataRegionTable( "Dataset", this);
+        /* DOB doesn't change because it's a text field, not a true date.
+           since it's the most unique thing on the page, we can use it to see a specific user and verify that
+           the date fields did change
+         */
+        Assert.assertNotSame("2005-01-01", drt.getDataAsText(drt.getRow("1.Date of Birth", "1965-03-06"), "Contact Date"));
+        verifyStatsDoNotMatch(_originalFirstMouseStats, alteredFirstMouseStats);
+        verifyParticipantGroups(_originalFirstMouseStats.get("Mouse Id"), alteredFirstMouseStats.get("Mouse Id"));
 
-    @Override
-    protected void cleanUp()
-    {
-//        deleteProject(getProjectName());
+        deleteStudy(getStudyLabel());
+        importAlteredStudy();
+        waitForPipelineJobsToComplete(3, "Study reimport", false);
+
+        Map reimportedFirstMouseStats = getFirstMouseStats();
+        verifyStatsMatch(alteredFirstMouseStats, reimportedFirstMouseStats);
+
+        log("Verify second export and clinic masking");
+
+        startSpecimenImport(4, SPECIMEN_ARCHIVE_A);
+        waitForPipelineJobsToComplete(4, "Specimen import", false);
+        exportStudy(true, true, false, true, true, true, null);
+
+        deleteStudy(getStudyLabel());
+        importAlteredStudy();
+        waitForPipelineJobsToComplete(5, "Study reimport with specimens", false);
+
+        verifyMaskedClinics(8);
     }
 
     private void goToDatasetWithProtectedColum()
@@ -184,6 +195,72 @@ public class StudyProtectedExportTest extends StudyExportTest
 
     }
 
+    protected  void verifyMaskedClinics(int clinicCount)
+    {
+        List<String> nonClinics = new ArrayList<String>();
+
+        goToSchemaBrowser();
+        selectQuery("study", "Location");
+        waitAndClickAndWait(Locator.linkWithText("view data"));
+        DataRegionTable query = new DataRegionTable("query", this);
+        int labelCol = query.getColumn("Label");
+        int labCodeCol = query.getColumn("Labware Lab Code");
+        int clinicCol = query.getColumn("Clinic");
+        int rowCount = query.getDataRowCount();
+        int foundClinics = 0;
+        for (int i = 0; i < rowCount; i++)
+        {
+            if (query.getDataAsText(i, clinicCol).equals("true"))
+            {
+                foundClinics++;
+                Assert.assertTrue("Clinic Location name was not masked", query.getDataAsText(i, labelCol).equals("Clinic"));
+                Assert.assertTrue("Clinic Labware Lab Code was not masked", query.getDataAsText(i, labCodeCol).equals(""));
+            }
+            else // non-clinic
+            {
+                Assert.assertFalse("Non-clinic Location name was masked", query.getDataAsText(i, labelCol).equals("Clinic"));
+            }
+        }
+        Assert.assertEquals("Unexpected number of clinics", clinicCount, foundClinics);
+
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Locations"));
+        foundClinics = 0;
+        rowCount = getXpathCount(Locator.xpath("id('manageLocationsTable')/tbody/tr"));
+        for (int i = 2; i <= rowCount - 2; i++) // skip header row; Stop before Add Location row & Save/Cancel button row
+        {
+            Locator.XPathLocator rowLoc = Locator.xpath("id('manageLocationsTable')/tbody/tr["+i+"]");
+            String locName = getFormElement(rowLoc.append("/td/input[@name='labels']"));
+            String locTypes = getText(rowLoc.append("/td[4]"));
+            if (locTypes.contains("Clinic"))
+            {
+                Assert.assertTrue("Clinic Location name not masked", locName.equals("Clinic"));
+                foundClinics++;
+            }
+            else
+            {
+                Assert.assertFalse("Clinic Location name not masked", locName.equals("Clinic"));
+                nonClinics.add(locName);
+            }
+        }
+        Assert.assertEquals("Unexpected number of clinics", clinicCount, foundClinics);
+
+        clickTab("Specimen Data");
+        clickAndWait(Locator.linkWithText("Blood (Whole)"));
+        DataRegionTable vialsTable = new DataRegionTable("SpecimenDetail", this);
+        List<String> procLocs = vialsTable.getColumnDataAsText("Processing Location");
+        procLocs.remove(procLocs.size() - 1); // Skip aggregate row
+        for (String procLoc : procLocs)
+        {
+            Assert.assertTrue("Processing Locations was not masked", procLoc.equals("Clinic") || nonClinics.contains(procLoc));
+        }
+        List<String> siteNames = vialsTable.getColumnDataAsText("Site Name");
+        siteNames.remove(siteNames.size() - 1); // Skip aggregate row
+        for (String siteName : siteNames)
+        {
+            Assert.assertTrue("Site Name was not masked", siteName.equals("Clinic") || siteName.equals("In Transit"));
+        }
+    }
 
     @Override
     public void runApiTests()
