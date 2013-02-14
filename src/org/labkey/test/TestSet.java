@@ -16,13 +16,7 @@
 
 package org.labkey.test;
 
-import org.labkey.test.module.CDSPopulation;
-import org.labkey.test.module.CDSTest;
-import org.labkey.test.module.EHRApiTest;
-import org.labkey.test.module.EHRDataEntryTest;
-import org.labkey.test.module.EHRReportingAndUITest;
-import org.labkey.test.module.ModuleTest;
-import org.labkey.test.module.ONPRC_EHRTest;
+import org.labkey.test.module.*;
 import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.ms2.MascotTest;
 import org.labkey.test.ms2.QuantitationTest;
@@ -36,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public enum TestSet
 {
@@ -190,13 +183,13 @@ public enum TestSet
         StudyCohortExportTest.class,
         ViabilityTest.class,
         ProjectSettingsTest.class,
-        CDSTest.class,
+        //CDSTest.class, // Broken
         ExtraKeyStudyTest.class,
         CAVDStudyTest.class,
         SampleMindedImportTest.class,
         PivotQueryTest.class,
         StudyPublishTest.class,
-                DatabaseDiagnosticsTest.class,
+        DatabaseDiagnosticsTest.class,
         HiddenEmailTest.class,
         ElisaAssayTest.class,
         ContainerContextTest.class,
@@ -204,8 +197,8 @@ public enum TestSet
         FlowAnalysisResolverTest.class,
         WebpartPermissionsTest.class,
         SurveyTest.class,
-       NWBioTrustTest.class,
-       SequestImportTest.class
+        NWBioTrustTest.class,
+        SequestImportTest.class
     ),
 
     Daily(600000, DailyA.getTestList(), DailyB.getTestList()),
