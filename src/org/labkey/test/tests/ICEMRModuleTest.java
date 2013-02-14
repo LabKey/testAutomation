@@ -218,14 +218,14 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         waitForElement(Locator.name("dailyUpload"));
 
         //Try to upload a form with bad columns
-        setFormElement(Locator.name("dailyUpload"), getLabKeyRoot() + "/sampledata/icemr/missingColumns.xls");
+        setFormElement(Locator.name("dailyUpload"), new File(getLabKeyRoot(), "sampledata/icemr/missingColumns.xls"));
         clickButtonContainingText("Upload", "The data file header row does not match the daily results schema");
         _extHelper.waitForExtDialog("Daily Upload Failed");
         clickButtonContainingText("OK", "Daily Upload");
         _extHelper.waitForExtDialogToDisappear("Daily Upload Failed");
 
         //Try to upload a form with bad flasks (invalid IDs)
-        setFormElement(Locator.name("dailyUpload"), getLabKeyRoot() + "/sampledata/icemr/badFlasks.xls");
+        setFormElement(Locator.name("dailyUpload"), new File(getLabKeyRoot(), "sampledata/icemr/badFlasks.xls"));
         clickButtonContainingText("Upload", "Submit");
         sleep(500);
         clickButtonContainingText("Submit", "Invalid flask specified");
@@ -236,7 +236,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         //Upload test
         refresh();
         waitForText("Daily Upload");
-        setFormElement(Locator.name("dailyUpload"), getLabKeyRoot() + "/sampledata/icemr/dailyUploadFilled.xls");
+        setFormElement(Locator.name("dailyUpload"), new File(getLabKeyRoot(), "sampledata/icemr/dailyUploadFilled.xls"));
         clickButtonContainingText("Upload", "Scientist Name");
         sleep(500);
         clickButton("Submit");
@@ -244,7 +244,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         //Ensure that you can't add flasks if maintenance has been stopped on that flask.
         waitAndClick(link);
         waitForElement(Locator.name("dailyUpload"));
-        setFormElement(Locator.name("dailyUpload"), getLabKeyRoot() + "/sampledata/icemr/dailyUploadFilled.xls");
+        setFormElement(Locator.name("dailyUpload"), new File(getLabKeyRoot(), "sampledata/icemr/dailyUploadFilled.xls"));
         clickButtonContainingText("Upload", "Scientist Name");
         sleep(500);
         clickButtonContainingText("Submit", "Invalid flask specified");
