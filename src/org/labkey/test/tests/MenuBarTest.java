@@ -173,7 +173,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
         _extHelper.clickExtDropDownMenu("userQuery_folderTypes", "Study");
         _extHelper.clickExtButton("Submit");
 
-        clickAndWait(Locator.linkWithText("DemStudyFolder"));
+        waitAndClickAndWait(Locator.linkWithText("DemStudyFolder"));
         assertTextPresent("Demo Study", "Study Overview");
 
         showNavigationBar();
