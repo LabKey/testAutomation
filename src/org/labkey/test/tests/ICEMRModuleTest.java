@@ -43,6 +43,8 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     public static final String DIAGNOSTIC_ASSAY_NAME = "Diagnostics Assay";
     public static final String ADAPTATION_ASSAY_NAME = "Adaptation Assay";
     public static final String FLASKS_SAMPLESET_NAME = "Flasks";
+    public static final String FOLD_INCREASE_DEFAULT = "4";
+    public static final String ADAPTATION_CRITERIA_DEFAULT = "2";
     public static final String FLASK_SAMPLESET_COLS  =
     "Property\tLabel\tRangeURI\tFormat\tNotNull\tHidden\tMvEnabled\tDescription\n" +
     "PatientID\tPatient ID\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
@@ -110,10 +112,11 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void enterDataPoint()
     {
-        Locator.XPathLocator link = Locator.linkContainingText("Upload data");
+        Locator.XPathLocator link = Locator.linkContainingText("Diagnostics Assay");
+        waitAndClick(link);
+        link = Locator.navButtonContainingText("Import Data");
         waitAndClick(link);
         waitForElement(Locator.id("upload-diagnostic-form-body"));
-
         enterData();
     }
 
@@ -121,16 +124,22 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     {
         Locator.XPathLocator link = Locator.linkContainingText("Adaptation Assay");
         waitAndClick(link);
-        link = Locator.navButtonContainingText("Import Data");
+        link = Locator.navButtonContainingText("New Experiment");
         waitAndClick(link);
         waitForElement(Locator.id("SampleID1"));
         enterAdaptationData();
-
     }
 
     private void enterAdaptationData()
     {
-        verifyError(11);
+        verifyError(7);
+
+        // verify our default values for fold increase and adaptation criteria are correct
+        for (int i = 1; i < 4; i++)
+        {
+            assertFormElementEquals(Locator.name("FoldIncrease" + i + "1"), FOLD_INCREASE_DEFAULT);
+        }
+        assertFormElementEquals(Locator.name("AdaptationCriteria1"), ADAPTATION_CRITERIA_DEFAULT);
 
         fieldAndValue = new HashMap<String, String>();
 
@@ -177,15 +186,15 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void makeAdaptationFlask(int flaskNum)
     {
-        verifyError(9);
+        verifyError(5);
 
         fieldAndValue = new HashMap<String, String>();
 
         fieldAndValue.put("SampleID" + flaskNum, "15258");
-        fieldAndValue.put("Scientist"+ flaskNum, "Dr. Helvetica");
-        fieldAndValue.put("Gametocytemia"+ flaskNum, "24");
-        fieldAndValue.put("Hematocrit"+ flaskNum, "28");
-        fieldAndValue.put("Parasitemia"+ flaskNum, "27");
+        fieldAndValue.put("Scientist" + flaskNum, "Dr. Helvetica");
+        fieldAndValue.put("Gametocytemia" + flaskNum, "24");
+        fieldAndValue.put("Hematocrit" + flaskNum, "28");
+        fieldAndValue.put("Parasitemia" + flaskNum, "27");
         fieldAndValue.put("SerumBatchID"+ flaskNum, "00123");
         fieldAndValue.put("AlbumaxBatchID"+ flaskNum, "10213");
         fieldAndValue.put("FoldIncrease1"+ flaskNum, "12");
@@ -204,7 +213,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     private void enterDailyAdaptationData(){
 
         //Navigate to Daily Upload page
-        Locator.XPathLocator link = Locator.xpath("//a[@class='labkey-text-link' and text()='edit']");
+        Locator.XPathLocator link = Locator.linkContainingText("Daily Maintenance");
         waitAndClick(link);
         waitForElement(Locator.name("dailyUpload"));
 
@@ -319,7 +328,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void createAdaptationAssay()
     {
-        _assayHelper.createAssayWithEditableRunFields(ADAPTATION_ASSAY_DESIGN, ADAPTATION_ASSAY_NAME);
+        _assayHelper.createAssayWithDefaults(ADAPTATION_ASSAY_DESIGN, ADAPTATION_ASSAY_NAME);
     }
     private void createFlasksSampleSet()
     {
