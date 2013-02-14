@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.Ext4Helper;
@@ -26,7 +25,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.*;
+import org.labkey.test.util.ExcelHelper;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -215,6 +219,8 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         //Navigate to Daily Upload page
         Locator.XPathLocator link = Locator.linkContainingText("Daily Maintenance");
         waitAndClick(link);
+
+        checkTemplate();
         waitForElement(Locator.name("dailyUpload"));
 
         //Try to upload a form with bad columns
@@ -252,6 +258,56 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         clickButtonContainingText("OK", "Result");
         _extHelper.waitForExtDialogToDisappear("Daily Maintenance Error");
         clickButton("Cancel");
+    }
+
+    private void checkTemplate(){
+        waitForElement(Locator.name("dailyUpload"));
+        clickButtonContainingText("Get Template", "Daily Upload");
+        File downloadDir = new File(ensureDumpDir(), "downloads");
+        File templateFile = new File(downloadDir.getAbsolutePath() + "/dailyUpload.xls");
+        try{
+            Workbook template = ExcelHelper.create(templateFile);
+            Sheet sheet = template.getSheetAt(0);
+            //Warnings about possible null pointers can be ignored, as all cells in question are tested for null before loading them.
+            if(sheet != null){
+                for(int i = 0; i < 18; i++)
+                {
+                    Assert.assertNotNull(ExcelHelper.getCell(sheet, i, 0));
+                }
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 0, 0).toString(), "SampleID");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 1, 0).toString(), "MeasurementDate");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 2, 0).toString(), "Scientist");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 3, 0).toString(), "Parasitemia");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 4, 0).toString(), "Gametocytemia");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 5, 0).toString(), "Stage");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 6, 0).toString(), "Removed");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 7, 0).toString(), "RBCBatchID");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 8, 0).toString(), "SerumBatchID");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 9, 0).toString(), "AlbumaxBatchID");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 10, 0).toString(), "GrowthFoldTestInitiated");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 11, 0).toString(), "GrowthFoldTestFinished");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 12, 0).toString(), "Contamination");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 13, 0).toString(), "MycoTestResult");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 14, 0).toString(), "FreezerProIDs");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 15, 0).toString(), "FlaskMaintenanceStopped");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 16, 0).toString(), "InterestingResult");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 17, 0).toString(), "Comments");
+
+
+                Assert.assertNotNull(ExcelHelper.getCell(sheet, 0, 1));
+                Assert.assertNotNull(ExcelHelper.getCell(sheet, 0, 2));
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 0, 1).toString(), "15243");
+                Assert.assertEquals(ExcelHelper.getCell(sheet, 0, 2).toString(), "15258");
+            }
+        }
+        catch (IOException e)
+        {
+            Assert.fail("IOException creating the template file");
+        }
+        catch (InvalidFormatException e)
+        {
+            Assert.fail("Template file has invalid format.");
+        }
     }
 
     private void checkResultsPage(){

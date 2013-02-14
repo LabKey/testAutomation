@@ -273,10 +273,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             profile.setPreference("extensions.update.enabled", false);
 
             profile.setPreference("browser.download.folderList", 2);
-            profile.setPreference("browser.download.useDownloadDir", false);
             profile.setPreference("browser.download.downloadDir", _downloadDir.getAbsolutePath());
             profile.setPreference("browser.download.dir", _downloadDir.getAbsolutePath());
-            profile.setPreference("browser.helperApps.alwaysAsk.force", "False");
+            profile.setPreference("browser.helperApps.alwaysAsk.force", false);
+            profile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/vnd.ms-excel");
             profile.setPreference("browser.download.manager.showWhenStarting",false);
             if (enableScriptCheck())
             {
