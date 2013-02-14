@@ -104,7 +104,7 @@ public class ComplianceTrainingTest extends BaseWebDriverTest implements Advance
 
     private DataRegionTable getDataRegion(int idx)
     {
-        Locator.XPathLocator form = (Locator.XPathLocator)Locator.xpath("//form[./table[starts-with(@id, 'dataregion_')]]").index(idx);
+        Locator.XPathLocator form = (Locator.XPathLocator)Locator.xpath("//form[div/table[starts-with(@id, 'dataregion_')]]").index(idx);
         waitForElement(form);
         String id = getAttribute(form, "id");
         return new DataRegionTable(id, this);
