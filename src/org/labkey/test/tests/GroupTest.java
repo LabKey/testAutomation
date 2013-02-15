@@ -303,7 +303,8 @@ public class GroupTest extends BaseWebDriverTest
 
         waitForText("Can't add a system group to another group");
         clickButton("OK", 0);
-        clickButton("Done");
+        clickButton("Done", 0);
+        clickButton("Save and Finish");
     }
 
     @LogMethod
