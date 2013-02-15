@@ -5129,7 +5129,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         int zIndex;
         while (!el.isDisplayed() && i < 5 )
         {
-            zIndex = Integer.parseInt(el.getCssValue("z-index")) * i++;
+            try
+            {
+                zIndex = Integer.parseInt(el.getCssValue("z-index")) * i++;
+            }
+            catch (NumberFormatException ignore)
+            {
+                zIndex = i * 2;
+            }
+            // Ext file inputs are often hidden; force them forward so WebDriver can interact with them
             executeScript("arguments[0].style.zIndex = arguments[1];", el, zIndex); // force element to the front
         }
         setFormElement(loc, file.getAbsolutePath());
