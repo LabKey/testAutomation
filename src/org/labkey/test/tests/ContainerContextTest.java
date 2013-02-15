@@ -15,10 +15,15 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.query.DeleteRowsCommand;
+import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -31,7 +36,10 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.WorkbookHelper;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +50,10 @@ public class ContainerContextTest extends BaseWebDriverTest
 
     private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
+
+    private static final String COLOR = "Red";
+    private static final String MANUFACTURER = "Toyota";
+    private static final String MODEL = "Prius C";
 
     @Override
     protected boolean isFileUploadTest()
@@ -64,6 +76,8 @@ public class ContainerContextTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
+        if (afterTest)
+            deleteVehicleRecords();
         deleteProject(getProjectName(), afterTest);
     }
 
@@ -85,7 +99,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         rReportHelperWD.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), null);
-        enableModule(getProjectName(), "Laboratory");
+        enableModule(getProjectName(), "simpletest");
         addWebPart("Workbooks");
 
         createSubfolder(getProjectName(), SUB_FOLDER_A, new String[] {"List", "Study", "ViscStudies"});
@@ -266,126 +280,123 @@ public class ContainerContextTest extends BaseWebDriverTest
     @LogMethod
     protected void doTestSimpleModuleTables() throws Exception
     {
-        log("** Inserting data into labratory.samples table...");
-        int max = 3;
+        log("** Creating required vehicle schema records...");
+        int vehicleId = createRequiredRecords();
 
+        log("** Inserting data into vehicle.emissiontest table...");
         String[] workbookIds = new String[3];
-        String[] sampleIds = new String[3];
-        String[] parentSampleIds = new String[3];
-        Map<String, String> sampleIdToWorkbookId = new HashMap<String, String>();
+
+        String[] emissionIds = new String[3];
+        String[] parentRowIds = new String[3];
+        Map<String, String> rowIdToWorkbookId = new HashMap<String, String>();
+        WorkbookHelper workbookHelper = new WorkbookHelper(this);
+        int max = 3;
         for (int i = 0; i < max; i++)
         {
             String workbookName = "Workbook" + i;
-            LabModuleHelper labModuleHelper = new LabModuleHelper(this);
             goToProjectHome();
-            String id = labModuleHelper.createWorkbook(workbookName, "Description", false);
+
+            String id = workbookHelper.createWorkbook(getProjectName(), workbookName, "Description", WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK);
             workbookIds[i] = id;
-            parentSampleIds[i] = i > 0 ? sampleIds[i-1] : null;
-            sampleIds[i] = insertLabSample(id, String.valueOf(i), parentSampleIds[i]);
-            sampleIdToWorkbookId.put(sampleIds[i], workbookIds[i]);
+            parentRowIds[i] = i > 0 ? emissionIds[i-1] : null;
+            emissionIds[i] = insertEmissionTest(workbookIds[i], String.valueOf(i), vehicleId, parentRowIds[i]);
+            rowIdToWorkbookId.put(emissionIds[i], workbookIds[i]);
         }
-//        log(" ** For running against this data repeatedly without having to re-rcreate the folders: ");
-//        log("String[] workbookIds = new String[] { \"" + StringUtils.join(workbookIds, "\", \"") + "\" };");
-//        log("String[] sampleIds = new String[] { \"" + StringUtils.join(sampleIds, "\", \"") + "\" };");
-//        log("String[] parentSampleIds = new String[] { \"" + StringUtils.join(parentSampleIds, "\", \"") + "\" };");
-//        log("Map<String, String> sampleIdToWorkbookId = new HashMap<String, String>();");
-//        for (int i = 0; i < max; i++)
-//            log("sampleIdToWorkbookId.put(\"" + sampleIds[i] + "\", \"" + workbookIds[i] + "\");");
 
-
-        //the default view lacks the container column
-        verifySimpleModuleTables("Samples", "recordDetails.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, true);
+        log("** Checking default case, which includes the container column...");
+        verifySimpleModuleTables("EmissionTest", "detailsQueryRow.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, true, true, vehicleId);
 
         // Verify Issue 16243: Details URL creating URLs with null container unless the container column is actually added to current view
-        log("** Adding container column and rehecking lookup URLs...");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=laboratory&query.queryName=samples&query.sort=RowId");
-
-        verifySimpleModuleTables("Samples", "recordDetails.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, true, true);
-
         log("** Removing container column and rehecking lookup URLs...");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=laboratory&query.queryName=samples&query.sort=RowId");
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=EmissionTest&query.sort=RowId");
+        CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
+        cv.openCustomizeViewPanel();
+        cv.showHiddenItems();
+        cv.removeCustomizeViewColumn("Container");
+        cv.applyCustomView();
+
+        verifySimpleModuleTables("EmissionTest", "detailsQueryRow.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, true, vehicleId);
+
+        cv.openCustomizeViewPanel();
+        cv.revertUnsavedView();
+
 
         log("** Override detailsURL in metadata...");
         String customMetadata =
                 "<ns:tables xmlns:ns=\"http://labkey.org/data/xml\">\n" +
-                "  <ns:table tableName=\"CustomSamples\" tableDbType=\"TABLE\" useColumnOrder=\"true\">\n" +
-                "    <ns:tableTitle>Custom Samples</ns:tableTitle>\n" +
+                "  <ns:table tableName=\"CustomQuery\" tableDbType=\"TABLE\" useColumnOrder=\"true\">\n" +
+                "    <ns:tableTitle>Custom Query</ns:tableTitle>\n" +
                 "    <!--<ns:javaCustomizer>org.labkey.ldk.query.BuiltInColumnsCustomizer</ns:javaCustomizer>-->\n" +
                 "    <ns:titleColumn>rowid</ns:titleColumn>\n" +
-                "    <ns:updateUrl>/query/manageRecord.view?schemaName=laboratory&amp;query.queryName=samples&amp;keyField=rowid&amp;key=${rowid}</ns:updateUrl>\n" +
-                "    <ns:tableUrl>/query/XXX.view?schemaName=laboratory&amp;query.queryName=samples&amp;keyField=rowid&amp;key=${rowid}</ns:tableUrl>\n" +
+                "    <ns:updateUrl>/query/updateQueryRow.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}</ns:updateUrl>\n" +
+                "    <ns:tableUrl>/query/XXX.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}</ns:tableUrl>\n" +
                 "    <ns:insertUrl></ns:insertUrl>\n" +
-                "    <ns:importUrl>/query/importData.view?schemaName=laboratory&amp;query.queryName=samples&amp;keyField=rowid&amp;key=${rowid}&amp;query.columns=*</ns:importUrl>\n" +
+                "    <ns:importUrl>/query/importData.view?schemaName=vehicle&amp;query.queryName=EmissionTest&amp;RowId=${rowid}&amp;query.columns=*</ns:importUrl>\n" +
                 "  </ns:table>\n" +
                 "</ns:tables>";
 
-        overrideMetadata(getProjectName(), "laboratory", "Samples", customMetadata);
-        verifySimpleModuleTables("Samples", "XXX.view", "XXX.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, true);
-        removeMetadata(getProjectName(), "laboratory", "Samples");
-
+        overrideMetadata(getProjectName(), "vehicle", "EmissionTest", customMetadata);
+        verifySimpleModuleTables("EmissionTest", "XXX.view", "XXX.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, true, vehicleId);
+        removeMetadata(getProjectName(), "vehicle", "EmissionTest");
         
-        log("** Create custom query with custom metadata over laboratory.samples table WITH container");
+        log("** Create custom query with custom metadata over vehicle.emissiontest table WITH container");
         String customQueryWithContainer =
-                "SELECT samples.rowid,\n" +
-                "samples.samplename,\n" +
-                "samples.subjectid,\n" +
-                "samples.sampletype,\n" +
-                "samples.samplesource,\n" +
-                "samples.parentsample,\n" +
-                "samples.container\n" +
-                "FROM samples";
+                "SELECT emissiontest.rowid,\n" +
+                    "emissiontest.name,\n" +
+                    "emissiontest.vehicleid,\n" +
+                    "emissiontest.result,\n" +
+                    "emissiontest.parenttest,\n" +
+                    "emissiontest.container\n" +
+                "FROM emissiontest";
 
-        createQuery(getProjectName(), "Samples With Container", "laboratory", customQueryWithContainer, customMetadata, false);
-        verifySimpleModuleTables("Samples With Container", "XXX.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, true, false);
+        createQuery(getProjectName(), "EmissionTests With Container", "vehicle", customQueryWithContainer, customMetadata, false);
+        verifySimpleModuleTables("EmissionTests With Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, true, false, vehicleId);
 
 
-        log("** Create custom query with custom metadata over laboratory.samples table WITH container AS folder");
+        log("** Create custom query with custom metadata over vehicle.emissiontest table WITH container AS folder");
         String customQueryFolderContainer =
-                "SELECT samples.rowid,\n" +
-                "samples.samplename,\n" +
-                "samples.subjectid,\n" +
-                "samples.sampletype,\n" +
-                "samples.samplesource,\n" +
-                "samples.parentsample,\n" +
-                "samples.container AS folder\n" +
-                "FROM samples";
+                "SELECT emissiontest.rowid,\n" +
+                    "emissiontest.name,\n" +
+                    "emissiontest.vehicleid,\n" +
+                    "emissiontest.result,\n" +
+                    "emissiontest.parenttest,\n" +
+                    "emissiontest.container AS folder\n" +
+                "FROM emissiontest";
 
-        createQuery(getProjectName(), "Samples With Folder", "laboratory", customQueryFolderContainer, customMetadata, false);
-        verifySimpleModuleTables("Samples With Folder", "XXX.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, false);
+        createQuery(getProjectName(), "EmissionTests With Folder", "vehicle", customQueryFolderContainer, customMetadata, false);
+        verifySimpleModuleTables("EmissionTests With Folder", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false, vehicleId);
 
 
         // Container context won't work if the container column is named something other than container or folder.
         /*
-        log("** Create custom query with custom metadata over laboratory.samples table WITH RENAMED container");
+        log("** Create custom query with custom metadata over vehicle.emissiontest table WITH RENAMED container");
         String customQueryXXXContainer =
-                "SELECT samples.rowid,\n" +
-                "samples.samplename,\n" +
-                "samples.subjectid,\n" +
-                "samples.sampletype,\n" +
-                "samples.samplesource,\n" +
-                "samples.parentsample,\n" +
-                "samples.container AS XXX\n" +
-                "FROM samples";
+                "SELECT emissiontest.rowid,\n" +
+                "emissiontest.name,\n" +
+                "emissiontest.vehicleid,\n" +
+                "emissiontest.result,\n" +
+                "emissiontest.parenttest,\n" +
+                "emissiontest.container AS XXX\n" +
+                "FROM emissiontest";
 
-        createQuery(getProjectName(), "Samples XXX Container", "laboratory", customQueryXXXContainer, customMetadata, false);
-        verifySimpleModuleTables("Samples XXX Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, false);
+        createQuery(getProjectName(), "EmissionTests XXX Container", "vehicle", customQueryXXXContainer, customMetadata, false);
+        verifySimpleModuleTables("EmissionTests XXX Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false);
         */
 
 
-        log("** Create custom query with custom metadata over laboratory.samples table WITHOUT container.");
+        log("** Create custom query with custom metadata over vehicle.emissiontest table WITHOUT container.");
         log("** The container column should be added as a suggested column.");
         String customQueryWithoutContainer =
-                "SELECT samples.rowid,\n" +
-                "samples.samplename,\n" +
-                "samples.subjectid,\n" +
-                "samples.sampletype,\n" +
-                "samples.samplesource,\n" +
-                "samples.parentsample\n" +
-                "--samples.container\n" +
-                "FROM samples";
+                "SELECT emissiontest.rowid,\n" +
+                    "emissiontest.name,\n" +
+                    "emissiontest.vehicleid,\n" +
+                    "emissiontest.result,\n" +
+                    "emissiontest.parenttest,\n" +
+                    "--emissiontest.container\n" +
+                "FROM emissiontest";
 
-        createQuery(getProjectName(), "Samples Without Container", "laboratory", customQueryWithoutContainer, customMetadata, false);
-        verifySimpleModuleTables("Samples Without Container", "XXX.view", "recordDetails.view", max, workbookIds, sampleIds, parentSampleIds, sampleIdToWorkbookId, false, false);
+        createQuery(getProjectName(), "EmissionTests Without Container", "vehicle", customQueryWithoutContainer, customMetadata, false);
+        verifySimpleModuleTables("EmissionTests Without Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false, vehicleId);
     }
 
     private void deleteQuery(String container, String schemaName, String queryName)
@@ -428,14 +439,15 @@ public class ContainerContextTest extends BaseWebDriverTest
             String parentDetailsAction,
             int max,
             String[] workbookIds,
-            String[] sampleIds,
-            String[] parentSampleIds,
-            Map<String, String> sampleIdToWorkbookId,
+            String[] emissionIds,
+            String[] parentRowIds,
+            Map<String, String> rowIdToWorkbookId,
             boolean hasContainer,
-            boolean hasUpdate)
+            boolean hasUpdate,
+            int vehicleId)
     {
         log("** Checking containers on lookup URLs for '" + queryName + "'");
-        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=laboratory&query.queryName=" + queryName + "&query.sort=RowId");
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=" + queryName + "&query.sort=RowId");
 
         DataRegionTable dr = new DataRegionTable("query", this);
         boolean shouldRevert = false;
@@ -451,7 +463,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             {
                 href = dr.getUpdateHref(i);
                 log("  [edit] column href = " + href);
-                expectedHref = "/query/" + workbookContainer + "/manageRecord.view?schemaName=laboratory&query.queryName=samples&keyField=rowid&key=" + sampleIds[i];
+                expectedHref = "/query/" + workbookContainer + "/updateQueryRow.view?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
                 Assert.assertTrue("Expected and actual [edit] links differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual  : " + href,
@@ -459,90 +471,48 @@ public class ContainerContextTest extends BaseWebDriverTest
             }
 
             // details link
-            href = dr.getDetailsHref(i);
-            log("  [details] column href = " + href);
-            expectedHref = "/query/" + workbookContainer + "/" + detailsAction;
-            Assert.assertTrue("Expected and actual [details] links differ:\n" +
-                    "Expected: " + expectedHref + "\n" +
-                    "Actual:   " + href,
-                    href.contains(expectedHref));
+            if (detailsAction != null)
+            {
+                href = dr.getDetailsHref(i);
+                log("  [details] column href = " + href);
+                expectedHref = "/query/" + workbookContainer + "/" + detailsAction + "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
+                Assert.assertTrue("Expected and actual [details] links differ:\n" +
+                        "Expected: " + expectedHref + "\n" +
+                        "Actual:   " + href,
+                        href.contains(expectedHref));
+            }
 
-            // sample ID link
-            href = dr.getHref(i, "Sample Id");
-            log("  Sample Id column href = " + href);
-            expectedHref = "/query/" + workbookContainer + "/" + detailsAction + "?schemaName=laboratory&query.queryName=samples&keyField=rowid&key=" + sampleIds[i];
-            Assert.assertTrue("Expected and actual Sample Id column URL differ:\n" +
+            // vehicle link
+            href = dr.getHref(i, "Vehicle Id");
+            log("  Vehicle column href = " + href);
+            expectedHref = "/simpletest/" + getProjectName() + "/vehicle.view?rowid=" + vehicleId;
+            Assert.assertTrue("Expected and actual Vehicle column URL differ:\n" +
                     "Expected: " + expectedHref + "\n" +
                     "Actual:   " + href,
                     href.contains(expectedHref));
 
             // parent sample ID link (table has a container so URL should go to lookup's container)
-            if (parentSampleIds[i] != null && !parentSampleIds[i].equals(""))
+            if (parentRowIds[i] != null && !parentRowIds[i].equals("") && parentDetailsAction != null)
             {
-                String parentSampleWorkbookId = sampleIdToWorkbookId.get(parentSampleIds[i]);
-                String parentSampleContainer = EscapeUtil.encode(getProjectName()) + "/workbook-" + parentSampleWorkbookId;
-                expectedHref = "/query/" + parentSampleContainer + "/" + parentDetailsAction + "?schemaName=laboratory&query.queryName=samples&keyField=rowid&key=" + parentSampleIds[i];
+                String parentTestWorkbookId = rowIdToWorkbookId.get(parentRowIds[i]);
+                String parentTestContainer = EscapeUtil.encode(getProjectName()) + "/workbook-" + parentTestWorkbookId;
+                expectedHref = "/query/" + parentTestContainer + "/" + parentDetailsAction + "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + parentRowIds[i];
 
-                href = dr.getHref(i, "Parent Sample");
-                if (href == null)
-                {
-                    log(" adding parent sample column to current view");
-                    CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
-                    cv.openCustomizeViewPanel();
-                    cv.showHiddenItems();
-                    cv.addCustomizeViewColumn("parentsample");
-                    cv.applyCustomView();
-                    shouldRevert = true;
-
-                    href = dr.getHref(i, "Parent Sample");
-                }
-
+                href = dr.getHref(i, "Parent Test");
                 if (href != null)
                 {
-                    log("  Parent Sample column href = " + href);
-                    Assert.assertTrue("Expected and actual parent sample column URL differ:\n" +
+                    log("  Parent test column href = " + href);
+                    Assert.assertTrue("Expected and actual parent test column URL differ:\n" +
                             "Expected: " + expectedHref + "\n" +
                             "Actual:   " + href,
                             href.contains(expectedHref));
                 }
             }
 
-            // sample source lookup (table has no container so URL should go to current container)
-            href = dr.getHref(i, "Sample Source");
-            log("  Sample Source column href = " + href);
-            expectedHref = "/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type";
-            Assert.assertTrue("Expected and actual sample source column URL differ:\n" +
-                    "Expected container: " + getProjectName() + "\n" +
-                    "Actual URL        : " + href,
-                    href.contains(expectedHref));
-
-            // sample type lookup (table has no container so URL should go to current container)
-            href = dr.getHref(i, "Sample Type");
-            log("  Sample Type column href = " + href);
-            expectedHref = "/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type";
-            Assert.assertTrue("Expected and actual sample type column URL differ:\n" +
-                    "Expected container: " + getProjectName() + "\n" +
-                    "Actual URL:         " + href,
-                    href.contains(expectedHref));
-
             // container column
             if (hasContainer)
             {
                 href = dr.getHref(i, "Folder");
-
-                //if we URL is found, the column isnt being displayed, so we add it
-                if (href == null)
-                {
-                    log(" adding container column to current view");
-                    CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
-                    cv.openCustomizeViewPanel();
-                    cv.showHiddenItems();
-                    cv.addCustomizeViewColumn("container");
-                    cv.applyCustomView();
-                    shouldRevert = true;
-
-                    href = dr.getHref(i, "Folder");
-                }
 
                 log("  Folder column href = " + href);
                 expectedHref = "/project/" + workbookContainer + "/begin.view?";
@@ -566,20 +536,21 @@ public class ContainerContextTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private String insertLabSample(String workbookId, String suffix, String parentSampleId)
+    private String insertEmissionTest(String workbookId, String suffix, int vehicleId, String parentRowId)
     {
         try
         {
             Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
-            InsertRowsCommand insertCmd = new InsertRowsCommand("laboratory", "samples");
-            Map<String,Object> rowMap = new HashMap<String,Object>();
-            rowMap.put("samplename", "Sample" + suffix);
-            rowMap.put("freezer", "Freezer" + suffix);
-            rowMap.put("sampletype", "DNA");
-            rowMap.put("samplesource", "PBMC");
-            if (parentSampleId != null)
-                rowMap.put("parentsample", parentSampleId);
+            InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "EmissionTest");
+            Map<String, Object> rowMap = new HashMap<String,Object>();
+            rowMap.put("name", "EmissionTest" + suffix);
+            rowMap.put("vehicleId", vehicleId);
+
+            if (parentRowId != null)
+                rowMap.put("ParentTest", parentRowId);
+
+            rowMap.put("result", false);
 
             insertCmd.addRow(rowMap);
             SaveRowsResponse response = insertCmd.execute(cn, getProjectName() + "/workbook-" + workbookId);
@@ -591,5 +562,127 @@ public class ContainerContextTest extends BaseWebDriverTest
         {
             throw new RuntimeException(e);
         }
+    }
+
+    @LogMethod
+    private void deleteVehicleRecords()
+    {
+        try
+        {
+            log("deleting records from vehicle schema that may have been created by this test");
+            Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+            SelectRowsCommand sr0 = new SelectRowsCommand("vehicle", "EmissionTest");
+            SelectRowsResponse resp0 = sr0.execute(cn, getProjectName());
+
+            if (resp0.getRowCount().intValue() > 0)
+            {
+                DeleteRowsCommand del = new DeleteRowsCommand("vehicle", "EmissionTest");
+                for (Map<String, Object> row : resp0.getRows())
+                {
+                    del.addRow(row);
+                }
+                del.execute(cn, getProjectName());
+            }
+
+            SelectRowsCommand sr1 = new SelectRowsCommand("vehicle", "vehicles");
+            SelectRowsResponse resp1 = sr1.execute(cn, getProjectName());
+
+            if (resp1.getRowCount().intValue() > 0)
+            {
+                DeleteRowsCommand del = new DeleteRowsCommand("vehicle", "vehicles");
+                for (Map<String, Object> row : resp1.getRows())
+                {
+                    del.addRow(row);
+                }
+                del.execute(cn, getProjectName());
+            }
+
+            SelectRowsCommand sr2 = new SelectRowsCommand("vehicle", "models");
+            sr2.addFilter(new Filter("name", MODEL));
+            SelectRowsResponse resp2 = sr2.execute(cn, getProjectName());
+
+            if (resp2.getRowCount().intValue() > 0)
+            {
+                DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "models");
+                del2.addRow(Maps.<String, Object>of("rowid", resp2.getRows().get(0).get("rowid")));
+                del2.execute(cn, getProjectName());
+            }
+
+            SelectRowsCommand sr = new SelectRowsCommand("vehicle", "manufacturers");
+            sr.addFilter(new Filter("name", MANUFACTURER));
+            SelectRowsResponse resp = sr.execute(cn, getProjectName());
+
+            if (resp.getRowCount().intValue() > 0)
+            {
+                DeleteRowsCommand del1 = new DeleteRowsCommand("vehicle", "manufacturers");
+                del1.addRow(Maps.<String, Object>of("rowid", resp.getRows().get(0).get("rowid")));
+                del1.execute(cn, getProjectName());
+            }
+
+            DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "colors");
+            del2.addRow(Maps.<String, Object>of("name", COLOR + "!"));
+            del2.execute(cn, getProjectName());
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @LogMethod
+    private int createRequiredRecords()
+    {
+        try
+        {
+            deleteVehicleRecords();  //schema should be enabled, so dont ignore exceptions
+
+            Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+            //look like we need to create this too
+            InsertRowsCommand insertCmd0 = new InsertRowsCommand("vehicle", "colors");
+            insertCmd0.addRow(Maps.<String, Object>of("Name", COLOR, "Hex", "#FF0000"));
+            insertCmd0.execute(cn, getProjectName());
+
+            //then create manufacturer
+            InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
+            Map<String,Object> rowMap = new HashMap<String,Object>();
+            rowMap.put("name", MANUFACTURER);
+            insertCmd.addRow(rowMap);
+            SaveRowsResponse resp1 = insertCmd.execute(cn, getProjectName());
+
+            //then create model
+            InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
+            rowMap = new HashMap<String,Object>();
+            rowMap.put("manufacturerId",  resp1.getRows().get(0).get("rowid"));
+            rowMap.put("name", MODEL);
+            insertCmd2.addRow(rowMap);
+            SaveRowsResponse resp2 = insertCmd2.execute(cn, getProjectName());
+
+            InsertRowsCommand insertCmd3 = new InsertRowsCommand("vehicle", "vehicles");
+            rowMap = new HashMap<String,Object>();
+            rowMap.put("Color", COLOR + "!");
+            rowMap.put("ModelId", resp2.getRows().get(0).get("rowid"));
+            rowMap.put("ModelYear", 2050);
+            rowMap.put("Milage", 2);
+            rowMap.put("LastService", new Date());
+
+            insertCmd3.addRow(rowMap);
+            SaveRowsResponse response = insertCmd3.execute(cn, getProjectName());
+
+            Map<String, Object> row = response.getRows().get(0);
+            Long rowId = (Long)row.get("RowId");
+            return rowId.intValue();
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected void checkQueries()
+    {
+        //simplemodule has queries for list we didnt import
     }
 }

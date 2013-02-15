@@ -172,4 +172,44 @@
     </ns:columns>
   </ns:table>
 
+  <ns:table tableName="EmissionTest" tableDbType="TABLE">
+    <ns:pkColumnName>RowId</ns:pkColumnName>
+    <ns:auditLogging>SUMMARY</ns:auditLogging>
+    <ns:columns>
+      <ns:column columnName="RowId">
+        <ns:datatype>serial</ns:datatype>
+        <ns:isAutoInc>true</ns:isAutoInc>
+        <ns:scale>10</ns:scale>
+        <ns:nullable>false</ns:nullable>
+        <ns:isReadOnly>true</ns:isReadOnly>
+        <ns:isKeyField>true</ns:isKeyField>
+        <ns:isHidden>false</ns:isHidden>
+      </ns:column>
+      <ns:column columnName="Name">
+
+      </ns:column>
+      <ns:column columnName="Container">
+        <ns:isUserEditable>false</ns:isUserEditable>
+        <ns:datatype>entityid</ns:datatype>
+        <ns:isHidden>false</ns:isHidden>
+      </ns:column>
+      <ns:column columnName="ParentTest">
+        <ns:columnTitle>Parent Test</ns:columnTitle>
+        <ns:fk>
+          <ns:fkColumnName>RowId</ns:fkColumnName>
+          <ns:fkTable>EmissionTest</ns:fkTable>
+          <ns:fkDbSchema>vehicle</ns:fkDbSchema>
+        </ns:fk>
+      </ns:column>
+      <ns:column columnName="VehicleId">
+        <ns:fk>
+          <ns:fkColumnName>RowId</ns:fkColumnName>
+          <ns:fkTable>Vehicles</ns:fkTable>
+          <ns:fkDbSchema>vehicle</ns:fkDbSchema>
+        </ns:fk>
+      </ns:column>
+      <ns:column columnName="Result">
+      </ns:column>
+    </ns:columns>
+  </ns:table>
 </ns:tables>

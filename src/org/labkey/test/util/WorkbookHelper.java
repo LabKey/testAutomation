@@ -19,6 +19,8 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
+import java.net.URISyntaxException;
+
 /**
  * User: tchadick
  * Date: 12/18/12
@@ -38,7 +40,7 @@ public class WorkbookHelper extends AbstractHelperWD
      * @param description Description of created workbook
      * @param folderType Type of created workbook
      */
-    public void createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
+    public String createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
     {
         _test.clickFolder(project);
         _test.clickButton("Insert New");
@@ -49,6 +51,18 @@ public class WorkbookHelper extends AbstractHelperWD
 
         _test.clickButton("Create Workbook");
         _test.waitForElement(Locator.css(".wb-name"));
+
+        try
+        {
+            String path = _test.getURL().toURI().getPath();
+            path = path.replaceAll(".*/workbook-", "");
+            path = path.replaceAll("/begin.view", "");
+            return path;
+        }
+        catch (URISyntaxException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
 
