@@ -54,7 +54,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
      * Sets up the data pipeline for the specified project. This can be called from any page.
      * @param project name of project for which the pipeline should be setup
      */
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void setupPipeline(String project)
     {
         log("Setting up data pipeline for project " + project);
@@ -92,7 +92,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
      *  - if the target study was set to a folder where the PI does not have editor perms, the system will
      *     warn the PI of this when publishing and force the PI to select one in which the PI does have editor perms.
      */
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void setupEnvironment()
     {
         //create a new project for the security tests

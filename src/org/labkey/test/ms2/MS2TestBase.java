@@ -19,6 +19,7 @@ package org.labkey.test.ms2;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 

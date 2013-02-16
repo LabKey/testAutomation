@@ -125,7 +125,7 @@ public class ReportTest extends StudyBaseTest
         super.doCleanup(afterTest);
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doCreateSteps()
     {
         enableEmailRecorder();
@@ -151,7 +151,7 @@ public class ReportTest extends StudyBaseTest
         setDemographicsBit("DEM-1: Demographics", false);
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
         doParticipantGroupCategoriesTest();

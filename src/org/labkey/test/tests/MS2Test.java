@@ -23,6 +23,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.ms2.MS2TestBase;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.util.HashMap;
@@ -93,6 +94,13 @@ public class MS2Test extends MS2TestBase
 
     protected void goTestIt(String testFile1, String testFile2)
     {
+        setupMS2(testFile1);
+        verifyMS2(testFile1, testFile2);
+    }
+
+    @LogMethod(category = LogMethod.MethodType.SETUP)
+    protected void setupMS2(String testFile1)
+    {
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
@@ -126,7 +134,11 @@ public class MS2Test extends MS2TestBase
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         assertElementPresent(Locator.linkWithSpan("MS2 Runs"));
         assertLinkPresentContainingText(SAMPLE_BASE_NAME);
+    }
 
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    protected void verifyMS2(String testFile1, String testFile2)
+    {
         log("Verify run view.");
         clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
 
@@ -822,7 +834,7 @@ public class MS2Test extends MS2TestBase
         selectImportDataAction("Import Experiment");
 
         log("Verify upload finished.");
-        seconds = 0;
+        int seconds = 0;
         clickAndWait(Locator.linkWithText("Data Pipeline"));
         while (countLinksWithText("COMPLETE") < 2 && seconds++ < MAX_WAIT_SECONDS)
         {

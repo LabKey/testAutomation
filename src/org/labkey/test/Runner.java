@@ -33,6 +33,8 @@ import org.labkey.test.util.Crawler;
 import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.MethodPerfAspect;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.AdvancedSqlTest;
@@ -56,6 +58,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -280,6 +283,7 @@ public class Runner extends TestSuite
 
         long testTimeMs = System.currentTimeMillis() - startTimeMs;
         saveTestDuration(test, testTimeMs);
+        MethodPerfAspect.savePerfStats(test);
 
         if (_remainingTests.isEmpty())
         {
@@ -544,6 +548,15 @@ public class Runner extends TestSuite
             testName = testName.substring(testName.lastIndexOf('.') + 1);
 
             System.out.println(getFixedWidthString(testName, durationAndPercent, width));
+
+            HashMap<LogMethod.MethodType, Long> perfStats = MethodPerfAspect.getPerfStats(testName);
+            Iterator it = perfStats.entrySet().iterator();
+            while (it.hasNext())
+            {
+                Map.Entry<LogMethod.MethodType, Long> stats = (Map.Entry)it.next();
+                System.out.println("\t" + stats.getKey() + "\t" + formatDuration(stats.getValue()));
+            }
+
             if (Crawler.getCrawlStats().containsKey(testName))
             {
                 crawl = true;

@@ -31,6 +31,11 @@ public class TestLogger
 
     private static final int MAX_INDENT = 20;
 
+    public static void resetIndent()
+    {
+        currentIndent = 0;
+    }
+
     public static void increaseIndent()
     {
         currentIndent += indentStep;

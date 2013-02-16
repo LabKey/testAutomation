@@ -58,7 +58,7 @@ public class StudyRedesignTest extends StudyBaseTest
                                            "999320036","999320038", "999321033", "999321029", "999320981"};
     private static final String REFRESH_DATE = "2012-03-01";
 
-    @Override @LogMethod
+    @Override @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doCreateSteps()
     {
         RReportHelper _rReportHelper = new RReportHelper(this);
@@ -91,7 +91,7 @@ public class StudyRedesignTest extends StudyBaseTest
 //        clickButton("Save & Finish");
     }
 
-    @Override @LogMethod
+    @Override @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
         customizeTabsTest();

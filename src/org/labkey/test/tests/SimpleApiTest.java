@@ -33,6 +33,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.JSONHelper;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,6 +78,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
 
     }
 
+    @LogMethod
     protected final void doTestSteps() throws Exception
     {
         ensureConfigured();
@@ -92,6 +94,7 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         runApiTests(getTestFiles(), null, null, false);
     }
 
+    @LogMethod
     public void runApiTests(File[] testFiles, String username, String password, boolean expectErrors) throws Exception
     {
         int tests = 0;
