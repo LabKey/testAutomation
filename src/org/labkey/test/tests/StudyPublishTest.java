@@ -47,8 +47,6 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String STUDY_INVESTIGATOR = "Original Investigator";
     private final String STUDY_GRANT = "Original Grant";
     private final String STUDY_DESCRIPTION = "This is the study we start with.";
-    private final int STUDY_VISIT_COUNT = 64;
-    private final int STUDY_DATASET_COUNT = 47;
 
     private final String GROUP0_NAME = "Unshared Group";
     private final String[] GROUP0_PTIDS = {"1234"};
@@ -257,7 +255,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         if (datasets.length > 0)
             Assert.assertEquals("Unexpected number of datasets", datasets.length + dependentDatasets.length, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
         else // All visits were published
-            Assert.assertEquals("Unexpected number of datasets", STUDY_DATASET_COUNT, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
+            Assert.assertEquals("Unexpected number of datasets", datasetCount, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
         for (String dataset: datasets)
         {
             pushLocation();
@@ -283,7 +281,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         if (visits.length > 0)
             Assert.assertEquals("Unexpected number of visits", visits.length, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
         else // All visits were published
-            Assert.assertEquals("Unexpected number of visits", STUDY_VISIT_COUNT, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
+            Assert.assertEquals("Unexpected number of visits", visitCount, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
         for (String visit: visits)
         {
             assertTextPresent(visit);
