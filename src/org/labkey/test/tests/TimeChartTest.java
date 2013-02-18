@@ -487,7 +487,7 @@ public class TimeChartTest extends StudyBaseTest
 
         String tableId = getAttribute(Locator.xpath("//table[starts-with(@id, 'dataregion_') and contains(@class, 'labkey-data-region')]"), "id");
         String tableName = tableId.substring(tableId.indexOf('_') + 1, tableId.length());
-        DataRegionTable table = new DataRegionTable(tableName, this, false, true);
+        DataRegionTable table = new DataRegionTable(tableName, this, false, false);
         List displayOrders = table.getColumnDataAsText("Study APX1Abbreviated Physical Exam Mouse Visit Visit Display Order");
         for (Object str : displayOrders)
         {
