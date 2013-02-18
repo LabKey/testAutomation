@@ -1003,7 +1003,7 @@ public class TimeChartTest extends StudyBaseTest
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE);//, 1); // One chart per group.
 
-        _ext4Helper.uncheckGridRowCheckbox("Cohorts");
+        _ext4Helper.clickParticipantFilterCategory("Cohorts");
         waitForCharts(1);
 
         // TODO: WebDriver
@@ -1060,13 +1060,13 @@ public class TimeChartTest extends StudyBaseTest
         //assertTextPresent(GROUP3_PTIDS[2]+",\n Days:", 0);
 
         // uncheck group 1
-        _ext4Helper.uncheckGridRowCheckbox(GROUP1_NAME);
+        _ext4Helper.clickParticipantFilterCategory(GROUP1_NAME);
         waitForCharts(1);
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE);//, 1); // One chart per group.
 
         // reselect cohorts
-        _ext4Helper.checkGridRowCheckbox("Cohorts");
+        _ext4Helper.clickParticipantFilterCategory("Cohorts");
         waitForCharts(3);
 
         openSaveMenu();

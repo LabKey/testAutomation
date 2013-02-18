@@ -1176,7 +1176,7 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 0 Results");
 
         //Mouse down on GROUP 1
-        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_ONE, 1);
+        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0);
         waitForText("Showing 12 Results");
 
         //Check if all PTIDs of GROUP 1 are visible.
@@ -1195,11 +1195,11 @@ public class ReportTest extends StudyBaseTest
 
         }
 
-        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_TWO, 1);
+        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_TWO, 0);
         // groups are disjoint
         waitForText("Showing 0 Results");
 
-        _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 1);
+        _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0);
         waitForText("Showing 13 Results");
 
         //Check if all PTIDs of GROUP 2 are visible
@@ -1244,16 +1244,16 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 0 Results");
 
         //Mouse down on SPEC GROUP 1
-        _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_ONE, 1);
+        _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_ONE, 0);
         waitForText("Showing 1 Results");
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
 
         //Add SPEC GROUP 2
-        _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_TWO, 1);
+        _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_TWO, 0);
         waitForText("Showing 0 Results");
         //Remove SPEC GROUP 1
-        _ext4Helper.uncheckGridRowCheckbox(SPECIMEN_GROUP_ONE, 1);
+        _ext4Helper.uncheckGridRowCheckbox(SPECIMEN_GROUP_ONE, 0);
         waitForText("Showing 1 Results");
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
@@ -1348,19 +1348,19 @@ public class ReportTest extends StudyBaseTest
         waitForText("Showing 14 Results");
 
         // Selecting all or none of an entire category should not filter report
-        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 1); // click group, not category with the same name
+        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 0); // click group, not category with the same name
         waitForText("Showing 6 Results");
-        _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 1); // click group, not category with the same name
+        _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0); // click group, not category with the same name
         waitForText("Showing 14 Results");
-        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 1); // click group, not category with the same name
+        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 0); // click group, not category with the same name
         waitForText("Showing 6 Results");
-        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0); // click category
+        _ext4Helper.clickParticipantFilterCategory(PARTICIPANT_GROUP_ONE); // click category
         waitForText("Showing 14 Results");
 
         //Check intersection between cohorts and multiple categories
         _ext4Helper.clickParticipantFilterGridRowText(MICE_A, 0);
         waitForText("Showing 3 Results");
-        _ext4Helper.clickParticipantFilterGridRowText(SPECIMEN_GROUP_TWO, 1); // click group, not category with the same name
+        _ext4Helper.clickParticipantFilterGridRowText(SPECIMEN_GROUP_TWO, 0); // click group, not category with the same name
         waitForText("Showing 1 Results");
 
         selectAllFilterGroups();
@@ -1400,19 +1400,19 @@ public class ReportTest extends StudyBaseTest
         waitForText("Found 15 mice of 138.");
 
         // Selecting all or none of an entire category should not filter report
-        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 1);
+        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 0);
         waitForText("Found 7 mice of 138.");
-        _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 1);
+        _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0);
         waitForText("Found 15 mice of 138.");
-        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 1);
+        _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 0);
         waitForText("Found 7 mice of 138.");
-        _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0);
+        _ext4Helper.clickParticipantFilterCategory(PARTICIPANT_GROUP_ONE);
         waitForText("Found 15 mice of 138.");
 
         //Check intersection between cohorts and multiple categories
         _ext4Helper.clickParticipantFilterGridRowText(MICE_A, 0);
         waitForText("Found 3 mice of 138.");
-        _ext4Helper.clickParticipantFilterGridRowText(SPECIMEN_GROUP_TWO, 1);
+        _ext4Helper.clickParticipantFilterGridRowText(SPECIMEN_GROUP_TWO, 0);
         waitForText("Found 1 mouse of 138.");
 
         setFormElement(Locator.id("participantsDiv1.filter"), PTIDS_ONE[0]);
