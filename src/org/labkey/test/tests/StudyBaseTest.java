@@ -182,6 +182,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         // complete before doing any further tests.
         clickFolder(getFolderName());
 
+        log("Import new study with alt-ID");
         importFolderFromPipeline("AltIdStudy.folder.zip");
 //        clickButton("Process and Import Data");
 //        _extHelper.waitForImportDataEnabled();

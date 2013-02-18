@@ -52,7 +52,7 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
  */
 public class StudyTest extends StudyBaseTest
 {
-    public final String DATASETS = datasetCount + " datasets";
+    public String datasetLink = datasetCount + " datasets";
     protected boolean quickTest = true;
     protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some \u2018special symbols\u2019 - they help test that we're roundtripping in UTF-8.";
     protected static final String DEMOGRAPHICS_TITLE = "DEM-1: Demographics";
@@ -84,6 +84,19 @@ public class StudyTest extends StudyBaseTest
     private String Study001 = "Study 001";
     private String authorUser = "author@study.test";
     private String specimenUrl = null;
+
+    protected void setDatasetLink(int datasetCount)
+    {
+        datasetLink =  datasetCount + " datasets";
+    }
+
+    protected boolean isManualTest = false;
+
+    protected void triggerManualTest()
+    {
+        setDatasetLink(47);
+        isManualTest = true;
+    }
 
     protected File[] getTestFiles()
     {
@@ -252,7 +265,8 @@ public class StudyTest extends StudyBaseTest
         // test creating a participant group directly from a data grid
         waitForElement(Locator.linkContainingText(STUDY_NAME));
         clickAndWait(Locator.linkWithText(STUDY_NAME));
-        clickAndWait(Locator.linkWithText(DATASETS));
+        waitForText(datasetLink);
+        clickAndWait(Locator.linkWithText(datasetLink));
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
 
@@ -556,7 +570,8 @@ public class StudyTest extends StudyBaseTest
         if(quickTest)
             return;
 
-        verifyAlternateIDs();
+        if(!isManualTest)
+            verifyAlternateIDs();
 
         verifyHiddenVisits();
         verifyVisitImportMapping();
@@ -577,7 +592,7 @@ public class StudyTest extends StudyBaseTest
 
         // return to dataset import page
         clickAndWait(Locator.linkWithText(getStudyLabel()));
-        clickAndWait(Locator.linkWithText(DATASETS));
+        clickAndWait(Locator.linkWithText(datasetLink));
         clickAndWait(Locator.linkWithText("verifyAssay"));
         assertTextPresent("QC State");
         assertTextNotPresent("1234_B");
@@ -649,6 +664,7 @@ public class StudyTest extends StudyBaseTest
         nameAndValue.put("Alt ID", "191919");
         (new ChartHelper(this)).editDrtRow(4, nameAndValue);
         searchHelper.searchFor("191919");
+        // Issue 17203: Changes to study datasets not auto indexed
 //        assertTextPresent("Study Study 001 -- Mouse 999320687");
 
 
@@ -982,7 +998,7 @@ public class StudyTest extends StudyBaseTest
         Assert.assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 0, countTableCells("ConMeds Log #%{S.3.2}", true));
 
         clickFolder(getFolderName());
-        clickAndWait(Locator.linkWithText(DATASETS));
+        clickAndWait(Locator.linkWithText(datasetLink));
         clickAndWait(Locator.linkWithText("Types"));
         log("Verifying sequence numbers and visit names imported correctly");
 
@@ -1028,8 +1044,13 @@ public class StudyTest extends StudyBaseTest
         return getXpathCount(Locator.xpath(path));
     }
 
-    @LogMethod
     protected void verifyCohorts()
+    {
+        verifyCohorts(true);
+    }
+
+    @LogMethod
+    protected void verifyCohorts(boolean altIDsEnabled)       //todo
     {
         clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickAndWait(Locator.linkWithText("Study Navigator"));
@@ -1050,7 +1071,8 @@ public class StudyTest extends StudyBaseTest
         // verify that the participant view respects the cohort filter:
         setSort("Dataset", "MouseId", SortDirection.ASC);
         clickAndWait(Locator.linkWithText("999320518"));
-        assertTextPresent("b: 888209407"); //Alternate ID
+        if(!isManualTest)
+            assertTextPresent("b: 888209407"); //Alternate ID
         click(Locator.linkWithText("125: EVC-1: Enrollment Vaccination"));
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");

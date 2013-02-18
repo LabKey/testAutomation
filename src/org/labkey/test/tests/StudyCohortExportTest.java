@@ -38,7 +38,7 @@ public class StudyCohortExportTest extends StudyExportTest
         // codepath since we have to persist out a cohorts.xml file.  Test that
         // automatic cohorts do this.
         verifyUnenrolledCohort();
-        verifyCohorts();
+        verifyCohorts(false);
     }
 
     @Override

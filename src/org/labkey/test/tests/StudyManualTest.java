@@ -57,6 +57,7 @@ public class StudyManualTest extends StudyTest
 
     protected void createStudyManually()
     {
+        triggerManualTest();
         initializeFolder();
 
         clickButton("Create Study");
