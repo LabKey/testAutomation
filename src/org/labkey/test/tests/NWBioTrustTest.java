@@ -91,7 +91,7 @@ public class NWBioTrustTest extends SurveyTest
         verifyResearchCoordDashboard();
         verifyRequestorDashboard();
         verifySecondRequestorDashboard();
-        populateDocumentSetForReqeusts();
+        populateDocumentSetForRequests();
         verifyDocumentSetFromDashboard();
     }
 
@@ -112,6 +112,7 @@ public class NWBioTrustTest extends SurveyTest
             waitForText("No sample requests to show", WAIT_FOR_PAGE);
             assertTextNotPresent(designLabel);
             clickFolder(requestorFolder1);
+            clickAndWait(Locator.linkWithText("Sample Requests"));
             waitForText("No sample requests to show", 2, WAIT_FOR_PAGE);
             assertTextNotPresent(submittedRequestLabels);
         }
@@ -135,7 +136,6 @@ public class NWBioTrustTest extends SurveyTest
         clickButton("Manage");
         waitForGridToLoad("tr", "x4-grid-row", fileCount);
         // verify that we navigated to the appropriate subfolder for the manage document set page
-        assertTextPresent("NW BioTrust Specimen Requestor Dashboard");
         assertTextNotPresent("NW BioTrust Research Coordinator Dashboard");
         Locator loc = getEditLinkLocator(TEST_FILE_1.getName());
         click(loc);
@@ -147,10 +147,11 @@ public class NWBioTrustTest extends SurveyTest
         waitForGridToLoad("tr", "x4-grid-row", fileCount);
     }
 
-    private void populateDocumentSetForReqeusts()
+    private void populateDocumentSetForRequests()
     {
         log("Add documents to a document set for requests");
         clickFolder(requestorFolder1);
+        clickAndWait(Locator.linkWithText("Sample Requests"));
         waitForGridToLoad("div", "x4-grid-group-title", NWBT_REQUEST_STATUSES.length);
         assertElementPresent(Locator.linkWithText("Document Set (0)"), 3);
         click(Locator.linkWithText("Document Set (0)")); // link for the first request
@@ -214,14 +215,16 @@ public class NWBioTrustTest extends SurveyTest
         // TODO: this will be put to better use once we implement the NWBT security roles/permissions
         log("Verify that the 2nd requestor folder does not contain data from the first requestor");
         clickFolder(requestorFolder2);
+        clickAndWait(Locator.linkWithText("Sample Requests"));
         waitForText("No sample requests to show", 2, WAIT_FOR_PAGE);
         assertElementNotPresent(Locator.linkWithText("Click Here"));
     }
 
     private void verifyRequestorDashboard()
     {
-        log("Verify updated reqeusts show up in Requestor Dashboard");
+        log("Verify updated requests show up in Requestor Dashboard");
         clickFolder(requestorFolder1);
+        clickAndWait(Locator.linkWithText("Sample Requests"));
         waitForGridToLoad("div", "x4-grid-group-title", NWBT_REQUEST_STATUSES.length);
         assertElementNotPresent(getGroupingTitleLocator("Submitted"));
         for (String category : NWBT_REQUEST_STATUSES)
@@ -250,15 +253,6 @@ public class NWBioTrustTest extends SurveyTest
 
     private void waitForGridToLoad(final String tag, final String className, final int expectedCount)
     {
-//        waitFor(new BaseWebDriverTest.Checker()
-//        {
-//            public boolean check()
-//            {
-//                Locator l = Locator.xpath("//" + tag + "[contains(@class, '" + className + "')]");
-//                return getElementCount(l) == expectedCount;
-//            }
-//        }, "Expected number of grid elements did not appear after " + WAIT_FOR_JAVASCRIPT + "ms", WAIT_FOR_JAVASCRIPT);
-
         Locator l = Locator.xpath("//" + tag + "[contains(@class, '" + className + "')]");
         startTimer();
         while (getElementCount(l) < expectedCount && elapsedMilliseconds() < WAIT_FOR_JAVASCRIPT)
@@ -299,7 +293,8 @@ public class NWBioTrustTest extends SurveyTest
 
         log("Submit requests from the requestor subfolder");
         clickFolder(requestorFolder1);
-        customizeDashboard("Requestor Dashboard - Study Registrations", designLabel);
+        clickAndWait(Locator.linkWithText("Sample Requests"));
+        customizeDashboard("Requestor Dashboard - Sample Requests", designLabel);
         assertTextPresentInThisOrder(designLabel, description, "Draft Requests", "Submitted Requests");
         waitForText("No sample requests to show", 2, WAIT_FOR_PAGE); // both draft and submitted should be empty
         for (String requestLabel : submittedRequestLabels)
@@ -452,9 +447,16 @@ public class NWBioTrustTest extends SurveyTest
         goToProjectHome();
         verifyWebpartTitleOrder(new String[]{"RC Dashboard - Study Registrations", "Survey Designs", "NW BioTrust Administration"});
         clickFolder(requestorFolder1);
-        verifyWebpartTitleOrder(new String[]{"Requestor Dashboard - Study Registrations"});
+        verifyWebpartTitleOrder(new String[]{"NW BioTrust Requestor - Overview"});
+        verifyFolderTabLinks(new String[]{"Overview", "Study Registrations", "Sample Requests", "Contacts"});
         clickFolder(requestorFolder2);
-        verifyWebpartTitleOrder(new String[]{"Requestor Dashboard - Study Registrations"});
+        verifyWebpartTitleOrder(new String[]{"NW BioTrust Requestor - Overview"});
+    }
+
+    private void verifyFolderTabLinks(String[] folders)
+    {
+        for (String folder : folders)
+            assertElementPresent(Locator.linkWithText(folder));
     }
 
     private void verifyWebpartTitleOrder(String[] titles)
