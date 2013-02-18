@@ -209,6 +209,11 @@ public class Runner extends TestSuite
         return " (" + completed + " of " + _testCount + ")";
     }
 
+    public static boolean isFinalTest()
+    {
+        return 0 == (_remainingTests.size() - 1);
+    }
+
     private static void saveTestDuration(Test currentWebTest, long durationMs)
     {
         _testStats.put(currentWebTest, durationMs);
@@ -455,7 +460,7 @@ public class Runner extends TestSuite
             }
             else isServerSideTest = true;
 
-            if (isServerSideTest)
+            if (isServerSideTest && !"DRT".equals(System.getProperty("suite")))
             {
                 // Clear errors and enable dumbster before JUnitTest runs.
                 suite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
@@ -463,7 +468,7 @@ public class Runner extends TestSuite
             if(!illegalTest)
                 suite.addTest(test);
 
-            if (isServerSideTest)
+            if (isServerSideTest && !"DRT".equals(System.getProperty("suite")))
             {
                 // Check for leaks and errors after JUnitTest runs
                 suite.addTest(new JUnit4TestAdapter(JUnitFooter.class));

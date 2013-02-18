@@ -1329,7 +1329,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
             // Only do this as part of test startup if we haven't already checked. Since we do this as the last
             // step in the test, there's no reason to bother doing it again at the beginning of the next test
-            if (!_checkedLeaksAndErrors)
+            if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
             {
                 checkLeaksAndErrors();
             }
@@ -1342,8 +1342,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             checkQueries();
 
             checkViews();
-
-            checkLeaksAndErrors();
 
             checkActionCoverage();
 
@@ -1365,7 +1363,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 log("Skipping test cleanup as requested.");
             }
 
-            checkLeaksAndErrors();
+            if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
+            {
+                checkLeaksAndErrors();
+            }
 
             _testFailed = false;
         }
