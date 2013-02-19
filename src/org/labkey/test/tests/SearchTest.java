@@ -36,7 +36,6 @@ public class SearchTest extends StudyTest
 {
     private final SearchHelper _searchHelper = new SearchHelper(this);
     
-    private static final String PROJECT_NAME = "SearchTest Project";
     private static final String FOLDER_A = "Folder Apple";
     private static final String FOLDER_B = "Folder Banana"; // Folder move destination
     private static final String FOLDER_C = "Folder Cherry"; // Folder rename name.
@@ -55,7 +54,6 @@ public class SearchTest extends StudyTest
     private static final String MESSAGE_BODY = "Queen";
 
     private String FOLDER_NAME = FOLDER_A;
-    private boolean _testDone = false;
     private static final String GRID_VIEW_NAME = "DRT Eligibility Query";
     private static final String REPORT_NAME = "TestReport";
 
@@ -126,17 +124,15 @@ public class SearchTest extends StudyTest
     {
         waitForIndexer();
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
-        renameFolder(getProjectName(), getFolderName(), FOLDER_C, false);
+        renameFolder(getProjectName(), getFolderName(), FOLDER_C, true);
         FOLDER_NAME = FOLDER_C;
         waitForIndexer();
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
-        moveFolder(getProjectName(), getFolderName(), FOLDER_B, false);
+        moveFolder(getProjectName(), getFolderName(), FOLDER_B, true);
         alterListsAndReSearch();
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + FOLDER_B + "/" + getFolderName(), false);
 
         verifySyntaxErrorMessages();
-
-        _testDone = true;
     }
 
     private void alterListsAndReSearch()
@@ -372,6 +368,9 @@ public class SearchTest extends StudyTest
         }, "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//label[./span[text() = 'Choose a File:']]//..//input[@class = 'x-form-file']"), f.toString());
         clickButton("Upload", 0);
+        // Wait for the mask to disappear
+        waitForTextToDisappear("Uploading");
+        // Then wait for the file to show up in the list
         waitForText(f.getName(), 10000);
     }
 }
