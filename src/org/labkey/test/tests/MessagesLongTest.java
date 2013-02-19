@@ -354,7 +354,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         clickAndWait(Locator.linkWithText(PROJECT_NAME));
         createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
-        clickButton("Done");
+        clickButton("Save and Finish");
 
         clickWebpartMenuItem("Messages", "Email", "Preferences");
         checkRadioButton("emailPreference", "2");
