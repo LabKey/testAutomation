@@ -714,8 +714,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
             clickButton("OK", 0);
         }
 
-        _ext4Helper.checkGridRowCheckbox("Mice");
-        _ext4Helper.uncheckGridRowCheckbox("Mice");
+        _ext4Helper.checkGridRowCheckbox("All");
+        _ext4Helper.uncheckGridRowCheckbox("All");
         for (String mouseId : GROUP1_PTIDS)
         {
             // Select all of the Mice in GROUP1
