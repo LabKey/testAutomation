@@ -36,6 +36,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 
@@ -89,6 +90,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         return true;
     }
 
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     public void setUp2()
     {
         _containerHelper.createProject(getProjectName(), "Genotyping");

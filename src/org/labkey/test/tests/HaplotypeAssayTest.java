@@ -50,6 +50,7 @@ public class HaplotypeAssayTest extends GenotypingTest
     protected void doTestSteps() throws Exception
     {
         setUp2();  // from GenotypingTest
+
         configureExtensibleTables();
         setupHaplotypeAssay();
         verifyAssayUploadErrors();
@@ -59,10 +60,9 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyAssignmentReport();
         verifyDuplicateRecords();
         verifyAribitraryHaplotypeAssay();
-
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyAribitraryHaplotypeAssay()
     {
         setupHaplotypeAssay(DBR_ASSAY,  new String[][] {{"DRBHaplotype", "DRB Haplotype" }});
@@ -83,7 +83,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void configureExtensibleTables()
     {
         log("Configure extensible Animal table");
@@ -118,7 +118,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         setupHaplotypeAssay(ASSAY_NAME, null);
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void setupHaplotypeAssay(String name, String[][] extraHaplotypes)
     {
         log("Setting up Haplotype assay");
@@ -153,7 +153,7 @@ public class HaplotypeAssayTest extends GenotypingTest
 
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyAssayUploadErrors()
     {
         log("Test errors with Haplotype assay upload");
@@ -171,7 +171,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         clickButton("Cancel");
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyFirstRun()
     {
         importRun("first run", ASSAY_NAME, FIRST_RUN_FILE);
@@ -213,7 +213,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyHaplotypeRecordsByType(11, 5, 6);
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifySecondRun()
     {
         importRun("second run", ASSAY_NAME, SECOND_RUN_FILE);
@@ -248,7 +248,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyHaplotypeRecordsByType(13, 6, 7);
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyExtraHaplotypeAssignment()
     {
         log("Verify Animal Haplotype Assignment with > 4 assignments");
@@ -286,7 +286,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         drt.clearFilter("AnimalId");
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyAssignmentReport()
     {
         log("Verify Haplotype Assignment Report");
@@ -344,7 +344,7 @@ public class HaplotypeAssayTest extends GenotypingTest
         verifyColumnDataValues(drt, "ID-5", "1,2,,,3,,,");
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyDuplicateRecords()
     {
         // verify that the two duplicates show up on the duplicates report
