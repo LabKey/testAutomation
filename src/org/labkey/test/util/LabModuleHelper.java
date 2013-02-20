@@ -203,6 +203,18 @@ public class LabModuleHelper
         }, "Field did not appear: " + label, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
+    public void waitForCmp(final String query)
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return _test._ext4Helper.queryOne(query, Ext4CmpRefWD.class) != null;
+            }
+        }, "Ext4 component did not appear for query: " + query, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
     public void waitForDisabled(final Ext4CmpRefWD cmp, final boolean state)
     {
         _test.waitFor(new BaseWebDriverTest.Checker()

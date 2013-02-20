@@ -150,7 +150,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             {"Participant0018","Project13","","04/08/2004",""},
             {"Participant0019","Project13","","10/12/2002","10/12/2003"},
             {"Participant0020","Project13","","01/02/2004","01/01/2005"},
-            {"Participant0001","Project3","","01/02/2003",""},
+            {"Participant0001","Project3","","05/02/2002",""},
             {"Participant0002","Project3","","01/02/2003","08/31/2007"},
             {"Participant0003","Project3","","01/02/2003",""},
             {"Participant0004","Project3","","01/02/2003","9/31/2007"}
@@ -268,8 +268,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         List<String[]> expected = new ArrayList<String[]>();
         expected.add(new String[]{"OtherSample",null,null,"DNA",null,null,null,null,null,null,null,null,null,null,null,null,null,null});
         expected.add(new String[]{"OtherSample2",null,null,"RNA",null,null,null,null,null,null,null,null,null,null,null,null,null,null});
-        expected.add(new String[]{"Participant0001_gDNA","Participant0001","04/23/2008","gDNA","Project3",null,"Project1\nProject3","Project1 (Controls)","2036","5",null,null,null,"536",null,null,"5.3",null});
-        expected.add(new String[]{"Participant0001_RNA","Participant0001","06/23/2009","RNA","Project3",null,"Project1\nProject3","Project1 (Controls)","2462","6",null,null,null,"962",null,null,"6.4",null});
+        expected.add(new String[]{"Participant0001_gDNA","Participant0001","04/23/2008","gDNA","Project3",null,"Project1\nProject3","Project1 (Controls)","2036","5",null,null,null,"536",null,null,"5.9",null});
+        expected.add(new String[]{"Participant0001_RNA","Participant0001","06/23/2009","RNA","Project3",null,"Project1\nProject3","Project1 (Controls)","2462","6",null,null,null,"962",null,null,"7.1",null});
         expected.add(new String[]{"Participant0002_DNA","Participant0002","06/23/2005","DNA","Project1\nProject3","Project1 (Controls)","Project1\nProject3","Project1 (Controls)","1000","2",null,null,null,"-500","538",null,"2.4",null});
         expected.add(new String[]{"Participant0002_RNA","Participant0002","10/23/2009","RNA","Project1","Project1 (Controls)","Project1\nProject3","Project1 (Controls)","2583","7",null,null,null,"1083","2121",null,null,null});
         expected.add(new String[]{"Participant0003_DNA","Participant0003","05/02/2001","DNA",null,null,"Project1\nProject3","Project1 (Group A)",null,null,"-514",null,null,"-2014",null,null,null,null});
@@ -381,13 +381,15 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         InsertRowsCommand insertCmd = new InsertRowsCommand("laboratory", "samples");
 
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
         for (String[] arr : SAMPLE_DATA)
         {
             Map<String,Object> rowMap = new HashMap<String,Object>();
             rowMap.put("samplename", arr[0]);
             rowMap.put("subjectId", arr[1]);
             rowMap.put("sampleType", arr[2]);
-            rowMap.put("sampleDate", arr[3]);
+            Date date = format.parse(arr[3]);
+            rowMap.put("sampleDate", date);
             rowMap.put("location", arr[4]);
             insertCmd.addRow(rowMap);
         }
@@ -752,7 +754,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitAndClick(_helper.toolIcon("Settings"));
         waitAndClick(Locator.linkContainingText("Control Item Visibility"));
         waitForText("Sequence"); //proxy for page load
-        waitForText("TruCount"); //proxy for page load
+        waitForText("TruCount", WAIT_FOR_JAVASCRIPT * 2); //proxy for page load
 
         for (Pair<String, String> pair : getAssaysToCreate())
         {
@@ -1044,6 +1046,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
         cv.openCustomizeViewPanel();
+        cv.showHiddenItems();
         cv.addCustomizeViewColumn("container");
         cv.applyCustomView();
 
@@ -1068,11 +1071,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("edit", rowNum), "href"), "UTF-8");
             Assert.assertTrue("Expected [edit] link to go to the container: " + workbook + ", href was: " + href,
                     href.contains("/query/" + workbook + "/manageRecord.view?"));
-
-            //sample source: this is the current container
-            href = URLDecoder.decode(getAttribute(Locator.linkWithText("Whole Blood", rowNum), "href"), "UTF-8");
-            Assert.assertTrue("Expected sample source column URL to go to the container: " + getProjectName() + ", href was: " + href,
-                    href.contains("/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type&keyField=type&key=Whole Blood"));
 
             //sample type
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA", rowNum), "href"), "UTF-8");
@@ -1257,7 +1255,11 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.waitForField("Source Material");
         Boolean state = (Boolean)Ext4FieldRefWD.getForBoxLabel(this, defaultVal).getValue();
         Assert.assertTrue("Default method not correct", state);
-        waitAndClick(Locator.xpath("//span[contains(@class, 'x4-btn-inner') and text() = 'Cancel']"));
+
+        _helper.waitForCmp("#cancelBtn");
+        Ext4CmpRefWD btn = _ext4Helper.queryOne("#cancelBtn", Ext4CmpRefWD.class);
+        waitAndClick(Locator.id(btn.getId() + "-btnEl"));
+
         Alert alert = getDriver().switchTo().alert();
         alert.accept();
         waitForText(LabModuleHelper.LAB_HOME_TEXT);

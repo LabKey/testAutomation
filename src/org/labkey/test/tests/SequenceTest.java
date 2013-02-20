@@ -270,6 +270,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         waitAndClick(Locator.linkContainingText("All"));
         _startedPipelineJobs++;
+        waitForElement(Locator.xpath("//span[contains(text(), 'Data Pipeline']"));
         waitForPipelineJobsToComplete(_startedPipelineJobs, "Import Illumina", false);
         assertTextPresent("COMPLETE");
     }
@@ -1122,6 +1123,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         waitAndClick(Locator.linkWithText("All"));
         _startedPipelineJobs++;
+        waitForElement(Locator.xpath("//span[contains(text(), 'Data Pipeline']"));
         waitForPipelineJobsToComplete(_startedPipelineJobs, "Import Readsets", false);
         assertTextPresent("COMPLETE");
 
