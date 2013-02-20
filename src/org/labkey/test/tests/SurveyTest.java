@@ -257,7 +257,7 @@ public class SurveyTest extends BaseWebDriverTest
         assertElementPresent(Locator.xpath("//li[text()='Start']"));
         assertElementPresent(Locator.xpath("//li[text()='Section 1']"));
         assertElementPresent(Locator.xpath("//li[text()='Section 2']"));
-        assertElementPresent(Locator.xpath("//li[text()='Finish']"));
+        assertElementPresent(Locator.xpath("//li[text()='Save / Submit']"));
         assertElementPresent(Locator.button("Previous"));
         assertElementPresent(Locator.button("Next"));
         assertElementNotPresent(Locator.button("Submit completed form"));
