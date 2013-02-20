@@ -206,9 +206,10 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         {
             // Delete all runs
             table.checkAllOnPage();
+            prepForPageLoad();
             click(Locator.tagContainingText("span", "Delete"));
             assertAlertContains("Are you sure you want to delete the selected row");
-            waitForPageToLoad();
+            newWaitForPageToLoad();
             Assert.assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
 
             // Check all DataInputs were deleted
