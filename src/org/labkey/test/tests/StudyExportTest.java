@@ -99,7 +99,7 @@ public class StudyExportTest extends StudyManualTest
         log("Importing exported study (xml formats)");
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
-        waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));//TODO: Bad cookie. Marker class won't appear without this step.
+        waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node-expanded') and @*='/']"));//TODO: Bad cookie. Marker class won't appear without this step.
         _extHelper.selectFileBrowserItem("export/");
         _extHelper.selectAllFileBrowserFiles();
 
@@ -335,7 +335,7 @@ public class StudyExportTest extends StudyManualTest
 
         // test specimen comments
         clickAndWait(Locator.linkWithText(getStudyLabel()));
-        click(Locator.linkWithText("Vials by Derivative Type"));
+        waitAndClick(Locator.linkWithText("Vials by Derivative Type"));
         waitForText("Plasma, Unknown Processing");
         clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
         clickButton("Enable Comments/QC");
@@ -359,7 +359,7 @@ public class StudyExportTest extends StudyManualTest
 
         // verify that comments remain after second specimen load
         clickAndWait(Locator.linkWithText(getStudyLabel()));
-        click(Locator.linkWithText("Vials by Derivative Type"));
+        waitAndClick(Locator.linkWithText("Vials by Derivative Type"));
         waitForText("Plasma, Unknown Processing");
         clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
         assertTextPresent("These vials are very important.", 2);
@@ -385,7 +385,7 @@ public class StudyExportTest extends StudyManualTest
 //        setFormElement(participantIDFormElems[2], "999320528");
 
         _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Mouse:"), "618005775", true);
-        _ext4Helper.selectComboBoxItem("Visit:", "201.0"); //use the raw value for: "Enroll/Vacc #1"
+        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Visit:"), " Enroll/Vacc #1 (201)", true);
 
         clickButton("Search");
         assertTextPresent("999320528");

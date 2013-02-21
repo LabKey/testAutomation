@@ -47,8 +47,8 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String selection, boolean containsText)
     {
-        Locator l = comboBox.append("//div").withClass("x4-form-arrow-trigger");
-        _test.waitAndClick(l);
+        Locator arrowTrigger = comboBox.append("//div").withClass("x4-form-arrow-trigger");
+        _test.waitAndClick(arrowTrigger);
         _test.waitForElement(comboBox.append("//td").withClass("x4-pickerfield-open"));
         _test.sleep(100);
         if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
@@ -67,6 +67,10 @@ public class Ext4Helper extends AbstractHelper
 
             // wait for and select the list item
             _test.waitAndClick(listItem);
+
+            // close combo manually if it is a checkbox combo-box
+            if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))
+                _test.click(arrowTrigger);
 
             // menu should disappear
             _test.waitForElementToDisappear(listItem, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);

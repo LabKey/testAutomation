@@ -6973,7 +6973,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @LogMethod
     public void selectImportDataAction(String actionName)
     {
-        sleep(100);
+        sleep(200);
         _extHelper.waitForFileGridReady();
         _extHelper.waitForImportDataEnabled();
         selectImportDataActionNoWaitForGrid(actionName);

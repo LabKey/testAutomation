@@ -46,8 +46,8 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String selection, boolean containsText)
     {
-        Locator l = Locator.xpath(comboBox.getPath()+"//div[contains(@class,'arrow')]");
-        _test.waitAndClick(l);
+        Locator arrowTrigger = Locator.xpath(comboBox.getPath()+"//div[contains(@class,'arrow')]");
+        _test.waitAndClick(arrowTrigger);
         _test.waitForElement(comboBox.append("//td").withClass("x4-pickerfield-open"));
         if(_test.getBrowser().startsWith(BaseWebDriverTest.IE_BROWSER))
         {
@@ -57,7 +57,7 @@ public class Ext4HelperWD extends AbstractHelperWD
         }
         else
         {
-            Locator listItem;
+            Locator.XPathLocator listItem;
             if (containsText)
                 listItem = Locator.xpath("//li[contains(@class, 'x4-boundlist-item')]").notHidden().containing(selection);
             else
@@ -65,6 +65,10 @@ public class Ext4HelperWD extends AbstractHelperWD
 
             // wait for and select the list item
             _test.waitAndClick(listItem);
+
+            // close combo manually if it is a checkbox combo-box
+            if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))
+                _test.click(arrowTrigger);
 
             // menu should disappear
             _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("li.x4-boundlist-item")));
