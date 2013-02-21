@@ -166,10 +166,13 @@ public class RISAssayTest extends BaseWebDriverTest
 
         waitForElement(Locator.linkWithText(ASSAY_ID));
         click(ExtHelperWD.Locators.checkerForGridRowContainingText(ASSAY_ID));
-
         clickButton("Create Bar Chart", 0);
-        waitAndClickAndWait(Locator.linkWithText("Kiem Chart"));
+        waitForElement(Locator.linkWithText("Kiem Chart"));
+        //assertTextNotPresent("Error"); //TODO: 17236: RIS Report bar chart is broken
+
+        clickAndWait(Locator.linkWithText("Kiem Chart"));
         waitForElement(Locator.pageHeader("bar-chart"));
+        //assertTextNotPresent("Error"); //TODO: 17236: RIS Report bar chart is broken
     }
 
     @Override
