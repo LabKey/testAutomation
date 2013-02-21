@@ -23,12 +23,12 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.ListHelper;
 import org.junit.Assert;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.UIAssayHelper;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 
@@ -283,10 +283,10 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         enableModule(assayFolder, "rho");
 
         _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + assay1XarPath, ++pipelineCount, assay1);
-        _assayHelper.importAssay(assay1, STUDY_PIPELINE_ROOT + "/assays/" + assay1File,  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
+        _assayHelper.importAssay(assay1, new File(STUDY_PIPELINE_ROOT + "/assays/" + assay1File),  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
         clickAndWait(Locator.linkWithText(assayFolder));
         _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + assay2XarPath, ++pipelineCount, assay2);
-        _assayHelper.importAssay(assay2, STUDY_PIPELINE_ROOT + "/assays/" + assay2File,  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
+        _assayHelper.importAssay(assay2, new File(STUDY_PIPELINE_ROOT + "/assays/" + assay2File),  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
 
 
         clickAndWait(Locator.linkWithText(assayFolder));

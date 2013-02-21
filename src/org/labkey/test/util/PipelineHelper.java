@@ -142,6 +142,19 @@ public class PipelineHelper
         _test.waitForText(lookupColumn, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
+    public void uploadFile(File file)
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            public boolean check()
+            {
+                return _test.getFormElement(Locator.xpath("//label[./span[text() = 'Choose a File:']]//..//input[contains(@class, 'x-form-file-text')]")).equals("");
+            }
+        }, "Upload field did not clear after upload.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.setFormElement(Locator.css(".single-upload-panel input[type=file]"), file);
+        _test.clickButton("Upload", 0);
+        _test.waitForElement(Locator.css("#fileBrowser div.x-grid3-col-2").withText(file.getName()), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
 
     public void importFile(String fileName, String importAction)
     {

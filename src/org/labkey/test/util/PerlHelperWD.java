@@ -16,6 +16,7 @@ package org.labkey.test.util;
  * limitations under the License.
  */
 
+import junit.framework.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
@@ -40,12 +41,10 @@ public class PerlHelperWD extends AbstractHelperWD
 
         _test.goToAdminConsole();
         _test.clickAndWait(Locator.linkWithText("views and scripting"));
+
         _test.log("Check if Perl already is configured");
-
-
         if (_test.isPerlEngineConfigured())
             return true;
-
 
         _test.log("Try configuring Perl");
         String perlHome = System.getenv("PERL_HOME");
@@ -71,7 +70,7 @@ public class PerlHelperWD extends AbstractHelperWD
             {
                 for (File file : files)
                 {
-                    // add a new r engine configuration
+                    // add a new Perl engine configuration
                     String id = _test._extHelper.getExtElementId("btn_addEngine");
                     _test.click(Locator.id(id));
 
@@ -102,6 +101,15 @@ public class PerlHelperWD extends AbstractHelperWD
                 }
             }
         }
+
+        _test.log("Environment info: " + System.getenv());
+
+        if (null == perlHome)
+        {
+            _test.log("");   // Blank line helps make the following message more readable
+            _test.log("PERL_HOME environment variable is not set.  Set PERL_HOME to your R bin directory to enable automatic configuration.");
+        }
+        Assert.fail("Perl is not configured on this system.");
         return false;
     }
 }

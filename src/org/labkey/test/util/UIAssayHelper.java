@@ -35,28 +35,28 @@ public class UIAssayHelper extends AbstractAssayHelper
         super(test);
     }
 
-    public void importAssay(int assayID, String file, String projectPath) throws CommandException, IOException
+    public void importAssay(int assayID, File file, String projectPath) throws CommandException, IOException
     {
         throw new RuntimeException("Not implemented");
     }
 
     @Override
-    public void importAssay(String assayName, String file, String projectPath) throws CommandException, IOException
+    public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
     {
         String[] folders = projectPath.split("/");
         for(String folder : folders)
             _test.clickAndWait(Locator.linkWithText(folder));
-        _test.clickAndWait(Locator.linkContainingText(assayName));
+        _test.clickAndWait(Locator.linkWithText(assayName));
         _test.clickButton("Import Data");
         _test.clickButton("Next");
 
-        _test.checkRadioButton("dataCollectorName", "File upload");
-        _test.setFormElement("__primaryFile__", new File(file));
+        _test.checkRadioButton(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
+        _test.setFormElement(Locator.name("__primaryFile__"), file);
         _test.clickButton("Save and Finish");
     }
 
     @Override
-    public void importAssay(String assayName, String file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException
+    public void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException
     {
         importAssay(assayName, file, projectPath); //UI doesn't need to worry about the batch properties, it's done automatically
     }

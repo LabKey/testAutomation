@@ -297,6 +297,7 @@ src/org/labkey/test/tests/PivotQueryTest.java -text
 src/org/labkey/test/tests/ProgrammaticQCTest.java -text
 src/org/labkey/test/tests/ProjectSettingsTest.java -text
 src/org/labkey/test/tests/QuerySnapshotTest.java -text
+src/org/labkey/test/tests/RISAssayTest.java -text
 src/org/labkey/test/tests/ReagentTest.java -text
 src/org/labkey/test/tests/ReportTest.java -text
 src/org/labkey/test/tests/RlabkeyTest.java -text

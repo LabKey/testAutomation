@@ -267,13 +267,8 @@ public abstract class AbstractAssayTestWD extends SimpleApiTestWD
 
     protected void clickEditAssayDesign()
     {
-        clickEditAssayDesign(WAIT_FOR_PAGE);
-    }
-
-    protected void clickEditAssayDesign(int timeout)
-    {
         click(Locator.linkWithText("MANAGE ASSAY DESIGN"));
-        clickAndWait(Locator.linkWithText("edit assay design"), timeout);
+        waitAndClickAndWait(Locator.linkWithText("edit assay design"));
     }
 
     protected void enterStudySecurity()

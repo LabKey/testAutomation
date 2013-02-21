@@ -548,9 +548,12 @@ public class ExtHelperWD extends AbstractHelperWD
         }
         waitForFileGridReady();
 
-        // expand root tree node
-        _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), WAIT_FOR_JAVASCRIPT);
+        if (parts.length > 1)
+        {
+            // expand root tree node
+            _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
+            _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), WAIT_FOR_JAVASCRIPT);
+        }
 
         for (int i = 0; i < parts.length; i++)
         {
@@ -798,6 +801,11 @@ public class ExtHelperWD extends AbstractHelperWD
         public static Locator.XPathLocator window(String title)
         {
             return Locator.xpath("//div").withClass("x-window").notHidden().withDescendant(Locator.xpath("//span").withClass("x-window-header-text").withText(title));
+        }
+
+        public static Locator.XPathLocator checkerForGridRowContainingText(String text)
+        {
+            return Locator.xpath("//tr").withPredicate(Locator.xpath("td/div/a").withText(text)).append("//div").withClass("x-grid3-row-checker");
         }
     }
 }

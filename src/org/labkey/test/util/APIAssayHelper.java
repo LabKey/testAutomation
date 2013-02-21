@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.assay.AssayListCommand;
@@ -40,23 +41,23 @@ public class APIAssayHelper extends AbstractAssayHelper
         super(test);
     }
 
-    public void importAssay(int assayID, String file, String projectPath, Map<String, Object> batchProperties)  throws CommandException, IOException
+    public void importAssay(int assayID, File file, String projectPath, @Nullable Map<String, Object> batchProperties)  throws CommandException, IOException
     {
-        ImportRunCommand  irc = new ImportRunCommand(assayID, new File(file));
+        ImportRunCommand  irc = new ImportRunCommand(assayID, file);
         irc.setBatchProperties(batchProperties);
         irc.execute(_test.getDefaultConnection(), "/" + projectPath);
 
     }
-    public void importAssay(int assayID, String file, String projectPath) throws CommandException, IOException
+    public void importAssay(int assayID, File file, String projectPath) throws CommandException, IOException
     {
         importAssay(assayID, file, projectPath, null);
     }
 
-    public void importAssay(String assayName, String file, String projectPath) throws CommandException, IOException
+    public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
     {
         importAssay(assayName, file, projectPath, null);
     }
-    public void importAssay(String assayName, String file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException
+    public void importAssay(String assayName, File file, String projectPath, @Nullable Map<String, Object> batchProperties) throws CommandException, IOException
     {
         importAssay(getIdFromAssayName(assayName, projectPath), file, projectPath, batchProperties);
     }

@@ -649,7 +649,12 @@ public abstract class Locator
 
     public static XPathLocator paginationText(int firstRow, int lastRow, int maxRows)
     {
-        return paginationText(firstRow + " - " + lastRow + " of " + maxRows);
+        return paginationText(
+                (firstRow > (lastRow - firstRow) ? "\u00AB First " : "") +
+                (firstRow > 1 ? "\u2039 Prev " : "") +
+                firstRow + " - " + lastRow + " of " + maxRows +
+                (maxRows > lastRow ? " Next \u203A" : "") +
+                (((maxRows - lastRow)) > (lastRow - firstRow) ? " Last \u00BB" : ""));
     }
 
     public static XPathLocator paginationText(String text)
@@ -754,6 +759,11 @@ public abstract class Locator
         }
 
         public XPathLocator withDescendant(XPathLocator descendant)
+        {
+            return this.withPredicate(descendant.getPath());
+        }
+
+        public XPathLocator withPredicate(XPathLocator descendant)
         {
             return this.withPredicate(descendant.getPath());
         }

@@ -143,6 +143,7 @@ public enum TestSet
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
         SpecimenProgressReportTest.class,
+        RISAssayTest.class,
         DatabaseDiagnosticsTest.class
     ),
 

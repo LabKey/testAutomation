@@ -37,7 +37,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     }
 
 //    public abstract void importAssay(int assayID, String file, String projectPath) throws CommandException, IOException;
-    public abstract void importAssay(String assayName, String file, String projectPath) throws CommandException, IOException;
+    public abstract void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException;
 
 
 
@@ -112,7 +112,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     }
 
 
-    public abstract void importAssay(String assayName, String file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
+    public abstract void importAssay(String assayName, File file, String projectPath, Map<String, Object> batchProperties) throws CommandException, IOException;
 
     @LogMethod
     public void createAssayWithDefaults(String type, String name)
@@ -148,5 +148,47 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         _test.clickButton("Save & Close");
 
         _test.waitForElement(Locator.id("AssayList"));
+    }
+
+    public void clickEditAssayDesign()
+    {
+        _test.click(Locator.linkWithText("MANAGE ASSAY DESIGN"));
+        _test.waitAndClickAndWait(Locator.linkWithText("edit assay design"));
+    }
+
+    public void addTransformScript(File transformScript)
+    {
+        if (transformScript.exists())
+        {
+            _test.waitForElement(Locator.navButton("Add Script"));
+            int index = _test.getXpathCount(Locator.xpath("//input[starts-with(@id, 'AssayDesignerTransformScript')]"));
+            _test.clickButton("Add Script", 0);
+            _test.setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
+        }
+        else
+            Assert.fail("Unable to locate the Transform script: " + transformScript.toString());
+    }
+
+
+    public void setTransformScript(File transformScript)
+    {
+        setTransformScript(transformScript, 0);
+    }
+
+    public void setTransformScript(File transformScript, int index)
+    {
+        if (transformScript.exists())
+        {
+            _test.waitForElement(Locator.navButton("Add Script"));
+            _test.setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
+        }
+        else
+            Assert.fail("Unable to locate the Transform script: " + transformScript.toString());
+    }
+
+    public void saveAssayDesign()
+    {
+        _test.clickButton("Save & Close");
+        _test.waitForElement(Locator.id("dataregion_Runs"));
     }
 }

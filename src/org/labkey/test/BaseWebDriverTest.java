@@ -167,7 +167,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelperWD _securityHelper = new SecurityHelperWD(this);
-    public File _downloadDir;
+    private File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
@@ -273,10 +273,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             profile.setPreference("extensions.update.enabled", false);
 
             profile.setPreference("browser.download.folderList", 2);
-            profile.setPreference("browser.download.downloadDir", _downloadDir.getAbsolutePath());
-            profile.setPreference("browser.download.dir", _downloadDir.getAbsolutePath());
+            profile.setPreference("browser.download.downloadDir", getDownloadDir().getAbsolutePath());
+            profile.setPreference("browser.download.dir", getDownloadDir().getAbsolutePath());
             profile.setPreference("browser.helperApps.alwaysAsk.force", false);
-            profile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/vnd.ms-excel");
+            profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+                    "application/vnd.ms-excel," +
+                    "application/octet-stream," +
+                    "application/x-zip-compressed," +
+                    "text/x-script.perl");
             profile.setPreference("browser.download.manager.showWhenStarting",false);
             if (enableScriptCheck())
             {
@@ -1843,6 +1847,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public WebDriver getDriver()
     {
         return _driver;
+    }
+
+    public File getDownloadDir()
+    {
+        return _downloadDir;
     }
 
     public boolean isGroupConcatSupported()
@@ -3670,6 +3679,19 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
         }
         return true;
+    }
+
+    public void waitForElementWithRefresh(Locator loc, int wait)
+    {
+        for(int i=0; i<wait; i+=1000)
+        {
+            if(isElementPresent(loc))
+                return;
+            else
+                sleep(500);
+            refresh();
+        }
+        Assert.fail("Element did not appear: " + loc.getLoggableDescription());
     }
 
     public void waitForElement(final Locator locator, int wait)

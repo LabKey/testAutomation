@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
@@ -38,12 +39,10 @@ public class PerlHelper extends AbstractHelper
 
         _test.goToAdminConsole();
         _test.clickAndWait(Locator.linkWithText("views and scripting"));
+
         _test.log("Check if Perl already is configured");
-
-
         if (_test.isPerlEngineConfigured())
             return true;
-
 
         _test.log("Try configuring Perl");
         String perlHome = System.getenv("PERL_HOME");
@@ -100,6 +99,15 @@ public class PerlHelper extends AbstractHelper
                 }
             }
         }
+
+        _test.log("Environment info: " + System.getenv());
+
+        if (null == perlHome)
+        {
+            _test.log("");   // Blank line helps make the following message more readable
+            _test.log("PERL_HOME environment variable is not set.  Set PERL_HOME to your R bin directory to enable automatic configuration.");
+        }
+        Assert.fail("Perl is not configured on this system.");
         return false;
     }
 }

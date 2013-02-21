@@ -18,6 +18,7 @@ package org.labkey.test;
 import org.junit.Assert;
 import org.labkey.test.util.APIAssayHelper;
 
+import java.io.File;
 import java.util.Collections;
 
 /**
@@ -45,18 +46,18 @@ public class AssayAPITest extends BaseSeleniumWebTest
         goToProjectHome();
         int pipelineCount = 0;
         String runName = "trial01.xls";
-        importAssayAndRun(getSampledataPath() + "/AssayAPI/XLS Assay.xar.xml", ++pipelineCount, "XLS Assay",
-                getSampledataPath() + "/GPAT/" + runName,  runName, new String[] {"1 - 100 of 201", "K770K3VY-19"});
+        importAssayAndRun(new File(getSampledataPath() + "/AssayAPI/XLS Assay.xar.xml"), ++pipelineCount, "XLS Assay",
+                new File(getSampledataPath() + "/GPAT/" + runName),  runName, new String[] {"1 - 100 of 201", "K770K3VY-19"});
 //
         goToProjectHome();
 
         //Issue 16073
-        importAssayAndRun(getSampledataPath() + "/AssayAPI/BatchPropRequired.xar", ++pipelineCount, "BatchPropRequired",
-                getSampledataPath() + "/GPAT/" + runName,   "trial01-1.xls", new String[] {"1 - 100 of 201", "K770K3VY-19"});
+        importAssayAndRun(new File(getSampledataPath() + "/AssayAPI/BatchPropRequired.xar"), ++pipelineCount, "BatchPropRequired",
+                new File(getSampledataPath() + "/GPAT/" + runName),   "trial01-1.xls", new String[] {"1 - 100 of 201", "K770K3VY-19"});
 //        _assayHelper.getCurrentAssayNumber();
     }
 
-    protected void  importAssayAndRun(String assayPath, int pipelineCount, String assayName, String runPath,
+    protected void  importAssayAndRun(File assayPath, int pipelineCount, String assayName, File runPath,
                                       String runName, String[] textToCheck)
     {
         APIAssayHelper assayHelper = new APIAssayHelper(this);

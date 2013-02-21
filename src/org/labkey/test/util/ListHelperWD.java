@@ -67,7 +67,7 @@ public class ListHelperWD extends ListHelper
         _submitImportTsv(null == error ? "" : error);
     }
 
-    private void _submitImportTsv(String error)
+    private void _submitImportTsv(@Nullable String error)
     {
         _test.clickButton("Submit", 0);
         if (null != error)
@@ -508,9 +508,10 @@ public class ListHelperWD extends ListHelper
 
     private void beginCreateListHelper(String listName)
     {
-        if (!_test.isLinkPresentWithText("Lists"))
+        if (!_test.isElementPresent(Locator.linkWithText("Lists")))
         {
-            _test.addWebPart("Lists");
+            PortalHelper portalHelper = new PortalHelper(_test);
+            portalHelper.addWebPart("Lists");
         }
 
         _test.clickAndWait(Locator.linkWithText("manage lists"));
@@ -546,9 +547,10 @@ public class ListHelperWD extends ListHelper
         Assert.assertTrue("Unable to locate input file: " + inputFile, inputFile.exists());
 
         _test.clickFolder(folderName);
-        if (!_test.isLinkPresentWithText("Lists"))
+        if (!_test.isElementPresent(Locator.linkWithText("Lists")))
         {
-            _test.addWebPart("Lists");
+            PortalHelper portalHelper = new PortalHelper(_test);
+            portalHelper.addWebPart("Lists");
         }
 
         _test.clickAndWait(Locator.linkWithText("manage lists"));
@@ -557,7 +559,7 @@ public class ListHelperWD extends ListHelper
         _test.clickButton("Import List Archive");
         _test.waitForElement(Locator.xpath("//input[@name='listZip']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        _test.setFormElement("listZip", inputFile);
+        _test.setFormElement(Locator.name("listZip"), inputFile);
         _test.clickButton("Import List Archive");
     }
 
@@ -594,7 +596,7 @@ public class ListHelperWD extends ListHelper
         clickRow(null, index);
     }
 
-    public void clickRow(String prefix, int index)
+    public void clickRow(@Nullable String prefix, int index)
     {
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_name" + index + "']");
         _test.click(l);
@@ -605,7 +607,7 @@ public class ListHelperWD extends ListHelper
         setColumnName(null, index, name);
     }
 
-    public void setColumnName(String prefix, int index, String name)
+    public void setColumnName(@Nullable String prefix, int index, String name)
     {
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_name" + index + "']");
         _test.setFormElement(l, name);
@@ -617,7 +619,7 @@ public class ListHelperWD extends ListHelper
         setColumnLabel(null,index,label);
     }
 
-    public void setColumnLabel(String prefix, int index, String label)
+    public void setColumnLabel(@Nullable String prefix, int index, String label)
     {
         Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_label" + index + "']");
         _test.setFormElement(l, label);
@@ -629,7 +631,7 @@ public class ListHelperWD extends ListHelper
         setColumnType(null, index, type);
     }
 
-    public void setColumnType(String prefix, int index, ListColumnType type)
+    public void setColumnType(@Nullable String prefix, int index, ListColumnType type)
     {
         setColumnType(prefix, null, type, index);
     }
@@ -639,7 +641,7 @@ public class ListHelperWD extends ListHelper
         setColumnType(null, index, lookup);
     }
 
-    public void setColumnType(String prefix, int index, LookupInfo lookup)
+    public void setColumnType(@Nullable String prefix, int index, LookupInfo lookup)
     {
         setColumnType(prefix, lookup, null, index);
     }
@@ -693,7 +695,7 @@ public class ListHelperWD extends ListHelper
         selectPropertyTab(null, name);
     }
 
-    public void selectPropertyTab(String prefix, String name)
+    public void selectPropertyTab(@Nullable String prefix, String name)
     {
         _test.click(Locator.xpath((null == prefix ? "" : prefix) + "//span[contains(@class,'x-tab-strip-text') and text()='" + name + "']"));
     }

@@ -17,7 +17,6 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -106,9 +105,11 @@ public abstract class AbstractQCAssayTestWD extends AbstractAssayTestWD
                 try {
                     pw.append("machine localhost:8080");
                     pw.append('\n');
-                    pw.append("login " + PasswordUtil.getUsername());
+                    pw.append("login ");
+                    pw.append(PasswordUtil.getUsername());
                     pw.append('\n');
-                    pw.append("password " + PasswordUtil.getPassword());
+                    pw.append("password ");
+                    pw.append(PasswordUtil.getPassword());
                     pw.append('\n');
                 }
                 finally
@@ -169,7 +170,7 @@ public abstract class AbstractQCAssayTestWD extends AbstractAssayTestWD
     protected void startCreateNabAssay(String name)
     {
         clickButton("New Assay Design");
-        checkRadioButton("providerName", "TZM-bl Neutralization (NAb)");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb)"));
         clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
