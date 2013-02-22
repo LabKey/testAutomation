@@ -56,7 +56,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     "Scientist\tScientist\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
     "Stage\tStage\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
     "Parasitemia\t\thttp://www.w3.org/2001/XMLSchema#double\t\tTRUE\tFALSE\tFALSE\n" +
-    "Gametocytemia\t\tthttp://www.w3.org/2001/XMLSchema#double\t\tTRUE\tFALSE\tFALSE\n" +
+    "Gametocytemia\t\thttp://www.w3.org/2001/XMLSchema#double\t\tTRUE\tFALSE\tFALSE\n" +
     "PatientpRBCs\tPatient pRBCs\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
     "Hematocrit\t\thttp://www.w3.org/2001/XMLSchema#double\t\tTRUE\tFALSE\tFALSE\tHematocrit %\n" +
     "CultureMedia\tCulture Media\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
@@ -174,7 +174,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         setICEMRField("Hematocrit1", "101");
         setICEMRField("Gametocytemia1", "101");
         setICEMRField("Parasitemia1", "101");
-        verifyError(2);
+        verifyError(3);
 
         setICEMRField("Hematocrit1", "20");
         setICEMRField("Gametocytemia1", "22");
