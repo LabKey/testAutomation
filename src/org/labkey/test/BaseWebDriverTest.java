@@ -3449,8 +3449,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Long startTime = System.currentTimeMillis();
         while ( (System.currentTimeMillis() - startTime) < wait )
         {
-            if( checker.check() )
-                return true;
+            try
+            {
+                if( checker.check() )
+                    return true;
+            }
+            catch (Exception ignore) {} // Checker exceptions count as a false check
             sleep(100);
         }
         if (!checker.check())

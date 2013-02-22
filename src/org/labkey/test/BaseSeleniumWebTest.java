@@ -2917,8 +2917,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         while ( time < wait )
         {
-            if( checker.check() )
-                return true;
+            try
+            {
+                if( checker.check() )
+                    return true;
+            }
+            catch (Exception ignore) {} // Checker exceptions count as a false check
             sleep(100);
             time += 100;
         }
