@@ -29,7 +29,7 @@ import java.io.File;
  * Date: Jun 7, 2007
  * Time: 5:40:36 PM
  */
-public class StudyExtraTest extends BaseSeleniumWebTest
+public class VaccineProtocolTest extends BaseSeleniumWebTest
 {
     protected static final String PROJECT_NAME = "ProtocolVerifyProject";
     protected static final String FOLDER_NAME = "My Folder";
