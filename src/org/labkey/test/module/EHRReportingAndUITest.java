@@ -247,8 +247,9 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForElement(Ext4Helper.ext4Window("Search By Project/Protocol"));
         //_ext4Helper.selectComboBoxItem("Project:", PROJECT_ID); // TODO: Project combo-box not populated
         setFormElement(Locator.xpath("//tr").withPredicate(Locator.xpath("td/label").withText("Project:")).append("//input").withClass("x4-form-text"), PROJECT_ID);
+        fireEvent(Locator.xpath("//tr").withPredicate(Locator.xpath("td/label").withText("Project:")).append("//input").withClass("x4-form-text"), SeleniumEvent.blur);
+        _extHelper.clickExtButton("Search By Project/Protocol", "Submit", 0);
 
-        clickButton("Submit", 0);
         waitForElement(Locator.ext4Button(PROJECT_MEMBER_ID + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
         waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT * 3);
