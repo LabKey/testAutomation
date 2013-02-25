@@ -3214,19 +3214,19 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String desc = type + value;
         if(type.contains("Equals One Of"))
         {
-            desc = "IS ONE OF (" + value.replace(";", ", ") + "))";
+            desc = column + " IS ONE OF (" + value.replace(";", ", ") + "))";
         }
         else if(type.contains("Contains One Of"))
         {
-            desc = "CONTAINS ONE OF (" + value.replace(";", ", ") + "))";
+            desc = column + " CONTAINS ONE OF (" + value.replace(";", ", ") + "))";
         }
         else if(type.contains("Does Not Equal Any Of"))
         {
-            desc = "IS NOT ANY OF (" + value.replace(";", ", ") + "))";
+            desc = column + " IS NOT ANY OF (" + value.replace(";", ", ") + "))";
         }
         else if(type.contains("Does Not Contain Any Of"))
         {
-            desc = "DOES NOT CONTAIN ANY OF (" + value.replace(";", ", ") + "))";
+            desc = column + " DOES NOT CONTAIN ANY OF (" + value.replace(";", ", ") + "))";
         }
         else if(type.equals("Equals"))
         {

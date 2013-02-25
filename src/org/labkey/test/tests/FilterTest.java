@@ -44,6 +44,7 @@ public class FilterTest extends ListTest
     protected final static String PROJECT_NAME = "FilterVerifyProject";
     protected final static String R_VIEW = TRICKY_CHARACTERS + "R view";
     protected final static String FACET_TEST_LIST = "FacetList";
+    protected String listUrl = "";
 
     protected void createList2()
     {
@@ -59,9 +60,11 @@ public class FilterTest extends ListTest
         waitForElement(Locator.id("labkey-nav-trail-current-page").withText(FACET_TEST_LIST));
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     void setUpList()
     {
+        RReportHelperWD _RReportHelperWD = new RReportHelperWD(this);
+        _RReportHelperWD.ensureRConfig();
         StringBuilder testDataFull = new StringBuilder();
         testDataFull.append(StringUtils.join(Arrays.asList(LIST_KEY_NAME2, _listCol1.getName(), _listCol2.getName(), _listCol3.getName(), _listCol4.getName(), _listCol6.getName()), "\t"));
         testDataFull.append("\n");
@@ -87,19 +90,44 @@ public class FilterTest extends ListTest
         selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
         clickDone();
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
+        listUrl = getCurrentRelativeURL();
         clickImportData();
         setFormElement(Locator.name("text"), testDataFull.toString());
         submitImportTsv();
+
+        _customizeViewsHelper.createRView(null, R_VIEW);
     }
 
     public void doTestSteps()
     {
-        RReportHelperWD _RReportHelperWD = new RReportHelperWD(this);
-        _RReportHelperWD.ensureRConfig();
         setUpList();
-        _customizeViewsHelper.createRView(null, R_VIEW);
+
         filterTest();
         facetedFilterTest();
+        directUrlTest();
+    }
+
+    /**
+     * Issue 16821:  Create additional tests for behavior of URL filters w/ empty strings
+     * https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=16281
+     * Filters are represented in the page URL.  Because users can save these URLs for reference, it is
+     * important they be consistent.  To that end, this test will hit various URLs directly
+     * and virify the appropriate data is displayed
+     */
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    private void directUrlTest()
+    {
+        List<FilterArgs> args = generateValidFilterByUrlArgsAndResponses();
+//        FilterArgs  a = args.get(0);
+//        beginAt(listUrl + "&query.Good~in=7%3B8");
+        int count = 0;
+        for(FilterArgs a : args)
+        {
+            log("Loop count: " + count++);
+            validFilterGeneratesCorrectResultsTest(a);
+        }
+
+
     }
 
     private void startFilter(String column)
@@ -111,7 +139,7 @@ public class FilterTest extends ListTest
         sleep(400);
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void facetedFilterTest()
     {
         createList2();
@@ -216,7 +244,7 @@ public class FilterTest extends ListTest
             Assert.assertEquals(1, StringUtils.countMatches(filterDialogText, text));
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void filterTest()
     {
         log("Filter Test");
@@ -308,11 +336,7 @@ public class FilterTest extends ListTest
 
         for (FilterArgs a : testArgs)
         {
-            validFilterGeneratesCorrectResultsTest(
-                    a.columnName,
-                    a.filter1Type, a.filter1Value,
-                    a.filter2Type, a.filter2Value,
-                    a.present, a.notPresent);
+            validFilterGeneratesCorrectResultsTest(a);
         }
     }
 
@@ -323,14 +347,30 @@ public class FilterTest extends ListTest
         public String filter1Value;
         public String filter2Type;
         public String filter2Value;
+        public String filterUrl;
 
         public String[] present;
         public String[] notPresent;
 
+//        public FilterArgs(String columnName,
+//                          String filter1Type, @Nullable String filter1Value,
+//                          @Nullable String filter2Type, @Nullable String filter2Value,
+//                          String[] present, String[] notPresent)
+//        {
+//            this(columnName, filter1Type, filter1Value, filter2Value, filter2Value, present, notPresent, null);
+//            this.columnName = columnName;
+//            this.filter1Type = filter1Type;
+//            this.filter1Value = filter1Value;
+//            this.filter2Type = filter2Type;
+//            this.filter2Value = filter2Value;
+//            this.present = present;
+//            this.notPresent = notPresent;
+//        }
+
         public FilterArgs(String columnName,
                           String filter1Type, @Nullable String filter1Value,
                           @Nullable String filter2Type, @Nullable String filter2Value,
-                          String[] present, String[] notPresent)
+                          String[] present, String[] notPresent, String filterUrl)
         {
             this.columnName = columnName;
             this.filter1Type = filter1Type;
@@ -339,6 +379,7 @@ public class FilterTest extends ListTest
             this.filter2Value = filter2Value;
             this.present = present;
             this.notPresent = notPresent;
+            this.filterUrl = filterUrl;
         }
     }
 
@@ -347,7 +388,31 @@ public class FilterTest extends ListTest
                              @Nullable String filter2Type, @Nullable String filter2Value,
                              String[] present, String[] notPresent)
     {
-        return new FilterArgs(columnName, filter1Type, filter1Value, filter2Type, filter2Value, present, notPresent);
+        return new FilterArgs(columnName, filter1Type, filter1Value, filter2Type, filter2Value, present, notPresent, null);
+    }
+
+
+    public static FilterArgs FilterArgs(String columnName,
+                             String filter1Type, @Nullable String filter1Value,
+                             @Nullable String filter2Type, @Nullable String filter2Value,
+                             String[] present, String[] notPresent, String url)
+    {
+        return new FilterArgs(columnName, filter1Type, filter1Value, filter2Type, filter2Value, present, notPresent, url);
+    }
+
+    private List<FilterArgs> generateValidFilterByUrlArgsAndResponses()
+    {
+            return Arrays.asList(
+                    //String columnName, String filter1Type, String filter1, String filter2Type, String filter2, String[] textPresentAfterFilter, String[] textNotPresentAfterFilter,
+                    //Issue 12197
+                    new FilterArgs(_listCol6.getName(), "= ", "NULL",  null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}, listUrl + "&query.Aliased%24CColumn~eq="),
+                    new FilterArgs(_listCol6.getName(), "<> ", "NULL",  null, null, new String[] {TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}, new String[] {TEST_DATA[1][3]}, listUrl + "&query.Aliased%24CColumn~neq="),
+                    new FilterArgs(_listCol6.getName(), "Equals One Of", "BLANK",  null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}, listUrl + "&query.Aliased%24CColumn~in=%3B"),
+                    new FilterArgs(_listCol6.getName(), "IS NOT ANY OF ", "(BLANK)",  null, null, new String[] {TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}, new String[] {TEST_DATA[1][3]}, listUrl + "&query.Aliased%24CColumn~notin=%3B"),
+                    new FilterArgs(_listCol6.getName(), "IS ", "NULL",  null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0]}, listUrl + "&query.Aliased%24CColumn~isblank"),
+                    new FilterArgs(_listCol4.getName(), "IS NOT ", "NULL",  null, null, new String[] {}, TEST_DATA[1], listUrl + "&query.HiddenColumn~isnonblank"),
+                    FilterArgs(_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}, listUrl + "&query.Good~in=7%3B8")
+            );
     }
 
     private List<FilterArgs> generateValidFilterArgsAndResponses()
@@ -390,32 +455,66 @@ public class FilterTest extends ListTest
         assertTextNotPresent("Show Rows Where");
     }
 
-    @LogMethod
+    private void validFilterGeneratesCorrectResultsTest(String url, String columnName, String filter1Type, String filter1, String filter2Type, String filter2,
+            String[] textPresentAfterFilter, String[] textNotPresentAfterFilter )
+    {
+        List<FilterArgs> args = generateValidFilterByUrlArgsAndResponses();
+        beginAt(url);
+        FilterArgs  arg = args.get(0);
+        checkFilterWasApplied(arg.present, arg.notPresent, arg.columnName, arg.filter1Type, arg.filter1Value,
+                arg.filter2Type, arg.filter2Value);
+    }
+
+    private void validFilterGeneratesCorrectResultsTest(FilterArgs a)
+    {
+            validFilterGeneratesCorrectResultsTest(
+                    a.columnName,
+                    a.filter1Type, a.filter1Value,
+                    a.filter2Type, a.filter2Value,
+                    a.present, a.notPresent.clone(),  a.filterUrl);
+    }
     private void validFilterGeneratesCorrectResultsTest(String columnName, String filter1Type, String filter1, String filter2Type, String filter2,
             String[] textPresentAfterFilter, String[] textNotPresentAfterFilter)
     {
+        validFilterGeneratesCorrectResultsTest(columnName, filter1Type, filter1, filter2Type, filter2, textPresentAfterFilter, textNotPresentAfterFilter, null);
+    }
+
+    @LogMethod
+    private void validFilterGeneratesCorrectResultsTest(String columnName, String filter1Type, String filter1, String filter2Type, String filter2,
+            String[] textPresentAfterFilter, String[] textNotPresentAfterFilter, String url)
+    {
         String fieldKey = EscapeUtil.fieldKeyEncodePart(columnName);
+        if(url==null)
+        {
+//            String fieldKey = EscapeUtil.fieldKeyEncodePart(columnName);
 
-        log("** Filtering " + columnName + " with filter type: " + filter1Type + ", value: " + filter1);
-        if(filter2Type!=null)
-            log("** Second filter: " + filter2Type + ".  value:" + filter2);
-        setFilter(TABLE_NAME, fieldKey, filter1Type, filter1, filter2Type, filter2);
+            log("** Filtering " + columnName + " with filter type: " + filter1Type + ", value: " + filter1);
+            if(filter2Type!=null)
+                log("** Second filter: " + filter2Type + ".  value:" + filter2);
+            setFilter(TABLE_NAME, fieldKey, filter1Type, filter1, filter2Type, filter2);
+
+            checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
+
+            log("** Checking filter present in R view");
+            clickMenuButton("Views", R_VIEW);
+        }
+        else
+            beginAt(url);
+
 
         checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
+        if(url==null)
+        {
 
-        log("** Checking filter present in R view");
-        clickMenuButton("Views", R_VIEW);
-        checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
+            clickMenuButton("Views", "default");
 
-        clickMenuButton("Views", "default");
-
-        //open filter
-        log("** Checking filter values in filter dialog");
-        runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
-        waitForTextToDisappear("Loading...");
-        _extHelper.clickExtTab("Choose Filters");
-        _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
+            //open filter
+            log("** Checking filter values in filter dialog");
+            runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
+            waitForTextToDisappear("Loading...");
+            _extHelper.clickExtTab("Choose Filters");
+            _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
 
         if (filter1 != null)
         {
@@ -464,6 +563,7 @@ public class FilterTest extends ListTest
             assertFormElementEquals(Locator.name("filterType_2"), "No Other Filter");
 
         clickButtonContainingText("CANCEL", 0);
+        }
 
         executeScript("LABKEY.DataRegions['query'].clearAllFilters();");
         waitForElementToDisappear(Locator.css(".labkey-dataregion-msg"), WAIT_FOR_JAVASCRIPT);
