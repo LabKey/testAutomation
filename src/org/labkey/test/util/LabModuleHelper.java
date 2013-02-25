@@ -415,8 +415,8 @@ public class LabModuleHelper
             }
             else
             {
-                Alert alert = _test.getDriver().switchTo().alert();
-                alert.accept();
+                _test.waitForElement(Ext4HelperWD.ext4Window("Error"));
+                _test.click(Locator.ext4Button("OK"));
                 _test.click(Locator.ext4Button("Cancel"));
             }
         }

@@ -213,6 +213,7 @@ src/org/labkey/test/tests/AbstractPlateBasedAssayTest.java -text
 src/org/labkey/test/tests/AbstractQCAssayTest.java -text
 src/org/labkey/test/tests/AbstractQCAssayTestWD.java -text
 src/org/labkey/test/tests/AbstractViabilityTest.java -text
+src/org/labkey/test/tests/AdminConsoleTest.java -text
 src/org/labkey/test/tests/AncillaryStudyFromSpecimenRequestTest.java -text
 src/org/labkey/test/tests/AncillaryStudyTest.java -text
 src/org/labkey/test/tests/AssayTest.java -text

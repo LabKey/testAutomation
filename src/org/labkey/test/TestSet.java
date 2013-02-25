@@ -145,7 +145,8 @@ public enum TestSet
         SpecimenProgressReportTest.class,
         RISAssayTest.class,
         DatabaseDiagnosticsTest.class,
-        StudyDatasetsTest.class
+        StudyDatasetsTest.class,
+        AdminConsoleTest.class
     ),
 
     DailyB(600000,
@@ -283,8 +284,7 @@ public enum TestSet
         CAVDStudyTest.class,
         ExtraKeyStudyTest.class,
         SampleMindedImportTest.class,
-        StudyPublishTest.class,
-        StudyDatasetsTest.class
+        StudyPublishTest.class
     ),
 
     Assays(

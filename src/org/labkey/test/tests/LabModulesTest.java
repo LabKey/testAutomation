@@ -388,7 +388,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             rowMap.put("samplename", arr[0]);
             rowMap.put("subjectId", arr[1]);
             rowMap.put("sampleType", arr[2]);
-            Date date = format.parse(arr[3]);
+            Date date = StringUtils.isEmpty(arr[3]) ? null : format.parse(arr[3]);
             rowMap.put("sampleDate", date);
             rowMap.put("location", arr[4]);
             insertCmd.addRow(rowMap);

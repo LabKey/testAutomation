@@ -41,97 +41,97 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
     private static final String ASSAY_NAME = "ELISPOT Test";
     private static final String[][] TEMPLATE_DATA = new String[][]{
         {"Well", "Subject Id", "Sample Date", "Category", "Peptide", "Cell Number (x10^5)"},
-            //NOTE: this is deliberately missing a subject
-            {"A1", "", "2012-02-07", "Unknown", "3", "1"},
-            {"B1", "Subject1", "2012-02-07", "Unknown", "3", "1"},
-            {"C1", "Control", "", "Pos Control", "Con A", "1"},
-            {"D1", "Subject1", "", "Neg Control", "No stim", "1"},
-            {"E1", "Control", "", "Pos Control", "Con A", "1"},
-            {"F1", "Subject1", "", "Neg Control", "No stim", "1"},
+        //NOTE: this is deliberately missing a subject
+            {"A1", "Subject1", "2012-02-09", "Unknown", "3", "1"},
+            {"B1", "Subject1", "2012-02-09", "Unknown", "3", "1"},
+            {"C1", "Subject1", "2012-02-09", "Pos Control", "Con A", "1"},
+            {"D1", "Subject1", "2012-02-09", "Neg Control", "No stim", "1"},
+            {"E1", "Subject1", "2012-02-09", "Pos Control", "Con A", "1"},
+            {"F1", "Subject1", "2012-02-09", "Neg Control", "No stim", "1"},
             {"G1", "Subject1", "2012-02-09", "Unknown", "5", "1"},
-            {"H1", "Subject1", "40948", "Unknown", "5", "1"},
-            {"A2", "Subject1", "2012-02-11", "Unknown", "7", "1"},
-            {"B2", "Subject1", "2012-02-11", "Unknown", "7", "1"},
-            {"C2", "Subject1", "2012-02-13", "Unknown", "9", "1"},
-            {"D2", "Subject1", "2012-02-13", "Unknown", "9", "1"},
-            {"E2", "Subject1", "2012-02-15", "Unknown", "11", "1"},
-            {"F2", "Subject1", "2012-02-15", "Unknown", "11", "1"},
-            {"G2", "Subject2", "2012-02-17", "Unknown", "13", "1"},
-            {"H2", "Subject2", "2012-02-17", "Unknown", "13", "1"},
+            {"H1", "Subject1", "2/9/2012", "Unknown", "5", "1"},
+            {"A2", "Subject1", "2012-02-09", "Unknown", "7", "1"},
+            {"B2", "Subject1", "2012-02-09", "Unknown", "7", "1"},
+            {"C2", "Subject1", "2012-02-09", "Unknown", "9", "1"},
+            {"D2", "Subject1", "2012-02-09", "Unknown", "9", "1"},
+            {"E2", "Subject1", "2012-02-09", "Unknown", "11", "1"},
+            {"F2", "Subject1", "2012-02-09", "Unknown", "11", "1"},
+            {"G2", "Subject2", "2012-02-19", "Unknown", "13", "1"},
+            {"H2", "Subject2", "2012-02-19", "Unknown", "13", "1"},
             {"A3", "Subject2", "2012-02-19", "Neg Control", "15", "1"},
             {"B3", "Subject2", "2012-02-19", "Unknown", "15", "1"},
-            {"C3", "Subject2", "2012-02-21", "Neg Control", "17", "1"},
-            {"D3", "Subject2", "2012-02-21", "Unknown", "17", "1"},
-            {"E3", "Subject2", "2012-02-23", "Unknown", "19", "1"},
-            {"F3", "Subject2", "2012-02-23", "Unknown", "19", "1"},
-            {"G3", "Subject2", "2012-02-25", "Unknown", "21", "1"},
-            {"H3", "Subject2", "2012-02-25", "Unknown", "21", "1"},
-            {"A4", "Subject2", "2012-02-27", "Unknown", "23", "1"},
-            {"B4", "Subject2", "2012-02-27", "Unknown", "23", "1"},
-            {"C4", "Subject2", "2012-02-29", "Unknown", "25", "1"},
-            {"D4", "Subject2", "2012-02-29", "Unknown", "25", "1"},
-            {"E4", "Subject2", "2012-03-02", "Unknown", "27", "1"},
-            {"F4", "Subject2", "2012-03-02", "Unknown", "27", "1"},
+            {"C3", "Subject2", "2012-02-19", "Neg Control", "17", "1"},
+            {"D3", "Subject2", "2012-02-19", "Unknown", "17", "1"},
+            {"E3", "Subject2", "2012-02-19", "Unknown", "19", "1"},
+            {"F3", "Subject2", "2012-02-19", "Unknown", "19", "1"},
+            {"G3", "Subject2", "2012-02-19", "Unknown", "21", "1"},
+            {"H3", "Subject2", "2012-02-19", "Unknown", "21", "1"},
+            {"A4", "Subject2", "2012-02-19", "Unknown", "23", "1"},
+            {"B4", "Subject2", "2012-02-19", "Unknown", "23", "1"},
+            {"C4", "Subject2", "2012-02-19", "Unknown", "25", "1"},
+            {"D4", "Subject2", "2012-02-19", "Unknown", "25", "1"},
+            {"E4", "Subject2", "2012-02-19", "Unknown", "27", "1"},
+            {"F4", "Subject2", "2012-02-19", "Unknown", "27", "1"},
             {"G4", "Subject3", "2012-03-04", "Unknown", "29", "1"},
             {"H4", "Subject3", "2012-03-04", "Unknown", "29", "1"},
-            {"A5", "Subject3", "2012-03-06", "Neg Control", "31", "1"},
-            {"B5", "Subject3", "2012-03-06", "Unknown", "31", "1"},
-            {"C5", "Subject3", "2012-03-08", "Neg Control", "33", "1"},
-            {"D5", "Subject3", "2012-03-08", "Unknown", "33", "1"},
-            {"E5", "Subject3", "2012-03-10", "Unknown", "35", "1"},
-            {"F5", "Subject3", "2012-03-10", "Unknown", "35", "1"},
-            {"G5", "Subject3", "2012-03-12", "Unknown", "37", "1"},
-            {"H5", "Subject3", "2012-03-12", "Unknown", "37", "1"},
-            {"A6", "Subject3", "2012-03-14", "Unknown", "39", "1"},
-            {"B6", "Subject3", "2012-03-14", "Unknown", "39", "1"},
-            {"C6", "Subject3", "2012-03-16", "Unknown", "41", "1"},
-            {"D6", "Subject3", "2012-03-16", "Unknown", "41", "1"},
-            {"E6", "Subject3", "2012-03-18", "Unknown", "43", "1"},
-            {"F6", "Subject3", "2012-03-18", "Unknown", "43", "1"},
-            {"G6", "Subject3", "2012-03-20", "Unknown", "45", "1"},
-            {"H6", "Subject3", "2012-03-20", "Unknown", "45", "1"},
-            {"A7", "Subject3", "2012-03-22", "Unknown", "47", "1"},
-            {"B7", "Subject3", "2012-03-22", "Unknown", "47", "1"},
-            {"C7", "Subject3", "2012-03-24", "Unknown", "49", "1"},
-            {"D7", "Subject3", "2012-03-24", "Unknown", "49", "1"},
-            {"E7", "Subject3", "2012-03-26", "Unknown", "51", "1"},
-            {"F7", "Subject3", "2012-03-26", "Unknown", "51", "1"},
-            {"G7", "Subject3", "2012-03-28", "Unknown", "53", "1"},
-            {"H7", "Subject3", "2012-03-28", "Unknown", "53", "1"},
-            {"A8", "Subject3", "2012-03-30", "Unknown", "55", "1"},
-            {"B8", "Subject3", "2012-03-30", "Unknown", "55", "1"},
-            {"C8", "Subject3", "2012-04-01", "Unknown", "57", "1"},
-            {"D8", "Subject3", "2012-04-01", "Unknown", "57", "1"},
-            {"E8", "Subject3", "2012-04-03", "Unknown", "59", "1"},
-            {"F8", "Subject3", "2012-04-03", "Unknown", "59", "1"},
-            {"G8", "Subject3", "2012-04-05", "Unknown", "61", "1"},
-            {"H8", "Subject3", "2012-04-05", "Unknown", "61", "1"},
-            {"A9", "Subject3", "2012-04-07", "Unknown", "63", "1"},
-            {"B9", "Subject3", "2012-04-07", "Unknown", "63", "1"},
-            {"C9", "Subject3", "2012-04-09", "Unknown", "65", "1"},
-            {"D9", "Subject3", "2012-04-09", "Unknown", "65", "1"},
-            {"E9", "Subject3", "2012-04-11", "Unknown", "67", "1"},
-            {"F9", "Subject3", "2012-04-11", "Unknown", "67", "1"},
-            {"G9", "Subject3", "2012-04-13", "Unknown", "69", "1"},
-            {"H9", "Subject3", "2012-04-13", "Unknown", "69", "1"},
-            {"A10", "Subject3", "2012-04-15", "Unknown", "71", "1"},
-            {"B10", "Subject3", "2012-04-15", "Unknown", "71", "1"},
-            {"C10", "Subject3", "2012-04-17", "Unknown", "73", "1"},
-            {"D10", "Subject3", "2012-04-17", "Unknown", "73", "1"},
-            {"E10", "Subject3", "2012-04-19", "Unknown", "75", "1"},
-            {"F10", "Subject3", "2012-04-19", "Unknown", "75", "1"},
-            {"G10", "Subject3", "2012-04-21", "Unknown", "77", "1"},
-            {"H10", "Subject3", "2012-04-21", "Unknown", "77", "1"},
-            {"A11", "Subject3", "2012-04-23", "Unknown", "79", "1"},
-            {"B11", "Subject3", "2012-04-23", "Unknown", "79", "1"},
-            {"C11", "Subject3", "2012-04-25", "Unknown", "81", "1"},
-            {"D11", "Subject3", "2012-04-25", "Unknown", "81", "1"},
-            {"E11", "Subject3", "2012-04-27", "Unknown", "83", "1"},
-            {"F11", "Subject3", "2012-04-27", "Unknown", "83", "1"},
-            {"G11", "Subject3", "2012-04-29", "Unknown", "85", "1"},
-            {"H11", "Subject3", "2012-04-29", "Unknown", "85", "1"},
-            {"A12", "Subject3", "2012-05-01", "Unknown", "87", "1"},
-            {"B12", "Subject3", "2012-05-01", "Unknown", "87", "1"}
+            {"A5", "Subject3", "2012-03-04", "Neg Control", "31", "1"},
+            {"B5", "Subject3", "2012-03-04", "Unknown", "31", "1"},
+            {"C5", "Subject3", "2012-03-04", "Neg Control", "33", "1"},
+            {"D5", "Subject3", "2012-03-04", "Unknown", "33", "1"},
+            {"E5", "Subject3", "2012-03-04", "Unknown", "35", "1"},
+            {"F5", "Subject3", "2012-03-04", "Unknown", "35", "1"},
+            {"G5", "Subject3", "2012-03-04", "Unknown", "37", "1"},
+            {"H5", "Subject3", "2012-03-04", "Unknown", "37", "1"},
+            {"A6", "Subject3", "2012-03-04", "Unknown", "39", "1"},
+            {"B6", "Subject3", "2012-03-04", "Unknown", "39", "1"},
+            {"C6", "Subject3", "2012-03-04", "Unknown", "41", "1"},
+            {"D6", "Subject3", "2012-03-04", "Unknown", "41", "1"},
+            {"E6", "Subject3", "2012-03-04", "Unknown", "43", "1"},
+            {"F6", "Subject3", "2012-03-04", "Unknown", "43", "1"},
+            {"G6", "Subject3", "2012-03-04", "Unknown", "45", "1"},
+            {"H6", "Subject3", "2012-03-04", "Unknown", "45", "1"},
+            {"A7", "Subject3", "2012-03-04", "Unknown", "47", "1"},
+            {"B7", "Subject3", "2012-03-04", "Unknown", "47", "1"},
+            {"C7", "Subject3", "2012-03-04", "Unknown", "49", "1"},
+            {"D7", "Subject3", "2012-03-04", "Unknown", "49", "1"},
+            {"E7", "Subject3", "2012-03-04", "Unknown", "51", "1"},
+            {"F7", "Subject3", "2012-03-04", "Unknown", "51", "1"},
+            {"G7", "Subject3", "2012-03-04", "Unknown", "53", "1"},
+            {"H7", "Subject3", "2012-03-04", "Unknown", "53", "1"},
+            {"A8", "Subject3", "2012-03-04", "Unknown", "55", "1"},
+            {"B8", "Subject3", "2012-03-04", "Unknown", "55", "1"},
+            {"C8", "Subject3", "2012-03-04", "Unknown", "57", "1"},
+            {"D8", "Subject3", "2012-03-04", "Unknown", "57", "1"},
+            {"E8", "Subject3", "2012-03-04", "Unknown", "59", "1"},
+            {"F8", "Subject3", "2012-03-04", "Unknown", "59", "1"},
+            {"G8", "Subject3", "2012-03-04", "Unknown", "61", "1"},
+            {"H8", "Subject3", "2012-03-04", "Unknown", "61", "1"},
+            {"A9", "Subject3", "2012-03-04", "Unknown", "63", "1"},
+            {"B9", "Subject3", "2012-03-04", "Unknown", "63", "1"},
+            {"C9", "Subject3", "2012-03-04", "Unknown", "65", "1"},
+            {"D9", "Subject3", "2012-03-04", "Unknown", "65", "1"},
+            {"E9", "Subject3", "2012-03-04", "Unknown", "67", "1"},
+            {"F9", "Subject3", "2012-03-04", "Unknown", "67", "1"},
+            {"G9", "Subject3", "2012-03-04", "Unknown", "69", "1"},
+            {"H9", "Subject3", "2012-03-04", "Unknown", "69", "1"},
+            {"A10", "Subject3", "2012-03-04", "Unknown", "71", "1"},
+            {"B10", "Subject3", "2012-03-04", "Unknown", "71", "1"},
+            {"C10", "Subject3", "2012-03-04", "Unknown", "73", "1"},
+            {"D10", "Subject3", "2012-03-04", "Unknown", "73", "1"},
+            {"E10", "Subject3", "2012-03-04", "Unknown", "75", "1"},
+            {"F10", "Subject3", "2012-03-04", "Unknown", "75", "1"},
+            {"G10", "Subject3", "2012-03-04", "Unknown", "77", "1"},
+            {"H10", "Subject3", "2012-03-04", "Unknown", "77", "1"},
+            {"A11", "Subject3", "2012-03-04", "Unknown", "79", "1"},
+            {"B11", "Subject3", "2012-03-04", "Unknown", "79", "1"},
+            {"C11", "Subject3", "2012-03-04", "Unknown", "81", "1"},
+            {"D11", "Subject3", "2012-03-04", "Unknown", "81", "1"},
+            {"E11", "Subject3", "2012-03-04", "Unknown", "83", "1"},
+            {"F11", "Subject3", "2012-03-04", "Unknown", "83", "1"},
+            {"G11", "Subject3", "2012-03-04", "Unknown", "85", "1"},
+            {"H11", "Subject3", "2012-03-04", "Unknown", "85", "1"},
+            {"A12", "Subject3", "2012-03-04", "Unknown", "87", "1"},
+            {"B12", "Subject3", "2012-03-04", "Unknown", "87", "1"}
     };
 
     public ELISPOT_AssayTest()
@@ -170,6 +170,9 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         expectedCols.add("sampleId");
 
         waitForElement(Locator.xpath("//span[contains(text(), 'Freezer Id') and contains(@class, 'x4-column-header-text')]")); //ensure grid loaded
+        String originalID = TEMPLATE_DATA[1][1];
+        TEMPLATE_DATA[1][1] = "";
+
         _helper.addRecordsToAssayTemplate(TEMPLATE_DATA, expectedCols);
 
         waitForElement(_helper.getAssayWell("A1", LabModuleHelper.UNKNOWN_COLOR), WAIT_FOR_PAGE);
@@ -179,17 +182,24 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         assertElementPresent(_helper.getAssayWell("F1", LabModuleHelper.NEG_COLOR));
         assertElementPresent(_helper.getAssayWell("H11", LabModuleHelper.UNKNOWN_COLOR));
 
-        //TODO: try to save invalid data
-
-        //The sample data is missing required values
+        //the data are missing an ID
         click(Locator.ext4Button("Save"));
         waitForElement(Ext4HelperWD.ext4Window("Error"));
         assertTextPresent("One or more required fields are missing from the sample records");
         waitAndClick(Locator.ext4Button("OK"));
 
-        //restore valid values
+        //save data using a fake ID
         Ext4GridRefWD grid = _ext4Helper.queryOne("grid", Ext4GridRefWD.class);
-        grid.setGridCell(1, 4, "Subject1");
+        grid.setGridCell(1, 4, "FakeId");
+
+        click(Locator.ext4Button("Save"));
+        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        assertTextPresent("Must provide at least 2 negative controls for each subjectId/date.");
+        assertTextPresent("Missing for: FakeId / 2012-02-09");
+        waitAndClick(Locator.ext4Button("OK"));
+
+        //restore valid values
+        grid.setGridCell(1, 4, originalID);
         waitAndClick(Locator.ext4Button("Save and Close"));
         waitForText("Save Complete");
         waitAndClick(Locator.ext4Button("OK"));
@@ -244,96 +254,96 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         DataRegionTable results = new DataRegionTable("Data", this);
 
         Map<String, String[]> expected = new LinkedHashMap<String, String[]>();
-        expected.put("Subject7_56", new String[]{"Subject7", "<5>", "2012-02-09", "56", "NEG", "High CV: 0.30743773095067284", "PBMC"});
-        expected.put("Subject7_36", new String[]{"Subject7", "<5>", "2012-02-09", "36", "NEG", "High CV: 0.30743773095067284", "PBMC"});
-        expected.put("Subject79_11", new String[]{"Subject79", "<77>", "2012-04-21", "11", "POS", "High CV: 0.1697056274847714", "PBMC"});
-        expected.put("Subject79_14", new String[]{"Subject79", "<77>", "2012-04-21", "14", "POS", "High CV: 0.1697056274847714", "PBMC"});
-        expected.put("Subject27_35", new String[]{"Subject27", "<25>", "2012-02-29", "35", "NEG", "High CV: 0.128564869306645", "PBMC"});
-        expected.put("Subject27_42", new String[]{"Subject27", "<25>", "2012-02-29", "42", "NEG", "High CV: 0.128564869306645", "PBMC"});
-        expected.put("Subject15_47", new String[]{"Subject15", "<13>", "2012-02-17", "47", "POS", " ", "PBMC"});
-        expected.put("Subject15_46", new String[]{"Subject15", "<13>", "2012-02-17", "46", "POS", " ", "PBMC"});
-        expected.put("Subject41_51", new String[]{"Subject41", "<39>", "2012-03-14", "51", "NEG", "High CV: 0.15986762009434988", "PBMC"});
-        expected.put("Subject41_64", new String[]{"Subject41", "<39>", "2012-03-14", "64", "NEG", "High CV: 0.15986762009434988", "PBMC"});
-        expected.put("Subject39_67", new String[]{"Subject39", "<37>", "2012-03-12", "67", "NEG", "High CV: 0.308555686335948", "PBMC"});
-        expected.put("Subject39_43", new String[]{"Subject39", "<37>", "2012-03-12", "43", "NEG", "High CV: 0.308555686335948", "PBMC"});
-        expected.put("Subject77_14", new String[]{"Subject77", "<75>", "2012-04-19", "14", "NEG", " ", "PBMC"});
-        expected.put("Subject77_16", new String[]{"Subject77", "<75>", "2012-04-19", "16", "NEG", " ", "PBMC"});
-        expected.put("Subject69_13", new String[]{"Subject69", "<67>", "2012-04-11", "13", "NEG", "High CV: 0.29998469504883835", "PBMC"});
-        expected.put("Subject69_20", new String[]{"Subject69", "<67>", "2012-04-11", "20", "NEG", "High CV: 0.29998469504883835", "PBMC"});
-        expected.put("Subject83_47", new String[]{"Subject83", "<81>", "2012-04-25", "47", "NEG", "High CV: 0.13155474998819489", "PBMC"});
-        expected.put("Subject83_39", new String[]{"Subject83", "<81>", "2012-04-25", "39", "NEG", "High CV: 0.13155474998819489", "PBMC"});
-        expected.put("Control_1154", new String[]{"Control", "Con A", "", "1154", "POS", " ", "PBMC"});
-        expected.put("Control_1124", new String[]{"Control", "Con A", "", "1124", "POS", " ", "PBMC"});
-        expected.put("Subject43_46", new String[]{"Subject43", "<41>", "2012-03-16", "46", "NEG", " ", "PBMC"});
-        expected.put("Subject43_40", new String[]{"Subject43", "<41>", "2012-03-16", "40", "NEG", " ", "PBMC"});
-        expected.put("Subject71_15", new String[]{"Subject71", "<69>", "2012-04-13", "15", "NEG", " ", "PBMC"});
-        expected.put("Subject71_14", new String[]{"Subject71", "<69>", "2012-04-13", "14", "NEG", " ", "PBMC"});
-        expected.put("Subject11_53", new String[]{"Subject11", "<9>", "2012-02-13", "53", "NEG", "High CV: 0.11544600509168124", "PBMC"});
-        expected.put("Subject11_45", new String[]{"Subject11", "<9>", "2012-02-13", "45", "NEG", "High CV: 0.11544600509168124", "PBMC"});
-        expected.put("Subject55_15", new String[]{"Subject55", "<53>", "2012-03-28", "15", "NEG", "High CV: 0.51425947722658", "PBMC"});
-        expected.put("Subject55_7", new String[]{"Subject55", "<53>", "2012-03-28", "7", "NEG", "High CV: 0.51425947722658", "PBMC"});
-        expected.put("Subject65_37", new String[]{"Subject65", "<63>", "2012-04-07", "37", "NEG", "High CV: 0.5237828008789241", "PBMC"});
-        expected.put("Subject65_17", new String[]{"Subject65", "<63>", "2012-04-07", "17", "NEG", "High CV: 0.5237828008789241", "PBMC"});
-        expected.put("Subject47_63", new String[]{"Subject47", "<45>", "2012-03-20", "63", "NEG", "High CV: 0.16269713549424986", "PBMC"});
-        expected.put("Subject47_50", new String[]{"Subject47", "<45>", "2012-03-20", "50", "NEG", "High CV: 0.16269713549424986", "PBMC"});
-        expected.put("Subject73_36", new String[]{"Subject73", "<71>", "2012-04-15", "36", "NEG", "High CV: 0.6638145292771671", "PBMC"});
-        expected.put("Subject73_13", new String[]{"Subject73", "<71>", "2012-04-15", "13", "NEG", "High CV: 0.6638145292771671", "PBMC"});
-        expected.put("Subject5_1154", new String[]{"Subject5", "<3>", "2012-02-07", "1154", "NEG", "High CV: 1.3378984966126584", "PBMC"});
-        expected.put("Subject5_32", new String[]{"Subject5", "<3>", "2012-02-07", "32", "NEG", "High CV: 1.3378984966126584", "PBMC"});
-        expected.put("Subject19_47", new String[]{"Subject19", "<17>", "2012-02-21", "47", "POS", " ", "PBMC"});
-        expected.put("Subject19_43", new String[]{"Subject19", "<17>", "2012-02-21", "43", "POS", " ", "PBMC"});
-        expected.put("Subject51_36", new String[]{"Subject51", "<49>", "2012-03-24", "36", "NEG", "High CV: 0.10878565864408422", "PBMC"});
-        expected.put("Subject51_42", new String[]{"Subject51", "<49>", "2012-03-24", "42", "NEG", "High CV: 0.10878565864408422", "PBMC"});
-        expected.put("Subject53_42", new String[]{"Subject53", "<51>", "2012-03-26", "42", "NEG", "High CV: 0.30743773095067284", "PBMC"});
-        expected.put("Subject53_27", new String[]{"Subject53", "<51>", "2012-03-26", "27", "NEG", "High CV: 0.30743773095067284", "PBMC"});
-        expected.put("Subject13_33", new String[]{"Subject13", "<11>", "2012-02-15", "33", "NEG", "High CV: 0.388520209443158", "PBMC"});
-        expected.put("Subject13_58", new String[]{"Subject13", "<11>", "2012-02-15", "58", "NEG", "High CV: 0.388520209443158", "PBMC"});
-        expected.put("Subject57_48", new String[]{"Subject57", "<55>", "2012-03-30", "48", "POS", " ", "PBMC"});
-        expected.put("Subject57_53", new String[]{"Subject57", "<55>", "2012-03-30", "53", "POS", " ", "PBMC"});
-        expected.put("Subject61_44", new String[]{"Subject61", "<59>", "2012-04-03", "44", "NEG", "High CV: 0.1414213562373095", "PBMC"});
-        expected.put("Subject61_36", new String[]{"Subject61", "<59>", "2012-04-03", "36", "NEG", "High CV: 0.1414213562373095", "PBMC"});
-        expected.put("Subject21_33", new String[]{"Subject21", "<19>", "2012-02-23", "33", "NEG", "High CV: 0.27594410973133565", "PBMC"});
-        expected.put("Subject21_49", new String[]{"Subject21", "<19>", "2012-02-23", "49", "NEG", "High CV: 0.27594410973133565", "PBMC"});
-        expected.put("Subject33_71", new String[]{"Subject33", "<31>", "2012-03-06", "71", "NEG", "High CV: 0.411407581781264", "PBMC"});
-        expected.put("Subject33_39", new String[]{"Subject33", "<31>", "2012-03-06", "39", "NEG", "High CV: 0.411407581781264", "PBMC"});
-        expected.put("Subject49_66", new String[]{"Subject49", "<47>", "2012-03-22", "66", "NEG", "High CV: 0.5102832441552405", "PBMC"});
-        expected.put("Subject49_31", new String[]{"Subject49", "<47>", "2012-03-22", "31", "NEG", "High CV: 0.5102832441552405", "PBMC"});
-        expected.put("Subject37_65", new String[]{"Subject37", "<35>", "2012-03-10", "65", "NEG", "High CV: 0.1438183283769249", "PBMC"});
-        expected.put("Subject37_53", new String[]{"Subject37", "<35>", "2012-03-10", "53", "NEG", "High CV: 0.1438183283769249", "PBMC"});
-        expected.put("Subject81_12", new String[]{"Subject81", "<79>", "2012-04-23", "12", "NEG", "High CV: 0.37216146378239345", "PBMC"});
-        expected.put("Subject81_7", new String[]{"Subject81", "<79>", "2012-04-23", "7", "NEG", "High CV: 0.37216146378239345", "PBMC"});
-        expected.put("Subject17_53", new String[]{"Subject17", "<15>", "2012-02-19", "53", "NEG", "High CV: 0.215206411665471", "PBMC"});
-        expected.put("Subject17_39", new String[]{"Subject17", "<15>", "2012-02-19", "39", "NEG", "High CV: 0.215206411665471", "PBMC"});
-        expected.put("Subject45_48", new String[]{"Subject45", "<43>", "2012-03-18", "48", "NEG", "High CV: 0.22329687826943606", "PBMC"});
-        expected.put("Subject45_66", new String[]{"Subject45", "<43>", "2012-03-18", "66", "NEG", "High CV: 0.22329687826943606", "PBMC"});
-        expected.put("Subject75_16", new String[]{"Subject75", "<73>", "2012-04-17", "16", "NEG", " ", "PBMC"});
-        expected.put("Subject75_15", new String[]{"Subject75", "<73>", "2012-04-17", "15", "NEG", " ", "PBMC"});
-        expected.put("Subject29_61", new String[]{"Subject29", "<27>", "2012-03-02", "61", "NEG", "High CV: 0.16866767257660767", "PBMC"});
-        expected.put("Subject29_48", new String[]{"Subject29", "<27>", "2012-03-02", "48", "NEG", "High CV: 0.16866767257660767", "PBMC"});
-        expected.put("Subject35_41", new String[]{"Subject35", "<33>", "2012-03-08", "41", "NEG", "High CV: 0.2664460334905831", "PBMC"});
-        expected.put("Subject35_28", new String[]{"Subject35", "<33>", "2012-03-08", "28", "NEG", "High CV: 0.2664460334905831", "PBMC"});
-        expected.put("Control_25", new String[]{"Control", "No stim", "", "25", "NEG", " ", "PBMC"});
-        expected.put("Control_22", new String[]{"Control", "No stim", "", "22", "NEG", " ", "PBMC"});
-        expected.put("Subject63_12", new String[]{"Subject63", "<61>", "2012-04-05", "12", "NEG", " ", "PBMC"});
-        expected.put("Subject63_12", new String[]{"Subject63", "<61>", "2012-04-05", "12", "NEG", " ", "PBMC"});
-        expected.put("Subject85_23", new String[]{"Subject85", "<83>", "2012-04-27", "23", "NEG", "High CV: 0.41338550284752007", "PBMC"});
-        expected.put("Subject85_42", new String[]{"Subject85", "<83>", "2012-04-27", "42", "NEG", "High CV: 0.41338550284752007", "PBMC"});
-        expected.put("Subject23_31", new String[]{"Subject23", "<21>", "2012-02-25", "31", "NEG", "High CV: 0.12478354962115544", "PBMC"});
-        expected.put("Subject23_37", new String[]{"Subject23", "<21>", "2012-02-25", "37", "NEG", "High CV: 0.12478354962115544", "PBMC"});
-        expected.put("Subject87_46", new String[]{"Subject87", "<85>", "2012-04-29", "46", "NEG", "High CV: 0.4182885184483802", "PBMC"});
-        expected.put("Subject87_25", new String[]{"Subject87", "<85>", "2012-04-29", "25", "NEG", "High CV: 0.4182885184483802", "PBMC"});
-        expected.put("Subject31_54", new String[]{"Subject31", "<29>", "2012-03-04", "54", "POS", " ", "PBMC"});
-        expected.put("Subject31_60", new String[]{"Subject31", "<29>", "2012-03-04", "60", "POS", " ", "PBMC"});
-        expected.put("Subject25_78", new String[]{"Subject25", "<23>", "2012-02-27", "78", "NEG", "High CV: 0.282842712474619", "PBMC"});
-        expected.put("Subject25_52", new String[]{"Subject25", "<23>", "2012-02-27", "52", "NEG", "High CV: 0.282842712474619", "PBMC"});
-        expected.put("Subject67_25", new String[]{"Subject67", "<65>", "2012-04-09", "25", "NEG", " ", "PBMC"});
-        expected.put("Subject67_23", new String[]{"Subject67", "<65>", "2012-04-09", "23", "NEG", " ", "PBMC"});
-        expected.put("Subject59_43", new String[]{"Subject59", "<57>", "2012-04-01", "43", "NEG", "High CV: 0.22933192903347485", "PBMC"});
-        expected.put("Subject59_31", new String[]{"Subject59", "<57>", "2012-04-01", "31", "NEG", "High CV: 0.22933192903347485", "PBMC"});
-        expected.put("Subject89_13", new String[]{"Subject89", "<87>", "2012-05-01", "13", "NEG", " ", "PBMC"});
-        expected.put("Subject89_12", new String[]{"Subject89", "<87>", "2012-05-01", "12", "NEG", " ", "PBMC"});
-        expected.put("Subject9_1124", new String[]{"Subject9", "<7>", "2012-02-11", "1124", "NEG", "High CV: 1.2822682766555034", "PBMC"});
-        expected.put("Subject9_55", new String[]{"Subject9", "<7>", "2012-02-11", "55", "NEG", "High CV: 1.2822682766555034", "PBMC"});
+        expected.put("Subject3_<53>_15", new String[]{"Subject3", "<53>", "2012-03-04", "15", "NEG", "High CV: 0.51425947722658", "PBMC"});
+        expected.put("Subject3_<53>_7", new String[]{"Subject3", "<53>", "2012-03-04", "7", "NEG", "High CV: 0.51425947722658", "PBMC"});
+        expected.put("Subject3_<45>_63", new String[]{"Subject3", "<45>", "2012-03-04", "63", "NEG", "High CV: 0.16269713549424986", "PBMC"});
+        expected.put("Subject3_<45>_50", new String[]{"Subject3", "<45>", "2012-03-04", "50", "NEG", "High CV: 0.16269713549424986", "PBMC"});
+        expected.put("Subject3_<83>_23", new String[]{"Subject3", "<83>", "2012-03-04", "23", "NEG", "High CV: 0.41338550284752007", "PBMC"});
+        expected.put("Subject3_<83>_42", new String[]{"Subject3", "<83>", "2012-03-04", "42", "NEG", "High CV: 0.41338550284752007", "PBMC"});
+        expected.put("Subject3_<37>_67", new String[]{"Subject3", "<37>", "2012-03-04", "67", "NEG", "High CV: 0.308555686335948", "PBMC"});
+        expected.put("Subject3_<37>_43", new String[]{"Subject3", "<37>", "2012-03-04", "43", "NEG", "High CV: 0.308555686335948", "PBMC"});
+        expected.put("Subject3_<51>_42", new String[]{"Subject3", "<51>", "2012-03-04", "42", "NEG", "High CV: 0.30743773095067284", "PBMC"});
+        expected.put("Subject3_<51>_27", new String[]{"Subject3", "<51>", "2012-03-04", "27", "NEG", "High CV: 0.30743773095067284", "PBMC"});
+        expected.put("Subject3_<63>_37", new String[]{"Subject3", "<63>", "2012-03-04", "37", "NEG", "High CV: 0.5237828008789241", "PBMC"});
+        expected.put("Subject3_<63>_17", new String[]{"Subject3", "<63>", "2012-03-04", "17", "NEG", "High CV: 0.5237828008789241", "PBMC"});
+        expected.put("Subject3_<55>_48", new String[]{"Subject3", "<55>", "2012-03-04", "48", "NEG", "", "PBMC"});
+        expected.put("Subject3_<55>_53", new String[]{"Subject3", "<55>", "2012-03-04", "53", "NEG", "", "PBMC"});
+        expected.put("Subject3_<47>_66", new String[]{"Subject3", "<47>", "2012-03-04", "66", "NEG", "High CV: 0.5102832441552405", "PBMC"});
+        expected.put("Subject3_<47>_31", new String[]{"Subject3", "<47>", "2012-03-04", "31", "NEG", "High CV: 0.5102832441552405", "PBMC"});
+        expected.put("Subject3_<81>_47", new String[]{"Subject3", "<81>", "2012-03-04", "47", "NEG", "High CV: 0.13155474998819489", "PBMC"});
+        expected.put("Subject3_<81>_39", new String[]{"Subject3", "<81>", "2012-03-04", "39", "NEG", "High CV: 0.13155474998819489", "PBMC"});
+        expected.put("Subject3_<67>_13", new String[]{"Subject3", "<67>", "", "13", "NEG", "High CV: 0.29998469504883835", "PBMC"});
+        expected.put("Subject3_<67>_20", new String[]{"Subject3", "<67>", "", "20", "NEG", "High CV: 0.29998469504883835", "PBMC"});
+        expected.put("Subject3_<71>_36", new String[]{"Subject3", "<71>", "2012-03-04", "36", "NEG", "High CV: 0.6638145292771671", "PBMC"});
+        expected.put("Subject3_<71>_13", new String[]{"Subject3", "<71>", "2012-03-04", "13", "NEG", "High CV: 0.6638145292771671", "PBMC"});
+        expected.put("Subject3_<65>_25", new String[]{"Subject3", "<65>", "2012-03-04", "25", "NEG", "", "PBMC"});
+        expected.put("Subject3_<65>_23", new String[]{"Subject3", "<65>", "2012-03-04", "23", "NEG", "", "PBMC"});
+        expected.put("Subject1_No stim_25", new String[]{"Subject1", "No stim", "2012-02-09", "25", "NEG", "", "PBMC"});
+        expected.put("Subject1_No stim_22", new String[]{"Subject1", "No stim", "2012-02-09", "22", "NEG", "", "PBMC"});
+        expected.put("Subject3_<35>_65", new String[]{"Subject3", "<35>", "2012-03-04", "65", "NEG", "High CV: 0.1438183283769249", "PBMC"});
+        expected.put("Subject3_<35>_53", new String[]{"Subject3", "<35>", "2012-03-04", "53", "NEG", "High CV: 0.1438183283769249", "PBMC"});
+        expected.put("Subject2_<19>_33", new String[]{"Subject2", "<19>", "2012-02-19", "33", "NEG", "High CV: 0.27594410973133565", "PBMC"});
+        expected.put("Subject2_<19>_49", new String[]{"Subject2", "<19>", "2012-02-19", "49", "NEG", "High CV: 0.27594410973133565", "PBMC"});
+        expected.put("Subject3_<61>_12", new String[]{"Subject3", "<61>", "2012-03-04", "12", "NEG", "", "PBMC"});
+        expected.put("Subject3_<61>_12", new String[]{"Subject3", "<61>", "2012-03-04", "12", "NEG", "", "PBMC"});
+        expected.put("Subject3_<33>_41", new String[]{"Subject3", "<33>", "2012-03-04", "41", "NEG", "High CV: 0.2664460334905831", "PBMC"});
+        expected.put("Subject3_<33>_28", new String[]{"Subject3", "<33>", "2012-03-04", "28", "NEG", "High CV: 0.2664460334905831", "PBMC"});
+        expected.put("Subject3_<85>_46", new String[]{"Subject3", "<85>", "2012-03-04", "46", "NEG", "High CV: 0.4182885184483802", "PBMC"});
+        expected.put("Subject3_<85>_25", new String[]{"Subject3", "<85>", "2012-03-04", "25", "NEG", "High CV: 0.4182885184483802", "PBMC"});
+        expected.put("Subject3_<79>_12", new String[]{"Subject3", "<79>", "2012-03-04", "12", "NEG", "High CV: 0.37216146378239345", "PBMC"});
+        expected.put("Subject3_<79>_7", new String[]{"Subject3", "<79>", "2012-03-04", "7", "NEG", "High CV: 0.37216146378239345", "PBMC"});
+        expected.put("Subject1_<5>_56", new String[]{"Subject1", "<5>", "2012-02-09", "56", "NEG", "High CV: 0.30743773095067284", "PBMC"});
+        expected.put("Subject1_<5>_36", new String[]{"Subject1", "<5>", "2012-02-09", "36", "NEG", "High CV: 0.30743773095067284", "PBMC"});
+        expected.put("Subject3_<77>_11", new String[]{"Subject3", "<77>", "2012-03-04", "11", "NEG", "High CV: 0.1697056274847714", "PBMC"});
+        expected.put("Subject3_<77>_14", new String[]{"Subject3", "<77>", "2012-03-04", "14", "NEG", "High CV: 0.1697056274847714", "PBMC"});
+        expected.put("Subject3_<87>_13", new String[]{"Subject3", "<87>", "2012-03-04", "13", "NEG", "", "PBMC"});
+        expected.put("Subject3_<87>_12", new String[]{"Subject3", "<87>", "2012-03-04", "12", "NEG", "", "PBMC"});
+        expected.put("Subject1_<3>_1154", new String[]{"Subject1", "<3>", "2012-02-09", "1154", "NEG", "High CV: 1.3378984966126584", "PBMC"});
+        expected.put("Subject1_<3>_32", new String[]{"Subject1", "<3>", "2012-02-09", "32", "NEG", "High CV: 1.3378984966126584", "PBMC"});
+        expected.put("Subject3_<73>_16", new String[]{"Subject3", "<73>", "2012-03-04", "16", "NEG", "", "PBMC"});
+        expected.put("Subject3_<73>_15", new String[]{"Subject3", "<73>", "2012-03-04", "15", "NEG", "", "PBMC"});
+        expected.put("Subject3_<75>_14", new String[]{"Subject3", "<75>", "2012-03-04", "14", "NEG", "", "PBMC"});
+        expected.put("Subject3_<75>_16", new String[]{"Subject3", "<75>", "2012-03-04", "16", "NEG", "", "PBMC"});
+        expected.put("Subject3_<29>_54", new String[]{"Subject3", "<29>", "2012-03-04", "54", "NEG", "", "PBMC"});
+        expected.put("Subject3_<29>_60", new String[]{"Subject3", "<29>", "2012-03-04", "60", "NEG", "", "PBMC"});
+        expected.put("Subject1_<9>_53", new String[]{"Subject1", "<9>", "2012-02-09", "53", "NEG", "High CV: 0.11544600509168124", "PBMC"});
+        expected.put("Subject1_<9>_45", new String[]{"Subject1", "<9>", "2012-02-09", "45", "NEG", "High CV: 0.11544600509168124", "PBMC"});
+        expected.put("Subject1_<7>_1124", new String[]{"Subject1", "<7>", "2012-02-09", "1124", "NEG", "High CV: 1.2822682766555034", "PBMC"});
+        expected.put("Subject1_<7>_55", new String[]{"Subject1", "<7>", "2012-02-09", "55", "NEG", "High CV: 1.2822682766555034", "PBMC"});
+        expected.put("Subject1_<11>_33", new String[]{"Subject1", "<11>", "2012-02-09", "33", "NEG", "High CV: 0.388520209443158", "PBMC"});
+        expected.put("Subject1_<11>_58", new String[]{"Subject1", "<11>", "2012-02-09", "58", "NEG", "High CV: 0.388520209443158", "PBMC"});
+        expected.put("Subject1_Con A_1154", new String[]{"Subject1", "Con A", "2012-02-09", "1154", "POS", "", "PBMC"});
+        expected.put("Subject1_Con A_1124", new String[]{"Subject1", "Con A", "2012-02-09", "1124", "POS", "", "PBMC"});
+        expected.put("Subject2_<21>_31", new String[]{"Subject2", "<21>", "2012-02-19", "31", "NEG", "High CV: 0.12478354962115544", "PBMC"});
+        expected.put("Subject2_<21>_37", new String[]{"Subject2", "<21>", "2012-02-19", "37", "NEG", "High CV: 0.12478354962115544", "PBMC"});
+        expected.put("Subject3_<69>_15", new String[]{"Subject3", "<69>", "2012-03-04", "15", "NEG", "", "PBMC"});
+        expected.put("Subject3_<69>_14", new String[]{"Subject3", "<69>", "2012-03-04", "14", "NEG", "", "PBMC"});
+        expected.put("Subject2_<23>_78", new String[]{"Subject2", "<23>", "2012-02-19", "78", "NEG", "High CV: 0.282842712474619", "PBMC"});
+        expected.put("Subject2_<23>_52", new String[]{"Subject2", "<23>", "2012-02-19", "52", "NEG", "High CV: 0.282842712474619", "PBMC"});
+        expected.put("Subject2_<27>_61", new String[]{"Subject2", "<27>", "2012-02-19", "61", "NEG", "High CV: 0.16866767257660767", "PBMC"});
+        expected.put("Subject2_<27>_48", new String[]{"Subject2", "<27>", "2012-02-19", "48", "NEG", "High CV: 0.16866767257660767", "PBMC"});
+        expected.put("Subject3_<31>_71", new String[]{"Subject3", "<31>", "", "71", "NEG", "High CV: 0.411407581781264", "PBMC"});
+        expected.put("Subject3_<31>_39", new String[]{"Subject3", "<31>", "", "39", "NEG", "High CV: 0.411407581781264", "PBMC"});
+        expected.put("Subject2_<17>_47", new String[]{"Subject2", "<17>", "2012-02-19", "47", "NEG", "", "PBMC"});
+        expected.put("Subject2_<17>_43", new String[]{"Subject2", "<17>", "2012-02-19", "43", "NEG", "", "PBMC"});
+        expected.put("Subject3_<41>_46", new String[]{"Subject3", "<41>", "2012-03-04", "46", "NEG", "", "PBMC"});
+        expected.put("Subject3_<41>_40", new String[]{"Subject3", "<41>", "2012-03-04", "40", "NEG", "", "PBMC"});
+        expected.put("Subject3_<49>_36", new String[]{"Subject3", "<49>", "2012-03-04", "36", "NEG", "High CV: 0.10878565864408422", "PBMC"});
+        expected.put("Subject3_<49>_42", new String[]{"Subject3", "<49>", "2012-03-04", "42", "NEG", "High CV: 0.10878565864408422", "PBMC"});
+        expected.put("Subject2_<25>_35", new String[]{"Subject2", "<25>", "2012-02-19", "35", "NEG", "High CV: 0.128564869306645", "PBMC"});
+        expected.put("Subject2_<25>_42", new String[]{"Subject2", "<25>", "2012-02-19", "42", "NEG", "High CV: 0.128564869306645", "PBMC"});
+        expected.put("Subject3_<57>_43", new String[]{"Subject3", "<57>", "2012-03-04", "43", "NEG", "High CV: 0.22933192903347485", "PBMC"});
+        expected.put("Subject3_<57>_31", new String[]{"Subject3", "<57>", "2012-03-04", "31", "NEG", "High CV: 0.22933192903347485", "PBMC"});
+        expected.put("Subject2_<13>_47", new String[]{"Subject2", "<13>", "2012-02-19", "47", "NEG", "", "PBMC"});
+        expected.put("Subject2_<13>_46", new String[]{"Subject2", "<13>", "2012-02-19", "46", "NEG", "", "PBMC"});
+        expected.put("Subject3_<43>_48", new String[]{"Subject3", "<43>", "2012-03-04", "48", "NEG", "High CV: 0.22329687826943606", "PBMC"});
+        expected.put("Subject3_<43>_66", new String[]{"Subject3", "<43>", "2012-03-04", "66", "NEG", "High CV: 0.22329687826943606", "PBMC"});
+        expected.put("Subject3_<59>_44", new String[]{"Subject3", "<59>", "2012-03-04", "44", "NEG", "High CV: 0.1414213562373095", "PBMC"});
+        expected.put("Subject3_<59>_36", new String[]{"Subject3", "<59>", "2012-03-04", "36", "NEG", "High CV: 0.1414213562373095", "PBMC"});
+        expected.put("Subject3_<39>_51", new String[]{"Subject3", "<39>", "2012-03-04", "51", "NEG", "High CV: 0.15986762009434988", "PBMC"});
+        expected.put("Subject3_<39>_64", new String[]{"Subject3", "<39>", "2012-03-04", "64", "NEG", "High CV: 0.15986762009434988", "PBMC"});
+        expected.put("Subject2_<15>_53", new String[]{"Subject2", "<15>", "2012-02-19", "53", "NEG", "High CV: 0.215206411665471", "PBMC"});
+        expected.put("Subject2_<15>_39", new String[]{"Subject2", "<15>", "2012-02-19", "39", "NEG", "High CV: 0.215206411665471", "PBMC"});
 
         int totalRows = 90;
         Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
@@ -346,7 +356,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
             String peptide = results.getDataAsText(i, "Peptide/Pool");
             String spots = results.getDataAsText(i, "Spots");
             String result = results.getDataAsText(i, "Qualitative Result");
-            String key = subjectId + "_" + spots;
+            String key = subjectId + "_" + peptide + "_" + spots;
 
             String[] expectedVals = expected.get(key);
             Assert.assertNotNull("Unable to find expected values", expectedVals);

@@ -265,31 +265,33 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         assertElementPresent(_helper.getAssayWell("G3", LabModuleHelper.STD_COLOR));
         assertElementPresent(_helper.getAssayWell("H12", LabModuleHelper.STD_COLOR));
 
-        //verify duplicates not allowed
+        //no duplicate wells allowed
         Ext4GridRefWD grid = _ext4Helper.queryOne("grid", Ext4GridRefWD.class);
         grid.setGridCell(1, 1, "H11\t");
-        click(Locator.ext4Button("Download"));
-        assertAlert("There was an error downloading the template");
+        click(Locator.ext4Button("Save"));
+        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        click(Locator.ext4Button("OK"));
         assertTextPresent("another sample is already present in well: H11");
-        //restore original contents
-        grid.setGridCell(1, 1, "A5\t");
+        grid.setGridCell(1, 1, "A5\t");  //restore original contents
 
-        //TODO: test other error messages including a run lacking any controls, required values, also verify well matching template, etc.
-        //ALSO make sure we get a warning if template has sample not in results
-//        click(Locator.ext4Button("Download"));
-//       grid.setGridCell(1, 2, "");
-//        grid.setGridCell(1, 2, "Subject1");
-//        assertAlert("There was an error downloading the template");
-//        assertTextPresent("another sample is already present in well: H11");
+        //verify neg controls enforced
+        grid.setGridCell(70, 3, "Unknown\t");
+        click(Locator.ext4Button("Download"));
+        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        click(Locator.ext4Button("OK"));
+        assertTextPresent("Must provide at least 2 negative controls per run");
+        grid.setGridCell(70, 3, "Neg Control");  //restore original contents
 
         //save valid data
         click(Locator.ext4Button("Save"));
         waitAndClick(Locator.ext4Button("OK"));
+        assertTextNotPresent("Must provide at least 2 negative controls per run");
 
         //test download
         String url = getCurrentRelativeURL();
         url += "&exportAsWebPage=1";
         beginAt(url);
+        waitForPageToLoad();
         waitForElement(_helper.getAssayWell("G1", LabModuleHelper.NEG_COLOR), WAIT_FOR_PAGE);
 
         waitAndClick(Locator.ext4Button("Download"));

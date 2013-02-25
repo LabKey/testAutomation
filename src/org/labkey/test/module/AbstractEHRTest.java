@@ -59,6 +59,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     protected static final String PROJECT_MEMBER_ID = "test2312318"; // PROJECT_ID's single participant
     protected static final String ROOM_ID = "6824778"; // room of PROJECT_MEMBER_ID
     protected static final String CAGE_ID = "4434662"; // cage of PROJECT_MEMBER_ID
+    protected static final String ROOM_ID2 = "2043365";
 
     protected static final String AREA_ID = "A1/AB190"; // arbitrary area
     protected static final String PROTOCOL_PROJECT_ID = "795644"; // Project with exactly 3 members
@@ -155,6 +156,8 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
                 REQUEST_ADMIN.getEmail(),
                 FULL_UPDATER.getEmail(),
                 FULL_SUBMITTER.getEmail());
+
+        try{deleteRecords();}catch(Throwable T){}
     }
 
     @LogMethod
@@ -240,6 +243,16 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         rowMap.put("protocol", DUMMY_PROTOCOL);
         insertCmd.addRow(rowMap);
         saveResp = insertCmd.execute(cn, getContainerPath());
+
+        //then ehr_lookups.rooms
+        insertCmd = new InsertRowsCommand("ehr_lookups", "rooms");
+        rowMap = new HashMap<String,Object>();
+        rowMap.put("room", ROOM_ID);
+        insertCmd.addRow(rowMap);
+        rowMap = new HashMap<String,Object>();
+        rowMap.put("room", ROOM_ID2);
+        insertCmd.addRow(rowMap);
+        saveResp = insertCmd.execute(cn, getContainerPath());
     }
 
     @LogMethod
@@ -268,6 +281,16 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         rowMap = new HashMap<String,Object>();
         rowMap.put("project", PROJECT_ID);
         rowMap.put("protocol", DUMMY_PROTOCOL);
+        deleteCmd.addRow(rowMap);
+        deleteResp = deleteCmd.execute(cn, getContainerPath());
+
+        //then ehr_lookups.room
+        deleteCmd = new DeleteRowsCommand("ehr_lookups", "rooms");
+        rowMap = new HashMap<String,Object>();
+        rowMap.put("room", ROOM_ID);
+        deleteCmd.addRow(rowMap);
+        rowMap = new HashMap<String,Object>();
+        rowMap.put("room", ROOM_ID2);
         deleteCmd.addRow(rowMap);
         deleteResp = deleteCmd.execute(cn, getContainerPath());
     }
@@ -303,18 +326,13 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     protected void defineQCStates()
     {
         log("Define QC states for EHR study");
-        goToEHRFolder();
 
+        beginAt("/ehr/" + getContainerPath() + "/ensureQCStates.view");
+        clickButton("OK");
+
+        goToEHRFolder();
         goToManageStudy();
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
-
-        for(EHRQCState qcState : EHRQCState.values())
-        {
-            setFormElement("newLabel", qcState.label);
-            setFormElement("newDescription", qcState.description);
-            if(!qcState.publicData) uncheckCheckbox("newPublicData");
-            clickButton("Save");
-        }
 
         selectOptionByValue(Locator.name("showPrivateDataByDefault"), "true");
         clickButton("Done");

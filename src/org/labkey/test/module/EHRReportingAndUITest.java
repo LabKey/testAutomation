@@ -36,7 +36,6 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     @Override
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        try{deleteRecords();}catch(Throwable T){}
         super.doCleanup(afterTest);
     }
 
@@ -191,15 +190,15 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForText("Other Population Queries");
         //TODO: test R report plus other queries
         assertNoErrorText();
-    }
 
-    /**
-     * This is designed to test several queries that are mainly used as reports.  We will insert and query specific data designed to test
-     * problematic conditions
-     */
-    public void queriesTest()
-    {
-
+        //participant page
+        beginAt("/query/" + getContainerPath() + "/executeQuery.view?schemaName=study&query.queryName=animal");
+        waitForText("Animal");
+        DataRegionTable dr = new DataRegionTable("query", this);
+        dr.clickLink(1,"Id");
+        waitForText("Animal Details:");
+        waitForText("# Animals In Cage:");
+        assertNoErrorText();
     }
 
     private void animalHistoryTest()
@@ -222,7 +221,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         subjField = _ext4Helper.queryOne("#subjArea", Ext4FieldRefWD.class);
         Assert.assertEquals("Incorrect value in subject ID field", PROTOCOL_MEMBER_IDS[0], subjField.getValue());
 
-        //crawlReportTabs(); // TOO SLOW. TODO: Enable when performance is better.
+        //crawlReportTabs(); // TOO SLOW. TODO: Crawl specific tabs to test functionality
 
         //NOTE: rendering the entire colony is slow, so instead of abstract we load a simpler report
         log("Verify Entire colony history");
@@ -234,22 +233,21 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         log("Verify location based history");
         waitAndClick(Locator.ext4Radio("Current Location"));
-        _ext4Helper.selectComboBoxItem("Area:", AREA_ID, true);
+        
+        _ext4Helper.queryOne("#areaField", Ext4FieldRefWD.class).setValue(AREA_ID);
+        sleep(200); //wait for 2nd field to filter
         _ext4Helper.queryOne("#roomField", Ext4FieldRefWD.class).setValue(ROOM_ID);
         _ext4Helper.queryOne("#cageField", Ext4FieldRefWD.class).setValue(CAGE_ID);
         _ext4Helper.clickTabContainingText("Abstract");
-        // No results expected due to anonymized cage info.
-        waitForText("No records found", WAIT_FOR_JAVASCRIPT);
+        waitForText("9794992", WAIT_FOR_JAVASCRIPT);   //this is the values of sire field
 
         log("Verify Project search");
         waitAndClick(Locator.ext4Radio("Multiple Animals"));
         waitAndClick(Locator.xpath("//span[text()='[Search By Project/Protocol]']"));
         waitForElement(Ext4Helper.ext4Window("Search By Project/Protocol"));
-        //_ext4Helper.selectComboBoxItem("Project:", PROJECT_ID); // TODO: Project combo-box not populated
-        setFormElement(Locator.xpath("//tr").withPredicate(Locator.xpath("td/label").withText("Project:")).append("//input").withClass("x4-form-text"), PROJECT_ID);
-        fireEvent(Locator.xpath("//tr").withPredicate(Locator.xpath("td/label").withText("Project:")).append("//input").withClass("x4-form-text"), SeleniumEvent.blur);
+        _ext4Helper.selectComboBoxItem("Center Project", PROJECT_ID);
         _extHelper.clickExtButton("Search By Project/Protocol", "Submit", 0);
-
+        
         waitForElement(Locator.ext4Button(PROJECT_MEMBER_ID + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
         waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT * 3);
@@ -258,7 +256,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitAndClick(Locator.ext4Radio("Multiple Animals"));
         waitAndClick(Locator.xpath("//span[text()='[Search By Project/Protocol]']"));
         waitForElement(Ext4Helper.ext4Window("Search By Project/Protocol"));
-        _ext4Helper.selectComboBoxItem("Protocol:", PROTOCOL_ID, true);
+        _ext4Helper.selectComboBoxItem("IACUC Protocol", PROTOCOL_ID);
         clickButton("Submit", 0);
         waitForElement(Locator.ext4Button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
 
@@ -322,49 +320,51 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Compare Weights");
         _extHelper.waitForExtDialog("Weights");
         _extHelper.clickExtButton("Weights", "OK", 0);
+        assertTextNotPresent("Weight1");
 
         log("Compare Weights - two selections");
         checkDataRegionCheckbox(dataRegionName, 1);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Compare Weights");
         _extHelper.waitForExtDialog("Weights");
         _extHelper.clickExtButton("Weights", "OK", 0);
+        assertTextNotPresent("Weight1");
 
         log("Compare Weights - three selections");
         checkDataRegionCheckbox(dataRegionName, 2);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Compare Weights");
         _extHelper.waitForExtDialog("Error"); // After error dialog.
         _extHelper.clickExtButton("Error", "OK", 0);
+        assertTextNotPresent("Weight1");
 
         log("Jump to Other Dataset - no selection");
         uncheckAllOnPage(dataRegionName);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Jump To Other Dataset");
         assertAlert("No records selected");
 
-        //TODO: Jump to Other Dataset broken
-//        log("Jump to Other Dataset - two selection");
-//        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
-//        checkDataRegionCheckbox(dataRegionName, 0); // PROTOCOL_MEMBER_IDS[0]
-//        checkDataRegionCheckbox(dataRegionName, 2); // PROTOCOL_MEMBER_IDS[2]
-//        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Jump To Other Dataset");
-//        _extHelper.selectComboBoxItem("Dataset:", "Blood Draws");
-//        _extHelper.selectComboBoxItem("Filter On:", "Animal Id");
-//        _extHelper.clickExtButton("Jump To Other Dataset", "Submit", 0);
-//        waitForElement(Locator.linkWithText(PROTOCOL_MEMBER_IDS[0]), WAIT_FOR_JAVASCRIPT);
-//        assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
+        log("Jump to Other Dataset - two selections");
+        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
+        checkDataRegionCheckbox(dataRegionName, 0); // PROTOCOL_MEMBER_IDS[0]
+        checkDataRegionCheckbox(dataRegionName, 2); // PROTOCOL_MEMBER_IDS[2]
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Jump To Other Dataset");
+        _extHelper.selectComboBoxItem("Dataset:", "Blood Draws");
+        _extHelper.selectComboBoxItem("Filter On:", "Animal Id");
+        clickButton("Submit", 0);
+        waitForTextToDisappear("Loading...");
+        waitForElement(Locator.linkWithText(PROTOCOL_MEMBER_IDS[0]), WAIT_FOR_JAVASCRIPT);
+        assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
 
-        //TODO: Jump to History broken
-//        log("Jump to History");
-//        checkDataRegionCheckbox("query", 0); // PROTOCOL_MEMBER_IDS[0]
-//        clickMenuButton("More Actions", "Jump To History");
-//        assertTitleContains("Animal History");
-//        waitAndClick(Locator.ext4Button("Append -->"));
-//        //page has loaded, so we re-query
-//        getAnimalHistorySubjField().setValue(PROTOCOL_MEMBER_IDS[2]);
-//        waitAndClick(Locator.ext4Button("Append -->"));
-//        refreshAnimalHistoryReport();
-//        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
-//        Assert.assertEquals("Did not find the expected number of Animals", 2, getDataRegionRowCount(dataRegionName));
-//        assertTextPresent(PROTOCOL_MEMBER_IDS[0], PROTOCOL_MEMBER_IDS[2]);
+        log("Jump to History");
+        checkDataRegionCheckbox("query", 0); // PROTOCOL_MEMBER_IDS[0]
+        clickMenuButton("More Actions", "Jump To History");
+        assertTitleContains("Animal History");
+        waitAndClick(Locator.ext4Button("Append -->"));
+        //page has loaded, so we re-query
+        getAnimalHistorySubjField().setValue(PROTOCOL_MEMBER_IDS[2]);
+        waitAndClick(Locator.ext4Button("Append -->"));
+        refreshAnimalHistoryReport();
+        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
+        Assert.assertEquals("Did not find the expected number of Animals", 2, getDataRegionRowCount(dataRegionName));
+        assertTextPresent(PROTOCOL_MEMBER_IDS[0], PROTOCOL_MEMBER_IDS[2]);
 
         log("Check subjectField parsing");
         getAnimalHistorySubjField().setValue(MORE_ANIMAL_IDS[0] + "," + MORE_ANIMAL_IDS[1] + ";" + MORE_ANIMAL_IDS[2] + " " + MORE_ANIMAL_IDS[3] + "\t" + MORE_ANIMAL_IDS[4]);
@@ -403,21 +403,13 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("animal"), MORE_ANIMAL_IDS[0]);
         clickButton("Show Animal");
-        assertTitleContains("Animal - "+MORE_ANIMAL_IDS[0]);
-
-//        log("Quick Search - Show Group");
-//        clickFolder(getProjectName());
-//        clickAndWait(Locator.linkWithText(FOLDER_NAME));
-//        waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
-//        _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='animalGroup']/.."), "Alive, at Center");
-//        clickButton("Show Group");
-//        waitForText("1 - 36 of 36", WAIT_FOR_JAVASCRIPT);
+        assertTitleContains("Animal Details: "+MORE_ANIMAL_IDS[0]);
 
         log("Quick Search - Show Project");
         clickFolder(getProjectName());
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
-        _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='projectField']/.."), PROJECT_ID);
+        _ext4Helper.queryOne("#projectField", Ext4FieldRefWD.class).setValue(PROJECT_ID);
         clickButton("Show Project");
         waitForElement(Locator.linkWithText(DUMMY_PROTOCOL), WAIT_FOR_JAVASCRIPT);
 
@@ -425,7 +417,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         clickFolder(getProjectName());
         clickAndWait(Locator.linkWithText(FOLDER_NAME));
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
-        _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='protocolField']/.."), PROTOCOL_ID);
+        _ext4Helper.queryOne("#protocolField", Ext4FieldRefWD.class).setValue(PROTOCOL_ID);
         clickButton("Show Protocol");
         waitForElement(Locator.linkWithText(PROTOCOL_ID), WAIT_FOR_JAVASCRIPT);
 
