@@ -25,6 +25,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -41,7 +42,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         super(test);
     }
 
-    public void importAssay(int assayID, File file, String projectPath, @Nullable Map<String, Object> batchProperties)  throws CommandException, IOException
+    public void importAssay(int assayID, File file, String projectPath, Map<String, Object> batchProperties)  throws CommandException, IOException
     {
         ImportRunCommand  irc = new ImportRunCommand(assayID, file);
         irc.setBatchProperties(batchProperties);
@@ -50,12 +51,12 @@ public class APIAssayHelper extends AbstractAssayHelper
     }
     public void importAssay(int assayID, File file, String projectPath) throws CommandException, IOException
     {
-        importAssay(assayID, file, projectPath, null);
+        importAssay(assayID, file, projectPath, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo"));
     }
 
     public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
     {
-        importAssay(assayName, file, projectPath, null);
+        importAssay(assayName, file, projectPath, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo"));
     }
     public void importAssay(String assayName, File file, String projectPath, @Nullable Map<String, Object> batchProperties) throws CommandException, IOException
     {

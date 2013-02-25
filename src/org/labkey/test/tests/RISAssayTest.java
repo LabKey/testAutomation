@@ -33,12 +33,6 @@ public class RISAssayTest extends BaseWebDriverTest
     private final int ASSAY_ROW_COUNT = 719;
     private final int UNIQUEBLATT_ROW_COUNT = 34;
 
-    public RISAssayTest()
-    {
-        super();
-        _assayHelper = new UIAssayHelper(this);
-    }
-
     @Override
     protected String getProjectName()
     {
