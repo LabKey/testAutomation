@@ -101,6 +101,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         clickFolder(assayFolder);
         ignoreSampleMindedData(assay2);
         verifyProgressReport(assay2, true);
+        verifyUnassayedSpecimenQuery(assay2);
     }
 
     @LogMethod
@@ -252,6 +253,18 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
         Assert.assertEquals(7, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
         Assert.assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
+    }
+
+    private void verifyUnassayedSpecimenQuery(String assayName)
+    {
+        goToSchemaBrowser();
+        selectQuery("rho", assayName + " Base Unassayed Specimens");
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
+        DataRegionTable drt = new DataRegionTable("query", this);
+        Assert.assertEquals(4, drt.getDataRowCount());
+        assertTextPresent("specimen collected", 2);
+        assertTextPresent("specimen received by lab", 2);
     }
 
     @LogMethod
