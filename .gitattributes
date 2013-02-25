@@ -323,6 +323,7 @@ src/org/labkey/test/tests/StudyBaseTest.java -text
 src/org/labkey/test/tests/StudyBaseTestWD.java -text
 src/org/labkey/test/tests/StudyBaseWDTest.java -text
 src/org/labkey/test/tests/StudyCohortExportTest.java -text
+src/org/labkey/test/tests/StudyDatasetsTest.java -text
 src/org/labkey/test/tests/StudyDemoModeTest.java -text
 src/org/labkey/test/tests/StudyExportTest.java -text
 src/org/labkey/test/tests/StudyManualTest.java -text
