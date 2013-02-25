@@ -77,7 +77,7 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(getProjectName(), new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         enableModule(getProjectName(), "Survey");
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(getProjectName(), projectSurveyDesign, null, "lists", "listA");
+        createSurveyDesign(getProjectName(), null, projectSurveyDesign, null, "lists", "listA");
     }
 
     private void setupSubfolder()
@@ -88,7 +88,7 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(folderName, new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         enableModule(folderName, "Survey");
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(folderName, subfolderSurveyDesign, null, "lists", "listA");
+        createSurveyDesign(folderName, null, subfolderSurveyDesign, null, "lists", "listA");
 
         log("Add users that will be used for permissions testing");
         createUser(EDITOR, null);
@@ -99,10 +99,12 @@ public class SurveyTest extends BaseWebDriverTest
         clickButton("Save and Finish");
     }
 
-    protected void createSurveyDesign(String folder, String designName, @Nullable String description, String schemaName, String queryName)
+    protected void createSurveyDesign(String folder, String tabName, String designName, @Nullable String description, String schemaName, String queryName)
     {
         log("Create new survey design");
         clickFolder(folder);
+        if (tabName != null)
+            clickAndWait(Locator.linkWithText(tabName));
         waitForElement(Locator.id("dataregion_query"));
         clickButton("Add New Survey");
         waitForElement(Locator.name("label"));
@@ -134,13 +136,13 @@ public class SurveyTest extends BaseWebDriverTest
         Assert.assertTrue("Submit button should be initially disabled", isElementPresent(Locator.xpath("//div[contains(@class,'item-disabled')]//span[text() = 'Submit completed form']")));
         // set form field values
         setFormElement(Locator.name("_surveyLabel_"), firstSurvey);
-        setFormElement(Locator.name("txtField"), "txtField");
-        setFormElement(Locator.name("txtAreaField"), "txtAreaField");
+        setFormElement(Locator.name("txtfield"), "txtField");
+        setFormElement(Locator.name("txtareafield"), "txtAreaField");
         _ext4Helper.checkCheckbox("Bool Field");
-        setFormElement(Locator.name("intField"), "999");
-        setFormElement(Locator.name("dblField"), "999.1");
-        setFormElement(Locator.name("dtField"), "2013-01-04");
-        addSurveyFileAttachment("attField", pipelineLoc + "/TestAttachment.txt");
+        setFormElement(Locator.name("intfield"), "999");
+        setFormElement(Locator.name("dblfield"), "999.1");
+        setFormElement(Locator.name("dtfield"), "2013-01-04");
+        addSurveyFileAttachment("attfield", pipelineLoc + "/TestAttachment.txt");
         _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test1", true);
         log("Wait for the survey autosave (save attempts every minute)");
         waitForText("Responses automatically saved at", 65000);
@@ -167,7 +169,7 @@ public class SurveyTest extends BaseWebDriverTest
         clickFolder(folderName);
         clickEditForLabel(firstSurvey, true);
         _ext4Helper.waitForMaskToDisappear();
-        setFormElement(Locator.name("txtAreaField"), "txtAreaField\nnew line");
+        setFormElement(Locator.name("txtareafield"), "txtAreaField\nnew line");
         _ext4Helper.uncheckCheckbox("Bool Field");
         sleep(500); // give the save button a split second to enable based on form changes
         clickButton("Save", 0);
@@ -202,7 +204,7 @@ public class SurveyTest extends BaseWebDriverTest
         // we should currently be logged in as site admin
         assertTextPresent("You are allowed to make changes to this form because you are a project/site administrator.");
         Assert.assertTrue("Save button should be disabled", isElementPresent(Locator.xpath("//div[contains(@class,'item-disabled')]//span[text() = 'Save']")));
-        setFormElement(Locator.name("txtAreaField"), "edit by admin after submit");
+        setFormElement(Locator.name("txtareafield"), "edit by admin after submit");
         _ext4Helper.checkCheckbox("Bool Field");
         sleep(500); // give the save button a split second to enable based on form changes
         clickButton("Save", 0);
@@ -214,7 +216,7 @@ public class SurveyTest extends BaseWebDriverTest
         impersonate(EDITOR);
         popLocation();
         waitForText("Survey Label*");
-        Assert.assertTrue(getFormElement(Locator.name("txtAreaField")).equals("edit by admin after submit"));
+        Assert.assertTrue(getFormElement(Locator.name("txtareafield")).equals("edit by admin after submit"));
         assertTextPresent("This survey was submitted by");
         assertTextNotPresent("You are allowed to make changes to this form");
         assertElementNotPresent(Locator.button("Save"));
@@ -273,9 +275,9 @@ public class SurveyTest extends BaseWebDriverTest
         waitForText("Description for section 2");
         _ext4Helper.checkCheckbox("Bool Field");
         // leave the required intField blank for now
-        setFormElement(Locator.name("dblField"), "999.1");
+        setFormElement(Locator.name("dblfield"), "999.1");
         // set the date to an invalid format
-        setFormElement(Locator.name("dtField"), "01/04/2013");
+        setFormElement(Locator.name("dtfield"), "01/04/2013");
         // check survey skip logic that attachment field appears with selectin of lkField = Test1
         assertElementPresent(Locator.xpath("//table[contains(@style,'display: none;')]//label[text()='Att Field']"));
         _ext4Helper.selectComboBoxItem(Locator.xpath("//tbody[./tr/td/label[text()='Lk Field']]"), "Test1", true);
@@ -291,11 +293,11 @@ public class SurveyTest extends BaseWebDriverTest
         // go back and fix the validation errors
         clickButton("Previous", 0);
         waitForText("Description for section 2");
-        setFormElement(Locator.name("intField"), "999");
-        setFormElement(Locator.name("dtField"), "2013-01-04");
+        setFormElement(Locator.name("intfield"), "999");
+        setFormElement(Locator.name("dtfield"), "2013-01-04");
         clickButton("Previous", 0);
         waitForText("Description for section 1");
-        setFormElement(Locator.name("txtField"), "txtField");
+        setFormElement(Locator.name("txtfield"), "txtField");
         clickButton("Next", 0);
         clickButton("Next", 0);
         // verify question counts on section header

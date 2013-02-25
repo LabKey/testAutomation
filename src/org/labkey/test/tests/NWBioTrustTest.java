@@ -99,6 +99,7 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Delete the survey design for this project (which will delete the document sets and requests");
         goToProjectHome();
+        clickAndWait(Locator.linkWithText("Manage"));
         if (isTextPresent(designLabel))
         {
             _customizeViewsHelper.openCustomizeViewPanel();
@@ -109,6 +110,7 @@ public class NWBioTrustTest extends SurveyTest
             checkDataRegionCheckbox("query", rowId);
             clickButton("Delete", 0);
             assertAlert("Are you sure you want to delete this survey design and its associated surveys?");
+            clickAndWait(Locator.linkWithText("New Registrations"));
             waitForText("No study registrations to show", WAIT_FOR_PAGE);
             assertTextNotPresent(designLabel);
             clickFolder(requestorFolder1);
@@ -122,6 +124,7 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Verify documents and types via RC Dashboard");
         goToProjectHome();
+        clickAndWait(Locator.linkWithText("New Registrations"));
         waitForGridToLoad("div", "x4-grid-group-title", NWBT_REQUEST_CATEGORIES.length);
         assertElementPresent(Locator.linkWithText("Document Set (0)"), 2);
         assertElementPresent(Locator.linkWithText("Document Set (3)"), 1);
@@ -235,6 +238,7 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Verify submitted requests show up in RC Dashboard");
         goToProjectHome();
+        clickAndWait(Locator.linkWithText("New Registrations"));
         waitForGridToLoad("div", "x4-grid-group-title", 1); // all request should still be in the Unassigned category
         assertTextNotPresent("No study registrations to show");
         assertElementPresent(getGroupingTitleLocator("Unassigned"));
@@ -243,7 +247,8 @@ public class NWBioTrustTest extends SurveyTest
         log("Update request status and categories");
         for (int i = 0; i < submittedRequestLabels.length; i++)
             setRequestStatusAndCategory(i, submittedRequestLabels[i], NWBT_REQUEST_STATUSES[i], NWBT_REQUEST_CATEGORIES[i]);
-        clickFolder(getProjectName());
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText("New Registrations"));
         waitForGridToLoad("div", "x4-grid-group-title", NWBT_REQUEST_CATEGORIES.length);
         assertElementNotPresent(getGroupingTitleLocator("Unassigned"));
         for (String category : NWBT_REQUEST_CATEGORIES)
@@ -287,7 +292,8 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Create survey design in project folder and configure dashboard");
         assertTextNotPresent(designLabel);
-        createSurveyDesign(getProjectName(), designLabel, description, "biotrust", provisionTableName);
+        createSurveyDesign(getProjectName(), "Manage", designLabel, description, "biotrust", provisionTableName);
+        clickAndWait(Locator.linkWithText("New Registrations"));
         waitForText("No study registrations to show");
         customizeDashboard("RC Dashboard - Study Registrations", designLabel);
 
@@ -295,15 +301,15 @@ public class NWBioTrustTest extends SurveyTest
         clickFolder(requestorFolder1);
         clickAndWait(Locator.linkWithText("Study Registrations"));
         customizeDashboard("Requestor Dashboard - Study Registrations", designLabel);
-        assertTextPresentInThisOrder(designLabel, description, "Draft Registrations", "Submitted Registrations");
-        waitForText("No study registrations to show", 2, WAIT_FOR_PAGE); // both draft and submitted should be empty
+        assertTextPresentInThisOrder(designLabel, description, "Pending Registrations", "Submitted Registrations");
+        waitForText("No study registrations to show", 2, WAIT_FOR_PAGE); // both pending and submitted should be empty
         for (String requestLabel : submittedRequestLabels)
         {
             clickAndWait(Locator.linkWithText("Click Here"));
             submitSampleRequest(requestLabel, Collections.singletonMap("testfield1", "Text Field Value"));
         }
         waitForGridToLoad("div", "x4-grid-group-title", 1); // all request should be in the Submitted group
-        waitForText("No study registrations to show", 1, WAIT_FOR_PAGE); // draft grid should still be empty
+        waitForText("No study registrations to show", 1, WAIT_FOR_PAGE); // pending grid should still be empty
         assertTextPresentInThisOrder(submittedRequestLabels);
     }
 
@@ -331,6 +337,7 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Create provision table in biotrust schema for responses");
         goToProjectHome();
+        clickAndWait(Locator.linkWithText("Manage"));
         waitForText("Existing Request Response Schemas");
         click(Locator.linkWithText("Create new Request Response Schema"));
         _extHelper.waitForExtDialog("New Request Response Schema");
@@ -341,6 +348,7 @@ public class NWBioTrustTest extends SurveyTest
         _listHelper.addField(new ListHelper.ListColumn("testfield1", "Test Field 1", ListHelper.ListColumnType.String, null));
         clickButton("Save");
         goToProjectHome();
+        clickAndWait(Locator.linkWithText("Manage"));
         assertElementPresent(Locator.linkWithText(provisionTableName));
     }
 
@@ -378,6 +386,7 @@ public class NWBioTrustTest extends SurveyTest
 
         log("Populate the Request Category dashboard lookup table");
         goToProjectHome();
+        clickAndWait(Locator.linkWithText("Manage"));
         checkForValuesToInsert("RequestCategory", "Category", NWBT_REQUEST_CATEGORIES);
         List<Map<String,Object>> rows = new ArrayList<Map<String, Object>>();
         for (int index = 0; index < NWBT_REQUEST_CATEGORIES.length; index++)
@@ -445,12 +454,13 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Verify folder type default webparts");
         goToProjectHome();
-        verifyWebpartTitleOrder(new String[]{"RC Dashboard - Study Registrations", "Survey Designs", "NW BioTrust Administration"});
+        verifyFolderTabLinks(new String[]{"Overview", "New Registrations", "Active Sample Requests", "Patient ID", "Patient Consent", "Sample Orders", "Manage"});
+        verifyWebpartTitleOrder(new String[]{"Pending Registrations"});
         clickFolder(requestorFolder1);
-        verifyWebpartTitleOrder(new String[]{"NW BioTrust Requestor - Overview"});
+        verifyWebpartTitleOrder(new String[]{"Overview"});
         verifyFolderTabLinks(new String[]{"Overview", "Study Registrations", "Sample Requests", "Contacts"});
         clickFolder(requestorFolder2);
-        verifyWebpartTitleOrder(new String[]{"NW BioTrust Requestor - Overview"});
+        verifyWebpartTitleOrder(new String[]{"Overview"});
     }
 
     private void verifyFolderTabLinks(String[] folders)
