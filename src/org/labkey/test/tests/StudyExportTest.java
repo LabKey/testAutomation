@@ -384,7 +384,7 @@ public class StudyExportTest extends StudyManualTest
 //        setFormElement(globalUniqueIDValueElems[0], "1416");
 //        setFormElement(participantIDFormElems[2], "999320528");
 
-        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Mouse:"), "618005775", true);
+        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Mouse:"), "999320528", true);
         _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Visit:"), "Enroll/Vacc #1 (201)", true);
 
         clickButton("Search");
