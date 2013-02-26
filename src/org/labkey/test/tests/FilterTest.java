@@ -46,25 +46,30 @@ public class FilterTest extends ListTest
     protected final static String FACET_TEST_LIST = "FacetList";
     protected String listUrl = "";
 
-    protected void createList2()
+    @LogMethod
+    public void doTestSteps()
     {
-        ListHelper.ListColumn yearColumn = new ListHelper.ListColumn("year", "year", ListHelper.ListColumnType.Integer, "");
-        _listHelper.createList(PROJECT_NAME, FACET_TEST_LIST, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, yearColumn);
-        clickButton("Import Data");
-        setFormElement(Locator.name("text"),"Car\tColor\tyear\n" +
-                "1\tBlue\t1980\n" +
-                "2\tRed\t1970\n" +
-                "3\tYellow\t1990\n" );
+        setupProject();
 
-        clickButton("Submit", 0);
-        waitForElement(Locator.id("labkey-nav-trail-current-page").withText(FACET_TEST_LIST));
+        createList();
+        filterTest();
+
+        createList2();
+        facetedFilterTest();
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
-    void setUpList()
+    private void setupProject()
     {
         RReportHelperWD _RReportHelperWD = new RReportHelperWD(this);
         _RReportHelperWD.ensureRConfig();
+
+        _containerHelper.createProject(PROJECT_NAME, null);
+    }
+
+    @LogMethod(category = LogMethod.MethodType.SETUP)
+    void createList()
+    {
         StringBuilder testDataFull = new StringBuilder();
         testDataFull.append(StringUtils.join(Arrays.asList(LIST_KEY_NAME2, _listCol1.getName(), _listCol2.getName(), _listCol3.getName(), _listCol4.getName(), _listCol6.getName()), "\t"));
         testDataFull.append("\n");
@@ -81,8 +86,6 @@ public class FilterTest extends ListTest
             testDataFull.append("\n");
         }
 
-        log("Setup project and list module");
-        _containerHelper.createProject(PROJECT_NAME, null);
         log("Add list -- " + LIST_NAME_COLORS);
         _listHelper.createList(PROJECT_NAME, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
         log("Set title field of 'Colors' to 'Desc'");
@@ -98,13 +101,19 @@ public class FilterTest extends ListTest
         _customizeViewsHelper.createRView(null, R_VIEW);
     }
 
-    public void doTestSteps()
+    @LogMethod(category = LogMethod.MethodType.SETUP)
+    protected void createList2()
     {
-        setUpList();
+        ListHelper.ListColumn yearColumn = new ListHelper.ListColumn("year", "year", ListHelper.ListColumnType.Integer, "");
+        _listHelper.createList(PROJECT_NAME, FACET_TEST_LIST, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, yearColumn);
+        clickButton("Import Data");
+        setFormElement(Locator.name("text"),"Car\tColor\tyear\n" +
+                "1\tBlue\t1980\n" +
+                "2\tRed\t1970\n" +
+                "3\tYellow\t1990\n" );
 
-        filterTest();
-        facetedFilterTest();
-        directUrlTest();
+        clickButton("Submit", 0);
+        waitForElement(Locator.id("labkey-nav-trail-current-page").withText(FACET_TEST_LIST));
     }
 
     /**
@@ -142,7 +151,6 @@ public class FilterTest extends ListTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void facetedFilterTest()
     {
-        createList2();
         verifyColumnValues("query", "Color", "Light", "Robust", "Zany");
         startFilter("Color");
 
@@ -247,8 +255,6 @@ public class FilterTest extends ListTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void filterTest()
     {
-        log("Filter Test");
-
         validFiltersGenerateCorrectResultsTest();
 
         invalidFiltersGenerateCorrectErrorTest();
