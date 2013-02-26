@@ -71,7 +71,7 @@ public class RISAssayTest extends BaseWebDriverTest
         createRISAssay();
 
         verifyRISAssay();
-        verifyRISReport();
+        //verifyRISReport();
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
