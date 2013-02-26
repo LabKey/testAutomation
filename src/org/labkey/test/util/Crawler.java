@@ -365,12 +365,15 @@ public class Crawler
     {
         ControllerActionId actionId = new ControllerActionId(rootRelativeURL);
         String strippedRelativeURL = stripQueryParams(rootRelativeURL);
-		
+
         // never go to the exactly same URL (minus query params) twice:
         if (_urlsChecked.contains(strippedRelativeURL) && currentDepth > 1)
             return false;
 
         if (rootRelativeURL.contains("export=")) //Study report export uses same URL for export. But don't mark visited yet
+            return false;
+
+        if (rootRelativeURL.contains("mailto:")) //Don't crawl mailto: links
             return false;
 
         _urlsChecked.add(strippedRelativeURL);
