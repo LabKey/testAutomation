@@ -518,7 +518,6 @@ public class FilterTest extends ListTest
             //open filter
             log("** Checking filter values in filter dialog");
             runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
-            waitForTextToDisappear("Loading...");
             _extHelper.clickExtTab("Choose Filters");
             _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
 
