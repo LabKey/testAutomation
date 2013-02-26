@@ -536,7 +536,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         DELETE_REQUESTED("Delete Requested", "Records are requested to be deleted", true, true, false),
         IN_PROGRESS("In Progress", "Draft Record, not public", false, true, false),
         REQUEST_APPROVED("Request: Approved", "Request has been approved", true, true, true),
-        REQUEST_COMPLETE("Request: Complete", "Request has been completed", true, false, true),
+        //REQUEST_COMPLETE("Request: Complete", "Request has been completed", true, false, true),
         REQUEST_DENIED("Request: Denied", "Request has been denied", true, false, true),
         REQUEST_PENDING("Request: Pending", "Part of a request that has not been approved", false, false, true),
         REVIEW_REQUIRED("Review Required", "Review is required prior to public release", false, false, false),
