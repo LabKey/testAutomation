@@ -245,7 +245,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitAndClick(Locator.ext4Radio("Multiple Animals"));
         waitAndClick(Locator.xpath("//span[text()='[Search By Project/Protocol]']"));
         waitForElement(Ext4Helper.ext4Window("Search By Project/Protocol"));
-        _ext4Helper.selectComboBoxItem("Center Project", PROJECT_ID);
+        _ext4Helper.selectComboBoxItem("Center Project:", PROJECT_ID);
         _extHelper.clickExtButton("Search By Project/Protocol", "Submit", 0);
         
         waitForElement(Locator.ext4Button(PROJECT_MEMBER_ID + " (X)"), WAIT_FOR_JAVASCRIPT);
@@ -256,7 +256,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitAndClick(Locator.ext4Radio("Multiple Animals"));
         waitAndClick(Locator.xpath("//span[text()='[Search By Project/Protocol]']"));
         waitForElement(Ext4Helper.ext4Window("Search By Project/Protocol"));
-        _ext4Helper.selectComboBoxItem("IACUC Protocol", PROTOCOL_ID);
+        _ext4Helper.selectComboBoxItem("IACUC Protocol:", PROTOCOL_ID);
         clickButton("Submit", 0);
         waitForElement(Locator.ext4Button(PROTOCOL_MEMBER_IDS[0] + " (X)"), WAIT_FOR_JAVASCRIPT);
 
