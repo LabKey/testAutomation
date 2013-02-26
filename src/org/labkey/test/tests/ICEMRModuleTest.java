@@ -263,8 +263,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     private void checkTemplate(){
         waitForElement(Locator.name("dailyUpload"));
         clickButtonContainingText("Get Template", "Daily Upload");
-        File downloadDir = new File(ensureDumpDir(), "downloads");
-        File templateFile = new File(downloadDir.getAbsolutePath() + "/dailyUpload.xls");
+        File templateFile = new File(getDownloadDir(), "dailyUpload.xls");
         try{
             Workbook template = ExcelHelper.create(templateFile);
             Sheet sheet = template.getSheetAt(0);

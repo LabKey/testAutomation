@@ -501,18 +501,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void tearDown() throws Exception
     {
         boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
-        if ((!skipTearDown || onTeamCity())&& _driver != null)
-        {
+        if ((!skipTearDown || onTeamCity()) && _driver != null)
             _driver.quit();
-        }
-    }
 
-    public void tearDown(boolean forceTeardown) throws Exception
-    {
-       if (forceTeardown)
-           _driver.quit();
-        else
-           tearDown();
+        if (!_testFailed && _downloadDir.exists())
+        {
+            FileUtils.deleteDirectory(_downloadDir);
+        }
     }
 
     private boolean validateJsError(JavaScriptError error)
@@ -2775,7 +2770,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitAndClickAndWait(Locator.tagContainingText("a","manage group"));
     }
 
-    public void dragGroupToRole(String group, String srcRole, String destRole)
+    @LogMethod(quiet = true)
+    public void dragGroupToRole(@LoggedParam String group, @LoggedParam String srcRole, @LoggedParam String destRole)
     {
         Actions builder = new Actions(_driver);
         builder

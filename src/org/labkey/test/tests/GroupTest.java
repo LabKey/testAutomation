@@ -97,8 +97,10 @@ public class GroupTest extends BaseWebDriverTest
         setSiteGroupPermissions(COMPOUND_GROUP, "Author");
         setSiteGroupPermissions(COMPOUND_GROUP, "Reader");
         setSiteGroupPermissions(SIMPLE_GROUP, "Reader");
+        sleep(500);
         dragGroupToRole(SIMPLE_GROUP, "Reader", "Editor"); // Verify group drag-drop
         setSiteGroupPermissions(SIMPLE_GROUP, "Reader");
+        sleep(500);
         dragGroupToRole(SIMPLE_GROUP, "Reader", "Editor"); // Verify drag-drop onto existing role
         clickButton("Save and Finish");
         assertUserCanSeeProject(TEST_USERS_FOR_GROUP[0], getProjectName());
