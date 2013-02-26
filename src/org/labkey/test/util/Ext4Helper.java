@@ -182,8 +182,11 @@ public class Ext4Helper extends AbstractHelper
     public void checkGridRowCheckbox(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        // first try mouse down, but the participant filter panel no longer uses that event, so try click
         if (!isChecked(rowLoc))
             _test.mouseDown(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
+        if (!isChecked(rowLoc))
+            _test.click(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
     }
 
     /**
@@ -206,8 +209,12 @@ public class Ext4Helper extends AbstractHelper
     public void uncheckGridRowCheckbox(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        // first try mouse down, but the participant filter panel no longer uses that event, so try click
         if (isChecked(rowLoc))
             _test.mouseDown(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
+        if (isChecked(rowLoc))
+            _test.click(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
+
     }
 
     /**
@@ -242,7 +249,7 @@ public class Ext4Helper extends AbstractHelper
      */
     public void clickParticipantFilterCategory(String categoryLabel)
     {
-        Locator.XPathLocator loc = Locator.xpath("//input[contains(@class, 'category-header') and contains(@value, '" + categoryLabel + "')]");
+        Locator.XPathLocator loc = Locator.xpath("//input[contains(@class, 'category-header') and contains(@category, '" + categoryLabel + "')]");
         _test.click(loc);
     }
 
