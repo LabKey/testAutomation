@@ -575,4 +575,77 @@ public class DataRegionTable
         }
         return url.getFile();
     }
+
+    // ======== Site facet panel =========
+
+    public void openSideFilterPanel()
+    {
+        _test.click(Locators.headerButton(_tableName, "Filter"));
+        _test.waitForElement(Locators.expandedFacetPanel(_tableName));
+        _test.waitForElement(Locator.css(".lk-filter-panel-label"));
+    }
+
+    public void clickFacetCheckbox(String category, String group)
+    {
+        _test.click(Locators.facetPanel(_tableName).append(Locators.facetCheckbox(category, group)));
+    }
+
+    public void clickFacetLabel(String category, String group)
+    {
+        _test.click(Locators.facetPanel(_tableName).append(Locators.facetRow(category, group)).append("//span").withClass("lk-filter-panel-label"));
+    }
+
+    public void clickFacetCheckbox(String category)
+    {
+        _test.click(Locators.facetPanel(_tableName).append(Locators.facetCheckbox(category)));
+    }
+
+    public void toggleAllFacetsCheckbox()
+    {
+        _test.click(Locator.xpath("//b").withClass("lk-filter-panel-label").withText("All"));
+    }
+
+
+    public static class Locators
+    {
+        public static Locator.XPathLocator headerButton(String tableName, String text)
+        {
+            return Locator.xpath("id('dataregion_header_" + tableName + "')//a").withClass("labkey-button").withText(text);
+        }
+
+        public static Locator.XPathLocator facetPanel(String tableName)
+        {
+            return Locator.id("dataregion_facet_" + tableName);
+        }
+
+        public static Locator.XPathLocator expandedFacetPanel(String tableName)
+        {
+            return facetPanel(tableName).withDescendant(Locator.xpath("div/div").withPredicate("not(contains(@class, 'x4-panel-collapsed'))").withClass("labkey-data-region-facet"));
+        }
+
+        public static Locator.XPathLocator collapsedFacetPanel(String tableName)
+        {
+            return facetPanel(tableName).withPredicate(Locator.xpath("div/div").withClass("x4-panel-collapsed").withClass("labkey-data-region-facet"));
+        }
+
+        public static Locator.XPathLocator facetRow(String category)
+        {
+            return Locator.xpath("//tr").withClass("x4-grid-group-hd").withText(category);
+        }
+
+        public static Locator.XPathLocator facetRow(String category, String group)
+        {
+            return facetRow(category).append("/following-sibling::tr[1]").withClass("x4-grid-group-body").append("//tr").withClass("x4-grid-row").withPredicate(Locator.xpath("td").withText(group));
+        }
+
+        public static Locator.XPathLocator facetCheckbox(String category)
+        {
+            return facetRow(category).append("//td[@type='checkbox']");
+        }
+
+        public static Locator.XPathLocator facetCheckbox(String category, String group)
+        {
+            return facetRow(category, group).append("//span").withClass("x4-grid-row-checker");
+        }
+    }
 }

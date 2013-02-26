@@ -657,6 +657,16 @@ public abstract class Locator
                 (((maxRows - lastRow)) > (lastRow - firstRow) ? " Last \u00BB" : ""));
     }
 
+    /**
+     * Pagination text for dataregion with one page of data with
+     * @param rowCount
+     * @return
+     */
+    public static XPathLocator paginationText(int rowCount)
+    {
+        return paginationText(1, rowCount, rowCount);
+    }
+
     public static XPathLocator paginationText(String text)
     {
         return Locator.xpath("//div[contains(@class, 'labkey-pagination')]").withText(text);
@@ -799,41 +809,29 @@ public abstract class Locator
         }
     }
 
-    public static class IdLocator extends Locator
+    public static class IdLocator extends XPathLocator
     {
+        private String _id;
+
         public IdLocator(String loc)
         {
-            super(loc);
-        }
-
-        private IdLocator(String loc, Integer index, String contains, String text)
-        {
-            super(loc, index, contains, text);
-        }
-
-        public Locator containing(String contains)
-        {
-            return new IdLocator(_loc, _index, contains, _text);
-        }
-
-        public Locator withText(String text)
-        {
-            return new IdLocator(_loc, _index, _contains, text);
-        }
-
-        public Locator index(Integer index)
-        {
-            return new IdLocator(_loc, index, _contains, _text);
+            super("id('" + loc + "')");
+            _id = loc;
         }
 
         protected By toBy()
         {
-            return By.id(_loc);
+            return By.id(_id);
         }
 
         public String toString()
         {
-            return "id=" + _loc;
+            return "id=" + _id;
+        }
+
+        public CssLocator toCssLocator()
+        {
+            return css("#" + _id);
         }
     }
 
