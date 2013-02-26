@@ -518,6 +518,7 @@ public class FilterTest extends ListTest
             //open filter
             log("** Checking filter values in filter dialog");
             runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
+            _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
             _extHelper.clickExtTab("Choose Filters");
             _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
 
@@ -544,7 +545,7 @@ public class FilterTest extends ListTest
                 // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;Zany" are selected.
                 // When switching tabs, nothing changes.
                 //waitForFormElementToEqual(Locator.name("filterType_1"), "Equals One Of (e.g. \"a;b;c\")");
-                waitForFormElementToEqual(Locator.name("value_1"), "Robust;Zany");
+                waitForFormElementToEqual(Locator.name("value_1"), "Light;Mellow");
             }
             else if (filter1Type.equals("Does Not Equal") && "false".equals(filter1))
             {
