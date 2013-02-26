@@ -56,7 +56,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
 
         clickButton("Save");
 
-        waitForElement(Locator.xpath("//div[contains(text(), 'Cannot enable the ribbon message with providing a message to show')]"));
+        waitForElement(Locator.xpath("//div[contains(text(), 'Cannot enable the ribbon message without providing a message to show')]"));
 
         String linkText = "and also click this...";
         String html = "READ ME!!!  <a href='<%=contextPath%>/project/home/begin.view'>" + linkText + "</a>";
