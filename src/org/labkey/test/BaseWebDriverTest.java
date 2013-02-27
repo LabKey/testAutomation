@@ -4568,11 +4568,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     // Returns the text contents of every "Status" cell in the pipeline StatusFiles grid
     public List<String> getPipelineStatusValues()
     {
-        List<String> statusValues = getTableColumnValues("dataregion_StatusFiles", "Status");
-        if (!statusValues.isEmpty())
-            statusValues.remove(0);  // Remove the header
-
-        return statusValues;
+        DataRegionTable status = new DataRegionTable("StatusFiles", this, true, false);
+        return status.getColumnDataAsText("Status");
     }
 
     public void setPipelineRoot(String rootPath)
