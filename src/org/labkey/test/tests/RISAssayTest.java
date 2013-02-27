@@ -71,7 +71,8 @@ public class RISAssayTest extends BaseWebDriverTest
         createRISAssay();
 
         verifyRISAssay();
-        //verifyRISReport();
+        configureReportWebPart();
+        verifyRISReport();
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -86,6 +87,8 @@ public class RISAssayTest extends BaseWebDriverTest
 
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Kiem RIS Dashboard");
+        portalHelper.addWebPart("Kiem RIS Report");
+
         portalHelper.addWebPart("Lists");
     }
 
@@ -179,9 +182,20 @@ public class RISAssayTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText("Kiem Chart"));
         //assertTextNotPresent("Error"); //TODO: 17236: RIS Report bar chart is broken
 
-        clickAndWait(Locator.linkWithText("Kiem Chart"));
-        waitForElement(Locator.pageHeader("bar-chart"));
+        //clickAndWait(Locator.linkWithText("Kiem Chart"));
+        //waitForElement(Locator.pageHeader("bar-chart"));
         //assertTextNotPresent("Error"); //TODO: 17236: RIS Report bar chart is broken
+    }
+
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    private void configureReportWebPart()
+    {
+        clickFolder(getProjectName());
+
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.clickWebpartMenuItem("Kiem RIS Report", true, "Customize");
+        click(Locator.tagContainingText("label", "RIS"));
+        clickButton("Save");
     }
 
     @Override
