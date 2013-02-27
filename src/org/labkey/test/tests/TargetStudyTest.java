@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Random;
@@ -112,10 +113,7 @@ public class TargetStudyTest extends AbstractAssayTestWD
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/manageStudyProperties.view");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("Label"), _study1Label);
-        clickButton("Submit", 0);
-//        _extHelper.waitForExtDialog("Status");
-//        Locator.css(".ext-el-mask").waitForElmementToDisappear(_driver, WAIT_FOR_JAVASCRIPT); // Mask doesn't have 'block' style
-        waitForPageToLoad();
+        clickButton("Submit");
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY2 + "/manageStudyProperties.view");
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
@@ -136,33 +134,17 @@ public class TargetStudyTest extends AbstractAssayTestWD
     {
         return true;
     }
+
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void setupAssay()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
 
-//        log("** Define GPAT Assay");
         clickFolder(TEST_ASSAY_PRJ_SECURITY);
-        if (!isLinkPresentWithText("Assay List"))
-            addWebPart("Assay List");
-        _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/TargetStudy/Assay.xar", 1, "Assay.xar");
-//        clickButton("Manage Assays");
-//        clickButton("New Assay Design");
-//        checkRadioButton("providerName", "General");
-//        clickButton("Next");
-//        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-//
-//        selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
-//        sleep(1000);
-//
-//        // Remove ParticipantVisitResolver and TargetStudy from the Batch domain
-//        deleteField("Batch Fields", 0);
-//        deleteField("Batch Fields", 0);
-//
-//        // Add TargetStudy to the end of the default list of Results domain
-//        addField("Data Fields", 4, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
-//
-//        clickButton("Save", 0);
-//        waitForText("Save successful.", 20000);
+        if (!isElementPresent(Locator.linkWithText("Assay List")))
+            portalHelper.addWebPart("Assay List");
 
+        _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/TargetStudy/Assay.xar", 1, "Assay.xar");
     }
 
     protected void uploadRuns()
