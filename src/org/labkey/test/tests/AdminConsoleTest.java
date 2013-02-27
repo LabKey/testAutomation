@@ -31,7 +31,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
 {
     public String getProjectName()
     {
-        return "AdminConsoleTestProject";
+        return null;
     }
 
     public void doTestSteps() throws Exception
