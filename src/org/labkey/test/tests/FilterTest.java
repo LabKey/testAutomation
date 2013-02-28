@@ -31,6 +31,7 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelperWD;
+import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
@@ -107,10 +108,10 @@ public class FilterTest extends ListTest
         ListHelper.ListColumn yearColumn = new ListHelper.ListColumn("year", "year", ListHelper.ListColumnType.Integer, "");
         _listHelper.createList(PROJECT_NAME, FACET_TEST_LIST, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, yearColumn);
         clickButton("Import Data");
-        setFormElement(Locator.name("text"),"Car\tColor\tyear\n" +
+        setFormElement(Locator.name("text"), "Car\tColor\tyear\n" +
                 "1\tBlue\t1980\n" +
                 "2\tRed\t1970\n" +
-                "3\tYellow\t1990\n" );
+                "3\tYellow\t1990\n");
 
         clickButton("Submit", 0);
         waitForElement(Locator.id("labkey-nav-trail-current-page").withText(FACET_TEST_LIST));
@@ -479,11 +480,6 @@ public class FilterTest extends ListTest
                     a.filter2Type, a.filter2Value,
                     a.present, a.notPresent.clone(),  a.filterUrl);
     }
-    private void validFilterGeneratesCorrectResultsTest(String columnName, String filter1Type, String filter1, String filter2Type, String filter2,
-            String[] textPresentAfterFilter, String[] textNotPresentAfterFilter)
-    {
-        validFilterGeneratesCorrectResultsTest(columnName, filter1Type, filter1, filter2Type, filter2, textPresentAfterFilter, textNotPresentAfterFilter, null);
-    }
 
     @LogMethod
     private void validFilterGeneratesCorrectResultsTest(String columnName, String filter1Type, String filter1, String filter2Type, String filter2,
@@ -518,9 +514,13 @@ public class FilterTest extends ListTest
             //open filter
             log("** Checking filter values in filter dialog");
             runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
-            _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
-            _extHelper.clickExtTab("Choose Filters");
-            _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
+            _extHelper.waitForExtDialog("Show Rows Where ");
+            if (isElementPresent(Locator.css(".x-tab-strip-active").withText("Choose Values")))
+            {
+                _shortWait.until(ExpectedConditions.elementToBeClickable(By.linkText("[All]")));
+                _extHelper.clickExtTab("Choose Filters");
+                _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
+            }
 
         if (filter1 != null)
         {
@@ -545,7 +545,7 @@ public class FilterTest extends ListTest
                 // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;Zany" are selected.
                 // When switching tabs, nothing changes.
                 //waitForFormElementToEqual(Locator.name("filterType_1"), "Equals One Of (e.g. \"a;b;c\")");
-                waitForFormElementToEqual(Locator.name("value_1"), "Light;Mellow");
+                waitForFormElementToEqual(Locator.name("value_1"), "Robust;Zany");
             }
             else if (filter1Type.equals("Does Not Equal") && "false".equals(filter1))
             {

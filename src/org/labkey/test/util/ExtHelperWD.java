@@ -785,7 +785,7 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         /**
          * Locates title bar of an Ext 3 or 4 window
-         * @param title exact text of window title
+         * @param title partial text of window title
          * @return Locator for window's title bar
          */
         public static Locator.XPathLocator extDialog(String title)
