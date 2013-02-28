@@ -33,7 +33,7 @@ import java.io.File;
 public class SurveyTest extends BaseWebDriverTest
 {
     private final String folderName = "subfolder";
-    private final String pipelineLoc =  "/sampledata/survey";
+    protected final String pipelineLoc =  "/sampledata/survey";
     private final String projectSurveyDesign = "My Project Survey Design";
     private final String subfolderSurveyDesign = "My Subfolder Survey Design";
     private final String firstSurvey = "First Survey";
@@ -77,7 +77,7 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(getProjectName(), new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         enableModule(getProjectName(), "Survey");
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(getProjectName(), null, projectSurveyDesign, null, "lists", "listA");
+        createSurveyDesign(getProjectName(), null, projectSurveyDesign, null, "lists", "listA", null);
     }
 
     private void setupSubfolder()
@@ -88,7 +88,7 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(folderName, new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         enableModule(folderName, "Survey");
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(folderName, null, subfolderSurveyDesign, null, "lists", "listA");
+        createSurveyDesign(folderName, null, subfolderSurveyDesign, null, "lists", "listA", null);
 
         log("Add users that will be used for permissions testing");
         createUser(EDITOR, null);
@@ -99,7 +99,8 @@ public class SurveyTest extends BaseWebDriverTest
         clickButton("Save and Finish");
     }
 
-    protected void createSurveyDesign(String folder, String tabName, String designName, @Nullable String description, String schemaName, String queryName)
+    protected void createSurveyDesign(String folder, String tabName, String designName, @Nullable String description,
+                                      String schemaName, String queryName, @Nullable String metadataFilePath)
     {
         log("Create new survey design");
         clickFolder(folder);
@@ -114,10 +115,20 @@ public class SurveyTest extends BaseWebDriverTest
         // the schema selection enables the query combo, so wait for it to enable
         waitForElementToDisappear(Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Query']"), WAIT_FOR_JAVASCRIPT);
         _ext4Helper.selectComboBoxItem("Query", queryName);
+
         clickButton("Generate Survey Questions", 0);
         sleep(1000); // give it a second to generate the metadata
         String metadataValue = getFormElement(Locator.name("metadata"));
         Assert.assertNotNull("No generate survey question metadata available", metadataValue);
+        if (metadataFilePath != null)
+        {
+            String json = getFileContents(metadataFilePath);
+            // hack: since we are not able to update the CodeMirror input field via selenium, we reshow the
+            // textarea and enter the value there, the SurveyDesignPanel will then use that value instead of the CodeMirror value
+            executeScript("document.getElementsByName('metadata')[0].style.display = 'block';");
+            setFormElement(Locator.name("metadata"), json);
+        }
+
         clickButton("Save Survey");
         waitForText(designName);
     }

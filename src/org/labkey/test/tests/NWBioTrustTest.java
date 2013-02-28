@@ -50,8 +50,7 @@ public class NWBioTrustTest extends SurveyTest
     private static final String requestorFolder1 = "Requestor 1";
     private static final String requestorFolder2 = "Requestor 2";
     private static final String provisionTableName = "Sample Request Responses";
-    private static final String designLabel = "ProspectiveTest";
-    private static final String description = "Request specimens from surgeries or clinic procedures";
+    private static final List<Map<String, String>> designs = new ArrayList<Map<String, String>>();
     private static final String[] submittedRequestLabels = {"first registration", "second registration", "third registration"};
     private static final File TEST_FILE_1 = new File( getLabKeyRoot() + "/sampledata/survey/TestAttachment.txt");
     private static final File TEST_FILE_2 = new File( getLabKeyRoot() + "/sampledata/survey/TestAttachment2.txt");
@@ -86,6 +85,7 @@ public class NWBioTrustTest extends SurveyTest
         setupProjectAdminProperties();
         setupSurveysTableDefinition();
         setupProvisionTableForResponses();
+        setupSurveyDesignsAndRequests();
 
         verifyFolderTypes();
         verifyResearchCoordDashboard();
@@ -96,22 +96,38 @@ public class NWBioTrustTest extends SurveyTest
 
     private void deleteSurveyDesign()
     {
-        log("Delete the survey design for this project (which will delete the document sets and requests");
+        if (designs.size() == 0)
+            configureDesigns();
+
+        log("Delete the survey designs for this project (which will delete the document sets and requests");
         goToProjectHome();
         clickAndWait(Locator.linkWithText("Manage"));
-        if (isTextPresent(designLabel))
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("RowId");
+        _customizeViewsHelper.applyCustomView();
+        DataRegionTable drt = new DataRegionTable("query", this);
+        int toDelete = 0;
+        for (Map<String, String> design : designs)
         {
-            _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.addCustomizeViewColumn("RowId");
-            _customizeViewsHelper.applyCustomView();
-            DataRegionTable drt = new DataRegionTable("query", this);
-            String rowId = drt.getDataAsText(drt.getRow("Label", designLabel), "RowId");
-            checkDataRegionCheckbox("query", rowId);
+            if (drt.getRow("Label", design.get("label")) > -1)
+            {
+                String rowId = drt.getDataAsText(drt.getRow("Label", design.get("label")), "RowId");
+                checkDataRegionCheckbox("query", rowId);
+                toDelete++;
+            }
+        }
+
+        if (toDelete > 0)
+        {
             clickButton("Delete", 0);
-            assertAlert("Are you sure you want to delete this survey design and its associated surveys?");
+            if (toDelete == 1)
+                assertAlert("Are you sure you want to delete this survey design and its associated surveys?");
+            else
+                assertAlert("Are you sure you want to delete these " + toDelete + " survey designs and their associated survey instances?");
+
+            waitForElement(Locator.linkWithText("New Registrations"));
             clickAndWait(Locator.linkWithText("New Registrations"));
             waitForText("No study registrations to show", WAIT_FOR_PAGE);
-            assertTextNotPresent(designLabel);
             clickFolder(requestorFolder1);
             clickAndWait(Locator.linkWithText("Study Registrations"));
             waitForText("No study registrations to show", 2, WAIT_FOR_PAGE);
@@ -241,8 +257,6 @@ public class NWBioTrustTest extends SurveyTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyResearchCoordDashboard()
     {
-        populateSurveyDesignsAndRequests();
-
         log("Verify submitted requests show up in RC Dashboard");
         goToProjectHome();
         clickAndWait(Locator.linkWithText("New Registrations"));
@@ -298,40 +312,69 @@ public class NWBioTrustTest extends SurveyTest
             return Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(),'" + label + "')]/../..//td//div//span[contains(@class, 'edit-views-link')]");
     }
 
-    private void populateSurveyDesignsAndRequests()
+    @LogMethod(category = LogMethod.MethodType.SETUP)
+    private void setupSurveyDesignsAndRequests()
     {
-        log("Create survey design in project folder and configure dashboard");
-        assertTextNotPresent(designLabel);
-        createSurveyDesign(getProjectName(), "Manage", designLabel, description, "biotrust", provisionTableName);
+        if (designs.size() == 0)
+            configureDesigns();
+
+        log("Create survey designs in project folder");
+        for (Map<String, String> entry : designs)
+        {
+            createSurveyDesign(getProjectName(), "Manage", entry.get("label"), entry.get("description"),
+                    "biotrust", entry.get("table"), entry.get("metadataPath"));
+        }
+
+        log("Configure dashboard");
         clickAndWait(Locator.linkWithText("New Registrations"));
         waitForText("No study registrations to show");
-        customizeDashboard("RC Dashboard - Study Registrations", designLabel);
+        customizeDashboard("RC Dashboard - Study Registrations", designs.get(0).get("label"));
 
         log("Submit requests from the requestor subfolder");
         clickFolder(requestorFolder1);
         clickAndWait(Locator.linkWithText("Study Registrations"));
-        customizeDashboard("Requestor Dashboard - Study Registrations", designLabel);
-        assertTextPresentInThisOrder(designLabel, description, "Pending Registrations", "Submitted Registrations");
+        customizeDashboard("Requestor Dashboard - Study Registrations", designs.get(0).get("label"));
+        assertTextPresentInThisOrder(designs.get(0).get("label"), designs.get(0).get("description"), "Pending Registrations", "Submitted Registrations");
         waitForText("No study registrations to show", 2, WAIT_FOR_PAGE); // both pending and submitted should be empty
         for (String requestLabel : submittedRequestLabels)
         {
             clickAndWait(Locator.linkWithText("Click Here"));
-            submitSampleRequest(requestLabel, Collections.singletonMap("testfield1", "Text Field Value"));
+            List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
+            fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + requestLabel));
+            fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Pending"));
+            fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
+            fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
+            submitStudyRegistration(requestLabel, fields);
         }
-        waitForGridToLoad("div", "x4-grid-group-title", 1); // all request should be in the Submitted group
+        waitForGridToLoad("div", "x4-grid-group-title", 1); // all study registrations should be in the Submitted group
         waitForText("No study registrations to show", 1, WAIT_FOR_PAGE); // pending grid should still be empty
         assertTextPresentInThisOrder(submittedRequestLabels);
     }
 
-    private void submitSampleRequest(String label, Map<String, String> fields)
+    private Map<String, String> createFieldInfo(String section, String name, String value)
     {
-        waitForText("Survey Label*");
+        Map<String, String> info = new HashMap<String, String>();
+        info.put("section", section);
+        info.put("name", name);
+        info.put("value", value);
+        return info;
+    }
+
+    private void submitStudyRegistration(String label, List<Map<String, String>> fields)
+    {
+        waitForText("Study Name*");
         setFormElement(Locator.name("_surveyLabel_"), label);
-        for (Map.Entry<String, String> field : fields.entrySet())
+        for (Map<String, String> field : fields)
         {
-            setFormElement(Locator.name(field.getKey()), field.getValue());
+            Locator sectionLoc = Locator.xpath("//li[text()='" + field.get("section") + "']");
+            if (isElementPresent(sectionLoc))
+                click(sectionLoc);
+
+            waitForElement(Locator.name(field.get("name")));
+            setFormElement(Locator.name(field.get("name")), field.get("value"));
         }
         sleep(500); // give the submit button a split second to enable base on form changes
+        click(Locator.xpath("//li[text()='Save / Submit']"));
         clickButton("Submit completed form");
     }
 
@@ -566,6 +609,51 @@ public class NWBioTrustTest extends SurveyTest
                Assert.fail(e.getMessage());
             }
         }
+    }
+
+    private void configureDesigns()
+    {
+        Map<String, String> design = new HashMap<String, String>();
+        design.put("label", "NW BioTrust Study Registration");
+        design.put("description", "Create a new study registration with associated sample requests");
+        design.put("table", "StudyRegistrations");
+        design.put("metadataPath", pipelineLoc + "/nwbt/StudyRegistrationsMetadata.json");
+        designs.add(design);
+
+        design = new HashMap<String, String>();
+        design.put("label", "ProspectiveSampleRequest");
+        design.put("description", "");
+        design.put("table", "SampleRequests");
+        design.put("metadataPath", pipelineLoc + "/nwbt/ProspectiveSampleRequestMetadata.json");
+        designs.add(design);
+
+        design = new HashMap<String, String>();
+        design.put("label", "DiscardedBloodSampleRequest");
+        design.put("description", "");
+        design.put("table", "SampleRequests");
+        design.put("metadataPath", null);
+        designs.add(design);
+
+        design = new HashMap<String, String>();
+        design.put("label", "SurgicalTissueSample");
+        design.put("description", "");
+        design.put("table", "TissueRecords");
+        design.put("metadataPath", pipelineLoc + "/nwbt/SurgicalTissueRecordMetadata.json");
+        designs.add(design);
+
+        design = new HashMap<String, String>();
+        design.put("label", "NonSurgicalTissueSample");
+        design.put("description", "");
+        design.put("table", "TissueRecords");
+        design.put("metadataPath", pipelineLoc + "/nwbt/NonSurgicalTissueRecordMetadata.json");
+        designs.add(design);
+
+        design = new HashMap<String, String>();
+        design.put("label", "BloodSample");
+        design.put("description", "");
+        design.put("table", "TissueRecords");
+        design.put("metadataPath", pipelineLoc + "/nwbt/BloodRecordMetadata.json");
+        designs.add(design);
     }
 
     @Override
