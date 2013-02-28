@@ -394,11 +394,12 @@ public class ExtHelperWD extends AbstractHelperWD
         return Locator.xpath("(" + ((Locator.XPathLocator)row).getPath() + "//td[contains(@class, 'x-grid3-cell')])[" + cellIndex + "]");
     }
 
-    public void clickFileBrowserFileCheckbox(String fileName)
+    @LogMethod(quiet = true)
+    public void clickFileBrowserFileCheckbox(@LoggedParam String fileName)
     {
+        waitForFileGridReady();
         _test.waitForElement(Locator.css("div.labkey-filecontent-grid"), WAIT_FOR_PAGE);
         _test.waitForElement(locateBrowserFileName(fileName), WAIT_FOR_PAGE);
-        _test.sleep(100); // Avoid race condition for file selection.
         selectExtGridItem("name", fileName, -1, "labkey-filecontent-grid", true);
     }
 
@@ -557,6 +558,9 @@ public class ExtHelperWD extends AbstractHelperWD
 
         for (int i = 0; i < parts.length; i++)
         {
+            waitForLoadingMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            waitForFileGridReady();
+
             nodeId.append(parts[i]).append('/');
 
             if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory

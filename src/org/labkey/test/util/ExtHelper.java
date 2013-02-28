@@ -273,11 +273,12 @@ public class ExtHelper extends AbstractHelper
         return Locator.xpath("(" + ((Locator.XPathLocator)row).getPath() + "//td[contains(@class, 'x-grid3-cell')])[" + cellIndex + "]");
     }
 
-    public void clickFileBrowserFileCheckbox(String fileName)
+    @LogMethod(quiet = true)
+    public void clickFileBrowserFileCheckbox(@LoggedParam String fileName)
     {
+        waitForFileGridReady();
         _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-filecontent-grid')]"), 60000);
         _test.waitForElement(locateBrowserFileName(fileName), 60000);
-        _test.sleep(100); // Avoid race condition for file selection.
         _test.getWrapper().getEval("selenium.selectFileBrowserCheckbox('" + fileName + "');");
     }
 
@@ -377,6 +378,9 @@ public class ExtHelper extends AbstractHelper
 
         for (int i = 0; i < parts.length; i++)
         {
+            waitForLoadingMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            waitForFileGridReady();
+
             nodeId.append(parts[i]).append('/');
 
             if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory
