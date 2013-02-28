@@ -49,9 +49,6 @@ public class MethodPerfAspect
     {
         if (logMethod.category() != LogMethod.MethodType.UNSPECIFIED)
         {
-            MethodSignature signature = (MethodSignature) joinPoint.getStaticPart().getSignature();
-            String method = signature.getName();
-
             _startTimes.push(System.currentTimeMillis());
             if (_methodTypesStack.isEmpty() || _methodTypesStack.peek() == logMethod.category())
                 _methodTypesStack.push(logMethod.category());
