@@ -131,12 +131,10 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
 
             // verify expected sample names and virus names
             for (int i=1; i <= 20; i++)
-            {
                 assertTextPresent("SPECIMEN-" + i);
 
-                // uncomment after 17303 is fixed
-                //assertTextPresent("VIRUS-" + i);
-            }
+            for (int i=1; i <= 3; i++)
+                assertTextPresent("VIRUS-" + i);
 
             click(Locator.linkContainingText("Change Curve Type"));
             clickAndWait(Locator.menuItem("Four Parameter"));
