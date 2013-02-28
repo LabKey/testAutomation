@@ -132,6 +132,8 @@ public class StudyHelper extends AbstractHelper
         // Select row
         selectParticipantCategoriesGridRow(groupName);
 
+        String oldCategory = _test.getText(Locator.css("tr.x4-grid-row-selected > td.x4-grid-cell:nth-of-type(2)"));
+
         _test.clickButton("Edit Selected", 0);
         _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
         _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
@@ -157,13 +159,18 @@ public class StudyHelper extends AbstractHelper
         }
         if( categoryName != null )
         {
+            Locator categoryField = Ext4HelperWD.Locators.formItemWithLabel(participantString + " Category:").append("//input");
+
+            if (!"".equals(oldCategory))
+                _test.waitForFormElementToEqual(categoryField, oldCategory);
+
             if (isCategoryNameNew)
                 _test.setFormElement(Locator.xpath("//input[@name='participantCategory']"), categoryName);
             else
                 _test._ext4Helper.selectComboBoxItem(participantString + " Category:", categoryName);
             _test.pressTab(Locator.xpath("//input[@name='participantCategory']"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-            Assert.assertEquals("Mouse category not set", categoryName, _test.getFormElement(Ext4HelperWD.Locators.formItemWithLabel(participantString + " Category:").append("//input")));
+            Assert.assertEquals("Mouse category not set", categoryName, _test.getFormElement(categoryField));
         }
         if ( shared != null )
         {
