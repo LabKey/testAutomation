@@ -294,6 +294,7 @@ public enum TestSet
         TargetStudyTest.class,
         NabOldTest.class,
         NabAssayTest.class,
+        NabHighThroughputAssayTest.class,
         LuminexUploadAndCopyTest.class,
         LuminexExcludableWellsTest.class,
         LuminexMultipleCurvesTest.class,
