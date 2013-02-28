@@ -678,6 +678,7 @@ public class ListHelperWD extends ListHelper
             _test.setFormElement(Locator.css("input[name=schema]"), lookup.getSchema());
             _test.fireEvent(Locator.css("input[name=schema]"), BaseWebDriverTest.SeleniumEvent.change);
             _test.waitForElement(Locator.xpath("//div[contains(@class,'test-marker-" + lookup.getSchema() + "')]/input[@name='schema']"));
+            _test.sleep(1000);
 
             _test.fireEvent(Locator.css("input[name=table]"), BaseWebDriverTest.SeleniumEvent.click);
             _test.setFormElement(Locator.css("input[name=table]"), lookup.getTable());

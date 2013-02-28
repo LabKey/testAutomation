@@ -24,11 +24,11 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
@@ -52,7 +52,7 @@ public class NWBioTrustTest extends SurveyTest
     private static final String provisionTableName = "Sample Request Responses";
     private static final String designLabel = "ProspectiveTest";
     private static final String description = "Request specimens from surgeries or clinic procedures";
-    private static final String[] submittedRequestLabels = {"first request", "second request", "third request"};
+    private static final String[] submittedRequestLabels = {"first registration", "second registration", "third registration"};
     private static final File TEST_FILE_1 = new File( getLabKeyRoot() + "/sampledata/survey/TestAttachment.txt");
     private static final File TEST_FILE_2 = new File( getLabKeyRoot() + "/sampledata/survey/TestAttachment2.txt");
 
@@ -83,15 +83,14 @@ public class NWBioTrustTest extends SurveyTest
     {
         setupResearchCoordAndRequstorFolders();
         //setupUsersAndPermissions();
-        verifyFolderTypes();
         setupProjectAdminProperties();
         setupSurveysTableDefinition();
         setupProvisionTableForResponses();
-        populateSurveyDesignsAndRequests();
+
+        verifyFolderTypes();
         verifyResearchCoordDashboard();
         verifyRequestorDashboard();
         verifySecondRequestorDashboard();
-        populateDocumentSetForRequests();
         verifyDocumentSetFromDashboard();
     }
 
@@ -120,15 +119,18 @@ public class NWBioTrustTest extends SurveyTest
         }
     }
 
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyDocumentSetFromDashboard()
     {
+        populateDocumentSetForRequests();
+
         log("Verify documents and types via RC Dashboard");
         goToProjectHome();
         clickAndWait(Locator.linkWithText("New Registrations"));
         waitForGridToLoad("div", "x4-grid-group-title", NWBT_REQUEST_CATEGORIES.length);
         assertElementPresent(Locator.linkWithText("Document Set (0)"), 2);
         assertElementPresent(Locator.linkWithText("Document Set (3)"), 1);
-        click(Locator.linkWithText("Document Set (3)")); // link for the first request
+        click(Locator.linkWithText("Document Set (3)")); // link for the first registration
         waitForText(TEST_FILE_1.getName());
         assertElementPresent(Locator.linkWithText(TEST_FILE_1.getName()), NWBT_DOCUMENT_TYPES.length);
         assertElementPresent(Locator.linkWithText(TEST_FILE_2.getName()), NWBT_DOCUMENT_TYPES.length - 1); // first doc type doesn't allow multiple file upload
@@ -140,7 +142,7 @@ public class NWBioTrustTest extends SurveyTest
         waitForGridToLoad("tr", "x4-grid-row", fileCount);
         // verify that we navigated to the appropriate subfolder for the manage document set page
         assertTextNotPresent("NW BioTrust Research Coordinator Dashboard");
-        Locator loc = getEditLinkLocator(TEST_FILE_1.getName());
+        Locator loc = getEditLinkLocator(TEST_FILE_1.getName(), true);
         click(loc);
         _extHelper.waitForExtDialog("Edit Document");
         assertTextPresentInThisOrder("File Name:", "Document Type:", "Created By:", "Created:");
@@ -157,7 +159,7 @@ public class NWBioTrustTest extends SurveyTest
         clickAndWait(Locator.linkWithText("Study Registrations"));
         waitForGridToLoad("div", "x4-grid-group-title", NWBT_REQUEST_STATUSES.length);
         assertElementPresent(Locator.linkWithText("Document Set (0)"), 3);
-        click(Locator.linkWithText("Document Set (0)")); // link for the first request
+        click(Locator.linkWithText("Document Set (0)")); // link for the first registration
         waitForText("No documents to show");
         waitForText(submittedRequestLabels[0]);
         clickButton("Manage");
@@ -213,6 +215,7 @@ public class NWBioTrustTest extends SurveyTest
         clickButton("Close", 0);
     }
 
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifySecondRequestorDashboard()
     {
         // TODO: this will be put to better use once we implement the NWBT security roles/permissions
@@ -223,6 +226,7 @@ public class NWBioTrustTest extends SurveyTest
         assertElementNotPresent(Locator.linkWithText("Click Here"));
     }
 
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyRequestorDashboard()
     {
         log("Verify updated requests show up in Requestor Dashboard");
@@ -234,8 +238,11 @@ public class NWBioTrustTest extends SurveyTest
             assertElementPresent(getGroupingTitleLocator(category));
     }
 
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyResearchCoordDashboard()
     {
+        populateSurveyDesignsAndRequests();
+
         log("Verify submitted requests show up in RC Dashboard");
         goToProjectHome();
         clickAndWait(Locator.linkWithText("New Registrations"));
@@ -272,9 +279,9 @@ public class NWBioTrustTest extends SurveyTest
 
     private void setRequestStatusAndCategory(int index, String label, String status, String category)
     {
-        Locator loc = getEditLinkLocator(label);
+        Locator loc = getEditLinkLocator(label, false);
         click(loc);
-        _extHelper.waitForExtDialog("Edit Request");
+        _extHelper.waitForExtDialog("Edit Registration");
         sleep(1000); // this is tricky because there is a loading mask for the combos, but they can load very quickly so that the test misses it if we wait for the mask to disappear
         _ext4Helper.selectComboBoxItem("NWBT Resource:", category);
         _ext4Helper.selectComboBoxItem("Status:", status);
@@ -283,9 +290,12 @@ public class NWBioTrustTest extends SurveyTest
         assertTextPresent(status);
     }
 
-    private Locator getEditLinkLocator(String label)
+    private Locator getEditLinkLocator(String label, boolean isLink)
     {
-        return Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(),'" + label + "')]/../../..//td//div//span[contains(@class, 'edit-views-link')]");
+        if (isLink)
+            return Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(),'" + label + "')]/../../..//td//div//span[contains(@class, 'edit-views-link')]");
+        else
+            return Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner') and contains(text(),'" + label + "')]/../..//td//div//span[contains(@class, 'edit-views-link')]");
     }
 
     private void populateSurveyDesignsAndRequests()
@@ -333,6 +343,7 @@ public class NWBioTrustTest extends SurveyTest
         clickButton("Save");
     }
 
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupProvisionTableForResponses()
     {
         log("Create provision table in biotrust schema for responses");
@@ -352,6 +363,7 @@ public class NWBioTrustTest extends SurveyTest
         assertElementPresent(Locator.linkWithText(provisionTableName));
     }
 
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupSurveysTableDefinition()
     {
         log("Add fields to extensible survey.Surveys table");
@@ -380,6 +392,7 @@ public class NWBioTrustTest extends SurveyTest
         clickAndWait(Locator.linkContainingText(textLink));
     }
 
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupProjectAdminProperties()
     {
         // NOTE: these tables are site wide (i.e. no container field), so we have to track which ones we add so we can delete them
@@ -450,6 +463,7 @@ public class NWBioTrustTest extends SurveyTest
             Assert.fail("The " + colName + " to be inserted already exist in the biotrust." + queryName + " table.");
     }
 
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyFolderTypes()
     {
         log("Verify folder type default webparts");
@@ -489,6 +503,7 @@ public class NWBioTrustTest extends SurveyTest
         }
     }
 
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupUsersAndPermissions()
     {
         log("Create all of the users for this test");
@@ -520,6 +535,7 @@ public class NWBioTrustTest extends SurveyTest
         // TODO: we could use the webpart permissions to hide/show the RC dashboard, etc. from the project folder
     }
 
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupResearchCoordAndRequstorFolders()
     {
         log("Create project folder and requestor subfolders");
