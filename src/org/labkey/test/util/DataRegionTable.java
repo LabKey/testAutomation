@@ -602,7 +602,7 @@ public class DataRegionTable
 
     public void toggleAllFacetsCheckbox()
     {
-        _test.click(Locator.xpath("//b").withClass("lk-filter-panel-label").withText("All"));
+        _test.mouseDown(Locator.xpath("//b").withClass("lk-filter-panel-label").withText("All"));
     }
 
 
@@ -613,7 +613,7 @@ public class DataRegionTable
             return Locator.xpath("id('dataregion_header_" + tableName + "')//a").withClass("labkey-button").withText(text);
         }
 
-        public static Locator.XPathLocator facetPanel(String tableName)
+        public static Locator.IdLocator facetPanel(String tableName)
         {
             return Locator.id("dataregion_facet_" + tableName);
         }
@@ -640,12 +640,12 @@ public class DataRegionTable
 
         public static Locator.XPathLocator facetCheckbox(String category)
         {
-            return facetRow(category).append("//td[@type='checkbox']");
+            return Locator.xpath("//input[@category='" + category + "']");
         }
 
         public static Locator.XPathLocator facetCheckbox(String category, String group)
         {
-            return facetRow(category, group).append("//span").withClass("x4-grid-row-checker");
+            return facetRow(category, group).append("//div").withClass("x4-grid-row-checker");
         }
     }
 }

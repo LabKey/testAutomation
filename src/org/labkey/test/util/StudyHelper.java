@@ -191,7 +191,12 @@ public class StudyHelper extends AbstractHelper
     @LogMethod
     public void deleteCustomParticipantGroup(String groupName, String participantString)
     {
-        // Caller must already be on Manage <participantString> Groups page
+        if( !_test.isElementPresent(Locator.xpath("id('labkey-nav-trail-current-page')[text() = 'Manage "+participantString+" Groups']")) )
+        {
+            _test.clickTab("Manage");
+            _test.clickAndWait(Locator.linkWithText("Manage " + participantString + " Groups"));
+            _test.waitForText("groups allow");
+        }
         _test.log("Delete " + participantString + " Group: " + groupName);
         selectParticipantCategoriesGridRow(groupName);
         _test.clickButton("Delete Selected", 0);

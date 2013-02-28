@@ -136,7 +136,7 @@ public class PortalHelper extends AbstractHelper
      */
     public void addWebPart(String webPartName)
     {
-        Locator.css("option").withText(webPartName).waitForElmement(((BaseWebDriverTest)_test)._driver, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//option").withText(webPartName));
         Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
         _test.selectOptionByText(form.append("//select"), webPartName);
         _test.submit(form);
@@ -148,6 +148,24 @@ public class PortalHelper extends AbstractHelper
         int startCount = _test.getXpathCount(removeButton);
         _test.click(removeButton);
         _test.waitForElementToDisappear(removeButton.index(startCount), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void addQueryWebPart(String title, String schemaName, @Nullable String queryName, @Nullable String viewName)
+    {
+        addWebPart("Query");
+        _test.setFormElement(Locator.name("title"), title);
+        _test.selectOptionByValue(Locator.id("schemaName"), schemaName);
+        if (queryName != null)
+        {
+            _test.click(Locator.radioButtonById("selectQueryContents"));
+            _test.selectOptionByValue(Locator.name("queryName"), queryName);
+            if (viewName != null)
+                _test.selectOptionByValue(Locator.name("viewName"), viewName);
+        }
+
+        _test.clickButton("Submit");
+
+        _test.waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title));
     }
 
     /**

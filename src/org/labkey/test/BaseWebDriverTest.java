@@ -3699,6 +3699,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForElement(locator, wait, true);
     }
 
+    public void waitForElementToDisappear(final Locator locator)
+    {
+        waitForElementToDisappear(locator, WAIT_FOR_JAVASCRIPT);
+    }
+
     public void waitForElementToDisappear(final Locator locator, int wait)
     {
         locator.waitForElmementToDisappear(_driver, wait);

@@ -20,16 +20,19 @@ import junit.framework.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.StudyHelper;
 
 public class StudyDatasetsTest extends StudyBaseTest
 {
-    private String CATEGORY1 = "Category1";
-    private String GROUP1A = "Group1A";
-    private String GROUP1B = "Group1B";
-    private String CATEGORY2 = "Category2";
-    private String GROUP2A = "Group2A";
-    private String GROUP2B = "Group2B";
-    private String[] PTIDS = {"999320016","999320518","999320529","999320533","999320557","999320565"};
+    private static final String CATEGORY1 = "Category1";
+    private static final String GROUP1A = "Group1A";
+    private static final String GROUP1B = "Group1B";
+    private static final String CATEGORY2 = "Category2";
+    private static final String GROUP2A = "Group2A";
+    private static final String GROUP2B = "Group2B";
+    private static final String EXTRA_GROUP = "Extra Group";
+    private static final String[] PTIDS = {"999320016","999320518","999320529","999320533","999320557","999320565"};
 
     @Override
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -41,7 +44,7 @@ public class StudyDatasetsTest extends StudyBaseTest
 
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP1A, "Mouse", CATEGORY1, true, null, PTIDS[0], PTIDS[1]);
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP1B, "Mouse", CATEGORY1, false, null, PTIDS[2], PTIDS[3]);
-        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP2A, "Mouse", CATEGORY2, true, null, PTIDS[0], PTIDS[3]);
+        _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP2A, "Mouse", CATEGORY2, true, null, PTIDS[1], PTIDS[3]);
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP2B, "Mouse", CATEGORY2, false, null, PTIDS[2], PTIDS[4]);
     }
 
@@ -144,18 +147,70 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickFolder(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
+        DataRegionTable dataregion = new DataRegionTable("Dataset", this);
+        verifyFilterPanelOnDemographics(dataregion);
 
-        DataRegionTable dataset = new DataRegionTable("Dataset", this);
+        _studyHelper.deleteCustomParticipantGroup(EXTRA_GROUP, "Mouse");
+
+        clickFolder(getProjectName());
+        clickFolder(getFolderName());
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addQueryWebPart("Demographics", "study", "DEM-1: Demographics", null);
+        dataregion = new DataRegionTable("qwp6", this);
+        verifyFilterPanelOnDemographics(dataregion);
+    }
+
+    private void verifyFilterPanelOnDemographics(DataRegionTable dataset)
+    {
         dataset.openSideFilterPanel();
 
         waitForElement(Locator.paginationText(24));
         dataset.clickFacetLabel(CATEGORY1, GROUP1A); // Select only GROUP1A
         waitForElementToDisappear(Locator.css(".labkey-pagination"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.linkWithText(PTIDS[0]));
+        assertElementPresent(Locator.linkWithText(PTIDS[1]));
         Assert.assertEquals("Wrong number of rows after filter", 2, dataset.getDataRowCount());
+
+        dataset.clickFacetCheckbox(CATEGORY1, GROUP1B); // GROUP1A OR GROU1B
+        waitForElement(Locator.linkWithText(PTIDS[2]));
         assertElementPresent(Locator.linkWithText(PTIDS[0]));
         assertElementPresent(Locator.linkWithText(PTIDS[1]));
+        assertElementPresent(Locator.linkWithText(PTIDS[3]));
+        Assert.assertEquals("Wrong number of rows after filter", 4, dataset.getDataRowCount());
 
-        //TODO: Add more check once bugs are fixed (17270, 17280, 17283, & 17284)
+        dataset.clickFacetLabel(CATEGORY2, GROUP2A); // (GROUP1A OR GROU1B) AND GROUP2A
+        waitForElementToDisappear(Locator.linkWithText(PTIDS[2]));
+        waitForElement(Locator.linkWithText(PTIDS[1]));
+        assertElementPresent(Locator.linkWithText(PTIDS[3]));
+        Assert.assertEquals("Wrong number of rows after filter", 2, dataset.getDataRowCount());
+
+        dataset.clickFacetLabel(CATEGORY2, "Not in any group"); // (GROUP1A OR GROUP1B) AND (CATEGORY2 = NULL)
+        waitForElementToDisappear(Locator.linkWithText(PTIDS[1]));
+        waitForElement(Locator.linkWithText(PTIDS[0]));
+        Assert.assertEquals("Wrong number of rows after filter", 1, dataset.getDataRowCount());
+
+        dataset.clickFacetCheckbox(CATEGORY2); // (GROUP1A OR GROUP1B)
+        waitForElement(Locator.linkWithText(PTIDS[2]));
+        assertElementPresent(Locator.linkWithText(PTIDS[0]));
+        assertElementPresent(Locator.linkWithText(PTIDS[1]));
+        assertElementPresent(Locator.linkWithText(PTIDS[3]));
+        Assert.assertEquals("Wrong number of rows after filter", 4, dataset.getDataRowCount());
+
+        dataset.clickFacetCheckbox("Cohorts", "Group 1"); // (GROUP1A OR GROUP1B) AND (NOT(COHORT 1))
+        waitForElementToDisappear(Locator.linkWithText(PTIDS[0]));
+        waitForElement(Locator.linkWithText(PTIDS[1]));
+        assertElementPresent(Locator.linkWithText(PTIDS[2]));
+        Assert.assertEquals("Wrong number of rows after filter", 2, dataset.getDataRowCount());
+
+        dataset.toggleAllFacetsCheckbox();
+        waitForElement(Locator.linkWithText(PTIDS[5]));
+        Assert.assertEquals("Wrong number of rows after filter", 24, dataset.getDataRowCount());
+
+        _extHelper.clickMenuButton(false, "Mouse Groups", "Create Mouse Group", "From All Mice");
+        _extHelper.waitForExtDialog("Define Mouse Group");
+        setFormElement(Locator.id("groupLabel-inputEl"), EXTRA_GROUP);
+        _extHelper.clickExtButton("Define Mouse Group", "Save", 0);
+        waitForElement(DataRegionTable.Locators.facetRow(EXTRA_GROUP, EXTRA_GROUP));
     }
 
     public void goToManageDatasets()

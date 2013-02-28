@@ -3177,6 +3177,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 //        }, failMessage, wait);
     }
 
+    public void waitForElementToDisappear(final Locator locator)
+    {
+        waitForElementToDisappear(locator, WAIT_FOR_JAVASCRIPT);
+    }
+
     public void waitForElementToDisappear(final Locator locator, int wait)
     {
         String failMessage = "Element with locator " + locator + " was still present.";
