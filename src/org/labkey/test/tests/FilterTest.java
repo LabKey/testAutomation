@@ -516,12 +516,9 @@ public class FilterTest extends ListTest
             runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
             _extHelper.waitForExtDialog("Show Rows Where ");
             _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-            if (isElementPresent(Locator.css(".x-tab-strip-active").withText("Choose Values")))
-            {
-                _shortWait.until(ExpectedConditions.elementToBeClickable(By.linkText("[All]")));
-                _extHelper.clickExtTab("Choose Filters");
-                _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
-            }
+            waitForElement(Locator.linkWithText("[All]"));
+            _extHelper.clickExtTab("Choose Filters");
+            _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
 
         if (filter1 != null)
         {
