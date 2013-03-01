@@ -515,8 +515,7 @@ public class FilterTest extends ListTest
             log("** Checking filter values in filter dialog");
             runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
             _extHelper.waitForExtDialog("Show Rows Where ");
-            _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-            waitForElement(Locator.linkWithText("[All]"));
+            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
             _extHelper.clickExtTab("Choose Filters");
             _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
 
