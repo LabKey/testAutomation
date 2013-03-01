@@ -28,6 +28,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.ExtHelperWD;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelperWD;
@@ -515,7 +516,16 @@ public class FilterTest extends ListTest
             log("** Checking filter values in filter dialog");
             runMenuItemHandler(TABLE_NAME + ":" + fieldKey + ":filter");
             _extHelper.waitForExtDialog("Show Rows Where ");
-            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+            waitFor(new Checker()
+            {
+                @Override
+                public boolean check()
+                {
+                    return isElementPresent(Locator.linkWithText("[All]")) ||
+                           isElementPresent(Locator.xpath("//li").withClass("x-tab-strip-active").containing("Choose Filters"));
+                }
+            }, "Filter dialog loading failed", WAIT_FOR_JAVASCRIPT);
+
             _extHelper.clickExtTab("Choose Filters");
             _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
 
