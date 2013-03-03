@@ -15,26 +15,21 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.apache.poi.util.SystemOutLogger;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelperWD;
@@ -54,6 +49,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = LinkedSchemaTest.class.getSimpleName() + "Project";
     private static final String SOURCE_FOLDER = "SourceFolder";
     private static final String TARGET_FOLDER = "TargetFolder";
+    private static final String OTHER_FOLDER = "OtherFolder";
     private static final int MOTHER_ID = 3;
 
 
@@ -94,7 +90,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        _containerHelper.deleteProject("InvisibleProject", false, 90000);
     }
 
     @Override
@@ -103,54 +98,55 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         setupProject();
         createList();
         File lists = new File(getLabKeyRoot() + "/sampledata/lists/ListDemo.lists.zip");
-        _listHelper.importListArchive("SourceFolder", lists);
+        _listHelper.importListArchive(SOURCE_FOLDER, lists);
 
-        //Create second project that should be invisible to linked schemas
-        _containerHelper.createProject("InvisibleProject", null);
-        _containerHelper.createSubfolder("InvisibleProject", "InvisibleFolder", null);
-        _listHelper.importListArchive("InvisibleFolder", lists);
+        //Create second folder that should be not visible to linked schemas
+        _containerHelper.createSubfolder(getProjectName(), OTHER_FOLDER, null);
+        _listHelper.importListArchive(OTHER_FOLDER, lists);
         goToProject("LinkedSchemaTestProject");
 
+
         createLinkedSchema();
-        createLinkedSchemaWithTabels("TargetFolder", "BasicLinkedSchema", "lists", "NIMHDemographics", "NIMHPortions");
+        verifyLinkedSchema();
+
+
+        createLinkedSchemaWithTables(TARGET_FOLDER, "BasicLinkedSchema", "lists", "NIMHDemographics", "NIMHPortions");
+
         //Ensure that all the columns we would expect to come through are coming through
-        assertColumnsPresent("TargetFolder", "BasicLinkedSchema", "NIMHDemographics", "SubjectID", "Name", "Family", "Mother", "Father", "Species", "Occupation",
-                            "MaritalStatus", "CurrentStatus", "Gender", "BirthDate", "Image");
+        assertColumnsPresent(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", "SubjectID", "Name", "Family", "Mother", "Father", "Species", "Occupation",
+                "MaritalStatus", "CurrentStatus", "Gender", "BirthDate", "Image");
         //Make sure the columns in the source that should be hidden are hidden, then check them in the linked schema
-        assertColumnsNotPresent("SourceFolder", "lists", "NIMHDemographics", "EntityId", "LastIndexed", "Created", "CreatedBy", "Modified", "ModifiedBy");
-        //TODO:  unccoment with fixing of issue 17316
-        //assertColumnsNotPresent("TargetFolder", "BasicLinkedSchema", "People", "Key", "EntityId", "LastIndexed", "Created", "CreatedBy", "Modified", "ModifiedBy");
+        assertColumnsNotPresent(SOURCE_FOLDER, "lists", "NIMHDemographics", "EntityId", "LastIndexed");
+        assertColumnsNotPresent(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", "EntityId", "LastIndexed");
 
         //Make sure that the lookup columns propogated properly into the linked schema
-        assertLookupsWorking("TargetFolder", "BasicLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
-        //Change the Mother column lookup to point to the invisible folder, then ensure that the mother lookup is no longer propogating
-        changelistLookup("SourceFolder", "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/InvisibleProject/InvisibleFolder", "lists", "NIMHDemographics"));
-        assertLookupsWorking("TargetFolder", "BasicLinkedSchema", "NIMHDemographics", true, "Father");
-        assertLookupsWorking("TargetFolder", "BasicLinkedSchema", "NIMHDemographics", false, "Mother");
+        assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
+
+        // Linked schemas disallow lookups to other folders outside of the current folder.
+        //Change the Mother column lookup to point to the other folder, then ensure that the mother lookup is no longer propogating
+        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics"));
+        assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Father");
+        assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", false, "Mother");
 
         //Create a query over the table with lookups
-        createLinkedSchemaQuery("SourceFolder", "lists", "QueryOverLookup", "NIMHDemographics");
+        createLinkedSchemaQuery(SOURCE_FOLDER, "lists", "QueryOverLookup", "NIMHDemographics");
 
         //Create a new linked schema that includes that query, and ensure that it is propogating lookups in the expected manner
-        createLinkedSchemaWithTabels("TargetFolder", "QueryLinkedSchema", "lists", "NIMHDemographics", "NIMHPortions", "QueryOverLookup");
-        assertLookupsWorking("TargetFolder", "QueryLinkedSchema", "QueryOverLookup", true, "Father");
-        assertLookupsWorking("TargetFolder", "QueryLinkedSchema", "QueryOverLookup", false, "Mother");
+        createLinkedSchemaWithTables(TARGET_FOLDER, "QueryLinkedSchema", "lists", "NIMHDemographics", "NIMHPortions", "QueryOverLookup");
+        assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", true, "Father");
+        assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", false, "Mother");
 
         //Change the Mother column lookup to point to the query, and then make sure that the table has lookups appropriately.
-        changelistLookup("SourceFolder", "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/LinkedSchemaTestProject/SourceFolder", "lists", "QueryOverLookup"));
-        //TODO:  Uncomment with fixing of issue 17298
-        //assertLookupsWorking("TargetFolder", "QueryLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
+        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup"));
+        assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
 
-        //Validate
-        //TODO:  Uncomment with fixing of issue 17317
-        //verifyLinkedSchema();
+
         createLinkedSchemaUsingTemplate();
-        //TODO:  Uncomment with fixing of issue 17317
-        //verifyLinkedSchemaUsingTemplate();
+        verifyLinkedSchemaUsingTemplate();
 
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     void setupProject()
     {
         _containerHelper.createProject(getProjectName(), null);
@@ -163,7 +159,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _targetContainerId = getContainerId();
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     void createList()
     {
         log("Importing some data...");
@@ -178,7 +174,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _listHelper.submitTsvData(LIST_DATA);
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     void createLinkedSchema()
     {
         if (_sourceContainerId == null)
@@ -186,7 +182,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "A_People", _sourceContainerId, null, "lists", "People", A_PEOPLE_METADATA);
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     void verifyLinkedSchema()
     {
         goToSchemaBrowser();
@@ -203,13 +199,13 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertTextPresent("Details", "Adam");
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     void createLinkedSchemaUsingTemplate()
     {
         createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "B_People", _sourceContainerId, "BPeopleTemplate", null, null, null);
     }
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     void verifyLinkedSchemaUsingTemplate()
     {
         goToSchemaBrowser();
@@ -224,13 +220,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         // Check generic details page is available
         clickAndWait(table.detailsLink(0));
         assertTextPresent("Details", "Britt");
-    }
-
-    //TODO:  DELETE THIS METHOD with resolution of issue 17317
-    @Override
-    public void validateQueries(boolean validateSubfolders)
-    {
-
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)
@@ -262,7 +251,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _listHelper.clickSave();
     }
 
-    protected void createLinkedSchemaWithTabels(String targetFolder, String linkedSchemaName, String sourceSchema, String... tables)
+    @LogMethod(category = LogMethod.MethodType.SETUP)
+    protected void createLinkedSchemaWithTables(String targetFolder, String linkedSchemaName, String sourceSchema, String... tables)
     {
         waitForElement(Locator.xpath("//a[text()='"+ targetFolder +"']"));
         click(Locator.xpath("//a[text()='"+ targetFolder +"']"));
@@ -275,14 +265,14 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         waitForElement(Locator.xpath("//input[@name='userSchemaName']"));
         setFormElement(Locator.xpath("//input[@name='userSchemaName']"), linkedSchemaName);
-        setFormElement(Locator.xpath("//input[@name='dataSource']"), "/LinkedSchemaTestProject/SourceFolder");
-        waitForElement(Locator.xpath("//li[text()='/LinkedSchemaTestProject/SourceFolder']"));
-        click(Locator.xpath("//li[text()='/LinkedSchemaTestProject/SourceFolder']"));
+        setFormElement(Locator.xpath("//input[@name='dataSource']"), "/" + PROJECT_NAME + "/" + SOURCE_FOLDER);
+        waitForElement(Locator.xpath("//li[text()='/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "']"));
+        click(Locator.xpath("//li[text()='/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "']"));
         setFormElement(Locator.xpath("//input[@name='sourceSchemaName']"), sourceSchema);
         click(Locator.xpath("//li[text()='"+ sourceSchema +"']"));
 
         click(Locator.xpath("//input[@name='tables']"));
-        for(String table : tables)
+        for (String table : tables)
         {
             click(Locator.xpath("//li[text() = '" + table + "']"));
         }
@@ -302,7 +292,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         click(Locator.xpath("//a[text()='view data']"));
         waitForText(tableName);
 
-        for(String name : columnNames){
+        for (String name : columnNames)
+        {
             waitForElement(Locator.xpath("//td[@id='query:" + name + ":header']"));
         }
 
@@ -321,7 +312,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         click(Locator.xpath("//a[text()='view data']"));
         waitForText(tableName);
 
-        for(String name : columnNames){
+        for (String name : columnNames)
+        {
             assertElementNotPresent(Locator.xpath("//td[@id='query:" + name + ":header']"));
         }
 
@@ -337,22 +329,11 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//a[text()='view data']"));
         click(Locator.xpath("//a[text()='view data']"));
 
-        click(Locator.xpath("//span[text()='Views']"));
-        click(Locator.xpath("//a[@id='query:Views:Customize View']"));
+        _customizeViewsHelper.openCustomizeViewPanel();
 
-        if(present)
+        for (String column : lookupColumns)
         {
-            for(String column : lookupColumns)
-            {
-                waitForElement(Locator.xpath("//div[@fieldkey='"+column+"']/img[@class='x-tree-ec-icon x-tree-elbow-plus']"));
-            }
-        }
-        else
-        {
-            for(String column : lookupColumns)
-            {
-                assertElementNotPresent(Locator.xpath("//div[@fieldkey='"+column+"']/img[@class='x-tree-ec-icon x-tree-elbow-plus']"));
-            }
+            Assert.assertEquals("Expected lookup column '" + column + "' to be " + (present ? "present" : "not present"), present, _customizeViewsHelper.isLookupColumn(column));
         }
     }
 
@@ -394,7 +375,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
 
 
-    @LogMethod
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     void createLinkedSchema(String containerPath, String name, String sourceContainerId, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
     {
         beginAt("/query/" + containerPath + "/admin.view");

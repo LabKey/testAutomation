@@ -746,6 +746,15 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
             return !liStyle.contains("display: none");
     }
 
+    /** Check that a column is present and is a lookup column. */
+    public boolean isLookupColumn(String fieldKey)
+    {
+        Locator.XPathLocator columnItem = expandPivots(fieldKey.split("/"));
+        Locator plus = columnItem.child("img[1][contains(@class, 'plus')]");
+        Locator minus = columnItem.child("img[1][contains(@class, 'minus')]");
+        return _test.isElementPresent(plus) || _test.isElementPresent(minus);
+    }
+
     public static class Locators
     {
         public static Locator.CssLocator viewItemClip(ViewItemType itemType, String fieldkey)
