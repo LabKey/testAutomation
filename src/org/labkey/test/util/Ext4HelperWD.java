@@ -219,7 +219,8 @@ public class Ext4HelperWD extends AbstractHelperWD
     public void clickGridRowText(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
-        _test.mouseDown(rowLoc.append("//div[contains(@class, 'x4-grid-cell')][string() = '"+cellText+"']"));
+        _test.waitForElement(rowLoc);
+        _test.click(rowLoc.append("//div[contains(@class, 'x4-grid-cell')][normalize-space() = '"+cellText+"']"));
     }
 
     /**
@@ -231,7 +232,8 @@ public class Ext4HelperWD extends AbstractHelperWD
     public void clickParticipantFilterGridRowText(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
-        _test.click(rowLoc.append("//span[contains(@class, 'lk-filter-panel-label')][string() = '"+cellText+"']"));
+        _test.waitForElement(rowLoc);
+        _test.click(rowLoc.append("//span[contains(@class, 'lk-filter-panel-label')][normalize-space() = '"+cellText+"']"));
     }
 
     /**
