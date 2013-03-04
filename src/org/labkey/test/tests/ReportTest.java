@@ -1829,6 +1829,7 @@ public class ReportTest extends StudyBaseTest
         log("Set X Axis");
         waitAndClick(Locator.css("svg text:contains('Cohort')"));
         _extHelper.waitForExtDialog("X Axis");
+        waitForElement(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='Integer']"));
         mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='Integer']"));
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
