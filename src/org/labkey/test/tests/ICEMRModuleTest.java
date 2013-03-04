@@ -241,7 +241,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
         //Upload test
         refresh();
-        waitForText("Daily Upload");
+        waitForElement(Locator.name("dailyUpload"));
         setFormElement(Locator.name("dailyUpload"), new File(getLabKeyRoot(), "sampledata/icemr/dailyUploadFilled.xls"));
         clickButtonContainingText("Upload", "Scientist Name");
         sleep(500);
