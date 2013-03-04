@@ -53,6 +53,7 @@ import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
@@ -72,6 +73,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -316,9 +318,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             _driver = new FirefoxDriver(profile);
         }
 
-        BrowserInfo browserInfo = BrowserInfo.getBrowserInfo(this);
-        String version = browserInfo.getVersion();
-        log("Browser: " + browserInfo.getType() + " " + version);
+        Capabilities caps = ((RemoteWebDriver) getDriver()).getCapabilities();
+        String browserName = caps.getBrowserName();
+        String browserVersion = caps.getVersion();
+        log("Browser: " + browserName + " " + browserVersion);
 
         _driver.manage().timeouts().setScriptTimeout(WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS);
 
@@ -2470,46 +2473,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 {
                     e.printStackTrace();
                 }
-        }
-    }
-
-    public static class BrowserInfo
-    {
-        private static BrowserInfo instance = null;
-        private static String _type;
-        private static String _version;
-
-        private BrowserInfo(){}
-
-        private BrowserInfo(String type, String version)
-        {
-            _type = type;
-            _version = version;
-        }
-
-        public static BrowserInfo getBrowserInfo(BaseWebDriverTest test)
-        {
-            if (instance == null)
-            {
-                List<String> browserInfoArray = (ArrayList<String>)test.executeScript(
-                        "    var N= navigator.appName, ua= navigator.userAgent, tem;\n" +
-                        "    var M= ua.match(/(opera|chrome|safari|firefox|msie)\\/?\\s*(\\.?\\d+(\\.\\d+)*)/i);\n" +
-                        "    if(M && (tem= ua.match(/version\\/([\\.\\d]+)/i))!= null) M[2]= tem[1];\n" +
-                        "    M= M? [M[1], M[2]]: [N, navigator.appVersion, '-?'];\n" +
-                        "    return M;");
-                instance = new BrowserInfo(browserInfoArray.get(0), browserInfoArray.get(1));
-            }
-            return instance;
-        }
-
-        public String getType()
-        {
-            return _type;
-        }
-
-        public String getVersion()
-        {
-            return _version;
         }
     }
 
