@@ -6176,7 +6176,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             deleteAllUsersFromGroup();
             click(Locator.xpath("//td/a/span[text()='Delete Empty Group']"));
-            waitForElementToDisappear(Locator.xpath("//div[@class='pGroup' and text()=" + Locator.xq(groupName) + "]"), WAIT_FOR_JAVASCRIPT);
+            waitForElementToDisappear(Locator.css("div.groupPicker div.x4-grid-cell-first").withText(groupName), WAIT_FOR_JAVASCRIPT);
         }
     }
 

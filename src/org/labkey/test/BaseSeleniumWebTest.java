@@ -5514,7 +5514,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             deleteAllUsersFromGroup();
 
             click(Locator.xpath("//td/a/span[text()='Delete Empty Group']"));
-            waitForElementToDisappear(Locator.xpath("//div[@class='pGroup' and text()="+Locator.xq(groupName)+"]"), WAIT_FOR_JAVASCRIPT);
+            waitForElementToDisappear(Locator.xpath("//div").withClass("groupPicker").append("//div").withClass("x4-grid-cell-first").withText(groupName), WAIT_FOR_JAVASCRIPT);
         }
     }
 
