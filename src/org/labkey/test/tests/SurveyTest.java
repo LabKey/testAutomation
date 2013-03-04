@@ -122,7 +122,11 @@ public class SurveyTest extends BaseWebDriverTest
         Assert.assertNotNull("No generate survey question metadata available", metadataValue);
         if (metadataFilePath != null)
         {
-            String json = getFileContents(metadataFilePath);
+            // the metadata file path needs to be a full path
+            File metadataFile = new File(metadataFilePath);
+
+            Assert.assertTrue(metadataFile.exists());
+            String json = getFileContents(metadataFile);
             // hack: since we are not able to update the CodeMirror input field via selenium, we reshow the
             // textarea and enter the value there, the SurveyDesignPanel will then use that value instead of the CodeMirror value
             executeScript("document.getElementsByName('metadata')[0].style.display = 'block';");

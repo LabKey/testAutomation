@@ -24,6 +24,7 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
@@ -66,6 +67,12 @@ public class NWBioTrustTest extends SurveyTest
     private static final String NWBT_FACULTY_REVIEWER = "fr_nwbiotrust@nwbiotrust.test";
     private static final String[] NWBT_USERS = {NWBT_PRINCIPAL_INVESTIGATOR, NWBT_STUDY_CONTACT, NWBT_RESEARCH_COORD,
                                                 NWBT_FACULTY_CHAIR, NWBT_FACULTY_REVIEWER};
+
+    private final File studyRegistrationJson = new File(getDownloadDir(), "study-registration.json");
+    private final File prospectiveSampleRequestJson = new File(getDownloadDir(), "prospective-sample-request.json");
+    private final File surgicalTissueJson = new File(getDownloadDir(), "surgical-tissue-sample.json");
+    private final File nonSurgicalTissueJson = new File(getDownloadDir(), "non-surgical-tissue-sample.json");
+    private final File bloodSampleJson = new File(getDownloadDir(), "blood-tissue-sample.json");
 
     private int fileCount = 0;
 
@@ -611,20 +618,76 @@ public class NWBioTrustTest extends SurveyTest
         }
     }
 
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     private void configureDesigns()
     {
+        log("download survey metadata");
+        goToProjectHome();
+        clickAndWait(Locator.linkWithText("Manage"));
+        waitForText("Metadata for Study Registration and Sample Requests");
+        click(Locator.linkWithText("Study Registration"));
+        click(Locator.linkWithText("Prospective Sample Request"));
+        click(Locator.linkWithText("Surgical Tissue Record"));
+        click(Locator.linkWithText("Non-surgical Tissue Record"));
+        click(Locator.linkWithText("Blood Tissue Record"));
+
+        waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return studyRegistrationJson.exists();
+            }
+        }, "failed to download study registration json", WAIT_FOR_JAVASCRIPT);
+
+        waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return prospectiveSampleRequestJson.exists();
+            }
+        }, "failed to download prospective sample request json", WAIT_FOR_JAVASCRIPT);
+
+        waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return surgicalTissueJson.exists();
+            }
+        }, "failed to download surgical tissue request json", WAIT_FOR_JAVASCRIPT);
+
+        waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return nonSurgicalTissueJson.exists();
+            }
+        }, "failed to download non-surgical tissue request json", WAIT_FOR_JAVASCRIPT);
+
+        waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return bloodSampleJson.exists();
+            }
+        }, "failed to download blood sample request json", WAIT_FOR_JAVASCRIPT);
+
         Map<String, String> design = new HashMap<String, String>();
         design.put("label", "NW BioTrust Study Registration");
         design.put("description", "Create a new study registration with associated sample requests");
         design.put("table", "StudyRegistrations");
-        design.put("metadataPath", pipelineLoc + "/nwbt/StudyRegistrationsMetadata.json");
+        design.put("metadataPath", studyRegistrationJson.getAbsolutePath());
         designs.add(design);
 
         design = new HashMap<String, String>();
         design.put("label", "ProspectiveSampleRequest");
         design.put("description", "");
         design.put("table", "SampleRequests");
-        design.put("metadataPath", pipelineLoc + "/nwbt/ProspectiveSampleRequestMetadata.json");
+        design.put("metadataPath", prospectiveSampleRequestJson.getAbsolutePath());
         designs.add(design);
 
         design = new HashMap<String, String>();
@@ -638,21 +701,21 @@ public class NWBioTrustTest extends SurveyTest
         design.put("label", "SurgicalTissueSample");
         design.put("description", "");
         design.put("table", "TissueRecords");
-        design.put("metadataPath", pipelineLoc + "/nwbt/SurgicalTissueRecordMetadata.json");
+        design.put("metadataPath", surgicalTissueJson.getAbsolutePath());
         designs.add(design);
 
         design = new HashMap<String, String>();
         design.put("label", "NonSurgicalTissueSample");
         design.put("description", "");
         design.put("table", "TissueRecords");
-        design.put("metadataPath", pipelineLoc + "/nwbt/NonSurgicalTissueRecordMetadata.json");
+        design.put("metadataPath", nonSurgicalTissueJson.getAbsolutePath());
         designs.add(design);
 
         design = new HashMap<String, String>();
         design.put("label", "BloodSample");
         design.put("description", "");
         design.put("table", "TissueRecords");
-        design.put("metadataPath", pipelineLoc + "/nwbt/BloodRecordMetadata.json");
+        design.put("metadataPath", bloodSampleJson.getAbsolutePath());
         designs.add(design);
     }
 
