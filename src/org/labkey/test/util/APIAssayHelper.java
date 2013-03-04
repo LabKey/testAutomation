@@ -18,6 +18,7 @@ package org.labkey.test.util;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.assay.AssayListCommand;
 import org.labkey.remoteapi.assay.AssayListResponse;
 import org.labkey.remoteapi.assay.ImportRunCommand;
@@ -46,6 +47,7 @@ public class APIAssayHelper extends AbstractAssayHelper
     {
         ImportRunCommand  irc = new ImportRunCommand(assayID, file);
         irc.setBatchProperties(batchProperties);
+        irc.setTimeout(120000); // Wait 2 minutes for assay import
         irc.execute(_test.getDefaultConnection(), "/" + projectPath);
 
     }
