@@ -107,7 +107,7 @@ public class SurveyTest extends BaseWebDriverTest
         if (tabName != null)
             clickAndWait(Locator.linkWithText(tabName));
         waitForElement(Locator.id("dataregion_query"));
-        clickButton("Add New Survey");
+        clickButton("Create Survey Design");
         waitForElement(Locator.name("label"));
         setFormElement(Locator.name("label"), designName);
         if (description != null) setFormElement(Locator.name("description"), description);
@@ -144,7 +144,7 @@ public class SurveyTest extends BaseWebDriverTest
         addSurveyWebpart(projectSurveyDesign);
 
         log("Create a new survey instance (i.e. take the survey)");
-        clickButtonByIndex("Create New Survey", 0, WAIT_FOR_JAVASCRIPT);
+        clickButtonByIndex("Create Survey", 0, WAIT_FOR_JAVASCRIPT);
         waitForText("Survey Label*");
         // verify that the save and submit buttons are disabled (and that they are visible, since this is the "auto" survey layout)
         Assert.assertTrue("Save button should be initially disabled", isElementPresent(Locator.xpath("//div[contains(@class,'item-disabled')]//span[text() = 'Save']")));
@@ -269,7 +269,7 @@ public class SurveyTest extends BaseWebDriverTest
         addSurveyWebpart(subfolderSurveyDesign);
 
         log("Verify the card layout (i.e. has section headers on left, not all questions visible, etc.)");
-        clickButtonByIndex("Create New Survey", 1, WAIT_FOR_JAVASCRIPT);
+        clickButtonByIndex("Create Survey", 1, WAIT_FOR_JAVASCRIPT);
         waitForText("Start");
         assertElementPresent(Locator.xpath("//li[text()='Start']"));
         assertElementPresent(Locator.xpath("//li[text()='Section 1']"));
