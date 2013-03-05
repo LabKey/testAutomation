@@ -116,7 +116,7 @@ public class DataViewsTester
         _test.assertTextPresent(WEBPART_TITLE);
         Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
-        _test.log("Verify category management");
+        _test.log("Verify category management: delete");
         openCustomizePanel();
         _test._extHelper.checkCheckbox("datasets");
         _test.clickButton("Manage Categories", 0);
@@ -126,9 +126,17 @@ public class DataViewsTester
         _test.clickButton("OK", 0);
         _test._extHelper.waitForExtDialogToDisappear("Delete Category");
         _test.waitForElementToDisappear(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + CATEGORIES.length + "]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.clickButton("Done", 0);
+        _test.clickButton("Save", 0);
+
+        _test.log("Verify category management: create");
+        _test.refresh();
+        openCustomizePanel();
+        _test.clickButton("Manage Categories", 0);
+        _test._extHelper.waitForExtDialog("Manage Categories");
         _test.clickButton("New Category", 0);
-        _test.waitForElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + CATEGORIES.length + "]"));
-        _test.setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + CATEGORIES.length + "]"), NEW_CATEGORY);
+        _test.waitForElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + (CATEGORIES.length-1) + "]"));
+        _test.setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + (CATEGORIES.length-1) + "]"), NEW_CATEGORY);
         _test.clickButton("Done", 0);
         _test.clickButton("Save", 0);
         _test.waitForText(CATEGORIES[1], BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
