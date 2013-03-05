@@ -370,13 +370,13 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name("field2"), val2);
         clickButton("Update", 0);
 
-        log("Remove record for SurveyGridQuestion");
+        log("Delete record for SurveyGridQuestion");
         clickButton("Add Record", 0);
         _extHelper.waitForExtDialog("Add Record");
         setFormElement(Locator.name("field2"), "tobedeleted");
         clickButton("Update", 0);
         _ext4Helper.clickGridRowText("tobedeleted", 0);
-        clickButton("Remove Selected", 0);
+        clickButton("Delete Selected", 0);
         assertTextNotPresent("tobedeleted");
     }
 

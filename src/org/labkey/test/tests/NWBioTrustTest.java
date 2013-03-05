@@ -169,7 +169,7 @@ public class NWBioTrustTest extends SurveyTest
         click(loc);
         _extHelper.waitForExtDialog("Edit Document");
         assertTextPresentInThisOrder("File Name:", "Document Type:", "Created By:", "Created:");
-        clickButton("Remove", 0);
+        clickButton("Delete", 0);
         fileCount--;
         waitForTextToDisappear(NWBT_DOCUMENT_TYPES[0]);
         waitForGridToLoad("tr", "x4-grid-row", fileCount);
