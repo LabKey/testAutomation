@@ -18,12 +18,8 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
@@ -82,6 +78,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     public static final String SCIENTIST = "Torruk";
 
     @Override
+//    @LogMethod(category = LogMethod.MethodType.SETUP)
     protected String getProjectName()
     {
         return "ICEMR assay test";
@@ -91,17 +88,44 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     protected void doTestSteps() throws Exception
     {
 
-        log("Create ICEMR with appropriate web parts");
-        _containerHelper.createProject(getProjectName(), "ICEMR");
-        createAdaptationAssay();
-        createDiagnosticAssay();
-        createFlasksSampleSet();
+        setUpAssays();
+        doVerification();
+    }
+
+//    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    private void doVerification()
+    {
         testJavaScript();
         enterDataPoint();
         verifyDataInAssay();
         enterDataPointAdaptation();
         enterDailyAdaptationData();
         checkResultsPage();
+        checkVisualization();
+    }
+
+    @LogMethod(category = LogMethod.MethodType.SETUP)
+    private void checkVisualization()
+    {
+        goBack();
+        Locator.XPathLocator visButton = Locator.tagWithText("span", "Visualization");
+        waitForElement(visButton);
+        click(visButton);
+        waitForText("ICEMR Visualization");
+        Locator.CssLocator datapoint = Locator.css("svg a");
+        waitForElement(datapoint);
+        String datapointData = getAttribute(datapoint, "title");
+        for(String s : new String[] {"Parasitemia", "100101", "SampleID"})
+            Assert.assertTrue(datapointData.contains(s));
+    }
+
+    private void setUpAssays()
+    {
+        log("Create ICEMR with appropriate web parts");
+        _containerHelper.createProject(getProjectName(), "ICEMR");
+        createAdaptationAssay();
+        createDiagnosticAssay();
+        createFlasksSampleSet();
     }
 
     private void verifyDataInAssay()
@@ -245,7 +269,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         setFormElement(Locator.name("dailyUpload"), new File(getLabKeyRoot(), "sampledata/icemr/dailyUploadFilled.xls"));
         clickButtonContainingText("Upload", "Scientist Name");
         sleep(500);
-        clickButton("Submit");
+        waitAndClick(Locator.button("Submit"));
 
         //Ensure that you can't add flasks if maintenance has been stopped on that flask.
         waitAndClick(link);
