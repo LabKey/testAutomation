@@ -2098,7 +2098,7 @@ public class ReportTest extends StudyBaseTest
 
         // Check that group has correct number of participants
         clickAndWait(Locator.linkWithText("Mice"));
-        waitForText("Filter"); // Wait for participant list to appear.
+        waitForElement(Locator.css(".lk-filter-panel-label")); // Wait for participant list to appear.
         deselectAllFilterGroups();
         waitForText("No matching Mice");
         _ext4Helper.checkGridRowCheckbox(MICE_C);
