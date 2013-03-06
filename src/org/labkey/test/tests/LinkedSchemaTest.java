@@ -271,7 +271,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         setFormElement(Locator.xpath("//input[@name='sourceSchemaName']"), sourceSchema);
         click(Locator.xpath("//li[text()='"+ sourceSchema +"']"));
 
-        click(Locator.xpath("//input[@name='tables']"));
+        clickAt(Locator.xpath("//input[@name='tables']"), 1, 1);
+        sleep(200);
         for (String table : tables)
         {
             click(Locator.xpath("//li[text() = '" + table + "']"));
