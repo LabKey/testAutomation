@@ -19,6 +19,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PortalHelper;
 
 /**
  * User: brittp
@@ -196,15 +197,16 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         verifyMetadataButtons();
 
         // Create a wiki page to hold a query webpart with JavaScript-based button customization:
+        PortalHelper portalHelper = new PortalHelper(this);
         clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        addWebPart("Wiki");
+        portalHelper.addWebPart("Wiki");
         createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "buttonTest");
         setFormElement(Locator.name("title"), "buttonTest");
         setWikiBody(getJavaScriptCustomizer());
         clickButton("Save & Close");
 
-        addWebPart("Wiki");
+        portalHelper.addWebPart("Wiki");
         createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "paramEcho");
         setFormElement(Locator.name("title"), "Parameter Echo");
@@ -223,10 +225,10 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         clickButton(JAVASCRIPT_HANDLER_BUTTON_TEXT, 0);
         assertAlert(JAVASCRIPT_MENU_HANDLER_ALERT1_TEXT);
 
-        clickMenuButtonAndContinue(JAVASCRIPT_MENU_BUTTON_TEXT, JAVASCRIPT_MENU_SUBBUTTON1_TEXT);
+        _extHelper.clickMenuButton(false, JAVASCRIPT_MENU_BUTTON_TEXT, JAVASCRIPT_MENU_SUBBUTTON1_TEXT);
         assertAlert(JAVASCRIPT_MENU_HANDLER_ALERT2_TEXT);
 
-        clickMenuButtonAndContinue(JAVASCRIPT_MENU_BUTTON_TEXT, JAVASCRIPT_MENU_SUBBUTTON2_TEXT, JAVASCRIPT_MENU_SUBSUBBUTTON_TEXT);
+        _extHelper.clickMenuButton(false, JAVASCRIPT_MENU_BUTTON_TEXT, JAVASCRIPT_MENU_SUBBUTTON2_TEXT, JAVASCRIPT_MENU_SUBSUBBUTTON_TEXT);
         assertAlert(JAVASCRIPT_MENU_HANDLER_ALERT3_TEXT);
 
         assertNavButtonNotPresent(METADATA_GET_BUTTON);
@@ -259,10 +261,11 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
         assertNavButtonNotPresent("Insert New");
 
-        clickMenuButtonAndContinue(METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_ON_CLICK_BUTTON);
+        _extHelper.clickMenuButton(false, METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_ON_CLICK_BUTTON);
         assertAlert(METADATA_OVERRIDE_ON_CLICK_MSG);
+        waitForElementToDisappear(Locator.css(".labkey-menu-button-active"));
 
-        clickMenuButton(METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_LINK_BUTTON);
+        _extHelper.clickMenuButton(METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_LINK_BUTTON);
         assertTextPresent("No messages");
     }
 
