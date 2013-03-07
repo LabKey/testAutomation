@@ -281,8 +281,8 @@ public class CohortTest extends BaseWebDriverTest
         clickFolder(PROJECT_NAME);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
-        clickRadioButtonById("simpleCohorts");
-        _driver.switchTo().alert().accept();
+        checkRadioButton(Locator.radioButtonById("simpleCohorts"));
+        assertAlertContains("Update cohort assignments now?");
 
         clickFolder(PROJECT_NAME);
         waitAndClick(Locator.linkWithText("Blood"));
