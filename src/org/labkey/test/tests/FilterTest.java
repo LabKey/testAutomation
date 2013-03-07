@@ -292,7 +292,7 @@ public class FilterTest extends ListTest
         //pressEnter("//input[@id='value_1']");
         clickButton("OK",0);
         assert(isElementPresent(Locator.extButton("OK")));
-        assert(!isElementPresent(Locator.extButtonEnabled("OK")));
+//        assert(!isElementPresent(Locator.extButtonEnabled("OK")));
         assertTextPresent(expectedError);
 
         clickButton("CANCEL", 0);

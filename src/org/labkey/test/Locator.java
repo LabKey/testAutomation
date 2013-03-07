@@ -361,7 +361,7 @@ public abstract class Locator
 
     public static XPathLocator extButtonEnabled(String text)
     {
-        return xpath("//table[contains(@class, 'x-btn-wrap') and not (contains(@class, 'x-item-disabled'))]//button[contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
+        return xpath("//table").withClass("x-btn").withoutClass("x-item-disabled").append("//button").withClass("x-btn-text").withText(text);
     }
 
     public static XPathLocator extMenuItem(String text)
@@ -786,6 +786,11 @@ public abstract class Locator
         public XPathLocator withClass(String cssClass)
         {
             return this.withPredicate("contains(concat(' ',normalize-space(@class),' '),' "+cssClass+" ')");
+        }
+
+        public XPathLocator withoutClass(String cssClass)
+        {
+            return this.withPredicate("not(contains(concat(' ',normalize-space(@class),' '),' "+cssClass+" '))");
         }
 
         public String getPath()

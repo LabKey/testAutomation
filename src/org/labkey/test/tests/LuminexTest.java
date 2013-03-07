@@ -2033,6 +2033,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("Standard1 Tracking Data for " + analyte + " - " + isotype + " " + conjugate);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
+        waitForElement(Locator.id("resultImage"));
     }
 
     private void addRemoveGuideSetRuns(String[] rows)
@@ -2193,8 +2194,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // set start and end date filter
         setFormElement(Locator.name("start-date-field"), "2011-03-26");
         setFormElement(Locator.name("end-date-field"), "2011-03-28");
-        sleep(1000); // setting the form fields takes a second to enable the Apply button
-        clickAt(Locator.extButton("Apply", 1),  "1,1");
+        waitAndClick(Locator.extButtonEnabled("Apply").index(1));
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
         // check that only 3 runs are now present
