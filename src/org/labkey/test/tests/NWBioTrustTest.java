@@ -73,6 +73,7 @@ public class NWBioTrustTest extends SurveyTest
     private final File surgicalTissueJson = new File(getDownloadDir(), "surgical-tissue-sample.json");
     private final File nonSurgicalTissueJson = new File(getDownloadDir(), "non-surgical-tissue-sample.json");
     private final File bloodSampleJson = new File(getDownloadDir(), "blood-tissue-sample.json");
+    private final File discardedBloodSampleJson = new File(getDownloadDir(), "discarded-blood-sample.json");
 
     private int fileCount = 0;
 
@@ -629,7 +630,8 @@ public class NWBioTrustTest extends SurveyTest
         click(Locator.linkWithText("Prospective Sample Request"));
         click(Locator.linkWithText("Surgical Tissue Record"));
         click(Locator.linkWithText("Non-surgical Tissue Record"));
-        click(Locator.linkWithText("Blood Tissue Record"));
+        click(Locator.linkWithText("Blood Sample Record"));
+        click(Locator.linkWithText("Discarded Blood Sample Record"));
 
         waitFor(new BaseWebDriverTest.Checker()
         {
@@ -676,6 +678,15 @@ public class NWBioTrustTest extends SurveyTest
             }
         }, "failed to download blood sample request json", WAIT_FOR_JAVASCRIPT);
 
+        waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return discardedBloodSampleJson.exists();
+            }
+        }, "failed to download discarded blood sample request json", WAIT_FOR_JAVASCRIPT);
+
         Map<String, String> design = new HashMap<String, String>();
         design.put("label", "NW BioTrust Study Registration");
         design.put("description", "Create a new study registration with associated sample requests");
@@ -716,6 +727,13 @@ public class NWBioTrustTest extends SurveyTest
         design.put("description", "");
         design.put("table", "TissueRecords");
         design.put("metadataPath", bloodSampleJson.getAbsolutePath());
+        designs.add(design);
+
+        design = new HashMap<String, String>();
+        design.put("label", "DiscardedBloodSample");
+        design.put("description", "");
+        design.put("table", "TissueRecords");
+        design.put("metadataPath", discardedBloodSampleJson.getAbsolutePath());
         designs.add(design);
     }
 

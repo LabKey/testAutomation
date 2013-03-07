@@ -21,6 +21,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
@@ -69,6 +70,7 @@ public class SurveyTest extends BaseWebDriverTest
         return true; // for list archive import
     }
 
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupProjectFolder()
     {
         _containerHelper.createProject(getProjectName(), null);
@@ -80,6 +82,7 @@ public class SurveyTest extends BaseWebDriverTest
         createSurveyDesign(getProjectName(), null, projectSurveyDesign, null, "lists", "listA", null);
     }
 
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupSubfolder()
     {
         _containerHelper.createSubfolder(getProjectName(), folderName, null);
@@ -103,8 +106,9 @@ public class SurveyTest extends BaseWebDriverTest
                                       String schemaName, String queryName, @Nullable String metadataFilePath)
     {
         log("Create new survey design");
-        clickFolder(folder);
-        if (tabName != null)
+        if (!isElementPresent(Locator.xpath("//td/a[contains(@class, 'nav-tree-selected') and text()='"+folder+"']")))
+            clickFolder(folder);
+        if (tabName != null && !isElementPresent(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab-active')]/a[text() = '"+tabName+"']")))
             clickAndWait(Locator.linkWithText(tabName));
         waitForElement(Locator.id("dataregion_query"));
         clickButton("Create Survey Design");
@@ -137,6 +141,7 @@ public class SurveyTest extends BaseWebDriverTest
         waitForText(designName);
     }
 
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifySurveyFromProject()
     {
         // add a survey webpart to the subfolder using the project survey design
@@ -178,6 +183,7 @@ public class SurveyTest extends BaseWebDriverTest
         //setFormElement(Locator.name(inputName), new File(getLabKeyRoot() + fileName));
     }
 
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyEditSurvey()
     {
         log("Edit the survey in the specified folder");
@@ -197,6 +203,7 @@ public class SurveyTest extends BaseWebDriverTest
         assertTextPresentInThisOrder("txtField", "txtAreaField", "new line", "false", "999", "999.1", "2013-01-04", "Test1");
     }
 
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifySubmitSurvey()
     {
         // TODO: add a required field to the survey and verify the submit button disables when it doesn't have a value
@@ -240,6 +247,7 @@ public class SurveyTest extends BaseWebDriverTest
         clickFolder(getProjectName());
     }
 
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifySurveyFromSubfolder()
     {
         log("Create wikis for survey header/footer");
@@ -337,6 +345,7 @@ public class SurveyTest extends BaseWebDriverTest
         waitForText("Surveys: " + surveyDesignName);
     }
 
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifySurveyContainerPermissions()
     {
         log("Verify survey designs (current and parent container)");
