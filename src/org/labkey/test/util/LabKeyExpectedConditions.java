@@ -16,10 +16,12 @@
 package org.labkey.test.util;
 
 
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
@@ -83,4 +85,32 @@ public class LabKeyExpectedConditions
         };
     }
 
+    public static ExpectedCondition<WebElement> elementIsEnabled(final Locator loc) {
+        return new ExpectedCondition<WebElement>()
+        {
+            @Override
+            public WebElement apply(WebDriver driver)
+            {
+                WebElement el;
+                try{
+                    el = loc.findElement(driver);
+                }
+                catch (ElementNotFoundException ignore)
+                {
+                    return null;
+                }
+
+                if (el.isEnabled())
+                    return el;
+                else
+                    return null;
+            }
+
+            @Override
+            public String toString()
+            {
+                return "element to be enabled: " + loc.getLoggableDescription();
+            }
+        };
+    }
 }
