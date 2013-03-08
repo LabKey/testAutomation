@@ -31,6 +31,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
@@ -268,6 +269,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         setFormElement(Locator.xpath("//input[@name='dataSource']"), "/" + PROJECT_NAME + "/" + SOURCE_FOLDER);
         waitForElement(Locator.xpath("//li[text()='/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "']"));
         click(Locator.xpath("//li[text()='/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "']"));
+        _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='sourceSchemaName']")));
         setFormElement(Locator.xpath("//input[@name='sourceSchemaName']"), sourceSchema);
         click(Locator.xpath("//li[text()='"+ sourceSchema +"']"));
 
