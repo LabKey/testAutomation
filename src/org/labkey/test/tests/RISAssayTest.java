@@ -24,6 +24,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PerlHelperWD;
 import org.labkey.test.util.PipelineHelper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.UIAssayHelper;
 
@@ -35,7 +36,7 @@ import java.io.IOException;
  * Date: 2/18/13
  * Time: 2:50 PM
  */
-public class RISAssayTest extends BaseWebDriverTest
+public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
 {
     private final File risXarFile = new File(getDownloadDir(), "ris.xar");
     private final File risListArchive = new File(getDownloadDir(), "ris-lists.zip");
