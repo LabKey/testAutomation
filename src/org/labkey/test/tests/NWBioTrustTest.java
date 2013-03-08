@@ -28,6 +28,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
@@ -351,7 +352,10 @@ public class NWBioTrustTest extends SurveyTest
             fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + requestLabel));
             fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Pending"));
             fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
+            fields.add(createFieldInfo("Study Information", "irbexpirationdate", "2013-03-07"));
             fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
+            fields.add(createRadioFieldInfo("Study Information", "Do you anticipate submitting data from this study to a public database (e.g. dbGAP)?*", "Yes"));
+            fields.add(createRadioFieldInfo("Billing", "Do you have funding for this request?*", "Yes"));
             submitStudyRegistration(requestLabel, fields);
         }
         waitForGridToLoad("div", "x4-grid-group-title", 1); // all study registrations should be in the Submitted group
@@ -368,6 +372,15 @@ public class NWBioTrustTest extends SurveyTest
         return info;
     }
 
+    private Map<String, String> createRadioFieldInfo(String section, String label, String boxLabel)
+    {
+        Map<String, String> info = new HashMap<String, String>();
+        info.put("section", section);
+        info.put("label", label);
+        info.put("boxLabel", boxLabel);
+        return info;
+    }
+
     private void submitStudyRegistration(String label, List<Map<String, String>> fields)
     {
         waitForText("Study Name*");
@@ -378,8 +391,15 @@ public class NWBioTrustTest extends SurveyTest
             if (isElementPresent(sectionLoc))
                 click(sectionLoc);
 
-            waitForElement(Locator.name(field.get("name")));
-            setFormElement(Locator.name(field.get("name")), field.get("value"));
+            if (field.get("boxLabel") != null)
+            {
+                _ext4Helper.selectRadioButton(field.get("label"), field.get("boxLabel"));
+            }
+            else
+            {
+                waitForElement(Locator.name(field.get("name")));
+                setFormElement(Locator.name(field.get("name")), field.get("value"));
+            }
         }
         sleep(500); // give the submit button a split second to enable base on form changes
         click(Locator.xpath("//li[text()='Save / Submit']"));
