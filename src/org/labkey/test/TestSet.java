@@ -117,6 +117,7 @@ public enum TestSet
         MessagesLongTest.class, //do we need both MessagesTest and MessagesLongTest?
         QuantitationTest.class,
         MessagesTest.class,
+        SpecimenReplaceTest.class,
         MS2Test.class,
         MS2GZTest.class,
         WikiLongTest.class,
@@ -269,6 +270,7 @@ public enum TestSet
 
     Study(
         StudyTest.class,
+        SpecimenReplaceTest.class,
         StudyExportTest.class,
         StudyCohortExportTest.class,
         StudyManualTest.class,

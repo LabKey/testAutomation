@@ -29,17 +29,18 @@ import java.io.File;
  */
 public class SpecimenMergeTest extends BaseSeleniumWebTest
 {
-    private static final String PROJECT_NAME = "SpecimenMergeTest";
-    private static final String FOLDER_NAME = "My Study";
-    private static final String STUDY_NAME = "My Study Study";
+    protected static final String PROJECT_NAME = "SpecimenMergeTest";
+    protected static final String FOLDER_NAME = "My Study";
+    protected static final String STUDY_NAME = "My Study Study";
 
-    private static final String LAB19_SPECIMENS = "/sampledata/study/specimens/lab19.specimens";
-    private static final String LAB20_SPECIMENS = "/sampledata/study/specimens/lab20.specimens";
-    private static final String LAB21_SPECIMENS = "/sampledata/study/specimens/lab21.specimens";
+    protected static final String LAB19_SPECIMENS = "/sampledata/study/specimens/lab19.specimens";
+    protected static final String LAB20_SPECIMENS = "/sampledata/study/specimens/lab20.specimens";
+    protected static final String LAB21_SPECIMENS = "/sampledata/study/specimens/lab21.specimens";
 
-    private static final String SPECIMEN_TEMP_DIR = "/sampledata/study/drt_temp";
+    protected static final String SPECIMEN_TEMP_DIR = "/sampledata/study/drt_temp";
+    protected int pipelineJobCount = 2;
 
-    private String _studyDataRoot = null;
+    protected String _studyDataRoot = null;
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -76,6 +77,31 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
     @Override
     protected void doTestSteps() throws Exception
     {
+        setUpSteps();
+
+        importFirstFileSet();
+    }
+
+    protected void importFirstFileSet()
+    {
+        File[] archives = new File[] {
+                new File(getLabKeyRoot(), LAB19_SPECIMENS),
+                new File(getLabKeyRoot(), LAB20_SPECIMENS),
+                new File(getLabKeyRoot(), LAB21_SPECIMENS)
+        };
+        SpecimenImporter importer = new SpecimenImporter(new File(_studyDataRoot), archives, new File(getLabKeyRoot(), SPECIMEN_TEMP_DIR), FOLDER_NAME, pipelineJobCount);
+        importer.setExpectError(true);
+        importer.importAndWaitForComplete();
+
+        // Check there was an error in the specimen merge.
+        clickAndWait(Locator.linkWithText("ERROR"));
+        assertTextPresent("lab20");
+        assertTextPresent("Conflicting specimens found for GlobalUniqueId 'AAA07XK5-02'");
+        checkExpectedErrors(2);
+    }
+
+    protected void setUpSteps()
+    {
         _studyDataRoot = getLabKeyRoot() + "/sampledata/study";
 
         _containerHelper.createProject(PROJECT_NAME, null);
@@ -88,21 +114,6 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
         setPipelineRoot(_studyDataRoot);
         clickAndWait(Locator.linkWithText("My Study"));
         clickAndWait(Locator.linkWithText("Manage Files"));
-
-        File[] archives = new File[] {
-                new File(getLabKeyRoot(), LAB19_SPECIMENS),
-                new File(getLabKeyRoot(), LAB20_SPECIMENS),
-                new File(getLabKeyRoot(), LAB21_SPECIMENS)
-        };
-        SpecimenImporter importer = new SpecimenImporter(new File(_studyDataRoot), archives, new File(getLabKeyRoot(), SPECIMEN_TEMP_DIR), FOLDER_NAME, 2);
-        importer.setExpectError(true);
-        importer.importAndWaitForComplete();
-
-        // Check there was an error in the specimen merge.
-        clickAndWait(Locator.linkWithText("ERROR"));
-        assertTextPresent("lab20");
-        assertTextPresent("Conflicting specimens found for GlobalUniqueId 'AAA07XK5-02'");
-        checkExpectedErrors(2);
     }
 
 }
