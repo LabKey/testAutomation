@@ -42,6 +42,12 @@ public class BasicTest extends BaseWebDriverTest
     }
 
     @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    @Override
     public void setUp() throws Exception
     {
         super.setUp();

@@ -68,11 +68,13 @@ import org.openqa.selenium.WebDriverBackedSelenium;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -108,6 +110,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -190,6 +193,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected static boolean _checkedLeaksAndErrors = false;
     private static final String ACTION_SUMMARY_TABLE_NAME = "springActions";
 
+    private final BrowserType BROWSER_TYPE;
 
     protected static final String PERMISSION_ERROR = "401: User does not have permission to perform this operation";
 
@@ -204,6 +208,31 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _customizeViewsHelper = new CustomizeViewsHelperWD(this);
         _jsErrors = new ArrayList<JavaScriptError>();
         _downloadDir = new File(ensureDumpDir(), "downloads");
+
+        String seleniumBrowser = System.getProperty("selenium.browser");
+        if (seleniumBrowser == null || "".equals(seleniumBrowser) || "*best".equals(seleniumBrowser.toLowerCase()))
+        {
+            if (onTeamCity())
+                BROWSER_TYPE = BrowserType.FIREFOX;
+            else
+                BROWSER_TYPE = bestBrowser();
+        }
+        else
+        {
+            if (seleniumBrowser.toLowerCase().startsWith("*firefox"))
+                BROWSER_TYPE = BrowserType.FIREFOX;
+            else if (seleniumBrowser.toLowerCase().startsWith("*ie"))
+                BROWSER_TYPE = BrowserType.IE;
+            else if (seleniumBrowser.toLowerCase().startsWith("*google"))
+                BROWSER_TYPE = BrowserType.CHROME;
+            else if (seleniumBrowser.toLowerCase().startsWith("*html"))
+                BROWSER_TYPE = BrowserType.HTML;
+            else
+            {
+                BROWSER_TYPE = bestBrowser();
+                log("Unknown browser [" + seleniumBrowser + "]; Using best compatible browser [" + BROWSER_TYPE + "]");
+            }
+        }
     }
 
 
@@ -255,67 +284,82 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @Before
     public void setUp() throws Exception
     {
-        if (getBrowser().startsWith("*ie")) //experimental
+        switch (BROWSER_TYPE)
         {
-            _driver = new InternetExplorerDriver();
-        }
-        else if (getBrowser().startsWith("*html")) //experimental
-        {
-            _driver = new HtmlUnitDriver(true);
-        }
-        else if (getBrowser().startsWith("*googlechrome")) //experimental
-        {
-            _driver = new ChromeDriver();
-        }
-        else
-        {
-            final FirefoxProfile profile = new FirefoxProfile();
-            profile.setPreference("app.update.auto", false);
-            profile.setPreference("extensions.update.autoUpdate", false);
-            profile.setPreference("extensions.update.enabled", false);
-
-            profile.setPreference("browser.download.folderList", 2);
-            profile.setPreference("browser.download.downloadDir", getDownloadDir().getAbsolutePath());
-            profile.setPreference("browser.download.dir", getDownloadDir().getAbsolutePath());
-            profile.setPreference("browser.helperApps.alwaysAsk.force", false);
-            profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
-                    "application/vnd.ms-excel," +
-                    "application/octet-stream," +
-                    "application/x-zip-compressed," +
-                    "text/x-script.perl");
-            profile.setPreference("browser.download.manager.showWhenStarting",false);
-            if (enableScriptCheck())
+            case IE: //experimental
             {
-                try
-                    {JavaScriptError.addExtension(profile);}
-                catch(IOException e)
-                    {Assert.fail("Failed to load JS error checker: " + e.getMessage());}
+                _driver = new InternetExplorerDriver();
+                break;
             }
-            if (firefoxExtensionsEnabled() && !onTeamCity()) // Firebug just clutters up screenshots on TeamCity
+            case HTML: //experimental
             {
-                try
+                _driver = new HtmlUnitDriver(true);
+                break;
+            }
+            case CHROME: //experimental
+            {
+                Map<String, String> prefs = new Hashtable<String, String>();
+                prefs.put("download.prompt_for_download", "false");
+                prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
+
+                DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+                capabilities.setCapability("chrome.prefs", prefs);
+                _driver = new ChromeDriver(capabilities);
+                break;
+            }
+            case FIREFOX:
+            {
+                final FirefoxProfile profile = new FirefoxProfile();
+                profile.setPreference("app.update.auto", false);
+                profile.setPreference("extensions.update.autoUpdate", false);
+                profile.setPreference("extensions.update.enabled", false);
+
+                profile.setPreference("browser.download.folderList", 2);
+                profile.setPreference("browser.download.downloadDir", getDownloadDir().getAbsolutePath());
+                profile.setPreference("browser.download.dir", getDownloadDir().getAbsolutePath());
+                profile.setPreference("browser.helperApps.alwaysAsk.force", false);
+                profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+                        "application/vnd.ms-excel," +
+                        "application/octet-stream," +
+                        "application/x-zip-compressed," +
+                        "text/x-script.perl");
+                profile.setPreference("browser.download.manager.showWhenStarting",false);
+                if (enableScriptCheck())
                 {
-                    profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/firebug-1.11.0.xpi"));
-                    profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/fireStarter-0.1a6.xpi"));
-                    profile.setPreference("extensions.firebug.currentVersion", "1.11.0"); // prevent upgrade spash page
-                    profile.setPreference("extensions.firebug.allPagesActivation", "on");
-                    profile.setPreference("extensions.firebug.previousPlacement", 3);
-                    profile.setPreference("extensions.firebug.net.enabledSites", true);
-
-                    if (firebugPanelsEnabled()) // Enabling Firebug panels slows down test and is usually not needed
-                    {
-                        profile.setPreference("extensions.firebug.net.enableSites", true);
-                        profile.setPreference("extensions.firebug.script.enableSites", true);
-                        profile.setPreference("extensions.firebug.console.enableSites", true);
-                    }
+                    try
+                        {JavaScriptError.addExtension(profile);}
+                    catch(IOException e)
+                        {Assert.fail("Failed to load JS error checker: " + e.getMessage());}
                 }
-                catch(IOException e)
-                    {Assert.fail("Failed to load Firebug: " + e.getMessage());}
+                if (firefoxExtensionsEnabled() && !onTeamCity()) // Firebug just clutters up screenshots on TeamCity
+                {
+                    try
+                    {
+                        profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/firebug-1.11.0.xpi"));
+                        profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/fireStarter-0.1a6.xpi"));
+                        profile.setPreference("extensions.firebug.currentVersion", "1.11.0"); // prevent upgrade spash page
+                        profile.setPreference("extensions.firebug.allPagesActivation", "on");
+                        profile.setPreference("extensions.firebug.previousPlacement", 3);
+                        profile.setPreference("extensions.firebug.net.enabledSites", true);
+
+                        if (firebugPanelsEnabled()) // Enabling Firebug panels slows down test and is usually not needed
+                        {
+                            profile.setPreference("extensions.firebug.net.enableSites", true);
+                            profile.setPreference("extensions.firebug.script.enableSites", true);
+                            profile.setPreference("extensions.firebug.console.enableSites", true);
+                        }
+                    }
+                    catch(IOException e)
+                        {Assert.fail("Failed to load Firebug: " + e.getMessage());}
+                }
+
+                profile.setEnableNativeEvents(useNativeEvents());
+
+                _driver = new FirefoxDriver(profile);
+                break;
             }
-
-            profile.setEnableNativeEvents(useNativeEvents());
-
-            _driver = new FirefoxDriver(profile);
+            default:
+                Assert.fail("Browser not yet implemented: " + BROWSER_TYPE);
         }
 
         Capabilities caps = ((RemoteWebDriver) getDriver()).getCapabilities();
@@ -419,20 +463,44 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
+    public enum BrowserType
+    {
+        FIREFOX("*firefox"),
+        IE("*iexplore"),
+        CHROME("*googlechrome"),
+        HTML("*html");
+
+        private String _seleniumBrowserString;
+
+        private BrowserType(String seleniumBrowserString)
+        {
+            _seleniumBrowserString = seleniumBrowserString;
+        }
+
+        public String toString()
+        {
+            return _seleniumBrowserString;
+        }
+    }
+
+    /**
+     * The browser that can run the test fastest.
+     * Firefox by default unless a faster browser (probably Chrome) has been verified.
+     * @return
+     */
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.FIREFOX;
+    }
+
     public String getBrowserType()
     {
-        return System.getProperty("selenium.browser", FIREFOX_BROWSER);
+        return BROWSER_TYPE.toString();
     }
 
     public String getBrowser()
     {
-        String browser = System.getProperty("selenium.browser", FIREFOX_BROWSER);
-        String browserPath = System.getProperty("selenium.browser.path", "");
-        if (browserPath.length() > 0)
-            browserPath = " " + browserPath;
-
-        _fileUploadAvailable = true;
-        return browser + browserPath;
+        return getBrowserType();
     }
 
     public void refreshIfIE()

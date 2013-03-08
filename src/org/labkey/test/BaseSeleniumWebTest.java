@@ -251,12 +251,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public String getBrowserType()
     {
-        return System.getProperty("selenium.browser", FIREFOX_BROWSER);
+        String seleniumBrowser = System.getProperty("selenium.browser", FIREFOX_BROWSER);
+        if (seleniumBrowser.equals("*best"))
+            seleniumBrowser = FIREFOX_BROWSER;
+
+        return seleniumBrowser;
     }
 
     public String getBrowser()
     {
-        String browser = System.getProperty("selenium.browser", FIREFOX_BROWSER);
+        String browser = getBrowserType();
         String browserPath = System.getProperty("selenium.browser.path", "");
         if (browserPath.length() > 0)
             browserPath = " " + browserPath;

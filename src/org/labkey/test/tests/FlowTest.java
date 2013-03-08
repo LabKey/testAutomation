@@ -342,11 +342,13 @@ public class FlowTest extends BaseFlowTestWD
         click(Locator.linkWithText("Analyze some runs"));
         final Locator.NameLocator ff_targetExperimentId = Locator.name("ff_targetExperimentId");
         waitForElement(ff_targetExperimentId);
+        prepForPageLoad();
         selectOptionByText(ff_targetExperimentId, "<create new>");
-//        waitForPageToLoad();
+        newWaitForPageToLoad();
         Assert.assertEquals(2, countEnabledInputs(SELECT_CHECKBOX_NAME));
+        prepForPageLoad();
         selectOptionByText(ff_targetExperimentId, "FlowExperiment2");
-//        waitForPageToLoad();
+        newWaitForPageToLoad();
 
         Assert.assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
         selectOptionByText("ff_compensationMatrixOption", "Matrix: " + FCS_FILE_1 + " comp matrix");
@@ -611,4 +613,9 @@ public class FlowTest extends BaseFlowTestWD
         assertTextPresent("Ignoring filter/sort on column '" , reportName , ".Response' because it does not exist.");
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

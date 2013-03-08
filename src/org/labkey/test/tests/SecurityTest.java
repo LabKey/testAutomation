@@ -60,6 +60,12 @@ public class SecurityTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);

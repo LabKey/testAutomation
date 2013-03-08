@@ -630,6 +630,7 @@
     <target name="drt" description="run developer regression tests">
         <property name="debug.suspend.selenium" value="n"/>
         <property name="suite" value="DRT"/>
+        <property name="selenium.browser" value="*best"/>
         <antcall target="sub-selenium"/>
     </target>
 
@@ -649,6 +650,7 @@
 
     <target name="drt-debug" description="run drt, suspend until debugger attaches">
         <property name="debug.suspend.selenium" value="y"/>
+        <property name="selenium.browser" value="*best"/>
         <antcall target="sub-selenium"/>
     </target>
 
@@ -717,6 +719,7 @@
     <target name="drt-clean">
         <property name="suite" value="DRT"/>
         <property name="cleanOnly" value="true"/>
+        <property name="selenium.browser" value="*best"/>
         <antcall target="sub-selenium"/>
     </target>
 
@@ -933,7 +936,7 @@
         </condition>
 
         <!-- Set property sysprop.selenium.browser -->
-        <condition property="sysprop.selenium.browser" value="*firefox">
+        <condition property="sysprop.selenium.browser" value="*best">
             <not>
                 <isset property="selenium.browser"/>
             </not>
