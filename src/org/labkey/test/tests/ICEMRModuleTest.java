@@ -39,10 +39,10 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 {
     public static final String ID = "myid";
     public static final String DIAGNOSTICS_ASSAY_DESIGN = "ICEMR Diagnostics";
-    public static final String ADAPTATION_ASSAY_DESIGN = "ICEMR Adaptation";
+    public static final String ADAPTATION_ASSAY_DESIGN = "ICEMR Flask Tracking";
     public static final String DIAGNOSTIC_ASSAY_NAME = "Diagnostics Assay";
-    public static final String ADAPTATION_ASSAY_NAME = "Adaptation Assay";
-    public static final String FLASKS_SAMPLESET_NAME = "Flasks";
+    public static final String ADAPTATION_ASSAY_NAME = "Culture Adaptation";
+    public static final String FLASKS_SAMPLESET_NAME = "Adaptation Flasks";
     public static final String FOLD_INCREASE_DEFAULT = "4";
     public static final String ADAPTATION_CRITERIA_DEFAULT = "2";
     public static final String FLASK_SAMPLESET_COLS  =
@@ -140,7 +140,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void enterDataPoint()
     {
-        Locator.XPathLocator link = Locator.linkContainingText("Diagnostics Assay");
+        Locator.XPathLocator link = Locator.linkContainingText(DIAGNOSTIC_ASSAY_NAME);
         waitAndClick(link);
         link = Locator.navButtonContainingText("Import Data");
         waitAndClick(link);
@@ -150,7 +150,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void enterDataPointAdaptation()
     {
-        Locator.XPathLocator link = Locator.linkContainingText("Adaptation Assay");
+        Locator.XPathLocator link = Locator.linkContainingText(ADAPTATION_ASSAY_NAME);
         waitAndClick(link);
         link = Locator.navButtonContainingText("New Experiment");
         waitAndClick(link);
