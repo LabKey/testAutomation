@@ -435,7 +435,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @Deprecated
     public boolean isFileUploadAvailable()
     {
-        return _fileUploadAvailable;
+        return true;
     }
 
     protected boolean isPipelineToolsTest()

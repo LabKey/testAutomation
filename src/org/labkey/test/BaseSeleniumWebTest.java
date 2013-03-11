@@ -221,7 +221,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public boolean isFileUploadAvailable()
     {
-        return _fileUploadAvailable;
+        return true;
     }
 
     protected boolean isPipelineToolsTest()
