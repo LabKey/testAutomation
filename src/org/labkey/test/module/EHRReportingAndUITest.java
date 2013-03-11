@@ -44,8 +44,9 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     {
         initProject();
 
-//        detailsPagesTest();
-//        viewsTest();
+        detailsPagesTest();
+        viewsTest();
+        customActionsTest();
         animalHistoryTest();
         quickSearchTest();
     }
@@ -282,13 +283,38 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForText(PROTOCOL_MEMBER_IDS[0]);
         Assert.assertEquals("Did not find the expected number of Animals", PROTOCOL_MEMBER_IDS.length, getDataRegionRowCount(dataRegionName));
 
+        waitForElement(Locator.xpath("//th[contains(text(), 'Weights -')]"));
+        _ext4Helper.clickExt4Tab("Raw Data");
+        waitForText("Percent Change");
+
+        log("Check subjectField parsing");
+        getAnimalHistorySubjField().setValue(MORE_ANIMAL_IDS[0] + "," + MORE_ANIMAL_IDS[1] + ";" + MORE_ANIMAL_IDS[2] + " " + MORE_ANIMAL_IDS[3] + "\t" + MORE_ANIMAL_IDS[4]);
+        waitAndClick(Locator.ext4Button("Replace -->"));
+        refreshAnimalHistoryReport();
+        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
+        Assert.assertEquals("Did not find the expected number of Animals", 5, getDataRegionRowCount(dataRegionName));
+        assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
+        assertTextNotPresent(PROTOCOL_MEMBER_IDS[2]);
+
+        waitAndClick(Locator.ext4Button("Clear"));
+        refreshAnimalHistoryReport();
+        waitForElement(Ext4Helper.ext4Window("Error"));
+        assertElementNotPresent(Locator.buttonContainingText("(X)"));
+        assertTextPresent("Must enter at least one subject");
+        click(Locator.ext4Button("OK"));
+    }
+
+    private void customActionsTest()
+    {
         log("Verify custom actions");
+        beginAt("/query/" + getContainerPath() + "/executeQuery.view?schemaName=study&query.queryName=weight&query.id~in=" + (PROTOCOL_MEMBER_IDS[0] + ";" + PROTOCOL_MEMBER_IDS[1] + ";" + PROTOCOL_MEMBER_IDS[2]));
+        waitForElement(Locator.xpath("//span[contains(text(), 'Weight')]"));
         log("Return Distinct Values - no selections");
         clickMenuButtonAndContinue("More Actions", "Return Distinct Values");
         assertAlert("No records selected");
 
         log("Return Distinct Values");
-        dataRegionName = _helper.getAnimalHistoryDataRegionName("Weight Raw Data");
+        String dataRegionName = "query";
         checkAllOnPage(dataRegionName);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Return Distinct Values");
         _extHelper.waitForExtDialog("Return Distinct Values");
@@ -301,7 +327,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         log("Return Distinct Values - filtered");
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT * 3);
         setFilterAndWait(dataRegionName, "Id", "Does Not Equal", PROTOCOL_MEMBER_IDS[1], 0);
-        waitForText("(Id <> " + PROTOCOL_MEMBER_IDS[1] + ")", WAIT_FOR_JAVASCRIPT * 5);
+        waitForText("(Id <> " + PROTOCOL_MEMBER_IDS[1], WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Return Distinct Values");
         _extHelper.waitForExtDialog("Return Distinct Values");
         _extHelper.selectComboBoxItem("Select Field:", "Animal Id");
@@ -342,14 +368,13 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         assertAlert("No records selected");
 
         log("Jump to Other Dataset - two selections");
-        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
-        checkDataRegionCheckbox(dataRegionName, 0); // PROTOCOL_MEMBER_IDS[0]
-        checkDataRegionCheckbox(dataRegionName, 2); // PROTOCOL_MEMBER_IDS[2]
+        checkAllOnPage(dataRegionName);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Jump To Other Dataset");
         _extHelper.selectComboBoxItem("Dataset:", "Blood Draws");
         _extHelper.selectComboBoxItem("Filter On:", "Animal Id");
         clickButton("Submit", 0);
         waitForTextToDisappear("Loading...");
+        waitForElement(Locator.xpath("//span[contains(text(), 'Blood Draws')]"));
         waitForElement(Locator.linkWithText(PROTOCOL_MEMBER_IDS[0]), WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
 
@@ -365,23 +390,6 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", 2, getDataRegionRowCount(dataRegionName));
         assertTextPresent(PROTOCOL_MEMBER_IDS[0], PROTOCOL_MEMBER_IDS[2]);
-
-        log("Check subjectField parsing");
-        getAnimalHistorySubjField().setValue(MORE_ANIMAL_IDS[0] + "," + MORE_ANIMAL_IDS[1] + ";" + MORE_ANIMAL_IDS[2] + " " + MORE_ANIMAL_IDS[3] + "\t" + MORE_ANIMAL_IDS[4]);
-        waitAndClick(Locator.ext4Button("Replace -->"));
-        refreshAnimalHistoryReport();
-        dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
-        DataRegionTable abstractTable = new DataRegionTable(dataRegionName, this);
-        Assert.assertEquals("Did not find the expected number of Animals", 5, abstractTable.getDataRowCount());
-        assertElementNotPresent(Locator.linkWithText(PROTOCOL_MEMBER_IDS[1]));
-        assertElementNotPresent(Locator.linkWithText(PROTOCOL_MEMBER_IDS[2]));
-
-        waitAndClick(Locator.ext4Button("Clear"));
-        refreshAnimalHistoryReport();
-        waitForElement(Ext4Helper.ext4Window("Error"));
-        assertElementNotPresent(Locator.buttonContainingText("(X)"));
-        assertTextPresent("Must enter at least one subject");
-        click(Locator.ext4Button("OK"));
     }
 
     private Ext4FieldRefWD getAnimalHistorySubjField()

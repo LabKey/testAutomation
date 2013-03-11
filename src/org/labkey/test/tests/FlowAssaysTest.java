@@ -71,7 +71,6 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
     
     public FlowAssaysTest()
     {
-        setContainerHelper(new UIContainerHelper(this));
         PROJECT_NAME = "FlowAssaysVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 

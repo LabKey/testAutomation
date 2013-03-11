@@ -22,6 +22,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,6 +63,13 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
     {
         String recordId = getRecordId(rowIdx);
         return getEval("store.data.get('" + recordId + "').get('" + fieldName + "')");
+    }
+
+    public Date getDateFieldValue(int rowIdx, String fieldName)
+    {
+        String recordId = getRecordId(rowIdx);
+        Long val = (Long)getFnEval("return this.store.data.get('" + recordId + "').get('" + fieldName + "') ? this.store.data.get('" + recordId + "').get('" + fieldName + "').getTime() : null");
+        return val == null ? null : new Date(val);
     }
 
     public static Locator locateExt4GridCell(String contents)

@@ -75,7 +75,6 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
             
     public GenotypeAssaysTest()
     {
-        setContainerHelper(new UIContainerHelper(this));
         PROJECT_NAME = "GenotypeAssaysVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
@@ -110,6 +109,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         setUpTest();
         sspImportTest();
         sspPivotedImportTest();
+        UCDavisTest();
     }
 
     @Override
@@ -316,9 +316,174 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
     {
         List<Pair<String, String>> assays = new ArrayList<Pair<String, String>>();
         assays.add(Pair.of("SSP Typing", SSP_ASSAY_NAME));
-        //assays.add(Pair.of("Genotype Assay", ASSAY_NAME));
+        assays.add(Pair.of("Genotype Assay", ASSAY_NAME));
 
         return assays;
+    }
+
+    private void UCDavisTest()
+    {
+        log("Verifying UC Davis STR Import");
+        _helper.goToAssayResultImport(ASSAY_NAME, false);
+
+        //a proxy for page loading
+        _helper.waitForField("Instrument");
+
+        //switch import method
+        Ext4FieldRefWD field = Ext4FieldRefWD.getForBoxLabel(this, "UC Davis STR");
+        field.setChecked(true);
+        Locator btn = Locator.xpath("//span[text() = 'Download Example Data']");
+        waitForElement(btn);
+
+        Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
+
+        //Assert.assertEquals("Incorrect value for field", "LC480", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
+        waitAndClick(btn);
+
+        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        String text = _helper.getExampleData();
+
+        log("Trying to save invalid data");
+        String errorText = text.replaceAll("13294", ",");
+        textarea.setValue(errorText);
+        waitAndClick(Locator.ext4Button("Upload"));
+        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
+        click(Locator.ext4Button("OK"));
+        assertTextPresent("There were errors in the upload");
+        assertTextPresent("Missing subject Id");
+
+        log("Saving valid data");
+        textarea.setValue(text);
+        waitAndClick(Locator.ext4Button("Upload"));
+        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        click(Locator.ext4Button("OK"));
+        waitForText("Import Samples");
+
+        log("Verifying results");
+        _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
+        waitAndClick(Locator.linkContainingText("view results"));
+
+        DataRegionTable results = new DataRegionTable("Data", this);
+
+        int totalRows = 100; //current page size
+        List<String[]> expected = new ArrayList<String[]>();
+        expected.add(new String[]{"13294", "D7S794", "108"});
+        expected.add(new String[]{"13294", "D5S1457", "136"});
+        expected.add(new String[]{"13294", "D7S513", "209"});
+        expected.add(new String[]{"13294", "D7S513", "217"});
+        expected.add(new String[]{"13294", "D3S1768", "205"});
+        expected.add(new String[]{"13294", "D3S1768", "225"});
+        expected.add(new String[]{"13294", "D13S765", "220"});
+        expected.add(new String[]{"13294", "D13S765", "228"});
+        expected.add(new String[]{"13294", "D11S925", "308"});
+        expected.add(new String[]{"13294", "D11S925", "312"});
+        expected.add(new String[]{"13294", "D6S291", "206"});
+        expected.add(new String[]{"13294", "D6S291", "208"});
+        expected.add(new String[]{"13294", "D6S276", "233"});
+        expected.add(new String[]{"13294", "D6S1691", "197"});
+        expected.add(new String[]{"13294", "D6S1691", "215"});
+        expected.add(new String[]{"13294", "D10S1412", "157"});
+        expected.add(new String[]{"13294", "D18S72", "308"});
+        expected.add(new String[]{"13294", "D16S403", "164"});
+        expected.add(new String[]{"13294", "D16S403", "174"});
+        expected.add(new String[]{"13294", "D8S1106", "148"});
+        expected.add(new String[]{"13294", "D8S1106", "152"});
+        expected.add(new String[]{"13294", "MFGT21", "115"});
+        expected.add(new String[]{"13294", "MFGT21", "125"});
+        expected.add(new String[]{"13294", "MFGT22", "110"});
+        expected.add(new String[]{"13294", "D4S2365", "283"});
+        expected.add(new String[]{"13294", "D4S2365", "291"});
+        expected.add(new String[]{"13294", "D11S2002", "260"});
+        expected.add(new String[]{"13294", "D11S2002", "264"});
+        expected.add(new String[]{"13294", "D12S67", "117"});
+        expected.add(new String[]{"13294", "D12S67", "204"});
+        expected.add(new String[]{"13294", "D17S1300", "228"});
+        expected.add(new String[]{"13294", "D17S1300", "276"});
+        expected.add(new String[]{"13294", "D6S501", "176"});
+        expected.add(new String[]{"13294", "D6S501", "184"});
+        expected.add(new String[]{"13294", "D2S1333", "277"});
+        expected.add(new String[]{"13294", "D2S1333", "301"});
+        expected.add(new String[]{"13294", "DXS2506", "262"});
+        expected.add(new String[]{"13294", "D12S364", "282"});
+        expected.add(new String[]{"13294", "D12S364", "290"});
+        expected.add(new String[]{"13294", "D4S413", "131"});
+        expected.add(new String[]{"13294", "D4S413", "151"});
+        expected.add(new String[]{"13294", "D1S548", "206"});
+        expected.add(new String[]{"13294", "D15S823", "329"});
+        expected.add(new String[]{"13294", "D15S823", "357"});
+        expected.add(new String[]{"13294", "D9S921", "187"});
+        expected.add(new String[]{"13294", "D9S921", "191"});
+        expected.add(new String[]{"13294", "D18S537", "162"});
+        expected.add(new String[]{"15227", "D7S794", "124"});
+        expected.add(new String[]{"15227", "D7S794", "128"});
+        expected.add(new String[]{"15227", "D5S1457", "132"});
+        expected.add(new String[]{"15227", "D5S1457", "136"});
+        expected.add(new String[]{"15227", "D7S513", "193"});
+        expected.add(new String[]{"15227", "D7S513", "210"});
+        expected.add(new String[]{"15227", "D3S1768", "205"});
+        expected.add(new String[]{"15227", "D3S1768", "209"});
+        expected.add(new String[]{"15227", "D13S765", "256"});
+        expected.add(new String[]{"15227", "D13S765", "260"});
+        expected.add(new String[]{"15227", "D11S925", "308"});
+        expected.add(new String[]{"15227", "D11S925", "338"});
+        expected.add(new String[]{"15227", "D6S291", "208"});
+        expected.add(new String[]{"15227", "D6S276", "215"});
+        expected.add(new String[]{"15227", "D6S276", "225"});
+        expected.add(new String[]{"15227", "D6S1691", "197"});
+        expected.add(new String[]{"15227", "D10S1412", "157"});
+        expected.add(new String[]{"15227", "D18S72", "308"});
+        expected.add(new String[]{"15227", "D16S403", "158"});
+        expected.add(new String[]{"15227", "D16S403", "164"});
+        expected.add(new String[]{"15227", "D8S1106", "160"});
+        expected.add(new String[]{"15227", "D8S1106", "164"});
+        expected.add(new String[]{"15227", "MFGT21", "123"});
+        expected.add(new String[]{"15227", "MFGT21", "127"});
+        expected.add(new String[]{"15227", "MFGT22", "100"});
+        expected.add(new String[]{"15227", "MFGT22", "122"});
+        expected.add(new String[]{"15227", "D4S2365", "279"});
+        expected.add(new String[]{"15227", "D4S2365", "283"});
+        expected.add(new String[]{"15227", "D11S2002", "256"});
+        expected.add(new String[]{"15227", "D11S2002", "260"});
+        expected.add(new String[]{"15227", "D12S67", "113"});
+        expected.add(new String[]{"15227", "D12S67", "204"});
+        expected.add(new String[]{"15227", "D17S1300", "228"});
+        expected.add(new String[]{"15227", "D17S1300", "252"});
+        expected.add(new String[]{"15227", "D6S501", "180"});
+        expected.add(new String[]{"15227", "D6S501", "184"});
+        expected.add(new String[]{"15227", "D2S1333", "289"});
+        expected.add(new String[]{"15227", "D2S1333", "301"});
+        expected.add(new String[]{"15227", "DXS2506", "286"});
+        expected.add(new String[]{"15227", "D12S364", "290"});
+        expected.add(new String[]{"15227", "D12S364", "294"});
+        expected.add(new String[]{"15227", "D4S413", "135"});
+        expected.add(new String[]{"15227", "D4S413", "145"});
+        expected.add(new String[]{"15227", "D1S548", "190"});
+        expected.add(new String[]{"15227", "D1S548", "202"});
+        expected.add(new String[]{"15227", "D15S823", "329"});
+        expected.add(new String[]{"15227", "D15S823", "349"});
+        expected.add(new String[]{"15227", "D9S921", "183"});
+        expected.add(new String[]{"15227", "D9S921", "187"});
+        expected.add(new String[]{"15227", "D18S537", "162"});
+        expected.add(new String[]{"15227", "D18S537", "178"});
+        expected.add(new String[]{"15673", "D7S794", "124"});
+        expected.add(new String[]{"15673", "D5S1457", "132"});
+
+        Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
+
+        int i = 0;
+        while (i < totalRows)
+        {
+            String subjectId = results.getDataAsText(i, "Subject Id");
+            String marker = results.getDataAsText(i, "Marker");
+            String result = results.getDataAsText(i, "Result");
+            String[] expectedVals = expected.get(i);
+
+            Assert.assertEquals("Incorrec subjectId", expectedVals[0], subjectId);
+            Assert.assertEquals("Incorrect marker", expectedVals[1], marker);
+            Assert.assertEquals("Incorrect result", expectedVals[2], result);
+
+            i++;
+        }
     }
 
     @Override

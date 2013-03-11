@@ -71,7 +71,7 @@ public enum TestSet
         SequenceTest.class,
         ViralLoadAssayTest.class,
         ELISPOT_AssayTest.class,
-        ElectrochemiluminescenceAssayTest.class,
+        HormoneAssayTest.class,
         GenotypeAssaysTest.class,
         FlowAssaysTest.class
     ),

@@ -51,6 +51,11 @@ public class EHRTestHelper
         return _test.getAttribute(Locator.xpath("//table[@name='webpart' and ./*/*/*/a//span[text()='" + title + "' or starts-with(text(), '" + title + " -')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), "id").substring(11);
     }
 
+    public String getWeightDataRegionName()
+    {
+        return _test.getAttribute(Locator.xpath("//div[contains(@class, 'ldk-wp') and ./*/*/*//th[contains(text(), 'Weights - test')]]//table[starts-with(@id,'dataregion_') and not(contains(@id, 'header'))]"), "id").substring(11);
+    }
+
     public void selectDataEntryRecord(String query, String Id, boolean keepExisting)
     {
         _test._extHelper.selectExtGridItem("Id", Id, -1, "ehr-" + query + "-records-grid", keepExisting);

@@ -26,9 +26,11 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
+import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
@@ -64,6 +66,8 @@ import java.util.Map;
 public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
+    protected APIContainerHelper _apiContainerHelper = new APIContainerHelper(this);
+
     protected String PROJECT_NAME = "LaboratoryVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private String VIRAL_LOAD_ASSAYNAME = "Viral Load Test";
 
@@ -177,7 +181,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
     public LabModulesTest()
     {
-        setContainerHelper(new UIContainerHelper(this));
+
     }
 
     @Override
@@ -191,7 +195,9 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     {
         setUpTest();
 
+        dateParseTest();
         overviewUITest();
+        workbookNumberingTest();
         reportsTest();
         settingsTest();
         siteSettingsTest();
@@ -233,10 +239,143 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assays.add(Pair.of("SSP Typing", "SSP Test"));
         assays.add(Pair.of("Viral Loads", VIRAL_LOAD_ASSAYNAME));
         assays.add(Pair.of("ELISPOT_Assay", "ELISPOT Test"));
-        assays.add(Pair.of("Electrochemiluminescence Assay", "Electrochemiluminescence Assay Test"));
+        assays.add(Pair.of("Hormone Assay", "Hormone Assay Test"));
         assays.add(Pair.of("Genotype Assay", "Genotyping Assay Test"));
 
         return assays;
+    }
+
+    private void dateParseTest() throws Exception
+    {
+        _helper.goToLabHome();
+        log("Validating client-side date parsing");
+
+        String dateFormat1 = "yyyy-MM-dd";
+        checkDate("2011-03-04", dateFormat1);
+        checkDate("2011-12-31", dateFormat1);
+
+        String dateFormat2 = "MM/dd/yyyy";
+        checkDate("03/04/2011", dateFormat2);
+        checkDate("9/4/1999", dateFormat2);
+
+        String dateFormat3 = "MM/dd/yy";
+        checkDate("02/20/11", dateFormat3);
+        checkDate("3/5/99", dateFormat3);
+    }
+
+    private void checkDate(String dateStr, String formatStr) throws Exception
+    {
+        SimpleDateFormat format = new SimpleDateFormat(formatStr);
+        Long expected = format.parse(dateStr).getTime();
+        Long actual = (Long)executeScript("return LDK.ConvertUtils.parseDate('" + dateStr + "').getTime();");
+        Date now = new Date();
+        Assert.assertEquals("Incorrect JS date parsing for date: " + dateStr + " at: " + now, expected, actual);
+    }
+
+    private void workbookNumberingTest() throws Exception
+    {
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+
+        //do cleanup in case test is started in the middle
+        Integer highestWorkbookId = deleteExistingWorkbooks();
+
+        List<CreateContainerResponse> workbooks = new ArrayList<CreateContainerResponse>();
+        workbooks.add(_apiContainerHelper.createWorkbook(getProjectName(), "Workbook1", null));
+        workbooks.add(_apiContainerHelper.createWorkbook(getProjectName(), "Workbook2", null));
+        workbooks.add(_apiContainerHelper.createWorkbook(getProjectName(), "Workbook3", null));
+
+        //select rows from laboratory.workbooks
+        SelectRowsCommand select1 = new SelectRowsCommand("laboratory", "workbooks");
+        select1.addSort("workbookId", Sort.Direction.ASCENDING);
+        select1.setColumns(Arrays.asList("workbookId", "container", "container/name", "containerRowId", "parentContainer"));
+
+        SelectRowsResponse resp1 = select1.execute(cn, getProjectName());
+
+        Assert.assertEquals("Incorrect row number", workbooks.size(), resp1.getRowCount().intValue());
+        int idx = 0;
+        for (Map<String, Object> row : resp1.getRows())
+        {
+            Integer workbookId = (Integer)row.get("workbookId");
+            String container = (String)row.get("container");
+            String containerName = (String)row.get("container/name");
+            Integer containerRowId = (Integer)row.get("containerRowId");
+
+            CreateContainerResponse workbook = workbooks.get(idx);
+
+            Assert.assertEquals("Incorrect container", workbook.getId(), container);
+            Assert.assertEquals("Incorrect container name", workbook.getName(), containerName);
+            String path = workbook.getName();
+            Integer rowId = Integer.parseInt(path.split("-")[1]);
+            Assert.assertEquals("Incorrect container rowId", rowId, containerRowId);
+
+            Integer expectedId = 1 + highestWorkbookId + idx;
+            Assert.assertEquals("Incorrect workbookId", expectedId, workbookId);
+            idx++;
+        }
+
+        //delete workbook in middle of series
+        CreateContainerResponse toDelete = workbooks.get(1);
+        workbooks.remove(toDelete);
+        _apiContainerHelper.deleteContainer(getProjectName() + "/" + toDelete.getName(), true);
+
+        //create new workbook
+        workbooks.add(_apiContainerHelper.createWorkbook(getProjectName(), "Workbook4", null));
+
+        //re-select
+        SelectRowsCommand select2 = new SelectRowsCommand("laboratory", "workbooks");
+        select2.addSort("workbookId", Sort.Direction.ASCENDING);
+        select2.setColumns(Arrays.asList("workbookId", "container", "container/name", "containerRowId", "parentContainer"));
+
+        SelectRowsResponse resp2 = select2.execute(cn, getProjectName());
+
+        Assert.assertEquals("Incorrect row number", workbooks.size(), resp2.getRowCount().intValue());
+        idx = 0;
+        int workbookIdOffset = 1 + highestWorkbookId;
+        for (Map<String, Object> row : resp2.getRows())
+        {
+            Integer workbookId = (Integer)row.get("workbookId");
+            String container = (String)row.get("container");
+            String containerName = (String)row.get("container/name");
+            Integer containerRowId = (Integer)row.get("containerRowId");
+
+            CreateContainerResponse workbook = workbooks.get(idx);
+
+            Assert.assertEquals("Incorrect container", workbook.getId(), container);
+            Assert.assertEquals("Incorrect container name", workbook.getName(), containerName);
+
+            String path = workbook.getName();
+            Integer rowId = Integer.parseInt(path.split("-")[1]);
+            Assert.assertEquals("Incorrect container rowId", rowId, containerRowId);
+
+            Integer expectedId = workbookIdOffset + idx;
+            Assert.assertEquals("Incorrect workbookId", expectedId, workbookId);
+            idx++;
+
+            //the second workbook was deleted, so increment the workbookId
+            if (idx == 1)
+                workbookIdOffset++;
+        }
+
+        deleteExistingWorkbooks();
+    }
+
+    private int deleteExistingWorkbooks() throws Exception
+    {
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        SelectRowsCommand select0 = new SelectRowsCommand("laboratory", "workbooks");
+        select0.setColumns(Arrays.asList("workbookId", "container", "container/rowid", "containerRowId", "parentContainer"));
+        select0.addSort("workbookId", Sort.Direction.ASCENDING);
+        SelectRowsResponse resp0 = select0.execute(cn, getProjectName());
+
+        int highestWorkbookId = 0;
+        for (Map<String, Object> row : resp0.getRows())
+        {
+            Integer rowId = (Integer)row.get("container/rowid");
+            highestWorkbookId = (Integer)row.get("workbookId");
+            _apiContainerHelper.deleteWorkbook(getProjectName(), rowId, true);
+        }
+
+        return highestWorkbookId;
     }
 
     private void calculatedColumnsTest() throws Exception
@@ -608,7 +747,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         waitAndClick(Locator.ext4Button("View Summary of Data Sources"));
         waitForText("The following sources have been defined:");
-        assertTextPresent("/" + getProjectName());
+        waitForText("/" + getProjectName());
         assertTextPresent(DATA_SOURCE + " (\"/home\".core.Users)");
 
         waitAndClick(Locator.ext4Button("View Summary of Demographics Sources"));
@@ -1212,7 +1351,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     protected List<String> getEnabledModules()
     {
         List<String> modules = new ArrayList<String>();
-        modules.add("Electrochemiluminescence");
+        modules.add("HormoneAssay");
         modules.add("ELISPOT_Assay");
         modules.add("FlowAssays");
         modules.add("GenotypeAssays");

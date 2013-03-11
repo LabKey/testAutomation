@@ -148,7 +148,6 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
     public ViralLoadAssayTest()
     {
-        setContainerHelper(new UIContainerHelper(this));
         PROJECT_NAME = "VL_AssayVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 

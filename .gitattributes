@@ -260,6 +260,7 @@ src/org/labkey/test/tests/GroupTest.java -text
 src/org/labkey/test/tests/HTTPApiTest.java -text
 src/org/labkey/test/tests/HaplotypeAssayTest.java -text
 src/org/labkey/test/tests/HiddenEmailTest.java -text
+src/org/labkey/test/tests/HormoneAssayTest.java -text
 src/org/labkey/test/tests/ICEMRModuleTest.java -text
 src/org/labkey/test/tests/IssuesTest.java -text
 src/org/labkey/test/tests/JUnitTest.java -text
