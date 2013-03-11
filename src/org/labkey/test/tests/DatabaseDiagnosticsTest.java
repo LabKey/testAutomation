@@ -49,12 +49,11 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
         click(Locator.linkWithText("Validate"));
 
         waitForElement(Locator.id("StatusFiles"));
-        if (isElementPresent(Locator.linkWithText("RUNNING")))
-            click(Locator.linkWithText("RUNNING"));
-        else
-            click(Locator.linkWithText("COMPLETE"));
 
-        waitForTextWithRefresh("Check complete", WAIT_FOR_JAVASCRIPT);
+        waitForElementWithRefresh(Locator.linkWithText("COMPLETE"), WAIT_FOR_JAVASCRIPT);
+        click(Locator.linkWithText("COMPLETE"));
+
+        waitForText("Check complete", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Check complete, 0 errors found");
     }
 
