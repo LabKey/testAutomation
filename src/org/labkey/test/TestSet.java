@@ -52,6 +52,7 @@ public enum TestSet
         PipelineTest.class,
         FileContentTest.class,
         ClientAPITest.class,
+        ChartingAPITest.class,
         ReportTest.class,
         MicroarrayTest.class,
         ButtonCustomizationTest.class,

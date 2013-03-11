@@ -33,9 +33,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,15 +51,15 @@ public class ClientAPITest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ClientAPITestProject";
     private static final String OTHER_PROJECT = "OtherClientAPITestProject"; // for cross-project query test
-    private static final String FOLDER_NAME = "api folder";
+    protected static final String FOLDER_NAME = "api folder";
     private static final String SUBFOLDER_NAME = "subfolder";
-    private final static String LIST_NAME = "People";
+    protected final static String LIST_NAME = "People";
     private final static String QUERY_LIST_NAME = "NewPeople";
     private final static String TEST_XLS_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/ClientAPITestList.xls";
     private final static String SUBFOLDER_LIST = "subfolderList"; // for cross-folder query test
     private static final String OTHER_PROJECT_LIST = "otherProjectList"; // for cross-project query test
-    private final static ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.AutoInteger;
-    private final static String LIST_KEY_NAME = "Key";
+    protected final static ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.AutoInteger;
+    protected final static String LIST_KEY_NAME = "Key";
     protected static final String TEST_ASSAY = "TestAssay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
     protected static final String[] CHARTING_API_TITLES = {
@@ -72,7 +74,7 @@ public class ClientAPITest extends BaseWebDriverTest
             "Boxplot No Outliers, All Points"
     };
 
-    private final static ListHelperWD.ListColumn[] LIST_COLUMNS = new ListHelperWD.ListColumn[]
+    protected final static ListHelperWD.ListColumn[] LIST_COLUMNS = new ListHelperWD.ListColumn[]
     {
         new ListHelperWD.ListColumn("FirstName", "First Name", ListHelperWD.ListColumnType.String, "The first name"),
         new ListHelperWD.ListColumn("LastName", "Last Name", ListHelperWD.ListColumnType.String, "The last name"),
@@ -84,7 +86,7 @@ public class ClientAPITest extends BaseWebDriverTest
         LIST_COLUMNS[1].setRequired(true);
     }
 
-    private final static String[][] TEST_DATA =
+    protected final static String[][] TEST_DATA =
     {
         { "1", "Bill", "Billson", "34" },
         { "2", "Jane", "Janeson", "42" },
@@ -180,13 +182,9 @@ public class ClientAPITest extends BaseWebDriverTest
 
         createWiki();
 
-        chartAPITest();
-
         createLists();
 
         gridTest();
-
-        chartTest();
 
         webpartTest();
 
@@ -220,19 +218,16 @@ public class ClientAPITest extends BaseWebDriverTest
         saveWikiPage();
     }
 
-    @LogMethod
-    private void createLists()
+    protected String getListData(String listKeyName, ListHelperWD.ListColumn[] listColumns, String[][] listData)
     {
-        _listHelper.createList(FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
-
         StringBuilder data = new StringBuilder();
-        data.append(LIST_KEY_NAME).append("\t");
-        for (int i = 0; i < LIST_COLUMNS.length; i++)
+        data.append(listKeyName).append("\t");
+        for (int i = 0; i < listColumns.length; i++)
         {
-            data.append(LIST_COLUMNS[i].getName());
-            data.append(i < LIST_COLUMNS.length - 1 ? "\t" : "\n");
+            data.append(listColumns[i].getName());
+            data.append(i < listColumns.length - 1 ? "\t" : "\n");
         }
-        for (String[] rowData : TEST_DATA)
+        for (String[] rowData : listData)
         {
             for (int col = 0; col < rowData.length; col++)
             {
@@ -241,37 +236,50 @@ public class ClientAPITest extends BaseWebDriverTest
             }
         }
 
-        _listHelper.clickImportData();
-        setFormElement(Locator.name("text"), data.toString());
-        _listHelper.submitImportTsv_success();
-        for (String[] rowData : TEST_DATA)
-        {
-            // check that all the data is in the grid (skipping the key column at index 0)
-            for (int col = 1; col < rowData.length; col++)
-            {
-                assertTextPresent(rowData[col]);
-            }
-        }
+        return data.toString();
+    }
 
+    @LogMethod(category = LogMethod.MethodType.SETUP)
+    private void createLists()
+    {
+        createPeopleList();
+        createLargePeopleList();
+        createCrossFolderLists();
+    }
+
+    protected void createPeopleList()
+    {
+        String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
+
+        _listHelper.createList(FOLDER_NAME, LIST_NAME, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
+        _listHelper.clickImportData();
+        setFormElement(Locator.name("text"), data);
+        _listHelper.submitImportTsv_success();
+    }
+
+    protected void createLargePeopleList()
+    {
         // Create Larger list for query test.
         File listFile = new File(TEST_XLS_DATA_FILE);
         _listHelper.createListFromFile(FOLDER_NAME, QUERY_LIST_NAME, listFile);
         waitForElement(Locator.linkWithText("Norbert"));
+    }
+
+    protected void createCrossFolderLists()
+    {
+        String data = getListData(LIST_KEY_NAME, LIST_COLUMNS, TEST_DATA);
 
         // Create lists for cross-folder query test.
         _listHelper.createList(SUBFOLDER_NAME, SUBFOLDER_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
         _listHelper.clickImportData();
-        setFormElement(Locator.name("text"), data.toString());
+        setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();
 
         // Create lists for cross-folder query test.
         _listHelper.createList(OTHER_PROJECT, OTHER_PROJECT_LIST, LIST_KEY_TYPE, LIST_KEY_NAME, LIST_COLUMNS);
         _listHelper.clickImportData();
-        setFormElement(Locator.name("text"), data.toString());
+        setFormElement(Locator.name("text"), data);
         _listHelper.submitImportTsv_success();
-
-        clickFolder(PROJECT_NAME);
-        clickFolder(FOLDER_NAME);
     }
 
     private String waitForDivPopulation()
@@ -319,67 +327,11 @@ public class ClientAPITest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void chartTest()
-    {
-        String chartHtml = setSourceFromFile("chartTest.js");
-        if (!chartHtml.contains("<img") && !chartHtml.contains("<IMG"))
-            Assert.fail("Test div does not contain an image:\n" + chartHtml);
-    }
-
-    @LogMethod
-    private void chartAPITest() throws Exception
-    {
-        setSourceFromFile("chartingAPITest.js");
-
-        //Some things we know about test 0. After this we loop through some others and just test to see if they convert
-        waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
-
-        String testCountStr = getFormElement(Locator.id("configCount"));
-        int testCount = Integer.parseInt(testCountStr);
-        for (int currentTest = 0; currentTest < testCount; currentTest++)
-        {
-            waitForText(CHARTING_API_TITLES[currentTest], WAIT_FOR_JAVASCRIPT);
-            checkSVGConversion();
-            click(Locator.buttonContainingText("Next"));
-        }
-    }
-
-    private void checkSVGConversion() throws Exception
-    {
-        //The server side svg converter is fairly strict and will fail with bad inputs
-        clickButton("Get SVG", 0);
-        String svgText = getFormElement(Locator.id("svgtext"));
-
-        String url = WebTestHelper.getBaseURL() + "/visualization/" + PROJECT_NAME + "/" + EscapeUtil.encode(FOLDER_NAME)+ "/exportPDF.view";
-        HttpClient httpClient = WebTestHelper.getHttpClient();
-        HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpPost method;
-        HttpResponse response = null;
-
-        try
-        {
-            method = new HttpPost(url);
-            List<NameValuePair> args = new ArrayList<NameValuePair>();
-            args.add(new BasicNameValuePair("svg", svgText));
-            method.setEntity(new UrlEncodedFormEntity(args));
-            response = httpClient.execute(method, context);
-            int status = response.getStatusLine().getStatusCode();
-            Assert.assertEquals("SVG Downloaded", HttpStatus.SC_OK, status);
-            Assert.assertTrue(response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
-            Assert.assertTrue(response.getHeaders("Content-Type")[0].getValue().startsWith("application/pdf"));
-        }
-        finally
-        {
-            if (null != response)
-                EntityUtils.consume(response.getEntity());
-            if (httpClient != null)
-                httpClient.getConnectionManager().shutdown();
-        }
-    }
-
-    @LogMethod
     private void gridTest()
     {
+        clickFolder(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
+
         setSourceFromFile("gridTest.js");
 
         assertTextPresent(GRIDTEST_GRIDTITLE);
@@ -586,6 +538,10 @@ public class ClientAPITest extends BaseWebDriverTest
         assertElementContains(Locator.id(TEST_DIV_NAME), "Successfully updated the description");
     }
 
+    protected File getApiFileRoot()
+    {
+        return new File(getLabKeyRoot(), "server/test/data/api/");
+    }
 
     /**
      * Given a file name sets the page contents to a *wrapped* version of file in server/test/data/api
@@ -593,23 +549,23 @@ public class ClientAPITest extends BaseWebDriverTest
      * @param fileName file will be found in server/test/data/api
      * @return
      */
-    private String setSourceFromFile(String fileName)
+    protected String setSourceFromFile(String fileName)
     {
         return setSourceFromFile(fileName, false);
     }
 
-    private String setSourceFromFile(String fileName, boolean excludeTags)
+    protected String setSourceFromFile(String fileName, boolean excludeTags)
     {
         return setSource(getFileContents("server/test/data/api/" + fileName ), excludeTags);
     }
 
-    private String setSource(String srcFragment)
+    protected String setSource(String srcFragment)
     {
         return setSource(srcFragment, false);
     }
 
     @LogMethod
-    private String setSource(String srcFragment, boolean excludeTags)
+    protected String setSource(String srcFragment, boolean excludeTags)
     {
         if (!isElementPresent(Locator.linkWithText(WIKIPAGE_NAME)))
             clickFolder(FOLDER_NAME);
@@ -620,6 +576,28 @@ public class ClientAPITest extends BaseWebDriverTest
             fullSource = getFullSource(srcFragment);
         log("Setting wiki page source:");
         log(fullSource);
+        setWikiBody(fullSource);
+        saveWikiPage();
+        return waitForDivPopulation();
+    }
+
+    protected String createAPITestWiki(String wikiName, File testSource, Boolean wrapSource)
+    {
+        if (!isElementPresent(Locator.folderTab("Wiki")))
+            goToModule("Wiki");
+
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.clickWebpartMenuItem("Pages", "New");
+
+        String fullSource;
+        String srcFragment = getFileContents(testSource);
+
+        if (wrapSource)
+            fullSource = getFullSource(srcFragment);
+        else
+            fullSource = srcFragment;
+
+        setFormElement(Locator.name("name"), wikiName);
         setWikiBody(fullSource);
         saveWikiPage();
         return waitForDivPopulation();
@@ -770,4 +748,11 @@ public class ClientAPITest extends BaseWebDriverTest
         Assert.assertFalse(loc.findElement(_driver).getText().contains("ERROR"));
         clearTestPage("WebDav Client API Test complete.");
     }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
 }
