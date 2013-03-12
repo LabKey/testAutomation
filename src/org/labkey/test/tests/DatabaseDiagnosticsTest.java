@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PipelineHelper;
 
 /**
  * User: tchadick
@@ -50,10 +51,9 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 
         waitForElement(Locator.id("StatusFiles"));
 
-        waitForElementWithRefresh(Locator.linkWithText("COMPLETE"), WAIT_FOR_JAVASCRIPT);
-        click(Locator.linkWithText("COMPLETE"));
+        clickAndWait(PipelineHelper.Locators.pipelineStatusLink(0));
 
-        waitForText("Check complete", WAIT_FOR_JAVASCRIPT);
+        waitForTextWithRefresh("Check complete", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Check complete, 0 errors found");
     }
 

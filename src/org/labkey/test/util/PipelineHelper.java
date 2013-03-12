@@ -161,4 +161,12 @@ public class PipelineHelper
         _test._extHelper.clickFileBrowserFileCheckbox(fileName);
         _test.selectImportDataAction(importAction);
     }
+
+    public static class Locators
+    {
+        public static Locator.XPathLocator pipelineStatusLink(int index)
+        {
+            return Locator.id("dataregion_StatusFiles").append("/tbody/tr/td[2]/a[starts-with(@href, '/labkey/pipeline-status/details.view?')]").index(index);
+        }
+    }
 }
