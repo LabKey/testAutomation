@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 LabKey Corporation
+ * Copyright (c) 2009-2013 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,18 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.ChartHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,8 +50,9 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
  * Date: Apr 3, 2009
  * Time: 9:18:32 AM
  */
-public class StudyWDTest extends StudyBaseWDTest
+public class StudyWDTest extends StudyBaseTestWD
 {
+    public String datasetLink = datasetCount + " datasets";
     protected boolean quickTest = true;
     protected static final String DEMOGRAPHICS_DESCRIPTION = "This is the demographics dataset, dammit. Here are some \u2018special symbols\u2019 - they help test that we're roundtripping in UTF-8.";
     protected static final String DEMOGRAPHICS_TITLE = "DEM-1: Demographics";
@@ -79,6 +85,19 @@ public class StudyWDTest extends StudyBaseWDTest
     private String authorUser = "author@study.test";
     private String specimenUrl = null;
 
+    protected void setDatasetLink(int datasetCount)
+    {
+        datasetLink =  datasetCount + " datasets";
+    }
+
+    protected boolean isManualTest = false;
+
+    protected void triggerManualTest()
+    {
+        setDatasetLink(47);
+        isManualTest = true;
+    }
+
     protected File[] getTestFiles()
     {
         return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/study-api.xml")};
@@ -86,18 +105,20 @@ public class StudyWDTest extends StudyBaseWDTest
 
     protected void doCreateSteps()
     {
+        pauseSearchCrawler(); //necessary for the alternate ID testing
         enableEmailRecorder();
+
         importStudy();
         startSpecimenImport(2);
 
-        // wait for study (but not specimens) to finish loading
-        waitForPipelineJobsToComplete(1, "study import", false);
+        waitForPipelineJobsToComplete(2, "study import", false);
     }
 
-    protected void doCleanup(boolean afterTest) //child class cleanup method throws Exception
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException //child class cleanup method throws Exception
     {
         super.doCleanup(afterTest);
         deleteUsers(false, authorUser); // Subclasses may not have created this user
+        unpauseSearchCrawler();
     }
 
     protected void emptyParticipantPickerList()
@@ -114,6 +135,7 @@ public class StudyWDTest extends StudyBaseWDTest
         doVerifyStepsSetDepth(false);
     }
 
+    @LogMethod
     protected void doVerifyStepsSetDepth(boolean quickTest)
     {
         this.quickTest = quickTest;
@@ -131,6 +153,7 @@ public class StudyWDTest extends StudyBaseWDTest
         }
     }
 
+    @LogMethod
     private void verifyPermissionsRestrictions()
     {
         clickFolder(getProjectName());
@@ -143,9 +166,10 @@ public class StudyWDTest extends StudyBaseWDTest
         stopImpersonating();
     }
 
+    @LogMethod
     private void verifyParticipantReports()
     {
-        clickAndWait(Locator.linkWithText(getFolderName()));
+        clickFolder(getFolderName());
         addWebPart("Study Data Tools");
         clickLinkWithImage("/labkey/study/tools/participant_report.png");
         clickButton("Choose Measures", 0);
@@ -196,6 +220,7 @@ public class StudyWDTest extends StudyBaseWDTest
     /**
      * This is a test of the participant picker/classification creation UI.
      */
+    @LogMethod
     protected void manageSubjectClassificationTest()
     {
 
@@ -239,7 +264,7 @@ public class StudyWDTest extends StudyBaseWDTest
         // test creating a participant group directly from a data grid
         waitForElement(Locator.linkContainingText(STUDY_NAME));
         clickAndWait(Locator.linkWithText(STUDY_NAME));
-        clickAndWait(Locator.linkWithText("47 datasets"));
+        waitAndClickAndWait(Locator.linkWithText(datasetLink));
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
 
@@ -321,6 +346,7 @@ public class StudyWDTest extends StudyBaseWDTest
      * @param listName
      * @return new name of list
      */
+    @LogMethod
     private String changeListName(String listName)
     {
         String newListName = listName.substring(0, 1) + "CHANGE" + listName.substring(2);
@@ -342,6 +368,7 @@ public class StudyWDTest extends StudyBaseWDTest
      * post-conditions:  list listName does not exist
      * @param listName list to delete
      */
+    @LogMethod
     private void deleteListTest(String listName)
     {
         sleep(1000);
@@ -373,6 +400,7 @@ public class StudyWDTest extends StudyBaseWDTest
      * @param expectedError error message to expect
      * @param listName name to enter in classification label
      */
+    @LogMethod
     private void attemptCreateExpectError(String ids, String expectedError, String listName)
     {
         startCreateParticipantGroup();
@@ -394,6 +422,7 @@ public class StudyWDTest extends StudyBaseWDTest
      * @param listName
      * @param pIDs
      */
+    @LogMethod
     private void editClassificationList(String listName, String pIDs)
     {
         sleep(1000);
@@ -437,10 +466,10 @@ public class StudyWDTest extends StudyBaseWDTest
     // select the list name from the main classification page
     private void selectListName(String listName)
     {
-
         Locator report = Locator.tagContainingText("div", listName);
 
-        selenium.click(report.toString());
+        // select the report and click the delete button
+        waitAndClick(report);
     }
 
     /**
@@ -476,6 +505,7 @@ public class StudyWDTest extends StudyBaseWDTest
      * @param filtered should list be filtered?  If so, only participants with DEMasian=0 will be included
      * @return ids in new list
      */
+    @LogMethod
     private String createListWithAddAll(String listName, boolean filtered)
     {
         startCreateParticipantGroup();
@@ -520,13 +550,13 @@ public class StudyWDTest extends StudyBaseWDTest
         //else
         sleep(1000);
         goToManageStudyPage(projectName, studyName);
-        clickManageSubjectCategory(subjectNoun);
+        clickAndWait(Locator.linkContainingText("Manage " + subjectNoun + " Groups"));
     }
 
-
-
+    @LogMethod
     protected void verifyStudyAndDatasets()
     {
+        goToProjectHome();
         verifyDemographics();
         verifyVisitMapPage();
         verifyManageDatasetsPage();
@@ -534,6 +564,9 @@ public class StudyWDTest extends StudyBaseWDTest
 
         if(quickTest)
             return;
+
+        if(!isManualTest)
+            verifyAlternateIDs();
 
         verifyHiddenVisits();
         verifyVisitImportMapping();
@@ -554,7 +587,7 @@ public class StudyWDTest extends StudyBaseWDTest
 
         // return to dataset import page
         clickAndWait(Locator.linkWithText(getStudyLabel()));
-        clickAndWait(Locator.linkWithText("47 datasets"));
+        clickAndWait(Locator.linkWithText(datasetLink));
         clickAndWait(Locator.linkWithText("verifyAssay"));
         assertTextPresent("QC State");
         assertTextNotPresent("1234_B");
@@ -603,6 +636,36 @@ public class StudyWDTest extends StudyBaseWDTest
         assertTextPresent("Updatable Value11");
     }
 
+    private void verifyAlternateIDs()
+    {
+        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickAndWait(Locator.linkWithText("Alt ID mapping"));
+        assertTextPresent("Contains up to one row of Alt ID mapping data for each ");
+        click(Locator.tagWithText("span", "Import Data"));
+        waitForText("This is the Alias Dataset. You do not need to include information for the date column");
+
+        //the crawler should be paused (this is done in create) to verify
+        log("Verify searching for alternate ID returns participant page");
+        SearchHelper searchHelper = new SearchHelper(this);
+        searchHelper.searchFor("888208905");
+        assertTextPresent("Study Study 001 -- Mouse 999320016");
+        goBack();
+        goBack();
+
+        //edit an entry, search for that
+        log("TODO");
+
+        Map nameAndValue = new HashMap(1);
+        nameAndValue.put("Alt ID", "191919");
+        (new ChartHelper(this)).editDrtRow(4, nameAndValue);
+        searchHelper.searchFor("191919");
+        // Issue 17203: Changes to study datasets not auto indexed
+//        assertTextPresent("Study Study 001 -- Mouse 999320687");
+
+
+    }
+
+    @LogMethod
     protected void verifySpecimens()
     {
         clickAndWait(Locator.linkWithText(getStudyLabel()));
@@ -617,6 +680,7 @@ public class StudyWDTest extends StudyBaseWDTest
         assertElementPresent(Locator.tagWithText("span", "Create New Request"));
     }
 
+    @LogMethod
     private void verifyParticipantComments()
     {
         log("creating the participant/visit comment dataset");
@@ -734,12 +798,10 @@ public class StudyWDTest extends StudyBaseWDTest
         Assert.assertEquals("Unexpected size of datasetAuditEvent log", previousCount + 1, rows.size());
         log("Dataset audit log contents: " + rows);
         Assert.assertEquals("A new dataset record was inserted", rows.get(rows.size() - 1).get("Comment"));
-
     }
 
     private SelectRowsResponse getDatasetAuditLog()
     {
-
         SelectRowsCommand selectCmd = new SelectRowsCommand("auditLog", "DatasetAuditEvent");
 
         selectCmd.setMaxRows(-1);
@@ -757,7 +819,6 @@ public class StudyWDTest extends StudyBaseWDTest
             Assert.fail("Error when attempting to verify audit trail: " + e.getMessage());
         }
         return selectResp;
-
     }
 
     private int getDatasetAuditEventCount()
@@ -767,22 +828,24 @@ public class StudyWDTest extends StudyBaseWDTest
         return rows.size();
     }
 
+    @LogMethod
     private void verifyDemographics()
     {
-        clickAndWait(Locator.linkWithText(getFolderName()));
+        clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Study Navigator"));
         clickAndWait(Locator.linkWithText("24"));
         assertTextPresent(DEMOGRAPHICS_DESCRIPTION);
         assertTextPresent("Male");
         assertTextPresent("African American or Black");
         clickAndWait(Locator.linkWithText("999320016"));
-        clickAndWait(Locator.linkWithText("125: EVC-1: Enrollment Vaccination", 0));
+        click(Locator.linkWithText("125: EVC-1: Enrollment Vaccination"));
         assertTextPresent("right deltoid");
         
         verifyDemoCustomizeOptions();
         verifyDatasetExport();
     }
 
+    @LogMethod
     private void verifyDatasetExport()
     {
         pushLocation();
@@ -813,6 +876,7 @@ public class StudyWDTest extends StudyBaseWDTest
         Assert.assertFalse(_customizeViewsHelper.isColumnPresent("MouseVisit/DEM-1"));
     }
 
+    @LogMethod
     protected void verifyVisitMapPage()
     {
         clickAndWait(Locator.linkWithText(getStudyLabel()));
@@ -820,7 +884,7 @@ public class StudyWDTest extends StudyBaseWDTest
         clickAndWait(Locator.linkWithText("Manage Visits"));
 
         // test optional/required/not associated
-        clickAndWait(Locator.linkWithText("edit", 0));
+        clickAndWait(Locator.linkWithText("edit", 1));
         selectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
         selectOption("dataSetStatus", 1, "NOT_ASSOCIATED");
         selectOption("dataSetStatus", 2, "NOT_ASSOCIATED");
@@ -831,7 +895,7 @@ public class StudyWDTest extends StudyBaseWDTest
         selectOption("dataSetStatus", 7, "REQUIRED");
         selectOption("dataSetStatus", 8, "REQUIRED");
         clickButton("Save");
-        clickAndWait(Locator.linkWithText("edit", 0));
+        clickAndWait(Locator.linkWithText("edit", 1));
         selectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
         selectOption("dataSetStatus", 1, "OPTIONAL");
         selectOption("dataSetStatus", 2, "REQUIRED");
@@ -842,7 +906,7 @@ public class StudyWDTest extends StudyBaseWDTest
         selectOption("dataSetStatus", 7, "OPTIONAL");
         selectOption("dataSetStatus", 8, "REQUIRED");
         clickButton("Save");
-        clickAndWait(Locator.linkWithText("edit", 0));
+        clickAndWait(Locator.linkWithText("edit", 1));
         assertSelectOption("dataSetStatus", 0, "NOT_ASSOCIATED");
         assertSelectOption("dataSetStatus", 1, "OPTIONAL");
         assertSelectOption("dataSetStatus", 2, "REQUIRED");
@@ -854,9 +918,10 @@ public class StudyWDTest extends StudyBaseWDTest
         assertSelectOption("dataSetStatus", 8, "REQUIRED");
     }
 
+    @LogMethod
     protected void verifyManageDatasetsPage()
     {
-        clickAndWait(Locator.linkWithText(getFolderName()));
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
 
@@ -880,6 +945,7 @@ public class StudyWDTest extends StudyBaseWDTest
         Assert.assertTrue("Could not find column \"MouseVisit/DEM-1\"", _customizeViewsHelper.isColumnPresent("MouseVisit/DEM-1"));
     }
 
+    @LogMethod
     private void verifyHiddenVisits()
     {
         clickAndWait(Locator.linkWithText(getStudyLabel()));
@@ -893,6 +959,7 @@ public class StudyWDTest extends StudyBaseWDTest
         assertTextPresent("Pre-exist Cond");
     }
 
+    @LogMethod
     private void verifyVisitImportMapping()
     {
         clickAndWait(Locator.linkWithText("Manage Study"));
@@ -925,8 +992,8 @@ public class StudyWDTest extends StudyBaseWDTest
         Assert.assertEquals("Incorrect number of non-gray \"ConMeds Log #%{S.3.2}\" cells", 1, countTableCells("ConMeds Log #%{S.3.2}", false));
         Assert.assertEquals("Incorrect number of gray \"ConMeds Log #%{S.3.2}\" cells", 0, countTableCells("ConMeds Log #%{S.3.2}", true));
 
-        clickAndWait(Locator.linkWithText(getFolderName()));
-        clickAndWait(Locator.linkWithText("47 datasets"));
+        clickFolder(getFolderName());
+        clickAndWait(Locator.linkWithText(datasetLink));
         clickAndWait(Locator.linkWithText("Types"));
         log("Verifying sequence numbers and visit names imported correctly");
 
@@ -974,6 +1041,12 @@ public class StudyWDTest extends StudyBaseWDTest
 
     protected void verifyCohorts()
     {
+        verifyCohorts(true);
+    }
+
+    @LogMethod
+    protected void verifyCohorts(boolean altIDsEnabled)       //todo
+    {
         clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickAndWait(Locator.linkWithText("Study Navigator"));
         clickAndWait(Locator.linkWithText("24"));
@@ -992,16 +1065,18 @@ public class StudyWDTest extends StudyBaseWDTest
 
         // verify that the participant view respects the cohort filter:
         setSort("Dataset", "MouseId", SortDirection.ASC);
-        click(Locator.linkWithText("999320518"));
-        clickAndWait(Locator.linkWithText("125: EVC-1: Enrollment Vaccination", 0));
+        clickAndWait(Locator.linkWithText("999320518"));
+        if(!isManualTest)
+            assertTextPresent("b: 888209407"); //Alternate ID
+        click(Locator.linkWithText("125: EVC-1: Enrollment Vaccination"));
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        click(Locator.linkWithText("Next Mouse"));
+        clickAndWait(Locator.linkWithText("Next Mouse"));
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        click(Locator.linkWithText("Next Mouse"));
+        clickAndWait(Locator.linkWithText("Next Mouse"));
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
-        click(Locator.linkWithText("Next Mouse"));
+        clickAndWait(Locator.linkWithText("Next Mouse"));
     }
 }

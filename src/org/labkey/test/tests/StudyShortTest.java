@@ -20,10 +20,17 @@ package org.labkey.test.tests;
  * Date: 7/19/12
  * Time: 12:48 PM
  */
-public class StudyShortTest extends StudyTest
+public class StudyShortTest extends StudyWDTest
 {
+    @Override
     protected void doVerifySteps()
     {
         doVerifyStepsSetDepth(true);
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

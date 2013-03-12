@@ -62,6 +62,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
             });
         }
         _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test._shortWait.until(LabKeyExpectedConditions.animationIsDone(Locator.css(".customizeViewPanel")));
     }
 
     public void closeCustomizeViewPanel()

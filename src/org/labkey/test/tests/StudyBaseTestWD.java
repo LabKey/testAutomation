@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013 LabKey Corporation
+ * Copyright (c) 2009-2013 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.support.ui.Select;
 
 import java.io.File;
@@ -42,6 +43,8 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
 {
     protected static final String ARCHIVE_TEMP_DIR = getStudySampleDataPath() + "drt_temp";
     protected static final String SPECIMEN_ARCHIVE_A = getStudySampleDataPath() + "specimens/sample_a.specimens";
+    protected int datasetCount = 48;
+    protected int visitCount = 65;
 
     private SpecimenImporter _specimenImporter;
 
@@ -141,7 +144,7 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
     @Override
     protected File[] getTestFiles()
     {
-        return new File[0];
+        return new File[0]; 
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -171,18 +174,21 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
 
     protected void importStudy(){importStudy(null);}
 
-    protected void importStudy(@Nullable String pipelinePath)
+    protected void importStudy(String pipelinePath)
     {
         initializeFolder();
         initializePipeline(pipelinePath);
 
         // Start importing study.xml to create the study and load all the datasets.  We'll wait for this import to
         // complete before doing any further tests.
-        clickAndWait(Locator.linkWithText(getFolderName()));
-        clickButton("Process and Import Data");
-        _extHelper.waitForImportDataEnabled();
-        _extHelper.clickFileBrowserFileCheckbox("study.xml");
-        selectImportDataAction("Import Study");
+        clickFolder(getFolderName());
+
+        log("Import new study with alt-ID");
+        importFolderFromPipeline("AltIdStudy.folder.zip");
+//        clickButton("Process and Import Data");
+//        _extHelper.waitForImportDataEnabled();
+//        _extHelper.clickFileBrowserFileCheckbox("study.xml");
+//        selectImportDataAction("Import Study");
     }
 
     protected void exportStudy(boolean useXmlFormat, boolean zipFile)
@@ -192,11 +198,12 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
 
     protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected)
     {
-        exportStudy(useXmlFormat, zipFile, exportProtected, false, false, Collections.<String>emptySet());
+        exportStudy(useXmlFormat, zipFile, exportProtected, false, false, false, Collections.<String>emptySet());
     }
 
-    protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected,
-                               boolean useAlternateIDs, boolean useAlternateDates, Set<String> uncheckObjects)
+    @LogMethod protected void exportStudy(boolean useXmlFormat, boolean zipFile, boolean exportProtected,
+                               boolean useAlternateIDs, boolean useAlternateDates, boolean maskClinic,
+                               @Nullable Set<String> uncheckObjects)
     {
         clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
@@ -205,16 +212,21 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
         assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings");
         // TODO: these have moved to the folder archive, be sure to test there: "Queries", "Custom Views", "Reports", "Lists"
 
-        for (String uncheckObject : uncheckObjects)
-            uncheckCheckbox("types", uncheckObject);
-        checkRadioButton("format", useXmlFormat ? "new" : "old");
-        checkRadioButton("location", zipFile ? "1" : "0");  // zip file vs. individual files
+        if (uncheckObjects != null)
+        {
+            for (String uncheckObject : uncheckObjects)
+                uncheckCheckbox(Locator.checkboxByNameAndValue("types", uncheckObject));
+        }
+        checkRadioButton(Locator.radioButtonByNameAndValue("format", useXmlFormat ? "new" : "old"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("location", zipFile ? "1" : "0"));  // zip file vs. individual files
         if(!exportProtected)
-            checkCheckbox("removeProtected");
+            checkCheckbox(Locator.name("removeProtected"));
         if(useAlternateIDs)
-            checkCheckbox("alternateIds");
+            checkCheckbox(Locator.name("alternateIds"));
         if(useAlternateDates)
-            checkCheckbox("shiftDates");
+            checkCheckbox(Locator.name("shiftDates"));
+        if(maskClinic)
+            checkCheckbox(Locator.name("maskClinic"));
         clickButton("Export");
     }
 
@@ -231,8 +243,8 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
     {
         initializePipeline(null);
     }
-
-    protected void initializePipeline(@Nullable String pipelinePath)
+    
+    protected void initializePipeline(String pipelinePath)
     {
         if(pipelinePath==null)
             pipelinePath = getPipelinePath();
@@ -304,12 +316,13 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
     protected void assertSelectOption(String name, int i, String expected)
     {
         Select select = new Select(Locator.tagWithName("select", name).index(i).findElement(_driver));
-        Assert.assertEquals("Expected option was not selected", expected, select.getFirstSelectedOption().getText());
+        Assert.assertEquals("Expected option was not selected", expected, select.getFirstSelectedOption().getAttribute("value"));
     }
 
     protected void goToManageStudyPage(String projectName, String studyName)
     {
         log("Going to Manage Study Page of: " + studyName);
+        waitForElement(Locator.css(".nav-tree-selected"));
         if (!getText(Locator.css(".nav-tree-selected")).equals(projectName))
         {
             waitAndClick(Locator.linkWithText(projectName));
