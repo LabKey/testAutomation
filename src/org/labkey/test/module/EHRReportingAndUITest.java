@@ -126,23 +126,21 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForText("details");
         dr = new DataRegionTable("query", this);
         dr.clickLink(0, 0);
-        //these are the sections we expect
-        waitForText("Run Details");
-        waitForText("Bacteriology Results");
-        waitForText("Chemistry Results");
-        waitForText("Immunology Results");
-        waitForText("Hematology Results");
-        waitForText("Hematology Morphology");
-        waitForText("Parasitology Results");
-        waitForText("Urinalysis Results");
-        waitForText("Virology Results");
+        waitForText("Labwork Summary");
+        waitForText("Results", WAIT_FOR_JAVASCRIPT * 2);
+        waitForText("No results found");
         assertNoErrorText();
 
-        //TODO: clinical encounters details page
-
-
-
-
+        beginAt("/ehr/" + getContainerPath() + "/datasets.view");
+        waitForText("Clinical Encounters");
+        waitAndClick(LabModuleHelper.getNavPanelItem("Clinical Encounters:", VIEW_TEXT));
+        waitForPageToLoad();
+        waitForText("details");
+        dr = new DataRegionTable("query", this);
+        dr.clickLink(0, 0);
+        waitForText("Encounter Details");
+        waitForText("Weight Monitoring Needed");
+        assertNoErrorText();
     }
 
     private void dataRegionButtonTest()
