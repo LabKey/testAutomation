@@ -52,6 +52,12 @@ public class SurveyTest extends BaseWebDriverTest
     }
 
     @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    @Override
     protected void doTestSteps() throws Exception
     {
         setupProjectFolder();
@@ -96,6 +102,9 @@ public class SurveyTest extends BaseWebDriverTest
         log("Add users that will be used for permissions testing");
         createUser(EDITOR, null);
         clickFolder(getProjectName());
+        enterPermissionsUI();
+        setUserPermissions(EDITOR, "Reader");
+        clickButton("Save and Finish");
         clickFolder(folderName);
         enterPermissionsUI();
         setUserPermissions(EDITOR, "Editor");
