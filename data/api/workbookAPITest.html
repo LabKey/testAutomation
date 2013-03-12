@@ -16,6 +16,7 @@
             success: success
         });
 
+        //Issue 17139: SQLException from org.labkey.core.workbook.WorkbooksTableInfo$WorkbookUpdateService.deleteRow()
         function success(containersinfo) {
             document.getElementById('createWorkbookDiv').innerHTML = 'Insert complete - Success.';
             if (deleteAfterCreate)
