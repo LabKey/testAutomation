@@ -103,4 +103,9 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         Assert.fail("Not implemented");
         return null;
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

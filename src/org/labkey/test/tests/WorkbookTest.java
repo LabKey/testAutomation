@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.WorkbookHelper;
 
 public class WorkbookTest extends BaseWebDriverTest
@@ -52,7 +53,7 @@ public class WorkbookTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    @Override
+    @Override @LogMethod
     public void doTestSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
@@ -138,4 +139,8 @@ public class WorkbookTest extends BaseWebDriverTest
         assertLinkNotPresentWithText(defaultWorkbookName); // Should not appear in folder tree.
     }
 
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

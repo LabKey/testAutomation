@@ -3091,10 +3091,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void addWebPart(String webPartName)
     {
-        Locator.css("option").withText(webPartName).waitForElmement(_driver, WAIT_FOR_JAVASCRIPT);
-        Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
-        selectOptionByText(form.append("//select"), webPartName);
-        submit(form);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart(webPartName);
     }
 
     /**
@@ -6502,7 +6500,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * Creates a new wiki page using HTML as the format. See {@link #createNewWikiPage(String)}
      * for more details.
      */
-    public void createNewWikiPage()
+    @LogMethod(quiet = true)public void createNewWikiPage()
     {
         createNewWikiPage("HTML");
     }
@@ -6511,7 +6509,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * Sets the wiki page body, automatically switching to source view if necessary
      * @param body The body text to set
      */
-    public void setWikiBody(String body)
+    @LogMethod(quiet = true)public void setWikiBody(String body)
     {
         switchWikiToSourceView();
         setFormElement(Locator.name("body"), body);

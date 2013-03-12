@@ -141,4 +141,9 @@ public class WikiTest extends BaseWebDriverTest
         waitForText("More HTML content");
         assertTextPresent(WIKI_PAGE_ALTTITLE);
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

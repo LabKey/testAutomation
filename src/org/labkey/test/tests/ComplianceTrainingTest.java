@@ -217,4 +217,9 @@ public class ComplianceTrainingTest extends BaseWebDriverTest implements Advance
     {
         return true;
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

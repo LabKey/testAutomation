@@ -307,4 +307,9 @@ public class FolderTest extends BaseWebDriverTest
                 click(Locator.xpath("//tr[./td/a[text()='"+folder+"']]/td[@class='labkey-nav-tree-node']/a"));
         }
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

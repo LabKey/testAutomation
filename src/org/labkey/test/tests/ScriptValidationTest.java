@@ -440,4 +440,9 @@ public class ScriptValidationTest extends SimpleModuleTest
             results.add(ColorRecord.fromMap(map));
         return results;
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

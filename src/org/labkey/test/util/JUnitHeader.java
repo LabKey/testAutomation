@@ -59,4 +59,9 @@ public class JUnitHeader extends BaseWebDriverTest
     @Override
     public void doTestSteps()
     { }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

@@ -134,7 +134,7 @@ public class PortalHelper extends AbstractHelper
     /**
      * Works with {@link BaseWebDriverTest} only
      */
-    public void addWebPart(String webPartName)
+    @LogMethod(quiet = true)public void addWebPart(@LoggedParam String webPartName)
     {
         _test.waitForElement(Locator.xpath("//option").withText(webPartName));
         Locator.XPathLocator form = Locator.xpath("//form[contains(@action,'addWebPart.view')][.//option[text()='"+webPartName+"']]");
@@ -142,7 +142,7 @@ public class PortalHelper extends AbstractHelper
         _test.submit(form);
     }
 
-    public void removeWebPart(String webPartTitle)
+    @LogMethod(quiet = true)public void removeWebPart(@LoggedParam String webPartTitle)
     {
         Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[img[@title='Remove From Page']]");
         int startCount = _test.getXpathCount(removeButton);
@@ -150,7 +150,7 @@ public class PortalHelper extends AbstractHelper
         _test.waitForElementToDisappear(removeButton.index(startCount), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public void addQueryWebPart(String title, String schemaName, @Nullable String queryName, @Nullable String viewName)
+    @LogMethod(quiet = true)public void addQueryWebPart(@LoggedParam String title, @LoggedParam String schemaName, @LoggedParam @Nullable String queryName, @Nullable String viewName)
     {
         addWebPart("Query");
         _test.setFormElement(Locator.name("title"), title);
@@ -171,7 +171,7 @@ public class PortalHelper extends AbstractHelper
     /**
      * Works with {@link BaseWebDriverTest} only
      */
-    public void moveWebPart(String webPartTitle, Direction direction)
+    @LogMethod(quiet = true)public void moveWebPart(@LoggedParam String webPartTitle, @LoggedParam Direction direction)
     {
         if (direction.isHorizontal())
             throw new IllegalArgumentException("Can't move webpart horizontally.");

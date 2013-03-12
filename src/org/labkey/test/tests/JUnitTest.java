@@ -85,6 +85,8 @@ public class JUnitTest extends TestSuite
         protected void doCleanup(boolean afterTest) throws TestTimeoutException
         { }
         public String getAssociatedModuleDirectory() { return null; }
+
+        @Override public BrowserType bestBrowser() {return BrowserType.CHROME;}
     }
 
     // Use WebDriver to ensure we're upgraded

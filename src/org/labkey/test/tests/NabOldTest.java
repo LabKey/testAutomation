@@ -147,4 +147,9 @@ public class NabOldTest extends AbstractQCAssayTestWD
 
         return false;
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

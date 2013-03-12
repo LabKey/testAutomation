@@ -136,4 +136,9 @@ public class FieldValidatorTest extends BaseWebDriverTest
     {
         return PROJECT_NAME;
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

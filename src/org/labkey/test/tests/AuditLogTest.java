@@ -151,4 +151,9 @@ public class AuditLogTest extends BaseWebDriverTest
         }
         return false;
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

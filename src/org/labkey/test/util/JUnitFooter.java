@@ -58,4 +58,9 @@ public class JUnitFooter extends BaseWebDriverTest
     }
 
     public void doTestSteps() {}
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

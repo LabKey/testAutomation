@@ -60,4 +60,9 @@ public class PipelineCancelTest  extends BaseWebDriverTest
     {
         return "server/modules/pipeline";
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

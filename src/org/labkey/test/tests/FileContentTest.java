@@ -262,4 +262,9 @@ public class FileContentTest extends BaseWebDriverTest
 
         validateLabAuditTrail();
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

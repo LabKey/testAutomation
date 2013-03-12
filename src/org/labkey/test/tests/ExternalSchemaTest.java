@@ -497,4 +497,9 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         for (int aPk : pk)
             Assert.assertEquals("Expected row '" + aPk + "' to be deleted.", -1, table.getRow(String.valueOf(aPk)));
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

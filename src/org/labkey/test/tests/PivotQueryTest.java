@@ -99,4 +99,9 @@ public class PivotQueryTest extends BaseWebDriverTest
         String[] concats = contents.split(", *");
         Assert.assertTrue("Expected 5 GROUP_CONCAT values", concats.length == 5);
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

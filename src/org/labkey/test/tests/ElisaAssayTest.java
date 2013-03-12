@@ -181,4 +181,9 @@ public class ElisaAssayTest extends ElispotAssayTest
 
         clickButton(finalButton);
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }
