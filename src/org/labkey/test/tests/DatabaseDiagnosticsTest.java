@@ -72,4 +72,9 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
     {
         return null;
     }
+
+    @Override public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }
