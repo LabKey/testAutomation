@@ -316,7 +316,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         //delete workbook in middle of series
         CreateContainerResponse toDelete = workbooks.get(1);
         workbooks.remove(toDelete);
-        _apiContainerHelper.deleteContainer(getProjectName() + "/" + toDelete.getName(), true);
+        _apiContainerHelper.deleteContainer(getProjectName() + "/" + toDelete.getName(), true, 90000);
 
         //create new workbook
         workbooks.add(_apiContainerHelper.createWorkbook(getProjectName(), "Workbook4", null));
@@ -372,7 +372,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         {
             Integer rowId = (Integer)row.get("container/rowid");
             highestWorkbookId = (Integer)row.get("workbookId");
-            _apiContainerHelper.deleteWorkbook(getProjectName(), rowId, true);
+            _apiContainerHelper.deleteWorkbook(getProjectName(), rowId, true, 90000);
         }
 
         return highestWorkbookId;
