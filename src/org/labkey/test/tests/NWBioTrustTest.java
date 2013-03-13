@@ -73,6 +73,7 @@ public class NWBioTrustTest extends SurveyTest
 
     private final File studyRegistrationJson = new File(getDownloadDir(), "study-registration.json");
     private final File prospectiveSampleRequestJson = new File(getDownloadDir(), "prospective-sample-request.json");
+    private final File discardedSampleRequestJson = new File(getDownloadDir(), "discarded-sample-request.json");
     private final File surgicalTissueJson = new File(getDownloadDir(), "surgical-tissue-sample.json");
     private final File nonSurgicalTissueJson = new File(getDownloadDir(), "non-surgical-tissue-sample.json");
     private final File bloodSampleJson = new File(getDownloadDir(), "blood-tissue-sample.json");
@@ -653,6 +654,7 @@ public class NWBioTrustTest extends SurveyTest
         waitForText("Metadata for Study Registration and Sample Requests");
         click(Locator.linkWithText("Study Registration"));
         downloadFileFromLink(Locator.linkWithText("Prospective Sample Request"));
+        downloadFileFromLink(Locator.linkWithText("Discarded Sample Request"));
         downloadFileFromLink(Locator.linkWithText("Surgical Tissue Record"));
         downloadFileFromLink(Locator.linkWithText("Non-surgical Tissue Record"));
         downloadFileFromLink(Locator.linkWithText("Blood Sample Record"));
@@ -675,6 +677,15 @@ public class NWBioTrustTest extends SurveyTest
                 return prospectiveSampleRequestJson.exists();
             }
         }, "failed to download prospective sample request json", WAIT_FOR_JAVASCRIPT);
+
+        waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return discardedSampleRequestJson.exists();
+            }
+        }, "failed to download discarded blood sample request json", WAIT_FOR_JAVASCRIPT);
 
         waitFor(new BaseWebDriverTest.Checker()
         {
@@ -730,7 +741,7 @@ public class NWBioTrustTest extends SurveyTest
         design.put("label", "DiscardedBloodSampleRequest");
         design.put("description", "");
         design.put("table", "SampleRequests");
-        design.put("metadataPath", null);
+        design.put("metadataPath", discardedSampleRequestJson.getAbsolutePath());
         designs.add(design);
 
         design = new HashMap<String, String>();
