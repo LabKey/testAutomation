@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 
@@ -26,23 +27,29 @@ import java.io.File;
  */
 public class StudyReloadTest extends StudyBaseTest
 {
+    public boolean isFileUploadTest()
+    {
+        return true;
+    }
     @Override
+    //disabled for 14569
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doCreateSteps()
     {
         initializeFolder();
         importStudyFromZip(new File(getSampledataPath(), "studyreload/original.zip").getAbsolutePath());
-        reloadStudyFromZip("C:\\Users\\elvan\\Downloads\\add_column.zip");
-//        reloadStudyFromZip(new File(getSampledataPath(), "studyreload/edited.zip").getAbsolutePath());
     }
 
     @Override
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
+        reloadStudyFromZip(new File(getSampledataPath(), "/studyreload/add_column.zip"));
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 dataset"));
         clickAndWait(Locator.linkWithText("update_test"));
-        assertTextPresent("id006", "additional_column");
+        assertTextPresent("id005", "additional_column");
         //text that was present in original but removed in the update
-        assertTextNotPresent("id005", "original_column_numeric");
+        assertTextNotPresent("original_column_numeric");
     }
 }
