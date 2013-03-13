@@ -621,7 +621,17 @@ public class StudyPublishTest extends StudyProtectedExportTest
             getWrapper().getEval("selenium.selectExtGridItem(null, null, -2, 'studyWizardVisitList', true)");
         clickButton("Next", 0);
 
-        // Wizard page 5 : Lists
+        // Wizard page 5 : Specimens
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
+        if (!includeSpecimens) uncheckCheckbox(Locator.name("includeSpecimens"));
+        if (refreshSpecimens) checkRadioButton("specimenRefresh", "true");
+        clickButton("Next", 0);
+
+        // Wizard Page 6 : Study Properties
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Properties']"));
+        clickButton("Next", 0);
+
+        // Wizard page 7 : Lists
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Lists']"));
         waitForElement(Locator.css(".studyWizardListList"));
         for (String list : lists)
@@ -630,7 +640,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
         clickButton("Next", 0);
 
-        // Wizard page 6 : Views
+        // Wizard page 8 : Views
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Views']"));
         waitForElement(Locator.css(".studyWizardViewList"));
         assertTextNotPresent(R_VIEW_UNSHARED);
@@ -640,7 +650,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
         clickButton("Next", 0);
 
-        // Wizard Page 7 : Reports
+        // Wizard Page 9 : Reports
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports']"));
         waitForElement(Locator.css(".studyWizardViewList"));
         //Lagged out and couldn't find elements without a sleep.  Could be a local issue, but it certainly broke the test once.
@@ -651,13 +661,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
         clickButton("Next", 0);
 
-        // Wizard page 8 : Specimens
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
-        if (!includeSpecimens) uncheckCheckbox(Locator.name("includeSpecimens"));
-        if (refreshSpecimens) checkRadioButton("specimenRefresh", "true");
+        // Wizard page 10 : Folder Properties
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Properties']"));
         clickButton("Next", 0);
 
-        // Wizard page 9 : Publish Options
+        // Wizard page 11 : Publish Options
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
         if (!removeProtected) uncheckCheckbox(Locator.name("removeProtected"));
         if (!shiftDates) uncheckCheckbox(Locator.name("shiftDates"));
