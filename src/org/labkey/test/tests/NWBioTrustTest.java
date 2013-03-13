@@ -343,7 +343,7 @@ public class NWBioTrustTest extends SurveyTest
         log("Configure dashboard");
         clickAndWait(Locator.linkWithText("New Registrations"));
         waitForText("No study registrations to show");
-        customizeDashboard("RC Dashboard - Study Registrations", designs.get(0).get("label"));
+        customizeDashboard("RC Dashboard - New Registrations", designs.get(0).get("label"));
 
         log("Submit requests from the requestor subfolder");
         clickFolder(requestorFolder1);
