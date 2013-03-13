@@ -44,7 +44,7 @@ public class StudyReloadTest extends StudyBaseTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
-        reloadStudyFromZip(new File(getSampledataPath(), "/studyreload/add_column.zip").getAbsolutePath());
+        reloadStudyFromZip(new File(getSampledataPath(), "/studyreload/add_column.zip"));
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 dataset"));
         clickAndWait(Locator.linkWithText("update_test"));
