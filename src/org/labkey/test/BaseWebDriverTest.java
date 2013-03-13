@@ -1920,6 +1920,38 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return _downloadDir;
     }
 
+    public void downloadFileFromLink(Locator downloadLink)
+    {
+        if (BROWSER_TYPE == BrowserType.FIREFOX)
+        {
+            click(downloadLink);
+        }
+        else
+        {
+            String href = downloadLink.findElement(getDriver()).getAttribute("href");
+            URL url;
+            try
+            {
+                url = new URL(href);
+            }
+            catch (MalformedURLException ex)
+            {
+                throw new RuntimeException(ex);
+            }
+
+            String fileName = href.substring(href.lastIndexOf("/") + 1);
+
+            try
+            {
+                FileUtils.copyURLToFile(url, new File(getDownloadDir(), fileName));
+            }
+            catch (IOException ex)
+            {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
     public boolean isGroupConcatSupported()
     {
         if ("pg".equals(getDatabaseType()))
@@ -5181,22 +5213,21 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void setFormElement(Locator loc, File file)
     {
         WebElement el = loc.findElement(_driver);
-        int i = 1;
-        int zIndex;
-        while (!el.isDisplayed() && i < 5 )
+        String cssString = "";
+
+        if (!el.isDisplayed())
         {
-            try
-            {
-                zIndex = Integer.parseInt(el.getCssValue("z-index")) * i++;
-            }
-            catch (NumberFormatException ignore)
-            {
-                zIndex = i * 2;
-            }
-            // Ext file inputs are often hidden; force them forward so WebDriver can interact with them
-            executeScript("arguments[0].style.zIndex = arguments[1];", el, zIndex); // force element to the front
+            cssString = el.getAttribute("class");
+            log("Remove class so that WebDriver can interact with concealed form element");
+            executeScript("arguments[0].setAttribute('class', '');", el);
         }
+
         setFormElement(loc, file.getAbsolutePath());
+
+        if (!cssString.isEmpty())
+        {
+            executeScript("arguments[0].setAttribute('class', arguments[1]);", el, cssString);
+        }
     }
 
     public void setFormElement(Locator element, String text)

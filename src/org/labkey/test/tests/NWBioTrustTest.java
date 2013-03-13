@@ -29,11 +29,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -197,16 +199,16 @@ public class NWBioTrustTest extends SurveyTest
             clickButton("Add Document(s)", 0);
             _extHelper.waitForExtDialog("Add Document(s)");
             _ext4Helper.selectComboBoxItem("Document Type:", documentType);
-            waitForElement(Locator.name("attachmentfile0"));
-            setFormElement(Locator.name("attachmentfile0"), TEST_FILE_1.toString());
+            _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.name("attachmentfile0")));
+            setFormElement(Locator.name("attachmentfile0"), TEST_FILE_1);
             fileCount++;
             // the first doc type was set to not allow multiple file uploads
             if (index > 0)
             {
                 assertElementPresent(Locator.linkContainingText("Attach a file"));
                 click(Locator.linkContainingText("Attach a file"));
-                waitForElement(Locator.name("attachmentfile1"));
-                setFormElement(Locator.name("attachmentfile1"), TEST_FILE_2.toString());
+                _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.name("attachmentfile1")));
+                setFormElement(Locator.name("attachmentfile1"), TEST_FILE_2);
                 fileCount++;
             }
             else
@@ -226,13 +228,14 @@ public class NWBioTrustTest extends SurveyTest
         clickButton("Add Document(s)", 0);
         _extHelper.waitForExtDialog("Add Document(s)");
         _ext4Helper.selectComboBoxItem("Document Type:", NWBT_DOCUMENT_TYPES[0]);
-        waitForElement(Locator.name("attachmentfile0"));
-        setFormElement(Locator.name("attachmentfile0"), TEST_FILE_2.toString());
+        _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.name("attachmentfile0")));
+        setFormElement(Locator.name("attachmentfile0"), TEST_FILE_2);
         sleep(500); // give the submit button a split second to enable base on form changes
         clickButton("Submit", 0);
         waitForText("This document type does not allow multiple files and one already exists in this document set.");
         clickButton("OK", 0);
-        setFormElement(Locator.name("attachmentfile0"), TEST_FILE_1.toString());
+        _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.name("attachmentfile0")));
+        setFormElement(Locator.name("attachmentfile0"), TEST_FILE_1);
         sleep(500); // give the submit button a split second to enable base on form changes
         clickButton("Submit", 0);
         waitForText("A document with the following name already exists for this document type: " + TEST_FILE_1.getName());
@@ -649,11 +652,11 @@ public class NWBioTrustTest extends SurveyTest
         clickAndWait(Locator.linkWithText("Manage"));
         waitForText("Metadata for Study Registration and Sample Requests");
         click(Locator.linkWithText("Study Registration"));
-        click(Locator.linkWithText("Prospective Sample Request"));
-        click(Locator.linkWithText("Surgical Tissue Record"));
-        click(Locator.linkWithText("Non-surgical Tissue Record"));
-        click(Locator.linkWithText("Blood Sample Record"));
-        click(Locator.linkWithText("Discarded Blood Sample Record"));
+        downloadFileFromLink(Locator.linkWithText("Prospective Sample Request"));
+        downloadFileFromLink(Locator.linkWithText("Surgical Tissue Record"));
+        downloadFileFromLink(Locator.linkWithText("Non-surgical Tissue Record"));
+        downloadFileFromLink(Locator.linkWithText("Blood Sample Record"));
+        downloadFileFromLink(Locator.linkWithText("Discarded Blood Sample Record"));
 
         waitFor(new BaseWebDriverTest.Checker()
         {
