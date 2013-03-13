@@ -7087,14 +7087,19 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return intersect;
     }
 
-
-    protected void reloadStudyFromZip(String studyFile)
+    protected void reloadStudyFromZip(File studyFile)
     {
         goToManageStudy();
         clickButton("Reload Study");
         setFormElement(Locator.name("folderZip"), studyFile);
         clickButton("Reload Study From Local Zip Archive");
         waitForPipelineJobsToComplete(2, "Study Reload", false);
+
+    }
+
+    protected void reloadStudyFromZip(String studyFile)
+    {
+        reloadStudyFromZip(new File(studyFile));
 
     }
 
