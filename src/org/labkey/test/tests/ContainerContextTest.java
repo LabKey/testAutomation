@@ -450,7 +450,6 @@ public class ContainerContextTest extends BaseWebDriverTest
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=" + queryName + "&query.sort=RowId");
 
         DataRegionTable dr = new DataRegionTable("query", this);
-        boolean shouldRevert = false;
 
         for (int i = 0; i < max; i++)
         {
@@ -523,13 +522,6 @@ public class ContainerContextTest extends BaseWebDriverTest
             }
 
             log("");
-        }
-
-        if (shouldRevert)
-        {
-            CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
-            cv.openCustomizeViewPanel();
-            cv.revertUnsavedView();
         }
 
         log("** Checked containers on lookup URLs for query '" + queryName + "'\n");
