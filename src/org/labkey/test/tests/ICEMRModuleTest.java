@@ -39,42 +39,16 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 {
     public static final String ID = "myid";
     public static final String DIAGNOSTICS_ASSAY_DESIGN = "ICEMR Diagnostics";
-    public static final String ADAPTATION_ASSAY_DESIGN = "ICEMR Flask Tracking";
+    public static final String TRACKING_ASSAY_DESIGN = "ICEMR Flask Tracking";
     public static final String DIAGNOSTIC_ASSAY_NAME = "Diagnostics Assay";
     public static final String ADAPTATION_ASSAY_NAME = "Culture Adaptation";
-    public static final String FLASKS_SAMPLESET_NAME = "Adaptation Flasks";
+    public static final String SELECTION_ASSAY_NAME = "Drug Selection";
     public static final String FOLD_INCREASE_DEFAULT = "4";
     public static final String ADAPTATION_CRITERIA_DEFAULT = "2";
-    public static final String FLASK_SAMPLESET_COLS  =
-    "Property\tLabel\tRangeURI\tFormat\tNotNull\tHidden\tMvEnabled\tDescription\n" +
-    "PatientID\tPatient ID\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
-    "SampleID\tSample ID\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
-    "Scientist\tScientist\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
-    "Stage\tStage\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
-    "Parasitemia\t\thttp://www.w3.org/2001/XMLSchema#double\t\tTRUE\tFALSE\tFALSE\n" +
-    "Gametocytemia\t\thttp://www.w3.org/2001/XMLSchema#double\t\tTRUE\tFALSE\tFALSE\n" +
-    "PatientpRBCs\tPatient pRBCs\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
-    "Hematocrit\t\thttp://www.w3.org/2001/XMLSchema#double\t\tTRUE\tFALSE\tFALSE\tHematocrit %\n" +
-    "CultureMedia\tCulture Media\thttp://www.w3.org/2001/XMLSchema#string\t\tTRUE\tFALSE\tFALSE\n" +
-    "SerumBatchID\tSerum Batch ID\thttp://www.w3.org/2001/XMLSchema#string\t\tFALSE\tFALSE\tFALSE\n" +
-    "AlbumaxBatchID\tAlbumax Batch ID\thttp://www.w3.org/2001/XMLSchema#string\t\tFALSE\tFALSE\tFALSE\n" +
-    "FoldIncrease1\tFold-Increase Test 1\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
-    "FoldIncrease2\tFold-Increase Test 2\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
-    "FoldIncrease3\tFold-Increase Test 3\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
-    "AdaptationCriteria\tAdaptation Criteria\thttp://www.w3.org/2001/XMLSchema#int\t\tTRUE\tFALSE\tFALSE\n" +
-    "Comments\t\thttp://www.w3.org/2001/XMLSchema#multiLine\t\tFALSE\tFALSE\tFALSE\n" +
-    "MaintenanceDate\tMaintenance Date\thttp://www.w3.org/2001/XMLSchema#dateTime\t\tFALSE\tFALSE\tFALSE\n" +
-    "MaintenanceStopped\tMaintenance Stopped\thttp://www.w3.org/2001/XMLSchema#dateTime\t\tFALSE\tFALSE\tFALSE\n" +
-    "StartParasitemia1\tParasitemia Test 1 Start\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
-    "FinishParasitemia1\tParasitemia Test 1 Finish\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
-    "StartParasitemia2\tParasitemia Test 2 Start\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
-    "FinishParasitemia2\tParasitemia Test 2 Finish\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
-    "StartParasitemia3\tParasitemia Test 3 Start\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
-    "FinishParasitemia3\tParasitemia Test 3 Finish\thttp://www.w3.org/2001/XMLSchema#double\t\tFALSE\tFALSE\tFALSE\n" +
-    "StartDate1\tStart Date Test 1\thttp://www.w3.org/2001/XMLSchema#dateTime\t\tFALSE\tFALSE\tFALSE\n" +
-    "FinishDate1\tFinish Date Test 1\thttp://www.w3.org/2001/XMLSchema#dateTime\t\tFALSE\tFALSE\tFALSE\n" +
-    "AdaptationDate\tAdaptation Date\thttp://www.w3.org/2001/XMLSchema#dateTime\t\tFALSE\tFALSE\tFALSE";
-
+    public static final String ADAPTATION_FLASK_FILE = "sampledata/icemr/adaptFlaskFields.txt";
+    public static final String ADAPTATION_FLASKS_NAME = "Adaptation Flasks";
+    public static final String SELECTION_FLASK_FILE = "sampledata/icemr/selectFlaskFields.txt";
+    public static final String SELECTION_FLASKS_NAME = "Selection Flasks";
     public static final String SCIENTIST = "Torruk";
 
     @Override
@@ -121,11 +95,13 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void setUpAssays()
     {
-        log("Create ICEMR with appropriate web parts");
+        log("Create ICEMR assays and samplesets");
         _containerHelper.createProject(getProjectName(), "ICEMR");
-        createAdaptationAssay();
-        createDiagnosticAssay();
-        createFlasksSampleSet();
+        _assayHelper.createAssayWithDefaults(DIAGNOSTICS_ASSAY_DESIGN, DIAGNOSTIC_ASSAY_NAME);
+        _assayHelper.createAssayWithDefaults(TRACKING_ASSAY_DESIGN, ADAPTATION_ASSAY_NAME);
+        _assayHelper.createAssayWithDefaults(TRACKING_ASSAY_DESIGN, SELECTION_ASSAY_NAME);
+        createFlasksSampleSet(ADAPTATION_FLASKS_NAME, ADAPTATION_FLASK_FILE);
+        createFlasksSampleSet(SELECTION_FLASKS_NAME, SELECTION_FLASK_FILE);
     }
 
     private void verifyDataInAssay()
@@ -400,31 +376,21 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         waitForElement(Locator.css(".labkey-nav-page-header").withText(DIAGNOSTIC_ASSAY_NAME + " Results"));
     }
 
-    private void createDiagnosticAssay()
-    {
-        _assayHelper.createAssayWithDefaults(DIAGNOSTICS_ASSAY_DESIGN, DIAGNOSTIC_ASSAY_NAME);
-    }
-
-    private void createAdaptationAssay()
-    {
-        _assayHelper.createAssayWithDefaults(ADAPTATION_ASSAY_DESIGN, ADAPTATION_ASSAY_NAME);
-    }
-    private void createFlasksSampleSet()
+    private void createFlasksSampleSet(String samplesetName, String samplesetFilename)
     {
         clickAndWait(Locator.linkWithText(getProjectName()));
         clickButton("Import Sample Set");
-        setFormElement("name", FLASKS_SAMPLESET_NAME);
+        setFormElement("name", samplesetName);
         setFormElement("data", "SampleID\n" + "1");
         clickButton("Submit");
-
         deleteSample("1");
 
         // now add our real fields with rich metadata
         clickButton("Edit Fields");
         waitAndClickButton("Import Fields", 0);
         waitForElement(Locator.xpath("//textarea[@id='schemaImportBox']"), WAIT_FOR_JAVASCRIPT);
-
-        setFormElement("schemaImportBox", FLASK_SAMPLESET_COLS);
+        String samplesetCols = getFileContents(new File(getLabKeyRoot(), samplesetFilename));
+        setFormElement("schemaImportBox", samplesetCols);
 
         clickButton("Import", 0);
         waitForElement(Locator.xpath("//input[@name='ff_label3']"), WAIT_FOR_JAVASCRIPT);
