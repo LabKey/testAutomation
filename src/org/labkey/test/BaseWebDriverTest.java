@@ -3104,7 +3104,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void deleteProject(String project, boolean failIfFail) throws TestTimeoutException
     {
-        _containerHelper.deleteProject(project, failIfFail, 90000); // Wait for 90 seconds for project deletion
+        _containerHelper.deleteProject(project, failIfFail, 120000); // Wait 2 minutes for project deletion
     }
 
     @LogMethod (quiet = true)
