@@ -127,7 +127,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
-        deleteProject(PUB2_NAME, afterTest);
+        _containerHelper.deleteProject(PUB2_NAME, afterTest, 1000000);
     }
 
     @Override
@@ -150,6 +150,18 @@ public class StudyPublishTest extends StudyProtectedExportTest
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP2_NAME, "Mouse", true, GROUP2_PTIDS);
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP3_NAME, "Mouse", true, GROUP3_PTIDS);
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), GROUP0_NAME, "Mouse", false, GROUP0_PTIDS);
+
+        //Create Wiki
+        createWiki("Test Wiki", "Test Wiki Title");
+
+        //Add a module to find later
+        goToFolderManagement();
+        waitForElement(Locator.xpath("//a[text()='Folder Type']"));
+        click(Locator.xpath("//a[text()='Folder Type']"));
+        waitForElement(Locator.xpath("//input[@value='Visualization']"));
+        checkCheckbox(Locator.xpath("//input[@value='Visualization']"));
+        clickButton("Update Folder");
+
 
         // Create some views and reports
         createRView(R_VIEW, REPORT_DATASET, true);
@@ -240,6 +252,18 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickFolder(getProjectName());
         clickAndWait(Locator.linkWithText(name));
 
+        //Assert webparts/wikis are present
+        waitForElement(Locator.xpath("//table[@name='webpart']"));
+        assert(getXpathCount(Locator.xpath("//table[@name='webpart']")) == 7);
+        assertTextPresent("Test Wiki Title");
+
+        //assert the added module is present
+        waitForElement(Locator.xpath("//span[@id='adminMenuPopupText']"));
+        click(Locator.xpath("//span[@id='adminMenuPopupText']"));
+        waitForElement(Locator.xpath("//span[text()='Go To Module']"));
+        mouseOver(Locator.xpath("//span[text()='Go To Module']"));
+        waitForElement(Locator.xpath("//span[text()='Visualization']"));
+
         // Verify published participant count
         clickAndWait(Locator.linkWithText("Mice"));
         // TODO: 15978: Too many participants published with study
@@ -249,8 +273,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
         else
             assertTextPresent(ptids);
 
-        // Verify correct published datasets
+        //Verify Cohorts present
         goToManageStudy();
+        waitForText("This study defines 2 cohorts");
+
+        // Verify correct published datasets
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         if (datasets.length > 0)
             Assert.assertEquals("Unexpected number of datasets", datasets.length + dependentDatasets.length, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
@@ -629,6 +656,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Wizard Page 6 : Study Properties
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Properties']"));
+        checkCheckbox(Locator.xpath("//input[@name = 'Cohort Settings']"));
+        checkCheckbox(Locator.xpath("//input[@name = 'Participant Comment Settings']"));
+        checkCheckbox(Locator.xpath("//input[@name = 'Protocol Documents']"));
         clickButton("Next", 0);
 
         // Wizard page 7 : Lists
@@ -663,6 +693,13 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Wizard page 10 : Folder Properties
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Properties']"));
+        checkCheckbox(Locator.xpath("//input[@name = 'External schema definitions']"));
+        checkCheckbox(Locator.xpath("//input[@name = 'Folder type and active modules']"));
+        checkCheckbox(Locator.xpath("//input[@name = 'Full-text search settings']"));
+        checkCheckbox(Locator.xpath("//input[@name = 'Missing value indicators']"));
+        checkCheckbox(Locator.xpath("//input[@name = 'Notification settings']"));
+        checkCheckbox(Locator.xpath("//input[@name = 'Webpart properties and layout']"));
+        checkCheckbox(Locator.xpath("//input[@name = 'Wikis and their attachments']"));
         clickButton("Next", 0);
 
         // Wizard page 11 : Publish Options
@@ -787,6 +824,19 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickAndWait(Locator.linkWithText(dataset));
         clickButton("View Data");
         _customizeViewsHelper.createRView(null, name, shareView);
+    }
+
+    private void createWiki(String name, String title)
+    {
+        goToProjectHome();
+        clickFolder(getFolderName());
+        addWebPart("Wiki");
+        waitForElement(Locator.xpath("//a[text()='Create a new wiki page']"));
+        click(Locator.xpath("//a[text()='Create a new wiki page']"));
+        waitForElement(Locator.xpath("//input[@name='name']"));
+        setFormElement(Locator.xpath("//input[@name='name']"), name);
+        setFormElement(Locator.xpath("//input[@name='title']"), title);
+        clickButton("Save & Close");
     }
 
     private String createOneOfFilterString(String[] values)

@@ -2572,7 +2572,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public void deleteProject(String project, boolean failIfFail) throws TestTimeoutException
     {
-        _containerHelper.deleteProject(project, failIfFail, 90000); // Wait for 90 seconds for project deletion
+        _containerHelper.deleteProject(project, failIfFail, 270000); // Wait for 270 seconds for project deletion
     }
 
     @LogMethod
