@@ -149,7 +149,6 @@ public class Crawler
             new ControllerActionId("targetedms", "downloadDocument"),
 
             // Script injection exclusions
-            new ControllerActionId("flow-editscript", "editGateTree"), // TODO: 16733: flow-editscript.EditGateTreeAction: NumberFormatException on bad 'scriptId'
             new ControllerActionId("idri", "formulationDetails"), // TODO: 16735: Idri.FormulationDetailsAction: NullPointerException on bad 'rowId'
             new ControllerActionId("user", "deleteUsers"), // TODO: 16769: User.DeleteUsersAction: AssertionError on bad 'userId'
             new ControllerActionId("study-designer", "designer")); // TODO: 16768: study-designer.DesignerAction: IllegalArgumentException on bad 'panel'
