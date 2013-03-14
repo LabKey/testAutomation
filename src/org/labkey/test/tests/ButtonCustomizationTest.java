@@ -258,12 +258,12 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         // The query view webpart populates asynchronously, so we may need to wait for it to appear:
         waitForElement(Locator.navButton(METADATA_OVERRIDE_BUTTON), 10000);
 
-        assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
         assertNavButtonNotPresent("Insert New");
 
         _extHelper.clickMenuButton(false, METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_ON_CLICK_BUTTON);
         assertAlert(METADATA_OVERRIDE_ON_CLICK_MSG);
-        waitForElementToDisappear(Locator.css(".labkey-menu-button-active"));
+
+        sleep(100); // Menu button sometimes isn't ready to open right away
 
         _extHelper.clickMenuButton(METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_LINK_BUTTON);
         assertTextPresent("No messages");
