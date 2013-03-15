@@ -215,8 +215,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         configureGroupingColumn(assayName, groupCol);
         waitForElement(tableLoc);
         clickAndWait(Locator.linkWithText("48 results from " + assayName + " have been uploaded."));
-        assertTextPresent("Participant Visit not found", 8);
-        assertTextPresent("2 duplicates found", 4);
+        assertTextPresent("Result reported with no corresponding specimen collected", 8);
+        assertTextPresent("2 results found for this participant and visit combination", 4);
     }
 
     @LogMethod
@@ -235,8 +235,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         verifyProgressReport(assayName, false);
 
         clickAndWait(Locator.linkWithText("7 results from " + assayName + " have been uploaded."));
-        assertTextPresent("Participant Visit not found", 1);
-        assertTextPresent("Specimen type is not expected by this Assay", 1);
+        assertTextPresent("Result reported with no corresponding specimen collected", 1);
+        assertTextPresent("This specimen type is not expected for this visit", 1);
     }
 
     private void verifyProgressReport(String assayName, boolean ignoreSampleminded)
