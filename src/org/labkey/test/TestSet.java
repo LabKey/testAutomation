@@ -359,6 +359,7 @@ public enum TestSet
     ),
 
     InDevelopment(
+        MassFilterTest.class,
         StudyReloadTest.class,
         ExperimentalFeaturesTest.class // currently no experimental features being tested
     ),

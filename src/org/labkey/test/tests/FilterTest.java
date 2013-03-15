@@ -141,7 +141,7 @@ public class FilterTest extends ListTest
 
     }
 
-    private void startFilter(String column)
+    protected void startFilter(String column)
     {
         click(Locator.tagWithText("div", column));
         click(Locator.tagWithText("span", "Filter..."));

@@ -284,6 +284,7 @@ src/org/labkey/test/tests/LuminexUploadAndCopyTest.java -text
 src/org/labkey/test/tests/MS1Test.java -text
 src/org/labkey/test/tests/MS2GZTest.java -text
 src/org/labkey/test/tests/MS2Test.java -text
+src/org/labkey/test/tests/MassFilterTest.java -text
 src/org/labkey/test/tests/MenuBarTest.java -text
 src/org/labkey/test/tests/MessagesLongTest.java -text
 src/org/labkey/test/tests/MessagesTest.java -text
