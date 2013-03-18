@@ -50,7 +50,7 @@ public class SequestImportTest extends BaseWebDriverTest
 
     private void verifyRunGrid()
     {
-        click(Locator.linkWithText("MS2 Dashboard"));
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         // Customize the view to show the distinct and total peptide counts based on the criteria established
         // by the custom query
