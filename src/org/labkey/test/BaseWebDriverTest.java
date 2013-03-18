@@ -3396,14 +3396,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * @return null = yes, present in this order
      * otherwise returns out of order string and explanation of error
      */
-    public String isPresentInThisOrder(String... text)
+    public String isPresentInThisOrder(Object... text)
     {
         String source = getBodyText();
         int previousIndex = -1;
         String previousString = null;
 
-        for (String s : text)
+        for (Object o : text)
         {
+            String s = o.toString();
             int index = source.indexOf(s);
 
             if(index == -1)
@@ -3416,7 +3417,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return null;
     }
     // Searches only the displayed text in the body of the page, not the HTML source.
-    public void assertTextPresentInThisOrder(String... text)
+    public void assertTextPresentInThisOrder(Object... text)
     {
         String success = isPresentInThisOrder(text);
         Assert.assertTrue(success, success==null);
@@ -6975,11 +6976,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
-        Locator loc = Locator.queryTreeNode(schemaName, queryName);
-        sleep(2000); //TODO
-        waitForElement(loc, WAIT_FOR_JAVASCRIPT);
-        sleep(10000); //TODO
-        click(loc);
+        waitAndClick(Locator.queryTreeNode(schemaName, queryName));
         waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + queryName + "']"), 1000);
     }
 

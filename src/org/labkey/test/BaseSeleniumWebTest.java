@@ -2850,14 +2850,15 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * @return null = yes, present in this order
      * otherwise returns out of order string and explanation of error
      */
-    public String isPresentInThisOrder(String... text)
+    public String isPresentInThisOrder(Object... text)
     {
         String source = selenium.getBodyText();
         int previousIndex = -1;
         String previousString = null;
 
-        for (String s : text)
+        for (Object o : text)
         {
+            String s = o.toString();
             int index = source.indexOf(s);
 
             if(index == -1)
@@ -2870,7 +2871,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return null;
     }
     // Searches only the displayed text in the body of the page, not the HTML source.
-    public void assertTextPresentInThisOrder(String... text)
+    public void assertTextPresentInThisOrder(Object... text)
     {
         String success = isPresentInThisOrder(text);
         Assert.assertTrue(success, success==null);

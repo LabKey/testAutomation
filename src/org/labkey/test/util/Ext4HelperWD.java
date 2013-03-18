@@ -48,7 +48,6 @@ public class Ext4HelperWD extends AbstractHelperWD
     {
         Locator arrowTrigger = Locator.xpath(comboBox.getPath()+"//div[contains(@class,'arrow')]");
         _test.waitAndClick(arrowTrigger);
-        _test.waitForElement(comboBox.append("//td").withClass("x4-pickerfield-open"));
         if(_test.getBrowser().startsWith(BaseWebDriverTest.IE_BROWSER))
         {
             _test.sleep(500);
@@ -59,9 +58,9 @@ public class Ext4HelperWD extends AbstractHelperWD
         {
             Locator.XPathLocator listItem;
             if (containsText)
-                listItem = Locator.xpath("//li[contains(@class, 'x4-boundlist-item')]").notHidden().containing(selection);
+                listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().containing(selection);
             else
-                listItem = Locator.xpath("//li[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
+                listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
 
             // wait for and select the list item
             _test.waitAndClick(listItem);
@@ -442,6 +441,11 @@ public class Ext4HelperWD extends AbstractHelperWD
         public static Locator.XPathLocator formItemWithLabel(String label)
         {
             return Locator.xpath("(//table|//tbody)").withClass("x4-form-item").withPredicate("(tbody/tr|tr)/td/label[normalize-space()='" + label + "']").notHidden();
+        }
+
+        public static Locator.XPathLocator formItemWithLabelContaining(String label)
+        {
+            return Locator.xpath("(//table|//tbody)").withClass("x4-form-item").withPredicate("(tbody/tr|tr)/td/label[contains(normalize-space(), '" + label + "')]").notHidden();
         }
     }
 

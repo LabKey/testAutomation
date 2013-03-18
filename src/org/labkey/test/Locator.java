@@ -306,12 +306,12 @@ public abstract class Locator
 
     public static XPathLocator tagWithText(String tag, String text)
     {
-        return xpath("//" + tag + "[text() = " + xq(text) + "]");
+        return xpath("//" + tag).withText(text);
     }
 
     public static XPathLocator tagContainingText(String tag, String text)
     {
-        return xpath("//" + tag + "[contains(text(), " + xq(text) + ")]");
+        return xpath("//" + tag).containing(text);
     }
 
     public static XPathLocator linkWithImage(String image)
@@ -431,17 +431,17 @@ public abstract class Locator
 
     public static XPathLocator linkWithText(String text, Integer index)
     {
-        return xpath("(//a[string() = " + xq(text) + "])[" + (index + 1) + "]");
+        return xpath("//a").withText(text).index(index);
     }
 
     public static XPathLocator linkContainingText(String text)
     {
-        return xpath("//a[contains(string(), " + xq(text) + ")]");
+        return xpath("//a").containing(text);
     }
 
     public static XPathLocator linkContainingText(String text, Integer index)
     {
-        return xpath("(//a[contains(string(), " + xq(text) + ")])[" + (index + 1) + "]");
+        return linkContainingText(text).index(index);
     }
 
     public static XPathLocator menuItem(String text)
@@ -723,6 +723,11 @@ public abstract class Locator
             super(loc);
         }
 
+        private XPathLocator(String loc, Integer index, String contains, String text)
+        {
+            super(loc, index, contains, text);
+        }
+
         public XPathLocator containing(String contains)
         {
             return this.withPredicate("contains(normalize-space(), "+xq(contains)+")");
@@ -925,52 +930,40 @@ public abstract class Locator
         }
     }
 
-    public static class LinkLocator extends Locator
+    public static class LinkLocator extends XPathLocator
     {
+        private String _linkText;
+
         public LinkLocator(String loc)
         {
-            super(loc);
-        }
-
-        private LinkLocator(String loc, Integer index, String contains, String text)
-        {
-            super(loc, index, contains, text);
-        }
-
-        public Locator containing(String contains)
-        {
-            return new LinkLocator(_loc, _index, contains, _text);
-        }
-
-        public Locator withText(String text)
-        {
-            return new LinkLocator(_loc, _index, _contains, text);
-        }
-
-        public Locator index(Integer index)
-        {
-            return new LinkLocator(_loc, index, _contains, _text);
+            super(xpath("//a").withText(loc).toXpath());
+            _linkText = loc;
         }
 
         @Override
         public List<WebElement> findElements(WebDriver driver)
         {
             List<WebElement> elements = super.findElements(driver);
-            if (elements.size() == 0 && !_loc.equals(_loc.toUpperCase()))
-                return (new LinkLocator(_loc.toUpperCase(), _index, _contains, _text)).findElements(driver);
+            if (elements.size() == 0 && !_linkText.equals(_linkText.toUpperCase()))
+                return (new LinkLocator(_linkText.toUpperCase())).findElements(driver);
             else
                 return elements;
+        }
+
+        public XPathLocator toXPathLocator()
+        {
+            return xpath(_loc);
         }
 
         @Override
         public String toString()
         {
-            return "link=" + _loc;
+            return "link=" + _linkText;
         }
 
         protected By toBy()
         {
-            return By.linkText(_loc);
+            return By.linkText(_linkText);
         }
     }
 
