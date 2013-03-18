@@ -315,6 +315,7 @@ public class GroupTest extends BaseWebDriverTest
             Assert.fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
         goToCreateProject();
+        waitForElement(Locator.name("name"));
         setFormElement(Locator.name("name"), projectName);
 
         click(Locator.xpath("//td[./label[text()='Custom']]/input"));
