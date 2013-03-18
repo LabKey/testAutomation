@@ -229,7 +229,7 @@ public class SurveyTest extends BaseWebDriverTest
         clickEditForLabel(firstSurvey, true);
         _ext4Helper.waitForMaskToDisappear();
         assertElementNotPresent(Locator.button("Submit completed form"));
-        assertTextPresent("This survey was submitted by");
+        assertTextPresent("Submitted by");
 
         log("Verify that only admins can make changes to a submitted survey");
         // we should currently be logged in as site admin
@@ -248,7 +248,7 @@ public class SurveyTest extends BaseWebDriverTest
         popLocation();
         waitForText("Survey Label*");
         Assert.assertTrue(getFormElement(Locator.name("txtareafield")).equals("edit by admin after submit"));
-        assertTextPresent("This survey was submitted by");
+        assertTextPresent("Submitted by");
         assertTextNotPresent("You are allowed to make changes to this form");
         assertElementNotPresent(Locator.button("Save"));
         assertElementNotPresent(Locator.button("Submit completed form"));
