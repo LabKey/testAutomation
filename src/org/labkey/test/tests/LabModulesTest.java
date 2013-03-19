@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
 import org.junit.Test;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
@@ -267,9 +268,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     {
         SimpleDateFormat format = new SimpleDateFormat(formatStr);
         Long expected = format.parse(dateStr).getTime();
+        String clientDateStr = (String)executeScript("return (new Date()).toString()");
         Long actual = (Long)executeScript("return LDK.ConvertUtils.parseDate('" + dateStr + "').getTime();");
         Date now = new Date();
-        Assert.assertEquals("Incorrect JS date parsing for date: " + dateStr + " at: " + now, expected, actual);
+        Assert.assertEquals("Incorrect JS date parsing for date: " + dateStr + " at: " + now + ", client date was: " + clientDateStr, expected, actual);
     }
 
     private void workbookNumberingTest() throws Exception
@@ -1019,9 +1021,9 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.createWorkbook(workbookTitle, workbookDescription);
 
         //verify correct name and correct webparts present
-        assertElementPresent(_helper.webpartTitle("Lab Tools"));
-        assertElementPresent(_helper.webpartTitle("Files"));
-        assertElementPresent(_helper.webpartTitle("Workbook Summary"));
+        assertElementPresent(LabModuleHelper.webpartTitle("Lab Tools"));
+        assertElementPresent(LabModuleHelper.webpartTitle("Files"));
+        assertElementPresent(LabModuleHelper.webpartTitle("Workbook Summary"));
 
         //we expect insert from within the workbook to go straight to the import page (unlike the top-level folder, which gives a dialog)
         waitAndClick(_helper.toolIcon("Import Samples"));
@@ -1064,9 +1066,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
 
-        //TODO: test field metadata, shownInInsertView, etc.
-        //eventually test import views
-
         String errorMsg = "Sequence can only contain valid bases: ATGCN or IUPAC bases: RYSWKMBDHV";
         waitForElement(Ext4HelperWD.ext4Window("Error"));
         assertTextPresent(errorMsg);
@@ -1091,8 +1090,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         clickButton("Upload", 0);
         _oligosTotal += 2;
 
-        //TODO: import more data
-
         waitForElement(Ext4HelperWD.ext4Window("Success"));
         assertTextPresent("Success! 2 rows inserted.");
         clickButton("OK");
@@ -1104,6 +1101,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitForText(text);
         Assert.assertTrue("Sequence was not formatted properly on import", isTextPresent(text));
         Assert.assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
+
+        DataRegionTable dr = new DataRegionTable("query", this);
+        Assert.assertEquals("Incorrect Oligo ID", "1", dr.getDataAsText(0, "Oligo Id"));
+        Assert.assertEquals("Incorrect Oligo ID", "2", dr.getDataAsText(1, "Oligo Id"));
     }
 
     private void samplesTableTest()
@@ -1273,7 +1274,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
     }
 
-    private void peptideTableTest()
+    private void peptideTableTest() throws Exception
     {
         log("Testing Peptide Table");
         _helper.goToLabHome();
@@ -1313,7 +1314,30 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitForText(text);
         Assert.assertTrue("Sequence was not formatted properly on import", isTextPresent(text));
         Assert.assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
-        Assert.assertTrue("MW not set correctly", isTextPresent("1036.1"));
+
+        DataRegionTable dr = new DataRegionTable("query", this);
+        Assert.assertEquals("Peptide Id not set correctly.", "1", dr.getDataAsText(0, "Peptide Id"));
+        Assert.assertEquals("MW not set correctly.", "1036.1", dr.getDataAsText(0, "MW"));
+
+        log("Attempting to double-insert the same peptide ID");
+        try
+        {
+            Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+            InsertRowsCommand insertCmd = new InsertRowsCommand("laboratory", "peptides");
+
+            Map<String,Object> rowMap = new HashMap<String,Object>();
+            rowMap.put("peptideId", 1);
+            rowMap.put("sequence", "aaa");
+            rowMap.put("_selfAssignedId_", "true");
+            insertCmd.addRow(rowMap);
+
+            SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
+            throw new Exception("The saveRows call above should have thrown an exception");
+        }
+        catch (CommandException e)
+        {
+            Assert.assertEquals("A record is already present with ID: 1", e.getMessage());
+        }
     }
 
     private void searchPanelTest()
@@ -1330,22 +1354,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //TODO: test different operators
         //also verify correct options show up on drop down menus
-
-
-        //TODO: also verify records imported into workbook show up here.  verify lookups / view
-    }
-
-    private void samplesWebpartTest()
-    {
-        log("Testing samples webpart");
-
-        clickTab("Materials");
-        waitForText("Samples and Materials:");
-        String msg = "Sample type missing or sample count incorrect";
-
-        Assert.assertTrue(msg, isTextPresent("DNA_Oligos" + (_oligosTotal > 0 ? " (" + _oligosTotal + ")" : "") + ":"));
-        Assert.assertTrue(msg, isTextPresent("Peptides" + (_peptideTotal > 0 ? " (" + _peptideTotal + ")" : "") + ":"));
-        Assert.assertTrue(msg, isTextPresent("Samples" + (_samplesTotal > 0 ? " (" + _samplesTotal + ")" : "") + ":"));
     }
 
     protected List<String> getEnabledModules()
