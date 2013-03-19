@@ -306,12 +306,12 @@ public abstract class Locator
 
     public static XPathLocator tagWithText(String tag, String text)
     {
-        return xpath("//" + tag).withText(text);
+        return xpath("//" + tag + "[text() = " + xq(text) + "]");
     }
 
     public static XPathLocator tagContainingText(String tag, String text)
     {
-        return xpath("//" + tag).containing(text);
+        return xpath("//" + tag + "[contains(text(), " + xq(text) + ")]");
     }
 
     public static XPathLocator linkWithImage(String image)
