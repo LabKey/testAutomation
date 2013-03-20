@@ -503,11 +503,12 @@ public class NWBioTrustTest extends SurveyTest
             clickAndWait(Locator.linkWithText("Click Here"));
             List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
             fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + requestLabel));
-            fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Pending"));
+            fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Approved human subjects research"));
             fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
             fields.add(createFieldInfo("Study Information", "irbexpirationdate", "2013-03-07"));
             fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
             fields.add(createRadioFieldInfo("Study Information", "Do you anticipate submitting data from this study to a public database (e.g. dbGAP)?*", "Yes"));
+            fields.add(createComboFieldInfo("Contact Information", "Study Principal Investigator*", "pi nwbiotrust"));
             fields.add(createRadioFieldInfo("Billing", "Do you have funding for this request?*", "Yes"));
             createNewStudyRegistration(requestLabel, fields, true);
         }
@@ -520,10 +521,9 @@ public class NWBioTrustTest extends SurveyTest
             List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
             fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + requestLabel));
             fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Pending"));
-            fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
-            fields.add(createFieldInfo("Study Information", "irbexpirationdate", "2013-03-07"));
             fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
             fields.add(createRadioFieldInfo("Study Information", "Do you anticipate submitting data from this study to a public database (e.g. dbGAP)?*", "Yes"));
+            fields.add(createComboFieldInfo("Contact Information", "Study Principal Investigator*", "pi nwbiotrust"));
             fields.add(createRadioFieldInfo("Billing", "Do you have funding for this request?*", "Yes"));
             createNewStudyRegistration(requestLabel, fields, false);
         }
@@ -557,6 +557,15 @@ public class NWBioTrustTest extends SurveyTest
         return info;
     }
 
+    private Map<String, String> createComboFieldInfo(String section, String label, String selection)
+    {
+        Map<String, String> info = new HashMap<String, String>();
+        info.put("section", section);
+        info.put("label", label);
+        info.put("selection", selection);
+        return info;
+    }
+
     private void createNewStudyRegistration(String label, List<Map<String, String>> fields, Boolean submitStudy)
     {
         waitForText("Study Name*");
@@ -570,6 +579,10 @@ public class NWBioTrustTest extends SurveyTest
             if (field.get("boxLabel") != null)
             {
                 _ext4Helper.selectRadioButton(field.get("label"), field.get("boxLabel"));
+            }
+            else if (field.get("selection") != null)
+            {
+                _ext4Helper.selectComboBoxItem(field.get("label"), field.get("selection"));
             }
             else
             {
