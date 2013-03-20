@@ -458,7 +458,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
                 }
 
                 int expectedLength = 1088;
-//                Assert.assertTrue("Length of file doesnt match expected value of "+expectedLength+", was: " + count, count == expectedLength);
+                Assert.assertTrue("Length of file doesnt match expected value of "+expectedLength+", was: " + count, count == expectedLength);
 
                 EntityUtils.consume(response.getEntity());
             }
