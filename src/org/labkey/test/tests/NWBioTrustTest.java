@@ -509,7 +509,7 @@ public class NWBioTrustTest extends SurveyTest
             fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
             fields.add(createRadioFieldInfo("Study Information", "Do you anticipate submitting data from this study to a public database (e.g. dbGAP)?*", "Yes"));
             fields.add(createComboFieldInfo("Contact Information", "Study Principal Investigator*", "pi nwbiotrust"));
-            fields.add(createRadioFieldInfo("Billing", "Do you have funding for this request?*", "Yes"));
+            fields.add(createFieldInfo("Billing", "fundingsource", "test funding source description"));
             createNewStudyRegistration(requestLabel, fields, true);
         }
         waitForGridToLoad("div", "x4-grid-group-title", 1); // all study registrations should be in the Submitted group
@@ -524,7 +524,7 @@ public class NWBioTrustTest extends SurveyTest
             fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
             fields.add(createRadioFieldInfo("Study Information", "Do you anticipate submitting data from this study to a public database (e.g. dbGAP)?*", "Yes"));
             fields.add(createComboFieldInfo("Contact Information", "Study Principal Investigator*", "pi nwbiotrust"));
-            fields.add(createRadioFieldInfo("Billing", "Do you have funding for this request?*", "Yes"));
+            fields.add(createFieldInfo("Billing", "fundingsource", "test funding source description"));
             createNewStudyRegistration(requestLabel, fields, false);
         }
         clickTab("Study Registrations");
