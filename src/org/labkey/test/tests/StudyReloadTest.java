@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
+import org.testng.Assert;
 
 import java.io.File;
 
@@ -44,12 +45,26 @@ public class StudyReloadTest extends StudyBaseTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
-        reloadStudyFromZip(new File(getSampledataPath(), "/studyreload/add_column.zip"));
+        reloadStudyFromZip(new File(getSampledataPath(), "/studyreload/edited.zip"));
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 dataset"));
         clickAndWait(Locator.linkWithText("update_test"));
-        assertTextPresent("id005", "additional_column");
+        assertTextPresent("id006", "additional_column", "1234566");
         //text that was present in original but removed in the update
         assertTextNotPresent("original_column_numeric");
+
+        verifyProtectedColumn();
+    }
+
+    private void verifyProtectedColumn()
+    {
+        clickButtonContainingText("Manage Dataset");
+        clickButtonContainingText("Edit Definition");
+        Locator.NameLocator ff_name1 = Locator.name("ff_name1");
+        waitForElement(ff_name1);
+        click(ff_name1);
+        click(Locator.linkContainingText("Advanced"));
+        Assert.assertEquals("on", getAttribute(Locator.name("protected"), "value"));
+
     }
 }

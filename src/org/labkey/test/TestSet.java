@@ -122,6 +122,7 @@ public enum TestSet
         MS2Test.class,
         MS2GZTest.class,
         WikiLongTest.class,
+        StudyReloadTest.class,
         ListTest.class,
         UserTest.class,
         IssuesTest.class,
@@ -360,7 +361,6 @@ public enum TestSet
 
     InDevelopment(
         MassFilterTest.class,
-        StudyReloadTest.class,
         ExperimentalFeaturesTest.class // currently no experimental features being tested
     ),
 
