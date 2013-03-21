@@ -17,9 +17,21 @@
 # This sample code shows the new JSON output parameter type.
 # renders as HTML. Replace this code with your R script. See the Help tab for more details.
 #
-require("RJSONIO");
-datafile <- paste(labkey.url.base, "input_data.tsv", sep="");
-labkey.data <- read.table(datafile, header=TRUE, sep="\t", quote="\"", comment.char="")
+
+#
+# setup: load data
+#
+print('Setup script time');
+ptm <- proc.time();
+if (!exists("sharedSession")) {
+    print('running setup code ...');
+    require("RJSONIO");
+    library(Cairo)
+    datafile <- paste(labkey.url.base, "input_data.tsv", sep="");
+    labkey.data <- read.table(datafile, header=TRUE, sep="\t", quote="\"", comment.char="")
+    sharedSession <- 1;
+}
+print(proc.time() - ptm);
 
 #
 # plot 1
@@ -34,7 +46,6 @@ dev.off();
 #
 # plot 2
 #
-library(Cairo);
 data_means <- aggregate(labkey.data, list(ParticipantID =
  labkey.data$participantid), mean, na.rm = TRUE);
 Cairo(file="${imgout:Blood Pressure/Multiple.png}", type="png")

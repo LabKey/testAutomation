@@ -28,6 +28,7 @@
 <div id='divOutput'>
 </div>
 <script type="text/javascript">
+    var _sessionId;
 
     function preparePage()
     {
@@ -96,11 +97,30 @@
         msg: "Generating the graphics, please, wait..."
     });
 
+    // mask for session management
+    var maskCreateSession = new Ext4.LoadMask('divForm', {
+        msg: "Creating the session, please wait ..."
+    });
+
+    var maskDeleteSession = new Ext4.LoadMask('divForm', {
+        msg: "Deleting the session, please wait ..."
+    });
+
     function onFailure(errorInfo, responseObj, options){
         maskGraph.hide();
         var htmlOut = renderText(null, "error", errorInfo.exceptionClass + ': ' + errorInfo.exception)
         renderFinal(htmlOut);
     };
+
+    function onCreateSessionSuccess(responseObj) {
+        maskCreateSession.hide();
+        _sessionId = responseObj.reportSessionId;
+    }
+
+    function onDeleteSessionSuccess(responseObj) {
+        maskDeleteSession.hide();
+        _sessionId = null;
+    }
 
     function onSuccess(responseObj){
         maskGraph.hide();
@@ -197,8 +217,8 @@
 
         Ext4.create('Ext.form.Panel', {
                renderTo: 'divForm',
-               width: 400,
-               layout: 'anchor',
+               width: 800,
+               //layout: 'anchor',
                title:  'Scriptpad',
                defaults: {
                  margin: '5 0 5 5'
@@ -209,6 +229,7 @@
                    handler: function() {
                        preparePage();
                        scriptConfig.reportId = 'module:/scriptpad/' + textField.value;
+                       scriptConfig.reportSessionId = _sessionId;
                        LABKEY.Report.execute(scriptConfig);
                    }},
                    {
@@ -217,7 +238,24 @@
                        preparePage();
                        webpartReportConfig.reportId = 'module:/scriptpad/' + textField.value;
                        webpartReport.render();
-                    }}
+                    }},
+                   {
+                   text: 'Create Report Session',
+                   handler: function() {
+                       maskCreateSession.show();
+                       LABKEY.Report.createSession({
+                           success : onCreateSessionSuccess
+                      });
+                   }},
+                   {
+                   text: 'Delete Report Session',
+                   handler: function() {
+                       maskDeleteSession.show();
+                       LABKEY.Report.deleteSession({
+                           success : onDeleteSessionSuccess,
+                           reportSessionId : _sessionId
+                       });
+                   }}
                ]
            });
     });
