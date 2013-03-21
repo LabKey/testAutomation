@@ -84,7 +84,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
         createAssayFolder();
         waitForElement(Locator.linkWithText("Specimen Report Study Folder Study specimens"));
-        assertTextPresent("33 collections have occurred.",  "48 results from " + assay1 + " have been uploaded", "46 " + assay1 + " queries");
+        assertTextPresent("33 collections have occurred.",  "48 results from " + assay1 + " have been uploaded", "48 " + assay1 + " queries");
         assertTextNotPresent("Configuration error:",
                 "You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report.");
 
@@ -190,8 +190,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     {
         clickAndWait(Locator.linkWithText(assayFolder));
         waitForElement(tableLoc);
-        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
-        Assert.assertEquals(22, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
+        Assert.assertEquals(0, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
+        Assert.assertEquals(24, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
         Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
         Assert.assertEquals(0, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
         Assert.assertEquals(54, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
@@ -211,12 +211,13 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     private void verifyAdditionalGroupingColumn(String assayName, String groupCol)
     {
         clickAndWait(Locator.linkWithText(assayFolder));
-        waitForText("46 " + assayName + " queries");
+        waitForText("48 " + assayName + " queries");
         configureGroupingColumn(assayName, groupCol);
         waitForElement(tableLoc);
         clickAndWait(Locator.linkWithText("48 results from " + assayName + " have been uploaded."));
         assertTextPresent("Result reported with no corresponding specimen collected", 8);
         assertTextPresent("2 results found for this participant and visit combination", 4);
+        assertTextPresent("This specimen type is not expected for this visit", 20);
     }
 
     @LogMethod
