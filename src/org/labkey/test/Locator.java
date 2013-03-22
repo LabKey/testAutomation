@@ -191,11 +191,7 @@ public abstract class Locator
         }
         catch (TimeoutException ex)
         {
-            Assert.fail("Timeout waiting for element [" + secTimeout + "sec]: " + toString() +
-                    (_index == null ? "" : "\nIndex: " + _index) +
-                    (_contains == null ? "" : "\nContaining: " + _contains) +
-                    (_text == null ? "" : "\nWith Text: " + _text));
-            return null; // unreachable
+            throw new NoSuchElementException("Timeout waiting for element [" + secTimeout + "sec]: " + getLoggableDescription());
         }
     }
 
@@ -217,10 +213,7 @@ public abstract class Locator
         }
         catch (TimeoutException ex)
         {
-            Assert.fail("Timeout waiting for element to disappear [" + secTimeout + "sec]: " + toString() +
-                    (_index == null ? "" : "\nIndex: " + _index) +
-                    (_contains == null ? "" : "\nContaining: " + _contains) +
-                    (_text == null ? "" : "\nWith Text: " + _text));
+            Assert.fail("Timeout waiting for element to disappear [" + secTimeout + "sec]: " + getLoggableDescription());
         }
     }
 
