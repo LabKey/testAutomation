@@ -654,7 +654,6 @@ public class ListHelperWD extends ListHelper
         // click lookup checkbox
         _test._extHelper.waitForExtDialog("Choose Field Type", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : colType) + "']/../input[@name = 'rangeURI']"));
-
         if (lookup != null)
         {
             _test._shortWait.until(new ExpectedCondition<Boolean>()
@@ -668,22 +667,21 @@ public class ListHelperWD extends ListHelper
 
             if (lookup.getFolder() != null)
             {
-                _test.fireEvent(Locator.css("input[name=lookupContainer]"), BaseWebDriverTest.SeleniumEvent.click);
-                _test.setFormElement(Locator.css("input[name=lookupContainer]"), lookup.getFolder());
-                _test.fireEvent(Locator.css("input[name=lookupContainer]"), BaseWebDriverTest.SeleniumEvent.change);
-                _test.waitForElement(Locator.xpath("//div[contains(@class,'test-marker-" + lookup.getFolder() + "')]/input[@name='lookupContainer']"));
+                _test.click(Locator.css("input[name=lookupContainer] + div.x-form-trigger"));
+                _test.waitAndClick(Locator.css(".x-combo-list-item").withText(lookup.getFolder()));
+                _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getFolder()).append("/input[@name='lookupContainer']"));
             }
 
-            _test.fireEvent(Locator.css("input[name=schema]"), BaseWebDriverTest.SeleniumEvent.click);
-            _test.setFormElement(Locator.css("input[name=schema]"), lookup.getSchema());
-            _test.fireEvent(Locator.css("input[name=schema]"), BaseWebDriverTest.SeleniumEvent.change);
-            _test.waitForElement(Locator.xpath("//div[contains(@class,'test-marker-" + lookup.getSchema() + "')]/input[@name='schema']"));
-            _test.sleep(1000);
+            if (!lookup.getSchema().equals(_test.getFormElement(Locator.css("input[name=schema]"))))
+            {
+                _test.click(Locator.css("input[name=schema] + div.x-form-trigger"));
+                _test.waitAndClick(Locator.css(".x-combo-list-item").withText(lookup.getSchema()));
+                _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getSchema()).append("/input[@name='schema']"));
+            }
 
-            _test.fireEvent(Locator.css("input[name=table]"), BaseWebDriverTest.SeleniumEvent.click);
-            _test.setFormElement(Locator.css("input[name=table]"), lookup.getTable());
-            _test.fireEvent(Locator.css("input[name=table]"), BaseWebDriverTest.SeleniumEvent.change);
-            _test.waitForElement(Locator.xpath("//div[contains(@class,'test-marker-" + lookup.getTable() + "')]/input[@name='table']"));
+            _test.click(Locator.css("input[name=table] + div.x-form-trigger"));
+            _test.waitAndClick(Locator.css(".x-combo-list-item").containing(lookup.getTable() + " ("));
+            _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getTable()).append("/input[@name='table']"));
         }
 
         _test.clickButton("Apply", 0);

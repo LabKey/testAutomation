@@ -67,14 +67,14 @@ public class NWBioTrustTest extends SurveyTest
 
     private enum NwbtRequestStatuses
     {
-        SUBMITTED("Submitted"),
-        SUBMISSION_REVIEW("Submission Review"),
-        FEASIBILITY_REVIEW("Feasibility Review"),
-        PRIORITIZATION_REVIEW("Prioritization Review"),
-        APPROVED("Approved"),
-        ROUTED("Routed"),
-        CLOSED("Closed"),
-        COMPLETE("Complete");
+        SUBMITTED("_Submitted"),
+        SUBMISSION_REVIEW("_Submission Review"),
+        FEASIBILITY_REVIEW("_Feasibility Review"),
+        PRIORITIZATION_REVIEW("_Prioritization Review"),
+        APPROVED("_Approved"),
+        ROUTED("_Routed"),
+        CLOSED("_Closed"),
+        COMPLETE("_Complete");
 
         private String _status;
 
@@ -500,7 +500,7 @@ public class NWBioTrustTest extends SurveyTest
         waitForText("No study registrations to show", 2, WAIT_FOR_PAGE); // both pending and submitted should be empty
         for (String requestLabel : submittedRequestLabels)
         {
-            clickAndWait(Locator.linkWithText("Click Here"));
+            waitAndClickAndWait(Locator.linkWithText("Click Here"));
             List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
             fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + requestLabel));
             fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Approved human subjects research"));
@@ -517,7 +517,7 @@ public class NWBioTrustTest extends SurveyTest
         assertTextPresentInThisOrder(submittedRequestLabels);
         for (String requestLabel : unsubmittedRequestLabels)
         {
-            clickAndWait(Locator.linkWithText("Click Here"));
+            waitAndClickAndWait(Locator.linkWithText("Click Here"));
             List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
             fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + requestLabel));
             fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Pending"));

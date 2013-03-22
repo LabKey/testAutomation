@@ -621,17 +621,35 @@ public class ListHelper extends AbstractHelper
     {
         setColumnType(null, index, lookup);
     }
-    public void setColumnType(String prefix, int index, LookupInfo lookup)
+    public void setColumnType(String prefix, int i, LookupInfo lookup)
     {
-        //test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']"));
-        _test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + index + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
-        if ( _test.isAlertPresent() ) _test.getAlert(); // Don't worry about schema alert until saving.
-        _test.click(Locator.xpath("//div[./label[text() = 'Lookup']]/input[@type = 'radio']"));
-        if ( lookup.getFolder() != null ) _test.setFormElement("lookupContainer", lookup.getFolder());
-        if ( lookup.getSchema() != null ) _test.setFormElement("schema", lookup.getSchema());
-        if ( lookup.getTable() != null ) _test.setFormElement("table", lookup.getTable());
+        // click the combobox trigger image
+        _test.click(Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_type" + i + "']/../div[contains(@class, 'x-form-trigger-arrow')]"));
+        // click lookup checkbox
+        _test._extHelper.waitForExtDialog("Choose Field Type", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.checkRadioButton(Locator.xpath("//label[text()='Lookup']/../input[@name = 'rangeURI']"));
+
+        if (lookup.getFolder() != null)
+        {
+            _test.click(Locator.css("input[name=lookupContainer] + div.x-form-trigger"));
+            _test.waitAndClick(Locator.css(".x-combo-list-item").withText(lookup.getFolder()));
+            _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getFolder()).append("/input[@name='lookupContainer']"));
+        }
+
+        if (!lookup.getSchema().equals(_test.getFormElement(Locator.css("input[name=schema]"))))
+        {
+            _test.click(Locator.css("input[name=schema] + div.x-form-trigger"));
+            _test.waitAndClick(Locator.css(".x-combo-list-item").withText(lookup.getSchema()));
+            _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getSchema()).append("/input[@name='schema']"));
+        }
+
+        _test.click(Locator.css("input[name=table] + div.x-form-trigger"));
+        _test.waitAndClick(Locator.css(".x-combo-list-item").containing(lookup.getTable() + " ("));
+        _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getTable()).append("/input[@name='table']"));
+
         _test.clickButton("Apply", 0);
-        _test.sleep(1000);
+
+        _test._extHelper.waitForExtDialogToDisappear("Choose Field Type");
     }
 
     public void selectPropertyTab(String name)

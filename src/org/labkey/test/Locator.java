@@ -790,12 +790,12 @@ public abstract class Locator
 
         public XPathLocator withClass(String cssClass)
         {
-            return this.withPredicate("contains(concat(' ',normalize-space(@class),' '),' "+cssClass+" ')");
+            return this.withPredicate("contains(concat(' ',normalize-space(@class),' '), " + xq(" " + cssClass + " ") + ")");
         }
 
         public XPathLocator withoutClass(String cssClass)
         {
-            return this.withPredicate("not(contains(concat(' ',normalize-space(@class),' '),' "+cssClass+" '))");
+            return this.withPredicate("not(contains(concat(' ',normalize-space(@class),' '), " + xq(" " + cssClass + " ") + "))");
         }
 
         public String getPath()
