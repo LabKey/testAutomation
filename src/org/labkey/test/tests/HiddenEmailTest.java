@@ -170,4 +170,10 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
 
         stopImpersonating();
     }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }
