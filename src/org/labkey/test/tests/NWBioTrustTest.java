@@ -498,6 +498,7 @@ public class NWBioTrustTest extends SurveyTest
         pushLocation();
         impersonate(NWBT_PRINCIPAL_INVESTIGATOR);
         popLocation();
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         assertTextPresentInThisOrder(designs.get(0).get("label"), designs.get(0).get("description"), "Pending Registrations", "Submitted Registrations");
         waitForText("No study registrations to show", 2, WAIT_FOR_PAGE); // both pending and submitted should be empty
         for (String requestLabel : submittedRequestLabels)
