@@ -67,14 +67,14 @@ public class NWBioTrustTest extends SurveyTest
 
     private enum NwbtRequestStatuses
     {
-        SUBMITTED("_Submitted"),
-        SUBMISSION_REVIEW("_Submission Review"),
-        FEASIBILITY_REVIEW("_Feasibility Review"),
-        PRIORITIZATION_REVIEW("_Prioritization Review"),
-        APPROVED("_Approved"),
-        ROUTED("_Routed"),
-        CLOSED("_Closed"),
-        COMPLETE("_Complete");
+        SUBMITTED("Submitted"),
+        SUBMISSION_REVIEW("Submission Review"),
+        FEASIBILITY_REVIEW("Feasibility Review"),
+        PRIORITIZATION_REVIEW("Prioritization Review"),
+        APPROVED("Approved"),
+        ROUTED("Routed"),
+        CLOSED("Closed"),
+        COMPLETE("Complete");
 
         private String _status;
 
@@ -376,6 +376,8 @@ public class NWBioTrustTest extends SurveyTest
         _extHelper.waitForExtDialogToDisappear("Add Surgical Tissue Samples");
         waitForElement(Locator.css(".x4-action-col-0"));
         String requestId = getText(Locator.css(".x4-grid-cell-first"));
+        setFormElement(Locator.name("surgicalstartdate"), "2013-03-20");
+        setFormElement(Locator.name("surgicalenddate"), "2013-03-21");
         click(Ext4HelperWD.Locators.formItemWithLabelContaining("Are samples collected after neoadjuvant").append("//label").withText("Yes"));
         clickButton("Next", 0);
         clickButton("Save");
@@ -503,7 +505,7 @@ public class NWBioTrustTest extends SurveyTest
             waitAndClickAndWait(Locator.linkWithText("Click Here"));
             List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
             fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + requestLabel));
-            fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Approved human subjects research"));
+            fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Approved Human Subjects Research"));
             fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
             fields.add(createFieldInfo("Study Information", "irbexpirationdate", "2013-03-07"));
             fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
@@ -521,6 +523,7 @@ public class NWBioTrustTest extends SurveyTest
             List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
             fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + requestLabel));
             fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Pending"));
+            fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
             fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
             fields.add(createRadioFieldInfo("Study Information", "Do you anticipate submitting data from this study to a public database (e.g. dbGAP)?*", "Yes"));
             fields.add(createComboFieldInfo("Contact Information", "Study Principal Investigator*", "pi nwbiotrust"));
