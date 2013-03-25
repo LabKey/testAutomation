@@ -324,6 +324,7 @@ public class GroupTest extends BaseWebDriverTest
 
         //second page of the wizard
         waitAndClick(Locator.xpath("//td[./label[text()='Copy From Existing Project']]/input"));
+        sleep(500); // Prevent StaleReferenceException from using combo-box too soon
         _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());
         waitAndClickButton("Next");
 
