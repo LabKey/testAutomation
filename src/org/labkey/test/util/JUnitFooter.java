@@ -19,6 +19,8 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
 
+import static org.labkey.test.WebTestHelper.logToServer;
+
 /**
  * User: tchad
  * Date: March 3, 2011
@@ -40,7 +42,7 @@ public class JUnitFooter extends BaseWebDriverTest
     }
 
     @Override
-    public void testSteps()
+    public void testSteps() throws Exception
     {
         log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
 
@@ -55,6 +57,8 @@ public class JUnitFooter extends BaseWebDriverTest
         _testFailed = false;
 
         log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
+
+        logToServer("=== Starting Server-side JUnit Tests ===");
     }
 
     public void doTestSteps() {}

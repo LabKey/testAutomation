@@ -186,6 +186,16 @@ public class WebTestHelper
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
     public static void logToServer(String message) throws Exception
     {
+        if (message.contains("\n"))
+        {
+            String [] splitMessage = message.split("\n");
+            for (String thisMessage: splitMessage)
+            {
+                if (thisMessage.length() > 0)
+                    logToServer(thisMessage);
+            }
+            return;
+        }
         String encodedUrl = getBaseURL() + "/admin/log.view?message=" + encodeURI(message);
         HttpClient client = null;
         HttpContext context = null;

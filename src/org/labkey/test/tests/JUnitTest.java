@@ -223,15 +223,17 @@ public class JUnitTest extends TestSuite
                 int status = response.getStatusLine().getStatusCode();
                 String responseBody = WebTestHelper.getHttpResponseBody(response);
 
+                WebTestHelper.logToServer(getLogTestString("successful", startTime));
+                WebTestHelper.logToServer(dump(responseBody, false));
                 if (status == HttpStatus.SC_OK)
                 {
-                    logTest("successful", startTime);
-                    log(dump(responseBody));
+                    log(getLogTestString("successful", startTime));
+                    log(dump(responseBody, true));
                 }
                 else
                 {
-                    logTest("failed", startTime);
-                    Assert.fail("remote junit failed: " + _remoteClass + "\n" + dump(responseBody));
+                    log(getLogTestString("failed", startTime));
+                    Assert.fail("remote junit failed: " + _remoteClass + "\n" + dump(responseBody, true));
                 }
             }
             catch (IOException ioe)
@@ -247,12 +249,12 @@ public class JUnitTest extends TestSuite
             }
         }
 
-        private void logTest(String message, long startTime)
+        private String getLogTestString(String message, long startTime)
         {
-            log("remote junit " + message + ": " + _remoteClass + " [" + commaf0.format(System.currentTimeMillis() - startTime) + " ms]");
+            return "remote junit " + message + ": " + _remoteClass + " [" + commaf0.format(System.currentTimeMillis() - startTime) + " ms]";
         }
 
-        static String dump(String response)
+        static String dump(String response, boolean dumpFailures)
         {
             Map<String, Object> json = null;
             try
@@ -272,7 +274,7 @@ public class JUnitTest extends TestSuite
 //            sb.append(", errors: ").append(json.get("errorCount"));
             sb.append(", failed: ").append(json.get("failureCount")).append("\n");
 //            dumpFailures(sb, (List<Map<String, Object>>) json.get("errors"));
-            dumpFailures(sb, (List<Map<String, Object>>) json.get("failures"));
+            if(dumpFailures) dumpFailures(sb, (List<Map<String, Object>>) json.get("failures"));
             return sb.toString();
         }
 
