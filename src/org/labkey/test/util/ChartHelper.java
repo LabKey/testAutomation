@@ -22,11 +22,9 @@ import org.openqa.selenium.internal.seleniumemulation.WaitForPageToLoad;
 import java.util.Map;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 2/11/13
  * Time: 3:06 PM
- * To change this template use File | Settings | File Templates.
  */
 public class ChartHelper  extends AbstractHelper
 {
