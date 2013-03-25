@@ -366,7 +366,7 @@ public class NWBioTrustTest extends SurveyTest
 
             // Sample Pickup
             _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
-            click(Ext4HelperWD.Locators.formItemWithLabelContaining("If sample is collected after 5pm").append("//label").withText("Yes"));
+            click(Ext4HelperWD.Locators.formItemWithLabelContaining("If sample is available after 5pm").append("//label").withText("Yes"));
             click(Ext4HelperWD.Locators.formItemWithLabelContaining("Prefer samples be held overnight").append("//label").withText("Yes"));
 
             _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
