@@ -298,16 +298,19 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     protected void assertNoErrorText()
     {
         String[] texts = new String[]{"error", "Error", "ERROR", "failed", "Failed", "Invalid", "invalid"};
-        for (String text : texts)
-        {
-            Assert.assertFalse("text should not be present: " + text, isVisibleTextPresent(text));
-        }
+        String visibleText = isVisibleTextPresent(texts);
+        Assert.assertNull("Error text found: " + visibleText, visibleText);
     }
 
-    public boolean isVisibleTextPresent(String... texts)
+    /**
+     * Checks if text is visible on the page
+     * @param texts Exact, case-sensitive strings to check for
+     * @return The first string among texts if any are found; null if none are found
+     */
+    public String isVisibleTextPresent(String... texts)
     {
         if(texts==null || texts.length == 0)
-            return true;
+            return null;
 
         String source = getBodyText();
 
@@ -317,9 +320,9 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
             text = text.replace("<", "&lt;");
             text = text.replace(">", "&gt;");
             if (!source.contains(text))
-                return false;
+                return text;
         }
-        return true;
+        return null;
     }
 
     @LogMethod
