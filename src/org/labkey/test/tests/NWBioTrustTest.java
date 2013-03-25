@@ -338,7 +338,7 @@ public class NWBioTrustTest extends SurveyTest
 
         log("Request specimens from surguries or clinic procedures");
         clickAndWait(Locator.linkWithText("Click Here"));
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tr").withPredicate(Locator.xpath("td/label").containing("Associated study")).append("/td[2]/table"), unsubmittedRequestLabels[0] + " (Pending)", true);
+        _ext4Helper.selectComboBoxItem(Locator.xpath("//tr").withPredicate(Locator.xpath("td/label").containing("Associated study")).append("/td[2]/table"), unsubmittedRequestLabels[0] + " (ID: ", true);
         _ext4Helper.checkCheckbox("Surgical tissue samples");
         clickButton("Next", 0);
         _ext4Helper.checkCheckbox("Stomach");
@@ -350,18 +350,18 @@ public class NWBioTrustTest extends SurveyTest
             waitForElementToDisappear(Locator.css(".x4-mask").index(2));
 
             // Tissue Type Information
-            _ext4Helper.selectComboBoxItem("Surgical Tissue Type:*", "Tumor from primary site");
-            _ext4Helper.selectComboBoxItem("Anatomical Site:*", "Stomach");
-            setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Minimum Size:*").append("//input"), "5");
-            _ext4Helper.selectComboBoxItem("Minimum Size Units:*", "gr");
-            setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Preferred Size:*").append("//input"), "6");
-            _ext4Helper.selectComboBoxItem("Preferred Size Units:*", "gr");
-            _ext4Helper.selectComboBoxItem("Preservation:*", "Flash Frozen");
+            _ext4Helper.selectComboBoxItem("Surgical Tissue Type:", "Tumor from primary site");
+            _ext4Helper.selectComboBoxItem("Anatomical Site:", "Stomach");
+            setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Minimum Size:").append("//input"), "5");
+            _ext4Helper.selectComboBoxItem("Minimum Size Units:", "gr");
+            setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Preferred Size:").append("//input"), "6");
+            _ext4Helper.selectComboBoxItem("Preferred Size Units:", "gr");
+            _ext4Helper.selectComboBoxItem("Preservation:", "Flash Frozen");
 
             // Participant Eligibility
             _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
-            setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Number of Cases/Participants:*").append("//input"), "6");
-            click(Ext4HelperWD.Locators.formItemWithLabel("Are patients with a prior cancer OK?*").append("//label").withText("Yes"));
+            setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Number of Cases/Participants:").append("//input"), "6");
+            click(Ext4HelperWD.Locators.formItemWithLabel("Are patients with a prior cancer OK?").append("//label").withText("Yes"));
             click(Ext4HelperWD.Locators.formItemWithLabelContaining("Are patients with a history of Basal").append("//label").withText("Yes"));
 
             // Sample Pickup
