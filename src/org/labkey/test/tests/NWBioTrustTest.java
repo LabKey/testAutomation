@@ -126,6 +126,7 @@ public class NWBioTrustTest extends SurveyTest
     private static final String NWBT_SURGICAL_REVIEWER_GROUP = "Surgical Reviewer";
     private static final String NWBT_NON_SURGICAL_REVIEWER_GROUP = "Non Surgical Reviewer";
     private static final String NWBT_DISCARDED_REVIEWER_GROUP = "Discarded Reviewer";
+    private static final String NWBT_RESEARCH_COORD_GROUP = "Research Coordinators";
 
     private final File studyRegistrationJson = new File(getDownloadDir(), "study-registration.json");
     private final File prospectiveSampleRequestJson = new File(getDownloadDir(), "prospective-sample-request.json");
@@ -803,18 +804,15 @@ public class NWBioTrustTest extends SurveyTest
         log("Grant the appropriate permissions for each of these users at the project level");
         goToProjectHome();
         enterPermissionsUI();
-        setUserPermissions(NWBT_RESEARCH_COORD, "NWBT Research Coordinator");
         setUserPermissions(NWBT_STUDY_CONTACT, "Reader");
         setUserPermissions(NWBT_PRINCIPAL_INVESTIGATOR, "Reader");
         setUserPermissions(NWBT_FACULTY_CHAIR, "Reader");
         setUserPermissions(NWBT_FACULTY_REVIEWER, "Reader");
         clickButton("Save and Finish");
+        addUserToProjGroup(NWBT_RESEARCH_COORD, getProjectName(), NWBT_RESEARCH_COORD_GROUP);
         addUserToProjGroup(NWBT_SURGICAL_REVIEWER, getProjectName(), NWBT_SURGICAL_REVIEWER_GROUP);
-        addUserToProjGroup(NWBT_RESEARCH_COORD, getProjectName(), NWBT_SURGICAL_REVIEWER_GROUP);
         addUserToProjGroup(NWBT_NON_SURGICAL_REVIEWER, getProjectName(), NWBT_NON_SURGICAL_REVIEWER_GROUP);
-        addUserToProjGroup(NWBT_RESEARCH_COORD, getProjectName(), NWBT_NON_SURGICAL_REVIEWER_GROUP);
         addUserToProjGroup(NWBT_DISCARDED_REVIEWER, getProjectName(), NWBT_DISCARDED_REVIEWER_GROUP);
-        addUserToProjGroup(NWBT_RESEARCH_COORD, getProjectName(), NWBT_DISCARDED_REVIEWER_GROUP);
 
         log("Grant the appropriate permissions for 1st requestor subfolder");
         //note: don't give them perm to the 2nd requestor folder so that we can test the container permissions
