@@ -356,7 +356,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("badString");
         assertTextPresent(R_SCRIPT1_TEXT1);
         assertTextPresent(R_SCRIPT1_TEXT2);
-        assertElementPresent(Locator.id(R_SCRIPT1_IMG));
+        assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
         assertTextPresent(R_SCRIPT1_PDF);
 
         log("Execute and save a script");
@@ -366,7 +366,7 @@ public class ReportTest extends StudyBaseTest
         log("Check that the script executed properly");
         assertTextPresent(R_SCRIPT1_TEXT1);
         assertTextPresent(R_SCRIPT1_TEXT2);
-        assertElementPresent(Locator.id(R_SCRIPT1_IMG));
+        assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
         assertTextPresent(R_SCRIPT1_PDF);
 
         saveReport(R_SCRIPTS[0]);
@@ -408,7 +408,7 @@ public class ReportTest extends StudyBaseTest
         assertTextNotPresent("Error executing command");
         assertTextPresent(R_SCRIPT1_TEXT1);
         assertTextPresent(R_SCRIPT1_TEXT2);
-        assertElementPresent(Locator.id(R_SCRIPT1_IMG));
+        assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
         assertTextPresent(R_SCRIPT1_PDF);
         popLocation();
 

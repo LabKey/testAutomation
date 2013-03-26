@@ -2033,7 +2033,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("Standard1 Tracking Data for " + analyte + " - " + isotype + " " + conjugate);
         waitForTextToDisappear("Loading");
         assertTextNotPresent("Error");
-        waitForElement(Locator.id("resultImage"));
+        waitForElement(Locator.xpath("//img[starts-with(@id,'resultImage'')]"));
     }
 
     private void addRemoveGuideSetRuns(String[] rows)
