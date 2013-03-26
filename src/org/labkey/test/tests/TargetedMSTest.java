@@ -20,6 +20,8 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4HelperWD;
+import org.labkey.test.util.LogMethod;
 
 /**
  * User: elvan
@@ -28,8 +30,8 @@ import org.labkey.test.util.DataRegionTable;
  */
 public class TargetedMSTest extends BaseSeleniumWebTest
 {
-
     private final String SKY_FILE = "MRMer.sky";
+
     @Override
     protected String getProjectName()
     {
@@ -39,10 +41,17 @@ public class TargetedMSTest extends BaseSeleniumWebTest
     @Override
     protected void doTestSteps() throws Exception
     {
+        setupAndImportData();
+        verifyImportedData();
+        verifyModificationSearch();
+    }
+
+    @LogMethod(category = LogMethod.MethodType.SETUP)
+    private void setupAndImportData()
+    {
         _containerHelper.createProject(getProjectName(), "Targeted MS");
         setPipelineRoot(getSampledataPath() + "/TargetedMS");
         goToProjectHome();
-        addWebPart("Data Pipeline");
         clickButton("Process and Import Data");
         waitForText("MRMer", 5*defaultWaitForPage);
         selectPipelineFileAndImportAction("MRMer/" + SKY_FILE, "Import Skyline Results");
@@ -50,8 +59,12 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         clickButton("Import");
         waitForText("Targeted MS Runs ");
         waitForTextWithRefresh(SKY_FILE, defaultWaitForPage);
-
         assertTextPresent("Transitions");
+    }
+
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    private void verifyImportedData()
+    {
         clickAndWait(Locator.linkContainingText(SKY_FILE));
 
         log("Verifying expected summary counts ");
@@ -129,6 +142,47 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         assertTextPresent("I from 71787-73289, Verified ORF, \"Pyruvate kinase, functions as a homotetramer in glycolysis to convert phosphoenolpyruvate to pyruvate, the input for aerobic (TCA cyc...");
 
 
+    }
+
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    private void verifyModificationSearch()
+    {
+        // add modificaiton search webpart and do an initial search by AminoAcid and DeltaMass
+        goToProjectHome();
+        addWebPart("Targeted MS Modification Search");
+        waitForElement(Locator.name("aminoAcids"));
+        setFormElement(Locator.name("aminoAcids"), "R");
+        setFormElement(Locator.name("deltaMass"), "10");
+        sleep(500); // sleep for a half second to let the search button enable based on form validation
+        clickAndWait(Locator.button("Search"));
+        waitForText("Modification Search Results");
+        waitForText("1 - 13 of 13");
+        assertTextPresentInThisOrder("Targeted MS Modification Search", "Targeted MS Peptides");
+        assertTextPresent("Amino Acids:", "Delta Mass:");
+        Assert.assertEquals(13, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
+        Assert.assertEquals(0, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
+
+        // search for K[+8] modification
+        setFormElement(Locator.name("aminoAcids"), "k R, N"); // should be split into just chars
+        setFormElement(Locator.name("deltaMass"), "8.01"); // should be rounded to a whole number
+        sleep(500); // sleep for a half second to let the search button enable based on form validation
+        clickAndWait(Locator.button("Search"));
+        waitForText("1 - 31 of 31");
+        Assert.assertEquals(0, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
+        Assert.assertEquals(31, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
+
+        // test UI form for other search types (Custom Name and Unimod Name)
+        _ext4Helper.selectRadioButton("Search Type:", "By Custom Name");
+        assertTextNotPresent("Amino Acids:", "Delta Mass:", "Unimod Name:");
+        assertTextPresent("Custom Name:");
+        _ext4Helper.selectRadioButton("Search Type:", "By Unimod Name");
+        assertTextNotPresent("Amino Acids:", "Delta Mass:", "Custom Name:");
+        assertTextPresent("Unimod Name:");
+        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabelContaining("Unimod Name:"), "Carbamidomethyl");
+        sleep(500); // sleep for a half second to let the search button enable based on form validation
+        clickAndWait(Locator.button("Search"));
+        // TODO: the current sampledata does not contain any matching Custom Name or Unimod Name searches
+        waitForText("No data to show.");
     }
 
     @Override
