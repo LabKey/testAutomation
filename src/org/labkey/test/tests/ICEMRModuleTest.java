@@ -69,11 +69,23 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 //    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void doVerification()
     {
+
         testJavaScript();
         enterDataPoint();
         verifyDataInAssay();
-        enterDataPointAdaptation();
-        enterDailyAdaptationData();
+
+
+        // test adaptation flavor of tracking assay
+        enterDataPointTracking(ADAPTATION_ASSAY_NAME);
+        enterDailyTrackingData();
+        checkResultsPage();
+        checkVisualization();
+
+        goToProjectHome();
+
+        // track drug selection flavor of tracking assay
+        enterDataPointTracking(SELECTION_ASSAY_NAME);
+        enterDailyTrackingData();
         checkResultsPage();
         checkVisualization();
     }
@@ -124,14 +136,18 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         enterData();
     }
 
-    private void enterDataPointAdaptation()
+    private void enterDataPointTracking(String assayName)
     {
-        Locator.XPathLocator link = Locator.linkContainingText(ADAPTATION_ASSAY_NAME);
+        Locator.XPathLocator link = Locator.linkContainingText(assayName);
         waitAndClick(link);
         link = Locator.navButtonContainingText("New Experiment");
         waitAndClick(link);
         waitForElement(Locator.id("SampleID1"));
-        enterAdaptationData();
+
+        if (assayName.equalsIgnoreCase(SELECTION_ASSAY_NAME))
+            enterSelectionData();
+        else
+            enterAdaptationData();
     }
 
     private void enterAdaptationData()
@@ -188,6 +204,55 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         waitForElement(Locator.css(".labkey-nav-page-header").withText(ADAPTATION_ASSAY_NAME + " Runs"));
     }
 
+    private void enterSelectionData()
+    {
+        verifyError(8);
+
+        // verify our default values for fold increase and adaptation criteria are correct
+        for (int i = 1; i < 4; i++)
+        {
+            assertFormElementEquals(Locator.name("FoldIncrease" + i + "1"), FOLD_INCREASE_DEFAULT);
+        }
+
+        fieldAndValue = new HashMap<String, String>();
+
+        fieldAndValue.put("PatientID", "100101");
+        fieldAndValue.put("ExperimentID", "12345");
+        fieldAndValue.put("SampleID1", "15243");
+        fieldAndValue.put("Scientist1", "Dr. Helvetica");
+
+        fieldAndValue.put("InitialPopulation1", "7");
+        fieldAndValue.put("Concentration1", "3");
+        fieldAndValue.put("AlbumaxBatchID1", "10213");
+        fieldAndValue.put("FoldIncrease11", "10");
+        fieldAndValue.put("FoldIncrease21", "11");
+        fieldAndValue.put("FoldIncrease31", "12");
+        fieldAndValue.put("ResistanceNumber1", "2");
+        fieldAndValue.put("Comments1", "Lorem ipsum");
+
+        for(String field : fieldAndValue.keySet())
+        {
+            setICEMRField(field, fieldAndValue.get(field));
+        }
+
+        //Verify missing fields (MinimumParasitemia)
+        verifyError(1);
+
+        //Verify fields out of acceptable bounds
+        setICEMRField("MinimumParasitemia1", "101");
+        verifyError(1);
+
+        setICEMRField("MinimumParasitemia1", ".5");
+
+        clickButton("Add Flask", "Flask 2");
+
+        makeSelectionFlask(2);
+
+        clickButtonContainingText("Submit");
+        waitForElement(Locator.css(".labkey-nav-page-header").withText(SELECTION_ASSAY_NAME + " Runs"));
+    }
+
+
     private void makeAdaptationFlask(int flaskNum)
     {
         verifyError(5);
@@ -214,7 +279,34 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         sleep(1000);
     }
 
-    private void enterDailyAdaptationData(){
+    private void makeSelectionFlask(int flaskNum)
+    {
+        verifyError(6);
+
+        fieldAndValue = new HashMap<String, String>();
+
+        fieldAndValue.put("SampleID" + flaskNum, "15258");
+        fieldAndValue.put("Scientist" + flaskNum, "Dr. Helvetica");
+        fieldAndValue.put("SerumBatchID"+ flaskNum, "00123");
+        fieldAndValue.put("AlbumaxBatchID"+ flaskNum, "10213");
+        fieldAndValue.put("InitialPopulation"+ flaskNum, "7");
+        fieldAndValue.put("Concentration"+ flaskNum, "3");
+        fieldAndValue.put("FoldIncrease1"+ flaskNum, "10");
+        fieldAndValue.put("FoldIncrease2"+ flaskNum, "11");
+        fieldAndValue.put("FoldIncrease3"+ flaskNum, "12");
+        fieldAndValue.put("ResistanceNumber"+ flaskNum, "2");
+        fieldAndValue.put("MinimumParasitemia" + flaskNum, ".5");
+        fieldAndValue.put("Comments"+ flaskNum, "Lorem ipsum");
+
+        for(String field : fieldAndValue.keySet())
+        {
+            setICEMRField(field, fieldAndValue.get(field));
+        }
+        sleep(1000);
+    }
+
+
+    private void enterDailyTrackingData(){
 
         //Navigate to Daily Upload page
         Locator.XPathLocator link = Locator.linkContainingText("Daily Maintenance");
