@@ -68,7 +68,7 @@ public class ListTest extends BaseWebDriverTest
     protected final ListColumn _listCol6 = new ListColumn("Aliased,Column", "Element", ListHelper.ListColumnType.String, "I show aliased data.");
     protected final static String[][] TEST_DATA = {
             { "Blue", "Green", "Red", "Yellow" },
-            { "Light", "Mellow", "Robust", "Zany" },
+            { "Light", "Mellow", "Robust", "ZanzibarMasinginiTanzaniaAfrica" },
             { "true", "false", "true", "false"},
             { "1", "4", "3", "2" },
             { "10", "9", "8", "7"},

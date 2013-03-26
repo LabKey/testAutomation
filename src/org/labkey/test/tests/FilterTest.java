@@ -21,6 +21,7 @@ package org.labkey.test.tests;
  * Date: 8/7/11
  * Time: 3:58 PM
  */
+
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
@@ -28,11 +29,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ExtHelperWD;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelperWD;
-import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
@@ -153,17 +152,17 @@ public class FilterTest extends ListTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void facetedFilterTest()
     {
-        verifyColumnValues("query", "Color", "Light", "Robust", "Zany");
+        verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
         startFilter("Color");
 
         log("Verifying expected faceted filter elements present");
-        verifyTextPresentInFilterDialog("Choose Filters", "Choose Values", "Light", "Robust", "Zany");
+        verifyTextPresentInFilterDialog("Choose Filters", "Choose Values", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
         _extHelper.clickExtButton("OK");
-        verifyColumnValues("query", "Color", "Light", "Robust", "Zany");
+        verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
-        setFacetedFilter("query", "Color", "Light");
-        verifyColumnValues("query", "Color", "Light");
+        setFacetedFilter("query", "Color", "ZanzibarMasinginiTanzaniaAfrica");
+        verifyColumnValues("query", "Color", "ZanzibarMasinginiTanzaniaAfrica");
 
         setUpFacetedFilter("query", "Color", "Robust");
         _extHelper.clickExtTab("Choose Filters");
@@ -178,14 +177,14 @@ public class FilterTest extends ListTest
         setUpFacetedFilter("query", "Color", "Robust", "Light");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "Zany", getFormElement(Locator.name("value_1")));
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "ZanzibarMasinginiTanzaniaAfrica", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Is Blank");
         clickButton("Clear Filter");
         //the change above would result in filters being dropped.
-        verifyColumnValues("query", "Color", "Light", "Robust", "Zany");
+        verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
         //now repeat with a filter that should be translated
         setUpFacetedFilter("query", "Color", "Light");
@@ -201,10 +200,10 @@ public class FilterTest extends ListTest
         _extHelper.clickExtButton("OK");
         verifyColumnValues("query", "Color", "Light", "Robust");
         verifyColumnValues("query", "year", "1980", "1970");
-        //assertTextNotPresent("Zany");  //NOTE: the filter message is 'Is not any of (Zany)', so this will fail.  test for '1990' instead.
+        //assertTextNotPresent("ZanzibarMasinginiTanzaniaAfrica");  //NOTE: the filter message is 'Is not any of (ZanzibarMasinginiTanzaniaAfrica)', so this will fail.  test for '1990' instead.
 
         setFacetedFilter("query", "Color");
-        verifyColumnValues("query", "Color", "Light", "Robust", "Zany");
+        verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
 
         log("Verifying faceted filter on non-lookup column");
         startFilter("year");
@@ -540,7 +539,7 @@ public class FilterTest extends ListTest
             {
                 // In this test case, "Does Not Equal" and "Light" are the initial filter type and value.
                 // When showing the dialog, "Does Not Equal" is first converted into "Not In" since "Does Not Equal" is a single value filter.
-                // Next, it is inverted from "Not In" to "In" and "Mellow;Robust;Zany" are selected.
+                // Next, it is inverted from "Not In" to "In" and "Mellow;Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
                 // When switching tabs, the number of selected values (1) is less than half of the available values (4),
                 // so the filter is inverted again from "Not In" to "Does Not Equal Any Of" and "Light" is selected.
                 //waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equals Any Of (e.g. \"a;b;c\")");
@@ -549,10 +548,10 @@ public class FilterTest extends ListTest
             else if (filter1Type.equals("Does Not Equal Any Of (e.g. \"a;b;c\")") && "Light;Mellow".equals(filter1))
             {
                 // In this test case, "Does Not Equal Any Of" and "Light;Mellow" are the initial filter type and value.
-                // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;Zany" are selected.
+                // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
                 // When switching tabs, nothing changes.
                 //waitForFormElementToEqual(Locator.name("filterType_1"), "Equals One Of (e.g. \"a;b;c\")");
-                waitForFormElementToEqual(Locator.name("value_1"), "Robust;Zany");
+                waitForFormElementToEqual(Locator.name("value_1"), "Robust;ZanzibarMasinginiTanzaniaAfrica");
             }
             else if (filter1Type.equals("Does Not Equal") && "false".equals(filter1))
             {

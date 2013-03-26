@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -23,18 +22,15 @@ import org.labkey.test.util.PortalHelper;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: elvan
  * Date: 3/13/13
- * Time: 12:05 PM
- * To change this template use File | Settings | File Templates.
  */
 public class MassFilterTest extends  FilterTest
 {
     @Override
     protected String getProjectName()
     {
-        return "Mass Filter Test";  //To change body of implemented methods use File | Settings | File Templates.
+        return "Mass Filter Test";
     }
 
     @Override
