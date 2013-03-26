@@ -15,6 +15,11 @@
             <dat:table tableName="People" tableDbType="NOT_IN_DB">
                 <dat:tableUrl>/simpletest/other.view</dat:tableUrl>
                 <dat:filters ref="b-filter"/>
+                <dat:columns>
+                    <dat:column columnName="Name">
+                        <dat:columnTitle>BPeopleTemplate Name title</dat:columnTitle>
+                    </dat:column>
+                </dat:columns>
             </dat:table>
         </dat:tables>
     </metadata>

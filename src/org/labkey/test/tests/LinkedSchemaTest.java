@@ -15,31 +15,17 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PasswordUtil;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * User: kevink
@@ -61,18 +47,42 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             "Britt\t30\tFalse\n" +
             "Josh\t30\tTrue";
 
+    public static final String A_PEOPLE_SCHEMA_NAME = "A_People";
+    public static final String A_PEOPLE_METADATA_TITLE = "A_PEOPLE_METADATA Name title";
     public static final String A_PEOPLE_METADATA =
-            "        <dat:tables xmlns:dat=\"http://labkey.org/data/xml\" xmlns:cv=\"http://labkey.org/data/xml/queryCustomView\">\n" +
-            "            <dat:table tableName=\"People\" tableDbType=\"NOT_IN_DB\">\n" +
-            "                <dat:tableUrl>/simpletest/other.view</dat:tableUrl>\n" +
-            "                <dat:filters>\n" +
-            "                  <cv:where>Name LIKE 'A%'</cv:where>\n" +
-            "                </dat:filters>\n" +
-            "            </dat:table>\n" +
-            "        </dat:tables>";
+            "<dat:tables xmlns:dat=\"http://labkey.org/data/xml\" xmlns:cv=\"http://labkey.org/data/xml/queryCustomView\">\n" +
+            "    <dat:table tableName=\"People\" tableDbType=\"NOT_IN_DB\">\n" +
+            "        <dat:tableUrl>/query/recordDetails.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&amp;queryName=People&amp;keyField=Key&amp;key=${Key}</dat:tableUrl>\n" +
+            "        <dat:filters>\n" +
+            "          <cv:where>Name LIKE 'A%'</cv:where>\n" +
+            "        </dat:filters>\n" +
+            "        <dat:columns>\n" +
+            "          <dat:column columnName=\"Name\">\n" +
+            "            <dat:columnTitle>" + A_PEOPLE_METADATA_TITLE + "</dat:columnTitle>\n" +
+            "          </dat:column>\n" +
+            "        </dat:columns>\n" +
+            "    </dat:table>\n" +
+            "</dat:tables>";
 
-    private String _sourceContainerId;
-    private String _targetContainerId;
+    public static final String B_PEOPLE_SCHEMA_NAME = "B_People";
+    public static final String B_PEOPLE_TEMPLATE_METADATA_TITLE = "BPeopleTemplate Name title";
+
+    public static final String D_PEOPLE_SCHEMA_NAME = "D_People";
+    public static final String D_PEOPLE_METADATA_TITLE = "D_PEOPLE_METADATA Name title";
+    public static final String D_PEOPLE_METADATA =
+            "<dat:tables xmlns:dat=\"http://labkey.org/data/xml\" xmlns:cv=\"http://labkey.org/data/xml/queryCustomView\">\n" +
+            "    <dat:table tableName=\"People\" tableDbType=\"NOT_IN_DB\">\n" +
+            "        <dat:tableUrl></dat:tableUrl>\n" +
+            "        <dat:filters>\n" +
+            "          <cv:where>Name LIKE 'D%'</cv:where>\n" +
+            "        </dat:filters>\n" +
+            "        <dat:columns>\n" +
+            "          <dat:column columnName=\"Name\">\n" +
+            "            <dat:columnTitle>" + D_PEOPLE_METADATA_TITLE + "</dat:columnTitle>\n" +
+            "          </dat:column>\n" +
+            "        </dat:columns>" +
+            "    </dat:table>\n" +
+            "</dat:tables>";
 
 
     @Override
@@ -90,7 +100,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        super.doCleanup(afterTest);
+//        super.doCleanup(afterTest);
     }
 
     @Override
@@ -98,20 +108,15 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         setupProject();
         createList();
-        File lists = new File(getLabKeyRoot() + "/sampledata/lists/ListDemo.lists.zip");
-        _listHelper.importListArchive(SOURCE_FOLDER, lists);
+        importListData();
 
-        //Create second folder that should be not visible to linked schemas
-        _containerHelper.createSubfolder(getProjectName(), OTHER_FOLDER, null);
-        _listHelper.importListArchive(OTHER_FOLDER, lists);
         goToProject("LinkedSchemaTestProject");
-
 
         createLinkedSchema();
         verifyLinkedSchema();
 
-
-        createLinkedSchemaWithTables(TARGET_FOLDER, "BasicLinkedSchema", "lists", "NIMHDemographics", "NIMHPortions");
+        String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
+        createLinkedSchema(TARGET_FOLDER, "BasicLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", null);
 
         //Ensure that all the columns we would expect to come through are coming through
         assertColumnsPresent(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", "SubjectID", "Name", "Family", "Mother", "Father", "Species", "Occupation",
@@ -133,7 +138,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         createLinkedSchemaQuery(SOURCE_FOLDER, "lists", "QueryOverLookup", "NIMHDemographics");
 
         //Create a new linked schema that includes that query, and ensure that it is propogating lookups in the expected manner
-        createLinkedSchemaWithTables(TARGET_FOLDER, "QueryLinkedSchema", "lists", "NIMHDemographics", "NIMHPortions", "QueryOverLookup");
+        createLinkedSchema(TARGET_FOLDER, "QueryLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions,QueryOverLookup", null);
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", false, "Mother");
 
@@ -145,6 +150,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         createLinkedSchemaUsingTemplate();
         verifyLinkedSchemaUsingTemplate();
 
+        createLinkedSchemaTemplateOverride();
+        verifyLinkedSchemaTemplateOverride();
+
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -154,10 +162,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER, null);
         // Enable simpletest in source folder so the "BPeopleTemplate" is visible.
         enableModule(SOURCE_FOLDER, "simpletest");
-        _sourceContainerId = getContainerId();
 
         _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER, null);
-        _targetContainerId = getContainerId();
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -176,58 +182,98 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
+    void importListData()
+    {
+        File lists = new File(getLabKeyRoot() + "/sampledata/lists/ListDemo.lists.zip");
+        _listHelper.importListArchive(SOURCE_FOLDER, lists);
+
+        //Create second folder that should be not visible to linked schemas
+        _containerHelper.createSubfolder(getProjectName(), OTHER_FOLDER, null);
+        _listHelper.importListArchive(OTHER_FOLDER, lists);
+    }
+
+    @LogMethod(category = LogMethod.MethodType.SETUP)
     void createLinkedSchema()
     {
-        if (_sourceContainerId == null)
-            _sourceContainerId = getContainerId(getBaseURL() + "/project/" + getProjectName() + "/" + SOURCE_FOLDER + "/begin.view");
-        createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "A_People", _sourceContainerId, null, "lists", "People", A_PEOPLE_METADATA);
+        log("** Creating linked schema APeople without template");
+        String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
+        createLinkedSchema(TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", "People", A_PEOPLE_METADATA);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     void verifyLinkedSchema()
     {
         goToSchemaBrowser();
-        selectQuery("A_People", "People");
+        selectQuery(A_PEOPLE_SCHEMA_NAME, "People");
         waitAndClick(Locator.linkWithText("view data"));
 
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable table = new DataRegionTable("query", this);
         Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
-        Assert.assertEquals("Expected to filter table to only Adam", "Adam", table.getDataAsText(0, "Name"));
+        Assert.assertEquals("Expected to filter table to only Adam", "Adam", table.getDataAsText(0, A_PEOPLE_METADATA_TITLE));
 
-        // Check generic details page is available
+        // Check the custom details url is used
         clickAndWait(table.detailsLink(0));
-        assertTextPresent("Details", "Adam");
+        assertTitleContains("Record Details:");
+        assertTextPresent("Adam");
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
     void createLinkedSchemaUsingTemplate()
     {
-        createLinkedSchema(getProjectName() + "/" + TARGET_FOLDER, "B_People", _sourceContainerId, "BPeopleTemplate", null, null, null);
+        log("** Creating linked schema BPeople using BPeopleTemplate");
+        String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
+        createLinkedSchema(TARGET_FOLDER, B_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, null, null);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     void verifyLinkedSchemaUsingTemplate()
     {
         goToSchemaBrowser();
-        selectQuery("B_People", "People");
+        selectQuery(B_PEOPLE_SCHEMA_NAME, "People");
         waitAndClick(Locator.linkWithText("view data"));
 
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable table = new DataRegionTable("query", this);
         Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
-        Assert.assertEquals("Expected to filter table to only Britt", "Britt", table.getDataAsText(0, "Name"));
+        // Check Name column is renamed and 'Britt' is the only value
+        Assert.assertEquals("Expected to filter table to only Britt", "Britt", table.getDataAsText(0, B_PEOPLE_TEMPLATE_METADATA_TITLE));
 
-        // Check generic details page is available
+        // Check the simpletest/other.view details url is used
         clickAndWait(table.detailsLink(0));
-        assertTextPresent("Details", "Britt");
+        assertTextPresent("This is another view in the simple test module.");
+    }
+
+    @LogMethod(category = LogMethod.MethodType.SETUP)
+    void createLinkedSchemaTemplateOverride()
+    {
+        log("** Creating linked schema BPeople using BPeopleTemplate with metadata override to only show 'D' people");
+        String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
+        createLinkedSchema(TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, null, D_PEOPLE_METADATA);
+    }
+
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    void verifyLinkedSchemaTemplateOverride()
+    {
+        goToSchemaBrowser();
+        selectQuery(D_PEOPLE_SCHEMA_NAME, "People");
+        waitAndClick(Locator.linkWithText("view data"));
+
+        waitForElement(Locator.id("dataregion_query"));
+        DataRegionTable table = new DataRegionTable("query", this, false);
+        Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
+        // Check Name column is renamed and 'Dave' is the only value
+        Assert.assertEquals("Expected to filter table to only Dave", "Dave", table.getDataAsText(0, D_PEOPLE_METADATA_TITLE));
+
+        // Check the details url has been disabled
+        assertElementNotPresent(Locator.linkWithText("details"));
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)
     {
         goToSchemaBrowser();
         waitForElement(Locator.xpath("//span[text()='"+schemaName+"']"));
-        click(Locator.xpath("//span[text()='"+schemaName+"']"));
+        click(Locator.xpath("//span[text()='" + schemaName + "']"));
         waitForElement(Locator.xpath("//span[text()='"+ tableName +"']"));
         click(Locator.xpath("//span[text()='" + tableName + "']"));
     }
@@ -236,7 +282,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         goToHome();
         waitForElement(Locator.xpath("//a[text()='"+ projectName +"']"));
-        click(Locator.xpath("//a[text()='"+ projectName +"']"));
+        click(Locator.xpath("//a[text()='" + projectName + "']"));
     }
 
     protected void changeListName(String oldName, String newName)
@@ -250,39 +296,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         setFormElement(Locator.xpath("//input[@name='ff_name']"), newName);
 
         _listHelper.clickSave();
-    }
-
-    @LogMethod(category = LogMethod.MethodType.SETUP)
-    protected void createLinkedSchemaWithTables(String targetFolder, String linkedSchemaName, String sourceSchema, String... tables)
-    {
-        waitForElement(Locator.xpath("//a[text()='"+ targetFolder +"']"));
-        click(Locator.xpath("//a[text()='"+ targetFolder +"']"));
-
-        goToSchemaBrowser();
-        waitForText("Schema Administration");
-        clickButton("Schema Administration");
-        waitForElement(Locator.xpath("//a[text()='new linked schema']"));
-        click(Locator.xpath("//a[text()='new linked schema']"));
-
-        waitForElement(Locator.xpath("//input[@name='userSchemaName']"));
-        setFormElement(Locator.xpath("//input[@name='userSchemaName']"), linkedSchemaName);
-        setFormElement(Locator.xpath("//input[@name='dataSource']"), "/" + PROJECT_NAME + "/" + SOURCE_FOLDER);
-        waitForElement(Locator.xpath("//li[text()='/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "']"));
-        click(Locator.xpath("//li[text()='/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "']"));
-        _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='sourceSchemaName']")));
-        setFormElement(Locator.xpath("//input[@name='sourceSchemaName']"), sourceSchema);
-        click(Locator.xpath("//li[text()='"+ sourceSchema +"']"));
-
-        clickAt(Locator.xpath("//input[@name='tables']"), 1, 1);
-        sleep(200);
-        for (String table : tables)
-        {
-            click(Locator.xpath("//li[text() = '" + table + "']"));
-        }
-
-        clickButton("Create");
-        waitForElement(Locator.xpath("//a[text()='TargetFolder']"));
-        click(Locator.xpath("//a[text()='TargetFolder']"));
     }
 
     protected void assertColumnsPresent(String sourceFolder, String schemaName, String tableName, String... columnNames)
@@ -377,89 +390,92 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     }
 
 
+    @LogMethod(category = LogMethod.MethodType.SETUP)
+    void createLinkedSchema(String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
+    {
+        _editLinkedSchema(true, targetFolder, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
+    }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
-    void createLinkedSchema(String containerPath, String name, String sourceContainerId, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
+    void updateLinkedSchema(String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
     {
-        beginAt("/query/" + containerPath + "/admin.view");
-        assertTextNotPresent(name);
+        _editLinkedSchema(false, targetFolder, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
+    }
 
-        // UNDONE: Use web ui to insert the linked schema ...
-        /*
-        clickAndWait(Locator.linkWithText("new linked schema"));
-        _extHelper.setExtFormElementByLabel("Schema Name:", name);
-        //setFormElement(Locator.name("userSchemaName"), name);
-        _extHelper.selectComboBoxItem("Source Container:", sourceContainer);
+    void _editLinkedSchema(boolean create, String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
+    {
+        beginAt("/query/" + getProjectName() + "/" + targetFolder + "/admin.view");
+
+        // Click the create new or edit existing link.
+        Locator link;
+        if (create)
+            link = Locator.xpath("//a[text()='new linked schema']");
+        else
+            link = Locator.xpath("//td[text()='" + name + "']/..//a[text()='edit']");
+        waitForElement(link);
+        click(link);
+
+        waitForElement(Locator.xpath("//input[@name='userSchemaName']"));
+        setFormElement(Locator.xpath("//input[@name='userSchemaName']"), name);
+        setFormElement(Locator.xpath("//input[@name='dataSource']"), sourceContainerPath);
+        waitForElement(Locator.xpath("//li[text()='" + sourceContainerPath + "']"));
+        click(Locator.xpath("//li[text()='" + sourceContainerPath + "']"));
+        _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='sourceSchemaName']")));
 
         if (schemaTemplate != null)
         {
-            // UNDONE: Can't seem to get the timing right -- so just set the schemaTemplate on the form element
-            _extHelper.selectComboBoxItem("Schema Template:", schemaTemplate);
-        }
-        else
-        {
-            _extHelper.selectComboBoxItem("Source Schema:", sourceSchema);
-
-            // UNDONE
-            //if (tables != null)
-            //    setFormElement(Locator.name("tables"), tables);
-
-            if (metadata != null)
-                setFormElement(Locator.name("metaData"), metadata);
+            setFormElement(Locator.xpath("//input[@name='schemaTemplate']"), schemaTemplate);
+            waitForElement(Locator.xpath("//li[text()='" + schemaTemplate + "']"));
+            click(Locator.xpath("//li[text()='" + schemaTemplate + "']"));
         }
 
-        clickButton("Create");
-        */
-
-        HttpClient client = WebTestHelper.getHttpClient(PasswordUtil.getUsername(), PasswordUtil.getPassword());
-        HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpPost method = null;
-        HttpResponse response = null;
-        try
+        if (sourceSchemaName != null)
         {
-            method = new HttpPost(getBaseURL() + "/query/" + containerPath + "/insertLinkedSchema.post");
-            List<NameValuePair> args = new ArrayList<NameValuePair>();
-            args.add(new BasicNameValuePair("schemaType", "linked"));
-            args.add(new BasicNameValuePair("userSchemaName", name));
-            args.add(new BasicNameValuePair("dataSource", sourceContainerId));
-            args.add(new BasicNameValuePair("schemaTemplate", schemaTemplate));
-            args.add(new BasicNameValuePair("sourceSchemaName", sourceSchemaName));
-            args.add(new BasicNameValuePair("tables", tables));
-            args.add(new BasicNameValuePair("metaData", metadata));
-            method.setEntity(new UrlEncodedFormEntity(args));
-
-            log("** Inserting linked schema by POST to " + method.getURI());
-            response = client.execute(method, context);
-
-            StatusLine statusLine = response.getStatusLine();
-            log("  " + statusLine);
-            Assert.assertTrue("Expected to success code 200 or 302: " + statusLine,
-                    HttpStatus.SC_OK == statusLine.getStatusCode() || HttpStatus.SC_MOVED_TEMPORARILY == statusLine.getStatusCode());
-            String html = EntityUtils.toString(response.getEntity());
-            int err = html.indexOf("<div class=\"labkey-error\"");
-            if (err > -1)
+            if (schemaTemplate != null)
             {
-                String msg = "ERROR inserting linked schema";
-                int end = html.indexOf("</div>", err+1);
-                if (end > -1)
-                    msg = html.substring(err, end);
-                Assert.fail(msg);
+                // click "Override template value" widget
+                click(Locator.xpath("id('sourceSchemaOverride')/span[text()='Override template value']"));
+            }
+
+            setFormElement(Locator.xpath("//input[@name='sourceSchemaName']"), sourceSchemaName);
+            waitForElement(Locator.xpath("//li[text()='"+ sourceSchemaName + "']"));
+            click(Locator.xpath("//li[text()='"+ sourceSchemaName + "']"));
+        }
+
+        if (tables != null)
+        {
+            if (schemaTemplate != null)
+            {
+                // click "Override template value" widget
+                click(Locator.xpath("id('tablesOverride')/span[text()='Override template value']"));
+            }
+
+            clickAt(Locator.xpath("//input[@name='tables']"), 1, 1);
+            sleep(200);
+            for (String table : tables.split(","))
+            {
+                click(Locator.xpath("//li[text() = '" + table + "']"));
             }
         }
-        catch (Exception e)
+
+        if (metadata != null)
         {
-            throw new RuntimeException(e);
-        }
-        finally
-        {
-            if (client != null)
-                client.getConnectionManager().shutdown();
+            if (schemaTemplate != null)
+            {
+                // click "Override template value" widget
+                click(Locator.xpath("id('metadataOverride')/span[text()='Override template value']"));
+            }
+
+            setFormElement(Locator.xpath("//textarea[@name='metaData']"), metadata);
         }
 
-        // On success, we are returned to admin.view (XXX: well, in the web ui version we will be...)
-        //assertTitleContains("Schema Administration");
-        beginAt("/query/" + containerPath + "/admin.view");
-        assertTextPresent(name);
+        if (create)
+            clickButton("Create");
+        else
+            clickButton("Update");
+
+        // Back on schema admin page, check the linked schema was created/updated.
+        waitForElement(Locator.xpath("//td[text()='" + name + "']"));
     }
 
 }
