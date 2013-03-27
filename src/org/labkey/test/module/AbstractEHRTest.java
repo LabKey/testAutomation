@@ -36,7 +36,6 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -298,16 +297,16 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     protected void assertNoErrorText()
     {
         String[] texts = new String[]{"error", "Error", "ERROR", "failed", "Failed", "Invalid", "invalid"};
-        String visibleText = isVisibleTextPresent(texts);
-        Assert.assertNull("Error text found: " + visibleText, visibleText);
+        String visibleText = findVisibleText(texts);
+        Assert.assertTrue("Error text found: " + visibleText, visibleText == null);
     }
 
     /**
-     * Checks if text is visible on the page
+     * Checks if any text is visible on the page
      * @param texts Exact, case-sensitive strings to check for
      * @return The first string among texts if any are found; null if none are found
      */
-    public String isVisibleTextPresent(String... texts)
+    public String findVisibleText(String... texts)
     {
         if(texts==null || texts.length == 0)
             return null;
@@ -319,7 +318,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
             text = text.replace("&", "&amp;");
             text = text.replace("<", "&lt;");
             text = text.replace(">", "&gt;");
-            if (!source.contains(text))
+            if (source.contains(text))
                 return text;
         }
         return null;
