@@ -675,6 +675,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         expected.put("STD_15000000", new String[]{"STD_15000000", "Standard", "", "147000000"});
         expected.put("STD_3", new String[]{"STD_3", "Standard", "", "0"});
 
+        waitForElement(Locator.linkContainingText("Control"));  //proxy for DR load
         String sampleType = results.getDataAsText(2, "Sample Type");
         Assert.assertEquals("Incorrect sample type", "Serum", sampleType);
 
