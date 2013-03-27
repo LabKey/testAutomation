@@ -223,7 +223,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         // Check the custom details url is used
         clickAndWait(table.detailsLink(0));
         assertTitleContains("Record Details:");
-        assertTextPresent("Adam");
+        waitForText("Adam");
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
