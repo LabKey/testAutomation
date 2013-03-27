@@ -279,8 +279,12 @@ public class ExtHelper extends AbstractHelper
         waitForFileGridReady();
         _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-filecontent-grid')]"), 60000);
         _test.waitForElement(locateBrowserFileName(fileName), 60000);
+        Boolean wasChecked = _test.isElementPresent(Locator.xpath("//div").withClass("x-grid3-row-selected").append("/table/tbody/tr/td/div").withText(fileName));
         _test.getWrapper().getEval("selenium.selectFileBrowserCheckbox('" + fileName + "');");
-        _test.waitForElement(Locator.xpath("//div").withClass("x-grid3-row-selected").append("/table/tbody/tr/td/div").withText(fileName));
+        if (wasChecked)
+            _test.waitForElementToDisappear(Locator.xpath("//div").withClass("x-grid3-row-selected").append("/table/tbody/tr/td/div").withText(fileName));
+        else
+            _test.waitForElement(Locator.xpath("//div").withClass("x-grid3-row-selected").append("/table/tbody/tr/td/div").withText(fileName));
     }
 
     public void clickXGridPanelCheckbox(int index, boolean keepExisting)
