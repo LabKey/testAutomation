@@ -401,6 +401,7 @@ public class ExtHelperWD extends AbstractHelperWD
         _test.waitForElement(Locator.css("div.labkey-filecontent-grid"), WAIT_FOR_PAGE);
         _test.waitForElement(locateBrowserFileName(fileName), WAIT_FOR_PAGE);
         selectExtGridItem("name", fileName, -1, "labkey-filecontent-grid", true);
+        _test.waitForElement(Locator.css("div.x-grid3-row-selected > table > tbody > tr > td > div").withText(fileName));
     }
 
     public void clickXGridPanelCheckbox(int index, boolean keepExisting)
