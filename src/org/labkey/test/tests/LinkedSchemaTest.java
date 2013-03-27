@@ -62,7 +62,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             "          </dat:column>\n" +
             "        </dat:columns>\n" +
             "    </dat:table>\n" +
-            "</dat:tables>";
+            "</dat:tables>\n";
 
     public static final String B_PEOPLE_SCHEMA_NAME = "B_People";
     public static final String B_PEOPLE_TEMPLATE_METADATA_TITLE = "BPeopleTemplate Name title";
@@ -72,6 +72,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     public static final String D_PEOPLE_METADATA =
             "<dat:tables xmlns:dat=\"http://labkey.org/data/xml\" xmlns:cv=\"http://labkey.org/data/xml/queryCustomView\">\n" +
             "    <dat:table tableName=\"People\" tableDbType=\"NOT_IN_DB\">\n" +
+            "        <!-- disable details url -->\n" +
             "        <dat:tableUrl></dat:tableUrl>\n" +
             "        <dat:filters>\n" +
             "          <cv:where>Name LIKE 'D%'</cv:where>\n" +
@@ -80,9 +81,16 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             "          <dat:column columnName=\"Name\">\n" +
             "            <dat:columnTitle>" + D_PEOPLE_METADATA_TITLE + "</dat:columnTitle>\n" +
             "          </dat:column>\n" +
-            "        </dat:columns>" +
+            "        </dat:columns>\n" +
             "    </dat:table>\n" +
-            "</dat:tables>";
+            "    <dat:table tableName=\"TestQuery\" tableDbType=\"NOT_IN_DB\">\n" +
+            "        <dat:columns>\n" +
+            "          <dat:column columnName=\"Name\">\n" +
+            "            <dat:columnTitle>Crazy " + D_PEOPLE_METADATA_TITLE + "</dat:columnTitle>\n" +
+            "          </dat:column>\n" +
+            "        </dat:columns>\n" +
+            "    </dat:table>\n" +
+            "</dat:tables>\n";
 
 
     @Override
@@ -100,7 +108,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-//        super.doCleanup(afterTest);
+        super.doCleanup(afterTest);
     }
 
     @Override
@@ -249,15 +257,14 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema BPeople using BPeopleTemplate with metadata override to only show 'D' people");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        createLinkedSchema(TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, null, D_PEOPLE_METADATA);
+        createLinkedSchema(TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, "People,TestQuery", D_PEOPLE_METADATA);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     void verifyLinkedSchemaTemplateOverride()
     {
         goToSchemaBrowser();
-        selectQuery(D_PEOPLE_SCHEMA_NAME, "People");
-        waitAndClick(Locator.linkWithText("view data"));
+        viewQueryData(D_PEOPLE_SCHEMA_NAME, "People");
 
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable table = new DataRegionTable("query", this, false);
@@ -267,6 +274,16 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         // Check the details url has been disabled
         assertElementNotPresent(Locator.linkWithText("details"));
+
+        // Check TestQuery is available and metadata is overridden
+        goToSchemaBrowser();
+        viewQueryData(D_PEOPLE_SCHEMA_NAME, "TestQuery");
+
+        waitForElement(Locator.id("dataregion_query"));
+        table = new DataRegionTable("query", this, false);
+        // TestQuery is executed over the 'D_People' filtered People table -- so only 'Dave' is available.
+        Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
+        Assert.assertEquals("Expected to filter query to only Dave", "Dave", table.getDataAsText(0, "Crazy " + D_PEOPLE_METADATA_TITLE));
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)
@@ -314,7 +331,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         }
 
         click(Locator.xpath("//a[text()='TargetFolder']"));
-        System.out.print("Hey! Good job.");
 
     }
 
@@ -420,10 +436,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         setFormElement(Locator.xpath("//input[@name='dataSource']"), sourceContainerPath);
         waitForElement(Locator.xpath("//li[text()='" + sourceContainerPath + "']"));
         click(Locator.xpath("//li[text()='" + sourceContainerPath + "']"));
-        _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='sourceSchemaName']")));
 
         if (schemaTemplate != null)
         {
+            _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='schemaTemplate']")));
             setFormElement(Locator.xpath("//input[@name='schemaTemplate']"), schemaTemplate);
             waitForElement(Locator.xpath("//li[text()='" + schemaTemplate + "']"));
             click(Locator.xpath("//li[text()='" + schemaTemplate + "']"));
@@ -436,6 +452,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
                 // click "Override template value" widget
                 click(Locator.xpath("id('sourceSchemaOverride')/span[text()='Override template value']"));
             }
+            _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='sourceSchemaName']")));
 
             setFormElement(Locator.xpath("//input[@name='sourceSchemaName']"), sourceSchemaName);
             waitForElement(Locator.xpath("//li[text()='"+ sourceSchemaName + "']"));
@@ -449,6 +466,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
                 // click "Override template value" widget
                 click(Locator.xpath("id('tablesOverride')/span[text()='Override template value']"));
             }
+            _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='tables']")));
 
             clickAt(Locator.xpath("//input[@name='tables']"), 1, 1);
             sleep(200);
@@ -465,6 +483,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
                 // click "Override template value" widget
                 click(Locator.xpath("id('metadataOverride')/span[text()='Override template value']"));
             }
+            _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//textarea[@name='metaData']")));
 
             setFormElement(Locator.xpath("//textarea[@name='metaData']"), metadata);
         }
