@@ -393,7 +393,8 @@ public class NWBioTrustTest extends SurveyTest
         waitForElement(Locator.id("closed-dashboard-5").append("//span").withText("No study registrations to show"));
         waitForElement(Locator.id("pending-dashboard-2").append(Locator.linkWithText(requestId)));
         clickTab("Study Registrations");
-        waitAndClickAndWait(Locator.linkWithText(requestId.split("-")[0]));
+        waitAndClick(Locator.linkWithText(requestId.split("-")[0]));
+        waitAndClick(Locator.linkWithText("view details"));
         waitAndClick(Locator.xpath("//li[text()='Save / Submit']"));
 
         clickButton("Submit completed form");
