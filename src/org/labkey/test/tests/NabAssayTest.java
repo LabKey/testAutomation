@@ -86,8 +86,6 @@ public class NabAssayTest extends AbstractQCAssayTest
     private static final boolean CONTINUE = false;
     private static final String PLATE_TEMPLATE_NAME = "NabAssayTest Template";
 
-    public static boolean useNewNab = true;
-
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/nab";
@@ -340,16 +338,10 @@ public class NabAssayTest extends AbstractQCAssayTest
             addAUCColumns();
             assertAliasedAUCCellData();
 
-            if (!useNewNab)
-                setFilter("Data", "Properties/SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
-            else
-                setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
+            setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
             assertTextPresent("ptid 1 C");
             String ptid1c_detailsURL = getAttribute(Locator.xpath("//a[contains(text(), 'details')]"), "href");
-            if (!useNewNab)
-                setFilter("Data", "Properties/SpecimenLsid/Property/ParticipantID", "Equals One Of (e.g. \"a;b;c\")", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
-            else
-                setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals One Of (e.g. \"a;b;c\")", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
+            setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals One Of (e.g. \"a;b;c\")", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
             assertTextPresent("ptid 1 A");
             assertTextPresent("ptid 1 B");
             assertTextNotPresent("ptid 1 C");
@@ -526,36 +518,18 @@ public class NabAssayTest extends AbstractQCAssayTest
         log("Adding AUC columns to custom view");
         // add AUC columns. ORDER MATTERS!
         _customizeViewsHelper.openCustomizeViewPanel();
-        if (!useNewNab)
-        {
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_4pl", "AUC 4pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_5pl", "AUC 5pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_poly", "AUC Poly");
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC50_4pl", "Curve IC50 4pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC50_5pl", "Curve IC50 5pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC50_poly", "Curve IC50 Poly");
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC70_4pl", "Curve IC70 4pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC70_5pl", "Curve IC70 5pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC70_poly", "Curve IC70 Poly");
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC80_4pl", "Curve IC80 4pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC80_5pl", "Curve IC80 5pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC80_poly", "Curve IC80 Poly");
-        }
-        else
-        {
-            _customizeViewsHelper.addCustomizeViewColumn("AUC_4pl", "AUC 4pl");
-            _customizeViewsHelper.addCustomizeViewColumn("AUC_5pl", "AUC 5pl");
-            _customizeViewsHelper.addCustomizeViewColumn("AUC_Poly", "AUC Poly");
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_4pl", "Curve IC50 4pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_5pl", "Curve IC50 5pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_Poly", "Curve IC50 Poly");
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_4pl", "Curve IC70 4pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_5pl", "Curve IC70 5pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_Poly", "Curve IC70 Poly");
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_4pl", "Curve IC80 4pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_5pl", "Curve IC80 5pl");
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_Poly", "Curve IC80 Poly");
-        }
+        _customizeViewsHelper.addCustomizeViewColumn("AUC_4pl", "AUC 4pl");
+        _customizeViewsHelper.addCustomizeViewColumn("AUC_5pl", "AUC 5pl");
+        _customizeViewsHelper.addCustomizeViewColumn("AUC_Poly", "AUC Poly");
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_4pl", "Curve IC50 4pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_5pl", "Curve IC50 5pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_Poly", "Curve IC50 Poly");
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_4pl", "Curve IC70 4pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_5pl", "Curve IC70 5pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_Poly", "Curve IC70 Poly");
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_4pl", "Curve IC80 4pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_5pl", "Curve IC80 5pl");
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_Poly", "Curve IC80 Poly");
         _customizeViewsHelper.applyCustomView();
     }
 
@@ -594,26 +568,13 @@ public class NabAssayTest extends AbstractQCAssayTest
         // check copied AUC data.
         setSort("Dataset", "ParticipantId", SortDirection.ASC);
         _customizeViewsHelper.openCustomizeViewPanel();
-        if (!useNewNab)
-        {
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_poly",        AUC_POLY_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_4pl",         AUC_4PL_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/AUC_5pl",         AUC_5PL_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC50_poly", CURVE_IC50_POLY_STUDY_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC50_4pl",  CURVE_IC50_4PL_STUDY_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC70_poly", CURVE_IC70_POLY_STUDY_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("Properties/Curve IC80_4pl",  CURVE_IC80_4PL_STUDY_COL_TITLE);
-        }
-        else
-        {
-            _customizeViewsHelper.addCustomizeViewColumn("AUC_Poly",        AUC_POLY_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("AUC_4pl",         AUC_4PL_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("AUC_5pl",         AUC_5PL_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_Poly", CURVE_IC50_POLY_STUDY_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_4pl",  CURVE_IC50_4PL_STUDY_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_Poly", CURVE_IC70_POLY_STUDY_COL_TITLE);
-            _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_4pl",  CURVE_IC80_4PL_STUDY_COL_TITLE);
-        }
+        _customizeViewsHelper.addCustomizeViewColumn("AUC_Poly",        AUC_POLY_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("AUC_4pl",         AUC_4PL_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("AUC_5pl",         AUC_5PL_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_Poly", CURVE_IC50_POLY_STUDY_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff50/IC_4pl",  CURVE_IC50_4PL_STUDY_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff70/IC_Poly", CURVE_IC70_POLY_STUDY_COL_TITLE);
+        _customizeViewsHelper.addCustomizeViewColumn("Cutoff80/IC_4pl",  CURVE_IC80_4PL_STUDY_COL_TITLE);
         _customizeViewsHelper.saveCustomView();
 
         DataRegionTable table = new DataRegionTable("Dataset", this);
