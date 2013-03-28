@@ -92,7 +92,7 @@ public abstract class Locator
             (_text == null ? "" : "\nWith Text: " + _text);
     }
 
-    protected abstract By toBy();
+    public abstract By toBy();
 
     @Deprecated
     public static Locator raw(String str)
@@ -736,7 +736,7 @@ public abstract class Locator
             return new XPathLocator("("+_loc+")["+(index+1)+"]");
         }
 
-        protected By toBy()
+        public By toBy()
         {
             return By.xpath(getPath());
         }
@@ -822,7 +822,7 @@ public abstract class Locator
             _id = loc;
         }
 
-        protected By toBy()
+        public By toBy()
         {
             return By.id(_id);
         }
@@ -871,7 +871,7 @@ public abstract class Locator
             return "name=" + _loc + (_index != null ? " index=" + _index : "");
         }
 
-        protected By toBy()
+        public By toBy()
         {
             return By.name(_loc);
         }
@@ -915,7 +915,7 @@ public abstract class Locator
             return "css=" + _loc;
         }
 
-        protected By toBy()
+        public By toBy()
         {
             if (_loc.contains(":contains("))
                 throw new IllegalArgumentException("CSS3 does not support the ':contains' pseudo-class: '" + _loc + "'");
@@ -954,7 +954,7 @@ public abstract class Locator
             return "link=" + _linkText;
         }
 
-        protected By toBy()
+        public By toBy()
         {
             return By.linkText(_linkText);
         }
@@ -997,7 +997,7 @@ public abstract class Locator
             return _loc;
         }
 
-        protected By toBy()
+        public By toBy()
         {
             throw new UnsupportedOperationException("Deprecated Locator: '" + toString() +"' not supported by WebDriver");
         }
