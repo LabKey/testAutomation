@@ -171,13 +171,28 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         Assert.assertEquals(0, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
         Assert.assertEquals(31, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
 
-        // test UI form for other search types (Custom Name and Unimod Name)
-        _ext4Helper.selectRadioButton("Search Type:", "By Custom Name");
+        // test custom name search type
+        _ext4Helper.selectRadioButton("Search By:", "Modification Name");
         assertTextNotPresent("Amino Acids:", "Delta Mass:", "Unimod Name:");
-        assertTextPresent("Custom Name:");
-        _ext4Helper.selectRadioButton("Search Type:", "By Unimod Name");
+        assertTextPresent("Include:", "Custom Name:");
+        _ext4Helper.selectRadioButton("Type:", "Names used in imported experiments");
+        _ext4Helper.selectComboBoxItem("Custom Name:", "Label:13C(6)15N(4) (C-term R)");
+        sleep(500); // sleep for a half second to let the search button enable based on form validation
+        clickAndWait(Locator.button("Search"));
+        waitForText("1 - 13 of 13");
+        Assert.assertEquals(13, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
+        Assert.assertEquals(0, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
+        _ext4Helper.selectComboBoxItem("Custom Name:", "Label:13C(6)15N(2) (C-term K)");
+        sleep(500); // sleep for a half second to let the search button enable based on form validation
+        clickAndWait(Locator.button("Search"));
+        waitForText("1 - 31 of 31");
+        Assert.assertEquals(0, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
+        Assert.assertEquals(31, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
+
+        // test unimod name search type
+        _ext4Helper.selectRadioButton("Type:", "All Unimod modifications");
         assertTextNotPresent("Amino Acids:", "Delta Mass:", "Custom Name:");
-        assertTextPresent("Unimod Name:");
+        assertTextPresent("Include:", "Unimod Name:");
         _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabelContaining("Unimod Name:"), "Carbamidomethyl");
         sleep(500); // sleep for a half second to let the search button enable based on form validation
         clickAndWait(Locator.button("Search"));
