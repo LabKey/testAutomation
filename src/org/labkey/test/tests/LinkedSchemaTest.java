@@ -468,7 +468,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             }
             _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='tables']")));
 
-            clickAt(Locator.xpath("//input[@name='tables']"), 1, 1);
+            clickAt(Locator.xpath("//input[@name='tables']"), 1, 1, 0);
             sleep(200);
             for (String table : tables.split(","))
             {
