@@ -27,6 +27,7 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4HelperWD;
@@ -116,6 +117,7 @@ public class NWBioTrustTest extends SurveyTest
     private static final String NWBT_PRINCIPAL_INVESTIGATOR = "pi_nwbiotrust@nwbiotrust.test";
     private static final String NWBT_STUDY_CONTACT = "sc_nwbiotrust@nwbiotrust.test";
     private static final String NWBT_RESEARCH_COORD = "rc_nwbiotrust@nwbiotrust.test";
+    private static final String NWBT_RC_EMAIL = "rc_notification@nwbiotrust.test";
     private static final String NWBT_FACULTY_CHAIR = "fc_nwbiotrust@nwbiotrust.test";
     private static final String NWBT_FACULTY_REVIEWER = "fr_nwbiotrust@nwbiotrust.test";
     private static final String NWBT_SURGICAL_REVIEWER = "sr_nwbiotrust@nwbiotrust.test";
@@ -836,6 +838,12 @@ public class NWBioTrustTest extends SurveyTest
         // create two requestor folders for this project
         _containerHelper.createSubfolder(getProjectName(), requestorFolder1, "NW BioTrust Specimen Requestor");
         _containerHelper.createSubfolder(getProjectName(), requestorFolder2, "NW BioTrust Specimen Requestor");
+
+        // set up the rc email notification
+        List<ModulePropertyValue> properties = new ArrayList<ModulePropertyValue>();
+        properties.add(new ModulePropertyValue("BioTrust", "/", "RC email address", NWBT_RC_EMAIL));
+
+        setModuleProperties(properties);
     }
 
     private void deleteDashboardLookupRows(String tableName, String filterColName, String[] valuesToBeDeleted)
