@@ -282,4 +282,10 @@ public class DataRegionTest extends BaseWebDriverTest
         String actual = matcher.group(0);
         Assert.assertEquals("Wrong pagination text", expected, actual);
     }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }
