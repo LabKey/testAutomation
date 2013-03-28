@@ -5272,7 +5272,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear");
         prepForPageLoad();
-        _extHelper.clickExtComponent(id);
+        _extHelper.clickExtComponent(EscapeUtil.filter(id));
         newWaitForPageToLoad(wait);
     }
 
@@ -5283,7 +5283,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":" + direction.toString().toLowerCase());
         prepForPageLoad();
-        _extHelper.clickExtComponent(id);
+        _extHelper.clickExtComponent(EscapeUtil.filter(id));
         newWaitForPageToLoad(wait);
     }
 
@@ -5327,7 +5327,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
         waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String columnLabel = getText(header);
-        _extHelper.clickExtComponent(id);
+        _extHelper.clickExtComponent(EscapeUtil.filter(id));
         _extHelper.waitForExtDialog("Show Rows Where " + columnLabel + "...");
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
@@ -5366,7 +5366,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
         waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String columnLabel = getText(header);
-        _extHelper.clickExtComponent(id);
+        _extHelper.clickExtComponent(EscapeUtil.filter(id));
         _extHelper.waitForExtDialog("Show Rows Where " + columnLabel + "...");
 
         sleep(500);
@@ -5411,7 +5411,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear-filter");
         if(waitForPageLoad > 0)
             prepForPageLoad();
-        _extHelper.clickExtComponent(id);
+        _extHelper.clickExtComponent(EscapeUtil.filter(id));
         if(waitForPageLoad > 0)
             newWaitForPageToLoad(waitForPageLoad);
     }
@@ -5425,7 +5425,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));
         waitForElement(header, WAIT_FOR_JAVASCRIPT);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
-        _extHelper.clickExtComponent(id);
+        _extHelper.clickExtComponent(EscapeUtil.filter(id));
         clickButton("CLEAR ALL FILTERS");
     }
 
