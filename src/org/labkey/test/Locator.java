@@ -332,6 +332,12 @@ public abstract class Locator
         return xpath("//a[" + NOT_HIDDEN + " and contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')]/span[text() = " + xq(text) + "]");
     }
 
+    public static XPathLocator navTreeExpander(String nodeText)
+    {
+
+        return Locator.xpath("//tr").withClass("labkey-nav-tree-row").withText(nodeText).append("/td").withClass("labkey-nav-tree-node");
+    }
+
     public static XPathLocator extButton(String text)
     {
         return xpath("//button[" + NOT_HIDDEN + " and contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");

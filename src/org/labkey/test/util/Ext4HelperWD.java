@@ -353,7 +353,7 @@ public class Ext4HelperWD extends AbstractHelperWD
 
     public void waitForMaskToDisappear(int wait)
     {
-        _test.waitForElementToDisappear(getExtMask(), wait);
+        _test.waitForElementToDisappear(Locators.mask(), wait);
     }
 
     public void waitForMask()
@@ -363,12 +363,7 @@ public class Ext4HelperWD extends AbstractHelperWD
 
     public void waitForMask(int wait)
     {
-        _test.waitForElement(getExtMask(), wait);
-    }
-
-    private Locator getExtMask()
-    {
-        return Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-mask')]");
+        _test.waitForElement(Locators.mask(), wait);
     }
 
     /**
@@ -446,6 +441,11 @@ public class Ext4HelperWD extends AbstractHelperWD
         public static Locator.XPathLocator formItemWithLabelContaining(String label)
         {
             return Locator.xpath("(//table|//tbody)").withClass("x4-form-item").withPredicate("(tbody/tr|tr)/td/label[contains(normalize-space(), '" + label + "')]").notHidden();
+        }
+
+        public static Locator.XPathLocator mask()
+        {
+            return Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-mask')]");
         }
     }
 

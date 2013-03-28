@@ -5940,6 +5940,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         clickButton("Save", 0);
         waitForElement(Locator.permissionRendered(),defaultWaitForPage);
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     @Deprecated

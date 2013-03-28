@@ -18,8 +18,10 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
@@ -28,7 +30,7 @@ import java.io.File;
  * Date: Nov 15, 2005
  * Time: 1:55:56 PM
  */
-public class WikiLongTest extends BaseSeleniumWebTest
+public class WikiLongTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "WikiVerifyProject";
     private static final String PROJECT2_NAME = "WikiCopied";
@@ -60,6 +62,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
     private static final String WIKI_SEARCH_TERM = "okapi";
     private static final String WIKI_INDEX_EDIT_CHECKBOX = "wiki-input-shouldIndex";
     private static final String WIKI_INDEX_MANAGE_CHECKBOX = "shouldIndex";
+    private final PortalHelper _portalHelper = new PortalHelper(this);
 
     private static final String WIKI_PAGE1_CONTENT =
             "1 Title\n" +
@@ -128,13 +131,13 @@ public class WikiLongTest extends BaseSeleniumWebTest
         enableEmailRecorder();
         _containerHelper.createProject(PROJECT2_NAME, null);
         enableModule(PROJECT2_NAME, "MS2");
-        setPermissions(USERS_GROUP, "Editor");
+        _securityHelper.setProjectPerm(USERS_GROUP, "Editor");
         clickButton("Save and Finish");
         _containerHelper.createProject(PROJECT_NAME, null);
         enableModule(PROJECT_NAME, "MS2");
         createPermissionsGroup("testers");
-        setPermissions("testers", "Editor");
-        setPermissions(USERS_GROUP, "Editor");
+        _securityHelper.setProjectPerm("testers", "Editor");
+        _securityHelper.setProjectPerm(USERS_GROUP, "Editor");
         clickButton("Save and Finish");
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
@@ -145,17 +148,17 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("full-text search"));
         if (isTextPresent("pause crawler"))
             clickButton("pause crawler");
-        beginAt(selenium.getLocation().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
+        beginAt(getDriver().getCurrentUrl().replace("admin.view", "waitForIdle.view"), 10*defaultWaitForPage);
 
-        clickAndWait(Locator.linkWithText(PROJECT2_NAME));
+        clickFolder(PROJECT2_NAME);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
         clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        addWebPart("Wiki");
-        addWebPart("Search");
+        _portalHelper.addWebPart("Wiki");
+        _portalHelper.addWebPart("Search");
 
         log("Test new wiki page");
         createNewWikiPage("RADEOX");
@@ -233,12 +236,12 @@ public class WikiLongTest extends BaseSeleniumWebTest
         log("test change renderer type");
         assertTextPresent("Some HTML content");
         clickAndWait(Locator.linkWithText("Edit"));
-        changeFormat("TEXT_WITH_LINKS");
+        convertWikiFormat("TEXT_WITH_LINKS");
         saveWikiPage();
 
         assertTextPresent("<b>");
         clickAndWait(Locator.linkWithText("Edit"));
-        changeFormat("HTML");
+        convertWikiFormat("HTML");
         saveWikiPage();
 
         log("Check Start Page series works");
@@ -257,9 +260,11 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("Manage"));
         clickButton("Move Down", 0);
         clickButton("Save");
-        clickAndWait(Locator.linkWithText(WIKI_PAGE3_NAME_TITLE));
+        clickAndWait(Locator.linkWithText(WIKI_PAGE2_TITLE));
         clickAndWait(Locator.linkWithText("next"));
-        assertTextPresent("normal normal normal");
+        assertElementPresent(Locator.css(".labkey-wiki").containing("Some HTML content"));
+        clickAndWait(Locator.linkWithText("next"));
+        assertElementPresent(Locator.css(".labkey-wiki").containing("normal normal normal"));
         clickAndWait(Locator.linkWithText("Manage"));
         clickButton("Move Up", 0);
         clickButton("Save");
@@ -267,6 +272,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         assertTextPresent("Page AAA");
 
         log("Check parent reset works");
+        click(Locator.navTreeExpander(WIKI_PAGE2_TITLE));
         clickAndWait(Locator.linkWithText(WIKI_PAGE3_NAME_TITLE));
         clickAndWait(Locator.linkWithText("Manage"));
         selectOptionByText("parent", WIKI_PAGE1_TITLE + " (" + WIKI_PAGE1_NAME + ")");
@@ -310,7 +316,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         setWikiBody(NAVBAR1_CONTENT);
         saveWikiPage();
 
-        assertTextNotPresent("Home");
+        assertElementNotPresent(Locator.linkWithText("Home"));
         assertLinkPresentWithText(PROJECT_NAME);
 
         clickAndWait(Locator.linkWithText("Edit"));
@@ -338,6 +344,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         assertTextNotPresent(HEADER_CONTENT);
 
         log("Return to where we were...");
+        click(Locator.navTreeExpander(WIKI_PAGE1_TITLE));
         clickAndWait(Locator.linkWithText(WIKI_PAGE3_NAME_TITLE));
 
         log("test versions");
@@ -359,7 +366,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
 
         log("test wiki customize link");
         clickTab("Portal");
-        addWebPart("Wiki");
+        _portalHelper.addWebPart("Wiki");
         clickWebpartMenuItem("Wiki", "Customize");
         log("check that container is set to current project");
         selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
@@ -378,11 +385,12 @@ public class WikiLongTest extends BaseSeleniumWebTest
         if(waitCycles == MAX_AJAX_WAIT_CYCLES)
             Assert.fail("AJAX population of page names in wiki web part customize view took longer than " + (MAX_AJAX_WAIT_CYCLES/2) + " seconds!");
 
-        selectOptionByText("name", WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
+        selectOptionByText(Locator.name("name"), WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
         sleep(500);
         clickButton("Submit");
         clickAndWait(Locator.linkWithText("Welcome"));
         log("make sure it all got copied");
+        click(Locator.navTreeExpander(WIKI_PAGE1_TITLE));
         clickAndWait(Locator.linkWithText(WIKI_PAGE3_ALTTITLE));
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
 
@@ -390,8 +398,8 @@ public class WikiLongTest extends BaseSeleniumWebTest
         log("Create fake user for permissions check");
         enterPermissionsUI();
         clickManageGroup(USERS_GROUP);
-        setFormElement("names", USER1);
-        uncheckCheckbox("sendEmail");
+        setFormElement(Locator.name("names"), USER1);
+        uncheckCheckbox(Locator.name("sendEmail"));
         clickButton("Update Group Membership");
 
         log("Check if permissions work");
@@ -399,13 +407,13 @@ public class WikiLongTest extends BaseSeleniumWebTest
         setPermissions(USERS_GROUP, "Reader");
         clickButton("Save and Finish");
         impersonate(USER1);
-        clickAndWait(Locator.linkWithText(PROJECT2_NAME));
+        clickFolder(PROJECT2_NAME);
         pushLocation();
         assertTextPresent(WIKI_PAGE2_TITLE);
         clickTab("Wiki");
         assertTextNotPresent("copy pages");
         stopImpersonating();
-        clickAndWait(Locator.linkWithText(PROJECT2_NAME));
+        clickFolder(PROJECT2_NAME);
         enterPermissionsUI();
         removePermission(USERS_GROUP, "Editor");
         clickButton("Save and Finish");
@@ -420,7 +428,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         stopImpersonating();
 
         log("Check if readers can read from other projects");
-        clickAndWait(Locator.linkWithText(PROJECT2_NAME));
+        clickFolder(PROJECT2_NAME);
         clickWebpartMenuItem(WIKI_PAGE2_TITLE, "Customize");
         selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
 
@@ -442,7 +450,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         setPermissions(USERS_GROUP, "Project Administrator");
         clickButton("Save and Finish");
         impersonate(USER1);
-        clickAndWait(Locator.linkWithText(PROJECT2_NAME));
+        clickFolder(PROJECT2_NAME);
         assertTextNotPresent("Welcome");
         log("Also check copying permission");
         clickTab("Wiki");
@@ -457,7 +465,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickButton("Update Group Membership");
 
         impersonate(USER1);
-        clickAndWait(Locator.linkWithText(PROJECT2_NAME));
+        clickFolder(PROJECT2_NAME);
         assertTextPresent(WIKI_PAGE2_TITLE);
         log("Also check copying permission");
         clickTab("Wiki");
@@ -471,21 +479,21 @@ public class WikiLongTest extends BaseSeleniumWebTest
 
         log("make sure the changes went through");
         impersonate(USER1);
-        clickAndWait(Locator.linkWithText(PROJECT2_NAME));
+        clickFolder(PROJECT2_NAME);
         clickTab("Wiki");
         clickWebpartMenuItem("Pages", "Copy");
         assertTextPresent(PROJECT_NAME);
         stopImpersonating();
 
         log("delete wiki web part");
-        clickAndWait(Locator.linkWithText(PROJECT2_NAME));
+        clickFolder(PROJECT2_NAME);
         clickTab("Portal");
         clickLinkWithImage(getContextPath() + "/_images/partdelete.png", 0);
         waitForElementToDisappear(Locator.linkWithImage(getContextPath() + "/_images/partdelete.png"), WAIT_FOR_JAVASCRIPT);
         assertLinkNotPresentWithText("Welcome");
 
         log("test wiki TOC customize link");
-        addWebPart("Wiki Table of Contents");
+        _portalHelper.addWebPart("Wiki Table of Contents");
         clickWebpartMenuItem("Pages", "Customize");
         setFormElement("title", "Test Customize TOC");
         log("check that container is set to current project");
@@ -505,7 +513,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         assertTextPresent(WIKI_PAGE1_TITLE);
 
         log("Check that 'New Page' works");
-        clickAndWait(Locator.linkWithText(PROJECT2_NAME));
+        clickFolder(PROJECT2_NAME);
         clickTab("Portal");
         clickWebpartMenuItem("Test Customize TOC", "New");
         convertWikiFormat("HTML");
@@ -557,7 +565,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
     private void termsOfUseTest()
     {
         log("Create user for terms of use checks");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickFolder(PROJECT_NAME);
         enterPermissionsUI();
         clickManageGroup(USERS_GROUP);
         setFormElement("names", USER2);
@@ -602,12 +610,12 @@ public class WikiLongTest extends BaseSeleniumWebTest
         signOut();
 
         log("Access project with guest user");
-        clickAndWait(Locator.linkWithText(PROJECT3_NAME));
+        clickFolder(PROJECT3_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
         goToHome();
-        clickAndWait(Locator.linkWithText(PROJECT3_NAME));
+        clickFolder(PROJECT3_NAME);
         assertTextNotPresent("fight club");         
 
         signIn();
@@ -631,7 +639,7 @@ public class WikiLongTest extends BaseSeleniumWebTest
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
 
-        clickAndWait(Locator.linkWithText(PROJECT4_NAME));
+        clickFolder(PROJECT4_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
@@ -643,17 +651,17 @@ public class WikiLongTest extends BaseSeleniumWebTest
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
-        clickAndWait(Locator.linkWithText(PROJECT3_NAME));
+        clickFolder(PROJECT3_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
-        clickAndWait(Locator.linkWithText(PROJECT4_NAME));
+        clickFolder(PROJECT4_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
 
         stopImpersonating();            
-        clickAndWait(Locator.linkWithText(PROJECT3_NAME));
+        clickFolder(PROJECT3_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
@@ -663,15 +671,6 @@ public class WikiLongTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("Edit"));
         deleteWikiPage();
         assertTextNotPresent(WIKI_TERMS_TITLE);
-    }
-
-    private void changeFormat(String format)
-    {
-        clickButton("Convert To...", 0);
-        sleep(500);
-        selectOptionByValue("wiki-input-window-change-format-to", format);
-        clickButton("Convert", 0);
-        sleep(500);
     }
 
     //
@@ -829,5 +828,11 @@ public class WikiLongTest extends BaseSeleniumWebTest
         deleteProject(PROJECT_NAME, afterTest);
         deleteProject(PROJECT3_NAME, afterTest);
         deleteProject(PROJECT4_NAME, afterTest);
+    }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
