@@ -4749,7 +4749,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 clickAndWait(Locator.linkWithText("override"));
         }
         checkRadioButton(Locator.radioButtonById("pipeOptionProjectSpecified"));
-        setFormElement(Locator.name("pipeProjectRootPath"), rootPath);
+        setFormElement(Locator.id("pipeProjectRootPath"), rootPath);
 
         submit();
         log("Finished setting pipeline to: " + rootPath);
