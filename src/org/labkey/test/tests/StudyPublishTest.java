@@ -654,11 +654,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
         if (refreshSpecimens) checkRadioButton("specimenRefresh", "true");
         clickButton("Next", 0);
 
-        // Wizard Page 6 : Study Properties
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Properties']"));
-        checkCheckbox(Locator.xpath("//input[@name = 'Cohort Settings']"));
-        checkCheckbox(Locator.xpath("//input[@name = 'Participant Comment Settings']"));
-        checkCheckbox(Locator.xpath("//input[@name = 'Protocol Documents']"));
+        // Wizard Page 6 : Study Objects
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Objects']"));
+        mouseDown(Locator.css(".studyObjects .x-grid3-hd-checker  div"));
+
+
         clickButton("Next", 0);
 
         // Wizard page 7 : Lists
@@ -691,15 +691,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
         clickButton("Next", 0);
 
-        // Wizard page 10 : Folder Properties
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Properties']"));
-        checkCheckbox(Locator.xpath("//input[@name = 'External schema definitions']"));
-        checkCheckbox(Locator.xpath("//input[@name = 'Folder type and active modules']"));
-        checkCheckbox(Locator.xpath("//input[@name = 'Full-text search settings']"));
-        checkCheckbox(Locator.xpath("//input[@name = 'Missing value indicators']"));
-        checkCheckbox(Locator.xpath("//input[@name = 'Notification settings']"));
-        checkCheckbox(Locator.xpath("//input[@name = 'Webpart properties and layout']"));
-        checkCheckbox(Locator.xpath("//input[@name = 'Wikis and their attachments']"));
+        // Wizard page 10 : Folder Objects
+        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Objects']"));
+        mouseDown(Locator.css(".folderObjects .x-grid3-hd-checker  div"));
         clickButton("Next", 0);
 
         // Wizard page 11 : Publish Options
