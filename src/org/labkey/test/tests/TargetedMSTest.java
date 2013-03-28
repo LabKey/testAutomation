@@ -193,7 +193,7 @@ public class TargetedMSTest extends BaseSeleniumWebTest
         _ext4Helper.selectRadioButton("Type:", "All Unimod modifications");
         assertTextNotPresent("Amino Acids:", "Delta Mass:", "Custom Name:");
         assertTextPresent("Include:", "Unimod Name:");
-        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabelContaining("Unimod Name:"), "Carbamidomethyl");
+        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabelContaining("Unimod Name:"), "Carbamidomethyl (C)");
         sleep(500); // sleep for a half second to let the search button enable based on form validation
         clickAndWait(Locator.button("Search"));
         // TODO: the current sampledata does not contain any matching Custom Name or Unimod Name searches
