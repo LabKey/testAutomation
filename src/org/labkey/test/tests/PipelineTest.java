@@ -244,8 +244,8 @@ public class PipelineTest extends PipelineWebTestBase
         pushLocation();
         goToHome();
         goToSiteSettings();
-        String existingValue = getFormElement("pipelineToolsDirectory");
-        setFormElement("pipelineToolsDirectory", path);
+        String existingValue = getFormElement(Locator.name("pipelineToolsDirectory"));
+        setFormElement(Locator.name("pipelineToolsDirectory"), path);
         clickButton("Save");
         popLocation();
         return existingValue;

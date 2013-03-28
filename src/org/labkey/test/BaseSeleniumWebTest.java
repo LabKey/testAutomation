@@ -2383,7 +2383,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * @param inheritPermissions should folder inherit permissions from parent?
      */
     @LogMethod
-    public void createSubfolder(String project, String parent, String child, String folderType, String templateFolder, String[] templatePartsToUncheck, String[] tabsToAdd, boolean inheritPermissions)
+    public void createSubfolder(String project, String parent, String child, @Nullable String folderType, String templateFolder, String[] templatePartsToUncheck, @Nullable String[] tabsToAdd, boolean inheritPermissions)
     {
         startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))

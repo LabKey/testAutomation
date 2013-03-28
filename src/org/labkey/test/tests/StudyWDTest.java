@@ -781,8 +781,10 @@ public class StudyWDTest extends StudyBaseTestWD
 
         selenium.click(".toggle");
         clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
+        prepForPageLoad();
         clickMenuButtonAndContinue("Copy or Move Comment(s)", "Move", "To Mouse", "999320812");
-        getConfirmationAndWait();
+        getAlert();
+        newWaitForPageToLoad();
         setFormElement("quf_" + COMMENT_FIELD_NAME, "Moved PTID Comment");
         clickButton("Submit");
         assertTextPresent("Moved PTID Comment");
