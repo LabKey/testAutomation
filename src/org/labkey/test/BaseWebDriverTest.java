@@ -4224,7 +4224,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         WebElement el = l.waitForElmement(_driver, WAIT_FOR_JAVASCRIPT);
 
-        prepForPageLoad();
+        if (pageTimeout > 0)
+            prepForPageLoad();
 
         Actions builder = new Actions(_driver);
         builder.moveToElement(el, xCoord, yCoord)
@@ -4232,7 +4233,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 .build()
                 .perform();
 
-        newWaitForPageToLoad(pageTimeout);
+        if (pageTimeout > 0)
+            newWaitForPageToLoad(pageTimeout);
     }
 
     public void clickAndWait(Locator l)
