@@ -586,7 +586,11 @@ public class NWBioTrustTest extends SurveyTest
 
             if (field.get("boxLabel") != null)
             {
-                _ext4Helper.selectRadioButton(field.get("label"), field.get("boxLabel"));
+                Locator l = Locator.xpath("//div[./table//label[text()='" + field.get("label") + "']]//label[text()='" + field.get("boxLabel") + "']");
+                if (isElementPresent(l))
+                    _ext4Helper.selectRadioButton(field.get("label"), field.get("boxLabel"));
+                else // can't use the ext4helper because our label is wrapped in a <span>
+                    click(Locator.xpath("//div[./table//label/span[text()='" + field.get("label") + "']]//label[text()='" + field.get("boxLabel") + "']"));
             }
             else if (field.get("selection") != null)
             {
