@@ -18,7 +18,7 @@ package org.labkey.test.ms2;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ModulePropertyValue;
-import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.CustomizeViewsHelperWD;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +54,7 @@ public class SequestImportTest extends BaseWebDriverTest
 
         // Customize the view to show the distinct and total peptide counts based on the criteria established
         // by the custom query
-        CustomizeViewsHelper viewsHelper = new CustomizeViewsHelper(this);
+        CustomizeViewsHelperWD viewsHelper = new CustomizeViewsHelperWD(this);
         viewsHelper.openCustomizeViewPanel();
         viewsHelper.addCustomizeViewColumn(TOTAL_PEPTIDES_FIELD_KEY);
         viewsHelper.addCustomizeViewColumn(UNIQUE_PEPTIDES_FIELD_KEY);
