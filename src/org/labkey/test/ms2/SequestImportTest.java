@@ -54,7 +54,7 @@ public class SequestImportTest extends BaseWebDriverTest
 
         // Customize the view to show the distinct and total peptide counts based on the criteria established
         // by the custom query
-        CustomizeViewsHelperWD viewsHelper = new CustomizeViewsHelperWD(this);
+        CustomizeViewsHelperWD viewsHelper = new CustomizeViewsHelperWD(this, Locator.id("MS2ExtensionsRunGrid"));
         viewsHelper.openCustomizeViewPanel();
         viewsHelper.addCustomizeViewColumn(TOTAL_PEPTIDES_FIELD_KEY);
         viewsHelper.addCustomizeViewColumn(UNIQUE_PEPTIDES_FIELD_KEY);
@@ -112,5 +112,11 @@ public class SequestImportTest extends BaseWebDriverTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/ms2";
+    }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -38,11 +39,20 @@ import java.util.Map;
 
 public class CustomizeViewsHelperWD extends AbstractHelperWD
 {
+    private final Locator.IdLocator _dataRegion;
+
     public CustomizeViewsHelperWD(BaseWebDriverTest test)
     {
         super(test);
+        _dataRegion = Locator.id("");
     }
-    
+
+    public CustomizeViewsHelperWD(BaseWebDriverTest test, Locator.IdLocator dataRegion)
+    {
+        super(test);
+        _dataRegion = dataRegion;
+    }
+
     public void openCustomizeViewPanel()
     {
         if (Locator.button("View Grid").findElements(_test._driver).size() < 1)
@@ -53,22 +63,28 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
                 @Override
                 public WebElement apply(WebDriver d)
                 {
-                    WebElement el = _test._driver.findElement(By.cssSelector(".labkey-data-region-header-container .labkey-ribbon"));
+                    WebElement el = _test._driver.findElement(_dataRegion.toCssLocator().append(".labkey-data-region-header-container .labkey-ribbon").toBy());
                     if (el.getCssValue("position").equalsIgnoreCase("static") && el.isDisplayed())
                         return el;
                     else
                         return null;
                 }
+
+                @Override
+                public String toString()
+                {
+                    return "Customize view panel did not open";
+                }
             });
         }
         _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test._shortWait.until(LabKeyExpectedConditions.animationIsDone(Locator.css(".customizeViewPanel")));
+        _test._shortWait.until(LabKeyExpectedConditions.animationIsDone(_dataRegion.toCssLocator().append(".customizeViewPanel")));
     }
 
     public void closeCustomizeViewPanel()
     {
-        _test.click(Locator.css(".x-panel-header > .x-tool-close"));
-        _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".labkey-data-region-header-container .labkey-ribbon")));
+        _test.click(_dataRegion.toCssLocator().append(".x-panel-header > .x-tool-close"));
+        _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(_dataRegion.toCssLocator().append(".labkey-data-region-header-container .labkey-ribbon").toBy()));
     }
 
     public void applyCustomView()
@@ -95,7 +111,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
      * Save a custom view
      * @param name if null, saves the current custom view, otherwise the saves the view with the name (empty string for default.)
      */
-    public void saveCustomView(String name)
+    public void saveCustomView(@Nullable String name)
     {
         saveCustomView(name, false);
     }
@@ -134,8 +150,8 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         }
         _test.clickButtonByIndex("Save", 1, 0);
 
-        _test.waitForElementToDisappear(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT); // Panel will be gone after a page load
-        _test.waitForElement(Locator.css(".labkey-data-region"));
+        _test.waitForElementToDisappear(_dataRegion.toCssLocator().append(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT); // Panel will be gone after a page load
+        _test.waitForElement(_dataRegion.toCssLocator().append(".labkey-data-region"));
     }
 
     public void deleteView()
@@ -207,12 +223,12 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
     public void changeTab(ViewItemType tab)
     {
-        if (_test.isElementPresent(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]")))
+        if (_test.isElementPresent(_dataRegion.append("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]") ))
             // Tab hasn't rendered yet
-            _test.click(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]"));
+            _test.click(_dataRegion.append("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]"));
         else
             // Tab has rendered
-            _test.click(Locator.xpath("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab.toString() + "')]]"));
+            _test.click(_dataRegion.append("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab.toString() + "')]]"));
     }
 
     public static enum ViewItemType
@@ -235,18 +251,18 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         for (int i = 0; i < fieldKeyParts.length - 1; i ++ )
         {
             nodePath += fieldKeyParts[i];
-            _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            if (_test.isElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
+            _test.waitForElement(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            if (_test.isElementPresent(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
             {
-                _test.click(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
+                _test.click(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
                 _test.sleep(1000); //TODO:  replace with wait for animation
             }
-            _test.waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'minus')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 2);
+            _test.waitForElement(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'minus')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 2);
 //            _test._shortWait.until(LabKeyExpectedConditions.animationIsDone());
             nodePath += "/";
         }
 
-        return Locator.xpath("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(fieldKey) + "]");
+        return _dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(fieldKey) + "]");
     }
 
     private void addCustomizeViewItem(String[] fieldKeyParts, String column_name, ViewItemType type)
@@ -326,7 +342,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
     private String tabContentXPath(ViewItemType type)
     {
-        return "//div[contains(@class, '_test-" + type.toString().toLowerCase() + "-tab')]";
+        return _dataRegion.append("//div[contains(@class, '_test-" + type.toString().toLowerCase() + "-tab')]").toXpath();
     }
 
     private String itemXPath(ViewItemType type, String[] fieldKeyParts)
@@ -336,12 +352,12 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
     private String itemXPath(ViewItemType type, String fieldKey)
     {
-        return "//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item') and @fieldkey=" + Locator.xq(fieldKey) +"]";
+        return _dataRegion.append("//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item') and @fieldkey=" + Locator.xq(fieldKey) +"]").toXpath();
     }
 
     private String itemXPath(ViewItemType type, int item_index)
     {
-        return "//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item')][" + (item_index + 1) + "]";
+        return _dataRegion.append("//table[contains(@class, 'labkey-customview-" + type.toString().toLowerCase() + "-item')][" + (item_index + 1) + "]").toXpath();
     }
 
     private void removeCustomizeViewItem(String fieldKey, ViewItemType type)
@@ -506,8 +522,8 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     public void clipFilter(String fieldkey)
     {
         changeTab(ViewItemType.Filter);
-        Locator itemClip = Locators.viewItemClip(ViewItemType.Filter, fieldkey);
-        if (!itemClip.findElement(_test._driver).getAttribute("class").contains("pressed"))
+        Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Filter, fieldkey);
+        if (!_dataRegion.toCssLocator().append(itemClip).findElement(_test._driver).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }
@@ -516,8 +532,8 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     public void unclipFilter(String fieldkey)
     {
         changeTab(ViewItemType.Filter);
-        Locator itemClip = Locators.viewItemClip(ViewItemType.Filter, fieldkey);
-        if (itemClip.findElement(_test._driver).getAttribute("class").contains("pressed"))
+        Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Filter, fieldkey);
+        if (_dataRegion.toCssLocator().append(itemClip).findElement(_test._driver).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }
@@ -526,8 +542,8 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     public void clipSort(String fieldkey)
     {
         changeTab(ViewItemType.Sort);
-        Locator itemClip = Locators.viewItemClip(ViewItemType.Sort, fieldkey);
-        if (!itemClip.findElement(_test._driver).getAttribute("class").contains("pressed"))
+        Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Sort, fieldkey);
+        if (!_dataRegion.toCssLocator().append(itemClip).findElement(_test._driver).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }
@@ -536,8 +552,8 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     public void unclipSort(String fieldkey)
     {
         changeTab(ViewItemType.Sort);
-        Locator itemClip = Locators.viewItemClip(ViewItemType.Sort, fieldkey);
-        if (itemClip.findElement(_test._driver).getAttribute("class").contains("pressed"))
+        Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Sort, fieldkey);
+        if (_dataRegion.toCssLocator().append(itemClip).findElement(_test._driver).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }
