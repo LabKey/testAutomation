@@ -685,6 +685,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
     private void verifyImportedVLs(int totalRows, Map<String, String[]> expected, DataRegionTable results, @Nullable String[] keyFields)
     {
         Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
+        waitForText("SIVmac239-Gag"); //proxy for DR load
 
         int i = 0;
         while (i < totalRows)
@@ -711,15 +712,15 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
             }
             Assert.assertNotNull("Unable to find expected values", expectedVals);
 
-            Assert.assertEquals("Incorrec subjectId", expectedVals[0], subjectId);
-            Assert.assertEquals("Incorrect category", expectedVals[1], category);
+            Assert.assertEquals("Incorrec subjectId on row: " + i, expectedVals[0], subjectId);
+            Assert.assertEquals("Incorrect category on row: " + i, expectedVals[1], category);
 
             if (!("".equals(expectedVals[2]) && " ".equals(date)))
-                Assert.assertEquals("Incorrect sample date", expectedVals[2], date);
+                Assert.assertEquals("Incorrect sample date on row: " + i, expectedVals[2], date);
 
             Double vl1 = Double.parseDouble(expectedVals[3]);
             Double vl2 = Double.parseDouble(vl);
-            Assert.assertEquals("Incorrect VL", vl1, vl2);
+            Assert.assertEquals("Incorrect VL on row: " + i, vl1, vl2);
 
             i++;
         }

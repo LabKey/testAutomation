@@ -273,6 +273,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
     private void verifyResults(List<String[]> expected)
     {
         DataRegionTable results = new DataRegionTable("Data", this);
+        waitForText("cells/uL"); //proxy for DR loading
         Assert.assertEquals("Incorrect row count", expected.size(), results.getDataRowCount());
 
         int i = 0;
@@ -289,15 +290,15 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
             String parentPopulation = results.getDataAsText(i, "Parent Population");
             String comments = results.getDataAsText(i, "Comment");
 
-            Assert.assertEquals("Incorrect subjectId", expectedVals[0], subjectId);
-            Assert.assertEquals("Incorrect date", expectedVals[1], date);
-            Assert.assertEquals("Incorrect sampleType", expectedVals[2], type);
-            Assert.assertEquals("Incorrect population", expectedVals[3], population);
-            Assert.assertEquals("Incorrect result", expectedVals[4], result);
-            Assert.assertEquals("Incorrect units", expectedVals[5], units);
-            Assert.assertEquals("Incorrect freezerId", expectedVals[6], freezer);
-            Assert.assertEquals("Incorrect parent population", expectedVals[7], parentPopulation);
-            Assert.assertEquals("Incorrect comments", expectedVals[8], comments);
+            Assert.assertEquals("Incorrect subjectId on row " + i, expectedVals[0], subjectId);
+            Assert.assertEquals("Incorrect date on row " + i, expectedVals[1], date);
+            Assert.assertEquals("Incorrect sampleType on row " + i, expectedVals[2], type);
+            Assert.assertEquals("Incorrect population on row " + i, expectedVals[3], population);
+            Assert.assertEquals("Incorrect result on row " + i, expectedVals[4], result);
+            Assert.assertEquals("Incorrect units on row " + i, expectedVals[5], units);
+            Assert.assertEquals("Incorrect freezerId on row " + i, expectedVals[6], freezer);
+            Assert.assertEquals("Incorrect parent population on row " + i, expectedVals[7], parentPopulation);
+            Assert.assertEquals("Incorrect comments on row " + i, expectedVals[8], comments);
             i++;
         }
     }
