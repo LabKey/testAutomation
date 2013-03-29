@@ -334,8 +334,7 @@ public abstract class Locator
 
     public static XPathLocator navTreeExpander(String nodeText)
     {
-
-        return Locator.xpath("//tr").withClass("labkey-nav-tree-row").withText(nodeText).append("/td").withClass("labkey-nav-tree-node");
+        return Locator.xpath("//tr").withClass("labkey-nav-tree-row").withText(nodeText).append("/td").withClass("labkey-nav-tree-node").append("/a");
     }
 
     public static XPathLocator extButton(String text)
