@@ -152,17 +152,17 @@ public class PortalHelper extends AbstractHelper
 
     @LogMethod(quiet = true)public void addQueryWebPart(@LoggedParam String title, @LoggedParam String schemaName, @LoggedParam @Nullable String queryName, @Nullable String viewName)
     {
-        Ext4Helper ext4Helper = new Ext4Helper(_test);
         addWebPart("Query");
         _test.setFormElement(Locator.name("title"), title);
-        ext4Helper.selectComboBoxItem(Locator.id("schemaName"), schemaName);
+        _test._ext4Helper.selectComboBoxItem(Locator.id("schemaName"), schemaName);
         if (queryName != null)
         {
-            _test.click(Locator.xpath("//input[@type='button' and @id='selectQueryContents-inputEl']"));            ext4Helper.selectComboBoxItem(Locator.id("queryName"), queryName);
+            _test.click(Locator.xpath("//input[@type='button' and @id='selectQueryContents-inputEl']"));
+            _test._ext4Helper.selectComboBoxItem(Locator.id("queryName"), queryName);
             if (viewName != null)
-                ext4Helper.selectComboBoxItem(Locator.id("viewName"), viewName);
+                _test._ext4Helper.selectComboBoxItem(Locator.id("viewName"), viewName);
             else
-                ext4Helper.selectComboBoxItem(Locator.id("viewName"), "[default view]");
+                _test._ext4Helper.selectComboBoxItem(Locator.id("viewName"), "[default view]");
         }
 
         _test.clickButton("Submit");
