@@ -21,6 +21,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 
 /**
  * User: klum
@@ -130,11 +131,8 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
     {
         // Create query webpart
         clickFolder(getProjectName());
-        addWebPart("Query");
-        selectOptionByValue(Locator.name("schemaName"), "core");
-        clickRadioButtonById("selectQueryContents");
-        selectOptionByValue(Locator.name("queryName"), "Users");
-        submit();
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addQueryWebPart(null, "core", "Users", null);
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("ModifiedBy/Email", "Email");
         _customizeViewsHelper.saveCustomView(EMAIL_VIEW, true);

@@ -28,6 +28,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelper.ListColumn;
 import org.labkey.test.util.ListHelper.LookupInfo;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -673,14 +674,10 @@ public class ListTest extends BaseWebDriverTest
     {
         log("Filter Test");
         clickFolder(PROJECT_VERIFY);
-        addWebPart("Query");
-        selectOptionByText(Locator.name("schemaName"), "lists");
-        click(Locator.id("selectQueryContents"));
-        submit();
-        addWebPart("Query");
-        selectOptionByText(Locator.name("schemaName"), "lists");
-        click(Locator.id("selectQueryContents"));
-        submit();
+
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addQueryWebPart("lists");
+        portalHelper.addQueryWebPart("lists");
 
         log("Test that the right filters are present for each type");
         runMenuItemHandler("qwp3:" + _listCol4.getName() + ":filter");

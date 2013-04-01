@@ -26,6 +26,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.junit.Assert;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIAssayHelper;
 
 import java.io.File;
@@ -108,9 +109,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     private void manageSpecimenConfiguration()
     {
         clickAndWait(Locator.linkWithText(studyFolder));
-        addWebPart("Query");
-        selectOptionByValue(Locator.name("schemaName"), "rho");
-        submit();
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addQueryWebPart("rho");
 
         // lookup the locationId for the Main site from the study.Locations table
         goToSchemaBrowser();

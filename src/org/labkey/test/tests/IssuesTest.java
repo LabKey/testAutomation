@@ -23,6 +23,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.EmailRecordTable;
 import org.labkey.test.util.EmailRecordTable.EmailMessage;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
+
 import java.util.List;
 
 /**
@@ -562,10 +564,8 @@ public class IssuesTest extends BaseSeleniumWebTest
     protected void queryTest()
     {
         clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        addWebPart("Query");
-        selenium.select("//select[@name='schemaName']", "issues");
-//        setFormElement("schemaName", "issues");
-        submit();
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addQueryWebPart("issues");
         clickAndWait(Locator.linkWithText("Issues Queries"));
         createNewQuery("issues");
         setFormElement("ff_newQueryName", "xxyzzy");

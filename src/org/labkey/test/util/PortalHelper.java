@@ -150,19 +150,25 @@ public class PortalHelper extends AbstractHelper
         _test.waitForElementToDisappear(removeButton.index(startCount), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    @LogMethod(quiet = true)public void addQueryWebPart(@LoggedParam String title, @LoggedParam String schemaName, @LoggedParam @Nullable String queryName, @Nullable String viewName)
+    public void addQueryWebPart(@LoggedParam String schemaName)
+    {
+        addQueryWebPart(null, schemaName, null, null);
+    }
+
+    @LogMethod(quiet = true)public void addQueryWebPart(@LoggedParam @Nullable String title, @LoggedParam String schemaName, @LoggedParam @Nullable String queryName, @Nullable String viewName)
     {
         addWebPart("Query");
-        _test.setFormElement(Locator.name("title"), title);
+        if (title != null)
+            _test.setFormElement(Locator.name("title"), title);
+
         _test._ext4Helper.selectComboBoxItem(Locator.id("schemaName"), schemaName);
+
         if (queryName != null)
         {
             _test.click(Locator.xpath("//input[@type='button' and @id='selectQueryContents-inputEl']"));
             _test._ext4Helper.selectComboBoxItem(Locator.id("queryName"), queryName);
             if (viewName != null)
                 _test._ext4Helper.selectComboBoxItem(Locator.id("viewName"), viewName);
-            else
-                _test._ext4Helper.selectComboBoxItem(Locator.id("viewName"), "[default view]");
         }
 
         _test.clickButton("Submit");

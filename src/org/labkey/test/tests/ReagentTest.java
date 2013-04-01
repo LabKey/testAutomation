@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.PortalHelper;
 
 /**
  * User: kevink
@@ -64,9 +65,8 @@ public class ReagentTest extends BaseSeleniumWebTest
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, null);
         enableModule("reagent", false);
 
-        addWebPart("Query");
-        setFormElement("schemaName", "reagent");
-        submit();
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addQueryWebPart("reagent");
 
         beginAt("reagent/" + PROJECT_NAME + "/" + FOLDER_NAME + "/initialize.view");
         clickButton("Initialize", 0);

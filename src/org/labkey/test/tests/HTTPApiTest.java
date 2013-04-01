@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
@@ -87,9 +88,7 @@ public class HTTPApiTest extends SimpleApiTest
         _listHelper.submitTsvData(LIST_DATA);
         
         clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        addWebPart("Query");
-        setFormElement("title", "Query");
-        selectOptionByValue("schemaName", "lists");
-        submit();
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addQueryWebPart("lists");
     }
 }
