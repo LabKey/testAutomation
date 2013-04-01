@@ -167,13 +167,14 @@ public class PortalHelper extends AbstractHelper
         {
             _test.click(Locator.xpath("//input[@type='button' and @id='selectQueryContents-inputEl']"));
             _test._ext4Helper.selectComboBoxItem(Locator.id("queryName"), queryName);
+
             if (viewName != null)
                 _test._ext4Helper.selectComboBoxItem(Locator.id("viewName"), viewName);
         }
 
         _test.clickButton("Submit");
 
-        _test.waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title));
+        _test.waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title == null ? "Custom Query" : title));
     }
 
     /**
