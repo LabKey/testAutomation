@@ -3272,19 +3272,28 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     protected final String firstForm = "//td[@id='bodypanel']//form[1]";
 
-    public void submit()
+    /**
+     * @deprecated Use {@link #clickButton(String)}
+     */
+    @Deprecated public void submit()
     {
         selenium.submit(firstForm);
         waitForPageToLoad();
     }
 
-    public void submit(Locator formLocator)
+    /**
+     * @deprecated Use {@link #clickButton(String)}
+     */
+    @Deprecated public void submit(Locator formLocator)
     {
         selenium.submit(formLocator.toString());
         waitForPageToLoad();
     }
 
-    public void submit(String buttonName)
+    /**
+     * @deprecated Use {@link #clickButton(String)}
+     */
+    @Deprecated public void submit(String buttonName)
     {
         Locator l = findButton(buttonName);
 

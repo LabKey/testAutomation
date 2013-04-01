@@ -3821,26 +3821,38 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }, failMessage, wait);
     }
 
-    public void submit()
+    /**
+     * @deprecated Use {@link #clickButton(String)}
+     */
+    @Deprecated public void submit()
     {
         WebElement form = _driver.findElement(By.xpath("//td[@id='bodypanel']//form[1]"));
         submit(form);
     }
 
-    public void submit(Locator formLocator)
+    /**
+     * @deprecated Use {@link #clickButton(String)}
+     */
+    @Deprecated public void submit(Locator formLocator)
     {
         WebElement form = formLocator.findElement(_driver);
         submit(form);
     }
 
-    public void submit(WebElement form)
+    /**
+     * @deprecated Use {@link #clickButton(String)}
+     */
+    @Deprecated public void submit(WebElement form)
     {
         prepForPageLoad();
         executeScript("arguments[0].submit()", form);
         newWaitForPageToLoad();
     }
 
-    public void submit(String buttonName)
+    /**
+     * @deprecated Use {@link #clickButton(String)}
+     */
+    @Deprecated public void submit(String buttonName)
     {
         Locator l = findButton(buttonName);
 
