@@ -83,12 +83,12 @@ public class FlowSpecimenTest extends BaseFlowTestWD
         importFlowAnalysis();
 
         // Issue 16945: flow specimen FK doesn't work for 'fake' FCS file wells created during FlowJo import
-        //verifyFCSAnalysisSpecimenFK();
+        verifyFCSAnalysisSpecimenFK();
 
         copyFlowResultsToStudy();
 
         // Issue 16945: flow specimen FK doesn't work for 'fake' FCS file wells created during FlowJo import
-        //verifyFlowDatasetSpecimenFK();
+        verifyFlowDatasetSpecimenFK();
     }
 
     @LogMethod
@@ -178,16 +178,16 @@ public class FlowSpecimenTest extends BaseFlowTestWD
     {
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.showHiddenItems();
-        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "Specimen");
-        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "Specimen/GlobalUniqueId");
-        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "Specimen/Volume");
-        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "Specimen/Specimen/SequenceNum");
+        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "SpecimenID");
+        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "SpecimenID/GlobalUniqueId");
+        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "SpecimenID/Volume");
+        _customizeViewsHelper.addCustomizeViewColumn(lookupPrefix + "SpecimenID/Specimen/SequenceNum");
         _customizeViewsHelper.saveCustomView();
 
         // verify the specimen columns are present
         DataRegionTable table = new DataRegionTable("query", this);
         int row = table.getRow("Name", "118795.fcs");
-        Assert.assertEquals("Sample_002", table.getDataAsText(row, "Specimen"));
+        Assert.assertEquals("Sample_002", table.getDataAsText(row, "Specimen ID"));
         Assert.assertEquals("Sample_002", table.getDataAsText(row, "Specimen Global Unique Id"));
         Assert.assertEquals("100.0", table.getDataAsText(row, "Specimen Volume"));
         Assert.assertEquals("20120912", table.getDataAsText(row, "Sequence Num"));
