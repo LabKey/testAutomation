@@ -417,8 +417,8 @@ public class FilterTest extends ListTest
                     new FilterArgs(_listCol6.getName(), "Equals One Of", "BLANK",  null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}, listUrl + "&query.Aliased%24CColumn~in=%3B"),
                     new FilterArgs(_listCol6.getName(), "IS NOT ANY OF ", "(BLANK)",  null, null, new String[] {TEST_DATA[1][0], TEST_DATA[1][1], TEST_DATA[1][2]}, new String[] {TEST_DATA[1][3]}, listUrl + "&query.Aliased%24CColumn~notin=%3B"),
                     new FilterArgs(_listCol6.getName(), "IS ", "NULL",  null, null, new String[] {TEST_DATA[1][3]}, new String[] {TEST_DATA[1][0]}, listUrl + "&query.Aliased%24CColumn~isblank"),
-                    new FilterArgs(_listCol4.getName(), "IS NOT ", "NULL",  null, null, new String[] {}, TEST_DATA[1], listUrl + "&query.HiddenColumn~isnonblank")
-//                    FilterArgs(_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}, listUrl + "&query.Good~in=7%3B8")
+                    new FilterArgs(_listCol4.getName(), "IS NOT ", "NULL",  null, null, new String[] {}, TEST_DATA[1], listUrl + "&query.HiddenColumn~isnonblank"),
+                    FilterArgs(_listCol4.getName(), "Equals One Of (e.g. \"a;b;c\")", TEST_DATA[4][3] + ";" + TEST_DATA[4][2], null, null, new String[]{TEST_DATA[1][2], TEST_DATA[1][3]}, new String[]{TEST_DATA[1][0], TEST_DATA[1][1]}, listUrl + "&query.Good~in=7%3B8")
             );
     }
 
