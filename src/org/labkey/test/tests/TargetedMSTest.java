@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
@@ -28,7 +29,7 @@ import org.labkey.test.util.LogMethod;
  * Date: 6/14/12
  * Time: 1:58 PM
  */
-public class TargetedMSTest extends BaseSeleniumWebTest
+public class TargetedMSTest extends BaseWebDriverTest
 {
     private final String SKY_FILE = "MRMer.sky";
 
@@ -210,5 +211,11 @@ public class TargetedMSTest extends BaseSeleniumWebTest
     public String getAssociatedModuleDirectory()
     {
         return "server/customModules/targetedms";
+    }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
