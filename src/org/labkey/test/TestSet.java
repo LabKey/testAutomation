@@ -204,7 +204,8 @@ public enum TestSet
         WebpartPermissionsTest.class,
         SurveyTest.class,
         NWBioTrustTest.class,
-        SequestImportTest.class
+        SequestImportTest.class,
+        ETLTest.class
     ),
 
     Daily(600000, DailyA.getTestList(), DailyB.getTestList()),
