@@ -302,32 +302,16 @@ public class DataViewsTester
         _test._extHelper.waitForExtDialog("Subcategories");
         _test.assertElementPresent(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[1]));
 
-        _test.clickButton("New Subcategory", 0);
-        _test.waitForElement(Locator.xpath("//input[@name='label']").notHidden());
-        _test.setFormElement(Locator.name("label"), "Subcategory1-" + CATEGORIES[1]);
-        _test.pressEnter(Locator.name("label"));
-        _test.waitForElementToDisappear(Locator.xpath("//input[@name='label']").notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.clickButton("New Subcategory", 0);
-        _test.waitForElement(Locator.xpath("//input[@name='label']").notHidden());
-        _test.setFormElement(Locator.name("label"), "Subcategory2-" + CATEGORIES[1]);
-        _test.pressEnter(Locator.name("label"));
-        _test.waitForElementToDisappear(Locator.xpath("//input[@name='label']").notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        addSubCategory("Subcategory1-" + CATEGORIES[1]);
+        addSubCategory("Subcategory2-" + CATEGORIES[1]);
 
         _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
         _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[2]));
         _test.waitForTextToDisappear("Subcategory1-" + CATEGORIES[1]);
         _test.assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1]);
 
-        _test.clickButton("New Subcategory", 0);
-        _test.waitForElement(Locator.xpath("//input[@name='label']").notHidden());
-        _test.setFormElement(Locator.name("label"), "Subcategory1-" + CATEGORIES[2]);
-        _test.pressEnter(Locator.name("label"));
-        _test.waitForElementToDisappear(Locator.xpath("//input[@name='label']").notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.clickButton("New Subcategory", 0);
-        _test.waitForElement(Locator.xpath("//input[@name='label']").notHidden());
-        _test.setFormElement(Locator.name("label"), "Subcategory2-" + CATEGORIES[2]);
-        _test.pressEnter(Locator.name("label"));
-        _test.waitForElementToDisappear(Locator.xpath("//input[@name='label']").notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        addSubCategory("Subcategory1-" + CATEGORIES[2]);
+        addSubCategory("Subcategory2-" + CATEGORIES[2]);
 
         _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[3])));
         _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[3]));
@@ -370,6 +354,18 @@ public class DataViewsTester
                 datasets[3][0],
             CATEGORIES[3],
             CATEGORIES[4]);
+    }
+
+    /**
+     * Add a sub-category to the selected dataset category
+     */
+    private void addSubCategory(String subCategoryName)
+    {
+        _test.clickButton("New Subcategory", 0);
+        _test.waitForElement(Locator.xpath("//input[@name='label']").notHidden());
+        _test.setFormElement(Locator.name("label"), subCategoryName);
+        _test.waitForElementToDisappear(Locator.xpath("//input[@name='label']").notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(subCategoryName));
     }
 
     @LogMethod
