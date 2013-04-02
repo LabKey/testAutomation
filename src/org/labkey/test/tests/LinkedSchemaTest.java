@@ -472,7 +472,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             sleep(200);
             for (String table : tables.split(","))
             {
-                click(Locator.xpath("//li[text() = '" + table + "']"));
+                click(Locator.xpath("//li[contains(text(), '" + table + "')]"));
             }
         }
 
