@@ -158,23 +158,37 @@ public class PortalHelper extends AbstractHelper
     @LogMethod(quiet = true)public void addQueryWebPart(@LoggedParam @Nullable String title, @LoggedParam String schemaName, @LoggedParam @Nullable String queryName, @Nullable String viewName)
     {
         addWebPart("Query");
+
         if (title != null)
             _test.setFormElement(Locator.name("title"), title);
 
+        _test.waitForElement(Locator.css(".schema-loaded-marker"));
         _test._ext4Helper.selectComboBoxItem(Locator.id("schemaName"), schemaName);
 
         if (queryName != null)
         {
             _test.click(Locator.xpath("//input[@type='button' and @id='selectQueryContents-inputEl']"));
+            _test.waitForElement(Locator.css(".query-loaded-marker"));
             _test._ext4Helper.selectComboBoxItem(Locator.id("queryName"), queryName);
 
             if (viewName != null)
+            {
+                _test.waitForElement(Locator.css(".view-loaded-marker"));
                 _test._ext4Helper.selectComboBoxItem(Locator.id("viewName"), viewName);
+            }
         }
 
         _test.clickButton("Submit");
 
-        _test.waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title == null ? "Custom Query" : title));
+        if (title == null)
+        {
+            if (queryName == null)
+                title = schemaName.substring(0, 1).toUpperCase() + schemaName.substring(1) + " Queries";
+            else
+                title = queryName;
+        }
+
+        _test.waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title));
     }
 
     /**
