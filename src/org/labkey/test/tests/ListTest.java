@@ -676,8 +676,8 @@ public class ListTest extends BaseWebDriverTest
         clickFolder(PROJECT_VERIFY);
 
         PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addQueryWebPart("lists");
-        portalHelper.addQueryWebPart("lists");
+        portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
+        portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
 
         log("Test that the right filters are present for each type");
         runMenuItemHandler("qwp3:" + _listCol4.getName() + ":filter");
