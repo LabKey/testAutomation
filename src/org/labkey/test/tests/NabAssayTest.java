@@ -359,6 +359,9 @@ public class NabAssayTest extends AbstractQCAssayTest
             clickAndWait(Locator.linkWithText("assay"));
             assertNabData(true);
 
+            doSchemaBrowserTest();
+//            doNabApiTest();
+
             // create user with read permissions to study and dataset, but no permissions to source assay
             clickFolder(TEST_ASSAY_PRJ_NAB);
             clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1));
@@ -416,6 +419,44 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertTextPresent("Description for NAb assay");
     }
 
+    private static String QUERY_NAME = "Data";
+    private void doSchemaBrowserTest()
+    {
+        clickFolder(TEST_ASSAY_FLDR_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        goToSchemaBrowser();
+        selectQuery("assay.NAb.TestAssayNab", QUERY_NAME);
+        clickButton("Create New Query");
+        setFormElement(Locator.name("ff_newQueryName"), "New NabQuery");
+        clickAndWait(Locator.linkWithText("Create and Edit Source"));
+        setQueryEditorValue("queryText",
+                "SELECT \n" +
+                        QUERY_NAME + ".Properties.AUC As AUC,\n" +
+                        QUERY_NAME + ".Properties.CurveIC50_4pl,\n" +
+                        QUERY_NAME + ".Properties.CurveIC50_4plOORIndicator,\n" +
+                        QUERY_NAME + ".Properties.SpecimenLsid.Property.ParticipantID,\n" +
+                        QUERY_NAME + ".WellgroupName\n" +
+                        "FROM " + QUERY_NAME + "\n"
+                       );
+        clickButton("Save & Finish", 0);
+        waitForText("Views", WAIT_FOR_JAVASCRIPT);
+        assertTextPresent("AUC", "Curve IC50 4pl", "Curve IC50 4pl OOR Indicator", "Participant ID", "Wellgroup Name");
+        assertTextPresent("<20.0", "ptid 1 C", "473.94");
+    }
+
+    private static String WIKIPAGE_NAME = "Nab API Wiki";
+    private void doNabApiTest()
+    {
+        clickFolder(TEST_ASSAY_FLDR_NAB);
+        addWebPart("Wiki");
+        createNewWikiPage("HTML");
+        setFormElement(Locator.name("name"), WIKIPAGE_NAME);
+        setFormElement(Locator.name("title"), WIKIPAGE_NAME);
+        setWikiBody("placeholder text");
+        saveWikiPage();
+
+//        setSource("nabAssayTest.js", false);
+    }
 
     private void uploadFile(String filePath, String uniqueifier, String finalButton)
     {
