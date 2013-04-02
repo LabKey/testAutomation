@@ -158,14 +158,11 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
 
     public void addTransformScript(File transformScript, int index)
     {
-        if (transformScript.exists())
-        {
-            waitForElement(Locator.navButton("Add Script"));
-            clickButton("Add Script", 0);
-            selenium.type("//input[@id='AssayDesignerTransformScript" + index + "']", transformScript.getAbsolutePath());
-        }
-        else
-            Assert.fail("unable to locate the Transform script");
+        Assert.assertTrue("unable to locate the Transform script", transformScript.exists());
+
+        waitForElement(Locator.navButton("Add Script"));
+        clickButton("Add Script", 0);
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
     }
 
     protected void startCreateNabAssay(String name)
