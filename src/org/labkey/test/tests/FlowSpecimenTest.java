@@ -185,7 +185,7 @@ public class FlowSpecimenTest extends BaseFlowTestWD
         _customizeViewsHelper.saveCustomView();
 
         // verify the specimen columns are present
-        DataRegionTable table = new DataRegionTable("query", this);
+        DataRegionTable table = new DataRegionTable(getDriver().getCurrentUrl().contains("dataset.view") ? "Dataset" : "query", this);
         int row = table.getRow("Name", "118795.fcs");
         Assert.assertEquals("Sample_002", table.getDataAsText(row, "Specimen ID"));
         Assert.assertEquals("Sample_002", table.getDataAsText(row, "Specimen Global Unique Id"));
