@@ -187,7 +187,6 @@ public class LuminexTest extends AbstractQCAssayTest
             waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
             setFormElement(Locator.id("AssayDesignerName"), TEST_ASSAY_LUM);
             setFormElement(Locator.id("AssayDesignerDescription"), TEST_ASSAY_LUM_DESC);
-            saveAssay();
         }
         else
         {
@@ -268,8 +267,14 @@ public class LuminexTest extends AbstractQCAssayTest
             setFormat("Data Fields", 16, "0.0");
 
             sleep(1000);
-            saveAssay();
         }
+        saveAssay();
+        // Clear the success message by reopening the designer, in case downstream the test wants to do further changes
+        // of the assay design and needs to be able to detect when the save is complete.
+        clickAndWait(Locator.linkWithText("Assay List"));
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
+        _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'manage assay design']"), "edit assay design");
+        waitForElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), WAIT_FOR_JAVASCRIPT);
 
         configStatus = Configured.CONFIGURED;
     }
