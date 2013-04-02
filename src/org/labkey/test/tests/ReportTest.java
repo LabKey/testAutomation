@@ -1580,17 +1580,17 @@ public class ReportTest extends StudyBaseTest
         assertSVG(BOX_PLOT_MV_2);
 
         clickButton("Save", 0);
-        _extHelper.waitForExtDialog("Save Chart");
+        _extHelper.waitForExtDialog("Save");
         //Verify name requirement
-        _extHelper.clickExtButton("Save Chart", "Save", 0);
+        _extHelper.clickExtButton("Save", "Save", 0);
         _extHelper.waitForExtDialog("Error");
         _extHelper.clickExtButton("Error", "OK", 0);
         _extHelper.waitForExtDialogToDisappear("Error");
 
         //Test cancel button
-        _extHelper.setExtFormElementByLabel("Report Name", "TestReportName");
-        _extHelper.setExtFormElementByLabel("Report Description", "TestReportDescription");
-        clickDialogButtonAndWaitForMaskToDisappear("Save Chart", "Cancel");
+        setFormElement("reportName", "TestReportName");
+        setFormElement("reportDescription", "TestReportDescription");
+        clickDialogButtonAndWaitForMaskToDisappear("Save", "Cancel");
         assertTextNotPresent("TestReportName");
 
         saveBoxPlot(BOX_PLOT_NAME_MV, BOX_PLOT_DESC_MV);
@@ -1760,17 +1760,17 @@ public class ReportTest extends StudyBaseTest
         assertSVG(SCATTER_PLOT_MV_2);
 
         clickButton("Save", 0);
-        _extHelper.waitForExtDialog("Save Chart");
+        _extHelper.waitForExtDialog("Save");
         //Verify name requirement
-        _extHelper.clickExtButton("Save Chart", "Save", 0);
+        _extHelper.clickExtButton("Save", "Save", 0);
         _extHelper.waitForExtDialog("Error");
         _extHelper.clickExtButton("Error", "OK", 0);
         _extHelper.waitForExtDialogToDisappear("Error");
 
         //Test cancel button
-        _extHelper.setExtFormElementByLabel("Report Name", "TestReportName");
-        _extHelper.setExtFormElementByLabel("Report Description", "TestReportDescription");
-        _extHelper.clickExtButton("Save Chart", "Cancel", 0);
+        setFormElement("reportName", "TestReportName");
+        setFormElement("reportDescription", "TestReportDescription");
+        _extHelper.clickExtButton("Save", "Cancel", 0);
         assertTextNotPresent("TestReportName");
 
         saveScatterPlot(SCATTER_PLOT_NAME_MV, SCATTER_PLOT_DESC_MV);
@@ -2034,11 +2034,10 @@ public class ReportTest extends StudyBaseTest
         boolean saveAs = getButtonLocator("Save As") != null;
 
         clickButton(saveAs ? "Save As" : "Save", 0);
-        _extHelper.waitForExtDialog(saveAs ? "Save As" : "Save Chart");
-        _extHelper.setExtFormElementByLabel("Report Name", name);
-        _extHelper.setExtFormElementByLabel("Report Description", description);
-
-        clickDialogButtonAndWaitForMaskToDisappear(saveAs ? "Save As" : "Save Chart", "Save");
+        _extHelper.waitForExtDialog(saveAs ? "Save As" : "Save");
+        setFormElement("reportName", name);
+        setFormElement("reportDescription", description);
+        clickDialogButtonAndWaitForMaskToDisappear(saveAs ? "Save As" : "Save", "Save");
         _extHelper.waitForExtDialogToDisappear("Saved");
         waitForText(name);
         waitFor(new Checker()
