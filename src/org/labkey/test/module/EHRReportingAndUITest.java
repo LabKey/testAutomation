@@ -18,6 +18,7 @@ package org.labkey.test.module;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -137,6 +138,8 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForPageToLoad();
         waitForText("details");
         dr = new DataRegionTable("query", this);
+        dr.setSort("date", SortDirection.DESC);
+        waitForText("details");
         dr.clickLink(0, 0);
         waitForText("Encounter Details");
         waitForText("Weight Monitoring Needed");
@@ -355,7 +358,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         log("Compare Weights - three selections");
         checkDataRegionCheckbox(dataRegionName, 2);
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Compare Weights");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_" + dataRegionName + "']" + Locator.navButton("More Actions").getPath()), "Compare Weights");
         _extHelper.waitForExtDialog("Error"); // After error dialog.
         _extHelper.clickExtButton("Error", "OK", 0);
         assertTextNotPresent("Weight1");

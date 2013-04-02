@@ -280,6 +280,10 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         DataRegionTable results = new DataRegionTable("Data", this);
 
         Map<String, String[]> expected = new LinkedHashMap<String, String[]>();
+        expected.put("DU_DHEAS_0.11", new String[]{"DU", " ", "DHEAS", "0.11", "ug/ml", "Blank", "DU", "1", " "});
+        expected.put("MA_Progesterone_1.56", new String[]{"MA", " ", "Progesterone", "1.56", "ng/ml", "Blank", "MA", "1", " "});
+        expected.put("MA_Estradiol_15.35", new String[]{"MA", " ", "Estradiol", "15.35", "pg/ml", "Blank", "MA", "1", " "});
+        expected.put("MD1_DHEAS_0.08", new String[]{"MD1", " ", "DHEAS", "0.08", "ug/ml", "Blank", "MD1", "1", " "});
         expected.put("PC U1 00153149_Free T4_1.2", new String[]{"PC U1 00153149", " ", "Free T4", "1.2", "ng/dl", "Pos Control", " ", " ", " "});
         expected.put("PC U1 00153149_Cortisol_13.11", new String[]{"PC U1 00153149", " ", "Cortisol", "13.11", "ug/dl", "Pos Control", " ", " ", " "});
         expected.put("PC U1 00153149_Total T3_1.55", new String[]{"PC U1 00153149", " ", "Total T3", "1.55", "ng/ml", "Pos Control", " ", " ", " "});
@@ -287,6 +291,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         expected.put("PC U1 00153149_Progesterone_8.88", new String[]{"PC U1 00153149", " ", "Progesterone", "8.88", "ng/ml", "Pos Control", " ", " ", " "});
         expected.put("PC U1 00153149_Total T4_8.07", new String[]{"PC U1 00153149", " ", "Total T4", "8.07", "ug/dl", "Pos Control", " ", " ", " "});
         expected.put("PC U1 00153149_Estradiol_101.8", new String[]{"PC U1 00153149", " ", "Estradiol", "101.8", "pg/ml", "Pos Control", " ", " ", " "});
+        expected.put("PC U1 00153149_Progesterone_8.95", new String[]{"PC U1 00153149", " ", "Progesterone", "8.95", "ng/ml", "Pos Control", " ", " ", " "});
         expected.put("PC U2 00153152_Free T4_2.77", new String[]{"PC U2 00153152", " ", "Free T4", "2.77", "ng/dl", "Pos Control", " ", " ", " "});
         expected.put("PC U2 00153152_Cortisol_30.73", new String[]{"PC U2 00153152", " ", "Cortisol", "30.73", "ug/dl", "Pos Control", " ", " ", " "});
         expected.put("PC U2 00153152_Total T3_3.28", new String[]{"PC U2 00153152", " ", "Total T3", "3.28", "ng/ml", "Pos Control", " ", " ", " "});
@@ -294,25 +299,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         expected.put("PC U2 00153152_Progesterone_20.29", new String[]{"PC U2 00153152", " ", "Progesterone", "20.29", "ng/ml", "Pos Control", " ", " ", " "});
         expected.put("PC U2 00153152_Total T4_11.59", new String[]{"PC U2 00153152", " ", "Total T4", "11.59", "ug/dl", "Pos Control", " ", " ", " "});
         expected.put("PC U2 00153152_Estradiol_466.6", new String[]{"PC U2 00153152", " ", "Estradiol", "466.6", "pg/ml", "Pos Control", " ", " ", " "});
-        expected.put("PC U1 00153149_Progesterone_8.95", new String[]{"PC U1 00153149", " ", "Progesterone", "8.95", "ng/ml", "Pos Control", " ", " ", " "});
         expected.put("PC U2 00153152_Progesterone_19.57", new String[]{"PC U2 00153152", " ", "Progesterone", "19.57", "ng/ml", "Pos Control", " ", " ", " "});
-
-        expected.put("DU_DHEAS_0.11", new String[]{"DU", " ", "DHEAS", "0.11", "ug/ml", "Blank", "DU", "1", " "});
-        expected.put("MD1_DHEAS_0.08", new String[]{"MD1", " ", "DHEAS", "0.08", "ug/ml", "Blank", "MD1", "1", " "});
-        expected.put("MA_Progesterone_1.56", new String[]{"MA", " ", "Progesterone", "1.56", "ng/ml", "Blank", "MA", "1", " "});
-        expected.put("MA_Estradiol_15.35", new String[]{"MA", " ", "Estradiol", "15.35", "pg/ml", "Blank", "MA", "1", " "});
-        expected.put("Subject4_Progesterone_0", new String[]{"Subject4", "2012-01-05", "Progesterone", "0", "ng/ml", "Unknown", "DU", "2", " "});
-        expected.put("Subject4_Estradiol_189.59", new String[]{"Subject4", "2012-01-05", "Estradiol", "189.59", "pg/ml", "Unknown", "DU", "2", " "});
-        expected.put("Subject5_Progesterone_-0.05", new String[]{"Subject5", "2012-01-06", "Progesterone", "-0.05", "ng/ml", "Unknown", "MD1", "4", "Test, Blank greater than result"});
-        expected.put("Subject5_Estradiol_4.92", new String[]{"Subject5", "2012-01-06", "Estradiol", "4.92", "pg/ml", "Unknown", "MD1", "4", "Test"});
-        expected.put("Subject6_Progesterone_-8.37", new String[]{"Subject6", "2012-01-07", "Progesterone", "-8.37", "ng/ml", "Unknown", "MA", "10", "Blank greater than result"});
-        expected.put("Subject6_Estradiol_-3.46", new String[]{"Subject6", "2012-01-07", "Estradiol", "-3.46", "pg/ml", "Unknown", "MA", "10", "Test, Blank greater than result"});
-        expected.put("Subject7_Progesterone_5.37", new String[]{"Subject7", "2012-01-08", "Progesterone", "5.37", "ng/ml", "Unknown", "DU", "5", " "});
-        expected.put("Subject7_Estradiol_39.34", new String[]{"Subject7", "2012-01-08", "Estradiol", "39.34", "pg/ml", "Unknown", "DU", "5", " "});
-        expected.put("Subject8_Progesterone_-0.01", new String[]{"Subject8", "2012-01-09", "Progesterone", "-0.01", "ng/ml", "Unknown", "MD1", "2", "Blank greater than result"});
-        expected.put("Subject8_Estradiol_24.78", new String[]{"Subject8", "2012-01-09", "Estradiol", "24.78", "pg/ml", "Unknown", "MD1", "2", " "});
-        expected.put("Subject9_Progesterone_-8.32", new String[]{"Subject9", "2012-01-10", "Progesterone", "-8.32", "ng/ml", "Unknown", "MA", "2", "Blank greater than result"});
-        expected.put("Subject9_Estradiol_0.29", new String[]{"Subject9", "2012-01-10", "Estradiol", "0.29", "pg/ml", "Unknown", "MA", "2", " "});
         expected.put("Subject10_Progesterone_0.16", new String[]{"Subject10", "2012-01-11", "Progesterone", "0.16", "ng/ml", "Unknown", " ", "1", " "});
         expected.put("Subject10_Estradiol_12.39", new String[]{"Subject10", "2012-01-11", "Estradiol", "12.39", "pg/ml", "Unknown", " ", "1", " "});
         expected.put("Subject11_Progesterone_0.23", new String[]{"Subject11", "2012-01-12", "Progesterone", "0.23", "ng/ml", "Unknown", " ", "1", " "});
@@ -370,6 +357,8 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         expected.put("Subject38_Estradiol_1549", new String[]{"Subject38", "2012-02-08", "Estradiol", "1549", "pg/ml", "Unknown", " ", "1", " "});
         expected.put("Subject39_Progesterone_0.05", new String[]{"Subject39", "2012-02-09", "Progesterone", "0.05", "ng/ml", "Unknown", " ", "1", " "});
         expected.put("Subject39_Estradiol_72.49", new String[]{"Subject39", "2012-02-09", "Estradiol", "72.49", "pg/ml", "Unknown", " ", "1", " "});
+        expected.put("Subject4_Progesterone_0", new String[]{"Subject4", "2012-01-05", "Progesterone", "0", "ng/ml", "Unknown", "DU", "2", " "});
+        expected.put("Subject4_Estradiol_189.59", new String[]{"Subject4", "2012-01-05", "Estradiol", "189.59", "pg/ml", "Unknown", "DU", "2", " "});
         expected.put("Subject40_Estradiol_328.1", new String[]{"Subject40", "2012-02-10", "Estradiol", "328.1", "pg/ml", "Unknown", " ", "1", " "});
         expected.put("Subject41_Progesterone_0.06", new String[]{"Subject41", "2012-02-11", "Progesterone", "0.06", "ng/ml", "Unknown", " ", "1", " "});
         expected.put("Subject41_Estradiol_124.8", new String[]{"Subject41", "2012-02-11", "Estradiol", "124.8", "pg/ml", "Unknown", " ", "1", " "});
@@ -381,6 +370,16 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         expected.put("Subject44_LH_3.66", new String[]{"Subject44", "2012-02-14", "LH", "3.66", "mIU/ml", "Unknown", " ", "1", " "});
         expected.put("Subject44_FSH_7.06", new String[]{"Subject44", "2012-02-14", "FSH", "7.06", "mIU/ml", "Unknown", " ", "1", " "});
         expected.put("Subject44_SHBG_2.75", new String[]{"Subject44", "2012-02-14", "SHBG", "2.75", "ug/ml", "Unknown", " ", "1", " "});
+        expected.put("Subject44_Estradiol_44.99", new String[]{"Subject44", "2012-02-14", "Estradiol", "44.99", "pg/ml", "Unknown", " ", "1", " "});
+        expected.put("Subject45_Progesterone_0.28", new String[]{"Subject45", "2012-02-15", "Progesterone", "0.28", "ng/ml", "Unknown", " ", "1", " "});
+        expected.put("Subject45_LH_8.13", new String[]{"Subject45", "2012-02-15", "LH", "8.13", "mIU/ml", "Unknown", " ", "1", " "});
+        expected.put("Subject45_Estradiol_28.17", new String[]{"Subject45", "2012-02-15", "Estradiol", "28.17", "pg/ml", "Unknown", " ", "1", " "});
+        expected.put("Subject46_Progesterone_0.35", new String[]{"Subject46", "2012-02-16", "Progesterone", "0.35", "ng/ml", "Unknown", " ", "1", " "});
+        expected.put("Subject46_LH_7.42", new String[]{"Subject46", "2012-02-16", "LH", "7.42", "mIU/ml", "Unknown", " ", "1", " "});
+        expected.put("Subject46_Estradiol_53.11", new String[]{"Subject46", "2012-02-16", "Estradiol", "53.11", "pg/ml", "Unknown", " ", "1", " "});
+        expected.put("Subject47_Progesterone_0.26", new String[]{"Subject47", "2012-02-17", "Progesterone", "0.26", "ng/ml", "Unknown", " ", "1", " "});
+        expected.put("Subject47_LH_11.31", new String[]{"Subject47", "2012-02-17", "LH", "11.31", "mIU/ml", "Unknown", " ", "1", " "});
+        expected.put("Subject47_Estradiol_28.62", new String[]{"Subject47", "2012-02-17", "Estradiol", "28.62", "pg/ml", "Unknown", " ", "1", " "});
 
         int totalRows = 100;
         Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
