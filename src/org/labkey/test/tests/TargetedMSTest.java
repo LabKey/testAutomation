@@ -58,7 +58,7 @@ public class TargetedMSTest extends BaseWebDriverTest
         selectPipelineFileAndImportAction("MRMer/" + SKY_FILE, "Import Skyline Results");
         waitForText("Confirm TargetedMS Data Import");
         clickButton("Import");
-        waitForText("Targeted MS Runs ");
+        waitForText("Targeted MS Runs");
         waitForTextWithRefresh(SKY_FILE, defaultWaitForPage);
         assertTextPresent("Transitions");
     }
@@ -68,7 +68,7 @@ public class TargetedMSTest extends BaseWebDriverTest
     {
         clickAndWait(Locator.linkContainingText(SKY_FILE));
 
-        log("Verifying expected summary counts ");
+        log("Verifying expected summary counts");
         assertElementPresent(Locator.xpath("//tr[td[text()='Peptide Group Count']][td[text()='24']]"));
         assertElementPresent(Locator.xpath("//tr[td[text()='Peptide Count']][td[text()='44']]"));
         assertElementPresent(Locator.xpath("//tr[td[text()='Precursor Count']][td[text()='88']]"));
@@ -92,7 +92,7 @@ public class TargetedMSTest extends BaseWebDriverTest
         assertElementPresent(Locator.xpath("//img[contains(@alt, 'Chromatogram')]"), 5);
 
         //Click on a precursor icon link.
-        clickLink(Locator.linkWithHref("precursorAllChromatogramsChart.view?"));
+        clickAndWait(Locator.linkWithHref("precursorAllChromatogramsChart.view?"));
         //Verify expected values in detail view. Verify chromatogram.
         assertTextPresentInThisOrder("Precursor Chromatograms", "YAL038W",  "LTSLNVVAGSDLR", "672.8777");
         assertElementPresent(Locator.xpath("//img[contains(@src, 'Chromatogram')]"));
@@ -110,7 +110,7 @@ public class TargetedMSTest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText(SKY_FILE));
         //Toggle to Transition view (click on down arrow in Precursor List webpart header)
         click(Locator.xpath("//th[span[contains(text(), 'Precursor List')]]/span/a/img"));
-        clickLink(Locator.tagContainingText("span","Transition List"));
+        clickAndWait(Locator.tagContainingText("span","Transition List"));
         waitForText("Transition List");
         DataRegionTable drt = new DataRegionTable("transitions_view", this);
         drt.getDataAsText(5, "Label");
@@ -126,20 +126,19 @@ public class TargetedMSTest extends BaseWebDriverTest
         assertTextPresent("1343.7408", "1226.6619", "1001.5505");
 
         //Click down arrow next to protein name. Click "Search for other references to this protein"
-
-        String xpath = Locator.xpath("//span[a[text()='YAL038W']]/span/img").toString();
-        selenium.mouseOver(xpath);
-        selenium.mouseMoveAt(xpath, "1,1");
+        Locator l = Locator.xpath("//span[a[text()='YAL038W']]/span/img");
+        waitForElement(l);
+        mouseOver(l);
         waitForText("Search for other references to this protein");
         clickAndWait(Locator.linkContainingText("Search for other references to this protein"));
 
         //Verify TargetedMS Peptides section of page.
         //Click on Details link.
         //Spot check some values.
-        assertTextPresent("Protein Search Results", "TargetedMS Peptides ","LTSLNVVAGSDLR",
+        assertTextPresent("Protein Search Results", "TargetedMS Peptides","LTSLNVVAGSDLR",
                "TNNPETLVALR",  "GVNLPGTDVDLPALSEK",  "TANDVLTIR",
                 "GDLGIEIPAPEVLAVQK", "EPVSDWTDDVEAR");
-        click(Locator.imageWithSrc("plus.gif", true, 2));
+        click(Locator.imageWithSrc("plus.gif", true));
         assertTextPresent("I from 71787-73289, Verified ORF, \"Pyruvate kinase, functions as a homotetramer in glycolysis to convert phosphoenolpyruvate to pyruvate, the input for aerobic (TCA cyc...");
 
 
@@ -158,43 +157,47 @@ public class TargetedMSTest extends BaseWebDriverTest
         sleep(500); // sleep for a half second to let the search button enable based on form validation
         clickAndWait(Locator.button("Search"));
         waitForText("Modification Search Results");
-        waitForText("1 - 13 of 13");
+        //waitForText("1 - 13 of 13");
         assertTextPresentInThisOrder("Targeted MS Modification Search", "Targeted MS Peptides");
         assertTextPresent("Amino Acids:", "Delta Mass:");
-        Assert.assertEquals(13, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
-        Assert.assertEquals(0, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
+        Assert.assertEquals(13, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
+        Assert.assertEquals(0, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
 
         // search for K[+8] modification
         setFormElement(Locator.name("aminoAcids"), "k R, N"); // should be split into just chars
         setFormElement(Locator.name("deltaMass"), "8.01"); // should be rounded to a whole number
         sleep(500); // sleep for a half second to let the search button enable based on form validation
         clickAndWait(Locator.button("Search"));
-        waitForText("1 - 31 of 31");
-        Assert.assertEquals(0, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
-        Assert.assertEquals(31, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
+        //waitForText("1 - 31 of 31");
+        Assert.assertEquals(0, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
+        Assert.assertEquals(31, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
 
         // test custom name search type
         _ext4Helper.selectRadioButton("Search By:", "Modification Name");
-        assertTextNotPresent("Amino Acids:", "Delta Mass:", "Unimod Name:");
-        assertTextPresent("Include:", "Custom Name:");
+        assertElementNotVisible(Locator.name("aminoAcids"));
+        assertElementNotVisible(Locator.name("deltaMass"));
+        assertElementNotVisible(Locator.name("unimodName"));
+        assertElementVisible(Locator.name("customName"));
         _ext4Helper.selectRadioButton("Type:", "Names used in imported experiments");
         _ext4Helper.selectComboBoxItem("Custom Name:", "Label:13C(6)15N(4) (C-term R)");
         sleep(500); // sleep for a half second to let the search button enable based on form validation
         clickAndWait(Locator.button("Search"));
-        waitForText("1 - 13 of 13");
-        Assert.assertEquals(13, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
-        Assert.assertEquals(0, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
+        //waitForText("1 - 13 of 13");
+        Assert.assertEquals(13, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
+        Assert.assertEquals(0, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
         _ext4Helper.selectComboBoxItem("Custom Name:", "Label:13C(6)15N(2) (C-term K)");
         sleep(500); // sleep for a half second to let the search button enable based on form validation
         clickAndWait(Locator.button("Search"));
-        waitForText("1 - 31 of 31");
-        Assert.assertEquals(0, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
-        Assert.assertEquals(31, getXpathCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
+        //waitForText("1 - 31 of 31");
+        Assert.assertEquals(0, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
+        Assert.assertEquals(31, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
 
         // test unimod name search type
         _ext4Helper.selectRadioButton("Type:", "All Unimod modifications");
-        assertTextNotPresent("Amino Acids:", "Delta Mass:", "Custom Name:");
-        assertTextPresent("Include:", "Unimod Name:");
+        assertElementNotVisible(Locator.name("aminoAcids"));
+        assertElementNotVisible(Locator.name("deltaMass"));
+        assertElementNotVisible(Locator.name("customName"));
+        assertElementVisible(Locator.name("unimodName"));
         _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabelContaining("Unimod Name:"), "Carbamidomethyl (C)");
         sleep(500); // sleep for a half second to let the search button enable based on form validation
         clickAndWait(Locator.button("Search"));
