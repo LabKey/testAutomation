@@ -170,12 +170,10 @@ public class PortalHelper extends AbstractHelper
             _test.click(Locator.xpath("//input[@type='button' and @id='selectQueryContents-inputEl']"));
             _test.waitForElement(Locator.css(".query-loaded-marker"));
             _test._ext4Helper.selectComboBoxItem(Locator.id("queryName"), queryName);
+            _test.waitForElement(Locator.css(".view-loaded-marker"));
 
             if (viewName != null)
-            {
-                _test.waitForElement(Locator.css(".view-loaded-marker"));
                 _test._ext4Helper.selectComboBoxItem(Locator.id("viewName"), viewName);
-            }
         }
 
         _test.clickButton("Submit");
