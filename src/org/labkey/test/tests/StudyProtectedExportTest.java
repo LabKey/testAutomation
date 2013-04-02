@@ -246,7 +246,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         Assert.assertEquals("Unexpected number of clinics", clinicCount, foundClinics);
 
         clickTab("Specimen Data");
-        clickAndWait(Locator.linkWithText("Blood (Whole)"));
+        waitAndClickAndWait(Locator.linkWithText("Blood (Whole)"));
         DataRegionTable vialsTable = new DataRegionTable("SpecimenDetail", this);
         List<String> procLocs = vialsTable.getColumnDataAsText("Processing Location");
         procLocs.remove(procLocs.size() - 1); // Skip aggregate row
