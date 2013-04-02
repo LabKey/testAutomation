@@ -49,8 +49,6 @@ public class Ext4Helper extends AbstractHelper
     {
         Locator arrowTrigger = comboBox.append("//div").withClass("x4-form-arrow-trigger");
         _test.waitAndClick(arrowTrigger);
-        _test.waitForElement(comboBox.append("//td").withClass("x4-pickerfield-open"));
-        _test.sleep(100);
         if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
         {
             _test.sleep(500);
