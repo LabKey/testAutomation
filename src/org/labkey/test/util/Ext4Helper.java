@@ -64,7 +64,9 @@ public class Ext4Helper extends AbstractHelper
                 listItem = Locator.xpath("//li").withClass("x4-boundlist-item").notHidden().withText(selection);
 
             // wait for and select the list item
-            _test.waitAndClick(listItem);
+            _test.waitForElement(listItem, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            _test.mouseOver(listItem);
+            _test.click(listItem);
 
             // close combo manually if it is a checkbox combo-box
             if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))
