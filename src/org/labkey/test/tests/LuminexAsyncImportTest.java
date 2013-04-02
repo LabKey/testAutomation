@@ -39,8 +39,7 @@ public class LuminexAsyncImportTest extends LuminexTest
     {
         clickCheckbox("backgroundUpload");
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
-        saveAssay();
-        sleep(1500);
+        clickButton("Save & Close");
 
         // test successful background upload
         importRunForTestLuminexConfig(TEST_ASSAY_LUM_FILE5, Calendar.getInstance(), 0);
