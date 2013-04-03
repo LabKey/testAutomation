@@ -10,7 +10,6 @@ import org.labkey.test.util.PortalHelper;
  * User: Rylan
  * Date: 3/26/13
  * Time: 11:32 AM
- * To change this template use File | Settings | File Templates.
  */
 public class ETLTest extends BaseWebDriverTest
 {
@@ -39,6 +38,7 @@ public class ETLTest extends BaseWebDriverTest
         //This is here to prevent an email send error at the end of the test
         enableEmailRecorder();
         _containerHelper.createProject(PROJECT_NAME, null);
+        enableModule("DataIntegration", true);
         createUser("issueuser@testing.test", null, false);
         createProjectGroup(PROJECT_NAME, "IssueGroup");
         goToProjectHome();
@@ -50,15 +50,15 @@ public class ETLTest extends BaseWebDriverTest
         addModule("DataIntegration");
         //Turn on the checker service (should cause a job to appear at the first pipeline check for the user we made)
         goToModule("DataIntegration");
-        waitForElement(Locator.xpath("//tr[@transformid='etls/DemoETL/config.xml']/td/input"));
-        click(Locator.xpath("//tr[@transformid='etls/DemoETL/config.xml']/td/input"));
+        waitForElement(Locator.xpath("//tr[contains(@transformid,'DemoETL')]/td/input"));
+        click(Locator.xpath("//tr[contains(@transformid,'DemoETL')]/td/input"));
     }
 
     protected void checkRun(int amount)
     {
         goToModule("DataIntegration");
-        waitForElement(Locator.xpath("//tr[@transformid='etls/IssuesETL/config.xml']/td/a"));
-        click(Locator.xpath("//tr[@transformid='etls/IssuesETL/config.xml']/td/a"));
+        waitForElement(Locator.xpath("//tr[contains(@transformid,'IssuesETL')]/td/a"));
+        click(Locator.xpath("//tr[contains(@transformid,'IssuesETL')]/td/a"));
         goToProjectHome();
         sleep(500);
         click(Locator.xpath("//span[@id='adminMenuPopupText']"));
