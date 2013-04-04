@@ -65,6 +65,12 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    @Override
     protected Set<String> getOrphanedViews()
     {
         Set<String> views = new HashSet<String>();
