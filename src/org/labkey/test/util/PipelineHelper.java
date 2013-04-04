@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
@@ -74,7 +75,7 @@ public class PipelineHelper
     {
         _test.dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Create Folder']"),
                          Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
-        _test.waitForElement(Locator.xpath("(//button[contains(@class, 'iconFolderNew')])[2]"), _test.defaultWaitForPage);
+        _test.waitForElement(Locator.css(".test-custom-toolbar .iconFolderNew"), _test.defaultWaitForPage);
     }
 
     //TODO
