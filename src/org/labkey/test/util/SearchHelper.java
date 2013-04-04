@@ -154,8 +154,9 @@ public class SearchHelper extends AbstractHelper
         }
         else
         {
-            _test.setFormElement(Locator.id("headerSearchInput-inputEl"), searchTerm);
-            _test.clickAndWait(Locator.xpath("//img[@src = '/labkey/_images/search.png']"));
+            _test.setFormElement(Locator.id("search-input"), searchTerm);
+            _test.pressEnter(Locator.id("search-input"));
+            _test.waitForPageToLoad();
         }
     }
 

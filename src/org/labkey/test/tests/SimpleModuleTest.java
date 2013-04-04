@@ -764,7 +764,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Save & Close");
 
         log("Check that parameterized query doesn't cause page load.");
-        setFormElement(Locator.id("headerSearchInput-inputEl"), MODULE_NAME);
+        setFormElement(Locator.id("search-input"), MODULE_NAME);
         waitForElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), "P");
         clickButton("Submit", 0);

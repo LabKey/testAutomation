@@ -3621,7 +3621,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _extHelper.clickSideTab(tab);
         if(type!=null)
         {
-            click(Locator.xpath("//tr[td[contains(text()," +  type + ")]]/td/input"));
+            click(Locator.xpath("//tr[td[contains(text()," +  Locator.xq(type) + ")]]/td/input"));
         }
         if(tab.equals("Script"))
         {
