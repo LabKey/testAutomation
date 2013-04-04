@@ -106,6 +106,7 @@ public class ChartingAPITest extends ClientAPITest
     {
         //The server side svg converter is fairly strict and will fail with bad inputs
         clickButton("Get SVG", 0);
+        waitForElement(Locator.id("svgtext"));
         String svgText = getFormElement(Locator.id("svgtext"));
 
         String url = WebTestHelper.getBaseURL() + "/visualization/" + EscapeUtil.encode(getProjectName())+ "/exportPDF.view";
