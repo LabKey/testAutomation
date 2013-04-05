@@ -6180,7 +6180,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         createUser(userName, cloneUserName, true);
     }
 
-    public void createUser(String userName, String cloneUserName, boolean verifySuccess)
+    public void createUser(String userName, @Nullable String cloneUserName, boolean verifySuccess)
     {
         if(cloneUserName == null)
         {

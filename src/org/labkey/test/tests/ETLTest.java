@@ -14,6 +14,7 @@ import org.labkey.test.util.PortalHelper;
 public class ETLTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ETLTestProject";
+    private static final String USER = "issueuser@testing.test";
 
     @Override
     protected String getProjectName()
@@ -38,35 +39,22 @@ public class ETLTest extends BaseWebDriverTest
         //This is here to prevent an email send error at the end of the test
         enableEmailRecorder();
         _containerHelper.createProject(PROJECT_NAME, null);
-        enableModule("DataIntegration", true);
-        createUser("issueuser@testing.test", null, false);
-        createProjectGroup(PROJECT_NAME, "IssueGroup");
-        goToProjectHome();
-        sleep(200);
-        addUserToProjGroup("issueuser@testing.test", PROJECT_NAME, "IssueGroup");
-        goToProjectHome();
-        sleep(200);
         new PortalHelper(this).addWebPart("Issues List");
-        addModule("DataIntegration");
+        enableModule("DataIntegration", true);
+        createPermissionsGroup("IssueGroup", USER);
+
         //Turn on the checker service (should cause a job to appear at the first pipeline check for the user we made)
         goToModule("DataIntegration");
-        waitForElement(Locator.xpath("//tr[contains(@transformid,'DemoETL')]/td/input"));
-        click(Locator.xpath("//tr[contains(@transformid,'DemoETL')]/td/input"));
+        waitAndClick(Locator.xpath("//tr[contains(@transformid,'DemoETL')]/td/input"));
     }
 
     protected void checkRun(int amount)
     {
         goToModule("DataIntegration");
-        waitForElement(Locator.xpath("//tr[contains(@transformid,'IssuesETL')]/td/a"));
-        click(Locator.xpath("//tr[contains(@transformid,'IssuesETL')]/td/a"));
+        waitAndClick(Locator.xpath("//tr[contains(@transformid,'IssuesETL')]/td/a"));
         goToProjectHome();
-        sleep(500);
-        click(Locator.xpath("//span[@id='adminMenuPopupText']"));
-        mouseOver(Locator.xpath("//span[text()='Go To Module']"));
-        waitForElement(Locator.xpath("//span[text()='Pipeline']"));
-        click(Locator.xpath("//span[text()='Pipeline']"));
-        //There are two instances of the text "COMPLETE" on the page, so we compensate them out.
-        assertTextPresent("COMPLETE", amount+2);
+        goToModule("Pipeline");
+        waitForPipelineJobsToComplete(amount, "ETL Job", false);
     }
 
     protected void addIssue(String issueName, String assignedTo, String comment)
@@ -82,49 +70,22 @@ public class ETLTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
-    protected void createProjectGroup(String projectName, String groupName)
-    {
-        if (isElementPresent(Locator.permissionRendered()))
-        {
-            exitPermissionsUI();
-            clickAndWait(Locator.linkWithText(projectName));
-        }
-        enterPermissionsUI();
-        click(Locator.xpath("//span[text()='Project Groups']"));
-        waitForElement(Locator.xpath("//input[@name='projectgroupsname']"));
-        setFormElement(Locator.xpath("//input[@name='projectgroupsname']"), groupName);
-        click(Locator.xpath("//span[text()='Create New Group']"));
-        waitForElement(Locator.xpath("//span[text()='Done']"));
-        click(Locator.xpath("//span[text()='Done']"));
-        waitForElement(Locator.xpath("//span[text()='Save and Finish']"));
-        click(Locator.xpath("//span[text()='Save and Finish']"));
-    }
-
-    protected void addModule(String moduleName)
-    {
-        //Add a module to find later
-        goToFolderManagement();
-        waitForElement(Locator.xpath("//a[text()='Folder Type']"));
-        click(Locator.xpath("//a[text()='Folder Type']"));
-        waitForElement(Locator.xpath("//input[@value='"+moduleName+"']"));
-        checkCheckbox(Locator.xpath("//input[@value='"+moduleName+"']"));
-        clickButton("Update Folder");
-    }
-
     @Override
-    protected void doCleanup(boolean aftertest) throws TestTimeoutException
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        if(aftertest)
-        {
-            deleteUser("issueuser@testing.test");
-        }
-
-        super.doCleanup(aftertest);
+        deleteUsers(afterTest, USER);
+        super.doCleanup(afterTest);
     }
 
     @Override
     public String getAssociatedModuleDirectory()
     {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return "server/modules/dataintegration";
+    }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
