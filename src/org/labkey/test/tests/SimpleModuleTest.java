@@ -769,7 +769,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         setFormElement(Locator.xpath("//input[contains(@name, 'param.STARTS_WITH')]"), "P");
         clickButton("Submit", 0);
         waitForText("Manufacturer");
-        Assert.assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(Locator.id("headerSearchInput-inputEl")));
+        Assert.assertEquals("Unexpected page refresh.", MODULE_NAME, getFormElement(Locator.id("search-input")));
         assertTextPresent("Pinto");
         assertTextNotPresent("Prius");
     }
