@@ -108,14 +108,14 @@ public class ClientAPITest extends BaseWebDriverTest
 
     private static final int PAGE_SIZE = 4;
 
-    private static final String SRC_PREFIX = CLIENTAPI_HEADER + "\n<script type=\"text/javascript\">\n" +
+    public static final String SRC_PREFIX = CLIENTAPI_HEADER + "\n<script type=\"text/javascript\">\n" +
             "    Ext.namespace('demoNamespace'); //define namespace with some 'name'\n" +
             "    demoNamespace.myModule = function(){//creates a property 'myModule' of the namespace object\n" +
             "        return {\n" +
             "            init : function()\n" +
             "            {";
 
-    private static final String SRC_SUFFIX = "            }\n" +
+    public static final String SRC_SUFFIX = "            }\n" +
             "        }\n" +
             "    }();\n" +
             "    // Since the above code has already executed, we can access the init method immediately:\n" +
@@ -143,7 +143,7 @@ public class ClientAPITest extends BaseWebDriverTest
             "   errorCallback: errorHandler,\n" +
             "});";
 
-    protected String getFullSource(String testFragment)
+    public static String getFullSource(String testFragment)
     {
         return SRC_PREFIX + "\n" + testFragment + "\n" + SRC_SUFFIX;
     }

@@ -85,6 +85,94 @@ public class NabAssayTest extends AbstractQCAssayTest
 
     private static final boolean CONTINUE = false;
     private static final String PLATE_TEMPLATE_NAME = "NabAssayTest Template";
+    private static final String STUDY_FOLDER = TEST_ASSAY_PRJ_NAB + "/Study 1";
+    private static final String STUDY_FOLDER_ENCODED = "Nab%20Test%20Verify%20Project/Study%201";
+    private static String NABJS_INCLUDE = "<script type=\"text/javascript\">" +
+            "var runOnce = false;\n" +
+            "function runNabAssayTest(config)\n" +
+            "{\n" +
+            "    if (runOnce) return;\n" +
+            "    runOnce = true;\n" +
+            "    var runsConfig = {\n" +
+            "        assayName : 'TestAssayNab',\n" +
+            "        success : function(runs)\n" +
+            "        {\n" +
+            "            \n" +
+            "            for (var j = 0; j < runs.length; j += 1)\n" +
+            "            {\n" +
+            "                if (runs[j].cutoffs[0] != 50) throw 'GetNabRuns failure';\n" +
+            "                var sampleIds = [];\n" +
+            "                var samples = runs[j].samples;\n" +
+            "                for (var k = 0; k < samples.length; k += 1)\n" +
+            "                {\n" +
+            "                    sampleIds[k] = samples[k].objectId;\n" +
+            "                }\n" +
+            "                var studyRunsConfig = {\n" +
+            "                    objectIds : sampleIds,\n" +
+            "                    containerPath : '" + STUDY_FOLDER + "',\n" +
+            "                    success : function(runs)\n" +
+            "                    {\n" +
+            "                        if (runs.length == 0) return;\n" +
+            "                        if (runs[0].cutoffs[0] != 50) throw 'GetStudyNabRuns failure';\n" +
+            "                        var studyRunsGraphConfig = {\n" +
+            "                            objectIds : sampleIds,\n" +
+            "                            containerPath : '" + STUDY_FOLDER + "',\n" +
+            "                            success : function(graph)\n" +
+            "                            {\n" +
+            "                               if (graph.length == 0) return;\n" +
+            "                               if (graph.url.indexOf('" + STUDY_FOLDER_ENCODED + "') < 0) throw 'GetStudyGraphURL failure';\n" +
+            "                               var done = Ext4.create(\"Ext.form.TextField\", { renderTo : config.renderTo, value : 'Success!'});\n" +
+            "                            },\n" +
+            "                            failure : function() {throw 'GetStudyGraphURL failure';}\n" +
+            "                        }\n" +
+            "                        var nabStudyGraphURl = LABKEY.Assay.getStudyNabGraphURL(studyRunsGraphConfig);\n" +
+            "                    },\n" +
+            "                    failure : function() {throw 'GetStudyNabRuns failure';}\n" +
+            "                }\n" +
+            "                var nabStudyRuns = LABKEY.Assay.getStudyNabRuns(studyRunsConfig);\n" +
+            "            }\n" +
+            "        },\n" +
+            "        failure : function() {throw 'GetNabRuns failure';}\n" +
+            "    };\n" +
+            "    var nabRuns = LABKEY.Assay.getNAbRuns(runsConfig);\n" +
+            "}" +
+            "</script>\n";
+
+    // TODO: taken form ClientAPITest; when NabAssayTest is moved to WebDriver, this should be factored into a common place for both tests
+    private static final String TEST_DIV_NAME = "testDiv";
+
+    protected String setSource(String srcFragment, boolean excludeTags)
+    {
+        assertElementPresent(Locator.linkWithText(WIKIPAGE_NAME));
+        clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
+
+        String fullSource = srcFragment;
+        if (!excludeTags)
+            fullSource = NABJS_INCLUDE + ClientAPITest.getFullSource(srcFragment);
+        log("Setting wiki page source:");
+        log(fullSource);
+        setWikiBody(fullSource);
+        saveWikiPage();
+        return waitForDivPopulation(30);
+    }
+
+    private String waitForDivPopulation(int waitSeconds)
+    {
+        while (waitSeconds-- > 0)
+        {
+            log("Waiting for " + TEST_DIV_NAME + " div to render...");
+            if (isElementPresent(Locator.id(TEST_DIV_NAME)))
+            {
+                String divHtml = selenium.getEval("this.browserbot.getCurrentWindow().document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
+                if (divHtml.length() > 0)
+                    return divHtml;
+            }
+            sleep(1000);
+        }
+        Assert.fail("Div failed to render.");
+        return null;
+    }
+    // End TODO
 
     public String getAssociatedModuleDirectory()
     {
@@ -360,7 +448,6 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertNabData(true);
 
             doSchemaBrowserTest();
-//            doNabApiTest();
 
             // create user with read permissions to study and dataset, but no permissions to source assay
             clickFolder(TEST_ASSAY_PRJ_NAB);
@@ -387,6 +474,8 @@ public class NabAssayTest extends AbstractQCAssayTest
             Assert.assertEquals(getResponseCode(), 401);
 
             beginAt("/login/logout.view");  // stop impersonating
+
+            doNabApiTest();
 
             runTransformTest();
 
@@ -447,6 +536,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     private static String WIKIPAGE_NAME = "Nab API Wiki";
     private void doNabApiTest()
     {
+        clickFolder(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_NAB);
         addWebPart("Wiki");
         createNewWikiPage("HTML");
@@ -455,7 +545,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         setWikiBody("placeholder text");
         saveWikiPage();
 
-//        setSource("nabAssayTest.js", false);
+        setSource("runNabAssayTest({renderTo : 'testDiv'})", false);
     }
 
     private void uploadFile(String filePath, String uniqueifier, String finalButton)

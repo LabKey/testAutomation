@@ -149,7 +149,7 @@ public class TargetedMSTest extends BaseWebDriverTest
     {
         // add modificaiton search webpart and do an initial search by AminoAcid and DeltaMass
         goToProjectHome();
-        assertTextPresent("MS2 Search");
+        assertTextPresent("Mass Spec Search");
         _ext4Helper.clickExt4Tab("Modification Search");
         waitForElement(Locator.name("aminoAcids"));
         setFormElement(Locator.name("aminoAcids"), "R");
