@@ -643,7 +643,39 @@ public class ListTest extends BaseWebDriverTest
         customFormattingTest();
         customizeURLTest();
         crossContainerLookupTest();
+        listSelfJoinTest();
      }
+
+    /*  Issue 6883: Create test for list self join
+        Issue 10394: Test spaces & special characters in table/column names
+
+        - Create a new list (use special characters)
+        - Add a field (use special characters)
+        - Make it a lookup linked back to the list itself
+
+        preconditions:  ListVerifyProject
+    */
+    @LogMethod
+    private void listSelfJoinTest()
+    {
+        final String listName = "listSelfJoin" + TRICKY_CHARACTERS;
+        final String dummyBase = "dummyCol";
+        final String dummyCol = dummyBase + TRICKY_CHARACTERS;
+        final String lookupField = "lookupField" + TRICKY_CHARACTERS;
+        final String lookupSchema = "lists";
+        final String lookupTable = listName;
+
+        log("Issue 6883: test list self join");
+
+        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
+                new ListHelper.ListColumn(dummyCol, dummyCol, ListHelper.ListColumnType.String, ""),
+                new ListHelper.ListColumn(lookupField, lookupField, ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, lookupSchema, lookupTable))
+        };
+        _listHelper.createList(PROJECT_VERIFY, listName, ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        clickButton("Done");
+        clickAndWait(Locator.linkWithText(listName));
+        assertTextPresent(dummyBase);
+    }
 
     String crossContainerLookupList = "CCLL";
     @LogMethod
