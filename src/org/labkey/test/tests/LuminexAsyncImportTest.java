@@ -57,7 +57,6 @@ public class LuminexAsyncImportTest extends LuminexTest
         waitForPipelineJobsToFinish(3);
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent("An error occurred when running the script (exit code: 1).", 3);
-        assertTextPresent("output lines omitted, see full output in log for details]", 2);
         assertTextPresent("Error: No value provided for 'Positivity Fold Change'.", 3);
         checkExpectedErrors(2);
     }
