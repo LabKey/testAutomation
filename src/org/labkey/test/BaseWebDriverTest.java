@@ -874,8 +874,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         goToHome();
         goToModule("Dumbster");
-        String emailSubject = "Reset Password Notification from the LabKey Server Web Site";
-        WebElement email = _driver.findElement(By.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[text() = '"+emailSubject+"']"));
+        String emailSubject = "Reset Password Notification";
+        WebElement email = _driver.findElement(By.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[starts-with(text(), '"+emailSubject+"')]"));
         email.click();
         WebElement resetLink = _shortWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]")));
         return resetLink.getText();
