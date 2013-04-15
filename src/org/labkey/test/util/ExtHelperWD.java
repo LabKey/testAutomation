@@ -369,17 +369,17 @@ public class ExtHelperWD extends AbstractHelperWD
         _test.waitForElement(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'block')]"), wait);
     }
 
-    public static Locator locateGridRowCheckbox(String rowTextContent)
+    public static Locator.XPathLocator locateGridRowCheckbox(String rowTextContent)
     {
         return Locator.xpath("//div[contains(@class, 'x-grid3-row')]//td/div[text()='" + rowTextContent + "']//..//..//div[@class='x-grid3-row-checker']");
     }
 
-    public static Locator locateBrowserFileName(String fileName)
+    public static Locator.XPathLocator locateBrowserFileName(String fileName)
     {
         return Locator.xpath("//div[contains(@class, 'x-grid3-row')]//td/div[text()='" + fileName + "']");
     }
 
-    public static Locator locateExt3GridRow(int rowIndex, String parent)
+    public static Locator.XPathLocator locateExt3GridRow(int rowIndex, String parent)
     {
         String base = "//div[contains(@class, 'x-grid-panel')]";
 
@@ -389,7 +389,7 @@ public class ExtHelperWD extends AbstractHelperWD
         return Locator.xpath("(" + base + "//table[contains(@class, 'x-grid3-row-table')])[" + rowIndex + "]");
     }
 
-    public static Locator locateExt3GridCell(Locator row, int cellIndex)
+    public static Locator.XPathLocator locateExt3GridCell(Locator row, int cellIndex)
     {
         return Locator.xpath("(" + ((Locator.XPathLocator)row).getPath() + "//td[contains(@class, 'x-grid3-cell')])[" + cellIndex + "]");
     }
@@ -400,12 +400,13 @@ public class ExtHelperWD extends AbstractHelperWD
         waitForFileGridReady();
         _test.waitForElement(Locator.css("div.labkey-filecontent-grid"), WAIT_FOR_PAGE);
         _test.waitForElement(locateBrowserFileName(fileName), WAIT_FOR_PAGE);
-        Boolean wasChecked = _test.isElementPresent(Locator.css("div.x-grid3-row-selected > table > tbody > tr > td > div").withText(fileName));
-        selectExtGridItem("name", fileName, -1, "labkey-filecontent-grid", true);
+        Locator rowSelected = Locator.css(".labkey-filecontent-grid div.x-grid3-row-selected > table > tbody > tr > td > div").withText(fileName);
+        Boolean wasChecked = _test.isElementPresent(rowSelected);
+        _test.click(Locator.xpath("//div").withClass("labkey-filecontent-grid").append(locateGridRowCheckbox(fileName)));
         if (wasChecked)
-            _test.waitForElementToDisappear(Locator.css("div.x-grid3-row-selected > table > tbody > tr > td > div").withText(fileName));
+            _test.waitForElementToDisappear(rowSelected);
         else
-            _test.waitForElement(Locator.css("div.x-grid3-row-selected > table > tbody > tr > td > div").withText(fileName));
+            _test.waitForElement(rowSelected);
     }
 
     public void clickXGridPanelCheckbox(int index, boolean keepExisting)

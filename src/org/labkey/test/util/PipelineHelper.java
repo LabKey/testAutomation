@@ -129,7 +129,7 @@ public class PipelineHelper
 
     public void uploadFile(File file, String description, String customProperty, String lookupColumn )
     {
-        _test.setFormElement(Locator.css(".single-upload-panel input[type=file]"), file);
+        chooseSingleFileUpload(file);
         _test._extHelper.setExtFormElementByLabel("Description:", description);
         _test.clickButton("Upload", 0);
         _test._extHelper.waitForExtDialog("Extended File Properties", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
@@ -152,9 +152,17 @@ public class PipelineHelper
                 return _test.getFormElement(Locator.xpath("//label[./span[text() = 'Choose a File:']]//..//input[contains(@class, 'x-form-file-text')]")).equals("");
             }
         }, "Upload field did not clear after upload.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement(Locator.css(".single-upload-panel input[type=file]"), file);
+        chooseSingleFileUpload(file);
         _test.clickButton("Upload", 0);
         _test.waitForElement(Locator.css("#fileBrowser div.x-grid3-col-2").withText(file.getName()), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void chooseSingleFileUpload(File file)
+    {
+        WebElement displayField = Locator.css(".single-upload-panel input.x-form-file-text").findElement(_test.getDriver());
+        _test.executeScript("arguments[0].style.display = 'none';", displayField);
+        _test.setFormElement(Locator.css(".single-upload-panel input[type=file]"), file);
+        _test.executeScript("arguments[0].style.display = '';", displayField);
     }
 
     public void importFile(String fileName, String importAction)
