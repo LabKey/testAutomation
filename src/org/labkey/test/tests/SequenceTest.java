@@ -212,7 +212,7 @@ public class SequenceTest extends BaseWebDriverTest
         outputTable = outputTable.replaceAll("<>", System.getProperty("line.separator"));
 
         //then we download anyway
-        clickButton("Download For Instrument");
+        clickButton("Download");
 
         //the browser converts line breaks to spaces.  this is a hack to get them back
         String text = _helper.getPageText();

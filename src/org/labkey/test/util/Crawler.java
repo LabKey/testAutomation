@@ -142,6 +142,8 @@ public class Crawler
             new ControllerActionId("NAb", "download"),
             new ControllerActionId("user", "impersonate"),
             new ControllerActionId("wiki", "download"),
+            // Used in the ContainerContext test to check URL generation, but doesn't actually exist
+            new ControllerActionId("fake", "action"),
 
             // Actions from unsupported modules
             new ControllerActionId("targetedms", "downloadDocument"),
@@ -386,8 +388,8 @@ public class Crawler
                 return false;
         }
 
-        //skip any _webdav or fake urls
-        if (actionId.getController().equalsIgnoreCase("_webdav") || actionId.getController().equalsIgnoreCase("fake"))
+        //skip any _webdav urls
+        if (actionId.getController().equalsIgnoreCase("_webdav"))
             return false;
 
         // skip export actions. 

@@ -66,6 +66,7 @@ public class FlowSpecimenTest extends BaseFlowTestWD
 
         log("** Import specimens");
         clickTab("Specimen Data");
+        waitAndClick(Locator.linkWithText("Administration"));
         waitAndClickAndWait(Locator.linkWithText("Import Specimens"));
         setFormElementJS(Locator.id("tsv"), SPECIMEN_DATA);
         clickButton("Submit");

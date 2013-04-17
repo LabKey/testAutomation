@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -27,57 +26,10 @@ import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
-import java.util.Arrays;
 
 /**
  * User: kevink
  * Date: 1/28/13
- *
- * This test created linked schemas from a source container in a target container.
- *
- * To check the metadata is applied correctly, each letter column has metadata applied
- * at each level that metadata can be applied.  Using this strategy we only need to
- * check the end query instead of at each level.
- *
- * For the LinkedSchemaTestPeople list, metadata should be applied in this order:
- *
- * In the source container:
- * - LinkedSchemaTestPeople list definition
- *   (original title and URL for  P, Q, R, S, T, U, V, W, X, Y, Z)
- * - File metadata xml in linkedschematest/queries/lists/LinkedSchemaTestPeople.query.xml
- *   (overrides title and URL for P, Q, R, S, T, U, V, W, X, Y)
- *   (BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.)
- * - Database metadata xml
- *   (overrides title and URL for P, Q, R, S, T, U, V, W, X)
- *
- * In linked schema target container:
- * - Linked schema tables have FKs and URLs removed, other metadata is intact.
- * - Linked schema template or instance metadata xml
- *   (overrides title and URL for P, Q, R, S, T, U, V, W)
- * - File metadata xml in linkedschematest/queries/&lt;schema>/LinkedSchemaTestPeople.query.xml
- *   (overrides title and URL for P, Q, R, S, T, U, V)
- * - Database metadata xml
- *   (overrides title and URL for P, Q, R, S, T, U)
- *
- * For LinkedSchemaTestQuery query, metadata should be applied in this order:
- *
- * In the source container:
- * - The LinkedSchemaTestPeople metadata as applied above
- * - File metadata xml in linkedschematest/queries/lists/LinkedSchemaTestQuery.query.xml
- *   (overrides title and URL for P, Q, R, S, T) (U, V, W, X, Y, Z should be the same as from LinkedSchemaTestPeople in the source container)
- * - Database metadata xml
- *   (overrides title and URL for P, Q, R, S)
- *   (BUGBUG? Can't override the metadata xml of a file-based query with .query.xml apparently.)
- *
- * In linked schema target container:
- * - Linked schema tables have FKs and URLs removed, other metadata is intact.
- * - Linked schema template or instance metadata xml
- *   (overrides title and URL for P, Q, R)
- * - File metadata xml in linkedschematest/queries/&lt;schema>/LinkedSchemaTestQuery.query.xml
- *   (overrides title and URL for P, Q)
- * - Database metadata xml
- *   (overrides title and URL for P)
- *   (BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.)
  */
 public class LinkedSchemaTest extends BaseWebDriverTest
 {
@@ -88,216 +40,38 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     private static final int MOTHER_ID = 3;
 
 
-    public static final String LIST_NAME = "LinkedSchemaTestPeople";
-    public static final String LIST_DATA = "Name\tAge\tCrazy\tP\tQ\tR\tS\tT\tU\tV\tW\tX\tY\tZ\n" +
-            "Dave\t39\tTrue\tp\tq\tr\ts\tt\tu\tv\tw\tx\ty\tz\n" +
-            "Adam\t65\tTrue\tp\tq\tr\ts\tt\tu\tv\tw\tx\ty\tz\n" +
-            "Britt\t30\tFalse\tp\tq\tr\ts\tt\tu\tv\tw\tx\ty\tz\n" +
-            "Josh\t30\tTrue\tp\tq\tr\ts\tt\tu\tv\tw\tx\ty\tz";
+    public static final String LIST_NAME = "People";
+    public static final String LIST_DATA = "Name\tAge\tCrazy\n" +
+            "Dave\t39\tTrue\n" +
+            "Adam\t65\tTrue\n" +
+            "Britt\t30\tFalse\n" +
+            "Josh\t30\tTrue";
 
-    // Original list definition title and URL
-    public static final String LIST_DEF_TITLE = "Original List";
-    public static final String LIST_DEF_URL   = "list_original.view";
-
-    // File-based metadata lives in linkedschematest/queries/lists/LinkedSchemaTestPeople.query.xml
-    public static final String LIST_FILE_METADATA_TITLE = "file_metadata List";
-    public static final String LIST_FILE_METADATA_URL   = "file_metadata.view";
-
-    // Metadata override applied to the list in the database in source container.
-    public static final String LIST_METADATA_OVERRIDE_TITLE = "db_metadata List";
-    public static final String LIST_METADATA_OVERRIDE_URL   = "db_metadata.view";
-    public static final String LIST_METADATA_OVERRIDE =
-            "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
-            "  <table tableName=\"" + LIST_NAME + "\" tableDbType=\"NOT_IN_DB\">\n" +
-            "    <columns>\n" +
-            "      <column columnName=\"P\">\n" +
-            "        <columnTitle>db_metadata List P</columnTitle>\n" +
-            "        <url>fake/db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "      <column columnName=\"Q\">\n" +
-            "        <columnTitle>db_metadata List Q</columnTitle>\n" +
-            "        <url>fake/db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "      <column columnName=\"R\">\n" +
-            "        <columnTitle>db_metadata List R</columnTitle>\n" +
-            "        <url>fake/db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "      <column columnName=\"S\">\n" +
-            "        <columnTitle>db_metadata List S</columnTitle>\n" +
-            "        <url>fake/db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "      <column columnName=\"T\">\n" +
-            "        <columnTitle>db_metadata List T</columnTitle>\n" +
-            "        <url>fake/db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "      <column columnName=\"U\">\n" +
-            "        <columnTitle>db_metadata List U</columnTitle>\n" +
-            "        <url>fake/db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "      <column columnName=\"V\">\n" +
-            "        <columnTitle>db_metadata List V</columnTitle>\n" +
-            "        <url>fake/db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "      <column columnName=\"W\">\n" +
-            "        <columnTitle>db_metadata List W</columnTitle>\n" +
-            "        <url>fake/db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "      <column columnName=\"X\">\n" +
-            "        <columnTitle>db_metadata List X</columnTitle>\n" +
-            "        <url>fake/db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "    </columns>\n" +
-            "  </table>\n" +
-            "</tables>";
-
-    public static final String QUERY_NAME = "LinkedSchemaTestQuery";
-    // BUGBUG? Can't apply database metadata to a file-based query.
-//    public static final String QUERY_METADATA_OVERRIDE_TITLE = "db_metadata Query";
-//    public static final String QUERY_METADATA_OVERRIDE_URL   = "db_metadata.view";
-//    public static final String QUERY_METADATA_OVERRIDE =
-//            "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
-//            "  <table tableName=\"" + QUERY_NAME + "\" tableDbType=\"NOT_IN_DB\">\n" +
-//            "    <columns>\n" +
-//            "      <column columnName=\"P\">\n" +
-//            "        <columnTitle>db-metadata List P</columnTitle>\n" +
-//            "        <url>fake/db_metadata.view</url>\n" +
-//            "      </column>\n" +
-//            "      <column columnName=\"Q\">\n" +
-//            "        <columnTitle>db_metadata Query Q</columnTitle>\n" +
-//            "        <url>fake/db_metadata.view</url>\n" +
-//            "      </column>\n" +
-//            "      <column columnName=\"R\">\n" +
-//            "        <columnTitle>db_metadata Query R</columnTitle>\n" +
-//            "        <url>fake/db_metadata.view</url>\n" +
-//            "      </column>\n" +
-//            "      <column columnName=\"S\">\n" +
-//            "        <columnTitle>db_metadata Query S</columnTitle>\n" +
-//            "        <url>fake/db_metadata.view</url>\n" +
-//            "      </column>\n" +
-//            "      <column columnName=\"T\">\n" +
-//            "        <columnTitle>db_metadata Query T</columnTitle>\n" +
-//            "        <url>fake/db_metadata.view</url>\n" +
-//            "      </column>\n" +
-//            "      <column columnName=\"U\">\n" +
-//            "        <columnTitle>db_metadata Query U</columnTitle>\n" +
-//            "        <url>fake/db_metadata.view</url>\n" +
-//            "      </column>\n" +
-//            "    </columns>\n" +
-//            "  </table>\n" +
-//            "</tables>";
-
-    // A_People linked schema definition and metadata override
     public static final String A_PEOPLE_SCHEMA_NAME = "A_People";
-    public static final String A_PEOPLE_METADATA_TITLE = "A_People template List Name";
+    public static final String A_PEOPLE_METADATA_TITLE = "A_PEOPLE_METADATA Name title";
     public static final String A_PEOPLE_METADATA =
-            "<tables xmlns=\"http://labkey.org/data/xml\" xmlns:cv=\"http://labkey.org/data/xml/queryCustomView\">\n" +
-            "    <table tableName=\"" + LIST_NAME + "\" tableDbType=\"NOT_IN_DB\">\n" +
-            "        <tableUrl>/query/recordDetails.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&amp;queryName=" + LIST_NAME + "&amp;keyField=Key&amp;key=${Key}</tableUrl>\n" +
-            "        <filters>\n" +
+            "<dat:tables xmlns:dat=\"http://labkey.org/data/xml\" xmlns:cv=\"http://labkey.org/data/xml/queryCustomView\">\n" +
+            "    <dat:table tableName=\"People\" tableDbType=\"NOT_IN_DB\">\n" +
+            "        <dat:tableUrl>/query/recordDetails.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&amp;queryName=People&amp;keyField=Key&amp;key=${Key}</dat:tableUrl>\n" +
+            "        <dat:filters>\n" +
             "          <cv:where>Name LIKE 'A%'</cv:where>\n" +
-            "        </filters>\n" +
-            "        <columns>\n" +
-            "          <column columnName=\"Name\">\n" +
-            "            <columnTitle>" + A_PEOPLE_METADATA_TITLE + "</columnTitle>\n" +
-            "          </column>\n" +
-            "          <column columnName=\"P\">\n" +
-            "            <columnTitle>A_People template List P</columnTitle>\n" +
-            "            <url>fake/a_template_metadata.view</url>\n" +
-            "          </column>\n" +
-            "          <column columnName=\"Q\">\n" +
-            "            <columnTitle>A_People template List Q</columnTitle>\n" +
-            "            <url>fake/a_template_metadata.view</url>\n" +
-            "          </column>\n" +
-            "          <column columnName=\"R\">\n" +
-            "            <columnTitle>A_People template List R</columnTitle>\n" +
-            "            <url>fake/a_template_metadata.view</url>\n" +
-            "          </column>\n" +
-            "          <column columnName=\"S\">\n" +
-            "            <columnTitle>A_People template List S</columnTitle>\n" +
-            "            <url>fake/a_template_metadata.view</url>\n" +
-            "          </column>\n" +
-            "          <column columnName=\"T\">\n" +
-            "            <columnTitle>A_People template List T</columnTitle>\n" +
-            "            <url>fake/a_template_metadata.view</url>\n" +
-            "          </column>\n" +
-            "          <column columnName=\"U\">\n" +
-            "            <columnTitle>A_People template List U</columnTitle>\n" +
-            "            <url>fake/a_template_metadata.view</url>\n" +
-            "          </column>\n" +
-            "          <column columnName=\"V\">\n" +
-            "            <columnTitle>A_People template List V</columnTitle>\n" +
-            "            <url>fake/a_template_metadata.view</url>\n" +
-            "          </column>\n" +
-            "          <column columnName=\"W\">\n" +
-            "            <columnTitle>A_People template List W</columnTitle>\n" +
-            "            <url>fake/a_template_metadata.view</url>\n" +
-            "          </column>\n" +
-            "        </columns>\n" +
-            "    </table>\n" +
-            "    <table tableName=\"" + QUERY_NAME + "\" tableDbType=\"NOT_IN_DB\">\n" +
-            "        <columns>\n" +
-            "          <column columnName=\"P\">\n" +
-            "            <columnTitle>A_People template Query P</columnTitle>\n" +
-            "            <url>fake/a_template_metadata.view</url>\n" +
-            "          </column>\n" +
-            "          <column columnName=\"Q\">\n" +
-            "            <columnTitle>A_People template Query Q</columnTitle>\n" +
-            "            <url>fake/a_template_metadata.view</url>\n" +
-            "          </column>\n" +
-            "          <column columnName=\"R\">\n" +
-            "            <columnTitle>A_People template Query R</columnTitle>\n" +
-            "            <url>fake/a_template_metadata.view</url>\n" +
-            "          </column>\n" +
-            "        </columns>\n" +
-            "    </table>\n" +
-            "</tables>\n";
+            "        </dat:filters>\n" +
+            "        <dat:columns>\n" +
+            "          <dat:column columnName=\"Name\">\n" +
+            "            <dat:columnTitle>" + A_PEOPLE_METADATA_TITLE + "</dat:columnTitle>\n" +
+            "          </dat:column>\n" +
+            "        </dat:columns>\n" +
+            "    </dat:table>\n" +
+            "</dat:tables>\n";
 
-    public static final String A_PEOPLE_LIST_METADATA_OVERRIDE =
-            "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
-            "  <table tableName=\"" + LIST_NAME + "\" tableDbType=\"NOT_IN_DB\">\n" +
-            "    <columns>\n" +
-            "      <column columnName=\"P\">\n" +
-            "        <columnTitle>A_People db_metadata List P</columnTitle>\n" +
-            "        <url>fake/a_db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "      <column columnName=\"Q\">\n" +
-            "        <columnTitle>A_People db_metadata List Q</columnTitle>\n" +
-            "        <url>fake/a_db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "      <column columnName=\"R\">\n" +
-            "        <columnTitle>A_People db_metadata List R</columnTitle>\n" +
-            "        <url>fake/a_db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "      <column columnName=\"S\">\n" +
-            "        <columnTitle>A_People db_metadata List S</columnTitle>\n" +
-            "        <url>fake/a_db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "    </columns>\n" +
-            "  </table>\n" +
-            "</tables>";
-
-    public static final String A_PEOPLE_QUERY_METADATA_OVERRIDE =
-            "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
-            "  <table tableName=\"" + QUERY_NAME + "\" tableDbType=\"NOT_IN_DB\">\n" +
-            "    <columns>\n" +
-            "      <column columnName=\"P\">\n" +
-            "        <columnTitle>A_People db_metadata Query P</columnTitle>\n" +
-            "        <url>fake/a_db_metadata.view</url>\n" +
-            "      </column>\n" +
-            "    </columns>\n" +
-            "  </table>\n" +
-            "</tables>";
-
-    // B_People linked schema definition is in linkedschematest/schemas/BPeopleTemplate.template.xml
     public static final String B_PEOPLE_SCHEMA_NAME = "B_People";
-    public static final String B_PEOPLE_TEMPLATE_METADATA_TITLE = "BPeopleTemplate List Name";
+    public static final String B_PEOPLE_TEMPLATE_METADATA_TITLE = "BPeopleTemplate Name title";
 
-    // D_People linked schema definition and metadata override
     public static final String D_PEOPLE_SCHEMA_NAME = "D_People";
-    public static final String D_PEOPLE_METADATA_TITLE = "D_PEOPLE_METADATA List Name";
+    public static final String D_PEOPLE_METADATA_TITLE = "D_PEOPLE_METADATA Name title";
     public static final String D_PEOPLE_METADATA =
             "<dat:tables xmlns:dat=\"http://labkey.org/data/xml\" xmlns:cv=\"http://labkey.org/data/xml/queryCustomView\">\n" +
-            "    <dat:table tableName=\"" + LIST_NAME + "\" tableDbType=\"NOT_IN_DB\">\n" +
+            "    <dat:table tableName=\"People\" tableDbType=\"NOT_IN_DB\">\n" +
             "        <!-- disable details url -->\n" +
             "        <dat:tableUrl></dat:tableUrl>\n" +
             "        <dat:filters>\n" +
@@ -309,11 +83,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             "          </dat:column>\n" +
             "        </dat:columns>\n" +
             "    </dat:table>\n" +
-            "    <dat:table tableName=\"" + QUERY_NAME + "\" tableDbType=\"NOT_IN_DB\">\n" +
-            "        <dat:filters>\n" +
-            "          <!-- NOTE: where clauses don't get applied to queries yet <cv:where>Age &gt; 30</cv:where>-->\n" +
-            "          <cv:filter column=\"Age\" operator=\"gt\" value=\"30\" />\n" +
-            "        </dat:filters>\n" +
+            "    <dat:table tableName=\"TestQuery\" tableDbType=\"NOT_IN_DB\">\n" +
             "        <dat:columns>\n" +
             "          <dat:column columnName=\"Name\">\n" +
             "            <dat:columnTitle>Crazy " + D_PEOPLE_METADATA_TITLE + "</dat:columnTitle>\n" +
@@ -390,6 +160,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         createLinkedSchemaTemplateOverride();
         verifyLinkedSchemaTemplateOverride();
+
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -397,8 +168,8 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER, null);
-        // Enable linkedschematest in source folder so the "BPeopleTemplate" is visible.
-        enableModule(SOURCE_FOLDER, "linkedschematest");
+        // Enable simpletest in source folder so the "BPeopleTemplate" is visible.
+        enableModule(SOURCE_FOLDER, "simpletest");
 
         _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER, null);
     }
@@ -406,35 +177,16 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     @LogMethod(category = LogMethod.MethodType.SETUP)
     void createList()
     {
-        log("** Importing some data...");
+        log("Importing some data...");
         _listHelper.createList(SOURCE_FOLDER, LIST_NAME,
                 ListHelperWD.ListColumnType.AutoInteger, "Key",
                 new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
                 new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
-                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"),
-                new ListHelperWD.ListColumn("P", LIST_DEF_TITLE + " P", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("Q", LIST_DEF_TITLE + " Q", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("R", LIST_DEF_TITLE + " R", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("S", LIST_DEF_TITLE + " S", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("T", LIST_DEF_TITLE + " T", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("U", LIST_DEF_TITLE + " U", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("V", LIST_DEF_TITLE + " V", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("W", LIST_DEF_TITLE + " W", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("X", LIST_DEF_TITLE + " X", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("Y", LIST_DEF_TITLE + " Y", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("Z", LIST_DEF_TITLE + " Z", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL));
+                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
 
-        log("** Importing some data...");
+        log("Importing some data...");
         clickButton("Import Data");
         _listHelper.submitTsvData(LIST_DATA);
-
-        // Issue 17592: Query: inconsistent handling of query metadata xml -- database metadata overrides file metadata until we get clarification of expected behavior...
-        log("** Applying metadata xml override to list...");
-        beginAt("/query/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/sourceQuery.view?schemaName=lists&query.queryName=" + LIST_NAME + "#metadata");
-        setQueryEditorValue("metadataText", LIST_METADATA_OVERRIDE);
-        clickButton("Save", 0);
-        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -453,130 +205,25 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema APeople without template");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        createLinkedSchema(TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", LIST_NAME + "," + QUERY_NAME, A_PEOPLE_METADATA);
-
-        // UNDONE
-//        // Issue 17592: Query: inconsistent handling of query metadata xml -- skip applying metadata override until we get clarification of expected behavior...
-//        log("** Applying metadata to " + LIST_NAME + " in linked schema container");
-//        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + LIST_NAME + "#metadata");
-//        setQueryEditorValue("metadataText", A_PEOPLE_LIST_METADATA_OVERRIDE);
-//        clickButton("Save", 0);
-//        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-//        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-
-//        // Issue 17592: Query: inconsistent handling of query metadata xml -- skip applying metadata override until we get clarification of expected behavior...
-//        log("** Applying metadata to " + QUERY_NAME + " in linked schema container");
-//        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + QUERY_NAME + "#metadata");
-//        setQueryEditorValue("metadataText", A_PEOPLE_QUERY_METADATA_OVERRIDE);
-//        clickButton("Save", 0);
-//        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-//        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        createLinkedSchema(TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", "People", A_PEOPLE_METADATA);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     void verifyLinkedSchema()
     {
         goToSchemaBrowser();
-        selectQuery(A_PEOPLE_SCHEMA_NAME, LIST_NAME);
+        selectQuery(A_PEOPLE_SCHEMA_NAME, "People");
         waitAndClick(Locator.linkWithText("view data"));
 
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable table = new DataRegionTable("query", this);
-        log("** Check tempalte filter is applied");
         Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
         Assert.assertEquals("Expected to filter table to only Adam", "Adam", table.getDataAsText(0, A_PEOPLE_METADATA_TITLE));
-
-        log("** Verify table metadata overrides when simplemodule is not active in TargetFolder");
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // So, if we set A_PEOPLE_LIST_METDATA_OVERRIDE and we allow database metadata xml
-        // to overlay over the queries/A_People/LinkedSchemaTestPeople.query.xml metadata,
-        // the metadata for columns P-S would have the title "A_People db_metadata List P".
-        //assertHrefContains(table, "A_People db_metadata List P", "a_template_file_metadata.view"); ...
-        assertHrefContains(table, "A_People template List P", "a_template_metadata.view");
-        assertHrefContains(table, "A_People template List Q", "a_template_metadata.view");
-        assertHrefContains(table, "A_People template List R", "a_template_metadata.view");
-        assertHrefContains(table, "A_People template List S", "a_template_metadata.view");
-        assertHrefContains(table, "A_People template List T", "a_template_metadata.view");
-        assertHrefContains(table, "A_People template List U", "a_template_metadata.view");
-        assertHrefContains(table, "A_People template List V", "a_template_metadata.view");
-        assertHrefContains(table, "A_People template List W", "a_template_metadata.view");
-        // Columns X, Y and Z have their URL removed by the linked schema.
-        assertHrefNotPresent(table, "db_metadata List X");
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // In this case, we have applied the database xml (see column X), but that isn't
-        // merged with the /queries/lists/LInkedSchemaTestPeople.query.xml so we lose the
-        // customization for column Y.
-        //assertHrefNotPresent(table, "file_metadata List Y");
-        assertHrefNotPresent(table, "Original List Y");
-        assertHrefNotPresent(table, "Original List Z");
-
-        log("** Verify table metadata overrides when simplemodule is active in TargetFolder");
-        pushLocation();
-        enableModules(Arrays.asList("linkedschematest"), false);
-        popLocation();
-        waitForElement(Locator.id("dataregion_query"));
-        table = new DataRegionTable("query", this);
-
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // So, if we set A_PEOPLE_LIST_METDATA_OVERRIDE and we allow database metadata xml
-        // to overlay over the queries/A_People/LinkedSchemaTestPeople.query.xml metadata,
-        // the metadata for columns P-S would have the title "A_People db_metadata List P".
-        //assertHrefContains(table, "A_People db_metadata List P", "a_template_file_metadata.view"); ...
-        assertHrefContains(table, "A_People file_metadata List P", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata List Q", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata List R", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata List S", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata List T", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata List U", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata List V", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People template List W",      "a_template_metadata.view");
-        // Columns X, Y and Z have their URL removed by the linked schema.
-        assertHrefNotPresent(table, "db_metadata List X");
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // In this case, we have applied the database xml (see column X), but that isn't
-        // merged with the /queries/lists/LInkedSchemaTestPeople.query.xml so we lose the
-        // customization for column Y.
-        //assertHrefNotPresent(table, "file_metadata List Y");
-        assertHrefNotPresent(table, "Original List Y");
-        assertHrefNotPresent(table, "Original List Z");
 
         // Check the custom details url is used
         clickAndWait(table.detailsLink(0));
         assertTitleContains("Record Details:");
         waitForText("Adam");
-
-        goToSchemaBrowser();
-        selectQuery(A_PEOPLE_SCHEMA_NAME, QUERY_NAME);
-        waitAndClick(Locator.linkWithText("view data"));
-        waitForElement(Locator.id("dataregion_query"));
-        table = new DataRegionTable("query", this);
-
-        log("** Verify query metadata overrides are correctly applied");
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // So, if we set A_PEOPLE_LIST_METDATA_OVERRIDE and we allow database metadata xml
-        // to overlay over the queries/A_People/LinkedSchemaTestPeople.query.xml metadata,
-        // the metadata for columns P-S would have the title "A_People db_metadata List P".
-        //assertHrefContains(table, "A_People db_metadata Query P", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata Query P", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata Query Q", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People template Query R", "a_template_metadata.view");
-        // Columns X, Y and Z have their URL removed by the linked schema.
-        assertHrefNotPresent(table, "file_metadata Query S");
-        assertHrefNotPresent(table, "file_metadata Query T");
-        assertHrefNotPresent(table, "db_metadata List U");
-        assertHrefNotPresent(table, "db_metadata List V");
-        assertHrefNotPresent(table, "db_metadata List W");
-        assertHrefNotPresent(table, "db_metadata List X");
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // In this case, we have applied the database xml (see column X), but that isn't
-        // merged with the /queries/lists/LInkedSchemaTestPeople.query.xml so we lose the
-        // customization for column Y.
-        //assertHrefNotPresent(table, "db_metadata List Y");
-        assertHrefNotPresent(table, "Original List Y");
-        assertHrefNotPresent(table, "Original List Z");
-
-        // Disable the module in the TargetFolder container so query validation will pass at the end of the test
-        disableModules(Arrays.asList("linkedschematest"));
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -591,7 +238,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     void verifyLinkedSchemaUsingTemplate()
     {
         goToSchemaBrowser();
-        selectQuery(B_PEOPLE_SCHEMA_NAME, LIST_NAME);
+        selectQuery(B_PEOPLE_SCHEMA_NAME, "People");
         waitAndClick(Locator.linkWithText("view data"));
 
         waitForElement(Locator.id("dataregion_query"));
@@ -600,9 +247,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         // Check Name column is renamed and 'Britt' is the only value
         Assert.assertEquals("Expected to filter table to only Britt", "Britt", table.getDataAsText(0, B_PEOPLE_TEMPLATE_METADATA_TITLE));
 
-        // Check the linkedschematest/other.view details url is used
-        String detailsUrl = table.getDetailsHref(0);
-        Assert.assertTrue("Expected details url to contain other.view, got '" + detailsUrl + "'", detailsUrl.contains("other.view"));
+        // Check the simpletest/other.view details url is used
+        clickAndWait(table.detailsLink(0));
+        assertTextPresent("This is another view in the simple test module.");
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -610,14 +257,14 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema BPeople using BPeopleTemplate with metadata override to only show 'D' people");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        createLinkedSchema(TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, LIST_NAME + "," + QUERY_NAME, D_PEOPLE_METADATA);
+        createLinkedSchema(TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, "People,TestQuery", D_PEOPLE_METADATA);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     void verifyLinkedSchemaTemplateOverride()
     {
         goToSchemaBrowser();
-        viewQueryData(D_PEOPLE_SCHEMA_NAME, LIST_NAME);
+        viewQueryData(D_PEOPLE_SCHEMA_NAME, "People");
 
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable table = new DataRegionTable("query", this, false);
@@ -628,19 +275,15 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         // Check the details url has been disabled
         assertElementNotPresent(Locator.linkWithText("details"));
 
-        // Check query is available and metadata is overridden
+        // Check TestQuery is available and metadata is overridden
         goToSchemaBrowser();
-        viewQueryData(D_PEOPLE_SCHEMA_NAME, QUERY_NAME);
+        viewQueryData(D_PEOPLE_SCHEMA_NAME, "TestQuery");
 
         waitForElement(Locator.id("dataregion_query"));
         table = new DataRegionTable("query", this, false);
-        table.setSort("Name", SortDirection.ASC);
-        // Query is executed over the original People table, NOT the 'D_People' filtered People table.
-        // So all crazy people are available in the original query (Dave, Adam, Josh),
-        // but the D_People template metadata filters LinkedSchemaPeopleQuery to those > 30 (Adam, Dave).
-        Assert.assertEquals("Unexpected number of rows", 2, table.getDataRowCount());
-        Assert.assertEquals("Adam", table.getDataAsText(0, "Crazy " + D_PEOPLE_METADATA_TITLE));
-        Assert.assertEquals("Dave", table.getDataAsText(1, "Crazy " + D_PEOPLE_METADATA_TITLE));
+        // TestQuery is executed over the 'D_People' filtered People table -- so only 'Dave' is available.
+        Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
+        Assert.assertEquals("Expected to filter query to only Dave", "Dave", table.getDataAsText(0, "Crazy " + D_PEOPLE_METADATA_TITLE));
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)
@@ -670,20 +313,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         setFormElement(Locator.xpath("//input[@name='ff_name']"), newName);
 
         _listHelper.clickSave();
-    }
-
-    protected void assertHrefContains(DataRegionTable table, String columnTitle, String expected)
-    {
-        Assert.assertTrue("Expected column '" + columnTitle + "' to be in table, was not found.", table.getColumn(columnTitle) != -1);
-        String href = table.getHref(0, columnTitle);
-        Assert.assertNotNull("Expected column '" + columnTitle + "' to have href containing '" + expected + "', was null", href);
-        Assert.assertTrue("Expected column '" + columnTitle + "' to have href containing '" + expected + "', got '" + href + "'", href.contains(expected));
-    }
-
-    protected void assertHrefNotPresent(DataRegionTable table, String columnTitle)
-    {
-        boolean hasHref = table.hasHref(0, columnTitle);
-        Assert.assertFalse("Expected column '" + columnTitle + "' to have null href", hasHref);
     }
 
     protected void assertColumnsPresent(String sourceFolder, String schemaName, String tableName, String... columnNames)
@@ -760,13 +389,16 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
         click(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
 
-        goToSchemaBrowserTable(schemaName, tableName);
+        goToSchemaBrowser();
+        waitForElement(Locator.xpath("//span[text()='"+schemaName+"']"));
+        click(Locator.xpath("//span[text()='"+schemaName+"']"));
 
         clickButton("Create New Query");
 
         waitForElement(Locator.xpath("//input[@name='ff_newQueryName']"));
         setFormElement(Locator.xpath("//input[@name='ff_newQueryName']"), queryName);
         click(Locator.xpath("//select[@name='ff_baseTableName']"));
+        click(Locator.xpath("//option[@name='"+tableName+"']"));
 
         clickButton("Create and Edit Source");
         waitForElement(Locator.xpath("//button[text()='Save & Finish']"));

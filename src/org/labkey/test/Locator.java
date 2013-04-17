@@ -357,11 +357,6 @@ public abstract class Locator
         return xpath("//a/span["+ NOT_HIDDEN +" and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]");
     }
 
-    public static XPathLocator ext4ButtonEnabled(String text)
-    {
-        return xpath("//div[contains(@class, 'x4-btn') and not(contains(@class, 'x4-item-disabled'))]//button/span["+ NOT_HIDDEN +" and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]");
-    }
-
     public static XPathLocator extButtonEnabled(String text)
     {
         return xpath("//table").withClass("x-btn").withoutClass("x-item-disabled").append("//button").withClass("x-btn-text").withText(text);

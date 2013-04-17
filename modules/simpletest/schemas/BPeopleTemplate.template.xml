@@ -3,7 +3,7 @@
         xmlns:cv="http://labkey.org/data/xml/queryCustomView"
         sourceSchemaName="lists">
     <tables>
-        <tableName>LinkedSchemaTestPeople</tableName>
+        <tableName>People</tableName>
     </tables>
     <metadata>
         <dat:tables>
@@ -12,12 +12,12 @@
                 <cv:filter column="Name" operator="startswith" value="b"/>
             </dat:filters>
 
-            <dat:table tableName="LinkedSchemaTestPeople" tableDbType="NOT_IN_DB">
-                <dat:tableUrl>/linkedschematest/other.view</dat:tableUrl>
+            <dat:table tableName="People" tableDbType="NOT_IN_DB">
+                <dat:tableUrl>/simpletest/other.view</dat:tableUrl>
                 <dat:filters ref="b-filter"/>
                 <dat:columns>
                     <dat:column columnName="Name">
-                        <dat:columnTitle>BPeopleTemplate List Name</dat:columnTitle>
+                        <dat:columnTitle>BPeopleTemplate Name title</dat:columnTitle>
                     </dat:column>
                 </dat:columns>
             </dat:table>

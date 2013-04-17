@@ -205,8 +205,7 @@ public enum TestSet
         SurveyTest.class,
         NWBioTrustTest.class,
         SequestImportTest.class,
-        ETLTest.class,
-        ReportThumbnailTest.class
+        ETLTest.class
     ),
 
     Daily(600000, DailyA.getTestList(), DailyB.getTestList()),
