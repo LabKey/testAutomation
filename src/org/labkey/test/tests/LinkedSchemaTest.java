@@ -468,12 +468,12 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             }
             _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='tables']")));
 
-            clickAt(Locator.xpath("//input[@name='tables']"), 1, 1, 0);
-            sleep(200);
+            click(Locator.xpath("//input[@name='tables']"));
             for (String table : tables.split(","))
             {
-                click(Locator.xpath("//li[contains(text(), '" + table + "')]"));
+                waitAndClick(Locator.xpath("//li").containing(table).notHidden());
             }
+            click(Locator.xpath("//input[@name='tables']"));
         }
 
         if (metadata != null)
