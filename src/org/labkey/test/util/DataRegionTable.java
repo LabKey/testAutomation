@@ -430,6 +430,30 @@ public class DataRegionTable
         return getHref(row, col);
     }
 
+    public boolean hasHref(int row, int column)
+    {
+        // headerRows and selector offsets are applied in link() locator
+        return _hasHref(row, column);
+    }
+
+    private boolean _hasHref(int row, int column)
+    {
+        // Check the td cell is present, but has no link.
+        Locator.XPathLocator cell = xpath(row, column);
+        _test.assertElementPresent(cell);
+
+        Locator link = link(row, column);
+        return _test.isElementPresent(link);
+    }
+
+    public boolean hasHref(int row, String columnName)
+    {
+        int col = getColumn(columnName);
+        if (col == -1)
+            Assert.fail("Column '" + columnName + "' not found.");
+        return hasHref(row, col);
+    }
+
     public void setSort(String columnName, SortDirection direction)
     {
         _test.setSort(_tableName, columnName, direction);

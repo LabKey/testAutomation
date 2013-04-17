@@ -40,6 +40,12 @@ data/api/timechart-api.xml -text
 data/api/webPartTest.js -text
 data/api/webdavTest.html -text
 data/api/workbookAPITest.html -text
+modules/linkedschematest/queries/A_People/LinkedSchemaTestPeople.query.xml -text
+modules/linkedschematest/queries/A_People/LinkedSchemaTestQuery.query.xml -text
+modules/linkedschematest/queries/lists/LinkedSchemaTestPeople.query.xml -text
+modules/linkedschematest/queries/lists/LinkedSchemaTestQuery.query.xml -text
+modules/linkedschematest/queries/lists/LinkedSchemaTestQuery.sql -text
+modules/linkedschematest/schemas/BPeopleTemplate.template.xml -text
 modules/miniassay/assay/simple/config.xml -text
 modules/miniassay/assay/simple/domains/result.xml -text
 modules/miniassay/assay/simple/domains/run.xml -text
@@ -107,7 +113,6 @@ modules/simpletest/reports/schemas/lists/People/Less[!!-~]Cool[!!-~]JS[!!-~]Repo
 modules/simpletest/reports/schemas/lists/People/Super[!!-~]Cool[!!-~]R[!!-~]Report.r -text
 modules/simpletest/reports/schemas/lists/People/Uncool[!!-~]Query.report.xml -text
 modules/simpletest/reports/schemas/schemaFolderReport.r -text
-modules/simpletest/schemas/BPeopleTemplate.template.xml -text
 modules/simpletest/schemas/LinkedVehicle.template.xml -text
 modules/simpletest/schemas/dbscripts/postgresql/obsolete/vehicle-11.30-11.31.sql -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-0.00-1.00.sql -text
