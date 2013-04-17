@@ -2254,4 +2254,69 @@ public class LuminexTest extends AbstractQCAssayTest
         if (!isBackgroundUpload && !isTextPresent("Error"))
             clickAndWait(Locator.linkWithText(assayName));
     }    
+
+    @LogMethod
+    protected void runFileUploadTest()
+    {
+        // files to upload in 3 seperate assays
+        File[] files = {TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3};
+        String[] assayNames = {"Test Assay 1", "Test Assay 2", "Test Assay 3"};
+        String ERROR_TEXT = "already exists.";
+
+        log("Testing file upload conflict error messages and archive on delete");
+
+        // Create a run that imports 1 file
+        createNewAssayRun(assayNames[0]);
+        for(int i=0; i<1; i++)
+        {
+            String fieldId = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
+            setFormElement(Locator.id(fieldId), files[i]);
+            waitForText(files[i].getName());
+            click(Locator.id("file-upload-add" + i));
+        }
+        clickButton("Next");
+        clickButton("Save and Finish", 2 * WAIT_FOR_PAGE);
+
+        // Create a second run that imports the file again and check for error message
+        createNewAssayRun(assayNames[1]);
+        for(int i=0; i<files.length; i++)
+        {
+            String fieldId = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
+            setFormElement(Locator.id(fieldId), files[i]);
+            waitForText(files[i].getName());
+            click(Locator.id("file-upload-add" + i));
+        }
+        // verify that conflict error message is present
+        waitForText(ERROR_TEXT, WAIT_FOR_JAVASCRIPT);
+        clickButton("Next");
+        clickButton("Cancel", 2 * WAIT_FOR_PAGE);
+
+        // Delete the first run, files should be archived
+        checkCheckbox(Locator.checkboxByName(".select"));
+        clickButton("Delete");
+        waitForText("Confirm Deletion", WAIT_FOR_JAVASCRIPT);
+        clickButton("Confirm Delete");
+        waitForText("Description for Luminex assay", WAIT_FOR_JAVASCRIPT);
+
+        // Create a 3rd run with the 1st file - verify no error message, it was deleted & archived
+        createNewAssayRun(assayNames[2]);
+        for(int i=0; i<files.length; i++)
+        {
+            String fieldId = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
+            setFormElement(Locator.id(fieldId), files[i]);
+            waitForText(files[i].getName());
+            click(Locator.id("file-upload-add" + i));
+        }
+        assertTextNotPresent(ERROR_TEXT);
+
+        // verify that the error message for duplicate entries pops up, and that the first remove button is enabled (checks prior bug)
+        String fieldId = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + 3;
+        setFormElement(Locator.id(fieldId), files[0]);
+        waitForText("duplicate", WAIT_FOR_JAVASCRIPT);
+        clickButton("OK",0);
+        waitForText("Data files must be", WAIT_FOR_JAVASCRIPT);
+        // verify that first "disable" button is still enabled (this was an observed bug)
+        String button_class = getAttribute(Locator.id("file-upload-remove0"), "class");
+        assert( button_class.contains("labkey-file-remove-icon-enabled"));
+    }
 }

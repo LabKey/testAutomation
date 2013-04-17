@@ -24,6 +24,7 @@ public class LuminexJavaTransformTest extends LuminexTest
 {
     public void runUITests()
     {
-         runJavaTransformTest();
+        runJavaTransformTest();
+        runFileUploadTest();
     }
 }
