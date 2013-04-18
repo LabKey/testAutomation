@@ -334,6 +334,33 @@ public class WebTestHelper
         return status;
     }
 
+    public static String getHttpGetResponseBody(String url) throws HttpException, IOException
+    {
+        return getHttpGetResponseBody(url, PasswordUtil.getUsername(), PasswordUtil.getPassword());
+    }
+
+    public static String getHttpGetResponseBody(String url, String username, String password) throws HttpException, IOException
+    {
+        HttpClient client = getHttpClient(username, password);
+        HttpResponse response = null;
+        String responseBody;
+
+        try
+        {
+            HttpGet method = new HttpGet(url);
+
+            response = client.execute(method);
+            responseBody = getHttpResponseBody(response);
+        }
+        finally
+        {
+            if (response != null)
+                EntityUtils.consume(response.getEntity());
+            client.getConnectionManager().shutdown();
+        }
+        return responseBody;
+    }
+
     public static class FolderIdentifier
     {
         private String _projectName;

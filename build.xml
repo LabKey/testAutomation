@@ -301,6 +301,7 @@
           <fileset dir="${staging.modules.dir}">
             <include name="miniassay.module"/>
             <include name="simpletest.module"/>
+            <include name="linkedschematest.module"/>
           </fileset>
         </copy>
 
@@ -310,6 +311,7 @@
             <srcfiles dir="${deploy.modules.dir}">
                 <include name="miniassay.module"/>
                 <include name="simpletest.module"/>
+                <include name="linkedschematest.module"/>
             </srcfiles>
         </uptodate>
         <antcall target="wait-for-redeploy-if-needed" />
@@ -325,7 +327,14 @@
         <touch file="${basedir}/testModuleDeployment.timestamp" />
     </target>
 
-    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, install-rpackages">
+    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, stage-linkedschematest-module, install-rpackages">
+    </target>
+
+    <target name="stage-linkedschematest-module">
+      <antcall target="stage-test-module">
+        <param name="module.name" value="linkedschematest"/>
+        <param name="module.src.dir" value="${project.root}/server/test/modules"/>
+      </antcall>
     </target>
 
     <target name="stage-simpletest-module">

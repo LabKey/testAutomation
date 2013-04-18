@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+ * Copyright (c) 2011-2013 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+
+ -->
+<query xmlns="http://labkey.org/data/xml/query">
+    <metadata>
+        <tables xmlns="http://labkey.org/data/xml">
+            <table tableName="LinkedSchemaTestQuery" tableDbType="TABLE">
+                <columns>
+                  <column columnName="P">
+                    <columnTitle>A_People file_metadata Query P</columnTitle>
+                    <url>fake/a_template_file_metadata.view</url>
+                  </column>
+                  <column columnName="Q">
+                    <columnTitle>A_People file_metadata Query Q</columnTitle>
+                    <url>fake/a_template_file_metadata.view</url>
+                  </column>
+                  <!--
+                  <column columnName="R">
+                    <columnTitle>A_People file_metadata Query R</columnTitle>
+                    <url>fake/a_template_file_metadata.view</url>
+                  </column>
+                  <column columnName="S">
+                    <columnTitle>A_People file_metadata Query S</columnTitle>
+                    <url>fake/a_template_file_metadata.view</url>
+                  </column>
+                  <column columnName="T">
+                    <columnTitle>A_People file_metadata Query T</columnTitle>
+                    <url>fake/a_template_file_metadata.view</url>
+                  </column>
+                  <column columnName="U">
+                    <columnTitle>A_People file_metadata Query U</columnTitle>
+                    <url>fake/a_template_file_metadata.view</url>
+                  </column>
+                  <column columnName="V">
+                    <columnTitle>A_People file_metadata Query V</columnTitle>
+                    <url>fake/a_template_file_metadata.view</url>
+                  </column>
+                  <column columnName="W">
+                    <columnTitle>A_People file_metadata Query W</columnTitle>
+                    <url>fake/a_template_file_metadata.view</url>
+                  </column>
+                  <column columnName="X">
+                    <columnTitle>A_People file_metadata Query X</columnTitle>
+                    <url>fake/a_template_file_metadata.view</url>
+                  </column>
+                  <column columnName="Y">
+                    <columnTitle>A_People file_metadata Query Y</columnTitle>
+                    <url>fake/a_template_file_metadata.view</url>
+                  </column>
+                  <column columnName="Z">
+                    <columnTitle>A_People file_metadata Query Z</columnTitle>
+                    <url>fake/a_template_file_metadata.view</url>
+                  </column>
+                  -->
+                </columns>
+            </table>
+        </tables>
+    </metadata>
+</query>
+
+
+

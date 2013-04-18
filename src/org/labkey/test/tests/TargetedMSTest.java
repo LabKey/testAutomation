@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -132,10 +131,10 @@ public class TargetedMSTest extends BaseWebDriverTest
         waitForText("Search for other references to this protein");
         clickAndWait(Locator.linkContainingText("Search for other references to this protein"));
 
-        //Verify TargetedMS Peptides section of page.
+        //Verify Targeted MS Peptides section of page.
         //Click on Details link.
         //Spot check some values.
-        assertTextPresent("Protein Search Results", "TargetedMS Peptides","LTSLNVVAGSDLR",
+        assertTextPresent("Protein Search Results", "Targeted MS Peptides","LTSLNVVAGSDLR",
                "TNNPETLVALR",  "GVNLPGTDVDLPALSEK",  "TANDVLTIR",
                 "GDLGIEIPAPEVLAVQK", "EPVSDWTDDVEAR");
         click(Locator.imageWithSrc("plus.gif", true));
@@ -154,8 +153,7 @@ public class TargetedMSTest extends BaseWebDriverTest
         waitForElement(Locator.name("aminoAcids"));
         setFormElement(Locator.name("aminoAcids"), "R");
         setFormElement(Locator.name("deltaMass"), "10");
-        sleep(500); // sleep for a half second to let the search button enable based on form validation
-        clickAndWait(Locator.button("Search"));
+        waitAndClickAndWait(Locator.ext4ButtonEnabled("Search"));
         waitForText("Modification Search Results");
         //waitForText("1 - 13 of 13");
         assertTextPresentInThisOrder("Targeted MS Modification Search", "Targeted MS Peptides");
@@ -166,8 +164,7 @@ public class TargetedMSTest extends BaseWebDriverTest
         // search for K[+8] modification
         setFormElement(Locator.name("aminoAcids"), "k R, N"); // should be split into just chars
         setFormElement(Locator.name("deltaMass"), "8.01"); // should be rounded to a whole number
-        sleep(500); // sleep for a half second to let the search button enable based on form validation
-        clickAndWait(Locator.button("Search"));
+        waitAndClickAndWait(Locator.ext4ButtonEnabled("Search"));
         //waitForText("1 - 31 of 31");
         Assert.assertEquals(0, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
         Assert.assertEquals(31, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
@@ -180,14 +177,12 @@ public class TargetedMSTest extends BaseWebDriverTest
         assertElementVisible(Locator.name("customName"));
         _ext4Helper.selectRadioButton("Type:", "Names used in imported experiments");
         _ext4Helper.selectComboBoxItem("Custom Name:", "Label:13C(6)15N(4) (C-term R)");
-        sleep(500); // sleep for a half second to let the search button enable based on form validation
-        clickAndWait(Locator.button("Search"));
+        waitAndClickAndWait(Locator.ext4ButtonEnabled("Search"));
         //waitForText("1 - 13 of 13");
         Assert.assertEquals(13, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
         Assert.assertEquals(0, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
         _ext4Helper.selectComboBoxItem("Custom Name:", "Label:13C(6)15N(2) (C-term K)");
-        sleep(500); // sleep for a half second to let the search button enable based on form validation
-        clickAndWait(Locator.button("Search"));
+        waitAndClickAndWait(Locator.ext4ButtonEnabled("Search"));
         //waitForText("1 - 31 of 31");
         Assert.assertEquals(0, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
         Assert.assertEquals(31, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
@@ -198,11 +193,20 @@ public class TargetedMSTest extends BaseWebDriverTest
         assertElementNotVisible(Locator.name("deltaMass"));
         assertElementNotVisible(Locator.name("customName"));
         assertElementVisible(Locator.name("unimodName"));
-        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabelContaining("Unimod Name:"), "Carbamidomethyl (C)");
-        sleep(500); // sleep for a half second to let the search button enable based on form validation
-        clickAndWait(Locator.button("Search"));
-        // TODO: the current sampledata does not contain any matching Custom Name or Unimod Name searches
-        waitForText("No data to show.");
+        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabelContaining("Unimod Name:"), "Label:13C(6)15N(4) (C-term R)");
+        waitAndClickAndWait(Locator.ext4ButtonEnabled("Search"));
+        //waitForText("1 - 13 of 13");
+        Assert.assertEquals(13, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
+        Assert.assertEquals(0, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
+
+        // test C-term search using special character (i.e. ] )
+        _ext4Helper.selectRadioButton("Search By:", "Delta Mass");
+        setFormElement(Locator.name("aminoAcids"), "]");
+        setFormElement(Locator.name("deltaMass"), "8");
+        waitAndClickAndWait(Locator.ext4ButtonEnabled("Search"));
+        //waitForText("1 - 31 of 31");
+        Assert.assertEquals(0, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
+        Assert.assertEquals(31, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
     }
 
     @Override
