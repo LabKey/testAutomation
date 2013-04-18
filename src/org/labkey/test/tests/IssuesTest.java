@@ -91,7 +91,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
         enableModule(PROJECT_NAME, "Dumbster");
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         addWebPart("Issues Summary");
         addWebPart("Search");
         assertTextPresent("Open");
@@ -106,7 +106,7 @@ public class IssuesTest extends BaseSeleniumWebTest
     {
         initProject();
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("view open Issues"));
         assertNavButtonPresent("New Issue");
 
@@ -182,9 +182,9 @@ public class IssuesTest extends BaseSeleniumWebTest
         Assert.assertEquals(assignedToText, "");
 
         // Add to group so user appears
-        clickAndWait(Locator.linkWithText("IssuesVerifyProject"));
+        clickProject("IssuesVerifyProject");
         addUserToProjGroup(PasswordUtil.getUsername(), PROJECT_NAME, TEST_GROUP);
-        clickAndWait(Locator.linkWithText("IssuesVerifyProject"));
+        clickProject("IssuesVerifyProject");
         clickAndWait(Locator.linkWithText("view open Issues"));
 
         // InsertAction
@@ -336,7 +336,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         addUserToProjGroup(USER1, PROJECT_NAME, TEST_GROUP);
         createUser(USER2, null, false);
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         goToModule("Dumbster");
         assertTextPresent("No email recorded.");
 
@@ -361,7 +361,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickButton("Update");
 
         impersonate(USER1);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("Issues Summary"));
         clickButton("Email Preferences");
         uncheckCheckbox("emailPreference", "2"); // issue assigned to me is modified
@@ -369,7 +369,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         stopImpersonating();
 
         enableEmailRecorder();
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
 
         clickAndWait(Locator.linkWithText("Issues Summary"));
         clickButton("New Issue");
@@ -407,7 +407,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextNotPresent("This line shouldn't appear");
 
         impersonate(USER1);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("Issues Summary"));
         clickAndWait(Locator.linkWithText(ISSUE_TITLE_2));
         updateIssue();
@@ -563,7 +563,7 @@ public class IssuesTest extends BaseSeleniumWebTest
 
     protected void queryTest()
     {
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addQueryWebPart("issues");
         clickAndWait(Locator.linkWithText("Issues Queries"));
@@ -573,7 +573,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         _extHelper.clickExtTab("Data");
         waitForText(ISSUE_TITLE_0, WAIT_FOR_JAVASCRIPT);
         waitForText(ISSUE_TITLE_1, WAIT_FOR_JAVASCRIPT);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
 
 
     }
@@ -589,8 +589,8 @@ public class IssuesTest extends BaseSeleniumWebTest
     public void subFolderIssuesTest()
     {
         log("Testing issues in sub-folders");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(SUB_FOLDER_NAME));
+        clickProject(PROJECT_NAME);
+        clickFolder(SUB_FOLDER_NAME);
 
         //Issue 15550: Better tests for view details, admin, and email preferences
         for(String button : new String[] {"Admin", "Email Preferences"})

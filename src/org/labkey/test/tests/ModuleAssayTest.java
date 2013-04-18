@@ -215,7 +215,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     protected void createAssayDesign()
     {
         log("Creating assay design");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
 
         addWebPart("Assay List");
         clickButton("Manage Assays");
@@ -237,7 +237,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     protected void createSampleSet()
     {
         log("Creating sample set");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
 
         addWebPart("Sample Sets");
         clickButton("Import Sample Set");
@@ -252,7 +252,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         Assert.assertTrue(dataRoot.isDirectory());
 
         log("Uploading batch: " + batchName);
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
 
         clickButton("Import Data");

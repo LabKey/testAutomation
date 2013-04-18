@@ -71,7 +71,7 @@ public class QuantitationTest extends AbstractXTandemTest
         String runDescription = SAMPLE_BASE_NAME + " (" + LIBRA_PROTOCOL_NAME + ")";
         waitForPipelineJobsToComplete(1, runDescription, false);
 
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkContainingText(runDescription));
         selectOptionByText("viewParams", "<Standard View>");
         clickButton("Go");
@@ -80,7 +80,7 @@ public class QuantitationTest extends AbstractXTandemTest
         assertTextPresent(PEPTIDE4);
         assertTextPresent(PEPTIDE5);
 
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
 
         // Jump to the flow chart view
         clickAndWait(Locator.linkWithText("Data Pipeline"));

@@ -61,7 +61,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
     protected void doSecurityTest() throws Exception
     {
         log("Starting security portion of test...");
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
 
         Connection cn = new Connection(getBaseURL());
         cn.setEmail(PasswordUtil.getUsername());
@@ -117,7 +117,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
     protected void doQueryTest() throws Exception
     {
         log("Starting query portion of test...");
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         addWebPart("Lists");
 
         log("Creating list for Query test...");
@@ -132,12 +132,12 @@ public class JavaClientApiTest extends BaseWebDriverTest
                 new ListHelper.ListColumn("Notes", "Notes", ListHelper.ListColumnType.String, "Notes"));
 
         log("Setting permissions...");
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         enterPermissionsUI();
         setSiteGroupPermissions("Guests", "Editor");
         exitPermissionsUI();
 
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(LIST_NAME));
         doCRUDtTest();
         doCommandFromResponseTest();

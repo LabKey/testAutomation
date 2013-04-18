@@ -157,7 +157,7 @@ public class StudyTest extends StudyBaseTest
     @LogMethod
     private void verifyPermissionsRestrictions()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         createUser(authorUser, null, true);
         setUserPermissions(authorUser, "Author");
         impersonate(authorUser);
@@ -263,8 +263,7 @@ public class StudyTest extends StudyBaseTest
         }
 
         // test creating a participant group directly from a data grid
-        waitForElement(Locator.linkContainingText(STUDY_NAME));
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
         waitForText(datasetLink);
         clickAndWait(Locator.linkWithText(datasetLink));
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
@@ -643,7 +642,7 @@ public class StudyTest extends StudyBaseTest
 
     private void verifyAlternateIDs()
     {
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
         clickAndWait(Locator.linkWithText("Alt ID mapping"));
         assertTextPresent("Contains up to one row of Alt ID mapping data for each ");
         click(Locator.tagWithText("span", "Import Data"));

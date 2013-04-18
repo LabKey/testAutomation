@@ -1685,7 +1685,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             return;
         if(getProjectName() != null)
         {
-            clickFolder(getProjectName());
+            clickProject(getProjectName());
             if(!"Query Schema Browser".equals(selenium.getTitle()))
                 goToSchemaBrowser();
             validateQueries(true);
@@ -1703,6 +1703,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         for (String projectName : _containerHelper.getCreatedProjects())
         {
+            clickProject(projectName);
+
             doViewCheck(projectName);
             checked.add(projectName);
         }
@@ -1713,17 +1715,24 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             String folder = folderId.getFolderName();
             if(!checked.contains(project))
             {
+                if (!getText(Locator.id("folderBar")).equals(project))
+                    clickProject(project);
+
                 doViewCheck(project);
                 checked.add(project);
             }
             if(!checked.contains(folder))
             {
-                clickAndWait(Locator.linkWithText(project));
-                if(isLinkPresentWithText(folder))
+                String currentFolder = getText(Locator.id("folderBar"));
+                if (!currentFolder.equals(folder))
                 {
-                    doViewCheck(folder);
-                    checked.add(folder);
+                    if (!currentFolder.equals(project))
+                        clickProject(project);
+                    clickFolder(folder);
                 }
+
+                doViewCheck(folder);
+                checked.add(folder);
             }
         }
     }
@@ -1731,7 +1740,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @LogMethod
     private void doViewCheck(@LoggedParam String folder)
     {
-        clickAndWait(Locator.linkWithText(folder));
         try{
             goToManageViews();
         }
@@ -2328,47 +2336,44 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     }
 
-
     public void createSubfolder(String project, String child, String[] tabsToAdd)
     {
         // create a child of the top-level project folder:
         createSubfolder(project, project, child, "None", tabsToAdd);
     }
 
-
-    public void createSubfolder(String project, String parent, String child, String folderType, String[] tabsToAdd)
+    public void createSubfolder(String project, String parent, String child, String folderType, @Nullable String[] tabsToAdd)
     {
         createSubfolder(project, parent, child, folderType, tabsToAdd, false);
     }
 
-
     private  void startCreateFolder(String project, String parent, String child)
     {
-
-        ensureAdminMode();
-        if (isLinkPresentWithText(child))
-            Assert.fail("Cannot create folder; A link with text " + child + " already exists.  " +
-                    "This folder may already exist, or the name appears elsewhere in the UI.");
-        assertLinkNotPresentWithText(child);
-        log("Creating subfolder " + child + " under project " + parent);
-        String _active = (!parent.equals(project)? parent : project);
-        clickAndWait(Locator.linkWithText(_active));
+        if (!parent.equals(getText(Locator.id("folderBar"))))
+        {
+            clickProject(project);
+            if (!parent.equals(project))
+            {
+                clickFolder(parent);
+            }
+        }
+        hoverFolderBar();
+        if (isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child))))
+            Assert.fail("Folder: " + child + " already exists in project: " + project);
+        log("Creating subfolder " + child + " under " + parent);
         goToFolderManagement();
-        waitForExt4FolderTreeNode(parent, 10000);
+        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(parent));
         clickButton("Create Subfolder");
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("name"), child);
-
-
     }
 
-    public void createSubfolder(String project, String parent, String child, String folderType, String[] tabsToAdd, boolean inheritPermissions)
+    public void createSubfolder(String project, String parent, String child, String folderType, @Nullable String[] tabsToAdd, boolean inheritPermissions)
     {
         createSubfolder(project, parent, child, folderType, null, tabsToAdd, inheritPermissions);
     }
 
-
-    public void createSubfolder(String project, String parent, String child, String folderType, String templateFolder, String[] tabsToAdd, boolean inheritPermissions)
+    public void createSubfolder(String project, String parent, String child, String folderType, @Nullable String templateFolder, String[] tabsToAdd, boolean inheritPermissions)
     {
         createSubfolder(project, parent, child, folderType, templateFolder, null, tabsToAdd, inheritPermissions);
     }
@@ -2383,7 +2388,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * @param inheritPermissions should folder inherit permissions from parent?
      */
     @LogMethod
-    public void createSubfolder(String project, String parent, String child, @Nullable String folderType, String templateFolder, String[] templatePartsToUncheck, @Nullable String[] tabsToAdd, boolean inheritPermissions)
+    public void createSubfolder(String project, String parent, String child, @Nullable String folderType, String templateFolder, @Nullable String[] templatePartsToUncheck, @Nullable String[] tabsToAdd, boolean inheritPermissions)
     {
         startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
@@ -2396,11 +2401,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 _ext4Helper.waitForMaskToDisappear();
                 _ext4Helper.selectComboBoxItem(Locator.xpath("//div").withClass("labkey-wizard-header").withText("Choose Template Folder:").append("/following-sibling::table[contains(@id, 'combobox')]"), templateFolder);
                 _ext4Helper.checkCheckbox("Include Subfolders");
-                for(String part : templatePartsToUncheck)
+                if (templatePartsToUncheck != null)
                 {
-                    click(Locator.xpath("//td[label[text()='" +  part + "']]/input"));
+                    for(String part : templatePartsToUncheck)
+                    {
+                        click(Locator.xpath("//td[label[text()='" +  part + "']]/input"));
+                    }
                 }
-
             }
         }
         else {
@@ -2475,11 +2482,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void deleteFolder(String project, String folderName)
     {
         log("Deleting folder " + folderName + " under project " + project);
-        clickAndWait(Locator.linkWithText(project));
-        clickAndWait(Locator.linkWithText(folderName));
+        clickProject(project);
+        clickFolder(folderName);
         ensureAdminMode();
         goToFolderManagement();
-        waitForExt4FolderTreeNode(folderName, 10000);
+        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName));
         clickButton("Delete");
         // confirm delete subfolders if present
         if(isTextPresent("This folder has subfolders."))
@@ -2513,11 +2520,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
     {
         log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
-        clickAndWait(Locator.linkWithText(project));
-        clickAndWait(Locator.linkWithText(folderName));
+        clickProject(project);
+        clickFolder(folderName);
         ensureAdminMode();
         goToFolderManagement();
-        waitForExt4FolderTreeNode(folderName, 10000);
+        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName));
         clickButton("Rename");
         setText("name", newFolderName);
         if (createAlias)
@@ -2535,11 +2542,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void moveFolder(String projectName, String folderName, String newParent, boolean createAlias)
     {
         log("Moving folder [" + folderName + "] under project [" + projectName + "] to [" + newParent + "]");
-        clickAndWait(Locator.linkWithText(projectName));
-        clickAndWait(Locator.linkWithText(folderName));
+        clickProject(projectName);
+        clickFolder(folderName);
         ensureAdminMode();
         goToFolderManagement();
-        waitForExt4FolderTreeNode(folderName, 10000);
+        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName));
         clickButton("Move");
         if (createAlias)
             checkCheckbox("addAlias");
@@ -2555,15 +2562,32 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertLinkPresentWithText(newParent);
     }
 
-    /**
-     * For compatibility with BaseWebDriverTest
-     * @param project
-     */
-    public void clickFolder(String project)
+    public void hoverProjectBar()
     {
-        waitForElement(Locator.css(".labkey-expandable-nav-panel"));
-        clickAndWait(Locator.linkWithText(project));
-        waitForElement(Locator.css(".labkey-expandable-nav-panel"));
+        waitForElement(Locator.id("projectBar"));
+        selenium.getEval("selenium.browserbot.getCurrentWindow().HoverNavigation._project.show();"); // mouseOver doesn't work
+        waitForElement(Locator.css("#projectBar_menu .project-nav"));
+    }
+
+    public void clickProject(String project)
+    {
+        hoverProjectBar();
+        waitAndClickAndWait(Locator.linkWithText(project));
+        waitForElement(Locator.id("projectBar"));
+    }
+
+    public void hoverFolderBar()
+    {
+        waitForElement(Locator.id("folderBar"));
+        selenium.getEval("selenium.browserbot.getCurrentWindow().HoverNavigation._folder.show();"); // mouseOver doesn't work in Firefox
+        waitForElement(Locator.css("#folderBar_menu .folder-nav"));
+    }
+
+    public void clickFolder(String folder)
+    {
+        hoverFolderBar();
+        waitAndClickAndWait(Locator.linkWithText(folder));
+        waitForElement(Locator.id("folderBar"));
     }
 
     /**
@@ -3126,7 +3150,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void waitForExt4FolderTreeNode(String nodeText, int wait)
     {
-        final Locator locator = Locator.xpath("//tr[contains(@class, 'x4-grid-row')]/td/div[text()=" + Locator.xq(nodeText) + "]");
+        final Locator locator = Ext4HelperWD.Locators.folderManagementTreeNode(nodeText);
         String failMessage = "Ext 4 Tree Node with locator " + locator + " did not appear.";
         waitFor(new Checker()
         {
@@ -5340,7 +5364,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (isElementPresent(Locator.permissionRendered()))
         {
             exitPermissionsUI();
-            clickAndWait(Locator.linkWithText(projectName));
+            clickProject(projectName);
         }
         enterPermissionsUI();
         clickManageGroup(groupName);
@@ -5452,7 +5476,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (projectName == null)
             goToProjectHome();
         else
-            clickAndWait(Locator.linkWithText(projectName));
+            clickProject(projectName);
 
         setUserPermissions(userName, permissions);
     }
@@ -5652,7 +5676,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public boolean doesGroupExist(String groupName, String projectName)
     {
         ensureAdminMode();
-        clickAndWait(Locator.linkWithText(projectName));
+        clickProject(projectName);
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Project Groups");
         waitForText("Member Groups");
@@ -5873,7 +5897,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public DataRegionTable getCohortDataRegionTable(String projectName)
     {
-        clickAndWait(Locator.linkWithText(projectName));
+        clickProject(projectName);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
         return new DataRegionTable("Cohort", this, false);
@@ -5967,7 +5991,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void enableModule(String projectName, String moduleName)
     {
         ensureAdminMode();
-        clickAndWait(Locator.linkWithText(projectName));
+        clickProject(projectName);
         enableModule(moduleName, true);
     }
 
@@ -6000,7 +6024,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void goToProjectHome()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
     }
 
     public void goToHome()
@@ -6016,7 +6040,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         if(!isLinkPresentWithText(project))
             goToHome();
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
         goToProjectSettings();
     }
 
@@ -6136,7 +6160,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         log("Signing out");
         beginAt("/login/logout.view");
-        waitForElement(Locator.xpath("//a[string()='Sign In']")); // Will recognize link [BeginAction] or button [LoginAction]("Sign In");
+        waitForElement(Locator.xpath("//a").withText("Sign\u00a0In")); // Will recognize link [BeginAction] or button [LoginAction]("Sign In");
     }
 
     /*
@@ -6145,7 +6169,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void searchFor(String projectName, String searchFor, int expectedResults, String titleName)
     {
         log("Searching Project : " + projectName + " for \"" + searchFor + "\".  Expecting to find : " + expectedResults + " results");
-        clickAndWait(Locator.linkWithText(projectName));
+        clickProject(projectName);
         assertElementPresent(Locator.name("q"));
         setFormElement("query", searchFor);
         clickButton("Search");
@@ -6832,7 +6856,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 copyFile(specimenArchive, _copiedArchives[i]);
             }
 
-            clickAndWait(Locator.linkWithText(_studyFolderName));
+            clickFolder(_studyFolderName);
 
             int total = 0;
             while( !isLinkPresentWithText("Manage Files") && total < WAIT_FOR_PAGE)
@@ -6875,7 +6899,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             log("Waiting for completion of specimen archives");
 
-            clickAndWait(Locator.linkWithText(_studyFolderName));
+            clickFolder(_studyFolderName);
             clickAndWait(Locator.linkWithText("Manage Files"));
 
             waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import", _expectError);

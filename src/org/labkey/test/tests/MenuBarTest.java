@@ -34,6 +34,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
     private static final String WIKI_PAGE_CONTENT = "This is a fancy wiki";
 
     private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
+    private static final String DEM_STUDY_FOLDER = "DemStudyFolder";
 
     public String getAssociatedModuleDirectory()
     {
@@ -64,7 +65,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
         addWebPart("Study List");
         addWebPart("Wiki Menu");
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         hideNavigationBar();
 
         goToModule("Wiki"); // Not required prior to 11.1 -- not sure how
@@ -83,7 +84,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
         selectOptionByText("name", WIKI_PAGE_TITLE + " (" + WIKI_PAGE_TITLE + ")");
         clickButton("Submit");
         
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
 
         //Make sure that the menus are shown, but the content is not yet loaded.
         assertElementPresent(Locator.id("menuBarFolder"));
@@ -115,7 +116,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
 //        setFormElement(Locator.id("AssayDesignerName"), "Test Assay");
 //        clickButton("Save", 0);
 //        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
 
         assertTextNotPresent("Test Assay");
         mouseOver(Locator.menuBarItem("Assays"));
@@ -144,14 +145,14 @@ public class MenuBarTest extends BaseSeleniumWebTest
         assertTextPresent("HTML", "RADEOX", "TEXT_WITH_LINKS");
 
         // Another custom menu with links to Participant Report
-        createSubfolder(PROJECT_NAME, PROJECT_NAME, "DemStudyFolder", "Study", null);
+        createSubfolder(PROJECT_NAME, PROJECT_NAME, DEM_STUDY_FOLDER, "Study", null);
         importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
 
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));
         addWebPart("Custom Menu");
         _extHelper.setExtFormElementByLabel("Title", "Participant Reports");
-        _extHelper.clickExtDropDownMenu("userQuery_folders", "DemStudyFolder");
+        _extHelper.clickExtDropDownMenu("userQuery_folders", DEM_STUDY_FOLDER);
         _extHelper.clickExtDropDownMenu("userQuery_schema", "study");
         _extHelper.clickExtDropDownMenu("userQuery_query", "Participant");
         _extHelper.clickExtDropDownMenu("userQuery_Column", "ParticipantId");
@@ -173,7 +174,7 @@ public class MenuBarTest extends BaseSeleniumWebTest
         _extHelper.clickExtDropDownMenu("userQuery_folderTypes", "Study");
         _extHelper.clickExtButton("Submit");
 
-        waitAndClickAndWait(Locator.linkWithText("DemStudyFolder"));
+        clickFolder(DEM_STUDY_FOLDER);
         assertTextPresent("Demo Study", "Study Overview");
 
         showNavigationBar();

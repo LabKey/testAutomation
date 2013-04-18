@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
@@ -225,7 +224,7 @@ public class ViabilityTest extends AbstractViabilityTest
         // add the transform script to the assay
         log("** Uploading Viability Runs with a transform script");
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
         clickEditAssayDesign(true);
@@ -282,7 +281,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         log("** Test Target Study as Result Domain Field");
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
         clickEditAssayDesign(true);
@@ -293,7 +292,7 @@ public class ViabilityTest extends AbstractViabilityTest
         addField("Result Fields", 13, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
         clickButton("Save & Close");
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
         clickButton("Import Data");

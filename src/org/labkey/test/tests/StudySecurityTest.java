@@ -69,7 +69,7 @@ public class StudySecurityTest extends StudyBaseTest
         createUser(READER, null);
         createUser(EDITOR, null);
         createUser(LIMITED, null);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
 
         //create groups for dataset reader, writer, and no-access
         createPermissionsGroup(GROUP_READERS, READER);
@@ -143,7 +143,7 @@ public class StudySecurityTest extends StudyBaseTest
 
     protected void adjustGroupDatasetPerms(String groupName, GroupSetting setting, String[] datasets, PerDatasetPerm perm)
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         enterStudySecurity();
 
@@ -172,7 +172,7 @@ public class StudySecurityTest extends StudyBaseTest
         if (null != userName)
             impersonate(userName);
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
 
         if (canSetupPipeline)

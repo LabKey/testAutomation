@@ -119,7 +119,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void importCDSData(String query, String dataFilePath)
     {
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         waitForTextWithRefresh("Fact Table", defaultWaitForPage*4);  //wait for study to fully load
         clickAndWait(Locator.linkWithText(query));
         _listHelper.clickImportData();
@@ -130,7 +130,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void populateFactTable()
     {
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("Populate Fact Table"));
         uncheckCheckbox("dataset", "HIV Test Results");
         uncheckCheckbox("dataset", "Physical Exam");
@@ -146,7 +146,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
 
     private void verifyFactTable()
     {
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("Verify"));
         waitForText("No data to show.", CDS_WAIT);
     }
@@ -154,7 +154,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     private static final String COUNTS_FEEDBACK_STATE = "{\"activeView\":\"singleaxis\",\"appVersion\":\"0.5\",\"viewState\":{\"ydimension\":\"Participant\",\"yHierarchyIdx\":2},\"views\":{},\"filters\":[],\"selections\":[{\"phantom\":true,\"internalId\":\"ext-record-589\",\"data\":{\"hierarchy\":\"Participant.Country\",\"members\":[{\"uname\":[\"Participant.Country\",\"Thailand\"]}],\"isGroup\":false,\"id\":\"\",\"operator\":\"UNION\"},\"modified\":{\"operator\":\"\"},\"events\":{},\"editing\":false,\"dirty\":true,\"id\":\"Connector.model.Filter-ext-record-589\"}],\"detail\":{},\"id\":60}";
     private void verifyCounts()
     {
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("Application"));
 
         assertLinkNotPresentWithText("Home");

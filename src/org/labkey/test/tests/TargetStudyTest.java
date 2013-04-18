@@ -74,7 +74,7 @@ public class TargetStudyTest extends AbstractAssayTestWD
         setupLabels();
         setupAssay();
 
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
         _study1ContainerId = getContainerId("/project/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/begin.view");
         log("** Study 1 container ID = " + _study1ContainerId);
         Assert.assertNotNull(_study1ContainerId);
@@ -140,7 +140,7 @@ public class TargetStudyTest extends AbstractAssayTestWD
     {
         PortalHelper portalHelper = new PortalHelper(this);
 
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
         if (!isElementPresent(Locator.linkWithText("Assay List")))
             portalHelper.addWebPart("Assay List");
 
@@ -150,7 +150,7 @@ public class TargetStudyTest extends AbstractAssayTestWD
     protected void uploadRuns()
     {
         log("** Upload Data");
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
 
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(ASSAY_NAME));

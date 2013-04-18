@@ -75,14 +75,14 @@ public class ElisaAssayTest extends ElispotAssayTest
         setupPipeline(TEST_ASSAY_PRJ_ELISA);
 
         //add the Assay List web part so we can create a new ELISA assay
-        clickFolder(TEST_ASSAY_PRJ_ELISA);
+        clickProject(TEST_ASSAY_PRJ_ELISA);
         addWebPart("Assay List");
 
         //create a new ELISA template
         createTemplate();
 
         //create a new ELISA assay
-        clickFolder(TEST_ASSAY_PRJ_ELISA);
+        clickProject(TEST_ASSAY_PRJ_ELISA);
         clickButton("Manage Assays");
         clickButton("New Assay Design");
         checkRadioButton("providerName", "ELISA");
@@ -105,7 +105,7 @@ public class ElisaAssayTest extends ElispotAssayTest
         clickButton("Save", 0);
         waitForText("Save successful.", 20000);
 //
-        clickFolder(TEST_ASSAY_PRJ_ELISA);
+        clickProject(TEST_ASSAY_PRJ_ELISA);
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISA));
 

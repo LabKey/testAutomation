@@ -194,7 +194,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         if (!isLinkPresentWithText(getProjectName()))
             return;
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         if (!isLinkPresentWithText(getFolderName()))
             return;
 
@@ -236,22 +236,11 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
             else
             {
                 // If we are elsewhere, get back to the current test folder
-                goToFolder();
+                clickProject(getProjectName());
+                clickFolder(getFolderName());
             }
         }
     }
-
-    protected void goToFolder()
-    {
-        goToFolder(getProjectName(), getFolderName());
-    }
-
-    protected void goToFolder(String... folderPath)
-    {
-        for (String folderName : folderPath)
-            clickFolder(folderName);
-    }
-
 
     protected void createQuery(String container, String name, String sql, String xml, boolean inheritable)
     {

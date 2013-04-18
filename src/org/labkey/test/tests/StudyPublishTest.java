@@ -180,7 +180,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         setUnshiftedDateField(DATE_SHIFT_DATASET, UNSHIFTED_DATE_FIELD.getKey());
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         // Publish the study in a few different ways
         publishStudy(PUB1_NAME, PUB1_DESCRIPTION, PUB1_CONTAINER, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true);
@@ -249,7 +249,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
 
         // Go to published study
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(name));
 
         //Assert webparts/wikis are present
@@ -847,7 +847,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     {
         String ptidFilter = createOneOfFilterString(ptids);
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkWithText(dataset));

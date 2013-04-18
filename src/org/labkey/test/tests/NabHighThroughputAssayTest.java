@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import bsh.This;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
@@ -69,7 +68,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         setupPipeline(TEST_ASSAY_PRJ_NAB);
 
         // create a study so we can test copy-to-study later:
-        clickFolder(TEST_ASSAY_PRJ_NAB);
+        clickProject(TEST_ASSAY_PRJ_NAB);
         _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, null);
         addWebPart("Study Overview");
         clickButton("Create Study");
@@ -77,7 +76,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
 
         //add the Assay List web part so we can create a new nab assay
         _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
-        clickFolder(TEST_ASSAY_PRJ_NAB);
+        clickProject(TEST_ASSAY_PRJ_NAB);
         addWebPart("Assay List");
 
         //create a new nab assay
@@ -105,7 +104,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         clickButton("Save & Close");
         assertTextPresent(PLATE_TEMPLATE_NAME);
 
-        clickFolder(TEST_ASSAY_PRJ_NAB);
+        clickProject(TEST_ASSAY_PRJ_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         clickEditAssayDesign(false);
@@ -119,7 +118,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
-        clickFolder(TEST_ASSAY_PRJ_NAB);
+        clickProject(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_NAB);
         addWebPart("Assay List");
 

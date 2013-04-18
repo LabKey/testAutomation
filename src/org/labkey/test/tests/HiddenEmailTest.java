@@ -130,7 +130,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
     private void createQueryWebpart()
     {
         // Create query webpart
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addQueryWebPart(null, "core", "Users", null);
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -155,7 +155,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
     private void verifyHiddenEmailTest()
     {
         impersonate(IMPERSONATED_USER);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
 
         log("Verify that emails cannot be seen in query webpart");
         clickMenuButton("Views", EMAIL_VIEW);

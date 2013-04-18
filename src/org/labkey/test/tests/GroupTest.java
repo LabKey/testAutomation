@@ -91,7 +91,7 @@ public class GroupTest extends BaseWebDriverTest
 
         //add read permissions to group2
         goToHome();
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         enterPermissionsUI();
         waitForText("Author");
         setSiteGroupPermissions(COMPOUND_GROUP, "Author");
@@ -103,7 +103,7 @@ public class GroupTest extends BaseWebDriverTest
         log("Verify you can copy perms even with a default");
 
         //give a system group permissions, so that we can verify copying them doesn't cause a problem
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         enterPermissionsUI();
         waitForText("Author");
         setSiteGroupPermissions("All Site Users", "Author");
@@ -191,7 +191,7 @@ public class GroupTest extends BaseWebDriverTest
 
         //impersonate user 1, make several wiki edits
         impersonate(TEST_USERS_FOR_GROUP[0]);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         String[][] nameTitleBody = {{"Name1", "Title1", "Body1"}, {"Name2", "Title2", "Body2"}};
 
         for(String[] wikiValues : nameTitleBody)
@@ -345,7 +345,8 @@ public class GroupTest extends BaseWebDriverTest
     protected void assertUserCanSeeProject(String user, String project)
     {
         impersonate(user);
-        expandFolder(project);
+        hoverProjectBar();
+        assertElementPresent(Locator.linkWithText(project));
         stopImpersonating();
     }
 
@@ -353,7 +354,7 @@ public class GroupTest extends BaseWebDriverTest
     protected void groupSecurityApiTest()
     {
         // Initialize the Wiki
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         addWebPart("Wiki");
 
         createNewWikiPage();

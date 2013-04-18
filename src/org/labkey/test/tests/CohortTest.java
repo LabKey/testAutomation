@@ -72,7 +72,7 @@ public class CohortTest extends BaseWebDriverTest
         log("Check advanced cohort features.");
         _containerHelper.createProject(PROJECT_NAME, "Study");
         importStudyFromZip(new File(getLabKeyRoot() + COHORT_STUDY_ZIP).getPath());
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         addWebPart("Specimens");
         // Check all cohorts after initial import.
     }
@@ -195,7 +195,7 @@ public class CohortTest extends BaseWebDriverTest
         // Check that cohort filters persist through participant view
 
         // Check that switching visit order changes cohort.
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("Change Visit Order"));
@@ -208,7 +208,7 @@ public class CohortTest extends BaseWebDriverTest
         clickButtonByIndex("Move Up", 1, 0);
         clickButtonByIndex("Move Up", 1, 0);
         clickButton("Save");
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         click(Locator.tagContainingText("span", "Specimen Reports")); // expand
         clickAndWait(Locator.linkWithText("View Available Reports"));
         clickButtonByIndex("View", 2);
@@ -226,7 +226,7 @@ public class CohortTest extends BaseWebDriverTest
         assertTableCellNotContains(TABLE_POSITIVE, 2, 5, INFECTED_4, UNASSIGNED_1);
 
         // Check that deleting a vistit changes the cohort.
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("edit", 4)); // Visit 4
@@ -238,7 +238,7 @@ public class CohortTest extends BaseWebDriverTest
         assertTableCellTextEquals(COHORT_TABLE, 4, 1, "Negative"); // Infected4
 
         // Check all cohorts after manipulation.
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText("Blood"), WAIT_FOR_PAGE);
 
         specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
@@ -258,7 +258,7 @@ public class CohortTest extends BaseWebDriverTest
         verifyVialCount(specimenTable, 6); // Visit4 samples no longer have a cohort, and are thus not shown.
 
         // Check that participant view respects filter.
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("2 datasets"));
         clickAndWait(Locator.linkWithText("Test Results"));
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -278,13 +278,13 @@ public class CohortTest extends BaseWebDriverTest
 
         // Check basic cohorts
         log("Check basic cohort features.");
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
         click(Locator.radioButtonById("simpleCohorts"));
         assertAlertContains("Update cohort assignments now?");
 
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         waitAndClick(Locator.linkWithText("Blood"));
 
         waitForText("Positive", 12, WAIT_FOR_JAVASCRIPT);
@@ -446,7 +446,7 @@ public class CohortTest extends BaseWebDriverTest
     private void savedCohortFilterTest()
     {
         log("Create cohort filtered views");
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("2 datasets"));
         clickAndWait(Locator.linkWithText("Test Results"));
 
@@ -483,7 +483,7 @@ public class CohortTest extends BaseWebDriverTest
     @LogMethod
     private void testCohortFilterExport()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("2 datasets"));
         clickAndWait(Locator.linkWithText("Test Results"));
 
@@ -497,7 +497,7 @@ public class CohortTest extends BaseWebDriverTest
     @LogMethod
     private void testCohortFilteredChart()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("2 datasets"));
         clickAndWait(Locator.linkWithText("Test Results"));
 

@@ -42,7 +42,7 @@ public class WorkbookHelper extends AbstractHelperWD
      */
     public String createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
     {
-        _test.clickFolder(project);
+        _test.clickProject(project);
         _test.clickButton("Insert New");
 
         _test.setFormElement(Locator.id("workbookTitle"), title);

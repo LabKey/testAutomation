@@ -68,7 +68,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest
             return;
         }
 
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         log("importing study...");
         setupPipeline();
         importStudy();
@@ -81,7 +81,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest
         log("Setting pipeline root to " + _pipelinePathMain + "...");
         setPipelineRoot(_pipelinePathMain);
         assertTextPresent("The pipeline root was set");
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
     }
 
     protected void importStudy()
@@ -112,7 +112,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest
             refresh();
         }
 
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
     }
 
     public String getAssociatedModuleDirectory()

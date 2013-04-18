@@ -58,7 +58,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     protected void setupPipeline(String project)
     {
         log("Setting up data pipeline for project " + project);
-        clickFolder(project);
+        clickProject(project);
         addWebPart("Data Pipeline");
         clickButton("Setup");
         File dir = getTestTempDir();
@@ -161,7 +161,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
 
         //add the Assay List web part to the lab1 folder so we can upload data later as a labtech
         log("Adding assay list web part to lab1 folder");
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
         clickFolder(TEST_ASSAY_FLDR_LAB1);
         addWebPart("Assay List");
     } //setupEnvironment()
@@ -180,8 +180,8 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         log("Setting permissions for group '" + group + "' on subfolder '" + project + "/" + subfolder + "' to '" + perms + "'");
         if (isElementPresent(Locator.permissionRendered()) && isNavButtonPresent("Save and Finish"))
             clickButton("Save and Finish");
-        clickAndWait(Locator.linkWithText(project));
-        clickAndWait(Locator.linkWithText(subfolder));
+        clickProject(project);
+        clickFolder(subfolder);
         enterPermissionsUI();
         uncheckInheritedPermissions();
         waitAndClickButton("Save", 0);
@@ -209,8 +209,8 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         log("Setting study-level read permissions for group " + group + " in project " + project + " to " + perms);
         if (isElementPresent(Locator.permissionRendered()) && isNavButtonPresent("Save and Finish"))
             clickButton("Save and Finish");
-        clickAndWait(Locator.linkWithText(project));
-        clickAndWait(Locator.linkWithText(folder));
+        clickProject(project);
+        clickFolder(folder);
         enterStudySecurity();
 
         selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
@@ -225,8 +225,8 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     private void setStudyQCStates(String project, String folder)
     {
         log("Setting QC states in study " + folder + ".");
-        clickAndWait(Locator.linkWithText(project));
-        clickAndWait(Locator.linkWithText(folder));
+        clickProject(project);
+        clickFolder(folder);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         setFormElement("newLabel", "Approved");

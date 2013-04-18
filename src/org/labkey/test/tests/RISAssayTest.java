@@ -26,7 +26,6 @@ import org.labkey.test.util.PipelineHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.RReportHelperWD;
-import org.labkey.test.util.UIAssayHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -147,7 +146,7 @@ public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
     {
         _assayHelper.importAssay(ASSAY_NAME, risAssayData, getProjectName());
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         log("Add link to Uniqueblatts view");
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -174,14 +173,14 @@ public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
         RReportHelperWD rHelper = new RReportHelperWD(this);
         rHelper.ensureRConfig();
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("RIS Report Tool"));
 
         waitForElement(Locator.linkWithText(ASSAY_ID));
         click(ExtHelperWD.Locators.checkerForGridRowContainingText(ASSAY_ID));
         clickButton("Create Bar Chart", 0);
         waitForElement(Locator.linkWithText("Kiem Chart"));
-        //assertTextNotPresent("Error"); //TODO: 17236: RIS Report bar chart is broken
+        waitForElement(Locator.xpath("//img[starts-with(@id, 'resultImage')]"));
 
         //clickAndWait(Locator.linkWithText("Kiem Chart"));
         //waitForElement(Locator.pageHeader("bar-chart"));
@@ -191,7 +190,7 @@ public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void configureReportWebPart()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
 
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.clickWebpartMenuItem("Kiem RIS Report", true, "Customize");

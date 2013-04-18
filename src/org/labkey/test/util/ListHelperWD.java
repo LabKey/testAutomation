@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
@@ -502,7 +503,15 @@ public class ListHelperWD extends ListHelper
     // initial "create list" steps common to both manual and import from file scenarios
     public void beginCreateList(String folderName, String listName)
     {
-        _test.clickFolder(folderName);
+        try
+        {
+            _test.clickFolder(folderName);
+        }
+        catch (NoSuchElementException ex)
+        {
+            _test.clickProject(folderName);
+        }
+
         beginCreateListHelper(listName);
     }
 

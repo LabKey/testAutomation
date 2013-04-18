@@ -253,7 +253,7 @@ public class TimeChartTest extends StudyBaseTest
         createSubfolder(PROJECT_NAME, PROJECT_NAME, VISIT_FOLDER_NAME, "Study", null);
         initializePipeline();
 
-        clickAndWait(Locator.linkWithText(VISIT_FOLDER_NAME));
+        clickFolder(VISIT_FOLDER_NAME);
         clickButton("Process and Import Data");
         _extHelper.waitForImportDataEnabled();
         _extHelper.clickFileBrowserFileCheckbox("study.xml");
@@ -363,7 +363,7 @@ public class TimeChartTest extends StudyBaseTest
     private void goToNewTimeChart()
     {
 
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         goToManageViews();
         clickMenuButton("Create", "Time Chart");
         clickChooseInitialMeasure();
@@ -403,8 +403,8 @@ public class TimeChartTest extends StudyBaseTest
 
     public void createChartTest()
     {
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
         addWebPart("Views");
         addWebPart("Datasets");
         addWebPart("Specimens");
@@ -432,8 +432,8 @@ public class TimeChartTest extends StudyBaseTest
     {
         log("Test time chart from a filtered grid");
         
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkWithText("Physical Exam"));
 
         String ptid = "249318596";
@@ -457,7 +457,7 @@ public class TimeChartTest extends StudyBaseTest
     public void visitBasedChartTest()
     {
         log("Create multi-measure time chart.");
-        clickAndWait(Locator.linkWithText(VISIT_FOLDER_NAME));
+        clickFolder(VISIT_FOLDER_NAME);
         goToManageViews();
         clickMenuButton("Create", "Time Chart");
         clickChooseInitialMeasure();
@@ -526,7 +526,7 @@ public class TimeChartTest extends StudyBaseTest
     public void filteredViewQueryMeasureTest()
     {
         log("Create query over " + QUERY_MEASURE_DATASET + " dataset.");
-        clickAndWait(Locator.linkWithText(VISIT_FOLDER_NAME));
+        clickFolder(VISIT_FOLDER_NAME);
         goToModule("Query");
         createNewQuery("study");
         setFormElement(Locator.name("ff_newQueryName"), "My APX Query");
@@ -729,8 +729,8 @@ public class TimeChartTest extends StudyBaseTest
     public void multiMeasureTimeChartTest()
     {
         log("Create multi-measure time chart.");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
         goToManageViews();
         clickMenuButton("Create", "Time Chart");
         clickChooseInitialMeasure();
@@ -759,7 +759,7 @@ public class TimeChartTest extends StudyBaseTest
         waitForText(CHART_TITLE);
         assertTextPresent(CHART_TITLE, 2); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
 
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         goToManageViews();
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
         clickAndWait(Locator.linkWithText("edit"));
@@ -783,8 +783,8 @@ public class TimeChartTest extends StudyBaseTest
     private void sqlTest(String htmlPage, String[] testTitles, String[] testNumRows, String[][] columnHeaders, String[][] stringCheck, double[][] numbercheck, String[] measure, double[][] measureValue)
     {
         // check multi-measure calls to LABKEY.Query.Visualization.getData API requesting date information
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
         // create new wiki to add to Demo study folder, or edit existing one
         if(isTextPresent(WIKIPAGE_NAME))
         {
@@ -901,7 +901,7 @@ public class TimeChartTest extends StudyBaseTest
     {
         log("Test charting with participant groups");
 
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         goToManageViews();
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
         clickAndWait(Locator.linkWithText("edit"));
@@ -988,12 +988,12 @@ public class TimeChartTest extends StudyBaseTest
 
         openSaveMenu();
         saveReport(false);
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
 
         modifyParticipantGroups();
 
         log("Verify report after modifying participant groups.");
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkWithText(REPORT_NAME_3));
         waitForText(REPORT_NAME_3);
         waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
@@ -1109,8 +1109,8 @@ public class TimeChartTest extends StudyBaseTest
 
     public void multiAxisTimeChartTest()
     {
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
         goToManageViews();
         waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
         clickAndWait(Locator.linkWithText("edit"));
@@ -1171,8 +1171,8 @@ public class TimeChartTest extends StudyBaseTest
     {
         log("Check Time Chart Permissions");
         createUser(USER1, null);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
         enterPermissionsUI();
         setUserPermissions(USER1, "Reader");
         setSiteGroupPermissions("Guests", "Reader");
@@ -1183,7 +1183,7 @@ public class TimeChartTest extends StudyBaseTest
         assertElementNotPresent(Locator.button("Edit"));
         assertElementNotPresent(Locator.button("Save"));
         assertElementPresent(Locator.button("Save As"));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         assertTextNotPresent(REPORT_NAME_2);
         stopImpersonating();
         signOut();
@@ -1197,8 +1197,8 @@ public class TimeChartTest extends StudyBaseTest
     public void pointClickFunctionTest()
     {
         log("Check Time Chart Point Click Function (Developer Only)");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
         goToManageViews();
         waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
         click(Locator.tagWithText("div", REPORT_NAME_1));
@@ -1258,8 +1258,8 @@ public class TimeChartTest extends StudyBaseTest
 
         // verify that only developers can see the button to add point click function
         createUser(USER2, null);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
         enterPermissionsUI();
         setUserPermissions(USER2, "Editor");
         // USER2 is not yet a developer, so shouldn't have permissions to this feature

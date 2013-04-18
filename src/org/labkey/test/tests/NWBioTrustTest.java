@@ -335,7 +335,7 @@ public class NWBioTrustTest extends SurveyTest
     private void verifySampleRequests()
     {
         impersonate(NWBT_PRINCIPAL_INVESTIGATOR);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(requestorFolder1);
         clickAndWait(Locator.folderTab("Sample Requests"));
 
@@ -485,7 +485,7 @@ public class NWBioTrustTest extends SurveyTest
         log("Create survey designs in project folder");
         for (Map<String, String> entry : designs)
         {
-            createSurveyDesign(getProjectName(), "Manage", entry.get("label"), entry.get("description"),
+            createSurveyDesign(getProjectName(), null, "Manage", entry.get("label"), entry.get("description"),
                     "biotrust", entry.get("table"), entry.get("metadataPath"));
         }
 

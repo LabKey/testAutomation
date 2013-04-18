@@ -246,7 +246,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     private void checkDataset() throws Exception
     {
         log("Create dataset");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("Import Visit Map"));
@@ -366,7 +366,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         validateSingleColumnData();
 
         log("Import two column MV data");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
         selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
@@ -387,7 +387,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         validateTwoColumnData("Data", "ParticipantID");
 
         log("Copy to study");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickAndWait(Locator.linkWithText(ASSAY_RUN_SINGLE_COLUMN));
         validateSingleColumnData();
@@ -402,7 +402,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         if (isFileUploadAvailable())
         {
             log("Import from Excel in single-column format");
-            clickAndWait(Locator.linkWithText(PROJECT_NAME));
+            clickProject(PROJECT_NAME);
             clickAndWait(Locator.linkWithText(ASSAY_NAME));
             clickButton("Import Data");
             selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
@@ -425,7 +425,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
             validateSingleColumnData();
 
             log("Import from Excel in two-column format");
-            clickAndWait(Locator.linkWithText(PROJECT_NAME));
+            clickProject(PROJECT_NAME);
             clickAndWait(Locator.linkWithText(ASSAY_NAME));
             clickButton("Import Data");
             selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
@@ -469,7 +469,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         log("Defining a test assay at the project level");
         //define a new assay at the project level
         //the pipeline must already be setup
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         addWebPart("Assay List");
 
         //copied from old test

@@ -376,8 +376,8 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
 
     protected void goToEHRFolder()
     {
-        clickFolder(getProjectName());
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
     }
 
     protected void setupStudyPermissions() throws Exception

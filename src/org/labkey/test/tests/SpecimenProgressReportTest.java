@@ -108,7 +108,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     @LogMethod
     private void manageSpecimenConfiguration()
     {
-        clickAndWait(Locator.linkWithText(studyFolder));
+        clickFolder(studyFolder);
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addQueryWebPart("rho");
 
@@ -133,7 +133,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         sleep(1000); // give the store a second to save the configurations
 
         // lookup the config IDs to use in setting the visits
-        clickAndWait(Locator.linkWithText(studyFolder));
+        clickFolder(studyFolder);
         clickAndWait(Locator.linkWithText("SpecimenConfiguration"));
         drt = new DataRegionTable("query", this);
         String pcr1RowId = drt.getDataAsText(drt.getRow("TubeType", "CEF-R Cryovial"), "RowId");
@@ -154,7 +154,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
     private void checkRhoQueryRowCount(String name, int expectedCount)
     {
-        clickAndWait(Locator.linkWithText(studyFolder));
+        clickFolder(studyFolder);
         clickAndWait(Locator.linkWithText(name));
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable drt = new DataRegionTable("query", this);
@@ -188,7 +188,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     @LogMethod
     private void verifyAssayResultInvalid(String assayName, String runName)
     {
-        clickAndWait(Locator.linkWithText(assayFolder));
+        clickFolder(assayFolder);
         waitForElement(tableLoc);
         Assert.assertEquals(0, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
         Assert.assertEquals(24, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
@@ -210,7 +210,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     @LogMethod
     private void verifyAdditionalGroupingColumn(String assayName, String groupCol)
     {
-        clickAndWait(Locator.linkWithText(assayFolder));
+        clickFolder(assayFolder);
         waitForText("48 " + assayName + " queries");
         configureGroupingColumn(assayName, groupCol);
         waitForElement(tableLoc);
@@ -223,14 +223,14 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     @LogMethod
     private void verifyUnscheduledVisitDisplay(String assayName)
     {
-        clickAndWait(Locator.linkWithText(assayFolder));
+        clickFolder(assayFolder);
         waitForElement(tableLoc);
         configureAssayProgressDashboard(assay2);
         configureAssaySchema(assayName);
 
         flagSpecimenForReview(assayName, assay2File, "2011-03-02");
 
-        clickAndWait(Locator.linkWithText(assayFolder));
+        clickFolder(assayFolder);
         waitForElement(tableLoc);
 
         verifyProgressReport(assayName, false);
@@ -271,7 +271,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     @LogMethod
     private void flagSpecimenForReview(String assayName, String runName, @Nullable String collectionDateFilterStr)
     {
-        clickAndWait(Locator.linkWithText(assayFolder));
+        clickFolder(assayFolder);
 
         clickAndWait(Locator.linkWithText(assayName));
         clickAndWait(Locator.linkWithText(runName));
@@ -286,7 +286,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         clickButton("OK", 0);
         waitForElement(Locator.tagWithAttribute("img", "title", "Flagged for review"));
 
-        clickAndWait(Locator.linkWithText(assayFolder));
+        clickFolder(assayFolder);
     }
 
     @LogMethod
@@ -298,19 +298,19 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
         _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + assay1XarPath, ++pipelineCount, assay1);
         _assayHelper.importAssay(assay1, new File(STUDY_PIPELINE_ROOT + "/assays/" + assay1File),  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
-        clickAndWait(Locator.linkWithText(assayFolder));
+        clickFolder(assayFolder);
         _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + assay2XarPath, ++pipelineCount, assay2);
         _assayHelper.importAssay(assay2, new File(STUDY_PIPELINE_ROOT + "/assays/" + assay2File),  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
 
 
-        clickAndWait(Locator.linkWithText(assayFolder));
+        clickFolder(assayFolder);
         addWebPart("Assay Progress Dashboard");
         addWebPart("Assay Progress Report");
         assertTextPresent("You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report", 2);
 
         configureAssayProgressDashboard(assay1);
         configureAssaySchema(assay1);
-        clickAndWait(Locator.linkWithText(assayFolder));
+        clickFolder(assayFolder);
     }
 
     @LogMethod

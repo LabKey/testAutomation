@@ -125,7 +125,7 @@ public class FolderExportTest extends BaseWebDriverTest
         importFolderFromPipeline( "" + fileImport);
 
 
-        clickAndWait(Locator.linkWithText(folderName));
+        clickFolder(folderName);
         verifyFolderImportAsExpected(subfolderIndex);
         verifyFolderExportAsExpected(folderName);
     }
@@ -137,11 +137,11 @@ public class FolderExportTest extends BaseWebDriverTest
         // create one of the subfolders, to be imported, to test merge on import of subfolders
         _containerHelper.createSubfolder(folderFromZip, "Subfolder1", "Collaboration");
 
-        clickAndWait(Locator.linkWithText(folderFromZip));
+        clickFolder(folderFromZip);
         importFolderFromZip(new File(dataDir, folderZip).getAbsolutePath());
         beginAt(getCurrentRelativeURL()); //work around linux issue
         waitForPipelineJobsToComplete(1, "Folder import", false);
-        clickAndWait(Locator.linkWithText(folderFromZip));
+        clickFolder(folderFromZip);
         verifyFolderImportAsExpected(0);
         verifyFolderExportAsExpected(folderFromZip);
     }
@@ -150,7 +150,7 @@ public class FolderExportTest extends BaseWebDriverTest
     private void verifyFolderExportAsExpected(String folderName)
     {
         log("Exporting folder to pipeline as individual files");
-        clickAndWait(Locator.linkWithText(folderName));
+        clickFolder(folderName);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Export"));
         click(Locator.name("includeSubfolders"));
@@ -233,10 +233,13 @@ public class FolderExportTest extends BaseWebDriverTest
     private void verifySubfolderImport(int subfolderIndex, boolean fromTemplate)
     {
         log("verify child containers were imported");
+        hoverFolderBar();
         clickAndWait(Locator.linkWithText("Subfolder1", subfolderIndex));
         assertTextPresent("My Test Container Tab Query");
+        hoverFolderBar();
         clickAndWait(Locator.linkWithText("_hidden", subfolderIndex));
         assertTextPresentInThisOrder("Lists", "Hidden Folder List");
+        hoverFolderBar();
         clickAndWait(Locator.linkWithText("Subfolder2", subfolderIndex));
         if (fromTemplate)
             assertElementPresent(Locator.css("#bodypanel .labkey-wp-body p").withText("This folder does not contain a study."));
@@ -244,6 +247,7 @@ public class FolderExportTest extends BaseWebDriverTest
             assertElementPresent(Locator.css(".study-properties").withText("Study Label for Subfolder2 tracks data in 1 dataset over 1 visit. Data is present for 2 Monkeys."));
 
         log("verify container tabs were imported");
+        hoverFolderBar();
         clickAndWait(Locator.linkWithText("Subfolder1", subfolderIndex));
         assertLinkPresentWithText("Assay Container");
         assertLinkPresentWithText("Tab 2");

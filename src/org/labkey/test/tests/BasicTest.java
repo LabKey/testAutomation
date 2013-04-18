@@ -121,7 +121,7 @@ public class BasicTest extends BaseWebDriverTest
         assertTextNotPresent("WARNING:");
 
         ensureAdminMode();
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickFolder(FOLDER_NAME);
 
         log("Test folder aliasing");

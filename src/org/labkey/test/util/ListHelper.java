@@ -494,7 +494,7 @@ public class ListHelper extends AbstractHelper
     // initial "create list" steps common to both manual and import from file scenarios
     public void beginCreateList(String folderName, String listName)
     {
-        _test.clickAndWait(Locator.linkWithText(folderName));
+        _test.clickFolder(folderName);
         if (!_test.isLinkPresentWithText("Lists"))
         {
             _test.addWebPart("Lists");
@@ -531,7 +531,7 @@ public class ListHelper extends AbstractHelper
     {
         Assert.assertTrue("Unable to locate input file: " + inputFile, inputFile.exists());
 
-        _test.clickAndWait(Locator.linkWithText(folderName));
+        _test.clickFolder(folderName);
         if (!_test.isLinkPresentWithText("Lists"))
         {
             _test.addWebPart("Lists");

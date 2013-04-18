@@ -470,7 +470,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void createFlasksSampleSet(String samplesetName, String samplesetFilename)
     {
-        clickAndWait(Locator.linkWithText(getProjectName()));
+        clickProject(getProjectName());
         clickButton("Import Sample Set");
         setFormElement("name", samplesetName);
         setFormElement("data", "SampleID\n" + "1");
@@ -487,7 +487,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         clickButton("Import", 0);
         waitForElement(Locator.xpath("//input[@name='ff_label3']"), WAIT_FOR_JAVASCRIPT);
         clickButton("Save");
-        clickAndWait(Locator.linkWithText(getProjectName()));
+        clickProject(getProjectName());
     }
 
     private void testJavaScript()

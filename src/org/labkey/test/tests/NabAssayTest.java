@@ -208,7 +208,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             setupPipeline(TEST_ASSAY_PRJ_NAB);
 
             // create a study so we can test copy-to-study later:
-            clickFolder(TEST_ASSAY_PRJ_NAB);
+            clickProject(TEST_ASSAY_PRJ_NAB);
             _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, null);
             addWebPart("Study Overview");
             clickButton("Create Study");
@@ -216,7 +216,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             //add the Assay List web part so we can create a new nab assay
             _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
-            clickFolder(TEST_ASSAY_PRJ_NAB);
+            clickProject(TEST_ASSAY_PRJ_NAB);
             addWebPart("Assay List");
 
             //create a new nab assay
@@ -261,7 +261,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertTextPresent(PLATE_TEMPLATE_NAME);
             assertTextPresent("NAb: 5 specimens in duplicate");
 
-            clickFolder(TEST_ASSAY_PRJ_NAB);
+            clickProject(TEST_ASSAY_PRJ_NAB);
             clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
             clickEditAssayDesign(false);
@@ -284,7 +284,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             assertTextNotPresent("NAb: 5 specimens in duplicate");
         }
 
-        clickFolder(TEST_ASSAY_PRJ_NAB);
+        clickProject(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_NAB);
         addWebPart("Assay List");
 
@@ -450,7 +450,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             doSchemaBrowserTest();
 
             // create user with read permissions to study and dataset, but no permissions to source assay
-            clickFolder(TEST_ASSAY_PRJ_NAB);
+            clickProject(TEST_ASSAY_PRJ_NAB);
             clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1));
             pushLocation();  // Save our location because impersonatied user won't have permission to project
             createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
@@ -536,7 +536,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     private static String WIKIPAGE_NAME = "Nab API Wiki";
     private void doNabApiTest()
     {
-        clickFolder(TEST_ASSAY_PRJ_NAB);
+        clickProject(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_NAB);
         addWebPart("Wiki");
         createNewWikiPage("HTML");
@@ -746,7 +746,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         // add the transform script to the assay
         log("Uploading NAb Runs with a transform script");
-        clickFolder(TEST_ASSAY_PRJ_NAB);
+        clickProject(TEST_ASSAY_PRJ_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
         clickEditAssayDesign(false);
 

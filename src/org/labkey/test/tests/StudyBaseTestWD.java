@@ -322,13 +322,10 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
     protected void goToManageStudyPage(String projectName, String studyName)
     {
         log("Going to Manage Study Page of: " + studyName);
-        waitForElement(Locator.css(".nav-tree-selected"));
-        if (!getText(Locator.css(".nav-tree-selected")).equals(projectName))
-        {
-            waitAndClick(Locator.linkWithText(projectName));
-            waitForElement(Locator.xpath("//a[contains(@class, 'nav-tree-selected')][text()='" + projectName + "']"));
-        }
-        waitAndClick(Locator.linkWithText(studyName));
+        waitForElement(Locator.id("folderBar"));
+        if (!getText(Locator.id("folderBar")).equals(projectName))
+            clickProject(projectName);
+        clickFolder(studyName);
         waitAndClick(Locator.linkWithText("Manage Study"));
         waitForElement(Locator.xpath("id('labkey-nav-trail-current-page')[text()='Manage Study']"));
     }

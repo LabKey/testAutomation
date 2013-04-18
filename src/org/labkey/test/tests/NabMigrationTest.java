@@ -50,7 +50,7 @@ public class NabMigrationTest extends NabOldTest
     private void verifyMigration()
     {
         log("Verify that the data didn't transfer to the first assay");
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         clickTab("Nab");
         clickAndWait(Locator.linkWithText(NEW_ASSAY_NAME));
         Assert.assertEquals("Data present in NAb assay that should be unused", 0, new DataRegionTable("Runs", this).getDataRowCount());
@@ -87,7 +87,7 @@ public class NabMigrationTest extends NabOldTest
 
     private void createAssay(String assayName)
     {
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         clickTab("Nab");
         startCreateNabAssay(assayName);
         addRunField("LegacyID", "LegacyID", ListHelper.ListColumnType.Integer);

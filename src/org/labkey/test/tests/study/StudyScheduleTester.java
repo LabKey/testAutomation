@@ -203,7 +203,7 @@ public class StudyScheduleTester
         if (verify)
         {
             // verify a placeholder dataset cannot be edited from the manage dataset page
-            _test.clickAndWait(Locator.linkWithText(_folderName));
+            _test.clickFolder(_folderName);
             _test.goToManageStudy();
             _test.clickAndWait(Locator.linkWithText("Manage Datasets"));
             _test.clickAndWait(Locator.linkWithText(name));

@@ -58,7 +58,7 @@ public class FlowCBCTest extends BaseFlowTestWD
         log("** Initialize CBC Assay");
         createSubfolder(getProjectName(), getProjectName(), CBC_FOLDER, "Assay", null);
 
-        clickAndWait(Locator.linkWithText(CBC_FOLDER));
+        clickFolder(CBC_FOLDER);
         if (!isLinkPresentWithText("Assay List"))
             addWebPart("Assay List");
         clickButton("New Assay Design");
@@ -151,8 +151,8 @@ public class FlowCBCTest extends BaseFlowTestWD
     private void copyCBCResultsToStudy()
     {
         log("** Upload CBC Data");
-        clickFolder(getProjectName());
-        clickAndWait(Locator.linkWithText(CBC_FOLDER));
+        clickProject(getProjectName());
+        clickFolder(CBC_FOLDER);
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
 

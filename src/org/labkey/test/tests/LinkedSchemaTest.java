@@ -348,7 +348,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         createList();
         importListData();
 
-        goToProject("LinkedSchemaTestProject");
+        clickProject("LinkedSchemaTestProject");
 
         createLinkedSchema();
         verifyLinkedSchema();
@@ -646,24 +646,13 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     protected void goToSchemaBrowserTable(String schemaName, String tableName)
     {
         goToSchemaBrowser();
-        waitForElement(Locator.xpath("//span[text()='"+schemaName+"']"));
-        click(Locator.xpath("//span[text()='" + schemaName + "']"));
-        waitForElement(Locator.xpath("//span[text()='"+ tableName +"']"));
-        click(Locator.xpath("//span[text()='" + tableName + "']"));
-    }
-
-    protected void goToProject(String projectName)
-    {
-        goToHome();
-        waitForElement(Locator.xpath("//a[text()='"+ projectName +"']"));
-        click(Locator.xpath("//a[text()='" + projectName + "']"));
+        selectQuery(schemaName, tableName);
     }
 
     protected void changeListName(String oldName, String newName)
     {
         goToSchemaBrowserTable("lists", oldName);
-        waitForElement(Locator.xpath("//a[text()='edit definition']"));
-        click(Locator.xpath("//a[text()='edit definition']"));
+        waitAndClick(Locator.linkWithText("edit definition"));
 
         _listHelper.clickEditDesign();
         waitForElement(Locator.xpath("//input[@name='ff_name']"));
@@ -688,12 +677,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
     protected void assertColumnsPresent(String sourceFolder, String schemaName, String tableName, String... columnNames)
     {
-        waitForElement(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
-        click(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
+        clickFolder(sourceFolder);
 
         goToSchemaBrowserTable(schemaName, tableName);
-        waitForElement(Locator.xpath("//a[text()='view data']"));
-        click(Locator.xpath("//a[text()='view data']"));
+        waitAndClick(Locator.linkWithText("view data"));
         waitForText(tableName);
 
         for (String name : columnNames)
@@ -707,30 +694,24 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
     protected void assertColumnsNotPresent(String sourceFolder, String schemaName, String tableName, String... columnNames)
     {
-        waitForElement(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
-        click(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
+        clickFolder(sourceFolder);
 
         goToSchemaBrowserTable(schemaName, tableName);
-        waitForElement(Locator.xpath("//a[text()='view data']"));
-        click(Locator.xpath("//a[text()='view data']"));
+        waitAndClick(Locator.linkWithText("view data"));
         waitForText(tableName);
 
         for (String name : columnNames)
         {
             assertElementNotPresent(Locator.xpath("//td[@id='query:" + name + ":header']"));
         }
-
-        click(Locator.xpath("//a[text()='TargetFolder']"));
     }
 
     protected void assertLookupsWorking(String sourceFolder, String schemaName, String listName, boolean present, String... lookupColumns)
     {
-        waitForElement(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
-        click(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
+        clickFolder(sourceFolder);
 
         goToSchemaBrowserTable(schemaName, listName);
-        waitForElement(Locator.xpath("//a[text()='view data']"));
-        click(Locator.xpath("//a[text()='view data']"));
+        waitAndClick(Locator.linkWithText("view data"));
 
         _customizeViewsHelper.openCustomizeViewPanel();
 
@@ -742,12 +723,10 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
     protected void changelistLookup(String sourceFolder, String tableName, int index, ListHelper.LookupInfo info)
     {
-        waitForElement(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
-        click(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
+        clickFolder(sourceFolder);
 
         goToSchemaBrowserTable("lists", tableName);
-        waitForElement(Locator.xpath("//a[text()='edit definition']"));
-        click(Locator.xpath("//a[text()='edit definition']"));
+        waitAndClick(Locator.linkWithText("edit definition"));
 
         _listHelper.clickEditDesign();
         _listHelper.setColumnType(index, info);
@@ -757,8 +736,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
     protected void createLinkedSchemaQuery(String sourceFolder, String schemaName, String queryName, String tableName)
     {
-        waitForElement(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
-        click(Locator.xpath("//a[text()='"+ sourceFolder +"']"));
+        clickFolder(sourceFolder);
 
         goToSchemaBrowserTable(schemaName, tableName);
 

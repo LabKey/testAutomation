@@ -15,33 +15,18 @@
  */
 package org.labkey.test.tests;
 
-import net.sf.cglib.core.Local;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
-import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * User: brittp
@@ -178,7 +163,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         createSubfolder(PROJECT_NAME, FOLDER_NAME, SUBFOLDER_NAME, "None", null); // for cross-folder query
 
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
 
         createWiki();
 
@@ -212,7 +197,7 @@ public class ClientAPITest extends BaseWebDriverTest
     private void clearTestPage(String message)
     {
         if (!isTextPresent(WIKIPAGE_NAME))
-            clickAndWait(Locator.linkWithText(FOLDER_NAME));
+            clickFolder(FOLDER_NAME);
         clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
         setWikiBody("<p>" + message + "</p>");
         saveWikiPage();
@@ -329,7 +314,7 @@ public class ClientAPITest extends BaseWebDriverTest
     @LogMethod
     private void gridTest()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickFolder(FOLDER_NAME);
 
         setSourceFromFile("gridTest.js");
@@ -649,7 +634,7 @@ public class ClientAPITest extends BaseWebDriverTest
         for (String user : EMAIL_RECIPIENTS)
             createUser(user, null);
 
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         enableEmailRecorder();
 
         // test failure cases: no from email

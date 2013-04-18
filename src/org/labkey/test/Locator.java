@@ -367,11 +367,6 @@ public abstract class Locator
         return xpath("//table").withClass("x-btn").withoutClass("x-item-disabled").append("//button").withClass("x-btn-text").withText(text);
     }
 
-    public static XPathLocator extMenuItem(String text)
-    {
-        return xpath("//a[@class='x-menu-item' and text() = " + xq(text) + "]");
-    }
-
     public static XPathLocator extButton(String text, Integer index)
     {
         return xpath("(//button[contains(@class, 'x-btn-text') and text() = " + xq(text) + "])[" + (index + 1) + "]");
@@ -405,21 +400,6 @@ public abstract class Locator
     public static XPathLocator navButton(String text, Integer index)
     {
         return xpath("(//a[normalize-space(@class)='labkey-button' or @class='labkey-menu-button']/span[text() = " + xq(text) + "])[" + (index + 1) + "]");
-    }
-
-    public static XPathLocator navSubmitButton(String text)
-    {
-        return xpath("//span[normalize-space(@class)='labkey-button' or @class='labkey-menu-button']/input[@type='submit' and @value=" + xq(text) + "]");
-    }
-
-    public static XPathLocator navSubmitButtonContainingText(String text)
-    {
-        return xpath("//input[@type='submit' and contains(@value, " + xq(text) + ")]");
-    }
-
-    public static XPathLocator navSubmitButton(String text, Integer index)
-    {
-        return xpath("(//input[@type='submit' and @value=" + xq(text) + "])[" + (index + 1) + "]");
     }
 
     public static XPathLocator linkWithImage(String image, Integer index)
@@ -640,6 +620,11 @@ public abstract class Locator
     public static XPathLocator permissionsTreeNode(String folderName)
     {
         return xpath("//a[@class='x-tree-node-anchor']/span[text()='" + folderName + "' or text()='" + folderName + "*']");
+    }
+
+    public static XPathLocator currentContainer(String projectOrFolder)
+    {
+        return id("folderBar").withText(projectOrFolder);
     }
 
     public static IdLocator folderTab(String text)

@@ -15,14 +15,11 @@
  */
 package org.labkey.test.tests;
 
-import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.tests.study.DataViewsTester;
 import org.labkey.test.tests.study.StudyScheduleTester;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 
@@ -230,7 +227,7 @@ public class StudyRedesignTest extends StudyBaseTest
         // assign them to each dataset
         for (int i = 0; i < dsCount; i++)
         {
-            Locator.XPathLocator combo = Locator.xpath("(//div[contains(@id, '-viewcategory')]//table[contains(@class, 'x4-form-item')])[" + (i+1) + "]");
+            Locator.XPathLocator combo = Locator.xpath("(//div[contains(@id, '-viewcategory')]//table[contains(@class, 'x4-form-item')])[" + (i + 1) + "]");
             _ext4Helper.selectComboBoxItem(combo, CATEGORIES[i / 10]);
         }
         uncheckCheckbox("visible", dsCount - 1); // Set last dataset to not be visible.
@@ -266,7 +263,7 @@ public class StudyRedesignTest extends StudyBaseTest
     private void participantListWebpartTest()
     {
         log("Participant List Webpart Test");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Overview"));
         addWebPart("Mouse List");

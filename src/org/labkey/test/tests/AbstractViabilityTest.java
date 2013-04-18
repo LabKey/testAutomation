@@ -76,7 +76,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     protected void importSpecimens(String studyFolder, String specimensPath)
     {
         log("** Import specimens");
-        clickAndWait(Locator.linkWithText(studyFolder));
+        clickFolder(studyFolder);
         clickAndWait(Locator.linkWithText("Specimen Data"));
         addWebPart("Specimens");
         clickAndWait(Locator.linkWithText("By Vial Group"));

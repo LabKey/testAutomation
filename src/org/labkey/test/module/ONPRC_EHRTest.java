@@ -44,7 +44,7 @@ public class ONPRC_EHRTest extends AbstractEHRTest
     @Override
     protected void goToEHRFolder()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
     }
 
     public void runUITests() throws Exception

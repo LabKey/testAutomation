@@ -1028,10 +1028,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if (!isElementPresent(Locator.css("#adminMenuPopupText")))
             stopImpersonating();
-        if (!isElementPresent(Locator.css(".labkey-expandable-nav-panel")))
+        if (!isElementPresent(Locator.id("projectBar")))
         {
             goToHome();
-            waitForElement(Locator.css(".labkey-expandable-nav-panel"));
+            waitForElement(Locator.id("projectBar"));
         }
     }
 
@@ -1820,9 +1820,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             beginAt("");
 
             // The following checks verify that the test deleted all projects and folders that it created.
+            hoverFolderBar();
             for (WebTestHelper.FolderIdentifier folder : _createdFolders)
                 assertElementNotPresent(Locator.linkWithText(folder.getFolderName()));
 
+            hoverProjectBar();
             for (String projectName : _containerHelper.getCreatedProjects())
                 assertElementNotPresent(Locator.linkWithText(projectName));
             log("========= " + getClass().getSimpleName() + " cleanup complete =========");
@@ -2083,7 +2085,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             return;
         if(getProjectName() != null)
         {
-            clickFolder(getProjectName());
+            clickProject(getProjectName());
             if(!"Query Schema Browser".equals(_driver.getTitle()))
                 goToSchemaBrowser();
             validateQueries(true);
@@ -2101,6 +2103,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         for (String projectName : _containerHelper.getCreatedProjects())
         {
+            clickProject(projectName);
+
             doViewCheck(projectName);
             checked.add(projectName);
         }
@@ -2111,17 +2115,24 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             String folder = folderId.getFolderName();
             if(!checked.contains(project))
             {
+                if (!getText(Locator.id("folderBar")).equals(project))
+                    clickProject(project);
+
                 doViewCheck(project);
                 checked.add(project);
             }
             if(!checked.contains(folder))
             {
-                clickAndWait(Locator.linkWithText(project));
-                if(isElementPresent(Locator.linkWithText(folder)))
+                String currentFolder = getText(Locator.id("folderBar"));
+                if (!currentFolder.equals(folder))
                 {
-                    doViewCheck(folder);
-                    checked.add(folder);
+                    if (!currentFolder.equals(project))
+                        clickProject(project);
+                    clickFolder(folder);
                 }
+
+                doViewCheck(folder);
+                checked.add(folder);
             }
         }
     }
@@ -2138,7 +2149,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @LogMethod
     private void doViewCheck(@LoggedParam String folder)
     {
-        clickAndWait(Locator.linkWithText(folder));
         try{
             goToManageViews();
         }
@@ -2857,22 +2867,23 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         createSubfolder(project, parent, child, folderType, tabsToAdd, false);
     }
 
-
     private  void startCreateFolder(String project, String parent, String child)
     {
-
-        ensureAdminMode();
-        if (isElementPresent(Locator.linkWithText(child)))
-            Assert.fail("Cannot create folder; A link with text " + child + " already exists.  " +
-                    "This folder may already exist, or the name appears elsewhere in the UI.");
-        assertElementNotPresent(Locator.linkWithText(child));
-        log("Creating subfolder " + child + " under project " + parent);
-        String _active = (!parent.equals(project)? parent : project);
-        if (!getText(Locator.css(".nav-tree-selected")).equals(_active))
-            clickAndWait(Locator.linkWithText(_active));
+        if (!parent.equals(getText(Locator.id("folderBar"))))
+        {
+            clickProject(project);
+            if (!parent.equals(project))
+            {
+                clickFolder(parent);
+            }
+        }
+        hoverFolderBar();
+        if (isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child))))
+            Assert.fail("Folder: " + child + " already exists in project: " + project);
+        log("Creating subfolder " + child + " under " + parent);
         goToFolderManagement();
-        waitForExt4FolderTreeNode(parent, 10000);
-        clickButton("Create Subfolder", 0);
+        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(parent));
+        clickButton("Create Subfolder");
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("name"), child);
     }
@@ -2935,7 +2946,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         waitAndClickButton("Finish");
-        waitForElement(Locator.css(".nav-tree-selected").withText(child));
+        waitForElement(Locator.id("folderBar").withText(child));
 
         //unless we need addtional tabs, we end here.
         if (null == tabsToAdd || tabsToAdd.length == 0)
@@ -2983,11 +2994,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void deleteFolder(String project, @LoggedParam String folderName)
     {
         log("Deleting folder " + folderName + " under project " + project);
-        clickAndWait(Locator.linkWithText(project));
-        clickAndWait(Locator.linkWithText(folderName));
+        clickProject(project);
+        clickFolder(folderName);
         ensureAdminMode();
         goToFolderManagement();
-        waitForExt4FolderTreeNode(folderName, 10000);
+        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName));
         clickButton("Delete");
         // confirm delete subfolders if present
         if(isTextPresent("This folder has subfolders."))
@@ -2995,7 +3006,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         // confirm delete:
         clickButton("Delete");
         // verify that we're not on an error page with a check for a project link:
-        assertElementPresent(Locator.linkWithText(project));
+        assertElementPresent(Locator.currentContainer(project));
+        hoverFolderBar();
         assertElementNotPresent(Locator.linkWithText(folderName));
     }
 
@@ -3021,11 +3033,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void renameFolder(String project, @LoggedParam String folderName, @LoggedParam String newFolderName, boolean createAlias)
     {
         log("Renaming folder " + folderName + " under project " + project + " -> " + newFolderName);
-        clickAndWait(Locator.linkWithText(project));
-        clickAndWait(Locator.linkWithText(folderName));
+        clickProject(project);
+        clickFolder(folderName);
         ensureAdminMode();
         goToFolderManagement();
-        waitForExt4FolderTreeNode(folderName, 10000);
+        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName));
         clickButton("Rename");
         setFormElement(Locator.name("name"), newFolderName);
         if (createAlias)
@@ -3035,7 +3047,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         // confirm rename:
         clickButton("Rename");
         // verify that we're not on an error page with a check for a new folder link:
-        assertElementPresent(Locator.linkWithText(newFolderName));
+        assertElementPresent(Locator.currentContainer(newFolderName));
+        hoverFolderBar();
         assertElementNotPresent(Locator.linkWithText(folderName));
     }
 
@@ -3043,11 +3056,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void moveFolder(String projectName, String folderName, String newParent, boolean createAlias)
     {
         log("Moving folder [" + folderName + "] under project [" + projectName + "] to [" + newParent + "]");
-        clickAndWait(Locator.linkWithText(projectName));
-        clickAndWait(Locator.linkWithText(folderName));
+        clickProject(projectName);
+        clickFolder(folderName);
         ensureAdminMode();
         goToFolderManagement();
-        waitForExt4FolderTreeNode(folderName, 10000);
+        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName));
         clickButton("Move");
         if (createAlias)
             checkCheckbox(Locator.name("addAlias"));
@@ -3059,32 +3072,37 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         // move:
         clickButton("Confirm Move");
         // verify that we're not on an error page with a check for folder link:
-        assertElementPresent(Locator.linkWithText(folderName));
+        assertElementPresent(Locator.currentContainer(folderName));
+        hoverFolderBar();
         assertElementPresent(Locator.linkWithText(newParent));
     }
 
-    public void expandFolder(String folder)
+    public void hoverProjectBar()
     {
-        waitForElement(Locator.css(".labkey-expandable-nav-panel"));
-        String xpath = "//tr[not(ancestor-or-self::*[contains(@style,'none')]) and following-sibling::tr[contains(@style,'none')]//a[text()='"+folder+"']]//a/img[contains(@src,'plus')]";
-        List<WebElement> possibleAncestors = _driver.findElements(By.xpath(xpath));
-        int depth = 0;
-        while(possibleAncestors.size() > 0 && depth < 10)
-        {
-            possibleAncestors.get(possibleAncestors.size()-1).click(); // the last one in the list is the actual ancestor.
-            possibleAncestors = _driver.findElements(By.xpath(xpath));
-            depth++;
-        }
-        assertElementVisible(Locator.css(".labkey-nav-tree-text").withText(folder));
+        waitForElement(Locator.id("projectBar"));
+        selenium.getEval("HoverNavigation._project.show();"); // mouseOver doesn't work in Firefox
+        waitForElement(Locator.css("#projectBar_menu .project-nav"));
     }
 
-    /**
-     * Expand any necessary nodes in the left nav bar and click a link to a project or folder
-     */
+    public void clickProject(String project)
+    {
+        hoverProjectBar();
+        waitAndClickAndWait(Locator.linkWithText(project));
+        waitForElement(Locator.id("folderBar").withText(project));
+    }
+
+    public void hoverFolderBar()
+    {
+        waitForElement(Locator.id("folderBar"));
+        selenium.getEval("HoverNavigation._folder.show();"); // mouseOver doesn't work in Firefox
+        waitForElement(Locator.css("#folderBar_menu .folder-nav"));
+    }
+
     public void clickFolder(String folder)
     {
-        expandFolder(folder);
-        clickAndWait(Locator.linkWithText(folder));
+        hoverFolderBar();
+        waitAndClickAndWait(Locator.linkWithText(folder));
+        waitForElement(Locator.id("folderBar").withText(folder));
     }
 
     /**
@@ -6064,7 +6082,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (isElementPresent(Locator.permissionRendered()))
         {
             exitPermissionsUI();
-            clickAndWait(Locator.linkWithText(projectName));
+            clickProject(projectName);
         }
         enterPermissionsUI();
         clickManageGroup(groupName);
@@ -6171,7 +6189,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if(projectName==null)
             goToProjectHome();
         else
-            clickAndWait(Locator.linkWithText(projectName));
+            clickProject(projectName);
         setUserPermissions(userName, permissions);
     }
 
@@ -6368,7 +6386,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public boolean doesGroupExist(String groupName, String projectName)
     {
         ensureAdminMode();
-        clickAndWait(Locator.linkWithText(projectName));
+        clickProject(projectName);
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Project Groups");
         waitForText("Member Groups");
@@ -6396,7 +6414,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public boolean isUserInGroup(String email, String groupName, String projectName)
     {
         ensureAdminMode();
-        clickAndWait(Locator.linkWithText(projectName));
+        clickProject(projectName);
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Project Groups");
         waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
@@ -6563,7 +6581,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public DataRegionTable getCohortDataRegionTable(String projectName)
     {
-        clickFolder(projectName);
+        clickProject(projectName);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
         return new DataRegionTable("Cohort", this, false);
@@ -6661,7 +6679,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void enableModule(String projectName, String moduleName)
     {
         ensureAdminMode();
-        clickAndWait(Locator.linkWithText(projectName));
+        clickProject(projectName);
         enableModule(moduleName, true);
     }
 
@@ -6696,7 +6714,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if(!isElementPresent(Locator.linkWithText(getProjectName())))
             goToHome();
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
     }
 
     public void goToHome()
@@ -6712,7 +6730,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if(!isElementPresent(Locator.linkWithText(project)))
             goToHome();
-        clickFolder(project);
+        clickProject(project);
 
         goToProjectSettings();
     }
@@ -6827,7 +6845,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         log("Signing out");
         beginAt("/login/logout.view");
-        waitForElement(Locator.xpath("//a[string()='Sign In']")); // Will recognize link [BeginAction] or button [LoginAction]
+        waitForElement(Locator.xpath("//a").withText("Sign\u00a0In")); // Will recognize link [BeginAction] or button [LoginAction]
     }
 
     /*
@@ -6836,7 +6854,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void searchFor(String projectName, String searchFor, int expectedResults, @Nullable String titleName)
     {
         log("Searching Project : " + projectName + " for \"" + searchFor + "\".  Expecting to find : " + expectedResults + " results");
-        clickAndWait(Locator.linkWithText(projectName));
+        clickProject(projectName);
         assertElementPresent(Locator.name("q"));
         setFormElement(Locator.id("query"), searchFor);
         clickButton("Search");
@@ -6965,7 +6983,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 click(loc);
             }
             waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + schemaPart + "']"), 1000);
-            waitForText(schemaWithParents + " Schema");
+            waitForElement(Locator.css(".lk-qd-name").withText(schemaWithParents + " Schema"));
         }
     }
 
@@ -7172,7 +7190,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 copyFile(specimenArchive, _copiedArchives[i]);
             }
 
-            clickAndWait(Locator.linkWithText(_studyFolderName));
+            clickFolder(_studyFolderName);
 
             int total = 0;
             while( !isElementPresent(Locator.linkWithText("Manage Files")) && total < WAIT_FOR_PAGE)
@@ -7214,7 +7232,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             log("Waiting for completion of specimen archives");
 
-            clickAndWait(Locator.linkWithText(_studyFolderName));
+            clickFolder(_studyFolderName);
             clickAndWait(Locator.linkWithText("Manage Files"));
 
             waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import", _expectError);

@@ -72,7 +72,7 @@ public class HTTPApiTest extends SimpleApiTest
     {
         log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         addWebPart("Lists");
 
         log("Create List");
@@ -87,7 +87,7 @@ public class HTTPApiTest extends SimpleApiTest
         clickButton("Import Data");
         _listHelper.submitTsvData(LIST_DATA);
         
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addQueryWebPart("lists");
     }

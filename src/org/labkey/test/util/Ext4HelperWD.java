@@ -447,6 +447,11 @@ public class Ext4HelperWD extends AbstractHelperWD
         {
             return Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-mask')]");
         }
+
+        public static Locator.XPathLocator folderManagementTreeNode(String nodeText)
+        {
+            return Locator.xpath("//tr").withClass("x4-grid-row").append("/td/div").withText(nodeText);
+        }
     }
 
     public static Locator.XPathLocator ext4Tab(String label)

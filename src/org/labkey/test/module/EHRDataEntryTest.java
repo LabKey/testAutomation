@@ -46,8 +46,8 @@ public class EHRDataEntryTest extends AbstractEHRTest
     private void weightDataEntryTest()
     {
         log("Test weight data entry");
-        clickFolder(getProjectName());
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
         saveLocation();
         impersonate(FULL_SUBMITTER.getEmail());
         recallLocation();
@@ -178,8 +178,8 @@ public class EHRDataEntryTest extends AbstractEHRTest
         stopImpersonating();
         sleep(1000); // Weird
 
-        clickFolder(PROJECT_NAME);
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
         waitAndClick(Locator.linkWithText("Browse All Datasets"));
         waitForPageToLoad();
         waitAndClick(LabModuleHelper.getNavPanelItem("Weight:", "Browse All"));
@@ -194,8 +194,8 @@ public class EHRDataEntryTest extends AbstractEHRTest
     private void mprDataEntryTest()
     {
         log("Test MPR data entry.");
-        clickFolder(PROJECT_NAME);
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME);
         saveLocation();
         impersonate(FULL_SUBMITTER.getEmail());
         recallLocation();

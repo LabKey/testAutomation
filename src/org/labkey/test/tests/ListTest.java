@@ -482,7 +482,7 @@ public class ListTest extends BaseWebDriverTest
 
         filterTest();
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
 
         log("Test that sort only affects one web part");
         setSort("qwp2", _listCol4.getName(), SortDirection.ASC);
@@ -500,7 +500,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("created", 1);
         Assert.assertEquals("details Links", 6, countLinksWithText("DETAILS"));
-        Assert.assertEquals("Project Links", 17 + 3, countLinksWithText(PROJECT_VERIFY)); // Table links + header & sidebar links
+        Assert.assertEquals("Project Links", 17 + 1, countLinksWithText(PROJECT_VERIFY)); // Table links + header link
         Assert.assertEquals("List Links", 17 + 1, countLinksWithText(LIST_NAME_COLORS)); // Table links + header link
         clickAndWait(Locator.linkWithText("DETAILS"));
         assertTextPresent("List Item Details");
@@ -622,8 +622,8 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(LIST2_NAME_CARS));
         pushLocation();
         _customizeViewsHelper.openCustomizeViewPanel();
+        waitForElement(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST3_KEY_NAME + "']"));
         assertElementNotPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST_KEY_NAME + "']"));
-        assertElementPresent(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + LIST3_KEY_NAME + "']"));
         popLocation();
         clickAndWait(Locator.linkWithText(PROJECT_VERIFY));
         assertTextPresent("query not found");
@@ -718,7 +718,7 @@ public class ListTest extends BaseWebDriverTest
     private void filterTest()
     {
         log("Filter Test");
-        clickFolder(PROJECT_VERIFY);
+        clickProject(PROJECT_VERIFY);
 
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addQueryWebPart(null, "lists", LIST_NAME_COLORS, null);
@@ -782,7 +782,7 @@ public class ListTest extends BaseWebDriverTest
         File tsvFile = new File(TSV_DATA_FILE);
         //Cancel test disabled because teamcity is too slow to run it successfully
         /*log("Infer from tsv file, but cancel before completion");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("manage lists"));
         clickButton("Create New List");
         waitForElement(Locator.id("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);

@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.Ext4HelperWD;
 
 /**
  * User: Nick
@@ -61,7 +62,7 @@ public class FolderTest extends BaseWebDriverTest
     protected void createFolders()
     {
         // Initialize the Creation Wiki
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         addWebPart("Wiki");
 
         createNewWikiPage();
@@ -80,9 +81,9 @@ public class FolderTest extends BaseWebDriverTest
     protected void moveFolders()
     {
         log("Moving Folders");
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         goToFolderManagement();
-        waitForExt4FolderTreeNode(PROJECT_NAME, 10000);
+        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(PROJECT_NAME));
 
         log("Ensure folders will be visible");
         _driver.manage().window().maximize();

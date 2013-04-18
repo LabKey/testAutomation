@@ -137,7 +137,7 @@ public class SearchTest extends StudyTest
 
     private void alterListsAndReSearch()
     {
-        clickAndWait(Locator.linkWithText(FOLDER_C));
+        clickFolder(FOLDER_C);
         clickAndWait(Locator.linkWithText(listIndexAsWhole));
         HashMap<String, String> data = new HashMap<String, String>();
         String newAnimal = "Zebra Seal";
@@ -208,7 +208,7 @@ public class SearchTest extends StudyTest
 
     private void addSearchableContainers()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         createSubfolder(getProjectName(), getProjectName(), FOLDER_B, "None", null);
     }
 

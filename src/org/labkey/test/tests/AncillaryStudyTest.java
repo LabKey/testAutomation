@@ -77,7 +77,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
     private void createAncillaryStudy()
     {
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickFolder(getFolderName());
         clickTab("Manage");
 
@@ -197,7 +197,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         _studyHelper.editCustomParticipantGroup(PARTICIPANT_GROUP, "Mouse", null, null, true, true, true, csp);
 
         log("Verify that modified participant group has no effect on ancillary study.");
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
         clickAndWait(Locator.linkWithText("Mice"));
         waitForText("Filter"); // Wait for participant list to appear.
 
@@ -219,7 +219,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         waitAndClickButton("OK");
 
         log("Verify changes in Ancillary Study. (insert)");
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText(DATASETS[0]));
@@ -242,7 +242,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         (new ChartHelper(this)).editDrtRow(1, nameAndValue);
 
         log("Verify changes in Ancillary Study. (modify)");
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText(DATASETS[0]));
@@ -265,7 +265,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         assertConfirmation("Delete selected row from this dataset?");
 
         log("Verify changes in Ancillary Study. (delete)");
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText(DATASETS[0]));
@@ -282,7 +282,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
     private void verifyProtocolDocument()
     {
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
         assertTextPresent(STUDY_DESCRIPTION);
         assertElementPresent(Locator.xpath("//a[contains(@href, 'name=" + PROTOCOL_DOC.getName() + "')]"));
         clickAndWait(Locator.xpath("//a[./img[@title='Edit']]"));
@@ -310,7 +310,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         setFormElement(Locator.name("quf_formlang"), UPDATED_DATASET_VAL);
         clickButton("Submit");
 
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
         clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
         for(String dataset : DATASETS)
         {
@@ -331,7 +331,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     private void verifySpecimens(int specimenCount, int vialCount)
     {
         log("Verify copied specimens");
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
         clickAndWait(Locator.linkWithText("Specimen Data"));
         clickAndWait(Locator.linkWithText("By Vial Group"));
         DataRegionTable table = new DataRegionTable("SpecimenSummary", this, false, true);

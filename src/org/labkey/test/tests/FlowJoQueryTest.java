@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 
 import java.util.Arrays;
@@ -61,7 +60,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         _customizeViewsHelper.addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S4+:Count", "4+:Count");
         _customizeViewsHelper.addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
         _customizeViewsHelper.applyCustomView();
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         toggleCheckboxByTitle("Query");

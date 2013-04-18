@@ -67,7 +67,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, "Assay");
         addWebPart("Pipeline Files");
         setPipelineRoot(getLabKeyRoot() + "/sampledata/GPAT");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
 
         log("Import XLS GPAT assay");
         sleep(2000);
@@ -102,7 +102,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
 
         log("Import XLSX GPAT assay");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         _extHelper.waitForFileGridReady();
         _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_XLSX);
         selectImportDataAction("Create New General Assay Design");
@@ -132,7 +132,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
 
         log("Import TSV GPAT assay");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         _extHelper.waitForFileGridReady();
         _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_TSV);
         selectImportDataAction("Create New General Assay Design");
@@ -172,7 +172,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
 
         log("Verify standard column aliases");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         _extHelper.selectFileBrowserItem(ALIASED_ASSAY_1);
         selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
@@ -210,7 +210,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         clickButton("Cancel");
 
         log("Import FASTA GPAT assay");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         _extHelper.waitForFileGridReady();
         _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_FNA);
         selectImportDataAction("Create New General Assay Design");

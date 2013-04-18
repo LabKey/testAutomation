@@ -82,7 +82,7 @@ public class WikiTest extends BaseWebDriverTest
             clickButton("pause crawler");
         beginAt(_driver.getCurrentUrl().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
 
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         addWebPart("Wiki");
         addWebPart("Search");
 

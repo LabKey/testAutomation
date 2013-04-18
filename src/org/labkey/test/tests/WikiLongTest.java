@@ -149,13 +149,13 @@ public class WikiLongTest extends BaseWebDriverTest
             clickButton("pause crawler");
         beginAt(getDriver().getCurrentUrl().replace("admin.view", "waitForIdle.view"), 10*defaultWaitForPage);
 
-        clickFolder(PROJECT2_NAME);
+        clickProject(PROJECT2_NAME);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         _portalHelper.addWebPart("Wiki");
         _portalHelper.addWebPart("Search");
 
@@ -406,13 +406,13 @@ public class WikiLongTest extends BaseWebDriverTest
         setPermissions(USERS_GROUP, "Reader");
         clickButton("Save and Finish");
         impersonate(USER1);
-        clickFolder(PROJECT2_NAME);
+        clickProject(PROJECT2_NAME);
         pushLocation();
         assertTextPresent(WIKI_PAGE2_TITLE);
         clickTab("Wiki");
         assertTextNotPresent("copy pages");
         stopImpersonating();
-        clickFolder(PROJECT2_NAME);
+        clickProject(PROJECT2_NAME);
         enterPermissionsUI();
         removePermission(USERS_GROUP, "Editor");
         clickButton("Save and Finish");
@@ -427,7 +427,7 @@ public class WikiLongTest extends BaseWebDriverTest
         stopImpersonating();
 
         log("Check if readers can read from other projects");
-        clickFolder(PROJECT2_NAME);
+        clickProject(PROJECT2_NAME);
         clickWebpartMenuItem(WIKI_PAGE2_TITLE, "Customize");
         selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
 
@@ -449,14 +449,14 @@ public class WikiLongTest extends BaseWebDriverTest
         setPermissions(USERS_GROUP, "Project Administrator");
         clickButton("Save and Finish");
         impersonate(USER1);
-        clickFolder(PROJECT2_NAME);
+        clickProject(PROJECT2_NAME);
         assertTextNotPresent("Welcome");
         log("Also check copying permission");
         clickTab("Wiki");
         clickWebpartMenuItem("Pages", "Copy");
         assertTextNotPresent(PROJECT_NAME);
         stopImpersonating();
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         enterPermissionsUI();
         clickManageGroup(USERS_GROUP);
         setFormElement("names", USER1);
@@ -464,28 +464,28 @@ public class WikiLongTest extends BaseWebDriverTest
         clickButton("Update Group Membership");
 
         impersonate(USER1);
-        clickFolder(PROJECT2_NAME);
+        clickProject(PROJECT2_NAME);
         assertTextPresent(WIKI_PAGE2_TITLE);
         log("Also check copying permission");
         clickTab("Wiki");
         clickWebpartMenuItem("Pages", "Copy");
         assertTextNotPresent(PROJECT_NAME);
         stopImpersonating();
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         enterPermissionsUI();
         setPermissions(USERS_GROUP, "Project Administrator");
         clickButton("Save and Finish");
 
         log("make sure the changes went through");
         impersonate(USER1);
-        clickFolder(PROJECT2_NAME);
+        clickProject(PROJECT2_NAME);
         clickTab("Wiki");
         clickWebpartMenuItem("Pages", "Copy");
         assertTextPresent(PROJECT_NAME);
         stopImpersonating();
 
         log("delete wiki web part");
-        clickFolder(PROJECT2_NAME);
+        clickProject(PROJECT2_NAME);
         clickTab("Portal");
         clickLinkWithImage(getContextPath() + "/_images/partdelete.png", 0);
         waitForElementToDisappear(Locator.linkWithImage(getContextPath() + "/_images/partdelete.png"), WAIT_FOR_JAVASCRIPT);
@@ -505,14 +505,14 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Check that 'Copy Pages' in TOC works");
         clickWebpartMenuItem("Test Customize TOC", "Copy");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickButton("Copy Pages");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickTab("Wiki");
         assertTextPresent(WIKI_PAGE1_TITLE);
 
         log("Check that 'New Page' works");
-        clickFolder(PROJECT2_NAME);
+        clickProject(PROJECT2_NAME);
         clickTab("Portal");
         clickWebpartMenuItem("Test Customize TOC", "New");
         convertWikiFormat("HTML");
@@ -520,7 +520,7 @@ public class WikiLongTest extends BaseWebDriverTest
         setFormElement("name", WIKI_PAGE4_TITLE);
         setWikiBody(WIKI_PAGE4_CONTENT);
         saveWikiPage();
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickTab("Wiki");
         assertTextPresent(WIKI_PAGE4_TITLE);
 
@@ -534,7 +534,7 @@ public class WikiLongTest extends BaseWebDriverTest
         indexTest();
 
         //extended wiki test -- generate 2000 pages
-//        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+//        clickProject(PROJECT_NAME);
 //        clickTab("Wiki");
 //        for (int i = 0; i <= 1999; i++)
 //        {
@@ -564,7 +564,7 @@ public class WikiLongTest extends BaseWebDriverTest
     private void termsOfUseTest()
     {
         log("Create user for terms of use checks");
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         enterPermissionsUI();
         clickManageGroup(USERS_GROUP);
         setFormElement("names", USER2);
@@ -604,17 +604,17 @@ public class WikiLongTest extends BaseWebDriverTest
         pushLocation(); // For attempting to bypass Terms of Use (4 pops)
 
         log("Terms don't come into play until you log out");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         assertTextNotPresent("fight club");
         signOut();
 
         log("Access project with guest user");
-        clickFolder(PROJECT3_NAME);
+        clickProject(PROJECT3_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
         goToHome();
-        clickFolder(PROJECT3_NAME);
+        clickProject(PROJECT3_NAME);
         assertTextNotPresent("fight club");         
 
         signIn();
@@ -629,7 +629,7 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextPresent("fight club"); // PROJECT4_NAME/subfolder
 
         goToHome();
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         assertTextPresent("fight club");
         log("Submit without agreeing");
         clickButton("Agree");
@@ -638,7 +638,7 @@ public class WikiLongTest extends BaseWebDriverTest
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
 
-        clickFolder(PROJECT4_NAME);
+        clickProject(PROJECT4_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
@@ -646,26 +646,26 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Check terms with impersonated user");
         impersonate(USER2);
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
-        clickFolder(PROJECT3_NAME);
+        clickProject(PROJECT3_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
-        clickFolder(PROJECT4_NAME);
+        clickProject(PROJECT4_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
 
         stopImpersonating();            
-        clickFolder(PROJECT3_NAME);
+        clickProject(PROJECT3_NAME);
         assertTextPresent("fight club");
         checkCheckbox("approvedTermsOfUse");
         clickButton("Agree");
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickTab("Wiki");
         clickAndWait(Locator.linkWithText("Edit"));
         deleteWikiPage();

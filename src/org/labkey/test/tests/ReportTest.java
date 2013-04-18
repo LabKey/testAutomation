@@ -337,7 +337,7 @@ public class ReportTest extends StudyBaseTest
         log("Create an R Report");
 
         click(Locator.linkWithText("Projects"));
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         clickMenuButton("Views", "Create", "R View");
@@ -415,11 +415,11 @@ public class ReportTest extends StudyBaseTest
         log("Test user permissions");
         pushLocation();
         createSiteDeveloper(AUTHOR_USER);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         enterPermissionsUI();
         setUserPermissions(AUTHOR_USER, "Author");
         impersonate(AUTHOR_USER);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         createRReport(AUTHOR_REPORT, R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), true, true, new String[0]);
@@ -458,7 +458,7 @@ public class ReportTest extends StudyBaseTest
         impersonate(R_USER);
 
         log("Access shared R script");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         pushLocation();
@@ -470,7 +470,7 @@ public class ReportTest extends StudyBaseTest
         popLocation();
         log("Change user permission");
         stopImpersonating();
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         if (isTextPresent("Enable Admin"))
             clickAndWait(Locator.linkWithText("Enable Admin"));
         enterPermissionsUI();
@@ -478,7 +478,7 @@ public class ReportTest extends StudyBaseTest
         exitPermissionsUI();
 
         log("Create a new R script that uses other R scripts");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         clickMenuButton("Views", "Create", "R View");
@@ -494,7 +494,7 @@ public class ReportTest extends StudyBaseTest
         log("Test editing R scripts");
         signOut();
         signIn();
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickReportGridLink(R_SCRIPTS[0], "edit");
         if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
@@ -504,7 +504,7 @@ public class ReportTest extends StudyBaseTest
         waitForPageToLoad();
 
         log("Check that edit worked");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickReportGridLink(R_SCRIPTS[1], "edit");
 
@@ -572,7 +572,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doAttachmentReportTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
         clickMenuButton("Create", "Attachment Report");
@@ -625,7 +625,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doUpdateAttachmentReportTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
 
         //
@@ -653,11 +653,11 @@ public class ReportTest extends StudyBaseTest
         // server attachment report
         //
         createUser(ATTACHMENT_USER, null);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         enterPermissionsUI();
         setUserPermissions(ATTACHMENT_USER, "Editor");
         impersonate(ATTACHMENT_USER);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
 
         // can edit local
@@ -684,7 +684,7 @@ public class ReportTest extends StudyBaseTest
         Assert.assertTrue("Expected 'Edit Report' button to not be present", l == null);
         stopImpersonating();
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
 
@@ -742,7 +742,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doLinkReportTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
 
@@ -824,7 +824,7 @@ public class ReportTest extends StudyBaseTest
     protected void deleteRReports()
     {
         log("Clean up R Reports");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
         for (String script : R_SCRIPTS)
@@ -842,7 +842,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     protected void cleanPipelineItem(String item)
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Manage Files"));
         if (isTextPresent(item))
@@ -858,7 +858,7 @@ public class ReportTest extends StudyBaseTest
     {
         click(Locator.linkWithText("Projects"));
         sleep(3000);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("My Study"));
 
         // create a test group and give it container read perms
@@ -895,7 +895,7 @@ public class ReportTest extends StudyBaseTest
     protected void doReportSecurity()
     {
         // create charts
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
@@ -942,7 +942,7 @@ public class ReportTest extends StudyBaseTest
         // test security
         click(Locator.linkWithText("Projects"));
         sleep(3000);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("My Study"));
 
         clickReportGridLink("participant chart", "permissions");
@@ -957,7 +957,7 @@ public class ReportTest extends StudyBaseTest
 
         goToAdminConsole();
         impersonate(TEST_USER);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("My Study"));
 
         assertLinkNotPresentWithText("APX-1: Abbreviated Physical Exam");
@@ -1007,7 +1007,7 @@ public class ReportTest extends StudyBaseTest
     {
         log("Testing Participant Report");
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
         clickMenuButton("Create", "Mouse Report");
@@ -1317,7 +1317,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doParticipantReportFilterTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickTab("Clinical and Assay Data");
         waitAndClick(Locator.linkWithText(PARTICIPANT_REPORT5_NAME));
@@ -1377,7 +1377,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doParticipantListFilterTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickTab("Mice");
         waitForElement(Locator.css(".participant-filter-panel"));
@@ -1459,7 +1459,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doReportDiscussionTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickReportGridLink(R_SCRIPTS[0], "edit");
 
@@ -1526,7 +1526,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doManageViewsBoxPlotTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Manage Views"));
         clickMenuButton("Create", "Box Plot");
@@ -1604,7 +1604,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doDataRegionBoxPlotTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("RCH-1: Reactogenicity-Day 1"));
         setFilter("Dataset", "RCHtempc", "Is Less Than", "39");
@@ -1645,7 +1645,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doQuickChartBoxPlotTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Types"));
 
@@ -1680,7 +1680,7 @@ public class ReportTest extends StudyBaseTest
         doPointClickScatterPlotTest(); // Uses scatter plot created by doManageViewsScatterPlotTest()
 
         log("Verify saved scatter plots");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickTab("Clinical and Assay Data");
         for(int i = 0; i < _scatterPlots.size(); i++)
@@ -1701,7 +1701,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doManageViewsScatterPlotTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Manage Views"));
         clickMenuButton("Create", "Scatter Plot");
@@ -1784,7 +1784,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doDataRegionScatterPlotTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         setFilter("Dataset", "APXpulse", "Is Less Than", "100");
@@ -1820,7 +1820,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doQuickChartScatterPlotTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Types"));
 
@@ -1977,11 +1977,11 @@ public class ReportTest extends StudyBaseTest
         assertTextPresent("APX-1: Abbreviated Physical Exam");
         // verify that only developers can see the button to add point click function
         createUser(DEVELOPER_USER, null);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         enterPermissionsUI();
         setUserPermissions(DEVELOPER_USER, "Editor");
         impersonate(DEVELOPER_USER);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(SCATTER_PLOT_NAME_MV + " PointClickFn"));
         waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
@@ -2055,7 +2055,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doParticipantGroupCategoriesTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
 
         setDemographicsBit("DEM-1: Demographics", true);
@@ -2149,7 +2149,7 @@ public class ReportTest extends StudyBaseTest
     {
         log("Create a query report.");
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
 
@@ -2172,7 +2172,7 @@ public class ReportTest extends StudyBaseTest
         waitForText("1 - 100 of 138");
         goBack();
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkWithText("AE-1:(VTN) AE Log"));

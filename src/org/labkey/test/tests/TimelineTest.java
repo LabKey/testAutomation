@@ -109,7 +109,7 @@ public class TimelineTest extends BaseSeleniumWebTest
         _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Timeline"});
 
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
 
         createWiki();
 
@@ -155,7 +155,7 @@ public class TimelineTest extends BaseSeleniumWebTest
     {
         if (enableLinkCheck())
         {
-            clickAndWait(Locator.linkWithText(FOLDER_NAME));
+            clickFolder(FOLDER_NAME);
             removeWebPart(WIKIPAGE_NAME);
         }
     }
@@ -190,7 +190,7 @@ public class TimelineTest extends BaseSeleniumWebTest
                 assertTextPresent(rowData[col]);
             }
         }
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
     }
 
     private String waitForDivPopulation()
@@ -226,7 +226,7 @@ public class TimelineTest extends BaseSeleniumWebTest
     private String setSource(String srcFragment)
     {
         if (!isTextPresent(WIKIPAGE_NAME))
-            clickAndWait(Locator.linkWithText(FOLDER_NAME));
+            clickFolder(FOLDER_NAME);
         clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
 
         String fullSource = getFullSource(srcFragment);

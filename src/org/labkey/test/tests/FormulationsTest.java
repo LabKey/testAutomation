@@ -150,7 +150,7 @@ public class FormulationsTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(PROJECT_NAME, FOLDER_NAME, "Study");
         createDefaultStudy();
 
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
 
         // Sample Sets should already exist
         assertLinkPresentWithText(COMPOUNDS_NAME);
@@ -161,7 +161,7 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     protected void setupTimeTemperature()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         assertTextPresent("There are no user-defined lists in this folder");
 
         log("Add list -- " + TEMPERATURE_LIST);
@@ -202,7 +202,7 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     protected void setupCompounds()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
 
         log("Entering compound information");
         clickAndWait(Locator.linkWithText(COMPOUNDS_NAME));
@@ -236,7 +236,7 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     protected void setupRawMaterials()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
 
         log("Enterting raw material information");
         clickAndWait(Locator.linkWithText(RAWMATERIALS_SET_NAME));
@@ -251,7 +251,7 @@ public class FormulationsTest extends BaseWebDriverTest
     {
         String addButton = "Add Another Material";
 
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
 
         log("Inserting a Formulation");
         clickAndWait(Locator.linkWithText("Sample Sets"));
@@ -322,7 +322,7 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     protected void defineParticleSizeAssay()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         
         log("Defining Particle Size Assay");
         clickAndWait(Locator.linkWithText("Manage Assays"));
@@ -356,7 +356,7 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     protected void uploadParticleSizeData()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
 
         log("Uploading Particle Size Data");
         clickAndWait(Locator.linkWithText(PS_ASSAY));
@@ -385,7 +385,7 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     private void validateParticleSizeCopyToStudy()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(PS_ASSAY));
 
         DataRegionTable runs = new DataRegionTable("Runs", this);
@@ -412,14 +412,14 @@ public class FormulationsTest extends BaseWebDriverTest
 
         waitAndClick(Locator.linkWithText(FORMULATION));
 
-        waitForElement(Locator.css(".nav-tree-selected").withText(PROJECT_NAME));
+        waitForElement(Locator.id("folderBar").withText(PROJECT_NAME));
         assertElementPresent(Locator.linkWithText("copied"), 99);
     }
 
     @LogMethod
     protected void defineVisualAssay()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
 
         log("Defining Visual Assay");
         clickAndWait(Locator.linkWithText("Manage Assays"));
@@ -452,7 +452,7 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     protected void uploadVisualAssayData()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
 
         log("Uploading Visual Data");
         clickAndWait(Locator.linkWithText(VIS_ASSAY));
@@ -522,7 +522,7 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     protected void defineHPLCAssay()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
 
         log("Defining HPLC Assay");
         clickAndWait(Locator.linkWithText("Manage Assays"));
@@ -564,7 +564,7 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     protected void uploadHPLCAssayData()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
 
         log("Uploading HPLC Data");
         clickAndWait(Locator.linkWithText(HPLC_ASSAY));
@@ -645,7 +645,7 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     private void validateHPLCAssayData()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         waitAndClick(Locator.linkWithText(HPLC_ASSAY));
 
         Locator methodLink = Locator.linkWithText(" HPLCRun" + File.separator + HPLC_METHOD);
@@ -684,7 +684,7 @@ public class FormulationsTest extends BaseWebDriverTest
     @LogMethod
     protected void performSearch()
     {
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
 
         log("Using Formulation search");
         setFormElement(Locator.name("nameContains"), FORMULATION);

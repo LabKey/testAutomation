@@ -70,7 +70,7 @@ public class CDSPopulation extends BaseSeleniumWebTest implements PostgresOnlyTe
     private void verifyCDSApplication()
     {
 //        selenium.windowMaximize(); // Count bars don't render properly when hidden.
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         goToModule("CDS");
 
         clickAndWait(Locator.linkWithText("Application"));

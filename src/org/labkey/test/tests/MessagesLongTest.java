@@ -62,7 +62,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
     protected void permissionCheck(String permission, boolean readAbility)
     {
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         enterPermissionsUI();
         removePermission("Users","Reader");
         removePermission("Users","Author");
@@ -70,7 +70,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         setPermissions("Users", permission);
         exitPermissionsUI();
         impersonate(USER1);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         if (readAbility)
             assertTextPresent(MSG1_BODY);
         else
@@ -107,7 +107,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         doTestEmailPrefsMine();
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         log("Check email preferences");
         clickWebpartMenuItem("Messages", "Email", "Preferences");
         checkRadioButton("emailPreference", "1");
@@ -135,7 +135,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertTextPresent("All conversations");
 
         waitForExtMaskToDisappear();
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
 
         log("Check message works in Wiki");
         clickWebpartMenuItem("Messages", "New");
@@ -199,7 +199,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         permissionCheck("Editor", true);
 
         log("Check with security");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "Customize");
         checkRadioButton("secure", 1);
         clickButton("Save");
@@ -207,7 +207,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         permissionCheck("Editor", true);
 
         log("Check if the customized names work");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "Customize");
         setFormElement("boardName", "Notes");
         setFormElement("conversationName", "Thread");
@@ -261,10 +261,10 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertTextPresent("Status: Closed");
         assertTextNotPresent("Expires:");
         impersonate(USER1);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         assertTextNotPresent(MSG2_TITLE);
         stopImpersonating();
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
 
         // USER1 is now a reader
         log("Test member list");
@@ -279,7 +279,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         setFormElement("newUsers", USER2);
         uncheckCheckbox("sendMail");
         clickButton("Add Users");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
 
         // USER3 is a Project Administrator
         enterPermissionsUI();
@@ -288,7 +288,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         uncheckCheckbox("sendEmail");
         clickButton("Update Group Membership");
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "New");
         setFormElement("emailList", USER2);
         clickButtonContainingText("Submit", "Title must not be blank");
@@ -304,10 +304,10 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertTextPresent("Members: "+USER1);
         assertTextPresent("Assigned To: "+ displayNameFromEmail(USER3));
         impersonate(USER1);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         assertTextPresent(MSG3_TITLE);
         stopImpersonating();
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "Customize");
         checkRadioButton("secure", 0);
         clickButton("Save");
@@ -322,7 +322,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         assertTextNotPresent(RESP1_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
         assertTextPresent("2 response");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         assertTextNotPresent(MSG2_TITLE);
         clickAndWait(Locator.linkWithText("view message or respond"));
 
@@ -330,7 +330,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickButton("Delete Message");
         clickButton("Delete");
         assertTextNotPresent(MSG1_TITLE);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         assertTextNotPresent(MSG1_TITLE);
 
         log("Check emailed messages");
@@ -352,7 +352,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         String _messageTitle = "Mine Message";
         String _messageBody = "test";
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
         clickButton("Save and Finish");
 
@@ -365,7 +365,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         impersonate(RESPONDER);
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(_messageTitle));
         clickButton("Respond");
         setFormElement("title", _messageTitle + " response");
@@ -374,7 +374,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         stopImpersonating();
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         goToModule("Dumbster");
         DataRegionTable record = new DataRegionTable("EmailRecord", this, false, false);
         List<String> subject = record.getColumnDataAsText("Message");

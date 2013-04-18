@@ -213,7 +213,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     private void getToRunScreen()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("View Runs"));
         clickRunLink(first454importNum);
     }

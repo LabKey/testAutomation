@@ -65,7 +65,7 @@ public class StudyHelperWD extends AbstractHelperWD
     {
         if( !_test.isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
         {
-            _test.clickFolder(projectName);
+            _test.clickProject(projectName);
             _test.clickFolder(studyFolder);
             _test.clickTab("Manage");
             _test.click(Locator.linkWithText("Manage " + participantString + " Groups"));

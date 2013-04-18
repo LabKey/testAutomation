@@ -99,21 +99,21 @@ public class UserPermissionsTest extends BaseWebDriverTest
         addWebPart("Wiki Table of Contents");
 
         //Create Reader User
-        clickAndWait(Locator.linkWithText(PERM_PROJECT_NAME));
+        clickProject(PERM_PROJECT_NAME);
         enterPermissionsUI();
         createPermissionsGroup(GAMMA_READER_GROUP_NAME);
         assertPermissionSetting(GAMMA_READER_GROUP_NAME, "No Permissions");
         setPermissions(GAMMA_READER_GROUP_NAME, "Reader");
         createUserInProjectForGroup(GAMMA_READER_USER, PERM_PROJECT_NAME, GAMMA_READER_GROUP_NAME, false);
         //Create Author User
-        clickAndWait(Locator.linkWithText(PERM_PROJECT_NAME));
+        clickProject(PERM_PROJECT_NAME);
         enterPermissionsUI();
         createPermissionsGroup(GAMMA_AUTHOR_GROUP_NAME);
         assertPermissionSetting(GAMMA_AUTHOR_GROUP_NAME, "No Permissions");
         setPermissions(GAMMA_AUTHOR_GROUP_NAME, "Author");
         createUserInProjectForGroup(GAMMA_AUTHOR_USER, PERM_PROJECT_NAME, GAMMA_AUTHOR_GROUP_NAME, false);
         //Create the Submitter User
-        clickAndWait(Locator.linkWithText(PERM_PROJECT_NAME));
+        clickProject(PERM_PROJECT_NAME);
         enterPermissionsUI();
         createPermissionsGroup(GAMMA_SUBMITTER_GROUP_NAME);
         assertPermissionSetting(GAMMA_SUBMITTER_GROUP_NAME, "No Permissions");
@@ -126,7 +126,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure the Editor can edit
         impersonate(GAMMA_EDITOR_USER);
-        clickFolder(PERM_PROJECT_NAME);
+        clickProject(PERM_PROJECT_NAME);
         clickFolder(GAMMA_SUB_FOLDER_NAME);
         clickWebpartMenuItem("Messages", "Email", "Preferences");
         checkRadioButton("emailPreference", "0");
@@ -142,7 +142,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure that the Author can read as well, edit his own but not edit the Edtiors
         impersonate(GAMMA_AUTHOR_USER);
-        clickFolder(PERM_PROJECT_NAME);
+        clickProject(PERM_PROJECT_NAME);
         clickFolder(GAMMA_SUB_FOLDER_NAME);
         clickWebpartMenuItem("Messages", "Email", "Preferences");
         checkRadioButton("emailPreference", "0");
@@ -155,7 +155,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         selectOptionByValue(Locator.name("rendererType"), "RADEOX");
         clickButton("Submit");
         //Can't edit the editor's
-        clickAndWait(Locator.linkWithText(GAMMA_SUB_FOLDER_NAME));
+        clickFolder(GAMMA_SUB_FOLDER_NAME);
         clickAndWait(Locator.linkContainingText("view message", 1));
         assertTextPresent(GAMMA_EDITOR_PAGE_TITLE);
         assertLinkNotPresentWithText("Edit");
@@ -163,14 +163,14 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Make sure that the Reader can read but not edit
         impersonate(GAMMA_READER_USER);
-        clickFolder(PERM_PROJECT_NAME);
+        clickProject(PERM_PROJECT_NAME);
         clickFolder(GAMMA_SUB_FOLDER_NAME);
 
         clickAndWait(Locator.linkContainingText("view message", 0));
         assertTextPresent(GAMMA_AUTHOR_PAGE_TITLE);
         assertLinkNotPresentWithText("Edit");
 
-        clickAndWait(Locator.linkWithText(GAMMA_SUB_FOLDER_NAME));
+        clickFolder(GAMMA_SUB_FOLDER_NAME);
         clickAndWait(Locator.linkContainingText("view message", 1));
         assertTextPresent(GAMMA_EDITOR_PAGE_TITLE);
         assertLinkNotPresentWithText("Edit");
@@ -178,7 +178,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //switch back to Editor and edit
         impersonate(GAMMA_EDITOR_USER);
-        clickFolder(PERM_PROJECT_NAME);
+        clickProject(PERM_PROJECT_NAME);
         clickFolder(GAMMA_SUB_FOLDER_NAME);
         //Go back and Edit
         clickAndWait(Locator.linkContainingText("view message", 1));
@@ -189,7 +189,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         //Remove permission from folder to verify unviewability
         log("Check for disallowed folder links");
         stopImpersonating();
-        clickFolder(PERM_PROJECT_NAME);
+        clickProject(PERM_PROJECT_NAME);
         clickFolder(GAMMA_SUB_FOLDER_NAME);
         enterPermissionsUI();
         uncheckInheritedPermissions();
@@ -202,7 +202,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         // Test that a project admin is confined to a single project when impersonating a project user. Site admins
         // are not restricted in this way, so we need to create and login as a new user with project admin permissions.
-        clickAndWait(Locator.linkWithText(PERM_PROJECT_NAME));
+        clickProject(PERM_PROJECT_NAME);
         createPermissionsGroup(GAMMA_ADMIN_GROUP_NAME);
         setPermissions(GAMMA_ADMIN_GROUP_NAME, "Project Administrator");
         createUserInProjectForGroup(GAMMA_PROJECT_ADMIN_USER, PERM_PROJECT_NAME, GAMMA_ADMIN_GROUP_NAME, true);
@@ -213,15 +213,15 @@ public class UserPermissionsTest extends BaseWebDriverTest
         clickButton("Set Password");
         signOut();
         signIn(GAMMA_PROJECT_ADMIN_USER, PasswordUtil.getPassword(), true);
-        clickFolder(PERM_PROJECT_NAME);
+        clickProject(PERM_PROJECT_NAME);
         impersonateAtProjectLevel(GAMMA_READER_USER);
-        clickFolder(PERM_PROJECT_NAME);
-        expandFolder(DENIED_SUB_FOLDER_NAME);
-        assertLinkNotPresentWithText(DENIED_SUB_FOLDER_NAME);
+        clickProject(PERM_PROJECT_NAME);
+        hoverFolderBar();
+        assertElementNotPresent(Locator.linkWithText(DENIED_SUB_FOLDER_NAME));
         // Ensure only one project visible during project impersonation. Regression test 13346
-        assertElementPresent(Locator.xpath("//table[@class='labkey-expandable-nav' and .//a[text()='Projects']]//td[@class='labkey-nav-tree-text']"), 1);
-        expandFolder(GAMMA_SUB_FOLDER_NAME);
-        assertLinkPresentWithText(GAMMA_SUB_FOLDER_NAME);
+        assertElementPresent(Locator.css("#projectBar_menu .project-nav li"), 1);
+        hoverFolderBar();
+        assertElementPresent(Locator.linkWithText(GAMMA_SUB_FOLDER_NAME));
 
         //Reset ourselves to the global user so we can do cleanup
         stopImpersonating();
@@ -248,7 +248,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         if (isElementPresent(Locator.permissionRendered()))
         {
             exitPermissionsUI();
-            clickAndWait(Locator.linkWithText(projectName));
+            clickProject(projectName);
         }
         enterPermissionsUI();
         clickManageGroup(groupName);

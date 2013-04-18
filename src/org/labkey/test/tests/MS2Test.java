@@ -109,7 +109,7 @@ public class MS2Test extends MS2TestBase
         super.doTestSteps();
 
         log("Upload existing MS2 data.");
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         clickButton("Process and Import Data");
         _extHelper.selectFileBrowserItem("bov_sample/" + SEARCH_TYPE + "/" + testFile1 + "/" + SAMPLE_BASE_NAME + ".search.xar.xml");
 
@@ -846,7 +846,7 @@ public class MS2Test extends MS2TestBase
             sleep(1000);
             refresh();
         }
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
 
         log("Test export 2 runs together");
         pushLocation();

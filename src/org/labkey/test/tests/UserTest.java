@@ -221,7 +221,7 @@ public class UserTest extends SecurityTest
         waitForPageToLoad();
         clickAndWait(Locator.linkWithText("Done"));
         // View reset password email.
-//        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+//        clickProject(PROJECT_NAME);
         goToProjectHome();
         goToModule("Dumbster");
         click(Locator.linkContainingText("Reset Password Notification")); // Expand message.

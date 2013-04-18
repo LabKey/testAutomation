@@ -47,7 +47,7 @@ public class RlabkeyTest extends SimpleApiTest
         log("Create Projects");
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.createProject(PROJECT_NAME_2, null);
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         addWebPart("Lists");
        
         log("Import Lists");
@@ -59,7 +59,7 @@ public class RlabkeyTest extends SimpleApiTest
         _listHelper.importListArchive(PROJECT_NAME, listArchive);
         // create an issues list in a project and subfolder to test ContainerFilters.
 
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         addWebPart("Issues List");
         clickButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
@@ -70,7 +70,7 @@ public class RlabkeyTest extends SimpleApiTest
         clickButton("Save");
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[0]);
 
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         addWebPart("Issues List");
         clickButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
@@ -80,7 +80,7 @@ public class RlabkeyTest extends SimpleApiTest
         setFormElement("title", ISSUE_TITLE_1);
         clickButton("Save");
 
-        clickAndWait(Locator.linkWithText(PROJECT_NAME_2));
+        clickProject(PROJECT_NAME_2);
         addWebPart("Issues List");
         clickButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
@@ -104,7 +104,7 @@ public class RlabkeyTest extends SimpleApiTest
 
             if (!tests.isEmpty())
             {
-                clickFolder(PROJECT_NAME);
+                clickProject(PROJECT_NAME);
                 clickAndWait(Locator.linkWithText(LIST_NAME));
                 clickMenuButton("Views", "Create", "R View");
 

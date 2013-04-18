@@ -198,7 +198,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
 
         // Create a wiki page to hold a query webpart with JavaScript-based button customization:
         PortalHelper portalHelper = new PortalHelper(this);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         portalHelper.addWebPart("Wiki");
         createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "buttonTest");
@@ -216,7 +216,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         waitForElement(Locator.id("aqwp3"));
         clickButton(JAVASCRIPT_LINK_BUTTON_TEXT);
         assertTextPresent("No messages");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
 
         waitForElement(Locator.id("aqwp3"));
         clickButton(JAVASCRIPT_ONCLICK_BUTTON_TEXT, 0);

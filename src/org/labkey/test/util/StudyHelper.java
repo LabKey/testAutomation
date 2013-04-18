@@ -66,8 +66,8 @@ public class StudyHelper extends AbstractHelper
             throw new IllegalStateException("Already in the middle of Creating a participant group");
         if( !_test.isElementPresent(Locator.xpath("id('labkey-nav-trail-current-page')[text() = 'Manage "+participantString+" Groups']")) )
         {
-            _test.clickAndWait(Locator.linkWithText(projectName));
-            _test.clickAndWait(Locator.linkWithText(studyFolder));
+            _test.clickProject(projectName);
+            _test.clickFolder(studyFolder);
             _test.clickTab("Manage");
             _test.clickAndWait(Locator.linkWithText("Manage " + participantString + " Groups"));
             _test.waitForText("groups allow");
@@ -228,7 +228,7 @@ public class StudyHelper extends AbstractHelper
     @LogMethod
     public void exportStudy(String folder, boolean useXmlFormat, boolean zipFile)
     {
-        _test.clickAndWait(Locator.linkWithText(folder));
+        _test.clickFolder(folder);
         _test.clickTab("Manage");
         _test.clickButton("Export Study");
 

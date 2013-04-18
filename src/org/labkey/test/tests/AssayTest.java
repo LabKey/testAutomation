@@ -160,7 +160,7 @@ public class AssayTest extends AbstractAssayTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyRunDeletionRecallsDatasetRows()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_LAB1));
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
         checkDataRegionCheckbox("Runs", 0);
@@ -245,7 +245,7 @@ public class AssayTest extends AbstractAssayTest
                 "testAssayDataProp5 changed from blank to '514801'");
         assertTextPresent("Deleted data row.");
 
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
     }
 
     /**
@@ -257,7 +257,7 @@ public class AssayTest extends AbstractAssayTest
         log("Defining a test assay at the project level");
         //define a new assay at the project level
         //the pipeline must already be setup
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
         addWebPart("Assay List");
 
         //copied from old test
@@ -331,7 +331,7 @@ public class AssayTest extends AbstractAssayTest
     {
         log("Uploading runs into folder " + folder + " as user " + asUser);
         impersonate(asUser);
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
         clickFolder(folder);
 
         clickAndWait(Locator.linkWithText("Assay List"));
@@ -481,7 +481,7 @@ public class AssayTest extends AbstractAssayTest
         assertLinkPresentWithText("BAQ00051-11");
         assertTextNotPresent("AAA");
         stopImpersonating();
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
     } //uploadRuns()
 
     /**
@@ -504,7 +504,7 @@ public class AssayTest extends AbstractAssayTest
 
         //impersonate the PI
         impersonate(TEST_ASSAY_USR_PI1);
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
 
         //select the Lab1 folder and view all the data for the test assay
         clickFolder(TEST_ASSAY_FLDR_LAB1);
@@ -615,7 +615,7 @@ public class AssayTest extends AbstractAssayTest
     {
         log("Prepare visit map to check PTID counts in study navigator.");
 
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
         clickFolder(TEST_ASSAY_FLDR_STUDY3);
 
         clickAndWait(Locator.linkWithText("Manage"));
@@ -714,7 +714,7 @@ public class AssayTest extends AbstractAssayTest
     {
         log("Prepare visit map to check PTID counts in study navigator.");
 
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
         clickFolder(TEST_ASSAY_FLDR_STUDY2);
 
         clickAndWait(Locator.linkWithText("Manage"));
@@ -811,7 +811,7 @@ public class AssayTest extends AbstractAssayTest
     {
         log("Testing edit and delete and assay definition");
 
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
 
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
         clickEditAssayDesign(false);
@@ -837,7 +837,7 @@ public class AssayTest extends AbstractAssayTest
     {
         log("Testing cross-folder data");
 
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
 
         // Remove so we can easily click on the Views menu for the right web part
         removeWebPart("Assay List");
@@ -868,7 +868,7 @@ public class AssayTest extends AbstractAssayTest
         verifySpecimensPresent(3, 2, 3);
 
         log("Testing clicking on a run");
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
         clickAndWait(Locator.linkWithText("FirstRun"));
         verifySpecimensPresent(3, 2, 0);
 
@@ -896,7 +896,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("Copied to Study 1 Study");
 
         log("Testing copy to study availability");
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
         clickAndWait(Locator.linkWithText("SecondRun"));
 
         clickCheckbox(".toggle");
@@ -907,7 +907,7 @@ public class AssayTest extends AbstractAssayTest
 
         clickButton("Cancel", defaultWaitForPage);
 
-        clickFolder(TEST_ASSAY_PRJ_SECURITY);
+        clickProject(TEST_ASSAY_PRJ_SECURITY);
 
         // Add it back to the portal page
         addWebPart("Assay List");

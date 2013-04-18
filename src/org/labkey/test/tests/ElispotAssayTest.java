@@ -78,14 +78,14 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         setupPipeline(TEST_ASSAY_PRJ_ELISPOT);
 
         //add the Assay List web part so we can create a new elispot assay
-        clickFolder(TEST_ASSAY_PRJ_ELISPOT);
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
         addWebPart("Assay List");
 
         //create a new elispot template
         createTemplate();
 
         //create a new elispot assay
-        clickFolder(TEST_ASSAY_PRJ_ELISPOT);
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickButton("Manage Assays");
         clickButton("New Assay Design");
         checkRadioButton("providerName", "ELISpot");
@@ -109,7 +109,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         clickButton("Save", 0);
         waitForText("Save successful.", 20000);
 
-        clickFolder(TEST_ASSAY_PRJ_ELISPOT);
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
 
@@ -367,7 +367,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         // add the transform script to the assay
         log("Uploading Elispot Runs with a transform script");
 
-        clickFolder(TEST_ASSAY_PRJ_ELISPOT);
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickEditAssayDesign();
 
@@ -375,7 +375,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         clickButton("Save & Close");
         waitForElement(Locator.id("dataregion_Runs"));
 
-        clickFolder(TEST_ASSAY_PRJ_ELISPOT);
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickButton("Import Data");
         clickButton("Next");
@@ -401,7 +401,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     // Unable to apply background substitution to runs imported with a transform script.
     protected void removeTransformScript()
     {
-        clickFolder(TEST_ASSAY_PRJ_ELISPOT);
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickEditAssayDesign();
         waitForElement(Locator.css("#partdelete_removeTransformScript0 img"));
@@ -422,7 +422,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
             "H\n14.0\n6.0\n6.0\n4.0\n17.0\n11.0\n49.0\n731.0\n0.0\n0.0\n0.0\n0.0";
     protected void verifyBackgroundSubtractionOnExistingRun()
     {
-        clickFolder(TEST_ASSAY_PRJ_ELISPOT);
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         assertTextPresent("Background Subtraction");
         DataRegionTable runTable = new DataRegionTable("Runs", this, true, true);
@@ -438,7 +438,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         waitForTextWithRefresh("COMPLETE", WAIT_FOR_PAGE);
 
         // Check well counts for TEST_ASSAY_ELISPOT_FILE4
-        clickFolder(TEST_ASSAY_PRJ_ELISPOT);
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickAndWait(Locator.linkWithText("run details", 3));
         waitForElement(Locator.css("#plate-summary-div-1 table"));
@@ -456,7 +456,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         //Assert.assertEquals("Incorrect spot counts after background subtraction.", FILE4_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
         // Check that all runs have been subtracted
-        clickFolder(TEST_ASSAY_PRJ_ELISPOT);
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         column = runTable.getColumnDataAsText("Background Subtraction");
         for(String item : column)
@@ -477,7 +477,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
             "H\n6.0\n4.0\n11.0\n20.0\n26.0\n12.0\n46.0\n576.0\n0.0\n0.0\n0.0\n0.0";
     protected void verifyBackgroundSubtractionOnNewRun()
     {
-        clickFolder(TEST_ASSAY_PRJ_ELISPOT);
+        clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
         clickButton("Import Data");
         clickButton("Next");

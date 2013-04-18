@@ -82,7 +82,7 @@ public class QuerySnapshotTest extends StudyBaseTest
     private void waitForStudyLoad(String folderName)
     {
         // Navigate
-        clickAndWait(Locator.linkWithText(folderName));
+        clickFolder(folderName);
         clickAndWait(Locator.linkWithText("Data Pipeline"));
         waitForPipelineJobsToComplete(1, "study import", false);
 
@@ -92,7 +92,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         waitForPageToLoad(30000);
 
         // shut off demographics bit to allow for insert
-        clickAndWait(Locator.linkWithText(folderName));
+        clickFolder(folderName);
         setDemographicsBit("DEM-1: Demographics", false);
     }
 
@@ -238,7 +238,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         createQuerySnapshot(CROSS_STUDY_SNAPSHOT, true, false, "keyField", 3);
 
         // verify refresh from both datasets
-        clickAndWait(Locator.linkWithText(FOLDER_1));
+        clickFolder(FOLDER_1);
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButton("Insert New");
         setFormElement("quf_MouseId", "999121212");
@@ -247,11 +247,11 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         clickButton("Submit");
 
-        clickAndWait(Locator.linkWithText(FOLDER_2));
+        clickFolder(FOLDER_2);
         clickAndWait(Locator.linkWithText(CROSS_STUDY_SNAPSHOT));
         waitForSnapshotUpdate("Unknown");
         
-        clickAndWait(Locator.linkWithText(FOLDER_2));
+        clickFolder(FOLDER_2);
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButton("Insert New");
         setFormElement("quf_MouseId", "999151515");
@@ -260,7 +260,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         clickButton("Submit");
 
-        clickAndWait(Locator.linkWithText(FOLDER_2));
+        clickFolder(FOLDER_2);
         clickAndWait(Locator.linkWithText(CROSS_STUDY_SNAPSHOT));
         waitForSnapshotUpdate("Undecided");
 

@@ -44,8 +44,9 @@ public class UIAssayHelper extends AbstractAssayHelper
     public void importAssay(String assayName, File file, String projectPath) throws CommandException, IOException
     {
         String[] folders = projectPath.split("/");
-        for(String folder : folders)
-            _test.clickAndWait(Locator.linkWithText(folder));
+        _test.clickProject(folders[0]);
+        if (folders.length > 1)
+            _test.clickFolder(folders[folders.length - 1]);
         _test.clickAndWait(Locator.linkWithText(assayName));
         _test.clickButton("Import Data");
         _test.clickButton("Next");

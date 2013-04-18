@@ -66,7 +66,7 @@ public class ScriptValidationTest extends SimpleModuleTest
         enableModule(getProjectName(), MODULE_NAME);
         enableModule(getProjectName(), "Query");
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         doTestTransformation();
         doTestValidation();
 

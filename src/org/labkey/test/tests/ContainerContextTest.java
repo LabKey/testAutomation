@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
@@ -30,7 +29,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
@@ -38,7 +36,6 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.WorkbookHelper;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -191,7 +188,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Creating study in " + SUB_FOLDER_B);
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(SUB_FOLDER_B));
+        clickFolder(SUB_FOLDER_B);
         goToManageStudy();
         clickButton("Create Study");
         setFormElement(Locator.name("label"), SUB_FOLDER_B + "-Study");
@@ -261,7 +258,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Creating background R script");
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(folder));
+        clickFolder(folder);
         clickAndWait(Locator.linkWithText(listName));
         clickMenuButton("Views", "Create", "R View");
         clickCheckboxById("runInBackground");

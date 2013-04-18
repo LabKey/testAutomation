@@ -290,7 +290,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
     protected void setupPipeline(String project)
     {
         log("Setting up data pipeline for project " + project);
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
         addWebPart("Data Pipeline");
         clickButton("Setup");
         File dir = getTestTempDir();
@@ -315,7 +315,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         log("Defining a test assay at the project level");
         //define a new assay at the project level
         //the pipeline must already be setup
-        clickAndWait(Locator.linkWithText(projectName));
+        clickProject(projectName);
         addWebPart("Assay List");
 
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/studyextra/TestAssay1.xar", 1, "TestAssay1.xar");

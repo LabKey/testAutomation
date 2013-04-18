@@ -93,7 +93,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestTabbedFolder();
         doTestContainerTabConversion();
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         doTestCustomFolder();
         doTestSchemas();
         doTestTableAudit();
@@ -523,7 +523,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     {
         log("Testing web parts in modules...");
         //go to project portal
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
 
         //add Simple Module Web Part
         addWebPart("Simple Module Web Part");
@@ -537,7 +537,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void createList()
     {
         //create a list for our query
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         addWebPart("Lists");
 
         log("Creating list for query/view/report test...");
@@ -578,7 +578,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("Testing queries in modules...");
 
         //go to query module portal
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         goToModule("Query");
         viewQueryData("lists", "TestQuery");
 
@@ -592,7 +592,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestQueryViews()
     {
         log("Testing module-based custom query views...");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(LIST_NAME));
 
         clickMenuButton("Views", "Crazy People");
@@ -622,12 +622,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _rReportHelper.ensureRConfig();
 
         log("Testing module-based JS reports...");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(LIST_NAME));
         clickMenuButton("Views", "Want To Be Cool");
         waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         addWebPart("Report");
         setFormElement("title", "Report Tester Part");
         selectOptionByValue("reportId", "module:simpletest/reports/schemas/lists/People/Less Cool JS Report.js");
@@ -662,7 +662,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("Testing import templates...");
 
         //go to query module portal
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         goToModule("Query");
         viewQueryData(VEHICLE_SCHEMA, "Vehicles");
         clickButton("Import Data");
@@ -756,7 +756,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestParameterizedQueries()
     {
         log("Create embedded QWP to test parameterized query.");
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         goToModule("Wiki");
         createNewWikiPage();
         setFormElement("wiki-input-name", "Parameterized QWP");
@@ -904,21 +904,21 @@ public class SimpleModuleTest extends BaseWebDriverTest
         final String ASSAYTAB_NAME = "Assay Container";
         final String COLLABFOLDER_PATH = getProjectName() + "/" + COLLAB_FOLDER;
         final String EXTRA_ASSAY_WEBPART = "Run Groups";
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         _containerHelper.createSubfolder(getProjectName(), COLLAB_FOLDER, "Collaboration");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, STUDYCONTAINER_NAME, "Study");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, ASSAYCONTAINER_NAME, "Assay");
-        clickAndWait(Locator.linkWithText(COLLAB_FOLDER));
+        clickFolder(COLLAB_FOLDER);
         clickAndWait(Locator.linkWithText(STUDYCONTAINER_NAME));
         assertTextPresent("Study Overview");
         clickAndWait(Locator.linkWithText("Create Study"));
         clickAndWait(Locator.linkWithText("Create Study"));
-        clickAndWait(Locator.linkWithText(COLLAB_FOLDER));
+        clickFolder(COLLAB_FOLDER);
         clickAndWait(Locator.linkWithText(ASSAYCONTAINER_NAME));
         addWebPart(EXTRA_ASSAY_WEBPART);
 
         // Change folder type to XML Tabbed
-        clickAndWait(Locator.linkWithText(COLLAB_FOLDER));
+        clickFolder(COLLAB_FOLDER);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", TABBED_FOLDER_TYPE);
@@ -935,7 +935,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent(EXTRA_ASSAY_WEBPART);
 
         // Change back to Collab
-        clickAndWait(Locator.linkWithText(COLLAB_FOLDER));
+        clickFolder(COLLAB_FOLDER);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", "Collaboration");
@@ -945,7 +945,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextNotPresent(STUDYTAB_NAME, ASSAYTAB_NAME, STUDYCONTAINER_NAME, ASSAYCONTAINER_NAME);
 
         // Now change back to TABBED
-        clickAndWait(Locator.linkWithText(COLLAB_FOLDER));
+        clickFolder(COLLAB_FOLDER);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", TABBED_FOLDER_TYPE);

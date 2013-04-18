@@ -166,11 +166,11 @@ public class LuminexTest extends AbstractQCAssayTest
         setupPipeline(TEST_ASSAY_PRJ_LUMINEX);
 
         //create a study within this project to which we will publish
-        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
+        clickProject(TEST_ASSAY_PRJ_LUMINEX);
         addWebPart("Study Overview");
         clickButton("Create Study");
         clickButton("Create Study");
-        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
+        clickProject(TEST_ASSAY_PRJ_LUMINEX);
 
         //add the Assay List web part so we can create a new luminex assay
         addWebPart("Assay List");
@@ -318,7 +318,7 @@ public class LuminexTest extends AbstractQCAssayTest
 //                "2\tListParticipant2\t1001.2\n" +
 //                "3\tListParticipant3\t1001.3\n" +
 //                "4\tListParticipant4\t1001.4");
-        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
+        clickProject(TEST_ASSAY_PRJ_LUMINEX);
 
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
@@ -432,7 +432,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("LX10005314302");
 
         // Upload another run that has both Raw and Summary data in the same excel file
-        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
+        clickProject(TEST_ASSAY_PRJ_LUMINEX);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         clickButton("Import Data");
         clickButton("Next");
@@ -1159,7 +1159,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
 
         //TODO:  goToTestRunList
-        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
+        clickProject(TEST_ASSAY_PRJ_LUMINEX);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         clickEditAssayDesign(false);
 
@@ -1187,7 +1187,7 @@ public class LuminexTest extends AbstractQCAssayTest
     //helper function to go to test assay home from anywhere the project link is visible
     protected void goToTestAssayHome()
     {
-        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
+        clickProject(TEST_ASSAY_PRJ_LUMINEX);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
     }
 
@@ -1214,7 +1214,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Save & Close");
 
         // upload the sample data file
-        clickFolder(TEST_ASSAY_PRJ_LUMINEX);
+        clickProject(TEST_ASSAY_PRJ_LUMINEX);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         clickButton("Import Data");
         clickButton("Next");
@@ -1753,7 +1753,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void goToQCAnalysisPage()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
         String qcUrlInRuns = getQCLink();
@@ -1839,7 +1839,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void excludableWellsWithTransformTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkContainingText(TEST_ASSAY_LUM));
         excludeWellFromRun("Guide Set plate 5", "A6,B6");
         goToLeveyJenningsGraphPage("Standard1");
@@ -1851,7 +1851,7 @@ public class LuminexTest extends AbstractQCAssayTest
     @LogMethod
     private void guideSetApiTest()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         assertTextNotPresent("GS Analyte");
 
         String wikiName = "LuminexGuideSetTestWiki";

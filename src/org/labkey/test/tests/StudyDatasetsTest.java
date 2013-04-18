@@ -21,7 +21,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.StudyHelper;
 
 public class StudyDatasetsTest extends StudyBaseTest
 {
@@ -144,7 +143,7 @@ public class StudyDatasetsTest extends StudyBaseTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifySideFilter()
     {
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         DataRegionTable dataregion = new DataRegionTable("Dataset", this);
@@ -152,7 +151,7 @@ public class StudyDatasetsTest extends StudyBaseTest
 
         _studyHelper.deleteCustomParticipantGroup(EXTRA_GROUP, "Mouse");
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addQueryWebPart("Demographics", "study", "DEM-1: Demographics", null);

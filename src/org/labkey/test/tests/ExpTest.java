@@ -64,7 +64,7 @@ public class ExpTest extends BaseSeleniumWebTest
         addWebPart("Run Groups");
         clickButton("Setup");
         setPipelineRoot(getLabKeyRoot() + "/sampledata/xarfiles/expVerify");
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         clickButton("Process and Import Data");
 
         _extHelper.waitForImportDataEnabled();
@@ -82,7 +82,7 @@ public class ExpTest extends BaseSeleniumWebTest
         if (!isLinkPresentWithText("COMPLETE"))
             Assert.fail("Import did not complete.");
 
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkWithText(EXPERIMENT_NAME));
         assertTextPresent("Example 5 Run");
         clickAndWait(Locator.linkWithText(RUN_NAME));

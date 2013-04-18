@@ -25,8 +25,6 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
-import java.util.List;
-
 /**
  * User: Treygdor
  * Date: Mar 21, 2011
@@ -60,8 +58,8 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     {
         String VIEW_TEXT = "Browse All";
 
-        clickAndWait(Locator.linkWithText(getProjectName()));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
         waitForPageToLoad();
         waitAndClick(Locator.linkWithText("Browse All Datasets"));
         waitForPageToLoad();
@@ -206,8 +204,8 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     private void animalHistoryTest()
     {
         String dataRegionName;
-        clickFolder(getProjectName());
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
 
         waitAndClick(Locator.linkWithText("Animal History"));
         waitForPageToLoad();
@@ -407,32 +405,32 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     private void quickSearchTest()
     {
         log("Quick Search - Show Animal");
-        clickFolder(getProjectName());
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("animal"), MORE_ANIMAL_IDS[0]);
         clickButton("Show Animal");
         assertTitleContains("Animal Details: "+MORE_ANIMAL_IDS[0]);
 
         log("Quick Search - Show Project");
-        clickFolder(getProjectName());
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         _ext4Helper.queryOne("#projectField", Ext4FieldRefWD.class).setValue(PROJECT_ID);
         clickButton("Show Project");
         waitForElement(Locator.linkWithText(DUMMY_PROTOCOL), WAIT_FOR_JAVASCRIPT);
 
         log("Quick Search - Show Protocol");
-        clickFolder(getProjectName());
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         _ext4Helper.queryOne("#protocolField", Ext4FieldRefWD.class).setValue(PROTOCOL_ID);
         clickButton("Show Protocol");
         waitForElement(Locator.linkWithText(PROTOCOL_ID), WAIT_FOR_JAVASCRIPT);
 
         log("Quick Search - Show Room");
-        clickFolder(getProjectName());
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("room"), ROOM_ID);
         clickButton("Show Room");
@@ -474,8 +472,8 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         }
 
         //Clear out lingering text on report pages
-        clickFolder(getProjectName());
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
         waitAndClick(Locator.linkWithText("Animal History"));
         waitForPageToLoad();
     }

@@ -310,7 +310,7 @@ public class StudyExportTest extends StudyManualTest
         if (isFileUploadAvailable())
             assertTextPresent(VISIT_MAP.substring(VISIT_MAP.lastIndexOf("/") + 1));
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         enterStudySecurity();
 
@@ -418,7 +418,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("BAQ00051-11");
 
         log("Test editing rows in a dataset");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
 
         enterStudySecurity();
@@ -591,7 +591,7 @@ public class StudyExportTest extends StudyManualTest
         if (!isFileUploadAvailable())
             return;
 
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Datasets"));

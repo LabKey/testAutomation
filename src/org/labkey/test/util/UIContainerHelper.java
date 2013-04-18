@@ -43,7 +43,7 @@ public class UIContainerHelper extends AbstractContainerHelper
     {
         _test.log("Creating project with name " + projectName);
         _test.ensureAdminMode();
-        if (_test.isLinkPresentWithText(projectName))
+        if (_test.isElementPresent(Locator.linkWithText(projectName)))
             Assert.fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
         _test.goToCreateProject();
@@ -79,16 +79,10 @@ public class UIContainerHelper extends AbstractContainerHelper
     @Override
     public void doDeleteProject(String project, boolean failIfNotFound, int wait)
     {
-        // Ensure that projects menu is expanded so test project can be seen
-        Locator minus = Locator.xpath("id('expandCollapse-projectsMenu')/img[contains(@src, 'minus.gif')]");
-
-        if (!_test.isElementPresent(minus))
-        {
-            _test.click(Locator.id("expandCollapse-projectsMenu"));
-            _test.assertElementPresent(minus);
-        }
-
-        if (!_test.isLinkPresentWithText(project))
+        _test.goToHome();
+        _test.goToFolderManagement();
+        _test.waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode("home"));
+        if (!_test.isElementPresent(Ext4HelperWD.Locators.folderManagementTreeNode(project)))
         {
             if (failIfNotFound)
             {
@@ -101,19 +95,7 @@ public class UIContainerHelper extends AbstractContainerHelper
                 return;
             }
         }
-
-        _test.clickAndWait(Locator.linkWithText(project));
-
-        //Delete even if terms of use is required
-        if (_test.isElementPresent(Locator.name("approvedTermsOfUse")))
-        {
-            _test.clickCheckbox("approvedTermsOfUse");
-            _test.clickButton("Agree");
-        }
-
-        _test.ensureAdminMode();
-        _test.goToFolderManagement();
-        _test.waitForExt4FolderTreeNode(project, 10000);
+        _test.click(Ext4HelperWD.Locators.folderManagementTreeNode(project));
         _test.clickButton("Delete");
 
         // in case there are sub-folders
@@ -127,7 +109,7 @@ public class UIContainerHelper extends AbstractContainerHelper
         _test.log("Starting delete of project '" + project + "'...");
         _test.clickButton("Delete", _test.longWaitForPage);
 
-        if (_test.isLinkPresentWithText(project))
+        if (_test.isElementPresent(Locator.linkWithText(project)))
         {
             _test.log("Wait extra long for folder to finish deleting.");
             while (_test.isLinkPresentWithText(project) && System.currentTimeMillis() - startTime < wait)
@@ -137,12 +119,13 @@ public class UIContainerHelper extends AbstractContainerHelper
             }
         }
 
-        if (!_test.isLinkPresentWithText(project))
+        if (!_test.isElementPresent(Locator.linkWithText(project)))
             _test.log(project + " deleted in " + (System.currentTimeMillis() - startTime) + "ms");
         else
             Assert.fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
 
         // verify that we're not on an error page with a check for a project link:
-        _test.assertLinkNotPresentWithText(project);
+        _test.hoverProjectBar();
+        _test.assertElementNotPresent(Locator.linkWithText(project));
     }
 }

@@ -209,7 +209,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
         // test import of .dat file
         log("Upload existing Mascot .dat result file.");
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         clickButton("Process and Import Data");
         _extHelper.selectFileBrowserItem("bov_sample/" + SEARCH_TYPE + "/test3/");
         selectImportDataAction("Import Results");
@@ -220,7 +220,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
         pushLocation();
 
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
 
 /*
         Commented out because .dat is not loaded as part of an experiment, so it won't appear in the dashboard
@@ -234,7 +234,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
         log("Navigate to Pipeline status.");
         //was: clickTab("Pipeline");
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkWithText("All"));
         int sec = 300;
         while (!isLinkPresentWithText("COMPLETE", 1) && sec-- > 0)

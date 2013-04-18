@@ -17,13 +17,11 @@ package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
 import java.io.File;
 
@@ -85,7 +83,7 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(getProjectName(), new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         enableModule(getProjectName(), "Survey");
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(getProjectName(), null, projectSurveyDesign, null, "lists", "listA", null);
+        createSurveyDesign(getProjectName(), null, null, projectSurveyDesign, null, "lists", "listA", null);
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -97,11 +95,11 @@ public class SurveyTest extends BaseWebDriverTest
         _listHelper.importListArchive(folderName, new File(getLabKeyRoot() + pipelineLoc, "ListA.zip"));
         enableModule(folderName, "Survey");
         portalHelper.addWebPart("Survey Designs");
-        createSurveyDesign(folderName, null, subfolderSurveyDesign, null, "lists", "listA", null);
+        createSurveyDesign(folderName, null, null, subfolderSurveyDesign, null, "lists", "listA", null);
 
         log("Add users that will be used for permissions testing");
         createUser(EDITOR, null);
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         enterPermissionsUI();
         setUserPermissions(EDITOR, "Reader");
         clickButton("Save and Finish");
@@ -111,13 +109,13 @@ public class SurveyTest extends BaseWebDriverTest
         clickButton("Save and Finish");
     }
 
-    protected void createSurveyDesign(String folder, String tabName, String designName, @Nullable String description,
+    protected void createSurveyDesign(String project, @Nullable String folder, @Nullable String tabName, String designName, @Nullable String description,
                                       String schemaName, String queryName, @Nullable String metadataFilePath)
     {
         log("Create new survey design");
-        if (!isElementPresent(Locator.xpath("//td/a[contains(@class, 'nav-tree-selected') and text()='"+folder+"']")))
+        if (!isElementPresent(Locator.id("folderBar").withText(folder)))
             clickFolder(folder);
-        if (tabName != null && !isElementPresent(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab-active')]/a[text() = '"+tabName+"']")))
+        if (tabName != null && !isElementPresent(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab-active')]/a").withText(tabName)))
             clickAndWait(Locator.linkWithText(tabName));
         waitForElement(Locator.id("dataregion_query"));
         clickButton("Create Survey Design");
@@ -181,7 +179,7 @@ public class SurveyTest extends BaseWebDriverTest
         waitForText(firstSurvey);
         clickAndWait(Locator.linkWithText("listA"));
         assertTextPresentInThisOrder("txtField", "txtAreaField", "true", "999", "999.1", "2013-01-04", "Test1");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("listA"));
         waitForText("No data to show.");
     }
@@ -253,7 +251,7 @@ public class SurveyTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.button("Save"));
         assertElementNotPresent(Locator.button("Submit completed form"));
         stopImpersonating();
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -360,12 +358,12 @@ public class SurveyTest extends BaseWebDriverTest
         log("Verify survey designs (current and parent container)");
         clickFolder(folderName);
         assertTextPresentInThisOrder("My Project Survey Design", "My Subfolder Survey Design");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         assertTextPresent("My Project Survey Design");
         assertTextNotPresent("My Subfolder Survey Design");
 
         log("Add Survey webpart to project and verify subfolder survey is not present");
-        clickFolder(getProjectName());
+        clickProject(getProjectName());
         addSurveyWebpart(projectSurveyDesign);
         assertTextPresent("No data to show.");
         assertTextNotPresent(firstSurvey);

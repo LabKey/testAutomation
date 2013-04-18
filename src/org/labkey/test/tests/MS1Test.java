@@ -92,7 +92,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void setupPipeline(String project, String path)
     {
         log("Setting up pipeline for project " + project + "...");
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
 
         //test invalid path
         setPipelineRoot(path + "-invalid");
@@ -120,7 +120,7 @@ public class MS1Test extends BaseSeleniumWebTest
         importPepTsvFile(project, PIPELINE_FIND_FEATURES_PROTOCOL);
 
         //go back to the portal/data pipeline page and wait for all four experiments to be complete
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
         clickAndWait(Locator.linkWithText("Data Pipeline"));
         waitForPipelineJobsToComplete(5, "Experiment Import", false);
 
@@ -137,7 +137,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void importXtandemExps(String project, String xProtocol)
     {
         //go back to the portal page
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
@@ -149,7 +149,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void importFeaturesExp(String project, String xProtocol, String featuresProtocol)
     {
         //go back to the portal page
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
@@ -161,7 +161,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void importPepTsvFile(String project, String protocol)
     {
         //go back to the portal page
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
@@ -187,7 +187,7 @@ public class MS1Test extends BaseSeleniumWebTest
     {
         log("Verifying features view rendered in folder " + folder + "...");
 
-        clickAndWait(Locator.linkWithText(folder));
+        clickFolder(folder);
         clickAndWait(Locator.linkWithText(getRunTitle("ms1-data", BASE_FILE_NAME_3, PIPELINE_FIND_FEATURES_PROTOCOL)));
 
         assertTextNotPresent("No data to show");
@@ -200,7 +200,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void testCompareView(String project)
     {
         log("Testing Compare Runs view");
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
         checkAllOnPage("MSInspectFeatureRuns");
         clickButton("Compare", 60000);
         assertTextPresent("-.TMITDSLAVVLQR.R");
@@ -243,7 +243,7 @@ public class MS1Test extends BaseSeleniumWebTest
     protected void testPepSearchView(String project)
     {
         log("Testing peptide search view");
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
         ensureAdminMode();
         addWebPart("Peptide Search");
 
@@ -275,7 +275,7 @@ public class MS1Test extends BaseSeleniumWebTest
     {
         log("Testing Similar Search View...");
 
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
         clickAndWait(Locator.linkWithText(getRunTitle(BASE_FILE_NAME_2, FEATURES_PROTOCOL)));
 
         setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
@@ -317,7 +317,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
     protected void testFeaturesView(String project)
     {
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
         String run1Title = getRunTitle(BASE_FILE_NAME_1, FEATURES_PROTOCOL);
         String run2Title = getRunTitle(BASE_FILE_NAME_2, FEATURES_PROTOCOL);
         assertTextPresent(run1Title);
@@ -436,7 +436,7 @@ public class MS1Test extends BaseSeleniumWebTest
         //Feature Details View
         //go back to the features list and make sure next and prev features work
         log("Testing showFeatureDetails...");
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
         clickAndWait(Locator.linkWithText(run2Title));
         setFilter(DATAREGION_FEATURES, "MS2ConnectivityProbability", "Is Greater Than or Equal To", "0.90");
         setFilter(DATAREGION_FEATURES, "Scan", "Equals", "1948");
@@ -457,7 +457,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         log("showFeatureDetails.view OK");
 
-        clickAndWait(Locator.linkWithText(project));
+        clickProject(project);
         log("Finsihed testing features views.");
     }
 

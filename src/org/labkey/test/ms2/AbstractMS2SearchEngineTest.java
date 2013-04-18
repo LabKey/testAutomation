@@ -148,7 +148,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertNavButtonNotPresent("Search");
 
         log("View full status.");
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
 
         assertTextPresent(SAMPLE_BASE_NAME + " (test2)");
 

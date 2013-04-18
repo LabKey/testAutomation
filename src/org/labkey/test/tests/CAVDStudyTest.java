@@ -84,7 +84,7 @@ public class CAVDStudyTest extends StudyBaseTest
     private void doVerifyEmptyStudy()
     {
         log("Verifying that the study is empty.");
-        clickAndWait(Locator.linkWithText(FOLDER_NAME));
+        clickFolder(FOLDER_NAME);
 
         // Make sure a study was made.
         assertTextNotPresent("No study is active in the current container.");
@@ -113,7 +113,7 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void doVerifyStudyDesign()
     {
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
 
         clickAndWait(Locator.linkWithText("Vaccine Design"));
         clickEditDesign();
@@ -166,7 +166,7 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void doVerifyAssaySchedule()
     {
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
         clickAndWait(Locator.linkWithText("Assays"));
         clickEditDesign();
         deleteStudyDesignRow(RowType.Assay, 1);
@@ -215,7 +215,7 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void doVerifyDatasets()
     {
-        clickAndWait(Locator.linkWithText(STUDY_NAME));
+        clickFolder(STUDY_NAME);
         clickAndWait(Locator.linkWithText("Assays"));
 
         waitAndClickButton("Create Assay Datasets", 0);
@@ -270,8 +270,8 @@ public class CAVDStudyTest extends StudyBaseTest
         String study3name = FOLDER_NAME3 + " Study";
 
         log("Set study name for " + FOLDER_NAME2 + " and verify datasets exist.");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME2));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME2);
         // workaround for issue 15023: go to manage views page to initialize study dataset properties
         goToManageViews();
         waitForText("Manage Views");
@@ -289,8 +289,8 @@ public class CAVDStudyTest extends StudyBaseTest
         }
 
         log("Set study name for " + FOLDER_NAME3 + " and verify datasets exist.");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME3));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME3);
         // workaround for issue 15023: go to manage views page to initialize study dataset properties
         goToManageViews();
         waitForText("Manage Views");
@@ -322,8 +322,8 @@ public class CAVDStudyTest extends StudyBaseTest
         }
 
         log("Change study dataset status for " + FOLDER_NAME2 + " and verify changes in study list query.");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME2));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME2);
         waitForText("Study Schedule");
         // wait for the study schedule grid to load, any dataset name will do
         waitForText(DATASETS.values().iterator().next());
@@ -342,8 +342,8 @@ public class CAVDStudyTest extends StudyBaseTest
         }
 
         log("Create list in " + FOLDER_NAME4 + " with lookup to the studies list query.");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME4));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME4);
         addWebPart("Lists");
         ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
                 new ListHelper.ListColumn("MyStudyName", "MyStudyName", ListHelper.ListColumnType.String, ""),
@@ -353,8 +353,8 @@ public class CAVDStudyTest extends StudyBaseTest
         clickButton("Done");
 
         log("Add records to list for each study.");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME4));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME4);
         clickAndWait(Locator.linkWithText("AllStudiesList"));
         clickButton("Insert New");
         setFormElement("quf_MyStudyName", "Something");
@@ -366,8 +366,8 @@ public class CAVDStudyTest extends StudyBaseTest
         clickButton("Submit");
 
         log("Verify that the list lookup displays dataset status values.");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(FOLDER_NAME4));
+        clickProject(PROJECT_NAME);
+        clickFolder(FOLDER_NAME4);
         clickAndWait(Locator.linkWithText("AllStudiesList"));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn("StudyLookup");
@@ -434,8 +434,8 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void goToViscStudiesQuery(String folderName)
     {
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
-        clickAndWait(Locator.linkWithText(folderName));
+        clickProject(PROJECT_NAME);
+        clickFolder(folderName);
         goToSchemaBrowser();
         selectQuery("viscstudies", "studies");
         waitForText("view data");

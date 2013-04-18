@@ -216,7 +216,7 @@ public class SecurityTest extends BaseWebDriverTest
 
     private void assertNoDumbsterPermission(String user)
     {
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         goToModule("Dumbster");
         pushLocation();
         impersonate(user);
@@ -398,13 +398,13 @@ public class SecurityTest extends BaseWebDriverTest
         pushLocation();
         signOut();
         popLocation();
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         assertNavButtonNotPresent("New");
         signIn();
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         assertNavButtonPresent("New");
         impersonate(NORMAL_USER);
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         assertNavButtonPresent("New");
         stopImpersonating();
     }
@@ -703,7 +703,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         // 17037 Regression
         impersonate(PROJECT_ADMIN_USER);
-        clickFolder(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Impersonate");
         assertTextPresent("Already impersonating; click");

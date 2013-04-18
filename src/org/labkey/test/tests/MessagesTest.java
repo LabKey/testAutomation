@@ -87,7 +87,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         enableEmailRecorder();
 
         log("Check that Plain Text message works and is added everywhere");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickButton("New");
 
         // Check defaults for uncustomized message board
@@ -179,7 +179,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
 
         log("test the search module on messages");
-        clickAndWait(Locator.linkWithText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         searchFor(PROJECT_NAME, "Banana", 1, MSG1_TITLE);
 
         log("test filtering of messages grid");
