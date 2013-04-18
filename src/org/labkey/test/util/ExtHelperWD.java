@@ -402,7 +402,10 @@ public class ExtHelperWD extends AbstractHelperWD
         _test.waitForElement(locateBrowserFileName(fileName), WAIT_FOR_PAGE);
         Locator rowSelected = Locator.css(".labkey-filecontent-grid div.x-grid3-row-selected > table > tbody > tr > td > div").withText(fileName);
         Boolean wasChecked = _test.isElementPresent(rowSelected);
-        _test.click(Locator.xpath("//div").withClass("labkey-filecontent-grid").append(locateGridRowCheckbox(fileName)));
+        if (_test.isElementPresent(locateGridRowCheckbox(fileName)))
+            _test.click(Locator.xpath("//div").withClass("labkey-filecontent-grid").append(locateGridRowCheckbox(fileName)));
+        else
+            _test.click(Locator.xpath("//div").withClass("labkey-filecontent-grid").append("//td").withClass("x-grid3-td-1").withText(fileName));
         if (wasChecked)
             _test.waitForElementToDisappear(rowSelected);
         else
