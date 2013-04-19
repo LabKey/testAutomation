@@ -855,8 +855,6 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     protected void setupDatasetSecurity()
     {
-        click(Locator.linkWithText("Projects"));
-        sleep(3000);
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("My Study"));
 
@@ -939,8 +937,6 @@ public class ReportTest extends StudyBaseTest
         clickButton("Create View");
 
         // test security
-        click(Locator.linkWithText("Projects"));
-        sleep(3000);
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText("My Study"));
 
