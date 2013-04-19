@@ -161,7 +161,7 @@ public class AssayTest extends AbstractAssayTest
     private void verifyRunDeletionRecallsDatasetRows()
     {
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_LAB1));
+        clickFolder(TEST_ASSAY_FLDR_LAB1);
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
         checkDataRegionCheckbox("Runs", 0);
         clickButton("Delete");
@@ -176,7 +176,7 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("3 row(s) were recalled to the assay: ");
 
         // Verify that the deleted run data is gone from the dataset
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY2));
+        clickFolder(TEST_ASSAY_FLDR_STUDY2);
         clickAndWait(Locator.linkWithText("1 dataset"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
         assertTextPresent("AAA07XMC-04", "FirstRun");
@@ -493,7 +493,7 @@ public class AssayTest extends AbstractAssayTest
     private void publishData()
     {
         log("Prepare visit map to check PTID counts in study navigator.");
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1));
+        clickFolder(TEST_ASSAY_FLDR_STUDY1);
         clickAndWait(Locator.linkWithText("Manage"));
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("Import Visit Map"));
@@ -877,7 +877,7 @@ public class AssayTest extends AbstractAssayTest
         verifySpecimensPresent(3, 2, 3);
 
         log("Testing assay-study linkage");
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1));
+        clickFolder(TEST_ASSAY_FLDR_STUDY1);
         addWebPart("Datasets");
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
         clickButton("View Source Assay", defaultWaitForPage);
@@ -916,7 +916,7 @@ public class AssayTest extends AbstractAssayTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyStudyList()
     {
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDIES));
+        clickFolder(TEST_ASSAY_FLDR_STUDIES);
         addWebPart("Study List");
         assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY1 + " Study");
         assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY2 + " Study");
@@ -938,7 +938,7 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Submit");
 
         //verify study properties (grid view)
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDIES));
+        clickFolder(TEST_ASSAY_FLDR_STUDIES);
         DataRegionTable table = new DataRegionTable("qwpStudies", this, false);
         Assert.assertEquals("Studies not sorted correctly.", TEST_ASSAY_FLDR_STUDY1 + " Study", table.getDataAsText(0, "Label"));
         Assert.assertEquals("Failed to set study investigator.", INVESTIGATOR, table.getDataAsText(0, "Investigator"));
