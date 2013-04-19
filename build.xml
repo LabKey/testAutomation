@@ -221,7 +221,7 @@
             debug="${test.compile.debug}"
             deprecation="${test.compile.deprecation}"
             optimize="${test.compile.optimize}"
-            source="1.6"
+            source="1.7"
             classpathref="test.build.classpath">
         </javac>
         <copy todir="${test.build.home}/classes" >
@@ -247,7 +247,7 @@
             destdir="${test.build.home}/classes"
             debug="${test.compile.debug}"
             deprecation="${test.compile.deprecation}"
-            source="1.6"
+            source="1.7"
             classpathref="test.build.classpath">
         </iajc>
         <copy todir="${test.build.home}/classes" >
@@ -593,7 +593,7 @@
             destdir="${test.build.home}/classes"
             deprecation="${test.compile.deprecation}"
             optimize="${test.compile.optimize}"
-            source="1.6"
+            source="1.7"
             classpathref="shutdown.build.classpath"
             includeantruntime="false" />
         <java classname="org.labkey.test.debug.ThreadDumpAndKill" failonerror="false">
@@ -1262,7 +1262,7 @@
             debug="${test.compile.debug}"
             deprecation="${test.compile.deprecation}"
             optimize="${test.compile.optimize}"
-            source="1.6"
+            source="1.7"
             classpathref="test.build.classpath"
             includeantruntime="false" >
         </javac>
