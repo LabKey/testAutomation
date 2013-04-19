@@ -57,8 +57,6 @@ public class MenuBarTest extends BaseSeleniumWebTest
         log("Open new project");
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");
         goToProjectSettings();
-        checkRadioButton("folderDisplayMode", "IN_MENU");
-        clickButtonContainingText("Save");
         clickAndWait(Locator.linkWithText("Menu Bar"));
         clickButtonContainingText("Turn On Custom Menus");
         addWebPart("AssayList2");

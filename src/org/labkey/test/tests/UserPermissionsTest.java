@@ -217,11 +217,11 @@ public class UserPermissionsTest extends BaseWebDriverTest
         impersonateAtProjectLevel(GAMMA_READER_USER);
         clickProject(PERM_PROJECT_NAME);
         hoverFolderBar();
+        assertElementPresent(Locator.linkWithText(GAMMA_SUB_FOLDER_NAME));
         assertElementNotPresent(Locator.linkWithText(DENIED_SUB_FOLDER_NAME));
         // Ensure only one project visible during project impersonation. Regression test 13346
+        hoverProjectBar();
         assertElementPresent(Locator.css("#projectBar_menu .project-nav li"), 1);
-        hoverFolderBar();
-        assertElementPresent(Locator.linkWithText(GAMMA_SUB_FOLDER_NAME));
 
         //Reset ourselves to the global user so we can do cleanup
         stopImpersonating();

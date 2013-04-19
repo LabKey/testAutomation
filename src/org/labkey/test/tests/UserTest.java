@@ -166,7 +166,7 @@ public class UserTest extends SecurityTest
     private String getEmailChangeableUser()
     {
         createUserAndNotify(NORMAL_USER2, NORMAL_USER);
-        clickAndWait(Locator.linkWithText("Home"));
+        clickProject("Home");
         setInitialPassword(NORMAL_USER2, TEST_PASSWORD);
 
         return NORMAL_USER2;

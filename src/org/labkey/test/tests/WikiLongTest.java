@@ -328,7 +328,7 @@ public class WikiLongTest extends BaseWebDriverTest
         //test deleting via edit page
         clickAndWait(Locator.linkWithText("Edit"));
         deleteWikiPage();
-        assertLinkPresentWithText("Home");
+        assertElementNotPresent(Locator.linkWithText(WIKI_NAVTREE_TITLE));
 
         createNewWikiPage("HTML");
         setFormElement("name", "_header");

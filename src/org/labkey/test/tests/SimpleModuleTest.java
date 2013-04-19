@@ -437,7 +437,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void cleanupSchema(Connection cn) throws IOException
     {
         // enable simpletest module in Home so we can delete from all containers
-        enableModule("Home", "simpletest");
+        enableModule("home", "simpletest");
 
         cleanupTable(cn, "Vehicles");
         cleanupTable(cn, "Models");

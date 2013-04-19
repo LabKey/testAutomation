@@ -113,7 +113,7 @@ public class SurveyTest extends BaseWebDriverTest
                                       String schemaName, String queryName, @Nullable String metadataFilePath)
     {
         log("Create new survey design");
-        if (!isElementPresent(Locator.id("folderBar").withText(folder)))
+        if (folder != null && !isElementPresent(Locator.id("folderBar").withText(folder)))
             clickFolder(folder);
         if (tabName != null && !isElementPresent(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab-active')]/a").withText(tabName)))
             clickAndWait(Locator.linkWithText(tabName));

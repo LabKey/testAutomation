@@ -606,7 +606,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         setFormElement("comment", "We are in a sub-folder");
         clickButton("Save");
 
-        clickAndWait(Locator.linkContainingText(PROJECT_NAME));
+        clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("Issues Summary"));
         // Set the container filter to include subfolders
         clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");

@@ -861,7 +861,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void goToTestRunList()
     {
         goToHome();
-        clickAndWait(Locator.linkContainingText(TEST_ASSAY_PRJ_LUMINEX));
+        clickProject(TEST_ASSAY_PRJ_LUMINEX);
         clickAndWait(Locator.linkContainingText(TEST_ASSAY_LUM));
     }
 

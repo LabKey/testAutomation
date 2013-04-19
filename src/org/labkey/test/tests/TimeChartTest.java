@@ -247,7 +247,8 @@ public class TimeChartTest extends StudyBaseTest
 
     public void configureVisitStudy()
     {
-        if (!isLinkPresentWithText(PROJECT_NAME))
+        hoverProjectBar();
+        if (!isElementPresent(Locator.linkWithText(PROJECT_NAME)))
             _containerHelper.createProject(PROJECT_NAME, null);
 
         createSubfolder(PROJECT_NAME, PROJECT_NAME, VISIT_FOLDER_NAME, "Study", null);

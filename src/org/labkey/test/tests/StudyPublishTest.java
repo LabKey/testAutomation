@@ -249,7 +249,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
 
         // Go to published study
-        clickProject(projectName);
+        clickProject(getProjectName());
         clickFolder(name);
 
         //Assert webparts/wikis are present

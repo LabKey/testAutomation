@@ -112,7 +112,7 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
         clickButton("Create Study");
 
         setPipelineRoot(_studyDataRoot);
-        clickAndWait(Locator.linkWithText("My Study"));
+        clickFolder("My Study");
         clickAndWait(Locator.linkWithText("Manage Files"));
     }
 

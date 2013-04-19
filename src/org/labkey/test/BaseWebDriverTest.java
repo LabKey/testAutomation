@@ -6582,7 +6582,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public DataRegionTable getCohortDataRegionTable(String projectName)
     {
-        clickProject(projectName);
+        if (!isElementPresent(Locator.id("folderBar").withText(projectName)))
+            clickProject(projectName);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
         return new DataRegionTable("Cohort", this, false);

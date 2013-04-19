@@ -79,10 +79,9 @@ public class UIContainerHelper extends AbstractContainerHelper
     @Override
     public void doDeleteProject(String project, boolean failIfNotFound, int wait)
     {
-        _test.goToHome();
-        _test.goToFolderManagement();
-        _test.waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode("home"));
-        if (!_test.isElementPresent(Ext4HelperWD.Locators.folderManagementTreeNode(project)))
+        _test.hoverProjectBar();
+
+        if (!_test.isElementPresent(Locator.linkWithText(project)))
         {
             if (failIfNotFound)
             {
@@ -95,7 +94,10 @@ public class UIContainerHelper extends AbstractContainerHelper
                 return;
             }
         }
-        _test.click(Ext4HelperWD.Locators.folderManagementTreeNode(project));
+        _test.clickProject(project);
+        _test.goToFolderManagement();
+        _test.waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(project));
+
         _test.clickButton("Delete");
 
         // in case there are sub-folders

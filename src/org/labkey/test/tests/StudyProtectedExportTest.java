@@ -175,7 +175,7 @@ public class StudyProtectedExportTest extends StudyExportTest
 
     private void goToDatasets()
     {
-        clickAndWait(Locator.linkContainingText(getFolderName()));
+        clickFolder(getFolderName());
         clickAndWait(Locator.linkContainingText("datasets"));
     }
 
