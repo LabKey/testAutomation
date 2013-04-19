@@ -146,10 +146,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
     private String _lastPageText = null;
-    private Stack<String> _locationStack = new Stack<String>();
+    private Stack<String> _locationStack = new Stack<>();
     private String _savedLocation = null;
-    private Stack<String> _impersonationStack = new Stack<String>();
-    private List<WebTestHelper.FolderIdentifier> _createdFolders = new ArrayList<WebTestHelper.FolderIdentifier>();
+    private Stack<String> _impersonationStack = new Stack<>();
+    private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
     protected boolean _testFailed = true;
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 30000;
@@ -3046,7 +3046,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             uncheckCheckbox(Locator.name("addAlias"));
         // confirm rename:
         clickButton("Rename");
-        // verify that we're not on an error page with a check for a new folder link:
+        _createdFolders.remove(new WebTestHelper.FolderIdentifier(project, folderName));
+        _createdFolders.add(new WebTestHelper.FolderIdentifier(project, newFolderName));
         assertElementPresent(Locator.currentContainer(newFolderName));
         hoverFolderBar();
         assertElementNotPresent(Locator.linkWithText(folderName));

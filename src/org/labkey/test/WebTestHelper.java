@@ -363,8 +363,8 @@ public class WebTestHelper
 
     public static class FolderIdentifier
     {
-        private String _projectName;
-        private String _folderName;
+        private final String _projectName;
+        private final String _folderName;
 
         public FolderIdentifier(String projectName, String folderName)
         {
@@ -380,6 +380,23 @@ public class WebTestHelper
         public String getProjectName()
         {
             return _projectName;
+        }
+
+        public boolean equals(FolderIdentifier o)
+        {
+            return getProjectName().equalsIgnoreCase(o.getProjectName()) &&
+                   getFolderName().equalsIgnoreCase(o.getFolderName());
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            return (o instanceof FolderIdentifier) && equals((FolderIdentifier)o);
+        }
+
+        @Override
+        public int hashCode() {
+            return (41 * (41 + getProjectName().hashCode()) + getFolderName().hashCode());
         }
     }
 
