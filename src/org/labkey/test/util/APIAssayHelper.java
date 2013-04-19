@@ -43,6 +43,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         super(test);
     }
 
+    @LogMethod(quiet = true)
     public void importAssay(int assayID, File file, String projectPath, Map<String, Object> batchProperties)  throws CommandException, IOException
     {
         ImportRunCommand  irc = new ImportRunCommand(assayID, file);

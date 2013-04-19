@@ -19,6 +19,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.ExtHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PerlHelperWD;
@@ -41,6 +42,8 @@ public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
     private final File risListArchive = new File(getDownloadDir(), "ris-lists.zip");
     private final File risTransformScript = new File(getDownloadDir(), "kiem_transform.pl");
     private final File risAssayData = new File(getSampledataPath(), "kiem/RIS test.xls");
+    private final File risAssayData2 = new File(getSampledataPath(), "kiem/RIS_SEQ_000_000_000_000_001.txt");
+    private final File risAssayData3 = new File(getSampledataPath(), "kiem/RIS_SEQ_000_000_000_000_024.txt");
     
     private final String ASSAY_NAME = "RIS"; // Defined by risXarFile
     private final String ASSAY_ID = risAssayData.getName();
@@ -71,8 +74,11 @@ public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
         createRISAssay();
 
         verifyRISAssay();
+
         configureReportWebPart();
         verifyRISReport();
+
+        verifyRISWobbleQC();
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -165,6 +171,65 @@ public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
         goToSchemaBrowser();
         viewQueryData("assay.General.RIS", "uniqueblatts");
         waitForElement(Locator.paginationText(1, UNIQUEBLATT_ROW_COUNT, UNIQUEBLATT_ROW_COUNT));
+    }
+
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    private void verifyRISWobbleQC() throws IOException, CommandException
+    {
+        clickProject(getProjectName());
+        _assayHelper.importAssay(ASSAY_NAME, risAssayData3, getProjectName());
+
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Kiem RIS Wobble QC");
+
+        Locator.XPathLocator qcWebpart = Locator.id("ris-wobble-qc-div");
+        Locator.XPathLocator thresholdCell = Locator.xpath("//span[contains(@style, 'color:#ff0000;')]"); // Threshold rows should have red text
+        Locator.XPathLocator editedCell =  Locator.xpath("//span[contains(@style, 'background-color:yellow;')]"); // Edited rows should have yellow background
+
+        waitAndClick(qcWebpart.append("//tr").withText(risAssayData3.getName()));
+        clickButton("Search Run Data", 0);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.css(".x4-toolbar-text").withText("Displaying 1 - 26 of 26")); // 23 threshold rows, plus possible alternate CStart Grouping rows
+        assertElementPresent(qcWebpart.append(thresholdCell), 23);
+
+        log("Edit CStart grouping");
+        _ext4Helper.checkGridRowCheckbox("27756455"); // CStart value for member of CStart Group 2775646
+        _ext4Helper.checkGridRowCheckbox("41341764"); // CStart value for member of CStart Group 4134176 (non-threshold row)
+        clickButton("Edit Grouping", 0);
+        waitAndClick(Ext4HelperWD.Locators.window("Edit Grouping for Selections").append("//td").withText("2775645"));
+        _extHelper.clickExtButton("Edit Grouping for Selections", "Save", 0);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        //TODO: 17611: RIS Wobble: Duplicate rows in QC grid  [Should only be two edited/highlighted rows.]
+        waitForElement(editedCell);
+        assertElementPresent(qcWebpart.append(editedCell), 3);
+        assertElementNotPresent(qcWebpart.append("//tr").withPredicate(thresholdCell).withPredicate(editedCell));
+
+        log("Reset CStart Grouping");
+        _ext4Helper.checkGridRowCheckbox("27756455");
+        clickButton("Reset Grouping", 0);
+        _extHelper.waitForExtDialog("Reset CStart Grouping");
+        _extHelper.clickExtButton("Reset CStart Grouping", "OK", 0);
+        waitForElementToDisappear(qcWebpart.append(editedCell).index(2));
+        //TODO: 17611: RIS Wobble: Duplicate rows in QC grid  [Should only be one edited/highlighted row now.]
+        assertElementPresent(qcWebpart.append(editedCell), 2);
+        assertElementNotPresent(qcWebpart.append("//tr").withPredicate(thresholdCell).withPredicate(editedCell));
+        _ext4Helper.checkGridRowCheckbox("41341764");
+        clickButton("Reset Grouping", 0);
+        _extHelper.waitForExtDialog("Reset CStart Grouping");
+        _extHelper.clickExtButton("Reset CStart Grouping", "OK", 0);
+        waitForElementToDisappear(qcWebpart.append(editedCell));
+
+        log("Try increased threshold");
+        setFormElement(Locator.name("threshold"), "1000");
+        clickButton("Search Run Data", 0);
+        waitForElement(Locator.css(".x4-toolbar-text").withText("Displaying 1 - 69 of 69"));
+
+        log("Show all data");
+        click(Locator.xpath("//input").withPredicate(Locator.xpath("../label").withText("Show all data")));
+        clickButton("Search Run Data", 0);
+        waitForElement(Locator.css(".x4-toolbar-text").withText("Displaying 1 - 500 of 16214"));
+
+        portalHelper.removeWebPart("Kiem RIS Wobble QC");
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)

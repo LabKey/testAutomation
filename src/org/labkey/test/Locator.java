@@ -773,6 +773,8 @@ public abstract class Locator
 
         public XPathLocator withPredicate(String predicate)
         {
+            if (predicate.startsWith("//"))
+                predicate = predicate.replaceFirst("//", "descendant::");
             return this.append("["+predicate+"]");
         }
 
