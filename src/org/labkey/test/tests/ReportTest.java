@@ -336,7 +336,6 @@ public class ReportTest extends StudyBaseTest
     {
         log("Create an R Report");
 
-        click(Locator.linkWithText("Projects"));
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
