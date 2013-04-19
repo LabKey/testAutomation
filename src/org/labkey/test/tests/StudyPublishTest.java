@@ -195,13 +195,13 @@ public class StudyPublishTest extends StudyProtectedExportTest
     protected void doVerifySteps()
     {
         verifyPipelineJobLinks(PUB3_NAME, PUB2_NAME, PUB1_NAME);
-        verifyPublishedStudy(PUB1_NAME, GROUP1_PTIDS, PUB1_DATASETS, PUB1_DEPENDENT_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true, PUB1_EXPECTED_SPECIMENS);
-        verifyPublishedStudy(PUB2_NAME, GROUP2_PTIDS, PUB2_DATASETS, PUB2_DEPENDENT_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false, PUB2_EXPECTED_SPECIMENS);
+        verifyPublishedStudy(PUB1_NAME, getProjectName(), GROUP1_PTIDS, PUB1_DATASETS, PUB1_DEPENDENT_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true, PUB1_EXPECTED_SPECIMENS);
+        verifyPublishedStudy(PUB2_NAME, PUB2_NAME, GROUP2_PTIDS, PUB2_DATASETS, PUB2_DEPENDENT_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false, PUB2_EXPECTED_SPECIMENS);
         // concat group 2 and group 3 ptids for the last publisehd study ptid list
         ArrayList<String> group2and3ptids = new ArrayList<String>();
         group2and3ptids.addAll(Arrays.asList(GROUP2_PTIDS));
         group2and3ptids.addAll(Arrays.asList(GROUP3_PTIDS));
-        verifyPublishedStudy(PUB3_NAME, group2and3ptids.toArray(new String[group2and3ptids.size()]), PUB3_DATASETS, PUB3_DEPENDENT_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, PUB3_EXPECTED_SPECIMENS, false, true, false, true);
+        verifyPublishedStudy(PUB3_NAME, getProjectName(), group2and3ptids.toArray(new String[group2and3ptids.size()]), PUB3_DATASETS, PUB3_DEPENDENT_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, PUB3_EXPECTED_SPECIMENS, false, true, false, true);
 
         verifySpecimenRefresh();
     }
@@ -224,15 +224,15 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
     }
 
-    protected void verifyPublishedStudy(String name, String[] ptids, String[] datasets, String[] dependentDatasets,
+    protected void verifyPublishedStudy(String name, String projectName, String[] ptids, String[] datasets, String[] dependentDatasets,
                                         String[] visits, String[] views, String[] reports, String[] lists,
                                         boolean includeSpecimens, boolean refreshSpecimens, int expectedSpecimenCount)
     {
-        verifyPublishedStudy(name, ptids, datasets, dependentDatasets, visits, views, reports, lists, includeSpecimens, refreshSpecimens, expectedSpecimenCount, true, true, true, false);
+        verifyPublishedStudy(name, projectName, ptids, datasets, dependentDatasets, visits, views, reports, lists, includeSpecimens, refreshSpecimens, expectedSpecimenCount, true, true, true, false);
     }
 
     @LogMethod
-    protected void verifyPublishedStudy(@LoggedParam final String name, final String[] ptids, final String[] datasets, final String[] dependentDatasets,
+    protected void verifyPublishedStudy(@LoggedParam final String name, final String projectName, final String[] ptids, final String[] datasets, final String[] dependentDatasets,
                                         final String[] visits, final String[] views, final String[] reports, final String[] lists,
                                         final boolean includeSpecimens, final boolean refreshSpecimens, final int expectedSpecimenCount,
                                         final boolean removeProtected, final boolean shiftDates, final boolean alternateIDs, final boolean maskClinicNames)
@@ -249,8 +249,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
 
         // Go to published study
-        clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText(name));
+        clickProject(projectName);
+        clickFolder(name);
 
         //Assert webparts/wikis are present
         waitForElement(Locator.xpath("//table[@name='webpart']"));
@@ -526,7 +526,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // verify specimen refresh for PUB1 study
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(PUB1_NAME));
+        clickFolder(PUB1_NAME);
         clickAndWait(Locator.linkWithText("Specimen Data"));
         clickAndWait(Locator.linkWithText("By Individual Vial"));
         waitForText("1 - 37 of 37"); // updated number of total specimens
