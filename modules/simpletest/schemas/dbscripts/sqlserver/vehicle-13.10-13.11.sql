@@ -15,10 +15,10 @@
  */
 
 CREATE TABLE vehicle.etl_source(
-  rowid SERIAL,
+  RowId INT IDENTITY(1,1),
   container entityid,
-  created TIMESTAMP,
-  modified TIMESTAMP,
+  created DATETIME,
+  modified DATETIME,
 
   id VARCHAR(9),
   name VARCHAR(100),
@@ -30,10 +30,10 @@ CREATE TABLE vehicle.etl_source(
 
 
 CREATE TABLE vehicle.etl_target(
-  rowid SERIAL,
+  RowId INT IDENTITY(1,1),
   container entityid,
-  created TIMESTAMP,
-  modified TIMESTAMP,
+  created DATETIME,
+  modified DATETIME,
 
   id VARCHAR(9),
   name VARCHAR(100),
