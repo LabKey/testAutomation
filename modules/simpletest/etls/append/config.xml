@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Append Test</name>
+    <description>append rows from etl_source to etl_target</description>
+    <transforms></transforms>
+    <source schemaName="vehicle" queryName="etl_source" />
+    <destination schemaName="vehicle" queryName="etl_target" />
+    <schedule><poll updateTimeColumn="modified" createTimeColumn="created"></poll></schedule>
+</etl>

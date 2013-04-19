@@ -34,6 +34,7 @@ public class ETLTest extends BaseWebDriverTest
         checkRun(2);
     }
 
+
     protected void runInitialSetup()
     {
         //This is here to prevent an email send error at the end of the test
@@ -41,12 +42,18 @@ public class ETLTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, null);
         new PortalHelper(this).addWebPart("Issues List");
         enableModule("DataIntegration", true);
+        enableModule("simpletest", true);
         createPermissionsGroup("IssueGroup", USER);
 
         //Turn on the checker service (should cause a job to appear at the first pipeline check for the user we made)
         goToModule("DataIntegration");
+        waitForElement(Locator.xpath("//tr[contains(@transformid,'DemoETL')]"));
+        waitForElement(Locator.xpath("//tr[contains(@transformid,'IssuesETL')]"));
+        waitForElement(Locator.xpath("//tr[contains(@transformid,'append')]"));
+
         waitAndClick(Locator.xpath("//tr[contains(@transformid,'DemoETL')]/td/input"));
     }
+
 
     protected void checkRun(int amount)
     {
