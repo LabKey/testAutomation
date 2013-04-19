@@ -182,7 +182,7 @@ public class StudyExportTest extends StudyManualTest
         super.verifySpecimens();
 
         // configure specimen tracking
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Request Statuses"));
         setFormElement("newLabel", "New Request");
@@ -222,7 +222,7 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
 
         // create specimen request
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("Study Navigator"));
 
         assertLinkNotPresentWithText("24");
@@ -334,7 +334,7 @@ public class StudyExportTest extends StudyManualTest
         clickMenuButton("QC State", "clean");
 
         // test specimen comments
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         waitAndClick(Locator.linkWithText("Vials by Derivative Type"));
         waitForText("Plasma, Unknown Processing");
         clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
@@ -358,14 +358,14 @@ public class StudyExportTest extends StudyManualTest
         importer.importAndWaitForComplete();
 
         // verify that comments remain after second specimen load
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         waitAndClick(Locator.linkWithText("Vials by Derivative Type"));
         waitForText("Plasma, Unknown Processing");
         clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
         assertTextPresent("These vials are very important.", 2);
 
         // check to see that data in the specimen archive was merged correctly:
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("By Individual Vial"));
         clickMenuButton("Page Size", "Show All");
         assertTextPresent("DRT000XX-01");
@@ -401,7 +401,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("Added Comments");
         assertTextPresent("Johannesburg, South Africa");
 
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         click(Locator.linkWithText("Specimen Requests"));
         clickAndWait(Locator.linkWithText("View Current Requests"));
         clickButton("Details");
@@ -460,7 +460,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextNotPresent("999320529");
 
         // configure QC state management to show all data by default so the next steps don't have to keep changing the state:
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         selectOptionByText("showPrivateDataByDefault", "All data");

@@ -105,16 +105,16 @@ public class StudyManualTest extends StudyTest
         clickButton("Update Assignments");
 
         // configure QC state management so that all data is displayed by default (we'll test with hidden data later):
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         selectOptionByText("showPrivateDataByDefault", "All data");
         clickButton("Save");
 
         // upload datasets:
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         setPipelineRoot(getPipelinePath());
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("Manage Files"));
         clickButton("Process and Import Data");
         _extHelper.selectFileBrowserItem("datasets/Study001.dataset");

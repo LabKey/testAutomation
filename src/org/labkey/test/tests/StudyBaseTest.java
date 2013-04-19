@@ -54,7 +54,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void setupSpecimenManagement()
     {
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Request Statuses"));
         setFormElement("newLabel", "New Request");
@@ -204,7 +204,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
                                boolean useAlternateIDs, boolean useAlternateDates, boolean maskClinic,
                                @Nullable Set<String> uncheckObjects)
     {
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickTab("Manage");
         clickButton("Export Study");
 
@@ -231,7 +231,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void deleteStudy(String studyLabel)
     {
-        clickAndWait(Locator.linkWithText(studyLabel));
+        clickFolder(studyLabel);
         clickTab("Manage");
         clickButton("Delete Study");
         checkCheckbox("confirm");

@@ -451,7 +451,7 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             // create user with read permissions to study and dataset, but no permissions to source assay
             clickProject(TEST_ASSAY_PRJ_NAB);
-            clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1));
+            clickFolder(TEST_ASSAY_FLDR_STUDY1);
             pushLocation();  // Save our location because impersonatied user won't have permission to project
             createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
             setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
@@ -462,7 +462,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             popLocation();
             assertTextPresent(TEST_ASSAY_PRJ_NAB);
             assertTextNotPresent(TEST_ASSAY_FLDR_NAB); // assert no read permissions to nabassay container
-            clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1));
+            clickFolder(TEST_ASSAY_FLDR_STUDY1);
             clickAndWait(Locator.linkWithText("Study Navigator"));
             clickAndWait(Locator.linkWithText("2"));
             assertStudyData(1);

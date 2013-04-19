@@ -123,7 +123,7 @@ public class QuerySnapshotTest extends StudyBaseTest
     {
         // create a snapshot from a dataset
         log("create a snapshot from a dataset");
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         createQuerySnapshot(DEMOGRAPHICS_SNAPSHOT, true, false);
 
@@ -131,7 +131,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         // test automatic updates by altering the source dataset
         log("test automatic updates by altering the source dataset");
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButton("Insert New");
         setFormElement("quf_MouseId", "999121212");
@@ -140,7 +140,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         clickButton("Submit");
 
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText(DEMOGRAPHICS_SNAPSHOT));
         clickMenuButton("QC State", "All data");
         waitForSnapshotUpdate("Armenian");
@@ -153,7 +153,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         // snapshot over a custom view
         // test automatic updates by altering the source dataset
         log("create a snapshot over a custom view");
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         _customizeViewsHelper.openCustomizeViewPanel();
 
@@ -164,13 +164,13 @@ public class QuerySnapshotTest extends StudyBaseTest
         assertTextNotPresent("Slovakian");
 
         log("test automatic updates for a joined snapshot view");
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickLink(Locator.xpath("//a[.='999320016']/../..//td/a[.='edit']"));
         setFormElement("quf_DEMraco", "Slovakian");
         clickButton("Submit");
 
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText(APX_SNAPSHOT));
         clickMenuButton("QC State", "All data");
 
@@ -183,7 +183,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         // snapshot over a custom query
         log("create a snapshot over a custom query");
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
         createReport(GRID_VIEW);
@@ -248,7 +248,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickButton("Submit");
 
         clickFolder(FOLDER_2);
-        clickAndWait(Locator.linkWithText(CROSS_STUDY_SNAPSHOT));
+        clickFolder(CROSS_STUDY_SNAPSHOT);
         waitForSnapshotUpdate("Unknown");
         
         clickFolder(FOLDER_2);
@@ -261,7 +261,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickButton("Submit");
 
         clickFolder(FOLDER_2);
-        clickAndWait(Locator.linkWithText(CROSS_STUDY_SNAPSHOT));
+        clickFolder(CROSS_STUDY_SNAPSHOT);
         waitForSnapshotUpdate("Undecided");
 
         clickMenuButton("Views", "Edit Snapshot");

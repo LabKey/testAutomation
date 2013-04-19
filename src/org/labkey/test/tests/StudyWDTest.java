@@ -572,7 +572,7 @@ public class StudyWDTest extends StudyBaseTestWD
         verifyCohorts();
 
         // configure QC state management before importing duplicate data
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         setFormElement("newLabel", "unknown QC");
@@ -585,7 +585,7 @@ public class StudyWDTest extends StudyBaseTestWD
         clickButton("Save");
 
         // return to dataset import page
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText(datasetLink));
         clickAndWait(Locator.linkWithText("verifyAssay"));
         assertTextPresent("QC State");
@@ -667,7 +667,7 @@ public class StudyWDTest extends StudyBaseTestWD
     @LogMethod
     protected void verifySpecimens()
     {
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         addWebPart("Specimens");
         waitForText("Blood (Whole)");
         clickAndWait(Locator.linkWithText("Blood (Whole)"));
@@ -683,7 +683,7 @@ public class StudyWDTest extends StudyBaseTestWD
     private void verifyParticipantComments()
     {
         log("creating the participant/visit comment dataset");
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("Create New Dataset"));
@@ -727,7 +727,7 @@ public class StudyWDTest extends StudyBaseTestWD
             waitForPageToLoad();
 
             log("configure comments");
-            clickAndWait(Locator.linkWithText(getStudyLabel()));
+            clickFolder(getStudyLabel());
             clickTab("Manage");
             clickAndWait(Locator.linkWithText("Manage Comments"));
         }
@@ -740,7 +740,7 @@ public class StudyWDTest extends StudyBaseTestWD
         selectOptionByText("participantVisitCommentProperty", PARTICIPANT_VISIT_COMMENT_LABEL);
         clickButton("Save");
 
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         waitForText("Blood (Whole)");
         clickAndWait(Locator.linkWithText("Blood (Whole)"));
         clickButton("Enable Comments/QC");
@@ -755,7 +755,7 @@ public class StudyWDTest extends StudyBaseTestWD
         //Issue 14894: Datasets no longer audit row insertion
         verifyAuditEventAdded(datasetAuditEventCount);
 
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         waitForText("Blood (Whole)");
         clickAndWait(Locator.linkWithText("Blood (Whole)"));
         setFilter("SpecimenDetail", "MouseId", "Equals", "999320812");
@@ -880,7 +880,7 @@ public class StudyWDTest extends StudyBaseTestWD
     @LogMethod
     protected void verifyVisitMapPage()
     {
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Visits"));
 
@@ -949,7 +949,7 @@ public class StudyWDTest extends StudyBaseTestWD
     @LogMethod
     private void verifyHiddenVisits()
     {
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("Study Navigator"));
         assertTextNotPresent("Screening Cycle");
         assertTextNotPresent("Cycle 1");
@@ -1048,7 +1048,7 @@ public class StudyWDTest extends StudyBaseTestWD
     @LogMethod
     protected void verifyCohorts(boolean altIDsEnabled)       //todo
     {
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("Study Navigator"));
         clickAndWait(Locator.linkWithText("24"));
 

@@ -55,7 +55,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 
     private void verifyAncillaryStudy()
     {
-        clickAndWait(Locator.linkWithText(ANCILLARY_STUDY_NAME));
+        clickFolder(ANCILLARY_STUDY_NAME);
         assertTextPresent(ANCILLARY_STUDY_DESC);
         clickTab("Mice");
         assertTextPresent("Showing all " + specimensToSelect.length + " mice");

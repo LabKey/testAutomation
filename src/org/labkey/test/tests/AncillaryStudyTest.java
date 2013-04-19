@@ -186,7 +186,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
     private void verifyModifyParticipantGroup(String study)
     {
-        clickAndWait(Locator.linkWithText(study));
+        clickFolder(study);
         log("Modify " + study + " participant group.");
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Mouse Groups"));

@@ -909,7 +909,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, STUDYCONTAINER_NAME, "Study");
         _containerHelper.createSubfolder(COLLABFOLDER_PATH, ASSAYCONTAINER_NAME, "Assay");
         clickFolder(COLLAB_FOLDER);
-        clickAndWait(Locator.linkWithText(STUDYCONTAINER_NAME));
+        clickFolder(STUDYCONTAINER_NAME);
         assertTextPresent("Study Overview");
         clickAndWait(Locator.linkWithText("Create Study"));
         clickAndWait(Locator.linkWithText("Create Study"));

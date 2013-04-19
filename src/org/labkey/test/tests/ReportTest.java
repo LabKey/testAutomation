@@ -266,7 +266,7 @@ public class ReportTest extends StudyBaseTest
     @LogMethod
     private void doCreateCharts()
     {
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
         clickMenuButton("Views", "Create", "Crosstab View");
@@ -281,14 +281,14 @@ public class ReportTest extends StudyBaseTest
         setFormElement("label", "TestReport");
         clickButton("Save");
 
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         assertTextPresent("TestReport");
         clickAndWait(Locator.linkWithText("TestReport"));
 
         assertTableCellTextEquals("report", 2, 0, "Female");
 
         //Delete the report
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickTab("Manage");
         deleteReport("TestReport");
 
@@ -300,12 +300,12 @@ public class ReportTest extends StudyBaseTest
         clickButton("Create View");
         assertLinkPresentWithText("999320016");
         assertNavButtonNotPresent("go");
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickTab("Manage");
         deleteReport(viewName);
 
         // create new external report
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickMenuButton("Views", "Create", "Advanced View");
         selectOptionByText("queryName", "DEM-1: Demographics");
@@ -320,7 +320,7 @@ public class ReportTest extends StudyBaseTest
         setFormElement("label", "tsv");
         selectOptionByText("showWithDataset", "DEM-1: Demographics");
         clickButton("Save");
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("tsv"));
         assertTextPresent("Female");
     }
