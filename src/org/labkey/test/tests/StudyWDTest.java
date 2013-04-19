@@ -880,7 +880,7 @@ public class StudyWDTest extends StudyBaseTestWD
     @LogMethod
     protected void verifyVisitMapPage()
     {
-        clickFolder(getStudyLabel());
+        clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Visits"));
 
@@ -949,7 +949,7 @@ public class StudyWDTest extends StudyBaseTestWD
     @LogMethod
     private void verifyHiddenVisits()
     {
-        clickFolder(getStudyLabel());
+        clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Study Navigator"));
         assertTextNotPresent("Screening Cycle");
         assertTextNotPresent("Cycle 1");

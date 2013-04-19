@@ -2946,7 +2946,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         waitAndClickButton("Finish");
-        waitForElement(Locator.id("folderBar").withText(child));
+        waitForElement(Locator.id("folderBar").withText(project));
 
         //unless we need addtional tabs, we end here.
         if (null == tabsToAdd || tabsToAdd.length == 0)
@@ -3006,7 +3006,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         // confirm delete:
         clickButton("Delete");
         // verify that we're not on an error page with a check for a project link:
-        assertElementPresent(Locator.currentContainer(project));
+        assertElementPresent(Locator.currentProject(project));
         hoverFolderBar();
         assertElementNotPresent(Locator.linkWithText(folderName));
     }
@@ -3048,7 +3048,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickButton("Rename");
         _createdFolders.remove(new WebTestHelper.FolderIdentifier(project, folderName));
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, newFolderName));
-        assertElementPresent(Locator.currentContainer(newFolderName));
+        assertElementPresent(Locator.currentProject(project));
         hoverFolderBar();
         assertElementNotPresent(Locator.linkWithText(folderName));
     }
@@ -3073,7 +3073,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         // move:
         clickButton("Confirm Move");
         // verify that we're not on an error page with a check for folder link:
-        assertElementPresent(Locator.currentContainer(folderName));
+        assertElementPresent(Locator.currentProject(projectName));
         hoverFolderBar();
         assertElementPresent(Locator.linkWithText(newParent));
     }
@@ -3103,7 +3103,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         hoverFolderBar();
         waitAndClickAndWait(Locator.linkWithText(folder));
-        waitForElement(Locator.id("folderBar").withText(folder));
     }
 
     /**
