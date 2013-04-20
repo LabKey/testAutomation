@@ -6804,7 +6804,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickButtonContainingText("Import Folder Using Pipeline");
         _extHelper.selectFileBrowserItem(folderFile);
         selectImportDataAction("Import Folder");
-        waitForPipelineJobsToComplete(1, "foo", false);
+        waitForPipelineJobsToComplete(1, "Folder import", false);
     }
     public String getFileContents(String rootRelativePath)
     {
