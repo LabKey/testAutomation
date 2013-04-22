@@ -64,7 +64,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
                 public WebElement apply(WebDriver d)
                 {
                     WebElement el = _test._driver.findElement(_dataRegion.toCssLocator().append(".labkey-data-region-header-container .labkey-ribbon").toBy());
-                    if (el.getCssValue("position").equalsIgnoreCase("static") && el.isDisplayed())
+                    if ("static".equalsIgnoreCase(el.getCssValue("position")) && el.isDisplayed())
                         return el;
                     else
                         return null;
