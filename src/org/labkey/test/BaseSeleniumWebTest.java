@@ -2349,21 +2349,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     private  void startCreateFolder(String project, String parent, String child)
     {
-        if (!parent.equals(getText(Locator.id("folderBar"))))
+        clickProject(project);
+        if (!parent.equals(project))
         {
-            clickProject(project);
-            if (!parent.equals(project))
-            {
-                clickFolder(parent);
-            }
+            clickFolder(parent);
         }
         hoverFolderBar();
         if (isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child))))
             Assert.fail("Folder: " + child + " already exists in project: " + project);
         log("Creating subfolder " + child + " under " + parent);
-        goToFolderManagement();
-        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(parent));
-        clickButton("Create Subfolder");
+        clickAndWait(Locator.xpath("//a[@title='New Subfolder']"));
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("name"), child);
     }
