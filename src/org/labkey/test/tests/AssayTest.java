@@ -359,9 +359,9 @@ public class AssayTest extends AbstractAssayTest
 
         //ensure that the target study drop down contains Study 1 and Study 2 only and not Study 3
         //(labtech1 does not have read perms to Study 3)
-        assertTextPresent(getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY1));
-        assertTextPresent(getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY2));
-        assertTextNotPresent(getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY3));
+        waitForElement(Locator.xpath("//option").withText(getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY1)));
+        assertElementPresent(Locator.xpath("//option").withText(getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY2)));
+        assertElementNotPresent(Locator.xpath("//option").withText(getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY3)));
 
         //select Study2 as the target study (note that PI is not an Editor in this study so we can test for override case)
         selenium.select("//select[@name='targetStudy']", getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY2));
