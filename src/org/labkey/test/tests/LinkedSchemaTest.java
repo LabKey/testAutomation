@@ -576,7 +576,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         assertHrefNotPresent(table, "Original List Z");
 
         // Disable the module in the TargetFolder container so query validation will pass at the end of the test
-        disableModules(Arrays.asList("linkedschematest"));
+        disableModules("linkedschematest");
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)

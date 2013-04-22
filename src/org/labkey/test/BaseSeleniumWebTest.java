@@ -6012,7 +6012,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickButton("Update Folder");
     }
 
-    public void disableModules(List<String> moduleNames)
+    public void disableModules(String... moduleNames)
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));

@@ -5,6 +5,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.PortalHelper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * Created with IntelliJ IDEA.
  * User: Rylan
@@ -32,6 +35,8 @@ public class ETLTest extends BaseWebDriverTest
         //Add an issue to detect and check that it creates a job
         addIssue("Issue #1", "issueuser", "The first issue.");
         checkRun(2);
+
+        disableModules("simpletest");
     }
 
 

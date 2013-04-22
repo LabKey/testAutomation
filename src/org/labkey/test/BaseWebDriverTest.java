@@ -6700,7 +6700,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickButton("Update Folder");
     }
 
-    public void disableModules(List<String> moduleNames)
+    public void disableModules(String... moduleNames)
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));

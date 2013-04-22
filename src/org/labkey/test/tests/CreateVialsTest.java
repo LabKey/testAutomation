@@ -75,7 +75,7 @@ public class CreateVialsTest extends AbstractViabilityTest
     protected void cleanUp()
     {
         // Disable the Letvin module so the study queries don't cause the query validation to fail.
-        disableModules(Arrays.asList("Letvin"));
+        disableModules("Letvin");
 
         super.cleanUp();
     }
