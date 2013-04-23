@@ -71,6 +71,8 @@ public class Ext4Helper extends AbstractHelper
             // close combo manually if it is a checkbox combo-box
             if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))
                 _test.click(arrowTrigger);
+            else if (_test.isElementPresent(listItem)) // Try again
+                _test.click(listItem);
 
             // menu should disappear
             _test.waitForElementToDisappear(listItem, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);

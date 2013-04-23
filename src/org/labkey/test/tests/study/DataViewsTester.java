@@ -22,6 +22,7 @@ import org.labkey.test.tests.StudyBaseTest;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.PortalHelper;
 
 /**
  * User: klum
@@ -100,7 +101,7 @@ public class DataViewsTester
         setDataBrowseSearch("");
         _test.waitForElement(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden());
         _test.waitForElement(Locator.linkWithText(REPORT_NAME), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.assertTextPresent(WEBPART_TITLE);
+        _test.assertElementPresent(PortalHelper.Locators.webPartTitle(WEBPART_TITLE));
         Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
         _test.log("Verify cancel button");
@@ -135,9 +136,11 @@ public class DataViewsTester
         _test.clickButton("Manage Categories", 0);
         _test._extHelper.waitForExtDialog("Manage Categories");
         _test.clickButton("New Category", 0);
-        _test.waitForElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + (CATEGORIES.length-1) + "]"));
-        _test.setFormElement(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + (CATEGORIES.length-1) + "]"), NEW_CATEGORY);
+        _test.waitForElement(Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden());
+        _test.setFormElement(Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden(), NEW_CATEGORY);
+        _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//div").withText(NEW_CATEGORY));
         _test.clickButton("Done", 0);
+        _test._extHelper.waitForExtDialogToDisappear("Manage Categories");
         _test.clickButton("Save", 0);
         _test.waitForText(CATEGORIES[1], BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.refresh(); // Deleted category is still present, but hidden.  Refresh to clear page.
@@ -382,7 +385,7 @@ public class DataViewsTester
     {
         _test.waitAndClick(Locators.editViewsLink(dataset));
         _test._extHelper.waitForExtDialog(dataset);
-        _test.waitForElement(Locator.xpath("//table").withClass("category-loaded-marker").notHidden());
+        _test.waitForElement(Ext4HelperWD.Locators.window(dataset).append(Locator.xpath("//table").withClass("category-loaded-marker").notHidden()));
     }
 
     public void saveDatasetProperties(String dataset)

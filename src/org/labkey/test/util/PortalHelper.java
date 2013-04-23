@@ -258,4 +258,12 @@ public class PortalHelper extends AbstractHelper
             VERTICAL
         }
     }
+
+    public static class Locators
+    {
+        public static Locator.XPathLocator webPartTitle(String title)
+        {
+            return Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title);
+        }
+    }
 }
