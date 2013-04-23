@@ -294,7 +294,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     {
         goToProjectHome();
         _containerHelper.createSubfolder(getProjectName(), assayFolder, "Assay");
-        enableModule(assayFolder, "rho");
+        enableModule("rho", false);
 
         _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + assay1XarPath, ++pipelineCount, assay1);
         _assayHelper.importAssay(assay1, new File(STUDY_PIPELINE_ROOT + "/assays/" + assay1File),  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );
