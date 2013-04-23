@@ -3084,9 +3084,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void clickProject(String project)
     {
+        clickProject(project, true);
+    }
+
+    public void clickProject(String project, boolean assertDestination)
+    {
         hoverProjectBar();
         waitAndClickAndWait(Locator.linkWithText(project));
-        waitForElement(Locator.id("folderBar").withText("Home".equals(project) ? "home" : project)); // home casing is incosistent
+        if (assertDestination)
+            waitForElement(Locator.id("folderBar").withText("Home".equals(project) ? "home" : project)); // home casing is incosistent
     }
 
     public void hoverFolderBar()

@@ -609,9 +609,9 @@ public class WikiLongTest extends BaseWebDriverTest
         signOut();
 
         log("Access project with guest user");
-        clickProject(PROJECT3_NAME);
+        clickProject(PROJECT3_NAME, false);
         assertTextPresent("fight club");
-        checkCheckbox("approvedTermsOfUse");
+        checkCheckbox(Locator.id("approvedTermsOfUse"));
         clickButton("Agree");
         goToHome();
         clickProject(PROJECT3_NAME);
@@ -629,40 +629,40 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextPresent("fight club"); // PROJECT4_NAME/subfolder
 
         goToHome();
-        clickProject(PROJECT_NAME);
+        clickProject(PROJECT_NAME, false);
         assertTextPresent("fight club");
         log("Submit without agreeing");
         clickButton("Agree");
 
         assertTextPresent("fight club");
-        checkCheckbox("approvedTermsOfUse");
+        checkCheckbox(Locator.id("approvedTermsOfUse"));
         clickButton("Agree");
 
-        clickProject(PROJECT4_NAME);
+        clickProject(PROJECT4_NAME, false);
         assertTextPresent("fight club");
-        checkCheckbox("approvedTermsOfUse");
+        checkCheckbox(Locator.id("approvedTermsOfUse"));
         clickButton("Agree");
 
         log("Check terms with impersonated user");
         impersonate(USER2);
 
-        clickProject(PROJECT_NAME);
+        clickProject(PROJECT_NAME, false);
         assertTextPresent("fight club");
-        checkCheckbox("approvedTermsOfUse");
+        checkCheckbox(Locator.id("approvedTermsOfUse"));
         clickButton("Agree");
-        clickProject(PROJECT3_NAME);
+        clickProject(PROJECT3_NAME, false);
         assertTextPresent("fight club");
-        checkCheckbox("approvedTermsOfUse");
+        checkCheckbox(Locator.id("approvedTermsOfUse"));
         clickButton("Agree");
-        clickProject(PROJECT4_NAME);
+        clickProject(PROJECT4_NAME, false);
         assertTextPresent("fight club");
-        checkCheckbox("approvedTermsOfUse");
+        checkCheckbox(Locator.id("approvedTermsOfUse"));
         clickButton("Agree");
 
         stopImpersonating();            
-        clickProject(PROJECT3_NAME);
+        clickProject(PROJECT3_NAME, false);
         assertTextPresent("fight club");
-        checkCheckbox("approvedTermsOfUse");
+        checkCheckbox(Locator.id("approvedTermsOfUse"));
         clickButton("Agree");
 
         clickProject(PROJECT_NAME);
