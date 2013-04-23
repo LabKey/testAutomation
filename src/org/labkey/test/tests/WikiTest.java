@@ -132,7 +132,7 @@ public class WikiTest extends BaseWebDriverTest
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);
 
         log("verify second wiki part pointing to first handled delete well");
-        clickAndWait(Locator.linkWithText(getSubolderName()));
+        clickFolder(getSubolderName());
         assertTextPresent("This folder does not currently contain any wiki pages to display");
     }
 

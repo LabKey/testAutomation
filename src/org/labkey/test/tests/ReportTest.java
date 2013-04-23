@@ -856,7 +856,7 @@ public class ReportTest extends StudyBaseTest
     protected void setupDatasetSecurity()
     {
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("My Study"));
+        clickFolder("My Study");
 
         // create a test group and give it container read perms
         enterPermissionsUI();
@@ -874,7 +874,7 @@ public class ReportTest extends StudyBaseTest
         clickButton("Save and Finish");
 
         // give the test group read access to only the DEM-1 dataset
-        clickAndWait(Locator.linkWithText("My Study"));
+        clickFolder("My Study");
         enterStudySecurity();
 
         // enable advanced study security
@@ -938,7 +938,7 @@ public class ReportTest extends StudyBaseTest
 
         // test security
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("My Study"));
+        clickFolder("My Study");
 
         clickReportGridLink("participant chart", "permissions");
         selenium.click("useCustom");
@@ -953,7 +953,7 @@ public class ReportTest extends StudyBaseTest
         goToAdminConsole();
         impersonate(TEST_USER);
         clickProject(getProjectName());
-        clickAndWait(Locator.linkWithText("My Study"));
+        clickFolder("My Study");
 
         assertLinkNotPresentWithText("APX-1: Abbreviated Physical Exam");
         clickAndWait(Locator.linkWithText("participant chart"));

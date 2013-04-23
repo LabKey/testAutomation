@@ -126,9 +126,9 @@ public class GenotypingTest extends BaseSeleniumWebTest
         {
             click(Locator.linkContainingText("configure",i));
             _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
-            _extHelper.clickExtDropDownMenu("userQuery_schema", "lists");
-            _extHelper.clickExtDropDownMenu("userQuery_query", listVals[i]);
-            _extHelper.clickExtDropDownMenu("userQuery_view", "[default view]");
+            _extHelper.selectComboBoxItem("Schema", "lists");
+            _extHelper.selectComboBoxItem("Query", listVals[i]);
+            _extHelper.selectComboBoxItem("View", "[default view]");
             _extHelper.clickExtButton("Submit", 0);
             _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         }

@@ -122,23 +122,10 @@ public class ExtHelperWD extends AbstractHelperWD
         return (Boolean)_test.executeScript(script, id);
     }
 
-    public void clickExtDropDownMenu(String menuId, String value)
-    {
-        clickExtDropDownMenu(Locator.id(menuId), value);
-    }
-
     public int getExtElementHeight(String className, int index)
     {
         List<WebElement> elements = _test._driver.findElements(By.className(className));
         return elements.get(index).getSize().height;        
-    }
-
-    public void clickExtDropDownMenu(Locator menuLocator, String value)
-    {
-        _test.click(menuLocator);
-        Locator element = Locator.xpath("//*[(self::li[contains(@class, 'x4-boundlist-item')] or self::div[contains(@class, 'x-combo-list-item')] or self::span[contains(@class, 'x-menu-item-text')]) and text()='" + value + "']");
-        _test.waitForElement(element, WAIT_FOR_JAVASCRIPT);
-        _test.click(element);
     }
 
     public void selectFolderManagementTreeItem(String path, boolean keepExisting)

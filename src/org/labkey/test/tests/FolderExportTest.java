@@ -135,7 +135,7 @@ public class FolderExportTest extends BaseWebDriverTest
     {
         _containerHelper.createSubfolder(getProjectName(), folderFromZip, null);
         // create one of the subfolders, to be imported, to test merge on import of subfolders
-        _containerHelper.createSubfolder(folderFromZip, "Subfolder1", "Collaboration");
+        _containerHelper.createSubfolder(getProjectName() + "/" + folderFromZip, "Subfolder1", "Collaboration");
 
         clickFolder(folderFromZip);
         importFolderFromZip(new File(dataDir, folderZip).getAbsolutePath());

@@ -2521,16 +2521,19 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToFolderManagement();
         waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName));
         clickButton("Rename");
-        setText("name", newFolderName);
+        setFormElement(Locator.name("name"), newFolderName);
         if (createAlias)
-            checkCheckbox("addAlias");
+            checkCheckbox(Locator.name("addAlias"));
         else
-            uncheckCheckbox("addAlias");
+            uncheckCheckbox(Locator.name("addAlias"));
         // confirm rename:
         clickButton("Rename");
-        // verify that we're not on an error page with a check for a new folder link:
-        assertLinkPresentWithText(newFolderName);
-        assertLinkNotPresentWithText(folderName);
+        _createdFolders.remove(new WebTestHelper.FolderIdentifier(project, folderName));
+        _createdFolders.add(new WebTestHelper.FolderIdentifier(project, newFolderName));
+        assertElementPresent(Locator.currentProject(project));
+        hoverFolderBar();
+        assertElementPresent(Locator.linkWithText(newFolderName));
+        assertElementNotPresent(Locator.linkWithText(folderName));
     }
 
     @LogMethod
@@ -5890,10 +5893,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      * Returns the data region for the the cohort table to enable setting
      * or verifying the enrolled status of the cohort
      */
-    public DataRegionTable getCohortDataRegionTable(String projectName)
+    public DataRegionTable getCohortDataRegionTable()
     {
-        if (!isElementPresent(Locator.id("folderBar").withText(projectName)))
-            clickProject(projectName);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
         return new DataRegionTable("Cohort", this, false);

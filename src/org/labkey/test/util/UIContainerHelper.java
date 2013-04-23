@@ -32,9 +32,10 @@ public class UIContainerHelper extends AbstractContainerHelper
 
     @Override
     @LogMethod
-    public void createSubfolder(String project, String child, String foldertype)
+    public void createSubfolder(String parentPath, String child, String foldertype)
     {
-        _test.createSubfolder(project, project, child, foldertype, null);
+        String[] ancestors = parentPath.split("/");
+        _test.createSubfolder(ancestors[0], ancestors[ancestors.length - 1], child, foldertype, null);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class UIContainerHelper extends AbstractContainerHelper
     //but at the moment it's unnecessary, and complicated because the two don't have the same capabilities.
     protected void doCreateFolder(String projectName, String folderType, String path)
     {
-//        _test.createSubfolder();
+        throw new UnsupportedOperationException("Use APIContainerHelper to delete a sub-folder.");
     }
 
     @LogMethod

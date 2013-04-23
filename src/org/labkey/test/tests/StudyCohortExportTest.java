@@ -49,7 +49,7 @@ public class StudyCohortExportTest extends StudyExportTest
     private void verifyUnenrolledCohort()
     {
         clickFolder(getFolderName());
-        DataRegionTable table = getCohortDataRegionTable(getFolderName());
+        DataRegionTable table = getCohortDataRegionTable();
         verifyCohortStatus(table, GROUP_2, false);
     }
 
@@ -57,7 +57,7 @@ public class StudyCohortExportTest extends StudyExportTest
     private void unenrollCohort()
     {
         clickFolder(getFolderName());
-        DataRegionTable table =  getCohortDataRegionTable(getFolderName());
+        DataRegionTable table =  getCohortDataRegionTable();
         changeCohortStatus(table, GROUP_2, false);
     }
 }

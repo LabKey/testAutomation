@@ -103,6 +103,7 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
 
     protected void initializeFolder()
     {
+        hoverProjectBar();
         int response = -1;
         try{
             response = WebTestHelper.getHttpGetResponse(getBaseURL() + "/" + stripContextPath(getAttribute(Locator.linkWithText(getProjectName()), "href")));

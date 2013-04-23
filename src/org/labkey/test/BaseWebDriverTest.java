@@ -6576,10 +6576,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * Returns the data region for the the cohort table to enable setting
      * or verifying the enrolled status of the cohort
      */
-    public DataRegionTable getCohortDataRegionTable(String projectName)
+    public DataRegionTable getCohortDataRegionTable()
     {
-        if (!isElementPresent(Locator.id("folderBar").withText(projectName)))
-            clickProject(projectName);
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
         return new DataRegionTable("Cohort", this, false);

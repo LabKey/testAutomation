@@ -249,8 +249,14 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
 
         // Go to published study
-        clickProject(getProjectName());
-        clickFolder(name);
+        hoverProjectBar();
+        if (isElementPresent(Locator.linkWithText(name)))
+            clickProject(name);
+        else
+        {
+            clickProject(getProjectName());
+            clickFolder(name);
+        }
 
         //Assert webparts/wikis are present
         waitForElement(Locator.xpath("//table[@name='webpart']"));

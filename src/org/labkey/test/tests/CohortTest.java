@@ -342,7 +342,8 @@ public class CohortTest extends BaseWebDriverTest
     private void enrolledCohortTest()
     {
         log("Check enrolled/unenrolled cohort features.");
-        DataRegionTable table = getCohortDataRegionTable(PROJECT_NAME);
+        clickProject(PROJECT_NAME);
+        DataRegionTable table = getCohortDataRegionTable();
 
         // verify that we have an 'enrolled' column and both cohorts are
         // true by default
@@ -353,7 +354,7 @@ public class CohortTest extends BaseWebDriverTest
         // issue 15948: verify that a new cohort has the enrolled bit set
         log("Verify a new cohort has enrolled checked.");
         verifyNewCohort();
-        table = getCohortDataRegionTable(PROJECT_NAME);
+        table = getCohortDataRegionTable();
 
         // verify we can roundtrip enrolled status
         // unenroll the "postiive" cohort and check
@@ -381,7 +382,7 @@ public class CohortTest extends BaseWebDriverTest
         verifySpecimenEnrolledCohortFilter("By Individual Vial", false, 20, 0);
 
         // unenroll all cohorts
-        table = getCohortDataRegionTable(PROJECT_NAME);
+        table = getCohortDataRegionTable();
         changeCohortStatus(table, "positive", false);
         changeCohortStatus(table, "negative", false);
         refreshParticipantList();
@@ -406,7 +407,7 @@ public class CohortTest extends BaseWebDriverTest
         verifySpecimenEnrolledCohortFilter("By Individual Vial", false, 20, 0);
 
         // test both enrolled and unenrolled cohorts
-        table = getCohortDataRegionTable(PROJECT_NAME);
+        table = getCohortDataRegionTable();
         changeCohortStatus(table, "positive", true);
         changeCohortStatus(table, "negative", false);
         refreshParticipantList();

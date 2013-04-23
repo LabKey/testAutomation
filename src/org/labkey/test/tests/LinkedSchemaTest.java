@@ -398,7 +398,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER, null);
         // Enable linkedschematest in source folder so the "BPeopleTemplate" is visible.
-        enableModule(SOURCE_FOLDER, "linkedschematest");
+        enableModule("linkedschematest", false);
 
         _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER, null);
     }

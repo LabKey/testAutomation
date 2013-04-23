@@ -15,9 +15,10 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
@@ -26,7 +27,7 @@ import java.io.File;
  * Date: May 18, 2009
  * Time: 12:44:03 PM
  */
-public class MenuBarTest extends BaseSeleniumWebTest
+public class MenuBarTest extends BaseWebDriverTest
 {
 
     private static final String PROJECT_NAME = "MenuBarVerifyProject";
@@ -47,45 +48,48 @@ public class MenuBarTest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
-    public boolean isFileUploadTest()
-    {
-        return true;
-    }
+//    @Override
+//    protected BrowserType bestBrowser()
+//    {
+//        return BrowserType.CHROME;
+//    }
+
     protected void doTestSteps()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
 
         log("Open new project");
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));
         clickButtonContainingText("Turn On Custom Menus");
-        addWebPart("AssayList2");
-        addWebPart("Study List");
-        addWebPart("Wiki Menu");
+
+        portalHelper.addWebPart("AssayList2");
+        portalHelper.addWebPart("Study List");
+        portalHelper.addWebPart("Wiki Menu");
 
         clickProject(PROJECT_NAME);
-        hideNavigationBar();
 
-        goToModule("Wiki"); // Not required prior to 11.1 -- not sure how
+        goToModule("Wiki");
         createNewWikiPage("HTML");
-        setFormElement("name", WIKI_PAGE_TITLE);
-        setFormElement("title", WIKI_PAGE_TITLE);
+        setFormElement(Locator.name("name"), WIKI_PAGE_TITLE);
+        setFormElement(Locator.name("title"), WIKI_PAGE_TITLE);
         setWikiBody(WIKI_PAGE_CONTENT);
         saveWikiPage();
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));
 
         log("Test wiki customization");
-        clickWebpartMenuItem("Wiki", "Customize");
-        selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
+        portalHelper.clickWebpartMenuItem("Wiki", "Customize");
+        selectOptionByText(Locator.name("webPartContainer"), "/" + PROJECT_NAME);
         waitForElement(Locator.tagWithText("option", WIKI_PAGE_TITLE + " (" + WIKI_PAGE_TITLE + ")"), 2000);
-        selectOptionByText("name", WIKI_PAGE_TITLE + " (" + WIKI_PAGE_TITLE + ")");
+        selectOptionByText(Locator.name("name"), WIKI_PAGE_TITLE + " (" + WIKI_PAGE_TITLE + ")");
         clickButton("Submit");
         
         clickProject(PROJECT_NAME);
 
         //Make sure that the menus are shown, but the content is not yet loaded.
-        assertElementPresent(Locator.id("menuBarFolder"));
+        assertElementPresent(Locator.id("folderBar"));
         assertElementPresent(Locator.menuBarItem("Assays"));
         assertElementPresent(Locator.menuBarItem("Studies"));
         assertElementPresent(Locator.menuBarItem(WIKI_PAGE_TITLE));
@@ -95,30 +99,17 @@ public class MenuBarTest extends BaseSeleniumWebTest
         assertNavButtonNotPresent("Manage Assays");
         assertTextNotPresent("No Studies Found");
 
-//        mouseOver(Locator.menuBarItem("Wiki Menu"));
-//        waitForText(WIKI_PAGE_CONTENT, 3000);
-        //TODO:  clean up
-        Locator l = Locator.id("Wiki Menu6$Header");
-        //selenium.focus(l);
-        mouseOver(l);
-        sleep(3000);
-        assertTextPresent(WIKI_PAGE_CONTENT);
+        mouseOver(Locator.id("Wiki Menu6$Header"));
+        waitForElement(Locator.xpath("//div").withClass("labkey-wiki").withText(WIKI_PAGE_CONTENT));
         mouseOver(Locator.menuBarItem("Assays"));
         waitForElement(Locator.navButton("Manage Assays"), 3000);
 
-
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/menubar/Test Assay.xar", 1, "Test Assay.xar");
-//        checkRadioButton("providerName", "General");
-//        clickButton("Next");
-//        waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
-//        setFormElement(Locator.id("AssayDesignerName"), "Test Assay");
-//        clickButton("Save", 0);
-//        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
         clickProject(PROJECT_NAME);
 
         assertTextNotPresent("Test Assay");
         mouseOver(Locator.menuBarItem("Assays"));
-        waitForText("Test Assay", WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.linkWithText("Test Assay"));
 
         createSubfolder(PROJECT_NAME, PROJECT_NAME, "StudyFolder", "Study", null);
         createDefaultStudy();
@@ -132,13 +123,14 @@ public class MenuBarTest extends BaseSeleniumWebTest
         log("Test Custom Menu WebPart");
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));
-        addWebPart("Custom Menu");
+        portalHelper.addWebPart("Custom Menu");
 
         // Schema/Query/etc
         _extHelper.setExtFormElementByLabel("Title", "Wiki Render Types");
-        _extHelper.clickExtDropDownMenu("userQuery_schema", "wiki");
-        _extHelper.clickExtDropDownMenu("userQuery_query", "renderertype");
-        _extHelper.clickExtDropDownMenu("userQuery_Column", "Value");
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        _extHelper.selectComboBoxItem("Schema", "wiki");
+        _extHelper.selectComboBoxItem("Query", "renderertype");
+        _extHelper.selectComboBoxItem("Title Column", "Value");
         _extHelper.clickExtButton("Submit");
         assertTextPresent("HTML", "RADEOX", "TEXT_WITH_LINKS");
 
@@ -148,12 +140,13 @@ public class MenuBarTest extends BaseSeleniumWebTest
 
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));
-        addWebPart("Custom Menu");
+        portalHelper.addWebPart("Custom Menu");
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByLabel("Title", "Participant Reports");
-        _extHelper.clickExtDropDownMenu("userQuery_folders", DEM_STUDY_FOLDER);
-        _extHelper.clickExtDropDownMenu("userQuery_schema", "study");
-        _extHelper.clickExtDropDownMenu("userQuery_query", "Participant");
-        _extHelper.clickExtDropDownMenu("userQuery_Column", "ParticipantId");
+        _extHelper.selectComboBoxItem("Folder", DEM_STUDY_FOLDER);
+        _extHelper.selectComboBoxItem("Schema", "study");
+        _extHelper.selectComboBoxItem("Query", "Participant");
+        _extHelper.selectComboBoxItem("Title Column", "ParticipantId");
         _extHelper.setExtFormElementByLabel("URL", "/study-samples/typeParticipantReport.view?participantId=${participantId}");
         _extHelper.clickExtButton("Submit");
 
@@ -164,18 +157,16 @@ public class MenuBarTest extends BaseSeleniumWebTest
         // Another custom Menu with links to folders
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));
-        addWebPart("Custom Menu");
+        portalHelper.addWebPart("Custom Menu");
         _extHelper.setExtFormElementByLabel("Title", "Folders");
 
         Locator radioFolder = Locator.radioButtonById("folder-radio");
         click(radioFolder);
-        _extHelper.clickExtDropDownMenu("userQuery_folderTypes", "Study");
-        _extHelper.clickExtButton("Submit");
+        _extHelper.selectComboBoxItem("Folder Types", "Study");
+        clickButton("Submit");
 
         clickFolder(DEM_STUDY_FOLDER);
         assertTextPresent("Demo Study", "Study Overview");
-
-        showNavigationBar();
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -183,5 +174,9 @@ public class MenuBarTest extends BaseSeleniumWebTest
         deleteProject(getProjectName(), afterTest);
     }
 
-
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }
