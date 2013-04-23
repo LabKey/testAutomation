@@ -2571,7 +2571,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         hoverProjectBar();
         waitAndClickAndWait(Locator.linkWithText(project));
-        waitForElement(Locator.id("projectBar"));
+        waitForElement(Locator.id("folderBar").withText("Home".equals(project) ? "home" : project)); // home casing is incosistent
     }
 
     public void hoverFolderBar()
