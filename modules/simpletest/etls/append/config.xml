@@ -2,8 +2,12 @@
 <etl xmlns="http://labkey.org/etl/xml">
     <name>Append Test</name>
     <description>append rows from etl_source to etl_target</description>
-    <transforms></transforms>
-    <source schemaName="vehicle" queryName="etl_source" />
-    <destination schemaName="vehicle" queryName="etl_target" />
-    <schedule><poll updateTimeColumn="modified" createTimeColumn="created"></poll></schedule>
+    <transforms>
+        <transform type="org.labkey.di.pipeline.TransformTask">
+            <description>Copy new Users</description>
+            <source schemaName="vehicle" queryName="etl_source" />
+            <destination schemaName="vehicle" queryName="etl_target" />
+        </transform>
+    </transforms>
+    <schedule><poll updateTimeColumn="none" createTimeColumn="none2"></poll></schedule>
 </etl>
