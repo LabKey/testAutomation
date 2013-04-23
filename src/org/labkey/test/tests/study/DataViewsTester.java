@@ -308,14 +308,17 @@ public class DataViewsTester
         addSubCategory("Subcategory1-" + CATEGORIES[1]);
         addSubCategory("Subcategory2-" + CATEGORIES[1]);
 
+        _test.click(Ext4HelperWD.Locators.window("Subcategories").append("//img").withClass("x4-tool-close").notHidden());
+        _test.waitForTextToDisappear("Subcategory1-" + CATEGORIES[1]);
         _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
         _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[2]));
-        _test.waitForTextToDisappear("Subcategory1-" + CATEGORIES[1]);
         _test.assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1]);
 
         addSubCategory("Subcategory1-" + CATEGORIES[2]);
         addSubCategory("Subcategory2-" + CATEGORIES[2]);
 
+        _test.click(Ext4HelperWD.Locators.window("Subcategories").append("//img").withClass("x4-tool-close").notHidden());
+        _test.waitForTextToDisappear("Subcategory1-" + CATEGORIES[2]);
         _test.mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[3])));
         _test.waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[3]));
         _test.assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1], "Subcategory1-" + CATEGORIES[2], "Subcategory2-" + CATEGORIES[2]);
