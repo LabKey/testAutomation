@@ -19,11 +19,11 @@ function doTest()
     });
     console.log("LABKEY.Report.execute response: ", result);
 
-    if (result.console[0].indexOf("Hello, Bob!") == -1)
-        throw new Error("Expected console to contain 'Hello, Bob!', got: " + result.console[0]);
-
     if (result.errors.length != 0)
-        throw new Error("Expected empty errors array");
+        throw new Error("Expected empty errors array, but got: " + result.errors.join());
+
+    if (!result.console[0] || result.console[0].indexOf("Hello, Bob!") == -1)
+        throw new Error("Expected console to contain 'Hello, Bob!', got: " + result.console[0]);
 
     var expectedOutputParam = {
         name: "hello.json",
