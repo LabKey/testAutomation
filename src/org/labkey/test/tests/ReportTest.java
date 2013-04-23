@@ -617,6 +617,7 @@ public class ReportTest extends StudyBaseTest
 
         // relies on reports created in this function so
         // call from here
+        goToHome();
         doUpdateAttachmentReportTest();
     }
 
