@@ -2547,17 +2547,22 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName));
         clickButton("Move");
         if (createAlias)
-            checkCheckbox("addAlias");
+            checkCheckbox(Locator.name("addAlias"));
         else
-            uncheckCheckbox("addAlias");
+            uncheckCheckbox(Locator.name("addAlias"));
         // Select Target
         waitForElement(Locator.permissionsTreeNode(newParent), 10000);
         selectFolderTreeItem(newParent);
         // move:
         clickButton("Confirm Move");
+        _createdFolders.remove(new WebTestHelper.FolderIdentifier(projectName, folderName));
+        _createdFolders.add(new WebTestHelper.FolderIdentifier(newParent, folderName));
+
         // verify that we're not on an error page with a check for folder link:
-        assertLinkPresentWithText(folderName);
-        assertLinkPresentWithText(newParent);
+        assertElementPresent(Locator.currentProject(projectName));
+        hoverFolderBar();
+        assertElementPresent(Locator.linkWithText(projectName));
+        assertElementPresent(Locator.linkWithText(newParent));
     }
 
     public void hoverProjectBar()

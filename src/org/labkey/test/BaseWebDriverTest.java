@@ -3068,6 +3068,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         selectFolderTreeItem(newParent);
         // move:
         clickButton("Confirm Move");
+        _createdFolders.remove(new WebTestHelper.FolderIdentifier(projectName, folderName));
+        _createdFolders.add(new WebTestHelper.FolderIdentifier(newParent, folderName));
+
         // verify that we're not on an error page with a check for folder link:
         assertElementPresent(Locator.currentProject(projectName));
         hoverFolderBar();
