@@ -192,7 +192,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         createNewQuery("study");
 
         setFormElement("ff_newQueryName", "APX: Custom Query");
-        selectOptionByText("ff_baseTableName", "APX-1: Abbreviated Physical Exam");
+        selectOptionByText("ff_baseTableName", "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create and Edit Source");
         clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);

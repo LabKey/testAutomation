@@ -243,14 +243,14 @@ public class SearchTest extends StudyTest
         clickMenuButton("Views", "Manage Views");
         clickMenuButton("Create", "Grid View");
         setFormElement("label", GRID_VIEW_NAME);
-        selectOptionByText("params", "ECI-1: Eligibility Criteria");
+        selectOptionByText("params", "ECI-1 (ECI-1: Eligibility Criteria)");
         clickButton("Create View");
 
         // create new external report
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickMenuButton("Views", "Create", "Advanced View");
-        selectOptionByText("queryName", "DEM-1: Demographics");
+        selectOptionByText("queryName", "DEM-1 (DEM-1: Demographics)");
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
         clickButton("Submit");

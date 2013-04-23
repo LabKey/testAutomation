@@ -266,7 +266,6 @@ public class StudyWDTest extends StudyBaseTestWD
         waitAndClickAndWait(Locator.linkWithText(datasetLink));
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
-
         // verify warn on no selection
         if(!isQuickTest)
         {
@@ -460,8 +459,6 @@ public class StudyWDTest extends StudyBaseTestWD
         clickButtonContainingText("Cancel", 0);
     }
 
-
-
     // select the list name from the main classification page
     private void selectListName(String listName)
     {
@@ -559,7 +556,6 @@ public class StudyWDTest extends StudyBaseTestWD
         verifyDemographics();
         verifyVisitMapPage();
         verifyManageDatasetsPage();
-
 
         if(quickTest)
             return;
@@ -660,8 +656,6 @@ public class StudyWDTest extends StudyBaseTestWD
         searchHelper.searchFor("191919");
         // Issue 17203: Changes to study datasets not auto indexed
 //        assertTextPresent("Study Study 001 -- Mouse 999320687");
-
-
     }
 
     @LogMethod
@@ -858,7 +852,7 @@ public class StudyWDTest extends StudyBaseTestWD
         DataRegionTable auditTable =  new DataRegionTable("audit", this);
         String[][] columnAndValues = new String[][] {{"Created By", getDisplayName()},
                 {"Project", PROJECT_NAME}, {"Container", STUDY_NAME}, {"SchemaName", "study"},
-                {"QueryName", "DEM-1: Demographics"}, {"Comment", "Exported to script type r"}};
+                {"QueryName", "DEM-1"}, {"Comment", "Exported to script type r"}};
         for(String[] columnAndValue : columnAndValues)
         {
             log("Checking column: "+ columnAndValue[0]);

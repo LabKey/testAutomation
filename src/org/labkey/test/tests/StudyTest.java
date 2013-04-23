@@ -861,7 +861,7 @@ public class StudyTest extends StudyBaseTest
         DataRegionTable auditTable =  new DataRegionTable("audit", this);
         String[][] columnAndValues = new String[][] {{"Created By", getDisplayName()},
                 {"Project", PROJECT_NAME}, {"Container", STUDY_NAME}, {"SchemaName", "study"},
-                {"QueryName", "DEM-1: Demographics"}, {"Comment", "Exported to script type r"}};
+                {"QueryName", "DEM-1"}, {"Comment", "Exported to script type r"}};
         for(String[] columnAndValue : columnAndValues)
         {
             log("Checking column: "+ columnAndValue[0]);

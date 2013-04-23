@@ -154,7 +154,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addQueryWebPart("Demographics", "study", "DEM-1: Demographics", null);
+        portalHelper.addQueryWebPart("Demographics", "study", "DEM-1", null);
         dataregion = new DataRegionTable("qwp6", this);
         verifyFilterPanelOnDemographics(dataregion);
     }

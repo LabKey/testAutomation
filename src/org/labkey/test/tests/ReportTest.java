@@ -295,10 +295,10 @@ public class ReportTest extends StudyBaseTest
         // create new grid view report:
         String viewName = "DRT Eligibility Query";
         createReport(GRID_VIEW);
-        setFormElement("label", viewName);
-        selectOptionByText("params", "ECI-1: Eligibility Criteria");
+        setFormElement(Locator.name("label"), viewName);
+        selectOptionByText(Locator.name("params"), "ECI-1 (ECI-1: Eligibility Criteria)");
         clickButton("Create View");
-        assertLinkPresentWithText("999320016");
+        assertElementPresent(Locator.linkWithText("999320016"));
         assertNavButtonNotPresent("go");
         clickFolder(getStudyLabel());
         clickTab("Manage");
@@ -308,17 +308,17 @@ public class ReportTest extends StudyBaseTest
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickMenuButton("Views", "Create", "Advanced View");
-        selectOptionByText("queryName", "DEM-1: Demographics");
+        selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
         String java = System.getProperty("java.home") + "/bin/java";
-        setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
+        setFormElement(Locator.name("commandLine"), java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
         clickButton("Submit");
         assertTextPresent("Female");
-        setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
-        selectOptionByValue("fileExtension", "tsv");
+        setFormElement(Locator.name("commandLine"), java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
+        selectOptionByValue(Locator.name("fileExtension"), "tsv");
         clickButton("Submit");
         assertTextPresent("Female");
-        setFormElement("label", "tsv");
-        selectOptionByText("showWithDataset", "DEM-1: Demographics");
+        setFormElement(Locator.name("label"), "tsv");
+        selectOptionByText(Locator.name("showWithDataset"), "DEM-1: Demographics");
         clickButton("Save");
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("tsv"));
@@ -613,8 +613,7 @@ public class ReportTest extends StudyBaseTest
             clickReportGridLink(ATTACHMENT_REPORT_NAME, "view");
             goBack();
         }
-        //TODO: Verify reports. Blocked: 13761: Attachment reports can't be viewed
-//        clickReportGridLink(ATTACHMENT_REPORT2_NAME, "view");
+        clickReportGridLink(ATTACHMENT_REPORT2_NAME, "view");
 
         // relies on reports created in this function so
         // call from here
@@ -932,8 +931,8 @@ public class ReportTest extends StudyBaseTest
         goToManageViews();
 
         createReport(GRID_VIEW);
-        setFormElement("label", TEST_GRID_VIEW);
-        selectOptionByText("datasetSelection", "APX-1: Abbreviated Physical Exam");
+        setFormElement(Locator.name("label"), TEST_GRID_VIEW);
+        selectOptionByText(Locator.id("datasetSelection"), "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create View");
 
         // test security
@@ -1529,10 +1528,10 @@ public class ReportTest extends StudyBaseTest
         _extHelper.waitForExtDialog("Select Chart Query");
         //TODO: weird timing with these combo boxes.
         //Try once bug fixed: 15520: Box Plot - Allows selection of invalid schema/Query combination
-//        _extHelper.selectExt4ComboBoxItem(this, "Schema", "assay");
-//        _extHelper.selectExt4ComboBoxItem(this, "Query", "AssayList");
-//        _extHelper.selectExt4ComboBoxItem(this, "Schema", "study");
-        _extHelper.selectExt4ComboBoxItem("Query", "RCF-1: Reactogenicity-Day 2");
+        //_extHelper.selectExt4ComboBoxItem("Schema", "assay");
+        //_extHelper.selectExt4ComboBoxItem("Query", "AssayList");
+        //_extHelper.selectExt4ComboBoxItem("Schema", "study");
+        _extHelper.selectExt4ComboBoxItem("Query", "RCF-1 (RCF-1: Reactogenicity-Day 2)");
 
         // Todo: put better wait here
         sleep(5000);
@@ -1704,10 +1703,10 @@ public class ReportTest extends StudyBaseTest
         _extHelper.waitForExtDialog("Select Chart Query");
         //TODO: weird timing with these combo scatteres.
         //Try once bug fixed: 15520: Scatter Plot - Allows selection of invalid schema/Query combination
-//        _extHelper.selectExt4ComboScatterItem(this, "Schema", "assay");
-//        _extHelper.selectExt4ComboScatterItem(this, "Query", "AssayList");
-//        _extHelper.selectExt4ComboScatterItem(this, "Schema", "study");
-        _extHelper.selectExt4ComboBoxItem("Query", "APX-1: Abbreviated Physical Exam");
+        //_extHelper.selectExt4ComboBoxItem("Schema", "assay");
+        //_extHelper.selectExt4ComboBoxItem("Query", "AssayList");
+        //_extHelper.selectExt4ComboBoxItem("Schema", "study");
+        _extHelper.selectExt4ComboBoxItem("Query", "APX-1 (APX-1: Abbreviated Physical Exam)");
 
         // Todo: put better wait here
         sleep(5000);
@@ -2133,7 +2132,7 @@ public class ReportTest extends StudyBaseTest
     private static final String QUERY_REPORT_NAME_2 = "Second Test Query Report";
     private static final String QUERY_REPORT_DESCRIPTION_2 = "Description for the first query report.";
     private static final String QUERY_REPORT_SCHEMA_NAME_2 = "study";
-    private static final String QUERY_REPORT_QUERY_NAME_2 = "AE-1:(VTN) AE Log";
+    private static final String QUERY_REPORT_QUERY_NAME_2 = "AE-1 (AE-1:(VTN) AE Log)";
     private static final String QUERY_REPORT_VIEW_NAME_2 = "Limited PTIDS";
     private static final String[] PTIDS_FOR_CUSTOM_VIEW = {"999320533", "999320541", "999320529", "999320518"};
 

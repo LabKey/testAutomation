@@ -41,7 +41,7 @@ public class TimeChartTest extends StudyBaseTest
     private static final String Y_AXIS_LABEL = "New Y-Axis Label";
     private static final String CHART_TITLE = "New Chart Title";
     private static final String VISIT_CHART_TITLE = "APX-1: Abbreviated Physical Exam";
-    private static final String QUERY_MEASURE_DATASET = "APX-1: Abbreviated Physical Exam";
+    private static final String QUERY_MEASURE_DATASET = "APX-1 (APX-1: Abbreviated Physical Exam)";
     private static final String ADD_MEASURE_DIALOG = "Add Measure...";
     protected static final String PARTICIPANTS = "Participants";
     protected static final String PARTICIPANTS_GROUPS = "Participant Groups";

@@ -60,7 +60,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String[] DATASETS = {"RCB-1: Reactogenicity-Baseline", "RCM-1: Reactogenicity-Early Assessment", "RCE-1: Reactogenicity-Day 0", "RCH-1: Reactogenicity-Day 1", "RCF-1: Reactogenicity-Day 2", "RCT-1: Reactogenicity-Day 3", "CPS-1: Screening Chemistry Panel", "DEM-1: Demographics"};
     private final String REPORT_DATASET = "RCB-1: Reactogenicity-Baseline";
     private final String UNPUBLISHED_REPORT_DATASET = "AE-1:(VTN) AE Log";
-    private final String DATE_SHIFT_DATASET = "CPS-1: Screening Chemistry Panel";
+    private final String DATE_SHIFT_DATASET = "CPS-1 (CPS-1: Screening Chemistry Panel)";
     private final String DATE_SHIFT_REQUIRED_VISIT = "101";
     private final ImmutablePair<String, String> UNSHIFTED_DATE_FIELD = new ImmutablePair<String, String>("CPSdt", "Initial Spec Collect Date");
     private final ImmutablePair<String, String> SHIFTED_DATE_FIELD = new ImmutablePair<String, String>("CPScredt", "2a.Alt Creat Coll Date");
