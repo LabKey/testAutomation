@@ -67,6 +67,7 @@ public enum TestSet
         WebDavTest.class
     ),
 
+    //Tests for unsupported modules (not for unsupported tests)
     Unsupported(
         LabModulesTest.class,
         SequenceTest.class,
@@ -74,8 +75,7 @@ public enum TestSet
         ELISPOT_AssayTest.class,
         HormoneAssayTest.class,
         GenotypeAssaysTest.class,
-        FlowAssaysTest.class,
-        ListPublishTest.class
+        FlowAssaysTest.class
     ),
 
     Perf(
@@ -365,6 +365,7 @@ public enum TestSet
 
     InDevelopment(
         MassFilterTest.class,
+        ListPublishTest.class,
         ExperimentalFeaturesTest.class // currently no experimental features being tested
     ),
 
