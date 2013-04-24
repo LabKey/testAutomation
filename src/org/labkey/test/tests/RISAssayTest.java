@@ -247,9 +247,8 @@ public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
         waitForElement(Locator.linkWithText("Kiem Chart"));
         waitForElement(Locator.xpath("//img[starts-with(@id, 'resultImage')]"));
 
-        //clickAndWait(Locator.linkWithText("Kiem Chart"));
-        //waitForElement(Locator.pageHeader("bar-chart"));
-        //assertTextNotPresent("Error"); //TODO: 17236: RIS Report bar chart is broken
+        clickAndWait(Locator.linkWithText("Kiem Chart"));
+        waitForElement(Locator.xpath("//div[starts-with(@id, 'viewDiv_')]").containing("Please run this report from the RIS report webpart."));
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
