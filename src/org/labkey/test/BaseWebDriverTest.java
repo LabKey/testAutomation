@@ -1915,6 +1915,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return _downloadDir;
     }
 
+    public WebDriverWait shortWait()
+    {
+        return _shortWait;
+    }
+
+    public WebDriverWait longWait()
+    {
+        return _longWait;
+    }
+
     public void downloadFileFromLink(Locator downloadLink)
     {
         if (BROWSER_TYPE == BrowserType.FIREFOX)
@@ -5369,7 +5379,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _extHelper.waitForExtDialog("Show Rows Where " + columnLabel + "...");
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
-        if (isTextPresent("Choose Values"))
+        if (isElementPresent(Locator.css("span.x-tab-strip-text").withText("Choose Values")))
         {
             log("Switching to advanced filter UI");
             _extHelper.clickExtTab("Choose Filters");

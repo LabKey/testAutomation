@@ -611,9 +611,11 @@ public class ExtHelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
-        _test.click(Locator.xpath(parentLocator.getPath() + "//*[contains(@class, 'x-form-arrow-trigger')]"));
-        _test.waitAndClick(Locator.xpath("//div["+NOT_HIDDEN+"]/div/div[text()='" + selection + "']"));
-        _test.waitForElementToDisappear(Locator.xpath("//div["+NOT_HIDDEN+"]/div/div[text()='" + selection + "']"), WAIT_FOR_JAVASCRIPT);
+        _test.click(parentLocator.append("//*[contains(@class, 'x-form-arrow-trigger')]"));
+        Locator.XPathLocator listItem = Locator.xpath("//div").withClass("x-combo-list-item").notHidden().withText(selection);
+        _test.executeScript("arguments[0].scrollIntoView(true);", listItem.findElement(_test.getDriver()));
+        _test.click(listItem);
+        _test.waitForElementToDisappear(Locator.xpath("//div[" + NOT_HIDDEN + "]/div/div[text()='" + selection + "']"), WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod(quiet = true)
