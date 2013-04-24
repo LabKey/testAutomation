@@ -150,7 +150,8 @@ public enum TestSet
         RISAssayTest.class,
         DatabaseDiagnosticsTest.class,
         StudyDatasetsTest.class,
-        AdminConsoleTest.class
+        AdminConsoleTest.class,
+        DatasetPublishTest.class
     ),
 
     DailyB(600000,
