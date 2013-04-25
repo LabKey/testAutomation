@@ -71,7 +71,7 @@ public class CohortTest extends BaseWebDriverTest
     {
         log("Check advanced cohort features.");
         _containerHelper.createProject(PROJECT_NAME, "Study");
-        importStudyFromZip(new File(getLabKeyRoot() + COHORT_STUDY_ZIP).getPath());
+        importStudyFromZip(new File(getLabKeyRoot(), COHORT_STUDY_ZIP));
         clickProject(PROJECT_NAME);
         addWebPart("Specimens");
         // Check all cohorts after initial import.

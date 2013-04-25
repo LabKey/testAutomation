@@ -65,7 +65,7 @@ public class CAVDStudyTest extends StudyBaseTest
     public void configureStudy(String folderName)
     {
         createSubfolder(PROJECT_NAME, PROJECT_NAME, folderName, "Collaboration", null);
-        importFolderFromZip(new File(getLabKeyRoot() + CAVD_TEST_STUDY_ZIP).getPath());
+        importFolderFromZip(new File(getLabKeyRoot(), CAVD_TEST_STUDY_ZIP));
         waitForPipelineJobsToComplete(1, "Folder import", false);
     }
 

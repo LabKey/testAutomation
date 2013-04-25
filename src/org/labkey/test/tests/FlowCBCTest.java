@@ -23,6 +23,8 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.TimeChartHelper;
 
+import java.io.File;
+
 /**
  * User: kevink
  * Date: 6/6/12
@@ -86,7 +88,7 @@ public class FlowCBCTest extends BaseFlowTestWD
     {
         log("** Initialize Study Folder");
         createSubfolder(getProjectName(), getProjectName(), STUDY_FOLDER, "Study", new String[]{"Study", "Letvin", "Flow"});
-        importFolderFromZip(getLabKeyRoot() + PIPELINE_PATH + "/FlowStudy.folder.zip");       //Issue 16697: dataset ignored when importing study archive
+        importFolderFromZip(new File(getLabKeyRoot() + PIPELINE_PATH, "/FlowStudy.folder.zip"));       //Issue 16697: dataset ignored when importing study archive
     }
 
     @Override

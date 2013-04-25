@@ -167,7 +167,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     //https://docs.google.com/a/labkey.com/file/d/0B45Fm0-0-NLtdmpDR1hKaW5jSWc/edit
     private void verifyCleanIlluminaSampleSheets()
     {
-        importFolderFromZip(pipelineLoc + "/genoCleanSamples.folder.zip", 6);
+        importFolderFromZip(new File(pipelineLoc, "/genoCleanSamples.folder.zip"), 6);
         goToProjectHome();
         click(Locator.linkWithText("Samples"));
         waitForText("SIVkcol2");

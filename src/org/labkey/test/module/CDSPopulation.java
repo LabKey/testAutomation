@@ -53,7 +53,7 @@ public class CDSPopulation extends BaseSeleniumWebTest implements PostgresOnlyTe
     public void doTestSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, "Study");
-        importStudyFromZip(STUDY_ZIP.getPath());
+        importStudyFromZip(STUDY_ZIP);
         enableModule(PROJECT_NAME, "CDS");
 
         importCDSData("Antigens", new File(getSampledataPath(), "CDS/antigens.tsv"));

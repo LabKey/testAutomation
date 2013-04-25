@@ -38,7 +38,7 @@ public class StudyReloadTest extends StudyBaseTest
     protected void doCreateSteps()
     {
         initializeFolder();
-        importStudyFromZip(new File(getSampledataPath(), "studyreload/original.zip").getAbsolutePath());
+        importStudyFromZip(new File(getSampledataPath(), "studyreload/original.zip"));
     }
 
     @Override

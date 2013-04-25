@@ -50,7 +50,7 @@ public class PivotQueryTest extends BaseWebDriverTest
     protected void setupProject()
     {
         _containerHelper.createProject(getProjectName(), "Study");
-        importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
+        importStudyFromZip(new File(getLabKeyRoot(), STUDY_ZIP));
     }
 
     @Override

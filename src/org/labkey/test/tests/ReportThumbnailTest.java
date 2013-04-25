@@ -70,7 +70,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     protected void doSetup()
     {
         _containerHelper.createProject(PROJECT_NAME, "Study");
-        importStudyFromZip(TEST_STUDY.getAbsolutePath());
+        importStudyFromZip(TEST_STUDY);
         goToDataViews();
     }
 

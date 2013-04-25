@@ -19,6 +19,8 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
+import java.io.File;
+
 public class DatasetPublishTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "DatasetPublishTestProject";
@@ -35,7 +37,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, "Study");
 
-        importStudyFromZip(getSampledataPath() + "/study/LabkeyDemoStudy.zip");
+        importStudyFromZip(new File(getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
         goToProjectHome();
         publishStudy(SUBFOLDER_NAME);
 

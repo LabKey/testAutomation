@@ -6089,7 +6089,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
-    protected void startImportStudyFromZip(String studyFile)
+    protected void startImportStudyFromZip(File studyFile)
     {
         clickButton("Import Study");
         setFormElement(Locator.name("folderZip"), studyFile);
@@ -6097,24 +6097,24 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertTextNotPresent("You must select a .study.zip file to import.");
     }
 
-    protected void importStudyFromZip(String studyFile)
+    protected void importStudyFromZip(File studyFile)
     {
         startImportStudyFromZip(studyFile);
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 
 
-    protected void importFolderFromZip(String folderFile)
+    protected void importFolderFromZip(File folderFile)
     {
         importFolderFromZip(folderFile, 1);
     }
 
-    protected void importFolderFromZip(String folderFile, int completedJobs)
+    protected void importFolderFromZip(File folderFile, int completedJobs)
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
-        sleep(2000);
-        setFormElement(Locator.name("folderZip"), new File(folderFile));
+        waitForElement(Locator.name("folderZip"));
+        setFormElement(Locator.name("folderZip"), folderFile);
         clickButtonContainingText("Import Folder From Local Zip Archive");
         waitForText("Data Pipeline");
         waitForPipelineJobsToComplete(completedJobs, "Folder import", false);

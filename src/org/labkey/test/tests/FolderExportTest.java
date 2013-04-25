@@ -138,7 +138,7 @@ public class FolderExportTest extends BaseWebDriverTest
         _containerHelper.createSubfolder(getProjectName() + "/" + folderFromZip, "Subfolder1", "Collaboration");
 
         clickFolder(folderFromZip);
-        importFolderFromZip(new File(dataDir, folderZip).getAbsolutePath());
+        importFolderFromZip(new File(dataDir, folderZip));
         beginAt(getCurrentRelativeURL()); //work around linux issue
         waitForPipelineJobsToComplete(1, "Folder import", false);
         clickFolder(folderFromZip);

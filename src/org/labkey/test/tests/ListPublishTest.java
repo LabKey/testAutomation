@@ -23,6 +23,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,7 +45,7 @@ public class ListPublishTest extends BaseWebDriverTest
         initializePtids("249318596", "249320107", "249320127", "249320489", "249320897", "249325717");
         _containerHelper.createProject(PROJECT_NAME, "Study");
 
-        importStudyFromZip(getSampledataPath() + "/study/LabkeyDemoStudy.zip");
+        importStudyFromZip(new File(getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
         goToProjectHome();
         setUpLists();
         setListIds();

@@ -181,7 +181,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         waitForElement(Locator.xpath("//div[text() = 'Populate Complete']"), 200000);
 
         goToModule("Study");
-        importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
+        importStudyFromZip(new File(getLabKeyRoot(), STUDY_ZIP));
         try
         {
             deleteRecords();

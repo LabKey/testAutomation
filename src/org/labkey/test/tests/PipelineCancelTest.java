@@ -37,7 +37,7 @@ public class PipelineCancelTest  extends BaseWebDriverTest
     public void doTestSteps()
     {
         _containerHelper.createProject(getProjectName(), "Study");
-        startImportStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
+        startImportStudyFromZip(new File(getLabKeyRoot(), STUDY_ZIP));
 
         log("Cancel import");
         waitForText("Delaying import");

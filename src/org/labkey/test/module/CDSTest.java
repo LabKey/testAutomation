@@ -98,7 +98,7 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
     {
         _containerHelper.createProject(PROJECT_NAME, "Study");
         enableModule(PROJECT_NAME, "CDS");
-        importFolderFromZip(FOLDER_ZIP.getPath());
+        importFolderFromZip(FOLDER_ZIP);
         goToProjectHome();
         addWebPart("CDS Management");
     }

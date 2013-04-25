@@ -136,7 +136,7 @@ public class MenuBarTest extends BaseWebDriverTest
 
         // Another custom menu with links to Participant Report
         createSubfolder(PROJECT_NAME, PROJECT_NAME, DEM_STUDY_FOLDER, "Study", null);
-        importStudyFromZip(new File(getLabKeyRoot() + STUDY_ZIP).getPath());
+        importStudyFromZip(new File(getLabKeyRoot(), STUDY_ZIP));
 
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));

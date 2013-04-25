@@ -42,7 +42,7 @@ public class StudyImportPerfTest extends PerformanceTest
         _containerHelper.createProject(getProjectName(), "Study");
 
         long startTime = System.currentTimeMillis();
-        importFolderFromZip(getLabKeyRoot() + "/sampledata/study/LabkeyDemoStudy.zip");
+        importFolderFromZip(new File(getLabKeyRoot(), "/sampledata/study/LabkeyDemoStudy.zip"));
         elapsedTime = System.currentTimeMillis() - startTime;
         writePerfDataToFile();
     }

@@ -71,7 +71,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         _assayHelper = new UIAssayHelper(this);
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), studyFolder, "Study");
-        importFolderFromZip(STUDY_PIPELINE_ROOT + "/Study.folder.zip");
+        importFolderFromZip(new File(STUDY_PIPELINE_ROOT, "Study.folder.zip"));
 
         // set the label for the unscheduled visit
         clickAndWait(Locator.linkWithText("Manage"));

@@ -6786,26 +6786,30 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return locators;
     }
 
-    protected void startImportStudyFromZip(String studyFile)
+    protected void startImportStudyFromZip(File studyFile)
     {
         clickButton("Import Study");
         setFormElement(Locator.name("folderZip"), studyFile);
         clickButton("Import Study From Local Zip Archive");
-        assertTextNotPresent("You must select a .study.zip file to import.");
+        if (isElementPresent(Locator.css(".labkey-error")))
+        {
+            String errorText = Locator.css(".labkey-error").findElement(getDriver()).getText();
+            Assert.assertTrue("Error present: " + errorText, errorText.trim().length() == 0);
+        }
     }
 
-    protected void importStudyFromZip(String studyFile)
+    protected void importStudyFromZip(File studyFile)
     {
         startImportStudyFromZip(studyFile);
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 
-    protected void importFolderFromZip(String folderFile)
+    protected void importFolderFromZip(File folderFile)
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
-        sleep(2000);
-        setFormElement(Locator.name("folderZip"), new File(folderFile));
+        waitForElement(Locator.name("folderZip"));
+        setFormElement(Locator.name("folderZip"), folderFile);
         clickButtonContainingText("Import Folder From Local Zip Archive");
         waitForText("Data Pipeline");
         waitForPipelineJobsToComplete(1, "Folder import", false);
@@ -6820,6 +6824,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         selectImportDataAction("Import Folder");
         waitForPipelineJobsToComplete(1, "Folder import", false);
     }
+
     public String getFileContents(String rootRelativePath)
     {
         if (rootRelativePath.charAt(0) != '/')

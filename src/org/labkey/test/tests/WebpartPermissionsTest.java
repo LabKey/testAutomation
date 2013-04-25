@@ -21,6 +21,8 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
+import java.io.File;
+
 /**
  * User: elvan
  * Date: 1/16/13
@@ -147,7 +149,7 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
          * Flow Script = Read
          */
         _containerHelper.createProject(getProjectName(), "Collaboration");
-        importFolderFromZip(getLabKeyRoot() + "/sampledata/webpartPerm/webPerms.folder.zip");
+        importFolderFromZip(new File(getLabKeyRoot(), "/sampledata/webpartPerm/webPerms.folder.zip"));
         //set all users to Reader so they have access to the folder
         _securityHelper.setSiteGroupPermissions("All Site Users", "Reader");
     }
