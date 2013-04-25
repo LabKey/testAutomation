@@ -505,7 +505,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Check that 'Copy Pages' in TOC works");
         clickWebpartMenuItem("Test Customize TOC", "Copy");
-        clickProject(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(PROJECT_NAME));
         clickButton("Copy Pages");
         clickProject(PROJECT_NAME);
         clickTab("Wiki");
