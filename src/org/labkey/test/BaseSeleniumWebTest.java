@@ -1715,21 +1715,18 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             String folder = folderId.getFolderName();
             if(!checked.contains(project))
             {
-                if (!getText(Locator.id("folderBar")).equals(project))
-                    clickProject(project);
+                clickProject(project);
 
                 doViewCheck(project);
                 checked.add(project);
             }
             if(!checked.contains(folder))
             {
-                String currentFolder = getText(Locator.id("folderBar"));
-                if (!currentFolder.equals(folder))
-                {
-                    if (!currentFolder.equals(project))
-                        clickProject(project);
-                    clickFolder(folder);
-                }
+                String currentProject = getText(Locator.id("folderBar"));
+                if (!currentProject.equals(project))
+                    clickProject(project);
+
+                clickFolder(folder);
 
                 doViewCheck(folder);
                 checked.add(folder);
@@ -2530,7 +2527,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickButton("Rename");
         _createdFolders.remove(new WebTestHelper.FolderIdentifier(project, folderName));
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, newFolderName));
-        assertElementPresent(Locator.currentProject(project));
+        assertElementPresent(Locator.currentProject().withText(project));
         hoverFolderBar();
         assertElementPresent(Locator.linkWithText(newFolderName));
         assertElementNotPresent(Locator.linkWithText(folderName));
@@ -2555,14 +2552,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selectFolderTreeItem(newParent);
         // move:
         clickButton("Confirm Move");
-        _createdFolders.remove(new WebTestHelper.FolderIdentifier(projectName, folderName));
-        _createdFolders.add(new WebTestHelper.FolderIdentifier(newParent, folderName));
 
         // verify that we're not on an error page with a check for folder link:
-        assertElementPresent(Locator.currentProject(projectName));
+        assertElementPresent(Locator.currentProject().withText(projectName));
         hoverFolderBar();
-        assertElementPresent(Locator.linkWithText(projectName));
-        assertElementPresent(Locator.linkWithText(newParent));
+        assertElementPresent(Locator.xpath("//li").withClass("clbl").withPredicate(Locator.xpath("a").withText(newParent)).append("/ul/li/a").withText(folderName));
+        String newProject = getText(Locator.currentProject());
+        _createdFolders.remove(new WebTestHelper.FolderIdentifier(projectName, folderName));
+        _createdFolders.add(new WebTestHelper.FolderIdentifier(newProject, folderName));
     }
 
     public void hoverProjectBar()

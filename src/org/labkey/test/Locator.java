@@ -622,9 +622,9 @@ public abstract class Locator
         return xpath("//a[@class='x-tree-node-anchor']/span[text()='" + folderName + "' or text()='" + folderName + "*']");
     }
 
-    public static XPathLocator currentProject(String project)
+    public static XPathLocator currentProject()
     {
-        return id("folderBar").withText(project);
+        return id("folderBar");
     }
 
     public static IdLocator folderTab(String text)
