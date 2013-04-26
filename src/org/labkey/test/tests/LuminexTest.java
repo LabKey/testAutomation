@@ -1340,6 +1340,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToTestAssayHome();
         clickEditAssayDesign(false);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
+        addField("Batch Fields", 8, "CustomProtocol", "Protocol", ListColumnType.String);
         // save changes to assay design
         clickButton("Save & Close");
 
@@ -1350,7 +1351,18 @@ public class LuminexTest extends AbstractQCAssayTest
         // upload the first set of files (2 runs)
         for (int i = 0; i < 2; i++)
         {
-            importRunForTestLuminexConfig(files[i], testDate, i);
+            goToTestAssayHome();
+            clickButton("Import Data");
+            setFormElement("network", "NETWORK" + (i + 1));
+            setFormElement("customProtocol", "PROTOCOL" + (i + 1));
+            clickButton("Next");
+
+            testDate.add(Calendar.DATE, 1);
+            importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
+                        "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i].toString(), i);
+            uncheckCheckbox("_titrationRole_standard_Standard1");
+            checkCheckbox("_titrationRole_qccontrol_Standard1");
+            clickButton("Save and Finish");
 
             verifyRunFileAssociations(i+1);
         }
@@ -1384,6 +1396,7 @@ public class LuminexTest extends AbstractQCAssayTest
             goToTestAssayHome();
             clickButton("Import Data");
             setFormElement("network", "NETWORK" + (i + 1));
+            setFormElement("customProtocol", "PROTOCOL" + (i + 1));
             clickButton("Next");
 
             importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
@@ -1409,6 +1422,10 @@ public class LuminexTest extends AbstractQCAssayTest
         // test the start and end date filter for the report
         goToLeveyJenningsGraphPage("Standard1");
         applyStartAndEndDateFilter();
+
+        // test the network and customProtocol filters for the report
+        goToLeveyJenningsGraphPage("Standard1");
+        applyNetworkProtocolFilter();
 
         excludableWellsWithTransformTest();
         applyLogYAxisScale();
@@ -2209,6 +2226,44 @@ public class LuminexTest extends AbstractQCAssayTest
             assertElementPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + i));
         }
         assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + "5"));
+    }
+
+    @LogMethod
+    private void applyNetworkProtocolFilter()
+    {
+        String colNetworkPrefix = "NETWORK";
+        String colProtocolPrefix = "PROTOCOL";
+
+        setUpGuideSet("GS Analyte (2)");
+        // check that all 5 runs are present in the grid by clicking on them
+        for (int i = 1; i <= 5; i++)
+        {
+            assertElementPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + i));
+        }
+        // set network and protocol filter
+        _extHelper.selectComboBoxItem(Locator.xpath("//input[@id='network-combo-box']/.."), colNetworkPrefix + "3");
+        _extHelper.selectComboBoxItem(Locator.xpath("//input[@id='protocol-combo-box']/.."), colProtocolPrefix + "3");
+
+        waitAndClick(Locator.extButtonEnabled("Apply").index(1));
+        waitForTextToDisappear("Loading");
+        assertTextNotPresent("Error");
+        // check that only 1 runs are now present
+        waitForElementToDisappear(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "1"), WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "3"));
+
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "1"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "2"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "4"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "5"));
+
+        // Clear the filter and check that all rows reappear
+        waitAndClick(Locator.extButtonEnabled("Clear"));
+        waitForTextToDisappear("Loading");
+        assertTextNotPresent("Error");
+        for (int i = 1; i <= 5; i++)
+        {
+            assertElementPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + i));
+        }
     }
 
     private void applyLogYAxisScale()
