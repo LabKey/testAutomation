@@ -213,7 +213,7 @@
     </ns:columns>
   </ns:table>
   
-    <ns:table tableName="etl_target" tableDbType="TABLE">
+  <ns:table tableName="etl_target" tableDbType="TABLE">
     <ns:columns>
       <ns:column columnName="rowid"/>
       <ns:column columnName="container"/>
@@ -224,7 +224,20 @@
       <ns:column columnName="_txtransformrunid"/>
     </ns:columns>
   </ns:table>
-  <ns:table tableName="etl_source" tableDbType="TABLE">
+
+  <ns:table tableName="etl_target2" tableDbType="TABLE">
+    <ns:columns>
+        <ns:column columnName="rowid"/>
+        <ns:column columnName="container"/>
+        <ns:column columnName="created"/>
+        <ns:column columnName="modified"/>
+        <ns:column columnName="id"/>
+        <ns:column columnName="name"/>
+        <ns:column columnName="_txtransformrunid"/>
+    </ns:columns>
+  </ns:table>
+
+    <ns:table tableName="etl_source" tableDbType="TABLE">
     <ns:columns>
       <ns:column columnName="rowid"/>
       <ns:column columnName="container"/>
