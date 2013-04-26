@@ -221,6 +221,7 @@
       <ns:column columnName="modified"/>
       <ns:column columnName="id"/>
       <ns:column columnName="name"/>
+      <ns:column columnName="_txtransformrunid"/>
     </ns:columns>
   </ns:table>
   <ns:table tableName="etl_source" tableDbType="TABLE">
