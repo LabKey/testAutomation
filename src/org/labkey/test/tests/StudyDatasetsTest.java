@@ -22,6 +22,9 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class StudyDatasetsTest extends StudyBaseTest
 {
     private static final String CATEGORY1 = "Category1";
@@ -32,6 +35,13 @@ public class StudyDatasetsTest extends StudyBaseTest
     private static final String GROUP2B = "Group2B";
     private static final String EXTRA_GROUP = "Extra Group";
     private static final String[] PTIDS = {"999320016","999320518","999320529","999320533","999320557","999320565"};
+    private static final String CUSTOM_VIEW_WITH_DATASET_JOINS = "Chemistry + Criteria + Demographics";
+    private static final String TIME_CHART_REPORT_NAME = "Time Chart: Body Temp + Pulse For Group 2";
+    private static final String SCATTER_PLOT_REPORT_NAME = "Scatter: Systolic vs Diastolic";
+    private static final String PTID_REPORT_NAME = "Mouse Report: 2 Dem Vars + 3 Other Vars";
+    private static Map<String, String> EXPECTED_REPORTS = new HashMap<>();
+    private static Map<String, String> EXPECTED_CUSTOM_VIEWS = new HashMap<>();
+
 
     @Override
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -52,13 +62,15 @@ public class StudyDatasetsTest extends StudyBaseTest
     protected void doVerifySteps()
     {
         createDataset("A");
-        renameDataset("A", "Original A");
+        renameDataset("A", "Original A", "A", "Original A", "XTest", "YTest", "ZTest");
         createDataset("A");
         deleteFields("A");
 
         checkFieldsPresent("Original A", "YTest", "ZTest");
 
         verifySideFilter();
+
+        verifyReportAndViewDatasetReferences();
     }
 
     protected void createDataset(String name)
@@ -85,7 +97,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickButton("Save");
  }
 
-    protected void renameDataset(String orgName, String newName)
+    protected void renameDataset(String orgName, String newName, String orgLabel, String newLabel, String... fieldNames)
     {
         goToManageDatasets();
 
@@ -96,12 +108,26 @@ public class StudyDatasetsTest extends StudyBaseTest
 
         waitForElement(Locator.xpath("//input[@name='dsName']"));
         setFormElement(Locator.xpath("//input[@name='dsName']"), newName);
-        setFormElement(Locator.xpath("//input[@name='dsLabel']"), newName);
+        setFormElement(Locator.xpath("//input[@name='dsLabel']"), newLabel);
 
-        assertTextPresent("XTest");
-        assertTextPresent("YTest");
-        assertTextPresent("ZTest");
+        for (String fieldName : fieldNames)
+        {
+            assertTextPresent(fieldName);
+        }
+
         clickButton("Save");
+
+        // fix dataset label references in report and view mappings
+        for (Map.Entry<String, String> entry : EXPECTED_REPORTS.entrySet())
+        {
+            if (orgLabel.equals(entry.getValue()))
+                EXPECTED_REPORTS.put(entry.getKey(), newLabel);
+        }
+        for (Map.Entry<String, String> entry : EXPECTED_CUSTOM_VIEWS.entrySet())
+        {
+            if (orgLabel.equals(entry.getValue()))
+                EXPECTED_CUSTOM_VIEWS.put(entry.getKey(), newLabel);
+        }
 }
 
     protected void deleteFields(String name)
@@ -210,6 +236,147 @@ public class StudyDatasetsTest extends StudyBaseTest
         setFormElement(Locator.id("groupLabel-inputEl"), EXTRA_GROUP);
         _extHelper.clickExtButton("Define Mouse Group", "Save", 0);
         waitForElement(DataRegionTable.Locators.facetRow(EXTRA_GROUP, EXTRA_GROUP));
+    }
+
+    // in 13.2 Sprint 1 we changed reports and views so that they are associated with query name instead of label (i.e. dataset name instead of label)
+    // there is also a migration step that happens when importing study archives with version < 13.11 to fixup these report/view references
+    // this method verifies that migration on import for a handful of reports and views
+    private void verifyReportAndViewDatasetReferences()
+    {
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+
+        // verify the reports and views dataset label/name references after study import
+        verifyExpectedReportsAndViewsExist();
+        verifyCustomViewWithDatasetJoins("CPS-1: Screening Chemistry Panel", "DataSets/ECI-1/ECIelig", "DataSets/DEM-1/DEMbdt", "DataSets/DEM-1/DEMsex");
+        verifyTimeChart("APX-1", "APX-1: Abbreviated Physical Exam");
+        verifyScatterPlot("APX-1: Abbreviated Physical Exam");
+        verifyParticipantReport("DEM-1: 1.Date of Birth", "DEM-1: 2.What is your sex?", "APX-1: 1. Weight", "APX-1: 2. Body Temp", "ECI-1: 1.Meet eligible criteria?");
+
+        // rename and relabel the datasets related to these reports and views
+        renameDataset("DEM-1", "demo", "DEM-1: Demographics", "Demographics");
+        renameDataset("APX-1", "abbrphy", "APX-1: Abbreviated Physical Exam", "Abbreviated Physical Exam");
+        renameDataset("ECI-1", "eligcrit", "ECI-1: Eligibility Criteria", "Eligibility Criteria");
+        renameDataset("CPS-1", "scrchem", "CPS-1: Screening Chemistry Panel", "Screening Chemistry Panel");
+
+        // verify the reports and views dataset label/name references after dataset rename and relabel
+        verifyExpectedReportsAndViewsExist();
+        verifyCustomViewWithDatasetJoins("Screening Chemistry Panel", "DataSets/eligcrit/ECIelig", "DataSets/demo/DEMbdt", "DataSets/demo/DEMsex");
+        verifyTimeChart("abbrphy", "Abbreviated Physical Exam");
+        verifyScatterPlot("Abbreviated Physical Exam");
+        verifyParticipantReport("demo: 1.Date of Birth", "demo: 2.What is your sex?", "abbrphy: 1. Weight", "abbrphy: 2. Body Temp", "eligcrit: 1.Meet eligible criteria?");
+    }
+
+    private void verifyExpectedReportsAndViewsExist()
+    {
+        if (EXPECTED_REPORTS.size() == 0)
+        {
+            EXPECTED_REPORTS.put("Chart View: Systolic vs Diastolic", "APX-1: Abbreviated Physical Exam");
+            EXPECTED_REPORTS.put("Crosstab: MouseId Counts", "APX-1: Abbreviated Physical Exam");
+            EXPECTED_REPORTS.put("R Report: Dataset Column Names", "APX-1: Abbreviated Physical Exam");
+            EXPECTED_REPORTS.put(SCATTER_PLOT_REPORT_NAME, "APX-1: Abbreviated Physical Exam");
+            EXPECTED_REPORTS.put(TIME_CHART_REPORT_NAME, "APX-1: Abbreviated Physical Exam");
+            EXPECTED_REPORTS.put(PTID_REPORT_NAME, "Stand-alone views");
+        }
+
+        if (EXPECTED_CUSTOM_VIEWS.size() == 0)
+        {
+            EXPECTED_CUSTOM_VIEWS.put(CUSTOM_VIEW_WITH_DATASET_JOINS, "CPS-1: Screening Chemistry Panel");
+            EXPECTED_CUSTOM_VIEWS.put("Abbreviated Demographics", "DEM-1: Demographics");
+        }
+
+        goToManageViews();
+
+        log("Verify that all reports were imported");
+        for (Map.Entry<String, String> entry : EXPECTED_REPORTS.entrySet())
+        {
+            expandManageViewsRow(entry.getKey(), entry.getValue());
+        }
+        log("Verify that all custom views were imported");
+        for (Map.Entry<String, String> entry : EXPECTED_CUSTOM_VIEWS.entrySet())
+        {
+            expandManageViewsRow(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void verifyCustomViewWithDatasetJoins(String datasetLabel, String... colFieldKeys)
+    {
+        log("Verify dataset label to name fixup for custom view import");
+        goToManageViews();
+        expandManageViewsRow(CUSTOM_VIEW_WITH_DATASET_JOINS, datasetLabel);
+        clickAndWait(Locator.linkWithText("view"));
+        waitForElement(Locator.tagWithText("span", CUSTOM_VIEW_WITH_DATASET_JOINS));
+        assertTextPresentInThisOrder("Male", "Female"); // verify joined fields in sort
+        DataRegionTable drt = new DataRegionTable("Dataset", this); // verify joined fields in filter
+        Assert.assertEquals("Unexpected number of rows, filter was not applied correctly", 4, drt.getDataRowCount()); // 3 data rows + aggregates
+        assertTextPresentInThisOrder("Avg Cre:", "Agg Count:"); // verify joined fields in aggregates
+        for (String colFieldKey : colFieldKeys) // verify joined fields in column select
+        {
+            assertElementPresent(Locator.xpath("//td[@title = '" + colFieldKey + "']"));
+        }
+        _customizeViewsHelper.openCustomizeViewPanel();
+        assertTextNotPresent("not found", "Field not found");
+    }
+
+    private void verifyTimeChart(String datasetName, String datasetLabel)
+    {
+        log("Verfiy dataset label to name fixup for Time Chart");
+        goToManageViews();
+        expandManageViewsRow(TIME_CHART_REPORT_NAME, datasetLabel);
+        clickAndWait(Locator.linkWithText("edit"));
+        waitForText("APX Main Title");
+        assertTextNotPresent("Error: Could not find query"); // error message from 13.1 when dataset label was changed
+        waitAndClick(Locator.css("svg a>path")); // click first data point
+        _extHelper.waitForExtDialog("Data Point Information");
+        assertTextPresent("Query Name:" + datasetName);
+        assertTextNotPresent("Query Name:" + datasetLabel);
+        clickButton("OK", 0);
+        waitAndClick(Locator.css("svg text:contains('APX Main Title')"));
+        waitAndClick(Locator.xpath("//span[contains(@class, 'iconReload')]"));
+        Assert.assertEquals(datasetLabel, getFormElement(Locator.name("chart-title-textfield")));
+        clickButton("Cancel", 0);
+    }
+
+    private void verifyScatterPlot(String datasetLabel)
+    {
+        log("Verify dataset label to name fixup for Scatter Plot");
+        goToManageViews();
+        expandManageViewsRow(SCATTER_PLOT_REPORT_NAME, datasetLabel);
+        clickAndWait(Locator.linkWithText("edit"));
+        _ext4Helper.waitForMaskToDisappear();
+        assertTextNotPresent("An unexpected error occurred while retrieving data", "doesn't exist", "may have been deleted");
+        // verify that the main title reset goes back to the dataset label - measue name
+        waitAndClick(Locator.css("svg text:contains('APX Main Title')"));
+        setFormElement(Locator.name("chart-title-textfield"), "test");
+        waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'x4-btn-disabled')]//span[contains(@class, 'iconReload')]"));
+        click(Locator.xpath("//span[contains(@class, 'iconReload')]"));
+        Assert.assertEquals(datasetLabel + " - 3. BP systolic xxx/", getFormElement(Locator.name("chart-title-textfield")));
+        clickButton("Cancel", 0);
+    }
+
+    private void verifyParticipantReport(String... measureKeys)
+    {
+        log("Verify dataset label to name fixup for Participant Report");
+        goToManageViews();
+        expandManageViewsRow(PTID_REPORT_NAME, "Stand-alone views");
+        clickAndWait(Locator.linkWithText("view"));
+        waitForText("999320016");
+        assertTextPresent("Showing 10 Results");
+        for (String measureKey : measureKeys)
+        {
+            // element will be 'td' for demographic measures and 'th' for others
+            if (!isElementPresent(Locator.xpath("//td[contains(@data-qtip, '" + measureKey + "')]")) && !isElementPresent(Locator.xpath("//th[contains(@data-qtip, '" + measureKey + "')]")))
+            {
+                Assert.fail("Unable to find measure with key: " + measureKey);
+            }
+        }
+    }
+
+    private void expandManageViewsRow(String name, String category)
+    {
+        String categoryXpath = "//div[contains(@class, 'x-grid-group-title') and text() = '" + category + "']/../../";
+        waitForElement(Locator.xpath(categoryXpath + "/div[text() = '" + name + "']"));
+        click(Locator.tagWithText("div", name));
     }
 
     public void goToManageDatasets()

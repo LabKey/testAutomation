@@ -102,7 +102,7 @@ public class DataViewsTester
         _test.waitForElement(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden());
         _test.waitForElement(Locator.linkWithText(REPORT_NAME), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         _test.assertElementPresent(PortalHelper.Locators.webPartTitle(WEBPART_TITLE));
-        Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        Assert.assertEquals("Incorrect number of datasets after filter", 9, _test.getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
         _test.log("Verify cancel button");
         openCustomizePanel();
@@ -115,7 +115,7 @@ public class DataViewsTester
         _test.waitForText(REPORT_NAME); //TODO: /
         _test.assertTextNotPresent("nothing");
         _test.assertTextPresent(WEBPART_TITLE);
-        Assert.assertEquals("Incorrect number of datasets after filter", 1, _test.getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        Assert.assertEquals("Incorrect number of datasets after filter", 9, _test.getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
         _test.log("Verify category management: delete");
         openCustomizePanel();
