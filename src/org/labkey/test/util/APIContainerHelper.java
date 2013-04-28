@@ -113,7 +113,7 @@ public class APIContainerHelper extends AbstractContainerHelper
     public void deleteContainer(String path, boolean failIfNotFound, int wait) throws TestTimeoutException
     {
         DeleteContainerCommand dcc = new DeleteContainerCommand();
-        dcc.setTimeout(wait);
+        dcc.setTimeout(wait*10);
         try
         {
             dcc.execute(_test.getDefaultConnection(), path);
