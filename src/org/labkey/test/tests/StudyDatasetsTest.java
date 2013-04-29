@@ -36,6 +36,7 @@ public class StudyDatasetsTest extends StudyBaseTest
     private static final String EXTRA_GROUP = "Extra Group";
     private static final String[] PTIDS = {"999320016","999320518","999320529","999320533","999320557","999320565"};
     private static final String CUSTOM_VIEW_WITH_DATASET_JOINS = "Chemistry + Criteria + Demographics";
+    private static final String CUSTOM_VIEW_PRIVATE = "My Private Custom View";
     private static final String TIME_CHART_REPORT_NAME = "Time Chart: Body Temp + Pulse For Group 2";
     private static final String SCATTER_PLOT_REPORT_NAME = "Scatter: Systolic vs Diastolic";
     private static final String PTID_REPORT_NAME = "Mouse Report: 2 Dem Vars + 3 Other Vars";
@@ -248,10 +249,14 @@ public class StudyDatasetsTest extends StudyBaseTest
 
         // verify the reports and views dataset label/name references after study import
         verifyExpectedReportsAndViewsExist();
-        verifyCustomViewWithDatasetJoins("CPS-1: Screening Chemistry Panel", "DataSets/ECI-1/ECIelig", "DataSets/DEM-1/DEMbdt", "DataSets/DEM-1/DEMsex");
+        verifyCustomViewWithDatasetJoins("CPS-1: Screening Chemistry Panel", CUSTOM_VIEW_WITH_DATASET_JOINS, true, true, "DataSets/DEM-1/DEMbdt", "DataSets/DEM-1/DEMsex");
         verifyTimeChart("APX-1", "APX-1: Abbreviated Physical Exam");
         verifyScatterPlot("APX-1: Abbreviated Physical Exam");
         verifyParticipantReport("DEM-1: 1.Date of Birth", "DEM-1: 2.What is your sex?", "APX-1: 1. Weight", "APX-1: 2. Body Temp", "ECI-1: 1.Meet eligible criteria?");
+
+        // create a private custom view with dataset joins
+        createPrivateCustomView();
+        verifyCustomViewWithDatasetJoins("CPS-1: Screening Chemistry Panel", CUSTOM_VIEW_PRIVATE, false, false, "DataSets/DEM-1/DEMbdt", "DataSets/DEM-1/DEMsex");
 
         // rename and relabel the datasets related to these reports and views
         renameDataset("DEM-1", "demo", "DEM-1: Demographics", "Demographics");
@@ -261,7 +266,8 @@ public class StudyDatasetsTest extends StudyBaseTest
 
         // verify the reports and views dataset label/name references after dataset rename and relabel
         verifyExpectedReportsAndViewsExist();
-        verifyCustomViewWithDatasetJoins("Screening Chemistry Panel", "DataSets/eligcrit/ECIelig", "DataSets/demo/DEMbdt", "DataSets/demo/DEMsex");
+        verifyCustomViewWithDatasetJoins("Screening Chemistry Panel", CUSTOM_VIEW_WITH_DATASET_JOINS, true, true, "DataSets/eligcrit/ECIelig", "DataSets/demo/DEMbdt", "DataSets/demo/DEMsex");
+        verifyCustomViewWithDatasetJoins("Screening Chemistry Panel", CUSTOM_VIEW_PRIVATE, false, false, "DataSets/eligcrit/ECIelig", "DataSets/demo/DEMbdt", "DataSets/demo/DEMsex");
         verifyTimeChart("abbrphy", "Abbreviated Physical Exam");
         verifyScatterPlot("Abbreviated Physical Exam");
         verifyParticipantReport("demo: 1.Date of Birth", "demo: 2.What is your sex?", "abbrphy: 1. Weight", "abbrphy: 2. Body Temp", "eligcrit: 1.Meet eligible criteria?");
@@ -299,17 +305,38 @@ public class StudyDatasetsTest extends StudyBaseTest
         }
     }
 
-    private void verifyCustomViewWithDatasetJoins(String datasetLabel, String... colFieldKeys)
+    private void createPrivateCustomView()
+    {
+        log("Create private custom view");
+        clickFolder(getFolderName());
+        clickAndWait(Locator.linkWithText("CPS-1: Screening Chemistry Panel"));
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("DataSets/ECI-1/ECIelig");
+        _customizeViewsHelper.addCustomizeViewColumn("DataSets/DEM-1/DEMbdt");
+        _customizeViewsHelper.addCustomizeViewColumn("DataSets/DEM-1/DEMsex");
+        _customizeViewsHelper.saveCustomView(CUSTOM_VIEW_PRIVATE, false);
+
+        EXPECTED_CUSTOM_VIEWS.put(CUSTOM_VIEW_PRIVATE, "CPS-1: Screening Chemistry Panel");
+    }
+
+    private void verifyCustomViewWithDatasetJoins(String datasetLabel, String viewName, boolean checkSort, boolean checkAggregates, String... colFieldKeys)
     {
         log("Verify dataset label to name fixup for custom view import");
         goToManageViews();
-        expandManageViewsRow(CUSTOM_VIEW_WITH_DATASET_JOINS, datasetLabel);
+        expandManageViewsRow(viewName, datasetLabel);
         clickAndWait(Locator.linkWithText("view"));
-        waitForElement(Locator.tagWithText("span", CUSTOM_VIEW_WITH_DATASET_JOINS));
-        assertTextPresentInThisOrder("Male", "Female"); // verify joined fields in sort
-        DataRegionTable drt = new DataRegionTable("Dataset", this); // verify joined fields in filter
-        Assert.assertEquals("Unexpected number of rows, filter was not applied correctly", 4, drt.getDataRowCount()); // 3 data rows + aggregates
-        assertTextPresentInThisOrder("Avg Cre:", "Agg Count:"); // verify joined fields in aggregates
+        waitForElement(Locator.tagWithText("span", viewName));
+
+        if (checkSort)
+        {
+            assertTextPresentInThisOrder("Male", "Female"); // verify joined fields in sort
+        }
+        if (checkAggregates)
+        {
+            DataRegionTable drt = new DataRegionTable("Dataset", this); // verify joined fields in filter
+            Assert.assertEquals("Unexpected number of rows, filter was not applied correctly", 4, drt.getDataRowCount()); // 3 data rows + aggregates
+            assertTextPresentInThisOrder("Avg Cre:", "Agg Count:"); // verify joined fields in aggregates
+        }
         for (String colFieldKey : colFieldKeys) // verify joined fields in column select
         {
             assertElementPresent(Locator.xpath("//td[@title = '" + colFieldKey + "']"));
