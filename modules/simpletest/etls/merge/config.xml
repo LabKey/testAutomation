@@ -3,7 +3,7 @@
     <name>Merge Test</name>
     <description>append rows from etl_source to etl_target</description>
     <transforms>
-        <transform type="org.labkey.di.pipeline.TransformTask">
+        <transform id="merge" type="org.labkey.di.pipeline.TransformTask">
             <description>Merge to target</description>
             <source schemaName="vehicle" queryName="etl_source" />
             <destination schemaName="vehicle" queryName="etl_target2" targetOption="merge"/>
