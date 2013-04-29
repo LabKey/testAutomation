@@ -32,7 +32,6 @@ import java.util.Arrays;
 public class ETLTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ETLTestProject";
-    private static final String USER = "issueuser@testing.test";
 
     @Override
     protected String getProjectName()
@@ -45,11 +44,17 @@ public class ETLTest extends BaseWebDriverTest
     {
         //Setup Steps
         runInitialSetup();
-        //Confirm that if no changes were made, we don't initialize a pipeline job.
+
+        insertSourceRow("0", "Subject 0");
+        runETLJob();
+        assertInTarget("Subject 0");
         checkRun(1);
-        //Add an issue to detect and check that it creates a job
-        addIssue("Issue #1", "issueuser", "The first issue.");
+
+        insertSourceRow("1", "Subject 1");
+        deleteSourceRow("0");
+        runETLJob();
         checkRun(2);
+        assertInTarget("Subject 0", "Subject 1");
 
         disableModules("simpletest");
     }
@@ -57,51 +62,84 @@ public class ETLTest extends BaseWebDriverTest
 
     protected void runInitialSetup()
     {
-        //This is here to prevent an email send error at the end of the test
-        enableEmailRecorder();
         _containerHelper.createProject(PROJECT_NAME, null);
-        new PortalHelper(this).addWebPart("Issues List");
         enableModule("DataIntegration", true);
         enableModule("simpletest", true);
-        createPermissionsGroup("IssueGroup", USER);
+        addQueryWebpart("Source", "vehicle", "etl_source");
+        addQueryWebpart("Target", "vehicle", "etl_target");
+    }
 
-        //Turn on the checker service (should cause a job to appear at the first pipeline check for the user we made)
+    private void addQueryWebpart(String name, String schema, String query)
+    {
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Query");
+        waitForElement(Locator.name("title"));
+        setFormElement(Locator.name("title"), name);
+        waitForTextToDisappear("Loading...");
+        setFormElement(Locator.xpath("//input[@id='schemaName-inputEl']"), schema);
+        click(Locator.id("selectQueryContents-inputEl"));
+        waitForTextToDisappear("Loading...");
+        setFormElement(Locator.xpath("//input[@id='queryName-inputEl']"), query);
+        waitForTextToDisappear("Loading...");
+        clickButton("Submit");
+    }
+
+    private void insertSourceRow(String id, String name)
+    {
+        goToProjectHome();
+        click(Locator.xpath("//span[text()='Source']"));
+        waitAndClick(Locator.xpath("//span[text()='Insert New']"));
+        waitForElement(Locator.name("quf_id"));
+        setFormElement(Locator.name("quf_id"), id);
+        setFormElement(Locator.name("quf_name"), name);
+        clickButton("Submit");
+        goToProjectHome();
+    }
+
+    private void runETLJob()
+    {
         goToModule("DataIntegration");
-        waitForElement(Locator.xpath("//tr[contains(@transformid,'DemoETL')]"));
-        waitForElement(Locator.xpath("//tr[contains(@transformid,'IssuesETL')]"));
-        waitForElement(Locator.xpath("//tr[contains(@transformid,'append')]"));
+        waitAndClick(Locator.xpath("//tr[contains(@transformid,'append')]/td/a"));
+        goToProjectHome();
+    }
 
-        waitAndClick(Locator.xpath("//tr[contains(@transformid,'DemoETL')]/td/input"));
+    private void deleteSourceRow(String... ids)
+    {
+        goToProjectHome();
+        click(Locator.xpath("//span[text()='Source']"));
+        for(String id : ids)
+        {
+            click(Locator.xpath("//a[text()='"+id+"']/../../td/input[@type='checkbox']"));
+        }
+        click(Locator.xpath("//span[text()='Delete']"));
+        dismissAlerts();
+        goToProjectHome();
+    }
+
+    private void assertInTarget(String... targets)
+    {
+        goToProjectHome();
+        click(Locator.xpath("//span[text()='Target']"));
+        waitForText("etl_target");
+        for(String target : targets)
+        {
+            assertTextPresent(target);
+        }
     }
 
 
     protected void checkRun(int amount)
     {
-        goToModule("DataIntegration");
-        waitAndClick(Locator.xpath("//tr[contains(@transformid,'IssuesETL')]/td/a"));
         goToProjectHome();
         goToModule("Pipeline");
         waitForPipelineJobsToComplete(amount, "ETL Job", false);
     }
 
-    protected void addIssue(String issueName, String assignedTo, String comment)
-    {
-        goToProjectHome();
-        waitForElement(Locator.xpath("//span[text()='New Issue']"));
-        clickButton("New Issue");
-        waitForElement(Locator.xpath("//input[@name='title']"));
-        setFormElement(Locator.xpath("//input[@name='title']"), issueName);
-        setFormElement(Locator.xpath("//select[@name='assignedTo']"), assignedTo);
-        setFormElement(Locator.xpath("//textarea[@id='comment']"), comment);
-        clickButton("Save");
-        goToProjectHome();
-    }
-
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, USER);
         super.doCleanup(afterTest);
+
     }
 
     @Override
@@ -113,6 +151,6 @@ public class ETLTest extends BaseWebDriverTest
     @Override
     public BrowserType bestBrowser()
     {
-        return BrowserType.CHROME;
+        return BrowserType.FIREFOX;
     }
 }
