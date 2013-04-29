@@ -913,19 +913,24 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Study Overview");
         clickAndWait(Locator.linkWithText("Create Study"));
         clickAndWait(Locator.linkWithText("Create Study"));
-        clickFolder(COLLAB_FOLDER);
-        clickAndWait(Locator.linkWithText(ASSAYCONTAINER_NAME));
+        clickFolder(ASSAYCONTAINER_NAME);
         addWebPart(EXTRA_ASSAY_WEBPART);
 
         // Change folder type to XML Tabbed
         clickFolder(COLLAB_FOLDER);
+        assertElementNotPresent(Locator.linkWithText(STUDYTAB_NAME));
+        assertElementNotPresent(Locator.linkWithText(ASSAYTAB_NAME));
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", TABBED_FOLDER_TYPE);
         clickAndWait(Locator.linkWithText("Update Folder"));
 
         // Verify that subfolders got moved into tabs
-        assertTextPresent(STUDYTAB_NAME, ASSAYTAB_NAME);
+        assertElementPresent(Locator.linkWithText(STUDYTAB_NAME));
+        assertElementPresent(Locator.linkWithText(ASSAYTAB_NAME));
+        hoverFolderBar();
+        assertElementNotPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(STUDYTAB_NAME)));
+        assertElementNotPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(ASSAYTAB_NAME)));
         clickAndWait(Locator.linkWithText(STUDYTAB_NAME));
         assertTextPresent("Study Overview");
         clickAndWait(Locator.linkWithText("Specimen Data"));
