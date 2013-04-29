@@ -96,6 +96,7 @@ modules/scriptpad/src/org/labkey/scriptpad/scriptpadSchema.java -text
 modules/scriptpad/src/org/labkey/scriptpad/view/scriptpad.jsp -text
 modules/simpletest/config/module.xml -text
 modules/simpletest/etls/append/config.xml -text svneol=unset#application/xml
+modules/simpletest/etls/merge/config.xml -text
 modules/simpletest/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/customFolder.foldertype.xml -text
@@ -129,6 +130,7 @@ modules/simpletest/schemas/dbscripts/postgresql/vehicle-12.30-13.10.sql -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-13.10-13.11.sql -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-13.11-13.12.sql -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-13.12-13.13.sql -text
+modules/simpletest/schemas/dbscripts/postgresql/vehicle-13.13-13.14.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/obsolete/vehicle-11.30-11.31.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-0.00-1.00.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-11.30-12.10.sql -text
@@ -136,6 +138,7 @@ modules/simpletest/schemas/dbscripts/sqlserver/vehicle-12.30-13.10.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-13.10-13.11.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-13.11-13.12.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/vehicle-13.12-13.13.sql -text
+modules/simpletest/schemas/dbscripts/sqlserver/vehicle-13.13-13.14.sql -text
 modules/simpletest/schemas/vehicle.xml -text
 modules/simpletest/scripts/simpletest/Debug.js -text
 modules/simpletest/scripts/simpletest/ScriptValidationExports.js -text

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Merge Test</name>
+    <description>append rows from etl_source to etl_target</description>
+    <transforms>
+        <transform type="org.labkey.di.pipeline.TransformTask">
+            <description>Merge to target</description>
+            <source schemaName="vehicle" queryName="etl_source" />
+            <destination schemaName="vehicle" queryName="etl_target2" targetOption="merge"/>
+        </transform>
+    </transforms>
+    <schedule><poll updateTimeColumn="none" createTimeColumn="none2"></poll></schedule>
+</etl>

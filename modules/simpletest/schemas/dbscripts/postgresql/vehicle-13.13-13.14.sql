@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
+DROP TABLE vehicle.etl_target2;
+
 CREATE TABLE vehicle.etl_target2
 (
-  rowid SERIAL,
+  rowid INT NOT NULL,
   container entityid,
   created TIMESTAMP,
   modified TIMESTAMP,
