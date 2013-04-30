@@ -390,7 +390,7 @@ public class TimeChartTest extends StudyBaseTest
         waitForText("HIV Test Results: 249318596");
         assertTextPresentInThisOrder("HIV Test Results: 249318596", "HIV Test Results: 249320107", "HIV Test Results: 249320489");
 
-        goToMainTitleTab();
+        goToMainTitleTab("HIV Test Results: 249318596");
         setChartTitle(CHART_TITLE);
         applyChanges();
         waitForText(CHART_TITLE);
@@ -466,7 +466,7 @@ public class TimeChartTest extends StudyBaseTest
         clickButton("Select", 0);
         waitForText("Days Since Contact Date", WAIT_FOR_JAVASCRIPT);
 
-        goToAxisTab("X-Axis");
+        goToAxisTab("X-Axis", "Days Since Contact Date");
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and contains(@class, 'x4-item-disabled')]"));
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and contains(@class, 'x4-item-disabled')]"));
@@ -509,7 +509,7 @@ public class TimeChartTest extends StudyBaseTest
         clickButton("View Chart(s)", 0);
         waitForTextToDisappear("1 - 19 of 19");
         log("Revert to Date-based chart.");
-        goToAxisTab("X-Axis");
+        goToAxisTab("X-Axis", "Visit");
         _ext4Helper.selectRadioButton("Chart Type:", "Date Based Chart");
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and not(contains(@class, 'x4-item-disabled'))]"));
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and not(contains(@class, 'x4-item-disabled'))]"));
@@ -551,7 +551,7 @@ public class TimeChartTest extends StudyBaseTest
         _ext4Helper.clickGridRowText("2. Body Temp", 0);
         clickButton("Select", 0);
         waitForText("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.", WAIT_FOR_JAVASCRIPT);
-        goToAxisTab("X-Axis");
+        goToAxisTab("X-Axis", "Days Since Contact Date");
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         applyChanges();
         waitForText("My APX Query", WAIT_FOR_JAVASCRIPT);
@@ -641,21 +641,25 @@ public class TimeChartTest extends StudyBaseTest
         log("Test X-Axis");
         clickButton("View Chart(s)", 0);
 
-        goToAxisTab("X-Axis");
+        goToAxisTab("X-Axis", "Days Since Start Date");
         _ext4Helper.selectComboBoxItemById("xaxis_interval", "Weeks");
         applyChanges();
         waitForText("Weeks Since Start Date", WAIT_FOR_JAVASCRIPT);
+        goToAxisTab("X-Axis", "Weeks Since Start Date");
         setAxisValue("X", null, null, null, X_AXIS_LABEL, null, null, new String[]{X_AXIS_LABEL}, null);
 
-        goToAxisTab("X-Axis");
+        goToAxisTab("X-Axis", X_AXIS_LABEL);
         _ext4Helper.selectComboBoxItemById("xaxis_interval", "Days");
         Assert.assertEquals(X_AXIS_LABEL, getFormElement("x-axis-label-textfield")); // Label shouldn't change automatically once it has been set manually
 
         // set manual x-axis range
+        goToAxisTab("X-Axis", X_AXIS_LABEL);
         setAxisValue("X", "xaxis_range_manual", "15", "40", null, null, null, new String[] {"15", "20", "25", "30", "35", "40"}, null);
 
         log("Test Y-Axis");
+        goToAxisTab("Y-Axis", "Viral Load Quantified (copies/ml)");
         setAxisValue("Left", "leftaxis_range_manual", "200000", "400000", Y_AXIS_LABEL, null, null, new String[] {Y_AXIS_LABEL}, new String[] {"500000","200000"});
+        goToAxisTab("Y-Axis", Y_AXIS_LABEL);
         setAxisValue("Left", "leftaxis_range_manual", "10000", "1000000", null, "leftaxis_scale", "Log", new String[] {"100000"}, null );
     }
 
@@ -675,8 +679,6 @@ public class TimeChartTest extends StudyBaseTest
         {
             Assert.fail("Invalid axis marker");
         }
-
-        goToAxisTab(axis + "-Axis");
 
         //don't want to worry about case for the rest of the function
         axis = axis.toLowerCase();
@@ -748,7 +750,7 @@ public class TimeChartTest extends StudyBaseTest
         setNumberOfCharts(ONE_CHART_PER_MEASURE);
         applyChanges();
         waitForText("CD4+ (cells/mm3), Lymphs (cells/mm3)"); // y-axis default label
-        goToMainTitleTab();
+        goToMainTitleTab("Lab Results: CD4+ (cells/mm3)");
         setChartTitle(CHART_TITLE);
         applyChanges();
         waitForText(CHART_TITLE);
@@ -1139,6 +1141,7 @@ public class TimeChartTest extends StudyBaseTest
         _ext4Helper.selectComboBoxItemById("yaxis_side", "Right");
         applyChanges();
 
+        goToAxisTab("Right-Axis", "Hemoglobin");
         setAxisValue("Right", "rightaxis_range_manual", "12", "16", "Hemogoblins", null, null, null, null);
         waitForText("Hemogoblins");
         assertTextNotPresent("17");
@@ -1150,6 +1153,7 @@ public class TimeChartTest extends StudyBaseTest
 //        double newHeight = Double.parseDouble(transform.substring(newTransform.indexOf(" "), newTransform.indexOf(")") - 1));
 //        Assert.assertTrue("Hemoglobin not graphed relative to right axis.", newHeight < height);
 
+        goToAxisTab("Right-Axis", "Hemogoblins");
         setAxisValue("Right", "rightaxis_range_automatic", null, null, null, "rightaxis_scale", "Log", null, null);
         assertTextNotPresent("13");
         assertTextNotPresent("12.5");
@@ -1206,7 +1210,9 @@ public class TimeChartTest extends StudyBaseTest
         clickAndWait(Locator.xpath("//a[text()='edit' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
         waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
         // change to the data points are visible again
+        goToAxisTab("Left-Axis", Y_AXIS_LABEL);
         setAxisValue("Left", "leftaxis_range_automatic", null, null, null, "leftaxis_scale", "Linear", null, null);
+        goToAxisTab("X-Axis", X_AXIS_LABEL);
         setAxisValue("X", "xaxis_range_automatic", null, null, null, null, null, null, null);
         waitForText("249318596,\n Days", 20, WAIT_FOR_JAVASCRIPT); // 10 in first ptid chart and 10 in save dialog thumbnail preview
         // open the developer panel and verify that it is disabled by default
@@ -1346,15 +1352,15 @@ public class TimeChartTest extends StudyBaseTest
         waitForElement(Locator.button("Cancel"));
     }
 
-    private void goToMainTitleTab()
+    private void goToMainTitleTab(String mainTitle)
     {
-        getWrapper().getEval("window.showTimeChartAxisPanel('Title');");
+        waitAndClick(Locator.css("svg text:contains('" + mainTitle + "')"));
         waitForElement(Locator.button("Cancel"));
     }
 
-    private void goToAxisTab(String axisName)
+    private void goToAxisTab(String axisName, String axisLabel)
     {
-        getWrapper().getEval("window.showTimeChartAxisPanel('" + axisName + "');");
+        waitAndClick(Locator.css("svg text:contains('" + axisLabel + "')"));
         waitForElement(Locator.button("Cancel"));
     }
 
