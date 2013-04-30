@@ -70,8 +70,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String R_VIEW = "Shared R View";
     private final String R_VIEW2 = "R View on Unpublished Dataset";
     private final String R_VIEW_UNSHARED = "Unshared R View";
-    private final String MOUSE_REPORT = "Mouse Report";
-    private final String TIME_CHART = "Time Chart";
+    private final String MOUSE_REPORT = "Shared Mouse Report";
+    private final String TIME_CHART = "Shared Time Chart";
     private final String[] TIME_CHART_MEASURE1 = {DATASETS[2], "2.Body temperature"};
     private final String[] TIME_CHART_MEASURE2 = {DATASETS[3], "2.Body temperature"};
     private final String CUSTOM_VIEW = "Shared Custom View";
@@ -500,7 +500,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
         else
         {
-            waitForText("No specimens found.", 1, WAIT_FOR_JAVASCRIPT);
+            waitForText("No specimens found.", WAIT_FOR_JAVASCRIPT);
         }
         // verify that the specimen request options are hidden from the manage study page
         goToManageStudy();
@@ -774,7 +774,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitAndClick(Locator.button("OK"));
 
         // Visit-based chart
-        getWrapper().getEval("window.showTimeChartAxisPanel('X-Axis');");
+        waitAndClick(Locator.css("svg text:contains('Days Since Contact Date')"));
         waitForElement(Locator.button("Cancel"));
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         waitAndClick(Locator.button("OK"));
