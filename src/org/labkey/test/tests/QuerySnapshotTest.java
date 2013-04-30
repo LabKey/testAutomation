@@ -267,6 +267,20 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Delete Snapshot", 0);
         getConfirmationAndWait();
+
+        clickFolder(getStudyLabel());
+        clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
+        createQuerySnapshot(DEMOGRAPHICS_SNAPSHOT, true, false);
+        changeDatasetLabel(DEMOGRAPHICS_SNAPSHOT, "New Demographics");
+        clickFolder(getStudyLabel());
+        clickAndWait(Locator.linkWithText("New Demographics"));
+        clickMenuButton("Views", "Edit Snapshot");
+        changeDatasetName(DEMOGRAPHICS_SNAPSHOT, "New Dem");
+        clickFolder(getStudyLabel());
+        clickAndWait(Locator.linkWithText("New Demographics"));
+        clickMenuButton("Views", "Edit Snapshot");
+        clickButton("Delete Snapshot", 0);
+        getConfirmationAndWait();
     }
 
     private void createQuerySnapshot(String snapshotName, boolean autoUpdate, boolean isDemographic)
@@ -298,6 +312,28 @@ public class QuerySnapshotTest extends StudyBaseTest
             clickButton("Save", WAIT_FOR_JAVASCRIPT);
         }
         clickButton("Create Snapshot");
+    }
+
+    private void changeDatasetLabel(String datasetName, String newLabel)
+    {
+        goToManageDatasets();
+        waitAndClick(Locator.linkContainingText(datasetName));
+        waitForText("Edit Definition");
+        clickButton("Edit Definition");
+        waitForElement(Locator.xpath("//input[@name='dsLabel']"));
+        setFormElement(Locator.xpath("//input[@name='dsLabel']"), newLabel);
+        clickButton("Save");
+    }
+
+    private void changeDatasetName(String datasetName, String newName)
+    {
+        goToManageDatasets();
+        waitAndClick(Locator.linkContainingText(datasetName));
+        waitForText("Edit Definition");
+        clickButton("Edit Definition");
+        waitForElement(Locator.xpath("//input[@name='dsName']"));
+        setFormElement(Locator.xpath("//input[@name='dsName']"), newName);
+        clickButton("Save");
     }
 
     private void waitForSnapshotUpdate(String text)

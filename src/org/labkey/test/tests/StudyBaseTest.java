@@ -344,4 +344,11 @@ public abstract class StudyBaseTest extends SimpleApiTest
         _ext4Helper.clickTabContainingText("Study Security");
         waitAndClickButton("Study Security");
     }
+
+    public void goToManageDatasets()
+    {
+        goToManageStudy();
+        waitForText("Manage Datasets");
+        click(Locator.xpath("//a[text()='Manage Datasets']"));
+    }
 }

@@ -406,11 +406,4 @@ public class StudyDatasetsTest extends StudyBaseTest
         click(Locator.tagWithText("div", name));
     }
 
-    public void goToManageDatasets()
-    {
-        goToManageStudy();
-        waitForText("Manage Datasets");
-        click(Locator.xpath("//a[text()='Manage Datasets']"));
-    }
-
 }
