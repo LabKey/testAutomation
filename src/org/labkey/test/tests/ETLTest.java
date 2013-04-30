@@ -56,7 +56,7 @@ public class ETLTest extends BaseWebDriverTest
         checkRun(2);
         assertInTarget("Subject 0", "Subject 1");
 
-        disableModules("simpletest");
+//        disableModules("simpletest");
     }
 
 
