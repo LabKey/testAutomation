@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <etl xmlns="http://labkey.org/etl/xml">
     <name>Merge Test</name>
-    <description>append rows from etl_source to etl_target</description>
+    <description>append rows from etl_source to etl_target2</description>
     <transforms>
         <transform id="merge" type="org.labkey.di.pipeline.TransformTask">
             <description>Merge to target</description>
