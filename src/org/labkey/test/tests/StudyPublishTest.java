@@ -545,7 +545,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // verify that specimens were not refreshed for PUB3 study
         goToProjectHome();
-        clickAndWait(Locator.linkWithText(PUB3_NAME));
+        clickFolder(PUB3_NAME);
         clickAndWait(Locator.linkWithText("Specimen Data"));
         clickAndWait(Locator.linkWithText("By Individual Vial"));
         table = new DataRegionTable("SpecimenDetail", this);
