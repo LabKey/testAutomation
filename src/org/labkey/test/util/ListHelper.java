@@ -245,7 +245,7 @@ public class ListHelper extends AbstractHelper
 
     public enum ListColumnType
     {
-        MutliLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), DateTime("DateTime"), Boolean("Boolean"),
+        MutliLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), Subject("Subject/Participant (String)"), DateTime("DateTime"), Boolean("Boolean"),
         Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer"), Flag("Flag");
 
         private final String _description;

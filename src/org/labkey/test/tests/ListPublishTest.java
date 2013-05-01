@@ -22,6 +22,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.HashSet;
@@ -50,10 +52,6 @@ public class ListPublishTest extends BaseWebDriverTest
         setUpLists();
         setListIds();
         publishStudy();
-        refresh();
-
-        waitForElement(Locator.xpath("//a[text()='PublishedLists']"));
-
         checkListIds();
         assertPtidsNotPresent();
 
@@ -80,9 +78,13 @@ public class ListPublishTest extends BaseWebDriverTest
 
     private void assertPtidsNotPresent()
     {
+        int i = 1;
         for(String ptid : _Ptids)
         {
+            WebElement text = getDriver().findElement(By.xpath("//a[@href = '/labkey/list/ListPublishTestProject/PublishedLists/details.view?listId=4&pk="+i+"']"));
             assertTextNotPresent(ptid);
+            Assert.assertTrue(!text.getText().equals(""));
+            i++;
         }
     }
 
@@ -90,7 +92,7 @@ public class ListPublishTest extends BaseWebDriverTest
     {
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Lists");
-        ListHelper.ListColumn column = new ListHelper.ListColumn("ParticipantId", "ParticipantId", ListHelper.ListColumnType.String, "A list of Ptids");
+        ListHelper.ListColumn column = new ListHelper.ListColumn("ParticipantId", "ParticipantId", ListHelper.ListColumnType.Subject, "A list of Ptids");
         _listHelper.createList("ListPublishTestProject", "List4", ListHelper.ListColumnType.AutoInteger, "Key", column);
         goToProjectHome();
         goToList("List4");
@@ -188,7 +190,7 @@ public class ListPublishTest extends BaseWebDriverTest
     {
         for(int i = 0; i < 4; i++)
         {
-            click(Locator.xpath("//a[text()='PublishedLists']"));
+            clickFolder("PublishedLists");
             goToList(listIds[i]);
             Assert.assertEquals(getUrlParam(getURL().toString(), "listId", false), ""+(i+1));
         }
