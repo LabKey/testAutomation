@@ -61,9 +61,9 @@ public class DataRegionTable
         _tableName = tableName;
         _selectors = selectors;
         reload(test);
+        _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]"));
         _columnCount = _test.getTableColumnCount(getHtmlName());
         _headerRows = 2 + (floatingHeaders?2:0);
-        _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]"));
     }
 
     public String getTableName()
