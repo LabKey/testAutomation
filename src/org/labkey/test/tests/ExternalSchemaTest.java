@@ -17,6 +17,12 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -25,6 +31,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PasswordUtil;
 
@@ -465,13 +472,11 @@ public class ExternalSchemaTest extends BaseWebDriverTest
                 String.valueOf(intNotNull), table.getDataAsText(row, table.getColumn("IntNotNull")));
     }
 
-    private void _deleteViaForm(String containerPath, int[] pk, boolean showSubFolders)
+    private void _deleteViaForm(String containerPath, int[] pk)
     {
         log("** Deleting via form: pks=" + join(",", pk) + "...");
         beginAt("/query/" + containerPath + "/executeQuery.view?query.queryName=" + TABLE_NAME + "&schemaName=" + USER_SCHEMA_NAME);
 
-        if (showSubFolders)
-            clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
 
         for (int aPk : pk)
             checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(aPk)));
@@ -482,13 +487,46 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
     public void deleteViaFormNoPerms(String containerPath, int[] pk)
     {
-        _deleteViaForm(containerPath, pk, true);
-        assertTextPresent("The row is from the wrong container.");
+        // POST directly to the delete URL since ExternalSchemaTables don't allow container filtering
+        // and rows in sub-folders won't be available for deleting via the user interface.
+        // See Issue 17702: External schema tables disallow folder filter
+        StringBuilder deleteUrl = new StringBuilder(WebTestHelper.getBaseURL() + "/query/" + containerPath + "/deleteQueryRows.post?");
+        deleteUrl.append("schemaName=").append(USER_SCHEMA_NAME);
+        deleteUrl.append("&query.queryName=").append(TABLE_NAME);
+        deleteUrl.append("&dataRegionSelectionKey=$").append(USER_SCHEMA_NAME).append("$").append(TABLE_NAME).append("$$query");
+        for (int aPk : pk)
+            deleteUrl.append("&.select=").append(aPk);
+        log("** Deleting via http POST to form action: " + deleteUrl);
+
+        HttpClient client = WebTestHelper.getHttpClient();
+        HttpContext context = WebTestHelper.getBasicHttpContext();
+        HttpPost method = new HttpPost(deleteUrl.toString());
+        try
+        {
+            HttpResponse response = client.execute(method, context);
+            int status = response.getStatusLine().getStatusCode();
+
+            Assert.assertTrue("Expected success, actual: " + status, (HttpStatus.SC_OK == status));
+
+            String responseBody = WebTestHelper.getHttpResponseBody(response);
+            EntityUtils.consume(response.getEntity()); // close connection
+
+            Assert.assertTrue("Expected error message not present", responseBody.contains("The row is from the wrong container."));
+        }
+        catch (IOException e)
+        {
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            if (client != null)
+                client.getConnectionManager().shutdown();
+        }
     }
 
     public void deleteViaForm(String containerPath, int[] pk)
     {
-        _deleteViaForm(containerPath, pk, false);
+        _deleteViaForm(containerPath, pk);
 
         // assume no errors if we end up back on the grid view
         assertTitleEquals(TABLE_NAME + ": /" + containerPath);
