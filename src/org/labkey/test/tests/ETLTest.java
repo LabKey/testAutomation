@@ -46,15 +46,19 @@ public class ETLTest extends BaseWebDriverTest
         runInitialSetup();
 
         insertSourceRow("0", "Subject 0");
-        runETLJob();
+        runETLAppendJob();
         assertInTarget("Subject 0");
         checkRun(1);
 
         insertSourceRow("1", "Subject 1");
         deleteSourceRow("0");
-        runETLJob();
+        runETLAppendJob();
         checkRun(2);
         assertInTarget("Subject 0", "Subject 1");
+
+        insertSourceRow("2", "Subject 2");
+        runETLMergeJob();
+        assertInTarget("Subject 0", "Subject 1", "Subject 2");
 
 //        disableModules("simpletest");
     }
@@ -66,7 +70,7 @@ public class ETLTest extends BaseWebDriverTest
         enableModule("DataIntegration", true);
         enableModule("simpletest", true);
         addQueryWebpart("Source", "vehicle", "etl_source");
-        addQueryWebpart("Target", "vehicle", "etl_target");
+        addQueryWebpart("Target", "vehicle", "etl_target2");
     }
 
     private void addQueryWebpart(String name, String schema, String query)
@@ -96,10 +100,17 @@ public class ETLTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
-    private void runETLJob()
+    private void runETLAppendJob()
     {
         goToModule("DataIntegration");
         waitAndClick(Locator.xpath("//tr[contains(@transformid,'append')]/td/a"));
+        goToProjectHome();
+    }
+
+    private void runETLMergeJob()
+    {
+        goToModule("DataIntegration");
+        waitAndClick(Locator.xpath("//tr[contains(@transformid,'merge')]/td/a"));
         goToProjectHome();
     }
 
@@ -120,7 +131,7 @@ public class ETLTest extends BaseWebDriverTest
     {
         goToProjectHome();
         click(Locator.xpath("//span[text()='Target']"));
-        waitForText("etl_target");
+        waitForText("etl_target2");
         for(String target : targets)
         {
             assertTextPresent(target);
