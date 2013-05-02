@@ -272,6 +272,11 @@ public abstract class Locator
         return new XPathLocator(xpathExpr);
     }
 
+    public static XPathLocator tag(String tag)
+    {
+        return xpath("//" + tag);
+    }
+
     public static XPathLocator tagWithName(String tag, String name)
     {
         return tagWithAttribute(tag, "name", name);

@@ -3086,7 +3086,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void hoverProjectBar()
     {
         waitForElement(Locator.id("projectBar"));
-        selenium.getEval("HoverNavigation._project.show();"); // mouseOver doesn't work in Firefox
+        executeScript("HoverNavigation._project.show();"); // mouseOver doesn't work in Firefox
         waitForElement(Locator.css("#projectBar_menu .project-nav"));
     }
 
@@ -3106,7 +3106,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void hoverFolderBar()
     {
         waitForElement(Locator.id("folderBar"));
-        selenium.getEval("HoverNavigation._folder.show();"); // mouseOver doesn't work in Firefox
+        executeScript("HoverNavigation._folder.show();"); // mouseOver doesn't work in Firefox
         waitForElement(Locator.css("#folderBar_menu .folder-nav"));
     }
 

@@ -31,11 +31,12 @@ public class MenuBarTest extends BaseWebDriverTest
 {
 
     private static final String PROJECT_NAME = "MenuBarVerifyProject";
-    private static final String WIKI_PAGE_TITLE = "Wiki Menu";
+    private static final String WIKI_PAGE_TITLE = "A Wiki Menu" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String WIKI_PAGE_CONTENT = "This is a fancy wiki";
 
     private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
     private static final String DEM_STUDY_FOLDER = "DemStudyFolder";
+    private static final String STUDY_FOLDER = "StudyFolder";
 
     public String getAssociatedModuleDirectory()
     {
@@ -99,24 +100,24 @@ public class MenuBarTest extends BaseWebDriverTest
         assertNavButtonNotPresent("Manage Assays");
         assertTextNotPresent("No Studies Found");
 
-        mouseOver(Locator.id("Wiki Menu6$Header"));
+        hoverMenu(WIKI_PAGE_TITLE);
         waitForElement(Locator.xpath("//div").withClass("labkey-wiki").withText(WIKI_PAGE_CONTENT));
-        mouseOver(Locator.menuBarItem("Assays"));
+        hoverMenu("Assays");
         waitForElement(Locator.navButton("Manage Assays"), 3000);
 
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/menubar/Test Assay.xar", 1, "Test Assay.xar");
         clickProject(PROJECT_NAME);
 
         assertTextNotPresent("Test Assay");
-        mouseOver(Locator.menuBarItem("Assays"));
+        hoverMenu("Assays");
         waitForElement(Locator.linkWithText("Test Assay"));
 
         createSubfolder(PROJECT_NAME, PROJECT_NAME, "StudyFolder", "Study", null);
         createDefaultStudy();
-        beginAt("project/" + getProjectName() + "/begin.view?");
+        clickProject(getProjectName());
 
-        mouseOver(Locator.menuBarItem("Studies"));
-        waitForText("StudyFolder Study", WAIT_FOR_JAVASCRIPT);
+        hoverMenu("Studies");
+        waitForElement(Locator.linkWithText("StudyFolder Study"), WAIT_FOR_JAVASCRIPT);
 
 
         // Custom Menu
@@ -128,11 +129,19 @@ public class MenuBarTest extends BaseWebDriverTest
         // Schema/Query/etc
         _extHelper.setExtFormElementByLabel("Title", "Wiki Render Types");
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Locator.css(".ext-el-mask"));
         _extHelper.selectComboBoxItem("Schema", "wiki");
+        waitForElementToDisappear(Locator.css(".ext-el-mask"));
         _extHelper.selectComboBoxItem("Query", "renderertype");
+        waitForElementToDisappear(Locator.css(".ext-el-mask"));
         _extHelper.selectComboBoxItem("Title Column", "Value");
         _extHelper.clickExtButton("Submit");
-        assertTextPresent("HTML", "RADEOX", "TEXT_WITH_LINKS");
+
+        clickProject(getProjectName());
+        hoverMenu("Wiki Render Types");
+        waitForElement(Locator.xpath("//div[@id='Custom Menu7$Header_menu']").containing("HTML"));
+        assertElementPresent(Locator.xpath("//div[@id='Custom Menu7$Header_menu']").containing("RADEOX"));
+        assertElementPresent(Locator.xpath("//div[@id='Custom Menu7$Header_menu']").containing("TEXT_WITH_LINKS"));
 
         // Another custom menu with links to Participant Report
         createSubfolder(PROJECT_NAME, PROJECT_NAME, DEM_STUDY_FOLDER, "Study", null);
@@ -144,14 +153,19 @@ public class MenuBarTest extends BaseWebDriverTest
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByLabel("Title", "Participant Reports");
         _extHelper.selectComboBoxItem("Folder", DEM_STUDY_FOLDER);
+        waitForElementToDisappear(Locator.css(".ext-el-mask"));
         _extHelper.selectComboBoxItem("Schema", "study");
+        waitForElementToDisappear(Locator.css(".ext-el-mask"));
         _extHelper.selectComboBoxItem("Query", "Participant");
+        waitForElementToDisappear(Locator.css(".ext-el-mask"));
         _extHelper.selectComboBoxItem("Title Column", "ParticipantId");
         _extHelper.setExtFormElementByLabel("URL", "/study-samples/typeParticipantReport.view?participantId=${participantId}");
         _extHelper.clickExtButton("Submit");
 
         // Should take us to participant report page
-        clickAndWait(Locator.linkWithText("249320107"));
+        clickProject(getProjectName());
+        hoverMenu("Participant Reports");
+        waitAndClickAndWait(Locator.linkWithText("249320107"));
         assertTextPresent("Specimen Report: Participant 249320107");
 
         // Another custom Menu with links to folders
@@ -167,6 +181,17 @@ public class MenuBarTest extends BaseWebDriverTest
 
         clickFolder(DEM_STUDY_FOLDER);
         assertTextPresent("Demo Study", "Study Overview");
+        hoverMenu("Folders");
+        waitForElement(Locator.linkWithText(DEM_STUDY_FOLDER));
+        assertElementPresent(Locator.linkWithText(STUDY_FOLDER));
+    }
+
+    protected void hoverMenu(String menuText)
+    {
+        Locator menuItem = Locator.css("#menubar .labkey-main-menu-item").withText(menuText);
+        String menuId = menuItem.findElement(getDriver()).getAttribute("id");
+        String hoverNavigationPart = "_" + menuId.split("\\$")[0];
+        executeScript("HoverNavigation.Parts[\"" +hoverNavigationPart + "\"].show();");
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
