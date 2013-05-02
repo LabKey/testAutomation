@@ -42,8 +42,7 @@ public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
     private final File risListArchive = new File(getDownloadDir(), "ris-lists.zip");
     private final File risTransformScript = new File(getDownloadDir(), "kiem_transform.pl");
     private final File risAssayData = new File(getSampledataPath(), "kiem/RIS test.xls");
-    private final File risAssayData2 = new File(getSampledataPath(), "kiem/RIS_SEQ_000_000_000_000_001.txt");
-    private final File risAssayData3 = new File(getSampledataPath(), "kiem/RIS_SEQ_000_000_000_000_024.txt");
+    private final File risAssayData2 = new File(getSampledataPath(), "kiem/RIS_SEQ_000_000_000_000_024.txt");
     
     private final String ASSAY_NAME = "RIS"; // Defined by risXarFile
     private final String ASSAY_ID = risAssayData.getName();
@@ -177,7 +176,7 @@ public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
     private void verifyRISWobbleQC() throws IOException, CommandException
     {
         clickProject(getProjectName());
-        _assayHelper.importAssay(ASSAY_NAME, risAssayData3, getProjectName());
+        _assayHelper.importAssay(ASSAY_NAME, risAssayData2, getProjectName());
 
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Kiem RIS Wobble QC");
@@ -186,7 +185,7 @@ public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
         Locator.XPathLocator thresholdCell = Locator.xpath("//span[contains(@style, 'color:#ff0000;')]"); // Threshold rows should have red text
         Locator.XPathLocator editedCell =  Locator.xpath("//span[contains(@style, 'background-color:yellow;')]"); // Edited rows should have yellow background
 
-        waitAndClick(qcWebpart.append("//tr").withText(risAssayData3.getName()));
+        waitAndClick(qcWebpart.append("//tr").withText(risAssayData2.getName()));
         clickButton("Search Run Data", 0);
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.css(".x4-toolbar-text").withText("Displaying 1 - 26 of 26")); // 23 threshold rows, plus possible alternate CStart Grouping rows
