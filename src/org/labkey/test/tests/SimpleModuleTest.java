@@ -37,6 +37,7 @@ import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.SecurityHelperWD;
 
@@ -109,6 +110,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         doTestContainerColumns();
         doTestFilterSort();
         doTestImportTemplates();
+        doTestDatasetsAndFileBasedQueries();
     }
 
     @LogMethod
@@ -967,6 +969,37 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent(EXTRA_ASSAY_WEBPART);
 
         deleteFolder(getProjectName(), COLLAB_FOLDER);
+    }
+
+    private static final String DATASET_NAME = "Data Name";
+    private static final String DATASET_LABEL = "Data Label";
+    private static final String DATASET_FIELDS = "Property\nFirst\nLast";
+
+    @LogMethod
+    private void doTestDatasetsAndFileBasedQueries()
+    {
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Study Overview");
+        waitForText("Create Study");
+        clickAndWait(Locator.linkWithText("Create Study"));
+        clickAndWait(Locator.linkWithText("Create Study"));
+        waitForText("Manage Study");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("Create New Dataset"));
+        setFormElement(Locator.xpath("//input[@name='typeName']"), DATASET_NAME);
+        clickButton("Next");
+        waitForElement(Locator.xpath("//input[@name='dsLabel']"));
+        setFormElement(Locator.xpath("//input[@name='dsLabel']"), DATASET_LABEL);
+        clickButton("Import Fields", "Paste tab-delimited");
+        setFormElement(Locator.name("tsv"), DATASET_FIELDS);
+        clickButton("Import", 0);
+        waitForText("First");
+        clickButton("Save");
+        clickButton("View Data");
+        assertTextPresent("My Custom View", "Hello Dataset", "Sequence Number");
+        assertTextNotPresent("Participant Identifier");
     }
 
     protected void assertModuleDeployed(String moduleName)

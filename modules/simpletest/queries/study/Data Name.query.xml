@@ -1,0 +1,23 @@
+<query xmlns="http://labkey.org/data/xml/query">
+    <metadata>
+        <tables xmlns="http://labkey.org/data/xml">
+            <table tableName="Data Name" tableDbType="NOT_IN_DB">
+                <columns>
+                    <column columnName="SequenceNum">
+                        <columnTitle>Sequence Number</columnTitle>
+                    </column>
+                    <column columnName="lsid">
+                        <columnTitle>LS ID</columnTitle>
+                    </column>
+                </columns>
+                <buttonBarOptions position="top" includeStandardButtons="true" >
+                    <item text="Hello Dataset">
+                        <item text="OnCLickButton">
+                            <onClick>alert('Hello');</onClick>
+                        </item>
+                    </item>
+                </buttonBarOptions>
+            </table>
+        </tables>
+    </metadata>
+</query>
