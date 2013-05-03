@@ -227,7 +227,7 @@ public class GroupTest extends BaseWebDriverTest
         createGlobalPermissionsGroup(CHILD_GROUP, "");
         addUserToSiteGroup(CHILD_GROUP, SIMPLE_GROUP);
         impersonateGroup(CHILD_GROUP, true);
-        clickAndWait(Locator.linkContainingText(getProjectName()));
+        clickProject(getProjectName());
         verifyEditorPermission(nameTitleBody);
         stopImpersonatingGroup();
     }
