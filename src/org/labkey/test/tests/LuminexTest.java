@@ -2104,6 +2104,7 @@ public class LuminexTest extends AbstractQCAssayTest
             assertElementNotPresent(Locator.button("Save"));
             assertElementPresent(Locator.button("Create"));
             clickButton("Create",0);
+            today = df.format(Calendar.getInstance().getTime());
         }
         else
         {
