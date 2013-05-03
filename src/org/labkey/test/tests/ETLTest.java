@@ -154,6 +154,13 @@ public class ETLTest extends BaseWebDriverTest
     }
 
     @Override
+    public void checkQueries()
+    {
+        log("Skipping query check. Some tables used by queries in simpletest module are not created in this test");
+        log("Query check from " + SimpleModuleTest.class.getSimpleName() + " should cover anything this would check");
+    }
+
+    @Override
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/dataintegration";
