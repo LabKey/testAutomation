@@ -96,7 +96,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
         _containerHelper.createProject(getProjectName(), "Genotyping");
         setUpLists();
         configureAdmin();
-        clickAndWait(Locator.linkContainingText(getProjectName()));
+        clickProject(getProjectName());
         setPipelineRoot(pipelineLoc);
     }
 
@@ -104,7 +104,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void setUpLists()
     {
         log("Import genotyping list");
-        clickAndWait(Locator.linkContainingText(getProjectName()));
+        clickProject(getProjectName());
         _listHelper.importListArchive(getProjectName(), new File(pipelineLoc, "sequencing.lists.zip"));
         assertTextPresent(
                 samples,
@@ -117,8 +117,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
     private void configureAdmin()
     {
-        clickAndWait(Locator.linkContainingText(getProjectName()));
-        waitForPageToLoad();
+        clickProject(getProjectName());
         clickLink("adminSettings");
 
         String[] listVals = {"sequences", "runs", samples};
@@ -730,20 +729,6 @@ public class GenotypingTest extends BaseSeleniumWebTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        //delete run first, due to issue  ###
-//        goToHome();
-//        if(isTextPresent(getProjectName()))
-//        {
-//            clickAndWait(Locator.linkContainingText(getProjectName()));
-//
-//            if(isTextPresent("View Runs"))
-//            {
-//                clickAndWait(Locator.linkContainingText("View Runs"));
-//                click(Locator.name(".select"));
-//                clickButton("Delete");
-//                getConfirmationAndWait();
-//            }
-//        }
         File dir = new File(pipelineLoc);
         File[] files = dir.listFiles();
         for(File file: files)
