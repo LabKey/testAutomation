@@ -617,6 +617,7 @@ public class ClientAPITest extends BaseWebDriverTest
         assertElementContains(loc, "SUCCESS: executeSql 1 returned 93 rows");
         assertElementContains(loc, "SUCCESS: executeSql 2 returned 10 rows");
         assertElementContains(loc, "SUCCESS: executeSql 2 returned with requested v9.1");
+        assertElementContains(loc, "SUCCESS: selectRows 3 returned 96 rows with mixed sort parameters");
         clearTestPage("Query Regression portion of test complete");
     }
 

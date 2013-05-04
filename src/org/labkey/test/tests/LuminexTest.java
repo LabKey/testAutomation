@@ -1246,7 +1246,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify that the transform script and ruminex versions are as expected
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
         DataRegionTable table = new DataRegionTable("Runs", this);
-        Assert.assertEquals("Unexpected Transform Script Version number", "5.0.20121210", table.getDataAsText(0, "Transform Script Version"));
+        Assert.assertEquals("Unexpected Transform Script Version number", "5.1.20130424", table.getDataAsText(0, "Transform Script Version"));
         Assert.assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
 
         // verify that the lot number value are as expected

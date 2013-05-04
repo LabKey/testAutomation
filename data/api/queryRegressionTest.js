@@ -44,6 +44,32 @@ var testFunctions = [
             });
         },
 
+        function()
+        {
+            LABKEY.ExtAdapter.Ajax.request({
+                url     : LABKEY.ActionURL.buildURL('query', 'selectRows'),
+                method  : 'POST',
+                success : function(json) {
+                    successHandler.call(this, LABKEY.ExtAdapter.decode(json.responseText));
+                },
+                failure : failureHandler,
+                params  : {
+                    'schemaName' : 'lists',
+                    'query.queryName' : 'NewPeople',
+
+                    // labkey sort
+                    'query.sort' : '-Age',
+
+                    // ext sort
+                    'sort' : 'Age',
+                    'dir'  : 'DESC',
+
+                    // filter
+                    'query.Age~gt' : 25
+                }
+            });
+        },
+
         // last function sets the contents of the results div.
         function()
         {
@@ -67,6 +93,11 @@ var testFunctions = [
                 html += success(2, 'executeSql 2 returned with requested v9.1');
             else
                 html += failure(2, 'executeSql 2 failed to return v9.1. Version value = ' + testResults[3].formatVersion);
+
+            if (testResults[3].rows !== undefined && testResults[3].rows.length == 96)
+                html += success(3, "selectRows 3 returned 96 rows with mixed sort parameters");
+            else
+                html += failure(3, "selectRows 3 failed with mixed sort parameters. Error value = '" + testResults[3].exception);
 
             document.getElementById('testDiv').innerHTML = html;
         }
