@@ -50,8 +50,9 @@ public class TargetedMSTest extends BaseWebDriverTest
     private void setupAndImportData()
     {
         _containerHelper.createProject(getProjectName(), "Targeted MS");
+        selectExperimentFolder();
         setPipelineRoot(getSampledataPath() + "/TargetedMS");
-        goToProjectHome();
+        goToModule("Pipeline");
         clickButton("Process and Import Data");
         waitForText("MRMer", 5*defaultWaitForPage);
         selectPipelineFileAndImportAction("MRMer/" + SKY_FILE, "Import Skyline Results");
@@ -207,6 +208,13 @@ public class TargetedMSTest extends BaseWebDriverTest
         //waitForText("1 - 31 of 31");
         Assert.assertEquals(0, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'R[+10]')]")));
         Assert.assertEquals(31, getElementCount( Locator.xpath("//td/a/span[contains(@title, 'K[+8]')]")));
+    }
+
+    @LogMethod
+    protected void selectExperimentFolder() {
+        log("Select Experimental Folder Type");
+        click(Locator.radioButtonById("experimentalData"));  // click the first radio button - Experimental Data
+        clickButton("Submit");
     }
 
     @Override
