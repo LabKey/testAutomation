@@ -162,7 +162,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
     @LogMethod
     protected void initProject() throws Exception
     {
-        _containerHelper.createProject(getProjectName(), "EHR");
+        _containerHelper.createProject(getProjectName(), null);
         createSubfolder(getProjectName(), getProjectName(), FOLDER_NAME, "EHR", null);
 
         setEHRModuleProperties();
