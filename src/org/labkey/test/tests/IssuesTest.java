@@ -422,8 +422,9 @@ public class IssuesTest extends BaseSeleniumWebTest
         emailTable = new EmailRecordTable(this);
         message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been updated");
 
-        Assert.assertTrue(USER3 + " did not receieve updated issue notification" + message.getTo()[0],
-                USER3.equals(emailTable.getDataAsText(0, "To")) || USER3.equals(emailTable.getDataAsText(1, "To")));
+        // issue 17637 : inactive users as well as users not in the system should not receive emails
+        //Assert.assertTrue(USER3 + " did not receieve updated issue notification" + message.getTo()[0],
+        //        USER3.equals(emailTable.getDataAsText(0, "To")) || USER3.equals(emailTable.getDataAsText(1, "To")));
         Assert.assertTrue("User did not receive updated issue notification",
                 PasswordUtil.getUsername().equals(emailTable.getDataAsText(0, "To")) || PasswordUtil.getUsername().equals(emailTable.getDataAsText(1, "To")));
     }
