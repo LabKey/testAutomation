@@ -121,7 +121,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
         waitAndClick(Locator.xpath("//span[text()='Insert New']"));
         waitForElement(Locator.name("quf_ParticipantId"));
         setFormElement(Locator.name("quf_ParticipantId"), "67676");
-        setFormElement(Locator.name("quf_date"), "1/1/0001");
+        setFormElement(Locator.name("quf_date"), "1/1/2001");
         setFormElement(Locator.name("quf_Comments"), "Comment on added participant");
         clickButton("Submit");
     }
