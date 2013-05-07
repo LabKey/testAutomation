@@ -63,7 +63,6 @@ public class MenuBarTest extends BaseWebDriverTest
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));
-        clickButtonContainingText("Turn On Custom Menus");
 
         portalHelper.addWebPart("AssayList2");
         portalHelper.addWebPart("Study List");
