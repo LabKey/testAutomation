@@ -242,6 +242,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assays.add(Pair.of("ELISPOT_Assay", "ELISPOT Test"));
         assays.add(Pair.of("Hormone Assay", "Hormone Assay Test"));
         assays.add(Pair.of("Genotype Assay", "Genotyping Assay Test"));
+        assays.add(Pair.of("SNP Assay", "SNP Assay Test"));
 
         return assays;
     }
@@ -714,9 +715,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         //assert custom data element present.  core.users cannot be edited, so it should hide the import UI
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Users:"));
+        assertElementPresent(LabModuleHelper.getNavPanelRow(GROUP_SOURCE));
         assertElementNotPresent(LabModuleHelper.getNavPanelItem("Users:", IMPORT_DATA_TEXT));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Groups:"));
 
         //verify that the demographics source has been added
         String fieldKey = _helper.getLegalNameFromName(SUBJECT_LIST);
@@ -885,7 +885,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
             i++;
         }
-        assertElementPresent(Locator.linkContainingText("TruCount Test: Results Pivoted"));
+        assertElementPresent(Locator.linkContainingText("TruCount Test: Results By Run"));
 
         assertElementNotPresent(Locator.linkContainingText("View All")); //covers samples, peptides, oligos
         assertElementNotPresent(Locator.linkContainingText("Browse Sequence Data"));
@@ -961,10 +961,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         {
             assertElementPresent(Locator.linkContainingText(pair.getValue() + ": Raw Data"));
         }
-        assertElementPresent(Locator.linkContainingText("TruCount Test: Results Pivoted"));
+        assertElementPresent(Locator.linkContainingText("TruCount Test: Results By Run"));
         assertElementPresent(Locator.linkContainingText("SSP Test: SSP Summary"));
-        assertElementPresent(Locator.linkContainingText("SSP Test: SSP Pivot"));
-        assertElementPresent(Locator.linkContainingText("ICS Test: Results Pivoted"));
+        assertElementPresent(Locator.linkContainingText("SSP Test: Results By Run"));
+        assertElementPresent(Locator.linkContainingText("ICS Test: Results By Run"));
         assertElementPresent(Locator.linkContainingText(VIRAL_LOAD_ASSAYNAME + ": Viral Load Summary"));
 
         assertElementPresent(Locator.linkContainingText("View All DNA Oligos"));

@@ -107,7 +107,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForText("Housing");
         waitAndClick(LabModuleHelper.getNavPanelItem("Housing:", VIEW_TEXT));
         waitForPageToLoad();
-        waitForText("details");
+        waitForText(ROOM_ID2);
         dr = new DataRegionTable("query", this);
         dr.clickLink(1, "Room");
         waitForPageToLoad();
