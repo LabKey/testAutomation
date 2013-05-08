@@ -1155,7 +1155,7 @@ public class TimeChartTest extends StudyBaseTest
 
         goToAxisTab("Right-Axis", "Hemogoblins");
         setAxisValue("Right", "rightaxis_range_automatic", null, null, null, "rightaxis_scale", "Log", null, null);
-        assertTextNotPresent("13");
+        assertTextNotPresent("13");    // TODO: fix to use measure value format that is more unique (i.e. #.00000)
         assertTextNotPresent("12.5");
 
 //        assertTextPresent("100"); TODO: Issue 14846
