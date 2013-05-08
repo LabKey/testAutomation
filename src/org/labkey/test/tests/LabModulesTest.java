@@ -445,24 +445,24 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             int idx = 0;
             for (String col : colOrder)
             {
-                Assert.assertTrue("Row " + idx + " is missing value for column: " + col, row.containsKey(col));
+                Assert.assertTrue("Row " + i + " is missing value for column: " + col, row.containsKey(col));
 
                 Object serverVal = row.get(col);
                 if (serverVal instanceof JSONArray)
                 {
                     JSONArray arr = ((JSONArray)serverVal);
                     String value = arr.size() == 0 ? null : StringUtils.trimToNull(StringUtils.join(arr, "\n"));
-                    Assert.assertEquals("Incorrect value for: " + col, expectations[idx], value);
+                    Assert.assertEquals("Incorrect value for: " + col + " on row: " + i, expectations[idx], value);
                 }
                 else if (serverVal instanceof Date)
                 {
                     Date d = dateFormat.parse(expectations[idx]);
-                    Assert.assertEquals("Incorrect value for: " + col + " on row " + idx, d, serverVal);
+                    Assert.assertEquals("Incorrect value for: " + col + " on row " + i, d, serverVal);
                 }
                 else if (serverVal != null && (serverVal instanceof Integer || serverVal instanceof Double))
                 {
                     Double d = Double.parseDouble(expectations[idx]);
-                    Assert.assertEquals("Incorrect value for: " + col + " on row " + idx, d, Double.parseDouble(serverVal.toString()));
+                    Assert.assertEquals("Incorrect value for: " + col + " on row " + i, d, Double.parseDouble(serverVal.toString()));
                 }
                 else
                 {
@@ -507,7 +507,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             Map<String,Object> rowMap = new HashMap<String,Object>();
             rowMap.put("subjectId", arr[0]);
             rowMap.put("project", arr[1]);
-            rowMap.put("groupname", arr[2]);
+            //TODO: switich this back to inserting empty string once core bug (17804) is fixed.
+            //NOTE: this is deliberately inserting using empty string, not null.  LK is expected to convert that to NULL.  If this doesnt happen,
+            //calculatedColumnsTest() will fail since groupname is not null on row 2
+            rowMap.put("groupname", StringUtils.trimToNull(arr[2]));
             rowMap.put("startdate", arr[3]);
             rowMap.put("enddate", arr[4]);
             insertCmd.addRow(rowMap);
