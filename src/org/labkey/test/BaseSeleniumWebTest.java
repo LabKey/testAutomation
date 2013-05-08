@@ -1770,38 +1770,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
-    protected void validateLabAuditTrail()
-    {
-        int auditEventRowCount = 0;
-        SelectRowsCommand selectCmd = new SelectRowsCommand("auditLog", "tobereplaced");
-        selectCmd.setMaxRows(-1);
-        selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
-        selectCmd.setColumns(Arrays.asList("*"));
-        Connection cn = getDefaultConnection();
-        SelectRowsResponse selectResp = null;
-
-        for(String query : new String[] {"ExperimentAuditEvent", "SampleSetAuditEvent", "ContainerAuditEvent"})
-        {
-            selectCmd.setQueryName(query);
-            int rowCount = 0;
-                selectResp = executeSelectRowCommand("auditLog", query);
-//                selectResp = selectCmd.execute(cn,  "/" +  getProjectName());
-                rowCount =   selectResp.getRowCount().intValue();
-            log(query + " row count: " + rowCount);
-            auditEventRowCount += rowCount;
-        }
-
-        //file system events are batched
-        selectResp = executeSelectRowCommand("auditLog", "FileSystem");
-        //if we ever have a test generating more than one batch of files, this will need to be updated, but it will
-        //do for now
-        if(selectResp.getRowCount().intValue() > 0)
-            auditEventRowCount++;
-
-        selectResp = executeSelectRowCommand("auditLog", "LabAuditEvents");
-        Assert.assertEquals("Number of rows in LabAuditEvents did not equal sum of component event types", auditEventRowCount, selectResp.getRowCount().intValue());
-    }
-
     public Connection getDefaultConnection()
     {
         return new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());

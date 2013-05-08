@@ -259,8 +259,6 @@ public class FileContentTest extends BaseWebDriverTest
             assertTextBefore("File uploaded", "annotations updated"); // All notifications in one email
             assertTextBefore("annotations updated", "File deleted");
         }
-
-        validateLabAuditTrail();
     }
 
     @Override public BrowserType bestBrowser()
