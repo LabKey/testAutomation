@@ -1,4 +1,4 @@
-<cv:customView xmlns:cv="http://labkey.org/data/xml/queryCustomView">
+<cv:customView xmlns:cv="http://labkey.org/data/xml/queryCustomView" label="Sort on model year test alt label">
     <cv:sorts>
         <cv:sort column="ModelYear" descending="true"/>
     </cv:sorts>
