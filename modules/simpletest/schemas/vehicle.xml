@@ -247,5 +247,47 @@
       <ns:column columnName="name"/>
     </ns:columns>
   </ns:table>
-  
+
+    <ns:table tableName="Owner" tableDbType="TABLE">
+        <ns:columns>
+            <ns:column columnName="RowId"/>
+            <ns:column columnName="container"/>
+            <ns:column columnName="created"/>
+            <ns:column columnName="createdby"/>
+            <ns:column columnName="modified"/>
+            <ns:column columnName="modifiedby"/>
+            <ns:column columnName="first_name"/>
+            <ns:column columnName="last_name"/>
+            <ns:column columnName="email"/>
+            <ns:column columnName="gender"/>
+            <ns:column columnName="race"/>
+            <ns:column columnName="city"/>
+            <ns:column columnName="state"/>
+            <ns:column columnName="zip"/>
+            <ns:column columnName="text"/>
+            <ns:column columnName="birth_date"/>
+        </ns:columns>
+    </ns:table>
+
+    <ns:table tableName="OwnerBackup" tableDbType="TABLE">
+        <ns:columns>
+            <ns:column columnName="RowId"/>
+            <ns:column columnName="container"/>
+            <ns:column columnName="created"/>
+            <ns:column columnName="createdby"/>
+            <ns:column columnName="modified"/>
+            <ns:column columnName="modifiedby"/>
+            <ns:column columnName="first_name"/>
+            <ns:column columnName="last_name"/>
+            <ns:column columnName="email"/>
+            <ns:column columnName="gender"/>
+            <ns:column columnName="race"/>
+            <ns:column columnName="city"/>
+            <ns:column columnName="state"/>
+            <ns:column columnName="zip"/>
+            <ns:column columnName="text"/>
+            <ns:column columnName="birth_date"/>
+        </ns:columns>
+    </ns:table>
+
 </ns:tables>
