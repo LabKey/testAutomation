@@ -658,7 +658,6 @@ public class ListTest extends BaseWebDriverTest
     @LogMethod
     private void listSelfJoinTest()
     {
-        /*
         // Commented out the use of TRICKY_CHARACTERS because it broke ListTest on Postgres
         // submitted issue 17609, replace the next code block with these comments when resolved.
         final String listName = "listSelfJoin" + TRICKY_CHARACTERS;
@@ -667,14 +666,13 @@ public class ListTest extends BaseWebDriverTest
         final String lookupField = "lookupField" + TRICKY_CHARACTERS;
         final String lookupSchema = "lists";
         final String lookupTable = listName;
-        */
 
-        final String listName = "listSelfJoin";
+/*        final String listName = "listSelfJoin";
         final String dummyBase = "dummyCol";
         final String dummyCol = dummyBase;
         final String lookupField = "lookupField";
         final String lookupSchema = "lists";
-        final String lookupTable = listName;
+        final String lookupTable = listName; */
 
 
         log("Issue 6883: test list self join");
