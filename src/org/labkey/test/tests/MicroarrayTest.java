@@ -66,7 +66,6 @@ public class MicroarrayTest extends BaseSeleniumWebTest
     protected void doTestSteps()
     {
         log("Create Project");
-        log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));

@@ -315,7 +315,8 @@ public enum TestSet
         ViabilityTest.class,
         ModuleAssayTest.class,
         FormulationsTest.class,
-        ElisaAssayTest.class
+        ElisaAssayTest.class,
+        AffymetrixAssayTest.class
     ),
 
     UnitTests(
