@@ -640,7 +640,7 @@ public class TimeChartTest extends StudyBaseTest
 
         log("Test X-Axis");
         clickButton("View Chart(s)", 0);
-
+        _ext4Helper.waitForMaskToDisappear();
         goToAxisTab("X-Axis", "Days Since Start Date");
         _ext4Helper.selectComboBoxItemById("xaxis_interval", "Weeks");
         applyChanges();
@@ -1226,20 +1226,20 @@ public class TimeChartTest extends StudyBaseTest
         assertTextPresentInThisOrder("Your code should define a single function", "data:", "columnMap:", "measureInfo:", "clickEvent:");
         _ext4Helper.clickTabContainingText("Source");
         click(Locator.xpath("//input/../label[contains(text(), 'Toggle editor')]"));
-        sleep(1000); // wait for editor to toggle
-        Assert.assertTrue("Default point click function not inserted in to editor", getFormElement("point-click-fn-textarea").startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
+        waitForElement(Locator.name("point-click-fn-textarea"));
+        Assert.assertTrue("Default point click function not inserted in to editor", getFormElement(Locator.name("point-click-fn-textarea")).startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
         // apply the default point click function
         applyChanges();
         click(Locator.css("svg a circle"));
         _extHelper.waitForExtDialog("Data Point Information");
-        _extHelper.clickExtButton("OK", 0);
+        waitAndClick(Locator.button("OK"));
         // open developer panel and test JS function validation
         goToDeveloperTab();
-        setFormElement("point-click-fn-textarea", "");
-        applyChanges();
+        setFormElement(Locator.name("point-click-fn-textarea"), "");
+        waitAndClick(Locator.button("OK"));
         assertTextPresent("Error: the value provided does not begin with a function declaration.");
-        setFormElement("point-click-fn-textarea", "function(){");
-        applyChanges();
+        setFormElement(Locator.name("point-click-fn-textarea"), "function(){");
+        waitAndClick(Locator.button("OK"));
         assertTextPresent("Error parsing the function:");
         clickButton("Disable", 0);
         _extHelper.waitForExtDialog("Confirmation...");
@@ -1248,7 +1248,7 @@ public class TimeChartTest extends StudyBaseTest
         clickButton("Enable", 0);
         // test use-case to navigate to participang page on click
         String function = getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js");
-        setFormElement("point-click-fn-textarea", function);
+        setFormElement(Locator.name("point-click-fn-textarea"), function);
         applyChanges();
         openSaveMenu();
         saveReport(false);
@@ -1372,9 +1372,8 @@ public class TimeChartTest extends StudyBaseTest
 
     private void applyChanges()
     {
-        Locator l =  Locator.button("OK");
-        waitForElement(l);
-        click(l);
+        waitAndClick(Locator.button("OK"));
+        _ext4Helper.waitForMaskToDisappear();
     }
 
     private void setParticipantSelection(String selection)
