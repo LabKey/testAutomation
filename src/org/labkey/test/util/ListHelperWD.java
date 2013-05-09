@@ -677,19 +677,19 @@ public class ListHelperWD extends ListHelper
             if (lookup.getFolder() != null)
             {
                 _test.click(Locator.css("input[name=lookupContainer] + div.x-form-trigger"));
-                _test.waitAndClick(Locator.css(".x-combo-list-item").withText(lookup.getFolder()));
+                _test.waitAndClick(Locator.tag("div").withClass(".x-combo-list-item").withText(lookup.getFolder()));
                 _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getFolder()).append("/input[@name='lookupContainer']"));
             }
 
             if (!lookup.getSchema().equals(_test.getFormElement(Locator.css("input[name=schema]"))))
             {
                 _test.click(Locator.css("input[name=schema] + div.x-form-trigger"));
-                _test.waitAndClick(Locator.css(".x-combo-list-item").withText(lookup.getSchema()));
+                _test.waitAndClick(Locator.tag("div").withClass(".x-combo-list-item").withText(lookup.getSchema()));
             }
             _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getSchema()).append("/input[@name='schema']"));
 
             _test.click(Locator.css("input[name=table] + div.x-form-trigger"));
-            _test.waitAndClick(Locator.xpath("//div").withClass("x-combo-list-item").withPredicate("starts-with(normalize-space(), " + Locator.xq(lookup.getTable() + " (")  + ")"));
+            _test.waitAndClick(Locator.tag("div").withClass(".x-combo-list-item").withPredicate("starts-with(normalize-space(), " + Locator.xq(lookup.getTable() + " (")  + ")"));
             _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getTable()).append("/input[@name='table']"));
         }
 
