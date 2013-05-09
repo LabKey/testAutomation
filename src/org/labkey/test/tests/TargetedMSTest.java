@@ -56,16 +56,14 @@ public class TargetedMSTest extends BaseWebDriverTest
         clickButton("Process and Import Data");
         waitForText("MRMer", 5*defaultWaitForPage);
         selectPipelineFileAndImportAction("MRMer/" + SKY_FILE, "Import Skyline Results");
-        waitForText("Confirm TargetedMS Data Import");
-        clickButton("Import");
-        waitForText("Targeted MS Runs");
-        waitForTextWithRefresh(SKY_FILE, defaultWaitForPage);
-        assertTextPresent("Transitions");
+        waitForText("Skyline document import");
+        waitForPipelineJobsToFinish(1);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyImportedData()
     {
+        clickAndWait(Locator.linkContainingText("Targeted MS Dashboard"));
         clickAndWait(Locator.linkContainingText(SKY_FILE));
 
         log("Verifying expected summary counts");
