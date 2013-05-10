@@ -689,7 +689,7 @@ public class ListHelperWD extends ListHelper
             _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getSchema()).append("/input[@name='schema']"));
 
             _test.click(Locator.css("input[name=table] + div.x-form-trigger"));
-            _test.waitAndClick(Locator.tag("div").withClass(".x-combo-list-item").withPredicate("starts-with(normalize-space(), " + Locator.xq(lookup.getTable() + " (")  + ")"));
+            _test.waitAndClick(Locator.tag("div").withClass("x-combo-list-item").withPredicate("starts-with(normalize-space(), " + Locator.xq(lookup.getTable() + " (")  + ")"));
             _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getTable()).append("/input[@name='table']"));
         }
 
