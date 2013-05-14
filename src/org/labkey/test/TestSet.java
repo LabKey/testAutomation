@@ -89,7 +89,8 @@ public enum TestSet
         MS2Test.class,
         MS2GZTest.class,
         LibraTest.class,
-        TargetedMSTest.class,
+        TargetedMSExperimentTest.class,
+        TargetedMSLibraryTest.class,
         SequestImportTest.class
     ),
 
@@ -166,7 +167,8 @@ public enum TestSet
         CreateVialsTest.class,
         SpecimenMergeTest.class,
         TargetStudyTest.class,
-        TargetedMSTest.class,
+        TargetedMSExperimentTest.class,
+        TargetedMSLibraryTest.class,
         TimeChartDateBasedTest.class,
         TimeChartVisitBasedTest.class,
         TimeChartAPITest.class,

@@ -28,9 +28,13 @@ import org.labkey.test.util.LogMethod;
  * Date: 6/14/12
  * Time: 1:58 PM
  */
-public class TargetedMSTest extends BaseWebDriverTest
+public abstract class TargetedMSTest extends BaseWebDriverTest
 {
-    private final String SKY_FILE = "MRMer.sky";
+    protected static final String SKY_FILE = "MRMer.sky";
+
+    public enum FolderType {
+            Experiment, Library, LibraryProtein, Undefined;
+    }
 
     @Override
     protected String getProjectName()
@@ -38,19 +42,11 @@ public class TargetedMSTest extends BaseWebDriverTest
         return "TargetedMS" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
-    {
-        setupAndImportData();
-        verifyImportedData();
-        verifyModificationSearch();
-    }
-
     @LogMethod(category = LogMethod.MethodType.SETUP)
-    private void setupAndImportData()
+    protected void setupAndImportData(FolderType folderType)
     {
         _containerHelper.createProject(getProjectName(), "Targeted MS");
-        selectExperimentFolder();
+        selectFolderType(folderType);
         setPipelineRoot(getSampledataPath() + "/TargetedMS");
         goToModule("Pipeline");
         clickButton("Process and Import Data");
@@ -61,22 +57,23 @@ public class TargetedMSTest extends BaseWebDriverTest
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void verifyImportedData()
+    protected void verifyRunSummaryCounts()
     {
-        clickAndWait(Locator.linkContainingText("Targeted MS Dashboard"));
-        clickAndWait(Locator.linkContainingText(SKY_FILE));
-
         log("Verifying expected summary counts");
-        assertElementPresent(Locator.xpath("//tr[td[text()='Peptide Group Count']][td[text()='24']]"));
+        assertElementPresent(Locator.xpath("//tr[td[text()='Protein Count']][td[text()='24']]"));
         assertElementPresent(Locator.xpath("//tr[td[text()='Peptide Count']][td[text()='44']]"));
         assertElementPresent(Locator.xpath("//tr[td[text()='Precursor Count']][td[text()='88']]"));
         assertElementPresent(Locator.xpath("//tr[td[text()='Transition Count']][td[text()='296']]"));
         assertTextPresent("CDC19 SGDID:S000000036, Chr I from 71787-73289, Verified ORF, \"Pyruvate kinase, functions as a homotetramer in glycolysis to convert phosphoenolpyruvate to pyruvate, the input for aerobic (TCA cycle) or anaerobic (glucose fermentation) respiration");
         // Verify expected peptides/proteins in the nested view
         //Verify that amino acids from peptides are highlighted in blue as expected.
+    }
 
 
-//        Click on a peptide.
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    protected void verifyPeptide()
+    {
+        // Click on a peptide.
         String targetProtein  = "LTSLNVVAGSDLR";
         clickAndWait(Locator.linkContainingText(targetProtein));
         //Verify it’s associated with the right protein and other values from details view.
@@ -101,7 +98,7 @@ public class TargetedMSTest extends BaseWebDriverTest
         assertTextPresent("CDC19 SGDID:S000000036, Chr I from 71787-73289, Verified ORF, \"Pyruvate kinase, functions as a homotetramer in glycolysis to convert phosphoenolpyruvate to pyruvate,");
 
         assertTextPresent("Sequence Coverage", "Peptides", "LTSLNVVAGSDLR", "TNNPETLVALR", "GVNLPGTDVDLPALSEK", "TANDVLTIR",
-                 "GDLGIEIPAPEVLAVQK", "EPVSDWTDDVEAR",
+                "GDLGIEIPAPEVLAVQK", "EPVSDWTDDVEAR",
                 "Peak Areas");
 
         goBack();
@@ -138,15 +135,13 @@ public class TargetedMSTest extends BaseWebDriverTest
                 "GDLGIEIPAPEVLAVQK", "EPVSDWTDDVEAR");
         click(Locator.imageWithSrc("plus.gif", true));
         assertTextPresent("I from 71787-73289, Verified ORF, \"Pyruvate kinase, functions as a homotetramer in glycolysis to convert phosphoenolpyruvate to pyruvate, the input for aerobic (TCA cyc...");
-
-
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void verifyModificationSearch()
+    protected void verifyModificationSearch()
     {
         // add modificaiton search webpart and do an initial search by AminoAcid and DeltaMass
-        goToProjectHome();
+        clickAndWait(Locator.linkContainingText("Targeted MS Dashboard"));
         assertTextPresent("Mass Spec Search");
         _ext4Helper.clickExt4Tab("Modification Search");
         waitForElement(Locator.name("aminoAcids"));
@@ -209,9 +204,21 @@ public class TargetedMSTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    protected void selectExperimentFolder() {
-        log("Select Experimental Folder Type");
-        click(Locator.radioButtonById("experimentalData"));  // click the first radio button - Experimental Data
+    protected void selectFolderType(FolderType folderType) {
+        log("Select Folder Type: " + folderType);
+        switch(folderType)
+        {
+            case Experiment:
+                click(Locator.radioButtonById("experimentalData")); // click the first radio button - Experimental Data
+                break;
+            case Library:
+                click(Locator.radioButtonById("chromatogramLibrary")); // click the 2nd radio button - Library
+                break;
+            case LibraryProtein:
+                click(Locator.radioButtonById("chromatogramLibrary")); // click the 2nd radio button - Library
+                click(Locator.checkboxById("precursorNormalized")); // check the normalization checkbox.
+                break;
+        }
         clickButton("Submit");
     }
 

@@ -374,6 +374,8 @@ src/org/labkey/test/tests/StudyWDTest.java -text
 src/org/labkey/test/tests/SurveyTest.java -text
 src/org/labkey/test/tests/SystemMaintenanceTest.java -text
 src/org/labkey/test/tests/TargetStudyTest.java -text
+src/org/labkey/test/tests/TargetedMSExperimentTest.java -text
+src/org/labkey/test/tests/TargetedMSLibraryTest.java -text
 src/org/labkey/test/tests/TargetedMSTest.java -text
 src/org/labkey/test/tests/TimeChartAPITest.java -text
 src/org/labkey/test/tests/TimeChartDateBasedTest.java -text
