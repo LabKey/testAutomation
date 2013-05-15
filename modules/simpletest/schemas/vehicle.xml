@@ -287,6 +287,7 @@
             <ns:column columnName="zip"/>
             <ns:column columnName="text"/>
             <ns:column columnName="birth_date"/>
+            <ns:column columnName="_txTransformRunId"/>
         </ns:columns>
     </ns:table>
 

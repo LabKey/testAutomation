@@ -9,5 +9,6 @@
             <destination schemaName="vehicle" queryName="etl_target2" targetOption="merge"/>
         </transform>
     </transforms>
-    <schedule><poll updateTimeColumn="none" createTimeColumn="none2"></poll></schedule>
+    <schedule>
+    </schedule>
 </etl>
