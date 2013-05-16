@@ -145,17 +145,17 @@ public class DatasetPublishTest extends BaseWebDriverTest
     public void goToDataset(String datasetName)
     {
         click(Locator.linkWithText("Clinical and Assay Data"));
-        waitAndClick(Locator.linkWithText(datasetName));
+        waitAndClickAndWait(Locator.linkWithText(datasetName));
     }
 
     public void refreshDataset(String datasetName)
     {
         goToDataset(datasetName);
-        click(Locator.xpath("//span[text()='Views']"));
-        waitAndClick(Locator.xpath("//span[text()='Edit Snapshot']"));
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
+        prepForPageLoad();
         clickButton("Update Snapshot", 0);
         assertAlertContains("Updating will replace all existing data with a new set of data. Continue?");
-        dismissAlerts();
+        newWaitForPageToLoad();
     }
 
     @Override
