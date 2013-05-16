@@ -1470,7 +1470,7 @@ public class ReportTest extends StudyBaseTest
         _extHelper.clickExtDropDownMenu("discussionMenuToggle", DISCUSSION_TITLE_1);
         waitForPageToLoad();
 
-        assertTextPresent(DISCUSSION_TITLE_1);
+        waitForText(DISCUSSION_TITLE_1);
         assertTextPresent(DISCUSSION_BODY_1);
 
         clickButton("Respond");
