@@ -772,12 +772,14 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickButton("Enable", 0);
         setFormElement("point-click-fn-textarea", getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js"));
         waitAndClick(Locator.button("OK"));
+        _ext4Helper.waitForMaskToDisappear();
 
         // Visit-based chart
         waitAndClick(Locator.css("svg text:contains('Days Since Contact Date')"));
         waitForElement(Locator.button("Cancel"));
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         waitAndClick(Locator.button("OK"));
+        _ext4Helper.waitForMaskToDisappear();
         waitForTextToDisappear("Days Since Contact Date");
 
         clickButton("Save", 0);
