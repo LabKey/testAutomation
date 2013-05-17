@@ -244,6 +244,7 @@ src/org/labkey/test/tests/AbstractQCAssayTestWD.java -text
 src/org/labkey/test/tests/AbstractViabilityTest.java -text
 src/org/labkey/test/tests/AdminConsoleTest.java -text
 src/org/labkey/test/tests/AffymetrixAssayTest.java -text
+src/org/labkey/test/tests/AliquotTest.java -text
 src/org/labkey/test/tests/AncillaryStudyFromSpecimenRequestTest.java -text
 src/org/labkey/test/tests/AncillaryStudyTest.java -text
 src/org/labkey/test/tests/AssayTest.java -text
@@ -354,6 +355,7 @@ src/org/labkey/test/tests/SequenceTest.java -text
 src/org/labkey/test/tests/SimpleApiTest.java -text
 src/org/labkey/test/tests/SimpleApiTestWD.java -text
 src/org/labkey/test/tests/SimpleModuleTest.java -text
+src/org/labkey/test/tests/SpecimenBaseTest.java -text
 src/org/labkey/test/tests/SpecimenMergeTest.java -text
 src/org/labkey/test/tests/SpecimenProgressReportTest.java -text
 src/org/labkey/test/tests/SpecimenReplaceTest.java -text

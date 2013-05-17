@@ -152,7 +152,8 @@ public enum TestSet
         DatabaseDiagnosticsTest.class,
         StudyDatasetsTest.class,
         AdminConsoleTest.class,
-        DatasetPublishTest.class
+        DatasetPublishTest.class,
+        AliquotTest.class
     ),
 
     DailyB(600000,
