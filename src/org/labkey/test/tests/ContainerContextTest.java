@@ -450,7 +450,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         for (int i = 0; i < max; i++)
         {
-            String workbookContainer = EscapeUtil.encode(getProjectName()) + "/workbook-" + workbookIds[i];
+            String workbookContainer = EscapeUtil.encode(getProjectName()) + "/" + workbookIds[i];
             String href;
             String expectedHref;
 
@@ -491,7 +491,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             if (parentRowIds[i] != null && !parentRowIds[i].equals("") && parentDetailsAction != null)
             {
                 String parentTestWorkbookId = rowIdToWorkbookId.get(parentRowIds[i]);
-                String parentTestContainer = EscapeUtil.encode(getProjectName()) + "/workbook-" + parentTestWorkbookId;
+                String parentTestContainer = EscapeUtil.encode(getProjectName()) + "/" + parentTestWorkbookId;
                 expectedHref = "/query/" + parentTestContainer + "/" + parentDetailsAction + "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + parentRowIds[i];
 
                 href = dr.getHref(i, "Parent Test");
@@ -542,7 +542,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             rowMap.put("result", false);
 
             insertCmd.addRow(rowMap);
-            SaveRowsResponse response = insertCmd.execute(cn, getProjectName() + "/workbook-" + workbookId);
+            SaveRowsResponse response = insertCmd.execute(cn, getProjectName() + "/" + workbookId);
             Map<String, Object> row = response.getRows().get(0);
             Long rowId = (Long)row.get("RowId");
             return rowId.toString();

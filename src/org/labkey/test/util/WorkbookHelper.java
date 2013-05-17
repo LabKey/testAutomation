@@ -39,6 +39,7 @@ public class WorkbookHelper extends AbstractHelperWD
      * @param title Title of created workbook
      * @param description Description of created workbook
      * @param folderType Type of created workbook
+     * @return workbook id
      */
     public String createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
     {
@@ -54,10 +55,14 @@ public class WorkbookHelper extends AbstractHelperWD
 
         try
         {
+            // path is something like "http://localhost:8080/labkey/project/ContainerContextTest/2/begin.view?"
+            // this code pulls "2" out by finding the last and second to last slashes
             String path = _test.getURL().toURI().getPath();
-            path = path.replaceAll(".*/workbook-", "");
-            path = path.replaceAll("/begin.view", "");
-            return path;
+            int idx = path.lastIndexOf("/");
+            path = path.substring(0, idx);
+            idx = path.lastIndexOf("/");
+
+            return path.substring(idx + 1);
         }
         catch (URISyntaxException e)
         {
