@@ -25,6 +25,7 @@ import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
@@ -774,8 +775,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             link = Locator.xpath("//a[text()='new linked schema']");
         else
             link = Locator.xpath("//td[text()='" + name + "']/..//a[text()='edit']");
-        waitForElement(link);
-        click(link);
+        waitAndClickAndWait(link);
 
         waitForElement(Locator.xpath("//input[@name='userSchemaName']"));
         setFormElement(Locator.xpath("//input[@name='userSchemaName']"), name);
@@ -817,7 +817,9 @@ public class LinkedSchemaTest extends BaseWebDriverTest
             click(Locator.xpath("//input[@name='tables']"));
             for (String table : tables.split(","))
             {
-                waitAndClick(Locator.xpath("//li").containing(table).notHidden());
+                WebElement li = Locator.xpath("//li").containing(table).notHidden().waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT);
+                if (!li.getAttribute("class").contains("selected"))
+                    li.click();
             }
             click(Locator.xpath("//input[@name='tables']"));
         }
