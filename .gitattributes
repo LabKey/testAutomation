@@ -262,6 +262,7 @@ src/org/labkey/test/tests/CustomizeViewTest.java -text
 src/org/labkey/test/tests/DataRegionTest.java -text
 src/org/labkey/test/tests/DatabaseDiagnosticsTest.java -text
 src/org/labkey/test/tests/DatasetPublishTest.java -text
+src/org/labkey/test/tests/DrugSensitivityAssayTest.java -text
 src/org/labkey/test/tests/ELISPOT_AssayTest.java -text
 src/org/labkey/test/tests/ETLTest.java -text
 src/org/labkey/test/tests/ElectrochemiluminescenceAssayTest.java -text

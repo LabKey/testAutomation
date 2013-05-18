@@ -22,8 +22,5 @@ package org.labkey.test.tests;
  */
 public abstract class AbstractPlateBasedAssayTest extends AbstractQCAssayTestWD
 {
-    protected void createTemplate(String type, String name)
-    {
-
-    }
+    protected abstract void createTemplate();
 }
