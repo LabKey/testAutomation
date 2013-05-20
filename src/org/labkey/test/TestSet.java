@@ -41,7 +41,6 @@ public enum TestSet
         XTandemShortTest.class,
         StudyShortTest.class
     ),
-    //new tests added to the DRTs should be added to BVT as well
 
     BVT(
         BasicTest.class,
@@ -59,11 +58,11 @@ public enum TestSet
         ReagentTest.class,
         FilterTest.class,
         GroupTest.class,
-        StudyRedesignTest.class,
+//        StudyRedesignTest.class, //TODO: Remove from Daily once more stable
+        StudyShortTest.class, //TODO: Replace with StudyRedesignTest
         SecurityTest.class,
         FlowTest.class,
         XTandemTest.class,
-//        StudyWDTest.class,
         WebDavTest.class
     ),
 
@@ -96,6 +95,7 @@ public enum TestSet
 
     DailyA(600000,
         BasicTest.class,
+        StudyRedesignTest.class,
         EmbeddedWebPartTest.class,
         ModuleAssayTest.class,
         SpecimenTest.class,
@@ -176,7 +176,6 @@ public enum TestSet
         EHRReportingAndUITest.class,
         EHRDataEntryTest.class,
         EHRApiTest.class,
-        //ONPRC_EHRTest.class,
         ComplianceTrainingTest.class,
         GpatAssayTest.class,
         FolderTest.class,
@@ -194,7 +193,6 @@ public enum TestSet
         StudyCohortExportTest.class,
         ViabilityTest.class,
         ProjectSettingsTest.class,
-        //CDSTest.class, // Broken
         ExtraKeyStudyTest.class,
         CAVDStudyTest.class,
         SampleMindedImportTest.class,
@@ -302,7 +300,7 @@ public enum TestSet
     Assays(
         AssayTest.class,
         MissingValueIndicatorsTest.class,
-//        ElispotAssayTest.class,
+        ElispotAssayTest.class,
         TargetStudyTest.class,
         NabOldTest.class,
         NabAssayTest.class,
@@ -371,6 +369,8 @@ public enum TestSet
     InDevelopment(
         MassFilterTest.class,
         ListPublishTest.class,
+        StudyWDTest.class,
+        CDSTest.class,
         ExperimentalFeaturesTest.class // currently no experimental features being tested
     ),
 

@@ -511,7 +511,7 @@ public class StudyWDTest extends StudyBaseTestWD
         if(filtered)
         {
             table.setFilter("DEMasian", "Equals", "0", 0);
-            waitForText("Filter", WAIT_FOR_JAVASCRIPT);
+            waitForElement(Locator.paginationText(21));
         }
 
         clickButtonContainingText("Add All", 0);
@@ -635,9 +635,9 @@ public class StudyWDTest extends StudyBaseTestWD
     {
         clickFolder(STUDY_NAME);
         clickAndWait(Locator.linkWithText("Alt ID mapping"));
-        assertTextPresent("Contains up to one row of Alt ID mapping data for each ");
-        click(Locator.tagWithText("span", "Import Data"));
-        waitForText("This is the Alias Dataset. You do not need to include information for the date column");
+        waitForElement(Locator.tagContainingText("div", "Contains up to one row of Alt ID mapping data for each "));
+        clickButton("Import Data");
+        waitForElement(Locator.tagWithText("div", "This is the Alias Dataset. You do not need to include information for the date column."));
 
         //the crawler should be paused (this is done in create) to verify
         log("Verify searching for alternate ID returns participant page");
@@ -647,8 +647,7 @@ public class StudyWDTest extends StudyBaseTestWD
         goBack();
         goBack();
 
-        //edit an entry, search for that
-        log("TODO");
+        //TODO: edit an entry, search for that
 
         Map nameAndValue = new HashMap(1);
         nameAndValue.put("Alt ID", "191919");

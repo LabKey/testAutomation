@@ -287,11 +287,6 @@ public abstract class Locator
         return tagWithName("form", formName);
     }
 
-    public static XPathLocator formWithAction(String actionName)
-    {
-        return tagWithAttribute("form", "action", actionName);
-    }
-
     public static XPathLocator tagWithId(String tag, String id)
     {
         return tagWithAttribute(tag, "id", id);
@@ -299,17 +294,17 @@ public abstract class Locator
 
     public static XPathLocator tagWithAttribute(String tag, String attrName, String attrVal)
     {
-        return xpath("//" + tag + "[@" + attrName + "=" + xq(attrVal) + "]");
+        return Locator.tag(tag).withAttribute(attrName, attrVal);
     }
 
     public static XPathLocator tagWithText(String tag, String text)
     {
-        return xpath("//" + tag + "[text() = " + xq(text) + "]");
+        return Locator.tag(tag).withText(text);
     }
 
     public static XPathLocator tagContainingText(String tag, String text)
     {
-        return xpath("//" + tag + "[contains(text(), " + xq(text) + ")]");
+        return Locator.tag(tag).withPredicate("contains(text(), " + xq(text) + ")");
     }
 
     public static XPathLocator linkWithImage(String image)
@@ -319,7 +314,7 @@ public abstract class Locator
 
     public static XPathLocator gwtButton(String text)
     {
-        return xpath("//a[contains(@class, 'gwt-Anchor') and text() = '" + text + "']");
+        return tag("a").withClass("gwt-Anchor").withText(text);
     }
 
     public static XPathLocator button(String text)
@@ -475,11 +470,6 @@ public abstract class Locator
     public static XPathLocator input(String name)
     {
         return tagWithName("input", name);
-    }
-
-    public static XPathLocator inputWithValue(String value)
-    {
-        return tagWithAttribute("input", "value", value);
     }
 
     @Deprecated
@@ -791,6 +781,11 @@ public abstract class Locator
         public XPathLocator withoutClass(String cssClass)
         {
             return this.withPredicate("not(contains(concat(' ',normalize-space(@class),' '), " + xq(" " + cssClass + " ") + "))");
+        }
+
+        public XPathLocator withAttribute(String attrName, String attrVal)
+        {
+            return this.withPredicate("@" + attrName + "=" + xq(attrVal));
         }
 
         public String getPath()
