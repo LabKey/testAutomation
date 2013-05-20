@@ -69,7 +69,7 @@ public class UserTest extends SecurityTest
         checkRequiredField("FirstName", false);
         clickButton("Save");
 
-        deleteUsers(false, NORMAL_USER2, NORMAL_USER2_ALTERNATE);
+        deleteUsers(false, NORMAL_USER2, NORMAL_USER2_ALTERNATE); // Deleted/renamed during test. Only needed during pre-clean
     }
 
     private void siteUsersTest()

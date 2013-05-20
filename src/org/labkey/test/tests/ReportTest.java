@@ -121,7 +121,7 @@ public class ReportTest extends StudyBaseTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(false, TEST_USER, R_USER, AUTHOR_USER, DEVELOPER_USER, ATTACHMENT_USER);
+        deleteUsers(afterTest, TEST_USER, R_USER, AUTHOR_USER, DEVELOPER_USER, ATTACHMENT_USER);
         super.doCleanup(afterTest);
     }
 
