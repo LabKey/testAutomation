@@ -89,7 +89,7 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         assertTextPresent("Drug Treatment Information");
 
         click(Locator.linkContainingText("View Runs"));
-        assertTextPresent("assaydata\\acquisition3");
+        assertElementPresent(Locator.linkContainingText("assaydata"+File.separator+"acquisition3.xlsx"));
         click(Locator.linkContainingText("3.txt"));
 
         DataRegionTable table = new DataRegionTable("Data", this);
