@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
@@ -31,6 +32,8 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
     @Override @LogMethod
     protected void runUITests() throws Exception
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+
         log("Starting Drug Sensitivity Assay BVT Test");
 
         //revert to the admin user
@@ -47,8 +50,14 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         //setup a pipeline for it
         setupPipeline(getProjectName());
 
+        _containerHelper.createSubfolder(getProjectName(), TEST_ASSAY_FLDR_STUDY1, null);
+        portalHelper.addWebPart("Study Overview");
+        clickButton("Create Study");
+        click(Locator.radioButtonById("dateTimepointType"));
+        clickButton("Create Study");
+
         clickProject(getProjectName());
-        addWebPart("Assay List");
+        portalHelper.addWebPart("Assay List");
         createTemplate();
 
         //create a new assay
@@ -75,29 +84,31 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         log("Uploading Drug Sensitivity Runs");
         clickButton("Import Data");
         clickButton("Next");
-        uploadFile(TEST_ASSAY_FILE1, null);
+        uploadFile(TEST_ASSAY_FILE1, null, "11223344");
 
         click(Locator.linkContainingText("Import Data"));
         clickButton("Next");
-        uploadFile(TEST_ASSAY_FILE2, null);
+        uploadFile(TEST_ASSAY_FILE2, null, "55667788");
 
         click(Locator.linkContainingText("Import Data"));
         clickButton("Next");
-        uploadFile(TEST_ASSAY_FILE3, TEST_ASSAY_DATA_ACQUISITION_FILE3);
+        uploadFile(TEST_ASSAY_FILE3, TEST_ASSAY_DATA_ACQUISITION_FILE3, "12341234");
 
         // verify details view has a custom sample label
         assertTextPresent("Drug Treatment Information");
 
         click(Locator.linkContainingText("View Runs"));
-        assertElementPresent(Locator.linkContainingText("assaydata"+File.separator+"acquisition3.xlsx"));
+        assertElementPresent(Locator.linkContainingText("assaydata" + File.separator + "acquisition3"));
         click(Locator.linkContainingText("3.txt"));
 
         DataRegionTable table = new DataRegionTable("Data", this);
 
         assert(table.getDataRowCount() == 3);
+
+        testCopyToStudy();
     }
 
-    protected void uploadFile(String filePath, String acquisitionFilePath)
+    protected void uploadFile(String filePath, String acquisitionFilePath, String ptid)
     {
         // cutoff values
         setFormElement(Locator.name("cutoff1"), "50");
@@ -108,6 +119,8 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         setFormElement(Locator.name("mediaFreezerProID"), "77768");
         setFormElement(Locator.name("totalEventPerWell"), "1000");
 
+        setFormElement(Locator.name("participantID"), ptid);
+        setFormElement(Locator.name("date"), "5/18/2013");
         setFormElement(Locator.name("experimentPerformer"), "John White");
         selectOptionByText(Locator.name("curveFitMethod"), "Four Parameter");
 
@@ -164,5 +177,28 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
     @Override public BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    private void testCopyToStudy()
+    {
+        checkAllOnPage("Data");
+        clickButton("Copy to Study");
+
+        selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
+        clickButton("Next");
+        clickButton("Copy to Study");
+
+        DataRegionTable table = new DataRegionTable("Dataset", this);
+
+        assert(table.getDataRowCount() == 3);
+
+        // verify cutoff properties are pulled through
+        assert(table.getColumn("FitError") != -1);
+        assert(table.getColumn("Cutoff50/IC") != -1);
+        assert(table.getColumn("Cutoff50/Point") != -1);
+        assert(table.getColumn("Cutoff75/IC") != -1);
+        assert(table.getColumn("Cutoff75/Point") != -1);
+        assert(table.getColumn("Cutoff99/IC") != -1);
+        assert(table.getColumn("Cutoff99/Point") != -1);
     }
 }
