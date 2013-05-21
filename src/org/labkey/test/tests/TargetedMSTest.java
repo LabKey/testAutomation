@@ -219,7 +219,7 @@ public abstract class TargetedMSTest extends BaseWebDriverTest
                 click(Locator.checkboxById("precursorNormalized")); // check the normalization checkbox.
                 break;
         }
-        clickButton("Submit");
+        clickButton("Finish");
     }
 
     @Override
