@@ -41,7 +41,6 @@ public enum TestSet
         XTandemShortTest.class,
         StudyShortTest.class
     ),
-    //new tests added to the DRTs should be added to BVT as well
 
     BVT(
         BasicTest.class,
@@ -63,7 +62,6 @@ public enum TestSet
         SecurityTest.class,
         FlowTest.class,
         XTandemTest.class,
-//        StudyWDTest.class,
         WebDavTest.class
     ),
 
@@ -178,7 +176,6 @@ public enum TestSet
         EHRReportingAndUITest.class,
         EHRDataEntryTest.class,
         EHRApiTest.class,
-        //ONPRC_EHRTest.class,
         ComplianceTrainingTest.class,
         GpatAssayTest.class,
         FolderTest.class,
@@ -196,7 +193,6 @@ public enum TestSet
         StudyCohortExportTest.class,
         ViabilityTest.class,
         ProjectSettingsTest.class,
-        //CDSTest.class, // Broken
         ExtraKeyStudyTest.class,
         CAVDStudyTest.class,
         SampleMindedImportTest.class,
@@ -304,7 +300,7 @@ public enum TestSet
     Assays(
         AssayTest.class,
         MissingValueIndicatorsTest.class,
-//        ElispotAssayTest.class,
+        ElispotAssayTest.class,
         TargetStudyTest.class,
         NabOldTest.class,
         NabAssayTest.class,
@@ -361,7 +357,6 @@ public enum TestSet
         EHRReportingAndUITest.class,
         EHRDataEntryTest.class,
         EHRApiTest.class
-        //ONPRC_EHRTest.class
     ),
 
     ONPRC(Unsupported, EHR.getTestList()),
@@ -373,6 +368,9 @@ public enum TestSet
     InDevelopment(
         MassFilterTest.class,
         ListPublishTest.class,
+        StudyWDTest.class, // Broken
+        CDSTest.class, // Broken
+        ONPRC_EHRTest.class, // Unknown?
         ExperimentalFeaturesTest.class // currently no experimental features being tested
     ),
 
