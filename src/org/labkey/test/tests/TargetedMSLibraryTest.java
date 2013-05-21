@@ -19,11 +19,18 @@ import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.UIContainerHelper;
 
 import java.util.Arrays;
 
 public class TargetedMSLibraryTest extends TargetedMSTest
 {
+    public TargetedMSLibraryTest()
+    {
+        // We want to use the UI when creating the project/folder so that we can verify that we get the wizard
+        // that has the extra steps
+        setContainerHelper(new UIContainerHelper(this));
+    }
 
     @Override
     protected void doTestSteps() throws Exception
@@ -31,6 +38,14 @@ public class TargetedMSLibraryTest extends TargetedMSTest
         setupAndImportData(FolderType.Library);
         verifyImportedData();
         verifyModificationSearch();
+    }
+
+    @Override
+    protected void selectFolderType(FolderType folderType)
+    {
+        // Make sure that we're still in the wizard UI
+        assertTextPresent("Create Project", "Users / Permissions");
+        super.selectFolderType(folderType);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)

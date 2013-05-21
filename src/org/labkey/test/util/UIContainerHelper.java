@@ -56,15 +56,24 @@ public class UIContainerHelper extends AbstractContainerHelper
         else
             _test.click(Locator.xpath("//td[./label[text()='Custom']]/input"));
 
-        _test.waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
+        _test.waitAndClick(Locator.button("Next"));
         _test.waitForPageToLoad();
 
         //second page of the wizard
-        _test.waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
+        _test.waitAndClick(Locator.button("Next"));
         _test.waitForPageToLoad();
 
         //third page of wizard
-        _test.waitAndClick(Locator.xpath("//button[./span[text()='Finish']]"));
+        if (_test.isElementPresent(Locator.button("Finish")))
+        {
+            _test.waitAndClick(Locator.button("Finish"));
+        }
+        else
+        {
+            // There may be additional steps based on
+            _test.waitAndClick(Locator.button("Next"));
+        }
+
         _test.waitForPageToLoad();
         
     }
@@ -73,7 +82,7 @@ public class UIContainerHelper extends AbstractContainerHelper
     //but at the moment it's unnecessary, and complicated because the two don't have the same capabilities.
     protected void doCreateFolder(String projectName, String folderType, String path)
     {
-        throw new UnsupportedOperationException("Use APIContainerHelper to delete a sub-folder.");
+        throw new UnsupportedOperationException("Use APIContainerHelper to create a sub-folder.");
     }
 
     @LogMethod
