@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.tests.study;
+package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.tests.StudyBaseTest;
+import org.labkey.test.tests.StudyRedesignTest;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
@@ -28,7 +29,7 @@ import java.io.File;
  * User: klum
  * Date: Feb 24, 2012
  */
-public class StudyScheduleTester
+public class StudyScheduleTest extends StudyRedesignTest
 {
     // dataset names
     private static final String IMPORT_DATASET = "ImportDataset";
@@ -58,59 +59,67 @@ public class StudyScheduleTester
         linkeToExisting,
     }
 
-    private StudyBaseTest _test;
-    private String _folderName;
-    private String _sampleDataPath;
-
+    private String _folderName = getFolderName();
+    private String _sampleDataPath = getStudySampleDataPath();
+     /*
     public StudyScheduleTester(StudyBaseTest test, String folderName, String sampleDataPath)
     {
         _test = test;
         _folderName = folderName;
         _sampleDataPath = sampleDataPath;
+    }*/
+
+    @Override
+    protected void doVerifySteps()
+    {
+        basicTest();
+        datasetStatusTest();
+        linkDatasetTest();
+        linkFromDatasetDetailsTest();
     }
 
     @LogMethod
     public void basicTest()
     {
-        _test.log("Study Schedule Test");
+        log("Study Schedule Test");
         String dataset = "PRE-1: Pre-Existing Conditions";
         String visit = "Screening Cycle";
 
         // check required timepoints
         goToStudySchedule();
 //        getXpathCount(Locator.xpath("//div[./span[@class='x4-column-header-text']]//div[text()='" + visit +"']"));
-        _test.assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[6]//div[@class='checked']"));
+        assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[6]//div[@class='checked']"));
 
         // change a required visit to optional
-        _test.clickWebpartMenuItem("Study Schedule", "Manage Visits");
-        _test.clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
-        _test.selectOption("dataSetStatus", 2, "OPTIONAL");
-        _test.clickButton("Save");
+        clickWebpartMenuItem("Study Schedule", "Manage Visits");
+        clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
+        selectOption("dataSetStatus", 2, "OPTIONAL");
+        clickButton("Save");
 
         // verify that change is noted in schedule
         goToStudySchedule();
-        _test.assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[5]//div[@class='unchecked']"));
+        assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[5]//div[@class='unchecked']"));
 
         // revert change
-        _test.clickWebpartMenuItem("Study Schedule", "Manage Visits");
-        _test.clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
-        _test.selectOption("dataSetStatus", 2, "REQUIRED");
-        _test.clickButton("Save");
+        clickWebpartMenuItem("Study Schedule", "Manage Visits");
+        clickAndWait(Locator.xpath("//table[@id='visits']//tr[./th[text() = '" + visit + "']]/td/a[text() = 'edit']"));
+        selectOption("dataSetStatus", 2, "REQUIRED");
+        clickButton("Save");
 
         // verify dataset 'data' link
         goToStudySchedule();
-        _test.click(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//a")); // go to dataset
-        _test.waitForPageToLoad();
-        _test.waitForText(dataset);
+        click(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//a")); // go to dataset
+        waitForPageToLoad();
+        waitForText(dataset);
 
         // test paging
         goToStudySchedule();
 //        click(Locator.xpath("//input[@role='checkbox']"));
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'button-next')][1]"), _test.WAIT_FOR_JAVASCRIPT); //wait for next button to appear
-        _test.assertTextNotPresent("Cycle 2");
-        _test.click(Locator.xpath("//div[contains(@class, 'button-next')][1]")); //click next button
-        _test.waitForText("Cycle 2");
-        _test.waitForText(dataset);
+        waitForElement(Locator.xpath("//div[contains(@class, 'button-next')][1]"), WAIT_FOR_JAVASCRIPT); //wait for next button to appear
+        assertTextNotPresent("Cycle 2");
+        click(Locator.xpath("//div[contains(@class, 'button-next')][1]")); //click next button
+        waitForText("Cycle 2");
+        waitForText(dataset);
     }
 
     @LogMethod
@@ -122,20 +131,20 @@ public class StudyScheduleTester
         addDataset(IMPORT_DATASET, ASSAY_CATEGORY, DatasetType.importFromFile);
 
         // verify it shows up in the schedule
-        _test.waitForElement(Locator.xpath("//div[text()='" + IMPORT_DATASET + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-        _test.assertElementPresent(Locator.xpath("//div[text() = '" + IMPORT_DATASET + "']/../../../td//img[@alt='dataset']"));
+        waitForElement(Locator.xpath("//div[text()='" + IMPORT_DATASET + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.xpath("//div[text() = '" + IMPORT_DATASET + "']/../../../td//img[@alt='dataset']"));
 
         // click on the dataset link to verify it takes you to the dataset view
-        _test.click(Locator.xpath("//div[text() = '" + IMPORT_DATASET + "']/../../../td//a"));
-        _test.waitForPageToLoad();
-        _test.assertTextPresent("Dataset:", IMPORT_DATASET);
+        click(Locator.xpath("//div[text() = '" + IMPORT_DATASET + "']/../../../td//a"));
+        waitForPageToLoad();
+        assertTextPresent("Dataset:", IMPORT_DATASET);
         goToStudySchedule();
 
         // create a dataset from a manual definition
         addDataset(MANUAL_DATASET, null, DatasetType.defineManually);
         // verify it shows up in the schedule
-        _test.waitForElement(Locator.xpath("//div[text()='" + MANUAL_DATASET + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-        _test.assertElementPresent(Locator.xpath("//div[text() = '" + MANUAL_DATASET + "']/../../../td//img[@alt='dataset']"));
+        waitForElement(Locator.xpath("//div[text()='" + MANUAL_DATASET + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.xpath("//div[text() = '" + MANUAL_DATASET + "']/../../../td//img[@alt='dataset']"));
 
         // create and verify a placeholder datasets
         createPlaceholderDataset(GHOST_DATASET_1, GHOST_CATEGORY, true);
@@ -146,14 +155,14 @@ public class StudyScheduleTester
         linkDatasetFromSchedule(GHOST_DATASET_1, DatasetType.linkeToExisting, IMPORT_DATASET);
 
         // verify the expectation dataset gets converted and the existing dataset is gone
-        _test.waitForElement(Locator.xpath("//div[text()='" + GHOST_DATASET_1 + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-        _test.assertElementPresent(Locator.xpath("//div[text() = '" + GHOST_DATASET_1 + "']/../../../td//img[@alt='dataset']"));
-        _test.assertElementNotPresent(Locator.xpath("//div[text() = '" + IMPORT_DATASET + "']"));
+        waitForElement(Locator.xpath("//div[text()='" + GHOST_DATASET_1 + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.xpath("//div[text() = '" + GHOST_DATASET_1 + "']/../../../td//img[@alt='dataset']"));
+        assertElementNotPresent(Locator.xpath("//div[text() = '" + IMPORT_DATASET + "']"));
 
         // click on the dataset link to verify it takes you to the dataset view
-        _test.click(Locator.xpath("//div[text() = '" + GHOST_DATASET_1 + "']/../../../td//a"));
-        _test.waitForPageToLoad();
-        _test.assertTextPresent("Dataset:", GHOST_DATASET_1);
+        click(Locator.xpath("//div[text() = '" + GHOST_DATASET_1 + "']/../../../td//a"));
+        waitForPageToLoad();
+        assertTextPresent("Dataset:", GHOST_DATASET_1);
         goToStudySchedule();
 
         // link manually
@@ -163,13 +172,13 @@ public class StudyScheduleTester
         linkDatasetFromSchedule(GHOST_DATASET_3, DatasetType.importFromFile, null);
 
         // verify the expectation dataset gets converted and the existing dataset is gone
-        _test.waitForElement(Locator.xpath("//div[text()='" + GHOST_DATASET_3 + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-        _test.assertElementPresent(Locator.xpath("//div[text() = '" + GHOST_DATASET_3 + "']/../../../td//img[@alt='dataset']"));
+        waitForElement(Locator.xpath("//div[text()='" + GHOST_DATASET_3 + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.xpath("//div[text() = '" + GHOST_DATASET_3 + "']/../../../td//img[@alt='dataset']"));
 
         // click on the dataset link to verify it takes you to the dataset view
-        _test.click(Locator.xpath("//div[text() = '" + GHOST_DATASET_3 + "']/../../../td//a"));
-        _test.waitForPageToLoad();
-        _test.assertTextPresent("Dataset:", GHOST_DATASET_3);
+        click(Locator.xpath("//div[text() = '" + GHOST_DATASET_3 + "']/../../../td//a"));
+        waitForPageToLoad();
+        assertTextPresent("Dataset:", GHOST_DATASET_3);
     }
 
     @LogMethod
@@ -182,12 +191,12 @@ public class StudyScheduleTester
         createPlaceholderDataset(GHOST_DATASET_5, null, false);
         createPlaceholderDataset(GHOST_DATASET_6, GHOST_CATEGORY, false);
 
-        _test.goToManageStudy();
-        _test.clickAndWait(Locator.linkWithText("Manage Datasets"));
+        goToManageStudy();
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
 
         linkDatasetFromDetails(GHOST_DATASET_4, DatasetType.linkeToExisting, GHOST_DATASET_1);
-        _test.assertElementPresent(Locator.xpath("//a[text()='" + GHOST_DATASET_4 + "']"));
-        _test.assertElementNotPresent(Locator.xpath("//a[text()='" + GHOST_DATASET_1 + "']"));
+        assertElementPresent(Locator.xpath("//a[text()='" + GHOST_DATASET_4 + "']"));
+        assertElementNotPresent(Locator.xpath("//a[text()='" + GHOST_DATASET_1 + "']"));
         linkDatasetFromDetails(GHOST_DATASET_5, DatasetType.defineManually, null);
         linkDatasetFromDetails(GHOST_DATASET_6, DatasetType.importFromFile, null);
     }
@@ -197,18 +206,18 @@ public class StudyScheduleTester
     {
         // create and verify a placeholder dataset
         addDataset(name, null, DatasetType.placeholder);
-        _test.waitForElement(Locator.xpath("//div[text()='" + name + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-        _test.assertElementPresent(Locator.xpath("//div[text() = '" + name + "']/../../../td//img[@alt='link data']"));
+        waitForElement(Locator.xpath("//div[text()='" + name + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(Locator.xpath("//div[text() = '" + name + "']/../../../td//img[@alt='link data']"));
 
         if (verify)
         {
             // verify a placeholder dataset cannot be edited from the manage dataset page
-            _test.clickFolder(_folderName);
-            _test.goToManageStudy();
-            _test.clickAndWait(Locator.linkWithText("Manage Datasets"));
-            _test.clickAndWait(Locator.linkWithText(name));
+            clickFolder(_folderName);
+            goToManageStudy();
+            clickAndWait(Locator.linkWithText("Manage Datasets"));
+            clickAndWait(Locator.linkWithText(name));
 
-            _test.assertTextNotPresent("View Data", "Edit Definition");
+            assertTextNotPresent("View Data", "Edit Definition");
             goToStudySchedule();
         }
     }
@@ -216,32 +225,32 @@ public class StudyScheduleTester
     @LogMethod
     private void addDataset(String name, String category, DatasetType type)
     {
-        _test.log("adding dataset: " + name + " type: " + type);
+        log("adding dataset: " + name + " type: " + type);
 
-        _test.clickButton("Add Dataset", 0);
-        _test.waitForElement(Locator.xpath("//span[text() = 'New Dataset']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement(Locator.xpath("//label[text() = 'Name:']/../..//input"), name);
+        clickButton("Add Dataset", 0);
+        waitForElement(Locator.xpath("//span[text() = 'New Dataset']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+        setFormElement(Locator.xpath("//label[text() = 'Name:']/../..//input"), name);
 
         if (category != null)
         {
-            _test.setFormElement(Locator.xpath("//label[text() = 'Category:']/../..//input"), category);
+            setFormElement(Locator.xpath("//label[text() = 'Category:']/../..//input"), category);
         }
 
         switch (type)
         {
             case defineManually:
-                _test.click(Locator.ext4Radio("Define dataset manually"));
-                _test.clickButton("Next");
+                click(Locator.ext4Radio("Define dataset manually"));
+                clickButton("Next");
 
-                _test.waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+                waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
                 // add a single name field
-                _test._listHelper.setColumnName(0, "antigenName");
-                _test.clickButton("Save");
+                _listHelper.setColumnName(0, "antigenName");
+                clickButton("Save");
                 break;
             case importFromFile:
-                _test.click(Locator.ext4Radio("Import data from file"));
-                _test.clickButton("Next");
+                click(Locator.ext4Radio("Import data from file"));
+                clickButton("Next");
 
                 String datasetFileName = _sampleDataPath + "/datasets/plate002.tsv";
                 File file = new File(WebTestHelper.getLabKeyRoot(), datasetFileName);
@@ -249,18 +258,18 @@ public class StudyScheduleTester
                 if (file.exists())
                 {
                     Locator fileUpload = Locator.xpath("//input[@name = 'uploadFormElement']");
-                    _test.waitForElement(fileUpload, StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-                    _test.setFormElement(fileUpload, file.getAbsolutePath());
+                    waitForElement(fileUpload, StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+                    setFormElement(fileUpload, file.getAbsolutePath());
 
-                    _test.waitForElement(Locator.xpath("//div[@class = 'gwt-HTML' and contains(text(), 'Showing first 5 rows')]"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-                    _test.clickButton("Import");
+                    waitForElement(Locator.xpath("//div[@class = 'gwt-HTML' and contains(text(), 'Showing first 5 rows')]"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+                    clickButton("Import");
                 }
                 else
                     Assert.fail("The dataset import .tsv file (plate002.tsv) does not exist");
                 break;
             case placeholder:
-                _test.click(Locator.ext4Radio("do this later"));
-                _test.clickButton("Done", 0);
+                click(Locator.ext4Radio("do this later"));
+                clickButton("Done", 0);
 
                 break;
         }
@@ -270,16 +279,16 @@ public class StudyScheduleTester
     @LogMethod
     private void linkDatasetFromSchedule(String name, DatasetType type, String targetDataset)
     {
-        _test.log("linking dataset: " + name + " to type: " + type + " from study schedule.");
-        _test.waitForElement(Locator.xpath("//div[text()='" + name + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+        log("linking dataset: " + name + " to type: " + type + " from study schedule.");
+        waitForElement(Locator.xpath("//div[text()='" + name + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
         Locator link = Locator.xpath("//div[text() = '" + name + "']/../../../td//img[@alt='link data']/../..//div");
-        _test.assertElementPresent(link);
+        assertElementPresent(link);
 
-        _test.mouseClick(link.toString());
-        _test.click(link);
-        _test.log("show define dataset dialog");
-        _test._extHelper.waitForExtDialog("Define Dataset");
+        mouseClick(link.toString());
+        click(link);
+        log("show define dataset dialog");
+        _extHelper.waitForExtDialog("Define Dataset");
 
         linkDataset(name, type, targetDataset);
         goToStudySchedule();
@@ -288,16 +297,16 @@ public class StudyScheduleTester
     @LogMethod
     private void linkDatasetFromDetails(String name, DatasetType type, String targetDataset)
     {
-        _test.log("linking dataset: " + name + " to type: " + type + "from dataset details.");
+        log("linking dataset: " + name + " to type: " + type + "from dataset details.");
 
-        _test.clickAndWait(Locator.linkContainingText(name));
-        _test.click(Locator.xpath("//span[text()='Link or Define Dataset']"));
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'x4-form-display-field')][text()='Define " + name + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+        clickAndWait(Locator.linkContainingText(name));
+        click(Locator.xpath("//span[text()='Link or Define Dataset']"));
+        waitForElement(Locator.xpath("//div[contains(@class, 'x4-form-display-field')][text()='Define " + name + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
         linkDataset(name, type, targetDataset);
 
-        _test.clickTab("Manage");
-        _test.clickAndWait(Locator.linkContainingText("Manage Datasets"));
+        clickTab("Manage");
+        clickAndWait(Locator.linkContainingText("Manage Datasets"));
     }
 
     @LogMethod
@@ -306,18 +315,18 @@ public class StudyScheduleTester
         switch (type)
         {
             case defineManually:
-                _test.click(Locator.ext4Radio("Define dataset manually"));
-                _test.clickButton("Next");
+                click(Locator.ext4Radio("Define dataset manually"));
+                clickButton("Next");
 
-                _test.waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+                waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
                 // add a single name field
-                _test._listHelper.setColumnName(0, "antigenName");
-                _test.clickButton("Save");
+                _listHelper.setColumnName(0, "antigenName");
+                clickButton("Save");
                 break;
             case importFromFile:
-                _test.click(Locator.ext4Radio("Import data from file"));
-                _test.clickButton("Next");
+                click(Locator.ext4Radio("Import data from file"));
+                clickButton("Next");
 
                 String datasetFileName = _sampleDataPath + "/datasets/plate002.tsv";
                 File file = new File(WebTestHelper.getLabKeyRoot(), datasetFileName);
@@ -325,22 +334,22 @@ public class StudyScheduleTester
                 if (file.exists())
                 {
                     Locator fileUpload = Locator.xpath("//input[@name = 'uploadFormElement']");
-                    _test.waitForElement(fileUpload, StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-                    _test.setFormElement(fileUpload, file.getAbsolutePath());
+                    waitForElement(fileUpload, StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+                    setFormElement(fileUpload, file.getAbsolutePath());
 
-                    _test.waitForElement(Locator.xpath("//div[@class = 'gwt-HTML' and contains(text(), 'Showing first 5 rows')]"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
-                    _test.clickButton("Import");
+                    waitForElement(Locator.xpath("//div[@class = 'gwt-HTML' and contains(text(), 'Showing first 5 rows')]"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
+                    clickButton("Import");
                 }
                 else
                     Assert.fail("The dataset import .tsv file (plate002.tsv) does not exist");
                 break;
             case linkeToExisting:
-                _test.click(Locator.ext4Radio("Link to existing dataset"));
+                click(Locator.ext4Radio("Link to existing dataset"));
 
                 Locator.XPathLocator comboParent = Locator.xpath("//table[contains(@class, 'existing-dataset-combo')]");
-                _test._ext4Helper.selectComboBoxItem(comboParent, targetDataset);
+                _ext4Helper.selectComboBoxItem(comboParent, targetDataset);
 
-                _test.clickButton("Done", 0);
+                clickButton("Done", 0);
                 break;
         }
     }
@@ -348,7 +357,7 @@ public class StudyScheduleTester
     @LogMethod
     public void datasetStatusTest()
     {
-        _test.log("Testing status settings for datasets");
+        log("Testing status settings for datasets");
 
         goToStudySchedule();
 
@@ -356,18 +365,18 @@ public class StudyScheduleTester
         {
             clickCustomizeView(entry[0]);
 
-            _test._ext4Helper.selectComboBoxItem("Status", entry[1]);
+            _ext4Helper.selectComboBoxItem("Status", entry[1]);
 
-            _test.clickButton("Save", 0);
+            clickButton("Save", 0);
 
             Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + entry[0] + "')]/../../..//img[@alt='" + entry[1] + "']");
-            _test.waitForElement(statusLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            waitForElement(statusLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
             // visit the dataset page and make sure we inject the correct class onto the page
-            _test.log("Verify dataset view has the watermark class");
+            log("Verify dataset view has the watermark class");
             Locator datasetLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + entry[0] + "')]/../../..//a");
-            _test.click(datasetLink);
-            _test.waitForElement(Locator.xpath("//td[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            click(datasetLink);
+            waitForElement(Locator.xpath("//td[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
 
             goToStudySchedule();
         }
@@ -376,21 +385,21 @@ public class StudyScheduleTester
     @LogMethod
     private void goToStudySchedule()
     {
-        _test.clickFolder(_folderName);
-        _test.goToManageStudy();
-        _test.clickAndWait(Locator.linkWithText("Study Schedule"));
+        clickFolder(_folderName);
+        goToManageStudy();
+        clickAndWait(Locator.linkWithText("Study Schedule"));
 
         // wait for grid to load
-        _test.waitForText("verifyAssay"); // verify dataset column
-        _test.waitForText("Termination"); // verify timepoint
+        waitForText("verifyAssay"); // verify dataset column
+        waitForText("Termination"); // verify timepoint
     }
 
     private void clickCustomizeView(String viewName)
     {
         Locator editLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//div[contains(text(), '" + viewName + "')]/../../..//span[contains(@class, 'edit-views-link')]");
-        _test.waitForElement(editLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.click(editLink);
+        waitForElement(editLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        click(editLink);
 
-        _test._extHelper.waitForExtDialog(viewName);
+        _extHelper.waitForExtDialog(viewName);
     }
 }

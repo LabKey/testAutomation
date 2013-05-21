@@ -17,8 +17,6 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.Locator;
-import org.labkey.test.tests.study.DataViewsTester;
-import org.labkey.test.tests.study.StudyScheduleTester;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -93,8 +91,8 @@ public class StudyRedesignTest extends StudyBaseTest
     protected void doVerifySteps()
     {
         customizeTabsTest();
-        dataViewsWebpartTest();
-        scheduleWebpartTest();
+        //dataViewsWebpartTest();
+        //scheduleWebpartTest();
         participantListWebpartTest();
         exportImportTest();
     }
@@ -131,27 +129,6 @@ public class StudyRedesignTest extends StudyBaseTest
         // See Issue 16929: Folder tab order & names aren't retained through folder export/import
 
         portalHelper.removeTab("RENAMED TAB 1");
-    }
-
-    private void dataViewsWebpartTest()
-    {
-        DataViewsTester test = new DataViewsTester(this, getFolderName());
-
-        //TODO: enable once data views tree is enabled
-        test.subcategoryTest();
-        test.basicTest();
-        test.datasetStatusTest();
-        test.refreshDateTest();
-    }
-
-    private void scheduleWebpartTest()
-    {
-        StudyScheduleTester tester = new StudyScheduleTester(this, getFolderName(), getStudySampleDataPath());
-
-        tester.basicTest();
-        tester.datasetStatusTest();
-        tester.linkDatasetTest();
-        tester.linkFromDatasetDetailsTest();
     }
 
     private void clickExt4HeaderMenu(String title, String selection)

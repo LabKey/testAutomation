@@ -20,11 +20,7 @@ import junit.framework.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.tests.study.DataViewsTester;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -147,7 +143,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     {
         goToDataViews();
         waitAndClick(Locator.xpath("//img[@title='Edit']"));
-        DataViewsTester.clickCustomizeView(chart, this);
+        DataViewsTest.clickCustomizeView(chart, this);
         waitForElement(Locator.id("customThumbnail"));
         setFormElement(Locator.xpath("//input[@id='customThumbnail-fileInputEl']"), thumbnail);
         _extHelper.clickExtButton(chart, "Save", 0);

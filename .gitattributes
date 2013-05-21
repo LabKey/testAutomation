@@ -260,6 +260,7 @@ src/org/labkey/test/tests/ContainerContextTest.java -text
 src/org/labkey/test/tests/CreateVialsTest.java -text
 src/org/labkey/test/tests/CustomizeViewTest.java -text
 src/org/labkey/test/tests/DataRegionTest.java -text
+src/org/labkey/test/tests/DataViewsTest.java -text
 src/org/labkey/test/tests/DatabaseDiagnosticsTest.java -text
 src/org/labkey/test/tests/DatasetPublishTest.java -text
 src/org/labkey/test/tests/DrugSensitivityAssayTest.java -text
@@ -372,6 +373,7 @@ src/org/labkey/test/tests/StudyProtectedExportTest.java -text
 src/org/labkey/test/tests/StudyPublishTest.java -text
 src/org/labkey/test/tests/StudyRedesignTest.java -text
 src/org/labkey/test/tests/StudyReloadTest.java -text
+src/org/labkey/test/tests/StudyScheduleTest.java -text
 src/org/labkey/test/tests/StudySecurityTest.java -text
 src/org/labkey/test/tests/StudyShortTest.java -text
 src/org/labkey/test/tests/StudyTest.java -text
@@ -402,8 +404,6 @@ src/org/labkey/test/tests/XTandemShortTest.java -text
 src/org/labkey/test/tests/XTandemTest.java -text
 src/org/labkey/test/tests/perf/PerformanceTest.java -text
 src/org/labkey/test/tests/perf/StudyImportPerfTest.java -text
-src/org/labkey/test/tests/study/DataViewsTester.java -text
-src/org/labkey/test/tests/study/StudyScheduleTester.java -text
 src/org/labkey/test/util/APIAssayHelper.java -text
 src/org/labkey/test/util/APIContainerHelper.java -text
 src/org/labkey/test/util/APIUserHelper.java -text

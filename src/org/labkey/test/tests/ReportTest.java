@@ -20,7 +20,6 @@ import com.sun.istack.internal.NotNull;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.tests.study.DataViewsTester;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
@@ -177,7 +176,7 @@ public class ReportTest extends StudyBaseTest
     {
         clickTab("Clinical and Assay Data");
         clickWebpartMenuItem("Data Views", false, "Customize");
-        DataViewsTester.clickCustomizeView(AUTHOR_REPORT, this);
+        DataViewsTest.clickCustomizeView(AUTHOR_REPORT, this);
         assertTextPresent("Share this report with all users");
 
         //set change thumbnail
