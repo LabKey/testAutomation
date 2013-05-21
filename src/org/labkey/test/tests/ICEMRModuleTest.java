@@ -62,7 +62,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     protected void doTestSteps() throws Exception
     {
 
-        setUpAssays();
+        setupAssays();
         doVerification();
     }
 
@@ -105,10 +105,16 @@ public class ICEMRModuleTest extends BaseWebDriverTest
             Assert.assertTrue(datapointData.contains(s));
     }
 
-    private void setUpAssays()
+    private void setupAssays()
     {
         log("Create ICEMR assays and samplesets");
         _containerHelper.createProject(getProjectName(), "ICEMR");
+        enableModule(getProjectName(), "Study");
+
+        PortalHelper ph = new PortalHelper(this);
+        ph.addWebPart("Assay List");
+        ph.addWebPart("Sample Sets");
+
         _assayHelper.createAssayWithDefaults(DIAGNOSTICS_ASSAY_DESIGN, DIAGNOSTIC_ASSAY_NAME);
         _assayHelper.createAssayWithDefaults(TRACKING_ASSAY_DESIGN, ADAPTATION_ASSAY_NAME);
         _assayHelper.createAssayWithDefaults(TRACKING_ASSAY_DESIGN, SELECTION_ASSAY_NAME);
