@@ -148,8 +148,8 @@ public class AssayTest extends AbstractAssayTest
         viewCrossFolderData();
         verifyStudyList();
         verifyRunDeletionRecallsDatasetRows();
-        // Turned this on now that file browser migration is complete -- see issue 12203.
-        verifyWebdavTree();
+        // TODO: Turn this on once file browser migration is complete.
+        //verifyWebdavTree();
         goBack();
 
 
