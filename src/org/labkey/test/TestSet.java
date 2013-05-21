@@ -114,6 +114,8 @@ public enum TestSet
         ProgrammaticQCTest.class,
         SchemaBrowserTest.class,
         StudySecurityTest.class,
+        StudyScheduleTest.class,
+        DataViewsTest.class,
         MS1Test.class,
         UniprotAnnotationTest.class, //requires bootstrap
         HTTPApiTest.class,
