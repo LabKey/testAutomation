@@ -39,12 +39,14 @@ public class DatasetPublishTest extends BaseWebDriverTest
 
         importStudyFromZip(new File(getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
         goToProjectHome();
+        hideDatasets();
         publishStudy(SUBFOLDER_NAME);
 
         modifySourceDataset();
         checkTargetDataset();
         addRowToSourceDataset();
         assertNewRowPresentInTarget();
+        assertHiddenDatasetPresentInTarget();
     }
 
     private void publishStudy(String studyName)
@@ -67,6 +69,9 @@ public class DatasetPublishTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Datasets']"));
         click(Locator.css(".studyWizardDatasetList .x-grid3-hd-checker  div"));
         click(Locator.xpath("//input[@name='autoRefresh' and @value='false']"));
+
+        assertTextPresent("Hidden Datasets", "ELISpotAssay");
+        click(Locator.css(".studyWizardHiddenDatasetList .x-grid3-hd-checker  div"));
         clickButton("Next", 0);
 
         // Wizard page 4 : Visits
@@ -102,6 +107,16 @@ public class DatasetPublishTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
         clickButton("Finish");
         waitForPipelineJobsToComplete(2, "Publish Study", false);
+    }
+
+    private void hideDatasets()
+    {
+        goToProjectHome();
+        goToManageStudy();
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("Change Properties"));
+        click(getDatasetCheckboxLocator("ELISpotAssay"));
+        clickButton("Save");
     }
 
     private void modifySourceDataset()
@@ -158,9 +173,25 @@ public class DatasetPublishTest extends BaseWebDriverTest
         newWaitForPageToLoad();
     }
 
+    private void assertHiddenDatasetPresentInTarget()
+    {
+        clickFolder(SUBFOLDER_NAME);
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        assertTextPresent("ELISpotAssay");              // it did get published
+        clickAndWait(Locator.linkWithText("ELISpotAssay"));
+        Locator locator = Locator.xpath("//tr[td='Show In Overview' and td='false']");
+        waitForElement(locator);
+    }
+
     @Override
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/study";
+    }
+
+    protected Locator getDatasetCheckboxLocator(String datasetLabel)
+    {
+        return Locator.xpath("//tr[./td/input[@value='" + datasetLabel + "']]/td/input[@name='visible']");
     }
 }
