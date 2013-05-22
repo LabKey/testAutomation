@@ -58,7 +58,7 @@ public enum TestSet
         ReagentTest.class,
         FilterTest.class,
         GroupTest.class,
-        StudyRedesignTest.class,
+        StudyShortTest.class, // TODO: Placeholder while StudyRedesignTest is broken
         SecurityTest.class,
         FlowTest.class,
         XTandemTest.class,
@@ -153,6 +153,7 @@ public enum TestSet
         StudyDatasetsTest.class,
         AdminConsoleTest.class,
         DatasetPublishTest.class,
+        StudyRedesignTest.class,
         AliquotTest.class
     ),
 
