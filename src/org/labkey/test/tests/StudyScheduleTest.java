@@ -61,13 +61,6 @@ public class StudyScheduleTest extends StudyRedesignTest
 
     private String _folderName = getFolderName();
     private String _sampleDataPath = getStudySampleDataPath();
-     /*
-    public StudyScheduleTester(StudyBaseTest test, String folderName, String sampleDataPath)
-    {
-        _test = test;
-        _folderName = folderName;
-        _sampleDataPath = sampleDataPath;
-    }*/
 
     @Override
     protected void doVerifySteps()
@@ -87,7 +80,6 @@ public class StudyScheduleTest extends StudyRedesignTest
 
         // check required timepoints
         goToStudySchedule();
-//        getXpathCount(Locator.xpath("//div[./span[@class='x4-column-header-text']]//div[text()='" + visit +"']"));
         assertElementPresent(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[6]//div[@class='checked']"));
 
         // change a required visit to optional
@@ -114,7 +106,6 @@ public class StudyScheduleTest extends StudyRedesignTest
 
         // test paging
         goToStudySchedule();
-//        click(Locator.xpath("//input[@role='checkbox']"));
         waitForElement(Locator.xpath("//div[contains(@class, 'button-next')][1]"), WAIT_FOR_JAVASCRIPT); //wait for next button to appear
         assertTextNotPresent("Cycle 2");
         click(Locator.xpath("//div[contains(@class, 'button-next')][1]")); //click next button

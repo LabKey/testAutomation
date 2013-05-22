@@ -32,23 +32,7 @@ public class DataViewsTest extends StudyRedesignTest
     private static final String REPORT_NAME = "TestReport";
     private static final String WEBPART_TITLE = "TestDataViews";
     private static final String NEW_CATEGORY = "A New Category";
-    private static final String EDITED_DATASET = "CPS-1: Screening Chemistry Panel";
     private static final String NEW_DESCRIPTION = "Description set in data views webpart";
-    private static final String[] BITS = {"ABCD", "EFGH", "IJKL", "MNOP", "QRST", "UVWX"};
-    private static final String[] CATEGORIES = {
-            BITS[0]+BITS[1]+ BaseSeleniumWebTest.TRICKY_CHARACTERS_NO_QUOTES,
-            BITS[1]+BITS[2]+BaseSeleniumWebTest.TRICKY_CHARACTERS_NO_QUOTES,
-            BITS[2]+BITS[3]+BaseSeleniumWebTest.TRICKY_CHARACTERS_NO_QUOTES,
-            BITS[3]+BITS[4]+BaseSeleniumWebTest.TRICKY_CHARACTERS_NO_QUOTES,
-            BITS[4]+BITS[5]+BaseSeleniumWebTest.TRICKY_CHARACTERS_NO_QUOTES
-    };
-    private static final String[] someDataSets = {
-            "Data Views",
-            "DEM-1: Demographics",
-            "URF-1: Follow-up Urinalysis (Page 1)",
-            CATEGORIES[3],
-            "AE-1:(VTN) AE Log"
-    };
     private static final String[][] datasets = {
             {"CPS-1: Screening Chemistry Panel", "Unlocked"},
             {"ECI-1: Eligibility Criteria", "Draft"},
@@ -63,6 +47,7 @@ public class DataViewsTest extends StudyRedesignTest
         basicTest();
         datasetStatusTest();
         refreshDateTest();
+        exportImportTest();
     }
     
     @LogMethod
@@ -361,6 +346,32 @@ public class DataViewsTest extends StudyRedesignTest
             CATEGORIES[4]);
     }
 
+    private void exportImportTest()
+    {
+        log("Verify roundtripping of study redesign features");
+        exportStudy(true, false);
+        deleteStudy(getStudyLabel());
+
+        clickButton("Import Study");
+        clickButton("Import Study Using Pipeline");
+        _extHelper.selectFileBrowserItem("export/study/study.xml");
+        selectImportDataAction("Import Study");
+
+        waitForPipelineJobsToComplete(3, "Study import", false);
+
+        clickAndWait(Locator.linkWithText("Data & Reports"));
+
+        log("Verify export-import of refresh date settings");
+        //why should a date appear somewhere on the page at this point???
+        waitForText(REFRESH_DATE, 1, WAIT_FOR_JAVASCRIPT);
+        // check hover box
+        mouseOver(Locator.linkWithText(EDITED_DATASET));
+        waitForText("Data Cut Date:");
+        assertTextPresent(REFRESH_DATE);
+        clickAndWait(Locator.linkWithText(EDITED_DATASET));
+        assertTextPresent(REFRESH_DATE);
+    }
+
     /**
      * Add a sub-category to the selected dataset category
      */
@@ -377,10 +388,6 @@ public class DataViewsTest extends StudyRedesignTest
     public void categoryReorderTest()
     {
         throw new IllegalStateException("Not yet implemented");
-//        clickAndWait(Locator.linkContainingText("Data & Reports"));
-//        openCustomizePanel();
-//        clickButton("Manage Categories", 0);
-//        _extHelper.waitForExtDialog("Manage Categories");
     }
 
     private void editDatasetProperties(String dataset)

@@ -29,17 +29,12 @@ import org.labkey.test.util.RReportHelper;
  */
 public class StudyRedesignTest extends StudyBaseTest
 {
-
-    private static final String DATA_BROWSE_TABLE_NAME = "";
-    private static final String[] BITS = {"ABCD", "EFGH", "IJKL", "MNOP", "QRST", "UVWX"};
-    private static final String[] CATEGORIES = {BITS[0]+BITS[1]+TRICKY_CHARACTERS_NO_QUOTES, BITS[1]+BITS[2]+TRICKY_CHARACTERS_NO_QUOTES,
+    protected static final String[] BITS = {"ABCD", "EFGH", "IJKL", "MNOP", "QRST", "UVWX"};
+    protected static final String[] CATEGORIES = {BITS[0]+BITS[1]+TRICKY_CHARACTERS_NO_QUOTES, BITS[1]+BITS[2]+TRICKY_CHARACTERS_NO_QUOTES,
             BITS[2]+BITS[3]+TRICKY_CHARACTERS_NO_QUOTES, BITS[3]+BITS[4]+TRICKY_CHARACTERS_NO_QUOTES, BITS[4]+BITS[5]+TRICKY_CHARACTERS_NO_QUOTES};
-    private static final String[] someDataSets = {"Data Views","DEM-1: Demographics", "URF-1: Follow-up Urinalysis (Page 1)", CATEGORIES[3], "AE-1:(VTN) AE Log"};
+    protected static final String[] someDataSets = {"Data Views","DEM-1: Demographics", "URF-1: Follow-up Urinalysis (Page 1)", CATEGORIES[3], "AE-1:(VTN) AE Log"};
     private static final String REPORT_NAME = "TestReport";
-    private static final String WEBPART_TITLE = "TestDataViews";
-    private static final String EDITED_DATASET = "CPS-1: Screening Chemistry Panel";
-    private static final String NEW_CATEGORY = "A New Category" + TRICKY_CHARACTERS_NO_QUOTES;
-    private static final String NEW_DESCRIPTION = "Description set in data views webpart";
+    protected static final String EDITED_DATASET = "CPS-1: Screening Chemistry Panel";
     private static final String PARTICIPANT_GROUP_ONE = "GROUP 1";
     private static final String PARTICIPANT_GROUP_TWO = "GROUP 2";
     private static final String PARTICIPANT_GROUP_THREE = "ThisIsAGroupThatHasALongNameWithoutAnySpacesInIt";
@@ -52,7 +47,7 @@ public class StudyRedesignTest extends StudyBaseTest
                                            "999320565", "999320576", "999320582", "999320590", "999320004", "999320007",
                                            "999320010", "999320016", "999320018", "999320021", "999320029", "999320033",
                                            "999320036","999320038", "999321033", "999321029", "999320981"};
-    private static final String REFRESH_DATE = "2012-03-01";
+    protected static final String REFRESH_DATE = "2012-03-01";
 
     @Override @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doCreateSteps()
@@ -78,23 +73,13 @@ public class StudyRedesignTest extends StudyBaseTest
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_ONE, "Mouse", PTIDS_ONE);
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_TWO, "Mouse", PTIDS_TWO);
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_THREE, "Mouse", PTIDS[0]);
-
-//        log("Create query for data view webpart.");
-//        goToSchemaBrowser();
-//        createNewQuery("study");
-//        setFormElement("ff_newQueryName", "testquery");
-//        clickButton("Create and Edit Source");
-//        clickButton("Save & Finish");
     }
 
     @Override @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
         customizeTabsTest();
-        //dataViewsWebpartTest();
-        //scheduleWebpartTest();
         participantListWebpartTest();
-        exportImportTest();
     }
 
     @LogMethod
@@ -258,10 +243,7 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForText("Found 10 mice of 138.");
 
         //Check if all PTIDs of GROUP 1 are visible.
-        for(String ptid : PTIDS_ONE)
-        {
-            assertTextPresent(ptid);
-        }
+        assertTextPresent(PTIDS_ONE);
 
         //Mouse down GROUP 2
         _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_TWO, 0);
@@ -272,10 +254,7 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForText("Found 13 mice of 138.");
         
         //Check if all PTIDs of GROUP 2 are visible
-        for(String ptid : PTIDS_TWO)
-        {
-            assertTextPresent(ptid);
-        }
+        assertTextPresent(PTIDS_TWO);
 
         //Filter a mouse in GROUP 2
         setFormElement("//div[contains(text(), 'Filter')]//input", "999320038");
@@ -313,33 +292,9 @@ public class StudyRedesignTest extends StudyBaseTest
 
     private void deselectAllFilterGroups()
     {
-        Locator all = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//b[contains(@class, 'filter-description') and contains(text(), 'All')]/../../../..//div[contains(@class, 'x4-grid-row-checker')]");
+        Locator all = Locator.tag("tr").withClass("x4-grid-row-selected").withDescendant(Locator.tag("b").withClass("filter-description").containing("All")).append(Locator.tag("div").withClass("x4-grid-row-checker"));
         waitForElement(all);
         mouseDown(all);
     }
 
-    private void exportImportTest()
-    {
-        log("Verify roundtripping of study redesign features");
-        exportStudy(true, false);
-        deleteStudy(getStudyLabel());
-
-        clickButton("Import Study");
-        clickButton("Import Study Using Pipeline");
-        _extHelper.selectFileBrowserItem("export/study/study.xml");
-        selectImportDataAction("Import Study");
-
-        waitForPipelineJobsToComplete(3, "Study import", false);
-
-        clickAndWait(Locator.linkWithText("Data & Reports"));
-
-        log("Verify export-import of refresh date settings");
-        waitForText(REFRESH_DATE, 1, WAIT_FOR_JAVASCRIPT);
-        // check hover box
-        mouseOver(Locator.linkWithText(EDITED_DATASET));
-        waitForText("Data Cut Date:");
-        assertTextPresent(REFRESH_DATE);
-        clickAndWait(Locator.linkWithText(EDITED_DATASET));
-        assertTextPresent(REFRESH_DATE);
-    }
 }
