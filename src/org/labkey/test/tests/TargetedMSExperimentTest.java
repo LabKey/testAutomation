@@ -22,9 +22,17 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.UIContainerHelper;
 
 public class TargetedMSExperimentTest extends TargetedMSTest
 {
+
+    public TargetedMSExperimentTest()
+    {
+        // We want to use the UI when creating the project/folder so that we can verify that we get the wizard
+        // that has the extra steps
+        setContainerHelper(new UIContainerHelper(this));
+    }
 
     @Override
     protected void doTestSteps() throws Exception

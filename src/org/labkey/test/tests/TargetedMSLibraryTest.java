@@ -63,9 +63,9 @@ public class TargetedMSLibraryTest extends TargetedMSTest
     private void verifyChromatogramLibraryDownloadWebPart()
     {
         clickAndWait(Locator.linkContainingText("Targeted MS Dashboard"));
-        assertElementPresent(Locator.xpath("//img[contains(@src, 'Chromatogram')]"));
-        assertTextPresent("0 proteins");
-        assertTextPresent("88 precursors");
+        assertElementPresent(Locator.xpath("//img[contains(@src, 'graphLibraryStatistics.view')]"));
+        assertTextPresent("44 peptides");
+        assertTextPresent("296 ranked transitions");
         assertElementPresent(Locator.linkWithText("Download"));
     }
 
