@@ -90,9 +90,6 @@ public class CAVDStudyTest extends StudyBaseTest
         assertTextNotPresent("No study is active in the current container.");
         assertTextPresent(STUDY_NAME + " tracks data in");
 
-        // Make sure Data tab is hidden
-        assertTabNotPresent("Data");
-
         // Change timepoint type.
         clickAndWait(Locator.linkWithText("Edit"));
         waitForText("Timepoint Type");

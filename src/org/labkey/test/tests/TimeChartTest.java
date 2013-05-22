@@ -508,6 +508,7 @@ public class TimeChartTest extends StudyBaseTest
 
         clickButton("View Chart(s)", 0);
         waitForTextToDisappear("1 - 19 of 19");
+        waitForCharts(1);
         log("Revert to Date-based chart.");
         goToAxisTab("X-Axis", "Visit");
         _ext4Helper.selectRadioButton("Chart Type:", "Date Based Chart");
