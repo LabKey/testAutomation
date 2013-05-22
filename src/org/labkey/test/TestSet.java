@@ -297,6 +297,15 @@ public enum TestSet
         StudyPublishTest.class
     ),
 
+    Specimen
+    (
+        StudyTest.class,
+        SpecimenReplaceTest.class,
+        SpecimenMergeTest.class,
+        SampleMindedImportTest.class,
+        CreateVialsTest.class
+    ),
+
     Assays(
         AssayTest.class,
         MissingValueIndicatorsTest.class,
@@ -398,14 +407,14 @@ public enum TestSet
 
     TestSet(int timeout, List<Class>... testLists)
     {
-        HashSet<Class> all = new HashSet<Class>();
+        HashSet<Class> all = new HashSet<>();
 
         for (List<Class> tests: testLists)
         {
             all.addAll(tests);
         }
 
-        _tests = new ArrayList<Class>(all);
+        _tests = new ArrayList<>(all);
         crawlerTimeout = timeout;
     }
 
@@ -451,7 +460,7 @@ public enum TestSet
 
     public List<String> getTestNames()
     {
-        ArrayList<String> testNames = new ArrayList<String>();
+        List<String> testNames = new ArrayList<>();
         for (Class test : _tests)
             testNames.add(test.getSimpleName());
         return testNames;
