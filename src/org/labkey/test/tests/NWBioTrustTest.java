@@ -57,9 +57,10 @@ public class NWBioTrustTest extends SurveyTest
     private static final String requestorFolder2 = "Requestor 2";
     private static final String provisionTableName = "Sample Request Responses";
     private static final List<Map<String, String>> designs = new ArrayList<Map<String, String>>();
-    private static final String[] unsubmittedRequestLabels = {"registration with request"};
-    private static final String[] submittedRequestLabels = {"first registration", "second registration", "third registration"};
-    private static final String[] allRequestLabels = ArrayUtils.addAll(unsubmittedRequestLabels, submittedRequestLabels);
+    private static final String registrationLabel = "requestor 1 study";
+    private static final String[] unsubmittedRequestTypes = {"Normal tissue from patients without cancer"};
+    private static final String[] submittedRequestTypes = {"Tumor from primary site", "Tumor from metastasis", "Normal tissues adjacent to primary site (same organ)"};
+    private static final String[] allRequestTypes = ArrayUtils.addAll(submittedRequestTypes, unsubmittedRequestTypes);
     private static final File TEST_FILE_1 = new File( getLabKeyRoot() + "/sampledata/survey/TestAttachment.txt");
     private static final File TEST_FILE_2 = new File( getLabKeyRoot() + "/sampledata/survey/TestAttachment2.txt");
 
@@ -72,10 +73,38 @@ public class NWBioTrustTest extends SurveyTest
         SUBMISSION_REVIEW("Submission Review"),
         FEASIBILITY_REVIEW("Feasibility Review"),
         PRIORITIZATION_REVIEW("Prioritization Review"),
-        APPROVED("Approved"),
-        ROUTED("Routed"),
-        CLOSED("Closed"),
-        COMPLETE("Complete");
+        APPROVED("Approved")
+        {
+            @Override
+            public boolean isLocked()
+            {
+                return true;
+            }
+        },
+        ROUTED("Routed")
+        {
+            @Override
+            public boolean isLocked()
+            {
+                return true;
+            }
+        },
+        CLOSED("Closed")
+        {
+            @Override
+            public boolean isLocked()
+            {
+                return true;
+            }
+        },
+        COMPLETE("Complete")
+        {
+            @Override
+            public boolean isLocked()
+            {
+                return true;
+            }
+        };
 
         private String _status;
 
@@ -93,6 +122,11 @@ public class NWBioTrustTest extends SurveyTest
         {
             return this.ordinal() + 1;
         }
+
+        public boolean isLocked()
+        {
+            return false;
+        }
     }
 
     private static final String[] NWBT_DOCUMENT_TYPES = {
@@ -102,7 +136,7 @@ public class NWBioTrustTest extends SurveyTest
             "Signed MTDUA Agreement",
             "Signed Confidentiality Pledge",
             "Specimen Processing Protocol",
-            "Blank Unique Consent Form",
+            "Blank Unique Consent Form (by Study)",
             "Approval Reviewer Response",};
     private static final Boolean[][] NWBT_DOCUMENT_TYPE_FLAGS = { // multiple upload allowed, expriation
             {false, false}, //Proposal Summary (Specimen Request) (multi-upload changed for test purposes)
@@ -158,13 +192,13 @@ public class NWBioTrustTest extends SurveyTest
         setupProjectAdminProperties();
         setupSurveysTableDefinition();
         setupProvisionTableForResponses();
-        setupSurveyDesignsAndRequests();
+        setupSurveyDesignsAndStudy();
 
+        verifySampleRequests();
         verifyFolderTypes();
         verifyResearchCoordDashboard();
         verifyRequestorDashboard();
         verifySecondRequestorDashboard();
-        verifySampleRequests();
         verifyDocumentSetFromDashboard();
     }
 
@@ -200,12 +234,12 @@ public class NWBioTrustTest extends SurveyTest
             else
                 assertAlert("Are you sure you want to delete these " + toDelete + " survey designs and their associated survey instances?");
 
-            waitAndClickAndWait(Locator.linkWithText("New Registrations"));
-            waitForText("No study registrations to show", WAIT_FOR_PAGE);
+            clickTab("New Sample Requests");
+            waitForText("No sample requests to show", WAIT_FOR_PAGE);
             clickFolder(requestorFolder1);
-            clickAndWait(Locator.linkWithText("Study Registrations"));
-            waitForText("No study registrations to show", 2, WAIT_FOR_PAGE);
-            assertTextNotPresent(submittedRequestLabels);
+            clickTab("Request Samples");
+            waitForText("No sample requests to show", 3, WAIT_FOR_PAGE);
+            assertTextNotPresent(submittedRequestTypes);
         }
     }
 
@@ -217,11 +251,10 @@ public class NWBioTrustTest extends SurveyTest
 
         log("Verify documents and types via RC Dashboard");
         goToProjectHome();
-        clickAndWait(Locator.linkWithText("New Registrations"));
-        waitForGridToLoad("div", "x4-grid-group-title", submittedRequestLabels.length + unsubmittedRequestLabels.length);
-        assertElementPresent(Locator.linkWithText("Document Set (0)"), 3);
-        assertElementPresent(Locator.linkWithText("Document Set (" + NWBT_DOCUMENT_TYPES.length + ")"), 1);
-        click(Locator.linkWithText("Document Set (" + NWBT_DOCUMENT_TYPES.length + ")")); // link for the first registration
+        clickTab("New Sample Requests");
+        waitForGridToLoad("tr", "x4-grid-row", submittedRequestTypes.length);
+        waitAndClickAndWait(Locator.linkWithText("view document set"));
+        waitForText(registrationLabel);
         waitForText(TEST_FILE_1.getName());
         assertElementPresent(Locator.linkWithText(TEST_FILE_1.getName()), NWBT_DOCUMENT_TYPES.length);
         assertElementPresent(Locator.linkWithText(TEST_FILE_2.getName()), NWBT_DOCUMENT_TYPES.length - 1); // one doc type doesn't allow multiple file upload
@@ -229,10 +262,8 @@ public class NWBioTrustTest extends SurveyTest
             assertTextPresent(NWBT_DOCUMENT_TYPES[index], NWBT_DOCUMENT_TYPE_FLAGS[index][0] ? 2 : 1);
 
         log("Verify removing documents from document set");
-        clickButton("Manage");
-        waitForGridToLoad("tr", "x4-grid-row", fileCount);
         // verify that we navigated to the appropriate subfolder for the manage document set page
-        assertTextNotPresent("NW BioTrust Research Coordinator Dashboard");
+        assertTextNotPresent("RC Dashboard");
         Locator loc = getEditLinkLocator(NWBT_DOCUMENT_TYPES[0], false);
         click(loc);
         _extHelper.waitForExtDialog("Edit Document");
@@ -248,15 +279,15 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Add documents to a document set for requests");
         clickFolder(requestorFolder1);
-        clickAndWait(Locator.linkWithText("Study Registrations"));
-        waitForGridToLoad("div", "x4-grid-group-title", 3);
-        assertElementPresent(Locator.linkWithText("Document Set (0)"), 4);
-        click(Locator.linkWithText("Document Set (0)")); // link for the first registration
+        clickTab("My Studies");
+        waitForGridToLoad("tr", "x4-grid-row", 1);
+        assertElementPresent(Locator.linkWithText("Document Set (0)"), 1);
+        click(Locator.linkWithText("Document Set (0)"));
         waitForText("No documents to show");
-        waitForText(submittedRequestLabels[0]);
+        waitForText(registrationLabel);
         clickButton("Manage");
         waitForText("No documents to show");
-        waitForText(NWBT_REQUEST_STATUSES[0].toString());
+        waitForText(registrationLabel);
         fileCount = 0;
         for (int index = 0; index < NWBT_DOCUMENT_TYPES.length; index++)
         {
@@ -311,12 +342,12 @@ public class NWBioTrustTest extends SurveyTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifySecondRequestorDashboard()
     {
-        // TODO: this will be put to better use once we implement the NWBT security roles/permissions
         log("Verify that the 2nd requestor folder does not contain data from the first requestor");
         clickFolder(requestorFolder2);
-        clickAndWait(Locator.linkWithText("Study Registrations"));
-        waitForText("No study registrations to show", 2, WAIT_FOR_PAGE);
-        assertElementNotPresent(Locator.linkWithText("Click Here"));
+        clickTab("My Studies");
+        waitForText("No study registrations to show", 1, WAIT_FOR_PAGE);
+        clickTab("Request Samples");
+        waitForText("No sample requests to show", 3, WAIT_FOR_PAGE);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -324,11 +355,16 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Verify updated requests show up in Requestor Dashboard");
         clickFolder(requestorFolder1);
-        clickAndWait(Locator.linkWithText("Study Registrations"));
-        waitForGridToLoad("div", "x4-grid-group-title", 3);
-        assertElementNotPresent(getGroupingTitleLocator(NWBT_REQUEST_STATUSES[submittedRequestLabels.length].toString()));
-        for (Object category : Arrays.copyOfRange(NWBT_REQUEST_STATUSES, 0, submittedRequestLabels.length - 1))
-            assertElementPresent(getGroupingTitleLocator(category.toString()));
+        clickTab("My Studies");
+        waitForGridToLoad("tr", "x4-grid-row", 1);
+        assertTextPresent(registrationLabel);
+        clickTab("Request Samples");
+        waitForGridToLoad("tr", "x4-grid-row", 4);
+        waitForElement(Locator.id("pending-dashboard-2").append(Locator.linkWithText("4")));
+        waitForElement(Locator.id("submitted-dashboard-3").append(Locator.linkWithText("1")));
+        waitForElement(Locator.id("submitted-dashboard-3").append(Locator.linkWithText("2")));
+        waitForElement(Locator.id("submitted-dashboard-3").append(Locator.linkWithText("3")));
+        waitForText("No sample requests to show", 1, WAIT_FOR_PAGE);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -337,78 +373,87 @@ public class NWBioTrustTest extends SurveyTest
         impersonate(NWBT_PRINCIPAL_INVESTIGATOR);
         clickProject(getProjectName());
         clickFolder(requestorFolder1);
-        clickAndWait(Locator.folderTab("Sample Requests"));
+        clickTab("Request Samples");
 
-        log("Request specimens from surguries or clinic procedures");
-        clickAndWait(Locator.linkWithText("Click Here"));
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//tr").withPredicate(Locator.xpath("td/label").containing("Associated study")).append("/td[2]/table"), unsubmittedRequestLabels[0] + " (ID: ", true);
-        _ext4Helper.checkCheckbox("Surgical tissue samples");
-        clickButton("Next", 0);
-        _ext4Helper.checkCheckbox("Stomach");
-        clickButton("Next", 0);
-        _ext4Helper.waitForMaskToDisappear();
-        clickButton("Add Record", 0);
-        {// Tissue Samples dialog
-            _extHelper.waitForExtDialog("Add Surgical Tissue Samples");
-            waitForElementToDisappear(Locator.css(".x4-mask").index(2));
+        log("Create sample requests - from surguries or clinic procedures");
+        for (String requestType : allRequestTypes)
+        {
+            clickAndWait(Locator.linkWithText("Click Here"));
+            _ext4Helper.selectComboBoxItem(Locator.xpath("//tr").withPredicate(Locator.xpath("td/label").containing("Associated study")).append("/td[2]/table"), registrationLabel);
+            _ext4Helper.checkCheckbox("Surgical tissue samples");
+            clickButton("Next", 0);
+            _ext4Helper.checkCheckbox("Stomach");
+            clickButton("Next", 0);
+            _ext4Helper.waitForMaskToDisappear();
+            clickButton("Add Record", 0);
+            {// Tissue Samples dialog
+                _extHelper.waitForExtDialog("Add Surgical Tissue Samples");
+                waitForElementToDisappear(Locator.css(".x4-mask").index(2));
 
-            // Tissue Type Information
-            _ext4Helper.selectComboBoxItem("Surgical Tissue Type:", "Tumor from primary site");
-            _ext4Helper.selectComboBoxItem("Anatomical Site:", "Stomach");
-            setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Minimum Size:").append("//input"), "5");
-            _ext4Helper.selectComboBoxItem("Minimum Size Units:", "gr");
-            setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Preferred Size:").append("//input"), "6");
-            _ext4Helper.selectComboBoxItem("Preferred Size Units:", "gr");
-            _ext4Helper.selectComboBoxItem("Preservation:", "Flash Frozen");
+                // Tissue Type Information
+                _ext4Helper.selectComboBoxItem("Surgical Tissue Type:", requestType);
+                _ext4Helper.selectComboBoxItem("Anatomical Site:", "Stomach");
+                setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Minimum Size:").append("//input"), "5");
+                _ext4Helper.selectComboBoxItem("Minimum Size Units:", "gr");
+                setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Preferred Size:").append("//input"), "6");
+                _ext4Helper.selectComboBoxItem("Preferred Size Units:", "gr");
+                _ext4Helper.selectComboBoxItem("Preservation:", "Flash Frozen");
 
-            // Participant Eligibility
-            _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
-            setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Number of Cases/Participants:").append("//input"), "6");
-            click(Ext4HelperWD.Locators.formItemWithLabel("Are patients with a prior cancer OK?").append("//label").withText("Yes"));
-            click(Ext4HelperWD.Locators.formItemWithLabelContaining("Are patients with a history of Basal").append("//label").withText("Yes"));
+                // Participant Eligibility
+                _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
+                setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Number of Cases/Participants:").append("//input"), "6");
+                click(Ext4HelperWD.Locators.formItemWithLabel("Are patients with a prior cancer OK?").append("//label").withText("Yes"));
+                click(Ext4HelperWD.Locators.formItemWithLabelContaining("Are patients with a history of Basal").append("//label").withText("Yes"));
 
-            // Sample Pickup
-            _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
-            click(Ext4HelperWD.Locators.formItemWithLabelContaining("If sample is available after 5pm").append("//label").withText("Yes"));
-            click(Ext4HelperWD.Locators.formItemWithLabelContaining("Prefer samples be held overnight").append("//label").withText("Yes"));
+                // Sample Pickup
+                _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
+                click(Ext4HelperWD.Locators.formItemWithLabelContaining("If sample is available after 5pm").append("//label").withText("Yes"));
+                click(Ext4HelperWD.Locators.formItemWithLabelContaining("Prefer samples be held overnight").append("//label").withText("Yes"));
 
-            _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
-            _extHelper.clickExtButton("Add Surgical Tissue Samples", "Save", 0);
-        }// done with Tissue Samples dialog
+                _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
+                _extHelper.clickExtButton("Add Surgical Tissue Samples", "Save", 0);
+            }// done with Tissue Samples dialog
 
-        _extHelper.waitForExtDialogToDisappear("Add Surgical Tissue Samples");
-        waitForElement(Locator.css(".x4-action-col-0"));
-        String requestId = getText(Locator.css(".x4-grid-cell-first"));
-        setFormElement(Locator.name("surgicalstartdate"), "2013-03-20");
-        setFormElement(Locator.name("surgicalenddate"), "2013-03-21");
-        click(Ext4HelperWD.Locators.formItemWithLabelContaining("Are samples collected after neoadjuvant").append("//label").withText("Yes"));
-        clickButton("Next", 0);
-        clickButton("Save");
+            _extHelper.waitForExtDialogToDisappear("Add Surgical Tissue Samples");
+            waitForElement(Locator.css(".x4-action-col-0"));
+            setFormElement(Locator.name("surgicalstartdate"), "2013-03-20");
+            setFormElement(Locator.name("surgicalenddate"), "2013-03-21");
+            click(Ext4HelperWD.Locators.formItemWithLabelContaining("Are samples collected after neoadjuvant").append("//label").withText("Yes"));
+            clickButton("Next", 0);
+            clickButton("Save");
+        }
+        waitForGridToLoad("tr", "x4-grid-row", allRequestTypes.length);
+        assertTextPresentInThisOrder(allRequestTypes);
+        clickTab("Overview");
+        waitForText("There are 4 sample requests that have not yet been submitted.");
+        waitForText("There are 0 sample requests that have already been submitted.");
+        waitForText("There is 1 study registration that has been created.");
+
+        log("Submit sample requests from the requestor subfolder");
+        clickTab("Request Samples");
+        waitForElement(Locator.id("submitted-dashboard-3").append("//span").withText("No sample requests to show"));
+        waitForElement(Locator.id("locked-dashboard-4").append("//span").withText("No sample requests to show"));
+        for (int i = 0; i < submittedRequestTypes.length; i++)
+        {
+            // note: the NWBT IDs for a sample request in a new folder should now be predictable (starting at 1)
+            waitAndClick(Locator.id("pending-dashboard-2").append(Locator.linkWithText(String.valueOf(i+1))));
+            waitForElement(Locator.xpath("//label[text() = 'Tissue Type:']/../../td/div[text() = '" + submittedRequestTypes[i] + "']"));
+            clickAndWait(Locator.linkWithText("view details", 1));
+            waitForGridToLoad("tr", "x4-grid-row", 1);
+            waitAndClick(Locator.xpath("//li[text()='Save / Submit']"));
+            clickButton("Submit completed form");
+        }
+
+        waitForElement(Locator.id("pending-dashboard-2").append(Locator.linkWithText("4")));
+        waitForElement(Locator.id("submitted-dashboard-3").append(Locator.linkWithText("1")));
+        waitForElement(Locator.id("submitted-dashboard-3").append(Locator.linkWithText("2")));
+        waitForElement(Locator.id("submitted-dashboard-3").append(Locator.linkWithText("3")));
+        waitForElement(Locator.id("locked-dashboard-4").append("//span").withText("No sample requests to show"));
 
         clickTab("Overview");
-        waitForElement(Locator.linkWithText("Pending Sample Request (1)", 0));
-        assertElementPresent(Locator.linkWithText("Submitted Sample Request (0)", 0));
-
-        clickTab("Sample Requests");
-        waitForElement(Locator.id("submitted-dashboard-3").append("//span").withText("No study registrations to show"));
-        waitForElement(Locator.id("active-dashboard-4").append("//span").withText("No study registrations to show"));
-        waitForElement(Locator.id("closed-dashboard-5").append("//span").withText("No study registrations to show"));
-        waitForElement(Locator.id("pending-dashboard-2").append(Locator.linkWithText(requestId)));
-        clickTab("Study Registrations");
-        waitAndClick(Locator.linkWithText(requestId.split("-")[0]));
-        waitAndClick(Locator.linkWithText("view details"));
-        waitAndClick(Locator.xpath("//li[text()='Save / Submit']"));
-
-        clickButton("Submit completed form");
-        clickTab("Sample Requests");
-        waitForElement(Locator.id("pending-dashboard-2").append("//span").withText("No study registrations to show"));
-        waitForElement(Locator.id("submitted-dashboard-3").append(Locator.linkWithText(requestId)));
-        waitForElement(Locator.id("active-dashboard-4").append("//span").withText("No study registrations to show"));
-        waitForElement(Locator.id("closed-dashboard-5").append("//span").withText("No study registrations to show"));
-
-        clickTab("Overview");
-        waitForElement(Locator.linkWithText("Pending Sample Request (0)", 0));
-        assertElementPresent(Locator.linkWithText("Submitted Sample Request (1)", 0));
+        waitForText("There is 1 sample request that has not yet been submitted.");
+        waitForText("There are 3 sample requests that have already been submitted.");
+        waitForText("There is 1 study registration that has been created.");
 
         stopImpersonating();
 
@@ -420,23 +465,23 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Verify submitted requests show up in RC Dashboard");
         goToProjectHome();
-        clickAndWait(Locator.linkWithText("New Registrations"));
-        waitForGridToLoad("div", "x4-grid-group-title", 1); // all request should still be in the Unassigned category
-        assertTextNotPresent("No study registrations to show");
-        assertElementPresent(getGroupingTitleLocator("Unassigned"));
-        assertTextPresentInThisOrder(submittedRequestLabels);
-        assertTextNotPresent(unsubmittedRequestLabels);
+        clickTab("New Sample Requests");
+        waitForGridToLoad("div", "x4-grid-group-title", 1); // requests grouped by study
+        waitForGridToLoad("tr", "x4-grid-row", submittedRequestTypes.length);
+        assertElementPresent(getGroupingTitleLocator(registrationLabel));
+        assertTextPresentInThisOrder(submittedRequestTypes);
+        assertTextNotPresent(unsubmittedRequestTypes);
 
         log("Update request status and categories");
-        for (int i = 0; i < submittedRequestLabels.length; i++)
-            setRequestStatusAndCategory(i, submittedRequestLabels[i], NWBT_REQUEST_STATUSES[i].toString(), NWBT_REQUEST_CATEGORIES[i]);
+        for (int i = 0; i < submittedRequestTypes.length; i++)
+            setRequestStatusAndCategory(i, submittedRequestTypes[i], NWBT_REQUEST_STATUSES[i].toString(), NWBT_REQUEST_CATEGORIES[i]);
         goToProjectHome();
-        clickAndWait(Locator.linkWithText("New Registrations"));
-        waitForGridToLoad("div", "x4-grid-group-title", NWBT_REQUEST_CATEGORIES.length);
-        assertElementNotPresent(getGroupingTitleLocator("Unassigned"));
-        for (String category : NWBT_REQUEST_CATEGORIES)
-            assertElementPresent(getGroupingTitleLocator(category));
-        assertTextPresentInThisOrder(Arrays.copyOfRange(NWBT_REQUEST_STATUSES, 0, submittedRequestLabels.length - 1));
+        clickTab("New Sample Requests");
+        waitForGridToLoad("div", "x4-grid-group-title", 1); // requests grouped by study
+        waitForGridToLoad("tr", "x4-grid-row", submittedRequestTypes.length);
+        assertTextNotPresent("Unassigned");
+        assertTextPresentInThisOrder(NWBT_REQUEST_CATEGORIES);
+        assertTextPresentInThisOrder(Arrays.copyOfRange(NWBT_REQUEST_STATUSES, 0, submittedRequestTypes.length - 1));
     }
 
     private void waitForGridToLoad(final String tag, final String className, final int expectedCount)
@@ -450,21 +495,21 @@ public class NWBioTrustTest extends SurveyTest
 
     private Locator getGroupingTitleLocator(String title)
     {
-        return Locator.xpath("//div[contains(@class, 'x4-grid-group-title') and contains(text(), '" + title + "')]");
+        return Locator.xpath("//div[contains(@class, 'x4-grid-group-title')]//td[contains(text(), '" + title + "')]");
     }
 
     private void setRequestStatusAndCategory(int index, String label, String status, String category)
     {
         Locator loc = getEditLinkLocator(label, false);
         click(loc);
-        _extHelper.waitForExtDialog("Edit Registration");
+        _extHelper.waitForExtDialog("Edit Sample Request : 1-" + (index+1));
         sleep(1000); // this is tricky because there is a loading mask for the combos, but they can load very quickly so that the test misses it if we wait for the mask to disappear
         _ext4Helper.selectComboBoxItem("NWBT Resource:", category);
         _ext4Helper.selectComboBoxItem("Status:", status);
         setFormElement(Locator.name("Comment"), "resource and status changed");
         sleep(500); // update button is enabled based on form state
         clickButton("Update", 0);
-        waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid-group-title') and contains(text(), '" + category + "')]"));
+        waitForElement(Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner ') and contains(text(), '" + category + "')]"));
         assertTextPresent(status);
     }
 
@@ -477,7 +522,7 @@ public class NWBioTrustTest extends SurveyTest
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
-    private void setupSurveyDesignsAndRequests()
+    private void setupSurveyDesignsAndStudy()
     {
         if (designs.size() == 0)
             configureDesigns();
@@ -490,61 +535,33 @@ public class NWBioTrustTest extends SurveyTest
         }
 
         log("Configure dashboard");
-        clickAndWait(Locator.linkWithText("New Registrations"));
-        waitForText("No study registrations to show");
-        customizeDashboard("RC Dashboard - New Registrations", designs.get(0).get("label"));
-
-        log("Submit requests from the requestor subfolder");
+        clickTab("New Sample Requests");
+        waitForText("No sample requests to show");
+        customizeDashboard("RC Dashboard - New Sample Requests", designs.get(0).get("label"));
         clickFolder(requestorFolder1);
-        clickAndWait(Locator.linkWithText("Study Registrations"));
-        customizeDashboard("Requestor Dashboard - Study Registrations", designs.get(0).get("label"));
+        clickTab("My Studies");
+        customizeDashboard("Requestor Dashboard - My Studies", designs.get(0).get("label"));
 
+        log("Create study registration to use for sample requests");
         pushLocation();
         impersonate(NWBT_PRINCIPAL_INVESTIGATOR);
         popLocation();
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        assertTextPresentInThisOrder(designs.get(0).get("label"), designs.get(0).get("description"), "Pending Registrations", "Submitted Registrations");
-        waitForText("No study registrations to show", 2, WAIT_FOR_PAGE); // both pending and submitted should be empty
-        for (String requestLabel : submittedRequestLabels)
-        {
-            waitAndClickAndWait(Locator.linkWithText("Click Here"));
-            List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
-            fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + requestLabel));
-            fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Approved Human Subjects Research"));
-            fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
-            fields.add(createFieldInfo("Study Information", "irbexpirationdate", "2013-03-07"));
-            fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
-            fields.add(createRadioFieldInfo("Study Information", "Do you anticipate submitting data from this study to a public database (e.g. dbGAP)?*", "Yes"));
-            fields.add(createComboFieldInfo("Contact Information", "Study Principal Investigator*", "pi nwbiotrust"));
-            fields.add(createFieldInfo("Billing", "fundingsource", "test funding source description"));
-            createNewStudyRegistration(requestLabel, fields, true);
-        }
-        waitForGridToLoad("div", "x4-grid-group-title", 1); // all study registrations should be in the Submitted group
-        waitForText("No study registrations to show", 1, WAIT_FOR_PAGE); // pending grid should still be empty
-        assertTextPresentInThisOrder(submittedRequestLabels);
-        for (String requestLabel : unsubmittedRequestLabels)
-        {
-            waitAndClickAndWait(Locator.linkWithText("Click Here"));
-            List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
-            fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + requestLabel));
-            fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Pending"));
-            fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
-            fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
-            fields.add(createRadioFieldInfo("Study Information", "Do you anticipate submitting data from this study to a public database (e.g. dbGAP)?*", "Yes"));
-            fields.add(createComboFieldInfo("Contact Information", "Study Principal Investigator*", "pi nwbiotrust"));
-            fields.add(createFieldInfo("Billing", "fundingsource", "test funding source description"));
-            createNewStudyRegistration(requestLabel, fields, false);
-        }
-        clickTab("Study Registrations");
-        waitForGridToLoad("div", "x4-grid-group-title", 1); // all study registrations should be in the Submitted group, pending registration is in no group
-        waitForElement(Locator.tagWithText("div", unsubmittedRequestLabels[0]));
-        assertTextPresentInThisOrder(allRequestLabels);
+        waitForText("No study registrations to show", 1, WAIT_FOR_PAGE);
+        waitAndClickAndWait(Locator.linkWithText("Click Here"));
+        List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
+        fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + registrationLabel));
+        fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Approved Human Subjects Research"));
+        fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
+        fields.add(createFieldInfo("Study Information", "irbexpirationdate", "2013-03-07"));
+        fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
+        fields.add(createRadioFieldInfo("Study Information", "Do you anticipate submitting data from this study to a public database (e.g. dbGAP)?", "Yes"));
+        fields.add(createComboFieldInfo("Contact Information", "Study Principal Investigator", "pi nwbiotrust"));
+        fields.add(createFieldInfo("Billing", "fundingsource", "test funding source description"));
+        createNewStudyRegistration(registrationLabel, fields);
+        waitForGridToLoad("tr", "x4-grid-row", 1);
 
-        pushLocation();
         stopImpersonating();
-        popLocation();
-        waitForGridToLoad("div", "x4-grid-group-title", 1); // all study registrations should be in the Submitted group, pending registration is in no group
-        assertTextPresentInThisOrder(allRequestLabels);
     }
 
     private Map<String, String> createFieldInfo(String section, String name, String value)
@@ -574,7 +591,7 @@ public class NWBioTrustTest extends SurveyTest
         return info;
     }
 
-    private void createNewStudyRegistration(String label, List<Map<String, String>> fields, Boolean submitStudy)
+    private void createNewStudyRegistration(String label, List<Map<String, String>> fields)
     {
         waitForText("Study Name*");
         setFormElement(Locator.name("_surveyLabel_"), label);
@@ -602,16 +619,8 @@ public class NWBioTrustTest extends SurveyTest
                 setFormElement(Locator.name(field.get("name")), field.get("value"));
             }
         }
-        sleep(500); // give the submit button a split second to enable base on form changes
-        click(Locator.xpath("//li[text()='Save / Submit']"));
-        if (submitStudy)
-            clickButton("Submit completed form");
-        else
-        {
-            clickButton("Save", 0);
-            _extHelper.waitForExtDialog("Success");
-            _ext4Helper.waitForMaskToDisappear();
-        }
+        click(Locator.xpath("//li[text()='Save / Cancel']"));
+        clickButton("Save");
 
     }
 
@@ -697,6 +706,7 @@ public class NWBioTrustTest extends SurveyTest
             Map<String, Object> rowMap = new HashMap<String, Object>();
             rowMap.put("Status", status.toString());
             rowMap.put("SortOrder", ((NwbtRequestStatuses)status).sortOrder());
+            rowMap.put("LockedState", ((NwbtRequestStatuses)status).isLocked());
             rows.add(rowMap);
         }
         insertLookupTableRecords("RequestStatus", rows);
@@ -766,11 +776,11 @@ public class NWBioTrustTest extends SurveyTest
     {
         log("Verify folder type default webparts");
         goToProjectHome();
-        verifyFolderTabLinks(new String[]{"Overview", "New Registrations", "Active Sample Requests", "Patient ID", "Patient Consent", "Sample Orders", "Manage"});
-        verifyWebpartTitleOrder(new String[]{"Pending Registrations"});
+        verifyFolderTabLinks(new String[]{"Overview", "New Sample Requests", "Active Sample Requests", "Patient ID", "Patient Consent", "Sample Orders", "Manage"});
+        verifyWebpartTitleOrder(new String[]{"Pending Sample Requests"});
         clickFolder(requestorFolder1);
         verifyWebpartTitleOrder(new String[]{"Overview"});
-        verifyFolderTabLinks(new String[]{"Overview", "Study Registrations", "Sample Requests", "Contacts"});
+        verifyFolderTabLinks(new String[]{"Overview", "Request Samples", "My Studies", "Contacts"});
         clickFolder(requestorFolder2);
         verifyWebpartTitleOrder(new String[]{"Overview"});
     }
@@ -951,8 +961,8 @@ public class NWBioTrustTest extends SurveyTest
         }, "failed to download discarded blood sample request json", WAIT_FOR_JAVASCRIPT);
 
         Map<String, String> design = new HashMap<String, String>();
-        design.put("label", "NW BioTrust Study Registration");
-        design.put("description", "Create a new study registration with associated sample requests");
+        design.put("label", "StudyRegistration");
+        design.put("description", "");
         design.put("table", "StudyRegistrations");
         design.put("metadataPath", studyRegistrationJson.getAbsolutePath());
         designs.add(design);
