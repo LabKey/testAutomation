@@ -396,20 +396,6 @@ public class ContainerContextTest extends BaseWebDriverTest
         verifySimpleModuleTables("EmissionTests Without Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false, vehicleId);
     }
 
-    private void deleteQuery(String container, String schemaName, String queryName)
-    {
-        String deleteQueryURL = "query/" + container + "/deleteQuery.view?schemaName=" + schemaName + "&query.queryName=" + queryName;
-        beginAt(deleteQueryURL);
-        clickButton("OK");
-    }
-
-    @Override
-    protected void createQuery(String container, String name, String schemaName, String sql, String xml, boolean inheritable)
-    {
-        deleteQuery(container, schemaName, name);
-        super.createQuery(container, name, schemaName, sql, xml, inheritable);
-    }
-
     protected void overrideMetadata(String container, String schemaName, String queryName, String xml)
     {
         beginAt("/query/" + container + "/schema.view?schemaName=" + schemaName + "&queryName=" + queryName);
