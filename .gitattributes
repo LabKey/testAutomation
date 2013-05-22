@@ -81,6 +81,8 @@ modules/scriptpad/resources/reports/schemas/consoleOnly.r -text
 modules/scriptpad/resources/reports/schemas/err.r -text
 modules/scriptpad/resources/reports/schemas/errOnly.r -text
 modules/scriptpad/resources/reports/schemas/script.r -text
+modules/scriptpad/resources/reports/schemas/script.rhtml -text
+modules/scriptpad/resources/reports/schemas/script.rmd -text
 modules/scriptpad/resources/reports/schemas/script2.r -text
 modules/scriptpad/resources/reports/schemas/script3.r -text
 modules/scriptpad/resources/schemas/dbscripts/postgresql/scriptpad-0.00-0.01.sql -text

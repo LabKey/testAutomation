@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>A minimal knitr example in HTML</title>
+</head>
+<body>
+
+<!--begin.rcode echo=FALSE
+  opts_chunk$set(fig.width=5, fig.height=5)
+  end.rcode-->
+
+<p>This is a minimal example which shows <strong>knitr</strong>
+    working with HTML
+    pages in LabKey.</p>
+
+<!--begin.rcode echo=FALSE
+#
+# setup: load data
+#
+print('Setup script time');
+ptm <- proc.time();
+if (!exists("sharedSession")) {
+    print('running setup code ...');
+    require("RJSONIO");
+    library(Cairo)
+    datafile <- paste(labkey.url.base, "input_data.tsv", sep="");
+    labkey.data <- read.table(datafile, header=TRUE, sep="\t", quote="\"", comment.char="")
+    sharedSession <- 1;
+}
+print(proc.time() - ptm);
+end.rcode-->
+
+<!--begin.rcode blood-pressure-scatter, warning=FALSE, message=FALSE, echo=FALSE, fig.align='center'
+#
+# plot 1
+#
+plot(labkey.data$diastolicbloodpressure, labkey.data$systolicbloodpressure,
+main="Diastolic vs. Systolic Pressures: All Visitsx",
+ylab="Systolic (mm Hg)", xlab="Diastolic (mm Hg)", ylim =c(60, 200));
+abline(lsfit(labkey.data$diastolicbloodpressure, labkey.data$systolicbloodpressure));
+
+#
+# plot 2
+#
+data_means <- aggregate(labkey.data, list(ParticipantID =
+ labkey.data$participantid), mean, na.rm = TRUE);
+#Cairo(file="${imgout:Blood Pressure/Multiple.png}", type="png")
+op <- par(mfcol = c(2, 2)) # 2 x 2 pictures on one plot
+c11 <- plot(data_means$diastolicbloodpressure, data_means$weight_kg, ,
+ xlab="Diastolic Blood Pressure (mm Hg)", ylab="Weight (kg)",
+ mfg=c(1, 1))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$weight_kg))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$systolicbloodpressure, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Systolic Blood Pressure (mm Hg)", mfg= c(2, 1))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$systolicbloodpressure))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$pulse, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Pulse Rate (Beats/Minute)", mfg= c(1, 2))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$pulse))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$temp_c, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Temperature (Degrees C)", mfg= c(2, 2))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$temp_c))
+par(op); #Restore graphics parameters
+#dev.off();
+end.rcode -->
+
+<!--begin.rcode
+
+#
+# csv
+#
+##write.csv(labkey.data, file = "${txtout:csvfile}");
+write.csv(labkey.data);
+end.rcode-->
+<p>Errors, messages and warnings can be put into <code>div</code>'s
+    with different <code>class</code>es:</p>
+
+<!--begin.rcode
+    sqrt(-1)  # warning
+    message('knitr says hello to HTML!')
+    1+'a'  # mission impossible
+    end.rcode-->
+
+<p>Well, everything seems to be working. Let's ask R what is the
+    value of &pi;? Of course it is <!--rinline pi -->.</p>
+
+</body>
+</html>

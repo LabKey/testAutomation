@@ -1,0 +1,114 @@
+# A Minimal Example for Markdown
+
+This is a minimal example of using **knitr** to produce an _HTML_ page from _Markdown_.
+
+## R code chunks
+
+```{r setup}
+# set global chunk options: images will be 7x5 inches
+opts_chunk$set(fig.width=7, fig.height=5)
+```
+
+Now we write some code chunks in this markdown file:
+
+```{r computing}
+x <- 1+1 # a simple calculator
+set.seed(123)
+rnorm(5)  # boring random numbers
+```
+
+We can also produce plots:
+
+```{r graphics}
+par(mar = c(4, 4, .1, .1))
+with(mtcars, {
+  plot(mpg~hp, pch=20, col='darkgray')
+  lines(lowess(hp, mpg))
+})
+```
+
+Or integrate with LabKey:
+
+```{r echo=FALSE}
+#
+# setup: load data
+#
+print('Setup script time');
+ptm <- proc.time();
+if (!exists("sharedSession")) {
+    print('running setup code ...');
+    require("RJSONIO");
+    library(Cairo)
+    datafile <- paste(labkey.url.base, "input_data.tsv", sep="");
+    labkey.data <- read.table(datafile, header=TRUE, sep="\t", quote="\"", comment.char="")
+    sharedSession <- 1;
+}
+print(proc.time() - ptm);
+```
+
+
+```{r blood-pressure-scatter, message=FALSE, warning=FALSE, echo=FALSE, fig.align='center'}
+#
+# plot 1
+#
+plot(labkey.data$diastolicbloodpressure, labkey.data$systolicbloodpressure,
+main="Diastolic vs. Systolic Pressures: All Visitsx",
+ylab="Systolic (mm Hg)", xlab="Diastolic (mm Hg)", ylim =c(60, 200));
+abline(lsfit(labkey.data$diastolicbloodpressure, labkey.data$systolicbloodpressure));
+
+#
+# plot 2
+#
+data_means <- aggregate(labkey.data, list(ParticipantID =
+ labkey.data$participantid), mean, na.rm = TRUE);
+
+op <- par(mfcol = c(2, 2)) # 2 x 2 pictures on one plot
+c11 <- plot(data_means$diastolicbloodpressure, data_means$weight_kg, ,
+ xlab="Diastolic Blood Pressure (mm Hg)", ylab="Weight (kg)",
+ mfg=c(1, 1))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$weight_kg))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$systolicbloodpressure, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Systolic Blood Pressure (mm Hg)", mfg= c(2, 1))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$systolicbloodpressure))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$pulse, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Pulse Rate (Beats/Minute)", mfg= c(1, 2))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$pulse))
+c21 <- plot(data_means$diastolicbloodpressure, data_means$temp_c, ,
+ xlab="Diastolic Blood Pressure (mm Hg)",
+ ylab="Temperature (Degrees C)", mfg= c(2, 2))
+abline(lsfit(data_means$diastolicbloodpressure, data_means$temp_c))
+par(op); #Restore graphics parameters
+```
+
+
+## Inline code
+
+Inline R code is also supported, e.g. the value of `x` is `r x`, and 2 &times; &pi;
+= `r 2*pi`.
+
+## Math
+
+LaTeX math as usual: $f(\alpha, \beta) \propto x^{\alpha-1}(1-x)^{\beta-1}$.
+
+## Misc
+
+You can indent code chunks so they can nest within other environments such as lists.
+
+1. the area of a circle with radius x
+    ```{r foo}
+    pi * x^2
+    ```
+2. OK, that is great
+
+To compile me, use
+
+```{r compile, eval=FALSE}
+library(knitr)
+knit('knitr-minimal.Rmd')
+```
+
+## Conclusion
+
+Markdown is super easy to write. Go to **knitr** [homepage](http://yihui.name/knitr) for details.
