@@ -84,15 +84,15 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         log("Uploading Drug Sensitivity Runs");
         clickButton("Import Data");
         clickButton("Next");
-        uploadFile(TEST_ASSAY_FILE1, null, "11223344");
+        uploadFile(TEST_ASSAY_FILE1, null, "11223344", true);
 
         click(Locator.linkContainingText("Import Data"));
         clickButton("Next");
-        uploadFile(TEST_ASSAY_FILE2, null, "55667788");
+        uploadFile(TEST_ASSAY_FILE2, null, "55667788", false);
 
         click(Locator.linkContainingText("Import Data"));
         clickButton("Next");
-        uploadFile(TEST_ASSAY_FILE3, TEST_ASSAY_DATA_ACQUISITION_FILE3, "12341234");
+        uploadFile(TEST_ASSAY_FILE3, TEST_ASSAY_DATA_ACQUISITION_FILE3, "12341234", false);
 
         // verify details view has a custom sample label
         assertTextPresent("Drug Treatment Information");
@@ -108,7 +108,7 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         testCopyToStudy();
     }
 
-    protected void uploadFile(String filePath, String acquisitionFilePath, String ptid)
+    protected void uploadFile(String filePath, String acquisitionFilePath, String ptid, boolean checkRequired)
     {
         // cutoff values
         setFormElement(Locator.name("cutoff1"), "50");
@@ -152,6 +152,15 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         setFormElement(Locator.name("__primaryFile__"), file1);
 
         clickButton("Save and Finish");
+
+        if (checkRequired)
+        {
+        // validate required field
+        assertTextPresent("Initial Parasitemia Percent is required");
+        setFormElement(Locator.name("initialParasitemia"), "1.60");
+
+        clickButton("Save and Finish");
+        }
     }
 
     @Override
