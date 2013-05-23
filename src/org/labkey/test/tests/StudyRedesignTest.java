@@ -165,7 +165,7 @@ public class StudyRedesignTest extends StudyBaseTest
         return ret;
     }
 
-    private void setupDatasetCategories()
+    protected void setupDatasetCategories()
     {
         clickAndWait(Locator.linkWithText("Manage"));
         clickAndWait(Locator.linkWithText("Manage Datasets"));

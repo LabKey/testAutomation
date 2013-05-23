@@ -293,7 +293,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             String workbookName = "Workbook" + i;
             goToProjectHome();
 
-            String id = workbookHelper.createWorkbook(getProjectName(), workbookName, "Description", WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK);
+            String id = String.valueOf(workbookHelper.createWorkbook(getProjectName(), workbookName, "Description", WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK));
             workbookIds[i] = id;
             parentRowIds[i] = i > 0 ? emissionIds[i-1] : null;
             emissionIds[i] = insertEmissionTest(workbookIds[i], String.valueOf(i), vehicleId, parentRowIds[i]);

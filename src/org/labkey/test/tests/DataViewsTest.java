@@ -40,6 +40,26 @@ public class DataViewsTest extends StudyRedesignTest
             {"PT-1: Participant Transfer", "Locked"}
     };
 
+    @Override @LogMethod(category = LogMethod.MethodType.SETUP)
+    protected void doCreateSteps()
+    {
+        importStudy();
+        startSpecimenImport(2);
+
+        // wait for study and specimens to finish loading
+        waitForSpecimenImport();
+        setStudyRedesign();
+        setupDatasetCategories();
+        log("Create report for data view webpart test.");
+        goToModule("StudyRedesign");
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Views"));
+        clickMenuButton("Create", "R View");
+        clickButton("Save", "Please enter a view name:");
+        setFormElement(Locator.xpath("//div[./span[.='Please enter a view name:']]/div/input"), REPORT_NAME);
+        _extHelper.clickExtButton("Save");
+    }
+
     @Override
     protected void doVerifySteps()
     {   

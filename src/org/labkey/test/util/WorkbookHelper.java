@@ -20,6 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import java.net.URISyntaxException;
+import java.net.URL;
 
 /**
  * User: tchadick
@@ -41,7 +42,7 @@ public class WorkbookHelper extends AbstractHelperWD
      * @param folderType Type of created workbook
      * @return workbook id
      */
-    public String createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
+    public int createWorkbook(String project, String title, String description, WorkbookFolderType folderType)
     {
         _test.clickProject(project);
         _test.clickButton("Insert New");
@@ -53,24 +54,26 @@ public class WorkbookHelper extends AbstractHelperWD
         _test.clickButton("Create Workbook");
         _test.waitForElement(Locator.css(".wb-name"));
 
+        return getWorkbookIdFromUrl(_test.getURL()) ;
+    }
+
+    public int getWorkbookIdFromUrl(URL url)
+    {
+        // path is something like "http://localhost:8080/labkey/project/ContainerContextTest/2/begin.view?"
+        // this code pulls "2" out by finding the last and second to last slashes
         try
         {
-            // path is something like "http://localhost:8080/labkey/project/ContainerContextTest/2/begin.view?"
-            // this code pulls "2" out by finding the last and second to last slashes
-            String path = _test.getURL().toURI().getPath();
-            int idx = path.lastIndexOf("/");
-            path = path.substring(0, idx);
-            idx = path.lastIndexOf("/");
-
-            return path.substring(idx + 1);
+        String path = url.toURI().getPath();
+        int idx = path.lastIndexOf("/");
+        path = path.substring(0, idx);
+        idx = path.lastIndexOf("/");
+        return Integer.parseInt(path.substring(idx + 1));
         }
         catch (URISyntaxException e)
         {
             throw new RuntimeException(e);
         }
     }
-
-
 
     public enum WorkbookFolderType
     {
@@ -98,14 +101,15 @@ public class WorkbookHelper extends AbstractHelperWD
      * @param title Title of created workbook
      * @param description Description of created workbook
      */
-    public void createFileWorkbook(String projectName, String title, String description)
+    public int createFileWorkbook(String projectName, String title, String description)
     {
         // Create File Workbook
-        createWorkbook(projectName, title, description, WorkbookFolderType.FILE_WORKBOOK);
+        int id = createWorkbook(projectName, title, description, WorkbookFolderType.FILE_WORKBOOK);
         _test.waitForElement(Locator.linkWithText("Files"));
         Assert.assertEquals(title, _test.getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
         Assert.assertEquals(description, _test.getText(Locator.xpath("//div[@id='wb-description']")));
         _test.assertLinkNotPresentWithText(title); // Should not appear in folder tree.
+        return id;
     }
 
 }
