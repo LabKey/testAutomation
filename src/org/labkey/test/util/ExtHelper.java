@@ -30,6 +30,12 @@ public class ExtHelper extends AbstractHelper
     {
         super(test);
     }
+
+    public void clickMenuButton(String menusLabel, String... subMenuLabels)
+    {
+        clickMenuButton(true, menusLabel, subMenuLabels);
+    }
+
     /**
      * Clicks the Ext or labkey menu item from the submenu specified by the menu object's text
      */

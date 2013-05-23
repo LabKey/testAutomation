@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -112,7 +112,7 @@ public class StudyHelperWD extends AbstractHelperWD
 
     @LogMethod
     public void editCustomParticipantGroup(String groupName, String participantString,
-                                                  String categoryName, Boolean isCategoryNameNew, Boolean shared, Boolean demographicsPresent,
+                                                  @Nullable String categoryName, Boolean isCategoryNameNew, @Nullable Boolean shared, Boolean demographicsPresent,
                                                   Boolean replaceExistingPtids,  String... newPtids)
     {
        // Caller must already be on Manage <participantString> Groups page
@@ -176,6 +176,22 @@ public class StudyHelperWD extends AbstractHelperWD
         }
         _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
         _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    @LogMethod
+    public void deleteCustomParticipantGroup(String groupName, String participantString)
+    {
+        if( !_test.isElementPresent(Locator.xpath("id('labkey-nav-trail-current-page')[text() = 'Manage "+participantString+" Groups']")) )
+        {
+            _test.clickTab("Manage");
+            _test.clickAndWait(Locator.linkWithText("Manage " + participantString + " Groups"));
+            _test.waitForText("groups allow");
+        }
+        _test.log("Delete " + participantString + " Group: " + groupName);
+        selectParticipantCategoriesGridRow(groupName);
+        _test.clickButton("Delete Selected", 0);
+        _test._extHelper.waitForExtDialog("Delete Group");
+        _test._extHelper.clickExtButton("Delete Group", "Yes", 0);
     }
 
     public void selectParticipantCategoriesGridRow(String groupName)

@@ -236,6 +236,17 @@ public class Ext4HelperWD extends AbstractHelperWD
     }
 
     /**
+     * Click the text of an Participant filter panel category grouping header
+     * Currently used only for participant filter panel
+     * @param categoryLabel Exact text from any category label (i.e. Cohorts, Group 1)
+     */
+    public void clickParticipantFilterCategory(String categoryLabel)
+    {
+        Locator.XPathLocator loc = Locator.xpath("//input[contains(@class, 'category-header') and contains(@category, '" + categoryLabel + "')]");
+        _test.click(loc);
+    }
+
+    /**
      * Determines if the specified row has a checked checkbox
      * @param rowLoc Locator provided by {@link #getGridRow(String, int)}
      * @return true if the specified row has a checked checkbox

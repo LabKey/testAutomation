@@ -175,6 +175,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
 
+    public static final double DELTA = 10E-10;
+
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1";
     public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#";
@@ -1142,6 +1144,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void goToManageViews()
     {
         clickAdminMenuItem("Manage Views");
+        waitForElement(Locator.id("viewsGrid"));
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
     public void goToManageStudy()
@@ -1852,7 +1856,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean enableScriptCheck()
     {
-        return !onTeamCity() && "true".equals(System.getProperty("scriptCheck")) && getBrowser().startsWith("*firefox"); //TODO: hanging tests on TeamCity
+        return !onTeamCity() && "true".equals(System.getProperty("scriptCheck")) && BROWSER_TYPE == BrowserType.FIREFOX; //TODO: hanging tests on TeamCity
     }
 
     public boolean enableDevMode()
@@ -2653,6 +2657,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void fireEvent(Locator l, SeleniumEvent event)
     {
+        fireEvent(l.findElement(getDriver()), event);
+    }
+
+    /**
+     * Create and fire a JavaScript UIEvent
+     * @param el event target
+     * @param event event
+     */
+    public void fireEvent(WebElement el, SeleniumEvent event)
+    {
         executeScript(
                 "var element = arguments[0];" +
                         "var eventType = arguments[1];" +
@@ -2662,7 +2676,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                         "   ,true      // can bubble?\n" +
                         "   ,true      // cancelable?\n" +
                         ");\n" +
-                        "element.dispatchEvent(myEvent);", l.findElement(_driver), event.toString());
+                        "element.dispatchEvent(myEvent);", el);
     }
 
     @LogMethod
@@ -5917,7 +5931,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     @Deprecated
-    //use _securityHelperWD.setPermissions
+    //use _securityHelper.setPermissions
     @LogMethod
     public void setPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
     {
@@ -5925,7 +5939,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     @Deprecated
-    //use _securityHelperWD.setSiteGroupPermissions
+    //use _securityHelper.setSiteGroupPermissions
     @LogMethod
     public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
     {

@@ -289,8 +289,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent(TEST_DATA[3][2]);
 
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from Grid view.
-        if(!getBrowserType().contains("iexplore"))
-            assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel()); // Columns swapped. Doesn't work in IE
+        assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
 
         setUpListFinish();
 
@@ -308,20 +307,17 @@ public class ListTest extends BaseWebDriverTest
         log("Check that hidden column is hidden.");
         clickAndWait(Locator.linkWithText("details"));
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from details view.
-        if(!getBrowserType().contains("iexplore"))
-            assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
+        assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         clickButton("Edit");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from update view.
-        if(!getBrowserType().contains("iexplore"))
-            assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
+        assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         clickButton("Cancel");
         clickButton(DETAILS_BUTTON_NAME);
 
         log("Test inserting new row");
         clickButton("Insert New");
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
-        if(!getBrowserType().contains("iexplore"))
-            assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
+        assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         String html = getHtmlSource();
         Assert.assertTrue("Description \"" + _listCol1.getDescription() + "\" not present.", html.contains(_listCol1.getDescription()));
         Assert.assertTrue("Description \"" + _listCol3.getDescription() + "\" not present.", html.contains(_listCol3.getDescription()));

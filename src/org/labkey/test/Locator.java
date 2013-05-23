@@ -65,6 +65,11 @@ public abstract class Locator
 
     public abstract Locator withText(String text);
 
+    /**
+     * Locate the nth element matched by the selector. Can only find a single element.
+     * @param index zero-based index of desired element
+     * @return Locator for the element
+     */
     public abstract Locator index(Integer index);
 
     /**
@@ -788,6 +793,11 @@ public abstract class Locator
             return this.withPredicate("@" + attrName + "=" + xq(attrVal));
         }
 
+        public XPathLocator withAttributeContaining(String attrName, String partialAttrVal)
+        {
+            return this.withPredicate("contains(@" + attrName + ", " + xq(partialAttrVal) + ")");
+        }
+
         public String getPath()
         {
             return _loc;
@@ -888,16 +898,30 @@ public abstract class Locator
 
         public Locator containing(String contains)
         {
+            if (_text != null && _text.length() > 0 || _contains != null && _contains.length() > 0)
+                throw new IllegalStateException("Text content already been specified for this Locator");
+
             return new CssLocator(_loc, _index, contains, _text);
         }
 
         public Locator withText(String text)
         {
+            if (_text != null && _text.length() > 0 || _contains != null && _contains.length() > 0)
+                throw new IllegalStateException("Text content already been specified for this Locator");
+
             return new CssLocator(_loc, _index, _contains, text);
         }
 
+        /**
+         * Locate the nth element matched by the selector. Can only find a single element.
+         * @param index zero-based index of desired element
+         * @return Locator to find the nth instance of the base selector
+         */
         public Locator index(Integer index)
         {
+            if (_index != null && _index != 0)
+                throw new IllegalArgumentException("An index has already been specified for this Locator");
+
             return new CssLocator(_loc, index, _contains, _text);
         }
 
@@ -914,7 +938,7 @@ public abstract class Locator
         @Override
         public String toString()
         {
-            return "css=" + _loc;
+            return "css=" + _loc + (_contains != null ? ":contains('" + _contains + "')" : "");
         }
 
         public By toBy()
