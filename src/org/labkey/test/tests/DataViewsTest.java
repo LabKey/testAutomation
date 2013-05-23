@@ -30,7 +30,9 @@ import org.labkey.test.util.PortalHelper;
 public class DataViewsTest extends StudyRedesignTest
 {
     private static final String REPORT_NAME = "TestReport";
-    private static final String WEBPART_TITLE = "TestDataViews";
+    private static final String RENAMED_WEBPART_TITLE = "TestDataViews";
+    private static final String ORIGINAL_WEBPART_TITLE = "Data Views";
+    private static final String REPORT_TO_DELETE = "Scatter: Systolic vs Diastolic";
     private static final String NEW_CATEGORY = "A New Category";
     private static final String NEW_DESCRIPTION = "Description set in data views webpart";
     private static final String[][] datasets = {
@@ -97,19 +99,19 @@ public class DataViewsTest extends StudyRedesignTest
         collapseCategory(CATEGORIES[2]);
         Assert.assertEquals("Incorrect number of datasets after collapsing category.", 10, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
         Assert.assertEquals("Incorrect number of dataset categories visible after collapsing category.", 2, getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
-        openCustomizePanel();
+        openCustomizePanel(ORIGINAL_WEBPART_TITLE);
         _extHelper.uncheckCheckbox("datasets");
-        setFormElement(Locator.name("webpart.title"), WEBPART_TITLE);
+        setFormElement(Locator.name("webpart.title"), RENAMED_WEBPART_TITLE);
         clickButton("Save", 0);
         _extHelper.waitForLoadingMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         setDataBrowseSearch("");
         waitForElement(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden());
         waitForElement(Locator.linkWithText(REPORT_NAME), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        assertElementPresent(PortalHelper.Locators.webPartTitle(WEBPART_TITLE));
+        assertElementPresent(PortalHelper.Locators.webPartTitle(RENAMED_WEBPART_TITLE));
         Assert.assertEquals("Incorrect number of datasets after filter", 9, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
         log("Verify cancel button");
-        openCustomizePanel();
+        openCustomizePanel(ORIGINAL_WEBPART_TITLE);
         _extHelper.checkCheckbox("datasets");
         _extHelper.uncheckCheckbox("reports");
         setFormElement(Locator.name("webpart.title"), "nothing");
@@ -118,11 +120,11 @@ public class DataViewsTest extends StudyRedesignTest
         refresh();                //TODO:  |remove: 13265: Data views webpart admin cancel button doesn't reset form
         waitForText(REPORT_NAME); //TODO: /
         assertTextNotPresent("nothing");
-        assertTextPresent(WEBPART_TITLE);
+        assertTextPresent(RENAMED_WEBPART_TITLE);
         Assert.assertEquals("Incorrect number of datasets after filter", 9, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
         log("Verify category management: delete");
-        openCustomizePanel();
+        openCustomizePanel(RENAMED_WEBPART_TITLE);
         _extHelper.checkCheckbox("datasets");
         clickButton("Manage Categories", 0);
         _extHelper.waitForExtDialog("Manage Categories");
@@ -136,7 +138,7 @@ public class DataViewsTest extends StudyRedesignTest
 
         log("Verify category management: create");
         refresh();
-        openCustomizePanel();
+        openCustomizePanel(RENAMED_WEBPART_TITLE);
         clickButton("Manage Categories", 0);
         _extHelper.waitForExtDialog("Manage Categories");
         clickButton("New Category", 0);
@@ -153,8 +155,8 @@ public class DataViewsTest extends StudyRedesignTest
         assertTextPresentInThisOrder(CATEGORIES[2], CATEGORIES[3], "Uncategorized", REPORT_NAME, "APX-1");
 
         log("Verify modify dataset");
-        openCustomizePanel();
-        editDatasetProperties(EDITED_DATASET);
+        openCustomizePanel(RENAMED_WEBPART_TITLE);
+        openEditPanel(EDITED_DATASET);
         setFormElement(Locator.name("description"), NEW_DESCRIPTION);
         saveDatasetProperties(EDITED_DATASET);
         mouseOver(Locator.linkWithText(EDITED_DATASET));
@@ -162,6 +164,17 @@ public class DataViewsTest extends StudyRedesignTest
         Assert.assertEquals("Dataset hover tip not as expected", EDITED_DATASET_TOOLTIP, getText(Locator.css(".data-views-tip-content")));
         clickAndWait(Locator.linkWithText(EDITED_DATASET));
         assertTextPresent(NEW_DESCRIPTION);
+
+        log("Verify report deletion");
+        clickAndWait(Locator.linkContainingText("Data & Reports"));
+        waitForElement(Locator.linkContainingText(REPORT_TO_DELETE));
+        enableEditMode();
+        openEditPanel(REPORT_TO_DELETE);
+        clickButtonContainingText("Delete Report", 0);
+        waitForText("Delete Report?");
+        clickButtonContainingText("Yes", 0);
+        _ext4Helper.waitForMaskToDisappear();
+        assertElementNotPresent(Locator.linkContainingText(REPORT_TO_DELETE));
     }
     private final static String EDITED_DATASET_TOOLTIP = "Source:Subcategory1-EFGHIJKL></% 1Type:DatasetDescription:Description set in data views webpart";
 
@@ -173,15 +186,15 @@ public class DataViewsTest extends StudyRedesignTest
         waitForText(someDataSets[3]);
         assertTextPresent("Data Views", "Name", "Type", "Access");
 
-        openCustomizePanel();
+        openCustomizePanel(RENAMED_WEBPART_TITLE);
         _extHelper.checkCheckbox("Status");
         clickButton("Save", 0);
         clickAndWait(Locator.linkContainingText("Data & Reports"));
 
         for (String[] entry : datasets)
         {
-            openCustomizePanel();
-            editDatasetProperties(entry[0]);
+            enableEditMode();
+            openEditPanel(entry[0]);
 
             _ext4Helper.selectComboBoxItem("Status", entry[1]);
 
@@ -199,10 +212,16 @@ public class DataViewsTest extends StudyRedesignTest
         }
     }
 
-    private void openCustomizePanel()
+    private void openCustomizePanel(String title)
+    {
+        clickWebpartMenuItem(title, false, "Customize");
+        waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void enableEditMode()
     {
         waitAndClick(Locator.css("a>img[title=Edit]"));
-        waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.css("span[class~=edit-views-link]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public static void clickCustomizeView(String viewName, BaseSeleniumWebTest test)
@@ -263,7 +282,7 @@ public class DataViewsTest extends StudyRedesignTest
         assertTextNotPresent("Data Cut Date:");
         mouseOut(Locator.linkWithText(EDITED_DATASET)); // Dismiss hover box
         waitForTextToDisappear("Type:");
-        openCustomizePanel();
+        openCustomizePanel(RENAMED_WEBPART_TITLE);
         _extHelper.checkCheckbox("Modified");
         _extHelper.checkCheckbox("Data Cut Date");
         Locator manageButton = getButtonLocator("Manage Categories");
@@ -271,8 +290,8 @@ public class DataViewsTest extends StudyRedesignTest
         waitForElementToDisappear(manageButton, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         waitForText("Data Cut Date");
         waitForText("Modified");
-        openCustomizePanel();
-        editDatasetProperties(EDITED_DATASET);
+        openCustomizePanel(RENAMED_WEBPART_TITLE);
+        openEditPanel(EDITED_DATASET);
         _extHelper.waitForExtDialog(EDITED_DATASET);
         setFormElement("refreshDate", refreshDate);
         _extHelper.clickExtButton(EDITED_DATASET, "Save", 0);
@@ -300,7 +319,7 @@ public class DataViewsTest extends StudyRedesignTest
     public void subcategoryTest()
     {
         clickAndWait(Locator.linkContainingText("Data & Reports"));
-        openCustomizePanel();
+        openCustomizePanel(ORIGINAL_WEBPART_TITLE);
         clickButton("Manage Categories", 0);
         _extHelper.waitForExtDialog("Manage Categories");
 
@@ -329,24 +348,24 @@ public class DataViewsTest extends StudyRedesignTest
 
         _extHelper.clickExtButton("Manage Categories", "Done", 0);
         _extHelper.waitForExtDialogToDisappear("Manage Categories");
-        editDatasetProperties("DEM-1: Demographics");
+        openEditPanel("DEM-1: Demographics");
         click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").withClass("x4-form-arrow-trigger"));
         Assert.assertEquals("Available categories are not as expected", CATEGORY_LIST, getText(Locator.css(".x4-boundlist")));
         saveDatasetProperties("DEM-1: Demographics");
 
-        editDatasetProperties(datasets[0][0]);
+        openEditPanel(datasets[0][0]);
         _ext4Helper.selectComboBoxItem("Category", "Subcategory1-" + CATEGORIES[1]);
         saveDatasetProperties(datasets[0][0]);
 
-        editDatasetProperties(datasets[1][0]);
+        openEditPanel(datasets[1][0]);
         _ext4Helper.selectComboBoxItem("Category", "Subcategory2-" + CATEGORIES[1]);
         saveDatasetProperties(datasets[1][0]);
 
-        editDatasetProperties(datasets[2][0]);
+        openEditPanel(datasets[2][0]);
         _ext4Helper.selectComboBoxItem("Category", "Subcategory1-" + CATEGORIES[2]);
         saveDatasetProperties(datasets[2][0]);
 
-        editDatasetProperties(datasets[3][0]);
+        openEditPanel(datasets[3][0]);
         _ext4Helper.selectComboBoxItem("Category", "Subcategory2-" + CATEGORIES[2]);
         saveDatasetProperties(datasets[3][0]);
 
@@ -410,11 +429,10 @@ public class DataViewsTest extends StudyRedesignTest
         throw new IllegalStateException("Not yet implemented");
     }
 
-    private void editDatasetProperties(String dataset)
+    private void openEditPanel(String itemName)
     {
-        waitAndClick(Locators.editViewsLink(dataset));
-        _extHelper.waitForExtDialog(dataset);
-        waitForElement(Ext4HelperWD.Locators.window(dataset).append(Locator.xpath("//table").withClass("category-loaded-marker").notHidden()));
+        waitAndClick(Locators.editViewsLink(itemName));
+        _extHelper.waitForExtDialog(itemName);
     }
 
     public void saveDatasetProperties(String dataset)
