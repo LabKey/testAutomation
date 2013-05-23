@@ -88,6 +88,8 @@ modules/scriptpad/resources/reports/schemas/script3.r -text
 modules/scriptpad/resources/schemas/dbscripts/postgresql/scriptpad-0.00-0.01.sql -text
 modules/scriptpad/resources/schemas/dbscripts/sqlserver/scriptpad-0.00-0.01.sql -text
 modules/scriptpad/resources/schemas/scriptpad.xml -text
+modules/scriptpad/resources/views/scriptpad.html -text
+modules/scriptpad/resources/views/scriptpad.webpart.xml -text
 modules/scriptpad/resources/web/input_data.tsv -text
 modules/scriptpad/scriptpad.iml -text
 modules/scriptpad/src/org/labkey/scriptpad/scriptpadContainerListener.java -text
