@@ -130,6 +130,8 @@ public class StudyProtectedExportTest extends StudyExportTest
     @Override
     protected void doVerifySteps()
     {
+        verifyImportingAlternateIds();
+
         deleteStudy(getStudyLabel());
         importAlteredStudy();
         goToDatasetWithProtectedColum();
@@ -292,5 +294,61 @@ public class StudyProtectedExportTest extends StudyExportTest
         }
 
         return stats;
+    }
+
+    private static final String BAD_ALTERNATEID_MAPPING =
+            "ParticipantId\tAlternateId\tDateOffset\n" +
+                    "999320582\tNEWALT_32\t0\n" +
+                    "999320638\tNEWALT_32\t1";
+
+    private static final String ALTERNATEID_MAPPING =
+            "ParticipantId\tAlternateId\tDateOffset\n" +
+                    "999320582\tNEWALT_32\t0\n" +
+                    "999320638\tNEWALT_33\t1";
+
+    private static final String BAD_ALTERNATEID_MAPPING_2 =
+            "ParticipantId\tAlternateId\tDateOffset\n" +
+                    "999320533\tNEWALT_32\t0\n" +
+                    "999320638\tNEWALT_33\t1";
+
+    private static final String BAD_ALTERNATEID_MAPPING_3 =
+            "ParticipantId\tAlternateId\tDateOffset\n" +
+                    "999320582\tNEWALT_12\n" +
+                    "999320638\tNEWALT_13\t1";
+
+    private static final String BAD_ALTERNATEID_MAPPING_4 =
+                    "999320582\tNEWALT_12\t0\n" +
+                    "999320638\tNEWALT_13\t1";
+
+    @LogMethod
+    private void verifyImportingAlternateIds()
+    {
+        goToManageStudy();
+        clickAndWait(Locator.linkContainingText("Manage Alternate"));
+        clickButton("Import Alternate Id Mapping");
+        waitForElement(Locator.xpath("//textarea[@id='tsv3']"));
+        setFormElement(Locator.xpath("//textarea[@id='tsv3']"), BAD_ALTERNATEID_MAPPING);
+        clickButton("Submit", "Two participants may not share the same Alternate ID.");
+
+        setFormElement(Locator.xpath("//textarea[@id='tsv3']"), ALTERNATEID_MAPPING);
+        clickButton("Submit");
+
+        // Test that ids actually got changed
+        clickButton("Import Alternate Id Mapping");
+        waitForElement(Locator.xpath("//textarea[@id='tsv3']"));
+        setFormElement(Locator.xpath("//textarea[@id='tsv3']"), BAD_ALTERNATEID_MAPPING_2);
+        clickButton("Submit", "Two participants may not share the same Alternate ID.");
+
+        // Test input lacking all columns
+        setFormElement(Locator.xpath("//textarea[@id='tsv3']"), BAD_ALTERNATEID_MAPPING_3);
+        clickButton("Submit", "Malformed input data.");
+
+        // Test input without header row
+        setFormElement(Locator.xpath("//textarea[@id='tsv3']"), BAD_ALTERNATEID_MAPPING_4);
+        clickButton("Submit", "Malformed input data.");
+
+        clickButton("Cancel");
+        assertTextPresent("Import Alternate Id Mapping");
+        clickButton("Done");
     }
 }
