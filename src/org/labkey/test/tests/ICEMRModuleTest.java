@@ -94,9 +94,8 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     private void checkVisualization()
     {
         goBack();
-        Locator.XPathLocator visButton = Locator.tagWithText("span", "Visualization");
-        waitForElement(visButton);
-        click(visButton);
+        Locator.XPathLocator visButton = Locator.navButtonContainingText("Visualization");
+        waitAndClick(visButton);
         waitForText("ICEMR Visualization");
         Locator.CssLocator datapoint = Locator.css("svg a");
         waitForElement(datapoint);
