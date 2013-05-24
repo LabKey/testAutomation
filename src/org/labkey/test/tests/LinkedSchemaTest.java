@@ -483,7 +483,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
 
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable table = new DataRegionTable("query", this);
-        log("** Check tempalte filter is applied");
+        log("** Check template filter is applied");
         Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
         Assert.assertEquals("Expected to filter table to only Adam", "Adam", table.getDataAsText(0, A_PEOPLE_METADATA_TITLE));
 
