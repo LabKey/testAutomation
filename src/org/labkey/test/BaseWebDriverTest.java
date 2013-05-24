@@ -54,6 +54,7 @@ import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
@@ -3738,12 +3739,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void waitForTextToDisappear(final String text, int wait)
     {
         String failMessage = "Text: " + text + " was still present after [" + wait + "ms]";
-//        if(getBrowser().equals("*iexploreproxy"))
-//        {
-//            // IE can't detect some ext elements disappearing
-//            sleep(10000);
-//            return;
-//        }
         waitFor(new Checker()
         {
             public boolean check()
@@ -4183,6 +4178,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickAndWait(Locator.linkWithImage(image, index), wait ? defaultWaitForPage : 0);
     }
 
+    public void scrollIntoView(Locator loc)
+    {
+        scrollIntoView(loc.findElement(getDriver()));
+    }
+
+    public void scrollIntoView(WebElement el)
+    {
+        executeScript("arguments[0].scrollIntoView(true);", el);
+    }
+
     public void click(Locator l)
     {
         clickAndWait(l, 0);
@@ -4243,7 +4248,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (pageTimeoutMs > 0)
             prepForPageLoad();
 
-        el.click();
+        try
+        {
+            el.click();
+        }
+        catch (ElementNotVisibleException tryAgain)
+        {
+            scrollIntoView(el); // TODO: WebDriver 2.33 sometimes fails to do this automatically in Firefox
+            el.click();
+        }
 
         if (pageTimeoutMs > 0)
             newWaitForPageToLoad(pageTimeoutMs);
