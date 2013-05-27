@@ -15,9 +15,11 @@
  */
 package org.labkey.test.util;
 
+import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +31,7 @@ import java.util.List;
  */
 public class SearchHelper extends AbstractHelper
 {
-    private static LinkedList<SearchItem> _searchQueue = new LinkedList<SearchItem>();
+    private static LinkedList<SearchItem> _searchQueue = new LinkedList<>();
 
     public SearchHelper(BaseSeleniumWebTest test)
     {
@@ -42,9 +44,27 @@ public class SearchHelper extends AbstractHelper
         deleteIndex();
     }
         
+    private void waitForIndexer()
+    {
+        try
+        {
+            _test.log("Waiting for indexer");
+            // Invoke a special server action that waits until all previous indexer tasks are complete
+            int response = WebTestHelper.getHttpGetResponse(_test.getBaseURL() + "/search/waitForIndexer.view");
+            org.testng.Assert.assertEquals(HttpStatus.SC_OK, response, "WaitForIndexer action timed out");
+        }
+        catch (Exception e)
+        {
+            org.testng.Assert.fail("WaitForIndexer action failed", e);
+        }
+    }
+
     public void verifySearchResults(String container, boolean crawlResults)
     {
         _test.log("Verify search results.");
+
+        // Note: adding this "waitForIndexer()" call should eliminate the need for sleep() and retrie below.  TODO: Remove
+        waitForIndexer();
 
         List<SearchItem> notFound = verifySearchItems(_searchQueue, container, crawlResults);
 
@@ -63,14 +83,15 @@ public class SearchHelper extends AbstractHelper
         }
     }
 
+    // Does not wait for indexer... caller should do so
     private List<SearchItem> verifySearchItems(List<SearchItem> items, String container, boolean crawlResults)
     {
         _test.log("Verifying " + items.size() + " items");
-        LinkedList<SearchItem> notFound = new LinkedList<SearchItem>();
+        LinkedList<SearchItem> notFound = new LinkedList<>();
 
         for ( SearchItem item : items)
         {
-            searchFor(item._searchTerm);
+            searchFor(item._searchTerm, false);  // We already waited for the indexer in calling method
 
             if(item._searchResults.length == 0)
             {
@@ -123,10 +144,12 @@ public class SearchHelper extends AbstractHelper
 
     public void verifyNoSearchResults()
     {
+        waitForIndexer();
+
         _test.log("Verify null search results.");
         for( SearchItem item : _searchQueue )
         {
-            searchFor(item._searchTerm);
+            searchFor(item._searchTerm, false);
             for ( Locator loc : item._searchResults )
             {
                 _test.assertElementNotPresent(loc);
@@ -144,8 +167,18 @@ public class SearchHelper extends AbstractHelper
         _searchQueue.add(new SearchItem(searchTerm, file, expectedResults));
     }
 
+    // This method always waits for the indexer queue to empty before issuing search query
     public void searchFor(String searchTerm)
     {
+        searchFor(searchTerm, true);
+    }
+
+    // This method waits for the indexer queue to empty iff waitForIndex == true
+    public void searchFor(String searchTerm, boolean waitForIndexer)
+    {
+        if (waitForIndexer)
+            waitForIndexer();
+
         _test.log("Searching for: '" + searchTerm + "'.");
         if ( _test.isElementPresent(Locator.id("query")) )
         {

@@ -15,13 +15,10 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.http.HttpStatus;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.WikiHelper;
-import org.testng.Assert;
 
 import java.io.File;
 import java.util.HashMap;
@@ -122,11 +119,9 @@ public class SearchTest extends StudyTest
 
     protected void doVerifySteps()
     {
-        waitForIndexer();
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
         renameFolder(getProjectName(), getFolderName(), FOLDER_C, true);
         FOLDER_NAME = FOLDER_C;
-        waitForIndexer();
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
         moveFolder(getProjectName(), getFolderName(), FOLDER_B, true);
         alterListsAndReSearch();
@@ -155,28 +150,13 @@ public class SearchTest extends StudyTest
         /* No API tests */
     }
     
-    private void waitForIndexer()
-    {
-        try
-        {
-            log("Waiting for indexer");
-            // Invoke a special server action that waits until all previous indexer tasks are complete
-            int response = WebTestHelper.getHttpGetResponse(getBaseURL() + "/search/waitForIndexer.view");
-            Assert.assertEquals(HttpStatus.SC_OK, response, "WaitForIndexer action timed out");
-        }
-        catch (Exception e)
-        {
-            Assert.fail("WaitForIndexer action failed", e);
-        }
-    }
-
     private void verifySyntaxErrorMessages()
     {
-        _searchHelper.searchFor("age()");
+        _searchHelper.searchFor("age()", false);
         checkSyntaxErrorMessage("Error: Can't parse 'age()': Problem character is highlighted", "These characters have special meaning within search queries:", "You can escape special characters using \\ before the character or you can enclose the query string in double quotes.", "For more information, visit the search syntax documentation.");
-        _searchHelper.searchFor("incomplete(");
+        _searchHelper.searchFor("incomplete(", false);
         checkSyntaxErrorMessage("Error: Can't parse 'incomplete(': Query string is incomplete", "These characters have special meaning within search queries:");
-        _searchHelper.searchFor("this AND OR");
+        _searchHelper.searchFor("this AND OR", false);
         checkSyntaxErrorMessage("Error: Can't parse 'this AND OR': Problem character is highlighted", "Boolean operators AND, OR, and NOT have special meaning within search queries");
     }
 
@@ -201,7 +181,6 @@ public class SearchTest extends StudyTest
         super.doCleanup(afterTest);
         if (afterTest)
         {
-            waitForIndexer();
             _searchHelper.verifyNoSearchResults();
         }
     }
