@@ -22,6 +22,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.StringHelper;
+import org.openqa.selenium.StaleElementReferenceException;
 
 /**
  * User: elvan
@@ -324,7 +325,15 @@ public class GroupTest extends BaseWebDriverTest
 
         //second page of the wizard
         waitAndClick(Locator.xpath("//td[./label[text()='Copy From Existing Project']]/input"));
-        _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());
+        try
+        {
+            _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());
+        }
+        catch (StaleElementReferenceException retry)
+        {
+            click(Locator.xpath("//*").withClass("x4-boundlist-item").withText(getProjectName()));
+        }
+
         waitAndClickButton("Next");
 
         //third page of wizard
