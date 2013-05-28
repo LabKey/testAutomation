@@ -252,6 +252,7 @@ public class TimeChartAPITest extends TimeChartTest
         waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
 
         // loop through the getData calls to check grid for: # rows, column headers, and data values (for a single ptid)
+        waitForElement(Locator.name("configCount"));
         int testCount = Integer.parseInt(getFormElement(Locator.name("configCount")));
         int testIndex = 0;
         while(testIndex < testCount)
