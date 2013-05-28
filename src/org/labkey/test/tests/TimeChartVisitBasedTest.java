@@ -105,7 +105,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and not(contains(@class, 'x4-item-disabled'))]"));
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Calculate time interval(s) relative to:'] and not(contains(@class, 'x4-item-disabled'))]"));
         applyChanges();
-        waitForText("Days Since Contact Date");
+        waitForTextToDisappear(VISIT_STRINGS[0]);
         assertTextNotPresent(VISIT_STRINGS);
 
         openSaveMenu();
