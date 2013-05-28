@@ -686,10 +686,10 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Wizard Page 9 : Reports
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports']"));
-        waitForElement(Locator.css(".studyWizardViewList"));
+        waitForElement(Locator.css(".studyWizardReportList"));
         for (String report : reports)
         {
-            waitForElement(Locator.css(".studyWizardViewList .x-grid3-col-1")); // Make sure grid is filled in
+            waitForElement(Locator.css(".studyWizardReportList .x-grid3-col-1")); // Make sure grid is filled in
             getWrapper().getEval("selenium.selectExtGridItem('name', '" + report + "', -1, 'studyWizardReportList', true)");
         }
         clickButton("Next", 0);
