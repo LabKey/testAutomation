@@ -341,6 +341,21 @@ selenium.resumeJsErrorChecker = function() {
     consoleListener.paused = false;
 };
 
+selenium.setCodeMirrorValue = function(id, value) {
+    try {
+        var win = selenium.browserbot.getCurrentWindow();
+        if (win.LABKEY.CodeMirror && win.LABKEY.CodeMirror[id]) {
+            var eal = win.LABKEY.CodeMirror[id];
+            eal.setValue(value);
+        }
+        else {
+            throw new SeleniumError("Unable to find editCodeMirror.");
+        }
+    } catch (e) {
+        throw new SeleniumError("setCodeMirrorValue() threw an exception: " + e.message);
+    }
+};
+
 selenium.setEditAreaValue = function(id, value) {
     try {
         var win = selenium.browserbot.getCurrentWindow();

@@ -185,23 +185,23 @@ public class ExtHelperWD extends AbstractHelperWD
         _test.executeScript(script, path, markerCls, keepExisting);
     }
 
-    public void setQueryEditorValue(String id, String value)
+    public void setCodeMirrorValue(String id, String value)
     {
         String script =
-                "setEditAreaValue = function(id, value) {\n" +
+                "setCodeMirrorValue = function(id, value) {\n" +
                 "    try {\n" +
-                "        if (window.editAreaLoader) {\n" +
-                "            var eal = window.editAreaLoader;\n" +
-                "            eal.setValue(id, value);\n" +
+                "        if (LABKEY.CodeMirror && LABKEY.CodeMirror[id]) {\n" +
+                "            var eal = LABKEY.CodeMirror[id];\n" +
+                "            eal.setValue(value);\n" +
                 "        }\n" +
                 "        else {\n" +
-                "            throw 'Unable to find editAreaLoader.';\n" +
+                "            throw 'Unable to find code mirror instance.';\n" +
                 "        }\n" +
                 "    } catch (e) {\n" +
-                "        throw 'setEditAreaValue() threw an exception: ' + e.message;\n" +
+                "        throw 'setCodeMirrorValue() threw an exception: ' + e.message;\n" +
                 "    }\n" +
                 "};\n" +
-                "setEditAreaValue(arguments[0], arguments[1]);";
+                "setCodeMirrorValue(arguments[0], arguments[1]);";
         _test.executeScript(script, id, value);
     }
 

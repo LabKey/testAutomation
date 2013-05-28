@@ -6968,9 +6968,20 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void setQueryEditorValue(String id, String value)
     {
+        _extHelper.setQueryEditorValue(id, value);
+    }
+
+    /**
+     * Temporary until, the report editor can be migrated to codemirror
+     * @param id
+     * @param value
+     */
+    public void setReportEditorValue(String id, String value)
+    {
         Locator toggleCheckBoxId = Locator.id("edit_area_toggle_checkbox_" + id);
         waitForElement(toggleCheckBoxId, WAIT_FOR_JAVASCRIPT);
-        _extHelper.setQueryEditorValue(id, value);
+
+        _extHelper.setReportEditorValue(id, value);
     }
 
     /**

@@ -339,7 +339,7 @@ public class ReportTest extends StudyBaseTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         clickMenuButton("Views", "Create", "R View");
-        setQueryEditorValue("script", "");
+        setReportEditorValue("script", "");
 
         log("Execute bad scripts");
         clickViewTab();
@@ -384,7 +384,7 @@ public class ReportTest extends StudyBaseTest
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
         clickMenuButton("Views", "Create", "R View");
-        setQueryEditorValue("script", "labkey.data");
+        setReportEditorValue("script", "labkey.data");
         clickViewTab();
         waitForText(R_SORT1);
         assertTextNotPresent(R_REMCOL);
@@ -531,7 +531,7 @@ public class ReportTest extends StudyBaseTest
     {
 
         clickMenuButton("Views", "Create", "R View");
-        setQueryEditorValue("script", scriptValue);
+        setReportEditorValue("script", scriptValue);
 
         // if there are any shared scripts, check the check box so they get included when the report is rendered
         if (sharedScripts != null && sharedScripts.length > 0)

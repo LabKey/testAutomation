@@ -7277,16 +7277,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.fail("Running pipeline jobs were found.  Timeout:" + wait);
     }
 
-    protected void toggleMetadataQueryEditor()
-    {
-        toggleEditAreaOff("metadataText");
-    }
-
-    public void toggleScriptReportEditor()
-    {
-        toggleEditAreaOff("script");
-    }
-
     public void toggleEditAreaOff(final String underlyingTextAreaId)
     {
         Locator toggleCheckBoxId = Locator.id("edit_area_toggle_checkbox_" + underlyingTextAreaId);
@@ -7305,9 +7295,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void setQueryEditorValue(String id, String value)
     {
-        Locator toggleCheckBoxId = Locator.id("edit_area_toggle_checkbox_" + id);
-        waitForElement(toggleCheckBoxId, WAIT_FOR_JAVASCRIPT);
-        _extHelper.setQueryEditorValue(id, value);
+        _extHelper.setCodeMirrorValue(id, value);
     }
 
     /**
