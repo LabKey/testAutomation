@@ -63,7 +63,7 @@ public class Ext4HelperWD extends AbstractHelperWD
                 listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
 
             // wait for and select the list item
-            _test._shortWait.until(ExpectedConditions.elementToBeClickable(listItem.toBy())).click();
+            _test.waitAndClick(listItem);
 
             // close combo manually if it is a checkbox combo-box
             if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))
