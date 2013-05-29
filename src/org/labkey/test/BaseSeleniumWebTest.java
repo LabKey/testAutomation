@@ -3245,7 +3245,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
     public void waitForText(final String text, int wait)
     {
-        String failMessage = text + " did not appear";
+        String failMessage = "'" + text + "' did not appear";
         waitFor(new Checker()
         {
             public boolean check()
