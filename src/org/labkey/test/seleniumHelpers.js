@@ -349,10 +349,25 @@ selenium.setCodeMirrorValue = function(id, value) {
             eal.setValue(value);
         }
         else {
-            throw new SeleniumError("Unable to find editCodeMirror.");
+            throw new SeleniumError("Unable to find CodeMirror.");
         }
     } catch (e) {
         throw new SeleniumError("setCodeMirrorValue() threw an exception: " + e.message);
+    }
+};
+
+selenium.getCodeMirrorValue = function(id) {
+    try {
+        var win = selenium.browserbot.getCurrentWindow();
+        if (win.LABKEY.CodeMirror && win.LABKEY.CodeMirror[id]) {
+            var eal = win.LABKEY.CodeMirror[id];
+            return eal.getValue();
+        }
+        else {
+            throw new SeleniumError("Unable to find CodeMirror.");
+        }
+    } catch (e) {
+        throw new SeleniumError("getCodeMirrorValue() threw an exception: " + e.message);
     }
 };
 

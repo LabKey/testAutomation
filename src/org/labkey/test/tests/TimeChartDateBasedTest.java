@@ -338,9 +338,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _ext4Helper.clickTabContainingText("Help");
         assertTextPresentInThisOrder("Your code should define a single function", "data:", "columnMap:", "measureInfo:", "clickEvent:");
         _ext4Helper.clickTabContainingText("Source");
-        click(Locator.xpath("//input/../label[contains(text(), 'Toggle editor')]"));
-        waitForElement(Locator.name("point-click-fn-textarea"));
-        Assert.assertTrue("Default point click function not inserted in to editor", getFormElement(Locator.name("point-click-fn-textarea")).startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
+        String fn = _extHelper.getCodeMirrorValue("point-click-fn-textarea");
+        if (fn != null)
+            Assert.assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
         // apply the default point click function
         applyChanges();
         click(Locator.css("svg a circle"));
@@ -348,10 +348,10 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitAndClick(Locator.button("OK"));
         // open developer panel and test JS function validation
         goToDeveloperTab();
-        setFormElement(Locator.name("point-click-fn-textarea"), "");
+        _extHelper.setCodeMirrorValue("point-click-fn-textarea", "");
         waitAndClick(Locator.button("OK"));
         assertTextPresent("Error: the value provided does not begin with a function declaration.");
-        setFormElement(Locator.name("point-click-fn-textarea"), "function(){");
+        _extHelper.setCodeMirrorValue("point-click-fn-textarea", "function(){");
         waitAndClick(Locator.button("OK"));
         assertTextPresent("Error parsing the function:");
         clickButton("Disable", 0);
@@ -360,7 +360,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickButton("Enable", 0);
         // test use-case to navigate to participang page on click
         String function = getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js");
-        setFormElement(Locator.name("point-click-fn-textarea"), function);
+        _extHelper.setCodeMirrorValue("point-click-fn-textarea", function);
         applyChanges();
         openSaveMenu();
         saveReport(false);

@@ -205,6 +205,26 @@ public class ExtHelperWD extends AbstractHelperWD
         _test.executeScript(script, id, value);
     }
 
+    public String getCodeMirrorValue(String id)
+    {
+        String script =
+                "var getCodeMirrorValue = function(id) {\n" +
+                "    try {\n" +
+                "        if (LABKEY.CodeMirror && LABKEY.CodeMirror[id]) {\n" +
+                "            var eal = LABKEY.CodeMirror[id];\n" +
+                "            return eal.getValue();\n" +
+                "        }\n" +
+                "        else {\n" +
+                "            throw 'Unable to find code mirror instance.';\n" +
+                "        }\n" +
+                "    } catch (e) {\n" +
+                "        throw 'getCodeMirrorValue() threw an exception: ' + e.message;\n" +
+                "    }\n" +
+                "};\n" +
+                "getCodeMirrorValue(arguments[0]);";
+        return (String)_test.executeScript(script, id);
+    }
+
     /**
      * Returns a DOM Element id from an ext object id. Assumes that the ext component
      * has already been rendered.

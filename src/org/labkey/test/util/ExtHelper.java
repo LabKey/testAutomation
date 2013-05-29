@@ -115,6 +115,12 @@ public class ExtHelper extends AbstractHelper
         _test.getWrapper().getEval(script);
     }
 
+    public String getQueryEditorValue(String id)
+    {
+        String script = "selenium.getCodeMirrorValue(" + jsString(id) + ");";
+        return _test.getWrapper().getEval(script);
+    }
+
     public void setReportEditorValue(String id, String value)
     {
         String script = "selenium.setEditAreaValue(" + jsString(id) + ", " + jsString(value) + ");";

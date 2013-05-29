@@ -1938,9 +1938,8 @@ public class ReportTest extends StudyBaseTest
         assertTextPresentInThisOrder("Your code should define a single function", "data:", "measureInfo:", "clickEvent:");
         assertTextPresentInThisOrder("YAxisMeasure:", "XAxisMeasure:", "ColorMeasure:", "PointMeasure:");
         _ext4Helper.clickTabContainingText("Source");
-        click(Locator.xpath("//input/../label[contains(text(), 'Toggle editor')]"));
-        sleep(1000); // wait for editor to toggle
-        Assert.assertTrue("Default point click function not inserted in to editor", getFormElement("point-click-fn-textarea").startsWith("function (data, measureInfo, clickEvent) {"));
+        String fn = _extHelper.getQueryEditorValue("point-click-fn-textarea");
+        Assert.assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, measureInfo, clickEvent) {"));
         // apply the default point click function
         clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
         Locator svgCircleLoc = Locator.css("svg a circle");
@@ -1950,10 +1949,10 @@ public class ReportTest extends StudyBaseTest
         clickButton("OK", 0);
         // open developer panel and test JS function validation
         clickOptionButtonAndWaitForDialog("Developer", "Developer Options");
-        setFormElement("point-click-fn-textarea", "");
+        _extHelper.setQueryEditorValue("point-click-fn-textarea", "");
         _extHelper.clickExtButton("Developer Options", "OK", 0);
         assertTextPresent("Error: the value provided does not begin with a function declaration.");
-        setFormElement("point-click-fn-textarea", "function(){");
+        _extHelper.setQueryEditorValue("point-click-fn-textarea", "function(){");
         _extHelper.clickExtButton("Developer Options", "OK", 0);
         assertTextPresent("Error parsing the function:");
         clickButton("Disable", 0);
@@ -1963,7 +1962,7 @@ public class ReportTest extends StudyBaseTest
         // test use-case to navigate to query page on click
         clickButton("Enable", 0);
         String function = getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
-        setFormElement("point-click-fn-textarea", function);
+        _extHelper.setQueryEditorValue("point-click-fn-textarea", function);
         clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
         saveScatterPlot(SCATTER_PLOT_NAME_MV + " PointClickFn", SCATTER_PLOT_DESC_MV + " PointClickFn");
         clickAndWait(Locator.css("svg a circle"));
