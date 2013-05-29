@@ -313,7 +313,7 @@ public class StudyProtectedExportTest extends StudyExportTest
 
     private static final String BAD_ALTERNATEID_MAPPING_3 =
             "ParticipantId\tAlternateId\tDateOffset\n" +
-                    "999320582\tNEWALT_12\n" +
+                    "999320582\n" +
                     "999320638\tNEWALT_13\t1";
 
     private static final String BAD_ALTERNATEID_MAPPING_4 =
@@ -325,8 +325,9 @@ public class StudyProtectedExportTest extends StudyExportTest
     {
         goToManageStudy();
         clickAndWait(Locator.linkContainingText("Manage Alternate"));
-        clickButton("Import Alternate Id Mapping");
+        clickButton("Import");
         waitForElement(Locator.xpath("//textarea[@id='tsv3']"));
+        assertTextPresent("Export Participant Transforms");
         setFormElement(Locator.xpath("//textarea[@id='tsv3']"), BAD_ALTERNATEID_MAPPING);
         clickButton("Submit", "Two participants may not share the same Alternate ID.");
 
@@ -334,21 +335,21 @@ public class StudyProtectedExportTest extends StudyExportTest
         clickButton("Submit");
 
         // Test that ids actually got changed
-        clickButton("Import Alternate Id Mapping");
+        clickButton("Import");
         waitForElement(Locator.xpath("//textarea[@id='tsv3']"));
         setFormElement(Locator.xpath("//textarea[@id='tsv3']"), BAD_ALTERNATEID_MAPPING_2);
         clickButton("Submit", "Two participants may not share the same Alternate ID.");
 
         // Test input lacking all columns
         setFormElement(Locator.xpath("//textarea[@id='tsv3']"), BAD_ALTERNATEID_MAPPING_3);
-        clickButton("Submit", "Malformed input data.");
+        clickButton("Submit", "Either AlternateId or DateOffset must be specified.");
 
         // Test input without header row
         setFormElement(Locator.xpath("//textarea[@id='tsv3']"), BAD_ALTERNATEID_MAPPING_4);
-        clickButton("Submit", "Malformed input data.");
+        clickButton("Submit", "There must be a header row, which must contain ParticipantId, and may optionally contain AlternateId and DateOffset.");
 
         clickButton("Cancel");
-        assertTextPresent("Import Alternate Id Mapping");
+        assertTextPresent("Manage Alternate", "Aliases");
         clickButton("Done");
     }
 }
