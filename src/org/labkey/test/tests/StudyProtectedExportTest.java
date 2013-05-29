@@ -320,6 +320,11 @@ public class StudyProtectedExportTest extends StudyExportTest
                     "999320582\tNEWALT_12\t0\n" +
                     "999320638\tNEWALT_13\t1";
 
+    private static final String ALTERNATEID_MAPPING_2 =
+            "AlternateId\tParticipantId\tDateOffset\n" +
+                    "NEWALT_32AB9\t999320582\t0\n" +
+                    "NEWALT_333Q\t999320638\t1";
+
     @LogMethod
     private void verifyImportingAlternateIds()
     {
@@ -348,7 +353,10 @@ public class StudyProtectedExportTest extends StudyExportTest
         setFormElement(Locator.xpath("//textarea[@id='tsv3']"), BAD_ALTERNATEID_MAPPING_4);
         clickButton("Submit", "There must be a header row, which must contain ParticipantId, and may optionally contain AlternateId and DateOffset.");
 
-        clickButton("Cancel");
+        // Good input with different column order
+        setFormElement(Locator.xpath("//textarea[@id='tsv3']"), ALTERNATEID_MAPPING_2);
+        clickButton("Submit");
+
         assertTextPresent("Manage Alternate", "Aliases");
         clickButton("Done");
     }
