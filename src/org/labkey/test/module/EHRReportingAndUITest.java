@@ -292,8 +292,8 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", 5, getDataRegionRowCount(dataRegionName));
-        assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
-        assertTextNotPresent(PROTOCOL_MEMBER_IDS[2]);
+        waitForElementToDisappear(Locator.linkWithText(PROTOCOL_MEMBER_IDS[1]));
+        assertElementNotPresent(Locator.linkWithText(PROTOCOL_MEMBER_IDS[2]));
 
         waitAndClick(Locator.ext4Button("Clear"));
         refreshAnimalHistoryReport();
