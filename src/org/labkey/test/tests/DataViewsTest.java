@@ -22,6 +22,7 @@ import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.RReportHelper;
 
 /**
  * User: klum
@@ -45,6 +46,9 @@ public class DataViewsTest extends StudyRedesignTest
     @Override @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doCreateSteps()
     {
+        RReportHelper reportHelper = new RReportHelper(this);
+        reportHelper.ensureRConfig();
+
         importStudy();
         startSpecimenImport(2);
 
