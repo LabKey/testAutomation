@@ -19,7 +19,6 @@ package org.labkey.test.util;
 import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.NoSuchElementException;
@@ -664,39 +663,58 @@ public class ListHelperWD extends ListHelper
         if (lookup != null)
         {
             _test.waitForElement(Locator.xpath("//input[@name='lookupContainer'][not(@disabled)]"));
-            _test.sleep(1000); // BS GWT workaround
 
             if (lookup.getFolder() != null)
             {
-                _test.click(Locator.css("input[name=lookupContainer] + div.x-form-trigger"));
-                try
-                {
-                    _test.waitAndClick(500, Locator.tag("div").withClass("x-combo-list-item").withText(lookup.getFolder()), 0);
-                }
-                catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
-                {
-                    _test.fireEvent(Locator.css("input[name=lookupContainer]"), BaseWebDriverTest.SeleniumEvent.blur);
-                    _test.click(Locator.css("input[name=lookupContainer] + div.x-form-trigger"));
-                    _test.waitAndClick(500, Locator.tag("div").withClass("x-combo-list-item").withText(lookup.getFolder()), 0);
-                }
-                _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getFolder()).append("/input[@name='lookupContainer']"));
+                selectLookupComboItem("lookupContainer", lookup.getFolder());
             }
 
             if (!lookup.getSchema().equals(_test.getFormElement(Locator.css("input[name=schema]"))))
             {
-                _test.click(Locator.css("input[name=schema] + div.x-form-trigger"));
-                _test.waitAndClick(Locator.tag("div").withClass("x-combo-list-item").withText(lookup.getSchema()));
+                selectLookupComboItem("schema", lookup.getSchema());
             }
-            _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getSchema()).append("/input[@name='schema']"));
+            else
+                _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getSchema()).append("/input[@name='schema']"));
 
-            _test.click(Locator.css("input[name=table] + div.x-form-trigger"));
-            _test.waitAndClick(Locator.tag("div").withClass("x-combo-list-item").withPredicate("starts-with(normalize-space(), " + Locator.xq(lookup.getTable() + " (")  + ")"));
-            _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getTable()).append("/input[@name='table']"));
+            selectLookupTableComboItem(lookup.getTable());
         }
 
         _test.clickButton("Apply", 0);
 
         _test._extHelper.waitForExtDialogToDisappear("Choose Field Type");
+    }
+
+    private void selectLookupComboItem(String fieldName, String value)
+    {
+        _test.click(Locator.css("input[name="+fieldName+"] + div.x-form-trigger"));
+        try
+        {
+            _test.waitAndClick(500, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
+        }
+        catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
+        {
+            _test.fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
+            _test.click(Locator.css("input[name=" + fieldName + "] + div.x-form-trigger"));
+            _test.waitAndClick(1000, Locator.tag("div").withClass("x-combo-list-item").withText(value), 0);
+        }
+        _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + value).append("/input[@name='" + fieldName + "']"));
+    }
+
+    private void selectLookupTableComboItem(String table)
+    {
+        String fieldName = "table";
+        _test.click(Locator.css("input[name="+fieldName+"] + div.x-form-trigger"));
+        try
+        {
+            _test.waitAndClick(Locator.tag("div").withClass("x-combo-list-item").withPredicate("starts-with(normalize-space(), " + Locator.xq(table + " (")  + ")"));
+        }
+        catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
+        {
+            _test.fireEvent(Locator.css("input[name=" + fieldName + "]"), BaseWebDriverTest.SeleniumEvent.blur);
+            _test.click(Locator.css("input[name=" + fieldName + "] + div.x-form-trigger"));
+            _test.waitAndClick(Locator.tag("div").withClass("x-combo-list-item").withPredicate("starts-with(normalize-space(), " + Locator.xq(table + " (")  + ")"));
+        }
+        _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + table).append("/input[@name='" + fieldName + "']"));
     }
 
     public void selectPropertyTab(String name)
