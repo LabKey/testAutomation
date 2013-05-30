@@ -53,7 +53,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -460,7 +459,7 @@ public class Runner extends TestSuite
             }
             else isServerSideTest = true;
 
-            if (isServerSideTest && !"DRT".equals(System.getProperty("suite")))
+            if (isServerSideTest && !"DRT".equals(System.getProperty("suite")) && !"CONTINUE".equals(System.getProperty("suite")))
             {
                 // Clear errors and enable dumbster before JUnitTest runs.
                 suite.addTest(new JUnit4TestAdapter(JUnitHeader.class));
@@ -468,7 +467,7 @@ public class Runner extends TestSuite
             if(!illegalTest)
                 suite.addTest(test);
 
-            if (isServerSideTest && !"DRT".equals(System.getProperty("suite")))
+            if (isServerSideTest && !"DRT".equals(System.getProperty("suite")) && !"CONTINUE".equals(System.getProperty("suite")))
             {
                 // Check for leaks and errors after JUnitTest runs
                 suite.addTest(new JUnit4TestAdapter(JUnitFooter.class));
