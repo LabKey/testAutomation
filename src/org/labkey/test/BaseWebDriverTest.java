@@ -715,14 +715,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void refresh(int millis)
     {
+        prepForPageLoad();
         _driver.navigate().refresh();
-        waitForExtOnReady();
+        newWaitForPageToLoad(millis);
     }
 
     public void goBack(int millis)
     {
+        prepForPageLoad();
         _driver.navigate().back();
-        waitForExtOnReady();
+        newWaitForPageToLoad(millis);
     }
 
     public void goBack()

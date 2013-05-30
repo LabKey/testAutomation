@@ -16,15 +16,13 @@
 
 package org.labkey.test.util;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import java.io.File;
 import java.util.Map;
@@ -665,19 +663,22 @@ public class ListHelperWD extends ListHelper
         _test.checkRadioButton(Locator.xpath("//label[text()='" + (lookup != null ? "Lookup" : colType) + "']/../input[@name = 'rangeURI']"));
         if (lookup != null)
         {
-            _test._shortWait.until(new ExpectedCondition<Boolean>()
-            {
-                @Override
-                public Boolean apply(WebDriver driver)
-                {
-                    return driver.findElement(By.name("lookupContainer")).isEnabled();
-                }
-            });
+            _test.waitForElement(Locator.xpath("//input[@name='lookupContainer'][not(@disabled)]"));
+            _test.sleep(1000); // BS GWT workaround
 
             if (lookup.getFolder() != null)
             {
                 _test.click(Locator.css("input[name=lookupContainer] + div.x-form-trigger"));
-                _test.waitAndClick(Locator.tag("div").withClass("x-combo-list-item").withText(lookup.getFolder()));
+                try
+                {
+                    _test.waitAndClick(500, Locator.tag("div").withClass("x-combo-list-item").withText(lookup.getFolder()), 0);
+                }
+                catch (NoSuchElementException retry) // Workaround: sometimes fails on slower machines
+                {
+                    _test.fireEvent(Locator.css("input[name=lookupContainer]"), BaseWebDriverTest.SeleniumEvent.blur);
+                    _test.click(Locator.css("input[name=lookupContainer] + div.x-form-trigger"));
+                    _test.waitAndClick(500, Locator.tag("div").withClass("x-combo-list-item").withText(lookup.getFolder()), 0);
+                }
                 _test.waitForElement(Locator.xpath("//div").withClass("test-marker-" + lookup.getFolder()).append("/input[@name='lookupContainer']"));
             }
 

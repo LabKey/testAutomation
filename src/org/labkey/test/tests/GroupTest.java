@@ -79,7 +79,8 @@ public class GroupTest extends BaseWebDriverTest
         //double check that user can't see the project yet- otherwise our later check will be invalid
 
         impersonate(TEST_USERS_FOR_GROUP[0]);
-        assertLinkNotPresentWithText(getProjectName());
+        hoverProjectBar();
+        assertElementNotPresent(Locator.linkWithText(getProjectName()));
         stopImpersonating();
         //create users
 
@@ -95,9 +96,10 @@ public class GroupTest extends BaseWebDriverTest
         clickProject(getProjectName());
         enterPermissionsUI();
         waitForText("Author");
-        setSiteGroupPermissions(COMPOUND_GROUP, "Author");
-        setSiteGroupPermissions(COMPOUND_GROUP, "Reader");
-        setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
+
+        _securityHelper.setSiteGroupPermissions(COMPOUND_GROUP, "Author");
+        _securityHelper.setSiteGroupPermissions(COMPOUND_GROUP, "Reader");
+        _securityHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
         clickButton("Save and Finish");
         assertUserCanSeeProject(TEST_USERS_FOR_GROUP[0], getProjectName());
         //can't add built in group to regular group
@@ -107,7 +109,7 @@ public class GroupTest extends BaseWebDriverTest
         clickProject(getProjectName());
         enterPermissionsUI();
         waitForText("Author");
-        setSiteGroupPermissions("All Site Users", "Author");
+        _securityHelper.setSiteGroupPermissions("All Site Users", "Author");
 
         permissionsReportTest();
 
@@ -138,18 +140,9 @@ public class GroupTest extends BaseWebDriverTest
 
         int rowIndex = drt.getRow(userColumn, displayNameFromEmail(TEST_USERS_FOR_GROUP[0]));
 
-        if(getBrowser().startsWith(FIREFOX_BROWSER))
-        //IE displays correctly but selenium retrieves the data differently
-        {
-            //confirm correct perms
-            Assert.assertTrue("Unexpected groups", StringHelper.stringArraysAreEquivalentTrimmed(new String[]{"Author", "Reader", "Editor"},
-                    drt.getDataAsText(rowIndex, accessColumn).replace(" ", "").split(",")));
-        }
-        else
-        {
-//            Assert.assertTrue(StringHelper.stringArraysAreEquivalentTrimmed(("Reader, Author RoleGroup(s) ReaderSite: " + GROUP2 + "AuthorSite: " + GROUP2 + ", Site: Users").split(" "),
-//                    drt.getDataAsText(rowIndex, accessColumn).split(" ")));//TODO: Fix
-        }
+        //confirm correct perms
+        Assert.assertTrue("Unexpected groups", StringHelper.stringArraysAreEquivalentTrimmed(new String[]{"Author", "Reader", "Editor"},
+                drt.getDataAsText(rowIndex, accessColumn).replace(" ", "").split(",")));
 
 
         //exapnd plus  to check specific groups
@@ -188,7 +181,7 @@ public class GroupTest extends BaseWebDriverTest
     private void verifyImpersonateGroup()
     {
         //set simple group as editor
-        setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
+        _securityHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
 
         //impersonate user 1, make several wiki edits
         impersonate(TEST_USERS_FOR_GROUP[0]);
@@ -255,10 +248,9 @@ public class GroupTest extends BaseWebDriverTest
         {
             waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText(wikiValues[1]), WAIT_FOR_PAGE);
             waitForText(wikiValues[2]);
-            if(!isLinkPresentWithText("Edit"))
+            if(!isElementPresent(Locator.linkWithText("Edit")))
                 return false;
-            _driver.navigate().back();
-            waitForPageToLoad();
+            goBack();
         }
         return true;
     }
@@ -267,7 +259,7 @@ public class GroupTest extends BaseWebDriverTest
     {
         for(String[] wikiValues : nameTitleBody)
         {
-            if(!isLinkPresentWithText(wikiValues[1]))
+            if(!isElementPresent(Locator.linkWithText(wikiValues[1])))
                 return false;
         }
         return true;
@@ -312,9 +304,6 @@ public class GroupTest extends BaseWebDriverTest
 
         ensureAdminMode();
         log("Creating project with name " + projectName);
-        if (isLinkPresentWithText(projectName))
-            Assert.fail("Cannot create project; A link with text " + projectName + " already exists.  " +
-                    "This project may already exist, or its name appears elsewhere in the UI.");
         goToCreateProject();
         waitForElement(Locator.name("name"));
         setFormElement(Locator.name("name"), projectName);
@@ -329,9 +318,10 @@ public class GroupTest extends BaseWebDriverTest
         {
             _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());
         }
-        catch (StaleElementReferenceException retry)
+        catch (StaleElementReferenceException retry) // Workaround: weird combo-box behavior
         {
-            click(Locator.xpath("//*").withClass("x4-boundlist-item").withText(getProjectName()));
+            click(Locator.xpath("//table[@id='targetProject']"));
+            _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());
         }
 
         waitAndClickButton("Next");
