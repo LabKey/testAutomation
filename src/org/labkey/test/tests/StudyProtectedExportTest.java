@@ -351,7 +351,7 @@ public class StudyProtectedExportTest extends StudyExportTest
 
         // Test input without header row
         setFormElement(Locator.xpath("//textarea[@id='tsv3']"), BAD_ALTERNATEID_MAPPING_4);
-        clickButton("Submit", "There must be a header row, which must contain ParticipantId, and may optionally contain AlternateId and DateOffset.");
+        clickButton("Submit", "The header row must contain ParticipantId and either AlternateId, DateOffset or both.");
 
         // Good input with different column order
         setFormElement(Locator.xpath("//textarea[@id='tsv3']"), ALTERNATEID_MAPPING_2);
