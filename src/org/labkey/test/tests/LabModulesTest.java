@@ -15,11 +15,10 @@
  */
 package org.labkey.test.tests;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
-import org.junit.Test;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -462,7 +461,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
                 else if (serverVal != null && (serverVal instanceof Integer || serverVal instanceof Double))
                 {
                     Double d = Double.parseDouble(expectations[idx]);
-                    Assert.assertEquals("Incorrect value for: " + col + " on row " + i, d, Double.parseDouble(serverVal.toString()));
+                    Assert.assertEquals("Incorrect value for: " + col + " on row " + i, d, Double.parseDouble(serverVal.toString()), DELTA);
                 }
                 else
                 {

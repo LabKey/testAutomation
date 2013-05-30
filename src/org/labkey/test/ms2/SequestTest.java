@@ -16,7 +16,7 @@
 
 package org.labkey.test.ms2;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;

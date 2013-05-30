@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.commons.lang3.tuple.Pair;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;

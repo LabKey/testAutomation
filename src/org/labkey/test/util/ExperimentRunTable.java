@@ -20,7 +20,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import java.util.List;
 import java.util.ArrayList;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.labkey.test.Locator;
 
 /**

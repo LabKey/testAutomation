@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;

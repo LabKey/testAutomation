@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.http.HttpException;
 import org.apache.http.HttpStatus;
 import org.labkey.test.BaseWebDriverTest;

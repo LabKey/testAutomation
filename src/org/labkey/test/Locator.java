@@ -16,7 +16,7 @@
 
 package org.labkey.test;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;

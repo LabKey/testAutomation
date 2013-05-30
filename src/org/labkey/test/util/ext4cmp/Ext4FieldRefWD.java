@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util.ext4cmp;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;

@@ -15,7 +15,7 @@
  */
 package org.labkey.test.pipeline;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;

@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;

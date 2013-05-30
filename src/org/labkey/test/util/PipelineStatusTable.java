@@ -19,7 +19,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 
 import java.util.*;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * <code>PipelineStatusTable</code>

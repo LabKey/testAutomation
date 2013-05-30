@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.BaseFlowTestWD;
 import org.labkey.test.Locator;

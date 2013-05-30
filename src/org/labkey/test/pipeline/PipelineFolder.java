@@ -15,7 +15,7 @@
  */
 package org.labkey.test.pipeline;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
