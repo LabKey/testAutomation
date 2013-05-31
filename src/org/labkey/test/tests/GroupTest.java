@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StringHelper;
 import org.openqa.selenium.StaleElementReferenceException;
 
@@ -61,7 +62,7 @@ public class GroupTest extends BaseWebDriverTest
         deleteProject(getProject2Name(), afterTest);
     }
 
-    protected void init()
+    @LogMethod protected void init()
     {
         for(String group : TEST_USERS_FOR_GROUP)
         {
@@ -267,7 +268,7 @@ public class GroupTest extends BaseWebDriverTest
 
     //should be at manage group page of COMPOUND_GROUP already
     //verify attempting add a user and a group containing that user to another group results in a warning
-    private void verifyRedundantUserWarnings()
+    @LogMethod private void verifyRedundantUserWarnings()
     {
         setFormElement(Locator.name("names"), TEST_USERS_FOR_GROUP[0]); //this user is in group1 and so is already in group 2
         clickButton("Update Group Membership");
@@ -276,7 +277,7 @@ public class GroupTest extends BaseWebDriverTest
 //        expect warning
     }
 
-    private void verifyExportFunction()
+    @LogMethod private void verifyExportFunction()
     {
         selectGroup(COMPOUND_GROUP, true);
         clickAndWait(Locator.linkWithText("manage group"));
@@ -323,6 +324,14 @@ public class GroupTest extends BaseWebDriverTest
             click(Locator.xpath("//table[@id='targetProject']"));
             _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());
         }
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return getFormElement(Locator.css("#targetProject input")).equals(getProjectName());
+            }
+        }, "Failed to select project", WAIT_FOR_JAVASCRIPT);
 
         waitAndClickButton("Next");
 
@@ -354,7 +363,8 @@ public class GroupTest extends BaseWebDriverTest
     {
         // Initialize the Wiki
         clickProject(getProjectName());
-        addWebPart("Wiki");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Wiki");
 
         createNewWikiPage();
         setFormElement(Locator.name("name"), WIKITEST_NAME);
@@ -368,5 +378,10 @@ public class GroupTest extends BaseWebDriverTest
         clickButton("Start Test", 0);
         waitForText("Done!", defaultWaitForPage);
         Assert.assertFalse("Security API error.", Locator.id("log-info").findElement(_driver).getText().contains("Error"));
+    }
+
+    @Override protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
