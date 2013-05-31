@@ -18,6 +18,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.lang.reflect.Constructor;
@@ -48,30 +49,23 @@ public class Ext4HelperWD extends AbstractHelperWD
     {
         Locator arrowTrigger = Locator.xpath(comboBox.getPath()+"//div[contains(@class,'arrow')]");
         _test.waitAndClick(arrowTrigger);
-        if(_test.getBrowser().startsWith(BaseWebDriverTest.IE_BROWSER))
-        {
-            _test.sleep(500);
-            _test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
-            _test.clickAt(Locator.xpath("/html/body"), 1,1);
-        }
+        Locator.XPathLocator listItem;
+        if (containsText)
+            listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().containing(selection);
         else
-        {
-            Locator.XPathLocator listItem;
-            if (containsText)
-                listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().containing(selection);
-            else
-                listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
+            listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
 
-            // wait for and select the list item
-            _test.waitAndClick(listItem);
+        // wait for and select the list item
+        WebElement element = listItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.scrollIntoView(listItem); // Workaround: Auto-scrolling in chrome isn't working well
+        element.click();
 
-            // close combo manually if it is a checkbox combo-box
-            if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))
-                _test.click(arrowTrigger);
+        // close combo manually if it is a checkbox combo-box
+        if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))
+            _test.click(arrowTrigger);
 
-            // menu should disappear
-            _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("li.x4-boundlist-item")));
-        }
+        // menu should disappear
+        _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("li.x4-boundlist-item")));
     }
 
     @LogMethod(quiet = true)
