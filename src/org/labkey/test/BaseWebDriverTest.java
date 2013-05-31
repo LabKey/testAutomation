@@ -43,11 +43,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.query.ContainerFilter;
-import org.labkey.remoteapi.query.SelectRowsCommand;
-import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
@@ -104,7 +100,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -506,7 +501,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             refresh();
     }
 
-    static String getStreamContentsAsString(InputStream is) throws IOException
+    public static String getStreamContentsAsString(InputStream is) throws IOException
     {
         StringBuilder contents = new StringBuilder();
         BufferedReader input = null;
@@ -908,7 +903,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-    protected void changePassword(String oldPassword, String password)
+    @LogMethod protected void changePassword(String oldPassword, @LoggedParam String password)
     {
         goToMyAccount();
         clickButton("Change Password");

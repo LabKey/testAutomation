@@ -22,6 +22,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.BufferedReader;
@@ -79,7 +81,8 @@ public class SecurityTest extends BaseWebDriverTest
     {
         doTestStepsSetDetph(false);
     }
-    protected void doTestStepsSetDetph(boolean isQuickTest)
+
+    @LogMethod protected void doTestStepsSetDetph(boolean isQuickTest)
     {
         this.isQuickTest = isQuickTest;
         enableEmailRecorder();
@@ -140,7 +143,7 @@ public class SecurityTest extends BaseWebDriverTest
      * @param longForm if and only if longFrom = true, test against the extended list of admin urls.
      * if longForm = false, test against only a few high priority URLs.
      */
-    protected void cantReachAdminToolFromUserAccount(boolean longForm)
+    @LogMethod protected void cantReachAdminToolFromUserAccount(boolean longForm)
     {
         //just in case, create user
 //        createUserAndNotify(NORMAL_USER, null);
@@ -183,7 +186,7 @@ public class SecurityTest extends BaseWebDriverTest
         stopImpersonating();
     }
 
-    public void assertUrlUnreachableDueToPermissions(String url)
+    @LogMethod public void assertUrlUnreachableDueToPermissions(String url)
     {
         log("Attempting to reach URL user does not have permission for:  " + url);
         beginAt(url);
@@ -195,7 +198,7 @@ public class SecurityTest extends BaseWebDriverTest
      * preconditions:  NORAM_USER exists with password NORMAL_USER_PASSWORD.  Currently logged in as admin
      * post conditions
      */
-    public void passwordResetTest()
+    @LogMethod public void passwordResetTest()
     {
         //get user a password
         String username = NORMAL_USER;
@@ -210,13 +213,13 @@ public class SecurityTest extends BaseWebDriverTest
         ensureSignedInAsAdmin();
     }
 
-    private void dumbsterTest()
+    @LogMethod private void dumbsterTest()
     {
         assertNoDumbsterPermission(PROJECT_ADMIN_USER);
         assertNoDumbsterPermission(NORMAL_USER);
     }
 
-    private void assertNoDumbsterPermission(String user)
+    @LogMethod private void assertNoDumbsterPermission(@LoggedParam String user)
     {
         clickProject(PROJECT_NAME);
         goToModule("Dumbster");
@@ -232,7 +235,7 @@ public class SecurityTest extends BaseWebDriverTest
     /**
      * Precondtions:  able to reset user's password at resetUrl, db in weak-password mode
      */
-    protected void userPasswordResetTest(String username, String resetUrl)
+    @LogMethod protected void userPasswordResetTest(String username, String resetUrl)
     {
         ensureSignedOut();
 
@@ -255,7 +258,7 @@ public class SecurityTest extends BaseWebDriverTest
      * selecting "change password".  This requires the old password to work.
       */
 
-    protected void attemptSetInvalidPasswords(PasswordAlterType changeType, String[][] passwords, String[][] errors)
+    @LogMethod protected void attemptSetInvalidPasswords(PasswordAlterType changeType, String[][] passwords, String[][] errors)
     {
         //if reset, should already be at reset Url
         for (int i = 0; i < errors.length; i++)
@@ -268,7 +271,7 @@ public class SecurityTest extends BaseWebDriverTest
         }
     }
 
-    protected void attemptSetInvalidPassword(PasswordAlterType changeType, String[] passwords, String... errors)
+    @LogMethod protected void attemptSetInvalidPassword(PasswordAlterType changeType, String[] passwords, String... errors)
     {
         switch (changeType)
         {
@@ -294,7 +297,7 @@ public class SecurityTest extends BaseWebDriverTest
      * @return URL to use to reset user password
      */
     //issue 3876
-    private String userForgotPasswordWorkflowTest(String username, String password)
+    @LogMethod private String userForgotPasswordWorkflowTest(String username, String password)
     {
         ensureSignedOut();
 
@@ -309,7 +312,7 @@ public class SecurityTest extends BaseWebDriverTest
         return resetUrl;
     }
 
-    public String userInitiatePasswordReset(String username)
+    @LogMethod public String userInitiatePasswordReset(String username)
     {
         goToHome();
         ensureSignedOut();
@@ -341,7 +344,7 @@ public class SecurityTest extends BaseWebDriverTest
      * @param password user's current password (before test starts)
      * @return user's new password
      */
-    private String adminPasswordResetTest(String username, String password)
+    @LogMethod private String adminPasswordResetTest(String username, String password)
     {
         String newPassword = password +"1";
         goToSiteUsers();
@@ -372,7 +375,7 @@ public class SecurityTest extends BaseWebDriverTest
         return newPassword;
     }
 
-    protected void addRemoveSiteAdminTest()
+    @LogMethod protected void addRemoveSiteAdminTest()
     {
         // test for issue 13921
         goToSiteAdmins();
@@ -387,7 +390,7 @@ public class SecurityTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
-    protected void guestTest()
+    @LogMethod protected void guestTest()
     {
         goToProjectHome();
         enterPermissionsUI();
@@ -411,7 +414,7 @@ public class SecurityTest extends BaseWebDriverTest
         stopImpersonating();
     }
 
-    protected void displayNameTest()
+    @LogMethod protected void displayNameTest()
     {
         //set display name to user's email minus domain
         String oldDisplayName = getDisplayName();
@@ -437,7 +440,7 @@ public class SecurityTest extends BaseWebDriverTest
         clickButton("Submit");
     }
 
-    protected void clonePermissionsTest()
+    @LogMethod protected void clonePermissionsTest()
     {
         // create admin templates, plus test bogus & duplicate email addresses
         createUserAndNotify(ADMIN_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + NORMAL_USER_TEMPLATE + '\n' + BOGUS_USER_TEMPLATE, null, false);
@@ -475,7 +478,7 @@ public class SecurityTest extends BaseWebDriverTest
 //        assertTextPresent("Site Users >  User Details >  Permissions >  ");
     }
 
-    protected void checkGroupMembership(String userName, String groupName, int expectedCount)
+    @LogMethod protected void checkGroupMembership(String userName, String groupName, int expectedCount)
     {
         goToSiteUsers();
 
@@ -502,7 +505,7 @@ public class SecurityTest extends BaseWebDriverTest
         Assert.fail("Unable to verify group membership of cloned user privileges");
     }
 
-    protected void tokenAuthenticationTest()
+    @LogMethod protected void tokenAuthenticationTest()
     {
         beginAt("/project/SecurityVerifyProject/begin.view?");
         String homePageUrl = removeUrlParameters(getURL().toString());  // Absolute URL for redirect, get rid of '?'
@@ -667,7 +670,7 @@ public class SecurityTest extends BaseWebDriverTest
     }
 
 
-    protected void impersonationTest()
+    @LogMethod protected void impersonationTest()
     {
         String testUserDisplayName = getDisplayName();
 
@@ -715,7 +718,7 @@ public class SecurityTest extends BaseWebDriverTest
     }
 
 
-    protected void passwordStrengthTest()
+    @LogMethod protected void passwordStrengthTest()
     {
         String simplePassword = "3asdfghi"; // Only two character types. 8 characters long.
         String shortPassword = "4asdfg!"; // Only 7 characters long. 3 character types.
