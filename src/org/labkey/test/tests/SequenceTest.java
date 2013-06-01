@@ -455,7 +455,7 @@ public class SequenceTest extends BaseWebDriverTest
         //String customRefName = "CustomRef1";
         //String customRefSeq = "ATGATGATG";
         String jobName = "TestAnalysisJob";
-        String protocolDescription = "This is the description for my analysis";
+        String analysisDescription = "This is the description for my analysis";
         String qualThreshold = "0.11";
         String minSnpQual = "23";
         String minAvgSnpQual = "24";
@@ -475,7 +475,7 @@ public class SequenceTest extends BaseWebDriverTest
         }
 
         Ext4FieldRefWD.getForLabel(this, "Job Name").setValue(jobName);
-        Ext4FieldRefWD.getForLabel(this, "Protocol Description").setValue(protocolDescription);
+        Ext4FieldRefWD.getForLabel(this, "Description").setValue(analysisDescription);
 
         log("Verifying Pre-processing section");
         WebElement el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Total Reads").getId()));
@@ -608,7 +608,7 @@ public class SequenceTest extends BaseWebDriverTest
         Assert.assertEquals("Incorect param in form JSON", containerPath, params.get("containerPath"));
 
         Assert.assertEquals("Incorect param in form JSON", true, params.get("deleteIntermediateFiles"));
-        Assert.assertEquals("Incorect param in form JSON", protocolDescription, params.get("protocolDescription"));
+        Assert.assertEquals("Incorect param in form JSON", analysisDescription, params.get("analysisDescription"));
         Assert.assertEquals("Incorect param in form JSON", jobName, params.get("protocolName"));
 
         Assert.assertEquals("Incorect param in form JSON", false, params.get("saveProtocol"));

@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.Connection;
@@ -34,6 +35,7 @@ import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -687,6 +689,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
         waitForText("SIVmac239-Gag"); //proxy for DR load
 
+        DecimalFormat formatter = new DecimalFormat("0.#E00");
         int i = 0;
         while (i < totalRows)
         {
@@ -695,13 +698,13 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
             String date = results.getDataAsText(i, "Sample Date");
             String category = results.getDataAsText(i, "Category");
             String[] expectedVals;
+            StringBuilder sb = new StringBuilder();
             if (keyFields == null)
             {
                 expectedVals = expected.get(String.valueOf(i));
             }
             else
             {
-                StringBuilder sb = new StringBuilder();
                 String delim = "";
                 for (String field : keyFields)
                 {
@@ -710,7 +713,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
                 }
                 expectedVals = expected.get(sb.toString());
             }
-            Assert.assertNotNull("Unable to find expected values", expectedVals);
+            Assert.assertNotNull("Unable to find expected values: " + sb.toString(), expectedVals);
 
             Assert.assertEquals("Incorrec subjectId on row: " + i, expectedVals[0], subjectId);
             Assert.assertEquals("Incorrect category on row: " + i, expectedVals[1], category);
@@ -719,8 +722,8 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
                 Assert.assertEquals("Incorrect sample date on row: " + i, expectedVals[2], date);
 
             Double vl1 = Double.parseDouble(expectedVals[3]);
-            Double vl2 = Double.parseDouble(vl);
-            Assert.assertEquals("Incorrect VL on row: " + i, vl1, vl2);
+            String vlFormatted = formatter.format(vl1);
+            Assert.assertEquals("Incorrect VL on row: " + i, vlFormatted, StringUtils.trimToNull(vl));
 
             i++;
         }

@@ -60,14 +60,12 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         clickProject(getProjectName());
         clickFolder(FOLDER_NAME);
-        waitForPageToLoad();
-        waitAndClick(Locator.linkWithText("Browse All Datasets"));
-        waitForPageToLoad();
+
+        waitAndClickAndWait(Locator.linkWithText("Browse All Datasets"));
 
         //TODO: place these in a WNPRC_EHRTest if one if ever created
 //        waitForText("Biopsies");
 //        waitAndClick(LabModuleHelper.getNavPanelItem("Biopsies:", VIEW_TEXT));
-//        waitForPageToLoad();
 //
 //        waitForText("details");
 //        DataRegionTable dr = new DataRegionTable("query", this);
@@ -81,7 +79,6 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 //        beginAt("/ehr/" + getContainerPath() + "/datasets.view");
 //        waitForText("Necropsies");
 //        waitAndClick(LabModuleHelper.getNavPanelItem("Necropsies:", VIEW_TEXT));
-//        waitForPageToLoad();
 //        waitForText("details");
 //        dr = new DataRegionTable("query", this);
 //        dr.clickLink(0, 0);
@@ -94,7 +91,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         beginAt("/ehr/" + getContainerPath() + "/datasets.view");
         waitForText("Drug Administration");
         waitAndClick(LabModuleHelper.getNavPanelItem("Drug Administration:", VIEW_TEXT));
-        waitForPageToLoad();
+
         waitForText("details");
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.clickLink(0, 0);
@@ -106,11 +103,11 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         beginAt("/ehr/" + getContainerPath() + "/datasets.view");
         waitForText("Housing");
         waitAndClick(LabModuleHelper.getNavPanelItem("Housing:", VIEW_TEXT));
-        waitForPageToLoad();
+
         waitForText(ROOM_ID2);
         dr = new DataRegionTable("query", this);
         dr.clickLink(1, "Room");
-        waitForPageToLoad();
+
         //these are the sections we expect
         waitForText("Cage Details");
         waitForText("Animals Currently Housed");
@@ -121,7 +118,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         beginAt("/ehr/" + getContainerPath() + "/datasets.view");
         waitForText("Clinpath Runs");
         waitAndClick(LabModuleHelper.getNavPanelItem("Clinpath Runs:", VIEW_TEXT));
-        waitForPageToLoad();
+
         waitForText("details");
         dr = new DataRegionTable("query", this);
         dr.clickLink(0, 0);
@@ -133,7 +130,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         beginAt("/ehr/" + getContainerPath() + "/datasets.view");
         waitForText("Clinical Encounters");
         waitAndClick(LabModuleHelper.getNavPanelItem("Clinical Encounters:", VIEW_TEXT));
-        waitForPageToLoad();
+
         waitForText("details");
         dr = new DataRegionTable("query", this);
         dr.setSort("date", SortDirection.DESC);
@@ -159,14 +156,14 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         //housing queries
         beginAt("/project/" + getContainerPath() + "/begin.view");
         waitAndClick(Locator.linkWithText("Housing Queries"));
-        waitForPageToLoad();
+
         waitForText("View:"); //a proxy for the search panel loading
 
 
         //animal queries
         beginAt("/project/" + getContainerPath() + "/begin.view");
         waitAndClick(Locator.linkWithText("Animal Search"));
-        waitForPageToLoad();
+
         waitForTextToDisappear("Loading");
         waitForText("View:"); //a proxy for the search panel loading
         assertNoErrorText();
@@ -175,7 +172,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         //project, protocol queries
         beginAt("/project/" + getContainerPath() + "/begin.view");
         waitAndClick(Locator.linkWithText("Protocol and Project Queries"));
-        waitForPageToLoad();
+
         waitForTextToDisappear("Loading");
         waitForText("View:"); //a proxy for the search panel loading
         assertNoErrorText();
@@ -184,7 +181,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         //population overview
         beginAt("/project/" + getContainerPath() + "/begin.view");
         waitAndClick(Locator.linkWithText("Population Summary"));
-        waitForPageToLoad();
+
         waitForText("Current Population Counts");
         waitForText("Population Changes");
         waitForText("Other Population Queries");
@@ -196,6 +193,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForText("Animal");
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.clickLink(1,"Id");
+        log("Inspecting details page");
         waitForText("Animal Details:");
         waitForText("# Animals In Cage:");
         assertNoErrorText();
@@ -208,7 +206,6 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         clickFolder(FOLDER_NAME);
 
         waitAndClick(Locator.linkWithText("Animal History"));
-        waitForPageToLoad();
 
         log("Verify Single animal history");
         String query = "textfield[itemId=subjArea]";
@@ -474,7 +471,6 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         //Clear out lingering text on report pages
         clickProject(getProjectName());
         clickFolder(FOLDER_NAME);
-        waitAndClick(Locator.linkWithText("Animal History"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.linkWithText("Animal History"));
     }
 }

@@ -30,6 +30,7 @@ import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -39,6 +40,7 @@ import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
+import org.labkey.test.util.ext4cmp.Ext4ComboRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.openqa.selenium.Alert;
 
@@ -189,6 +191,12 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     {
         super.validateQueries(false); // too may subfolders
     }
+
+//    @Override
+//    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+//    {
+//        super.doCleanup(afterTest);
+//    }
 
     @Override
     protected void doTestSteps() throws Exception
@@ -506,10 +514,9 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             Map<String,Object> rowMap = new HashMap<String,Object>();
             rowMap.put("subjectId", arr[0]);
             rowMap.put("project", arr[1]);
-            //TODO: switich this back to inserting empty string once core bug (17804) is fixed.
             //NOTE: this is deliberately inserting using empty string, not null.  LK is expected to convert that to NULL.  If this doesnt happen,
             //calculatedColumnsTest() will fail since groupname is not null on row 2
-            rowMap.put("groupname", StringUtils.trimToNull(arr[2]));
+            rowMap.put("groupname", arr[2]);
             rowMap.put("startdate", arr[3]);
             rowMap.put("enddate", arr[4]);
             insertCmd.addRow(rowMap);
@@ -957,7 +964,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //TODO: also verify link targets
 
-        waitForElement(Locator.linkContainingText("Browse Sequence Data")); //proxy for page load
+        waitForElement(Locator.linkContainingText("Browse Sequence Data"), WAIT_FOR_JAVASCRIPT * 3); //proxy for page load
 
         for (Pair<String, String> pair : getAssaysToCreate())
         {
@@ -1084,7 +1091,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         waitForText("There were errors in the upload:");
 
-        assertTextPresent("Row 2:");
+        assertTextPresent("Row 3:");
         assertTextPresent(errorMsg);
 
         String sequence = "tggGg gGAAAAgg";
@@ -1126,10 +1133,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //verify drop down menus show correct text by spot checking several drop-downs
         //NOTE: trailing spaces are added by ext template
-        _ext4Helper.selectComboBoxItem("Sample Type", "Cell Line");
-        _ext4Helper.selectComboBoxItem("Sample Source", "DNA");
-        _ext4Helper.selectComboBoxItem("Additive", "EDTA");
-        _ext4Helper.selectComboBoxItem("Molecule Type", "vRNA");
+        Ext4ComboRefWD.getForLabel(this, "Sample Type").setValue("Cell Line");
+        Ext4ComboRefWD.getForLabel(this, "Sample Source").setValue("DNA");
+        Ext4ComboRefWD.getForLabel(this, "Additive").setValue("EDTA");
+        Ext4ComboRefWD.getForLabel(this, "Molecule Type").setValue("vRNA");
 
         _helper.setFormField("samplespecies", "Species");
 
@@ -1155,9 +1162,9 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitForText("Copy/Paste Data");
 
         //we only care that these items are present
-        _ext4Helper.selectComboBoxItem("Choose Template", "Default Template");
-        _ext4Helper.selectComboBoxItem("Choose Template", "Cells Template");
-        _ext4Helper.selectComboBoxItem("Choose Template", "DNA Samples Template");
+        _ext4Helper.selectComboBoxItem("Choose Template:", "Default Template");
+        _ext4Helper.selectComboBoxItem("Choose Template:", "Cells Template");
+        _ext4Helper.selectComboBoxItem("Choose Template:", "DNA Samples Template");
     }
 
     /**
@@ -1222,7 +1229,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             //container column
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("Workbook" + i), "href"), "UTF-8");
             Assert.assertTrue("Expected container column to go to the container: " + workbook + ", href was:" + href,
-                    href.contains("/project/" + workbook + "/start.view?"));
+                    href.contains("/project/" + workbook + "/begin.view?"));
 
             i++;
         }
@@ -1262,8 +1269,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.setFormField("samplename", "Sample" + suffix);
         _helper.setFormField("location", "location_" + _helper.getRandomInt());
 
-        _ext4Helper.selectComboBoxItem("Sample Type", "DNA");
-        _ext4Helper.selectComboBoxItem("Sample Source", "Whole Blood");
+        Ext4ComboRefWD.getForLabel(this, "Sample Type").setValue("DNA");
+        Ext4ComboRefWD.getForLabel(this, "Sample Source").setValue("Whole Blood");
 
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);

@@ -38,7 +38,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
     {
         initProject();
 
-//        weightDataEntryTest();
+        weightDataEntryTest();
         mprDataEntryTest();
     }
 
@@ -257,7 +257,8 @@ public class EHRDataEntryTest extends AbstractEHRTest
         waitForElement(Locator.xpath("//div[./div/span[text()='Treatments & Procedures']]//input[@name='code' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
         sleep(250);
         _extHelper.selectComboBoxItem("Code:", "Antibiotic");
-        _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='code']/.."), "amoxicillin (c-54620)\u00a0");
+        sleep(250);
+        _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='code']/.."), "Antibiotic: amoxicillin (c-54620)\u00a0");
         _extHelper.selectComboBoxItem("Route:", "oral\u00a0");
         _helper.setDataEntryFieldInTab("Treatments & Procedures", "concentration", "5");
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='conc_units']/.."), "mg/tablet\u00a0");

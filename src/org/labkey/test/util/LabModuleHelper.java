@@ -147,7 +147,7 @@ public class LabModuleHelper
         if (shouldNavigateToTab)
             _test.clickTab("Workbooks");
 
-        _test.clickButton("Create New Workbook", 0);
+        _test.waitAndClickButton("Create New Workbook", 0);
         _test.waitForElement(Ext4Helper.ext4Window("Create Workbook"));
         _test.setFormElement(Locator.name("title"), workbookTitle);
         _test.setFormElement(Locator.name("description"), workbookDescription);
