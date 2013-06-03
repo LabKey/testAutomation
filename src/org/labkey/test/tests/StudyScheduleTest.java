@@ -29,7 +29,7 @@ import java.io.File;
  * User: klum
  * Date: Feb 24, 2012
  */
-public class StudyScheduleTest extends StudyRedesignTest
+public class StudyScheduleTest extends StudyBaseTest
 {
     // dataset names
     private static final String IMPORT_DATASET = "ImportDataset";
@@ -61,6 +61,17 @@ public class StudyScheduleTest extends StudyRedesignTest
 
     private String _folderName = getFolderName();
     private String _sampleDataPath = getStudySampleDataPath();
+
+    @Override @LogMethod(category = LogMethod.MethodType.SETUP)
+    protected void doCreateSteps()
+    {
+        importStudy();
+        startSpecimenImport(2);
+
+        // wait for study and specimens to finish loading
+        waitForSpecimenImport();
+        setStudyRedesign();
+    }
 
     @Override
     protected void doVerifySteps()
