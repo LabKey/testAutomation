@@ -82,7 +82,7 @@ public class SequestImportTest extends BaseWebDriverTest
 
     private void importSequestRun()
     {
-        click(Locator.linkWithText("MS2 Dashboard"));
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         // Import a Sequest run
         clickButton("Process and Import Data");
         _extHelper.selectFileBrowserItem("raftflow10.pep.xml");
