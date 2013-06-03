@@ -58,14 +58,14 @@ public class Ext4HelperWD extends AbstractHelperWD
         // wait for and select the list item
         WebElement element = listItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.scrollIntoView(listItem); // Workaround: Auto-scrolling in chrome isn't working well
-        element.click();
+        _test.click(listItem);
 
         // close combo manually if it is a checkbox combo-box
         if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))
             _test.click(arrowTrigger);
 
         // menu should disappear
-        _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("li.x4-boundlist-item")));
+        _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".x4-boundlist-item")));
     }
 
     @LogMethod(quiet = true)
