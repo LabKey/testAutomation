@@ -384,8 +384,7 @@ public enum TestSet
         StudyWDTest.class, // Broken
         CDSTest.class, // Broken
         ONPRC_EHRTest.class, // Unknown?
-        ExperimentalFeaturesTest.class, // currently no experimental features being tested
-        OConnorExperimentTest.class
+        ExperimentalFeaturesTest.class // currently no experimental features being tested
     ),
 
     CONTINUE()
