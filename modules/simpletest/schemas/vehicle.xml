@@ -221,7 +221,7 @@
       <ns:column columnName="modified"/>
       <ns:column columnName="id"/>
       <ns:column columnName="name"/>
-      <ns:column columnName="_txtransformrunid"/>
+      <ns:column columnName="ditransformrunid"/>
     </ns:columns>
   </ns:table>
 
@@ -233,7 +233,7 @@
         <ns:column columnName="modified"/>
         <ns:column columnName="id"/>
         <ns:column columnName="name"/>
-        <ns:column columnName="_txtransformrunid"/>
+        <ns:column columnName="ditransformrunid"/>
     </ns:columns>
   </ns:table>
 
@@ -287,7 +287,7 @@
             <ns:column columnName="zip"/>
             <ns:column columnName="text"/>
             <ns:column columnName="birth_date"/>
-            <ns:column columnName="_txTransformRunId"/>
+            <ns:column columnName="ditransformrunid"/>
         </ns:columns>
     </ns:table>
 

@@ -5,7 +5,7 @@
     <transforms>
         <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
             <description>Copy to target</description>
-            <source schemaName="vehicle" queryName="etl_source" />
+            <source schemaName="vehicle" queryName="etl_source" timestampcolumnname="modfiied" />
             <destination schemaName="vehicle" queryName="etl_target" />
         </transform>
         <transform id="step2" type="org.labkey.di.pipeline.TransformTask">
