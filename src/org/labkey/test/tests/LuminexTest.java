@@ -138,7 +138,12 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         if(getConfigStatus()!=Configured.CONFIGURED)
         {
+            log("luminex assay not configured, configuring now");
             configure();
+        }
+        else
+        {
+            log("luminex assay already configured, skipping configuration step");
         }
     }
 
@@ -843,13 +848,14 @@ public class LuminexTest extends AbstractQCAssayTest
      * preconditions:  Project TEST_ASSAY_PRJ_LUMINEX with Assay  TEST_ASSAY_LUM exists
      * postconditions:  assay run
      */
-    private void ensureMultipleCurveDataPresent()
+    protected void ensureMultipleCurveDataPresent()
     {
         goToTestRunList();
 
         if(!isTextPresent(MULTIPLE_CURVE_ASSAY_RUN_NAME)) //right now this is a good enough check.  May have to be
                                                     // more rigorous if tests start substantially altering data
         {
+            log("multiple curve data not present, adding now");
             startCreateMultipleCurveAssayRun();
             clickButton("Save and Finish");
         }

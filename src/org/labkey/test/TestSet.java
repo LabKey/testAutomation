@@ -143,6 +143,7 @@ public enum TestSet
         LuminexGuideSetTest.class,
         LuminexAsyncImportTest.class,
         LuminexPositivityTest.class,
+        LuminexExcludedTitrationTest.class,
         SimpleModuleTest.class,
         JavaClientApiTest.class,
         QuerySnapshotTest.class,
@@ -225,7 +226,8 @@ public enum TestSet
         LuminexEC50Test.class,
         LuminexGuideSetTest.class,
         LuminexAsyncImportTest.class,
-        LuminexPositivityTest.class
+        LuminexPositivityTest.class,
+        LuminexExcludedTitrationTest.class
     ),
 
     IE(
@@ -324,6 +326,7 @@ public enum TestSet
         LuminexGuideSetTest.class,
         LuminexAsyncImportTest.class,
         LuminexPositivityTest.class,
+        LuminexExcludedTitrationTest.class,
         ViabilityTest.class,
         ModuleAssayTest.class,
         FormulationsTest.class,
@@ -381,7 +384,8 @@ public enum TestSet
         StudyWDTest.class, // Broken
         CDSTest.class, // Broken
         ONPRC_EHRTest.class, // Unknown?
-        ExperimentalFeaturesTest.class // currently no experimental features being tested
+        ExperimentalFeaturesTest.class, // currently no experimental features being tested
+        OConnorExperimentTest.class
     ),
 
     CONTINUE()
