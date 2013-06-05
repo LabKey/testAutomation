@@ -3,7 +3,6 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.ExtHelperWD;
 
 import java.util.List;
 
@@ -11,13 +10,11 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  * User: RyanS
  * Date: 5/31/13
- * Time: 11:43 AM
- * To change this template use File | Settings | File Templates.
  */
 public class LuminexExcludedTitrationTest extends LuminexTest
 {
-    protected static final Locator availableAnalytesCheckbox = Locator.xpath("//div[@class='x-grid3-hd-inner x-grid3-hd-checker']/div[@class='x-grid3-hd-checker']");
-    protected static final Locator commentLocator = Locator.xpath("//input[@id='comment']") ;
+    protected static final Locator AVAILABLE_ANALYTES_CHECKBOX = Locator.xpath("//div[@class='x-grid3-hd-inner x-grid3-hd-checker']/div[@class='x-grid3-hd-checker']");
+    protected static final Locator COMMENT_LOCATOR = Locator.xpath("//input[@id='comment']") ;
     protected void ensureConfigured()
     {
 
@@ -55,10 +52,10 @@ public class LuminexExcludedTitrationTest extends LuminexTest
         clickButton("Exclude Titration","Analytes excluded for a replicate group will not be re-included by changes in assay level exclusions" );
         waitForElement(Locator.xpath("//td/div").withText(Titration));
         mouseDown(Locator.xpath("//td/div").withText(Titration));
-        waitForElement(availableAnalytesCheckbox);
-        mouseDown(availableAnalytesCheckbox);
+        waitForElement(AVAILABLE_ANALYTES_CHECKBOX);
+        mouseDown(AVAILABLE_ANALYTES_CHECKBOX);
         String exclusionMessage =  "excluding all analytes for titration " + Titration;
-        setFormElement(commentLocator, exclusionMessage);
+        setFormElement(COMMENT_LOCATOR, exclusionMessage);
         sleep(5000);
         waitAndClickButton("Save", 0);
         _extHelper.waitForExtDialog("Save Changes?", WAIT_FOR_JAVASCRIPT);
@@ -74,7 +71,7 @@ public class LuminexExcludedTitrationTest extends LuminexTest
         waitForElement(Locator.xpath("//td/div[@class='x-grid3-cell-inner x-grid3-col-1 x-unselectable']").containing(Analyte));
         mouseDown(Locator.xpath("//td/div[@class='x-grid3-cell-inner x-grid3-col-1 x-unselectable']").containing(Analyte));
         String exclusionMessage =  "excluding " + Analyte + " analyte for titration " + Titration;
-        setFormElement(commentLocator, exclusionMessage);
+        setFormElement(COMMENT_LOCATOR, exclusionMessage);
         sleep(5000) ;
         waitAndClickButton("Save", 0);
         _extHelper.waitForExtDialog("Save Changes?", WAIT_FOR_JAVASCRIPT);
