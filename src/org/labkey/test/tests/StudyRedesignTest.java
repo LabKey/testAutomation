@@ -60,15 +60,7 @@ public class StudyRedesignTest extends StudyBaseTest
         // wait for study and specimens to finish loading
         waitForSpecimenImport();
         setStudyRedesign();
-        setupDatasetCategories();
-        log("Create report for data view webpart test.");
-        goToModule("StudyRedesign");
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Views"));
-        clickMenuButton("Create", "R View");
-        clickButton("Save", "Please enter a view name:");
-        setFormElement(Locator.xpath("//div[./span[.='Please enter a view name:']]/div/input"), REPORT_NAME);
-        _extHelper.clickExtButton("Save");
+        //setupDatasetCategories();
 
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_ONE, "Mouse", PTIDS_ONE);
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_TWO, "Mouse", PTIDS_TWO);

@@ -76,10 +76,11 @@ public class StudyScheduleTest extends StudyBaseTest
     @Override
     protected void doVerifySteps()
     {
-        basicTest();
-        datasetStatusTest();
-        linkDatasetTest();
-        linkFromDatasetDetailsTest();
+        basicTest(); //3min
+        datasetStatusTest(); //2.5min
+        linkDatasetTest();  //5.5min
+        linkFromDatasetDetailsTest(); //4 min
+        //studyScheduleWebPartTest();
     }
 
     @LogMethod
@@ -122,6 +123,13 @@ public class StudyScheduleTest extends StudyBaseTest
         click(Locator.xpath("//div[contains(@class, 'button-next')][1]")); //click next button
         waitForText("Cycle 2");
         waitForText(dataset);
+    }
+
+    @LogMethod
+    public void studyScheduleWebPartTest()
+    {
+        goToProjectHome();
+        addWebPart("Study Schedule");
     }
 
     @LogMethod
