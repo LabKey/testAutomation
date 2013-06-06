@@ -44,8 +44,6 @@ public class ReportTest extends StudyBaseTest
     private static final String MICE_C = "Mice C";
     private final RReportHelper _rReportHelper = new RReportHelper(this);
     protected static final String GRID_VIEW = "create_gridView";
-    protected static final String R_VIEW = "create_rView";
-    protected static final String QUERY_VIEW = "create_query_report";
     private final static String DATA_SET = "DEM-1: Demographics";
     private final static String DATA_BASE_PREFIX = "DEM";
     private final static String R_SCRIPT1_ORIG_FUNC = "length(x)";
@@ -374,7 +372,7 @@ public class ReportTest extends StudyBaseTest
         _customizeViewsHelper.removeCustomizeViewColumn(R_REMCOL);
         _customizeViewsHelper.addCustomizeViewFilter("DEMhisp", "3.Latino\\a or Hispanic?", "Does Not Equal", "Yes");
         _customizeViewsHelper.addCustomizeViewSort(R_SORT, "2.What is your sex?", "Descending");
-        _customizeViewsHelper.saveCustomView(R_VIEW);
+        _customizeViewsHelper.saveCustomView("R View");
 
         log("Check that customize view worked");
         assertTextNotPresent(R_REMCOL);
@@ -2146,7 +2144,7 @@ public class ReportTest extends StudyBaseTest
         clickFolder(getFolderName());
         goToManageViews();
 
-        _extHelper.clickMenuButton("Create", QUERY_VIEW);
+        _extHelper.clickMenuButton("Create", "Query View");
 
         setFormElement("viewName", QUERY_REPORT_NAME);
         setFormElement("description", QUERY_REPORT_DESCRIPTION);
@@ -2175,7 +2173,7 @@ public class ReportTest extends StudyBaseTest
 
         goToManageViews();
 
-        _extHelper.clickMenuButton("Create", QUERY_VIEW);
+        _extHelper.clickMenuButton("Create", "Query View");
 
         setFormElement("viewName", QUERY_REPORT_NAME_2);
         setFormElement("description", QUERY_REPORT_DESCRIPTION_2);
