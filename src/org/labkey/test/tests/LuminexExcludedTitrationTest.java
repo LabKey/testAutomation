@@ -56,9 +56,9 @@ public class LuminexExcludedTitrationTest extends LuminexTest
         mouseDown(AVAILABLE_ANALYTES_CHECKBOX);
         String exclusionMessage =  "excluding all analytes for titration " + Titration;
         setFormElement(COMMENT_LOCATOR, exclusionMessage);
-        sleep(5000);
+        sleep(10000);
         waitAndClickButton("Save", 0);
-        _extHelper.waitForExtDialog("Save Changes?", WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog("Confirm Exclusions", WAIT_FOR_JAVASCRIPT);
         clickButtonContainingText("Yes");
         verifyTitrationExclusion(Titration, exclusionMessage);
     }
@@ -72,9 +72,9 @@ public class LuminexExcludedTitrationTest extends LuminexTest
         mouseDown(Locator.xpath("//td/div[@class='x-grid3-cell-inner x-grid3-col-1 x-unselectable']").containing(Analyte));
         String exclusionMessage =  "excluding " + Analyte + " analyte for titration " + Titration;
         setFormElement(COMMENT_LOCATOR, exclusionMessage);
-        sleep(5000) ;
+        sleep(10000) ;
         waitAndClickButton("Save", 0);
-        _extHelper.waitForExtDialog("Save Changes?", WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExtDialog("Confirm Exclusions", WAIT_FOR_JAVASCRIPT);
         clickButtonContainingText("Yes");
         verifyTitrationAnalyteExclusion(Titration, Analyte, exclusionMessage);
     }
