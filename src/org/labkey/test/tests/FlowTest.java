@@ -22,6 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.ExtHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.RReportHelperWD;
@@ -186,7 +187,7 @@ public class FlowTest extends BaseFlowTestWD
         // Should allow for import all directories containing FCS Files
         _extHelper.selectFileBrowserItem("8color/");
         _extHelper.waitForImportDataEnabled();
-        waitForElement(_extHelper.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
+        waitForElement(ExtHelperWD.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Import Directory of FCS Files");
         assertTextPresent("The following directories within",  "8color");
         assertTextPresent(FCS_FILE_1 + " (25 fcs files)");
@@ -194,9 +195,8 @@ public class FlowTest extends BaseFlowTestWD
         clickButton("Cancel"); // go back to file-browser
 
         // Entering L02-060120-QUV-JS directory should allow import of current directory
-        waitForPageToLoad();
         _extHelper.selectFileBrowserItem("8color/" + FCS_FILE_1 + "/");
-        waitForElement(_extHelper.locateGridRowCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(ExtHelperWD.locateGridRowCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Current directory of 25 FCS Files");
         assertTextPresent("The following directories within" ,"'8color",  FCS_FILE_1);
         assertTextPresent("Current Directory (25 fcs files)");
@@ -351,8 +351,9 @@ public class FlowTest extends BaseFlowTestWD
         newWaitForPageToLoad();
 
         Assert.assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
+        prepForPageLoad();
         selectOptionByText("ff_compensationMatrixOption", "Matrix: " + FCS_FILE_1 + " comp matrix");
-        waitForPageToLoad();
+        newWaitForPageToLoad();
 
         checkCheckbox(".toggle");
         clickButton("Analyze selected runs");

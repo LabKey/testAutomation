@@ -109,7 +109,6 @@ public class FileContentTest extends BaseWebDriverTest
         click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Settings']"));
         _extHelper.waitForExtDialog("Update selected users");
         _extHelper.clickExtButton("Update selected users", "Yes");
-        waitForPageToLoad();
         Assert.assertEquals("Failed to opt out of file notifications.", "No Email", table.getDataAsText(table.getRow("Email", TEST_USER), "File Settings"));
 
         waitForElement(Locator.xpath("//a/span[text() = 'Admin']"), WAIT_FOR_JAVASCRIPT);

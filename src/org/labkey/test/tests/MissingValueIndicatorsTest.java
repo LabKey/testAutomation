@@ -238,9 +238,10 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     private void deleteListData(int rowCount)
     {
         checkCheckbox(".toggle");
+        prepForPageLoad();
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected row" + (rowCount == 1 ? "?" : "s?"));
-        waitForPageToLoad();
+        newWaitForPageToLoad();
     }
 
     private void checkDataset() throws Exception
@@ -502,9 +503,10 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     private void deleteDatasetData(int rowCount)
     {
         checkCheckbox(".toggle");
+        prepForPageLoad();
         clickButton("Delete", 0);
         assertAlert("Delete selected row" + (1 == rowCount ? "" : "s") + " from this dataset?");
-        waitForPageToLoad();
+        newWaitForPageToLoad();
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException

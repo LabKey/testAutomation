@@ -716,20 +716,23 @@ public class StudyWDTest extends StudyBaseTestWD
             log("configure editable datasets");
             clickTab("Manage");
             clickAndWait(Locator.linkWithText("Manage Security"));
+            prepForPageLoad();
             selectOptionByText(Locator.name("securityString"), "Basic security with editable datasets");
-            waitForPageToLoad();
+            newWaitForPageToLoad();
 
             log("configure comments");
             clickFolder(getStudyLabel());
             clickTab("Manage");
             clickAndWait(Locator.linkWithText("Manage Comments"));
         }
+        prepForPageLoad();
         selectOptionByText("participantCommentDataSetId", PARTICIPANT_CMT_DATASET);
-        waitForPageToLoad();
+        newWaitForPageToLoad();
         selectOptionByText("participantCommentProperty", PARTICIPANT_COMMENT_LABEL);
 
+        prepForPageLoad();
         selectOptionByText("participantVisitCommentDataSetId", PARTICIPANT_VISIT_CMT_DATASET);
-        waitForPageToLoad();
+        newWaitForPageToLoad();
         selectOptionByText("participantVisitCommentProperty", PARTICIPANT_VISIT_COMMENT_LABEL);
         clickButton("Save");
 
@@ -845,8 +848,9 @@ public class StudyWDTest extends StudyBaseTestWD
         pushLocation();
         exportDataRegion("Script", "R");
         goToAuditLog();
+        prepForPageLoad();
         selectOptionByText("view", "Query events");
-        waitForPageToLoad();
+        newWaitForPageToLoad();
 
         DataRegionTable auditTable =  new DataRegionTable("audit", this);
         String[][] columnAndValues = new String[][] {{"Created By", getDisplayName()},

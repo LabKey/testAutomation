@@ -836,7 +836,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestTabbedFolder()
     {
         clickFolder(FOLDER_NAME);
-        waitForPageToLoad();
 
         //it should start on tab 2
         verifyTabSelected("Tab 2");
@@ -845,51 +844,40 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         //verify Tab 1
         clickTab("Tab 1");
-        waitForPageToLoad();
         assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Run Groups", "Sample Sets", "Assay List");
         addWebPart("Messages");
 
         clickTab("Tab 2");
-        waitForPageToLoad();
 
         //verify added webpart is persisted
         clickTab("Tab 1");
-        waitForPageToLoad();
         assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Run Groups", "Sample Sets", "Assay List", "Messages");
 
         //there is a selector for the assay controller and tab2
         clickAndWait(Locator.linkWithText("New Assay Design"));
-        waitForPageToLoad();
         verifyTabSelected("Tab 2");
 
         //this is a controller selector
         beginAt("/query/" + getProjectName() + "/" + FOLDER_NAME + "/begin.view?");
-        waitForPageToLoad();
         verifyTabSelected("Tab 1");
 
         //this is a view selector
         beginAt("/pipeline-status/" + getProjectName() + "/" + FOLDER_NAME + "/showList.view?");
-        waitForPageToLoad();
         verifyTabSelected("Tab 2");
 
         //this is a regex selector
         clickFolder(FOLDER_NAME);
-        waitForPageToLoad();
         addWebPart("Sample Sets");
         clickAndWait(Locator.linkWithText("Import Sample Set"));
-        waitForPageToLoad();
         verifyTabSelected("Tab 1");
 
         // Test Container tabs
         clickTab("Assay Container");
-        waitForPageToLoad();
         assertTextPresent("Assay List");
         clickTab("Study Container");
         assertTextPresent("Study Overview");
         clickAndWait(Locator.linkWithText("Create Study"));
-        waitForPageToLoad();
         clickAndWait(Locator.linkWithText("Create Study"));
-        waitForPageToLoad();
         assertTextPresent("Manage Study", "Study Container", "Overview", "Specimen Data");
         clickAndWait(Locator.linkWithText("Specimen Data"));
         assertTextPresent("Vial Search", "Specimens");

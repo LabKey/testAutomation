@@ -92,19 +92,17 @@ public class ComplianceTrainingTest extends BaseWebDriverTest implements Advance
         clickButton("Submit", 0);
         waitForElement(Ext4Helper.ext4Window("SOPs Complete"));
         clickButton("OK");
-        waitForPageToLoad();
     }
 
     private void reloadPage()
     {
-        waitForPageToLoad();
         waitForText("Mark Read");
         waitForText("Mark Reread");
     }
 
     private DataRegionTable getDataRegion(int idx)
     {
-        Locator.XPathLocator form = (Locator.XPathLocator)Locator.xpath("//form[div/table[starts-with(@id, 'dataregion_')]]").index(idx);
+        Locator.XPathLocator form = Locator.xpath("//form[div/table[starts-with(@id, 'dataregion_')]]").index(idx);
         waitForElement(form);
         String id = getAttribute(form, "id");
         return new DataRegionTable(id, this);

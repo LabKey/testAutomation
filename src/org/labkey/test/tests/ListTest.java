@@ -165,9 +165,10 @@ public class ListTest extends BaseWebDriverTest
         // delete existing rows
         log("Test deleting rows");
         checkCheckbox(".toggle");
+        prepForPageLoad();
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected rows?");
-        waitForPageToLoad();
+        newWaitForPageToLoad();
         // load test data
         clickImportData();
         setFormElement(Locator.name("text"), LIST_DATA2);

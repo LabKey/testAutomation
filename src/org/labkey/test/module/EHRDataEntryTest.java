@@ -51,12 +51,10 @@ public class EHRDataEntryTest extends AbstractEHRTest
         saveLocation();
         impersonate(FULL_SUBMITTER.getEmail());
         recallLocation();
-        waitAndClick(Locator.linkWithText("Enter Data"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.linkWithText("Enter Data"));
 
         log("Create weight measurement task.");
-        waitAndClick(Locator.linkWithText("Enter Weights"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.linkWithText("Enter Weights"));
         waitForElement(Locator.name("title"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("title"), TASK_TITLE);
         _extHelper.selectComboBoxItem("Assigned To:", BASIC_SUBMITTER.getGroup() + "\u00A0"); // appended with a nbsp (Alt+0160)
@@ -122,8 +120,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         log("Fulfil measurement task");
         impersonate(BASIC_SUBMITTER.getEmail());
         recallLocation();
-        waitAndClick(Locator.linkWithText("Enter Data"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.linkWithText("Enter Data"));
         waitForElement(Locator.xpath("//div[contains(@class, 'my-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
 
         String href = getAttribute(Locator.linkWithText(TASK_TITLE), "href");
@@ -157,8 +154,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         sleep(1000); // Weird
         impersonate(DATA_ADMIN.getEmail());
         recallLocation();
-        waitAndClick(Locator.linkWithText("Enter Data"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.linkWithText("Enter Data"));
         waitForElement(Locator.xpath("//div[contains(@class, 'my-tasks-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtTab("Review Required");
         waitForElement(Locator.xpath("//div[contains(@class, 'review-requested-marker') and "+Locator.NOT_HIDDEN+"]//table"), WAIT_FOR_JAVASCRIPT);
@@ -180,10 +176,8 @@ public class EHRDataEntryTest extends AbstractEHRTest
 
         clickProject(PROJECT_NAME);
         clickFolder(FOLDER_NAME);
-        waitAndClick(Locator.linkWithText("Browse All Datasets"));
-        waitForPageToLoad();
-        waitAndClick(LabModuleHelper.getNavPanelItem("Weight:", "Browse All"));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.linkWithText("Browse All Datasets"));
+        waitAndClickAndWait(LabModuleHelper.getNavPanelItem("Weight:", "Browse All"));
 
         setFilter("query", "date", "Equals", DATE_FORMAT.format(new Date()));
         assertTextPresent("3.333", "4.444", "5.555");

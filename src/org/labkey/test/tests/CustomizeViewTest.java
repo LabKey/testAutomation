@@ -173,7 +173,6 @@ public class CustomizeViewTest extends BaseWebDriverTest
         assertTextPresent("unsaved");
 
         _customizeViewsHelper.revertUnsavedViewGridClosed();
-        waitForPageToLoad();
         assertTextNotPresent(newColumnDisplayName);
 
         _customizeViewsHelper.openCustomizeViewPanel();

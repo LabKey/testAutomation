@@ -285,12 +285,9 @@ public abstract class TimeChartTest extends StudyBaseTestWD
 
     protected void goToAxisTab(String axisLabel)
     {
-        //In Chrome: Unable to click x-asix label normally for some reason. Use javascript
-        if (getBrowserType().equals(BrowserType.CHROME.toString()))
-            fireEvent(Locator.css("svg text").containing(axisLabel).waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT), SeleniumEvent.click);
-        else
-            waitAndClick(Locator.css("svg text").containing(axisLabel));
-        waitForElement(Locator.button("Cancel"));
+        // Workaround: (Selenium 2.33) Unable to click axis labels reliably for some reason. Use javascript
+        fireEvent(Locator.css("svg text").containing(axisLabel).waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT), SeleniumEvent.click);
+        waitForElement(Locator.button("Cancel")); // Axis label windows always have a cancel button. It should be the only one on the page
     }
 
     protected void goToDeveloperTab()
@@ -324,13 +321,23 @@ public abstract class TimeChartTest extends StudyBaseTestWD
     }
 
     /**
-     * Wait for an SVG with the specified text
-     * @param svgText exact text expected
+     * Wait for an SVG with the specified text (Ignores thumbnails)
+     * @param svgText exact text expected. Spaces will be ignored due to inconsistencies accross different platforms.
      * @param svgIndex the zero-based index of the svg which is expected to match
      */
-    protected void waitForSvg(String svgText, int svgIndex)
+    protected void waitForSvg(final String svgText, final int svgIndex)
     {
-        waitForElement(Locator.css("div:not(.thumbnail) > svg").withText(svgText), WAIT_FOR_JAVASCRIPT, false);
+        if (doesElementAppear(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                String actualSvgText = getText(Locator.css("div:not(.thumbnail) > svg").index(svgIndex));
+                return actualSvgText.equals(svgText) || actualSvgText.replaceAll(" ", "").equals(svgText.replaceAll(" ", "")); // Spaces from SVGs are not consistent, try stripping them out
+            }
+        }, WAIT_FOR_JAVASCRIPT))
+            return;
+
         Assert.assertEquals("SVG text was not as expected", svgText, getText(Locator.css("div:not(.thumbnail) > svg").index(svgIndex)));
     }
 }

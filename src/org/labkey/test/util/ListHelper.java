@@ -75,7 +75,6 @@ public class ListHelper extends AbstractHelper
             _test._extHelper.waitForExtDialog("Success");
             _test.assertTextPresent(" inserted.");
             _test.clickButton("OK");
-            _test.waitForPageToLoad();
         }
     }
 

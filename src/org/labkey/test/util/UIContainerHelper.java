@@ -56,26 +56,21 @@ public class UIContainerHelper extends AbstractContainerHelper
         else
             _test.click(Locator.xpath("//td[./label[text()='Custom']]/input"));
 
-        _test.waitAndClick(Locator.button("Next"));
-        _test.waitForPageToLoad();
+        _test.waitAndClickAndWait(Locator.button("Next"));
 
         //second page of the wizard
-        _test.waitAndClick(Locator.button("Next"));
-        _test.waitForPageToLoad();
+        _test.waitAndClickAndWait(Locator.button("Next"));
 
         //third page of wizard
         if (_test.isElementPresent(Locator.button("Finish")))
         {
-            _test.waitAndClick(Locator.button("Finish"));
+            _test.waitAndClickAndWait(Locator.button("Finish"));
         }
         else
         {
             // There may be additional steps based on
-            _test.waitAndClick(Locator.button("Next"));
+            _test.waitAndClickAndWait(Locator.button("Next"));
         }
-
-        _test.waitForPageToLoad();
-        
     }
 
     @Override //TODO :  this will be necessary for full interconversion between UIcontainer and APIContainer,

@@ -118,13 +118,13 @@ public class SearchHelper extends AbstractHelper
 
                 if ( container != null )
                 {
-                    if ( _test.isLinkPresentContainingText("@files") )
+                    if ( _test.isElementPresent(Locator.linkContainingText("@files")) )
                         if(container.contains("@files"))
-                            _test.assertLinkPresentWithText(container);
+                            _test.assertElementPresent(Locator.linkWithText(container));
                         else
-                            _test.assertLinkPresentWithText(container + (item._file ? "/@files" : ""));
+                            _test.assertElementPresent(Locator.linkWithText(container + (item._file ? "/@files" : "")));
                     else
-                        _test.assertLinkPresentWithText(container);
+                        _test.assertElementPresent(Locator.linkWithText(container));
                 }
 
                 if ( crawlResults )
@@ -189,7 +189,7 @@ public class SearchHelper extends AbstractHelper
         {
             _test.setFormElement(Locator.id("search-input"), searchTerm);
             _test.pressEnter(Locator.id("search-input"));
-            _test.waitForPageToLoad();
+            _test.waitForElement(Locator.id("query"));
         }
     }
 
@@ -201,7 +201,7 @@ public class SearchHelper extends AbstractHelper
         if (_test.getAttribute(Locator.id("adv-search-btn"), "src").contains("plus"))
             _test.click(Locator.id("adv-search-btn"));
 
-        _test.checkCheckbox("category", 2);
+        _test.checkCheckbox(Locator.checkboxByName("category").index(2));
 
         _test.setFormElement(Locator.id("query"), searchTerm);
         _test.clickButton("Search");

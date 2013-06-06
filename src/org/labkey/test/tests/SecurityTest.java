@@ -349,9 +349,10 @@ public class SecurityTest extends BaseWebDriverTest
         String newPassword = password +"1";
         goToSiteUsers();
         clickAndWait(Locator.linkContainingText(displayNameFromEmail(username)));
+        prepForPageLoad();
         clickButtonContainingText("Reset Password", 0);
         getAlert();
-        waitForPageToLoad();
+        newWaitForPageToLoad();
         clickButton("Done");
 
         String url = getPasswordResetUrl(username);
@@ -690,8 +691,9 @@ public class SecurityTest extends BaseWebDriverTest
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("audit log"));
 
+        prepForPageLoad();
         selectOptionByText("view", "User events");
-        waitForPageToLoad();
+        newWaitForPageToLoad();
 
         DataRegionTable table = new DataRegionTable("audit", this, false);
 

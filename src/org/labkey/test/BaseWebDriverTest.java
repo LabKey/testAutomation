@@ -1565,7 +1565,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             return _driver.findElement(By.cssSelector("body")).getText();
         }
-        catch (StaleElementReferenceException ex)
+        catch (StaleElementReferenceException|NoSuchElementException ex)
         {
             try
             {
@@ -1576,17 +1576,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 return getHtmlSource(); // probably viewing a tsv or text file
             }
 
-        }
-        catch (NoSuchElementException ex)
-        {
-            try
-            {
-                return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body"))).getText();
-            }
-            catch (TimeoutException tex)
-            {
-                return getHtmlSource(); // probably viewing a tsv or text file
-            }
         }
     }
 
@@ -3391,10 +3380,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void waitForPageToLoad(int millis)
     {
-        _testTimeout = true;
-        selenium.waitForPageToLoad(Integer.toString(millis));
-        waitForExtOnReady();
-        _testTimeout = false;
+        throw new UnsupportedOperationException("selenium.waitForPageToLoad is deprecated. Use BaseWebDriverTest.prepForPageLoad and BaseWebDriverTest.newWaitForPageToLoad");
     }
 
     /**

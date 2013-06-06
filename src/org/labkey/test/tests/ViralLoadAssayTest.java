@@ -292,7 +292,6 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         String url = getCurrentRelativeURL();
         url += "&exportAsWebPage=1";
         beginAt(url);
-        waitForPageToLoad();
         waitForElement(_helper.getAssayWell("G1", LabModuleHelper.NEG_COLOR), WAIT_FOR_PAGE);
 
         waitAndClick(Locator.ext4Button("Download"));

@@ -187,7 +187,6 @@ public class UserTest extends SecurityTest
 
         clickButton("Save");
         waitAndClickButton("Change User Properties");
-        waitForPageToLoad();
 
         for (String field : REQUIRED_FIELDS)
         {
@@ -216,9 +215,10 @@ public class UserTest extends SecurityTest
 
         goToSiteUsers();
         clickAndWait(Locator.linkWithText(displayNameFromEmail(NORMAL_USER)));
+        prepForPageLoad();
         clickButtonContainingText("Reset Password", 0);
         assertAlertContains("You are about to clear the user's current password");
-        waitForPageToLoad();
+        newWaitForPageToLoad();
         clickAndWait(Locator.linkWithText("Done"));
         // View reset password email.
 //        clickProject(PROJECT_NAME);

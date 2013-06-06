@@ -406,7 +406,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         _extHelper.clickExtTab("XML Metadata");
         setQueryEditorValue("metadataText", xml);
         clickButton("Save", 0);
-        waitForText("Saved", WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod
@@ -659,5 +659,11 @@ public class ContainerContextTest extends BaseWebDriverTest
     protected void checkQueries()
     {
         //simplemodule has queries for list we didnt import
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

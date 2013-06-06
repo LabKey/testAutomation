@@ -18,6 +18,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -56,9 +57,18 @@ public class Ext4HelperWD extends AbstractHelperWD
             listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
 
         // wait for and select the list item
-        WebElement element = listItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.scrollIntoView(listItem); // Workaround: Auto-scrolling in chrome isn't working well
-        _test.click(listItem);
+        try
+        {
+            WebElement element = listItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            _test.scrollIntoView(element); // Workaround: Auto-scrolling in chrome isn't working well
+            _test.click(listItem);
+        }
+        catch (StaleElementReferenceException retry)
+        { // Workaround: Ext4 combo boxes do something wierd as they open; elements become stale for some reason
+            WebElement element = listItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            _test.scrollIntoView(element); // Workaround: Auto-scrolling in chrome isn't working well
+            _test.click(listItem);
+        }
 
         // close combo manually if it is a checkbox combo-box
         if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))

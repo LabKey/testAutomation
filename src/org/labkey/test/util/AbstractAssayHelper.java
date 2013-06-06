@@ -65,8 +65,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
         _test.clickAndWait(Locator.linkWithText("upload"));
         _test.setFormElement(Locator.name("uploadFile"), file);
-        _test.click(Locator.xpath("//input[contains(@type, 'SUBMIT') and contains(@value, 'Upload')]"));
-        _test.waitForPageToLoad();
+        _test.clickAndWait(Locator.xpath("//input[contains(@type, 'SUBMIT') and contains(@value, 'Upload')]"));
         _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + name, false);
     }
 

@@ -213,8 +213,9 @@ public abstract class AbstractAssayTestWD extends SimpleApiTestWD
         clickFolder(folder);
         enterStudySecurity();
 
+        prepForPageLoad();
         selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
-        waitForPageToLoad(30000);
+        newWaitForPageToLoad(30000);
 
         click(Locator.xpath("//td[.='" + group + "']/..//input[@value='" + perms + "']"));
 
