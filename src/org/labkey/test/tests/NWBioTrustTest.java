@@ -71,8 +71,22 @@ public class NWBioTrustTest extends SurveyTest
     {
         SUBMITTED("Submitted"),
         SUBMISSION_REVIEW("Submission Review"),
-        FEASIBILITY_REVIEW("Feasibility Review"),
-        PRIORITIZATION_REVIEW("Prioritization Review"),
+        FEASIBILITY_REVIEW("Feasibility Review")
+        {
+            @Override
+            public boolean isApproval()
+            {
+                return true;
+            }
+        },
+        PRIORITIZATION_REVIEW("Prioritization Review")
+        {
+            @Override
+            public boolean isApproval()
+            {
+                return true;
+            }
+        },
         APPROVED("Approved")
         {
             @Override
@@ -124,6 +138,11 @@ public class NWBioTrustTest extends SurveyTest
         }
 
         public boolean isLocked()
+        {
+            return false;
+        }
+
+        public boolean isApproval()
         {
             return false;
         }
@@ -707,6 +726,7 @@ public class NWBioTrustTest extends SurveyTest
             rowMap.put("Status", status.toString());
             rowMap.put("SortOrder", ((NwbtRequestStatuses)status).sortOrder());
             rowMap.put("LockedState", ((NwbtRequestStatuses)status).isLocked());
+            rowMap.put("ApprovalState", ((NwbtRequestStatuses)status).isApproval());
             rows.add(rowMap);
         }
         insertLookupTableRecords("RequestStatus", rows);
