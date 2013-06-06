@@ -186,7 +186,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickFolder(getStudyLabel());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
-        createReport(GRID_VIEW);
+        _extHelper.clickMenuButton("Create", GRID_VIEW);
 
         clickAndWait(Locator.linkWithText("Modify Dataset List (Advanced)"));
         createNewQuery("study");

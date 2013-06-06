@@ -299,16 +299,6 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
         clickButton("Save");
     }
 
-    protected void createReport(String reportType)
-    {
-        // click the create button dropdown
-        String id = _extHelper.getExtElementId("btn_createView");
-        click(Locator.id(id));
-
-        id = _extHelper.getExtElementId(reportType);
-        clickAndWait(Locator.id(id));
-    }
-
     public void selectOption(String name, int i, String value)
     {
         selectOptionByValue(Locator.tagWithName("select", name).index(i), value);

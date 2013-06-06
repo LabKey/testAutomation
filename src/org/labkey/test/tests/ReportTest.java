@@ -293,7 +293,7 @@ public class ReportTest extends StudyBaseTest
 
         // create new grid view report:
         String viewName = "DRT Eligibility Query";
-        createReport(GRID_VIEW);
+        _extHelper.clickMenuButton("Create", GRID_VIEW);
         setFormElement(Locator.name("label"), viewName);
         selectOptionByText(Locator.name("params"), "ECI-1 (ECI-1: Eligibility Criteria)");
         clickButton("Create View");
@@ -930,7 +930,7 @@ public class ReportTest extends StudyBaseTest
         clickFolder(getFolderName());
         goToManageViews();
 
-        createReport(GRID_VIEW);
+        _extHelper.clickMenuButton("Create", GRID_VIEW);
         setFormElement(Locator.name("label"), TEST_GRID_VIEW);
         selectOptionByText(Locator.id("datasetSelection"), "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create View");
@@ -2146,7 +2146,7 @@ public class ReportTest extends StudyBaseTest
         clickFolder(getFolderName());
         goToManageViews();
 
-        createReport(QUERY_VIEW);
+        _extHelper.clickMenuButton("Create", QUERY_VIEW);
 
         setFormElement("viewName", QUERY_REPORT_NAME);
         setFormElement("description", QUERY_REPORT_DESCRIPTION);
@@ -2175,7 +2175,7 @@ public class ReportTest extends StudyBaseTest
 
         goToManageViews();
 
-        createReport(QUERY_VIEW);
+        _extHelper.clickMenuButton("Create", QUERY_VIEW);
 
         setFormElement("viewName", QUERY_REPORT_NAME_2);
         setFormElement("description", QUERY_REPORT_DESCRIPTION_2);

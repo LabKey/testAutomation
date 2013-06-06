@@ -155,6 +155,7 @@ public enum TestSet
         AdminConsoleTest.class,
         DatasetPublishTest.class,
         StudyRedesignTest.class,
+        KnitrReportTest.class,
         AliquotTest.class
     ),
 

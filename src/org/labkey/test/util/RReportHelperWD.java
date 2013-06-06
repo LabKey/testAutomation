@@ -24,6 +24,9 @@ import org.labkey.test.WebTestHelper;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * User: klum
@@ -127,11 +130,9 @@ public class RReportHelperWD extends AbstractHelperWD
     }
 
     @LogMethod
-    public boolean ensureRConfig()
+    public String ensureRConfig()
     {
         _test.ensureAdminMode();
-        // user need to be added to the site developers group
-        // createSiteDeveloper(PasswordUtil.getUsername());
 
         _test.goToAdminConsole();
         _test.clickAndWait(Locator.linkWithText("views and scripting"));
@@ -141,7 +142,10 @@ public class RReportHelperWD extends AbstractHelperWD
         {
             if (_test.isREngineConfigured())
                 if(System.getProperty("teamcity.buildType.id") == null)
-                    return true;
+                {
+                    _test.doubleClick(Locator.css("div.x-grid3-col-0").containing("R Scripting Engine"));
+                    return getRVersion(new File(_test.getFormElement(Locator.id("editEngine_exePath"))));
+                }
                 else // Reset R scripting engine on TeamCity
                     deleteEngine();
         }
@@ -175,7 +179,7 @@ public class RReportHelperWD extends AbstractHelperWD
             {
                 for (File file : files)
                 {
-                    if (file.isFile() )
+                    if (file.canExecute() )
                     {
                         // add a new r engine configuration
                         String id = _test._extHelper.getExtElementId("btn_addEngine");
@@ -189,6 +193,9 @@ public class RReportHelperWD extends AbstractHelperWD
 
                         id = _test._extHelper.getExtElementId("editEngine_exePath");
                         _test.setFormElement(Locator.id(id), file.getAbsolutePath());
+
+                        String rVersion = getRVersion(file);
+                        _test.setFormElement(Locator.id("editEngine_languageVersion"), rVersion);
 
                         id = _test._extHelper.getExtElementId("btn_submit");
                         _test.click(Locator.id(id));
@@ -209,7 +216,7 @@ public class RReportHelperWD extends AbstractHelperWD
                             }
                         }, "unable to setup the R script engine", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-                        return true;
+                        return rVersion;
                     }
                 }
             }
@@ -223,7 +230,27 @@ public class RReportHelperWD extends AbstractHelperWD
             _test.log("R_HOME environment variable is not set.  Set R_HOME to your R bin directory to enable automatic configuration.");
         }
         Assert.fail("R is not configured on this system. Failed R tests.");
-        return false;
+        return null; // unreachable
+    }
+
+    private String getRVersion(File r)
+    {
+        try
+        {
+            Runtime rt = Runtime.getRuntime();
+            Process p = rt.exec(r.getAbsolutePath() + " --version");
+            String versionOutput = BaseWebDriverTest.getStreamContentsAsString(p.getErrorStream());
+
+            Pattern versionPattern = Pattern.compile("^R version ([1-9]\\.\\d+\\.\\d)");
+            Matcher matcher = versionPattern.matcher(versionOutput);
+            matcher.find();
+            return matcher.group(1);
+        }
+        catch(IOException ex)
+        {
+            Assert.fail("Unable to determine R version: " + r.getAbsolutePath());
+            return null; // Unreachable
+        }
     }
 
     @LogMethod
@@ -232,7 +259,7 @@ public class RReportHelperWD extends AbstractHelperWD
         if (_test.isREngineConfigured())
         {
             Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']");
-            _test.mouseDown(engine);
+            _test.click(engine);
 
             String id = _test._extHelper.getExtElementId("btn_deleteEngine");
             _test.click(Locator.id(id));

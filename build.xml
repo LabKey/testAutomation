@@ -304,6 +304,7 @@
             <include name="linkedschematest.module"/>
           </fileset>
         </copy>
+        <ant dir="${project.root}/server/test/modules/scriptpad" target="build" usenativebasedir="true"/>
 
         <!-- See if the test modules have been updated in the deployment directory (the copy will no-op
         if the source files are older, so the timestamps won't change) than the last time we remember deploying them --> 
@@ -1342,6 +1343,7 @@
         <antcall target="install-ruminex" />
         <antcall target="install-flowWorkspace" />
         <antcall target="install-flowStats" />
+        <antcall target="install-knitr" />
         <touch file="${basedir}/rPackageDeployment.timestamp" />
     </target>
 
@@ -1473,6 +1475,13 @@
     </target>
 
     <target name="install-flowStats" depends="install-flowWorkspace, install-flowStats-binary, install-flowStats-source">
+    </target>
+
+    <target name="install-knitr" if="R.present" depends="check-rlabkey-installed">
+        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="true" searchpath="true"
+              input="${project.root}/tools/Rpackages/install-knitr.R">
+            <arg line="--vanilla --quiet"/>
+        </exec>
     </target>
 
     <target name="check-flowWorkspace-installed" if="R.present" depends="locate-R">

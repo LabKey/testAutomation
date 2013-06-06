@@ -84,11 +84,11 @@ modules/scriptpad/module.properties -text
 modules/scriptpad/resources/reports/schemas/consoleOnly.r -text
 modules/scriptpad/resources/reports/schemas/err.r -text
 modules/scriptpad/resources/reports/schemas/errOnly.r -text
-modules/scriptpad/resources/reports/schemas/script.r -text
-modules/scriptpad/resources/reports/schemas/script.rhtml -text
-modules/scriptpad/resources/reports/schemas/script.rmd -text
 modules/scriptpad/resources/reports/schemas/script2.r -text
 modules/scriptpad/resources/reports/schemas/script3.r -text
+modules/scriptpad/resources/reports/schemas/script_r.r -text
+modules/scriptpad/resources/reports/schemas/script_rhtml.rhtml -text
+modules/scriptpad/resources/reports/schemas/script_rmd.rmd -text
 modules/scriptpad/resources/schemas/dbscripts/postgresql/scriptpad-0.00-0.01.sql -text
 modules/scriptpad/resources/schemas/dbscripts/sqlserver/scriptpad-0.00-0.01.sql -text
 modules/scriptpad/resources/schemas/scriptpad.xml -text
@@ -311,6 +311,7 @@ src/org/labkey/test/tests/ICEMRModuleTest.java -text
 src/org/labkey/test/tests/IssuesTest.java -text
 src/org/labkey/test/tests/JUnitTest.java -text
 src/org/labkey/test/tests/JavaClientApiTest.java -text
+src/org/labkey/test/tests/KnitrReportTest.java -text
 src/org/labkey/test/tests/LabModulesTest.java -text
 src/org/labkey/test/tests/LibraTest.java -text
 src/org/labkey/test/tests/LinkedSchemaTest.java -text

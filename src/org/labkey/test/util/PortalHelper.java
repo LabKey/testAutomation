@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
@@ -187,6 +188,40 @@ public class PortalHelper extends AbstractHelper
         }
 
         _test.waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title));
+    }
+
+    public void addReportWebPart(@LoggedParam String reportId)
+    {
+        addReportWebPart(null, reportId, null);
+    }
+
+    @LogMethod(quiet = true)public void addReportWebPart(@LoggedParam @Nullable String title, @LoggedParam @NotNull String reportId, @Nullable Boolean showTabs, String... visibleSections)
+    {
+        addWebPart("Report");
+
+        if (title != null)
+            _test.setFormElement(Locator.name("title"), title);
+
+        _test.selectOptionByText(Locator.id("reportId"), reportId);
+
+        if (showTabs != null)
+        {
+            if(showTabs)
+                _test.checkCheckbox(Locator.id("showTabs"));
+            else
+                _test.uncheckCheckbox(Locator.id("showTabs"));
+        }
+
+        if (visibleSections.length > 0)
+            _test.waitForElement(Locator.id("showSection"));
+        for (String section : visibleSections)
+        {
+            _test.selectOptionByValue(Locator.id("showSection"), section);
+        }
+
+        _test.clickButton("Submit");
+
+        _test.waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title != null ? title : "Reports"));
     }
 
     /**
