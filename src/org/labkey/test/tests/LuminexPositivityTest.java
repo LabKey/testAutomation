@@ -16,11 +16,13 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PerlHelper;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,9 +32,9 @@ import java.util.List;
  */
 public class LuminexPositivityTest extends LuminexTest
 {
-
-    private String assayName = "Positivity";
-
+    private int _expectedThresholdValue = 100;
+    private int _newThresholdValue = 100;
+    private List<String> _thresholdInputNames = new ArrayList<>();
 
     protected void ensureConfigured()
     {
@@ -47,15 +49,17 @@ public class LuminexPositivityTest extends LuminexTest
 
     protected void runUITests()
     {
+        String assayName = "Positivity";
+
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + "/resources/transformscripts/description_parsing_example.pl"), 0);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 1);
-
-        //clickButton("Save & Close");
-        //TODO: Just 'Save & Close' to avoid timing issues. Blocked
         saveAssay();
-        sleep(5000);
+
+        _thresholdInputNames.add("_analyte_MyAnalyte (1)_PositivityThreshold");
+        _thresholdInputNames.add("_analyte_Blank (3)_PositivityThreshold");
 
         // Test positivity data upload with 3x Fold Change
+        setPositivityThresholdParams(100, 100);
         uploadPositivityFile(assayName + " 3x Fold Change", "1", "3", false);
         String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A8", "B8", "A9", "B9"};
         checkPositivityValues("positive", posWells.length, posWells);
@@ -64,6 +68,7 @@ public class LuminexPositivityTest extends LuminexTest
         checkDescriptionParsingForPositivityXLS();
 
         // Test positivity data upload with 5x Fold Change
+        setPositivityThresholdParams(100, 101);
         uploadPositivityFile(assayName + " 5x Fold Change", "1", "5", false);
         posWells = new String[] {"A8", "B8", "A9", "B9"};
         checkPositivityValues("positive", posWells.length, posWells);
@@ -72,11 +77,13 @@ public class LuminexPositivityTest extends LuminexTest
         checkDescriptionParsingForPositivityXLS();
 
         // Test positivity data upload w/out a baseline visit and/or fold change
+        setPositivityThresholdParams(101, 101);
         uploadPositivityFile(assayName + " No Fold Change", "1", "", false);
         // should result in error for having a base visit without a fold change
-        assertTextPresent("An error occurred when running the script (exit code: 1).", "Error: No value provided for 'Positivity Fold Change'.");
+        waitForText("An error occurred when running the script 'tomaras_luminex_transform.R', exit code: 1).");
+        assertTextPresent("Error: No value provided for 'Positivity Fold Change'.");
         clickButton("Cancel");
-        // TODO: set positivity threshold analyte props to 1000
+        setPositivityThresholdParams(101, 100);
         uploadPositivityFile(assayName + " No Base Visit", "", "", false);
         posWells = new String[] {"A1", "B1", "A2", "B2", "A3", "B3", "A4", "B4", "A6", "B6", "A7", "B7", "A8", "B8", "A9", "B9"};
         checkPositivityValues("positive", posWells.length, posWells);
@@ -85,14 +92,31 @@ public class LuminexPositivityTest extends LuminexTest
         checkDescriptionParsingForPositivityXLS();
     }
 
+    private void setPositivityThresholdParams(int expectedValue, int newValue)
+    {
+        _expectedThresholdValue = expectedValue;
+        _newThresholdValue = newValue;
+    }
+
+    @Override
+    protected void setPositivityThresholdValues()
+    {
+        for (String inputName : _thresholdInputNames)
+        {
+            Locator l = Locator.xpath("//input[@type='text' and @name='" + inputName + "'][1]");
+            waitForElement(l);
+            Assert.assertEquals(Integer.toString(_expectedThresholdValue), getFormElement(l));
+            setFormElement(l, Integer.toString(_newThresholdValue));
+        }
+    }
+
     /**
      * This function verify three specific descriptions present in positivity.xls are present in the
      * data grid and that they have been correctly processed
      */
     private void checkDescriptionParsingForPositivityXLS()
     {
-        //TODO:  bug
-//        checkDescriptionParsing("123400001 1 2012-10-01", "", "123400001", "1", "2012-10-01");
+        checkDescriptionParsing("123400001 1 2012-10-01", "", "123400001", "1.0", "2012-10-01");
         checkDescriptionParsing("123400002,2,1/15/2012", "", "123400002", "2.0", "2012-01-15");
         checkDescriptionParsing("P562, Wk 48, 7-27-2011", "", "P562", "48.0", "2011-07-27");
 
@@ -125,7 +149,5 @@ public class LuminexPositivityTest extends LuminexTest
             int i = wells.indexOf(well);
             Assert.assertEquals(type, posivitiy.get(i));
         }
-
-        //verify correctly parsed the description file into participant id, visit id, and date
     }
 }

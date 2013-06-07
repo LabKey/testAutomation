@@ -2304,18 +2304,24 @@ public class LuminexTest extends AbstractQCAssayTest
         goToTestAssayHome();
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement("name", assayName);
-        checkCheckbox("calculatePositivity");
-        setFormElement("baseVisit", baseVisit);
-        setFormElement("positivityFoldChange", foldChange);
+        setFormElement(Locator.name("name"), assayName);
+        checkCheckbox(Locator.name("calculatePositivity"));
+        setFormElement(Locator.name("baseVisit"), baseVisit);
+        setFormElement(Locator.name("positivityFoldChange"), foldChange);
         File positivityData = new File(getSampledataPath(), "Luminex/Positivity.xls");
         Assert.assertTrue("Positivity Data absent: " + positivityData.toString(), positivityData.exists());
-        setFormElement("__primaryFile__", positivityData);
+        setFormElement(Locator.name("__primaryFile__"), positivityData);
         clickButton("Next");
+        setPositivityThresholdValues();
         clickButton("Save and Finish");
         if (!isBackgroundUpload && !isTextPresent("Error"))
             clickAndWait(Locator.linkWithText(assayName));
-    }    
+    }
+
+    protected void setPositivityThresholdValues()
+    {
+        // no op
+    }
 
     @LogMethod
     protected void runFileUploadTest()
