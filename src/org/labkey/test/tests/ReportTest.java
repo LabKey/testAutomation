@@ -2144,7 +2144,7 @@ public class ReportTest extends StudyBaseTest
         clickFolder(getFolderName());
         goToManageViews();
 
-        _extHelper.clickMenuButton("Create", "Query View");
+        _extHelper.clickMenuButton("Create", "Query Report");
 
         setFormElement("viewName", QUERY_REPORT_NAME);
         setFormElement("description", QUERY_REPORT_DESCRIPTION);
@@ -2173,7 +2173,7 @@ public class ReportTest extends StudyBaseTest
 
         goToManageViews();
 
-        _extHelper.clickMenuButton("Create", "Query View");
+        _extHelper.clickMenuButton("Create", "Query Report");
 
         setFormElement("viewName", QUERY_REPORT_NAME_2);
         setFormElement("description", QUERY_REPORT_DESCRIPTION_2);
