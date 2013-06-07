@@ -244,20 +244,9 @@ public class RReportHelperWD extends AbstractHelperWD
             Process p = rt.exec(r.getCanonicalPath() + " --version");
             String versionOutput;
 
-            Capabilities caps = ((RemoteWebDriver) _test.getDriver()).getCapabilities();
-            Platform platform = caps.getPlatform();
-
-            switch (platform)
-            {
-                // R for Windows outputs version info to stderr
-                case WINDOWS:
-                case WIN8:
-                    versionOutput = BaseWebDriverTest.getStreamContentsAsString(p.getErrorStream());
-                    break;
-
-                default:
-                    versionOutput = BaseWebDriverTest.getStreamContentsAsString(p.getInputStream());
-            }
+            // Different platforms output version info differently; just combine all std/err output
+            versionOutput = BaseWebDriverTest.getStreamContentsAsString(p.getInputStream());
+            versionOutput += BaseWebDriverTest.getStreamContentsAsString(p.getErrorStream());
 
             _test.log("R --version >\n" + versionOutput);
 
