@@ -43,7 +43,6 @@ public class ReportTest extends StudyBaseTest
     private static final String MICE_B = "Mice B";
     private static final String MICE_C = "Mice C";
     private final RReportHelper _rReportHelper = new RReportHelper(this);
-    protected static final String GRID_VIEW = "create_gridView";
     private final static String DATA_SET = "DEM-1: Demographics";
     private final static String DATA_BASE_PREFIX = "DEM";
     private final static String R_SCRIPT1_ORIG_FUNC = "length(x)";
@@ -291,7 +290,7 @@ public class ReportTest extends StudyBaseTest
 
         // create new grid view report:
         String viewName = "DRT Eligibility Query";
-        _extHelper.clickMenuButton("Create", GRID_VIEW);
+        _extHelper.clickMenuButton("Create", "Grid View");
         setFormElement(Locator.name("label"), viewName);
         selectOptionByText(Locator.name("params"), "ECI-1 (ECI-1: Eligibility Criteria)");
         clickButton("Create View");
@@ -928,7 +927,7 @@ public class ReportTest extends StudyBaseTest
         clickFolder(getFolderName());
         goToManageViews();
 
-        _extHelper.clickMenuButton("Create", GRID_VIEW);
+        _extHelper.clickMenuButton("Create", "Grid View");
         setFormElement(Locator.name("label"), TEST_GRID_VIEW);
         selectOptionByText(Locator.id("datasetSelection"), "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create View");
