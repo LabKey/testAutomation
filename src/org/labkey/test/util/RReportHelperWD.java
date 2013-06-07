@@ -21,6 +21,9 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -238,10 +241,27 @@ public class RReportHelperWD extends AbstractHelperWD
         try
         {
             Runtime rt = Runtime.getRuntime();
-            Process p = rt.exec(r.getAbsolutePath() + " --version");
-            String versionOutput = BaseWebDriverTest.getStreamContentsAsString(p.getErrorStream());
+            Process p = rt.exec(r.getCanonicalPath() + " --version");
+            String versionOutput;
 
-            Pattern versionPattern = Pattern.compile("^R version ([1-9]\\.\\d+\\.\\d)");
+            Capabilities caps = ((RemoteWebDriver) _test.getDriver()).getCapabilities();
+            Platform platform = caps.getPlatform();
+
+            switch (platform)
+            {
+                // R for Windows outputs version info to stderr
+                case WINDOWS:
+                case WIN8:
+                    versionOutput = BaseWebDriverTest.getStreamContentsAsString(p.getErrorStream());
+                    break;
+
+                default:
+                    versionOutput = BaseWebDriverTest.getStreamContentsAsString(p.getInputStream());
+            }
+
+            _test.log("R --version >\n" + versionOutput);
+
+            Pattern versionPattern = Pattern.compile("R version ([1-9]\\.\\d+\\.\\d)");
             Matcher matcher = versionPattern.matcher(versionOutput);
             matcher.find();
             return matcher.group(1);
