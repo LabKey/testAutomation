@@ -20,7 +20,7 @@ import com.googlecode.sardine.DavResource;
 import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.PasswordUtil;
 
@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WebDavTest extends BaseSeleniumWebTest
+public class WebDavTest extends BaseWebDriverTest
 {
     final String PROJECT_NAME="WebDavTest";
     final String TEXT = "Four score and seven years ago our fathers brought forth on this continent a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal.\n"+
@@ -126,10 +126,15 @@ public class WebDavTest extends BaseSeleniumWebTest
         deleteProject(getProjectName(), afterTest);
     }
 
-
     @Override
     public String getAssociatedModuleDirectory()
     {
         return null;
+    }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

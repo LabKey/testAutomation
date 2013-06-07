@@ -16,7 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
@@ -25,7 +25,7 @@ import org.labkey.test.TestTimeoutException;
  * Date: 3/14/12
  * Time: 12:03 PM
  */
-public class ProjectSettingsTest extends BaseSeleniumWebTest
+public class ProjectSettingsTest extends BaseWebDriverTest
 {
     private static final Locator supportLink = Locator.xpath("//a[contains(@href, 'support')]/span[text()='Support']");
     private static final Locator helpLink = Locator.xpath("//a[@target='labkeyHelp']/span[contains(text(), 'LabKey Documentation')]");
@@ -121,5 +121,11 @@ public class ProjectSettingsTest extends BaseSeleniumWebTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/core";
+    }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

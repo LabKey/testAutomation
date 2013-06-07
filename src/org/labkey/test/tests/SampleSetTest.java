@@ -17,7 +17,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
@@ -28,7 +28,7 @@ import java.io.File;
  * User: jeckels
  * Date: Nov 19, 2007
  */
-public class SampleSetTest extends BaseSeleniumWebTest
+public class SampleSetTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleSetTestProject";
     private static final String FOLDER_NAME = "SampleSetTestFolder";
@@ -207,15 +207,19 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clickTab("Experiment");
         clickAndWait(Locator.linkWithText("Sample Sets"));
         clickButton("Import Sample Set");
-        setFormElement("name", FOLDER_CHILDREN_SAMPLE_SET_NAME);
-        setFormElement("data", AMBIGUOUS_CHILD_SAMPLE_SET_TSV);
-        selectOptionByText("parentCol", "Parent");
+        setFormElement(Locator.name("name"), FOLDER_CHILDREN_SAMPLE_SET_NAME);
+        setFormElement(Locator.name("data"), AMBIGUOUS_CHILD_SAMPLE_SET_TSV);
+        fireEvent(Locator.name("data"), SeleniumEvent.change);
+        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
+        setFormElement(Locator.id("parentCol"), "Parent"); // selectOptionByText helper breaks on this for some reason
         clickButton("Submit");
         assertTextPresent("More than one match for parent material");
 
         // Try again with a qualified sample name
-        setFormElement("data", CHILD_SAMPLE_SET_TSV);
-        selectOptionByText("parentCol", "Parent");
+        setFormElement(Locator.name("data"), CHILD_SAMPLE_SET_TSV);
+        fireEvent(Locator.name("data"), SeleniumEvent.change);
+        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
+        setFormElement(Locator.id("parentCol"), "Parent"); // selectOptionByText helper breaks on this for some reason
         clickButton("Submit");
         assertTextPresent("SampleSetBVTChildA");
 
@@ -234,13 +238,15 @@ public class SampleSetTest extends BaseSeleniumWebTest
         clickTab("Experiment");
         clickAndWait(Locator.linkWithText("Sample Sets"));
         clickButton("Import Sample Set");
-        setFormElement("name", FOLDER_CHILDREN_SAMPLE_SET_NAME);
-        setFormElement("data", GRANDCHILD_SAMPLE_SET_TSV);
-        selectOptionByText("parentCol", "Parent");
+        setFormElement(Locator.name("name"), FOLDER_CHILDREN_SAMPLE_SET_NAME);
+        setFormElement(Locator.name("data"), GRANDCHILD_SAMPLE_SET_TSV);
+        fireEvent(Locator.name("data"), SeleniumEvent.change);
+        waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
+        setFormElement(Locator.id("parentCol"), "Parent"); // selectOptionByText helper breaks on this for some reason
         clickButton("Submit");
 
         assertTextPresent("A sample set with that name already exists");
-        setFormElement("name", FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
+        setFormElement(Locator.name("name"), FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
         clickButton("Submit");
 
         clickAndWait(Locator.linkWithText("SampleSetBVTGrandchildA"));
@@ -350,5 +356,11 @@ public class SampleSetTest extends BaseSeleniumWebTest
         String path = drt.getDataAsText(index, "File Attachment");
         Assert.assertNotNull("Path shouldn't be null", path);
         Assert.assertTrue("Path didn't contain " + attachment.getName() + ", but was: " + path, path.contains(attachment.getName()));
+    }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
