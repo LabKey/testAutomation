@@ -2663,7 +2663,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                         "   ,true      // can bubble?\n" +
                         "   ,true      // cancelable?\n" +
                         ");\n" +
-                        "element.dispatchEvent(myEvent);", el);
+                        "element.dispatchEvent(myEvent);", el, event.toString());
     }
 
     @LogMethod
