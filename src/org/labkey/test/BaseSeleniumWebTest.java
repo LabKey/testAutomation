@@ -4500,7 +4500,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @Deprecated
     public void setFormElement(String element, String text)
     {
-        setFormElement(Locator.raw(element), text, false);
+        if (isElementPresent(Locator.id(element)))
+        {
+            log("DEPRECATED: Form element locator '' is an id; use Locator.id()");
+            setFormElement(Locator.id(element), text, false);
+        }
+        else
+        {
+            log("DEPRECATED: Form element locator '' is a name; use Locator.name()");
+            setFormElement(Locator.name(element), text, false);
+        }
     }
 
     public void setFormElement(Locator element, String text, boolean suppressValueLogging)
@@ -4521,7 +4530,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void setFormElement(String element, File file)
     {
         Assert.assertTrue("Test must be declared as file upload by overriding isFileUploadTest().", isFileUploadAvailable());
-        setFormElement(Locator.raw(element), file.getAbsolutePath());
+        setFormElement(element, file.getAbsolutePath());
     }
 
     public void setFormElement(Locator loc, File file)
@@ -4817,7 +4826,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             // Confirm the deletion
             clickButton("OK", 0);
-            waitForElement(Locator.raw("//td/img[@id='partstatus_" + index + "' and contains(@src, 'deleted')]"), WAIT_FOR_JAVASCRIPT);
+            waitForElement(Locator.xpath("//td/img[@id='partstatus_" + index + "' and contains(@src, 'deleted')]"), WAIT_FOR_JAVASCRIPT);
         }
     }
 
@@ -4945,17 +4954,18 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     /** Sets selection state for rows of the data region on the current page. */
     public void checkAllOnPage(String dataRegionName)
     {
-        String id = EscapeUtil.jsString(dataRegionName);
-        checkCheckbox(Locator.raw("document.forms[" + id + "].elements['.toggle']"));
+        String id = Locator.xq("dataregion_" + dataRegionName);
+        Locator checkAllCheckbox = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']");
+        checkCheckbox(checkAllCheckbox);
     }
 
     /** Clears selection state for rows of the data region on the current page. */
     public void uncheckAllOnPage(String dataRegionName)
     {
-        String id = EscapeUtil.jsString(dataRegionName);
-        Locator toggle = Locator.raw("document.forms[" + id + "].elements['.toggle']");
-        checkCheckbox(toggle);
-        uncheckCheckbox(toggle);
+        String id = Locator.xq("dataregion_" + dataRegionName);
+        Locator checkAllCheckbox = Locator.xpath("//table[@id=" + id + "]//input[@name='.toggle']");
+        checkCheckbox(checkAllCheckbox);
+        uncheckCheckbox(checkAllCheckbox);
     }
 
     /** Sets selection state for single rows of the data region. */
@@ -4968,15 +4978,17 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     /** Sets selection state for single rows of the data region. */
     public void checkDataRegionCheckbox(String dataRegionName, int index)
     {
-        String id = EscapeUtil.jsString(dataRegionName);
-        checkCheckbox(Locator.raw("document.forms[" + id + "].elements['.select'][" + index + "]"));
+        String id = Locator.xq("dataregion_" + dataRegionName);
+        Locator select = Locator.xpath("//table[@id=" + id + "]//input[@name='.select']").index(index);
+        checkCheckbox(select);
     }
 
     /** Sets selection state for single rows of the data region. */
     public void uncheckDataRegionCheckbox(String dataRegionName, int index)
     {
-        String id = EscapeUtil.jsString(dataRegionName);
-        uncheckCheckbox(Locator.raw("document.forms[" + id + "].elements['.select'][" + index + "]"));
+        String id = Locator.xq("dataregion_" + dataRegionName);
+        Locator select = Locator.xpath("//table[@id=" + id + "]//input[@name='.select']").index(index);
+        uncheckCheckbox(select);
     }
 
     public void toggleCheckboxByTitle(String title)
@@ -5045,7 +5057,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void checkCheckboxByNameInDataRegion(String name)
     {
-        checkCheckbox(Locator.raw("//a[contains(text(), '" + name + "')]/../..//td/input"));
+        checkCheckbox(Locator.xpath("//a[contains(text(), '" + name + "')]/../..//td/input"));
     }
 
     public void checkButtonByText(String text)
@@ -6030,15 +6042,15 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void goToPipelineItem(String item)
     {
         int time = 0;
-        while (getText(Locator.raw("//td[contains(text(),'" + item + "')]/../td[2]/a")).compareTo("WAITING") == 0
+        while (getText(Locator.xpath("//td[contains(text(),'" + item + "')]/../td[2]/a")).compareTo("WAITING") == 0
                 && time < defaultWaitForPage)
         {
             sleep(100);
             time += 100;
             refresh();
         }
-        clickAndWait(Locator.raw("//td[contains(text(),'" + item + "')]/../td[2]/a"));
-        waitForElement(Locator.raw("//input[@value='Data']"), WAIT_FOR_JAVASCRIPT);
+        clickAndWait(Locator.xpath("//td[contains(text(),'" + item + "')]/../td[2]/a"));
+        waitForElement(Locator.xpath("//input[@value='Data']"), WAIT_FOR_JAVASCRIPT);
         clickButton("Data");
     }
 

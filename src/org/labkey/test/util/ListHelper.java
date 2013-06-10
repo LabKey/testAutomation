@@ -245,7 +245,7 @@ public class ListHelper extends AbstractHelper
     public enum ListColumnType
     {
         MutliLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), Subject("Subject/Participant (String)"), DateTime("DateTime"), Boolean("Boolean"),
-        Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer"), Flag("Flag");
+        Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer"), Flag("Flag (String)");
 
         private final String _description;
 
@@ -729,7 +729,7 @@ public class ListHelper extends AbstractHelper
         {
             // Confirm the deletion
             _test.clickButton("OK", 0);
-            _test.waitForElement(Locator.raw("//td/img[@id='partstatus_" + index + "' and contains(@src, 'deleted')]]"), _test.WAIT_FOR_JAVASCRIPT);
+            _test.waitForElement(Locator.xpath("//td/img[@id='partstatus_" + index + "' and contains(@src, 'deleted')]]"), _test.WAIT_FOR_JAVASCRIPT);
         }
     }
     

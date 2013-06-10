@@ -504,7 +504,7 @@ public class MS2Test extends MS2TestBase
         checkCheckbox("expanded");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         pushLocation();
-        checkCheckbox(Locator.raw("document.forms['ProteinGroupsWithQuantitation'].elements['.select'][0]"));
+        checkDataRegionCheckbox("ProteinGroupsWithQuantitation", 0);
         clickMenuButton("Export Selected", "TSV");
         assertTextPresent("Group");
         assertTextPresent("PP Unique");

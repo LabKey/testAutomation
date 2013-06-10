@@ -314,7 +314,7 @@ public class IssuesTest extends BaseSeleniumWebTest
     // Add a keyword to the given field, without verifying the operation.  Need to be on the issues admin page already.
     private static void addKeyword(BaseSeleniumWebTest test, String fieldName, String caption, String value)
     {
-        test.setFormElement(Locator.formElement("add" + fieldName, "keyword"), value);
+        test.setFormElement(Locator.xpath("//form[@name='add" + fieldName + "']/input[@name='keyword']"), value);
         test.clickButton("Add " + caption);
     }
 
@@ -438,8 +438,8 @@ public class IssuesTest extends BaseSeleniumWebTest
     {
         goToModule("Issues");
         clickButton("Admin");
-        setFormElement(Locator.formElement("entryTypeNames", "entrySingularName"), "Ticket");
-        setFormElement(Locator.formElement("entryTypeNames", "entryPluralName"), "Tickets");
+        setFormElement(Locator.name("entrySingularName"), "Ticket");
+        setFormElement(Locator.name("entryPluralName"), "Tickets");
         clickButton("Update");
 
         assertFormElementEquals("entrySingularName", "Ticket");
@@ -456,8 +456,8 @@ public class IssuesTest extends BaseSeleniumWebTest
         assertTextNotPresent("Issue ID");
 
         clickButton("Admin");
-        setFormElement(Locator.formElement("entryTypeNames", "entrySingularName"), "Issue");
-        setFormElement(Locator.formElement("entryTypeNames", "entryPluralName"), "Issues");
+        setFormElement(Locator.name("entrySingularName"), "Issue");
+        setFormElement(Locator.name("entryPluralName"), "Issues");
         clickButton("Update");
     }
 

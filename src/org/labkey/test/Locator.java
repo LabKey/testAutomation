@@ -44,7 +44,7 @@ public abstract class Locator
     protected String _text;
 
     // XPATH fragments
-    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets')])";
+    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets')] or (@type = 'hidden'))";
     public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'disabled')])";
 
     @Deprecated
@@ -98,12 +98,6 @@ public abstract class Locator
     }
 
     public abstract By toBy();
-
-    @Deprecated
-    public static Locator raw(String str)
-    {
-        return new DeprecatedLocator(str);
-    }
 
     private void turnOnImplicitWait(WebDriver driver)
     {
@@ -253,18 +247,6 @@ public abstract class Locator
     @Deprecated public static Locator name(String name, Integer index)
     {
         return new NameLocator(name).index(index);
-    }
-
-    /**
-     * Find using script expression. Can be any amount of script,
-     * result of evaluating last expression will be returned.
-     * @param scriptExpr
-     * @return
-     */
-    @Deprecated
-    public static Locator dom(String scriptExpr)
-    {
-        return new DeprecatedLocator("dom=" + scriptExpr);
     }
 
     /**
@@ -475,12 +457,6 @@ public abstract class Locator
     public static XPathLocator input(String name)
     {
         return tagWithName("input", name);
-    }
-
-    @Deprecated
-    public static Locator formElement(String formName, String elementName)
-    {
-        return dom("document['" + formName + "']['" + elementName + "']");
     }
 
     public static XPathLocator radioButtonByTitle(String title)

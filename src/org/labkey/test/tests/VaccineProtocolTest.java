@@ -52,7 +52,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         setFormElement(Locator.inputByLabel("Investigator", 3), "My Investigator");
         setFormElement(Locator.inputByLabel("Grant", 1), "My Grant");
         setFormElement(Locator.inputByLabel("Species", 3), "Rabbit");
-        selenium.fireEvent(Locator.raw("//div[contains(text(), 'Click to edit description')]/..").toString(), "focus");
+        selenium.fireEvent(Locator.xpath("//div[contains(text(), 'Click to edit description')]/..").toString(), "focus");
         setFormElement("protocolDescription", "This is a very important protocol");
 
         clickButton("Save", 0);
@@ -239,7 +239,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("Create New Dataset"));
         setFormElement("typeName", "Simple");
         clickButton("Next");
-        waitForElement(Locator.raw("ff_name0"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
         _listHelper.setColumnName(0, "Value");
         clickButton("Save");
         waitForElement(Locator.navButton("View Data"), WAIT_FOR_JAVASCRIPT);

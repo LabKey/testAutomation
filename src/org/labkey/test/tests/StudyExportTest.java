@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.Ext4HelperWD;
+import org.junit.Assert;
 
 import java.io.File;
 
@@ -265,9 +266,9 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Create New Request");
         String inputs = selenium.getValue("inputs");
         System.out.println(inputs);
-        assertFormElementNotEquals(Locator.dom("document.forms[1].inputs[1]"), "Duke University, NC");
+        Assert.assertNotEquals(selenium.getEval("selenium.browserbot.getCurrentWindow().document.forms[1].inputs[1].value;"), "Duke University, NC");
         selectOptionByText("destinationLocation", "Duke University (Repository, Site Affiliated Lab, Clinic)");
-        assertFormElementEquals(Locator.dom("document.forms[1].inputs[1]"), "Duke University, NC");
+        Assert.assertEquals(selenium.getEval("selenium.browserbot.getCurrentWindow().document.forms[1].inputs[1].value;"), "Duke University, NC");
         clickButton("Cancel");
 
         // manage new request
@@ -454,7 +455,7 @@ public class StudyExportTest extends StudyManualTest
         popLocation();
 
         log("Test deleting rows in a dataset");
-        checkCheckbox(Locator.raw("//input[contains(@value, '999320529')]"));
+        checkCheckbox(Locator.xpath("//input[contains(@value, '999320529')]"));
         clickButton("Delete", 0);
         getConfirmationAndWait();
         assertTextNotPresent("999320529");

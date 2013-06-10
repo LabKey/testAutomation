@@ -16,17 +16,19 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.interactions.Actions;
 
 /**
  * User: kevink
  * Date: Sep 13, 2010
  * Time: 1:41:34 PM
  */
-public class ReagentTest extends BaseSeleniumWebTest
+public class ReagentTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "ReagentProject";
     protected static final String FOLDER_NAME = "ReagentFolder";
@@ -70,7 +72,7 @@ public class ReagentTest extends BaseSeleniumWebTest
 
         beginAt("reagent/" + PROJECT_NAME + "/" + FOLDER_NAME + "/initialize.view");
         clickButton("Initialize", 0);
-        waitForText("Done.", 2*WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.name("webpart").containing("Done."), 2 * WAIT_FOR_JAVASCRIPT);
     }
 
     public void _testInsert()
@@ -83,20 +85,19 @@ public class ReagentTest extends BaseSeleniumWebTest
 
         log("** Selecting AntigenId from ComboBox list");
         // click on ComboBox trigger image
-        click(Locator.xpath("//input[@name='AntigenId']/../img"));
-        waitForElement(Locator.xpath("//div[contains(@class, 'x-combo-list-item')]//b[text()='AVDLSHFLK']"), WAIT_FOR_JAVASCRIPT);
-        click(Locator.xpath("//div[contains(@class, 'x-combo-list-item')]//b[text()='AVDLSHFLK']"));
-        assertFormElementEquals(Locator.xpath("//input[@name='AntigenId']/../input[contains(@class, 'x-form-field')]"), "AVDLSHFLK");
+        _extHelper.selectComboBoxItem("Antigen:", "AVDLSHFLK");
 
         log("** Filtering LabelId ComboBox by 'Alexa'");
-        click(Locator.xpath("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]"));
-        setFormElement("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]", "Alexa");        
-        Number alexaLabels = selenium.getXpathCount("//div[contains(@class, 'x-combo-list')]//b[text()='Alexa 405']/../../..//b");
-        Assert.assertEquals("Expected to find 5 Alexa labels", 5, alexaLabels.intValue());
 
-        pressDownArrow("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]");
-        pressDownArrow("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]");
-        pressEnter("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]");
+        click(Locator.xpath("//input[@name='LabelId']/../img"));
+        setFormElement(Locator.xpath("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]"), "Alexa");
+        int alexaLabels = getElementCount(Locator.tag("div").withClass("x-combo-list-item").notHidden().containing("Alexa"));
+        Assert.assertEquals("Expected to find 5 Alexa labels", 5, alexaLabels);
+
+        Actions builder = new Actions(getDriver());
+        builder.sendKeys(Keys.ARROW_DOWN, Keys.ARROW_DOWN).build().perform();
+
+        waitAndClick(Locator.tag("div").withClass("x-combo-selected").withText("Alexa 680").notHidden());
         assertFormElementEquals(Locator.xpath("//input[@name='LabelId']/../input[contains(@class, 'x-form-field')]"), "Alexa 680");
     }
 

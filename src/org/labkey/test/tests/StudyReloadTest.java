@@ -17,7 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
-import org.testng.Assert;
+import org.junit.Assert;
 
 import java.io.File;
 
@@ -65,6 +65,5 @@ public class StudyReloadTest extends StudyBaseTest
         click(ff_name1);
         click(Locator.linkContainingText("Advanced"));
         Assert.assertEquals("on", getAttribute(Locator.name("protected"), "value"));
-
     }
 }

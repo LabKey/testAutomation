@@ -169,7 +169,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 
     public void addSpecimenId(String id, String value, int index)
     {
-        String xpath = "//input[@name='" + id + "'][" + index + "]";
+        Locator xpath = Locator.xpath("//input[@name='" + id + "'][" + index + "]");
         setFormElement(xpath, value);
         pressTab(xpath);
     }

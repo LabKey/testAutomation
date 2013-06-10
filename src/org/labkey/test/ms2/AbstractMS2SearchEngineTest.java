@@ -116,7 +116,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         waitForPipelineJobsToComplete(1, SAMPLE_BASE_NAME + " (test2)", false);
 
-        clickAndWait(Locator.raw("//a[contains(text(), '" + SAMPLE_BASE_NAME + " (test2)')]/../../td/a"));
+        clickAndWait(Locator.xpath("//a[contains(text(), '" + SAMPLE_BASE_NAME + " (test2)')]/../../td/a"));
 
         log("View log file.");
 
@@ -212,7 +212,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
     {
         selenium.select("//tr[td/table/tbody/tr/td/div[contains(text(),'Quantitation engine')]]/td/select","Libra");
         assertTextPresent("Libra config name", "Libra normalization channel");
-        setFormElement("//tr[td/table/tbody/tr/td/div[text()='Libra config name']]/td/input", "foo");
+        setFormElement(Locator.xpath("//tr[td/table/tbody/tr/td/div[text()='Libra config name']]/td/input"), "foo");
         String text = getFormElement("configureXml");
         Assert.assertTrue(text.contains("foo"));
     }

@@ -249,17 +249,17 @@ public class StudyRedesignTest extends StudyBaseTest
         assertTextPresent(PTIDS_TWO);
 
         //Filter a mouse in GROUP 2
-        setFormElement("//div[contains(text(), 'Filter')]//input", "999320038");
+        setFormElement(Locator.xpath("//div[contains(text(), 'Filter')]//input"), "999320038");
         fireEvent(Locator.xpath("//div[contains(text(), 'Filter')]//input"), SeleniumEvent.blur);
         waitForText("Found 1 mouse of 138.");
 
         //Filter a mouse not in GROUP 2
-        setFormElement("//div[contains(text(), 'Filter')]//input", "999320518");
+        setFormElement(Locator.xpath("//div[contains(text(), 'Filter')]//input"), "999320518");
         fireEvent(Locator.xpath("//div[contains(text(), 'Filter')]//input"), SeleniumEvent.blur);
         waitForText("No mouse IDs contain \"999320518\".");
 
         //Remove filter
-        setFormElement("//div[contains(text(), 'Filter')]//input", "");
+        setFormElement(Locator.xpath("//div[contains(text(), 'Filter')]//input"), "");
         fireEvent(Locator.xpath("//div[contains(text(), 'Filter')]//input"), SeleniumEvent.blur);
         waitForText("Found 13 mice of 138.");
 

@@ -77,12 +77,12 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickButton("New Assay Design");
         checkRadioButton("providerName", "Microarray");
         clickButton("Next");
-        waitForElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
-        setFormElement(Locator.raw("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);
-        setFormElement(Locator.raw("//td[contains(text(), 'Description')]/..//td/textarea"), ASSAY_DESCRIPTION);
+        waitForElement(Locator.xpath("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
+        setFormElement(Locator.xpath("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);
+        setFormElement(Locator.xpath("//td[contains(text(), 'Description')]/..//td/textarea"), ASSAY_DESCRIPTION);
         addField("Batch Fields", 0, BATCH_STRING_FIELD, BATCH_STRING_FIELD, ListHelper.ListColumnType.String);
         addField("Run Fields", 0, RUN_STRING_FIELD, RUN_STRING_FIELD, ListHelper.ListColumnType.String);
-        setFormElement("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']", XPATH_TEST);
+        setFormElement(Locator.xpath("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']"), XPATH_TEST);
         addField("Run Fields", 1, RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, ListHelper.ListColumnType.Integer);
         addField("Data Properties", 0, DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, ListHelper.ListColumnType.String);
         clickButton("Save", 0);
@@ -115,17 +115,17 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         setFormElement("batchStringField", "SingleRunProperties");
         clickButton("Next");
         assertTextPresent(MAGEML_FILE1);
-        waitForElement(Locator.raw("//div[contains(text(), 'Sample 1')]/../..//tr/td/select"), defaultWaitForPage);
-        waitForElement(Locator.raw("//option[contains(text(), 'Second')]"), defaultWaitForPage);
+        waitForElement(Locator.xpath("//div[contains(text(), 'Sample 1')]/../..//tr/td/select"));
+        waitForElement(Locator.xpath("//option[contains(text(), 'Second')]"));
         setFormElement("runIntegerField", "115468001");
         clickButton("Save and Import Next File");
 
         log("Import second run");
-        waitForElement(Locator.raw("//div[contains(text(), 'Sample 2')]/../..//tr/td/select"), defaultWaitForPage);
+        waitForElement(Locator.xpath("//div[contains(text(), 'Sample 2')]/../..//tr/td/select"));
         assertTextPresent(MAGEML_FILE2);
         setFormElement("runIntegerField", "115468002");
-        selectOptionByText("//div[contains(text(), 'Sample 1')]/../..//tr/td/select", "Third");
-        selectOptionByText("//div[contains(text(), 'Sample 2')]/../..//tr/td/select", "Fourth");
+        selectOptionByText(Locator.xpath("//div[contains(text(), 'Sample 1')]/../..//tr/td/select"), "Third");
+        selectOptionByText(Locator.xpath("//div[contains(text(), 'Sample 2')]/../..//tr/td/select"), "Fourth");
         clickButton("Save and Finish");
         waitForText(ASSAY_NAME + " Runs", 30000);
         assertTextPresent("SingleRunProperties");
@@ -237,7 +237,7 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickAndWait(Locator.linkWithText(MAGEML_FILE2));
         assertTextPresent("115468002");
-        clickLink(Locator.raw("//a[contains(text(), '" + MAGEML_FILE2 + "')]/../..//td/a[contains(text(), 'view')]"));
+        clickAndWait(Locator.xpath("//a[contains(text(), '" + MAGEML_FILE2 + "')]/../..//td/a[contains(text(), 'view')]"));
         waitForText(ASSAY_DESCRIPTION, 30000);
         assertTextPresent(DATA_FIELD_TEST_NAME);
         clickAndWait(Locator.linkWithText("view results"));

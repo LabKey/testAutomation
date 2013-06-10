@@ -239,16 +239,16 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         {
             case get:
                 setFormElement("txtUrlGet", url);
-                click(Locator.raw("//input[@id='btnGet']"));
+                click(Locator.xpath("//input[@id='btnGet']"));
                 break;
             case post:
                 setFormElement("txtUrlPost", url);
                 setFormElement("txtPost", StringUtils.trimToEmpty(formData));
-                click(Locator.raw("//input[@id='btnPost']"));
+                click(Locator.xpath("//input[@id='btnPost']"));
                 break;
         }
 
-        if (isElementPresent(Locator.raw("//div[@id='lblStatus' and contains(text(), 'ERROR')]")))
+        if (isElementPresent(Locator.xpath("//div[@id='lblStatus' and contains(text(), 'ERROR')]")))
             Assert.fail("The request has failed: " + url);
 
         waitForText("Request Complete", defaultWaitForPage);
@@ -257,9 +257,9 @@ public abstract class SimpleApiTest extends BaseSeleniumWebTest
         if (!StringUtils.isEmpty(expectedResponse))
         {
             if (failOnMatch)
-                assertElementNotPresent(Locator.raw("//pre[@id='lblResponse' and contains(text(), '" + expectedResponse + "')]"));
+                assertElementNotPresent(Locator.xpath("//pre[@id='lblResponse' and contains(text(), '" + expectedResponse + "')]"));
             else
-                assertElementPresent(Locator.raw("//pre[@id='lblResponse' and contains(text(), '" + expectedResponse + "')]"));
+                assertElementPresent(Locator.xpath("//pre[@id='lblResponse' and contains(text(), '" + expectedResponse + "')]"));
 
             assertTextPresent("Request Complete.");
         }

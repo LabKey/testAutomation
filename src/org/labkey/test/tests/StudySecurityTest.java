@@ -223,7 +223,7 @@ public class StudySecurityTest extends StudyBaseTest
         //setup advanced dataset security
         enterStudySecurity();
 
-        waitForElement(Locator.raw("securityString"));
+        waitForElement(Locator.name("securityString"));
         selectOptionByValue(Locator.name("securityString"), "ADVANCED_WRITE");
         waitForPageToLoad();
 

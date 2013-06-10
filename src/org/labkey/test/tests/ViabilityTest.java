@@ -95,7 +95,7 @@ public class ViabilityTest extends AbstractViabilityTest
 
         log("** Set Unreliable flag and IntValue");
         checkCheckbox("_pool_1604505335_0_Unreliable", 0);
-        setFormElement("//input[@name='_pool_1604505335_0_IntValue'][1]", "300");
+        setFormElement(Locator.xpath("//input[@name='_pool_1604505335_0_IntValue'][1]"), "300");
 
         clickButton("Save and Finish", 0);
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
