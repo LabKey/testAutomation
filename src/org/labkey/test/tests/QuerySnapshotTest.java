@@ -30,7 +30,6 @@ public class QuerySnapshotTest extends StudyBaseTest
     private final String DEMOGRAPHICS_SNAPSHOT = "Demographics Snapshot";
     private final String APX_SNAPSHOT = "APX Joined Snapshot";
     private final String CROSS_STUDY_SNAPSHOT = "Cross study query snapshot";
-    protected static final String GRID_VIEW = "create_gridView";
     private static final String FOLDER_1 = "054";
     private static final String FOLDER_2 = "065";
 
@@ -186,7 +185,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickFolder(getStudyLabel());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
-        _extHelper.clickMenuButton("Create", GRID_VIEW);
+        _extHelper.clickMenuButton("Create", "Grid View");
 
         clickAndWait(Locator.linkWithText("Modify Dataset List (Advanced)"));
         createNewQuery("study");
