@@ -7025,12 +7025,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickButton("Create and Edit Source", 0);
         waitForElement(Locator.id("labkey-nav-trail-current-page").withText("Edit " + name));
 //        toggleSQLQueryEditor();
-        setQueryEditorValue("queryText", sql);
+        setCodeEditorValue("queryText", sql);
 //        setFormElement("queryText", sql);
         if (xml != null)
         {
             _extHelper.clickExtTab("XML Metadata");
-            setQueryEditorValue("metadataText", xml);
+            setCodeEditorValue("metadataText", xml);
 //        toggleMetadataQueryEditor();
 //        setFormElement("metadataText", xml);
         }
@@ -7260,23 +7260,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.fail("Running pipeline jobs were found.  Timeout:" + wait);
     }
 
-    public void toggleEditAreaOff(final String underlyingTextAreaId)
-    {
-        Locator toggleCheckBoxId = Locator.id("edit_area_toggle_checkbox_" + underlyingTextAreaId);
-        waitForElement(toggleCheckBoxId, WAIT_FOR_JAVASCRIPT);
-        uncheckCheckbox(toggleCheckBoxId);
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                String style = getAttribute(Locator.id(underlyingTextAreaId), "style");
-                return style.contains("display: inline");
-            }
-        }, "Expected to toggle edit_area off and display textarea " + underlyingTextAreaId, WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void setQueryEditorValue(String id, String value)
+    public void setCodeEditorValue(String id, String value)
     {
         _extHelper.setCodeMirrorValue(id, value);
     }

@@ -336,7 +336,7 @@ public class ReportTest extends StudyBaseTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         clickMenuButton("Views", "Create", "R View");
-        setReportEditorValue("script", "");
+        setCodeEditorValue("script-report-editor", " ");
 
         log("Execute bad scripts");
         clickViewTab();
@@ -371,7 +371,7 @@ public class ReportTest extends StudyBaseTest
         _customizeViewsHelper.removeCustomizeViewColumn(R_REMCOL);
         _customizeViewsHelper.addCustomizeViewFilter("DEMhisp", "3.Latino\\a or Hispanic?", "Does Not Equal", "Yes");
         _customizeViewsHelper.addCustomizeViewSort(R_SORT, "2.What is your sex?", "Descending");
-        _customizeViewsHelper.saveCustomView("R View");
+        _customizeViewsHelper.saveCustomView("Custom Query View");
 
         log("Check that customize view worked");
         assertTextNotPresent(R_REMCOL);
@@ -381,7 +381,7 @@ public class ReportTest extends StudyBaseTest
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
         clickMenuButton("Views", "Create", "R View");
-        setReportEditorValue("script", "labkey.data");
+        setCodeEditorValue("script-report-editor", "labkey.data");
         clickViewTab();
         waitForText(R_SORT1);
         assertTextNotPresent(R_REMCOL);
@@ -528,7 +528,7 @@ public class ReportTest extends StudyBaseTest
     {
 
         clickMenuButton("Views", "Create", "R View");
-        setReportEditorValue("script", scriptValue);
+        setCodeEditorValue("script-report-editor", scriptValue);
 
         // if there are any shared scripts, check the check box so they get included when the report is rendered
         if (sharedScripts != null && sharedScripts.length > 0)
@@ -1935,7 +1935,7 @@ public class ReportTest extends StudyBaseTest
         assertTextPresentInThisOrder("Your code should define a single function", "data:", "measureInfo:", "clickEvent:");
         assertTextPresentInThisOrder("YAxisMeasure:", "XAxisMeasure:", "ColorMeasure:", "PointMeasure:");
         _ext4Helper.clickTabContainingText("Source");
-        String fn = _extHelper.getQueryEditorValue("point-click-fn-textarea");
+        String fn = _extHelper.getCodeEditorValue("point-click-fn-textarea");
         Assert.assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, measureInfo, clickEvent) {"));
         // apply the default point click function
         clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
@@ -1946,10 +1946,10 @@ public class ReportTest extends StudyBaseTest
         clickButton("OK", 0);
         // open developer panel and test JS function validation
         clickOptionButtonAndWaitForDialog("Developer", "Developer Options");
-        _extHelper.setQueryEditorValue("point-click-fn-textarea", "");
+        _extHelper.setCodeEditorValue("point-click-fn-textarea", "");
         _extHelper.clickExtButton("Developer Options", "OK", 0);
         assertTextPresent("Error: the value provided does not begin with a function declaration.");
-        _extHelper.setQueryEditorValue("point-click-fn-textarea", "function(){");
+        _extHelper.setCodeEditorValue("point-click-fn-textarea", "function(){");
         _extHelper.clickExtButton("Developer Options", "OK", 0);
         assertTextPresent("Error parsing the function:");
         clickButton("Disable", 0);
@@ -1959,7 +1959,7 @@ public class ReportTest extends StudyBaseTest
         // test use-case to navigate to query page on click
         clickButton("Enable", 0);
         String function = getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
-        _extHelper.setQueryEditorValue("point-click-fn-textarea", function);
+        _extHelper.setCodeEditorValue("point-click-fn-textarea", function);
         clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
         saveScatterPlot(SCATTER_PLOT_NAME_MV + " PointClickFn", SCATTER_PLOT_DESC_MV + " PointClickFn");
         clickAndWait(Locator.css("svg a circle"));

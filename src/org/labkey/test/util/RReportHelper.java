@@ -64,7 +64,7 @@ public class RReportHelper extends AbstractHelper
             _test._extHelper.clickExtTab("Source");
         }
 
-        _test.setReportEditorValue("script", script);
+        _test.setCodeEditorValue("script-report-editor", script);
         _test._extHelper.clickExtTab("View");
         _test._extHelper.waitForLoadingMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT * 5);
         _test.waitForElement(Locator.xpath("//table[@class='labkey-output']"), _test.getDefaultWaitForPage());

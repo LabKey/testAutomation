@@ -518,7 +518,7 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickButton("Create New Query");
         setFormElement(Locator.name("ff_newQueryName"), "New NabQuery");
         clickAndWait(Locator.linkWithText("Create and Edit Source"));
-        setQueryEditorValue("queryText",
+        setCodeEditorValue("queryText",
                 "SELECT \n" +
                         QUERY_NAME + ".Properties.AUC As AUC,\n" +
                         QUERY_NAME + ".Properties.CurveIC50_4pl,\n" +
@@ -526,7 +526,7 @@ public class NabAssayTest extends AbstractQCAssayTest
                         QUERY_NAME + ".Properties.SpecimenLsid.Property.ParticipantID,\n" +
                         QUERY_NAME + ".WellgroupName\n" +
                         "FROM " + QUERY_NAME + "\n"
-                       );
+        );
         clickButton("Save & Finish", 0);
         waitForText("Views", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("AUC", "Curve IC50 4pl", "Curve IC50 4pl OOR Indicator", "Participant ID", "Wellgroup Name");

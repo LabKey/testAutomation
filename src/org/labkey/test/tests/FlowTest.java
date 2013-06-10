@@ -166,7 +166,7 @@ public class FlowTest extends BaseFlowTestWD
         clickButton("Create and Edit Source");
 
         // Start Query Editing
-        setQueryEditorValue("queryText", "SELECT " + analysisName + ".RowId, " +
+        setCodeEditorValue("queryText", "SELECT " + analysisName + ".RowId, " +
                 analysisName + ".Statistic.\"Count\", " +
                 analysisName + ".Run.FilePathRoot, " +
                 analysisName + ".FCSFile.Run.WellCount " +

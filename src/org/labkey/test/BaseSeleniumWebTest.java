@@ -6355,12 +6355,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         setFormElement("ff_newQueryName", name);
         clickButton("Create and Edit Source");
 //        toggleSQLQueryEditor();
-        setQueryEditorValue("queryText", sql);
+        setCodeEditorValue("queryText", sql);
 //        setFormElement("queryText", sql);
         if (xml != null)
         {
             _extHelper.clickExtTab("XML Metadata");
-            setQueryEditorValue("metadataText", xml);
+            setCodeEditorValue("metadataText", xml);
 //        toggleMetadataQueryEditor();
 //        setFormElement("metadataText", xml);
         }
@@ -6940,48 +6940,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.fail("Running pipeline jobs were found.  Timeout:" + wait);
     }
 
-    protected void toggleMetadataQueryEditor()
+    public void setCodeEditorValue(String id, String value)
     {
-        toggleEditAreaOff("metadataText");
-    }
-
-    public void toggleScriptReportEditor()
-    {
-        toggleEditAreaOff("script");
-    }
-
-    public void toggleEditAreaOff(final String underlyingTextAreaId)
-    {
-        Locator toggleCheckBoxId = Locator.id("edit_area_toggle_checkbox_" + underlyingTextAreaId);
-        waitForElement(toggleCheckBoxId, WAIT_FOR_JAVASCRIPT);
-        uncheckCheckbox(toggleCheckBoxId);
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                String style = getAttribute(Locator.id(underlyingTextAreaId), "style");
-                return style.contains("display: inline");
-            }
-        }, "Expected to toggle edit_area off and display textarea " + underlyingTextAreaId, WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void setQueryEditorValue(String id, String value)
-    {
-        _extHelper.setQueryEditorValue(id, value);
-    }
-
-    /**
-     * Temporary until, the report editor can be migrated to codemirror
-     * @param id
-     * @param value
-     */
-    public void setReportEditorValue(String id, String value)
-    {
-        Locator toggleCheckBoxId = Locator.id("edit_area_toggle_checkbox_" + id);
-        waitForElement(toggleCheckBoxId, WAIT_FOR_JAVASCRIPT);
-
-        _extHelper.setReportEditorValue(id, value);
+        _extHelper.setCodeEditorValue(id, value);
     }
 
     /**

@@ -432,7 +432,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         // Issue 17592: Query: inconsistent handling of query metadata xml -- database metadata overrides file metadata until we get clarification of expected behavior...
         log("** Applying metadata xml override to list...");
         beginAt("/query/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/sourceQuery.view?schemaName=lists&query.queryName=" + LIST_NAME + "#metadata");
-        setQueryEditorValue("metadataText", LIST_METADATA_OVERRIDE);
+        setCodeEditorValue("metadataText", LIST_METADATA_OVERRIDE);
         clickButton("Save", 0);
         waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
         waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);

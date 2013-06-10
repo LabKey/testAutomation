@@ -124,7 +124,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         setFormElement(Locator.name("ff_newQueryName"), "My APX Query");
         selectOptionByText(Locator.name("ff_baseTableName"), QUERY_MEASURE_DATASET);
         clickButton("Create and Edit Source");
-        setQueryEditorValue("queryText", "SELECT x.MouseId, x.MouseVisit, x.SequenceNum, x.APXtempc, x.sfdt_136 FROM \"APX-1: Abbreviated Physical Exam\" AS x");
+        setCodeEditorValue("queryText", "SELECT x.MouseId, x.MouseVisit, x.SequenceNum, x.APXtempc, x.sfdt_136 FROM \"APX-1: Abbreviated Physical Exam\" AS x");
         clickButton("Save & Finish");
         waitForElement(Locator.paginationText(47));
 

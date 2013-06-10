@@ -232,7 +232,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         setFormElement("ff_newQueryName", "cross study query");
         clickButton("Create and Edit Source");
-        setQueryEditorValue("queryText", CROSS_STUDY_QUERY_SQL);
+        setCodeEditorValue("queryText", CROSS_STUDY_QUERY_SQL);
         clickButton("Save & Finish");
         
         createQuerySnapshot(CROSS_STUDY_SNAPSHOT, true, false, "keyField", 3);
