@@ -56,7 +56,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(3);
         clickAndWait(Locator.linkWithText("ERROR"));
-        assertTextPresent("An error occurred when running the script (exit code: 1).", 3);
+        assertTextPresent("An error occurred when running the script 'tomaras_luminex_transform.R', exit code: 1).", 3);
         assertTextPresent("Error: No value provided for 'Positivity Fold Change'.", 3);
         checkExpectedErrors(2);
     }
