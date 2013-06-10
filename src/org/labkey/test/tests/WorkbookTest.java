@@ -54,6 +54,7 @@ public class WorkbookTest extends BaseWebDriverTest
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
+        deleteProject(PROJECT_NAME2, afterTest);
     }
 
     @Override @LogMethod
