@@ -29,7 +29,6 @@ import java.io.FilenameFilter;
  */
 public class ListExportTest extends ListTest
 {
-    String downloadDirectory = "";
     @Override
     protected String getProjectName()
     {
@@ -39,28 +38,24 @@ public class ListExportTest extends ListTest
     @Override
     protected void doTestSteps()
     {
-        downloadDirectory = System.getenv("DL_DIR");
 
         setUpList(getProjectName());
         String filter = ".*Colors.*\\.xlsx";
-        int fileCount = getNumFilesWithNameInDlDir(downloadDirectory, filter);
+        int fileCount = getNumFilesWithNameInDlDir(getDownloadDir(), filter);
         exportList();
         sleep(1000);
-        File[] fileAfterDownload =  getFilesWithNameInDlDir(downloadDirectory, filter);
-        Assert.assertEquals(fileCount+1, fileAfterDownload.length);
+        File[] fileAfterDownload =  getFilesWithNameInDlDir(getDownloadDir(), filter);
+        Assert.assertEquals(1, fileAfterDownload.length - fileCount);
 
         File exportedFile = fileAfterDownload[fileAfterDownload.length-1];
         exportedFile.deleteOnExit();
     }
 
-    private File[] getFilesWithNameInDlDir(String dir, String fileRegEx)
+    private File[] getFilesWithNameInDlDir(File dir, String fileRegEx)
     {
-        File folder = new File(dir);
-        File[] list = folder.listFiles(new FilterOnName((fileRegEx)));
-        return list;
-
+        return dir.listFiles(new FilterOnName((fileRegEx)));
     }
-    private int getNumFilesWithNameInDlDir(String dir, String fileRegEx)
+    private int getNumFilesWithNameInDlDir(File dir, String fileRegEx)
     {
         return getFilesWithNameInDlDir(dir, fileRegEx).length;
     }
@@ -68,7 +63,7 @@ public class ListExportTest extends ListTest
     private void exportList()
     {
         clickButton("Export", 0);
-        click(Locator.name("excelExportType", 1));
+        click(Locator.name("excelExportType").index(1));
         clickButton("Export to Excel", 0);
     }
 
