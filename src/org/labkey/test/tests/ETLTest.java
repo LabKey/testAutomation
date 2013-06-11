@@ -117,13 +117,15 @@ public class ETLTest extends BaseWebDriverTest
     private void deleteSourceRow(String... ids)
     {
         goToProjectHome();
-        click(Locator.xpath("//span[text()='Source']"));
+        clickAndWait(Locator.xpath("//span[text()='Source']"));
         for(String id : ids)
         {
             click(Locator.xpath("//a[text()='"+id+"']/../../td/input[@type='checkbox']"));
         }
+        prepForPageLoad();
         click(Locator.xpath("//span[text()='Delete']"));
         dismissAlerts();
+        newWaitForPageToLoad();
         goToProjectHome();
     }
 
@@ -169,6 +171,6 @@ public class ETLTest extends BaseWebDriverTest
     @Override
     public BrowserType bestBrowser()
     {
-        return BrowserType.FIREFOX;
+        return BrowserType.CHROME;
     }
 }
