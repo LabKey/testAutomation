@@ -247,11 +247,13 @@ public class NWBioTrustTest extends SurveyTest
 
         if (toDelete > 0)
         {
+            prepForPageLoad();
             clickButton("Delete", 0);
             if (toDelete == 1)
                 assertAlert("Are you sure you want to delete this survey design and its associated surveys?");
             else
                 assertAlert("Are you sure you want to delete these " + toDelete + " survey designs and their associated survey instances?");
+            newWaitForPageToLoad();
 
             clickTab("New Sample Requests");
             waitForText("No sample requests to show", WAIT_FOR_PAGE);
