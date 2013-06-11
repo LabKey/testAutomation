@@ -114,8 +114,7 @@ public class KnitrReportTest extends BaseWebDriverTest
 
         _extHelper.clickMenuButton("Create", "R View");
         checkRadioButton(Locator.radioButtonByNameAndValue("knitrFormat", format.toString()));
-        uncheckCheckbox(Locator.id("edit_area_toggle_checkbox_script"));
-        setFormElement(Locator.id("script"), reportSource);
+        setCodeEditorValue("script-report-editor", reportSource);
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Save View");
         _extHelper.setExtFormElement(reportName);
