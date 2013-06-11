@@ -114,7 +114,6 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
         goToModule("Pipeline");
         clickButton("Process and Import Data");
         selectPipelineFileAndImportAction(EXCEL_FILE_NAME, "Use " + ASSAY_NAME);
-        clickButton("Next");
         clickButton("Save and Finish");
     }
 
