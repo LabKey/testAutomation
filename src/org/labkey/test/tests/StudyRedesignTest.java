@@ -37,7 +37,7 @@ public class StudyRedesignTest extends StudyBaseTest
     protected static final String EDITED_DATASET = "CPS-1: Screening Chemistry Panel";
     private static final String PARTICIPANT_GROUP_ONE = "GROUP 1";
     private static final String PARTICIPANT_GROUP_TWO = "GROUP 2";
-    private static final String PARTICIPANT_GROUP_THREE = "ThisIsAGroupThatHasALongNameWithoutAnySpacesInIt";
+    private static final String PARTICIPANT_GROUP_THREE = "ThisIsAGroupThatHasALong'NameWithoutAnySpacesInIt";
     private static final String[] PTIDS_ONE = {"999320016", "999320518", "999320529", "999320533", "999320541", "999320557",
                                                "999320565", "999320576", "999320582", "999320590"};
     private static final String[] PTIDS_TWO = {"999320004", "999320007", "999320010", "999320016", "999320018", "999320021",

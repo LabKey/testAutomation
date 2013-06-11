@@ -645,7 +645,7 @@ public class StudyTest extends StudyBaseTest
         clickFolder(STUDY_NAME);
         clickAndWait(Locator.linkWithText("Alt ID mapping"));
         assertTextPresent("Contains up to one row of Alt ID mapping data for each ");
-        click(Locator.tagWithText("span", "Import Data"));
+        clickButton("Import Data");
         waitForText("This is the Alias Dataset. You do not need to include information for the date column");
 
         //the crawler should be paused (this is done in create) to verify
