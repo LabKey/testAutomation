@@ -4502,12 +4502,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         if (isElementPresent(Locator.id(element)))
         {
-            log("DEPRECATED: Form element locator '' is an id; use Locator.id()");
+            log("DEPRECATED: Form element locator '" + element + "' is an id; use Locator.id");
             setFormElement(Locator.id(element), text, false);
         }
         else
         {
-            log("DEPRECATED: Form element locator '' is a name; use Locator.name()");
+            log("DEPRECATED: Form element locator '" + element + "' is a name; use Locator.name");
             setFormElement(Locator.name(element), text, false);
         }
     }

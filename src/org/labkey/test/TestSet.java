@@ -52,7 +52,8 @@ public enum TestSet
         FileContentTest.class,
         ClientAPITest.class,
         ChartingAPITest.class,
-        ReportTest.class,
+        DataReportsTest.class,
+        ScatterPlotTest.class,
         MicroarrayTest.class,
         ButtonCustomizationTest.class,
         ReagentTest.class,
@@ -156,6 +157,10 @@ public enum TestSet
         DatasetPublishTest.class,
         StudyRedesignTest.class,
         KnitrReportTest.class,
+        BoxPlotTest.class,
+        NonStudyReportsTest.class,
+        ParticipantReportTest.class,
+        ReportSecurityTest.class,
         AliquotTest.class
     ),
 
@@ -291,7 +296,6 @@ public enum TestSet
         AssayTest.class,
         SpecimenMergeTest.class,
         TargetStudyTest.class,
-        ReportTest.class,
         QuerySnapshotTest.class,
         SCHARPStudyTest.class,
         AncillaryStudyTest.class,
@@ -299,6 +303,19 @@ public enum TestSet
         ExtraKeyStudyTest.class,
         SampleMindedImportTest.class,
         StudyPublishTest.class
+    ),
+
+    Reports(
+        TimeChartVisitBasedTest.class,
+        TimeChartDateBasedTest.class,
+        TimeChartAPITest.class,
+        DataReportsTest.class,
+        BoxPlotTest.class,
+        ScatterPlotTest.class,
+        NonStudyReportsTest.class,
+        ParticipantReportTest.class,
+        ReportSecurityTest.class,
+        KnitrReportTest.class
     ),
 
     Specimen

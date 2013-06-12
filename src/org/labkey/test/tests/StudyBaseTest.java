@@ -174,6 +174,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void importStudy(){importStudy(null);}
 
+    @LogMethod
     protected void importStudy(String pipelinePath)
     {
         initializeFolder();
