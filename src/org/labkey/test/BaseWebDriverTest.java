@@ -1499,13 +1499,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _driver.switchTo().window((String)windows[1]);
         log("Waiting for system maintenance to complete");
 
+        int timeLeft = 1 * 60 * 1000 - ((Long)elapsed).intValue();
         // Page updates automatically via AJAX... keep checking (up to 10 minutes from the start of the test) for system maintenance complete text
         waitFor(new Checker() {
             public boolean check()
             {
                 return isTextPresent("System maintenance complete");
             }
-        }, "System maintenance failed to complete in 10 minutes.", 10 * 60 * 1000 - ((Long)elapsed).intValue());
+        }, "System maintenance failed to complete in 10 minutes.", timeLeft > 0 ? timeLeft : 0);
 
         _driver.close();
         _driver.switchTo().window((String)windows[0]);
@@ -3165,10 +3166,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         for (String text : texts)
         {
-            text = text.replace("&", "&amp;");
-            text = text.replace("<", "&lt;");
-            text = text.replace(">", "&gt;");
-            if (!source.contains(text))
+            String excapedText = text
+                    .replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;");
+            if (!source.contains(excapedText))
                 missingTexts.add(text);
         }
         return missingTexts;
@@ -3408,7 +3410,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             public boolean check()
             {
                 // Wait for marker to disappear
-                return (Boolean)executeScript("if(window.preppedForPageLoadMarker) return false; else return true;");
+                return (Boolean)executeScript("try {if(window.preppedForPageLoadMarker) return false; else return true;}" +
+                                              "catch(e) {return false;}");
             }
         }, "Page failed to load", millis);
         _testTimeout = false;
@@ -3448,7 +3451,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public boolean doesElementAppear(Checker checker, int wait)
     {
         Long startTime = System.currentTimeMillis();
-        while ( (System.currentTimeMillis() - startTime) < wait )
+        do
         {
             try
             {
@@ -3457,7 +3460,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
             catch (Exception ignore) {} // Checker exceptions count as a false check
             sleep(100);
-        }
+        } while ((System.currentTimeMillis() - startTime) < wait);
         if (!checker.check())
         {
             _testTimeout = true;
@@ -4471,7 +4474,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getTableCellText(Locator.XPathLocator table, int row, int column)
     {
-        return getText(table.append("/tbody/tr[" + (row + 1) + "]/*[(name()='TH' or name()='TD' or name()='th' or name()='td') and position() = " + (column + 1) + "]"));
+        return StringUtils.normalizeSpace(getText(table.append("/tbody/tr[" + (row + 1) + "]/*[(name()='TH' or name()='TD' or name()='th' or name()='td') and position() = " + (column + 1) + "]")));
     }
 
     public Locator getSimpleTableCell(Locator.XPathLocator table, int row, int column)
@@ -5157,9 +5160,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @Deprecated public void setFormElement(String name, String text)
     {
         if(_driver.findElements(By.name(name)).size() > 0)
+        {
+            log("Form element is named: \"" + name + "\". Use Locator.name");
             setFormElement(Locator.name(name), text, false);
+        }
         else
+        {
+            log("Form element has id: \"" + name + "\". Use Locator.id");
             setFormElement(Locator.id(name), text, false);
+        }
     }
 
     public void setFormElement(Locator l, String text, boolean suppressValueLogging)

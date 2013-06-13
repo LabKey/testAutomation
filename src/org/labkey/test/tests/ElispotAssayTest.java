@@ -369,7 +369,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
-        clickEditAssayDesign();
+        clickEditAssayDesign(false);
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         clickButton("Save & Close");
@@ -403,7 +403,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     {
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_ELISPOT));
-        clickEditAssayDesign();
+        clickEditAssayDesign(false);
         waitForElement(Locator.css("#partdelete_removeTransformScript0 img"));
         click(Locator.css("#partdelete_removeTransformScript0 img"));
         clickButton("Save & Close");

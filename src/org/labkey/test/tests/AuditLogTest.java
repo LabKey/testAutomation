@@ -120,7 +120,7 @@ public class AuditLogTest extends BaseWebDriverTest
         verifyAuditEvent(this, PROJECT_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_PROJECT + " was deleted", 5);
     }
 
-    public static void verifyAuditEvent(BaseSeleniumWebTest instance, String eventType, String column, String msg, int rowsToSearch)
+    public static void verifyAuditEvent(BaseWebDriverTest instance, String eventType, String column, String msg, int rowsToSearch)
     {
         if (!instance.isTextPresent("Audit Log"))
         {
@@ -132,8 +132,9 @@ public class AuditLogTest extends BaseWebDriverTest
 
         if (!instance.getSelectedOptionText(Locator.name("view")).equals(eventType))
         {
+            instance.prepForPageLoad();
             instance.selectOptionByText(Locator.name("view"), eventType);
-            instance.waitForPageToLoad();
+            instance.newWaitForPageToLoad();
         }
         instance.log("searching for audit entry: " + msg);
         DataRegionTable table = new DataRegionTable("audit", instance, false);

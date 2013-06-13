@@ -777,7 +777,7 @@ public class ListHelperWD extends ListHelper
         {
             // Confirm the deletion
             _test.clickButton("OK", 0);
-            _test.waitForElement(Locator.xpath("//td/img[@id='partstatus_" + index + "' and contains(@src, 'deleted')]]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            _test.waitForElement(Locator.xpath("//img[@id='partstatus_" + index + "'][contains(@src, 'deleted')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
     }
     

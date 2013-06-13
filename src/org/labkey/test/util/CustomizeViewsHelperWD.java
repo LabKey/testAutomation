@@ -342,7 +342,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
     private String tabContentXPath(ViewItemType type)
     {
-        return _dataRegion.append("//div[contains(@class, '_test-" + type.toString().toLowerCase() + "-tab')]").toXpath();
+        return _dataRegion.append("//div[contains(@class, 'test-" + type.toString().toLowerCase() + "-tab')]").toXpath();
     }
 
     private String itemXPath(ViewItemType type, String[] fieldKeyParts)
@@ -670,8 +670,6 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
                     Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text') and not(../img)]");
                     _test.setFormElement(fieldPath, aggregate.get("label"));
-                    // blur the form element so the label will be set
-                    _test.click(row);
                 }
 
                 idx++;

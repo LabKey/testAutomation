@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
 
@@ -266,10 +267,20 @@ public abstract class AbstractAssayTestWD extends SimpleApiTestWD
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.xpath(prefix + "//span/input[@name='required']"), 0);
     }
 
-    protected void clickEditAssayDesign()
+    protected void clickEditAssayDesign(Boolean confirmEditInOtherContainer)
     {
-        click(Locator.linkWithText("MANAGE ASSAY DESIGN"));
-        waitAndClickAndWait(Locator.linkWithText("edit assay design"));
+        prepForPageLoad();
+        click(Locator.linkWithText("manage assay design"));
+        waitAndClick(Locator.linkWithText("edit assay design"));
+        if (confirmEditInOtherContainer)
+        {
+            String alertText = getAlert();
+            Assert.assertTrue("Alert did not contain expected text\nExpected: This assay is defined in the\nActual: " + alertText,
+                    alertText.contains("This assay is defined in the"));
+            Assert.assertTrue("Alert did not contain expected text\nExpected: Would you still like to edit it?\nActual: " + alertText,
+                    alertText.contains("Would you still like to edit it?"));
+        }
+        newWaitForPageToLoad(WAIT_FOR_PAGE);
     }
 
     protected void enterStudySecurity()

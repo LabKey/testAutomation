@@ -19,22 +19,23 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.CustomizeViewsHelperWD;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 
-import static org.labkey.test.util.ListHelper.ListColumnType;
+import static org.labkey.test.util.ListHelperWD.ListColumnType;
 
 import java.io.File;
 
 /**
  * User: jeckels
  * Date: Aug 10, 2007
- *
- * Modified by DaveS on 13 Sept 13 2007
- *  Added security-related tests, and refactored the code to run Luminex by itself in a separate project
  */
-public class AssayTest extends AbstractAssayTest
+public class AssayTest extends AbstractAssayTestWD
 {
+    private final PortalHelper portalHelper = new PortalHelper(this);
+
     protected static final String TEST_ASSAY = "Test" + TRICKY_CHARACTERS + "Assay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
 
@@ -103,7 +104,6 @@ public class AssayTest extends AbstractAssayTest
 
     /**
      * Cleanup entry point.
-     * @param afterTest
      */
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
@@ -201,7 +201,7 @@ public class AssayTest extends AbstractAssayTest
         clickFolder(TEST_ASSAY_FLDR_LAB1);
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
         clickAndWait(Locator.linkWithText("view results"));
-        assertLinkNotPresentWithText("edit");
+        assertElementNotPresent(Locator.linkWithText("edit"));
         assertNavButtonNotPresent("Delete");
 
         // Edit the design to make them editable
@@ -230,9 +230,9 @@ public class AssayTest extends AbstractAssayTest
 
         // Try a delete
         checkCheckbox(".select");
-        selenium.chooseOkOnNextConfirmation();
-        clickButton("Delete");
-        assertConfirmation("Are you sure you want to delete the selected row?");
+        prepForPageLoad();
+        clickButton("Delete", 0);
+        assertAlert("Are you sure you want to delete the selected row?");
 
         // Verify that the edit was audited
         goToModule("Query");
@@ -258,19 +258,19 @@ public class AssayTest extends AbstractAssayTest
         //define a new assay at the project level
         //the pipeline must already be setup
         clickProject(TEST_ASSAY_PRJ_SECURITY);
-        addWebPart("Assay List");
+        portalHelper.addWebPart("Assay List");
 
         //copied from old test
         clickButton("Manage Assays");
         clickButton("New Assay Design");
         assertElementNotPresent(Locator.radioButtonByNameAndValue("providerName", "Flow"));
-        checkRadioButton("providerName", "General");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "General"));
         clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
-        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY);
-        selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_DESC);
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), TEST_ASSAY);
+        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_DESC);
 
         for (int i = TEST_ASSAY_SET_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + TEST_ASSAY_SET_PROP_TYPES.length; i++)
         {
@@ -338,7 +338,7 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
 
         //nav trail check
-        assertTextPresent("Assay List >  " + TEST_ASSAY + " Batches >  ");
+        Assert.assertEquals("Nav trail was not as expected", "Assay List >  " + TEST_ASSAY + " Batches > ", getText(Locator.id("navTrailAncestors")));
 
         clickButton("Import Data");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + "3");
@@ -364,7 +364,7 @@ public class AssayTest extends AbstractAssayTest
         assertElementNotPresent(Locator.xpath("//option").withText(getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY3)));
 
         //select Study2 as the target study (note that PI is not an Editor in this study so we can test for override case)
-        selenium.select("//select[@name='targetStudy']", getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY2));
+        selectOptionByText(Locator.name("targetStudy"), getTargetStudyOptionText(TEST_ASSAY_FLDR_STUDY2));
 
         clickButton("Next");
 
@@ -377,35 +377,35 @@ public class AssayTest extends AbstractAssayTest
         log("Run properties and data");
         clickButton("Save and Finish");
         assertTextPresent(TEST_ASSAY_RUN_PROP_NAME + "0 is required and must be of type Text (String).");
-        selenium.type("name", TEST_RUN1);
-		selenium.type("comments", TEST_RUN1_COMMENTS);
+        setFormElement("name", TEST_RUN1);
+		setFormElement("comments", TEST_RUN1_COMMENTS);
         setFormElement(TEST_ASSAY_RUN_PROP_NAME + "0", TEST_ASSAY_RUN_PROP1);
         clickButton("Save and Finish");
         assertTextPresent("Data file contained zero data rows");
-        selenium.click("//input[@value='textAreaDataProvider']");
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
         clickButton("Save and Finish");
 
-        selenium.click("//input[@value='textAreaDataProvider']");
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
         clickButton("Save and Finish");
         assertTextPresent("There are errors in the uploaded data: VisitID must be of type Number (Double)");
-        Assert.assertEquals(TEST_RUN1, selenium.getValue("name"));
-        Assert.assertEquals(TEST_RUN1_COMMENTS, selenium.getValue("comments"));
-        selenium.click("//input[@value='textAreaDataProvider']");
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
+        assertFormElementEquals(Locator.name("name"), TEST_RUN1);
+        assertFormElementEquals(Locator.name("comments"), TEST_RUN1_COMMENTS);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
         clickButton("Save and Import Another Run");
         assertTextPresent("There are errors in the uploaded data: " + TEST_ASSAY_DATA_PROP_NAME + "6 is required. ");
 
-        selenium.click("//input[@value='textAreaDataProvider']");
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA4);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement("TextAreaDataCollector.textArea", TEST_RUN1_DATA4);
         clickButton("Save and Import Another Run");
 
-        Assert.assertEquals("", selenium.getValue("name"));
-        Assert.assertEquals("", selenium.getValue("comments"));
-        selenium.type("name", TEST_RUN2);
-		selenium.type("comments", TEST_RUN2_COMMENTS);
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN2_DATA1);
+        assertFormElementEquals(Locator.name("name"), "");
+        assertFormElementEquals(Locator.name("comments"), "");
+        setFormElement("name", TEST_RUN2);
+		setFormElement("comments", TEST_RUN2_COMMENTS);
+        setFormElement("TextAreaDataCollector.textArea", TEST_RUN2_DATA1);
         clickButton("Save and Finish");
 
         log("Check out the data for one of the runs");
@@ -444,13 +444,13 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("Blood (Whole)", 4);
 
         Locator.XPathLocator trueLocator = Locator.xpath("//table[contains(@class, 'labkey-data-region')]//td[text() = 'true']");
-        int totalTrues = getXpathCount(trueLocator);
+        int totalTrues = getElementCount(trueLocator);
         Assert.assertEquals(4, totalTrues);
 
         setFilter("Data", "SpecimenID", "Starts With", "AssayTestControl");
 
         // verify that there are no trues showing for the assay match column that were filtered out
-        totalTrues = getXpathCount(trueLocator);
+        totalTrues = getElementCount(trueLocator);
         Assert.assertEquals(0, totalTrues);
 
         log("Check out the data for all of the runs");
@@ -462,13 +462,13 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("Blood (Whole)", 7);
 
         Locator.XPathLocator falseLocator = Locator.xpath("//table[contains(@class, 'labkey-data-region')]//td[text() = 'false']");
-        int totalFalses = getXpathCount(falseLocator);
+        int totalFalses = getElementCount(falseLocator);
         Assert.assertEquals(3, totalFalses);
 
         setFilter("Data", "SpecimenID", "Does Not Start With", "BAQ");
 
         // verify the falses have been filtered out
-        totalFalses = getXpathCount(falseLocator);
+        totalFalses = getElementCount(falseLocator);
         Assert.assertEquals(0, totalFalses);
 
         //Check to see that the bad specimen report includes the bad assay results and not the good ones
@@ -476,9 +476,9 @@ public class AssayTest extends AbstractAssayTest
         beginAt("specimencheck/" + TEST_ASSAY_PRJ_SECURITY + "/assayReport.view");
         waitForText("Global Specimen ID", 10000);
         waitForElement(Locator.linkWithText("BAQ00051-09"), 10000);
-        assertLinkPresentWithText("BAQ00051-09");
-        assertLinkPresentWithText("BAQ00051-08");
-        assertLinkPresentWithText("BAQ00051-11");
+        assertElementPresent(Locator.linkWithText("BAQ00051-09"));
+        assertElementPresent(Locator.linkWithText("BAQ00051-08"));
+        assertElementPresent(Locator.linkWithText("BAQ00051-11"));
         assertTextNotPresent("AAA");
         stopImpersonating();
         clickProject(TEST_ASSAY_PRJ_SECURITY);
@@ -512,7 +512,7 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("view results"));
 
         //select all the data rows and click publish
-        selenium.click(".toggle");
+        checkAllOnPage("Data");
         clickButton("Copy to Study");
 
         //the target study selected before was Study2, but the PI is not an editor there
@@ -557,12 +557,12 @@ public class AssayTest extends AbstractAssayTest
         String[] row2 = new String[]{TEST_ASSAY, "7", "1", "1", "1", "1", "1", "2"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
         // Manually click the checkbox -- normal checkCheckbox() method doesn't seem to work for checkbox that reloads using onchange event
-        click(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
-        waitForPageToLoad();
+        clickAndWait(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
         row2 = new String[]{TEST_ASSAY, "7 / 8", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "1 / 1", "2 / 3"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
-        uncheckCheckbox("visitStatistic", "ParticipantCount");
-        waitForPageToLoad();
+        prepForPageLoad();
+        uncheckCheckbox(Locator.checkboxByNameAndValue("visitStatistic", "ParticipantCount"));
+        newWaitForPageToLoad();
         row2 = new String[]{TEST_ASSAY, "8", "1", "1", "1", "1", "1", "3"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
 
@@ -590,8 +590,10 @@ public class AssayTest extends AbstractAssayTest
         setFilter("audit", "Comment", "Starts With", "3 row(s) were copied to a study from the assay");
         clickAndWait(Locator.linkWithText("details"));
         checkCheckbox(Locator.checkboxByName(".toggle"));
+        prepForPageLoad();
         clickButton("Recall Rows", 0);
-        getConfirmationAndWait();
+        getAlert();
+        newWaitForPageToLoad();
         assertTextPresent("row(s) were recalled to the assay: " + TEST_ASSAY);
 
         // Set a filter so that we know we're looking at the copy event for SecondRun again
@@ -634,7 +636,7 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("view results"));
 
         //select all the data rows and click publish
-        selenium.click(".toggle");
+        checkAllOnPage("Data");
         clickButton("Copy to Study");
 
         checkCheckbox(Locator.xpath("//td//input[@type='checkbox']"));
@@ -660,7 +662,6 @@ public class AssayTest extends AbstractAssayTest
         setFormElement(Locator.xpath("(//input[@name='participantId'])[4]"), "new4");
 
         clickButton("Re-Validate");
-        waitForPageToLoad();
 
         //validate timepoints:
         assertElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td[text()='AAA07XMC-02' and following-sibling::td[text()='301.0']]]"));
@@ -685,8 +686,7 @@ public class AssayTest extends AbstractAssayTest
         String[] row2 = new String[]{TEST_ASSAY, "8", "1", "2", "2", "1", "1", "1"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
         // Manually click the checkbox -- normal checkCheckbox() method doesn't seem to work for checkbox that reloads using onchange event
-        click(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
-        waitForPageToLoad();
+        clickAndWait(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
         row2 = new String[]{TEST_ASSAY, "8 / 8", "1 / 1", "2 / 2", "2 / 2", "1 / 1", "1 / 1", "1 / 1"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
 
@@ -733,7 +733,7 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("view results"));
 
         //select all the data rows and click publish
-        selenium.click(".toggle");
+        checkAllOnPage("Data");
         clickButton("Copy to Study");
 
         checkCheckbox(Locator.xpath("//td//input[@type='checkbox']"));
@@ -759,7 +759,6 @@ public class AssayTest extends AbstractAssayTest
         setFormElement(Locator.xpath("(//input[@name='participantId'])[4]"), "new4");
 
         clickButton("Re-Validate");
-        waitForPageToLoad();
 
         //validate timepoints:
         Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit3' and following-sibling::td[text()='AAA07XMC-02']]")));
@@ -785,8 +784,7 @@ public class AssayTest extends AbstractAssayTest
         String[] row2 = new String[]{TEST_ASSAY, "8", "", "", "", "", "", "", "1", "", "", "4", "", "", "", "", "1", "1", "", "", "", "1", "", "", "", "", ""};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
         // Manually click the checkbox -- normal checkCheckbox() method doesn't seem to work for checkbox that reloads using onchange event
-        click(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
-        waitForPageToLoad();
+        clickAndWait(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
         row2 = new String[]{TEST_ASSAY, "8 / 8", "", "", "", "", "", "", "1 / 1", "", "", "4 / 4", "", "", "", "", "1 / 1", "1 / 1", "", "", "", "1 / 1", "", "", "", "", ""};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
 
@@ -818,7 +816,7 @@ public class AssayTest extends AbstractAssayTest
         waitForElement(Locator.xpath(getPropertyXPath("Data Fields") + "//td//input[@name='ff_name5']"), WAIT_FOR_JAVASCRIPT);
         _listHelper.setColumnName(getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
         _listHelper.setColumnLabel(getPropertyXPath("Data Fields"), 5, TEST_ASSAY_DATA_PROP_NAME + "edit");
-        deleteField("Data Fields", 4);
+        _listHelper.deleteField("Data Fields", 4);
         clickButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
 
@@ -840,30 +838,31 @@ public class AssayTest extends AbstractAssayTest
         clickProject(TEST_ASSAY_PRJ_SECURITY);
 
         // Remove so we can easily click on the Views menu for the right web part
-        removeWebPart("Assay List");
+        portalHelper.removeWebPart("Assay List");
 
-        addWebPart("Assay Runs");
-        selectOptionByText("viewProtocolId", "General: " + TEST_ASSAY);
+        portalHelper.addWebPart("Assay Runs");
+        selectOptionByText(Locator.name("viewProtocolId"), "General: " + TEST_ASSAY);
         // assay runs has a details page that needs to be submitted
         clickButton("Submit", defaultWaitForPage);
 
         // Set the container filter to include subfolders
-        clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
+        _extHelper.clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
 
         assertTextPresent("FirstRun");
         assertTextPresent("SecondRun");
 
         log("Setting the customized view to include subfolders");
-        _customizeViewsHelper.openCustomizeViewPanel();
+        CustomizeViewsHelperWD customizeViewsHelper = new CustomizeViewsHelperWD(this, Locator.id("Runs2"));
+        customizeViewsHelper.openCustomizeViewPanel();
 
-        _customizeViewsHelper.clipFolderFilter();
-        _customizeViewsHelper.saveCustomView("");
+        customizeViewsHelper.clipFolderFilter();
+        customizeViewsHelper.saveCustomView("");
 
         assertTextPresent("FirstRun");
         assertTextPresent("SecondRun");
 
         log("Testing select all data and view");
-        clickCheckbox(".toggle");
+        checkAllOnPage("Runs2");
         clickButton("Show Results", defaultWaitForPage);
         verifySpecimensPresent(3, 2, 3);
 
@@ -878,7 +877,7 @@ public class AssayTest extends AbstractAssayTest
 
         log("Testing assay-study linkage");
         clickFolder(TEST_ASSAY_FLDR_STUDY1);
-        addWebPart("Datasets");
+        portalHelper.addWebPart("Datasets");
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
         clickButton("View Source Assay", defaultWaitForPage);
 
@@ -899,7 +898,7 @@ public class AssayTest extends AbstractAssayTest
         clickProject(TEST_ASSAY_PRJ_SECURITY);
         clickAndWait(Locator.linkWithText("SecondRun"));
 
-        clickCheckbox(".toggle");
+        checkAllOnPage("Data");
         clickButton("Copy to Study", defaultWaitForPage);
         clickButton("Next", defaultWaitForPage);
 
@@ -910,23 +909,23 @@ public class AssayTest extends AbstractAssayTest
         clickProject(TEST_ASSAY_PRJ_SECURITY);
 
         // Add it back to the portal page
-        addWebPart("Assay List");
+        portalHelper.addWebPart("Assay List");
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyStudyList()
     {
         clickFolder(TEST_ASSAY_FLDR_STUDIES);
-        addWebPart("Study List");
-        assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY1 + " Study");
-        assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY2 + " Study");
-        assertLinkPresentWithText(TEST_ASSAY_FLDR_STUDY3 + " Study");
-        clickWebpartMenuItem("Studies", "Customize");
+        portalHelper.addWebPart("Study List");
+        assertElementPresent(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1 + " Study"));
+        assertElementPresent(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY2 + " Study"));
+        assertElementPresent(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY3 + " Study"));
+        portalHelper.clickWebpartMenuItem("Studies", "Customize");
 
         //verify grid view
         selectOptionByText(Locator.name("displayType"), "Grid");
         clickButton("Submit");
-        assertLinkNotPresentWithText("edit");
+        assertElementNotPresent(Locator.linkWithText("edit"));
 
         //edit study properties
         clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1 + " Study"));
@@ -946,7 +945,7 @@ public class AssayTest extends AbstractAssayTest
         Assert.assertEquals("Failed to set study description.", DESCRIPTION, table.getDataAsText(0, "Description"));
 
         //verify study properties (details view)
-        clickWebpartMenuItem("Studies", "Customize");
+        portalHelper.clickWebpartMenuItem("Studies", "Customize");
         selectOptionByText(Locator.name("displayType"), "Details");
         clickButton("Submit");
         assertTextPresent(INVESTIGATOR, DESCRIPTION);
