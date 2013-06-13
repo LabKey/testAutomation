@@ -40,9 +40,11 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     public static final String ID = "myid";
     public static final String DIAGNOSTICS_ASSAY_DESIGN = "ICEMR Diagnostics";
     public static final String TRACKING_ASSAY_DESIGN = "ICEMR Flask Tracking";
+    public static final String SPECIES_ASSAY_DESIGN = "ICEMR Species-specific PCR";
     public static final String DIAGNOSTIC_ASSAY_NAME = "Diagnostics Assay";
     public static final String ADAPTATION_ASSAY_NAME = "Culture Adaptation";
     public static final String SELECTION_ASSAY_NAME = "Drug Selection";
+    public static final String SPECIES_ASSAY_NAME = "Species";
     public static final String FOLD_INCREASE_DEFAULT = "4";
     public static final String ADAPTATION_CRITERIA_DEFAULT = "2";
     public static final String ADAPTATION_FLASK_FILE = "sampledata/icemr/adaptFlaskFields.txt";
@@ -50,6 +52,8 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     public static final String SELECTION_FLASK_FILE = "sampledata/icemr/selectFlaskFields.txt";
     public static final String SELECTION_FLASKS_NAME = "Selection Flasks";
     public static final String SCIENTIST = "Torruk";
+    public static final String GEL_IMAGE_FIELD = "GelImage";
+    public static final String GEL_IMAGE_FILE = "sampledata/icemr/piggy.jpg";
 
     @Override
 //    @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -69,11 +73,17 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 //    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void doVerification()
     {
-
         testJavaScript();
-        enterDataPoint();
+
+        // test diagnostics
+        enterDataPoint(DIAGNOSTIC_ASSAY_NAME, Locator.id("upload-diagnostic-form-body"), null);
         verifyDataInAssay();
 
+        // test species
+        enterDataPoint(SPECIES_ASSAY_NAME, Locator.id("upload-speciesSpecific-form-body"), null);
+        verifyDataInAssay();
+        enterDataPoint(SPECIES_ASSAY_NAME, Locator.id("upload-speciesSpecific-form-body"), GEL_IMAGE_FILE);
+        verifyDataInAssay();
 
         // test adaptation flavor of tracking assay
         enterDataPointTracking(ADAPTATION_ASSAY_NAME);
@@ -117,6 +127,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         _assayHelper.createAssayWithDefaults(DIAGNOSTICS_ASSAY_DESIGN, DIAGNOSTIC_ASSAY_NAME);
         _assayHelper.createAssayWithDefaults(TRACKING_ASSAY_DESIGN, ADAPTATION_ASSAY_NAME);
         _assayHelper.createAssayWithDefaults(TRACKING_ASSAY_DESIGN, SELECTION_ASSAY_NAME);
+        _assayHelper.createAssayWithDefaults(SPECIES_ASSAY_DESIGN, SPECIES_ASSAY_NAME);
         createFlasksSampleSet(ADAPTATION_FLASKS_NAME, ADAPTATION_FLASK_FILE);
         createFlasksSampleSet(SELECTION_FLASKS_NAME, SELECTION_FLASK_FILE);
     }
@@ -128,17 +139,26 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         {
             assertElementPresent(Locator.css("#dataregion_Data td").withText(value));
         }
+
+        // make sure we can download the uploaded image
+        if (fieldAndValue.containsKey(GEL_IMAGE_FIELD))
+        {
+            Locator.XPathLocator link = Locator.linkContainingText(fieldAndValue.get(GEL_IMAGE_FIELD));
+            waitAndClick(link);
+            goBack();
+        }
+
         goToProjectHome();
     }
 
-    private void enterDataPoint()
+    private void enterDataPoint(String assayName, Locator.IdLocator locator, String fileUploadField)
     {
-        Locator.XPathLocator link = Locator.linkContainingText(DIAGNOSTIC_ASSAY_NAME);
+        Locator.XPathLocator link = Locator.linkContainingText(assayName);
         waitAndClick(link);
         link = Locator.navButtonContainingText("Import Data");
         waitAndClick(link);
-        waitForElement(Locator.id("upload-diagnostic-form-body"));
-        enterData();
+        waitForElement(locator);
+        enterData(assayName, fileUploadField);
     }
 
     private void enterDataPointTracking(String assayName)
@@ -430,7 +450,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     }
 
     private Map<String, String> fieldAndValue = new HashMap<String, String>();
-    private void enterData()
+    private void enterDiagnosticsData()
     {
         verifyError(10);
 
@@ -471,6 +491,54 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         setICEMRField("Hematocrit", "5.0");
         clickButton("Submit");
         waitForElement(Locator.css(".labkey-nav-page-header").withText(DIAGNOSTIC_ASSAY_NAME + " Results"));
+    }
+
+    private void enterSpeciesData(String fileUploadField)
+    {
+        verifyError(7);
+
+        fieldAndValue = new HashMap<String, String>();
+        String expId = "4321A";
+
+        if (fileUploadField != null)
+            expId = expId + "/" + GEL_IMAGE_FIELD;
+
+        fieldAndValue.put("ExpID", expId);
+        fieldAndValue.put("ParticipantID", ID);
+        fieldAndValue.put("Scientist", SCIENTIST);
+        fieldAndValue.put("FreezerProID", "2543");
+        fieldAndValue.put("Attempt", "2");
+        fieldAndValue.put("Sample", "4.0");
+        fieldAndValue.put("DNADilution", "20.0");
+        fieldAndValue.put("PfBand", "500");
+
+        for(String field : fieldAndValue.keySet())
+        {
+            setICEMRField(field, fieldAndValue.get(field));
+        }
+
+        // verify unset checkboxes default to false
+        fieldAndValue.put("PvPresent", "false");
+        fieldAndValue.put("PfPresent", "false");
+
+        if (fileUploadField != null)
+        {
+            File f = new File(getLabKeyRoot(), fileUploadField);
+            setFormElement(Locator.name(GEL_IMAGE_FIELD), f);
+            // verify that a "GelImage" field exists and that its value is the file name without the path
+            fieldAndValue.put(GEL_IMAGE_FIELD, f.getName());
+        }
+
+        clickButton("Submit");
+        waitForElement(Locator.css(".labkey-nav-page-header").withText(SPECIES_ASSAY_NAME + " Results"));
+    }
+
+    private void enterData(String assayName, String fileUploadField)
+    {
+        if (assayName == DIAGNOSTIC_ASSAY_NAME)
+            enterDiagnosticsData();
+        else
+            enterSpeciesData(fileUploadField);
     }
 
     private void createFlasksSampleSet(String samplesetName, String samplesetFilename)
