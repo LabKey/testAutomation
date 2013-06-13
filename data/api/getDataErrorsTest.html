@@ -1,0 +1,183 @@
+<div id="getData-config-form-div"></div>
+<br/>
+<div id="getData-message-div"></div>
+
+<script type="text/javascript">
+    LABKEY.requiresExt4ClientAPI(true);
+    LABKEY.requiresVisualization();
+</script>
+
+<script type="text/javascript">
+
+    var measureWithDimension = {
+        "time": "date",
+        "dateOptions": {
+            "dateCol":{
+                "name":"ParticipantVisit/VisitDate",
+                "queryName":"LuminexAssay",
+                "schemaName":"study"
+            },
+            "interval":"Days",
+            "zeroDateCol":{
+                "name":"date",
+                "queryName":"Demographics",
+                "schemaName":"study"
+            }
+        },
+        "measure":{
+            "name":"ObsConc",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "allowNullResults": false
+        },
+        "dimension":{
+            "name":"AnalyteName",
+            "queryName":"LuminexAssay",
+            "schemaName":"study",
+            "values":["IL-10 (23)", "IL-2 (3)", "TNF-alpha (40)"]
+        }
+    };
+
+    var sortArray = [
+        {
+            "name":"ParticipantId",
+            "schemaName":"study",
+            "queryName":"LuminexAssay",
+            "values":["249318596","249320107","249320127","249320489","249320897"]
+        },
+        {
+            "name":"ParticipantVisit/VisitDate",
+            "queryName":"LuminexAssay",
+            "schemaName":"study"
+        }
+    ];
+
+    var configs = [];
+    configs.push({title: 'Empty Measure Array', measures: []});
+    configs.push({title: 'Missing Measure Property', measures: [{}]});
+    configs.push({title: 'Bad Sorts Property', measures: [Ext.applyIf({} , measureWithDimension)], sorts: [{"schemaName":"study"}]});
+    configs.push({title: 'Unexpected Time Property', measures: [Ext.applyIf({"time": {}} , measureWithDimension)]});
+    configs.push({title: 'Unknown Time Property', measures: [Ext.applyIf({"time": "test"} , measureWithDimension)]});
+
+    var dateOptionsClone = Ext4.applyIf({"interval":"Weeks"}, measureWithDimension.dateOptions);
+    var differentInterval = Ext.applyIf({"dateOptions":dateOptionsClone}, measureWithDimension);
+    configs.push({title: 'Multiple Intervals', measures: [measureWithDimension, differentInterval]});
+
+    dateOptionsClone = Ext4.applyIf({"interval":"Minutes"}, measureWithDimension.dateOptions);
+    var unexpectedInterval = Ext.applyIf({"dateOptions":dateOptionsClone}, measureWithDimension);
+    configs.push({title: 'Unexpected Interval', measures: [unexpectedInterval]});
+
+    var measureClone = Ext4.applyIf({"name":null}, measureWithDimension.measure);
+    var missingMeasureName = Ext.applyIf({"measure":measureClone}, measureWithDimension);
+    configs.push({title: 'Missing Measure Name', measures: [missingMeasureName]});
+
+    measureClone = Ext4.applyIf({"name":"ObcConcNA"}, measureWithDimension.measure);
+    var badMeasureName = Ext.applyIf({"measure":measureClone}, measureWithDimension);
+    configs.push({title: 'Bad Measure Name', measures: [badMeasureName]});
+
+    dateOptionsClone = Ext4.applyIf({"dateCol":null}, measureWithDimension.dateOptions);
+    var missingDateCol = Ext.applyIf({"dateOptions":dateOptionsClone}, measureWithDimension);
+    configs.push({title: 'Missing DateCol Property', measures: [missingDateCol]});
+
+    dateOptionsClone = Ext4.applyIf({"dateCol":{"name":"NADate","queryName":"LuminexAssay","schemaName":"study"}}, measureWithDimension.dateOptions);
+    var badDateCol = Ext.applyIf({"dateOptions":dateOptionsClone}, measureWithDimension);
+    configs.push({title: 'Bad DateCol Property', measures: [badDateCol]});
+
+    var zeroDateOptionsClone = Ext4.applyIf({"zeroDateCol":null}, measureWithDimension.dateOptions);
+    var missingZeroDateCol = Ext.applyIf({"dateOptions":zeroDateOptionsClone}, measureWithDimension);
+    configs.push({title: 'Missing ZeroDateCol Property', measures: [missingZeroDateCol]});
+
+    zeroDateOptionsClone = Ext4.applyIf({"zeroDateCol":{"name":"NADate","queryName":"Demographics","schemaName":"study"}}, measureWithDimension.dateOptions);
+    var badZeroDateCol = Ext.applyIf({"dateOptions":zeroDateOptionsClone}, measureWithDimension);
+    configs.push({title: 'Bad ZeroDateCol Property', measures: [badZeroDateCol]});
+
+    var badDimension = Ext.applyIf({"dimension":{"name":"AnalyteName","queryName":"LuminexAssayNA","schemaName":"study"}}, measureWithDimension);
+    configs.push({title: 'Bad Dimension Query', measures: [badDimension]});
+
+    badDimension = Ext.applyIf({"dimension":{"name":"AnalyteNameNA","queryName":"LuminexAssay","schemaName":"study"}}, measureWithDimension);
+    configs.push({title: 'Bad Dimension Name', measures: [badDimension]});
+
+    var configCounter = -1;
+    var configForm;
+
+    //Lots of async script loading. Make sure everything is loaded before starting
+    LABKEY.Utils.onTrue({
+        testCallback:function() {return Ext.isReady && LABKEY.vis},
+        //Calling init directly causes errors to get swallowed by onTrue. We defer one more time
+        successCallback:function () {init.defer(100)},
+        errorCallback:doError
+    });
+
+    function doError(param) {
+        throw param;
+    }
+
+    function init(){
+        configForm = new Ext.FormPanel({
+            renderTo: 'getData-config-form-div',
+            frame: false,
+            items: [{
+                xtype: 'numberfield',
+                fieldLabel: 'Current Config ',
+                name: 'currentConfig',
+                value: 0,
+                allowBlank: false,
+                width: 30
+            },
+            {
+                xtype: 'numberfield',
+                fieldLabel: 'Total Number ',
+                name: 'configCount',
+                value: 0,
+                allowBlank: false,
+                width: 30
+            },
+            {
+                xtype: 'displayfield',
+                fieldLabel: 'Config Title ',
+                name: 'configTitle',
+                width: 500
+            }],
+            buttons: [{
+                xtype: 'button',
+                name: 'nextBtn',
+                text: 'Next',
+                handler: changeGrid
+            }],
+            buttonAlign: 'left'
+        });
+
+        changeGrid();
+    }
+
+    function changeGrid(){
+        // increment the config counter
+        configCounter++;
+        configForm.getForm().findField('currentConfig').setValue(configCounter);
+
+        // check that config exists for current value of counter
+        if(configCounter >= configs.length){
+            alert("Config does not exist: " + configCounter);
+            return;
+        }
+
+        // set the values in the form
+        configForm.getForm().findField('configCount').setValue(configs.length);
+        configForm.getForm().findField('configTitle').setValue(configs[configCounter].title);
+
+        // call the getData API with the new config measures
+        LABKEY.Query.Visualization.getData({
+            success: function(data){
+                Ext4.get('getData-message-div').update('ERROR: getData call returned successfully.');
+                console.log(data);
+            },
+            failure : function(info, response, options) {
+                Ext4.get('getData-message-div').update(info.exception);
+            },
+            measures: configs[configCounter].measures,
+            sorts: configs[configCounter].sorts,
+            scope: this
+        });
+    }
+
+</script>

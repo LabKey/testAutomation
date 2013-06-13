@@ -189,6 +189,43 @@ public class TimeChartAPITest extends TimeChartTest
             {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"}
     };
 
+    private static final String[] GETDATA_API_TEST_TITLES_ERRORS = {
+        "Empty Measure Array",
+        "Missing Measure Property",
+        "Bad Sorts Property",
+        "Unexpected Time Property",
+        "Unknown Time Property",
+        "Multiple Intervals",
+        "Unexpected Interval",
+        "Missing Measure Name",
+        "Bad Measure Name",
+        "Missing DateCol Property",
+        "Bad DateCol Property",
+        "Missing ZeroDateCol Property",
+        "Bad ZeroDateCol Property",
+        "Bad Dimension Query",
+        "Bad Dimension Name"
+    };
+
+    private static final String[] GETDATA_API_TEST_OUPUT_ERRORS = {
+        "No source queries requested with the specified measures array.",
+        "The 'measure' property is required for each of the elements in the measures array.",
+        "SchemaName, queryName, and name are all required for each measure, dimension, or sort.",
+        "Only time charts are currently supported: expected 'time' property on each measure.",
+        "Unknown time value: test",
+        "Multiple intervals with different start dates or units are not supported",
+        "No enum constant org.labkey.visualization.sql.VisualizationIntervalColumn.Interval.MINUTE",
+        "SchemaName, queryName, and name are all required for each measure, dimension, or sort.",
+        "Unable to find field ObcConcNA in study.LuminexAssay.",
+        "The 'dateCol' and 'zeroDateCol' properties are requried for each measure.",
+        "Unable to find field NADate in study.LuminexAssay.",
+        "The 'dateCol' and 'zeroDateCol' properties are requried for each measure.",
+        "Unable to find field NADate in study.Demographics.",
+        "Unable to find table study.LuminexAssayNA.",
+        "Unable to find field AnalyteNameNA in study.LuminexAssay.",
+    };
+
+
     @Override
     protected void doCreateSteps()
     {
@@ -201,32 +238,52 @@ public class TimeChartAPITest extends TimeChartTest
     {
         getDataDateTest();
         getDataVisitTest();
-        createParticipantGroups();
-        modifyParticipantGroups();
-        aggregateTimeChartSQLTest();
+        getDataAggregateTest();
+        getDataErrorTest();
     }
 
     @LogMethod public void getDataDateTest()
     {
-        sqlTest(TEST_DATA_API_PATH+"/getDataDateTest.html", GETDATA_API_DATETEST_COLNAMES, null, GETDATA_API_TEST_DAYS, GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
+        sqlTest(TEST_DATA_API_PATH+"/getDataDateTest.html", GETDATA_API_DATETEST_COLNAMES, null, GETDATA_API_TEST_DAYS,
+                GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
     }
 
     @LogMethod public void getDataVisitTest()
     {
-        sqlTest(TEST_DATA_API_PATH + "/getDataVisitTest.html", GETDATA_API_VISITTEST_COLNAMES, GETDATA_API_TEST_VISITLABEL, null, GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
+        sqlTest(TEST_DATA_API_PATH + "/getDataVisitTest.html", GETDATA_API_VISITTEST_COLNAMES, GETDATA_API_TEST_VISITLABEL,
+                null, GETDATA_API_TEST_MEASURES, GETDATA_API_TEST_MEASURE_VALUES);
     }
 
-    @LogMethod public void aggregateTimeChartSQLTest()
+    @LogMethod public void getDataAggregateTest()
     {
-        sqlTest(TEST_DATA_API_PATH + "/getDataAggregateTest.html", GETDATA_API_TEST_TITLES_AGGREGATE, GETDATA_API_TEST_NUMROWS_AGGREGATE,  GETDATA_API_COLNAMES_AGGREGATE, null, null, null, null);
+        createParticipantGroups();
+        modifyParticipantGroups();
+
+        sqlTest(TEST_DATA_API_PATH + "/getDataAggregateTest.html", GETDATA_API_TEST_TITLES_AGGREGATE,
+                GETDATA_API_TEST_NUMROWS_AGGREGATE, GETDATA_API_COLNAMES_AGGREGATE, null, null, null, null, null);
     }
 
-    private void sqlTest(String htmlPage, String[][] columnHeaders, @Nullable String[][] stringCheck, @Nullable double[][] numbercheck, String[] measure, double[][] measureValue)
+    @LogMethod public void getDataErrorTest()
     {
-        sqlTest(htmlPage, GETDATA_API_TEST_TITLES, GETDATA_API_TEST_NUMROWS, columnHeaders, stringCheck, numbercheck, measure, measureValue);
+        sqlTest(TEST_DATA_API_PATH+"/getDataErrorsTest.html", GETDATA_API_TEST_TITLES_ERRORS, null, null, null, null,
+                null, null, GETDATA_API_TEST_OUPUT_ERRORS);
     }
 
-    private void sqlTest(String htmlPage, String[] testTitles, int[] testNumRows, String[][] columnHeaders, @Nullable String[][] stringCheck, @Nullable double[][] numbercheck, @Nullable String[] measure, @Nullable double[][] measureValue)
+    private void sqlTest(String htmlPage, String[][] columnHeaders, @Nullable String[][] stringCheck,
+                         @Nullable double[][] numbercheck, String[] measure, double[][] measureValue)
+    {
+        sqlTest(htmlPage, GETDATA_API_TEST_TITLES, GETDATA_API_TEST_NUMROWS, columnHeaders, stringCheck,
+                numbercheck, measure, measureValue, null);
+    }
+
+    private void sqlTest(String htmlPage, String[] testTitles, String[] testOutputText)
+    {
+        sqlTest(htmlPage, testTitles, null, null, null, null, null, null, testOutputText);
+    }
+
+    private void sqlTest(String htmlPage, String[] testTitles, @Nullable int[] testNumRows, @Nullable String[][] columnHeaders,
+                         @Nullable String[][] stringCheck, @Nullable double[][] numbercheck, @Nullable String[] measure,
+                         @Nullable double[][] measureValue, @Nullable String[] testOutputText)
     {
         PortalHelper portalHelper = new PortalHelper(this);
         // check multi-measure calls to LABKEY.Query.Visualization.getData API requesting date information
@@ -260,13 +317,16 @@ public class TimeChartAPITest extends TimeChartTest
             // check title is present
             waitForElement(Locator.name("configTitle").withText(testTitles[testIndex]));
             // check # of rows
-            waitForElement(Locator.paginationText(testNumRows[testIndex]), WAIT_FOR_JAVASCRIPT);
-            // check column headers
-            DataRegionTable table = new DataRegionTable("apiTestDataRegion", this);
+            if (testNumRows!=null)
+            {
+                waitForElement(Locator.paginationText(testNumRows[testIndex]), WAIT_FOR_JAVASCRIPT);
+            }
 
             // check values in interval column for the first participant
             if (numbercheck!=null)
-            {                          String columnHeader = columnHeaders[testIndex][columnHeaders[testIndex].length - 1];
+            {
+                DataRegionTable table = new DataRegionTable("apiTestDataRegion", this);
+                String columnHeader = columnHeaders[testIndex][columnHeaders[testIndex].length - 1];
                 List<String> values = table.getColumnDataAsText(columnHeader);
                 for (int i = 0, valIndex = 0; i < numbercheck[testIndex].length; i++, valIndex++)
                 {
@@ -286,6 +346,7 @@ public class TimeChartAPITest extends TimeChartTest
             }
             if (stringCheck!=null)
             {
+                DataRegionTable table = new DataRegionTable("apiTestDataRegion", this);
                 for (int i = 0; i < stringCheck[testIndex].length; i++)
                 {
                     // visit label column may not have dataset name prefix
@@ -300,6 +361,7 @@ public class TimeChartAPITest extends TimeChartTest
             // check values in measure column
             if (measureValue!=null)
             {
+                DataRegionTable table = new DataRegionTable("apiTestDataRegion", this);
                 List<String> values = table.getColumnDataAsText(measure[testIndex]);
                 for (int i = 0, valIndex = 0; i < measureValue[testIndex].length; i++, valIndex++)
                 {
@@ -324,6 +386,11 @@ public class TimeChartAPITest extends TimeChartTest
                 }
             }
 
+            if(testOutputText!=null)
+            {
+                waitForText(testOutputText[testIndex]);
+            }
+
             if(testIndex < testCount-1)
                 clickButton("Next", 0);
 
@@ -335,5 +402,11 @@ public class TimeChartAPITest extends TimeChartTest
     protected File[] getTestFiles()
     {
         return new File[]{new File(getLabKeyRoot() + "/" + TEST_DATA_API_PATH + "/timechart-api.xml")};
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
