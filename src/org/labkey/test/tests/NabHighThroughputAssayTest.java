@@ -150,12 +150,8 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
             for (int i=1; i <= 3; i++)
                 assertTextPresent("VIRUS-" + i);
 
-            click(Locator.linkContainingText("Change Curve Type"));
-            clickAndWait(Locator.menuItem("Four Parameter"));
-
-
-            click(Locator.linkContainingText("Change Curve Type"));
-            clickAndWait(Locator.menuItem("Polynomial"));
+            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Four Parameter");
+            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Polynomial");
 
             clickAndWait(Locator.linkContainingText("View Results"));
 
