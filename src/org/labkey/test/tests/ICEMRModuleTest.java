@@ -15,15 +15,15 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.*;
-import org.labkey.test.util.ExcelHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -186,7 +186,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         }
         assertFormElementEquals(Locator.name("AdaptationCriteria1"), ADAPTATION_CRITERIA_DEFAULT);
 
-        fieldAndValue = new HashMap<String, String>();
+        fieldAndValue = new HashMap<>();
 
         fieldAndValue.put("PatientID", "100101");
         fieldAndValue.put("ExperimentID", "12345");
@@ -239,7 +239,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
             assertFormElementEquals(Locator.name("FoldIncrease" + i + "1"), FOLD_INCREASE_DEFAULT);
         }
 
-        fieldAndValue = new HashMap<String, String>();
+        fieldAndValue = new HashMap<>();
 
         fieldAndValue.put("PatientID", "100101");
         fieldAndValue.put("ExperimentID", "12345");
@@ -282,7 +282,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     {
         verifyError(5);
 
-        fieldAndValue = new HashMap<String, String>();
+        fieldAndValue = new HashMap<>();
 
         fieldAndValue.put("SampleID" + flaskNum, "15258");
         fieldAndValue.put("Scientist" + flaskNum, "Dr. Helvetica");
@@ -308,7 +308,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     {
         verifyError(6);
 
-        fieldAndValue = new HashMap<String, String>();
+        fieldAndValue = new HashMap<>();
 
         fieldAndValue.put("SampleID" + flaskNum, "15258");
         fieldAndValue.put("Scientist" + flaskNum, "Dr. Helvetica");
@@ -331,8 +331,8 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     }
 
 
-    private void enterDailyTrackingData(){
-
+    private void enterDailyTrackingData()
+    {
         //Navigate to Daily Upload page
         Locator.XPathLocator link = Locator.linkContainingText("Daily Maintenance");
         waitAndClick(link);
@@ -377,11 +377,13 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         clickButton("Cancel");
     }
 
-    private void checkTemplate(){
+    private void checkTemplate()
+    {
         waitForElement(Locator.name("dailyUpload"));
         clickButtonContainingText("Get Template", "Daily Upload");
         File templateFile = new File(getDownloadDir(), "dailyUpload.xls");
-        try{
+        try
+        {
             Workbook template = ExcelHelper.create(templateFile);
             Sheet sheet = template.getSheetAt(0);
             //Warnings about possible null pointers can be ignored, as all cells in question are tested for null before loading them.
@@ -449,12 +451,12 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         assertElementPresent(Locator.id("error-div").withText("> Errors in your submission. See below."));
     }
 
-    private Map<String, String> fieldAndValue = new HashMap<String, String>();
+    private Map<String, String> fieldAndValue = new HashMap<>();
     private void enterDiagnosticsData()
     {
         verifyError(10);
 
-        fieldAndValue = new HashMap<String, String>();
+        fieldAndValue = new HashMap<>();
 
         fieldAndValue.put("Scientist", SCIENTIST);
         fieldAndValue.put("ParticipantID", ID);
@@ -497,7 +499,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
     {
         verifyError(7);
 
-        fieldAndValue = new HashMap<String, String>();
+        fieldAndValue = new HashMap<>();
         String expId = "4321A";
 
         if (fileUploadField != null)
