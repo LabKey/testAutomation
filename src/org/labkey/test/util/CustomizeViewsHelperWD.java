@@ -670,6 +670,8 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
                     Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text') and not(../img)]");
                     _test.setFormElement(fieldPath, aggregate.get("label"));
+                    // blur the form element so the label will be set
+                    _test.click(row);
                 }
 
                 idx++;
