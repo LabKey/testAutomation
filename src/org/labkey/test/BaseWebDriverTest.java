@@ -3052,7 +3052,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void expandFolderTree(String folder)
     {
         Locator.XPathLocator folderNav = Locator.id("folderBar_menu").append("/div/div/div/ul").withClass("folder-nav-top");
-        Locator.XPathLocator treeAncestor = folderNav.append("//li").withClass("collapse-folder").withDescendant(Locator.linkWithText(folder)).append("/span").withClass("expand-folder");
+        Locator.XPathLocator treeAncestor = folderNav.append("//li").withClass("collapse-folder").withDescendant(Locator.linkWithText(folder)).append("/span").withClass("marked");
         int depth = 0;
         while(!Locator.linkWithText(folder).toXPathLocator().findElement(getDriver()).isDisplayed() && depth < 10)
         {
