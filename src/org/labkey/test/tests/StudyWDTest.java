@@ -761,20 +761,20 @@ public class StudyWDTest extends StudyBaseTestWD
 
         log("verify copying and moving vial comments");
         setFilter("SpecimenDetail", "GlobalUniqueId", "Equals", "AAA07XK5-01");
-        selenium.click(".toggle");
+        checkCheckbox(Locator.name(".toggle"));
         clickButton("Enable Comments/QC");
         clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         setFormElement("comments", "Vial Comment");
         clickButton("Save Changes");
 
-        selenium.click(".toggle");
+        checkCheckbox(Locator.name(".toggle"));
         clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         clickMenuButton("Copy or Move Comment(s)", "Copy", "To Mouse", "999320812");
         setFormElement("quf_" + COMMENT_FIELD_NAME, "Copied PTID Comment");
         clickButton("Submit");
         assertTextPresent("Copied PTID Comment");
 
-        selenium.click(".toggle");
+        checkCheckbox(Locator.name(".toggle"));
         clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         prepForPageLoad();
         clickMenuButtonAndContinue("Copy or Move Comment(s)", "Move", "To Mouse", "999320812");

@@ -134,10 +134,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public static final String ADMIN_MENU_XPATH = "id('adminMenuPopupLink')[@onclick]";
     public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
     /**
-     * @deprecated Refactor usages to use {@link #_driver}
+     * @deprecated Refactor usages to use {@link #getDriver()}
      * private in order to block access of object in BSWT and force full migration
      */
-    @Deprecated protected WebDriverBackedSelenium selenium;
+    @Deprecated private WebDriverBackedSelenium selenium; // Blocks accidental access to BaseSeleniumWebDriver.selenium
     public WebDriver _driver; // TODO: Refactor to private with getter
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
@@ -200,7 +200,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _ext4Helper = new Ext4HelperWD(this);
         _listHelper = new ListHelperWD(this);
         _customizeViewsHelper = new CustomizeViewsHelperWD(this);
-        _jsErrors = new ArrayList<JavaScriptError>();
+        _jsErrors = new ArrayList<>();
         _downloadDir = new File(ensureDumpDir(), "downloads");
 
         String seleniumBrowser = System.getProperty("selenium.browser");
@@ -292,7 +292,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
             case CHROME: //experimental
             {
-                Map<String, String> prefs = new Hashtable<String, String>();
+                Map<String, String> prefs = new Hashtable<>();
                 prefs.put("download.prompt_for_download", "false");
                 prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
 
@@ -362,8 +362,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Browser: " + browserName + " " + browserVersion);
 
         _driver.manage().timeouts().setScriptTimeout(WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS);
-
-        selenium = new WebDriverBackedSelenium(_driver, WebTestHelper.getBaseURL());
 
         _shortWait = new WebDriverWait(_driver, WAIT_FOR_JAVASCRIPT/1000);
         _longWait = new WebDriverWait(_driver, WAIT_FOR_PAGE/1000);
@@ -5173,15 +5171,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void setFormElement(String name, String text)
     {
-        if(_driver.findElements(By.name(name)).size() > 0)
+        if(_driver.findElements(By.id(name)).size() > 0)
         {
-            log("Form element is named: \"" + name + "\". Use Locator.name");
-            setFormElement(Locator.name(name), text, false);
+            log("DEPRECATED: Form element has id: \"" + name + "\". Use Locator.id");
+            setFormElement(Locator.id(name), text, false);
         }
         else
         {
-            log("Form element has id: \"" + name + "\". Use Locator.id");
-            setFormElement(Locator.id(name), text, false);
+            log("DEPRECATED: Form element is named: \"" + name + "\". Use Locator.name");
+            setFormElement(Locator.name(name), text, false);
         }
     }
 
