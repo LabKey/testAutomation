@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
@@ -76,15 +77,17 @@ public class SampleSetTest extends BaseWebDriverTest
 
     protected void doTestSteps()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+
         _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Experiment" });
 
         clickProject(PROJECT_NAME);
-        addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Sets");
 
         clickButton("Import Sample Set");
-        setFormElement("name", PROJECT_SAMPLE_SET_NAME);
-        setFormElement("data", "KeyCol\tIntCol\tStringCol\tDateCol\tBoolCol\n" +
+        setFormElement(Locator.id("name"), PROJECT_SAMPLE_SET_NAME);
+        setFormElement(Locator.name("data"), "KeyCol\tIntCol\tStringCol\tDateCol\tBoolCol\n" +
                 "SampleSetBVT1\t100\ta\t1/1/2000\tTRUE\n" +
                 "SampleSetBVT2\t200\tb\t2/2/2000\tFALSE\n" +
                 "SampleSetBVT3\t300\tc\t3/3/2000\tTRUE\n" +
@@ -92,10 +95,10 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Submit");
 
         clickFolder(FOLDER_NAME);
-        addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Sets");
         clickButton("Import Sample Set");
-        setFormElement("name", FOLDER_SAMPLE_SET_NAME);
-        setFormElement("data", "KeyCol-Folder\tIntCol-Folder\tStringCol-Folder\n" +
+        setFormElement(Locator.id("name"), FOLDER_SAMPLE_SET_NAME);
+        setFormElement(Locator.name("data"), "KeyCol-Folder\tIntCol-Folder\tStringCol-Folder\n" +
                 "SampleSetBVT11\t101\taa\n" +
                 "SampleSetBVT4\t102\tbb\n" +
                 "SampleSetBVT12\t102\tbb\n" +
@@ -112,10 +115,10 @@ public class SampleSetTest extends BaseWebDriverTest
         assertTextPresent(FOLDER_SAMPLE_SET_NAME);
         assertTextNotPresent(PROJECT_SAMPLE_SET_NAME);
 
-        clickCheckbox(".toggle");
+        checkCheckbox(Locator.name(".toggle"));
         clickButton("Derive Samples");
 
-        if (isLinkPresentWithText("configure a valid pipeline root for this folder"))
+        if (isElementPresent(Locator.linkWithText("configure a valid pipeline root for this folder")))
         {
             setPipelineRoot(getLabKeyRoot() + PIPELINE_PATH);
         }
@@ -124,32 +127,32 @@ public class SampleSetTest extends BaseWebDriverTest
         assertTextPresent(FOLDER_SAMPLE_SET_NAME);
         assertTextPresent(PROJECT_SAMPLE_SET_NAME);
         clickAndWait(Locator.linkWithText(FOLDER_SAMPLE_SET_NAME));
-        clickCheckbox(".toggle");
+        checkCheckbox(Locator.name(".toggle"));
         clickButton("Derive Samples");
 
-        selenium.select("inputRole0", "label=Add a new role...");
-        setFormElement("customRole0", "FirstRole");
-        selenium.select("inputRole1", "label=Add a new role...");
-        setFormElement("customRole1", "SecondRole");
-        selenium.select("inputRole2", "label=Add a new role...");
-        setFormElement("customRole2", "ThirdRole");
-        selenium.select("inputRole3", "label=Add a new role...");
-        setFormElement("customRole3", "FourthRole");
-        selenium.select("outputCount", "label=2");
-        selenium.select("targetSampleSetId", "label=FolderSampleSet in /SampleSetTestProject/SampleSetTestFolder");
+        selectOptionByText(Locator.name("inputRole0"), "Add a new role...");
+        setFormElement(Locator.id("customRole0"), "FirstRole");
+        selectOptionByText(Locator.name("inputRole1"), "Add a new role...");
+        setFormElement(Locator.id("customRole1"), "SecondRole");
+        selectOptionByText(Locator.name("inputRole2"), "Add a new role...");
+        setFormElement(Locator.id("customRole2"), "ThirdRole");
+        selectOptionByText(Locator.name("inputRole3"), "Add a new role...");
+        setFormElement(Locator.id("customRole3"), "FourthRole");
+        selectOptionByText(Locator.name("outputCount"), "2");
+        selectOptionByText(Locator.name("targetSampleSetId"), "FolderSampleSet in /SampleSetTestProject/SampleSetTestFolder");
         clickButton("Next");
 
-        setFormElement("outputSample1_KeyColFolder", "SampleSetBVT15");
-		setFormElement("outputSample2_KeyColFolder", "SampleSetBVT16");
-		selenium.click("outputSample1_IntColFolderCheckBox");
-		setFormElement("outputSample1_IntColFolder", "500a");
-		setFormElement("outputSample1_StringColFolder", "firstOutput");
-		setFormElement("outputSample2_StringColFolder", "secondOutput");
+        setFormElement(Locator.name("outputSample1_KeyColFolder"), "SampleSetBVT15");
+		setFormElement(Locator.name("outputSample2_KeyColFolder"), "SampleSetBVT16");
+		checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
+		setFormElement(Locator.name("outputSample1_IntColFolder"), "500a");
+		setFormElement(Locator.name("outputSample1_StringColFolder"), "firstOutput");
+		setFormElement(Locator.name("outputSample2_StringColFolder"), "secondOutput");
         clickButton("Submit");
 
         assertTextPresent("must be of type Integer");
-        clickCheckbox("outputSample1_IntColFolderCheckBox");
-        setFormElement("outputSample1_IntColFolder", "500");
+        checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
+        setFormElement(Locator.name("outputSample1_IntColFolder"), "500");
         clickButton("Submit");
 
         clickAndWait(Locator.linkContainingText("Derive 2 samples"));
@@ -162,31 +165,31 @@ public class SampleSetTest extends BaseWebDriverTest
         clickAndWait(Locator.linkContainingText("16"));
         clickAndWait(Locator.linkContainingText("derive samples from this sample"));
 
-        selectOptionByText("inputRole0", "FirstRole");
-        selenium.select("targetSampleSetId", "label=ProjectSampleSet in /SampleSetTestProject");
+        selectOptionByText(Locator.name("inputRole0"), "FirstRole");
+        selectOptionByText(Locator.name("targetSampleSetId"), "ProjectSampleSet in /SampleSetTestProject");
         clickButton("Next");
 
-        setFormElement("outputSample1_KeyCol", "200");
-        setFormElement("outputSample1_IntCol", "600");
-        setFormElement("outputSample1_StringCol", "String");
-        setFormElement("outputSample1_DateCol", "BadDate");
-        setFormElement("outputSample1_BoolCol", "FALSE");
+        setFormElement(Locator.name("outputSample1_KeyCol"), "200");
+        setFormElement(Locator.name("outputSample1_IntCol"), "600");
+        setFormElement(Locator.name("outputSample1_StringCol"), "String");
+        setFormElement(Locator.name("outputSample1_DateCol"), "BadDate");
+        setFormElement(Locator.name("outputSample1_BoolCol"), "FALSE");
         clickButton("Submit");
 
         assertTextPresent("must be of type Date and Time");
-        setFormElement("outputSample1_DateCol", "1/1/2007");
+        setFormElement(Locator.name("outputSample1_DateCol"), "1/1/2007");
         clickButton("Submit");
 
-        assertLinkPresentWithText("Derive sample from SampleSetBVT16");
-        assertLinkPresentWithText("SampleSetBVT11");
-        assertLinkPresentWithText("SampleSetBVT12");
-        assertLinkPresentWithText("SampleSetBVT13");
-        assertLinkPresentWithText("SampleSetBVT14");
+        assertElementPresent(Locator.linkWithText("Derive sample from SampleSetBVT16"));
+        assertElementPresent(Locator.linkWithText("SampleSetBVT11"));
+        assertElementPresent(Locator.linkWithText("SampleSetBVT12"));
+        assertElementPresent(Locator.linkWithText("SampleSetBVT13"));
+        assertElementPresent(Locator.linkWithText("SampleSetBVT14"));
 
         clickAndWait(Locator.linkWithText("SampleSetBVT11"));
 
-        assertLinkPresentWithText("Derive sample from SampleSetBVT16");
-        assertLinkPresentWithText("Derive 2 samples from SampleSetBVT11, SampleSetBVT12, SampleSetBVT13, SampleSetBVT14, SampleSetBVT4");
+        assertElementPresent(Locator.linkWithText("Derive sample from SampleSetBVT16"));
+        assertElementPresent(Locator.linkWithText("Derive 2 samples from SampleSetBVT11, SampleSetBVT12, SampleSetBVT13, SampleSetBVT14, SampleSetBVT4"));
 
         clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkWithText(FOLDER_SAMPLE_SET_NAME));
@@ -231,8 +234,8 @@ public class SampleSetTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("SampleSetBVT4"));
         // Check out the run
         clickAndWait(Locator.linkWithText("Derive sample from SampleSetBVT4"));
-        assertLinkPresentWithText("SampleSetBVT4");
-        assertLinkPresentWithText("SampleSetBVTChildB");
+        assertElementPresent(Locator.linkWithText("SampleSetBVT4"));
+        assertElementPresent(Locator.linkWithText("SampleSetBVTChildB"));
 
         // Make a grandchild set, but first try to insert as a duplicate set name
         clickTab("Experiment");
@@ -262,11 +265,11 @@ public class SampleSetTest extends BaseWebDriverTest
         // Filter out any child materials so we can just check for parents
         setFilter("childMaterials", "Name", "Is Blank");
         assertTextPresent("SampleSetBVT11");
-        assertLinkNotPresentWithText("SampleSetBVTGrandchildA");
+        assertElementNotPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
         // Switch to filter out any parent materials so we can just check for children
         setFilter("parentMaterials", "Name", "Is Blank");
         clearFilter("childMaterials", "Name");
-        assertLinkNotPresentWithText("SampleSetBVT11");
+        assertElementNotPresent(Locator.linkWithText("SampleSetBVT11"));
         assertTextPresent("SampleSetBVTGrandchildA");
 
         // Go up the chain one more hop
@@ -274,8 +277,8 @@ public class SampleSetTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("SampleSetBVT11"));
         // Filter out any child materials so we can just check for parents
         setFilter("childMaterials", "Name", "Is Blank");
-        assertLinkNotPresentWithText("SampleSetBVTChildA");
-        assertLinkNotPresentWithText("SampleSetBVTGrandchildA");
+        assertElementNotPresent(Locator.linkWithText("SampleSetBVTChildA"));
+        assertElementNotPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
         // Switch to filter out any parent materials so we can just check for children
         setFilter("parentMaterials", "Name", "Is Blank");
         clearFilter("childMaterials", "Name");
@@ -284,22 +287,22 @@ public class SampleSetTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText(FOLDER_CHILDREN_SAMPLE_SET_NAME));
         clickButton("Import More Samples");
-        clickRadioButtonById("insertOrUpdateChoice");
-        setFormElement("data", REPARENTED_CHILD_SAMPLE_SET_TSV);
+        checkRadioButton(Locator.radioButtonById("insertOrUpdateChoice"));
+        setFormElement(Locator.name("data"), REPARENTED_CHILD_SAMPLE_SET_TSV);
         clickButton("Submit");
 
         clickAndWait(Locator.linkWithText("SampleSetBVTChildB"));
         assertTextPresent("2.222");
-        assertLinkNotPresentWithText("SampleSetBVT4");
+        assertElementNotPresent(Locator.linkWithText("SampleSetBVT4"));
         // Filter out any child materials so we can just check for parents
         setFilter("childMaterials", "Name", "Is Blank");
-        assertLinkPresentWithText("SampleSetBVT14");
-        assertLinkNotPresentWithText("SampleSetBVTGrandchildA");
+        assertElementPresent(Locator.linkWithText("SampleSetBVT14"));
+        assertElementNotPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
         // Switch to filter out any parent materials so we can just check for children
         setFilter("parentMaterials", "Name", "Is Blank");
         clearFilter("childMaterials", "Name");
-        assertLinkNotPresentWithText("SampleSetBVT14");
-        assertLinkPresentWithText("SampleSetBVTGrandchildA");
+        assertElementNotPresent(Locator.linkWithText("SampleSetBVT14"));
+        assertElementPresent(Locator.linkWithText("SampleSetBVTGrandchildA"));
 
         // Verify that the event was audited
         goToModule("Query");
@@ -324,8 +327,8 @@ public class SampleSetTest extends BaseWebDriverTest
     private void inserNewWithFileAttachmentTest()
     {
         clickButton("Insert New");
-        setFormElement("quf_Name", "SampleSetInsertedManually");
-        setFormElement("quf_FileAttachment", experimentFilePath);
+        setFormElement(Locator.name("quf_Name"), "SampleSetInsertedManually");
+        setFormElement(Locator.name("quf_FileAttachment"), experimentFilePath);
         clickButton("Submit");
         //a double upload causes the file to be appended with a count
         assertTextPresent("experiment-1.xar.xml");
@@ -339,7 +342,7 @@ public class SampleSetTest extends BaseWebDriverTest
         waitForElement(Locator.navButton("Add Field"), defaultWaitForPage);
         clickButton("Add Field", 0);
         waitForElement(Locator.id(inputFormID), defaultWaitForPage);
-        setFormElement(inputFormID, fileField);
+        setFormElement(Locator.id(inputFormID), fileField);
         Locator l = Locator.xpath("//input[@id='" + inputFormID + "']/../../../td[8]/div/input");
         setFormElement(l,  "File");
         clickButton("Save");
@@ -348,7 +351,7 @@ public class SampleSetTest extends BaseWebDriverTest
     private void setFileAttachment(int index, File attachment)
     {
         clickAndWait(Locator.linkWithText("edit", index));
-        setFormElement("quf_FileAttachment",  attachment);
+        setFormElement(Locator.name("quf_FileAttachment"),  attachment);
         clickButton("Submit");
 
         DataRegionTable drt = new DataRegionTable("Material", this);
