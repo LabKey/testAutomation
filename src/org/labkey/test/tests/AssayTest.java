@@ -781,11 +781,11 @@ public class AssayTest extends AbstractAssayTestWD
         clickAndWait(Locator.linkWithText("Study Navigator"));
 
         log("Test participant counts and row counts in study overview");
-        String[] row2 = new String[]{TEST_ASSAY, "8", "", "", "", "", "", "", "1", "", "", "4", "", "", "", "", "1", "1", "", "", "", "1", "", "", "", "", ""};
+        String[] row2 = new String[]{TEST_ASSAY, "8", " ", " ", " ", " ", " ", " ", "1", " ", " ", "4", " ", " ", " ", " ", "1", "1", " ", " ", " ", "1", " ", " ", " ", " ", " "};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
         // Manually click the checkbox -- normal checkCheckbox() method doesn't seem to work for checkbox that reloads using onchange event
         clickAndWait(Locator.checkboxByNameAndValue("visitStatistic", "RowCount"));
-        row2 = new String[]{TEST_ASSAY, "8 / 8", "", "", "", "", "", "", "1 / 1", "", "", "4 / 4", "", "", "", "", "1 / 1", "1 / 1", "", "", "", "1 / 1", "", "", "", "", ""};
+        row2 = new String[]{TEST_ASSAY, "8 / 8", " ", " ", " ", " ", " ", " ", "1 / 1", " ", " ", "4 / 4", " ", " ", " ", " ", "1 / 1", "1 / 1", " ", " ", " ", "1 / 1", " ", " ", " ", " ", " "};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
 
         log("Test that correct timepoints were created");
