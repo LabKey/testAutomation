@@ -387,7 +387,8 @@ public enum TestSet
     EHR(
         EHRReportingAndUITest.class,
         EHRDataEntryTest.class,
-        EHRApiTest.class
+        EHRApiTest.class,
+        ONPRC_EHRTest.class
     ),
 
     ONPRC(Unsupported, EHR.getTestList()),

@@ -946,7 +946,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Cell Types:"));
         assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Genders:"));
-        assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Sample Types:"));
 
         assertElementPresent(LabModuleHelper.getNavPanelRow("Allowable Barcodes:"));
         assertElementPresent(LabModuleHelper.getNavPanelRow("DNA Loci:"));
