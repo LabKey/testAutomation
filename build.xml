@@ -146,8 +146,13 @@
     </target>
 
     <target name="delete_logs">
-        <delete dir="${test.log.output.dir}" />
+        <echo message="Deleting log files from ${tomcat.home}/logs"/>
+        <delete failonerror="false" dir="${tomcat.home}/logs" />
+        <echo message="Deleting tomcat temp dir ${tomcat.home}/temp"/>
+        <delete failonerror="false" dir="${tomcat.home}/temp" />
         <delete file="${basedir}/../teamcity-info.xml"/>
+        <mkdir dir="${tomcat.home}/logs" />
+        <mkdir dir="${tomcat.home}/temp" />
     </target>
 
     <target name="prepare">
@@ -478,12 +483,6 @@
 
     <target name="runsuite-selenium-tomcat" depends="stopSeleniumServer,compile,ensurePassword,deploy-test-modules,set-user-props,set-debug-props">
         <fail unless="tomcat.home" />
-        <echo message="Deleting log files from ${tomcat.home}/logs"/>
-        <delete failonerror="false" dir="${tomcat.home}/logs" />
-        <echo message="Deleting tomcat temp dir ${tomcat.home}/temp"/>
-        <delete failonerror="false" dir="${tomcat.home}/temp" />
-        <mkdir dir="${tomcat.home}/logs" />
-        <mkdir dir="${tomcat.home}/temp" />
         <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_teamcity" />
         <antcall target="waitfor-labkey-started"/>
 
@@ -649,13 +648,6 @@
         <property name="debug.suspend.selenium" value="n"/>
         <property name="suite" value="UnitTests"/>
         <antcall target="sub-selenium"/>
-    </target>
-
-    <target name="selenium-tomcat">
-        <property name="debug.suspend.selenium" value="n"/>
-        <property name="sysprop.close.on.fail" value="true" />
-        <property name="suite" value="SELENIUM"/>
-        <antcall target="runsuite-selenium-tomcat"/>
     </target>
 
     <target name="drt-debug" description="run drt, suspend until debugger attaches">
