@@ -4488,7 +4488,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getTableCellText(Locator.XPathLocator table, int row, int column)
     {
-        return StringUtils.normalizeSpace(getText(table.append("/tbody/tr[" + (row + 1) + "]/*[(name()='TH' or name()='TD' or name()='th' or name()='td') and position() = " + (column + 1) + "]")));
+        return getText(table.append("/tbody/tr[" + (row + 1) + "]/*[(name()='TH' or name()='TD' or name()='th' or name()='td') and position() = " + (column + 1) + "]"));
     }
 
     public Locator getSimpleTableCell(Locator.XPathLocator table, int row, int column)
