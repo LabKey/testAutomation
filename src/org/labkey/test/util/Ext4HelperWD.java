@@ -295,7 +295,7 @@ public class Ext4HelperWD extends AbstractHelperWD
                 "return ext4ComponentQuery(arguments[0], arguments[1]);";
 
         List<String> unfilteredIds = (List<String>)_test.executeScript(script, componentSelector, parentId);
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
         for (String id : unfilteredIds)
         {
             if (Locator.id(id).findElements(_test._driver).size() > 0)
@@ -320,7 +320,7 @@ public class Ext4HelperWD extends AbstractHelperWD
 
         try
         {
-            List<Type> ret = new ArrayList<Type>(ids.size());
+            List<Type> ret = new ArrayList<>(ids.size());
             for (String id : ids)
             {
                 Constructor<Type> constructor = clazz.getConstructor(String.class, BaseWebDriverTest.class);

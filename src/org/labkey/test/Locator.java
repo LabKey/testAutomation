@@ -165,7 +165,7 @@ public abstract class Locator
             return elements;
         else
         {
-            List<WebElement> zeroOrOneElement = new ArrayList<WebElement>();
+            List<WebElement> zeroOrOneElement = new ArrayList<>();
             if (elements.size() > _index)
                 zeroOrOneElement.add(elements.get(_index));
             return zeroOrOneElement;

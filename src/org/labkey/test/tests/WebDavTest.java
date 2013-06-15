@@ -108,7 +108,7 @@ public class WebDavTest extends BaseWebDriverTest
 
     private List<String> _listNames(Sardine s, String path) throws IOException
     {
-        ArrayList<String> names = new ArrayList<String>();
+        ArrayList<String> names = new ArrayList<>();
         for (DavResource r : s.list(path))
         {
             // ignore .deleted and .upload.log

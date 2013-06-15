@@ -83,7 +83,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         
         public Map<String, Object> toMap()
         {
-            HashMap<String, Object> map = new HashMap<String, Object>();
+            HashMap<String, Object> map = new HashMap<>();
             if (rowid != null)
                 map.put("Rowid", rowid);
             map.put("Text", text);
@@ -340,7 +340,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         SelectRowsResponse resp = cmd.execute(cn, containerPath);
         Assert.assertEquals("Expected to select " + pks.length + " rows", pks.length, resp.getRowCount().intValue());
 
-        List<Row> rows = new ArrayList<Row>(pks.length);
+        List<Row> rows = new ArrayList<>(pks.length);
         for (int i = 0; i < pks.length; i++)
         {
             Map<String, Object> row = resp.getRows().get(i);

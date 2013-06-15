@@ -116,7 +116,7 @@ public class EHRApiTest extends AbstractEHRTest
     @LogMethod
     private void doTriggerScriptTests() throws Exception
     {
-        _saveRowsTimes = new ArrayList<Long>();
+        _saveRowsTimes = new ArrayList<>();
         weightValidationTest();
         arrivalDepartureTest();
         assignmentTest();
@@ -210,7 +210,7 @@ public class EHRApiTest extends AbstractEHRTest
         Object[][] data = new Object[][]{
             {SUBJECTS[0], new Date(), null, null, 120, EHRQCState.IN_PROGRESS.label, null, null, "recordID"}
         };
-        Map<String, List<String>> expected = new HashMap<String, List<String>>();
+        Map<String, List<String>> expected = new HashMap<>();
         expected.put("weight", Arrays.asList("Weight above the allowable value of 35 kg for Rhesus", "Weight gain of >10%. Last weight 12 kg"));
         testValidationMessage("study", "weight", weightFields, data, expected);
 
@@ -218,7 +218,7 @@ public class EHRApiTest extends AbstractEHRTest
         data = new Object[][]{
             {SUBJECTS[0], new Date(), null, null, 20, EHRQCState.IN_PROGRESS.label, null, null, "recordID"}
         };
-        expected = new HashMap<String, List<String>>();
+        expected = new HashMap<>();
         expected.put("weight", Collections.singletonList("Weight gain of >10%. Last weight 12 kg"));
         testValidationMessage("study", "weight", weightFields, data, expected);
 
@@ -226,7 +226,7 @@ public class EHRApiTest extends AbstractEHRTest
         data = new Object[][]{
             {SUBJECTS[0], new Date(), null, null, 5, EHRQCState.IN_PROGRESS.label, null, null, "recordID"}
         };
-        expected = new HashMap<String, List<String>>();
+        expected = new HashMap<>();
         expected.put("weight", Collections.singletonList("Weight drop of >10%. Last weight 12 kg"));
         testValidationMessage("study", "weight", weightFields, data, expected);
 
@@ -499,7 +499,7 @@ public class EHRApiTest extends AbstractEHRTest
         String response;
 
         //maintain list of insert/update times for interest
-        _saveRowsTimes = new ArrayList<Long>();
+        _saveRowsTimes = new ArrayList<>();
 
         //test insert
         Object[][] insertData = {weightData1};
@@ -735,7 +735,7 @@ public class EHRApiTest extends AbstractEHRTest
     {
         try
         {
-            Map<String, List<String>> ret = new HashMap<String, List<String>>();
+            Map<String, List<String>> ret = new HashMap<>();
             JSONObject o = new JSONObject(response);
             if (o.has("errors"))
             {
@@ -757,7 +757,7 @@ public class EHRApiTest extends AbstractEHRTest
 
                             List<String> list = ret.get(field);
                             if (list == null)
-                                list = new ArrayList<String>();
+                                list = new ArrayList<>();
 
                             list.add(msg);
                             ret.put(field, list);
@@ -783,7 +783,7 @@ public class EHRApiTest extends AbstractEHRTest
 
                         List<String> list = ret.get(field);
                         if (list == null)
-                            list = new ArrayList<String>();
+                            list = new ArrayList<>();
 
                         list.add(msg);
                         ret.put(field, list);
@@ -981,6 +981,6 @@ public class EHRApiTest extends AbstractEHRTest
         long average = sum / _saveRowsTimes.size();
         log("The average save time per record was : " + average + " ms");
 
-        _saveRowsTimes = new ArrayList<Long>();
+        _saveRowsTimes = new ArrayList<>();
     }
 }

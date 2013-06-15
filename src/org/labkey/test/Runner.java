@@ -74,14 +74,14 @@ public class Runner extends TestSuite
 {
     private static final int DEFAULT_MAX_TEST_FAILURES = 10;
     private static final TestSet DEFAULT_TEST_SET = TestSet.DRT;
-    private static Map<Test, Long> _testStats = new LinkedHashMap<Test, Long>();
+    private static Map<Test, Long> _testStats = new LinkedHashMap<>();
     private static int _testCount;
     private static List<Class> _remainingTests;
-    private static List<String> _passedTests = new ArrayList<String>();
-    private static List<String> _failedTests = new ArrayList<String>();
-    private static List<String> _erroredTests = new ArrayList<String>();
+    private static List<String> _passedTests = new ArrayList<>();
+    private static List<String> _failedTests = new ArrayList<>();
+    private static List<String> _erroredTests = new ArrayList<>();
 
-    private Set<TestFailure> _failures = new HashSet<TestFailure>();
+    private Set<TestFailure> _failures = new HashSet<>();
     private boolean _cleanOnly;
 
     private Runner(boolean cleanOnly)
@@ -103,7 +103,7 @@ public class Runner extends TestSuite
 
     private static void writeRemainingTests()
     {
-        ArrayList<String> failedAndRemaining = new ArrayList<String>();
+        ArrayList<String> failedAndRemaining = new ArrayList<>();
         failedAndRemaining.addAll(_failedTests);
         failedAndRemaining.addAll(_erroredTests);
         for (Class clazz : _remainingTests)
@@ -135,7 +135,7 @@ public class Runner extends TestSuite
 
     private static List<Class> readClasses(File file)
     {
-        List<Class> testClasses = new ArrayList<Class>();
+        List<Class> testClasses = new ArrayList<>();
 
         if (file.exists())
         {
@@ -183,7 +183,7 @@ public class Runner extends TestSuite
     private static Class[] readClasses(File recentlyFailedTestsFile, List<Class> tests)
     {
         List<Class> recentlyFailedTests = readClasses(recentlyFailedTestsFile);
-        ArrayList<Class> filteredRecentlyFailedTests = new ArrayList<Class>();
+        ArrayList<Class> filteredRecentlyFailedTests = new ArrayList<>();
 
         for (Class item: recentlyFailedTests)
         {
@@ -332,7 +332,7 @@ public class Runner extends TestSuite
     // Set up only the requested tests
     private static List<Class> getTestClasses(TestSet testSet, List<String> testNames)
     {
-        Map<String, Class> nameMap = new HashMap<String, Class>();
+        Map<String, Class> nameMap = new HashMap<>();
         for (Class testClass : testSet.getTestList())
         {
             String simpleName = testClass.getSimpleName().toLowerCase();
@@ -349,7 +349,7 @@ public class Runner extends TestSuite
             }
         }
 
-        List<Class> testClasses = new ArrayList<Class>(testNames.size());
+        List<Class> testClasses = new ArrayList<>(testNames.size());
 
         for (String testName : testNames)
         {
@@ -375,7 +375,7 @@ public class Runner extends TestSuite
     private static TestSuite getSuite(List<Class> testClasses, boolean cleanOnly) throws Exception
     {
         // Remove duplicate tests (e.g., don't run "basic" test twice if bvt & drt are selected via ant test) but keep the order
-        Set<Class> testClassesCopy = new LinkedHashSet<Class>(testClasses);
+        Set<Class> testClassesCopy = new LinkedHashSet<>(testClasses);
         TestSuite suite = new Runner(cleanOnly);
 
         addTests(suite, testClassesCopy);
@@ -511,7 +511,7 @@ public class Runner extends TestSuite
 
             if (null == collection)
             {
-                collection = new ArrayList<Class>();
+                collection = new ArrayList<>();
                 put(key, collection);
             }
 
@@ -637,7 +637,7 @@ public class Runner extends TestSuite
 
     public static List<Class> getAllTests()
     {
-        List<Class> tests = new ArrayList<Class>();
+        List<Class> tests = new ArrayList<>();
         for (TestSet testSet : TestSet.values())
         {
             for (Class testClass : testSet.getTestList())
@@ -671,7 +671,7 @@ public class Runner extends TestSuite
     protected static List<String> getTestNames()
     {
         String testNames = System.getProperty("test");
-        List<String> tests = new ArrayList<String>();
+        List<String> tests = new ArrayList<>();
         if (testNames != null && testNames.length() > 0)
         {
             String[] testNameArray = testNames.split(",");
@@ -797,7 +797,7 @@ public class Runner extends TestSuite
         }
         else
         {
-            _remainingTests = new ArrayList<Class>(suite.testCount());
+            _remainingTests = new ArrayList<>(suite.testCount());
 
             System.out.println("Running the following tests:");
             for (Enumeration<Test> e = suite.tests(); e.hasMoreElements(); )
@@ -888,7 +888,7 @@ public class Runner extends TestSuite
     {
         String labkeyRoot = WebTestHelper.getLabKeyRoot();
         File changedFiles = new File(changedFilesFile);
-        Map<String, Long> moduleDirs = new HashMap<String, Long>(10);
+        Map<String, Long> moduleDirs = new HashMap<>(10);
         String modulePrefix = "server/modules/";
 
         if (changedFiles.exists())
@@ -922,12 +922,12 @@ public class Runner extends TestSuite
                 }
 
                 // Now sort modules by most recent file modification date
-                Map<Long, String> orderedModuleDirs = new TreeMap<Long, String>();
+                Map<Long, String> orderedModuleDirs = new TreeMap<>();
 
                 for (String moduleDir : moduleDirs.keySet())
                     orderedModuleDirs.put(-moduleDirs.get(moduleDir), moduleDir);  // Start with most recent change
 
-                return new ArrayList<String>(orderedModuleDirs.values());
+                return new ArrayList<>(orderedModuleDirs.values());
             }
             catch(IOException e)
             {

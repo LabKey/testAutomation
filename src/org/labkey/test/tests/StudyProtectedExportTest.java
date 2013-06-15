@@ -199,7 +199,7 @@ public class StudyProtectedExportTest extends StudyExportTest
 
     protected  void verifyMaskedClinics(int clinicCount)
     {
-        List<String> nonClinics = new ArrayList<String>();
+        List<String> nonClinics = new ArrayList<>();
 
         goToSchemaBrowser();
         selectQuery("study", "Location");

@@ -285,7 +285,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         String[] emissionIds = new String[3];
         String[] parentRowIds = new String[3];
-        Map<String, String> rowIdToWorkbookId = new HashMap<String, String>();
+        Map<String, String> rowIdToWorkbookId = new HashMap<>();
         WorkbookHelper workbookHelper = new WorkbookHelper(this);
         int max = 3;
         for (int i = 0; i < max; i++)
@@ -518,7 +518,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
             InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "EmissionTest");
-            Map<String, Object> rowMap = new HashMap<String,Object>();
+            Map<String, Object> rowMap = new HashMap<>();
             rowMap.put("name", "EmissionTest" + suffix);
             rowMap.put("vehicleId", vehicleId);
 
@@ -621,21 +621,21 @@ public class ContainerContextTest extends BaseWebDriverTest
 
             //then create manufacturer
             InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "manufacturers");
-            Map<String,Object> rowMap = new HashMap<String,Object>();
+            Map<String,Object> rowMap = new HashMap<>();
             rowMap.put("name", MANUFACTURER);
             insertCmd.addRow(rowMap);
             SaveRowsResponse resp1 = insertCmd.execute(cn, getProjectName());
 
             //then create model
             InsertRowsCommand insertCmd2 = new InsertRowsCommand("vehicle", "models");
-            rowMap = new HashMap<String,Object>();
+            rowMap = new HashMap<>();
             rowMap.put("manufacturerId",  resp1.getRows().get(0).get("rowid"));
             rowMap.put("name", MODEL);
             insertCmd2.addRow(rowMap);
             SaveRowsResponse resp2 = insertCmd2.execute(cn, getProjectName());
 
             InsertRowsCommand insertCmd3 = new InsertRowsCommand("vehicle", "vehicles");
-            rowMap = new HashMap<String,Object>();
+            rowMap = new HashMap<>();
             rowMap.put("Color", COLOR + "!");
             rowMap.put("ModelId", resp2.getRows().get(0).get("rowid"));
             rowMap.put("ModelYear", 2050);

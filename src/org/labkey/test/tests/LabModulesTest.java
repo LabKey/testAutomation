@@ -241,7 +241,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
     protected List<Pair<String, String>> getAssaysToCreate()
     {
-        List<Pair<String, String>> assays = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> assays = new ArrayList<>();
         assays.add(Pair.of("Immunophenotyping", "TruCount Test"));
         assays.add(Pair.of("ICS", "ICS Test"));
         assays.add(Pair.of("SSP Typing", "SSP Test"));
@@ -289,7 +289,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         //do cleanup in case test is started in the middle
         Integer highestWorkbookId = deleteExistingWorkbooks();
 
-        List<CreateContainerResponse> workbooks = new ArrayList<CreateContainerResponse>();
+        List<CreateContainerResponse> workbooks = new ArrayList<>();
         workbooks.add(_apiContainerHelper.createWorkbook(getProjectName(), "Workbook1", null));
         workbooks.add(_apiContainerHelper.createWorkbook(getProjectName(), "Workbook2", null));
         workbooks.add(_apiContainerHelper.createWorkbook(getProjectName(), "Workbook3", null));
@@ -414,7 +414,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         List<String> colOrder = Arrays.asList(new String[]{"samplename","subjectId","sampledate","sampletype","overlappingProjects/projects","overlappingProjects/groups","allProjects/projects","allProjects/groups","majorEvents/Appendectomy::DaysPostEvent","majorEvents/Appendectomy::YearsPostEvent","majorEvents/Gave Birth::DaysPostEvent","majorEvents/Vaccination::YearsPostEventDecimal","majorEvents/Biopsy::MonthsPostEvent","majorEvents/Influenza Infection::DaysPostEvent","relativeDates/Project1::DaysPostStart","relativeDates/Project2::MonthsPostStart","relativeDates/Project3::YearsPostStartDecimal"});
 
-        List<String[]> expected = new ArrayList<String[]>();
+        List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"OtherSample",null,null,"DNA",null,null,null,null,null,null,null,null,null,null,null,null,null,null});
         expected.add(new String[]{"OtherSample2",null,null,"RNA",null,null,null,null,null,null,null,null,null,null,null,null,null,null});
         expected.add(new String[]{"Participant0001_gDNA","Participant0001","04/23/2008","gDNA","Project3",null,"Project1\nProject3","Project1 (Controls)","2036","5",null,null,null,"536",null,null,"5.9",null});
@@ -492,7 +492,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         for (String[] arr : SUBJECTS)
         {
-            Map<String,Object> rowMap = new HashMap<String,Object>();
+            Map<String,Object> rowMap = new HashMap<>();
             rowMap.put("subjectname", arr[0]);
             rowMap.put("gender", arr[1]);
             rowMap.put("birth", arr[2]);
@@ -511,7 +511,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         for (String[] arr : PROJECT_ENROLLMENT)
         {
-            Map<String,Object> rowMap = new HashMap<String,Object>();
+            Map<String,Object> rowMap = new HashMap<>();
             rowMap.put("subjectId", arr[0]);
             rowMap.put("project", arr[1]);
             //NOTE: this is deliberately inserting using empty string, not null.  LK is expected to convert that to NULL.  If this doesnt happen,
@@ -535,7 +535,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
         for (String[] arr : SAMPLE_DATA)
         {
-            Map<String,Object> rowMap = new HashMap<String,Object>();
+            Map<String,Object> rowMap = new HashMap<>();
             rowMap.put("samplename", arr[0]);
             rowMap.put("subjectId", arr[1]);
             rowMap.put("sampleType", arr[2]);
@@ -557,7 +557,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         for (String[] arr : MAJOR_EVENTS)
         {
-            Map<String,Object> rowMap = new HashMap<String,Object>();
+            Map<String,Object> rowMap = new HashMap<>();
             rowMap.put("subjectId", arr[0]);
             rowMap.put("date", arr[1]);
             rowMap.put("event", arr[2]);
@@ -1333,7 +1333,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
             InsertRowsCommand insertCmd = new InsertRowsCommand("laboratory", "peptides");
 
-            Map<String,Object> rowMap = new HashMap<String,Object>();
+            Map<String,Object> rowMap = new HashMap<>();
             rowMap.put("peptideId", 1);
             rowMap.put("sequence", "aaa");
             rowMap.put("_selfAssignedId_", "true");
@@ -1366,7 +1366,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
     protected List<String> getEnabledModules()
     {
-        List<String> modules = new ArrayList<String>();
+        List<String> modules = new ArrayList<>();
         modules.add("HormoneAssay");
         modules.add("ELISPOT_Assay");
         modules.add("FlowAssays");
@@ -1378,7 +1378,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
     private List<String> getSampleItems()
     {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("DNA_Oligos");
         list.add("Peptides");
         list.add("Samples");

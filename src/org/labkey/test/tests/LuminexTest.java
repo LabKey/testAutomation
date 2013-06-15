@@ -661,7 +661,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickExcludeAnalyteCheckBox(excludedAnalyte, true);
         clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
 
-        excludeForSingleWellVerify("Excluded for replicate group: " + exclusionComment, new HashSet<String>((Arrays.asList(excludedAnalyte))));
+        excludeForSingleWellVerify("Excluded for replicate group: " + exclusionComment, new HashSet<>((Arrays.asList(excludedAnalyte))));
     }
 
     /**
@@ -680,7 +680,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setText(EXCLUDE_COMMENT_FIELD, comment);
         clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
 
-        excludeForSingleWellVerify("Excluded for replicate group: " + comment, new HashSet<String>(Arrays.asList(getListOfAnalytesMultipleCurveData())));
+        excludeForSingleWellVerify("Excluded for replicate group: " + comment, new HashSet<>(Arrays.asList(getListOfAnalytesMultipleCurveData())));
 
         //remove exclusions to leave in clean state
         clickExclusionMenuIconForWell(wellName);
@@ -772,8 +772,8 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
 
         String exclusionPrefix = "Excluded for analyte: ";
-        Map<String, Set<String>> analyteToExclusion = new HashMap<String, Set<String>>();
-        Set<String> set = new HashSet<String>();
+        Map<String, Set<String>> analyteToExclusion = new HashMap<>();
+        Set<String> set = new HashSet<>();
         set.add(exclusionPrefix + comment);
         analyteToExclusion.put(analyte, set);
 
@@ -790,7 +790,7 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private Map<String, Set<String>> createExclusionMap(Set<String> value, String... key)
     {
-        Map<String, Set<String>> m  = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> m  = new HashMap<>();
 
         for(String k: key)
         {
@@ -831,7 +831,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private String excludedWellDescription = "Sample 2";
     private String excludedWellType = "X25";
-    private Set<String> excludedWells = new HashSet<String>(Arrays.asList("E1", "F1"));
+    private Set<String> excludedWells = new HashSet<>(Arrays.asList("E1", "F1"));
 
     private String[] getListOfAnalytesMultipleCurveData()
     {
@@ -938,7 +938,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void compareColumnValuesAgainstExpected(String column1, String column2, Map<String, Set<String>> column1toColumn2)
     {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new HashSet<>();
         set.add(column2);
         column1toColumn2.put(column1, set); //column headers
 
@@ -1007,13 +1007,13 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private Map<String,Set<String>> generateAnalytesAndStandardsConfig(String[] possibleAnalytes, String[] possibleStandards)
     {
-        Map<String, Set<String>> analytesAndStandardsConfig =  new HashMap<String, Set<String>>();
+        Map<String, Set<String>> analytesAndStandardsConfig =  new HashMap<>();
 
 
         //based on the assumption that there are five analytes and two possible standards:  update this if you need to test for more
-        Set<String> firstStandard = new HashSet<String>(); firstStandard.add(possibleStandards[0]);
-        Set<String> secondStandard = new HashSet<String>(); secondStandard.add(possibleStandards[1]);
-        Set<String> bothStandard = new HashSet<String>();
+        Set<String> firstStandard = new HashSet<>(); firstStandard.add(possibleStandards[0]);
+        Set<String> secondStandard = new HashSet<>(); secondStandard.add(possibleStandards[1]);
+        Set<String> bothStandard = new HashSet<>();
         bothStandard.add(possibleStandards[0]);
         bothStandard.add(possibleStandards[1]);
 
@@ -2007,7 +2007,7 @@ public class LuminexTest extends AbstractQCAssayTest
         selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "GuideSet");
         waitForText("view data");
         clickAndWait(Locator.linkContainingText("view data"));
-        Map<String, Integer> guideSetIds = new HashMap<String, Integer>();
+        Map<String, Integer> guideSetIds = new HashMap<>();
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("RowId");
         _customizeViewsHelper.applyCustomView();

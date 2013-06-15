@@ -48,7 +48,7 @@ public class Crawler
     private final Collection<String> _forbiddenWords;
 
     // Replacements to make in HTML source before looking for "forbidden" words.
-    private static Map<String, String> _sourceReplacements = new HashMap<String, String>();
+    private static Map<String, String> _sourceReplacements = new HashMap<>();
 
     static
     {
@@ -56,16 +56,16 @@ public class Crawler
         _sourceReplacements.put("http://help.labkey.org/wiki/home/cpas/documentation/", "");   // Allow forbidden word "cpas" in help links
     }
 
-    private static Set<ControllerActionId> _actionsVisited = new HashSet<ControllerActionId>();
-    private static Set<String> _urlsChecked = new HashSet<String>();
+    private static Set<ControllerActionId> _actionsVisited = new HashSet<>();
+    private static Set<String> _urlsChecked = new HashSet<>();
     private UrlToCheck _urlToCheck;
     private int _crawlTime = 0;
-    private ArrayList<UrlToCheck> _urlsToCheck = new ArrayList<UrlToCheck>();
+    private ArrayList<UrlToCheck> _urlsToCheck = new ArrayList<>();
 
     private int _maxCrawlTime;
     private static final int DEFAULT_CRAWL_TIME = 90000;
 
-    private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<String, CrawlStats>();
+    private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
     private BaseSeleniumWebTest _test;
 
     public Crawler(BaseSeleniumWebTest test)
@@ -83,12 +83,12 @@ public class Crawler
 
     protected Set<String> getForbiddenWords()
     {
-        return new HashSet<String>();
+        return new HashSet<>();
     }
 
     protected List<ControllerActionId> getExcludedActions()
     {
-        List<ControllerActionId> list = new ArrayList<ControllerActionId>();
+        List<ControllerActionId> list = new ArrayList<>();
         Collections.addAll(list, new ControllerActionId("admin", "resetErrorMark"),
             new ControllerActionId("admin", "dbChecker"),
             new ControllerActionId("admin", "runSystemMaintenance"),

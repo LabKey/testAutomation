@@ -80,7 +80,7 @@ public class StudyWDTest extends StudyBaseTestWD
 
 
     //lists created in participant picker tests must be cleaned up afterwards
-    LinkedList<String> persistingLists  = new LinkedList<String>();
+    LinkedList<String> persistingLists  = new LinkedList<>();
     private String Study001 = "Study 001";
     private String authorUser = "author@study.test";
     private String specimenUrl = null;
@@ -328,7 +328,7 @@ public class StudyWDTest extends StudyBaseTestWD
         waitForElement(textArea, WAIT_FOR_JAVASCRIPT);
         sleep(1000);
         String subjectIDs = getFormElement(textArea);
-        Set<String> identifiers = new HashSet<String>();
+        Set<String> identifiers = new HashSet<>();
 
         for (String subjectId : subjectIDs.split(","))
             identifiers.add(subjectId.trim());
@@ -1020,7 +1020,7 @@ public class StudyWDTest extends StudyBaseTestWD
     // Either param can be null
     private int countTableCells(String text, Boolean grayed)
     {
-        List<String> parts = new LinkedList<String>();
+        List<String> parts = new LinkedList<>();
 
         if (null != text)
             parts.add("contains(text(), '" + text + "')");

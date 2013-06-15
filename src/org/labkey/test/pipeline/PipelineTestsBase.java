@@ -33,7 +33,7 @@ public class PipelineTestsBase
 {
     protected PipelineWebTestBase _test;
     protected PipelineFolder _folder;
-    protected List<PipelineTestParams> _listParams = new ArrayList<PipelineTestParams>();
+    protected List<PipelineTestParams> _listParams = new ArrayList<>();
 
     public PipelineTestsBase(PipelineWebTestBase test)
     {
@@ -73,7 +73,7 @@ public class PipelineTestsBase
     public PipelineTestParams[] getCompleteParams()
     {
         PageCache pc = new PageCache();
-        List<PipelineTestParams> listCompleteParams = new ArrayList<PipelineTestParams>();
+        List<PipelineTestParams> listCompleteParams = new ArrayList<>();
         for (PipelineTestParams tp : _listParams)
         {
             if (pc.isComplete(tp))
@@ -124,7 +124,7 @@ public class PipelineTestsBase
 
     public void runAll()
     {
-        HashSet<String> runs = new HashSet<String>();
+        HashSet<String> runs = new HashSet<>();
 
         for (PipelineTestParams tp : getParams())
         {
@@ -141,7 +141,7 @@ public class PipelineTestsBase
     public class PageCache
     {
         private PipelineStatusTable _tableStatus;
-        private Map<String, ExperimentRunTable> _mapTableExp = new HashMap<String, ExperimentRunTable>();
+        private Map<String, ExperimentRunTable> _mapTableExp = new HashMap<>();
 
         /**
          * Determines whether a test has completed its pipeline processing.  Note

@@ -76,7 +76,7 @@ public class JavaQC
     private static Map<String, String> parseInputData(File inputData)
     {
         BufferedReader br = null;
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<>();
 
         try {
             br = new BufferedReader(new FileReader(inputData));

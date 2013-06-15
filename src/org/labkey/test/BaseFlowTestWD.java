@@ -666,7 +666,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
             _analysisName = analysisName;
             _existingAnalysisFolder = existingAnalysisFolder;
             _viaPipeline = viaPipeline;
-            _expectedErrors = new ArrayList<String>();
+            _expectedErrors = new ArrayList<>();
         }
 
         public ImportAnalysisOptions(

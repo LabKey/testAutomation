@@ -57,7 +57,7 @@ public class JSONHelper extends AbstractHelper
     public JSONHelper(BaseSeleniumWebTest test)
     {
         super(test);
-        _ignoredElements = new ArrayList<Pattern>();
+        _ignoredElements = new ArrayList<>();
         _ignoredElements.addAll(Arrays.asList(GLOBALLY_IGNORED));
     }
 
@@ -66,7 +66,7 @@ public class JSONHelper extends AbstractHelper
         super(test);
 
         // load up the elements to skip comparisons on
-        _ignoredElements = new ArrayList<Pattern>();
+        _ignoredElements = new ArrayList<>();
         _ignoredElements.addAll(Arrays.asList(GLOBALLY_IGNORED));
         if (ignored != null)
             _ignoredElements.addAll(Arrays.asList(ignored));

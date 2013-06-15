@@ -72,10 +72,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
     private String _lastPageText = null;
-    private Stack<String> _locationStack = new Stack<String>();
+    private Stack<String> _locationStack = new Stack<>();
     private String _savedLocation = null;
-    private Stack<String> _impersonationStack = new Stack<String>();
-    private List<FolderIdentifier> _createdFolders = new ArrayList<FolderIdentifier>();
+    private Stack<String> _impersonationStack = new Stack<>();
+    private List<FolderIdentifier> _createdFolders = new ArrayList<>();
     protected boolean _testFailed = true;
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 60000;
@@ -421,7 +421,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         String js = "selenium.getLinkAddresses();";
         String linkStr = selenium.getEval(js);
         String[] linkArray = linkStr.split("\\\\n");
-        ArrayList<String> links = new ArrayList<String>(linkArray.length);
+        ArrayList<String> links = new ArrayList<>(linkArray.length);
         for (String link : linkArray)
         {
             if (link.contains("#"))
@@ -1699,7 +1699,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (skipViewCheck())
             return;
 
-        List<String> checked = new ArrayList<String>();
+        List<String> checked = new ArrayList<>();
 
         for (String projectName : _containerHelper.getCreatedProjects())
         {
@@ -3091,7 +3091,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         for (ModulePropertyValue value : values)
         {
             log("setting property: " + value.getPropertyName() + " for container: " + value.getContainerPath() + " to value: " + value.getValue());
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             map.put("moduleName", value.getModuleName());
             map.put("containerPath", value.getContainerPath());
             map.put("propName", value.getPropertyName());
@@ -4018,7 +4018,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     private ArrayList<File> listFilesRecursive(File path, FilenameFilter filter)
     {
         File[] files = path.listFiles(filter);
-        ArrayList<File> allFiles = new ArrayList<File>();
+        ArrayList<File> allFiles = new ArrayList<>();
         if (files != null)
         {
             for (File file : files)
@@ -4106,7 +4106,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         int rowCount = getTableRowCount(tableName);
 
-        List<String> values = new ArrayList<String>(rowCount);
+        List<String> values = new ArrayList<>(rowCount);
 
         for (int i = 0; i < rowCount; i++)
         {
@@ -4161,7 +4161,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             showAllInTable();
         }
-        List<List<String>> columns = new ArrayList<List<String>>();
+        List<List<String>> columns = new ArrayList<>();
         for(int i=0; i<columnNames.length; i++)
         {
             columns.add(new ArrayList<String>());
@@ -5604,7 +5604,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void deleteUsers(boolean failIfNotFound, String... userEmails)
     {
         int checked = 0;
-        List<String> displayNames = new ArrayList<String>();
+        List<String> displayNames = new ArrayList<>();
         ensureAdminMode();
         goToSiteUsers();
 
@@ -6056,7 +6056,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public List<Locator> findAllMatches(Locator.XPathLocator loc)
     {
-        List<Locator> locators = new ArrayList<Locator>();
+        List<Locator> locators = new ArrayList<>();
         for (int i = 0; ; i++)
         {
             if (isElementPresent(loc.index(i)))
@@ -6209,9 +6209,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         String[] firstArray = firstSet.split(delimiterRegEx);
         String[] secondArray = secondSet.split(delimiterRegEx);
         Assert.assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstArray.length == secondArray.length);
-        Set<String> firstHash= new HashSet<String>();
+        Set<String> firstHash= new HashSet<>();
         Collections.addAll(firstHash, firstArray);
-        Set<String> secondHash= new HashSet<String>();
+        Set<String> secondHash= new HashSet<>();
         Collections.addAll(secondHash, secondArray);
         Assert.assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
     }
@@ -6858,7 +6858,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
             // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
             File testDir = _tempDir;
-            List<String> dirNames = new ArrayList<String>();
+            List<String> dirNames = new ArrayList<>();
 
             while (!_pipelineRoot.equals(testDir))
             {
@@ -7023,7 +7023,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
 //        String navTrailXpath =   "//span[@id='navTrailAncestors']/a";
         int count = getXpathCount(Locator.xpath(xpath));
-        ArrayList<String> al = new ArrayList<String>(count);
+        ArrayList<String> al = new ArrayList<>(count);
         for(int i=1; i<=count; i++)
         {
             al.add(getAttribute(Locator.xpath(xpath + "[" + i + "]"), "href"));
@@ -7061,7 +7061,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             xpath.replace("inactive", "active");
 
         int count = getXpathCount(Locator.xpath(xpath));
-        ArrayList<String> al = new ArrayList<String>(count);
+        ArrayList<String> al = new ArrayList<>(count);
         for(int i=1; i<=count; i++)
         {
             al.add(getAttribute(Locator.xpath(xpath + "[" + i + "]/a"), "href"));

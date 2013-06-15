@@ -530,8 +530,8 @@ public class MS2Tests_20070701__3_4_0 extends MS2TestsBase
     public void addTestsQuant()
     {
         MS2QuantParams qp, qpRaw;
-        ArrayList<MS2QuantParams> list = new ArrayList<MS2QuantParams>();
-        ArrayList<MS2QuantParams> listRaw = new ArrayList<MS2QuantParams>();
+        ArrayList<MS2QuantParams> list = new ArrayList<>();
+        ArrayList<MS2QuantParams> listRaw = new ArrayList<>();
 
         // Q3 quantitation
         qp = new MS2QuantParams(_test, "quant/acrylamide", "xc_bov_q3_75", "BSA_10_1");

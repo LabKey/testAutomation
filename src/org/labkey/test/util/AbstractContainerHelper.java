@@ -28,7 +28,7 @@ import java.util.List;
  */
 public abstract class AbstractContainerHelper extends AbstractHelper
 {
-    private List<String> _createdProjects = new ArrayList<String>();
+    private List<String> _createdProjects = new ArrayList<>();
 
     public AbstractContainerHelper(BaseSeleniumWebTest test)
     {

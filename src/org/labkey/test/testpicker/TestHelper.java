@@ -422,7 +422,7 @@ public class TestHelper
      */
     public List<String> getSelectedTests(CheckNode root)
     {
-        List<String> selectedNodes = new ArrayList<String>();
+        List<String> selectedNodes = new ArrayList<>();
         selectedNodes.addAll(getChecked(root, true));
         return selectedNodes;
     }
@@ -432,7 +432,7 @@ public class TestHelper
       */
     public List<String> getCheckedNodes(CheckNode root)
     {
-        List<String> selectedNodes = new ArrayList<String>();
+        List<String> selectedNodes = new ArrayList<>();
         selectedNodes.addAll(getChecked(root, false));
         return selectedNodes;
     }
@@ -445,7 +445,7 @@ public class TestHelper
      */
     private List<String> getChecked(CheckNode node, boolean testsOnly)
     {
-        List<String> selected = new ArrayList<String>();
+        List<String> selected = new ArrayList<>();
         if (node.isSelected())
         {
             if (testsOnly)
@@ -566,7 +566,7 @@ public class TestHelper
      */
     private List<TestConfig> getSavedConfigs()
     {
-        List<TestConfig> savedConfigs = new ArrayList<TestConfig>();
+        List<TestConfig> savedConfigs = new ArrayList<>();
         try
         {
             if (_saveFile.isFile())

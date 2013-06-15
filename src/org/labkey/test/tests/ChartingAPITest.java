@@ -118,7 +118,7 @@ public class ChartingAPITest extends ClientAPITest
         try
         {
             method = new HttpPost(url);
-            List<NameValuePair> args = new ArrayList<NameValuePair>();
+            List<NameValuePair> args = new ArrayList<>();
             args.add(new BasicNameValuePair("svg", svgText));
             method.setEntity(new UrlEncodedFormEntity(args));
             response = httpClient.execute(method, context);

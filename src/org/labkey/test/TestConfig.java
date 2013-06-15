@@ -79,7 +79,7 @@ public class TestConfig implements Serializable
         _contextPath = TestHelper.DEFAULT_CONTEXT_PATH;
         _server = TestHelper.DEFAULT_SERVER;
         _root = TestHelper.DEFAULT_ROOT;
-        _checkedNodes = new ArrayList<String>();
+        _checkedNodes = new ArrayList<>();
         _haltOnError = true;
     }
 

@@ -121,7 +121,7 @@ public abstract class SimpleApiTestWD extends BaseWebDriverTest
     {
         try
         {
-            List<ApiTestCase> tests = new ArrayList<ApiTestCase>();
+            List<ApiTestCase> tests = new ArrayList<>();
             ApiTestsDocument doc = ApiTestsDocument.Factory.parse(testFile);
 
             if (doc != null)

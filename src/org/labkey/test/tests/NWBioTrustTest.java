@@ -56,7 +56,7 @@ public class NWBioTrustTest extends SurveyTest
     private static final String requestorFolder1 = "Requestor 1";
     private static final String requestorFolder2 = "Requestor 2";
     private static final String provisionTableName = "Sample Request Responses";
-    private static final List<Map<String, String>> designs = new ArrayList<Map<String, String>>();
+    private static final List<Map<String, String>> designs = new ArrayList<>();
     private static final String registrationLabel = "requestor 1 study";
     private static final String[] unsubmittedRequestTypes = {"Normal tissue from patients without cancer"};
     private static final String[] submittedRequestTypes = {"Tumor from primary site", "Tumor from metastasis", "Normal tissues adjacent to primary site (same organ)"};
@@ -570,7 +570,7 @@ public class NWBioTrustTest extends SurveyTest
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForText("No study registrations to show", 1, WAIT_FOR_PAGE);
         waitAndClickAndWait(Locator.linkWithText("Click Here"));
-        List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> fields = new ArrayList<>();
         fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + registrationLabel));
         fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Approved Human Subjects Research"));
         fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
@@ -587,7 +587,7 @@ public class NWBioTrustTest extends SurveyTest
 
     private Map<String, String> createFieldInfo(String section, String name, String value)
     {
-        Map<String, String> info = new HashMap<String, String>();
+        Map<String, String> info = new HashMap<>();
         info.put("section", section);
         info.put("name", name);
         info.put("value", value);
@@ -596,7 +596,7 @@ public class NWBioTrustTest extends SurveyTest
 
     private Map<String, String> createRadioFieldInfo(String section, String label, String boxLabel)
     {
-        Map<String, String> info = new HashMap<String, String>();
+        Map<String, String> info = new HashMap<>();
         info.put("section", section);
         info.put("label", label);
         info.put("boxLabel", boxLabel);
@@ -605,7 +605,7 @@ public class NWBioTrustTest extends SurveyTest
 
     private Map<String, String> createComboFieldInfo(String section, String label, String selection)
     {
-        Map<String, String> info = new HashMap<String, String>();
+        Map<String, String> info = new HashMap<>();
         info.put("section", section);
         info.put("label", label);
         info.put("selection", selection);
@@ -709,10 +709,10 @@ public class NWBioTrustTest extends SurveyTest
         goToProjectHome();
         clickAndWait(Locator.linkWithText("Manage"));
         Object[] categoriesToInsert = checkForValuesToInsert("RequestCategory", "Category", NWBT_REQUEST_CATEGORIES);
-        List<Map<String,Object>> rows = new ArrayList<Map<String, Object>>();
+        List<Map<String,Object>> rows = new ArrayList<>();
         for (Object category : categoriesToInsert)
         {
-            Map<String, Object> rowMap = new HashMap<String, Object>();
+            Map<String, Object> rowMap = new HashMap<>();
             rowMap.put("Category", category.toString());
             rowMap.put("SortOrder", Arrays.asList(NWBT_REQUEST_CATEGORIES).indexOf(category.toString()) + 1);
             rows.add(rowMap);
@@ -721,10 +721,10 @@ public class NWBioTrustTest extends SurveyTest
 
         log("Populate the Request Status dashboard lookup table");
         Object[] statusesToInsert = checkForValuesToInsert("RequestStatus", "Status", NWBT_REQUEST_STATUSES);
-        rows = new ArrayList<Map<String, Object>>();
+        rows = new ArrayList<>();
         for (Object status : statusesToInsert)
         {
-            Map<String, Object> rowMap = new HashMap<String, Object>();
+            Map<String, Object> rowMap = new HashMap<>();
             rowMap.put("Status", status.toString());
             rowMap.put("SortOrder", ((NwbtRequestStatuses)status).sortOrder());
             rowMap.put("LockedState", ((NwbtRequestStatuses)status).isLocked());
@@ -735,11 +735,11 @@ public class NWBioTrustTest extends SurveyTest
 
         log("Populate the Document Types lookup table");
         Object[] docTypesToInsert = checkForValuesToInsert("DocumentTypes", "Name", NWBT_DOCUMENT_TYPES);
-        rows = new ArrayList<Map<String, Object>>();
+        rows = new ArrayList<>();
         for (Object docType : docTypesToInsert)
         {
             int index = Arrays.asList(NWBT_DOCUMENT_TYPES).indexOf(docType);
-            Map<String, Object> rowMap = new HashMap<String, Object>();
+            Map<String, Object> rowMap = new HashMap<>();
             rowMap.put("Name", docType.toString());
             // set the first doc type as not allowing multiple uploads
             rowMap.put("AllowMultipleUpload", NWBT_DOCUMENT_TYPE_FLAGS[index][0]);
@@ -771,12 +771,12 @@ public class NWBioTrustTest extends SurveyTest
 
     private Object[] checkForValuesToInsert(String queryName, String colName, Object[] values)
     {
-        List<Object> valuesToInsert = new ArrayList<Object>(Arrays.asList(values));
+        List<Object> valuesToInsert = new ArrayList<>(Arrays.asList(values));
 
         log("Checking for values to be inserted via SelectRows API");
         Filter filter = new Filter(colName, StringUtils.join(values, ";"), Filter.Operator.IN);
         SelectRowsResponse response = executeSelectRowCommand("biotrust", queryName, ContainerFilter.Current, "/" + getProjectName(), Collections.singletonList(filter));
-        List<String> col = new ArrayList<String>();
+        List<String> col = new ArrayList<>();
         for (Map<String, Object> row : response.getRows())
         {
             col.add(row.get(colName).toString());
@@ -876,7 +876,7 @@ public class NWBioTrustTest extends SurveyTest
         _containerHelper.createSubfolder(getProjectName(), requestorFolder2, "NW BioTrust Specimen Requestor");
 
         // set up the rc email notification
-        List<ModulePropertyValue> properties = new ArrayList<ModulePropertyValue>();
+        List<ModulePropertyValue> properties = new ArrayList<>();
         properties.add(new ModulePropertyValue("BioTrust", "/", "RC email address", NWBT_RC_EMAIL));
 
         setModuleProperties(properties);
@@ -982,49 +982,49 @@ public class NWBioTrustTest extends SurveyTest
             }
         }, "failed to download discarded blood sample request json", WAIT_FOR_JAVASCRIPT);
 
-        Map<String, String> design = new HashMap<String, String>();
+        Map<String, String> design = new HashMap<>();
         design.put("label", "StudyRegistration");
         design.put("description", "");
         design.put("table", "StudyRegistrations");
         design.put("metadataPath", studyRegistrationJson.getAbsolutePath());
         designs.add(design);
 
-        design = new HashMap<String, String>();
+        design = new HashMap<>();
         design.put("label", "ProspectiveSampleRequest");
         design.put("description", "");
         design.put("table", "SampleRequests");
         design.put("metadataPath", prospectiveSampleRequestJson.getAbsolutePath());
         designs.add(design);
 
-        design = new HashMap<String, String>();
+        design = new HashMap<>();
         design.put("label", "DiscardedBloodSampleRequest");
         design.put("description", "");
         design.put("table", "SampleRequests");
         design.put("metadataPath", discardedSampleRequestJson.getAbsolutePath());
         designs.add(design);
 
-        design = new HashMap<String, String>();
+        design = new HashMap<>();
         design.put("label", "SurgicalTissueSample");
         design.put("description", "");
         design.put("table", "TissueRecords");
         design.put("metadataPath", surgicalTissueJson.getAbsolutePath());
         designs.add(design);
 
-        design = new HashMap<String, String>();
+        design = new HashMap<>();
         design.put("label", "NonSurgicalTissueSample");
         design.put("description", "");
         design.put("table", "TissueRecords");
         design.put("metadataPath", nonSurgicalTissueJson.getAbsolutePath());
         designs.add(design);
 
-        design = new HashMap<String, String>();
+        design = new HashMap<>();
         design.put("label", "BloodSample");
         design.put("description", "");
         design.put("table", "TissueRecords");
         design.put("metadataPath", bloodSampleJson.getAbsolutePath());
         designs.add(design);
 
-        design = new HashMap<String, String>();
+        design = new HashMap<>();
         design.put("label", "DiscardedBloodSample");
         design.put("description", "");
         design.put("table", "TissueRecords");

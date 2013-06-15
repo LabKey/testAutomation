@@ -159,7 +159,7 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
         waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
-        List<String> expectedCols = new ArrayList<String>();
+        List<String> expectedCols = new ArrayList<>();
         expectedCols.add("well");
         expectedCols.add("category");
         expectedCols.add("subjectId");
@@ -242,7 +242,7 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
 
         DataRegionTable results = new DataRegionTable("Data", this);
 
-        Map<String, String[]> expected = new LinkedHashMap<String, String[]>();
+        Map<String, String[]> expected = new LinkedHashMap<>();
         expected.put("PC U1 00153149_Free T4_1.2", new String[]{"PC U1 00153149", " ", "Free T4", "1.2", "ng/dl", "Pos Control", " ", " ", " "});
         expected.put("PC U1 00153149_Cortisol_13.11", new String[]{"PC U1 00153149", " ", "Cortisol", "13.11", "ug/dl", "Pos Control", " ", " ", " "});
         expected.put("PC U1 00153149_Total T3_1.55", new String[]{"PC U1 00153149", " ", "Total T3", "1.55", "ng/ml", "Pos Control", " ", " ", " "});
@@ -404,7 +404,7 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
     @Override
     protected List<Pair<String, String>> getAssaysToCreate()
     {
-        List<Pair<String, String>> assays = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> assays = new ArrayList<>();
         assays.add(Pair.of("Electrochemiluminescence Assay", ASSAY_NAME));
 
         return assays;
@@ -413,7 +413,7 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
     @Override
     protected List<String> getEnabledModules()
     {
-        List<String> modules = new ArrayList<String>();
+        List<String> modules = new ArrayList<>();
         modules.add("Electrochemiluminescence");
         return modules;
     }

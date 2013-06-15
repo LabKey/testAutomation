@@ -118,7 +118,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
         log("** Set column title and SUM aggregate");
         assertTextNotPresent("Oldness Factor");
 
-        List<Map<String, String>> aggregates = new ArrayList<Map<String, String>>();
+        List<Map<String, String>> aggregates = new ArrayList<>();
         aggregates.add(new HashMap<String, String>(){{put("type", "SUM");}});
         aggregates.add(new HashMap<String, String>(){{put("type", "COUNT");}});
         setColumnProperties("Age", "Oldness Factor" + INJECT_CHARS_2, aggregates);

@@ -463,7 +463,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
             {
                 String keyField = selectResp.getMetaData().get("id").toString();
 
-                Map<String, List<Map<String, Object>>> rowsByContainer = new LinkedHashMap<String, List<Map<String, Object>>>();
+                Map<String, List<Map<String, Object>>> rowsByContainer = new LinkedHashMap<>();
                 for (Map<String, Object> row : selectResp.getRows())
                 {
                     log("  ... found row: " + row);
@@ -473,13 +473,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
                     if (convertedRow.getValue("Container") != null)
                         container = convertedRow.getValue("Container").toString();
 
-                    Map<String, Object> newRow = new HashMap<String, Object>();
+                    Map<String, Object> newRow = new HashMap<>();
                     Object value = convertedRow.getValue(keyField);
                     newRow.put(keyField, value);
 
                     List<Map<String, Object>> rows = rowsByContainer.get(container);
                     if (rows == null)
-                        rowsByContainer.put(container, rows = new ArrayList<Map<String, Object>>());
+                        rowsByContainer.put(container, rows = new ArrayList<>());
                     rows.add(newRow);
                 }
 
@@ -682,7 +682,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("** Testing container columns");
         SelectRowsCommand selectCmd = new SelectRowsCommand(CORE_SCHEMA, "Containers");
         selectCmd.setMaxRows(-1);
-        List<String> columns = new ArrayList<String>();
+        List<String> columns = new ArrayList<>();
         columns.add("*");
         selectCmd.setColumns(columns);
         selectCmd.setRequiredVersion(9.1);
@@ -816,8 +816,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         Assert.assertEquals("Module context not set propertly", "DefaultValue", executeScript("return LABKEY.getModuleContext('simpletest')." + prop2));
 
-        Map<String, List<String[]>> props = new HashMap<String, List<String[]>>();
-        List<ModulePropertyValue> propList = new ArrayList<ModulePropertyValue>();
+        Map<String, List<String[]>> props = new HashMap<>();
+        List<ModulePropertyValue> propList = new ArrayList<>();
         propList.add(new ModulePropertyValue("simpletest", "/", prop1, prop1Value));
         propList.add(new ModulePropertyValue("simpletest", "/" + getProjectName() + "/" + FOLDER_NAME, prop2 , "FolderValue"));
 

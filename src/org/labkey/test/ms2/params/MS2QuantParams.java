@@ -31,7 +31,7 @@ import java.util.Map;
 */
 class MS2QuantParams extends MS2TestParams
 {
-    protected Map<String, MS2QuantRatio> ratios = new HashMap<String, MS2QuantRatio>();
+    protected Map<String, MS2QuantRatio> ratios = new HashMap<>();
 
     public MS2QuantParams(PipelineWebTestBase test, String dataPath, String protocol)
     {

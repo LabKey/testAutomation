@@ -432,7 +432,7 @@ public class SequenceTest extends BaseWebDriverTest
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.uncheckAllOnPage();
         dr.checkCheckbox(2);
-        List<String> rowIds = new ArrayList<String>();
+        List<String> rowIds = new ArrayList<>();
         rowIds.add(dr.getDataAsText(2, "Readset Id"));
         dr.checkCheckbox(6);
         rowIds.add(dr.getDataAsText(6, "Readset Id"));
@@ -770,7 +770,7 @@ public class SequenceTest extends BaseWebDriverTest
                 br = new BufferedReader(new InputStreamReader(gz));
                 int count = 0;
                 String thisLine;
-                List<String> lines = new ArrayList<String>();
+                List<String> lines = new ArrayList<>();
                 while ((thisLine = br.readLine()) != null)
                 {
                     count++;

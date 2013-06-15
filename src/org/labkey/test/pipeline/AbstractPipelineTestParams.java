@@ -145,7 +145,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
                 _experimentLinks = new String[] { dataDirName + " (" + _protocolName + ")" };
             else
             {
-                ArrayList<String> listLinks = new ArrayList<String>();
+                ArrayList<String> listLinks = new ArrayList<>();
                 for (String name : _sampleNames)
                     listLinks.add(dataDirName + '/' + name + " (" + _protocolName + ")");
                 _experimentLinks = listLinks.toArray(new String[listLinks.size()]);

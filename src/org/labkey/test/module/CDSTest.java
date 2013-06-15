@@ -766,8 +766,8 @@ public class CDSTest extends BaseSeleniumWebTest implements PostgresOnlyTest
         addFeedback("verify scatter plot", SCATTER_FEEDBACK_STATE);
     }
 
-    private List<String> _descriptions = new ArrayList<String>();
-    private List<String> _states = new ArrayList<String>();
+    private List<String> _descriptions = new ArrayList<>();
+    private List<String> _states = new ArrayList<>();
     private void verifyFeedback()
     {
         JSONHelper stateChecker = new JSONHelper(this, new Pattern[]{Pattern.compile("internalId", Pattern.CASE_INSENSITIVE),Pattern.compile("appVersion", Pattern.CASE_INSENSITIVE)});

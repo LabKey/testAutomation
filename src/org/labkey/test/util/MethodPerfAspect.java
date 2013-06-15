@@ -35,11 +35,11 @@ import java.util.Stack;
 @Aspect
 public class MethodPerfAspect
 {
-    private static HashMap<String, HashMap<LogMethod.MethodType, Long>> _testClassMethodPerfStats = new HashMap<String, HashMap<LogMethod.MethodType, Long>>();
+    private static HashMap<String, HashMap<LogMethod.MethodType, Long>> _testClassMethodPerfStats = new HashMap<>();
 
-    private static Stack<Long> _startTimes = new Stack<Long>();
-    private static Stack<LogMethod.MethodType> _methodTypesStack = new Stack<LogMethod.MethodType>();
-    private static HashMap<LogMethod.MethodType, Long> _methodTimes = new HashMap<LogMethod.MethodType, Long>();
+    private static Stack<Long> _startTimes = new Stack<>();
+    private static Stack<LogMethod.MethodType> _methodTypesStack = new Stack<>();
+    private static HashMap<LogMethod.MethodType, Long> _methodTimes = new HashMap<>();
 
     @Pointcut(value = "execution(@org.labkey.test.util.LogMethod * *(..))")
     void loggedMethod(){}
@@ -89,9 +89,9 @@ public class MethodPerfAspect
     @Before(value = "testMethod()", argNames = "joinPoint")
     public void beforeTestMethod(JoinPoint joinPoint)
     {
-        _startTimes = new Stack<Long>();
-        _methodTypesStack = new Stack<LogMethod.MethodType>();
-        _methodTimes = new HashMap<LogMethod.MethodType, Long>();
+        _startTimes = new Stack<>();
+        _methodTypesStack = new Stack<>();
+        _methodTimes = new HashMap<>();
     }
 
     @After(value = "testMethod()", argNames = "joinPoint")
@@ -110,6 +110,6 @@ public class MethodPerfAspect
         if (_testClassMethodPerfStats.containsKey(testName))
             return _testClassMethodPerfStats.get(testName);
         else
-            return new HashMap<LogMethod.MethodType, Long>();
+            return new HashMap<>();
     }
 }

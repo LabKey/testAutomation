@@ -59,7 +59,7 @@ public class ListPublishTest extends BaseWebDriverTest
 
     private void initializePtids(String... ptids)
     {
-        _Ptids =  new HashSet<String>();
+        _Ptids =  new HashSet<>();
         for(String ptid : ptids)
         {
             _Ptids.add(ptid);

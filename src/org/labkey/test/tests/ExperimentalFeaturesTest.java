@@ -101,7 +101,7 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         }
     }
 
-    HashMap<ExperimentalFeature, Boolean> _initialFeatureStates = new HashMap<ExperimentalFeature, Boolean>();
+    HashMap<ExperimentalFeature, Boolean> _initialFeatureStates = new HashMap<>();
     private enum ExperimentalFeature
     {
         JS_DOC ("jsdoc"),

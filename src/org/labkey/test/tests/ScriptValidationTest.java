@@ -385,7 +385,7 @@ public class ScriptValidationTest extends SimpleModuleTest
         SelectRowsResponse response = cmd.execute(cn, getProjectName());
         Assert.assertEquals("Expected to select " + names.length + " rows.", names.length, response.getRowCount().intValue());
 
-        ArrayList<ColorRecord> results = new ArrayList<ColorRecord>();
+        ArrayList<ColorRecord> results = new ArrayList<>();
         for (Map<String, Object> map : response.getRows())
             results.add(ColorRecord.fromMap(map));
         return results;
@@ -398,7 +398,7 @@ public class ScriptValidationTest extends SimpleModuleTest
 
     private List<ColorRecord> insertColors(List<ColorRecord> colors, Map<String, Object> extraContext) throws Exception
     {
-        ArrayList<Map<String, Object>> list = new ArrayList<Map<String, Object>>(colors.size());
+        ArrayList<Map<String, Object>> list = new ArrayList<>(colors.size());
         for (ColorRecord color : colors)
             list.add(color.toMap());
 
@@ -410,7 +410,7 @@ public class ScriptValidationTest extends SimpleModuleTest
         SaveRowsResponse response = cmd.execute(cn, getProjectName());
         Assert.assertEquals("Expected to insert " + colors.size() + " rows.", colors.size(), response.getRowsAffected().intValue());
 
-        ArrayList<ColorRecord> results = new ArrayList<ColorRecord>();
+        ArrayList<ColorRecord> results = new ArrayList<>();
         for (Map<String, Object> map : response.getRows())
             results.add(ColorRecord.fromMap(map));
         return results;
@@ -423,7 +423,7 @@ public class ScriptValidationTest extends SimpleModuleTest
 
     private List<ColorRecord> updateColors(List<ColorRecord> colors, Map<String, Object> extraContext) throws Exception
     {
-        ArrayList<Map<String, Object>> list = new ArrayList<Map<String, Object>>(colors.size());
+        ArrayList<Map<String, Object>> list = new ArrayList<>(colors.size());
         for (ColorRecord color : colors)
             list.add(color.toMap());
 
@@ -435,7 +435,7 @@ public class ScriptValidationTest extends SimpleModuleTest
         SaveRowsResponse response = cmd.execute(cn, getProjectName());
         Assert.assertEquals("Expected to update " + colors.size() + " rows.", colors.size(), response.getRowsAffected().intValue());
 
-        ArrayList<ColorRecord> results = new ArrayList<ColorRecord>();
+        ArrayList<ColorRecord> results = new ArrayList<>();
         for (Map<String, Object> map : response.getRows())
             results.add(ColorRecord.fromMap(map));
         return results;

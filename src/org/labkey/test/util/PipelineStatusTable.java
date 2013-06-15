@@ -73,7 +73,7 @@ public class PipelineStatusTable extends DataRegionTable
             int colStatus = getStatusColumn();
             int colDescripton = getDescriptionColumn();
 
-            _mapDescriptionStatus = new LinkedHashMap<String, String>();
+            _mapDescriptionStatus = new LinkedHashMap<>();
             for (int i = 0; i < rows; i++)
             {
                 _mapDescriptionStatus.put(getDataAsText(i, colDescripton),

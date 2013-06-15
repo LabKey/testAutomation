@@ -221,7 +221,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
-        Map<String, String[]> expected = new LinkedHashMap<String, String[]>();
+        Map<String, String[]> expected = new LinkedHashMap<>();
         expected.put("9835_Estradiol_24.82", new String[]{"9835", "2012-03-17", "Estradiol", "24.82", "", "Unknown", "", "", ""});
         expected.put("9785_Estradiol_48.51", new String[]{"9785", "2012-03-17", "Estradiol", "48.51", "", "Unknown", "", "", ""});
         expected.put("3011_Estradiol_70.94", new String[]{"3011", "2012-03-17", "Estradiol", "70.94", "", "Unknown", "", "", ""});
@@ -259,7 +259,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
-        List<String> expectedCols = new ArrayList<String>();
+        List<String> expectedCols = new ArrayList<>();
         expectedCols.add("well");
         expectedCols.add("category");
         expectedCols.add("subjectId");
@@ -358,7 +358,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
-        Map<String, String[]> expected = new LinkedHashMap<String, String[]>();
+        Map<String, String[]> expected = new LinkedHashMap<>();
         expected.put("DU_DHEAS_0.11", new String[]{"DU", "", "DHEAS", "0.11", "ug/ml", "Blank", "DU", "1", ""});
         expected.put("MA_Progesterone_1.56", new String[]{"MA", "", "Progesterone", "1.56", "ng/ml", "Blank", "MA", "1", ""});
         expected.put("MA_Estradiol_15.35", new String[]{"MA", "", "Estradiol", "15.35", "pg/ml", "Blank", "MA", "1", ""});
@@ -542,7 +542,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         log("Inserting testname records");
 
         Connection cn = getDefaultConnection();
-        Map<String, String[]> tests = new HashMap<String, String[]>();
+        Map<String, String[]> tests = new HashMap<>();
 
         tests.put("Estradiol", new String[]{"E2", "pg/ml"});
         tests.put("Progesterone", new String[]{"P4", "ng/ml"});
@@ -556,7 +556,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
             if (resp.getRowCount().intValue() == 0)
             {
                 InsertRowsCommand insertCmd = new InsertRowsCommand("hormoneassay", "assay_tests");
-                Map<String, Object> row = new HashMap<String, Object>();
+                Map<String, Object> row = new HashMap<>();
                 row.put("test", test);
                 row.put("code", tests.get(test)[0]);
                 row.put("units", tests.get(test)[1]);
@@ -570,7 +570,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
     @Override
     protected List<Pair<String, String>> getAssaysToCreate()
     {
-        List<Pair<String, String>> assays = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> assays = new ArrayList<>();
         assays.add(Pair.of("Hormone Assay", ASSAY_NAME));
 
         return assays;
@@ -579,7 +579,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
     @Override
     protected List<String> getEnabledModules()
     {
-        List<String> modules = new ArrayList<String>();
+        List<String> modules = new ArrayList<>();
         modules.add("HormoneAssay");
         return modules;
     }

@@ -35,10 +35,10 @@ public class CAVDStudyTest extends StudyBaseTest
     private static final String FOLDER_NAME3 = "CAVDStudy3";
     private static final String FOLDER_NAME4 = "VerifyStudyList";
     private static final String CAVD_TEST_STUDY_ZIP = "/sampledata/study/CAVDTestStudy.folder.zip";
-    private static Map<Integer, String> DATASETS = new TreeMap<Integer, String>();
-    private ArrayList<String> _expectedVaccineDesignText = new ArrayList<String>();
-    private ArrayList<String> _expectedImmunizationText = new ArrayList<String>();
-    private ArrayList<String> _expectedAssayDesignText = new ArrayList<String>();
+    private static Map<Integer, String> DATASETS = new TreeMap<>();
+    private ArrayList<String> _expectedVaccineDesignText = new ArrayList<>();
+    private ArrayList<String> _expectedImmunizationText = new ArrayList<>();
+    private ArrayList<String> _expectedAssayDesignText = new ArrayList<>();
 
     @Override
     protected void doCreateSteps()

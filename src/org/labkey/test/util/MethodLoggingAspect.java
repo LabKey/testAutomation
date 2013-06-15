@@ -37,10 +37,10 @@ import java.util.concurrent.TimeUnit;
 @Aspect
 public class MethodLoggingAspect
 {
-    private static Stack<Long> startTimes = new Stack<Long>();
-    private static Stack<String> methodStack = new Stack<String>();
-    private static Stack<String> quietMethods = new Stack<String>();
-    private static Stack<String> quietMethodsArgStrings = new Stack<String>();
+    private static Stack<Long> startTimes = new Stack<>();
+    private static Stack<String> methodStack = new Stack<>();
+    private static Stack<String> quietMethods = new Stack<>();
+    private static Stack<String> quietMethodsArgStrings = new Stack<>();
 
     @Pointcut(value = "execution(@org.labkey.test.util.LogMethod * *(..))")
     void loggedMethod(){}

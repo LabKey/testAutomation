@@ -190,7 +190,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
             log("Creating ABI7500 detector record");
 
             InsertRowsCommand insertCmd = new InsertRowsCommand(schema, query);
-            Map<String,Object> rowMap = new HashMap<String,Object>();
+            Map<String,Object> rowMap = new HashMap<>();
             rowMap.put("assayName", assayName);
             rowMap.put("detector", DETECTOR_NAME);
             rowMap.put("reporter", "FAM");
@@ -213,7 +213,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
-        List<String> expectedCols = new ArrayList<String>();
+        List<String> expectedCols = new ArrayList<>();
         expectedCols.add("well");
         expectedCols.add("category");
         expectedCols.add("subjectId");
@@ -298,7 +298,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
         int i = 1;
 
-        Map<String, String> categoryMap = new HashMap<String, String>();
+        Map<String, String> categoryMap = new HashMap<>();
         categoryMap.put("Unknown", "UNKN");
         categoryMap.put("Standard", "STND");
         categoryMap.put("Pos Control", "UNKN");
@@ -395,7 +395,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         DataRegionTable results = new DataRegionTable("Data", this);
 
         int totalRows = 92;
-        Map<String, String[]> expected = new LinkedHashMap<String, String[]>();
+        Map<String, String[]> expected = new LinkedHashMap<>();
         expected.put("0", new String[]{"LowQual1", "Unknown", "2012-02-01", "32360000"});
         expected.put("1", new String[]{"LowQual1", "Unknown", "2012-02-01", "4122000000"});
         expected.put("2", new String[]{"LowQual2", "Unknown", "2012-06-01", "0.07317"});
@@ -555,7 +555,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         DataRegionTable results = new DataRegionTable("Data", this);
 
         int totalRows = 38;
-        Map<String, String[]> expected = new HashMap<String, String[]>();
+        Map<String, String[]> expected = new HashMap<>();
         expected.put("STD_15000000", new String[]{"STD_15000000", "Standard", "", "176000000"});
         expected.put("STD_5", new String[]{"STD_5", "Standard", "", "56.5"});
         expected.put("STD_3", new String[]{"STD_3", "Standard", "", "30"});
@@ -646,7 +646,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         DataRegionTable results = new DataRegionTable("Data", this);
         int totalRows = 28;
 
-        Map<String, String[]> expected = new HashMap<String, String[]>();
+        Map<String, String[]> expected = new HashMap<>();
         expected.put("CTL_negative", new String[]{"CTL_negative", "Control", "", "0"});
         expected.put("CTL_r02007", new String[]{"CTL_r02007", "Control", "", "85000"});
         expected.put("d02321", new String[]{"d02321", "Unknown", "2008-09-08", "3370000"});
@@ -731,7 +731,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
     @Override
     protected List<Pair<String, String>> getAssaysToCreate()
     {
-        List<Pair<String, String>> assays = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> assays = new ArrayList<>();
         assays.add(Pair.of("Viral Loads", ASSAY_NAME));
 
         return assays;
@@ -740,7 +740,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
     @Override
     protected List<String> getEnabledModules()
     {
-        List<String> modules = new ArrayList<String>();
+        List<String> modules = new ArrayList<>();
         modules.add("Viral_Load_Assay");
         return modules;
     }

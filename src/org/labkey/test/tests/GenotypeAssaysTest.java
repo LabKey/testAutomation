@@ -92,7 +92,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
             {
                 log("creating primer: " + name);
                 InsertRowsCommand insert = new InsertRowsCommand("genotypeassays", "primer_pairs");
-                Map<String, Object> row = new HashMap<String, Object>();
+                Map<String, Object> row = new HashMap<>();
                 row.put("primerName", name);
                 row.put("ref_nt_name", REF_NT_NAME);
                 insert.addRow(row);
@@ -199,7 +199,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         _helper.clickNavPanelItem(SSP_ASSAY_NAME + " Runs:", 1);
         waitAndClick(Locator.linkContainingText("view results"));
 
-        List<String[]> expected = new ArrayList<String[]>();
+        List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"Subj1", "<3>", "2011-01-01", "POS", "TestPrimer1"});
         expected.add(new String[]{"Subj1", "<2>", "2011-01-02", "NEG", "TestPrimer1"});
         expected.add(new String[]{"Subj1", "<1>", "2012-03-03", "IND", "TestPrimer2"});
@@ -296,7 +296,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         _helper.clickNavPanelItem(SSP_ASSAY_NAME + " Runs:", 1);
         waitAndClick(Locator.linkContainingText("view results"));
 
-        List<String[]> expected = new ArrayList<String[]>();
+        List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"Subj1", "<1>", "2011-01-02", "POS", "TestPrimer1"});
         expected.add(new String[]{"Subj1", "<1>", "2012-02-05", "POS", "TestPrimer4"});
         expected.add(new String[]{"Subj1", "<1>", "2012-02-05", "POS", "TestPrimer1"});
@@ -315,7 +315,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
     @Override
     protected List<Pair<String, String>> getAssaysToCreate()
     {
-        List<Pair<String, String>> assays = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> assays = new ArrayList<>();
         assays.add(Pair.of("SSP Typing", SSP_ASSAY_NAME));
         assays.add(Pair.of("Genotype Assay", ASSAY_NAME));
 
@@ -367,7 +367,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         DataRegionTable results = new DataRegionTable("Data", this);
 
         int totalRows = 100; //current page size
-        List<String[]> expected = new ArrayList<String[]>();
+        List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"13294", "D10S1412", "157"});
         expected.add(new String[]{"13294", "D11S2002", "260"});
         expected.add(new String[]{"13294", "D11S2002", "264"});
@@ -490,7 +490,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
     @Override
     protected List<String> getEnabledModules()
     {
-        List<String> modules = new ArrayList<String>();
+        List<String> modules = new ArrayList<>();
         modules.add("GenotypeAssays");
         return modules;
     }

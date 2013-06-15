@@ -27,8 +27,8 @@ public class StringHelper
 {
     public static boolean stringArraysAreEquivalentTrimmed(String[] expected, String[] actual)
     {
-        HashSet<String> expectedSet = new HashSet<String>(Arrays.asList(expected));
-        HashSet<String> actualSet = new HashSet<String>(Arrays.asList(actual));
+        HashSet<String> expectedSet = new HashSet<>(Arrays.asList(expected));
+        HashSet<String> actualSet = new HashSet<>(Arrays.asList(actual));
 
         return expectedSet.equals(actualSet);
     }

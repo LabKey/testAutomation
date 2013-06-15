@@ -655,7 +655,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             _analysisName = analysisName;
             _existingAnalysisFolder = existingAnalysisFolder;
             _viaPipeline = viaPipeline;
-            _expectedErrors = new ArrayList<String>();
+            _expectedErrors = new ArrayList<>();
         }
 
         public ImportAnalysisOptions(

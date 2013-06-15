@@ -110,7 +110,7 @@ public class Runner
 
     static class AliasFactory
     {
-        private Map<String, String> _aliases = new HashMap<String, String>();
+        private Map<String, String> _aliases = new HashMap<>();
 
         String get(String key)
         {
@@ -143,7 +143,7 @@ public class Runner
         FillerFactory() throws IOException
         {
             BufferedReader reader = new BufferedReader(new FileReader("words.txt"));
-            words = new ArrayList<String>();
+            words = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null)
             {
@@ -186,13 +186,13 @@ public class Runner
         loadSubjectList(subjectFile, aliaser);
 
         // List of lists to be skipped
-        Set<File> clearTargets = new HashSet<File>();
+        Set<File> clearTargets = new HashSet<>();
 
         //NOTE: this list has been removed from the EHR, so this line is no longer needed
 //        clearTargets.add(new File(studyRoot + "/lists/deleted_records.tsv")); // contains scattered subject ids
 
         // Get a set of lists to be minimized
-        Set<File> minimizeTargets = new HashSet<File>();
+        Set<File> minimizeTargets = new HashSet<>();
         for (File f : new File(studyRoot + "/lists").listFiles())
         {
             if (!clearTargets.contains(f) && f.getName().contains("snomed"))
@@ -200,7 +200,7 @@ public class Runner
         }
 
         // Get a set of files to be transformed
-        Set<File> anonymizeTargets = new HashSet<File>();
+        Set<File> anonymizeTargets = new HashSet<>();
         for (File f : new File(studyRoot + "/datasets").listFiles())
         {
             if (f.getName().endsWith("tsv") && !minimizeTargets.contains(f) && !clearTargets.contains(f))
@@ -213,14 +213,14 @@ public class Runner
         }
 
         // Get a set of all other study files
-        Set<File> allFiles = new HashSet<File>();
+        Set<File> allFiles = new HashSet<>();
         for (File f : listFilesRecursive(studyRoot) )
         {
             if(!anonymizeTargets.contains(f) && !minimizeTargets.contains(f) && !clearTargets.contains(f))
                 allFiles.add(f);
         }
 
-        ArrayList<String> usedSnomeds = new ArrayList<String>();
+        ArrayList<String> usedSnomeds = new ArrayList<>();
 
         System.out.println("\nAnonymize lists and datasets");
 
@@ -237,8 +237,8 @@ public class Runner
 
             Integer idPosition = null;
             Integer snomedPosition = null;
-            Set<Integer> wipePositions = new HashSet<Integer>();
-            Set<Integer> aliasPositions = new HashSet<Integer>();
+            Set<Integer> wipePositions = new HashSet<>();
+            Set<Integer> aliasPositions = new HashSet<>();
 
             for (int i = 0; i < row.length; i++)
             {
@@ -404,7 +404,7 @@ public class Runner
     static ArrayList<File> listFilesRecursive(File path)
     {
         File[] files = path.listFiles();
-        ArrayList<File> allFiles = new ArrayList<File>();
+        ArrayList<File> allFiles = new ArrayList<>();
         for (File file : files)
         {
             if ( file.isDirectory() )
@@ -417,7 +417,7 @@ public class Runner
 
     static Set<String> newStringSet(String... strings)
     {
-        return new HashSet<String>(Arrays.asList(strings));
+        return new HashSet<>(Arrays.asList(strings));
     }
 
 }

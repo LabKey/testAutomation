@@ -63,7 +63,7 @@ public class ExperimentRunTable extends DataRegionTable
             int rows = getDataRowCount();
             int colName = getNameColumn();
 
-            _listNames = new ArrayList<String>();
+            _listNames = new ArrayList<>();
             for (int i = 0; i < rows; i++)
                 _listNames.add(getDataAsText(i, colName));
         }

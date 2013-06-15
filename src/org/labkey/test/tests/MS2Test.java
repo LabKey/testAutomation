@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2007-2013 LabKey Corporation
  *
@@ -1349,7 +1348,7 @@ public class MS2Test extends MS2TestBase
         {
             Assert.assertTrue("Run Group Map missing column: " + header, keys.contains(header));
         }
-        Map<String, Integer> textAndCount = new HashMap<String, Integer>();
+        Map<String, Integer> textAndCount = new HashMap<>();
         textAndCount.put(DEFAULT_EXPERIMENT, new Integer(2));
         textAndCount.put(RUN_GROUP1_NAME2, new Integer(2));
         textAndCount.put("Test Run Group 2", new Integer(1));

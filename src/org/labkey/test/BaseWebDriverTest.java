@@ -377,7 +377,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if (this.enableScriptCheck())
         {
-            _jsErrors = new ArrayList<JavaScriptError>();
+            _jsErrors = new ArrayList<>();
             JavaScriptError.readErrors(_driver); // clear errors
             jsCheckerPaused = false;
         }
@@ -637,7 +637,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 "};" +
                 "return getLinkAddresses();";
         List<String> linkArray = (ArrayList<String>)executeScript(js);
-        ArrayList<String> links = new ArrayList<String>();
+        ArrayList<String> links = new ArrayList<>();
         for (String link : linkArray)
         {
             if (link.contains("#"))
@@ -1416,7 +1416,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 //                }
             });
             method = new HttpPost(getBaseURL() + "/login/logout.view");
-            List<NameValuePair> args = new ArrayList<NameValuePair>();
+            List<NameValuePair> args = new ArrayList<>();
             args.add(new BasicNameValuePair("login", PasswordUtil.getUsername()));
             args.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
             ((HttpPost)method).setEntity(new UrlEncodedFormEntity(args));
@@ -1438,7 +1438,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void switchToMainWindow()
     {
-        Set<String> windows = new HashSet<String>(_driver.getWindowHandles());
+        Set<String> windows = new HashSet<>(_driver.getWindowHandles());
         _driver.switchTo().window((String) windows.toArray()[0]);
     }
 
@@ -1448,9 +1448,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public String newWindow()
     {
-        HashSet<String> initialWindows = new HashSet<String>(_driver.getWindowHandles());
+        HashSet<String> initialWindows = new HashSet<>(_driver.getWindowHandles());
         executeScript("window.open();");
-        HashSet<String> windows = new HashSet<String>(_driver.getWindowHandles());
+        HashSet<String> windows = new HashSet<>(_driver.getWindowHandles());
         windows.removeAll(initialWindows);
         Assert.assertEquals("Unexpected number of new windows", 1, windows.size());
         return (String)windows.toArray()[0];
@@ -2099,7 +2099,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (skipViewCheck())
             return;
 
-        List<String> checked = new ArrayList<String>();
+        List<String> checked = new ArrayList<>();
 
         for (String projectName : _containerHelper.getCreatedProjects())
         {
@@ -2138,7 +2138,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     protected Set<String> getOrphanedViews()
     {
-        return new HashSet<String>();
+        return new HashSet<>();
     }
 
     @LogMethod
@@ -2193,7 +2193,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             {
                 return; // Error checker has not been initialized
             }
-            List<JavaScriptError> validErrors = new ArrayList<JavaScriptError>();
+            List<JavaScriptError> validErrors = new ArrayList<>();
             for (JavaScriptError error : _jsErrors)
             {
                 if (!validErrors.contains(error) && validateJsError(error))
@@ -3170,7 +3170,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public List<String> getMissingTexts(String... texts)
     {
-        List<String> missingTexts = new ArrayList<String>();
+        List<String> missingTexts = new ArrayList<>();
         if(texts==null || texts.length == 0)
             return missingTexts;
 
@@ -3488,7 +3488,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public List<WebElement> filterElements(ElementChecker checker, List<WebElement> elements)
     {
-        List<WebElement> filteredElements = new ArrayList<WebElement>();
+        List<WebElement> filteredElements = new ArrayList<>();
         for (WebElement el : elements)
         {
             if (checker.check(el))
@@ -3624,7 +3624,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         for (ModulePropertyValue value : values)
         {
             log("setting property: " + value.getPropertyName() + " for container: " + value.getContainerPath() + " to value: " + value.getValue());
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             map.put("moduleName", value.getModuleName());
             map.put("containerPath", value.getContainerPath());
             map.put("propName", value.getPropertyName());
@@ -4698,7 +4698,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private ArrayList<File> listFilesRecursive(File path, FilenameFilter filter)
     {
         File[] files = path.listFiles(filter);
-        ArrayList<File> allFiles = new ArrayList<File>();
+        ArrayList<File> allFiles = new ArrayList<>();
         if (files != null)
         {
             for (File file : files)
@@ -4786,7 +4786,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         int rowCount = getTableRowCount(tableName);
 
-        List<String> values = new ArrayList<String>(rowCount);
+        List<String> values = new ArrayList<>(rowCount);
 
         for (int i = 0; i < rowCount; i++)
         {
@@ -4841,7 +4841,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             showAllInTable();
         }
-        List<List<String>> columns = new ArrayList<List<String>>(columnNames.length);
+        List<List<String>> columns = new ArrayList<>(columnNames.length);
 
         DataRegionTable table = new DataRegionTable(tableName, this);
         for(int i=0; i<columnNames.length; i++)
@@ -6301,7 +6301,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void deleteUsers(boolean failIfNotFound, @LoggedParam String... userEmails)
     {
         int checked = 0;
-        List<String> displayNames = new ArrayList<String>();
+        List<String> displayNames = new ArrayList<>();
         ensureAdminMode();
         goToSiteUsers();
 
@@ -6734,7 +6734,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public List<Locator> findAllMatches(Locator.XPathLocator loc)
     {
         List locs =  loc.findElements(_driver );
-        List<Locator> locators = new ArrayList<Locator>();
+        List<Locator> locators = new ArrayList<>();
         for (int i = 0; i < locs.size(); i++)
         {
             locators.add(loc.index(i));
@@ -6885,9 +6885,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String[] firstArray = firstSet.split(delimiterRegEx);
         String[] secondArray = secondSet.split(delimiterRegEx);
         Assert.assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstArray.length == secondArray.length);
-        Set<String> firstHash= new HashSet<String>();
+        Set<String> firstHash= new HashSet<>();
         Collections.addAll(firstHash, firstArray);
-        Set<String> secondHash= new HashSet<String>();
+        Set<String> secondHash= new HashSet<>();
         Collections.addAll(secondHash, secondArray);
         Assert.assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
     }
@@ -7182,7 +7182,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
             File testDir = _tempDir;
-            List<String> dirNames = new ArrayList<String>();
+            List<String> dirNames = new ArrayList<>();
 
             while (!_pipelineRoot.equals(testDir))
             {
@@ -7344,7 +7344,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected Collection<String> getAsUnderXpath(String xpath)
     {
         int count = getElementCount(Locator.xpath(xpath));
-        ArrayList<String> al = new ArrayList<String>(count);
+        ArrayList<String> al = new ArrayList<>(count);
         for(int i=1; i<=count; i++)
         {
             al.add(getAttribute(Locator.xpath(xpath + "[" + i + "]"), "href"));
@@ -7382,7 +7382,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             xpath.replace("inactive", "active");
 
         int count = getXpathCount(Locator.xpath(xpath));
-        ArrayList<String> al = new ArrayList<String>(count);
+        ArrayList<String> al = new ArrayList<>(count);
         for(int i=1; i<=count; i++)
         {
             al.add(getAttribute(Locator.xpath(xpath + "[" + i + "]/a"), "href"));

@@ -135,7 +135,7 @@ public class ComplianceTrainingTest extends BaseWebDriverTest implements Advance
             if (resp.getRows().size() == 0)
             {
                 insertCmd = new InsertRowsCommand("ehr_compliancedb", "requirements");
-                rowMap = new HashMap<String,Object>();
+                rowMap = new HashMap<>();
                 rowMap.put("requirementname", reqName);
 
                 insertCmd.addRow(rowMap);
@@ -151,7 +151,7 @@ public class ComplianceTrainingTest extends BaseWebDriverTest implements Advance
             if (resp.getRows().size() == 0)
             {
                 insertCmd = new InsertRowsCommand("ehr_compliancedb", "employeecategory");
-                rowMap = new HashMap<String,Object>();
+                rowMap = new HashMap<>();
                 rowMap.put("categoryname", category);
 
                 insertCmd.addRow(rowMap);
@@ -160,7 +160,7 @@ public class ComplianceTrainingTest extends BaseWebDriverTest implements Advance
 
             //create employee record
             insertCmd = new InsertRowsCommand("ehr_compliancedb", "employees");
-            rowMap = new HashMap<String,Object>();
+            rowMap = new HashMap<>();
             rowMap.put("employeeid", PasswordUtil.getUsername());
             rowMap.put("email", PasswordUtil.getUsername());
             rowMap.put("firstname", "Test");
@@ -172,7 +172,7 @@ public class ComplianceTrainingTest extends BaseWebDriverTest implements Advance
 
             //add SOP record
             insertCmd = new InsertRowsCommand("lists", "SOPs");
-            rowMap = new HashMap<String,Object>();
+            rowMap = new HashMap<>();
             rowMap.put("Id", "SOP1");
             rowMap.put("name", "SOP 1");
 
@@ -181,7 +181,7 @@ public class ComplianceTrainingTest extends BaseWebDriverTest implements Advance
 
             //add record to SOP requirements
             insertCmd = new InsertRowsCommand("ehr_compliancedb", "sopbycategory");
-            rowMap = new HashMap<String,Object>();
+            rowMap = new HashMap<>();
             rowMap.put("sop_id", "SOP1");
             rowMap.put("category", category);
 

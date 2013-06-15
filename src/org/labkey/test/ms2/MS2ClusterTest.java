@@ -104,7 +104,7 @@ public class MS2ClusterTest extends PipelineWebTestBase
         }
 
         int seconds = 0;
-        List<PipelineTestParams> listValidated = new ArrayList<PipelineTestParams>();
+        List<PipelineTestParams> listValidated = new ArrayList<>();
         while (seconds++ < MAX_WAIT_SECONDS)
         {
             PipelineTestParams[] completeParams = testSet.getCompleteParams();
@@ -144,7 +144,7 @@ public class MS2ClusterTest extends PipelineWebTestBase
 
     protected void doAnalysis()
     {
-        HashSet<String> searches = new HashSet<String>();
+        HashSet<String> searches = new HashSet<>();
 
         for (PipelineTestParams tp : testSet.getParams())
         {

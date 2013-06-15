@@ -154,7 +154,7 @@ public class ListTest extends BaseWebDriverTest
     @Override
     protected Set<String> getOrphanedViews()
     {
-        Set<String> views = new HashSet<java.lang.String>();
+        Set<String> views = new HashSet<>();
         views.add(TEST_VIEW);
         return views;
     }

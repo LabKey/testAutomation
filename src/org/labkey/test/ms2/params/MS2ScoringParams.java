@@ -52,7 +52,7 @@ class MS2ScoringParams extends MS2TestParams
 
         if (positiveProteins != null)
         {
-            this.positiveProteins = new HashSet<String>();
+            this.positiveProteins = new HashSet<>();
             this.positiveProteins.addAll(Arrays.asList(positiveProteins));
         }
         this.maxFPPeptideProb = maxFPPeptideProb;
@@ -80,7 +80,7 @@ class MS2ScoringParams extends MS2TestParams
             _test.clearAllFilters("ProteinGroupsWithQuantitation", "GroupNumber");
 
             int protsExpect = positiveProteins.size();
-            HashSet<String> protSet = new HashSet<String>();
+            HashSet<String> protSet = new HashSet<>();
 
             ProteinRegionTable tableProt = new ProteinRegionTable(0.995, _test);
 

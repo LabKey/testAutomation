@@ -134,7 +134,7 @@ public class SearchTest extends StudyTest
     {
         clickFolder(FOLDER_C);
         clickAndWait(Locator.linkWithText(listIndexAsWhole));
-        HashMap<String, String> data = new HashMap<String, String>();
+        HashMap<String, String> data = new HashMap<>();
         String newAnimal = "Zebra Seal";
         data.put("Animal", newAnimal);
         _listHelper.insertNewRow(data);

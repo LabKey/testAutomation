@@ -44,7 +44,7 @@ abstract public class AbstractInspectTestParams extends AbstractPipelineTestPara
         // msInspect pipeline does not support fraction roll-up.
         assert sampleNames.length > 0 : "Sample names are required for the msInspect pipeline.";
 
-        ArrayList<String> listExts = new ArrayList<String>(Arrays.asList(_cacheExtensions));
+        ArrayList<String> listExts = new ArrayList<>(Arrays.asList(_cacheExtensions));
         if (cachesExist)
         {
             listExts.add(".mzXML");

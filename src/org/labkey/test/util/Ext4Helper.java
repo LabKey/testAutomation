@@ -305,7 +305,7 @@ public class Ext4Helper extends AbstractHelper
         try
         {
             JSONArray array = (JSONArray) JSONValue.parse(jsonArrayStr);
-            List<Type> ret = new ArrayList<Type>(array.size());
+            List<Type> ret = new ArrayList<>(array.size());
             for (Object o : array)
             {
                 Constructor<Type> constructor = clazz.getConstructor(String.class, BaseSeleniumWebTest.class);

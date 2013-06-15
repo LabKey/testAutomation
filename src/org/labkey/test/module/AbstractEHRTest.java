@@ -223,21 +223,21 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
 
         //first ehr.protocol
         InsertRowsCommand insertCmd = new InsertRowsCommand("ehr", "protocol");
-        Map<String,Object> rowMap = new HashMap<String,Object>();
+        Map<String,Object> rowMap = new HashMap<>();
         rowMap.put("protocol", PROTOCOL_ID);
         insertCmd.addRow(rowMap);
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("protocol", DUMMY_PROTOCOL);
         insertCmd.addRow(rowMap);
         SaveRowsResponse saveResp = insertCmd.execute(cn, getContainerPath());
 
         //then ehr.project
         insertCmd = new InsertRowsCommand("ehr", "project");
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("project", PROTOCOL_PROJECT_ID);
         rowMap.put("protocol", PROTOCOL_ID);
         insertCmd.addRow(rowMap);
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("project", PROJECT_ID);
         rowMap.put("protocol", DUMMY_PROTOCOL);
         insertCmd.addRow(rowMap);
@@ -245,10 +245,10 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
 
         //then ehr_lookups.rooms
         insertCmd = new InsertRowsCommand("ehr_lookups", "rooms");
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("room", ROOM_ID);
         insertCmd.addRow(rowMap);
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("room", ROOM_ID2);
         insertCmd.addRow(rowMap);
         saveResp = insertCmd.execute(cn, getContainerPath());
@@ -263,21 +263,21 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
 
         //first ehr.protocol
         DeleteRowsCommand deleteCmd = new DeleteRowsCommand("ehr", "protocol");
-        Map<String,Object> rowMap = new HashMap<String,Object>();
+        Map<String,Object> rowMap = new HashMap<>();
         rowMap.put("protocol", PROTOCOL_ID);
         deleteCmd.addRow(rowMap);
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("protocol", DUMMY_PROTOCOL);
         deleteCmd.addRow(rowMap);
         SaveRowsResponse deleteResp = deleteCmd.execute(cn, getContainerPath());
 
         //then ehr.project
         deleteCmd = new DeleteRowsCommand("ehr", "project");
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("project", PROTOCOL_PROJECT_ID);
         rowMap.put("protocol", PROTOCOL_ID);
         deleteCmd.addRow(rowMap);
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("project", PROJECT_ID);
         rowMap.put("protocol", DUMMY_PROTOCOL);
         deleteCmd.addRow(rowMap);
@@ -285,10 +285,10 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
 
         //then ehr_lookups.room
         deleteCmd = new DeleteRowsCommand("ehr_lookups", "rooms");
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("room", ROOM_ID);
         deleteCmd.addRow(rowMap);
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("room", ROOM_ID2);
         deleteCmd.addRow(rowMap);
         deleteResp = deleteCmd.execute(cn, getContainerPath());

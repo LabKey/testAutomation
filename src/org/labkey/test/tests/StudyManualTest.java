@@ -211,7 +211,7 @@ public class StudyManualTest extends StudyTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Visits"));
 
-        Set<String> labels = new HashSet<String>(Arrays.asList(visitLabel));
+        Set<String> labels = new HashSet<>(Arrays.asList(visitLabel));
         int row = 2;  // Skip header row (row index is one-based)
         String currentLabel;
 

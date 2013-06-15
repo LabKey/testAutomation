@@ -425,7 +425,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
 
             //first try FASTQ merge
             method = new HttpPost(url);
-            List<NameValuePair> args = new ArrayList<NameValuePair>();
+            List<NameValuePair> args = new ArrayList<>();
             for (Map<String, Object> row : resp.getRows())
             {
                 args.add(new BasicNameValuePair("dataIds", row.get("DataId").toString()));
@@ -476,7 +476,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
             httpClient = WebTestHelper.getHttpClient();
 
             method = new HttpPost(url);
-            args = new ArrayList<NameValuePair>();
+            args = new ArrayList<>();
             for (Map<String, Object> row : resp.getRows())
             {
                 args.add(new BasicNameValuePair("dataIds", row.get("DataId").toString()));

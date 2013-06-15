@@ -644,7 +644,7 @@ public class SecurityTest extends BaseWebDriverTest
             Assert.fail();
         }
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         if (queryString != null)
         {
             String[] params = queryString.split("&");

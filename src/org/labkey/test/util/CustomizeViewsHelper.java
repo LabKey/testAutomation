@@ -518,7 +518,7 @@ public class CustomizeViewsHelper extends AbstractHelper
 
     public void setColumnProperties(String fieldKey, String caption, Map<String, String> aggregate)
     {
-        List<Map<String, String>> aggregates = new ArrayList<Map<String,String>>();
+        List<Map<String, String>> aggregates = new ArrayList<>();
         aggregates.add(aggregate);
         setColumnProperties(fieldKey, caption, aggregates);
     }

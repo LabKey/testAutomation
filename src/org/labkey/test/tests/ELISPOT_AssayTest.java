@@ -158,7 +158,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
-        List<String> expectedCols = new ArrayList<String>();
+        List<String> expectedCols = new ArrayList<>();
         expectedCols.add("well");
         expectedCols.add("category");
         expectedCols.add("subjectId");
@@ -253,7 +253,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 
         DataRegionTable results = new DataRegionTable("Data", this);
 
-        Map<String, String[]> expected = new LinkedHashMap<String, String[]>();
+        Map<String, String[]> expected = new LinkedHashMap<>();
         expected.put("Subject1_<3>_1130.5", new String[]{"Subject1", "<3>", "2012-02-09", "1130.5", "NEG", "High CV: 1.338", "PBMC"});
         expected.put("Subject1_<7>_1100.5", new String[]{"Subject1", "<7>", "2012-02-09", "1100.5", "NEG", "High CV: 1.282", "PBMC"});
         expected.put("Subject2_<15>_3", new String[]{"Subject2", "<15>", "2012-02-19", "3", "NEG", "High CV: 0.215", "PBMC"});
@@ -383,7 +383,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
     @Override
     protected List<Pair<String, String>> getAssaysToCreate()
     {
-        List<Pair<String, String>> assays = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> assays = new ArrayList<>();
         assays.add(Pair.of("ELISPOT_Assay", ASSAY_NAME));
 
         return assays;
@@ -392,7 +392,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
     @Override
     protected List<String> getEnabledModules()
     {
-        List<String> modules = new ArrayList<String>();
+        List<String> modules = new ArrayList<>();
         modules.add("ELISPOT_Assay");
         return modules;
     }

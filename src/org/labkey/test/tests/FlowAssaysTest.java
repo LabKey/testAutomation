@@ -132,7 +132,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         _helper.clickNavPanelItem(PHENOTYPE_ASSAY_NAME + " Runs:", 1);
         waitAndClick(Locator.linkContainingText("view results"));
 
-        List<String[]> expected = new ArrayList<String[]>();
+        List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD4 T-cells", "103", "cells/uL", "<1>", " ", "Comment"});
         expected.add(new String[]{"Subj2", "2011-05-06", "PBMC", "CD8+ NK Cells", "102", " ", "<2>", " ", " "});
         expected.add(new String[]{"Subj3", "2012-04-05", "PBMC", "CD14 Mono", "2", "%", "<3>", "Lymphocytes", " "});
@@ -192,7 +192,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         _helper.clickNavPanelItem(PHENOTYPE_ASSAY_NAME + " Runs:", 1);
         waitAndClick(Locator.linkContainingText("view results"));
 
-        List<String[]> expected = new ArrayList<String[]>();
+        List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD4 T-cells", "103", "cells/uL", "<1>", " ", "Comment"});
         expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD8+ NK Cells", "206", "cells/uL", "<1>", " ", "Comment"});
         expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD4 T-cells", "412", "cells/uL", "<1>", " ", "Comment"});
@@ -262,7 +262,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         _helper.clickNavPanelItem(ICS_ASSAY_NAME + " Runs:", 1);
         waitAndClick(Locator.linkContainingText("view results"));
 
-        List<String[]> expected = new ArrayList<String[]>();
+        List<String[]> expected = new ArrayList<>();
 
         verifyResults(expected);
     }
@@ -306,7 +306,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
     @Override
     protected List<Pair<String, String>> getAssaysToCreate()
     {
-        List<Pair<String, String>> assays = new ArrayList<Pair<String, String>>();
+        List<Pair<String, String>> assays = new ArrayList<>();
         assays.add(Pair.of("ICS", ICS_ASSAY_NAME));
         assays.add(Pair.of("Immunophenotyping", PHENOTYPE_ASSAY_NAME));
 
@@ -316,7 +316,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
     @Override
     protected List<String> getEnabledModules()
     {
-        List<String> modules = new ArrayList<String>();
+        List<String> modules = new ArrayList<>();
         modules.add("FlowAssays");
         return modules;
     }

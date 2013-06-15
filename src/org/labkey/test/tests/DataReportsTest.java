@@ -186,7 +186,7 @@ public class DataReportsTest extends ReportTest
 
         DataRegionTable table = new DataRegionTable("Dataset", this);
 
-        Map<String, Integer> counts = new HashMap<String, Integer>();
+        Map<String, Integer> counts = new HashMap<>();
         for (String value : table.getColumnDataAsText("MouseId"))
         {
             if (!counts.containsKey(value))

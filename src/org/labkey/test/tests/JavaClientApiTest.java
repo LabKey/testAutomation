@@ -155,7 +155,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         //insert a row
         Date now = new Date();
         InsertRowsCommand insertCmd = new InsertRowsCommand("lists", LIST_NAME);
-        Map<String,Object> rowMap = new HashMap<String,Object>();
+        Map<String,Object> rowMap = new HashMap<>();
         rowMap.put("FirstName", "first to be inserted");
         rowMap.put("LastName", "last to be inserted");
         rowMap.put("Birthdate", now);
@@ -190,7 +190,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         //update the record
         log("Updating the record...");
         UpdateRowsCommand updateCmd = new UpdateRowsCommand("lists", LIST_NAME);
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("Key", key);
         rowMap.put("firstname", "UPDATED first name"); //testing for case-insensitivity
         rowMap.put("gooamount", 5.5);
@@ -212,7 +212,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         //delete the record
         log("Deleting the record...");
         DeleteRowsCommand deleteCmd = new DeleteRowsCommand("lists", LIST_NAME);
-        rowMap = new HashMap<String,Object>();
+        rowMap = new HashMap<>();
         rowMap.put("Key", key);
         deleteCmd.addRow(rowMap);
         deleteCmd.execute(cn, PROJECT_NAME);
@@ -264,7 +264,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         InsertRowsCommand insCmd = new InsertRowsCommand("lists", LIST_NAME);
 
-        Map<String,Object> row = new HashMap<String,Object>();
+        Map<String,Object> row = new HashMap<>();
         row.put("FirstName", "Barney");
         row.put("LastName", "Rubble");
         insCmd.addRow(row);

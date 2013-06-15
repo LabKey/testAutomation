@@ -62,10 +62,10 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String UNPUBLISHED_REPORT_DATASET = "AE-1:(VTN) AE Log";
     private final String DATE_SHIFT_DATASET = "CPS-1 (CPS-1: Screening Chemistry Panel)";
     private final String DATE_SHIFT_REQUIRED_VISIT = "101";
-    private final ImmutablePair<String, String> UNSHIFTED_DATE_FIELD = new ImmutablePair<String, String>("CPSdt", "Initial Spec Collect Date");
-    private final ImmutablePair<String, String> SHIFTED_DATE_FIELD = new ImmutablePair<String, String>("CPScredt", "2a.Alt Creat Coll Date");
-    private HashMap<String, Set<String>> unshiftedDatesByStudy = new HashMap<String, Set<String>>();
-    private HashMap<String, Set<String>> preshiftedDatesByStudy = new HashMap<String, Set<String>>();
+    private final ImmutablePair<String, String> UNSHIFTED_DATE_FIELD = new ImmutablePair<>("CPSdt", "Initial Spec Collect Date");
+    private final ImmutablePair<String, String> SHIFTED_DATE_FIELD = new ImmutablePair<>("CPScredt", "2a.Alt Creat Coll Date");
+    private HashMap<String, Set<String>> unshiftedDatesByStudy = new HashMap<>();
+    private HashMap<String, Set<String>> preshiftedDatesByStudy = new HashMap<>();
     private final String[] VISITS = {"101", "201", "601", "1301"};
     private final String R_VIEW = "Shared R View";
     private final String R_VIEW2 = "R View on Unpublished Dataset";
@@ -198,7 +198,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         verifyPublishedStudy(PUB1_NAME, getProjectName(), GROUP1_PTIDS, PUB1_DATASETS, PUB1_DEPENDENT_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true, PUB1_EXPECTED_SPECIMENS);
         verifyPublishedStudy(PUB2_NAME, PUB2_NAME, GROUP2_PTIDS, PUB2_DATASETS, PUB2_DEPENDENT_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false, PUB2_EXPECTED_SPECIMENS);
         // concat group 2 and group 3 ptids for the last publisehd study ptid list
-        ArrayList<String> group2and3ptids = new ArrayList<String>();
+        ArrayList<String> group2and3ptids = new ArrayList<>();
         group2and3ptids.addAll(Arrays.asList(GROUP2_PTIDS));
         group2and3ptids.addAll(Arrays.asList(GROUP3_PTIDS));
         verifyPublishedStudy(PUB3_NAME, getProjectName(), group2and3ptids.toArray(new String[group2and3ptids.size()]), PUB3_DATASETS, PUB3_DEPENDENT_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, PUB3_EXPECTED_SPECIMENS, false, true, false, true);
@@ -324,8 +324,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         {
             log("Verify expected date shifting");
             goToQueryView("study", DATE_SHIFT_DATASET, false);
-            Set<String> unshiftedDates = new HashSet<String>();
-            Set<String> shiftedDates = new HashSet<String>();
+            Set<String> unshiftedDates = new HashSet<>();
+            Set<String> shiftedDates = new HashSet<>();
             DataRegionTable datasetTable = new DataRegionTable("Dataset", this, true, true);
             unshiftedDates.addAll(datasetTable.getColumnDataAsText(UNSHIFTED_DATE_FIELD.getValue()));
             shiftedDates.addAll(datasetTable.getColumnDataAsText(SHIFTED_DATE_FIELD.getValue()));
@@ -568,8 +568,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
     {
         pushLocation();
         goToQueryView("study", DATE_SHIFT_DATASET, false);
-        Set<String> unshiftedDates = new HashSet<String>();
-        Set<String> preshiftedDates = new HashSet<String>();
+        Set<String> unshiftedDates = new HashSet<>();
+        Set<String> preshiftedDates = new HashSet<>();
         if (groups != null && groups.length > 0)
         {
             for (String group : groups)
@@ -917,7 +917,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private void setSpecimenFieldsProtected(String[] keyFields, String[] protectedFields)
     {
         goToQueryView("study", "SpecimenEvent", true);
-        List<String> fields = new ArrayList<String>();
+        List<String> fields = new ArrayList<>();
         fields.addAll(Arrays.asList(keyFields));
         fields.addAll(Arrays.asList(protectedFields));
         for (String field : fields)

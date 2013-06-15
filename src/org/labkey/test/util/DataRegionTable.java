@@ -41,8 +41,8 @@ public class DataRegionTable
     protected final String _tableName;
     protected BaseSeleniumWebTest _test;
     protected final boolean _selectors;
-    protected final Map<String, Integer> _mapColumns = new HashMap<String, Integer>();
-    protected final Map<String, Integer> _mapRows = new HashMap<String, Integer>();
+    protected final Map<String, Integer> _mapColumns = new HashMap<>();
+    protected final Map<String, Integer> _mapRows = new HashMap<>();
     protected final int _columnCount;
     protected final int _headerRows;
 
@@ -296,7 +296,7 @@ public class DataRegionTable
     public List<String> getColumnDataAsText(int col)
     {
         int rowCount = getDataRowCount();
-        List<String> columnText = new ArrayList<String>();
+        List<String> columnText = new ArrayList<>();
 
         if (col >= 0)
         {

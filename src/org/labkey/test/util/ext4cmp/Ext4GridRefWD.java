@@ -175,7 +175,7 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         String selector = "div.x4-grid-editor input";
         _test.waitForElement(Locator.css(selector));
 
-        List<WebElement> visible = new ArrayList<WebElement>();
+        List<WebElement> visible = new ArrayList<>();
         for (WebElement element : _test.getDriver().findElements(By.cssSelector(selector)))
         {
             if (element.isDisplayed())

@@ -57,7 +57,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
     static
     {
-        Map<String, String> map = new LinkedHashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<>();
         map.put("aqua", "#00FFFF");
         map.put("black", "#000000");
         map.put("blue", "#0000FF");
