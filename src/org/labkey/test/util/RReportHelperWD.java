@@ -21,9 +21,6 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.openqa.selenium.Capabilities;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -241,7 +238,7 @@ public class RReportHelperWD extends AbstractHelperWD
         try
         {
             Runtime rt = Runtime.getRuntime();
-            Process p = rt.exec(r.getCanonicalPath() + " --version");
+            Process p = rt.exec(new String[]{r.getCanonicalPath(), "--version"});
             String versionOutput;
 
             // Different platforms output version info differently; just combine all std/err output
@@ -257,7 +254,7 @@ public class RReportHelperWD extends AbstractHelperWD
         }
         catch(IOException ex)
         {
-            Assert.fail("Unable to determine R version: " + r.getAbsolutePath());
+            Assert.fail("Unable to determine R version: " + r.getAbsolutePath() + " due to " + ex.getMessage());
             return null; // Unreachable
         }
     }
