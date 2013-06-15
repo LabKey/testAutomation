@@ -15,7 +15,7 @@
 
 selenium.getLinkAddresses = function () {
         var links = selenium.browserbot.getCurrentWindow().document.links;
-        var addresses = new Array();
+        var addresses = [];
         for (var i = 0; i < links.length; i++)
           addresses[i] = links[i].getAttribute('href');
         return addresses.join('\\n');

@@ -412,7 +412,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         SelectRowsResponse resp = sr.execute(cn, getProjectName());
         Assert.assertEquals("Incorrect number of rows returned", SAMPLE_DATA.length, resp.getRowCount().intValue());
 
-        List<String> colOrder = Arrays.asList(new String[]{"samplename","subjectId","sampledate","sampletype","overlappingProjects/projects","overlappingProjects/groups","allProjects/projects","allProjects/groups","majorEvents/Appendectomy::DaysPostEvent","majorEvents/Appendectomy::YearsPostEvent","majorEvents/Gave Birth::DaysPostEvent","majorEvents/Vaccination::YearsPostEventDecimal","majorEvents/Biopsy::MonthsPostEvent","majorEvents/Influenza Infection::DaysPostEvent","relativeDates/Project1::DaysPostStart","relativeDates/Project2::MonthsPostStart","relativeDates/Project3::YearsPostStartDecimal"});
+        List<String> colOrder = Arrays.asList("samplename","subjectId","sampledate","sampletype","overlappingProjects/projects","overlappingProjects/groups","allProjects/projects","allProjects/groups","majorEvents/Appendectomy::DaysPostEvent","majorEvents/Appendectomy::YearsPostEvent","majorEvents/Gave Birth::DaysPostEvent","majorEvents/Vaccination::YearsPostEventDecimal","majorEvents/Biopsy::MonthsPostEvent","majorEvents/Influenza Infection::DaysPostEvent","relativeDates/Project1::DaysPostStart","relativeDates/Project2::MonthsPostStart","relativeDates/Project3::YearsPostStartDecimal");
 
         List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"OtherSample",null,null,"DNA",null,null,null,null,null,null,null,null,null,null,null,null,null,null});

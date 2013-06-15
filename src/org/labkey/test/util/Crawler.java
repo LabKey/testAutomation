@@ -349,11 +349,9 @@ public class Crawler
         @Override
         public boolean equals(Object obj)
         {
-            if (obj instanceof ControllerActionId)
-                return _action.equalsIgnoreCase(((ControllerActionId) obj)._action) &&
-                        _controller.equalsIgnoreCase(((ControllerActionId) obj)._controller);
-            else
-                return false;
+            return obj instanceof ControllerActionId &&
+                   _action.equalsIgnoreCase(((ControllerActionId) obj)._action) &&
+                   _controller.equalsIgnoreCase(((ControllerActionId) obj)._controller);
         }
     }
 

@@ -566,14 +566,14 @@ public class CustomizeViewsHelper extends AbstractHelper
                     continue;
 
                 _test.clickButton("Add Aggregate", 0);
-                Locator row = _test._extHelper.locateExt3GridRow(idx, parent);
+                Locator row = ExtHelper.locateExt3GridRow(idx, parent);
 
-                Locator comboCell = _test._extHelper.locateExt3GridCell(row, 1);
+                Locator comboCell = ExtHelper.locateExt3GridCell(row, 1);
                 _test.doubleClick(comboCell);
                 _test._extHelper.selectComboBoxItem((Locator.XPathLocator)grid, aggregate.get("type"));
 
                 if(aggregate.get("label") != null){
-                    Locator labelCell = _test._extHelper.locateExt3GridCell(row, 2);
+                    Locator labelCell = ExtHelper.locateExt3GridCell(row, 2);
                     _test.doubleClick(labelCell);
 
                     Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text') and not(../img)]");

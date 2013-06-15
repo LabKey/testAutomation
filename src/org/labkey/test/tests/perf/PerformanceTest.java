@@ -54,10 +54,7 @@ public abstract class PerformanceTest extends BaseWebDriverTest
             writer.write("\t<statisticValue key=\"actionTime\" value=\"" + elapsedTime + "\"/>\n");
             writer.write("</build>");
         }
-        catch (IOException e)
-        {
-            return;
-        }
+        catch (IOException ignored) {}
         finally
         {
             if (writer != null)

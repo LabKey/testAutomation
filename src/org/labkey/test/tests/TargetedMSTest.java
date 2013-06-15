@@ -33,7 +33,7 @@ public abstract class TargetedMSTest extends BaseWebDriverTest
     protected static final String SKY_FILE = "MRMer.sky";
 
     public enum FolderType {
-            Experiment, Library, LibraryProtein, Undefined;
+        Experiment, Library, LibraryProtein, Undefined
     }
 
     @Override

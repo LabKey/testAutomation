@@ -148,9 +148,7 @@ public class DataRegionTable
      */
     public void ensureColumnPresent(String columnName)
     {
-        if(getColumn(columnName) > -1)
-            return;
-        else
+        if(getColumn(columnName) < 0)
         {
             _test._customizeViewsHelper.openCustomizeViewPanel();
             _test._customizeViewsHelper.addCustomizeViewColumn(columnName);

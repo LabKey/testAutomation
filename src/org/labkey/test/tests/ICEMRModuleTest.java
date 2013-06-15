@@ -537,7 +537,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
 
     private void enterData(String assayName, String fileUploadField)
     {
-        if (assayName == DIAGNOSTIC_ASSAY_NAME)
+        if (assayName.equals(DIAGNOSTIC_ASSAY_NAME))
             enterDiagnosticsData();
         else
             enterSpeciesData(fileUploadField);

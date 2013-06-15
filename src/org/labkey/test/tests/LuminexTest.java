@@ -557,7 +557,7 @@ public class LuminexTest extends AbstractQCAssayTest
             else if(formula.get(i).equals(rum5))
             {
                 // ec50 will be populated for well formed curves (i.e. not expected for every row, so we'll keep a count and check at the end of the loop)
-                if (((String) ec50.get(i)).length() > 0)
+                if (ec50.get(i).length() > 0)
                     rum5ec50count++;
 
                 // auc should not be populated
@@ -741,11 +741,9 @@ public class LuminexTest extends AbstractQCAssayTest
     //verifies if description, type, and well match the hardcoded values
     private boolean matchesWell(String description, String type, String well)
     {
-        if(!excludedWellDescription.equals(description))
-            return false;
-        if(!excludedWellType.equals(type))
-            return false;
-        return excludedWells.contains(well);
+        return excludedWellDescription.equals(description) &&
+                excludedWellType.equals(type) &&
+                excludedWells.contains(well);
     }
 
     //currently hardcoded for E1
@@ -1702,7 +1700,8 @@ public class LuminexTest extends AbstractQCAssayTest
         _customizeViewsHelper.saveCustomView();
 
         //verify expected values in column
-        String[] flags = getColumnValues("Runs", "QC Flags").get(0).toArray(new String[] {});
+        List<String> var = getColumnValues("Runs", "QC Flags").get(0);
+        String[] flags = var.toArray(new String[var.size()]);
         for(int i=0; i<flags.length; i++)
         {
             Assert.assertEquals(expectedFlags[i], flags[i]);
@@ -1948,7 +1947,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // to the test
         for (int i = 1; i <= 5; i++)
         {
-            clickAt(_extHelper.locateGridRowCheckbox("NETWORK" + i), "1,2");
+            clickAt(ExtHelper.locateGridRowCheckbox("NETWORK" + i), "1,2");
         }
         clickButton("View 4PL Curves", 0);
         waitForTextToDisappear("loading curves...", WAIT_FOR_JAVASCRIPT);
@@ -2172,12 +2171,12 @@ public class LuminexTest extends AbstractQCAssayTest
     @LogMethod
     private void applyGuideSetToRun(String network, int runRowIndex, String comment, int guideSetIndex)
     {
-        clickAt(_extHelper.locateGridRowCheckbox(network), "1," + runRowIndex);
+        clickAt(ExtHelper.locateGridRowCheckbox(network), "1," + runRowIndex);
         clickButton("Apply Guide Set", 0);
         sleep(1000);//we need a little time even after all the elements have appeared, so waits won't work
 
         if(guideSetIndex!=-1) //not clicking anything will apply the current guide set
-            clickAt(_extHelper.locateGridRowCheckbox(comment), "1," + guideSetIndex);
+            clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + guideSetIndex);
 
         waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0);
         waitForExtMaskToDisappear();

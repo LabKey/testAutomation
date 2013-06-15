@@ -531,7 +531,7 @@ public class EHRApiTest extends AbstractEHRTest
             response = doSaveRows(DATA_ADMIN, Collections.singletonList(initialInsertCommand), extraContext, true);
 
             String lsid = getLsidFromResponse(response);
-            originalData[0][Arrays.asList(weightFields).indexOf(FIELD_LSID)] = lsid.toString();
+            originalData[0][Arrays.asList(weightFields).indexOf(FIELD_LSID)] = lsid;
 
             //then try to update to all other QCStates
             for (EHRQCState qc : EHRQCState.values())

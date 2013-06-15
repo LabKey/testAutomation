@@ -330,7 +330,7 @@ public class FlowTest extends BaseFlowTestWD
 
         _extHelper.selectFileBrowserItem("8color/");
         _extHelper.waitForImportDataEnabled();
-        waitForElement(_extHelper.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
+        waitForElement(ExtHelperWD.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
         selectImportDataAction("Import Directory of FCS Files");
         assertTextNotPresent(FCS_FILE_1);
         assertTextPresent(FCS_FILE_2);

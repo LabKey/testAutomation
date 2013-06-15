@@ -248,7 +248,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void deleteMatchesTest()
     {
 
-        String[] alleleContentsBeforeDeletion = (String[]) drt.getColumnDataAsText("Allele Name").toArray(new String[] {"a"});
+        String[] alleleContentsBeforeDeletion = drt.getColumnDataAsText("Allele Name").toArray(new String[] {"a"});
 
 
         //attempt to delete a row and cancel

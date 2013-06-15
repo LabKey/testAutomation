@@ -124,7 +124,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("verifying readset count correct");
         waitForText("Total Readsets Imported");
-        Assert.assertTrue("Wrong number of readsets present", isElementPresent(_helper.getNavPanelItem("Total Readsets Imported:", _readsetCt.toString())));
+        Assert.assertTrue("Wrong number of readsets present", isElementPresent(LabModuleHelper.getNavPanelItem("Total Readsets Imported:", _readsetCt.toString())));
     }
 
     /**
@@ -538,8 +538,8 @@ public class SequenceTest extends BaseWebDriverTest
         Assert.assertEquals("Field should be hidden", false, Ext4FieldRefWD.isFieldPresent(this, "Reference Library Type"));
         Assert.assertEquals("Field should be hidden", false, Ext4FieldRefWD.isFieldPresent(this, "Aligner"));
 
-        Assert.assertEquals("Field should be disabled", true, (Boolean)Ext4FieldRefWD.getForLabel(this, "Sequence Based Genotyping").getEval("isDisabled()"));
-        Assert.assertEquals("Field should be disabled", true, (Boolean)Ext4FieldRefWD.getForLabel(this, "Min SNP Quality").getEval("isDisabled()"));
+        Assert.assertEquals("Field should be disabled", true, Ext4FieldRefWD.getForLabel(this, "Sequence Based Genotyping").getEval("isDisabled()"));
+        Assert.assertEquals("Field should be disabled", true, Ext4FieldRefWD.getForLabel(this, "Min SNP Quality").getEval("isDisabled()"));
 
         Ext4FieldRefWD.getForLabel(this, "Perform Alignment").setChecked(true);
         waitForText("Reference Library Type");
@@ -854,23 +854,23 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4FieldRefWD pairedField = Ext4FieldRefWD.getForLabel(this, "Data Is Paired End");
         Ext4GridRefWD grid = getSampleGrid();
 
-        Assert.assertEquals("Incorrect starting value for input file-handling field", "delete", (String) treatmentField.getValue());
+        Assert.assertEquals("Incorrect starting value for input file-handling field", "delete", treatmentField.getValue());
 
         barcodeField.setChecked(true);
         sleep(100);
-        Assert.assertEquals("Incorrect value for input file-handling field after barcode toggle", "compress", (String) treatmentField.getValue());
+        Assert.assertEquals("Incorrect value for input file-handling field after barcode toggle", "compress", treatmentField.getValue());
         Assert.assertFalse("MID5 column should not be hidden", (Boolean)grid.getEval("columns[2].hidden"));
         Assert.assertFalse("MID3 column should not be hidden", (Boolean)grid.getEval("columns[3].hidden"));
 
         barcodeField.setChecked(false);
         sleep(100);
-        Assert.assertEquals("Incorrect value for input file-handling field after barcode toggle", "delete", (String) treatmentField.getValue());
+        Assert.assertEquals("Incorrect value for input file-handling field after barcode toggle", "delete", treatmentField.getValue());
         Assert.assertTrue("MID5 column should be hidden", (Boolean) grid.getEval("columns[2].hidden"));
         Assert.assertTrue("MID3 column should be hidden", (Boolean) grid.getEval("columns[3].hidden"));
 
         mergeField.setChecked(true);
         sleep(100);
-        Assert.assertEquals("Incorrect value for input file-handling field after merge toggle", "compress", (String)treatmentField.getValue());
+        Assert.assertEquals("Incorrect value for input file-handling field after merge toggle", "compress", treatmentField.getValue());
         Assert.assertTrue("Paired end field should be disabled when merge is checked", pairedField.isDisabled());
 
         Ext4FieldRefWD mergenameField = Ext4FieldRefWD.getForLabel(this, "Name For Merged File");
@@ -883,7 +883,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         mergeField.setChecked(false);
         sleep(100);
-        Assert.assertEquals("Incorrect value for input file-handling field after merge toggle", "delete", (String) treatmentField.getValue());
+        Assert.assertEquals("Incorrect value for input file-handling field after merge toggle", "delete", treatmentField.getValue());
         Assert.assertFalse("Merge name field should be hidden", mergenameField.isVisible());
         Assert.assertFalse("Paired end field should be enable when merge is unchecked", pairedField.isDisabled());
 

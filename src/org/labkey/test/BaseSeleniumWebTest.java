@@ -1849,10 +1849,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             writer.write("\t<statisticValue key=\"actionCoveragePercent\" value=\"" + actionCoveragePercent + "\"/>\n");
             writer.write("</build>");
         }
-        catch (IOException e)
-        {
-            return;
-        }
+        catch (IOException ignored) {}
         finally
         {
             if (writer != null)

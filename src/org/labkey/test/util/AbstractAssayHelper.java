@@ -89,7 +89,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         // may need to try all lower case for form element selection
         if (!_test.getFormElement(l).equals(aliasedColumn))
             _test.setFormElement(l, aliasedColumn.toLowerCase());
-        _test.clickButton("OK", _test.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        _test.clickButton("OK", BaseSeleniumWebTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
         //set name
         //TODO:  better locator
@@ -107,7 +107,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         Locator l = Locator.xpath("(//input[contains(@name, 'ff_name')])["+count + "]");
         _test.isElementPresent(l);
         String name = _test.getAttribute(l,  "name");
-        return new Integer(name.substring(7)).intValue();
+        return Integer.parseInt(name.substring(7));
     }
 
 

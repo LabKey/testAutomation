@@ -166,7 +166,7 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
                 return getActiveGridEditor() != null;
 
             }
-        }, "Unable to find element", _test.WAIT_FOR_JAVASCRIPT);
+        }, "Unable to find element", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     private WebElement getActiveGridEditor()

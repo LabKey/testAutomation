@@ -1,4 +1,4 @@
-<project name="redirectServlet" default="usage" basedir=".">
+<project name="redirectServlet" default="build" basedir=".">
 
     <property environment="env"/>
     <path id="build.classpath">

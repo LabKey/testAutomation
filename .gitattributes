@@ -482,7 +482,6 @@ src/org/labkey/test/util/StopSelenium.java -text
 src/org/labkey/test/util/StringHelper.java -text
 src/org/labkey/test/util/StudyHelper.java -text
 src/org/labkey/test/util/StudyHelperWD.java -text
-src/org/labkey/test/util/TestAspect.aj -text
 src/org/labkey/test/util/TestLogger.java -text
 src/org/labkey/test/util/TestLoggingAspect.java -text
 src/org/labkey/test/util/TimeChartHelper.java -text

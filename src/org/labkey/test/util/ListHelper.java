@@ -700,7 +700,7 @@ public class ListHelper extends AbstractHelper
         String prefix = _test.getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
         _test.click(Locator.xpath(addField));
-        _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), _test.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         setColumnName(prefix, index, name);
         setColumnLabel(prefix, index, label);
         setColumnType(_test, prefix, index, type);
@@ -711,7 +711,7 @@ public class ListHelper extends AbstractHelper
         String prefix = areaTitle==null ? "" : _test.getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
         _test.click(Locator.xpath(addField));
-        _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), _test.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         setColumnName(prefix, index, name);
         setColumnLabel(prefix, index, label);
         setColumnType(prefix, index, type);
@@ -729,7 +729,7 @@ public class ListHelper extends AbstractHelper
         {
             // Confirm the deletion
             _test.clickButton("OK", 0);
-            _test.waitForElement(Locator.xpath("//td/img[@id='partstatus_" + index + "' and contains(@src, 'deleted')]]"), _test.WAIT_FOR_JAVASCRIPT);
+            _test.waitForElement(Locator.xpath("//td/img[@id='partstatus_" + index + "' and contains(@src, 'deleted')]]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
     }
     
