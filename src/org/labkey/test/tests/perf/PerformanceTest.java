@@ -65,7 +65,7 @@ public abstract class PerformanceTest extends BaseWebDriverTest
                 {
                     writer.close();
                 }
-                catch (IOException e)
+                catch (IOException ignored)
                 {
                 }
         }

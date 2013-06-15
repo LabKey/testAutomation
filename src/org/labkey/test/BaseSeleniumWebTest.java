@@ -345,8 +345,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
         finally
         {
-            if (fis != null) try { fis.close(); } catch (IOException e) {}
-            if (fos != null) try { fos.close(); } catch (IOException e) {}
+            if (fis != null) try { fis.close(); } catch (IOException ignored) {}
+            if (fos != null) try { fos.close(); } catch (IOException ignored) {}
         }
     }
 
@@ -516,7 +516,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             Thread.sleep(ms);
         }
-        catch (InterruptedException e)
+        catch (InterruptedException ignored)
         {
         }
     }
@@ -1860,7 +1860,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 {
                     writer.close();
                 }
-                catch (IOException e)
+                catch (IOException ignored)
                 {
                 }
         }
@@ -5762,7 +5762,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             if(decode)
             {
                 ret = ret.replace("+", "%20");
-                try {ret = URLDecoder.decode(ret, "UTF-8");} catch(UnsupportedEncodingException e) {}
+                try {ret = URLDecoder.decode(ret, "UTF-8");} catch(UnsupportedEncodingException ignored) {}
             }
             return ret.trim();
         }
@@ -6136,7 +6136,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
         finally
         {
-            if (reader != null) try { reader.close(); } catch (IOException e) {}
+            if (reader != null) try { reader.close(); } catch (IOException ignored) {}
             if (fis != null) try { fis.close(); } catch (IOException e) {}
         }
     }

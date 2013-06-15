@@ -130,7 +130,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
             setFormElement("workingDirectory", "");
             clickButton("update");
         }
-        catch (Throwable t) {}
+        catch (Throwable ignored) {}
         deletePipelineWorkDirectory();
     }
 

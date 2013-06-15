@@ -36,7 +36,7 @@ public abstract class AbstractXTandemTest extends AbstractMS2SearchEngineTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         try {
-            deleteViews(VIEW); } catch (Throwable t) {}
+            deleteViews(VIEW); } catch (Throwable ignored) {}
         cleanPipe(SEARCH_TYPE);
         deleteProject(getProjectName(), afterTest);
     }

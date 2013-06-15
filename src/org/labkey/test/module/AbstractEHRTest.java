@@ -156,7 +156,7 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
                 FULL_UPDATER.getEmail(),
                 FULL_SUBMITTER.getEmail());
 
-        try{deleteRecords();}catch(Throwable T){}
+        try{deleteRecords();}catch(Throwable ignored){}
     }
 
     @LogMethod

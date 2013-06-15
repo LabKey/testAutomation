@@ -76,7 +76,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         while (!isTextPresent("<None>") && seconds < 20)
         {
             seconds++;
-            try { Thread.sleep(1000); } catch (InterruptedException e) {}
+            sleep(1000);
         }
         selectOptionByText("sampleSetListBox0", "<None>");
         setFormElement("sampleTextBox0", "verify:001");

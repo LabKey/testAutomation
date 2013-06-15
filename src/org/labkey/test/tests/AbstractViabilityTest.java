@@ -49,7 +49,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     {
         deleteProject(getProjectName(), afterTest);
         try{deleteEngine();}
-        catch(Throwable T) {}
+        catch(Throwable ignored) {}
 
         deleteDir(getTestTempDir());
     }

@@ -96,7 +96,7 @@ public class JavaQC
         finally
         {
             if (br != null)
-                try {br.close();} catch(IOException ioe) {}
+                try {br.close();} catch(IOException ignored) {}
         }
     }
 

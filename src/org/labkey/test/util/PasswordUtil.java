@@ -156,7 +156,7 @@ public class PasswordUtil
                 {
                     ostream.close();
                 }
-                catch (IOException e)
+                catch (IOException ignored)
                 {
                 }
         }
@@ -226,7 +226,7 @@ public class PasswordUtil
                     {
                         istream.close();
                     }
-                    catch (IOException e)
+                    catch (IOException ignored)
                     {
                     }
             }
