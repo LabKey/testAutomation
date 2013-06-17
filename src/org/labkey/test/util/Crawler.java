@@ -60,6 +60,7 @@ public class Crawler
     private static Set<String> _urlsChecked = new HashSet<>();
     private UrlToCheck _urlToCheck;
     private int _crawlTime = 0;
+    private int _maxDepth = 3;
     private ArrayList<UrlToCheck> _urlsToCheck = new ArrayList<>();
 
     private int _maxCrawlTime;
@@ -98,6 +99,10 @@ public class Crawler
             new ControllerActionId("admin", "setAdminMode"),
             new ControllerActionId("admin", "dumpHeap"),
             new ControllerActionId("admin", "addTab"),
+            new ControllerActionId("admin", "actions"), // Gets hit often in normal testing
+            new ControllerActionId("admin", "credits"), // Gets checked by BasicTest
+            new ControllerActionId("admin", "showErrorsSinceMark"), // Gets hit often in normal testing
+            new ControllerActionId("admin", "resetQueryStatistics"),
             new ControllerActionId("assay", "assayDetailRedirect"),
             new ControllerActionId("core", "downloadFileLink"),
             new ControllerActionId("experiment", "showFile"),
@@ -138,6 +143,7 @@ public class Crawler
             new ControllerActionId("study-samples", "emailLabSpecimenLists"),
             new ControllerActionId("study-samples", "getSpecimenExcel"),
             new ControllerActionId("study-samples", "download"),
+            new ControllerActionId("targetedms", "downloadChromLibrary"),
             new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("NAb", "download"),
             new ControllerActionId("user", "impersonate"),
@@ -161,13 +167,17 @@ public class Crawler
 
     protected int getMaxDepth()
     {
-        return 3;
+        return _maxDepth;
+    }
+
+    protected int setMaxDepth(int maxDepth)
+    {
+        return _maxDepth = maxDepth;
     }
 
     private void saveCrawlStats(BaseSeleniumWebTest test, int maxDepth, int newPages, int uniqueActions, int crawlTestLength)
     {
-        String testName = test.toString();
-        testName = testName.substring(testName.lastIndexOf('.') + 1, testName.lastIndexOf('@'));
+        String testName = test.getClass().getSimpleName();
         _crawlStats.put(testName, new CrawlStats(maxDepth, newPages, uniqueActions, crawlTestLength));
     }
 
@@ -350,8 +360,8 @@ public class Crawler
         public boolean equals(Object obj)
         {
             return obj instanceof ControllerActionId &&
-                   _action.equalsIgnoreCase(((ControllerActionId) obj)._action) &&
-                   _controller.equalsIgnoreCase(((ControllerActionId) obj)._controller);
+                   _action.equalsIgnoreCase(((ControllerActionId) obj).getAction()) &&
+                   _controller.equalsIgnoreCase(((ControllerActionId) obj).getController());
         }
     }
 
@@ -362,7 +372,7 @@ public class Crawler
         String strippedRelativeURL = stripQueryParams(rootRelativeURL);
 
         // never go to the exactly same URL (minus query params) twice:
-        if (_urlsChecked.contains(strippedRelativeURL) && currentDepth > 1)
+        if (_urlsChecked.contains(strippedRelativeURL))
             return false;
 
         if (rootRelativeURL.contains("export=")) //Study report export uses same URL for export. But don't mark visited yet
@@ -389,7 +399,7 @@ public class Crawler
             return false;
 
         // skip export actions. 
-        if (actionId.getAction().toLowerCase().indexOf("export") >= 0)
+        if (actionId.getAction().toLowerCase().contains("export"))
             return false;
 
         // skip expanding and collapsing paths -- no HTML returned
@@ -543,7 +553,6 @@ public class Crawler
                 Assert.fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
 
 			testInjection(urlToCheck, currentPageUrl);
-            testNavTrail(urlToCheck);
         }
         catch (RuntimeException delay) {re = delay;}
         catch (AssertionError delay) {ae = delay;}
@@ -573,34 +582,6 @@ public class Crawler
                 throw new IllegalStateException("WTF");
         }
     }
-
-    private void testNavTrail(UrlToCheck relativeURL)
-    {
-        Collection<String> navTrailEntries = _test.getNavTrailEntries();
-        if(navTrailEntries.size()==0)
-            return;
-        String folderUrl = _test.getFolderUrl();
-        if(folderUrl!=null && navTrailEntries.contains(folderUrl))
-            Assert.fail("Header url contained in nav trail");
-
-        Collection<String> tabUrls = null;
-        try
-        {
-            tabUrls = _test.getTabEntries();
-        }
-        catch (Exception e)
-        {
-            Assert.fail("Unable to combine tab urls");
-        }
-        Collection intersect = BaseSeleniumWebTest.collectionIntersection(navTrailEntries,tabUrls);
-        if(intersect.size()>0)
-        {
-            Assert.fail("Overlap between tabs and nav trail.  Intersect at following urls: " + intersect.toString());
-
-        }
-
-    }
-
 
     protected void checkForForbiddenWords(String relativeURL)
     {
@@ -686,7 +667,7 @@ public class Crawler
         catch (RuntimeException re)
         {
             // ignore javascript errors (HTTPUnit has a poor engine) and non-HTML download links:
-            if (re.getMessage().indexOf("ScriptException") < 0 && !re.getClass().getSimpleName().equals("NotHTMLException"))
+            if (!re.getMessage().contains("ScriptException") && !re.getClass().getSimpleName().equals("NotHTMLException"))
                 throw re;
         }
 
