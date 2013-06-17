@@ -1549,13 +1549,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public boolean isGroupConcatSupported()
     {
-        if ("pg".equals(getDatabaseType()))
-            return true;
-
-        if ("mssql".equals(getDatabaseType()) && !"2005".equals(getDatabaseVersion()))
-            return true;
-
-        return false;
+        return  "pg".equals(getDatabaseType()) ||
+                "mssql".equals(getDatabaseType()) && !"2005".equals(getDatabaseVersion());
     }
 
     public boolean isGuestModeTest()
