@@ -16,11 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PortalHelper;
 
 /**
  * User: brittp
@@ -28,6 +28,8 @@ import org.labkey.test.util.ListHelper;
  */
 public class TimelineTest extends BaseWebDriverTest
 {
+    PortalHelper _portalHelper = new PortalHelper(this);
+
     private static final String PROJECT_NAME = "TimelineTestProject";
     private static final String FOLDER_NAME = "timeline folder";
     private final static String LIST_NAME = "People";
@@ -125,17 +127,17 @@ public class TimelineTest extends BaseWebDriverTest
 
     private void createWebPart()
     {
-        addWebPart("Timeline");
-        selectOptionByText("schemaName", "lists");
+        _portalHelper.addWebPart("Timeline");
+        selectOptionByText(Locator.name("schemaName"), "lists");
         waitFor(new Checker(){
             public boolean check()
             {
                 return isTextPresent("FirstName");
             }
         }, "Could not find field", 10000);
-        selectOptionByText("titleField", "FirstName");
-        selectOptionByText("descriptionField", "LastName");
-        submit();
+        selectOptionByText(Locator.name("titleField"), "FirstName");
+        selectOptionByText(Locator.name("descriptionField"), "LastName");
+        clickButton("Submit");
         waitForElement(Locator.tagContainingText("div", "Jane"), 10000);
         assertTextNotPresent("Janeson");
         //Click on jane and make sure the bubble comes up
@@ -157,7 +159,7 @@ public class TimelineTest extends BaseWebDriverTest
         if (enableLinkCheck())
         {
             clickFolder(FOLDER_NAME);
-            removeWebPart(WIKIPAGE_NAME);
+            _portalHelper.removeWebPart(WIKIPAGE_NAME);
         }
     }
 
@@ -215,10 +217,10 @@ public class TimelineTest extends BaseWebDriverTest
 
     private void createWiki()
     {
-        addWebPart("Wiki");
+        _portalHelper.addWebPart("Wiki");
         createNewWikiPage("HTML");
-        setFormElement("name", WIKIPAGE_NAME);
-        setFormElement("title", WIKIPAGE_NAME);
+        setFormElement(Locator.name("name"), WIKIPAGE_NAME);
+        setFormElement(Locator.name("title"), WIKIPAGE_NAME);
         setWikiBody("placeholder text");
         saveWikiPage();
     }
@@ -228,7 +230,7 @@ public class TimelineTest extends BaseWebDriverTest
     {
         if (!isTextPresent(WIKIPAGE_NAME))
             clickFolder(FOLDER_NAME);
-        clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
+        _portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
 
         String fullSource = getFullSource(srcFragment);
         log("Setting wiki page source:");
