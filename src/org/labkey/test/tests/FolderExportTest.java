@@ -234,6 +234,7 @@ public class FolderExportTest extends BaseWebDriverTest
     {
         log("verify child containers were imported");
         hoverFolderBar();
+        expandFolderTree("Subfolder1"); // Will expand to all subfolders with this name
         clickAndWait(Locator.linkWithText("Subfolder1", subfolderIndex));
         assertTextPresent("My Test Container Tab Query");
         hoverFolderBar();
