@@ -88,7 +88,12 @@ public class ComplianceTrainingTest extends BaseWebDriverTest implements Advance
         clickButton("Mark Reread");
         reloadPage();
 
-        click(Locator.xpath("//input[@id='sopCheck']"));
+        checkCheckbox(Locator.xpath("//input[@id='sopCheck']"));
+        uncheckCheckbox(Locator.xpath("//input[@id='sopCheck']"));
+        clickButton("Submit", 0);
+        assertAlert("You must check the box above the submit button to certify you have read your SOPs");
+
+        checkCheckbox(Locator.xpath("//input[@id='sopCheck']"));
         clickButton("Submit", 0);
         waitForElement(Ext4Helper.ext4Window("SOPs Complete"));
         clickButton("OK");
