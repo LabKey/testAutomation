@@ -92,7 +92,7 @@
 
     function onFailure(errorInfo, responseObj, options){
         maskGraph.hide();
-        var htmlOut = renderText(null, "error", errorInfo.exceptionClass + ': ' + errorInfo.exception)
+        var htmlOut = renderText(null, "error", errorInfo.exceptionClass + ': ' + errorInfo.exception);
         renderFinal(htmlOut);
     };
 
