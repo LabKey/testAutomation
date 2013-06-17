@@ -91,7 +91,7 @@ public class StudyHelper extends AbstractHelper
             if (isCategoryNameNew)
                 _test.setFormElement(Locator.name("participantCategory"), categoryName);
             else
-                _test._ext4Helper.selectComboBoxItem(participantString + " Category:", categoryName);
+                _test._ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(participantString + " Category:"), categoryName, false, Locator.xpath("//div"));
             _test.pressTab(Locator.name("participantCategory"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
@@ -167,7 +167,7 @@ public class StudyHelper extends AbstractHelper
             if (isCategoryNameNew)
                 _test.setFormElement(Locator.xpath("//input[@name='participantCategory']"), categoryName);
             else
-                _test._ext4Helper.selectComboBoxItem(participantString + " Category:", categoryName);
+                _test._ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(participantString + " Category:"), categoryName, false, Locator.xpath("//div"));
             _test.pressTab(Locator.xpath("//input[@name='participantCategory']"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
             Assert.assertEquals("Mouse category not set", categoryName, _test.getFormElement(categoryField));

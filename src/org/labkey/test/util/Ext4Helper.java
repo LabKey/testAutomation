@@ -47,6 +47,12 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String selection, boolean containsText)
     {
+        selectComboBoxItem(comboBox, selection, containsText, Locator.xpath("//li"));
+    }
+
+    @LogMethod(quiet = true)
+    public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String selection, boolean containsText, Locator.XPathLocator listItemLoc)
+    {
         Locator arrowTrigger = comboBox.append("//div").withClass("x4-form-arrow-trigger");
         _test.waitAndClick(arrowTrigger);
         if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
@@ -59,9 +65,9 @@ public class Ext4Helper extends AbstractHelper
         {
             Locator.XPathLocator listItem;
             if (containsText)
-                listItem = Locator.xpath("//li").withClass("x4-boundlist-item").notHidden().containing(selection);
+                listItem = listItemLoc.withClass("x4-boundlist-item").notHidden().containing(selection);
             else
-                listItem = Locator.xpath("//li").withClass("x4-boundlist-item").notHidden().withText(selection);
+                listItem = listItemLoc.withClass("x4-boundlist-item").notHidden().withText(selection);
 
             // wait for and select the list item
             _test.waitForElement(listItem, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
@@ -253,7 +259,7 @@ public class Ext4Helper extends AbstractHelper
      */
     public void clickParticipantFilterCategory(String categoryLabel)
     {
-        Locator.XPathLocator loc = Locator.xpath("//input[contains(@class, 'category-header') and contains(@category, '" + categoryLabel + "')]");
+        Locator.XPathLocator loc = Locator.xpath("//div[contains(@class, 'category-label') and text()='" + categoryLabel + "']/../../td/input[contains(@class, 'category-header')]");
         _test.click(loc);
     }
 
