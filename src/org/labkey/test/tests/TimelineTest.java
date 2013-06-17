@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
@@ -25,7 +26,7 @@ import org.labkey.test.util.ListHelper;
  * User: brittp
  * Created: Mar 12, 2008 9:36:47 AM
  */
-public class TimelineTest extends BaseSeleniumWebTest
+public class TimelineTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "TimelineTestProject";
     private static final String FOLDER_NAME = "timeline folder";
@@ -138,7 +139,7 @@ public class TimelineTest extends BaseSeleniumWebTest
         waitForElement(Locator.tagContainingText("div", "Jane"), 10000);
         assertTextNotPresent("Janeson");
         //Click on jane and make sure the bubble comes up
-        selenium.mouseDown(Locator.tagContainingText("div", "Jane").toString());
+        click(Locator.tagContainingText("div", "Jane"));
         assertTextPresent("Janeson");
     }
 
@@ -147,7 +148,7 @@ public class TimelineTest extends BaseSeleniumWebTest
         setSource(TIMELINE_TEST_SRC);
         clickAndWait(Locator.linkWithText(WIKIPAGE_NAME));
         waitForElement(Locator.tagContainingText("div", "Jane Janeson"), 10000);
-        selenium.mouseDown(Locator.tagContainingText("div", "Jane Janeson").toString());
+        click(Locator.tagContainingText("div", "Jane Janeson"));
         assertTextPresent("Hi Jane I am the description");
     }
 
@@ -203,7 +204,7 @@ public class TimelineTest extends BaseSeleniumWebTest
         while (waitSeconds-- > 0)
         {
             log("Waiting for div to render...");
-            String divHtml = selenium.getEval("this.browserbot.getCurrentWindow().document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
+            String divHtml = (String)executeScript("return document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
             if (divHtml.length() > 0)
                 return divHtml;
             sleep(1000);
@@ -237,4 +238,9 @@ public class TimelineTest extends BaseSeleniumWebTest
         return waitForDivPopulation();
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }
