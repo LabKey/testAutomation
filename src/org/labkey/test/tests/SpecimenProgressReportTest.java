@@ -85,7 +85,7 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
         createAssayFolder();
         waitForElement(Locator.linkWithText("Specimen Report Study Folder Study specimens"));
-        assertTextPresent("33 collections have occurred.",  "48 results from " + assay1 + " have been uploaded", "48 " + assay1 + " queries");
+        assertTextPresent("34 collections have occurred.",  "48 results from " + assay1 + " have been uploaded", "48 " + assay1 + " queries");
         assertTextNotPresent("Configuration error:",
                 "You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report.");
 
@@ -144,10 +144,10 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         waitForElement(Locator.css("#SpecimenVisitPanel table.x4-grid-table"));
         setSpecimenConfigurationVisit(pcr1RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
         setSpecimenConfigurationVisit(pcr2RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
-        setSpecimenConfigurationVisit(rnaRowId, new String[]{"0", "6", "20", "SR"});
+        setSpecimenConfigurationVisit(rnaRowId, new String[]{"PT1", "0", "6", "20", "SR"});
         sleep(1000); // give the store a second to save the configurations
-        checkRhoQueryRowCount("SpecimenConfigurationVisit", 34);
-        checkRhoQueryRowCount("AssaySpecimenMap", 34);
+        checkRhoQueryRowCount("SpecimenConfigurationVisit", 35);
+        checkRhoQueryRowCount("AssaySpecimenMap", 35);
         checkRhoQueryRowCount("MissingSpecimen", 2);
         checkRhoQueryRowCount("MissingVisit", 3);
     }
@@ -235,8 +235,8 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
 
         verifyProgressReport(assayName, false);
 
-        clickAndWait(Locator.linkWithText("7 results from " + assayName + " have been uploaded."));
-        assertTextPresent("Result reported with no corresponding specimen collected", 1);
+        clickAndWait(Locator.linkWithText("8 results from " + assayName + " have been uploaded."));
+        assertTextPresent("Result reported with no corresponding specimen collected", 2);
         assertTextPresent("This specimen type is not expected for this visit", 1);
     }
 
@@ -248,11 +248,11 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         waitForElement(tableLoc);
         assertTextPresentInThisOrder("SR1", "SR2", "SR3");
         Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
-        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
+        Assert.assertEquals(3, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
         Assert.assertEquals(2 + ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
         Assert.assertEquals(2 - ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'received')]")));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
-        Assert.assertEquals(7, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        Assert.assertEquals(11, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
         Assert.assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
     }
 
