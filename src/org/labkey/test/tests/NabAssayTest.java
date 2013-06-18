@@ -325,49 +325,54 @@ public class NabAssayTest extends AbstractQCAssayTest
             //uploadFile(TEST_ASSAY_NAB_FILE4, "D");
             //uploadFile(TEST_ASSAY_NAB_FILE5, "E");
 
-            assertTextPresent("Virus Name");
-            assertTextPresent("Nasty Virus");
-            assertTextPresent("ptid 1 C, Vst 1.0");
+            assertTextPresent("Virus Name", "Nasty Virus", "ptid 1 C, Vst 1.0");
             assertTextPresent("&lt; 20", 10);
+
             // check for the first dilution for the second participant:
-            // Five Parameter IC50
-            assertTextPresent("561");
-            // Five PL AUC
-            assertTextPresent("0.077");
-            // Five PL posAUC
-            assertTextPresent("0.081");
-            // Polynomial IC50:
-            assertTextNotPresent("503");
-            // Four parameter IC50
-            assertTextNotPresent("461");
+            assertTextPresent(
+            "561",      // Five Parameter IC50
+            "0.077",    // Five PL AUC
+            "0.081");   // Five PL posAUC
+            assertTextNotPresent(
+            "503",      // Polynomial IC50
+            "461");     // Four parameter IC50
 
             _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Four Parameter");
-            // Five Parameter IC50
-            assertTextNotPresent("561");
-            // Polynomial IC50:
-            assertTextNotPresent("503");
-            // Four parameter IC50
-            assertTextPresent("461");
-            // 4PL AUC/PosAUC
-            assertTextPresent("0.043");
-            // Five PL AUC
-            assertTextNotPresent("0.077");
+            assertTextPresent(
+            "461",      // Four parameter IC50
+            "0.043");   // 4PL AUC/PosAUC
+            assertTextNotPresent(
+            "561",      // Five Parameter IC50
+            "503",      // Polynomial IC50
+            "0.077");   // Five PL AUC
 
             _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Polynomial");
-            // Five Parameter IC50
-            assertTextNotPresent("561");
-            // Polynomial IC50:
-            assertTextPresent("503");
-            // Four parameter IC50
-            assertTextNotPresent("461");
-            // Polynomial AUC:
-            assertTextPresent("0.054");
-            // Polynomial posAUC:
-            assertTextPresent("0.055");
-            // Five PL AUC
-            assertTextNotPresent("0.077");
-            // 4PL AUC/PosAUC
-            assertTextNotPresent("0.043");
+            assertTextPresent(
+            "503",      // Polynomial IC50:
+            "0.054",    // Polynomial AUC:
+            "0.055");   // Polynomial posAUC:
+            assertTextNotPresent(
+            "561",      // Five Parameter IC50
+            "461",      // Four parameter IC50
+            "0.077",    // Five PL AUC
+            "0.043");   // 4PL AUC/PosAUC
+
+            log("Verify different graph sizes");
+            // Defaults to Small sized graphs
+            Number graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+            Assert.assertEquals("Graphs aren't the correct size (Large)", 300, graphHeight);
+
+            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Large");
+            graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+            Assert.assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
+
+            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Medium");
+            graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+            Assert.assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
+
+            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Small");
+            graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+            Assert.assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
 
             // Test editing runs
             // Set the design to allow editing

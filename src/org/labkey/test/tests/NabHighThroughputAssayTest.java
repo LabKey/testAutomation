@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
@@ -54,13 +55,6 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
     @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doCreateSteps()
     {
-        log("Starting High Throughput Nab Assay Test");
-
-        //revert to the admin user
-        revertToAdmin();
-
-        log("Testing NAb Assay Designer");
-
         //create a new test project
         _containerHelper.createProject(TEST_ASSAY_PRJ_NAB, null);
 
@@ -125,41 +119,126 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
-        if (isFileUploadAvailable())
-        {
-            log("Uploading NAb Runs");
-            clickButton("Import Data");
-            clickButton("Next");
+        log("Uploading NAb Runs");
+        clickButton("Import Data");
+        clickButton("Next");
 
-            setFormElement("cutoff1", "50");
-            setFormElement("cutoff2", "70");
-            selectOptionByText("curveFitMethod", "Polynomial");
+        setFormElement("cutoff1", "50");
+        setFormElement("cutoff2", "70");
+        selectOptionByText("curveFitMethod", "Polynomial");
 
-            File metadata = new File(TEST_ASSAY_NAB_METADATA_FILE);
-            setFormElement(Locator.xpath("//input[@type='file' and @name='__sampleMetadataFile']"), metadata);
+        File metadata = new File(TEST_ASSAY_NAB_METADATA_FILE);
+        setFormElement(Locator.xpath("//input[@type='file' and @name='__sampleMetadataFile']"), metadata);
 
-            File data = new File(TEST_ASSAY_NAB_DATA_FILE);
-            setFormElement(Locator.xpath("//input[@type='file' and @name='__primaryFile__']"), data);
+        File data = new File(TEST_ASSAY_NAB_DATA_FILE);
+        setFormElement(Locator.xpath("//input[@type='file' and @name='__primaryFile__']"), data);
 
-            clickButton("Save and Finish");
+        clickButton("Save and Finish");
 
-            // verify expected sample names and virus names
-            for (int i=1; i <= 20; i++)
-                assertTextPresent("SPECIMEN-" + i);
+        // verify expected sample names and virus names
+        for (int i=1; i <= 20; i++)
+            assertTextPresent("SPECIMEN-" + i);
 
-            for (int i=1; i <= 3; i++)
-                assertTextPresent("VIRUS-" + i);
+        for (int i=1; i <= 3; i++)
+            assertTextPresent("VIRUS-" + i);
 
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Four Parameter");
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Polynomial");
+        clickAndWait(Locator.linkContainingText("View Results"));
 
-            clickAndWait(Locator.linkContainingText("View Results"));
+        // verify the correct number of records
+        DataRegionTable table = new DataRegionTable("Data", this);
+        assert(table.getDataRowCount() == 20);
 
-            // verify the correct number of records
-            DataRegionTable table = new DataRegionTable("Data", this);
-            assert(table.getDataRowCount() == 20);
-        }
+        verifyGraphSettings();
     }
+
+    private void verifyGraphSettings()
+    {
+        clickAndWait(Locator.linkWithText("run details"));
+
+        log("Verify different curve types");
+        // Imported with polynomial curve fit
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC PositiveAUC"));
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.6 0.050 0.057"));
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Polynomial");
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_poly PositiveAUC_poly"));
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.6 0.050 0.057"));
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Four Parameter");
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_4pl PositiveAUC_4pl"));
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.9 0.050 0.058"));
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Five Parameter");
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.8 0.051 0.054"));
+
+        log("Verify different graph sizes");
+        // Defaults to Medium sized graphs
+        Number graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+        Assert.assertEquals("Graphs aren't the correct size (Large)", 550, graphHeight);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Large");
+        graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+        Assert.assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Medium");
+        graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+        Assert.assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Small");
+        graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+        Assert.assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
+
+        log("Verify different samples per graph");
+        // Defaults to 20 samples per graph
+        assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 3);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Samples per Graph", "20");
+        assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 3);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Samples per Graph", "15");
+        assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 4);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Samples per Graph", "10");
+        assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 6);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Samples per Graph", "5");
+        assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 12);
+
+        log("Verify different graphs per row");
+        // Defaults to one graph per row
+        assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 1); // Correct number of graphs in first row
+        assertElementNotPresent(Locator.xpath("//td[position()>1]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graphs per Row", "One");
+        assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 1); // Correct number of graphs in first row
+        assertElementNotPresent(Locator.xpath("//td[position()>1]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graphs per Row", "Two");
+        assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 2); // Correct number of graphs in first row
+        assertElementNotPresent(Locator.xpath("//td[position()>2]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graphs per Row", "Three");
+        assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 3); // Correct number of graphs in first row
+        assertElementNotPresent(Locator.xpath("//td[position()>3]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graphs per Row", "Four");
+        assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 4); // Correct number of graphs in first row
+        assertElementNotPresent(Locator.xpath("//td[position()>4]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
+
+        log("Verify customizations are applied to print page");
+        clickAndWait(Locator.linkContainingText("Print"));
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
+        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.8 0.051 0.054"));
+        graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+        Assert.assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
+        assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 12);
+        assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 4); // Correct number of graphs in first row
+        assertElementNotPresent(Locator.xpath("//td[position()>4]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
+
+        goBack();
+    }
+
 
     @Override
     protected String getProjectName()
@@ -176,7 +255,6 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        revertToAdmin();
         deleteProject(getProjectName(), afterTest);
         deleteDir(getTestTempDir());
     }
