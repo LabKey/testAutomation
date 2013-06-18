@@ -85,16 +85,35 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         enterDataPoint(SPECIES_ASSAY_NAME, Locator.id("upload-speciesSpecific-form-body"), GEL_IMAGE_FILE);
         verifyDataInAssay();
 
-        // test adaptation flavor of tracking assay
-        enterDataPointTracking(ADAPTATION_ASSAY_NAME);
-        enterDailyTrackingData();
-        checkResultsPage();
-        checkVisualization();
-
+        // test tracking assays, ensure they work with both sample sets
+        verifyTrackingAssay(ADAPTATION_ASSAY_NAME);
+        goToProjectHome();
+        // track drug selection flavor of tracking assay
+        verifyTrackingAssay(SELECTION_ASSAY_NAME);
         goToProjectHome();
 
-        // track drug selection flavor of tracking assay
-        enterDataPointTracking(SELECTION_ASSAY_NAME);
+        deleteSample(SELECTION_FLASKS_NAME);
+        deleteSample(ADAPTATION_FLASKS_NAME);
+
+        // issues 18050 and 18040 - verify that the adaptation and drug selection assays work
+        // with only the appropriate sample set available (Adaptation Flasks for Culture Adaptation
+        // or Selection Flasks for Drug Selection
+        createFlasksSampleSet(ADAPTATION_FLASKS_NAME, ADAPTATION_FLASK_FILE);
+        verifyTrackingAssay(ADAPTATION_ASSAY_NAME);
+        goToProjectHome();
+
+        deleteSample(ADAPTATION_FLASKS_NAME);
+        createFlasksSampleSet(SELECTION_FLASKS_NAME, SELECTION_FLASK_FILE);
+        verifyTrackingAssay(SELECTION_ASSAY_NAME);
+        goToProjectHome();
+
+        // since we validate all the queries on exist of the test, add back the adaptation sample set
+        createFlasksSampleSet(ADAPTATION_FLASKS_NAME, ADAPTATION_FLASK_FILE);
+    }
+
+    private void verifyTrackingAssay(String assayName)
+    {
+        enterDataPointTracking(assayName);
         enterDailyTrackingData();
         checkResultsPage();
         checkVisualization();
