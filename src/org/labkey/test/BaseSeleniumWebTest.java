@@ -326,13 +326,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         try
         {
+            Files.createDirectories(Paths.get(copy.toURI()).getParent());
             Files.copy(Paths.get(original.toURI()), Paths.get(copy.toURI()),
                     StandardCopyOption.COPY_ATTRIBUTES,
                     StandardCopyOption.REPLACE_EXISTING);
         }
         catch (IOException e)
         {
-            Assert.fail(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
