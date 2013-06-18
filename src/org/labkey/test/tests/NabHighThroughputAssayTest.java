@@ -151,6 +151,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         verifyGraphSettings();
     }
 
+    @LogMethod
     private void verifyGraphSettings()
     {
         clickAndWait(Locator.linkWithText("run details"));
