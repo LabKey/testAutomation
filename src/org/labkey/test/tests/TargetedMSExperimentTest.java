@@ -15,17 +15,39 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
-import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIContainerHelper;
+import org.labkey.test.util.WikiHelper;
+
+import java.io.File;
 
 public class TargetedMSExperimentTest extends TargetedMSTest
 {
+    String CLIENT_API_CORE1 = "{"+
+"   source: {"+
+"		type: 'query',"+
+"		schemaName: 'targetedms',"+
+"		queryName: 'precursor'"+
+"	},"+
+"	transforms: ["+
+"		{"+
+"			type: 'aggregate',"+
+"			filters: [ { fieldKey: ['ModifiedSequence'], type: 'startswith', value: 'L' } ],"+
+"		},"+
+"		{"+
+"			type: 'aggregate',"+
+"			groupBy: [ [\"PeptideId\", \"Sequence\"] ]"+
+"			,aggregates: [ { fieldKey: ['PeptideId'], type: 'MAX', label: 'MyPeptideId' },"+
+"                                       { fieldKey: ['Charge'], type: 'MAX', label: 'MyCharge' } ]"+
+"			,pivot: { columns: [ [\"MyPeptideId\"] ], by: [\"Charge\"] }"+
+"		}],"+
+"    success: tableSuccess,"+
+"    failure: function(responseData){"+
+"        console.log(responseData);"+
+"    }"+
+"}";
 
     public TargetedMSExperimentTest()
     {
@@ -40,6 +62,7 @@ public class TargetedMSExperimentTest extends TargetedMSTest
         setupAndImportData(FolderType.Experiment);
         verifyImportedData();
         verifyModificationSearch();
+        clientApiTest();
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -49,5 +72,44 @@ public class TargetedMSExperimentTest extends TargetedMSTest
         clickAndWait(Locator.linkContainingText(SKY_FILE));
         verifyRunSummaryCounts();
         verifyPeptide();
+    }
+
+    /*
+     * Test for the getData client API. The test was built on the test
+     * data for the TargetedMS module and therefore was placed here.
+     * The test uses a script saved in the file 'getDataTest.js' which is
+     * the source input of a wiki page that is run to generate a brief
+     * set of output.
+     */
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    protected void clientApiTest()
+    {
+        runClientAPITestCore(CLIENT_API_CORE1);
+        assertElementContains(Locator.id("jsonWrapperTest"),"Peptide");
+        assertElementContains(Locator.id("jsonWrapperTest"),"My Charge");
+
+        assertElementContains(Locator.id("jsonWrapperTest"),"LLPYWQDVIAK");
+        assertElementContains(Locator.id("jsonWrapperTest"),"LLSEEALPAIR");
+        assertElementContains(Locator.id("jsonWrapperTest"),"LLTTIADAAK");
+        assertElementContains(Locator.id("jsonWrapperTest"),"LSVQDLDLK");
+        assertElementContains(Locator.id("jsonWrapperTest"),"LTSLNVVAGSDLR");
+        assertElementContains(Locator.id("jsonWrapperTest"),"LVEAFQWTDK");
+        assertElementContains(Locator.id("jsonWrapperTest"),"LVEDPQVIAPFLGK");
+        assertElementContains(Locator.id("jsonWrapperTest"),"LWDVATGETYQR");
+        assertElementContains(Locator.id("jsonWrapperTest"), "2");
+    }
+
+    private void runClientAPITestCore(String request_core)
+    {
+        clickAndWait(Locator.linkContainingText("Targeted MS Dashboard"));
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Wiki");
+
+        String scriptText = getFileContents("server/test/data/api/" + "getDataTest.js");
+        scriptText = scriptText.replace("REPLACEMENT_STRING", request_core);
+
+        File getDataTestFile = new File(getApiScriptFolder(), "getDataTest.js");
+        WikiHelper wikiHelper = new WikiHelper(this);
+        wikiHelper.createWikiPage("getDataTest", null, "getData API Test", scriptText, true, null, false);
     }
 }

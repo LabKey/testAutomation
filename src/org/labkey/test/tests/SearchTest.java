@@ -249,10 +249,10 @@ public class SearchTest extends StudyTest
         
         clickFolder(getFolderName());
         addWebPart("Wiki");
-        _wikiHelper.createWikiPage("RADEOX", WIKI_NAME, WIKI_TITLE, WIKI_CONTENT, new File(getLabKeyRoot() + "/server/module.template.properties"));
+        _wikiHelper.createWikiPage(WIKI_NAME, "RADEOX", WIKI_TITLE, WIKI_CONTENT, new File(getLabKeyRoot() + "/server/module.template.properties"));
         addWebPart("Wiki");
         //Issue 9454: Don't index option for wiki page
-        _wikiHelper.createWikiPage(WIKI_NAME + "UNSEARCHABLE", "RADEOX", WIKI_TITLE, WIKI_CONTENT, false, null);
+        _wikiHelper.createWikiPage(WIKI_NAME + "UNSEARCHABLE", "RADEOX", WIKI_TITLE, WIKI_CONTENT, false, null, true);
 
         _searchHelper.enqueueSearchItem(WIKI_NAME, Locator.linkWithText(WIKI_TITLE));
         _searchHelper.enqueueSearchItem(WIKI_NAME + "UNSEARCHABLE");

@@ -54,11 +54,14 @@ public class WikiHelper extends AbstractHelper
         _test.saveWikiPage();
     }
 
-    public void createWikiPage(String name, @Nullable String format, @Nullable String title, String body, boolean index, @Nullable File attachment)
+    public void createWikiPage(String name, @Nullable String format, @Nullable String title, String body, boolean index, @Nullable File attachment, boolean wikiVisualBody)
     {
         create(name, format, title);
 
-        setWikiVisualBody(body);
+        if (wikiVisualBody == true)
+            setWikiVisualBody(body);
+        else
+            setSource(body);
 
         if(index)
             _test.checkCheckbox("shouldIndex");
@@ -74,7 +77,7 @@ public class WikiHelper extends AbstractHelper
 
     public void createWikiPage(String name, @Nullable String format, @Nullable String title, String body, File file)
     {
-        createWikiPage(format, name, title, body, true, file);
+        createWikiPage(name, format, title, body, true, file, true);
     }
 
     private void setSourceFromFile(File file)

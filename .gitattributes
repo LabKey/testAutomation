@@ -36,6 +36,7 @@ data/api/folderTest.html -text
 data/api/getDataAggregateTest.html -text
 data/api/getDataDateTest.html -text
 data/api/getDataErrorsTest.html -text
+data/api/getDataTest.js -text
 data/api/getDataVisitTest.html -text
 data/api/gridTest.js -text
 data/api/groupSecurityTest.html -text
