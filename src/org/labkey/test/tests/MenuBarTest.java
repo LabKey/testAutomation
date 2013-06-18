@@ -151,7 +151,7 @@ public class MenuBarTest extends BaseWebDriverTest
         portalHelper.addWebPart("Custom Menu");
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByLabel("Title", "Participant Reports");
-        _extHelper.selectComboBoxItem("Folder", DEM_STUDY_FOLDER);
+        _extHelper.selectComboBoxItem("Folder", "\u00a0\u00a0" + DEM_STUDY_FOLDER);
         waitForElementToDisappear(Locator.css(".ext-el-mask"));
         _extHelper.selectComboBoxItem("Schema", "study");
         waitForElementToDisappear(Locator.css(".ext-el-mask"));
@@ -175,6 +175,7 @@ public class MenuBarTest extends BaseWebDriverTest
 
         Locator radioFolder = Locator.radioButtonById("folder-radio");
         click(radioFolder);
+        _extHelper.selectComboBoxItem("Root Folder", "/");
         _extHelper.selectComboBoxItem("Folder Types", "Study");
         clickButton("Submit");
 
