@@ -94,6 +94,7 @@ public class WikiTest extends BaseWebDriverTest
         setWikiBody(WIKI_PAGE_CONTENT);
 
         log("test attachments in wiki");
+        click(Locator.linkWithText("Attach a file"));
         File file = new File(getLabKeyRoot() + "/common.properties");
         setFormElement(Locator.name("formFiles[0]"), file);
         saveWikiPage();

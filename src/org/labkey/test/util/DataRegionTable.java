@@ -662,7 +662,7 @@ public class DataRegionTable
 
         public static Locator.XPathLocator facetCheckbox(String category)
         {
-            return Locator.xpath("//input[@category='" + category + "']");
+            return Locator.xpath("//div[contains(@class, 'category-label') and text()='" + category + "']/../../td/input[contains(@class, 'category-header')]");
         }
 
         public static Locator.XPathLocator facetCheckbox(String category, String group)

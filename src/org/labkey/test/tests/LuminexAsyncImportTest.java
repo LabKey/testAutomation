@@ -37,11 +37,11 @@ public class LuminexAsyncImportTest extends LuminexTest
 
     protected void runUITests()
     {
-        clickCheckbox("backgroundUpload");
+        click(Locator.name("backgroundUpload"));
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
         saveAssay();
 
-        // test successful background upload
+        // test successful background import
         importRunForTestLuminexConfig(TEST_ASSAY_LUM_FILE5, Calendar.getInstance(), 0);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(2);
@@ -51,7 +51,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         clickButton("Data"); // data button links to the run results
         assertTextPresent(TEST_ASSAY_LUM + " Results");
 
-        // test background upload failure
+        // test background import failure
         uploadPositivityFile("No Fold Change", "1", "", true);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(3);

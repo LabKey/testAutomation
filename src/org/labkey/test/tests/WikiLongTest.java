@@ -203,6 +203,7 @@ public class WikiLongTest extends BaseWebDriverTest
         if (isFileUploadAvailable())
         {
             log("test attachments in wiki");
+            click(Locator.linkWithText("Attach a file"));
             File file = new File(getLabKeyRoot() + "/common.properties");
             setFormElement("formFiles[0]", file);
         }
