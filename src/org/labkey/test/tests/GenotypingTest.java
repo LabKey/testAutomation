@@ -118,7 +118,7 @@ public class GenotypingTest extends BaseSeleniumWebTest
     private void configureAdmin()
     {
         clickProject(getProjectName());
-        clickLink("adminSettings");
+        clickAndWait(Locator.id("adminSettings"));
 
         String[] listVals = {"sequences", "runs", samples};
         for(int i=0; i<3; i++)
@@ -440,15 +440,12 @@ public class GenotypingTest extends BaseSeleniumWebTest
             Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
             Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Type")[0].getValue().startsWith("application/x-gzip"));
 
-            InputStream is = null;
-            GZIPInputStream gz = null;
-            BufferedReader br = null;
 
-            try
+            try (
+                    InputStream is = response.getEntity().getContent();
+                    GZIPInputStream gz = new GZIPInputStream(is);
+                    BufferedReader br = new BufferedReader(new InputStreamReader(gz)))
             {
-                is = response.getEntity().getContent();
-                gz = new GZIPInputStream(is);
-                br = new BufferedReader(new InputStreamReader(gz));
                 int count = 0;
                 String thisLine;
                 while ((thisLine = br.readLine()) != null)
@@ -460,15 +457,6 @@ public class GenotypingTest extends BaseSeleniumWebTest
                 Assert.assertTrue("Length of file doesnt match expected value of "+expectedLength+", was: " + count, count == expectedLength);
 
                 EntityUtils.consume(response.getEntity());
-            }
-            finally
-            {
-                if(is != null)
-                    is.close();
-                if(gz != null)
-                    gz.close();
-                if(br != null)
-                    br.close();
             }
 
             //then ZIP export

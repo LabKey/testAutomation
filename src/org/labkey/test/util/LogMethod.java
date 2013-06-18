@@ -39,9 +39,11 @@ public @interface LogMethod
 
     public static enum MethodType
     {
+        BEFORE,
         SETUP,
         VERIFICATION,
         MIXEDPURPOSE,
-        UNSPECIFIED
+        UNSPECIFIED,
+        AFTER
     }
 }

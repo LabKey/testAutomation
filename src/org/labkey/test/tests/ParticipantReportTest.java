@@ -138,7 +138,7 @@ public class ParticipantReportTest extends ReportTest
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "cpf-1");
-        pressEnter(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
+        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
         waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][18]"), WAIT_FOR_JAVASCRIPT);
         Assert.assertEquals("Wrong number of measures visible after filtering.", 17, getXpathCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')]")));
 
@@ -158,7 +158,7 @@ public class ParticipantReportTest extends ReportTest
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "2a. Creatinine");
-        pressEnter(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
+        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
         waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')][5]"), WAIT_FOR_JAVASCRIPT);
         Assert.assertEquals("Wrong number of measures visible after filtering.", 4, getXpathCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
         _extHelper.clickX4GridPanelCheckbox("queryName", "CPS-1", "measuresGridPanel", true);
@@ -326,7 +326,7 @@ public class ParticipantReportTest extends ReportTest
         //Check if all PTIDs of GROUP 2 are visible
         for(String ptid : PTIDS_TWO)
         {
-            assertLinkPresentWithText(ptid);
+            assertElementPresent(Locator.linkWithText(ptid));
         }
         //Make sure none from Group 1 are visible.
         for(String ptid : PTIDS_ONE)
@@ -347,7 +347,7 @@ public class ParticipantReportTest extends ReportTest
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "primary type vial counts blood");
-        pressEnter(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
+        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
 
         _extHelper.clickX4GridPanelCheckbox("label", "Blood (Whole):VialCount", "measuresGridPanel", true);
         _extHelper.clickX4GridPanelCheckbox("label", "Blood (Whole):AvailableCount", "measuresGridPanel", true);
@@ -401,7 +401,7 @@ public class ParticipantReportTest extends ReportTest
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "demographic");
-        pressEnter(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']");
+        pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
 
         _extHelper.clickX4GridPanelCheckbox("label", "1.Date of Birth", "measuresGridPanel", true);
         _extHelper.clickX4GridPanelCheckbox("label", "2.What is your sex?", "measuresGridPanel", true);

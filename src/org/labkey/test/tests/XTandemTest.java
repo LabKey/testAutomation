@@ -64,7 +64,7 @@ public class XTandemTest extends AbstractXTandemTest
         assertTextPresent("100");
 
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-        clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
+        clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");

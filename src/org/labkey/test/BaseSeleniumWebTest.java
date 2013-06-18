@@ -47,6 +47,9 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -285,12 +288,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return browser + browserPath;
     }
 
-    public void refreshIfIE()
-    {
-        if(getBrowser().startsWith(IE_BROWSER))
-            refresh();
-    }
-
     static String getStreamContentsAsString(InputStream is) throws IOException
     {
         StringBuilder contents = new StringBuilder();
@@ -327,26 +324,15 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void copyFile(File original, File copy)
     {
-        InputStream fis = null;
-        OutputStream fos = null;
         try
         {
-            copy.getParentFile().mkdirs();
-            fis = new BufferedInputStream(new FileInputStream(original));
-            fos = new BufferedOutputStream(new FileOutputStream(copy));
-            int read;
-            byte[] buffer = new byte[1024];
-            while ((read = fis.read(buffer, 0, buffer.length)) > 0)
-                fos.write(buffer, 0, read);
+            Files.copy(Paths.get(original.toURI()), Paths.get(copy.toURI()),
+                    StandardCopyOption.COPY_ATTRIBUTES,
+                    StandardCopyOption.REPLACE_EXISTING);
         }
         catch (IOException e)
         {
             Assert.fail(e.getMessage());
-        }
-        finally
-        {
-            if (fis != null) try { fis.close(); } catch (IOException ignored) {}
-            if (fos != null) try { fos.close(); } catch (IOException ignored) {}
         }
     }
 
@@ -563,7 +549,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             assertTitleEquals("Sign In");
             waitForElement(Locator.id("email"), defaultWaitForPage);
-            assertFormPresent("login");
+            assertElementPresent(Locator.tagWithName("form", "login"));
             setText("email", PasswordUtil.getUsername());
             setText("password", PasswordUtil.getPassword());
             clickAndWait(Locator.linkWithText("Sign In"));
@@ -607,7 +593,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickAndWait(Locator.linkWithText("Sign In"));
 
         assertTitleEquals("Sign In");
-        assertFormPresent("login");
+        assertElementPresent(Locator.tagWithName("form", "login"));
         setText("email", email);
         setText("password", password);
         clickAndWait(Locator.linkWithText("Sign In"));
@@ -617,7 +603,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         attemptSignIn(email, password);
         assertTitleEquals("Sign In");
-        assertFormPresent("login");
+        assertElementPresent(Locator.tagWithName("form", "login"));
 
         assertTextPresent(expectedMessages);
     }
@@ -626,7 +612,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         // Get setPassword URL from notification email.
         goToModule("Dumbster");
-        clickLink(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + user + "']/..//a[contains(@href, 'setPassword.view')]"));
+        clickAndWait(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + user + "']/..//a[contains(@href, 'setPassword.view')]"));
 
         setFormElement("password", password);
         setFormElement("password2", password);
@@ -638,7 +624,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         goToHome();
         goToModule("Dumbster");
-        clickLink(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]"));
+        clickAndWait(Locator.xpath("//table[@id='dataregion_EmailRecord']//td[text() = '" + username + "']/..//a[contains(@href, 'setPassword.view')]"));
 
         return getCurrentRelativeURL();
     }
@@ -2405,7 +2391,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             if ("None".equals(folderType))
             {
                 for (String tabname : tabsToAdd)
-                    assertTabPresent(tabname);
+                    assertElementPresent(Locator.folderTab(tabname));
             }
 
             // verify that there's a link to our new folder:
@@ -2598,14 +2584,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         throw new RuntimeException("Could not find webpart with name: " + webPartName);
     }
 
-    public void removeWebPart(String webPartTitle)
-    {
-        Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[img[@title='Remove From Page']]");
-        int startCount = getXpathCount(removeButton);
-        click(removeButton);
-        waitForElementToDisappear(removeButton.index(startCount), WAIT_FOR_JAVASCRIPT);
-    }
-
     public boolean isTitleEqual(String match)
     {
         return match.equals(selenium.getTitle());
@@ -2620,26 +2598,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         String title = selenium.getTitle();
         Assert.assertTrue("Page title: '"+title+"' doesn't contain '"+match+"'", title.contains(match));
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isFormPresent(String form)
-    {
-        boolean present = isElementPresent(Locator.tagWithName("form", form));
-        if (!present)
-            present = isElementPresent(Locator.tagWithId("form", form));
-
-        return present;
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertFormPresent(String form)
-    {
-        Assert.assertTrue("Form '" + form + "' was not present", isFormPresent(form));
     }
 
     public void assertNoLabkeyErrors()
@@ -3397,17 +3355,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, selenium.getValue(loc.toString()));
     }
 
-    /**
-     * @deprecated Use {@link #assertOptionEquals(Locator, String)}
-     * @param selectName
-     * @return
-     */
-    @Deprecated
-    public void assertOptionEquals(String selectName, String value)
-    {
-        assertOptionEquals(new Locator.DeprecatedLocator(selectName), value);
-    }
-
     public void assertOptionEquals(Locator loc, String value)
     {
         Assert.assertEquals("Option '" + loc + "' was not equal '" + value + "'", selenium.getSelectedLabel(loc.toString()), value);
@@ -3423,17 +3370,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return selenium.getSelectedValue(loc.toString());
     }
 
-    /**
-     * @deprecated Use {@link #getSelectedOptionText(Locator)}
-     * @param selectName
-     * @return
-     */
-    @Deprecated
-    public String getSelectedOptionText(String selectName)
-    {
-        return getSelectedOptionText(new Locator.DeprecatedLocator(selectName));
-    }
-
     public void assertElementNotPresent(String errorMsg, Locator loc)
     {
         Assert.assertFalse(errorMsg, isElementPresent(loc));
@@ -3447,30 +3383,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void assertElementNotVisible(Locator loc)
     {
         Assert.assertFalse("Element was visible in page: " + loc, selenium.isVisible(loc.toString()));
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isLinkPresent(String linkId)
-    {
-        return isElementPresent(Locator.tagWithId("a", linkId));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertLinkPresent(String linkId)
-    {
-        Assert.assertTrue("Link with id '" + linkId + "' was not present", isLinkPresent(linkId));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementNotPresent(Locator)}
-     */
-    @Deprecated public void assertLinkNotPresent(String linkId)
-    {
-        Assert.assertFalse("Link with id '" + linkId + "' was present", isLinkPresent(linkId));
     }
 
     /**
@@ -3573,56 +3485,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertEquals("Link with text '" + text + "' was not present the expected number of times", count, countLinksWithText(text));
     }
 
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isLinkPresentWithImage(String imageName)
-    {
-        return isElementPresent(Locator.linkWithImage(imageName));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertLinkPresentWithImage(String imageName)
-    {
-        Assert.assertTrue("Link with image '" + imageName + "' was not present", isLinkPresentWithImage(imageName));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementNotPresent(Locator)}
-     */
-    @Deprecated public void assertLinkNotPresentWithImage(String imageName)
-    {
-        Assert.assertFalse("Link with image '" + imageName + "' was present", isLinkPresentWithImage(imageName));
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLinkWithImage(String image)
-    {
-        clickLinkWithImage(image, defaultWaitForPage);
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator, int)}
-     */
-    @Deprecated public void clickLinkWithImage(String image, int millis)
-    {
-        log("Clicking link with image: " + image);
-        clickAndWait(Locator.linkWithImage(image), millis);
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator, int)}
-     */
-    @Deprecated public void clickLinkWithImageByIndex(String image, int index, boolean wait)
-    {
-        log("Clicking link with image: " + image);
-        clickAndWait(Locator.linkWithImage(image, index), wait ? defaultWaitForPage : 0);
-    }
-
     public void click(Locator l)
     {
         clickAndWait(l, 0);
@@ -3651,13 +3513,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             waitForExtMaskToDisappear();
     }
 
-    public void clickAtAndWait(Locator l, String coord, int millis)
-    {
-        selenium.clickAt(l.toString(), coord);
-        if (millis > 0)
-            waitForPageToLoad(millis);
-    }
-
     public void doubleClick(Locator l)
     {
         doubleClickAndWait(l, 0);
@@ -3669,22 +3524,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (millis > 0)
             waitForPageToLoad(millis);
 
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLink(String linkId)
-    {
-        clickLink(Locator.id(linkId));
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLink(Locator l)
-    {
-        clickAndWait(l, defaultWaitForPage);
     }
 
     public void selectFolderTreeItem(String folderName)
@@ -3710,11 +3549,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void mouseUp(Locator l)
     {
         selenium.mouseUp(l.toString());
-    }
-
-    public void mouseDownAt(Locator l, int x, int y)
-    {
-        selenium.mouseDownAt(l.toString(), x + "," + y);
     }
 
     public int getElementIndex(Locator.XPathLocator l)
@@ -3773,66 +3607,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '"+caption+"']")));
     }
 
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator, int)}
-     */
-    @Deprecated public void clickImageWithTitle(String title, int mills)
-    {
-        Locator l = Locator.tagWithAttribute("img", "title", title);
-        clickAndWait(l, mills);
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator, int)}
-     */
-    @Deprecated public void clickImageWithAltText(String altText, int millis)
-    {
-        log("Clicking first image with alt text " + altText );
-        Locator l = Locator.tagWithAttribute("img", "alt", altText);
-        boolean present = isElementPresent(l);
-        if (!present)
-            Assert.fail("Unable to find image with altText " + altText);
-        clickAndWait(l, millis);
-    }
-
     public int getImageWithAltTextCount(String altText)
     {
         String js = "function countImagesWithAlt(txt) {var doc=selenium.browserbot.getCurrentWindow().document; var count = 0; for (var i = 0; i < doc.images.length; i++) {if (doc.images[i].alt == txt) count++;} return count}; ";
         js = js + "countImagesWithAlt('" + altText + "');";
         String count = selenium.getEval(js);
         return Integer.parseInt(count);
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isImagePresentWithSrc(String src)
-    {
-        return isImagePresentWithSrc(src, false);
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isImagePresentWithSrc(String src, boolean substringMatch)
-    {
-        return isElementPresent(Locator.imageWithSrc(src, substringMatch));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertImagePresentWithSrc(String src)
-    {
-        Assert.assertTrue(isImagePresentWithSrc(src));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertImagePresentWithSrc(String src, boolean substringMatch)
-    {
-        Assert.assertTrue(isImagePresentWithSrc(src, substringMatch));
     }
 
     public String getTableCellText(String tableId, int row, int column)
@@ -3959,11 +3739,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     // Returns the text contents of every "Status" cell in the pipeline StatusFiles grid
     public List<String> getPipelineStatusValues()
     {
-        List<String> statusValues = getTableColumnValues("dataregion_StatusFiles", "Status");
-        if (!statusValues.isEmpty())
-            statusValues.remove(0);  // Remove the header
-
-        return statusValues;
+        DataRegionTable status = new DataRegionTable("StatusFiles", this, true, false);
+        return status.getColumnDataAsText("Status");
     }
 
     public void setPipelineRoot(String rootPath)
@@ -4112,31 +3889,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return values;
     }
 
-    public List<String> getTableColumnValues(String tableName, String columnName)
-    {
-        int index = getColumnIndex(tableName, columnName);
-        return getTableColumnValues(tableName, index);
-    }
-
-
-
-    public void showAllInTable()
-    {
-        showNumberInTable("All");
-    }
-
     public void showNumberInTable(String shareValue)
     {
         clickButton("Page Size", 0);
-        waitForText("100 per page");
         Locator l = Locator.id("Page Size:" + shareValue);
-        clickAndWait(l);
-    }
-
-
-    public void show100InTable()
-    {
-        showNumberInTable("100");
+        waitAndClickAndWait(l);
     }
 
     /**get values for all specifed columns for all pages of the table
@@ -4151,7 +3908,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         boolean moreThanOnePage = isTextPresent("Next");
         if(moreThanOnePage)
         {
-            showAllInTable();
+            showNumberInTable("All");
         }
         List<List<String>> columns = new ArrayList<>();
         for(int i=0; i<columnNames.length; i++)
@@ -4167,7 +3924,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         if(moreThanOnePage)
         {
-            show100InTable();
+            showNumberInTable("100");
         }
         return columns;
     }
@@ -4183,58 +3940,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return getXpathCount(Locator.xpath("//table[@id="+Locator.xq(tableId)+"]/colgroup/col"));
     }
 
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
-    {
-        clickAndWait(Locator.imageMapLinkByTitle(imageMapName, areaTitle), defaultWaitForPage);
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isImageMapAreaPresent(String imageMapName, String areaTitle)
-    {
-        System.out.println("Checking for image map area " + imageMapName + ":" + areaTitle);
-        return isElementPresent(Locator.imageMapLinkByTitle(imageMapName, areaTitle));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertImageMapAreaPresent(String imageMapName, String areaTitle)
-    {
-        Assert.assertTrue("Image map '" + imageMapName + "' did not have an area title of '" + areaTitle + "'", isImageMapAreaPresent(imageMapName, areaTitle));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertTabPresent(String tabText)
-    {
-        assertElementPresent(Locator.folderTab(tabText));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertTabNotPresent(String tabText)
-    {
-        assertElementNotPresent(Locator.folderTab(tabText));
-    }
-
     public boolean isButtonPresent(String text)
     {
         return (getButtonLocator(text) != null);
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isButtonDisabled(String text)
-    {
-        return (isElementPresent(Locator.navButtonDisabled(text)));
     }
 
     public void clickButtonByIndex(String text, int index)
@@ -4358,16 +4066,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         else if(waitMillis==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
             waitForExtMaskToDisappear();
-        else
-            Assert.fail("No button found with text \"" + text + "\"");
-    }
-
-
-    public void clickButtonAt(String text, int waitMillis, String coord)
-    {
-        Locator.XPathLocator buttonLocator = getButtonLocator(text);
-        if (buttonLocator != null)
-            clickAtAndWait(buttonLocator, coord, waitMillis);
         else
             Assert.fail("No button found with text \"" + text + "\"");
     }
@@ -5810,16 +5508,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         convertWikiFormat(format);
     }
 
-
-
-    //TODO
-    protected void importSpecimen(String file)
-    {
-        _extHelper.selectFileBrowserItem(file);
-        selectImportDataActionNoWaitForGrid("Import Specimen Data");
-        clickButton("Start Import");
-    }
-
     //must already be on wiki page
     public void setWikiValuesAndSave(String name, String title, String body)
     {
@@ -6015,7 +5703,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public void goToProjectSettings(String project)
     {
-        if(!isLinkPresentWithText(project))
+        if(!isElementPresent(Locator.id("projectBar")))
             goToHome();
         clickProject(project);
         goToProjectSettings();
@@ -6029,33 +5717,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void goToMyAccount()
     {
         clickUserMenuItem("My Account");
-    }
-
-    public void goToPipelineItem(String item)
-    {
-        int time = 0;
-        while (getText(Locator.xpath("//td[contains(text(),'" + item + "')]/../td[2]/a")).compareTo("WAITING") == 0
-                && time < defaultWaitForPage)
-        {
-            sleep(100);
-            time += 100;
-            refresh();
-        }
-        clickAndWait(Locator.xpath("//td[contains(text(),'" + item + "')]/../td[2]/a"));
-        waitForElement(Locator.xpath("//input[@value='Data']"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Data");
-    }
-
-    public List<Locator> findAllMatches(Locator.XPathLocator loc)
-    {
-        List<Locator> locators = new ArrayList<>();
-        for (int i = 0; ; i++)
-        {
-            if (isElementPresent(loc.index(i)))
-                locators.add(loc.index(i));
-            else
-                return locators;
-        }
     }
 
     protected void startImportStudyFromZip(File studyFile)
@@ -6108,28 +5769,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public String getFileContents(File file)
     {
-        FileInputStream fis = null;
-        BufferedReader reader = null;
         try
         {
-            fis = new FileInputStream(file);
-            reader = new BufferedReader(new InputStreamReader(fis));
-            StringBuilder content = new StringBuilder();
-            int read;
-            char[] buffer = new char[1024];
-            while ((read = reader.read(buffer, 0, buffer.length)) > 0)
-                content.append(buffer, 0, read);
-            return content.toString();
+            return new String(Files.readAllBytes(Paths.get(file.toURI())));
         }
-        catch (IOException e)
+        catch (IOException fail)
         {
-            Assert.fail(e.getMessage());
+            Assert.fail(fail.getMessage());
             return null;
-        }
-        finally
-        {
-            if (reader != null) try { reader.close(); } catch (IOException ignored) {}
-            if (fis != null) try { fis.close(); } catch (IOException e) {}
         }
     }
 
@@ -6208,7 +5855,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
     }
 
-
     public String getAttribute(Locator locator, String attributeName)
     {
         return selenium.getAttribute(locator.toString() + "@" + attributeName);
@@ -6279,19 +5925,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
-    public boolean isQueryPresent(String schemaName, String queryName)
-    {
-        return isQueryPresent(schemaName, queryName, 0);
-    }
-
-    public boolean isQueryPresent(String schemaName, String queryName, int wait)
-    {
-        selectSchema(schemaName);
-        Locator loc = Locator.queryTreeNode(schemaName, queryName);
-        waitForElement(loc, wait, false);
-        return isElementPresent(loc);
-    }
-
     public void selectQuery(String schemaName, String queryName)
     {
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
@@ -6300,14 +5933,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         waitForElement(loc, WAIT_FOR_JAVASCRIPT);
         click(loc);
         waitForElement(Locator.linkWithText(schemaName + "." + queryName));
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isLookupLinkPresent(String schemaName, String queryName, String pkName)
-    {
-        return isElementPresent(Locator.lookupLink(schemaName, queryName, pkName));
     }
 
     public void clickFkExpando(String schemaName, String queryName, String columnName)
@@ -6403,7 +6028,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public void pressTab(Locator l)
     {
-        pressTab(l.toString());
+        selenium.keyDown(l.toString(), "\\9"); // For Windows
+        selenium.keyPress(l.toString(), "\\9"); // For Linux
+        selenium.keyUp(l.toString(), "\\9");
     }
 
     /**
@@ -6412,7 +6039,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public void pressEnter(Locator l)
     {
-        pressEnter(l.toString());
+        selenium.keyDown(l.toString(), "\\13"); // For Windows
+        selenium.keyPress(l.toString(), "\\13"); // For Linux
+        selenium.keyUp(l.toString(), "\\13");
     }
 
     /**
@@ -6421,43 +6050,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     public void pressDownArrow(Locator l)
     {
-        pressDownArrow(l.toString());
-    }
-
-    /**
-     * @deprecated Use {@link #pressTab(Locator)}
-     * @param xpath
-     */
-    @Deprecated
-    public void pressTab(String xpath)
-    {
-        selenium.keyDown(xpath, "\\9"); // For Windows
-        selenium.keyPress(xpath, "\\9"); // For Linux
-        selenium.keyUp(xpath, "\\9");
-    }
-
-    /**
-     * @deprecated Use {@link #pressEnter(Locator)}
-     * @param xpath
-     */
-    @Deprecated
-    public void pressEnter(String xpath)
-    {
-        selenium.keyDown(xpath, "\\13"); // For Windows
-        selenium.keyPress(xpath, "\\13"); // For Linux
-        selenium.keyUp(xpath, "\\13");
-    }
-
-    /**
-     * @deprecated Use {@link #pressDownArrow(Locator)}
-     * @param xpath
-     */
-    @Deprecated
-    public void pressDownArrow(String xpath)
-    {
-        selenium.keyDown(xpath, "\\40"); // For Windows
-        selenium.keyPress(xpath, "\\40"); // For Linux
-        selenium.keyUp(xpath, "\\40");
+        selenium.keyDown(l.toString(), "\\40"); // For Windows
+        selenium.keyPress(l.toString(), "\\40"); // For Linux
+        selenium.keyUp(l.toString(), "\\40");
     }
 
     public class DefaultSeleniumWrapper extends DefaultSelenium
@@ -6964,14 +6559,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selectImportDataActionNoWaitForGrid(actionName);
     }
 
-    //TODO
-    public void importSpecimenData(String file, int pipelineJobs)
-    {
-        selectPipelineFileAndImportAction(file, "Import Specimen Data");
-        clickButton("Start Import");
-        waitForPipelineJobsToFinish(pipelineJobs);
-    }
-
     public void selectPipelineFileAndImportAction(String file, String actionName)
     {
         _extHelper.selectFileBrowserItem(file);
@@ -6987,87 +6574,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         clickAndWait(Locator.id(id));
     }
 
-    public void clickManageSubjectCategory(String subjectNoun)
-    {
-        clickAndWait(Locator.linkContainingText("Manage " + subjectNoun + " Groups"));
-    }
-
     public void ensureSignedOut()
     {
         if(isElementPresent(Locator.id("userMenuPopupLink")))
             signOut();
-    }
-
-    public Collection<String> getNavTrailEntries()
-    {
-        return getAsUnderXpath("//span[@id='navTrailAncestors']/a");
-//        String navTrailXpath =   "//span[@id='navTrailAncestors']/a";
-//        int count = getXpathCount(Locator.xpath(navTrailXpath));
-//        ArrayList<String> al = new ArrayList<String>(count);
-//        for(int i=1; i<=count; i++)
-//        {
-//            al.add(getAttribute(Locator.xpath(navTrailXpath + "[" + i + "]"), "href"));
-//        }
-//        return al;
-    }
-
-    protected Collection<String> getAsUnderXpath(String xpath)
-    {
-//        String navTrailXpath =   "//span[@id='navTrailAncestors']/a";
-        int count = getXpathCount(Locator.xpath(xpath));
-        ArrayList<String> al = new ArrayList<>(count);
-        for(int i=1; i<=count; i++)
-        {
-            al.add(getAttribute(Locator.xpath(xpath + "[" + i + "]"), "href"));
-        }
-        return al;
-    }
-
-
-    public  String getFolderUrl()
-    {
-        Locator l = Locator.xpath("//div[@class='labkey-folder-title']/a");
-        return getAttribute(l, "href");
-    }
-
-    public Collection<String> getTabEntries() throws Exception
-    {
-        Collection<String> tabs = getTabUrls(false);
-        Collection<String> activeTabs = getTabUrls(true);
-        if(activeTabs.size()>0 && !tabs.addAll(activeTabs))
-            throw new Exception("unable to combine tab groups");
-        return tabs;
-//        int count = getXpathCount(Locator.xpath(tabPath));
-//        ArrayList<String> al = new ArrayList<String>(count);
-//        for(int i=1; i<=count; i++)
-//        {
-//            al.add(getAttribute(Locator.xpath(tabPath + "[" + i + "]"), "href"));
-//        }
-//        return al;
-    }
-
-    public Collection<String> getTabUrls(boolean active)
-    {
-        String xpath = "(//li[@class = 'labkey-tab-inactive'])";
-        if(active)
-            xpath.replace("inactive", "active");
-
-        int count = getXpathCount(Locator.xpath(xpath));
-        ArrayList<String> al = new ArrayList<>(count);
-        for(int i=1; i<=count; i++)
-        {
-            al.add(getAttribute(Locator.xpath(xpath + "[" + i + "]/a"), "href"));
-        }
-        return al;
-
-    }
-
-    public static Collection collectionIntersection(Collection s1, Collection s2)
-    {
-        Set intersect = new TreeSet(s1);
-        intersect.retainAll(s2);
-
-        return intersect;
     }
 
     protected void reloadStudyFromZip(File studyFile)
@@ -7077,12 +6587,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         setFormElement(Locator.name("folderZip"), studyFile);
         clickButton("Reload Study From Local Zip Archive");
         waitForPipelineJobsToComplete(2, "Study Reload", false);
-
-    }
-
-    protected void reloadStudyFromZip(String studyFile)
-    {
-        reloadStudyFromZip(new File(studyFile));
 
     }
 

@@ -30,6 +30,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
@@ -496,7 +497,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         if (isPresent)
         {
-            clickLink(userAccessLink);
+            clickAndWait(userAccessLink);
             
             // check for the expected number of group membership links (note: they may be hidden by expandos)
             click(Locator.xpath("//tr[td/a[text()='" + getProjectName() + "']]//img" ));
@@ -587,13 +588,13 @@ public class SecurityTest extends BaseWebDriverTest
     private String retrieveFromUrl(String relativeUrl)
     {
         String newline = System.getProperty("line.separator");
-        InputStream is = null;
+        StringBuilder sb = new StringBuilder();
+        URL url;
+        try {url = new URL(WebTestHelper.getBaseURL() +  relativeUrl);}
+        catch (MalformedURLException ex) {throw new RuntimeException(ex);}
 
-        try
+        try (InputStream is = url.openStream())
         {
-            StringBuilder sb = new StringBuilder();
-            URL url = new URL(WebTestHelper.getBaseURL() +  relativeUrl);
-            is = url.openStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
             String line;
@@ -611,20 +612,6 @@ public class SecurityTest extends BaseWebDriverTest
             log(e.getMessage());
             Assert.fail();
             return null;
-        }
-        finally
-        {
-            if (null != is)
-            {
-                try
-                {
-                    is.close();
-                }
-                catch (IOException e)
-                {
-                    //
-                }
-            }
         }
     }
 

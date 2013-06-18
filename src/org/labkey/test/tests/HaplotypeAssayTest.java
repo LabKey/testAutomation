@@ -88,8 +88,8 @@ public class HaplotypeAssayTest extends GenotypingTest
     {
         log("Configure extensible Animal table");
         goToProjectHome();
-        clickLink("adminSettings");
-        clickLink("configureAnimal");
+        clickAndWait(Locator.id("adminSettings"));
+        clickAndWait(Locator.id("configureAnimal"));
         waitForText("No fields have been defined.");
         _listHelper.addField("Field Properties", 0, "animalStrTest", "Animal String Test", ListHelper.ListColumnType.String);
         _listHelper.addField("Field Properties", 1, "animalIntTest", "Animal Integer Test", ListHelper.ListColumnType.Integer);
@@ -101,8 +101,8 @@ public class HaplotypeAssayTest extends GenotypingTest
 
         log("Configure extensible Haplotype table");
         goToProjectHome();
-        clickLink("adminSettings");
-        clickLink("configureHaplotype");
+        clickAndWait(Locator.id("adminSettings"));
+        clickAndWait(Locator.id("configureHaplotype"));
         waitForText("No fields have been defined.");
         _listHelper.addField("Field Properties", 0, "haplotypeStrTest", "Haplotype String Test", ListHelper.ListColumnType.String);
         _listHelper.addField("Field Properties", 1, "haplotypeIntTest", "Haplotype Integer Test", ListHelper.ListColumnType.Integer);

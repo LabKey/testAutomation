@@ -104,18 +104,16 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
 
             if (!netrcFile.exists())
             {
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(netrcFile)));
-                try {
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(netrcFile))))
+                {
                     pw.append("machine localhost:8080");
                     pw.append('\n');
-                    pw.append("login " + PasswordUtil.getUsername());
+                    pw.append("login ");
+                    pw.append(PasswordUtil.getUsername());
                     pw.append('\n');
-                    pw.append("password " + PasswordUtil.getPassword());
+                    pw.append("password ");
+                    pw.append(PasswordUtil.getPassword());
                     pw.append('\n');
-                }
-                finally
-                {
-                    pw.close();
                 }
             }
         }

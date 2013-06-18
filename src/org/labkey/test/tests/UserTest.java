@@ -235,8 +235,8 @@ public class UserTest extends SecurityTest
 
         clickUserMenuItem("Sign Out");
         clickAndWait(Locator.linkWithText("Sign In"));
-        setText("email", NORMAL_USER);
-        setText("password", TEST_PASSWORD);
+        setFormElement(Locator.id("email"), NORMAL_USER);
+        setFormElement(Locator.id("password"), TEST_PASSWORD);
         clickButton("Sign In");
         assertSignOutAndMyAccountPresent();
         assertTextPresent(NORMAL_USER);

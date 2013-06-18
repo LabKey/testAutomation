@@ -454,17 +454,8 @@ public class ExtHelper extends AbstractHelper
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
         _test.clickAt(Locator.xpath(parentLocator.getPath() + "//img[contains(@class, 'x-form-arrow-trigger')]"), "1,1");
-        if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
-        {
-            _test.sleep(500);
-            _test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
-            _test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
-        }
-        else
-        {
-            _test.waitAndClick(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"));
-            _test.mouseDown(Locator.xpath("/html/body"));
-        }
+        _test.waitAndClick(Locator.xpath("//div["+Locator.NOT_HIDDEN+"]/div/div[text()='" + selection + "']"));
+        _test.mouseDown(Locator.xpath("/html/body"));
     }
 
     public void selectComboBoxItem(String label, String selection)
@@ -475,17 +466,8 @@ public class ExtHelper extends AbstractHelper
     public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
         _test.clickAt(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"), "1,1");
-        if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
-        {
-            _test.sleep(500);
-            _test.clickAt(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and normalize-space()='" + selection + "']"), "1,1");
-            _test.mouseDownAt(Locator.xpath("/html/body"), 1,1);
-        }
-        else
-        {
-            _test.waitAndClick(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and normalize-space()='" + selection + "']"));
-            _test.mouseDown(Locator.xpath("/html/body"));
-        }
+        _test.waitAndClick(Locator.xpath("//li["+Locator.NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and normalize-space()='" + selection + "']"));
+        _test.mouseDown(Locator.xpath("/html/body"));
     }
 
     public void selectExt4ComboBoxItem(String label, String selection)
@@ -507,23 +489,14 @@ public class ExtHelper extends AbstractHelper
     public void closeExtTab(String tabName)
     {
         _test.log("Closing Ext tab " + tabName);
-        _test.mouseDownAt(Locator.xpath("//a[contains(@class, 'x-tab-strip-close') and ..//span[contains(@class, 'x-tab-strip-text') and text()='" + tabName + "']]"), 1, 1);
+        _test.mouseDown(Locator.xpath("//a[contains(@class, 'x-tab-strip-close') and ..//span[contains(@class, 'x-tab-strip-text') and text()='" + tabName + "']]"));
     }
 
     public void clickExtTab(String tabname)
     {
         _test.log("Selecting Ext tab " + tabname);
         Locator l = Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']");
-        _test.waitForElement(l, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
-        {
-            _test.mouseDownAt(l,  1,1);
-            _test.clickAt(l, "1,1");
-        }
-        else
-        {
-            _test.click(l);
-        }
+        _test.waitAndClick(l);
     }
 
     public void clickSideTab(String tab)

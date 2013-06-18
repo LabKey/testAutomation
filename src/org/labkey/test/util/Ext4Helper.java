@@ -55,34 +55,26 @@ public class Ext4Helper extends AbstractHelper
     {
         Locator arrowTrigger = comboBox.append("//div").withClass("x4-form-arrow-trigger");
         _test.waitAndClick(arrowTrigger);
-        if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
-        {
-            _test.sleep(500);
-            _test.clickAt(Locator.xpath("//div/div/div[text()='" + selection + "']"), "1,1");
-            _test.mouseDownAt(Locator.xpath("/html/body"), 1, 1);
-        }
-        else
-        {
-            Locator.XPathLocator listItem;
-            if (containsText)
-                listItem = listItemLoc.withClass("x4-boundlist-item").notHidden().containing(selection);
-            else
-                listItem = listItemLoc.withClass("x4-boundlist-item").notHidden().withText(selection);
 
-            // wait for and select the list item
-            _test.waitForElement(listItem, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-            _test.mouseOver(listItem);
+        Locator.XPathLocator listItem;
+        if (containsText)
+            listItem = listItemLoc.withClass("x4-boundlist-item").notHidden().containing(selection);
+        else
+            listItem = listItemLoc.withClass("x4-boundlist-item").notHidden().withText(selection);
+
+        // wait for and select the list item
+        _test.waitForElement(listItem, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.mouseOver(listItem);
+        _test.click(listItem);
+
+        // close combo manually if it is a checkbox combo-box
+        if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))
+            _test.click(arrowTrigger);
+        else if (_test.isElementPresent(listItem)) // Try again
             _test.click(listItem);
 
-            // close combo manually if it is a checkbox combo-box
-            if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))
-                _test.click(arrowTrigger);
-            else if (_test.isElementPresent(listItem)) // Try again
-                _test.click(listItem);
-
-            // menu should disappear
-            _test.waitForElementToDisappear(listItem, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        }
+        // menu should disappear
+        _test.waitForElementToDisappear(listItem, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void selectComboBoxItem(String label, String selection)
@@ -133,16 +125,7 @@ public class Ext4Helper extends AbstractHelper
 
         _test.log("Selecting Ext tab " + tabname);
         Locator l = Locator.xpath("//span[contains(@class, 'x4-tab') and text() = '" + tabname + "']");
-        _test.waitForElement(l, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        if(_test.getBrowser().startsWith(BaseSeleniumWebTest.IE_BROWSER))
-        {
-            _test.mouseDownAt(l,  1,1);
-            _test.clickAt(l, "1,1");
-        }
-        else
-        {
-            _test.click(l);
-        }
+        _test.waitAndClick(l);
     }
 
     public void checkCheckbox(String label)

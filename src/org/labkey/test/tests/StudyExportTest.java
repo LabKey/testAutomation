@@ -174,7 +174,7 @@ public class StudyExportTest extends StudyManualTest
         // verify visit modifications
         editVisit(MODIFIED_VISIT);
         assertFormElementEquals("dataSetStatus", "OPTIONAL");
-        assertOptionEquals("cohortId", GROUP_2);
+        assertOptionEquals(Locator.name("cohortId"), GROUP_2);
     }
 
     @Override

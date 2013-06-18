@@ -90,7 +90,7 @@ public class BasicTest extends BaseWebDriverTest
         assertTextBefore(WIKI_WEBPART_TEXT, MESSAGES_WEBPART_TEXT);
 
         // remove wiki by clicking the first delete link:
-        clickLinkWithImage("/_images/partdelete.png", 0);
+        click(Locator.linkWithImage("/_images/partdelete.png"));
         _ext4Helper.waitForMaskToDisappear(30000);
         assertTextNotPresent(WIKI_WEBPART_TEXT);
 

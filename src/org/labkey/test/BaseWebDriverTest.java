@@ -17,7 +17,6 @@
 package org.labkey.test;
 
 import com.thoughtworks.selenium.SeleniumException;
-import junit.framework.AssertionFailedError;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -83,24 +82,21 @@ import org.tmatesoft.svn.core.wc.SVNStatusType;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -110,7 +106,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -179,9 +174,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
     public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>\u2639";
-
-    public final static String FIREFOX_BROWSER = "*firefox";
-    public final static String IE_BROWSER = "*iexploreproxy";
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     protected static boolean _checkedLeaksAndErrors = false;
@@ -493,36 +485,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return getBrowserType();
     }
 
-    public void refreshIfIE()
-    {
-        if(getBrowser().startsWith(IE_BROWSER))
-            refresh();
-    }
-
     public static String getStreamContentsAsString(InputStream is) throws IOException
     {
         StringBuilder contents = new StringBuilder();
-        BufferedReader input = null;
-
-        try
+        try(BufferedReader input = new BufferedReader(new InputStreamReader(is)))
         {
-            input = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = input.readLine()) != null)
             {
                 contents.append(line);
                 contents.append("\n");
-            }
-        }
-        finally
-        {
-            try
-            {
-                if (input != null) input.close();
-            }
-            catch (IOException e)
-            {
-                // Do nothing.
             }
         }
         return contents.toString();
@@ -535,26 +507,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void copyFile(File original, File copy)
     {
-        InputStream fis = null;
-        OutputStream fos = null;
         try
         {
-            copy.getParentFile().mkdirs();
-            fis = new BufferedInputStream(new FileInputStream(original));
-            fos = new BufferedOutputStream(new FileOutputStream(copy));
-            int read;
-            byte[] buffer = new byte[1024];
-            while ((read = fis.read(buffer, 0, buffer.length)) > 0)
-                fos.write(buffer, 0, read);
+            Files.createDirectories(Paths.get(copy.toURI()).getParent());
+            Files.copy(Paths.get(original.toURI()), Paths.get(copy.toURI()),
+                    StandardCopyOption.COPY_ATTRIBUTES,
+                    StandardCopyOption.REPLACE_EXISTING);
         }
         catch (IOException e)
         {
-            Assert.fail(e.getMessage());
-        }
-        finally
-        {
-            if (fis != null) try { fis.close(); } catch (IOException ignore) {}
-            if (fos != null) try { fos.close(); } catch (IOException ignore) {}
+            throw new RuntimeException(e);
         }
     }
 
@@ -636,6 +598,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 "        return addresses;\n" +
                 "};" +
                 "return getLinkAddresses();";
+        @SuppressWarnings("unchecked")
         List<String> linkArray = (ArrayList<String>)executeScript(js);
         ArrayList<String> links = new ArrayList<>();
         for (String link : linkArray)
@@ -1442,20 +1405,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _driver.switchTo().window((String) windows.toArray()[0]);
     }
 
-    /**
-     * Open new window via javascript
-     * @return ID of created window, for use with WebDriver.TargetLocator.window interface
-     */
-    public String newWindow()
-    {
-        HashSet<String> initialWindows = new HashSet<>(_driver.getWindowHandles());
-        executeScript("window.open();");
-        HashSet<String> windows = new HashSet<>(_driver.getWindowHandles());
-        windows.removeAll(initialWindows);
-        Assert.assertEquals("Unexpected number of new windows", 1, windows.size());
-        return (String)windows.toArray()[0];
-    }
-
     @LogMethod
     public void disableMaintenance()
     {
@@ -1949,13 +1898,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean isGroupConcatSupported()
     {
-        if ("pg".equals(getDatabaseType()))
-            return true;
-
-        if ("mssql".equals(getDatabaseType()) && !"2005".equals(getDatabaseVersion()))
-            return true;
-
-        return false;
+        return "pg".equals(getDatabaseType()) ||
+               "mssql".equals(getDatabaseType()) && !"2005".equals(getDatabaseVersion());
     }
 
     public boolean isGuestModeTest()
@@ -2251,12 +2195,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private void writeActionStatistics(int totalActions, int coveredActions, Double actionCoveragePercent)
     {
         // TODO: Create static class for managing teamcity-info.xml file.
-        FileWriter writer = null;
-        try
+        File xmlFile = new File(getLabKeyRoot(), "teamcity-info.xml");
+        try (FileWriter writer = new FileWriter(xmlFile))
         {
-            File xmlFile = new File(getLabKeyRoot(), "teamcity-info.xml");
             xmlFile.createNewFile();
-            writer = new FileWriter(xmlFile);
 
             writer.write("<build>\n");
             writer.write("\t<statisticValue key=\"totalActions\" value=\"" + totalActions + "\"/>\n");
@@ -2265,17 +2207,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             writer.write("</build>");
         }
         catch (IOException ignore){}
-        finally
-        {
-            if (writer != null)
-                try
-                {
-                    writer.close();
-                }
-                catch (IOException ignore)
-                {
-                }
-        }
     }
 
     protected File ensureDumpDir()
@@ -2435,11 +2366,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public File dumpHtml(File dir, String baseName)
     {
-        FileWriter writer = null;
-        try
+        File htmlFile = new File(dir, baseName + ".html");
+
+        try(FileWriter writer = new FileWriter(htmlFile))
         {
-            File htmlFile = new File(dir, baseName + ".html");
-            writer = new FileWriter(htmlFile);
             writer.write(getLastPageText());
             return htmlFile;
         }
@@ -2447,18 +2377,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             e.printStackTrace();
             return null;
-        }
-        finally
-        {
-            if (writer != null)
-                try
-                {
-                    writer.close();
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
         }
     }
 
@@ -2474,11 +2392,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public File saveFile(File dir, String fileName, String contents)
     {
-        FileWriter writer = null;
-        try
+        File tsvFile = new File(dir, fileName);
+
+        try(FileWriter writer = new FileWriter(tsvFile);)
         {
-            File tsvFile = new File(dir, fileName);
-            writer = new FileWriter(tsvFile);
             writer.write(contents);
             return tsvFile;
         }
@@ -2486,18 +2403,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             e.printStackTrace();
             return null;
-        }
-        finally
-        {
-            if (writer != null)
-                try
-                {
-                    writer.close();
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
         }
     }
 
@@ -2567,10 +2472,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public String getConfirmationAndWait()
     {
-        Alert alert = _driver.switchTo().alert();
-        String confirmation = alert.getText();
-        alert.accept();
-        return confirmation;
+        throw new UnsupportedOperationException("Method deprecated, update test");
     }
 
     /**
@@ -2579,7 +2481,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @Deprecated
     public void assertConfirmation(String msg)
     {
-        assertAlert(msg);
+        throw new UnsupportedOperationException("Method deprecated, update test");
     }
 
     public void assertAlert(String msg)
@@ -3090,17 +2992,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         portalHelper.addWebPart(webPartName);
     }
 
-    /**
-     * @deprecated Use {@link org.labkey.test.util.PortalHelper#removeWebPart(String)}
-     */
-    @Deprecated public void removeWebPart(String webPartTitle)
-    {
-        Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[img[@title='Remove From Page']]");
-        int startCount = getElementCount(removeButton);
-        click(removeButton);
-        waitForElementToDisappear(removeButton.index(startCount), WAIT_FOR_JAVASCRIPT);
-    }
-
     public boolean isTitleEqual(String match)
     {
         return match.equals(_driver.getTitle());
@@ -3115,26 +3006,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         String title = _driver.getTitle();
         Assert.assertTrue("Page title: '"+title+"' doesn't contain '"+match+"'", title.contains(match));
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isFormPresent(String form)
-    {
-        boolean present = isElementPresent(Locator.tagWithName("form", form));
-        if (!present)
-            present = isElementPresent(Locator.tagWithId("form", form));
-
-        return present;
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertFormPresent(String form)
-    {
-        Assert.assertTrue("Form '" + form + "' was not present", isFormPresent(form));
     }
 
     public void assertNoLabkeyErrors()
@@ -3289,21 +3160,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertTextPresent(String text, int amount, boolean browserDependent)
     {
-        // IE doesn't getHtmlSource the same as Firefox, it replaces \t and \n with spaces, so skip if IE
-        if (!getBrowserType().equals(IE_BROWSER))
-        {
-            int count = countText(text);
+        int count = countText(text);
 
-            if (browserDependent)
-            {
-                if (count == 0)
-                    log("Your browser is probably out of date");
-                else
-                    Assert.assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
-            }
+        if (browserDependent)
+        {
+            if (count == 0)
+                log("Your browser is probably out of date");
             else
                 Assert.assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
         }
+        else
+            Assert.assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
     }
 
     public int countText(String text)
@@ -3402,7 +3269,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void waitForPageToLoad()
     {
-        waitForPageToLoad(defaultWaitForPage);
+        throw new UnsupportedOperationException("selenium.waitForPageToLoad is deprecated. Use BaseWebDriverTest.prepForPageLoad and BaseWebDriverTest.newWaitForPageToLoad");
     }
 
     private Boolean _preppedForPageLoad = false;
@@ -3929,15 +3796,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, getFormElement(loc));
     }
 
-    /**
-     * @deprecated Use specific locator for form element {@link BaseWebDriverTest#assertOptionEquals(Locator, String)}
-     */
-    @Deprecated
-    public void assertOptionEquals(String selectName, String value)
-    {
-        assertOptionEquals(Locator.name(selectName), value);
-    }
-
     public void assertOptionEquals(Locator loc, String value)
     {
         Assert.assertEquals("Option '" + loc + "' was not equal '" + value + "'", value, getSelectedOptionText(loc));
@@ -3953,15 +3811,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         Select select = new Select(loc.findElement(_driver));
         return select.getFirstSelectedOption().getAttribute("value");
-    }
-
-    /**
-     * @deprecated Use {@link #getSelectedOptionText(Locator)}
-     */
-    @Deprecated
-    public String getSelectedOptionText(String selectName)
-    {
-        return getSelectedOptionText(Locator.name(selectName));
     }
 
     public void assertElementNotPresent(String errorMsg, Locator loc)
@@ -3982,30 +3831,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void assertElementVisible(Locator loc)
     {
         Assert.assertTrue("Element was not visible: " + loc, loc.findElement(_driver).isDisplayed());
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isLinkPresent(String linkId)
-    {
-        return isElementPresent(Locator.tagWithId("a", linkId));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertLinkPresent(String linkId)
-    {
-        Assert.assertTrue("Link with id '" + linkId + "' was not present", isLinkPresent(linkId));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementNotPresent(Locator)}
-     */
-    @Deprecated public void assertLinkNotPresent(String linkId)
-    {
-        Assert.assertFalse("Link with id '" + linkId + "' was present", isLinkPresent(linkId));
     }
 
     /**
@@ -4111,69 +3936,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertEquals("Link with text '" + text + "' was not present the expected number of times", count, countLinksWithText(text));
     }
 
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isLinkPresentWithImage(String imageName)
-    {
-        return isElementPresent(Locator.linkWithImage(imageName));
-    }
-
     public void assertNavTrail(String... links)
     {
         ///TODO:  Would like this to be more sophisitcated
         assertTextPresentInThisOrder(links);
 
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertLinkPresentWithImage(String imageName)
-    {
-        Assert.assertTrue("Link with image '" + imageName + "' was not present", isLinkPresentWithImage(imageName));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementNotPresent(Locator)}
-     */
-    @Deprecated public void assertLinkNotPresentWithImage(String imageName)
-    {
-        Assert.assertFalse("Link with image '" + imageName + "' was present", isLinkPresentWithImage(imageName));
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLinkWithImage(String image)
-    {
-        clickLinkWithImage(image, defaultWaitForPage);
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator, int)}
-     */
-    @Deprecated public void clickLinkWithImage(String image, int millis)
-    {
-        log("Clicking link with image: " + image);
-        clickAndWait(Locator.linkWithImage(image), millis);
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLinkWithImageByIndex(String image, int index)
-    {
-        clickLinkWithImageByIndex(image, index, true);
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator, int)}
-     */
-    @Deprecated public void clickLinkWithImageByIndex(String image, int index, boolean wait)
-    {
-        log("Clicking link with image: " + image);
-        clickAndWait(Locator.linkWithImage(image, index), wait ? defaultWaitForPage : 0);
     }
 
     public void scrollIntoView(Locator loc)
@@ -4196,11 +3963,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void clickAt(Locator l, String coord)
     {
-        String[] splitCoord = coord.split(",");
-        Integer xCoord = Integer.parseInt(splitCoord[0]);
-        Integer yCoord = Integer.parseInt(splitCoord[1]);
-
-        clickAt(l, xCoord, yCoord);
+        throw new UnsupportedOperationException("Method not supported for WebDriver");
     }
 
     public void clickAt(Locator l, int xCoord, int yCoord)
@@ -4264,18 +4027,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
-    /**
-     * @deprecated Use {@link #clickAt(Locator, int, int, int)}
-     */
-    @Deprecated public void clickAtAndWait(Locator l, String coord, int millis)
-    {
-        String[] splitCoord = coord.split(",");
-        Integer xCoord = Integer.parseInt(splitCoord[0]);
-        Integer yCoord = Integer.parseInt(splitCoord[1]);
-
-        clickAt(l, xCoord, yCoord, millis);
-    }
-
     public void doubleClick(Locator l)
     {
         doubleClickAndWait(l, 0);
@@ -4292,22 +4043,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     }
 
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLink(String linkId)
-    {
-        clickLink(Locator.id(linkId));
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickLink(Locator l)
-    {
-        clickAndWait(l, defaultWaitForPage);
-    }
-
     public void selectFolderTreeItem(String folderName)
     {
         click(Locator.permissionsTreeNode(folderName));
@@ -4318,7 +4053,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void mouseOut(Locator l)
     {
-        throw new IllegalStateException("This method is no longer supported. Refactor test to use WebDriver actions");
+        throw new UnsupportedOperationException("This method is no longer supported. Refactor test to use WebDriver actions");
     }
 
     public void mouseOver(Locator l)
@@ -4333,15 +4068,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @Deprecated public void mouseDown(Locator l)
     {
         l.findElement(_driver).click();
-    }
-
-    /**
-     * @deprecated Use {@link #clickAt(Locator, int, int)}
-     */
-    @Deprecated
-    public void mouseDownAt(Locator l, int x, int y)
-    {
-        throw new IllegalStateException("This method is no longer supported. Use clickAt(Locator, int, int)");
     }
 
     public int getElementIndex(Locator.XPathLocator l)
@@ -4393,41 +4119,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '"+caption+"']")));
     }
 
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator, int)}
-     */
-    @Deprecated public void clickImageWithTitle(String title, int mills)
-    {
-        Locator l = Locator.tagWithAttribute("img", "title", title);
-        clickAndWait(l, mills);
-    }
-
-//    public void clickImageWithSrc(String src)
-//    {
-//        Locator l = Locator.tagWithAttribute("img", "title", title);
-//    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator, int)}
-     */
-    @Deprecated public void clickImageWithAltText(String altText, int millis)
-    {
-        log("Clicking first image with alt text " + altText );
-        Locator l = Locator.tagWithAttribute("img", "alt", altText);
-        boolean present = isElementPresent(l);
-        if (!present)
-            Assert.fail("Unable to find image with altText " + altText);
-        clickAndWait(l, millis);
-    }
-
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickImageWithAltText(String altText)
-    {
-        clickImageWithAltText(altText, defaultWaitForPage);
-    }
-
     public int getImageWithAltTextCount(String altText)
     {
         String js = "function countImagesWithAlt(txt) {" +
@@ -4441,38 +4132,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     "};" +
                     "return countImagesWithAlt('" + altText + "');";
         return Integer.parseInt(executeScript(js).toString());
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isImagePresentWithSrc(String src)
-    {
-        return isImagePresentWithSrc(src, false);
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isImagePresentWithSrc(String src, boolean substringMatch)
-    {
-        return isElementPresent(Locator.imageWithSrc(src, substringMatch));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertImagePresentWithSrc(String src)
-    {
-        Assert.assertTrue(isImagePresentWithSrc(src));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertImagePresentWithSrc(String src, boolean substringMatch)
-    {
-        Assert.assertTrue(isImagePresentWithSrc(src, substringMatch));
     }
 
     /**
@@ -4749,7 +4408,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         checkRadioButton(Locator.radioButtonById("pipeOptionProjectSpecified"));
         setFormElement(Locator.id("pipeProjectRootPath"), rootPath);
 
-        submit();
+        clickButton("Save");
         log("Finished setting pipeline to: " + rootPath);
     }
 
@@ -4800,34 +4459,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return values;
     }
 
-    /**
-     * @deprecated Use {@link DataRegionTable#getColumnDataAsText(String)}
-     */
-    @Deprecated public List<String> getTableColumnValues(String tableName, String columnName)
-    {
-        int index = getColumnIndex(tableName, columnName);
-        return getTableColumnValues(tableName, index);
-    }
-
-
-
-    public void showAllInTable()
-    {
-        showNumberInTable("All");
-    }
-
     public void showNumberInTable(String shareValue)
     {
         clickButton("Page Size", 0);
         waitForText("100 per page");
         Locator l = Locator.id("Page Size:" + shareValue);
         clickAndWait(l);
-    }
-
-
-    public void show100InTable()
-    {
-        showNumberInTable("100");
     }
 
     /**get values for all specifed columns for all pages of the table
@@ -4839,7 +4476,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         boolean moreThanOnePage = isTextPresent("Next");
         if(moreThanOnePage)
         {
-            showAllInTable();
+            showNumberInTable("All");
         }
         List<List<String>> columns = new ArrayList<>(columnNames.length);
 
@@ -4851,7 +4488,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         if(moreThanOnePage)
         {
-            show100InTable();
+            showNumberInTable("100");
         }
         return columns;
     }
@@ -4868,58 +4505,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return getElementCount(Locator.xpath("//table[@id=" + Locator.xq(tableId) + "]/colgroup/col"));
     }
 
-    /**
-     * @deprecated Use {@link #clickAndWait(Locator)}
-     */
-    @Deprecated public void clickImageMapLinkByTitle(String imageMapName, String areaTitle)
-    {
-        clickAndWait(Locator.imageMapLinkByTitle(imageMapName, areaTitle), defaultWaitForPage);
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isImageMapAreaPresent(String imageMapName, String areaTitle)
-    {
-        System.out.println("Checking for image map area " + imageMapName + ":" + areaTitle);
-        return isElementPresent(Locator.imageMapLinkByTitle(imageMapName, areaTitle));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertImageMapAreaPresent(String imageMapName, String areaTitle)
-    {
-        Assert.assertTrue("Image map '" + imageMapName + "' did not have an area title of '" + areaTitle + "'", isImageMapAreaPresent(imageMapName, areaTitle));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementPresent(Locator)}
-     */
-    @Deprecated public void assertTabPresent(String tabText)
-    {
-        assertElementPresent(Locator.folderTab(tabText));
-    }
-
-    /**
-     * @deprecated Use {@link #assertElementNotPresent(Locator)}
-     */
-    @Deprecated public void assertTabNotPresent(String tabText)
-    {
-        assertElementNotPresent(Locator.folderTab(tabText));
-    }
-
     public boolean isButtonPresent(String text)
     {
         return (getButtonLocator(text) != null);
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isButtonDisabled(String text)
-    {
-        return (isElementPresent(Locator.navButtonDisabled(text)));
     }
 
     public void clickButtonByIndex(String text, int index)
@@ -5045,19 +4633,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Locator.XPathLocator buttonLocator = getButtonLocator(text);
         if (buttonLocator != null)
             clickAndWait(buttonLocator, waitMillis);
-        else
-            Assert.fail("No button found with text \"" + text + "\"");
-    }
-
-
-    /**
-     * @deprecated Use {@link #clickAt(Locator, int, int, int)}
-     */
-    @Deprecated public void clickButtonAt(String text, int waitMillis, String coord)
-    {
-        Locator.XPathLocator buttonLocator = getButtonLocator(text);
-        if (buttonLocator != null)
-            clickAtAndWait(buttonLocator, coord, waitMillis);
         else
             Assert.fail("No button found with text \"" + text + "\"");
     }
@@ -6181,7 +5756,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             Assert.fail("cloneUserName support has been removed"); //not in use, so was not implemented in new user
             //helpers
         }
-
     }
 
     public void createUserAndNotify(String userName, String cloneUserName)
@@ -6489,16 +6063,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         convertWikiFormat(format);
     }
 
-
-
-    //TODO
-    protected void importSpecimen(String file)
-    {
-        _extHelper.selectFileBrowserItem(file);
-        selectImportDataActionNoWaitForGrid("Import Specimen Data");
-        clickButton("Start Import");
-    }
-
     //must already be on wiki page
     public void setWikiValuesAndSave(String name, String title, String body)
     {
@@ -6699,7 +6263,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void goToProjectSettings(String project)
     {
-        if(!isElementPresent(Locator.linkWithText(project)))
+        if(!isElementPresent(Locator.id("projectBar")))
             goToHome();
         clickProject(project);
 
@@ -6714,32 +6278,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void goToMyAccount()
     {
         clickUserMenuItem("My Account");
-    }
-
-    public void goToPipelineItem(String item)
-    {
-        int time = 0;
-        while (getText(Locator.xpath("//td[contains(text(),'" + item + "')]/../td[2]/a")).compareTo("WAITING") == 0
-                && time < defaultWaitForPage)
-        {
-            sleep(100);
-            time += 100;
-            refresh();
-        }
-        clickAndWait(Locator.xpath("//td[contains(text(),'" + item + "')]/../td[2]/a"));
-        waitForElement(Locator.xpath("//input[@value='Data']"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Data");
-    }
-
-    public List<Locator> findAllMatches(Locator.XPathLocator loc)
-    {
-        List locs =  loc.findElements(_driver );
-        List<Locator> locators = new ArrayList<>();
-        for (int i = 0; i < locs.size(); i++)
-        {
-            locators.add(loc.index(i));
-        }
-        return locators;
     }
 
     protected void startImportStudyFromZip(File studyFile)
@@ -6791,28 +6329,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getFileContents(File file)
     {
-        FileInputStream fis = null;
-        BufferedReader reader = null;
         try
         {
-            fis = new FileInputStream(file);
-            reader = new BufferedReader(new InputStreamReader(fis));
-            StringBuilder content = new StringBuilder();
-            int read;
-            char[] buffer = new char[1024];
-            while ((read = reader.read(buffer, 0, buffer.length)) > 0)
-                content.append(buffer, 0, read);
-            return content.toString();
+            return new String(Files.readAllBytes(Paths.get(file.toURI())));
         }
-        catch (IOException e)
+        catch (IOException fail)
         {
-            Assert.fail(e.getMessage());
+            Assert.fail(fail.getMessage());
             return null;
-        }
-        finally
-        {
-            if (reader != null) try { reader.close(); } catch (IOException ignore) {}
-            if (fis != null) try { fis.close(); } catch (IOException ignore) {}
         }
     }
 
@@ -6892,7 +6416,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
     }
 
-
     public String getAttribute(Locator locator, String attributeName)
     {
         return locator.findElement(_driver).getAttribute(attributeName);
@@ -6963,37 +6486,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-    public boolean isQueryPresent(String schemaName, String queryName)
-    {
-        return isQueryPresent(schemaName, queryName, 0);
-    }
-
-    public boolean isQueryPresent(String schemaName, String queryName, int wait)
-    {
-        selectSchema(schemaName);
-        Locator loc = Locator.queryTreeNode(schemaName, queryName);
-        try
-        {
-            waitForElement(loc, wait);
-        }
-        catch(AssertionFailedError ignore){}
-        return isElementPresent(loc);
-    }
-
     public void selectQuery(String schemaName, String queryName)
     {
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
         waitAndClick(Locator.queryTreeNode(schemaName, queryName));
         waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + queryName + "']"), 1000);
-    }
-
-    /**
-     * @deprecated Use {@link #isElementPresent(Locator)}
-     */
-    @Deprecated public boolean isLookupLinkPresent(String schemaName, String queryName, String pkName)
-    {
-        return isElementPresent(Locator.lookupLink(schemaName, queryName, pkName));
     }
 
     public void clickFkExpando(String schemaName, String queryName, String columnName)
@@ -7299,14 +6797,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         selectImportDataActionNoWaitForGrid(actionName);
     }
 
-    //TODO
-    public void importSpecimenData(String file, int pipelineJobs)
-    {
-        selectPipelineFileAndImportAction(file, "Import Specimen Data");
-        clickButton("Start Import");
-        waitForPipelineJobsToFinish(pipelineJobs);
-    }
-
     public void selectPipelineFileAndImportAction(String file, String actionName)
     {
         _extHelper.selectFileBrowserItem(file);
@@ -7328,86 +6818,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             signOut();
     }
 
-    public Collection<String> getNavTrailEntries()
-    {
-        return getAsUnderXpath("//span[@id='navTrailAncestors']/a");
-//        String navTrailXpath =   "//span[@id='navTrailAncestors']/a";
-//        int count = getXpathCount(Locator.xpath(navTrailXpath));
-//        ArrayList<String> al = new ArrayList<String>(count);
-//        for(int i=1; i<=count; i++)
-//        {
-//            al.add(getAttribute(Locator.xpath(navTrailXpath + "[" + i + "]"), "href"));
-//        }
-//        return al;
-    }
-
-    protected Collection<String> getAsUnderXpath(String xpath)
-    {
-        int count = getElementCount(Locator.xpath(xpath));
-        ArrayList<String> al = new ArrayList<>(count);
-        for(int i=1; i<=count; i++)
-        {
-            al.add(getAttribute(Locator.xpath(xpath + "[" + i + "]"), "href"));
-        }
-        return al;
-    }
-
-
-    public  String getFolderUrl()
-    {
-        Locator l = Locator.xpath("//div[@class='labkey-folder-title']/a");
-        return getAttribute(l, "href");
-    }
-
-    public Collection<String> getTabEntries() throws Exception
-    {
-        Collection<String> tabs = getTabUrls(false);
-        Collection<String> activeTabs = getTabUrls(true);
-        if(activeTabs.size()>0 && !tabs.addAll(activeTabs))
-            throw new Exception("unable to combine tab groups");
-        return tabs;
-//        int count = getXpathCount(Locator.xpath(tabPath));
-//        ArrayList<String> al = new ArrayList<String>(count);
-//        for(int i=1; i<=count; i++)
-//        {
-//            al.add(getAttribute(Locator.xpath(tabPath + "[" + i + "]"), "href"));
-//        }
-//        return al;
-    }
-
-    public Collection<String> getTabUrls(boolean active)
-    {
-        String xpath = "(//li[@class = 'labkey-tab-inactive'])";
-        if(active)
-            xpath.replace("inactive", "active");
-
-        int count = getXpathCount(Locator.xpath(xpath));
-        ArrayList<String> al = new ArrayList<>(count);
-        for(int i=1; i<=count; i++)
-        {
-            al.add(getAttribute(Locator.xpath(xpath + "[" + i + "]/a"), "href"));
-        }
-        return al;
-
-    }
-
-    public static Collection collectionIntersection(Collection s1, Collection s2)
-    {
-        Set intersect = new TreeSet(s1);
-        intersect.retainAll(s2);
-
-        return intersect;
-    }
-
-
-    protected void reloadStudyFromZip(String studyFile)
+    protected void reloadStudyFromZip(File studyFile)
     {
         goToManageStudy();
         clickButton("Reload Study");
         setFormElement(Locator.name("studyZip"), studyFile);
         clickButton("Reload Study From Local Zip Archive");
         waitForPipelineJobsToComplete(2, "Study Reload", false);
-
     }
 
     public AbstractContainerHelper getContainerHelper()
@@ -7420,12 +6837,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _containerHelper = containerHelper;
     }
 
-
     //hopefully we'll come up with a better solution soon
     public void waitForSaveAssay()
     {
         sleep(5000);
     }
-
-
 }

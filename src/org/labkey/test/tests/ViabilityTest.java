@@ -303,10 +303,10 @@ public class ViabilityTest extends AbstractViabilityTest
         log("** Test 'same' checkbox for TargetStudy");
         String targetStudyOptionText = "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)";
         selectOptionByText("_pool_1604505335_0_TargetStudy", targetStudyOptionText);
-        Assert.assertEquals("[None]", getSelectedOptionText("_pool_1594020325_1_TargetStudy"));
+        Assert.assertEquals("[None]", getSelectedOptionText(Locator.name("_pool_1594020325_1_TargetStudy")));
         clickCheckboxById("_pool_1604505335_0_TargetStudyCheckBox");
-        assertOptionEquals("_pool_1594020325_1_TargetStudy", targetStudyOptionText);
-        assertOptionEquals("_pool_161400006115_3_TargetStudy", targetStudyOptionText);
+        assertOptionEquals(Locator.name("_pool_1594020325_1_TargetStudy"), targetStudyOptionText);
+        assertOptionEquals(Locator.name("_pool_161400006115_3_TargetStudy"), targetStudyOptionText);
         clickCheckboxById("_pool_1604505335_0_TargetStudyCheckBox");
         
         // clear TargetStudy for 'vial2' and set the TargetStudy for 'vial3' and 'xyzzy'

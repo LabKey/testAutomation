@@ -113,23 +113,14 @@ public class Runner extends TestSuite
 
     private static void writeClasses(List<String> tests, File file)
     {
-        PrintWriter pw = null;
-
-        try
+        try(PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file))))
         {
-            pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-
             for (String test : tests)
                 pw.println(test);
         }
         catch(IOException e)
         {
             throw new RuntimeException(e);
-        }
-        finally
-        {
-            if (null != pw)
-                pw.close();
         }
    }
 
@@ -139,13 +130,10 @@ public class Runner extends TestSuite
 
         if (file.exists())
         {
-            BufferedReader reader = null;
             String line = null;
 
-            try
+            try(BufferedReader reader = new BufferedReader(new FileReader(file)))
             {
-                reader = new BufferedReader(new FileReader(file));
-
                 while ((line = reader.readLine()) != null)
                     if (null != StringUtils.trimToNull(line))
                     {
@@ -162,18 +150,6 @@ public class Runner extends TestSuite
             catch (ClassNotFoundException e)
             {
                 System.out.println("Can't find class '" + line + "'");
-            }
-            finally
-            {
-                try
-                {
-                    if (null != reader)
-                        reader.close();
-                }
-                catch(IOException e)
-                {
-                    //
-                }
             }
         }
 
@@ -893,10 +869,8 @@ public class Runner extends TestSuite
 
         if (changedFiles.exists())
         {
-            BufferedReader reader = null;
-            try
+            try(BufferedReader reader = new BufferedReader(new FileReader(changedFiles)))
             {
-                reader = new BufferedReader(new FileReader(changedFiles));
                 String line;
 
                 while ((line = reader.readLine()) != null)
@@ -932,10 +906,6 @@ public class Runner extends TestSuite
             catch(IOException e)
             {
                 System.err.print(e.getMessage());
-            }
-            finally
-            {
-                if (reader != null) { try { reader.close(); } catch (IOException e) {} }
             }
         }
 

@@ -117,7 +117,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         signOut();
         popLocation();                          // try open issues as guest
         assertNavButtonNotPresent("New Issue");
-        assertFormPresent("login");
+        assertElementPresent(Locator.tagWithName("form", "login"));
         signIn();
         popLocation();                          // and logged in again
         assertNavButtonPresent("New Issue");

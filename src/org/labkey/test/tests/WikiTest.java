@@ -127,7 +127,7 @@ public class WikiTest extends BaseWebDriverTest
 
         log("test delete wiki");
         goToProjectHome();
-        clickImageWithTitle("Edit", defaultWaitForPage);
+        clickAndWait(Locator.tagWithAttribute("img", "title", "Edit"));
         clickButton("Delete Page");
         clickButton("Delete");
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);

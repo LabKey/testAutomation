@@ -372,7 +372,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("check that container is set to current project");
         selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
         click(Locator.linkWithText("Reset to Folder Default Page"));
-        assertOptionEquals("webPartContainer", "/" + PROJECT2_NAME);
+        assertOptionEquals(Locator.name("webPartContainer"), "/" + PROJECT2_NAME);
         log("set container and page");
 
         //page names are now fetched via AJAX, so wait for them to be populated
@@ -489,7 +489,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("delete wiki web part");
         clickProject(PROJECT2_NAME);
         clickTab("Portal");
-        clickLinkWithImage(getContextPath() + "/_images/partdelete.png", 0);
+        click(Locator.linkWithImage(getContextPath() + "/_images/partdelete.png"));
         waitForElementToDisappear(Locator.linkWithImage(getContextPath() + "/_images/partdelete.png"), WAIT_FOR_JAVASCRIPT);
         assertLinkNotPresentWithText("Welcome");
 
@@ -498,7 +498,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickWebpartMenuItem("Pages", "Customize");
         setFormElement("title", "Test Customize TOC");
         log("check that container is set to current project");
-        assertOptionEquals("webPartContainer", "/" + PROJECT2_NAME);
+        assertOptionEquals(Locator.name("webPartContainer"), "/" + PROJECT2_NAME);
         selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
         submit();
         log("check that TOC title is set correctly");
@@ -813,7 +813,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
     protected void selectRenderType(String renderType)
     {
-        if (!renderType.equals(getSelectedOptionText("rendererType")))
+        if (!renderType.equals(getSelectedOptionText(Locator.name("rendererType"))))
         {
             selectOptionByText("rendererType", renderType);
         }

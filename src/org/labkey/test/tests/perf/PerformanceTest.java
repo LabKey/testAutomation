@@ -43,29 +43,16 @@ public abstract class PerformanceTest extends BaseWebDriverTest
 
     public void writePerfDataToFile()
     {
-        FileWriter writer = null;
-        try
+        File xmlFile = new File(getLabKeyRoot(), "teamcity-info.xml");
+
+        try (FileWriter writer = new FileWriter(xmlFile);)
         {
-            File xmlFile = new File(getLabKeyRoot(), "teamcity-info.xml");
             xmlFile.createNewFile();
-            writer = new FileWriter(xmlFile);
 
             writer.write("<build>\n");
             writer.write("\t<statisticValue key=\"actionTime\" value=\"" + elapsedTime + "\"/>\n");
             writer.write("</build>");
         }
         catch (IOException ignored) {}
-        finally
-        {
-            if (writer != null)
-                try
-                {
-                    writer.close();
-                }
-                catch (IOException ignored)
-                {
-                }
-        }
-
     }
 }

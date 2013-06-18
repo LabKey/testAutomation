@@ -139,7 +139,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         log("Make sure new protocol is listed.");
         waitForElement(Locator.xpath("//select[@name='protocol']/option[.='test2']"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("test2", getSelectedOptionText("protocol"));
+        Assert.assertEquals("test2", getSelectedOptionText(Locator.name("protocol")));
 
         if (!isLinkPresentWithText("running") && isLinkPresentWithText("completed"))
             assertTextPresent("running");
@@ -162,9 +162,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickButton("Data");
 
         log("Verify msPicture");
-        assertImageMapAreaPresent("graphmap", ANNOTATION_RUN_NAME);
+        assertElementPresent(Locator.imageMapLinkByTitle("graphmap", ANNOTATION_RUN_NAME));
         pushLocation();
-        clickImageMapLinkByTitle("graphmap", "Data: " + SAMPLE_BASE_NAME + ".mzXML.image..itms.png (Run Output)");
+        clickAndWait(Locator.imageMapLinkByTitle("graphmap", "Data: " + SAMPLE_BASE_NAME + ".mzXML.image..itms.png (Run Output)"));
         assertLinkPresentWithTextCount("msPicture", 2);
         beginAt(getAttribute(Locator.xpath("//img[contains(@src, 'showFile.view')]"), "src"));
         // Firefox sets the title of the page when we view an image separately from an HTML page, so use that to verify
@@ -175,22 +175,22 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         popLocation();
 
         log("Verify experiment view");
-        clickImageMapLinkByTitle("graphmap", "bov_sample/" + SAMPLE_BASE_NAME + " (test2)");
+        clickAndWait(Locator.imageMapLinkByTitle("graphmap", "bov_sample/" + SAMPLE_BASE_NAME + " (test2)"));
 
         log("Verify experiment run view.");
-        clickImageMapLinkByTitle("graphmap", "Data: CAexample_mini.mzXML");
+        clickAndWait(Locator.imageMapLinkByTitle("graphmap", "Data: CAexample_mini.mzXML"));
         assertTextPresent("bov_sample/" + SAMPLE_BASE_NAME);
         assertTextPresent("Data File CAexample_mini.mzXML");
         assertTextPresent("AutomatedTestAssay");
 
         clickAndWait(Locator.linkWithText(ANNOTATION_RUN_NAME));
-        clickImageMapLinkByTitle("graphmap", "Material: verify:001");
+        clickAndWait(Locator.imageMapLinkByTitle("graphmap", "Material: verify:001"));
 
         assertTextPresent("verify:001");
         assertTextPresent("Not a member of a sample set");
 
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-        clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
+        clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");

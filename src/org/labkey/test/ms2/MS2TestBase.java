@@ -95,9 +95,9 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
     {
         clickProject(PROJECT_NAME);
         clickFolder(FOLDER_NAME);
-        if (isLinkPresentWithImage(getContextPath() + "/MS2/images/runIcon.gif"))
+        if (isElementPresent(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif")))
         {
-            clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
+            clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
             clickButton("Manage Views");
             for (String viewName : viewNames)
             {

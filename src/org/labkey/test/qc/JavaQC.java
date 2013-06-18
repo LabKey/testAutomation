@@ -75,11 +75,10 @@ public class JavaQC
     }
     private static Map<String, String> parseInputData(File inputData)
     {
-        BufferedReader br = null;
         Map<String, String> props = new HashMap<>();
 
-        try {
-            br = new BufferedReader(new FileReader(inputData));
+        try(BufferedReader br = new BufferedReader(new FileReader(inputData)))
+        {
             String l;
             while ((l = br.readLine()) != null)
             {
@@ -92,11 +91,6 @@ public class JavaQC
         catch (Exception e)
         {
             throw new RuntimeException(e.getMessage());
-        }
-        finally
-        {
-            if (br != null)
-                try {br.close();} catch(IOException ignored) {}
         }
     }
 

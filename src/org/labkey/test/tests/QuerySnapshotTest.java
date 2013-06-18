@@ -165,7 +165,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         log("test automatic updates for a joined snapshot view");
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
-        clickLink(Locator.xpath("//a[.='999320016']/../..//td/a[.='edit']"));
+        clickAndWait(Locator.xpath("//a[.='999320016']/../..//td/a[.='edit']"));
         setFormElement("quf_DEMraco", "Slovakian");
         clickButton("Submit");
 

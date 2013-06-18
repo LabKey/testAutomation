@@ -101,8 +101,8 @@ public abstract class AbstractQCAssayTestWD extends AbstractAssayTestWD
 
             if (!netrcFile.exists())
             {
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(netrcFile)));
-                try {
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(netrcFile))))
+                {
                     pw.append("machine localhost:8080");
                     pw.append('\n');
                     pw.append("login ");
@@ -111,10 +111,6 @@ public abstract class AbstractQCAssayTestWD extends AbstractAssayTestWD
                     pw.append("password ");
                     pw.append(PasswordUtil.getPassword());
                     pw.append('\n');
-                }
-                finally
-                {
-                    pw.close();
                 }
             }
         }

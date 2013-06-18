@@ -139,7 +139,7 @@ public class MS2Test extends MS2TestBase
     protected void verifyMS2(String testFile1, String testFile2)
     {
         log("Verify run view.");
-        clickLinkWithImage(getContextPath() + "/MS2/images/runIcon.gif");
+        clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");
@@ -1141,7 +1141,7 @@ public class MS2Test extends MS2TestBase
 
         log("Test creating run groups");
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-        clickLinkWithImage(getContextPath() + "/Experiment/images/graphIcon.gif");
+        clickAndWait(Locator.linkWithImage(getContextPath() + "/Experiment/images/graphIcon.gif"));
         clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
         clickButton("Create new group");
         setFormElement("name", RUN_GROUP1_NAME1);

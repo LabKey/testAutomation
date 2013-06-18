@@ -87,8 +87,8 @@ public class ExpTest extends BaseSeleniumWebTest
         assertTextPresent("Example 5 Run");
         clickAndWait(Locator.linkWithText(RUN_NAME));
         clickAndWait(Locator.linkWithText("Graph Summary View"));
-        clickImageMapLinkByTitle("graphmap", RUN_NAME_IMAGEMAP);
-        clickImageMapLinkByTitle("graphmap", DATA_OBJECT_TITLE);
+        clickAndWait(Locator.imageMapLinkByTitle("graphmap", RUN_NAME_IMAGEMAP));
+        clickAndWait(Locator.imageMapLinkByTitle("graphmap", DATA_OBJECT_TITLE));
         assertTextPresent("CAexample_mini.mzXML");
         assertTextPresent("Not available on disk");
 

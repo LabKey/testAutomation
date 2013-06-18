@@ -88,11 +88,11 @@ public class QuantitationTest extends AbstractXTandemTest
         clickButton("Data");
         
         pushLocation();
-        clickImageMapLinkByTitle("graphmap", "Data: " + SAMPLE_BASE_NAME + ".libra.tsv (Run Output)");
+        clickAndWait(Locator.imageMapLinkByTitle("graphmap", "Data: " + SAMPLE_BASE_NAME + ".libra.tsv (Run Output)"));
         assertLinkPresentWithText("libra Protein Quantitation");
 
         clickAndWait(Locator.linkWithText("Lineage for " + SAMPLE_BASE_NAME + ".libra.tsv"));
-        clickImageMapLinkByTitle("graphmap", "libra Peptide Quantitation");
+        clickAndWait(Locator.imageMapLinkByTitle("graphmap", "libra Peptide Quantitation"));
         // Check to see that arguments to xinteract are showing
         assertTextPresent("-LLibraConfig1.xml-2");
 

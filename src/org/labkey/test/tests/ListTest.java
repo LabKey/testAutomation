@@ -689,7 +689,7 @@ public class ListTest extends BaseWebDriverTest
         _customizeViewsHelper.addCustomizeViewColumn("lookup/Bfk/Cfk/title");
         _customizeViewsHelper.saveCustomView();
 
-        clickLink(Locator.linkContainingText("one C"));
+        clickAndWait(Locator.linkContainingText("one C"));
         assertElementPresent(Locator.xpath("//input[@type='submit']"));
         goBack();
 

@@ -673,15 +673,7 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         _test.log("Selecting Ext tab " + tabname);
         Locator l = Locator.xpath("//span[contains(@class, 'x-tab-strip-text') and text() = '" + tabname + "']");
-        _test.waitForElement(l, WAIT_FOR_JAVASCRIPT);
-        if(_test.getBrowser().startsWith(BaseWebDriverTest.IE_BROWSER))
-        {
-            _test.clickAt(l, 1, 1);
-        }
-        else
-        {
-            _test.click(l);
-        }
+        _test.waitAndClick(l);
     }
 
     public void clickSideTab(String tab)

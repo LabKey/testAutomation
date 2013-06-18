@@ -34,7 +34,7 @@ public class ExperimentGraph
 
     public void clickLink(String link)
     {
-        _test.clickImageMapLinkByTitle(MAP_NAME, link);
+        _test.clickAndWait(Locator.imageMapLinkByTitle(MAP_NAME, link));
     }
 
     public void clickInputLink(String input)

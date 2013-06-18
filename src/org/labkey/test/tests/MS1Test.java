@@ -444,15 +444,14 @@ public class MS1Test extends BaseSeleniumWebTest
 
         assertCharts();
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
-        Assert.assertTrue(isButtonDisabled("<< Previous Feature"));
-
+        assertElementPresent(Locator.navButtonDisabled("<< Previous Feature"));
         //test next/prev buttons
         log("Testing Prev/Next buttons on feature details");
         clickButton("Next Feature >>");
-        Assert.assertTrue(isButtonDisabled("Next Feature >>"));
+        assertElementPresent(Locator.navButtonDisabled("Next Feature >>"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
         clickButton("<< Previous Feature");
-        Assert.assertTrue(isButtonDisabled("<< Previous Feature"));
+        assertElementPresent(Locator.navButtonDisabled("<< Previous Feature"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
 
         log("showFeatureDetails.view OK");
@@ -463,9 +462,9 @@ public class MS1Test extends BaseSeleniumWebTest
 
     protected void assertCharts()
     {
-        assertImagePresentWithSrc("type=elution", true);
-        assertImagePresentWithSrc("type=spectrum", true);
-        assertImagePresentWithSrc("type=bubble", true);
+        assertElementPresent(Locator.imageWithSrc("type=elution", true));
+        assertElementPresent(Locator.imageWithSrc("type=spectrum", true));
+        assertElementPresent(Locator.imageWithSrc("type=bubble", true));
     }
 
     protected void assertChartRendered(Locator.XPathLocator loc)

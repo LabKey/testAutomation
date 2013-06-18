@@ -143,22 +143,9 @@ public class PasswordUtil
         byte[] bytes = credentials.toString().getBytes();
         byte[] inverted = invertBytes(bytes, bytes.length);
 
-        FileOutputStream ostream = null;
-        try
+        try (FileOutputStream ostream = new FileOutputStream(file))
         {
-            ostream = new FileOutputStream(file);
             ostream.write(inverted);
-        }
-        finally
-        {
-            if (ostream != null)
-                try
-                {
-                    ostream.close();
-                }
-                catch (IOException ignored)
-                {
-                }
         }
     }
 
@@ -205,10 +192,8 @@ public class PasswordUtil
             if (file == null || !file.exists())
                 return null;
 
-            InputStream istream = null;
-            try
+            try (InputStream istream = new FileInputStream(file))
             {
-                istream = new FileInputStream(file);
                 byte[] bytes = new byte[1024];
                 int len = istream.read(bytes);
                 String data = new String(invertBytes(bytes, len));
@@ -218,17 +203,6 @@ public class PasswordUtil
             catch (IOException e)
             {
                 return null;
-            }
-            finally
-            {
-                if (istream != null)
-                    try
-                    {
-                        istream.close();
-                    }
-                    catch (IOException ignored)
-                    {
-                    }
             }
         }
         return _cachedCredentials;

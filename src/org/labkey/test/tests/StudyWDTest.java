@@ -171,7 +171,7 @@ public class StudyWDTest extends StudyBaseTestWD
     {
         clickFolder(getFolderName());
         addWebPart("Study Data Tools");
-        clickLinkWithImage("/labkey/study/tools/participant_report.png");
+        clickAndWait(Locator.linkWithImage("/labkey/study/tools/participant_report.png"));
         clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog("Add Measure");
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);

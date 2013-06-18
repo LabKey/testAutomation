@@ -50,27 +50,9 @@ public class ExcelHelper
 
     public static Workbook create(File file) throws IOException, InvalidFormatException
     {
-        FileInputStream fIn = new FileInputStream(file);
-        try
+        try (FileInputStream fIn = new FileInputStream(file))
         {
             return WorkbookFactory.create(fIn);
-        }
-        catch (OldExcelFormatException e)
-        {
-            try { fIn.close(); } catch (IOException ignored) {}
-            fIn = new FileInputStream(file);
-            throw e;
-        }
-        catch (IllegalArgumentException e)
-        {
-            throw new InvalidFormatException("Unable to open file as an Excel document. " + e.getMessage() == null ? "" : e.getMessage());
-        }
-        finally
-        {
-            if (fIn != null)
-            {
-                try { fIn.close(); } catch (IOException ignored) {}
-            }
         }
     }
 

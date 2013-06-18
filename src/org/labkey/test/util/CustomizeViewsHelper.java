@@ -56,7 +56,7 @@ public class CustomizeViewsHelper extends AbstractHelper
 
     public void applyCustomView(int waitMillis)
     {
-        _test.clickButtonAt("View Grid", waitMillis, "1,1");
+        _test.clickButton("View Grid", waitMillis);
     }
 
     public void saveDefaultView()
