@@ -524,8 +524,6 @@ public class ListTest extends BaseWebDriverTest
         log("Create second project");
         _containerHelper.createProject(PROJECT_OTHER, null);
 
-        String project2_url = getCurrentRelativeURL();
-
         log("Add List -- " + LIST3_NAME_OWNERS);
         _listHelper.createList(PROJECT_OTHER, LIST3_NAME_OWNERS, LIST3_KEY_TYPE, LIST3_KEY_NAME, _list3Col2);
         assertTextPresent("<AUTO> (Owner)");
