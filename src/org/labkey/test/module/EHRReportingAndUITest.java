@@ -281,7 +281,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         waitForElement(Locator.xpath("//th[contains(text(), 'Weights -')]"));
         _ext4Helper.clickExt4Tab("Raw Data");
-        waitForText("Percent Change");
+        waitForText("Percent Change", WAIT_FOR_PAGE);
 
         log("Check subjectField parsing");
         getAnimalHistorySubjField().setValue(MORE_ANIMAL_IDS[0] + "," + MORE_ANIMAL_IDS[1] + ";" + MORE_ANIMAL_IDS[2] + " " + MORE_ANIMAL_IDS[3] + "\t" + MORE_ANIMAL_IDS[4]);
