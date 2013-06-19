@@ -70,6 +70,7 @@ public class WikiHelper extends AbstractHelper
 
         if (null != attachment)
         {
+            _test.click(Locator.linkWithText("Attach a file"));
             _test.setFormElement("formFiles[0]", attachment);
         }
         _test.saveWikiPage();
