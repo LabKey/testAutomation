@@ -8,7 +8,6 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: May 29, 2009
  */
