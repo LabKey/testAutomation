@@ -24,7 +24,6 @@ import org.labkey.test.Locator;
  * User: elvan
  * Date: 1/10/13
  * Time: 4:40 PM
- * To change this template use File | Settings | File Templates.
  */
 public class FlowAnalysisResolverTest extends FlowTest
 {

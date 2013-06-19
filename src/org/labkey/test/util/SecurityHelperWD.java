@@ -24,7 +24,6 @@ import org.openqa.selenium.WebElement;
  * User: elvan
  * Date: 1/17/13
  * Time: 11:21 AM
- * To change this template use File | Settings | File Templates.
  */
 public class SecurityHelperWD extends AbstractHelperWD
 {

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -24,7 +23,6 @@ import org.labkey.test.util.PortalHelper;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: 5/18/13
  */

@@ -24,7 +24,6 @@ import org.labkey.test.util.LogMethod;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
  * User: klum
  * Date: 2/27/13
  */
