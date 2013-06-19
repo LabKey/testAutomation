@@ -181,7 +181,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     private final BrowserType BROWSER_TYPE;
 
-    protected static final String PERMISSION_ERROR = "401: User does not have permission to perform this operation";
+    protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation";
 
     protected boolean isPerfTest = false;
 
@@ -3895,7 +3895,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void assertAtUserUserLacksPermissionPage()
     {
         assertTextPresent(PERMISSION_ERROR);
-        assertTitleEquals("401: Error Page -- 401: User does not have permission to perform this operation");
+        assertTitleEquals("401: Error Page -- User does not have permission to perform this operation");
     }
 
     /**
@@ -4774,8 +4774,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             el.sendKeys(text.substring(text.length()-1));
         }
 
-        if (el.getAttribute("class").contains("gwt-TextBox") || el.getAttribute("class").contains("gwt-TextArea"))
-            fireEvent(l, SeleniumEvent.blur); // Make GWT form elements behave better
+        String elementClass = el.getAttribute("class");
+        if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
+            fireEvent(l, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
     }
 
     /**

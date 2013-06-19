@@ -117,7 +117,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     private static final String ACTION_SUMMARY_TABLE_NAME = "springActions";
 
 
-    protected static final String PERMISSION_ERROR = "401: User does not have permission to perform this operation";
+    protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation";
 
 
     public BaseSeleniumWebTest()
