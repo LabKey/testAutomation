@@ -131,7 +131,7 @@ public class DumbsterManager implements ShutdownListener
         if (_server == null)
             return new SmtpMessage[0];
 
-        List<SmtpMessage> messageList = new ArrayList<SmtpMessage>();
+        List<SmtpMessage> messageList = new ArrayList<>();
 
         // Dumbster returns iterator on list which requires synchronization.
         synchronized (_server)

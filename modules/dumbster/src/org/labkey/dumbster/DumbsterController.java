@@ -159,7 +159,7 @@ public class DumbsterController extends SpringActionController
         {
             SmtpMessage message = DumbsterManager.get().getMessages()[form.getMessage()];
 
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             String[] lines = message.getBody().split("\n");
 
             String key = null;
