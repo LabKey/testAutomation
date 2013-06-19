@@ -24,18 +24,19 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
-import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import java.io.File;
-import java.util.Calendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.labkey.test.util.ListHelper.ListColumnType;
 
 /**
  * User: jeckels
@@ -1093,8 +1094,8 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private void uploadMultipleCurveData()
     {
-        File[] files = {TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3};
-        addFilesToAssayRun(files);
+        addFilesToAssayRun(TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3);
+        clickButton("Next");
     }
 
     private void uploadEC50Data()
@@ -1102,20 +1103,19 @@ public class LuminexTest extends AbstractQCAssayTest
         uploadMultipleCurveData();
     }
 
-    private void addFilesToAssayRun(File[] files)
+    private void addFilesToAssayRun(File firstFile, File... additionalFiles)
     {
-        for(int i=0; i<files.length; i++)
+        setFormElement(Locator.name(ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD), firstFile);
+
+        int index = 1;
+        for (File additionalFile : additionalFiles)
         {
-            String fieldId = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
-
-            setFormElement(Locator.id(fieldId), files[i]);
-
             sleep(500);
+            click(Locator.xpath("//a[contains(@class, 'labkey-file-add-icon-enabled')]"));
 
-            click(Locator.id("file-upload-add" + i));
+            String fieldName = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + (index++);
+            setFormElement(Locator.name(fieldName), additionalFile);
         }
-         clickButton("Next");
-
     }
 
     /**
@@ -2325,8 +2325,6 @@ public class LuminexTest extends AbstractQCAssayTest
     @LogMethod
     protected void runFileUploadTest()
     {
-        // files to upload in 3 seperate assays
-        File[] files = {TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3};
         String[] assayNames = {"Test Assay 1", "Test Assay 2", "Test Assay 3"};
         String ERROR_TEXT = "already exists.";
 
@@ -2334,25 +2332,14 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // Create a run that imports 1 file
         createNewAssayRun(assayNames[0]);
-        for(int i=0; i<1; i++)
-        {
-            String fieldId = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
-            setFormElement(Locator.id(fieldId), files[i]);
-            waitForText(files[i].getName());
-            click(Locator.id("file-upload-add" + i));
-        }
+
+        addFilesToAssayRun(TEST_ASSAY_MULTIPLE_STANDARDS_1);
         clickButton("Next");
         clickButton("Save and Finish", 2 * WAIT_FOR_PAGE);
 
         // Create a second run that imports the file again and check for error message
         createNewAssayRun(assayNames[1]);
-        for(int i=0; i<files.length; i++)
-        {
-            String fieldId = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
-            setFormElement(Locator.id(fieldId), files[i]);
-            waitForText(files[i].getName());
-            click(Locator.id("file-upload-add" + i));
-        }
+        addFilesToAssayRun(TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3);
         // verify that conflict error message is present
         waitForText(ERROR_TEXT, WAIT_FOR_JAVASCRIPT);
         clickButton("Next");
@@ -2365,25 +2352,15 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Confirm Delete");
         waitForText("Description for Luminex assay", WAIT_FOR_JAVASCRIPT);
 
-        // Create a 3rd run with the 1st file - verify no error message, it was deleted & archived
+        // Create a run with a duplicate file within the set of files
         createNewAssayRun(assayNames[2]);
-        for(int i=0; i<files.length; i++)
-        {
-            String fieldId = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + i;
-            setFormElement(Locator.id(fieldId), files[i]);
-            waitForText(files[i].getName());
-            click(Locator.id("file-upload-add" + i));
-        }
-        assertTextNotPresent(ERROR_TEXT);
-
+        addFilesToAssayRun(TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3, TEST_ASSAY_MULTIPLE_STANDARDS_3);
         // verify that the error message for duplicate entries pops up, and that the first remove button is enabled (checks prior bug)
-        String fieldId = ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD + 3;
-        setFormElement(Locator.id(fieldId), files[0]);
         waitForText("duplicate", WAIT_FOR_JAVASCRIPT);
         clickButton("OK",0);
-        waitForText("Data files must be", WAIT_FOR_JAVASCRIPT);
-        // verify that first "disable" button is still enabled (this was an observed bug)
-        String button_class = getAttribute(Locator.id("file-upload-remove0"), "class");
-        assert( button_class.contains("labkey-file-remove-icon-enabled"));
+        waitForTextToDisappear("duplicate", WAIT_FOR_JAVASCRIPT);
+
+        // verify no other error message, previous file usage was deleted & archived
+        assertTextNotPresent(ERROR_TEXT);
     }
 }
