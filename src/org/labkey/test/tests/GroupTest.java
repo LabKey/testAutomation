@@ -316,21 +316,21 @@ public class GroupTest extends BaseWebDriverTest
 
         //second page of the wizard
         waitAndClick(Locator.xpath("//td[./label[text()='Copy From Existing Project']]/input"));
-        try
-        {
-            _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());
-        }
-        catch (StaleElementReferenceException retry) // Workaround: weird combo-box behavior
-        {
-            click(Locator.xpath("//table[@id='targetProject']"));
-            _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());
-        }
         waitFor(new Checker()
         {
             @Override
             public boolean check()
-            {
-                return getFormElement(Locator.css("#targetProject input")).equals(getProjectName());
+            { // Workaround: erratic combo-box behavior
+                _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());
+                if (!getFormElement(Locator.css("#targetProject input")).equals(getProjectName()))
+                {
+                    click(Locator.xpath("//table[@id='targetProject']"));
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
         }, "Failed to select project", WAIT_FOR_JAVASCRIPT);
 
