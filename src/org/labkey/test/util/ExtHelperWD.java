@@ -647,13 +647,22 @@ public class ExtHelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
-        _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"));
-        _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and normalize-space()='" + selection + "']"));
+        selectExt4ComboBoxItem(parentLocator, selection, false);
     }
 
     public void selectExt4ComboBoxItem(String label, String selection)
     {
         selectExt4ComboBoxItem(Locator.xpath("//tr["+NOT_HIDDEN+" and ./td/label[text()='"+label+"']]"), selection);
+    }
+
+    @LogMethod(quiet = true)
+    public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection, boolean checkSelectionStartsWith)
+    {
+        _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x4-form-arrow-trigger')]"));
+        if (checkSelectionStartsWith)
+            _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and starts-with(text(), '" + selection + "')]"));
+        else
+            _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, 'x4-boundlist-item') and normalize-space()='" + selection + "']"));
     }
 
     public void selectGWTComboBoxItem(Locator.XPathLocator parentLocator, String selection)

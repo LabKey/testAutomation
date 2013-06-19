@@ -37,6 +37,7 @@ public class GroupTest extends BaseWebDriverTest
     protected static final String BAD_GROUP = "group3";
     protected static final String CHILD_GROUP = "group4";
     protected static final String[] TEST_USERS_FOR_GROUP = {"user1_grouptest@" + SIMPLE_GROUP + ".group.test", "user2_grouptest@" + SIMPLE_GROUP + ".group.test", "user3_grouptest@" + COMPOUND_GROUP + ".group.test"};
+    protected static final String[] TEST_DISPLAY_NAMES_FOR_GROUP = {"user1 grouptest", "user2 grouptest", "user3 grouptest"};
     protected static final String WIKITEST_NAME = "GroupSecurityApiTest";
     protected static final String GROUP_SECURITY_API_FILE = "groupSecurityTest.html";
 
@@ -273,7 +274,7 @@ public class GroupTest extends BaseWebDriverTest
         setFormElement(Locator.name("names"), TEST_USERS_FOR_GROUP[0]); //this user is in group1 and so is already in group 2
         clickButton("Update Group Membership");
         assertTextPresent("* These group members already appear in other included member groups and can be safely removed.");
-        Assert.assertTrue("Missing or badly formatted group redundancy warning", getBodyText().contains(TEST_USERS_FOR_GROUP[0] + " *"));
+        Assert.assertTrue("Missing or badly formatted group redundancy warning", getBodyText().contains(TEST_DISPLAY_NAMES_FOR_GROUP[0] + ") *"));
 //        expect warning
     }
 

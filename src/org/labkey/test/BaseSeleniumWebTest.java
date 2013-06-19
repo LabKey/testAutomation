@@ -4981,7 +4981,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             if (className.equals("pSite"))
                 group = "Site: " + group;
             click(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]//div[contains(@class, 'x4-form-trigger')]"));
-            click(Locator.xpath("//div[contains(@class, 'x4-boundlist')]//li[contains(@class, '" + className + "') and contains(text(), '" + group + "')]"));
+            click(Locator.xpath("//div[contains(@class, 'x4-boundlist')]//li[contains(@class, '" + className + "') and starts-with(text(), '" + group + "')]"));
             waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
             savePermissions();
             assertPermissionSetting(userOrGroupName, permissionString);

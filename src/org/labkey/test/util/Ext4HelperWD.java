@@ -246,7 +246,7 @@ public class Ext4HelperWD extends AbstractHelperWD
      */
     public void clickParticipantFilterCategory(String categoryLabel)
     {
-        Locator.XPathLocator loc = Locator.xpath("//input[contains(@class, 'category-header') and contains(@category, '" + categoryLabel + "')]");
+        Locator.XPathLocator loc = Locator.xpath("//div[contains(@class, 'category-label') and text()='" + categoryLabel + "']/../../td/input[contains(@class, 'category-header')]");
         _test.click(loc);
     }
 

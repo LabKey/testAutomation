@@ -5566,7 +5566,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             String group = userOrGroupName;
             if (className.equals("pSite"))
                 group = "Site: " + group;
-            _extHelper.selectExt4ComboBoxItem(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]"), group);
+            _extHelper.selectExt4ComboBoxItem(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]"), group, true);
             waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
             String oldId = getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
             savePermissions();
