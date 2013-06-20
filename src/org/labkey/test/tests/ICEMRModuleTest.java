@@ -92,23 +92,23 @@ public class ICEMRModuleTest extends BaseWebDriverTest
         verifyTrackingAssay(SELECTION_ASSAY_NAME);
         goToProjectHome();
 
+        verifyTrackingIndependence();
+    }
+
+    private void verifyTrackingIndependence()
+    {
+        // issues 18050 and 18040 - verify that the adaptation and drug selection assays work
+        // with only the appropriate sample set available (Adaptation Flasks for Culture Adaptation
+        // or Selection Flasks for Drug Selection.  Just check adaptation in our automated tests.
         deleteSample(SELECTION_FLASKS_NAME);
         deleteSample(ADAPTATION_FLASKS_NAME);
 
-        // issues 18050 and 18040 - verify that the adaptation and drug selection assays work
-        // with only the appropriate sample set available (Adaptation Flasks for Culture Adaptation
-        // or Selection Flasks for Drug Selection
         createFlasksSampleSet(ADAPTATION_FLASKS_NAME, ADAPTATION_FLASK_FILE);
         verifyTrackingAssay(ADAPTATION_ASSAY_NAME);
         goToProjectHome();
 
-        deleteSample(ADAPTATION_FLASKS_NAME);
+        // recreate the selection flasks so that query validation will succeed.
         createFlasksSampleSet(SELECTION_FLASKS_NAME, SELECTION_FLASK_FILE);
-        verifyTrackingAssay(SELECTION_ASSAY_NAME);
-        goToProjectHome();
-
-        // since we validate all the queries on exist of the test, add back the adaptation sample set
-        createFlasksSampleSet(ADAPTATION_FLASKS_NAME, ADAPTATION_FLASK_FILE);
     }
 
     private void verifyTrackingAssay(String assayName)
