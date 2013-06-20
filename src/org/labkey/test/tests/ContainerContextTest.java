@@ -154,7 +154,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText("EDIT"), "href");
         Assert.assertTrue("Expected [edit] link to go to " + getProjectName() + " container, href=" + href,
-                href.contains("/list/" + getProjectName() + "/update.view?"));
+                href.contains("/query/" + getProjectName() + "/updateQueryRow.view?"));
 
         href = getAttribute(Locator.linkWithText("DETAILS"), "href");
         Assert.assertTrue("Expected [details] link to go to " + getProjectName() + " container, href=" + href,
