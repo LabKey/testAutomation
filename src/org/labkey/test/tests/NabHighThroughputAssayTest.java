@@ -35,14 +35,19 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
 
     private final static String TEST_ASSAY_FLDR_NAB_RENAME = "Rename" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
 
-    protected static final String TEST_ASSAY_NAB = "TestAssayHighThroughputNab";
-    protected static final String TEST_ASSAY_NAB_DESC = "Description for High Throughput NAb assay";
+    protected static final String MULTI_FILE_ASSAY_NAB = "MultiFileHighThroughputNab";
+    protected static final String MULTI_FILE_ASSAY_NAB_DESC = "Description for Multi File High Throughput NAb assay";
+
+    protected static final String SINGLE_FILE_ASSAY_NAB = "SingleFileHighThroughputNab";
+    protected static final String SINGLE_FILE_ASSAY_NAB_DESC = "Description for Single File High Throughput NAb assay";
 
     protected final static String TEST_ASSAY_USR_NAB_READER = "nabreader1@security.test";
     private final static String TEST_ASSAY_GRP_NAB_READER = "Nab Dataset Reader";   //name of Nab Dataset Readers group
 
     protected final String TEST_ASSAY_NAB_METADATA_FILE = getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) metadata.xlsx";
     protected final String TEST_ASSAY_NAB_DATA_FILE = getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) test data.xlsx";
+
+    protected final String COMBINED_NAB_DATA_FILE = getLabKeyRoot() + "/sampledata/Nab/NVITAL (short) single file.xlsx";
 
     @Override
     protected void runUITests() throws Exception
@@ -75,20 +80,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         //create a new nab assay
         clickButton("Manage Assays");
 
-        clickButton("New Assay Design");
-        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb), High-throughput (Single Plate Dilution)"));
-        clickButton("Next");
-
-        log("Setting up NAb assay");
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-        getWrapper().type("//input[@id='AssayDesignerName']", TEST_ASSAY_NAB);
-        getWrapper().type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_NAB_DESC);
-
-        sleep(1000);
-        clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
-
-        clickAndWait(Locator.linkWithText("configure templates"));
+        clickButton("Configure Plate Templates");
         clickAndWait(Locator.linkWithText("new 384 well (16x24) NAb high-throughput (single plate dilution) template"));
 
         waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
@@ -98,25 +90,61 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         assertTextPresent(PLATE_TEMPLATE_NAME);
 
         clickProject(TEST_ASSAY_PRJ_NAB);
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        clickFolder(TEST_ASSAY_FLDR_NAB);
+        addWebPart("Assay List");
 
-        clickEditAssayDesign(false);
-        waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_JAVASCRIPT);
+        createAssay(MULTI_FILE_ASSAY_NAB, MULTI_FILE_ASSAY_NAB_DESC, false);
+        createAssay(SINGLE_FILE_ASSAY_NAB, SINGLE_FILE_ASSAY_NAB_DESC, true);
+    }
+
+    private void createAssay(String name, String description, boolean singleFile)
+    {
+        clickButton("New Assay Design");
+        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb), High-throughput (Single Plate Dilution)"));
+        clickButton("Next");
+
+        log("Setting up NAb assay");
+        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
+        getWrapper().type("//input[@id='AssayDesignerName']", name);
+        getWrapper().type("//textarea[@id='AssayDesignerDescription']", description);
         selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
 
-        clickButton("Save", 0);
-        waitForText("Save successful.", 20000);
+        if(singleFile)
+        {
+            selectOptionByValue(Locator.xpath("//select[@id='metadataInputFormat']"), "COMBINED");
+        }
+
+        sleep(1000);
+        clickButton("Save & Close");
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
+        doMultiFileTest();
+        doSingleFileTest();
+    }
+
+    @LogMethod
+    private void doMultiFileTest()
+    {
+        doNAbTest(MULTI_FILE_ASSAY_NAB, TEST_ASSAY_NAB_DATA_FILE, TEST_ASSAY_NAB_METADATA_FILE);
+    }
+
+    @LogMethod
+    private void doSingleFileTest()
+    {
+        doNAbTest(SINGLE_FILE_ASSAY_NAB, COMBINED_NAB_DATA_FILE, null);
+    }
+
+    @LogMethod
+    private void doNAbTest(String assayName, String dataFileName, String metadataFileName)
+    {
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_NAB);
-        addWebPart("Assay List");
 
         clickAndWait(Locator.linkWithText("Assay List"));
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        clickAndWait(Locator.linkWithText(assayName));
 
         log("Uploading NAb Runs");
         clickButton("Import Data");
@@ -126,10 +154,13 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         setFormElement("cutoff2", "70");
         selectOptionByText("curveFitMethod", "Polynomial");
 
-        File metadata = new File(TEST_ASSAY_NAB_METADATA_FILE);
-        setFormElement(Locator.xpath("//input[@type='file' and @name='__sampleMetadataFile']"), metadata);
+        if(metadataFileName != null)
+        {
+            File metadata = new File(metadataFileName);
+            setFormElement(Locator.xpath("//input[@type='file' and @name='__sampleMetadataFile']"), metadata);
+        }
 
-        File data = new File(TEST_ASSAY_NAB_DATA_FILE);
+        File data = new File(dataFileName);
         setFormElement(Locator.xpath("//input[@type='file' and @name='__primaryFile__']"), data);
 
         clickButton("Save and Finish");
