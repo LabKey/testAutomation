@@ -218,7 +218,8 @@ public enum TestSet
         SequestImportTest.class,
         ETLTest.class,
         ReportThumbnailTest.class,
-        DrugSensitivityAssayTest.class
+        DrugSensitivityAssayTest.class,
+        OConnorExperimentTest.class
     ),
 
     Daily(600000, DailyA.getTestList(), DailyB.getTestList()),

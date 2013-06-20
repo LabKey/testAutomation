@@ -205,6 +205,7 @@ src/org/labkey/test/module/EHRApiTest.java -text
 src/org/labkey/test/module/EHRDataEntryTest.java -text
 src/org/labkey/test/module/EHRReportingAndUITest.java -text
 src/org/labkey/test/module/ModuleTest.java -text
+src/org/labkey/test/module/OConnorExperimentTest.java -text
 src/org/labkey/test/module/ONPRC_EHRTest.java -text
 src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text
 src/org/labkey/test/ms1/params/FeaturesTestParams.java -text

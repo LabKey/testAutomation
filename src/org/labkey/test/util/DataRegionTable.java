@@ -627,6 +627,10 @@ public class DataRegionTable
         _test.mouseDown(Locator.xpath("//b").withClass("lk-filter-panel-label").withText("All"));
     }
 
+    public void clickHeaderButtonByText(String buttonText)
+    {
+        _test.click(Locators.headerButton(_tableName, buttonText));
+    }
 
     public static class Locators
     {

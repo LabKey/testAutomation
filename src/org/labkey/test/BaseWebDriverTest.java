@@ -4478,12 +4478,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             showNumberInTable("All");
         }
-        List<List<String>> columns = new ArrayList<>(columnNames.length);
+
+        List<List<String>> columns = new ArrayList<>();
+        for(int i=0; i<columnNames.length; i++)
+        {
+            columns.add(new ArrayList<String>());
+        }
 
         DataRegionTable table = new DataRegionTable(tableName, this);
         for(int i=0; i<columnNames.length; i++)
         {
-            columns.get(i).addAll(table.getColumnDataAsText(columnNames[i]));
+            columns.add(table.getColumnDataAsText(columnNames[i]));
         }
 
         if(moreThanOnePage)
