@@ -2930,7 +2930,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void clickProject(String project, boolean assertDestination)
     {
         hoverProjectBar();
-        waitAndClickAndWait(Locator.linkWithText(project));
+        if (BROWSER_TYPE == BrowserType.CHROME)
+        {
+            WebElement el = Locator.linkWithText(project).findElement(getDriver());
+            prepForPageLoad();
+            fireEvent(el, SeleniumEvent.click);
+            newWaitForPageToLoad();
+        }
+        else
+            waitAndClickAndWait(Locator.linkWithText(project));
         if (assertDestination)
             waitForElement(Locator.id("folderBar").withText(project));
     }
