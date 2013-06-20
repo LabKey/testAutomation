@@ -338,24 +338,21 @@ public class ClientAPITest extends BaseWebDriverTest
         // enter a new first name
 
         String activeCellId = getActiveEditorId();
-        setFormElement(Locator.id(activeCellId), "Abe");
-        pressTab(Locator.id(activeCellId));
+        setFormElement(Locator.id(activeCellId), "Abe\t");
 
         // enter a new last name
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             Assert.fail("Failed to advance to next edit field");
-        setFormElement(Locator.id(activeCellId), "Abeson");
-        pressTab(Locator.id(activeCellId));
+        setFormElement(Locator.id(activeCellId), "Abeson\t");
 
         // enter a new age
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             Assert.fail("Failed to advance to next edit field");
-        setFormElement(Locator.id(activeCellId), "51");
-        pressTab(Locator.id(activeCellId));
+        setFormElement(Locator.id(activeCellId), "51\t");
 
         waitUntilGridUpdateComplete();
 
@@ -366,15 +363,13 @@ public class ClientAPITest extends BaseWebDriverTest
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             Assert.fail("Failed to advance to next edit field");
-        setFormElement(Locator.id(activeCellId), "Billy");
-        pressTab(Locator.id(activeCellId));
+        setFormElement(Locator.id(activeCellId), "Billy\t");
 
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
             Assert.fail("Failed to advance to next edit field");
-        setFormElement(Locator.id(activeCellId), "Billyson");
-        pressTab(Locator.id(activeCellId));
+        setFormElement(Locator.id(activeCellId), "Billyson\t");
 
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
