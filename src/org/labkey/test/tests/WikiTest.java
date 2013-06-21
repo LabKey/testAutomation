@@ -19,6 +19,8 @@ package org.labkey.test.tests;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.UIContainerHelper;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
@@ -116,6 +118,8 @@ public class WikiTest extends BaseWebDriverTest
         saveWikiPage();
         verifyWikiPagePresent();
 
+        doTestInlineEditor();
+
         log("Verify fix for issue 13937: NotFoundException when attempting to display a wiki from a different folder which has been deleted");
         createSubfolder(getProjectName(), getSubolderName(), new String[] {});
         addWebPart("Wiki");
@@ -127,7 +131,7 @@ public class WikiTest extends BaseWebDriverTest
 
         log("test delete wiki");
         goToProjectHome();
-        clickAndWait(Locator.tagWithAttribute("img", "title", "Edit"));
+        _extHelper.clickExtMenuButton(true, Locator.tagWithAttribute("img", "title", "More"), "Edit");
         clickButton("Delete Page");
         clickButton("Delete");
         assertTextNotPresent(WIKI_PAGE_ALTTITLE);
@@ -141,6 +145,71 @@ public class WikiTest extends BaseWebDriverTest
     {
         waitForText("More HTML content");
         assertTextPresent(WIKI_PAGE_ALTTITLE);
+    }
+
+    protected void doTestInlineEditor()
+    {
+        Locator.XPathLocator inlineEditor = Locator.xpath("//div[@class='labkey-inline-editor']");
+
+        log("** test inline wiki webpart editor");
+        goToProjectHome();
+        click(Locator.tagWithAttribute("img", "title", "Edit"));
+        waitForElement(inlineEditor);
+        String editorId = getAttribute(inlineEditor.child("textarea"), "id");
+
+        String addedContent = "Inline edited content";
+        setInlineEditorContent(editorId, addedContent);
+        clickButton("Save", 0);
+        waitForElementToDisappear(inlineEditor);
+        assertTextPresent(addedContent);
+        assertNavButtonNotPresent("Save");
+
+        log("** test second edit on inline wiki webpart editor");
+        click(Locator.tagWithAttribute("img", "title", "Edit"));
+        waitForElement(inlineEditor);
+        addedContent = "Second inline edited content";
+        setInlineEditorContent(editorId, addedContent);
+        clickButton("Save", 0);
+        waitForElementToDisappear(inlineEditor);
+        assertTextPresent(addedContent);
+
+        log("** test cancel on inline wiki webpart editor");
+        click(Locator.tagWithAttribute("img", "title", "Edit"));
+        waitForElement(inlineEditor);
+        setInlineEditorContent(editorId, addedContent);
+        clickButton("Cancel", 0);
+        waitForElementToDisappear(inlineEditor);
+        assertTextPresent(addedContent);
+        assertTextNotPresent("SHOULD NOT BE SAVED");
+
+        // check that the content was actually saved in the previous steps
+        log("** check inline wiki webpart edit is persisted");
+        refresh();
+        assertTextPresent(addedContent);
+    }
+
+    protected void setInlineEditorContent(String editorId, String content)
+    {
+        // swtich to the tinymce iframe
+        getDriver().switchTo().frame(editorId + "_ifr");
+
+        // locate the tinymce body element
+        Locator l = Locator.id("tinymce");
+
+        // send keypress to the element
+        WebElement el = l.findElement(getDriver());
+
+        // select all then delete previous content (can't seem to get "select all" via Ctrl-A to work)
+        el.sendKeys(Keys.HOME);
+        for (int i = 0; i < 10; i++)
+            el.sendKeys(Keys.chord(Keys.SHIFT, Keys.DOWN));
+        el.sendKeys(Keys.BACK_SPACE);
+
+        // enter new content + newline
+        el.sendKeys(content);
+
+        // switch back to parent window
+        getDriver().switchTo().defaultContent();
     }
 
     @Override public BrowserType bestBrowser()
