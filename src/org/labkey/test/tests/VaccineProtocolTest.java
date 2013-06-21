@@ -143,52 +143,15 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         addWebPart("Lists");
         clickAndWait(Locator.linkWithText("manage lists"));
 
-        clickButton("Create New List");
-        waitForElement(Locator.id("ff_name"), defaultWaitForPage);
-		setFormElement("ff_name", LIST_NAME);
-		clickButton("Create List", 0);
-        waitForElement(Locator.navButton("Add Field"),30000);
-        clickButton("Add Field", 0);
-        _listHelper.setColumnName(1, "Value");
-        clickButton("Save", 0);
-        waitForElement(Locator.navButton("Done"), 30000);
+        ListHelper.ListColumn valueColumn = new ListHelper.ListColumn("Value", "Value", ListHelper.ListColumnType.String, "Vaccine Value");
+        _listHelper.createList(STUDY_FOLDER, LIST_NAME, ListHelper.ListColumnType.Integer, "Key", valueColumn);
         clickButton("Done");
+
         clickAndWait(Locator.linkWithText(LIST_NAME));
         clickButton("Insert New");
-        //
-		selenium.type("firstInputField", "1");
+		selenium.type("quf_Key", "1");
 		selenium.type("quf_Value", "One");
         submit();
-
-/*
-        Snapshot Study Data feature has been removed
-
-        clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
-        clickAndWait(Locator.linkWithText("Manage Study"));
-        clickButton("Snapshot Study Data");
-        setFormElement("schemaName", "VerifySnapshot");
-        clickButton("Create Snapshot");
-        assertTextPresent("Snapshot completed successfully");
-        clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
-        goToModule("Query");
-        _extHelper.clickExtButton(this, "Schema Administration");
-		clickAndWait(Locator.linkWithText("new external schema"));
-		setFormElement("userSchemaName", "VerifySnapshot");
-		setFormElement("sourceSchemaName", "verifysnapshot");
-        clickButton("Create");
-		assertTextPresent("VerifySnapshot");
-        clickAndWait(Locator.linkWithText("Query Schema Browser"));
-        selectSchema("VerifySnapshot");
-		Assert.assertTrue(isQueryPresent("VerifySnapshot", LIST_NAME, 3000) || isQueryPresent("VerifySnapshot", LIST_NAME));
-        if (isQueryPresent("VerifySnapshot", "Subjects"))
-            viewQueryData("VerifySnapshot", "Subjects");
-        else if (isQueryPresent("VerifySnapshot", "subjects"))
-            viewQueryData("VerifySnapshot", "subjects");
-        else
-            Assert.fail("Missing subjects table");
-        assertTextPresent("Vaccine2");
-
-       */
 
 		clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
         setupPipeline(PROJECT_NAME);
