@@ -5980,7 +5980,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
         waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
         _extHelper.waitForExtDialog(groupName + " Information");
-        boolean ret = isElementPresent(Locator.xpath("//table[contains(@class, 'userinfo')]//td[text()='" + email +  "']"));
+        boolean ret = isElementPresent(Locator.xpath("//table[contains(@class, 'userinfo')]//td[starts-with(text(), '" + email +  "')]"));
         clickButton("Done", 0);
         _extHelper.waitForExtDialogToDisappear(groupName + " Information");
         return ret;

@@ -5384,7 +5384,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             enterPermissionsUI();
             openGroupPermissionsDisplay(groupName);
-            boolean ret = isElementPresent(Locator.xpath("//table[contains(@class,'userinfo')]//td[text()='" + email + "']"));
+            boolean ret = isElementPresent(Locator.xpath("//table[contains(@class,'userinfo')]//td[starts-with(text(), '" + email + "')]"));
             click(Locator.xpath("//div[contains(@class, 'x4-window')]//button[./span[text()='Done']]"));
             exitPermissionsUI();
             return ret;
