@@ -31,7 +31,6 @@ public class HTTPApiTest extends SimpleApiTest
 {
     private static final String PROJECT_NAME = "HTTPApiVerifyProject";
     private static final String LIST_NAME = "Test List";
-    private static final String LIST_NAME_URL = "Test%20List";
 
     private static final ListHelper.ListColumn COL1 = new ListHelper.ListColumn("Like", "Like", ListHelper.ListColumnType.String, "What the color is like");
     private static final ListHelper.ListColumn COL2 = new ListHelper.ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");

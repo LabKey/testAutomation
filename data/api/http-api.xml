@@ -24,7 +24,6 @@
             "Good": 4,
             "Like": "Magenta",
             "Month": "2000/01/01 00:00:00",
-            "EntityId": "25456da4-86d2-102c-ad58-95b8b56cdcaa",
             "Color": "Purple"
             }]
             }
@@ -93,7 +92,7 @@
         "hidden": false,
         "sortable": true,
         "align": "left",
-        "width": 10,
+        "width": 180,
         "dataIndex": "Color",
         "required": true,
         "editable": true,
@@ -171,7 +170,6 @@
 "rowCount":5}]]></response>
     </test>
 
-
     <test name="recorded test case 3" type="post">
         <url>
             <![CDATA[query/HTTPApiVerifyProject/insertRows.api?schemaName=lists&query.queryName=Test%20List]]></url>
@@ -208,21 +206,18 @@
             "Good": 7,
             "Like": "Rose",
             "Month": "2000/02/01 00:00:00",
-            "EntityId": "25456ddc-86d2-102c-ad58-95b8b56cdcaa",
             "Color": "Pink"
             },
             {
             "Good": 1,
             "Like": "Red",
             "Month": "2000/03/01 00:00:00",
-            "EntityId": "25456ddf-86d2-102c-ad58-95b8b56cdcaa",
             "Color": "Fuscia"
             },
             {
             "Good": 2,
             "Like": "Black",
             "Month": "2000/04/01 00:00:00",
-            "EntityId": "25456de2-86d2-102c-ad58-95b8b56cdcaa",
             "Color": "Gray"
             }
             ]
@@ -268,7 +263,7 @@
         "hidden": false,
         "sortable": true,
         "align": "left",
-        "width": 10,
+        "width": 180,
         "dataIndex": "Color",
         "required": true,
         "editable": true,
@@ -395,14 +390,12 @@
             "Good": 2,
             "Like": "Jungle Green",
             "Month": "2000/01/11 00:00:00",
-            "EntityId": "25456dca-86d2-102c-ad58-95b8b56cdcaa",
             "Color": "Green"
             },
             {
             "Good": 1,
             "Like": "Crimson",
             "Month": "2000/03/01 00:00:00",
-            "EntityId": "25456ddf-86d2-102c-ad58-95b8b56cdcaa",
             "Color": "Fuscia"
             }
             ]
@@ -448,7 +441,7 @@
         "hidden": false,
         "sortable": true,
         "align": "left",
-        "width": 10,
+        "width": 180,
         "dataIndex": "Color",
         "required": true,
         "editable": true,
@@ -615,7 +608,7 @@
         "hidden": false,
         "sortable": true,
         "align": "left",
-        "width": 10,
+        "width": 180,
         "dataIndex": "Color",
         "required": true,
         "editable": true,
