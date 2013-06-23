@@ -24,9 +24,9 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
-import static org.labkey.test.util.ListHelperWD.ListColumnType;
-
 import java.io.File;
+
+import static org.labkey.test.util.ListHelperWD.ListColumnType;
 
 /**
  * User: jeckels
@@ -664,15 +664,15 @@ public class AssayTest extends AbstractAssayTestWD
         clickButton("Re-Validate");
 
         //validate timepoints:
-        assertElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td[text()='AAA07XMC-02' and following-sibling::td[text()='301.0']]]"));
-        assertElementPresent(Locator.xpath("//td[text()='Preexisting Timepoint' and following-sibling::td[text()='AAA07XMC-04' and following-sibling::td[not(text())]]]"));
-        assertElementPresent(Locator.xpath("//td[text()='Day 90 - 95' and following-sibling::td[text()='AAA07XSF-02' and following-sibling::td[not(text())]]]"));
+        assertElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td/a[text()='AAA07XMC-02'] and following-sibling::td[text()='301.0']]"));
+        assertElementPresent(Locator.xpath("//td[text()='Preexisting Timepoint' and following-sibling::td/a[text()='AAA07XMC-04'] and following-sibling::td[not(text())]]"));
+        assertElementPresent(Locator.xpath("//td[text()='Day 90 - 95' and following-sibling::td/a[text()='AAA07XSF-02'] and following-sibling::td[not(text())]]"));
 
-        assertElementPresent(Locator.xpath("//td[text()='Day 120 - 127' and following-sibling::td[text()='AssayTestControl1' and following-sibling::td[text()='5.0']]]"));
-        assertElementPresent(Locator.xpath("//td[text()='Day 152 - 159' and following-sibling::td[text()='AssayTestControl2' and following-sibling::td[text()='6.0']]]"));
-        assertElementPresent(Locator.xpath("//td[text()='Day 0 - 7' and following-sibling::td[text()='BAQ00051-09' and following-sibling::td[text()='7.0']]]"));
-        assertElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td[text()='BAQ00051-08' and following-sibling::td[text()='8.0']]]"));
-        assertElementPresent(Locator.xpath("//td[text()='Preexisting Timepoint' and following-sibling::td[text()='BAQ00051-11' and following-sibling::td[text()='9.0']]]"));
+        assertElementPresent(Locator.xpath("//td[text()='Day 120 - 127' and following-sibling::td/a[text()='AssayTestControl1'] and following-sibling::td[text()='5.0']]"));
+        assertElementPresent(Locator.xpath("//td[text()='Day 152 - 159' and following-sibling::td/a[text()='AssayTestControl2'] and following-sibling::td[text()='6.0']]"));
+        assertElementPresent(Locator.xpath("//td[text()='Day 0 - 7' and following-sibling::td/a[text()='BAQ00051-09'] and following-sibling::td[text()='7.0']]"));
+        assertElementPresent(Locator.xpath("//td[text()='Day 32 - 39' and following-sibling::td/a[text()='BAQ00051-08'] and following-sibling::td[text()='8.0']]"));
+        assertElementPresent(Locator.xpath("//td[text()='Preexisting Timepoint' and following-sibling::td/a[text()='BAQ00051-11'] and following-sibling::td[text()='9.0']]"));
         clickButton("Copy to Study");
 
         log("Verifying that the data was published");
@@ -761,15 +761,15 @@ public class AssayTest extends AbstractAssayTestWD
         clickButton("Re-Validate");
 
         //validate timepoints:
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit3' and following-sibling::td[text()='AAA07XMC-02']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='33' and following-sibling::td[text()='AAA07XMC-04']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='4' and following-sibling::td[text()='AAA07XSF-02']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit3' and following-sibling::td/a[text()='AAA07XMC-02']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='33' and following-sibling::td/a[text()='AAA07XMC-04']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='4' and following-sibling::td/a[text()='AAA07XSF-02']]")));
 
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit2' and following-sibling::td[text()='AssayTestControl1']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='AssayTestControl2']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-09']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-08']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='BAQ00051-11']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit2' and following-sibling::td/a[text()='AssayTestControl1']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='AssayTestControl2']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-09']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-08']]")));
+        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-11']]")));
 
         clickButton("Copy to Study");
 
