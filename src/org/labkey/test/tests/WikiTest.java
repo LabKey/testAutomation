@@ -40,6 +40,7 @@ public class WikiTest extends BaseWebDriverTest
             "<b>Some HTML content</b>\n" +
                     "<b>${labkey.webPart(partName='Query', title='My Proteins', schemaName='ms2', " +
                     "queryName='Sequences', allowChooseQuery='true', allowChooseView='true')}</b>\n";
+    private static final String WIKI_CHECK_CONTENT = "More HTML content";
 
     public WikiTest()
     {
@@ -113,7 +114,7 @@ public class WikiTest extends BaseWebDriverTest
         setFormElement(Locator.name("title"), WIKI_PAGE_ALTTITLE);
         String wikiPageContentEdited =
             "<b>Some HTML content</b><br>\n" +
-            "<b>More HTML content</b><br>\n";
+            "<b>" + WIKI_CHECK_CONTENT + "</b><br>\n";
         setWikiBody(wikiPageContentEdited);
         saveWikiPage();
         verifyWikiPagePresent();
@@ -143,7 +144,7 @@ public class WikiTest extends BaseWebDriverTest
 
     protected void verifyWikiPagePresent()
     {
-        waitForText("More HTML content");
+        waitForText(WIKI_CHECK_CONTENT);
         assertTextPresent(WIKI_PAGE_ALTTITLE);
     }
 
@@ -162,12 +163,13 @@ public class WikiTest extends BaseWebDriverTest
         clickButton("Save", 0);
         waitForElementToDisappear(inlineEditor);
         assertTextPresent(addedContent);
+        assertTextNotPresent(WIKI_CHECK_CONTENT);
         assertNavButtonNotPresent("Save");
 
         log("** test second edit on inline wiki webpart editor");
         click(Locator.tagWithAttribute("img", "title", "Edit"));
         waitForElement(inlineEditor);
-        addedContent = "Second inline edited content";
+        addedContent = "Second inline edited content: " + WIKI_CHECK_CONTENT;
         setInlineEditorContent(editorId, addedContent);
         clickButton("Save", 0);
         waitForElementToDisappear(inlineEditor);
