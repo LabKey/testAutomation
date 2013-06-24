@@ -237,8 +237,7 @@ public class FolderExportTest extends BaseWebDriverTest
         expandFolderTree("Subfolder1"); // Will expand to all subfolders with this name
         clickAndWait(Locator.linkWithText("Subfolder1", subfolderIndex));
         assertTextPresent("My Test Container Tab Query");
-        hoverFolderBar();
-        clickAndWait(Locator.linkWithText("_hidden", subfolderIndex));
+        clickFolder("_hidden");
         assertTextPresentInThisOrder("Lists", "Hidden Folder List");
         hoverFolderBar();
         clickAndWait(Locator.linkWithText("Subfolder2", subfolderIndex));
