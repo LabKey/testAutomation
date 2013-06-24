@@ -238,7 +238,7 @@ public class JUnitTest extends TestSuite
             }
             catch (IOException ioe)
             {
-                Assert.fail("failed to run remote junit: " + ioe.getMessage());
+                Assert.fail("failed to run remote junit test " + _remoteClass + ": " + ioe.getMessage());
             }
             finally
             {
