@@ -16,6 +16,7 @@
 package org.labkey.test.module;
 
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.SqlserverOnlyTest;
 
 import java.io.File;
 
@@ -25,7 +26,7 @@ import java.io.File;
  * Date: 1/25/13
  * Time: 4:31 PM
  */
-public class ONPRC_EHRTest extends AbstractEHRTest
+public class ONPRC_EHRTest extends AbstractEHRTest implements SqlserverOnlyTest
 {
     protected String PROJECT_NAME = "ONPRC_EHR_TestProject";
 
