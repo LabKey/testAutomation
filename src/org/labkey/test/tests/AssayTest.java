@@ -479,7 +479,7 @@ public class AssayTest extends AbstractAssayTestWD
         assertElementPresent(Locator.linkWithText("BAQ00051-09"));
         assertElementPresent(Locator.linkWithText("BAQ00051-08"));
         assertElementPresent(Locator.linkWithText("BAQ00051-11"));
-        assertTextNotPresent("AAA");
+        assertElementNotPresent(Locator.linkContainingText("AAA"));
         stopImpersonating();
         clickProject(TEST_ASSAY_PRJ_SECURITY);
     } //uploadRuns()
