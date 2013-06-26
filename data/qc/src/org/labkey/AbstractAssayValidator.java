@@ -113,7 +113,7 @@ public abstract class AbstractAssayValidator
             sb.append(message);
             sb.append('\n');
 
-            pw.write(sb.toString());
+            pw.write(sb.toString().replaceAll("\\\\", "\\\\\\\\"));
             pw.close();
         }
         else

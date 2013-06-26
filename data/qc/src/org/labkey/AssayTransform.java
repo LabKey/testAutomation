@@ -41,18 +41,30 @@ public class AssayTransform extends AbstractAssayValidator
 
             String type = getRunProperties().get(Props.assayType.name());
 
-            if ("General".equalsIgnoreCase(type))
-                runGPATTest();
-            else if ("TZM-bl Neutralization (NAb)".equalsIgnoreCase(type))
-                runNAbTest();
-            else if ("Luminex".equalsIgnoreCase(type))
-                runLuminexTest();
-            else if ("Viability".equalsIgnoreCase(type))
-                runViabilityTest();
-            else if ("ELISpot".equalsIgnoreCase(type))
-                runElispotTest();
-            else
-                throw new IllegalArgumentException("Test does not exist for assay type: " + type);
+            switch(type)
+            {
+                case "General":
+                    runGPATTest();
+                    break;
+                case "TZM-bl Neutralization (NAb)":
+                    runNAbTest();
+                    break;
+                case "Luminex":
+                    runLuminexTest();
+                    break;
+                case "Viability":
+                    runViabilityTest();
+                    break;
+                case "ELISpot":
+                    runElispotTest();
+                    break;
+                case "TZM-bl Neutralization (NAb), High-throughput (Single Plate Dilution)":
+                case "TZM-bl Neutralization (NAb), High-throughput (Cross Plate Dilution)":
+                    runHTNAbTest();
+                    break;
+                default:
+                    throw new IllegalArgumentException("Test does not exist for assay type: " + type);
+            }
         }
         catch (Exception e)
         {
@@ -69,12 +81,11 @@ public class AssayTransform extends AbstractAssayValidator
                 List<Map<String, String>> dataMap = parseRunData(new File(runDataFile));
                 File transformFile = new File(getTransformFile().get(runDataFile));
 
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile)));
-
-                try {
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
+                {
                     String[] animals = {"bird", "dog", "horse", "monkey", "hamster", "pig", "goat"};
-                    Map<String, String> ptidMap = new HashMap<String, String>();
-                    List<String> columns = new ArrayList<String>();
+                    Map<String, String> ptidMap = new HashMap<>();
+                    List<String> columns = new ArrayList<>();
                     int idx = 0;
 
                     // transform the data, adding a new column
@@ -118,10 +129,6 @@ public class AssayTransform extends AbstractAssayValidator
                     }
                     insertLog("Programmatic Data Transform was run and " + getErrors().size() + " errors were found");
                 }
-                finally
-                {
-                    pw.close();
-                }
             }
             else
                 writeError("Unable to locate the runDataFile", "runDataFile");
@@ -140,13 +147,9 @@ public class AssayTransform extends AbstractAssayValidator
                 String runPropertiesFile = getRunProperties().get(Props.transformedRunPropertiesFile.name());
                 File transformFile = new File(runPropertiesFile);
 
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile)));
-                try {
-                    pw.write("FileID" + "\t" + "transformed FileID\n");
-                }
-                finally
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
                 {
-                    pw.close();
+                    pw.write("FileID" + "\t" + "transformed FileID\n");
                 }
             }
             if (getRunProperties().containsKey(Props.runDataFile.name()))
@@ -155,9 +158,8 @@ public class AssayTransform extends AbstractAssayValidator
                 List<Map<String, String>> dataMap = parseRunData(new File(runDataFile));
                 File transformFile = new File(getTransformFile().get(runDataFile));
 
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile)));
-
-                try {
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
+                {
                     // transform the fit error column
                     StringBuilder sb = new StringBuilder();
                     boolean header = true;
@@ -191,13 +193,83 @@ public class AssayTransform extends AbstractAssayValidator
                         pw.write(sb.toString());
                     }
                 }
-                finally
-                {
-                    pw.close();
-                }
             }
             else
                 writeError("Unable to locate the runDataFile", "runDataFile");
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void runHTNAbTest()
+    {
+        try {
+            if (getRunProperties().containsKey(Props.transformedRunPropertiesFile.name()))
+            {
+                String runPropertiesFile = getRunProperties().get(Props.transformedRunPropertiesFile.name());
+                File transformFile = new File(runPropertiesFile);
+
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
+                {
+                    pw.write("FileID" + "\t" + "transformed FileID\n");
+                }
+            }
+            if (getRunProperties().containsKey(Props.runDataFile.name()))
+            {
+                String runDataFile = getRunProperties().get(Props.runDataFile.name());
+                List<Map<String, String>> dataMap = parseRunData(new File(runDataFile));
+                File transformFile = new File(getTransformFile().get(runDataFile));
+
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
+                {
+                    // transform the fit error column
+                    StringBuilder sb = new StringBuilder();
+                    boolean header = true;
+
+                    // transform the data, adding a new column
+                    for (Map<String, String> row : dataMap)
+                    {
+                        sb.setLength(0);
+                        String delim = "";
+
+                        for (Map.Entry<String, String> entry : row.entrySet())
+                        {
+                            sb.append(delim);
+                            if (header)
+                                sb.append(entry.getValue());
+                            else
+                            {
+                                if ("Fit Error".equalsIgnoreCase(entry.getKey()))
+                                    sb.append("0.0");
+                                else
+                                {
+                                    String value = entry.getValue();
+                                    if (value != null)
+                                        sb.append(value);
+                                }
+                            }
+                            delim = "\t";
+                        }
+                        header = false;
+                        sb.append('\n');
+                        pw.write(sb.toString());
+                    }
+                }
+            }
+            else
+             {
+                 writeError("Unable to locate the runDataFile", "runDataFile");
+
+                 // Dump all properties for debugging purposes
+                 for (Map.Entry entry : getRunProperties().entrySet())
+                 {
+                     String key = entry.getKey().toString();
+                     String value = entry.getValue().toString();
+                     writeError(key + " : " + value, key);
+                 }
+             }
         }
         catch (Exception e)
         {
@@ -214,11 +286,10 @@ public class AssayTransform extends AbstractAssayValidator
                 List<Map<String, String>> dataMap = parseRunData(new File(runDataFile));
                 File transformFile = new File(getTransformFile().get(runDataFile));
 
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile)));
-
-                try {
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
+                {
                     // transform the fit error column
-                    List<String> columns = new ArrayList<String>();
+                    List<String> columns = new ArrayList<>();
                     StringBuilder sb = new StringBuilder();
                     boolean header = true;
 
@@ -251,10 +322,6 @@ public class AssayTransform extends AbstractAssayValidator
                         pw.write(sb.toString());
                     }
                 }
-                finally
-                {
-                    pw.close();
-                }
             }
             else
                 writeError("Unable to locate the runDataFile", "runDataFile");
@@ -274,11 +341,10 @@ public class AssayTransform extends AbstractAssayValidator
                 List<Map<String, String>> dataMap = parseRunData(new File(runDataFile));
                 File transformFile = new File(getTransformFile().get(runDataFile));
 
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile)));
-
-                try {
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
+                {
                     // transform the fit error column
-                    List<String> columns = new ArrayList<String>();
+                    List<String> columns = new ArrayList<>();
                     StringBuilder sb = new StringBuilder();
                     boolean header = true;
 
@@ -311,10 +377,6 @@ public class AssayTransform extends AbstractAssayValidator
                         pw.write(sb.toString());
                     }
                 }
-                finally
-                {
-                    pw.close();
-                }
             }
             else
                 writeError("Unable to locate the runDataFile", "runDataFile");
@@ -334,9 +396,8 @@ public class AssayTransform extends AbstractAssayValidator
                 List<Map<String, String>> dataMap = parseRunData(new File(runDataFile));
                 File transformFile = new File(getTransformFile().get(runDataFile));
 
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile)));
-
-                try {
+                try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(transformFile))))
+                {
                     // transform the spot count column
                     StringBuilder sb = new StringBuilder();
                     boolean header = true;
@@ -374,10 +435,6 @@ public class AssayTransform extends AbstractAssayValidator
                         sb.append('\n');
                         pw.write(sb.toString());
                     }
-                }
-                finally
-                {
-                    pw.close();
                 }
             }
             else
