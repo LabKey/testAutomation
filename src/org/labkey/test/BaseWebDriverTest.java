@@ -2688,7 +2688,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void createSubFolderFromTemplate(String project, String child, String template, @Nullable String[] objectsToSkip)
     {
         createSubfolder(project, project, child, "Create From Template Folder", template, objectsToSkip, null, false);
-
     }
 
 
@@ -2725,6 +2724,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         createSubfolder(project, parent, child, folderType, null, tabsToAdd, inheritPermissions);
     }
 
+    public void createSubfolder(String project, String parent, String child, String folderType, @Nullable String templateFolder, String[] tabsToAdd, boolean inheritPermissions)
+    {
+        createSubfolder(project, parent, child, folderType, templateFolder, null, tabsToAdd, inheritPermissions);
+    }
     /**
      *
      * @param project project in which to create new folder
@@ -2736,7 +2739,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * @param inheritPermissions should folder inherit permissions from parent?
      */
     @LogMethod
-    public void createSubfolder(String project, String parent, @LoggedParam String child, @Nullable String folderType, @Nullable String templateFolder, @Nullable String[] tabsToAdd, boolean inheritPermissions)
+    public void createSubfolder(String project, String parent, String child, @Nullable String folderType, String templateFolder, @Nullable String[] templatePartsToUncheck, @Nullable String[] tabsToAdd, boolean inheritPermissions)
     {
         startCreateFolder(project, parent, child);
         if (null != folderType && !folderType.equals("None"))
@@ -2747,10 +2750,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 log("create from template");
                 click(Locator.xpath("//td[./label[text()='"+folderType+"']]/input[@type='button' and contains(@class, 'radio')]"));
                 _ext4Helper.waitForMaskToDisappear();
-                _ext4Helper.selectComboBoxItem("Choose Template Folder:", templateFolder);
+                _ext4Helper.selectComboBoxItem(Locator.xpath("//div").withClass("labkey-wizard-header").withText("Choose Template Folder:").append("/following-sibling::table[contains(@id, 'combobox')]"), templateFolder);
                 _ext4Helper.checkCheckbox("Include Subfolders");
-
-                //TODO:  the checkboxes.  I don't need this right now so I haven't written it, but my intention is to use tabsToAdd
+                if (templatePartsToUncheck != null)
+                {
+                    for(String part : templatePartsToUncheck)
+                    {
+                        click(Locator.xpath("//td[label[text()='" +  part + "']]/input"));
+                    }
+                }
             }
         }
         else {
@@ -2957,17 +2965,20 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitAndClickAndWait(Locator.linkWithText(folder));
     }
 
+    /**
+     * Expand folder tree nodes to expose all folders with the given name
+     * Expects folder menu to be open
+     * @param folder Folder label
+     */
     public void expandFolderTree(String folder)
     {
         Locator.XPathLocator folderNav = Locator.id("folderBar_menu").append("/div/div/div/ul").withClass("folder-nav-top");
         Locator.XPathLocator treeAncestor = folderNav.append("//li").withClass("collapse-folder").withDescendant(Locator.linkWithText(folder)).append("/span").withClass("marked");
-        int depth = 0;
-        while(!Locator.linkWithText(folder).toXPathLocator().findElement(getDriver()).isDisplayed() && depth < 10)
+        List<WebElement> els = treeAncestor.findElements(getDriver());
+        for (WebElement el : els)
         {
-            click(treeAncestor);
-            depth++;
+            el.click();
         }
-        assertElementVisible(Locator.linkWithText(folder));
     }
 
     /**
@@ -4488,15 +4499,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         List<List<String>> columns = new ArrayList<>();
-        for(int i=0; i<columnNames.length; i++)
-        {
-            columns.add(new ArrayList<String>());
-        }
-
         DataRegionTable table = new DataRegionTable(tableName, this);
-        for(int i=0; i<columnNames.length; i++)
+        for (String columnName : columnNames)
         {
-            columns.add(table.getColumnDataAsText(columnNames[i]));
+            columns.add(table.getColumnDataAsText(columnName));
         }
 
         if(moreThanOnePage)
