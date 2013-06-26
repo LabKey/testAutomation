@@ -22,7 +22,6 @@ import org.labkey.test.util.LogMethod;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
  * User: RyanS
  * Date: 5/31/13
  */

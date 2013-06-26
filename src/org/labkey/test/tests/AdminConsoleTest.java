@@ -22,7 +22,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 /**
- * Created with IntelliJ IDEA.
  * User: bimber
  * Date: 2/21/13
  * Time: 4:10 PM

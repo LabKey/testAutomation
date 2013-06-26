@@ -21,7 +21,6 @@ import org.labkey.test.util.SqlserverOnlyTest;
 import java.io.File;
 
 /**
- * Created with IntelliJ IDEA.
  * User: bimber
  * Date: 1/25/13
  * Time: 4:31 PM

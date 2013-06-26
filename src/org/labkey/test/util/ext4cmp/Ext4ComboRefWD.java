@@ -19,7 +19,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.openqa.selenium.WebElement;
 
 /**
- * Created with IntelliJ IDEA.
  * User: bimber
  * Date: 1/23/13
  * Time: 5:31 PM
