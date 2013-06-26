@@ -116,6 +116,7 @@ public class WikiTest extends BaseWebDriverTest
             "<b>Some HTML content</b><br>\n" +
             "<b>" + WIKI_CHECK_CONTENT + "</b><br>\n";
         setWikiBody(wikiPageContentEdited);
+        switchWikiToVisualView();
         saveWikiPage();
         verifyWikiPagePresent();
 

@@ -6221,12 +6221,25 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void switchWikiToSourceView()
     {
         String curFormat = (String)executeScript("return window._wikiProps.rendererType;");
-        if(curFormat.equalsIgnoreCase("HTML"))
+        if (curFormat.equalsIgnoreCase("HTML"))
         {
             if (isElementPresent(Locator.css("#wiki-tab-source.labkey-tab-inactive")))
             {
                 click(Locator.css("#wiki-tab-source > a"));
                 waitForElement(Locator.css("#wiki-tab-source.labkey-tab-active"));
+            }
+        }
+    }
+
+    public void switchWikiToVisualView()
+    {
+        String curFormat = (String)executeScript("return window._wikiProps.rendererType;");
+        if (curFormat.equalsIgnoreCase("HTML"))
+        {
+            if (isElementPresent(Locator.css("#wiki-tab-visual.labkey-tab-inactive")))
+            {
+                click(Locator.css("#wiki-tab-visual > a"));
+                waitForElement(Locator.css("#wiki-tab-visual.labkey-tab-active"));
             }
         }
     }
