@@ -107,8 +107,8 @@ public class FlowSpecimenTest extends BaseFlowTestWD
         beginAt("/flow-run/" + getContainerPath() + "/showRuns.view");
         DataRegionTable table = new DataRegionTable("query", this);
         Assert.assertEquals(STUDY_FOLDER + " Study", table.getDataAsText(0, "Target Study"));
-        click(Locator.linkWithText("details"));
-        assertTextPresent(STUDY_FOLDER);
+        clickAndWait(Locator.linkWithText("details"));
+        assertElementPresent(Locator.linkWithText(STUDY_FOLDER + " Study"));
 
         log("** Set ICS protocol metadata");
         setProtocolMetadata("Keyword $SRC", null, null, null, false);
