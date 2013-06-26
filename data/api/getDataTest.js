@@ -23,7 +23,7 @@ var tableSuccess = function(responseData){
         for(j = 0; j < responseData.metaData.fields.length; j++){
             var field = responseData.metaData.fields[j];
             var fieldKey = field.fieldKey.toString();
-            table = table + '<td><span>' + row.data[fieldKey].value + '</span></td>';
+            table = table + '<td><span>' + row[fieldKey].value + '</span></td>';
         }
         table = table + '</tr>';
     }
@@ -31,45 +31,10 @@ var tableSuccess = function(responseData){
     table = table + '</table>';
     document.getElementById(id).innerHTML = table;
 };
-var extGridSuccess = function(responseData){
-    fields = responseData.metaData.fields;
-    cm = responseData.getColumnModel();
-    Ext4.onReady(function(){
-        var storeFields = [];
 
-        for(var i = 0; i < responseData.metaData.fields.length; i++){
-            var field = responseData.metaData.fields[i];
-            storeFields.push({
-                name: field.fieldKey.toString(),
-                mapping: 'data.' + field.fieldKey.toString() + '.value',
-                type: field.jsonType
-            });
-        }
-
-        Ext4.define('GetDataModel', {
-            extend: 'Ext.data.Model',
-            fields: storeFields
-        });
-
-        var gdStore = Ext4.create('Ext.data.Store', {
-            model: 'GetDataModel',
-            autoload: false,
-            proxy: {type:'memory', reader: {type: 'json'}}
-        });
-
-        gdStore.loadRawData(responseData.rows);
-
-        var myGrid = Ext4.create('Ext.grid.Panel', {
-            renderTo: id,
-            columns: responseData.getColumnModel(),
-            store: gdStore,
-            width: '100%'
-        });
-    });
-};
 var fancyRequest = REPLACEMENT_STRING
 
-var fReq = LABKEY.Query.GetData.RawData(fancyRequest);
+var fReq = LABKEY.Query.GetData.rawData(fancyRequest);
 
 </script>
 
