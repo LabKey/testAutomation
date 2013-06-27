@@ -35,8 +35,8 @@ public class BoxPlotTest extends GenericChartsTest
         doQuickChartBoxPlotTest();
     }
 
-    private static final String BOX_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0RCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measureCohortGroup 1Group 24c.Induration 1st measure0.05.010.015.020.025.0";
-    private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice AMice BNot in Cat Mice LetMice CTestYAxis36.537.037.538.038.539.039.540.0";
+    private static final String BOX_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0RCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measureGroup 1Group 2Cohort4c.Induration 1st measure0.05.010.015.020.025.0";
+    private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleMice AMice BNot in Cat Mice LetMice CTestXAxisTestYAxis36.537.037.538.038.539.039.540.0";
     private static final String BOX_PLOT_NAME_MV = "ManageViewsBoxPlot";
     private static final String BOX_PLOT_DESC_MV = "This box plot was created through the manage views UI";
     @LogMethod
@@ -112,8 +112,8 @@ public class BoxPlotTest extends GenericChartsTest
         savePlot(BOX_PLOT_NAME_MV, BOX_PLOT_DESC_MV);
     }
 
-    private static final String BOX_PLOT_DR_1 = "Created with Rapha\u00ebl 2.1.0RCH-1: Reactogenicity-Day 1 - 2.Body temperatureCohortGroup 2Group 12.Body temperature36.636.736.836.937.037.137.2";
-    private static final String BOX_PLOT_DR_2 = "Created with Rapha\u00ebl 2.1.0RCH-1: Reactogenicity-Day 1 - 2.Body temperatureCohortGroup 1Group 22.Body temperature36.537.037.538.038.539.039.540.0";
+    private static final String BOX_PLOT_DR_1 = "Created with Rapha\u00ebl 2.1.0RCH-1: Reactogenicity-Day 1 - 2.Body temperatureGroup 2Group 1Cohort2.Body temperature36.636.736.836.937.037.137.2";
+    private static final String BOX_PLOT_DR_2 = "Created with Rapha\u00ebl 2.1.0RCH-1: Reactogenicity-Day 1 - 2.Body temperatureGroup 1Group 2Cohort2.Body temperature36.537.037.538.038.539.039.540.0";
     private static final String BOX_PLOT_NAME_DR = "DataRegionBoxPlot";
     private static final String BOX_PLOT_DESC_DR = "This box plot was created through a data region's 'Views' menu";
     /// Test Box Plot created from a filtered data region.
@@ -155,7 +155,7 @@ public class BoxPlotTest extends GenericChartsTest
         savePlot(BOX_PLOT_NAME_DR, BOX_PLOT_DESC_DR);
     }
 
-    private static final String BOX_PLOT_QC = "Created with Rapha\u00ebl 2.1.0Types - DoubleCohortGroup 1Group 2Double0.020000000.040000000.060000000.080000000.0100000000.0120000000.0";
+    private static final String BOX_PLOT_QC = "Created with Rapha\u00ebl 2.1.0Types - DoubleGroup 1Group 2CohortDouble0.020000000.040000000.060000000.080000000.0100000000.0120000000.0";
     private static final String BOX_PLOT_NAME_QC = "QuickChartBoxPlot";
     private static final String BOX_PLOT_DESC_QC = "This box plot was created through the 'Quick Chart' column header menu option";
     @LogMethod

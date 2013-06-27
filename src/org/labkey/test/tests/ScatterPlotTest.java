@@ -45,8 +45,8 @@ public class ScatterPlotTest extends GenericChartsTest
         doPointClickScatterPlotTest(); // Uses scatter plot created by doManageViewsScatterPlotTest()
     }
 
-    private static final String SCATTER_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200";
-    private static final String SCATTER_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleTestXAxisMice ANot in Cat Mice LetMice BMice CTestYAxis33.034.035.036.037.038.039.040.0";
+    private static final String SCATTER_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight607080901001104. Pulse1. Weight6080100120140160180200";
+    private static final String SCATTER_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleMice ANot in Cat Mice LetMice BMice CTestXAxisTestYAxis33.034.035.036.037.038.039.040.0";
     private static final String SCATTER_PLOT_NAME_MV = "ManageViewsScatterPlot";
     private static final String SCATTER_PLOT_DESC_MV = "This scatter plot was created through the manage views UI";
     @LogMethod
@@ -78,6 +78,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
         //Verify scatter plot
+        // getText(Locator.css("svg"))
         assertSVG(SCATTER_PLOT_MV_1);
 
         log("Set Plot Title");
@@ -127,8 +128,8 @@ public class ScatterPlotTest extends GenericChartsTest
         savePlot(SCATTER_PLOT_NAME_MV, SCATTER_PLOT_DESC_MV);
     }
 
-    private static final String SCATTER_PLOT_DR_1 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse606570758085901. Weight50556065707580859095100105110";
-    private static final String SCATTER_PLOT_DR_2 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200";
+    private static final String SCATTER_PLOT_DR_1 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight606570758085904. Pulse1. Weight50556065707580859095100105110";
+    private static final String SCATTER_PLOT_DR_2 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight607080901001104. Pulse1. Weight6080100120140160180200";
     private static final String SCATTER_PLOT_NAME_DR = "DataRegionScatterPlot";
     private static final String SCATTER_PLOT_DESC_DR = "This scatter plot was created through a data region's 'Views' menu";
     /// Test Scatter Plot created from a filtered data region.
@@ -165,7 +166,7 @@ public class ScatterPlotTest extends GenericChartsTest
         savePlot(SCATTER_PLOT_NAME_DR, SCATTER_PLOT_DESC_DR);
     }
 
-    private static final String SCATTER_PLOT_QC = "Created with Rapha\u00ebl 2.1.0Types - DoubleInteger0.0200000.0400000.0600000.0800000.01000000.01200000.0Double10000000.020000000.030000000.040000000.050000000.060000000.070000000.080000000.090000000.0100000000.0110000000.0120000000.0";
+    private static final String SCATTER_PLOT_QC = "Created with Rapha\u00ebl 2.1.0Types - Double0.0200000.0400000.0600000.0800000.01000000.01200000.0IntegerDouble10000000.020000000.030000000.040000000.050000000.060000000.070000000.080000000.090000000.0100000000.0110000000.0120000000.0";
     private static final String SCATTER_PLOT_NAME_QC = "QuickChartScatterPlot";
     private static final String SCATTER_PLOT_DESC_QC = "This scatter plot was created through the 'Quick Chart' column header menu option";
     @LogMethod
@@ -193,9 +194,9 @@ public class ScatterPlotTest extends GenericChartsTest
         savePlot(SCATTER_PLOT_NAME_QC, SCATTER_PLOT_DESC_QC);
     }
 
-    private static final String SCATTER_PLOT_CUSTOMIZED_COLORS = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200 Group 1 Group 2";
-    private static final String SCATTER_PLOT_CUSTOMIZED_SHAPES = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200 normal abnormal/insignificant abnormal/significant";
-    private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight4. Pulse607080901001101. Weight6080100120140160180200 Group 1 Group 2 normal abnormal/insignificant abnormal/significant";
+    private static final String SCATTER_PLOT_CUSTOMIZED_COLORS = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight607080901001104. Pulse1. Weight6080100120140160180200 Group 1 Group 2";
+    private static final String SCATTER_PLOT_CUSTOMIZED_SHAPES = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight607080901001104. Pulse1. Weight6080100120140160180200 normal abnormal/insignificant abnormal/significant";
+    private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight607080901001104. Pulse1. Weight6080100120140160180200 Group 1 Group 2 normal abnormal/insignificant abnormal/significant";
 
     @LogMethod
     private void doCustomizeScatterPlotTest()
