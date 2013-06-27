@@ -134,6 +134,11 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
         _specimenImporter.waitForComplete();
     }
 
+    protected void setExpectSpecimenImportError(boolean expected)
+    {
+        _specimenImporter.setExpectError(expected);
+    }
+
     @Override
     protected void runUITests() throws Exception
     {
