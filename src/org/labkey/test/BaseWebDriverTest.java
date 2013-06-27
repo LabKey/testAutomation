@@ -5684,7 +5684,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void impersonateGroup(String group, boolean isSiteGroup)
     {
-        goToHome();
+        if (isSiteGroup)
+            goToHome();
         clickUserMenuItem("Impersonate", "Group", (isSiteGroup ? "Site: " : "") + group);
     }
 

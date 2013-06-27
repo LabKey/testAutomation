@@ -70,15 +70,6 @@ public class NWBioTrustTest extends SurveyTest
     private enum NwbtRequestStatuses
     {
         SUBMITTED("Submitted"),
-        SUBMISSION_REVIEW("Submission Review"),
-        FEASIBILITY_REVIEW("Feasibility Review")
-        {
-            @Override
-            public boolean isApproval()
-            {
-                return true;
-            }
-        },
         PRIORITIZATION_REVIEW("Prioritization Review")
         {
             @Override
@@ -87,6 +78,15 @@ public class NWBioTrustTest extends SurveyTest
                 return true;
             }
         },
+        FEASIBILITY_REVIEW("Feasibility Review")
+        {
+            @Override
+            public boolean isApproval()
+            {
+                return true;
+            }
+        },
+        SUBMISSION_REVIEW("Submission Review"),
         APPROVED("Approved")
         {
             @Override
@@ -154,18 +154,24 @@ public class NWBioTrustTest extends SurveyTest
             "IRB Approval Packet",
             "Signed MTDUA Agreement",
             "Signed Confidentiality Pledge",
-            "Specimen Processing Protocol",
+            "Specimen Processing Protocol (Tissue)",
+            "Specimen Processing Protocol (Blood)",
             "Blank Unique Consent Form (by Study)",
-            "Approval Reviewer Response",};
+            "Approval Reviewer Response",
+            "NWBT VBD Specimen Search Export"
+    };
     private static final Boolean[][] NWBT_DOCUMENT_TYPE_FLAGS = { // multiple upload allowed, expriation
             {false, false}, //Proposal Summary (Specimen Request) (multi-upload changed for test purposes)
             {true, false}, //Proposal Summary (Future Study Request)
             {true, true}, //IRB Approval Packet
             {true, false}, //Signed MTDUA Agreement(s)
             {true, false}, //Signed Confidentiality Pledge(s)
-            {true, false}, //Specimen Processing Protocol
+            {true, false}, //Specimen Processing Protocol (Tissue)
+            {true, false}, //Specimen Processing Protocol (Blood)
             {true, true}, //Blank Unique Consent Form (by Study)
-            {true, false}}; //Approval Reviewer Response
+            {true, false}, //Approval Reviewer Response
+            {true, false} //NWBT VBD Specimen Search Export
+    };
 
     private static final String NWBT_PRINCIPAL_INVESTIGATOR = "pi_nwbiotrust@nwbiotrust.test";
     private static final String NWBT_STUDY_CONTACT = "sc_nwbiotrust@nwbiotrust.test";
@@ -173,23 +179,18 @@ public class NWBioTrustTest extends SurveyTest
     private static final String NWBT_RC_EMAIL = "rc_notification@nwbiotrust.test";
     private static final String NWBT_FACULTY_CHAIR = "fc_nwbiotrust@nwbiotrust.test";
     private static final String NWBT_FACULTY_REVIEWER = "fr_nwbiotrust@nwbiotrust.test";
-    private static final String NWBT_SURGICAL_REVIEWER = "sr_nwbiotrust@nwbiotrust.test";
-    private static final String NWBT_NON_SURGICAL_REVIEWER = "nsr_nwbiotrust@nwbiotrust.test";
-    private static final String NWBT_DISCARDED_REVIEWER = "dr_nwbiotrust@nwbiotrust.test";
+    private static final String NWBT_TISSUE_REVIEWER = "tr_nwbiotrust@nwbiotrust.test";
+    private static final String NWBT_BLOOD_REVIEWER = "br_nwbiotrust@nwbiotrust.test";
     private static final String[] NWBT_USERS = {NWBT_PRINCIPAL_INVESTIGATOR, NWBT_STUDY_CONTACT, NWBT_RESEARCH_COORD,
-                                                NWBT_FACULTY_CHAIR, NWBT_FACULTY_REVIEWER, NWBT_SURGICAL_REVIEWER, NWBT_NON_SURGICAL_REVIEWER, NWBT_DISCARDED_REVIEWER};
-    private static final String NWBT_SURGICAL_REVIEWER_GROUP = "Surgical Reviewer";
-    private static final String NWBT_NON_SURGICAL_REVIEWER_GROUP = "Non Surgical Reviewer";
-    private static final String NWBT_DISCARDED_REVIEWER_GROUP = "Discarded Reviewer";
+                                                NWBT_FACULTY_CHAIR, NWBT_FACULTY_REVIEWER, NWBT_TISSUE_REVIEWER, NWBT_BLOOD_REVIEWER};
+    private static final String NWBT_REVIEWER_GROUP = "Approval Reviewers";
     private static final String NWBT_RESEARCH_COORD_GROUP = "Research Coordinators";
+    private static final String NWBT_RESEARCH_COORD_ROLE = "NWBT Research Coordinator";
 
     private final File studyRegistrationJson = new File(getDownloadDir(), "study-registration.json");
-    private final File prospectiveSampleRequestJson = new File(getDownloadDir(), "prospective-sample-request.json");
-    private final File discardedSampleRequestJson = new File(getDownloadDir(), "discarded-sample-request.json");
-    private final File surgicalTissueJson = new File(getDownloadDir(), "surgical-tissue-sample.json");
-    private final File nonSurgicalTissueJson = new File(getDownloadDir(), "non-surgical-tissue-sample.json");
-    private final File bloodSampleJson = new File(getDownloadDir(), "blood-tissue-sample.json");
-    private final File discardedBloodSampleJson = new File(getDownloadDir(), "discarded-blood-sample.json");
+    private final File sampleRequestJson = new File(getDownloadDir(), "sample-request.json");
+    private final File tissueJson = new File(getDownloadDir(), "tissue-sample.json");
+    private final File bloodSampleJson = new File(getDownloadDir(), "blood-sample.json");
 
     private int fileCount = 0;
 
@@ -216,9 +217,11 @@ public class NWBioTrustTest extends SurveyTest
         verifySampleRequests();
         verifyFolderTypes();
         verifyResearchCoordDashboard();
+        verifyReviewerWorkflow();
         verifyRequestorDashboard();
         verifySecondRequestorDashboard();
         verifyDocumentSetFromDashboard();
+        verifyEmailNotifications();
     }
 
     @LogMethod
@@ -374,6 +377,7 @@ public class NWBioTrustTest extends SurveyTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyRequestorDashboard()
     {
+        goToProjectHome();
         log("Verify updated requests show up in Requestor Dashboard");
         clickFolder(requestorFolder1);
         clickTab("My Studies");
@@ -399,47 +403,44 @@ public class NWBioTrustTest extends SurveyTest
         log("Create sample requests - from surguries or clinic procedures");
         for (String requestType : allRequestTypes)
         {
-            clickAndWait(Locator.linkWithText("Click Here"));
+            clickButton("Request sample collection");
             _ext4Helper.selectComboBoxItem(Locator.xpath("//tr").withPredicate(Locator.xpath("td/label").containing("Associated study")).append("/td[2]/table"), registrationLabel);
-            _ext4Helper.checkCheckbox("Surgical tissue samples");
+            _ext4Helper.checkCheckbox("Tissue collected at surgery");
+            setFormElement(Locator.name("collectionstartdate"), "2013-03-20");
+            setFormElement(Locator.name("collectionenddate"), "2013-03-21");
             clickButton("Next", 0);
             _ext4Helper.checkCheckbox("Stomach");
+            clickButton("Next", 0);
+            setFormElement(Locator.name("totalspecimendonors"), "6");
+            setFormElement(Locator.name("genderrequirements"), "males 50%, females 50%");
+            setFormElement(Locator.name("agerequirements"), ">=21yr");
+            click(Ext4HelperWD.Locators.formItemWithLabel("Is cancer history and previous treatment relevant to your study?").append("//label").withText("Yes"));
+            click(Ext4HelperWD.Locators.formItemWithLabel("Are patients with a prior cancer okay?").append("//label").withText("Yes"));
+            click(Ext4HelperWD.Locators.formItemWithLabel("Are samples collected after neoadjuvant therapy okay?").append("//label").withText("Yes"));
+            click(Ext4HelperWD.Locators.formItemWithLabelContaining("Are patients with a history of BCC").append("//label").withText("Yes"));
             clickButton("Next", 0);
             _ext4Helper.waitForMaskToDisappear();
             clickButton("Add Record", 0);
             {// Tissue Samples dialog
-                _extHelper.waitForExtDialog("Add Surgical Tissue Samples");
+                _extHelper.waitForExtDialog("Add Tissue Samples");
                 waitForElementToDisappear(Locator.css(".x4-mask").index(2));
 
                 // Tissue Type Information
-                _ext4Helper.selectComboBoxItem("Surgical Tissue Type:", requestType);
+                _ext4Helper.selectComboBoxItem("Tissue Type:", requestType);
                 _ext4Helper.selectComboBoxItem("Anatomical Site:", "Stomach");
-                setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Minimum Size:").append("//input"), "5");
-                _ext4Helper.selectComboBoxItem("Minimum Size Units:", "gr");
-                setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Preferred Size:").append("//input"), "6");
-                _ext4Helper.selectComboBoxItem("Preferred Size Units:", "gr");
+                setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Minimum Size:").append("//input"), "0.5cm x 0.4cm x 0.3cm");
+                setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Preferred Size:").append("//input"), "0.5cm x 0.4cm x 0.3cm");
                 _ext4Helper.selectComboBoxItem("Preservation:", "Flash Frozen");
 
-                // Participant Eligibility
-                _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
-                setFormElement(Ext4HelperWD.Locators.formItemWithLabel("Number of Cases/Participants:").append("//input"), "6");
-                click(Ext4HelperWD.Locators.formItemWithLabel("Are patients with a prior cancer OK?").append("//label").withText("Yes"));
-                click(Ext4HelperWD.Locators.formItemWithLabelContaining("Are patients with a history of Basal").append("//label").withText("Yes"));
-
-                // Sample Pickup
-                _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
-                click(Ext4HelperWD.Locators.formItemWithLabelContaining("If sample is available after 5pm").append("//label").withText("Yes"));
-                click(Ext4HelperWD.Locators.formItemWithLabelContaining("Prefer samples be held overnight").append("//label").withText("Yes"));
-
-                _extHelper.clickExtButton("Add Surgical Tissue Samples", "Next", 0);
-                _extHelper.clickExtButton("Add Surgical Tissue Samples", "Save", 0);
+                _extHelper.clickExtButton("Add Tissue Samples", "Save", 0);
             }// done with Tissue Samples dialog
 
-            _extHelper.waitForExtDialogToDisappear("Add Surgical Tissue Samples");
-            waitForElement(Locator.css(".x4-action-col-0"));
-            setFormElement(Locator.name("surgicalstartdate"), "2013-03-20");
-            setFormElement(Locator.name("surgicalenddate"), "2013-03-21");
-            click(Ext4HelperWD.Locators.formItemWithLabelContaining("Are samples collected after neoadjuvant").append("//label").withText("Yes"));
+            _extHelper.waitForExtDialogToDisappear("Add Tissue Samples");
+            clickButton("Next", "Please indicate all sample types needed from each specimen donor");
+            clickButton("Next", "Did you request fresh");
+            click(Ext4HelperWD.Locators.formItemWithLabelContaining("Did you request fresh tissue or a blood draw?").append("//label").withText("Yes"));
+            click(Ext4HelperWD.Locators.formItemWithLabelContaining("Can you arrange for pick up").append("//label").withText("Yes"));
+            click(Ext4HelperWD.Locators.formItemWithLabelContaining("Does your study allow fresh samples").append("//label").withText("Yes"));
             clickButton("Next", 0);
             clickButton("Save");
         }
@@ -456,7 +457,7 @@ public class NWBioTrustTest extends SurveyTest
         waitForElement(Locator.id("locked-dashboard-4").append("//span").withText("No sample requests to show"));
         for (int i = 0; i < submittedRequestTypes.length; i++)
         {
-            // note: the NWBT IDs for a sample request in a new folder should now be predictable (starting at 1)
+            // note: the Request IDs for a sample request in a new folder should now be predictable (starting at 1)
             waitAndClick(Locator.id("pending-dashboard-2").append(Locator.linkWithText(String.valueOf(i+1))));
             waitForElement(Locator.xpath("//label[text() = 'Tissue Type:']/../../td/div[text() = '" + submittedRequestTypes[i] + "']"));
             clickAndWait(Locator.linkWithText("view details", 1));
@@ -484,6 +485,8 @@ public class NWBioTrustTest extends SurveyTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifyResearchCoordDashboard()
     {
+        impersonateRole(NWBT_RESEARCH_COORD_ROLE);
+
         log("Verify submitted requests show up in RC Dashboard");
         goToProjectHome();
         clickTab("New Sample Requests");
@@ -503,6 +506,29 @@ public class NWBioTrustTest extends SurveyTest
         assertTextNotPresent("Unassigned");
         assertTextPresentInThisOrder(NWBT_REQUEST_CATEGORIES);
         assertTextPresentInThisOrder(Arrays.copyOfRange(NWBT_REQUEST_STATUSES, 0, submittedRequestTypes.length - 1));
+
+        log("Verify audit records");
+        Locator loc = getEditLinkLocator(submittedRequestTypes[0], false);
+        click(loc);
+        _extHelper.waitForExtDialog("Edit Sample Request : 1-1");
+        click(Locator.linkContainingText("view history"));
+        _extHelper.waitForExtDialog("Status Change History : 1-1");
+        waitForElement(Locator.xpath("//div[text() = 'TissueRecordId']"));
+        assertTextPresent("Sample Request Status Changed", "Submitted", "resource and status changed");
+        clickButton("Close", 0);
+        clickButton("Cancel", 0);
+
+        loc = getEditLinkLocator(submittedRequestTypes[1], false);
+        click(loc);
+        _extHelper.waitForExtDialog("Edit Sample Request : 1-2");
+        click(Locator.linkContainingText("view history"));
+        _extHelper.waitForExtDialog("Status Change History : 1-2");
+        waitForElement(Locator.xpath("//div[text() = 'TissueRecordId']"));
+        assertTextPresent("Sample Request Status Changed", "Prioritization Review", "Submitted", "resource and status changed");
+        clickButton("Close", 0);
+        clickButton("Cancel", 0);
+
+        stopImpersonatingRole();
     }
 
     private void waitForGridToLoad(final String tag, final String className, final int expectedCount)
@@ -569,8 +595,8 @@ public class NWBioTrustTest extends SurveyTest
         popLocation();
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForText("No study registrations to show", 1, WAIT_FOR_PAGE);
-        waitAndClickAndWait(Locator.linkWithText("Click Here"));
-        List<Map<String, String>> fields = new ArrayList<>();
+        clickButton("Create new study registration");
+        List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
         fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + registrationLabel));
         fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Approved Human Subjects Research"));
         fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
@@ -833,6 +859,73 @@ public class NWBioTrustTest extends SurveyTest
         }
     }
 
+    private void verifyReviewerWorkflow()
+    {
+        log("Verify reviewer views");
+        goToProjectHome();
+        clickTab("New Sample Requests");
+        waitForGridToLoad("div", "x4-grid-group-title", 1); // requests grouped by study
+        waitForGridToLoad("tr", "x4-grid-row", submittedRequestTypes.length);
+        assertElementPresent(getGroupingTitleLocator(registrationLabel));
+        assertTextPresentInThisOrder(submittedRequestTypes);
+        assertTextNotPresent(unsubmittedRequestTypes);
+
+        click(Locator.linkContainingText("Prioritization Review"));
+
+        impersonateGroup(NWBT_REVIEWER_GROUP, false);
+
+        waitForGridToLoad("div", "x4-grid-group-title", 1); // requests grouped by study
+        waitForGridToLoad("tr", "x4-grid-row", 1);
+        assertTextPresent(submittedRequestTypes[1]);
+
+        click(Locator.linkContainingText("1-2"));
+
+        waitForText("Prioritization Review Assessment Details");
+
+        _ext4Helper.selectRadioButton("Recommendation:", "Approve, no changes needed");
+
+        if (isElementPresent(Locator.xpath("//textarea[@name='Comment']")))
+            setFormElement(Locator.xpath("//textarea[@name='Comment']"), "Approved");
+
+        waitAndClick(Locator.ext4ButtonEnabled("Submit"));
+        waitForGridToLoad("div", "x4-grid-group-title", 1); // requests grouped by study
+        waitForGridToLoad("tr", "x4-grid-row", 1);
+        assertTextPresent(submittedRequestTypes[1]);
+        stopImpersonatingGroup();
+
+        log("Verify reviewer views");
+
+        goToProjectHome();
+        impersonateRole(NWBT_RESEARCH_COORD_ROLE);
+        clickTab("New Sample Requests");
+        waitForGridToLoad("div", "x4-grid-group-title", 1); // requests grouped by study
+        waitForGridToLoad("tr", "x4-grid-row", submittedRequestTypes.length);
+
+        click(Locator.linkContainingText("1-2"));
+        waitForText("Sample Request Details");
+        assertTextPresent("Prioritization Review Approval Response");
+        assertTextPresent("Prioritization Review, Approved");
+        clickButton("Close", 0);
+
+        stopImpersonatingRole();
+    }
+
+    private void verifyEmailNotifications()
+    {
+        goToModule("Dumbster");
+
+        waitForElement(Locator.xpath("//div[text()='Message']"));
+        assertElementPresent(Locator.linkWithText("A BioTrust Sample request has been updated"), 1);
+        assertElementPresent(Locator.linkWithText("A BioTrust Sample request has been submitted"), 3);
+        assertElementPresent(Locator.linkWithText("A BioTrust sample request is ready for prioritization review"), 1);
+        click(Locator.linkWithText("A BioTrust Sample request has been updated"));
+        assertTextPresent("A BioTrust sample request has been updated");
+        click(Locator.linkWithText("A BioTrust Sample request has been submitted"));
+        assertTextPresent("A BioTrust sample request has been submitted");
+        click(Locator.linkWithText("A BioTrust sample request is ready for prioritization review"));
+        assertTextPresent("A BioTrust sample request of type: Tissue has been marked for prioritization ");
+    }
+
     @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupUsersAndPermissions()
     {
@@ -849,9 +942,7 @@ public class NWBioTrustTest extends SurveyTest
         setUserPermissions(NWBT_FACULTY_REVIEWER, "Reader");
         clickButton("Save and Finish");
         addUserToProjGroup(NWBT_RESEARCH_COORD, getProjectName(), NWBT_RESEARCH_COORD_GROUP);
-        addUserToProjGroup(NWBT_SURGICAL_REVIEWER, getProjectName(), NWBT_SURGICAL_REVIEWER_GROUP);
-        addUserToProjGroup(NWBT_NON_SURGICAL_REVIEWER, getProjectName(), NWBT_NON_SURGICAL_REVIEWER_GROUP);
-        addUserToProjGroup(NWBT_DISCARDED_REVIEWER, getProjectName(), NWBT_DISCARDED_REVIEWER_GROUP);
+        addUserToProjGroup(NWBT_TISSUE_REVIEWER, getProjectName(), NWBT_REVIEWER_GROUP);
 
         log("Grant the appropriate permissions for 1st requestor subfolder");
         //note: don't give them perm to the 2nd requestor folder so that we can test the container permissions
@@ -912,12 +1003,9 @@ public class NWBioTrustTest extends SurveyTest
         clickAndWait(Locator.linkWithText("Manage"));
         waitForText("Metadata for Study Registration and Sample Requests");
         click(Locator.linkWithText("Study Registration"));
-        downloadFileFromLink(Locator.linkWithText("Prospective Sample Request"));
-        downloadFileFromLink(Locator.linkWithText("Discarded Sample Request"));
-        downloadFileFromLink(Locator.linkWithText("Surgical Tissue Record"));
-        downloadFileFromLink(Locator.linkWithText("Non-surgical Tissue Record"));
+        downloadFileFromLink(Locator.linkWithText("Sample Request"));
+        downloadFileFromLink(Locator.linkWithText("Tissue Sample Record"));
         downloadFileFromLink(Locator.linkWithText("Blood Sample Record"));
-        downloadFileFromLink(Locator.linkWithText("Discarded Blood Sample Record"));
 
         waitFor(new BaseWebDriverTest.Checker()
         {
@@ -933,36 +1021,18 @@ public class NWBioTrustTest extends SurveyTest
             @Override
             public boolean check()
             {
-                return prospectiveSampleRequestJson.exists();
+                return sampleRequestJson.exists();
             }
-        }, "failed to download prospective sample request json", WAIT_FOR_JAVASCRIPT);
+        }, "failed to download sample request json", WAIT_FOR_JAVASCRIPT);
 
         waitFor(new BaseWebDriverTest.Checker()
         {
             @Override
             public boolean check()
             {
-                return discardedSampleRequestJson.exists();
+                return tissueJson.exists();
             }
-        }, "failed to download discarded blood sample request json", WAIT_FOR_JAVASCRIPT);
-
-        waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return surgicalTissueJson.exists();
-            }
-        }, "failed to download surgical tissue request json", WAIT_FOR_JAVASCRIPT);
-
-        waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return nonSurgicalTissueJson.exists();
-            }
-        }, "failed to download non-surgical tissue request json", WAIT_FOR_JAVASCRIPT);
+        }, "failed to download tissue sample request json", WAIT_FOR_JAVASCRIPT);
 
         waitFor(new BaseWebDriverTest.Checker()
         {
@@ -973,62 +1043,32 @@ public class NWBioTrustTest extends SurveyTest
             }
         }, "failed to download blood sample request json", WAIT_FOR_JAVASCRIPT);
 
-        waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return discardedBloodSampleJson.exists();
-            }
-        }, "failed to download discarded blood sample request json", WAIT_FOR_JAVASCRIPT);
-
-        Map<String, String> design = new HashMap<>();
+        Map<String, String> design = new HashMap<String, String>();
         design.put("label", "StudyRegistration");
         design.put("description", "");
         design.put("table", "StudyRegistrations");
         design.put("metadataPath", studyRegistrationJson.getAbsolutePath());
         designs.add(design);
 
-        design = new HashMap<>();
-        design.put("label", "ProspectiveSampleRequest");
+        design = new HashMap<String, String>();
+        design.put("label", "SampleRequest");
         design.put("description", "");
         design.put("table", "SampleRequests");
-        design.put("metadataPath", prospectiveSampleRequestJson.getAbsolutePath());
+        design.put("metadataPath", sampleRequestJson.getAbsolutePath());
         designs.add(design);
 
-        design = new HashMap<>();
-        design.put("label", "DiscardedBloodSampleRequest");
-        design.put("description", "");
-        design.put("table", "SampleRequests");
-        design.put("metadataPath", discardedSampleRequestJson.getAbsolutePath());
-        designs.add(design);
-
-        design = new HashMap<>();
-        design.put("label", "SurgicalTissueSample");
+        design = new HashMap<String, String>();
+        design.put("label", "TissueSample");
         design.put("description", "");
         design.put("table", "TissueRecords");
-        design.put("metadataPath", surgicalTissueJson.getAbsolutePath());
+        design.put("metadataPath", tissueJson.getAbsolutePath());
         designs.add(design);
 
-        design = new HashMap<>();
-        design.put("label", "NonSurgicalTissueSample");
-        design.put("description", "");
-        design.put("table", "TissueRecords");
-        design.put("metadataPath", nonSurgicalTissueJson.getAbsolutePath());
-        designs.add(design);
-
-        design = new HashMap<>();
+        design = new HashMap<String, String>();
         design.put("label", "BloodSample");
         design.put("description", "");
         design.put("table", "TissueRecords");
         design.put("metadataPath", bloodSampleJson.getAbsolutePath());
-        designs.add(design);
-
-        design = new HashMap<>();
-        design.put("label", "DiscardedBloodSample");
-        design.put("description", "");
-        design.put("table", "TissueRecords");
-        design.put("metadataPath", discardedBloodSampleJson.getAbsolutePath());
         designs.add(design);
     }
 
