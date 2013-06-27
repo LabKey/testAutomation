@@ -18,10 +18,6 @@
 <%@ page import="org.labkey.api.view.HttpView"%>
 <%@ page import="org.labkey.api.view.ViewContext"%>
 <%@ page extends="org.labkey.api.jsp.JspBase" %>
-<%
-    ViewContext context = HttpView.currentContext();
-%>
-
 <div id='divForm'>
 </div>
 <p></p>

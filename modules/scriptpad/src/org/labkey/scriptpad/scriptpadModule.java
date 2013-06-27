@@ -16,18 +16,12 @@
 
 package org.labkey.scriptpad;
 
-import org.jetbrains.annotations.NotNull;
-import org.labkey.api.data.Container;
-import org.labkey.api.data.ContainerManager;
-import org.labkey.api.data.DbSchema;
 import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
-import org.labkey.api.util.PageFlowUtil;
 import org.labkey.api.view.WebPartFactory;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 
 public class scriptpadModule extends DefaultModule
 {
@@ -40,13 +34,19 @@ public class scriptpadModule extends DefaultModule
     @Override
     public double getVersion()
     {
-        return 0.01;
+        return 13.20;
+    }
+
+    @Override
+    public boolean isAutoUninstall()
+    {
+        return true;
     }
 
     @Override
     public boolean hasScripts()
     {
-        return true;
+        return false;
     }
 
     @Override
@@ -64,27 +64,5 @@ public class scriptpadModule extends DefaultModule
     @Override
     public void doStartup(ModuleContext moduleContext)
     {
-        // add a container listener so we'll know when our container is deleted:
-        ContainerManager.addContainerListener(new scriptpadContainerListener());
-    }
-
-    @Override
-    public Collection<String> getSummary(Container c)
-    {
-        return Collections.emptyList();
-    }
-
-    @Override
-    @NotNull
-    public Set<String> getSchemaNames()
-    {
-        return Collections.singleton("scriptpad");
-    }
-
-    @Override
-    @NotNull
-    public Set<DbSchema> getSchemasToTest()
-    {
-        return PageFlowUtil.set(scriptpadSchema.getInstance().getSchema());
     }
 }
