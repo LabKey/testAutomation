@@ -129,7 +129,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         setFormElement("testDate", testDate);
         //click(Locator.id("ext-gen4"));
         click(Locator.xpath("//a[contains(@class, 'labkey-file-add-icon-enabled')]"));
-        setFormElement("__primaryFile__1", file);
+        setFormElement("__primaryFile__", file);
         clickButton("Next", 60000);
     }
 
