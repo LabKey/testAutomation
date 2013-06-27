@@ -208,7 +208,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll(originalTest, "FakeTest");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
+        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
         waitAndClick(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: FakeTest (ng/ml)");

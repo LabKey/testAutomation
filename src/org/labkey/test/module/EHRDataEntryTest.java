@@ -195,7 +195,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
         recallLocation();
         waitAndClickAndWait(Locator.linkWithText("Enter Data"));
 
-        log("Create weight measurement task.");
+        log("Create MPR task.");
         waitAndClickAndWait(Locator.linkWithText("Enter MPR"));
         // Wait for page to fully render.
         waitForText("Treatments", WAIT_FOR_JAVASCRIPT);

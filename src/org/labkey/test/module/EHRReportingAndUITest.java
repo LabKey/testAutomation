@@ -221,7 +221,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         //crawlReportTabs(); // TOO SLOW. TODO: Crawl specific tabs to test functionality
 
         //NOTE: rendering the entire colony is slow, so instead of abstract we load a simpler report
-        log("Verify Entire colony history");
+        log("Verify entire colony history");
         waitAndClick(Locator.ext4Radio("Entire Database"));
         _ext4Helper.clickTabContainingText("Demographics");
         waitForText("Rhesus"); //a proxy for the loading of the dataRegion
@@ -230,7 +230,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         log("Verify location based history");
         waitAndClick(Locator.ext4Radio("Current Location"));
-        
+
         _ext4Helper.queryOne("#areaField", Ext4FieldRefWD.class).setValue(AREA_ID);
         sleep(200); //wait for 2nd field to filter
         _ext4Helper.queryOne("#roomField", Ext4FieldRefWD.class).setValue(ROOM_ID);
@@ -261,7 +261,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", PROTOCOL_MEMBER_IDS.length, getDataRegionRowCount(dataRegionName));
-        assertLinkPresentWithText(PROTOCOL_MEMBER_IDS[0]);
+        assertElementPresent(Locator.linkContainingText(PROTOCOL_MEMBER_IDS[0]));
 
         // Check animal count after removing one from search.
         waitAndClick(Locator.ext4Button(PROTOCOL_MEMBER_IDS[0] + " (X)"));
@@ -281,7 +281,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
         waitForElement(Locator.xpath("//th[contains(text(), 'Weights -')]"));
         _ext4Helper.clickExt4Tab("Raw Data");
-        waitForText("Percent Change", WAIT_FOR_PAGE);
+        waitForText("Percent Change", WAIT_FOR_PAGE * 3);
 
         log("Check subjectField parsing");
         getAnimalHistorySubjField().setValue(MORE_ANIMAL_IDS[0] + "," + MORE_ANIMAL_IDS[1] + ";" + MORE_ANIMAL_IDS[2] + " " + MORE_ANIMAL_IDS[3] + "\t" + MORE_ANIMAL_IDS[4]);
@@ -396,6 +396,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     private void refreshAnimalHistoryReport()
     {
         waitForText("Abstract");
+        sleep(100);
         waitAndClick(Locator.ext4Button("Refresh"));
     }
 
