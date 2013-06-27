@@ -374,6 +374,7 @@ src/org/labkey/test/tests/SimpleApiTest.java -text
 src/org/labkey/test/tests/SimpleApiTestWD.java -text
 src/org/labkey/test/tests/SimpleModuleTest.java -text
 src/org/labkey/test/tests/SpecimenBaseTest.java -text
+src/org/labkey/test/tests/SpecimenExportTest.java -text
 src/org/labkey/test/tests/SpecimenMergeTest.java -text
 src/org/labkey/test/tests/SpecimenProgressReportTest.java -text
 src/org/labkey/test/tests/SpecimenReplaceTest.java -text

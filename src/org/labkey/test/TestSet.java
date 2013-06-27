@@ -219,7 +219,8 @@ public enum TestSet
         ETLTest.class,
         ReportThumbnailTest.class,
         DrugSensitivityAssayTest.class,
-        OConnorExperimentTest.class
+        OConnorExperimentTest.class,
+        SpecimenExportTest.class
     ),
 
     Daily(600000, DailyA.getTestList(), DailyB.getTestList()),
@@ -325,7 +326,8 @@ public enum TestSet
         SpecimenReplaceTest.class,
         SpecimenMergeTest.class,
         SampleMindedImportTest.class,
-        CreateVialsTest.class
+        CreateVialsTest.class,
+        SpecimenExportTest.class
     ),
 
     Assays(
