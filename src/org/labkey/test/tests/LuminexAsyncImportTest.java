@@ -41,7 +41,14 @@ public class LuminexAsyncImportTest extends LuminexTest
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
         saveAssay();
 
-        // test successful background import
+        importFirstRun();
+        importSecondRun(1, Calendar.getInstance(), TEST_ASSAY_LUM_FILE5);
+        reimportFirstRun(0, Calendar.getInstance(), TEST_ASSAY_LUM_FILE5);
+    }
+
+    protected void importFirstRun() {
+        // IMPORT 1ST RUN
+        // First file to be import which will subsequently be re-imported
         importRunForTestLuminexConfig(TEST_ASSAY_LUM_FILE5, Calendar.getInstance(), 0);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(2);
@@ -60,4 +67,70 @@ public class LuminexAsyncImportTest extends LuminexTest
         assertTextPresent("Error: No value provided for 'Positivity Fold Change'.", 3);
         checkExpectedErrors(2);
     }
+
+    protected void importSecondRun(int index, Calendar testDate, File file) {
+        // add a second run with different run values
+        int i = index;
+        goToTestAssayHome();
+        checkCheckbox(".select");
+        clickButton("Import Data");
+        setFormElement("network", "NEWNET" + (i + 1));
+        //assert(getFormElement(Locator.name("network")).equals("NETWORK1"));
+        clickButton("Next");
+        testDate.add(Calendar.DATE, 1);
+        importLuminexRunPageTwo("Guide Set plate " + (i+1), "new"+isotype, "new"+conjugate, "", "", "NewNote" + (i+1),
+                "new Experimental", "NewTECH" + (i+1), df.format(testDate.getTime()), file.toString(), i);
+        uncheckCheckbox("_titrationRole_standard_Standard1");
+        checkCheckbox("_titrationRole_qccontrol_Standard1");
+        clickButton("Save and Finish");
+    }
+
+    protected void reimportFirstRun(int index, Calendar testDate, File file)
+    {
+        // test Luminex re-run import, check for identical values
+        int i = index;
+        goToTestAssayHome();
+        // The 2nd run should already be selected, so we just need to click Re-import run
+        clickButton("Re-import run");
+        // verify that all old values from the first imported run are present
+        assert(getFormElement(Locator.name("network")).equals("NETWORK1"));
+        clickButton("Next");
+        testDate.add(Calendar.DATE, 1);
+        reimportLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
+                "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), file.toString(), i);
+        uncheckCheckbox("_titrationRole_standard_Standard1");
+        checkCheckbox("_titrationRole_qccontrol_Standard1");
+        clickButton("Save and Finish");
+    }
+
+    protected void reimportLuminexRunPageTwo(String name, String isotype, String conjugate, String stndCurveFitInput,
+                                             String unkCurveFitInput, String notebookNo, String assayType, String expPerformer,
+                                             String testDate, String file, int i)
+    {
+        // verify that all old values from the first imported run are present
+        assert(getFormElement(Locator.name("name")).equals(name));
+        setFormElement("name", name);
+        assert(getFormElement(Locator.name("isotype")).equals(isotype));
+        setFormElement("isotype", isotype);
+        assert(getFormElement(Locator.name("conjugate")).equals(conjugate));
+        setFormElement("conjugate", conjugate);
+        assert(getFormElement(Locator.name("stndCurveFitInput")).equals(stndCurveFitInput));
+        setFormElement("stndCurveFitInput", stndCurveFitInput);
+        assert(getFormElement(Locator.name("unkCurveFitInput")).equals(unkCurveFitInput));
+        setFormElement("unkCurveFitInput", unkCurveFitInput);
+        uncheckCheckbox("curveFitLogTransform");
+        assert(getFormElement(Locator.name("notebookNo")).equals(notebookNo));
+        setFormElement("notebookNo", notebookNo);
+        assert(getFormElement(Locator.name("assayType")).equals(assayType));
+        setFormElement("assayType", assayType);
+        assert(getFormElement(Locator.name("expPerformer")).equals(expPerformer));
+        setFormElement("expPerformer", expPerformer);
+        assert(getFormElement(Locator.name("testDate")).equals(testDate));
+        setFormElement("testDate", testDate);
+        //click(Locator.id("ext-gen4"));
+        click(Locator.xpath("//a[contains(@class, 'labkey-file-add-icon-enabled')]"));
+        setFormElement("__primaryFile__1", file);
+        clickButton("Next", 60000);
+    }
+
 }
