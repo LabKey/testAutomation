@@ -102,7 +102,9 @@ public class ETLTest extends BaseWebDriverTest
     private void runETLAppendJob()
     {
         goToModule("DataIntegration");
+        prepForPageLoad();
         waitAndClick(Locator.xpath("//tr[contains(@transformid,'append')]/td/a"));
+        newWaitForPageToLoad();
         goToProjectHome();
     }
 
