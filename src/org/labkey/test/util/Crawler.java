@@ -21,6 +21,7 @@ import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.UnhandledAlertException;
 
@@ -58,6 +59,7 @@ public class Crawler
 
     private static Set<ControllerActionId> _actionsVisited = new HashSet<>();
     private static Set<String> _urlsChecked = new HashSet<>();
+    public static ActionProfiler _actionProfiler = new ActionProfiler();
     private UrlToCheck _urlToCheck;
     private int _crawlTime = 0;
     private int _maxDepth = 3;
@@ -222,7 +224,7 @@ public class Crawler
         }
     }
 
-    private String getURLBase(URL currentPageURL)
+    private static String getURLBase(URL currentPageURL)
     {
         String urlString = stripQueryParams(currentPageURL.getPath());
         int lastSlashIdx = urlString.lastIndexOf('/');
@@ -231,7 +233,7 @@ public class Crawler
         return urlString;
     }
 
-    private String stripQueryParams(String url)
+    private static String stripQueryParams(String url)
     {
         int paramIdx = url.indexOf('?');
         if (paramIdx > 0)
@@ -278,7 +280,7 @@ public class Crawler
     }
 
 
-    protected class ControllerActionId
+    protected static class ControllerActionId
     {
         private String _controller;
         private String _action = "";
@@ -365,6 +367,126 @@ public class Crawler
         }
     }
 
+    public static class ActionProfiler
+    {
+    	private Map<ControllerActionId, ActionProfile> _actionProfiles = new HashMap<>();
+
+        public void updateActionProfile(String relativeUrl, long loadTime)
+        {
+            ControllerActionId actionId = new ControllerActionId(relativeUrl);
+            if (_actionProfiles.containsKey(actionId))
+                _actionProfiles.get(actionId).updateActionProfile(relativeUrl, loadTime);
+            else
+                _actionProfiles.put(actionId, new ActionProfile(relativeUrl, loadTime));
+        }
+
+    	private class ActionProfile
+    	{
+    		private long _invocations;
+    		private long _longestLoad;
+    		private long _totalTime;
+    		private String _urlForLongest;
+    		private ControllerActionId _actionId;
+
+    		ActionProfile(String relativeURL, long loadTime)
+    		{
+    			_actionId = new ControllerActionId(relativeURL);
+    			_invocations = 1;
+    			_totalTime = _longestLoad = loadTime;
+    			_urlForLongest = relativeURL;
+    		}
+
+            public void updateActionProfile(String relativeURL, long loadTime)
+            {
+                if (!_actionId.equals(new ControllerActionId(relativeURL)))
+                    throw new IllegalArgumentException("Actions don't match");
+
+                _invocations++;
+                _totalTime += loadTime;
+
+                if (loadTime > _longestLoad)
+                {
+                    _longestLoad = loadTime;
+                    _urlForLongest = relativeURL;
+                }
+            }
+
+            public ControllerActionId getActionId()
+            {return _actionId;}
+
+            public String getAction()
+            {return _actionId.getAction();}
+
+            public String getController()
+            {return _actionId.getController();}
+
+            public long getInvocations()
+            {return _invocations;}
+
+            public long getLongestLoad()
+            {return _longestLoad;}
+
+            public long getTotalTime()
+            {return _totalTime;}
+    	}
+
+        public String toHtml()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append("<table cellspacing=0 cellpadding=3>\n");
+            sb.append("<tr>");
+            sb.append("<td>");
+            sb.append("Controller");
+            sb.append("</td><td style=\"padding-left:10;\">");
+            sb.append("Action");
+            sb.append("</td>");
+            sb.append("<td>");
+            sb.append("Slowest Instance");
+            sb.append("</td>");
+            sb.append("<td>");
+            sb.append("Invocation Count (crawler)");
+            sb.append("</td>");
+            sb.append("<td>");
+            sb.append("Total time");
+            sb.append("</td>");
+            sb.append("</tr>\n");
+
+            for (ActionProfile action : _actionProfiles.values())
+            {
+                sb.append("<tr>");
+                sb.append("<td valign=top align=right>").append(action.getController()).append("</td>");
+                sb.append("<td style=\"padding-left:10;\">").append(action.getAction()).append("</td>");
+                sb.append("<td style=\"padding-left:10;\">").append(action.getLongestLoad()).append("</td>");
+                sb.append("<td style=\"padding-left:10;\">").append(action.getInvocations()).append("</td>");
+                sb.append("<td style=\"padding-left:10;\">").append(action.getTotalTime()).append("</td>");
+                sb.append("</tr>\n");
+            }
+
+            sb.append("</table>\n");
+
+            return sb.toString();
+        }
+
+        public String toTsv()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append("Controller\tAction\tSlowest Instance\tInvocation Count (crawler)\tTotal time\n");
+
+            for (ActionProfile action : _actionProfiles.values())
+            {
+                sb.append(action.getController()).append("\t");
+                sb.append(action.getAction()).append("\t");
+                sb.append(action.getLongestLoad()).append("\t");
+                sb.append(action.getInvocations()).append("\t");
+                sb.append(action.getTotalTime());
+                sb.append("\n");
+            }
+
+            return sb.toString();
+        }
+    }
 
     private boolean isVisitableURL(String rootRelativeURL, int currentDepth)
     {
@@ -524,13 +646,11 @@ public class Crawler
     private void crawlLink(UrlToCheck urlToCheck, String relativeURL)
     {
         URL origin = null;
-        RuntimeException re = null;
-        AssertionError ae = null;
         // Helps breadth first crawl
         try
         {
             // Go to the site
-            _test.beginAt(relativeURL);
+            long loadTime = _test.beginAt(relativeURL);
             try{ _test.dismissAlerts(); } catch(SeleniumException ignore){}
 
             int depth = urlToCheck.getDepth();
@@ -538,12 +658,14 @@ public class Crawler
             URL currentPageUrl = _test.getURL();
 
             // Find all the links at the site
+            if (_test.isElementPresent(Locator.id("folderBar")))_test.hoverFolderBar();
             String[] linkAddresses = _test.getLinkAddresses();
             for (String url : linkAddresses)
                 _urlsToCheck.add(new UrlToCheck(currentPageUrl, url, depth + 1, urlToCheck.testInjection()));
 
             // Keep track of where crawler has been
             _actionsVisited.add(new ControllerActionId(relativeURL));
+            _actionProfiler.updateActionProfile(relativeURL, loadTime);
 
             checkForForbiddenWords(relativeURL);
 
@@ -554,12 +676,9 @@ public class Crawler
 
 			testInjection(urlToCheck, currentPageUrl);
         }
-        catch (RuntimeException delay) {re = delay;}
-        catch (AssertionError delay) {ae = delay;}
-
-        // Collect origin page snapshot for failure and rethrow original failure
-        if (ae != null || re != null)
-        {
+        catch (RuntimeException |
+               AssertionError rethrow) {
+            // Collect origin page snapshot for failure and rethrow original failure
             try
             {
                 if (origin != null){
@@ -574,12 +693,7 @@ public class Crawler
             }
             catch (Exception ignore) {}
 
-            if (ae != null)
-                throw ae;
-            if (re != null)
-                throw re;
-            else
-                throw new IllegalStateException("WTF");
+            throw rethrow;
         }
     }
 

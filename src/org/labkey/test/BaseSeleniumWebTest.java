@@ -2095,27 +2095,43 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return url;
     }
 
-    public void beginAt(String relativeURL)
+    public long beginAt(String relativeURL)
     {
-        beginAt(relativeURL, defaultWaitForPage);
+        return beginAt(relativeURL, defaultWaitForPage);
     }
 
-    public void beginAt(String relativeURL, int millis)
+    public long beginAt(String relativeURL, int millis)
     {
         relativeURL = stripContextPath(relativeURL);
-        if (relativeURL.length() == 0)
-            log("Navigating to root");
-        else
+        String logMessage = "";
+
+        try
         {
-            log("Navigating to " + relativeURL);
-            if (relativeURL.charAt(0) != '/')
+            if (relativeURL.length() == 0)
+                logMessage = "Navigating to root";
+            else
             {
-                relativeURL = "/" + relativeURL;
+                logMessage = "Navigating to " + relativeURL;
+                if (relativeURL.charAt(0) != '/')
+                {
+                    relativeURL = "/" + relativeURL;
+                }
             }
+            pauseJsErrorChecker();
+
+            long startTime = System.currentTimeMillis();
+            selenium.open(getBaseURL() + relativeURL, millis);
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            logMessage += " [" + elapsedTime + " ms]";
+
+            resumeJsErrorChecker();
+
+            return elapsedTime;
         }
-        pauseJsErrorChecker();
-        selenium.open(getBaseURL() + relativeURL, millis);
-        resumeJsErrorChecker();
+        finally
+        {
+            log(logMessage);
+        }
     }
 
     public String getContainerId(String url)

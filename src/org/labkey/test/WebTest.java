@@ -29,7 +29,13 @@ public interface WebTest
 {
     String getResponseText();
     int getResponseCode();
-    void beginAt(String url);
+
+    /**
+     * Navigate directly to a page
+     * @param url Absolute or relative URL
+     * @return Page load time in ms
+     */
+    long beginAt(String url);
     void log(String str);
     URL getURL() throws MalformedURLException;
     String[] getLinkAddresses();
