@@ -4431,6 +4431,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Finished setting pipeline to: " + rootPath);
     }
 
+    public void setPipelineRootToDefault()
+    {
+        log("Set pipeline to default based on the site-level root");
+        goToModule("Pipeline");
+        clickButton("Setup");
+        checkRadioButton(Locator.radioButtonById("pipeOptionSiteDefault"));
+        clickButton("Save");
+        log("Finished setting pipeline to default based on the site-level root");
+    }
+
     // Returns true if any status value is "ERROR"
     public boolean hasError(List<String> statusValues)
     {

@@ -53,10 +53,9 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
     abstract protected void doVerifySteps();
 
 
-    protected void setupSpecimenManagement()
+    protected void setupRequestStatuses()
     {
-        clickFolder(getStudyLabel());
-        clickAndWait(Locator.linkWithText("Manage Study"));
+        clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Request Statuses"));
         setFormElement(Locator.name("newLabel"), "New Request");
         clickButton("Save");
@@ -206,12 +205,10 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
                                boolean useAlternateIDs, boolean useAlternateDates, boolean maskClinic,
                                @Nullable Set<String> uncheckObjects)
     {
-        clickFolder(getStudyLabel());
         clickTab("Manage");
         clickButton("Export Study");
 
-        assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings");
-        // TODO: these have moved to the folder archive, be sure to test there: "Queries", "Custom Views", "Reports", "Lists"
+        assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Specimen Settings", "Participant Comment Settings");
 
         if (uncheckObjects != null)
         {
@@ -231,12 +228,12 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
         clickButton("Export");
     }
 
-    protected void deleteStudy(String studyLabel)
+    /* pre-requisite: test is already in the folder where the study exists */
+    protected void deleteStudy()
     {
-        clickFolder(studyLabel);
         clickTab("Manage");
         clickButton("Delete Study");
-        checkCheckbox("confirm");
+        checkCheckbox(Locator.checkboxByName("confirm"));
         clickButton("Delete", WAIT_FOR_PAGE);
     }
 

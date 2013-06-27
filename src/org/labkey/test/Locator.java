@@ -524,7 +524,7 @@ public abstract class Locator
     public static XPathLocator imageWithAltText(String altText, boolean substringMatch)
     {
         if (substringMatch)
-            return xpath("//img[contains(@src, " + xq(altText) + ")]");
+            return xpath("//img[contains(@alt, " + xq(altText) + ")]");
         else
             return xpath("//img[@alt=" + xq(altText) + "]");
     }

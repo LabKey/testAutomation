@@ -210,8 +210,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         clickTab("Manage");
         clickButton("Export Study");
 
-        assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Participant Comment Settings");
-        // TODO: these have moved to the folder archive, be sure to test there: "Queries", "Custom Views", "Reports", "Lists"
+        assertTextPresent("Visit Map", "Cohort Settings", "QC State Settings", "CRF Datasets", "Assay Datasets", "Specimens", "Specimen Settings", "Participant Comment Settings");
 
         if (uncheckObjects != null)
         {

@@ -552,6 +552,14 @@ public class ExtHelperWD extends AbstractHelperWD
     }
 
     @LogMethod(quiet = true)
+    public void expandFileBrowserRootNode()
+    {
+        // expand root tree node
+        _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), WAIT_FOR_JAVASCRIPT);
+    }
+
+    @LogMethod(quiet = true)
     public void selectFileBrowserItem(@LoggedParam String path)
     {
         String[] parts = {};
@@ -567,9 +575,7 @@ public class ExtHelperWD extends AbstractHelperWD
 
         if (parts.length > 1)
         {
-            // expand root tree node
-            _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
-            _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), WAIT_FOR_JAVASCRIPT);
+            expandFileBrowserRootNode();
         }
 
         for (int i = 0; i < parts.length; i++)
