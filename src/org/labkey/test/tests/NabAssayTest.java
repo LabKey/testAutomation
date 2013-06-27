@@ -452,6 +452,8 @@ public class NabAssayTest extends AbstractQCAssayTest
 
             doSchemaBrowserTest();
 
+            doResolverTypeTest();
+
             // create user with read permissions to study and dataset, but no permissions to source assay
             clickProject(TEST_ASSAY_PRJ_NAB);
             clickFolder(TEST_ASSAY_FLDR_STUDY1);
@@ -534,6 +536,25 @@ public class NabAssayTest extends AbstractQCAssayTest
         waitForText("Views", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("AUC", "Curve IC50 4pl", "Curve IC50 4pl OOR Indicator", "Participant ID", "Wellgroup Name");
         assertTextPresent("<20.0", "ptid 1 C", "473.94");
+    }
+
+    private void doResolverTypeTest()
+    {
+        // verify that the participant, visit, and date resolver type is there
+        clickFolder(TEST_ASSAY_FLDR_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        clickButton("Import Data");
+        checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", "ParticipantVisitDate"));
+        clickButton("Next");
+
+        // verify that 'Participant ID', 'Visit ID', and 'Date' fields are included
+        // in the batch properties as well as data/specimen grid
+        assertTextPresent("Participant id, visit id, and date.");
+        // assert that both the visit id and date are present.  In other resolver types only one
+        // or the other is present
+        assertElementPresent(Locator.checkboxById("specimen1_VisitIDCheckBox"));
+        assertElementPresent(Locator.checkboxById("specimen1_DateCheckBox"));
+        clickButton("Cancel");
     }
 
     private static String WIKIPAGE_NAME = "Nab API Wiki";

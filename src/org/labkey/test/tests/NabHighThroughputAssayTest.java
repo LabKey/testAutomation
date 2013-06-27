@@ -123,6 +123,26 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
     {
         doMultiFileTest();
         doSingleFileTest();
+        doResolverTypeTest();
+    }
+
+    @LogMethod
+    private void doResolverTypeTest()
+    {
+        doResolverTypeTest(MULTI_FILE_ASSAY_NAB);
+        doResolverTypeTest(SINGLE_FILE_ASSAY_NAB);
+    }
+
+    @LogMethod
+    private void doResolverTypeTest(String assayName)
+    {
+        // high throughput Nab assays should not contain the Participant, Visit, Date resolver type
+        clickProject(TEST_ASSAY_PRJ_NAB);
+        clickFolder(TEST_ASSAY_FLDR_NAB);
+        clickAndWait(Locator.linkWithText(assayName));
+        clickButton("Import Data");
+        assertElementNotPresent(Locator.radioButtonByNameAndValue("participantVisitResolver", "ParticipantVisitDate"));
+        clickButton("Cancel");
     }
 
     @LogMethod
