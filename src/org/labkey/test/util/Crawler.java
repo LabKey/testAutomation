@@ -110,6 +110,7 @@ public class Crawler
             new ControllerActionId("experiment", "showFile"),
             new ControllerActionId("flow-editscript", "download"),
             new ControllerActionId("flow-run", "download"),
+            new ControllerActionId("flow-well", "download"),
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
             new ControllerActionId("issues", "download"),
             new ControllerActionId("login", "logout"),
