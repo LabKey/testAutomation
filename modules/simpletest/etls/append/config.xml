@@ -14,6 +14,7 @@
             <destination schemaName="vehicle" queryName="etl_target2" />
         </transform>
     </transforms>
+    <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />
     <schedule>
     </schedule>
 </etl>
