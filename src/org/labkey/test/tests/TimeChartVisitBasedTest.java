@@ -36,6 +36,12 @@ public class TimeChartVisitBasedTest extends TimeChartTest
     private static final String[] VISIT_STRINGS = {"1 week Post-V#1", "Int. Vis. %{S.1.1} .%{S.2.1}", "Grp1:F/U/Grp2:V#2", "G1: 6wk/G2: 2wk", "6 week Post-V#2", "1 wk Post-V#2/V#3", "6 wk Post-V#2/V#3"};
 
     @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    @Override
     protected void doCreateSteps()
     {
         configureVisitStudy();
@@ -47,6 +53,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
     {
         visitBasedChartTest();
         filteredViewQueryMeasureTest();
+        errorMessageTest();
     }
 
     @LogMethod public void visitBasedChartTest()
@@ -99,7 +106,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         clickButton("View Chart(s)", 0);
         waitForElementToDisappear(Locator.paginationText(19));
         waitForCharts(1);
-        log("Revert to Date-based chart.");
+        log("Revert to Date-based chart to check axis panel state.");
         goToAxisTab("Visit");
         _ext4Helper.selectRadioButton("Chart Type:", "Date Based Chart");
         assertElementPresent(Locator.xpath("//table[//label[text() = 'Draw x-axis as:'] and not(contains(@class, 'x4-item-disabled'))]"));
@@ -107,6 +114,12 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         applyChanges();
         waitForTextToDisappear(VISIT_STRINGS[0]);
         assertTextNotPresent(VISIT_STRINGS);
+
+        log("Back to visit-based chart for save.");
+        goToAxisTab("Days Since Contact Date");
+        _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
+        applyChanges();
+        waitForElement(Locator.css("svg").containing("6 week Post-V#2"));
 
         openSaveMenu();
         setFormElement(Locator.name("reportName"), VISIT_REPORT_NAME);
@@ -158,5 +171,47 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         setFormElement(Locator.name("reportName"), VISIT_REPORT_NAME + " 2");
         saveReport(true);
         waitForText("My APX Query", WAIT_FOR_JAVASCRIPT);
+    }
+
+    @LogMethod private void errorMessageTest()
+    {
+        log("Test renaming time chart measure");
+        clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
+        waitForText(VISIT_REPORT_NAME);
+        clickAndWait(Locator.linkWithText(VISIT_REPORT_NAME));
+        waitForElement(Locator.css("svg").containing("6 week Post-V#2"));
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("APX-1"));
+        clickButton("Edit Definition");
+        waitForElement(Locator.xpath("//input[@name='dsName']"));
+        Assert.assertEquals("APXwtkg", getFormElement(Locator.name("ff_name1")));
+        setFormElement(Locator.name("ff_name1"), "APXwtkgCHANGED");
+        clickButton("Save");
+        clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
+        waitForText(VISIT_REPORT_NAME);
+        clickAndWait(Locator.linkWithText(VISIT_REPORT_NAME));
+        waitForText("Error: Unable to find field APXwtkg in study.APX-1.");
+        assertTextPresent("The field may have been deleted, renamed, or you may not have permissions to read the data.");
+
+        log("Test deleting time chart measure's dataset");
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        clickAndWait(Locator.linkWithText("APX-1"));
+        clickButton("Delete Dataset", 0);
+        Assert.assertTrue(getAlert().contains("Are you sure you want to delete this dataset?"));
+        waitForText("The study schedule defines"); // text on the Manage Datasets page
+        clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
+        waitForText(VISIT_REPORT_NAME);
+        clickAndWait(Locator.linkWithText(VISIT_REPORT_NAME));
+        waitForText("Error: Unable to find table study.APX-1.");
+        assertTextPresent("The table may have been deleted, or you may not have permissions to read the data.");
+
+        log("Delete My APX Query so it doesn't fail query validation");
+        goToSchemaBrowser();
+        selectQuery("study", "My APX Query");
+        clickAndWait(Locator.linkWithText("Delete Query"));
+        waitForText("Are you sure you want to delete the query 'My APX Query'?");
+        clickButton("OK");
     }
 }
