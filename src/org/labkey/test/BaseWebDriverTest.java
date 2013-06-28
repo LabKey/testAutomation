@@ -3848,6 +3848,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return select.getFirstSelectedOption().getAttribute("value");
     }
 
+    public List<String> getSelectedOptionValues(Locator loc)
+    {
+        Select select = new Select(loc.findElement(_driver));
+        List<WebElement> selectedOptions =  select.getAllSelectedOptions();
+        List<String> values = new ArrayList(selectedOptions.size());
+        for (WebElement selectedOption : selectedOptions)
+            values.add(selectedOption.getAttribute("value"));
+        return values;
+    }
+
     public void assertElementNotPresent(String errorMsg, Locator loc)
     {
         Assert.assertFalse(errorMsg, isElementPresent(loc));
