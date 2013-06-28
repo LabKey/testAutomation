@@ -124,7 +124,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("verifying readset count correct");
         waitForText("Total Readsets Imported");
-        Assert.assertTrue("Wrong number of readsets present", isElementPresent(LabModuleHelper.getNavPanelItem("Total Readsets Imported:", _readsetCt.toString())));
+        waitForElement(LabModuleHelper.getNavPanelItem("Total Readsets Imported:", _readsetCt.toString()));
     }
 
     /**
