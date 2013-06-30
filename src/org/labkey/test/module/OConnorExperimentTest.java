@@ -218,7 +218,8 @@ public class OConnorExperimentTest extends BaseWebDriverTest
         Assert.assertEquals("type4", getText(Locator.id("ExperimentType")));
 
         setEditInPlaceContent(Locator.id("ParentExperiments"), "1,100");
-        assertTextPresent("100 is not a valid Experiment Number");
+        sleep(500);
+        waitForText("100 is not a valid Experiment Number");
         setEditInPlaceContent(Locator.id("ParentExperiments"), "1,3");
         Assert.assertEquals("1,3", getText(Locator.id("ParentExperiments")));
 
