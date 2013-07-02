@@ -133,7 +133,7 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         //Wizard page 3 - select datasets
         waitForElement(Locator.xpath("//div[contains(@class, 'studyWizardDatasetList')]"), WAIT_FOR_JAVASCRIPT);
-        clickAt(Locator.xpath("//label/span[text()='Data Refresh']"), "1,1");
+        clickAt(Locator.xpath("//label/span[text()='Data Refresh:']"), "1,1");
         waitForElement(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and @class='g-tip-header']//span[text()='Data Refresh']"), WAIT_FOR_JAVASCRIPT);
         for(int i = 0; i < DATASETS.length; i++)
         {
