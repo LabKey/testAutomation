@@ -5493,9 +5493,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         start = System.currentTimeMillis();
     }
 
-    protected int elapsedSeconds()
+    protected long elapsedSeconds()
     {
-        return (int)((System.currentTimeMillis() - start) / 1000);
+        return (System.currentTimeMillis() - start) / 1000;
     }
 
     /**

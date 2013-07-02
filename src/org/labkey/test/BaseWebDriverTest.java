@@ -1507,23 +1507,59 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
+    /**
+     * Get rendered, visible page text.
+     * @return All visible text from the 'body' of the page
+     */
     public String getBodyText()
     {
-        try
+        RunnableGetText getText = new RunnableGetText();
+        final Thread t = new Thread(getText);
+        t.start();
+
+        waitFor(new Checker()
         {
-            return _driver.findElement(By.cssSelector("body")).getText();
+            @Override
+            public boolean check()
+            {
+                return !t.isAlive();
+            }
+        }, "Timed out getting page text. Page is probably too complex. Refactor test to look for specific element(s) instead.", 60000);
+
+        return getText.getResult();
+    }
+
+    /**
+     * Get page text using a separate thread to avoid test timeouts when complex pages choke WebDriver
+     */
+    private class RunnableGetText implements Runnable
+    {
+        private String _text;
+
+        public String getResult()
+        {
+            return this._text;
         }
-        catch (StaleElementReferenceException|NoSuchElementException ex)
+
+        @Override
+        public void run()
         {
             try
             {
-                return _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body"))).getText();
+                _text = _driver.findElement(By.cssSelector("body")).getText();
             }
-            catch (TimeoutException tex)
+            catch (StaleElementReferenceException|NoSuchElementException ex)
             {
-                return getHtmlSource(); // probably viewing a tsv or text file
-            }
+                try
+                {
+                    _text =  _shortWait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("body"))).getText();
+                }
+                catch (TimeoutException tex)
+                {
+                    _text =  _driver.getPageSource(); // probably viewing a tsv or text file
+                }
 
+            }
         }
     }
 
@@ -6080,14 +6116,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         start = System.currentTimeMillis();
     }
 
-    protected int elapsedSeconds()
+    protected long elapsedSeconds()
     {
-        return (int)((System.currentTimeMillis() - start) / 1000);
+        return (System.currentTimeMillis() - start) / 1000;
     }
 
-    protected int elapsedMilliseconds()
+    protected long elapsedMilliseconds()
     {
-        return (int)(System.currentTimeMillis() - start);
+        return System.currentTimeMillis() - start;
     }
 
     /**
