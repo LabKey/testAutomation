@@ -235,25 +235,28 @@ public class RReportHelperWD extends AbstractHelperWD
 
     private String getRVersion(File r)
     {
+        String versionOutput = "";
         try
         {
             Runtime rt = Runtime.getRuntime();
             Process p = rt.exec(new String[]{r.getCanonicalPath(), "--version"});
-            String versionOutput;
 
             // Different platforms output version info differently; just combine all std/err output
             versionOutput = BaseWebDriverTest.getStreamContentsAsString(p.getInputStream());
             versionOutput += BaseWebDriverTest.getStreamContentsAsString(p.getErrorStream());
 
-            _test.log("R --version >\n" + versionOutput);
-
             Pattern versionPattern = Pattern.compile("R version ([1-9]\\.\\d+\\.\\d)");
             Matcher matcher = versionPattern.matcher(versionOutput);
             matcher.find();
-            return matcher.group(1);
+            String versionNumber = matcher.group(1);
+
+            _test.log("R --version > " + versionNumber);
+
+            return versionNumber;
         }
         catch(IOException ex)
         {
+            if (versionOutput.length() > 0) _test.log("R --version > " + versionOutput);
             Assert.fail("Unable to determine R version: " + r.getAbsolutePath() + " due to " + ex.getMessage());
             return null; // Unreachable
         }
