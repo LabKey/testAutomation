@@ -34,13 +34,6 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     protected final static String TRANSFORM_ASSAY = "Transform Assay";
     protected final static String TRANSFORM_QC_ASSAY = "Transform & QC Assay";
 
-    private final ListHelper.ListColumn _listCol1 = new ListHelper.ListColumn("Date", "Date", ListHelper.ListColumnType.DateTime, "date");
-    private final ListHelper.ListColumn _listCol2 = new ListHelper.ListColumn("Container", "Container", ListHelper.ListColumnType.String, "container path");
-    private final ListHelper.ListColumn _listCol3 = new ListHelper.ListColumn("AssayId", "AssayId", ListHelper.ListColumnType.String, "assay id");
-    private final ListHelper.ListColumn _listCol4 = new ListHelper.ListColumn("AssayName", "AssayName", ListHelper.ListColumnType.String, "assay name");
-    private final ListHelper.ListColumn _listCol5 = new ListHelper.ListColumn("User", "User", ListHelper.ListColumnType.String, "user");
-    private final ListHelper.ListColumn _listCol6 = new ListHelper.ListColumn("Comments", "Comments", ListHelper.ListColumnType.String, "run comments");
-
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
     public static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
     protected static final ListHelper.ListColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { ListHelper.ListColumnType.Boolean, ListHelper.ListColumnType.Integer, ListHelper.ListColumnType.DateTime };
@@ -113,31 +106,9 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         goToProjectHome();
         clickAndWait(Locator.linkContainingText("QC Assay"));
         clickEditAssayDesign(false);
-//        clickButton("Manage Assays");
-//        clickButton("New Assay Design");
-//        checkRadioButton("providerName", "General");
-//        clickButton("Next");
-//
-//        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-//
-//        selenium.type("//input[@id='AssayDesignerName']", QC_ASSAY);
-//
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/validator.jar"), 0);
         clickButton("Save & Close");
-//        sleep(500);
         goToProjectHome();
-//
-//        for (int i = TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT; i < TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length; i++)
-//        {
-//            addField("Data Fields", i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
-//        }
-//        sleep(1000);
-//        clickButton("Save", 0);
-//        waitForText("Save successful.", 20000);
-
-        // create the list for the qc log
-//        ListHelper.createList(this, TEST_PROGRAMMATIC_QC_PRJ, "QC Log", ListHelper.ListColumnType.AutoInteger, "Key", _listCol1, _listCol2,
-//                _listCol3, _listCol4, _listCol5, _listCol6);
         _listHelper.importListArchive(getProjectName(), new File(getSampledataPath(), "/ProgrammaticQC/Programmatic QC.lists.zip"));
     }
 
