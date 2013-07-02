@@ -122,7 +122,7 @@ public class KnitrReportTest extends BaseWebDriverTest
     {
         final String reportSource = readReport(reportSourcePath);
         final String reportName = reportSourcePath.getFileName() + " Report";
-        Locator reportDiv = Locator.css("#viewDiv > div.labkey-wiki");
+        Locator reportDiv = Locator.css("#viewDiv > div.labkey-knitr");
 
         clickProject(getProjectName());
         goToManageViews();
