@@ -23,7 +23,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StringHelper;
-import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.NoSuchElementException;
 
 /**
  * User: elvan
@@ -321,7 +321,9 @@ public class GroupTest extends BaseWebDriverTest
             @Override
             public boolean check()
             { // Workaround: erratic combo-box behavior
-                _ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());
+                try{_ext4Helper.selectComboBoxItem(Locator.xpath("//table[@id='targetProject']"), getProjectName());}
+                catch (NoSuchElementException recheck) {return false;}
+
                 if (!getFormElement(Locator.css("#targetProject input")).equals(getProjectName()))
                 {
                     click(Locator.xpath("//table[@id='targetProject']"));
