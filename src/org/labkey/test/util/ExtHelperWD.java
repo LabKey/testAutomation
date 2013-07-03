@@ -625,6 +625,7 @@ public class ExtHelperWD extends AbstractHelperWD
     @LogMethod
     public void selectAllFileBrowserFiles()
     {
+        // TODO: this doesn't seem to be working with Firefox, it finds the header checkbox but has trouble clicking it
         Locator file = Locator.css("tr.x-grid3-hd-row div.x-grid3-hd-checker");
         _test.waitForElement(file, WAIT_FOR_PAGE);
         _test.sleep(1000);
