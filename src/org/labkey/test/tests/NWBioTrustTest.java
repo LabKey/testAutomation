@@ -598,13 +598,13 @@ public class NWBioTrustTest extends SurveyTest
         clickButton("Create new study registration");
         List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
         fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + registrationLabel));
-        fields.add(createFieldInfo("Study Information", "irbapprovalstatus", "Approved Human Subjects Research"));
+        fields.add(createComboFieldInfo("Study Information", "IRB approval status", "Approved Human Subjects Research"));
         fields.add(createFieldInfo("Study Information", "irbfilenumber", "TEST123"));
         fields.add(createFieldInfo("Study Information", "irbexpirationdate", "2013-03-07"));
-        fields.add(createFieldInfo("Study Information", "reviewingirb", "Other"));
+        fields.add(createComboFieldInfo("Study Information", "Reviewing IRB", "Other"));
         fields.add(createRadioFieldInfo("Study Information", "Do you anticipate submitting data from this study to a public database (e.g. dbGAP)?", "Yes"));
         fields.add(createComboFieldInfo("Contact Information", "Study Principal Investigator", "pi nwbiotrust"));
-        fields.add(createFieldInfo("Billing", "fundingsource", "test funding source description"));
+        fields.add(createFieldInfo("Billing", "billingcomments", "test funding source comments"));
         createNewStudyRegistration(registrationLabel, fields);
         waitForGridToLoad("tr", "x4-grid-row", 1);
 
