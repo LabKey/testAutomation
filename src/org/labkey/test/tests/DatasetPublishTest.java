@@ -18,6 +18,8 @@ package org.labkey.test.tests;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 
 import java.io.File;
 
@@ -49,6 +51,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
         assertHiddenDatasetPresentInTarget();
     }
 
+    @LogMethod
     private void publishStudy(String studyName)
     {
         //publish the study
@@ -109,6 +112,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
         waitForPipelineJobsToComplete(2, "Publish Study", false);
     }
 
+    @LogMethod
     private void hideDatasets()
     {
         goToProjectHome();
@@ -119,6 +123,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
         clickButton("Save");
     }
 
+    @LogMethod
     private void modifySourceDataset()
     {
         goToProjectHome();
@@ -129,6 +134,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
         clickButton("Submit");
     }
 
+    @LogMethod
     private void addRowToSourceDataset()
     {
         goToProjectHome();
@@ -141,6 +147,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
         clickButton("Submit");
     }
 
+    @LogMethod
     private void checkTargetDataset()
     {
         clickFolder(SUBFOLDER_NAME);
@@ -148,6 +155,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
         assertTextPresent("Comment on modified participant");
     }
 
+    @LogMethod
     private void assertNewRowPresentInTarget()
     {
         clickFolder(SUBFOLDER_NAME);
@@ -157,13 +165,15 @@ public class DatasetPublishTest extends BaseWebDriverTest
         assertTextNotPresent("67676");
     }
 
-    public void goToDataset(String datasetName)
+    @LogMethod
+    public void goToDataset(@LoggedParam String datasetName)
     {
         click(Locator.linkWithText("Clinical and Assay Data"));
         waitAndClickAndWait(Locator.linkWithText(datasetName));
     }
 
-    public void refreshDataset(String datasetName)
+    @LogMethod
+    public void refreshDataset(@LoggedParam String datasetName)
     {
         goToDataset(datasetName);
         _extHelper.clickMenuButton("Views", "Edit Snapshot");
@@ -173,6 +183,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
         newWaitForPageToLoad();
     }
 
+    @LogMethod
     private void assertHiddenDatasetPresentInTarget()
     {
         clickFolder(SUBFOLDER_NAME);
@@ -188,6 +199,12 @@ public class DatasetPublishTest extends BaseWebDriverTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/study";
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     protected Locator getDatasetCheckboxLocator(String datasetLabel)

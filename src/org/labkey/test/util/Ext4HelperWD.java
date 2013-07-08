@@ -396,8 +396,8 @@ public class Ext4HelperWD extends AbstractHelperWD
         return Locator.xpath("//input[contains(@class, 'x4-form-field') and contains(@class, 'x4-form-invalid-field')]");
     }
 
-    @LogMethod
-    public void clickExt4MenuButton(boolean wait, Locator menu, boolean onlyOpen, String ... subMenuLabels)
+    @LogMethod(quiet = true)
+    public void clickExt4MenuButton(boolean wait, Locator menu, boolean onlyOpen, @LoggedParam String ... subMenuLabels)
     {
         _test.waitAndClick(menu);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
