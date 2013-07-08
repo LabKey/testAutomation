@@ -78,20 +78,19 @@ public class TimeChartAPITest extends TimeChartTest
 
     private static final int[] GETDATA_API_TEST_NUMROWS_AGGREGATE = {
         22,
+        18,
         22,
+        18,
         22,
-        22,
-        22,
-        22,
+        18,
         15,
+        12,
+        22,
+        18,
         15,
+        12,
         22,
-        22,
-        15,
-        15,
-        22,
-        22,
-
+        18
     };
 
     private static final String[][] GETDATA_API_DATETEST_COLNAMES = {
@@ -174,19 +173,19 @@ public class TimeChartAPITest extends TimeChartTest
 
     private static final String[][] GETDATA_API_COLNAMES_AGGREGATE = {
             {"Days", "Aggregate Count", "Study Lab Results CD4"},
-            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum",  "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4"},
+            {"Study Lab Results Participant Visit",  "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "Study Lab Results Hemoglobin"},
-            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study Lab Results Hemoglobin"},
+            {"Study Lab Results Participant Visit",  "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study Lab Results Hemoglobin"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "Study HIVTest Results HIVLoad Quant"},
-            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study HIVTest Results HIVLoad Quant"},
+            {"Study Lab Results Participant Visit",  "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study HIVTest Results HIVLoad Quant"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
-            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
+            {"Study Lab Results Participant Visit",  "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
-            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
+            {"Study Lab Results Participant Visit",  "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "Study Luminex Assay Obs Conc"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
-            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
+            {"Study Lab Results Participant Visit",  "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
             {"Days", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"},
-            {"Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visitsequencenum", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"}
+            {"Study Lab Results Participant Visit",  "Study Lab Results Participant Visit Visit Display Order", "Study Lab Results Participant Visit Visit Label", "Aggregate Count", "Study Lab Results CD4", "IL-10 (23)::study Luminex Assay Obs Conc MAX", "IL-2 (3)::study Luminex Assay Obs Conc MAX","TNF-alpha (40)::study Luminex Assay Obs Conc MAX"}
     };
 
     private static final String[] GETDATA_API_TEST_TITLES_ERRORS = {
