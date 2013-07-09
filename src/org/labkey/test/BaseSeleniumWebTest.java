@@ -3878,7 +3878,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     // Returns count of "COMPLETE" and "ERROR"
-    public int getFinishedbCount(List<String> statusValues)
+    public int getFinishedCount(List<String> statusValues)
     {
         int finsihed = 0;
         for (String statusValue : statusValues)
@@ -6534,13 +6534,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         log("Waiting for " + jobsExpected + " pipeline jobs to finish");
         List<String> statusValues = getPipelineStatusValues();
         startTimer();
-        while (getFinishedbCount(statusValues) < jobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
+        while (getFinishedCount(statusValues) < jobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
         {
             sleep(1000);
             refresh();
             statusValues = getPipelineStatusValues();
         }
-        Assert.assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedbCount(statusValues));
+        Assert.assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
     }
 
     // Note: unverified

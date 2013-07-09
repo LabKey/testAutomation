@@ -161,7 +161,8 @@ public enum TestSet
         NonStudyReportsTest.class,
         ParticipantReportTest.class,
         ReportSecurityTest.class,
-        AliquotTest.class
+        AliquotTest.class,
+        SpecimenMultipleImportTest.class
     ),
 
     DailyB(600000,
@@ -327,7 +328,9 @@ public enum TestSet
         SpecimenMergeTest.class,
         SampleMindedImportTest.class,
         CreateVialsTest.class,
-        SpecimenExportTest.class
+        SpecimenExportTest.class,
+        AliquotTest.class,
+        SpecimenMultipleImportTest.class
     ),
 
     Assays(

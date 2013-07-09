@@ -4522,7 +4522,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     // Returns count of "COMPLETE" and "ERROR"
-    public int getFinishedbCount(List<String> statusValues)
+    public int getFinishedCount(List<String> statusValues)
     {
         int finsihed = 0;
         for (String statusValue : statusValues)
@@ -6830,9 +6830,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         log("Waiting for " + completeJobsExpected + " pipeline jobs to complete");
 
-        // Short circuit in case we already have too many COMPLETE jobs
-        Assert.assertTrue("Number of COMPLETE jobs already exceeds desired count", getCompleteCount(getPipelineStatusValues()) <= completeJobsExpected);
-
         waitFor(new Checker()
         {
             @Override
@@ -6844,7 +6841,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 {
                     assertElementNotPresent(Locator.linkWithText("ERROR"));
                 }
-                if (statusValues.size() < completeJobsExpected || statusValues.size() != getCompleteCount(statusValues))
+                if (statusValues.size() < completeJobsExpected || statusValues.size() != getFinishedCount(statusValues))
                 {
                     refresh();
                     return false;
@@ -6853,7 +6850,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
         }, "Pipeline jobs did not complete.", MAX_WAIT_SECONDS * 1000);
 
-        Assert.assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, getCompleteCount(getPipelineStatusValues()));
+        Assert.assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, expectError ? getFinishedCount(getPipelineStatusValues()) : getCompleteCount(getPipelineStatusValues()));
     }
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
@@ -6863,13 +6860,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Waiting for " + jobsExpected + " pipeline jobs to finish");
         List<String> statusValues = getPipelineStatusValues();
         startTimer();
-        while (getFinishedbCount(statusValues) < jobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
+        while (getFinishedCount(statusValues) < jobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
         {
             sleep(1000);
             refresh();
             statusValues = getPipelineStatusValues();
         }
-        Assert.assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedbCount(statusValues));
+        Assert.assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
     }
 
     // Note: unverified
