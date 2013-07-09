@@ -124,6 +124,15 @@ public abstract class GenericChartsTest extends ReportTest
     }
 
     @LogMethod
+    protected void savePlot()
+    {
+        clickButton("Save", 0);
+        _extHelper.waitForExtDialog("Save");
+        clickDialogButtonAndWaitForMaskToDisappear("Save", "Save");
+        _extHelper.waitForExtDialogToDisappear("Saved");
+    }
+
+    @LogMethod
     protected void createQuickChart(String regionName, String columnName)
     {
         Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));

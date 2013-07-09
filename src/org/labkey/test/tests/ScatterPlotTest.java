@@ -43,6 +43,8 @@ public class ScatterPlotTest extends GenericChartsTest
         doQuickChartScatterPlotTest();
         doCustomizeScatterPlotTest(); // Uses scatter plot created by doDataRegionScatterPlotTest()
         doPointClickScatterPlotTest(); // Uses scatter plot created by doManageViewsScatterPlotTest()
+        doDeleteMeasureTest(); // Uses scatter plot created by doCustomizeScatterPlotTest()
+        doDeleteQueryTest(); // Uses scatter plot created by doCustomizeScatterPlotTest(), deletes physical exam query.
     }
 
     private static final String SCATTER_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight607080901001104. Pulse1. Weight6080100120140160180200";
@@ -194,9 +196,9 @@ public class ScatterPlotTest extends GenericChartsTest
         savePlot(SCATTER_PLOT_NAME_QC, SCATTER_PLOT_DESC_QC);
     }
 
-    private static final String SCATTER_PLOT_CUSTOMIZED_COLORS = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight607080901001104. Pulse1. Weight6080100120140160180200 Group 1 Group 2";
+    private static final String SCATTER_PLOT_CUSTOMIZED_COLORS = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight607080901001104. Pulse1. Weight6080100120140160180200 Normal Not Done";
     private static final String SCATTER_PLOT_CUSTOMIZED_SHAPES = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight607080901001104. Pulse1. Weight6080100120140160180200 normal abnormal/insignificant abnormal/significant";
-    private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight607080901001104. Pulse1. Weight6080100120140160180200 Group 1 Group 2 normal abnormal/insignificant abnormal/significant";
+    private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "Created with Rapha\u00ebl 2.1.0APX-1: Abbreviated Physical Exam - 1. Weight607080901001104. Pulse1. Weight6080100120140160180200 Normal Not Done normal abnormal/insignificant abnormal/significant";
 
     @LogMethod
     private void doCustomizeScatterPlotTest()
@@ -219,16 +221,17 @@ public class ScatterPlotTest extends GenericChartsTest
         log("Group with colors");
         clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
         click(Locator.id("colorCategory-inputEl"));
+        _extHelper.selectExt4ComboBoxItem("Color Category:", "7. Neck");
         click(Locator.ext4Radio("Single shape"));
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_COLORS);
         // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
-        Assert.assertEquals("Point at (60, 48) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "fill"));
-        Assert.assertTrue("Point at (60, 48) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(26) > circle")));
-        // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - teal square
-        Assert.assertEquals("Square at (92, 89) was an unexpected color", "#66c2a5", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
-        Assert.assertTrue("Square at (92, 89) was an unexpected width", isElementPresent(Locator.css("svg > a:nth-of-type(25) > circle")));
+        Assert.assertEquals("Point at (70, 67) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(15) > *"), "fill"));
+        Assert.assertTrue("Point at (70, 67) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(15) > circle")));
+        // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - teal circle
+        Assert.assertEquals("Circle at (92, 89) was an unexpected color", "#66c2a5", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
+        Assert.assertTrue("Circle at (92, 89) was an unexpected width", isElementPresent(Locator.css("svg > a:nth-of-type(25) > circle")));
 
 
         // Enable Grouping - Shapes
@@ -258,15 +261,108 @@ public class ScatterPlotTest extends GenericChartsTest
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_BOTH);
-        // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
-        Assert.assertEquals("Point at (60, 48) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "fill"));
-        Assert.assertEquals("Point at (60, 48) was an unexpected shape", "M75,-45L80,-55L70,-55Z", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "d"));
+        // Verify custom styling for point at origin (APXpulse: 70, APXwtkg: 67) - pink circle
+        Assert.assertEquals("Point at (70, 67) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(15) > *"), "fill"));
+        Assert.assertTrue("Point at (70, 67) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(15) > circle")));
         // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - teal square
         Assert.assertEquals("Square at (92, 89) was an unexpected color", "#66c2a5", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
         Assert.assertEquals("Square at (92, 89) was an unexpected width", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "width"));
         Assert.assertEquals("Square at (92, 89) was an unexpected height", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "height"));
 
         savePlot(SCATTER_PLOT_NAME_DR + " Colored", SCATTER_PLOT_DESC_DR + " Colored");
+    }
+
+    @LogMethod
+    private void doDeleteMeasureTest()
+    {
+        log("Remove color and shape measures.");
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+
+        clickAndWait(Locator.linkContainingText("APX-1: Abbreviated Physical Exam"));
+        clickButton("Manage Dataset");
+        clickButton("Edit Definition");
+
+        waitForText("Dataset Fields");
+        _listHelper.deleteField("Dataset Fields", 12);
+        _listHelper.deleteField("Dataset Fields", 31);
+        clickButton("Save");
+
+        log("Verify proper error messages for removed measures.");
+        click(Locator.linkContainingText("Clinical and Assay Data"));
+        waitForText(SCATTER_PLOT_NAME_DR + " Colored");
+        clickAndWait(Locator.linkContainingText(SCATTER_PLOT_NAME_DR + " Colored"));
+        _ext4Helper.waitForMaskToDisappear();
+
+        waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
+        _ext4Helper.waitForMaskToDisappear();
+
+        waitForText("\"APXneck\", is not available. It may have been deleted or renamed.");
+        assertTextPresent("\"APXcemh\", is not available. It may have been deleted or renamed.");
+
+        clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
+        click(Locator.ext4Radio("With a single color"));
+        click(Locator.ext4Radio("Single shape"));
+        clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
+
+        log("Set X Axis to categorical measure.");
+        waitAndClick(Locator.css("svg text:contains('4. Pulse')"));
+        _extHelper.waitForExtDialog("X Axis");
+        waitForElement(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='Form Language']"));
+        mouseDown(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='Form Language']"));
+        clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
+
+        savePlot();
+
+        log("Remove x-axis measure.");
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+
+        clickAndWait(Locator.linkContainingText("APX-1: Abbreviated Physical Exam"));
+        clickButton("Manage Dataset");
+        clickButton("Edit Definition");
+
+        waitForText("Dataset Fields");
+        _listHelper.deleteField("Dataset Fields", 35);
+        clickButton("Save");
+
+        log("Verify missing measure error message.");
+        click(Locator.linkContainingText("Clinical and Assay Data"));
+        waitForText(SCATTER_PLOT_NAME_DR + " Colored");
+        clickAndWait(Locator.linkContainingText(SCATTER_PLOT_NAME_DR + " Colored"));
+        _ext4Helper.waitForMaskToDisappear();
+
+        waitForText("The measure Form Language was not found. It may have been renamed or removed.");
+        clickButton("OK", 0);
+    }
+
+    @LogMethod
+    private void doDeleteQueryTest()
+    {
+        log("Remove color and shape measures.");
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+
+        clickAndWait(Locator.linkContainingText("APX-1: Abbreviated Physical Exam"));
+        clickButton("Manage Dataset");
+        clickButton("Delete Dataset", 0);
+        String confirmationMsg = getConfirmationAndWait();
+        Assert.assertTrue(confirmationMsg.contains("Are you sure you want to delete this dataset?"));
+        waitForText("The study schedule defines"); // text on the Manage Datasets page
+
+        click(Locator.linkContainingText("Clinical and Assay Data"));
+        waitForText(SCATTER_PLOT_NAME_DR + " Colored");
+        clickAndWait(Locator.linkContainingText(SCATTER_PLOT_NAME_DR + " Colored"));
+        _ext4Helper.waitForMaskToDisappear();
+
+        clickButton("Edit");
+        _ext4Helper.waitForMaskToDisappear();
+        waitForText("The source dataset, list, or query may have been deleted.");
+
+        Integer buttonsCount = getXpathCount(Locator.xpath("//div[contains(@id, \"generic-report-div\")]//div//button"));
+        Integer disabledButtonsCount = getXpathCount(Locator.xpath("//div[contains(@id, \"generic-report-div\")]//div[contains(@class, 'x4-item-disabled')]//button"));
+
+        Assert.assertTrue("Only the help button should be enabled. More than one button was enabled.", 1 == (buttonsCount - disabledButtonsCount));
     }
 
     private static final String TEST_DATA_API_PATH = "server/test/data/api";

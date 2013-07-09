@@ -729,7 +729,7 @@ public class ListHelper extends AbstractHelper
         {
             // Confirm the deletion
             _test.clickButton("OK", 0);
-            _test.waitForElement(Locator.xpath("//td/img[@id='partstatus_" + index + "' and contains(@src, 'deleted')]]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            _test.waitForElement(Locator.xpath("//img[@id='partstatus_" + index + "'][contains(@src, 'deleted')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         }
     }
     
