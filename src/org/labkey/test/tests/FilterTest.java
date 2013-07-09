@@ -176,8 +176,8 @@ public class FilterTest extends ListTest
         // Issue 14710: Switching between faceted and logical filters breaks dialog
         setUpFacetedFilter("query", "Color", "Robust", "Light");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "ZanzibarMasinginiTanzaniaAfrica", getFormElement(Locator.name("value_1")));
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Equals One Of (e.g. \"a;b;c\")");
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "Robust;Light", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtTab("Choose Filters");
@@ -200,7 +200,6 @@ public class FilterTest extends ListTest
         _extHelper.clickExtButton("OK");
         verifyColumnValues("query", "Color", "Light", "Robust");
         verifyColumnValues("query", "year", "1980", "1970");
-        //assertTextNotPresent("ZanzibarMasinginiTanzaniaAfrica");  //NOTE: the filter message is 'Is not any of (ZanzibarMasinginiTanzaniaAfrica)', so this will fail.  test for '1990' instead.
 
         setFacetedFilter("query", "Color");
         verifyColumnValues("query", "Color", "Light", "Robust", "ZanzibarMasinginiTanzaniaAfrica");
@@ -226,12 +225,12 @@ public class FilterTest extends ListTest
 
         setUpFacetedFilter("query", "year", "1990", "1980");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement(Locator.name("value_1")));
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Equals One Of (e.g. \"a;b;c\")");
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "1990;1980", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
-        verifyColumnValues("query", "year", "1980", "1990");
+        verifyColumnValues("query", "year", "1980", "1970", "1990");
 
         setFacetedFilter("query", "year");
         verifyColumnValues("query", "year", "1980", "1970", "1990");
@@ -462,16 +461,6 @@ public class FilterTest extends ListTest
         assertTextNotPresent("Show Rows Where");
     }
 
-    private void validFilterGeneratesCorrectResultsTest(String url, String columnName, String filter1Type, String filter1, String filter2Type, String filter2,
-            String[] textPresentAfterFilter, String[] textNotPresentAfterFilter )
-    {
-        List<FilterArgs> args = generateValidFilterByUrlArgsAndResponses();
-        beginAt(url);
-        FilterArgs  arg = args.get(0);
-        checkFilterWasApplied(arg.present, arg.notPresent, arg.columnName, arg.filter1Type, arg.filter1Value,
-                arg.filter2Type, arg.filter2Value);
-    }
-
     private void validFilterGeneratesCorrectResultsTest(FilterArgs a)
     {
             validFilterGeneratesCorrectResultsTest(
@@ -486,12 +475,10 @@ public class FilterTest extends ListTest
             String[] textPresentAfterFilter, String[] textNotPresentAfterFilter, String url)
     {
         String fieldKey = EscapeUtil.fieldKeyEncodePart(columnName);
-        if(url==null)
+        if (null == url)
         {
-//            String fieldKey = EscapeUtil.fieldKeyEncodePart(columnName);
-
             log("** Filtering " + columnName + " with filter type: " + filter1Type + ", value: " + filter1);
-            if(filter2Type!=null)
+            if (null != filter2Type)
                 log("** Second filter: " + filter2Type + ".  value:" + filter2);
             setFilter(TABLE_NAME, fieldKey, filter1Type, filter1, filter2Type, filter2);
 
@@ -551,7 +538,7 @@ public class FilterTest extends ListTest
                 // When showing the dialog, "Does Not Equal Any Of" is inverted to "In" and "Robust;ZanzibarMasinginiTanzaniaAfrica" are selected.
                 // When switching tabs, nothing changes.
                 //waitForFormElementToEqual(Locator.name("filterType_1"), "Equals One Of (e.g. \"a;b;c\")");
-                waitForFormElementToEqual(Locator.name("value_1"), "Robust;ZanzibarMasinginiTanzaniaAfrica");
+                waitForFormElementToEqual(Locator.name("value_1"), "Light;Mellow");
             }
             else if (filter1Type.equals("Does Not Equal") && "false".equals(filter1))
             {
