@@ -177,8 +177,7 @@ public class DataViewsTest extends StudyRedesignTest
         clickButtonContainingText("Delete Report", 0);
         waitForText("Delete Report?");
         clickButtonContainingText("Yes", 0);
-        _ext4Helper.waitForMaskToDisappear();
-        assertElementNotPresent(Locator.linkContainingText(REPORT_TO_DELETE));
+        waitForElementToDisappear(Locator.linkContainingText(REPORT_TO_DELETE));
     }
     private final static String EDITED_DATASET_TOOLTIP = "Source:Subcategory1-EFGHIJKL></% 1Type:DatasetDescription:Description set in data views webpart";
 
