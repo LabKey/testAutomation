@@ -24,6 +24,7 @@ import org.labkey.test.ms2.SequestImportTest;
 import org.labkey.test.ms2.SequestTest;
 import org.labkey.test.tests.*;
 import org.labkey.test.tests.perf.StudyImportPerfTest;
+import org.labkey.test.unsupported.PeptideModuleTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,6 +75,7 @@ public enum TestSet
         ELISPOT_AssayTest.class,
         HormoneAssayTest.class,
         GenotypeAssaysTest.class,
+        PeptideModuleTest.class,
         FlowAssaysTest.class
     ),
 
