@@ -395,9 +395,9 @@ public class EHRReportingAndUITest extends AbstractEHRTest
 
     private void refreshAnimalHistoryReport()
     {
-        waitForText("Abstract");
-        sleep(100);
+        waitForElement(Locator.css("svg"));
         waitAndClick(Locator.ext4Button("Refresh"));
+        waitForElementToDisappear(Locator.css("svg"));
     }
 
     private void quickSearchTest()
