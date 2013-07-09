@@ -51,6 +51,10 @@ public class JUnitHeader extends BaseWebDriverTest
         signIn();
         resetErrors();
         enableEmailRecorder();
+
+        RReportHelperWD reportHelper = new RReportHelperWD(this);
+        reportHelper.ensureRConfig(); // reportTest.js (via RhinoService) executes an R script
+
         try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
 
         _testFailed = false;
