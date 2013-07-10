@@ -300,4 +300,10 @@ public class EHRDataEntryTest extends AbstractEHRTest
 
         stopImpersonating();
     }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }
