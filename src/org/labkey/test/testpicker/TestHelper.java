@@ -62,6 +62,8 @@ public class TestHelper
     private JTextField _contextPath;
     private JTextField _server;
     private JTextField _root;
+    private JRadioButton _bestBrowserButton;
+    private JRadioButton _chromeButton;
     private JRadioButton _firefoxButton;
     private JRadioButton _ieButton;
     private JComboBox _configDropDown;
@@ -228,15 +230,29 @@ public class TestHelper
 
         JLabel browserName = new JLabel("Browser:");
         optionsText.add(browserName);
-        _firefoxButton = new JRadioButton("Firefox", true);
+        ButtonGroup browser = new ButtonGroup();
+
+        _bestBrowserButton = new JRadioButton("Fastest", true);
+        _bestBrowserButton.setBackground(Color.white);
+        _bestBrowserButton.setToolTipText("Individual tests will run on the fastest browser they are able\nUsually Firefox, sometims Chrome");
+        browser.add(_bestBrowserButton);
+        optionsText.add(_bestBrowserButton);
+
+        _chromeButton = new JRadioButton("Chrome", true);
+        _chromeButton.setBackground(Color.white);
+        browser.add(_chromeButton);
+        optionsText.add(_chromeButton);
+
+        _firefoxButton = new JRadioButton("Firefox", false);
         _firefoxButton.setBackground(Color.white);
+        browser.add(_firefoxButton);
+        optionsText.add(_firefoxButton);
+
         _ieButton = new JRadioButton("Internet Explorer", false);
         _ieButton.setBackground(Color.white);
-        ButtonGroup browser = new ButtonGroup();
-        browser.add(_firefoxButton);
         browser.add(_ieButton);
-        optionsText.add(_firefoxButton);
         optionsText.add(_ieButton);
+
         options.add(optionsText);
 
         return options;
@@ -487,7 +503,7 @@ public class TestHelper
 
     private void saveTestConfig(String name)
     {
-        TestConfig config = new TestConfig(name, _clean.isSelected(), _linkCheck.isSelected(), _memCheck.isSelected(), _loop.isSelected(), _cleanOnly.isSelected(), _firefoxButton.isSelected(),
+        TestConfig config = new TestConfig(name, _clean.isSelected(), _linkCheck.isSelected(), _memCheck.isSelected(), _loop.isSelected(), _cleanOnly.isSelected(), _bestBrowserButton.isSelected(), _chromeButton.isSelected(), _firefoxButton.isSelected(),
                 _ieButton.isSelected(), _port.getText().trim(), _contextPath.getText().trim(), _server.getText().trim(), _root.getText().trim(), getCheckedNodes(_treeRoot), _haltOnError.isSelected());
 
         _savedConfigs = deleteTestConfigFromList(name, _savedConfigs);
@@ -596,6 +612,8 @@ public class TestHelper
         _haltOnError.setSelected(config.isHaltOnError());
         _loop.setSelected(config.isLoop());
         _cleanOnly.setSelected(config.isCleanOnly());
+        _bestBrowserButton.setSelected(config.isBestBrowser());
+        _chromeButton.setSelected(config.isChrome());
         _firefoxButton.setSelected(config.isFirefox());
         _ieButton.setSelected(config.isIe());
         _port.setText(config.getPort());
@@ -771,6 +789,14 @@ public class TestHelper
             System.setProperty("labkey.contextpath", _contextPath.getText().trim());
             System.setProperty("labkey.server", _server.getText().trim());
             System.setProperty("labkey.root", _root.getText().trim());
+            if (_bestBrowserButton.isSelected())
+            {
+                System.setProperty("selenium.browser", "*best");
+            }
+            else if (_chromeButton.isSelected())
+            {
+                System.setProperty("selenium.browser", "*googlechrome");
+            }
             if (_firefoxButton.isSelected())
             {
                 System.setProperty("selenium.browser", BaseSeleniumWebTest.FIREFOX_BROWSER);
