@@ -550,6 +550,7 @@ public class ICEMRModuleTest extends BaseWebDriverTest
             fieldAndValue.put(GEL_IMAGE_FIELD, f.getName());
         }
 
+        waitForElementToDisappear(Locator.css(".x4-form-invalid-field"));
         clickButton("Submit");
         waitForElement(Locator.css(".labkey-nav-page-header").withText(SPECIES_ASSAY_NAME + " Results"));
     }
