@@ -299,6 +299,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 profile.setPreference("app.update.auto", false);
                 profile.setPreference("extensions.update.autoUpdate", false);
                 profile.setPreference("extensions.update.enabled", false);
+                profile.setPreference("dom.max_script_run_time", 0);
+                profile.setPreference("dom.max_chrome_script_run_time", 0);
 
                 profile.setPreference("browser.download.folderList", 2);
                 profile.setPreference("browser.download.downloadDir", getDownloadDir().getAbsolutePath());
