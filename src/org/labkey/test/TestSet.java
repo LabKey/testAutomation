@@ -67,8 +67,8 @@ public enum TestSet
         WebDavTest.class
     ),
 
-    //Tests for unsupported modules (not for unsupported tests)
-    Unsupported(
+    //Tests for unsupported/externally developed modules
+    External(
         LabModulesTest.class,
         SequenceTest.class,
         ViralLoadAssayTest.class,
@@ -76,6 +76,9 @@ public enum TestSet
         HormoneAssayTest.class,
         GenotypeAssaysTest.class,
         PeptideModuleTest.class,
+        EHRReportingAndUITest.class,
+        EHRDataEntryTest.class,
+        EHRApiTest.class,
         FlowAssaysTest.class
     ),
 
@@ -184,9 +187,6 @@ public enum TestSet
         TimeChartDateBasedTest.class,
         TimeChartVisitBasedTest.class,
         TimeChartAPITest.class,
-        EHRReportingAndUITest.class,
-        EHRDataEntryTest.class,
-        EHRApiTest.class,
         ComplianceTrainingTest.class,
         GpatAssayTest.class,
         FolderTest.class,
@@ -399,7 +399,7 @@ public enum TestSet
         ONPRC_EHRTest.class
     ),
 
-    ONPRC(Unsupported, EHR.getTestList()),
+    ONPRC(External, EHR.getTestList()),
 
     CDSPopulation(
         CDSPopulation.class
