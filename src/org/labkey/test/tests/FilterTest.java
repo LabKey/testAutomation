@@ -176,8 +176,8 @@ public class FilterTest extends ListTest
         // Issue 14710: Switching between faceted and logical filters breaks dialog
         setUpFacetedFilter("query", "Color", "Robust", "Light");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.name("filterType_1"), "Equals One Of (e.g. \"a;b;c\")");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "Robust;Light", getFormElement(Locator.name("value_1")));
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal");
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "ZanzibarMasinginiTanzaniaAfrica", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtTab("Choose Filters");
@@ -225,8 +225,8 @@ public class FilterTest extends ListTest
 
         setUpFacetedFilter("query", "year", "1990", "1980");
         _extHelper.clickExtTab("Choose Filters");
-        waitForFormElementToEqual(Locator.name("filterType_1"), "Equals One Of (e.g. \"a;b;c\")");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "1990;1980", getFormElement(Locator.name("value_1")));
+        waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal");
+        Assert.assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
