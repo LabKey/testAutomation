@@ -33,6 +33,12 @@ import java.util.List;
 public class StudyDemoModeTest extends StudyBaseTest
 {
     @Override
+    protected String getProjectName()
+    {
+        return "StudyDemoMode Project";
+    }
+
+    @Override
     protected void doCreateSteps()
     {
         importStudy();
