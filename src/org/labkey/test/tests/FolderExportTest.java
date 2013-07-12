@@ -71,11 +71,11 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @Override
-    protected Set<String> getOrphanedViews()
+    protected Set<String> excludeFromViewCheck()
     {
-        Set<String> views = new HashSet<>();
-        views.add("Grid View: Demographics + HIV");
-        return views;
+        Set<String> folders = new HashSet<>();
+        folders.add(folderFromTemplate);
+        return folders;
     }
 
     @Override

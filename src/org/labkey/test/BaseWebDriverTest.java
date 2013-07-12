@@ -2123,9 +2123,24 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return new HashSet<>();
     }
 
+    /**
+     * To be overloaded by tests
+     * @return The Set of folder names to be excluded from the view check
+     */
+    protected Set<String> excludeFromViewCheck()
+    {
+        return new HashSet<>();
+    }
+
     @LogMethod
     private void doViewCheck(@LoggedParam String folder)
     {
+        if (excludeFromViewCheck().contains(folder))
+        {
+            log ("Skipping view check for folder");
+            return;
+        }
+
         try{
             goToManageViews();
         }
@@ -5054,8 +5069,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             for(String v : values)
             {
-                click(Locator.xpath(_extHelper.getExtDialogXPath("Show Rows Where "+columnLabel+"...")+
-                    "//div[contains(@class,'x-grid3-row') and .//span[text()='"+v+"']]//div[@class='x-grid3-row-checker']"));
+                click(Locator.xpath(_extHelper.getExtDialogXPath("Show Rows Where " + columnLabel + "...") +
+                        "//div[contains(@class,'x-grid3-row') and .//span[text()='" + v + "']]//div[@class='x-grid3-row-checker']"));
             }
         }
         else if (values.length == 1)

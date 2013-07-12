@@ -70,7 +70,7 @@ public class NWBioTrustTest extends SurveyTest
     private enum NwbtRequestStatuses
     {
         SUBMITTED("Submitted"),
-        PRIORITIZATION_REVIEW("Prioritization Review")
+        OVERSIGHT_REVIEW("Oversight Review")
         {
             @Override
             public boolean isApproval()
@@ -86,7 +86,7 @@ public class NWBioTrustTest extends SurveyTest
                 return true;
             }
         },
-        SUBMISSION_REVIEW("Submission Review"),
+        REQUEST_REVIEW("Request Review"),
         APPROVED("Approved")
         {
             @Override
@@ -95,23 +95,7 @@ public class NWBioTrustTest extends SurveyTest
                 return true;
             }
         },
-        ROUTED("Routed")
-        {
-            @Override
-            public boolean isLocked()
-            {
-                return true;
-            }
-        },
         CLOSED("Closed")
-        {
-            @Override
-            public boolean isLocked()
-            {
-                return true;
-            }
-        },
-        COMPLETE("Complete")
         {
             @Override
             public boolean isLocked()
@@ -503,7 +487,6 @@ public class NWBioTrustTest extends SurveyTest
         clickTab("New Sample Requests");
         waitForGridToLoad("div", "x4-grid-group-title", 1); // requests grouped by study
         waitForGridToLoad("tr", "x4-grid-row", submittedRequestTypes.length);
-        assertTextNotPresent("Unassigned");
         assertTextPresentInThisOrder(NWBT_REQUEST_CATEGORIES);
         assertTextPresentInThisOrder(Arrays.copyOfRange(NWBT_REQUEST_STATUSES, 0, submittedRequestTypes.length - 1));
 
@@ -524,7 +507,7 @@ public class NWBioTrustTest extends SurveyTest
         click(Locator.linkContainingText("view history"));
         _extHelper.waitForExtDialog("Status Change History : 1-2");
         waitForElement(Locator.xpath("//div[text() = 'TissueRecordId']"));
-        assertTextPresent("Sample Request Status Changed", "Prioritization Review", "Submitted", "resource and status changed");
+        assertTextPresent("Sample Request Status Changed", "Oversight Review", "Submitted", "resource and status changed");
         clickButton("Close", 0);
         clickButton("Cancel", 0);
 
@@ -870,7 +853,7 @@ public class NWBioTrustTest extends SurveyTest
         assertTextPresentInThisOrder(submittedRequestTypes);
         assertTextNotPresent(unsubmittedRequestTypes);
 
-        click(Locator.linkContainingText("Prioritization Review"));
+        click(Locator.linkContainingText("Oversight Review"));
 
         impersonateGroup(NWBT_REVIEWER_GROUP, false);
 
@@ -880,8 +863,7 @@ public class NWBioTrustTest extends SurveyTest
 
         click(Locator.linkContainingText("1-2"));
 
-        waitForText("Prioritization Review Assessment Details");
-
+        waitForText("Oversight Review Assessment Details");
         _ext4Helper.selectRadioButton("Recommendation:", "Approve, no changes needed");
 
         if (isElementPresent(Locator.xpath("//textarea[@name='Comment']")))
@@ -903,8 +885,8 @@ public class NWBioTrustTest extends SurveyTest
 
         click(Locator.linkContainingText("1-2"));
         waitForText("Sample Request Details");
-        assertTextPresent("Prioritization Review Approval Response");
-        assertTextPresent("Prioritization Review, Approved");
+        assertTextPresent("Oversight Review Approval Response");
+        assertTextPresent("Oversight Review, Approved");
         clickButton("Close", 0);
 
         stopImpersonatingRole();
@@ -917,13 +899,13 @@ public class NWBioTrustTest extends SurveyTest
         waitForElement(Locator.xpath("//div[text()='Message']"));
         assertElementPresent(Locator.linkWithText("A BioTrust Sample request has been updated"), 1);
         assertElementPresent(Locator.linkWithText("A BioTrust Sample request has been submitted"), 3);
-        assertElementPresent(Locator.linkWithText("A BioTrust sample request is ready for prioritization review"), 1);
+        assertElementPresent(Locator.linkWithText("A BioTrust sample request is ready for oversight review"), 1);
         click(Locator.linkWithText("A BioTrust Sample request has been updated"));
         assertTextPresent("A BioTrust sample request has been updated");
         click(Locator.linkWithText("A BioTrust Sample request has been submitted"));
         assertTextPresent("A BioTrust sample request has been submitted");
-        click(Locator.linkWithText("A BioTrust sample request is ready for prioritization review"));
-        assertTextPresent("A BioTrust sample request of type: Tissue has been marked for prioritization ");
+        click(Locator.linkWithText("A BioTrust sample request is ready for oversight review"));
+        assertTextPresent("A BioTrust sample request of type: Tissue has been marked for oversight ");
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)

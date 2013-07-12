@@ -34,7 +34,7 @@ var tableSuccess = function(responseData){
 
 var fancyRequest = REPLACEMENT_STRING
 
-var fReq = LABKEY.Query.GetData.rawData(fancyRequest);
+var fReq = LABKEY.Query.GetData.getRawData(fancyRequest);
 
 </script>
 
