@@ -1593,6 +1593,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             logToServer("=== Starting " + getClass().getSimpleName() + Runner.getProgress() + " ===");
             signIn();
+            enableEmailRecorder();
 			resetErrors();
 
             if (isMaintenanceDisabled())
