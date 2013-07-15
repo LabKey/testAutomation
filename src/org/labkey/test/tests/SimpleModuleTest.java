@@ -211,7 +211,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Toyota");
 
         log("** Testing vehicle.Model RowId url link...");
-        beginAt("/query/" + getProjectName() + "/begin.view?schemaName=" + VEHICLE_SCHEMA);
+        beginAt("/query/" + getProjectName() + "/begin.view?");
         viewQueryData(VEHICLE_SCHEMA, "Models");
         clickAndWait(Locator.linkWithText("Prius"));
         assertTextPresent("Hooray!");
@@ -220,7 +220,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         Assert.assertTrue("Expected rowid on model.html page", rowid > 0);
 
         log("** Testing query of vehicle schema...");
-        beginAt("/query/" + getProjectName() + "/schema.view?schemaName=" + VEHICLE_SCHEMA);
+        beginAt("/query/" + getProjectName() + "/begin.view?");
         viewQueryData(VEHICLE_SCHEMA, "Toyotas", "simpletest");
         
         assertTextPresent("Prius");
