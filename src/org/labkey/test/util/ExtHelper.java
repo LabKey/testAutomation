@@ -54,6 +54,7 @@ public class ExtHelper extends AbstractHelper
      */
     public void clickExtMenuButton(boolean wait, Locator menu, String... subMenuLabels)
     {
+        _test.mouseOver(menu);
         _test.click(menu);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {

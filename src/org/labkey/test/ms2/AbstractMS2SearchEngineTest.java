@@ -170,7 +170,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         // Firefox sets the title of the page when we view an image separately from an HTML page, so use that to verify
         // that we got something that matches what we expect. IE doesn't do this, so assume that we're good if we don't
         // get a 404, error message, etc
-        if(getBrowserType().startsWith(FIREFOX_BROWSER))
+        if(getBrowser().startsWith(FIREFOX_BROWSER))
             assertTitleContains("showFile.view (PNG Image");
         popLocation();
 

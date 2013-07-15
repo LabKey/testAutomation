@@ -152,13 +152,13 @@ public class DataReportsTest extends ReportTest
 
         _extHelper.clickMenuButton("Create", "Query Report");
 
-        setFormElement("viewName", QUERY_REPORT_NAME);
-        setFormElement("description", QUERY_REPORT_DESCRIPTION);
+        setFormElement(Locator.name("viewName"), QUERY_REPORT_NAME);
+        setFormElement(Locator.name("description"), QUERY_REPORT_DESCRIPTION);
         _ext4Helper.selectComboBoxItem("Schema:", QUERY_REPORT_SCHEMA_NAME);
-        waitForTextToDisappear("loading..."); // Ext4Helper.waitForMaskToDisappear(this) doesn't seem to work.
+        _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _ext4Helper.selectComboBoxItem("Query:", QUERY_REPORT_QUERY_NAME);
-        waitForTextToDisappear("loading...");
-        setFormElement("selectedQueryName", QUERY_REPORT_QUERY_NAME);
+        _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        setFormElement(Locator.name("selectedQueryName"), QUERY_REPORT_QUERY_NAME);
 
         clickButton("Save");
         waitForText("Manage Views");
@@ -179,12 +179,12 @@ public class DataReportsTest extends ReportTest
 
         _extHelper.clickMenuButton("Create", "Query Report");
 
-        setFormElement("viewName", QUERY_REPORT_NAME_2);
-        setFormElement("description", QUERY_REPORT_DESCRIPTION_2);
+        setFormElement(Locator.name("viewName"), QUERY_REPORT_NAME_2);
+        setFormElement(Locator.name("description"), QUERY_REPORT_DESCRIPTION_2);
         _ext4Helper.selectComboBoxItem("Schema:", QUERY_REPORT_SCHEMA_NAME_2);
-        waitForTextToDisappear("loading...");
+        _ext4Helper.waitForMaskToDisappear();
         _ext4Helper.selectComboBoxItem("Query:", QUERY_REPORT_QUERY_NAME_2);
-        waitForTextToDisappear("loading...");
+        _ext4Helper.waitForMaskToDisappear();
         _ext4Helper.selectComboBoxItem("View:", QUERY_REPORT_VIEW_NAME_2);
 
         clickButton("Save");
@@ -194,10 +194,11 @@ public class DataReportsTest extends ReportTest
         String datasetName = "AE-1:(VTN) AE Log";
 
         clickTab("Clinical and Assay Data");
-        waitForText(datasetName);
+        waitForElement(Locator.linkWithText(datasetName));
+        scrollIntoView(Locator.linkWithText(datasetName)); // WORKAROUND: Chrome weirdness
         clickAndWait(Locator.linkWithText(datasetName));
 
-        clickMenuButton("Views", QUERY_REPORT_NAME_2);
+        _extHelper.clickMenuButton("Views", QUERY_REPORT_NAME_2);
 
         DataRegionTable table = new DataRegionTable("Dataset", this);
 
@@ -221,7 +222,7 @@ public class DataReportsTest extends ReportTest
     @LogMethod
     private void doCrosstabViewTest()
     {
-        clickFolder(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
         clickMenuButton("Views", "Create", "Crosstab View");
@@ -236,14 +237,14 @@ public class DataReportsTest extends ReportTest
         setFormElement("label", "TestReport");
         clickButton("Save");
 
-        clickFolder(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         assertTextPresent("TestReport");
         clickAndWait(Locator.linkWithText("TestReport"));
 
         assertTableCellTextEquals("report", 2, 0, "Female");
 
         //Delete the report
-        clickFolder(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
         deleteReport("TestReport");
     }
@@ -259,7 +260,7 @@ public class DataReportsTest extends ReportTest
         clickButton("Create View");
         assertElementPresent(Locator.linkWithText("999320016"));
         assertNavButtonNotPresent("go");
-        clickFolder(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
         deleteReport(viewName);
 
@@ -269,7 +270,7 @@ public class DataReportsTest extends ReportTest
     private void doAdvancedViewTest()
     {
         // create new external report
-        clickFolder(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickMenuButton("Views", "Create", "Advanced View");
         selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
@@ -284,7 +285,7 @@ public class DataReportsTest extends ReportTest
         setFormElement(Locator.name("label"), "tsv");
         selectOptionByText(Locator.name("showWithDataset"), "DEM-1: Demographics");
         clickButton("Save");
-        clickFolder(getStudyLabel());
+        clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickAndWait(Locator.linkWithText("tsv"));
         assertTextPresent("Female");
     }
@@ -457,8 +458,9 @@ public class DataReportsTest extends ReportTest
         if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
                 Assert.fail("There was an error running the script");
+        prepForPageLoad();
         resaveReport();
-        waitForPageToLoad();
+        newWaitForPageToLoad();
 
         log("Check that edit worked");
         clickProject(getProjectName());
@@ -471,8 +473,9 @@ public class DataReportsTest extends ReportTest
         waitForText("COMPLETE", WAIT_FOR_PAGE);
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
+        prepForPageLoad();
         resaveReport();
-        waitForPageToLoad();
+        newWaitForPageToLoad();
 
         log("Clean up R pipeline jobs");
         cleanPipelineItem(R_SCRIPTS[1]);
@@ -511,7 +514,6 @@ public class DataReportsTest extends ReportTest
         Locator l = Locator.xpath("//div[span[text()='Please enter a view name:']]/div/input");
         setFormElement(l, name);
         _extHelper.clickExtButton("Save");
-        waitForPageToLoad();
 
     }
 
@@ -526,9 +528,10 @@ public class DataReportsTest extends ReportTest
         {
             while (isTextPresent(script))
             {
+                prepForPageLoad();
                 click(Locator.xpath("//a[contains(text(),'" + script + "')]/../../td[3]/a"));
-                Assert.assertTrue(selenium.getConfirmation().matches("^Permanently delete the selected view[\\s\\S]$"));
-                waitForPageToLoad();
+                Assert.assertTrue(getAlert().matches("^Permanently delete the selected view[\\s\\S]$"));
+                newWaitForPageToLoad();
             }
             assertTextNotPresent(script);
         }

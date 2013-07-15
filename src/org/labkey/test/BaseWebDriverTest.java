@@ -477,14 +477,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return BrowserType.FIREFOX;
     }
 
-    public String getBrowserType()
+    public BrowserType getBrowserType()
     {
-        return BROWSER_TYPE.toString();
+        return BROWSER_TYPE;
     }
 
     public String getBrowser()
     {
-        return getBrowserType();
+        return getBrowserType().toString();
     }
 
     public static String getStreamContentsAsString(InputStream is) throws IOException
@@ -6692,15 +6692,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void validateQueries(boolean validateSubfolders)
     {
         _extHelper.clickExtButton("Validate Queries", 0);
-        Locator locButton = Locator.xpath("//button[text()='Start Validation']");
         Locator locFinishMsg = Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok') or contains(@class, 'lk-vq-status-error')]");
-        waitForElement(locButton, WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("lk-sb-details__lk-vq-panel"), WAIT_FOR_JAVASCRIPT);
         if (validateSubfolders)
+        {
+            shortWait().until(ExpectedConditions.elementToBeClickable(By.id("lk-vq-subfolders")));
             checkCheckbox(Locator.id("lk-vq-subfolders"));
+        }
 //        if (!skipViewCheck())
 //            checkCheckbox(Locator.id("lk-vq-validatemetadata"));
         checkCheckbox(Locator.id("lk-vq-systemqueries"));
-        click(locButton);
+        clickButton("Start Validation", 0);
         waitForElement(locFinishMsg, 120000);
         //test for success
         if (!isElementPresent(Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok')]")))

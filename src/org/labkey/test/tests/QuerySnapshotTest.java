@@ -25,7 +25,7 @@ import org.labkey.test.util.ListHelper;
  * User: klum
  * Date: Jul 31, 2009
  */
-public class QuerySnapshotTest extends StudyBaseTest
+public class QuerySnapshotTest extends StudyBaseTestWD
 {
     private final String DEMOGRAPHICS_SNAPSHOT = "Demographics Snapshot";
     private final String APX_SNAPSHOT = "APX Joined Snapshot";
@@ -41,6 +41,12 @@ public class QuerySnapshotTest extends StudyBaseTest
             "UNION \n" +
             "SELECT 2 as sequenceNum, '065' as protocol, ds2.MouseId, ds2.demsex, ds2.demsexor\n" +
             "FROM Project.\"065\".study.\"DEM-1: Demographics\" ds2";
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 
     @Override
     protected void doCreateSteps()
@@ -87,8 +93,9 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         // enable advanced study security
         enterStudySecurity();
+        prepForPageLoad();
         selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
-        waitForPageToLoad(30000);
+        newWaitForPageToLoad();
 
         // shut off demographics bit to allow for insert
         clickFolder(folderName);
@@ -146,8 +153,10 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         log("delete the snapshot");
         clickMenuButton("Views", "Edit Snapshot");
+        prepForPageLoad();
         clickButton("Delete Snapshot", 0);
-        getConfirmationAndWait();
+        getAlert();
+        newWaitForPageToLoad();
 
         // snapshot over a custom view
         // test automatic updates by altering the source dataset
@@ -156,7 +165,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         _customizeViewsHelper.openCustomizeViewPanel();
 
-        _customizeViewsHelper.addCustomizeViewColumn("MouseId/DataSet/DEM-1/seq101/DEMraco", "DEM-1: Demographics Screening 4f.Other specify");
+        _customizeViewsHelper.addCustomizeViewColumn("DataSets/DEM-1/DEMraco", "DEM-1: Demographics Screening 4f.Other specify");
         _customizeViewsHelper.saveCustomView("APX Joined View");
 
         createQuerySnapshot(APX_SNAPSHOT, true, false);
@@ -183,8 +192,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         // snapshot over a custom query
         log("create a snapshot over a custom query");
         clickFolder(getStudyLabel());
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Views"));
+        goToManageViews();
         _extHelper.clickMenuButton("Create", "Grid View");
 
         clickAndWait(Locator.linkWithText("Modify Dataset List (Advanced)"));
@@ -300,8 +308,7 @@ public class QuerySnapshotTest extends StudyBaseTest
             clickButton("Edit Dataset Definition");
             waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
-            String xpath = getPropertyXPath("Dataset Fields") + "//span" + Locator.navButton("Add Field").getPath();
-            selenium.click(xpath);
+            click(Locator.xpath(getPropertyXPath("Dataset Fields")).append("//span").append(Locator.navButton("Add Field").getPath()));
             _listHelper.setColumnName(index, keyField);
             _listHelper.setColumnType(index, ListHelper.ListColumnType.Integer);
 

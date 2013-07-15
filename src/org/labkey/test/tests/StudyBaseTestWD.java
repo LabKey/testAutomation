@@ -338,4 +338,11 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
         _ext4Helper.clickTabContainingText("Study Security");
         waitAndClickButton("Study Security");
     }
+
+    public void goToManageDatasets()
+    {
+        goToManageStudy();
+        waitForText("Manage Datasets");
+        click(Locator.xpath("//a[text()='Manage Datasets']"));
+    }
 }

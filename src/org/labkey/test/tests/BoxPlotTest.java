@@ -35,8 +35,8 @@ public class BoxPlotTest extends GenericChartsTest
         doQuickChartBoxPlotTest();
     }
 
-    private static final String BOX_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0RCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measureGroup 1Group 2Cohort4c.Induration 1st measure0.05.010.015.020.025.0";
-    private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0Test TitleMice AMice BNot in Cat Mice LetMice CTestXAxisTestYAxis36.537.037.538.038.539.039.540.0";
+    private static final String BOX_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0\nRCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measure\nGroup 1\nGroup 2\nCohort\n4c.Induration 1st measure\n0.0\n5.0\n10.0\n15.0\n20.0\n25.0";
+    private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0\nTest Title\nMice A\nMice B\nNot in Cat Mice Let\nMice C\nTestXAxis\nTestYAxis\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0";
     private static final String BOX_PLOT_NAME_MV = "ManageViewsBoxPlot";
     private static final String BOX_PLOT_DESC_MV = "This box plot was created through the manage views UI";
     @LogMethod
@@ -44,7 +44,7 @@ public class BoxPlotTest extends GenericChartsTest
     {
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        clickAndWait(Locator.linkWithText("Manage Views"));
+        goToManageViews();
         clickMenuButton("Create", "Box Plot");
 
         _extHelper.waitForExtDialog("Select Chart Query");
@@ -60,13 +60,13 @@ public class BoxPlotTest extends GenericChartsTest
         _extHelper.clickExtButton("Select Chart Query", "Save", 0);
         _extHelper.waitForExtDialog("Y Axis");
         waitForText("4c.Induration 1st measure", WAIT_FOR_JAVASCRIPT);
-        mouseDown(Locator.xpath("//div[text()='4c.Induration 1st measure']"));
+        click(Locator.xpath("//div[text()='4c.Induration 1st measure']"));
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
 
         //Verify box plot
         assertSVG(BOX_PLOT_MV_1);
         log("Set Plot Title");
-        click(Locator.css("svg text:contains('4c.Induration 1st measure')"));
+        goToAxisTab("4c.Induration 1st measure");
         _extHelper.waitForExtDialog("Main Title");
         setFormElement(Locator.name("chart-title-textfield"), CHART_TITLE);
         waitForElement(Locator.css(".revertMainTitle:not(.x4-disabled)"));
@@ -74,21 +74,21 @@ public class BoxPlotTest extends GenericChartsTest
         waitForText(CHART_TITLE);
 
         log("Set Y Axis");
-        click(Locator.css("svg text:contains('4c.Induration 1st measure')"));
+        goToAxisTab("4c.Induration 1st measure");
         _extHelper.waitForExtDialog("Y Axis");
         click(Locator.ext4Radio("log"));
         waitForText("2.Body temperature", WAIT_FOR_JAVASCRIPT);
-        mouseDown(Locator.xpath("//div[text()='2.Body temperature']"));
+        click(Locator.xpath("//div[text()='2.Body temperature']"));
         setFormElement(Locator.name("label"), "TestYAxis");
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
         waitForText("TestYAxis");
 
         log("Set X Axis");
-        click(Locator.css("svg text:contains('Cohort')"));
+        goToAxisTab("Cohort");
         _extHelper.waitForExtDialog("X Axis");
         click(Locator.ext4Radio("log"));
         waitForText(MOUSE_GROUP_CATEGORY, WAIT_FOR_JAVASCRIPT);
-        mouseDown(Locator.xpath("//div[text()='"+ MOUSE_GROUP_CATEGORY +"']"));
+        click(Locator.xpath("//div[text()='"+ MOUSE_GROUP_CATEGORY +"']"));
         _extHelper.setExtFormElementByLabel("X Axis", "Label:", "TestXAxis");
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
         waitForText("TestXAxis");
@@ -112,8 +112,8 @@ public class BoxPlotTest extends GenericChartsTest
         savePlot(BOX_PLOT_NAME_MV, BOX_PLOT_DESC_MV);
     }
 
-    private static final String BOX_PLOT_DR_1 = "Created with Rapha\u00ebl 2.1.0RCH-1: Reactogenicity-Day 1 - 2.Body temperatureGroup 2Group 1Cohort2.Body temperature36.636.736.836.937.037.137.2";
-    private static final String BOX_PLOT_DR_2 = "Created with Rapha\u00ebl 2.1.0RCH-1: Reactogenicity-Day 1 - 2.Body temperatureGroup 1Group 2Cohort2.Body temperature36.537.037.538.038.539.039.540.0";
+    private static final String BOX_PLOT_DR_1 = "Created with Rapha\u00ebl 2.1.0\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nGroup 2\nGroup 1\nCohort\n2.Body temperature\n36.6\n36.7\n36.8\n36.9\n37.0\n37.1\n37.2";
+    private static final String BOX_PLOT_DR_2 = "Created with Rapha\u00ebl 2.1.0\nRCH-1: Reactogenicity-Day 1 - 2.Body temperature\nGroup 1\nGroup 2\nCohort\n2.Body temperature\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0";
     private static final String BOX_PLOT_NAME_DR = "DataRegionBoxPlot";
     private static final String BOX_PLOT_DESC_DR = "This box plot was created through a data region's 'Views' menu";
     /// Test Box Plot created from a filtered data region.
@@ -128,7 +128,7 @@ public class BoxPlotTest extends GenericChartsTest
 
         _extHelper.waitForExtDialog("Y Axis");
         waitForText("2.Body temperature", WAIT_FOR_JAVASCRIPT);
-        mouseDown(Locator.xpath("//div[text()='2.Body temperature']"));
+        click(Locator.xpath("//div[text()='2.Body temperature']"));
         clickDialogButtonAndWaitForMaskToDisappear("Y Axis", "Ok");
 
         //Verify box plot
@@ -147,7 +147,7 @@ public class BoxPlotTest extends GenericChartsTest
         clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
         Locator svgCircleLoc = Locator.css("svg a circle");
         waitForElement(svgCircleLoc);
-        click(svgCircleLoc);
+        fireEvent(svgCircleLoc, SeleniumEvent.click);
         _extHelper.waitForExtDialog("Data Point Information");
         assertTextPresentInThisOrder("MouseId/Cohort: Group 1", "RCHtempc:");
         clickButton("OK", 0);
@@ -155,7 +155,7 @@ public class BoxPlotTest extends GenericChartsTest
         savePlot(BOX_PLOT_NAME_DR, BOX_PLOT_DESC_DR);
     }
 
-    private static final String BOX_PLOT_QC = "Created with Rapha\u00ebl 2.1.0Types - DoubleGroup 1Group 2CohortDouble0.020000000.040000000.060000000.080000000.0100000000.0120000000.0";
+    private static final String BOX_PLOT_QC = "Created with Rapha\u00ebl 2.1.0\nTypes - Double\nGroup 1\nGroup 2\nCohort\nDouble\n0.0\n20000000.0\n40000000.0\n60000000.0\n80000000.0\n100000000.0\n120000000.0";
     private static final String BOX_PLOT_NAME_QC = "QuickChartBoxPlot";
     private static final String BOX_PLOT_DESC_QC = "This box plot was created through the 'Quick Chart' column header menu option";
     @LogMethod

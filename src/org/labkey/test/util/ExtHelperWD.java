@@ -68,6 +68,7 @@ public class ExtHelperWD extends AbstractHelperWD
      */
     public void clickExtMenuButton(boolean wait, Locator menu, String... subMenuLabels)
     {
+        _test.mouseOver(menu);
         _test.click(menu);
         for (int i = 0; i < subMenuLabels.length - 1; i++)
         {
@@ -221,7 +222,7 @@ public class ExtHelperWD extends AbstractHelperWD
                 "        throw 'getCodeMirrorValue() threw an exception: ' + e.message;\n" +
                 "    }\n" +
                 "};\n" +
-                "getCodeMirrorValue(arguments[0]);";
+                "return getCodeMirrorValue(arguments[0]);";
         return (String)_test.executeScript(script, id);
     }
 

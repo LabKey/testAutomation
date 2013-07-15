@@ -18,10 +18,11 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.util.CustomizeViewsHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
+import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.ext4cmp.Ext4FileFieldRefWD;
 
 import java.io.File;
 
@@ -85,10 +86,10 @@ public class NonStudyReportsTest extends ReportTest
         clickMenuButton("Create", "Attachment Report");
         setFormElement("viewName", ATTACHMENT_REPORT_NAME);
         setFormElement("description", ATTACHMENT_REPORT_DESCRIPTION);
-        setFormElement("uploadFile", ATTACHMENT_REPORT_FILE.toString());
+        setFormElement(Locator.id("uploadFile-fileInputEl"), ATTACHMENT_REPORT_FILE);
 
-        Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
-        ref.setToFile(ATTACHMENT_REPORT_FILE.toString());
+        Ext4FileFieldRefWD ref = Ext4FileFieldRefWD.create(this);
+        ref.setToFile(ATTACHMENT_REPORT_FILE);
         clickButton("Save");
         // save should return back to manage views page
         waitForText("Manage Views");
@@ -183,8 +184,8 @@ public class NonStudyReportsTest extends ReportTest
         clickReportGridLink(ATTACHMENT_REPORT2_NAME, "source");
         // change this from a server attachment report to a local attachment report
         click(Locator.xpath("//input[../label[string()='Upload file to server']]"));
-        Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
-        ref.setToFile(ATTACHMENT_REPORT2_FILE.toString());
+        Ext4FileFieldRefWD ref = Ext4FileFieldRefWD.create(this);
+        ref.setToFile(ATTACHMENT_REPORT2_FILE);
         clickButton("Save");
         // save should return back to the details page
         waitForText("Manage Views");
@@ -221,16 +222,16 @@ public class NonStudyReportsTest extends ReportTest
     private void doThumbnailChangeTest()
     {
         clickTab("Overview");
-        clickWebpartMenuItem("Data Views", false, "Customize");
+        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         DataViewsTest.clickCustomizeView(ATTACHMENT_REPORT_NAME, this);
         assertTextPresent("Share this report with all users");
 
         //set change thumbnail
 //        setFormElement(Locator.xpath("//input[contains(@id, 'customThumbnail')]"), ATTACHMENT_REPORT2_FILE.toString(), false);
 
-        Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
-        ref.setToFile(ATTACHMENT_REPORT2_FILE.toString());
-        clickButtonByIndex("Save", 1, 0);
+        Ext4FileFieldRefWD ref = Ext4FileFieldRefWD.create(this);
+        ref.setToFile(ATTACHMENT_REPORT2_FILE);
+        clickButton("Save", 0);
 
         //no way to verify, unfortunately
     }
@@ -242,41 +243,34 @@ public class NonStudyReportsTest extends ReportTest
 
         goToManageViews();
         _extHelper.clickMenuButton("Create", "R View");
-        RReportHelper rReportHelper = new RReportHelper(this);
-        rReportHelper.executeScript("# Placeholder script for discussion", "");
-        rReportHelper.saveReport(DISCUSSED_REPORT);
+        RReportHelperWD RReportHelperWD = new RReportHelperWD(this);
+        RReportHelperWD.executeScript("# Placeholder script for discussion", "");
+        RReportHelperWD.saveReport(DISCUSSED_REPORT);
         clickReportGridLink(DISCUSSED_REPORT, "view");
 
-        _extHelper.clickExtDropDownMenu("discussionMenuToggle", "Start new discussion");
-        waitForPageToLoad();
+        _extHelper.clickExtMenuButton(true, Locator.id("discussionMenuToggle"), "Start new discussion");
 
         waitForElement(Locator.id("title"), WAIT_FOR_JAVASCRIPT);
         setFormElement("title", DISCUSSION_TITLE_1);
         setFormElement("body", DISCUSSION_BODY_1);
         clickButton("Submit");
-        waitForPageToLoad();
 
-        _extHelper.clickExtDropDownMenu("discussionMenuToggle", DISCUSSION_TITLE_1);
-        waitForPageToLoad();
+        _extHelper.clickExtMenuButton(true, Locator.id("discussionMenuToggle"), DISCUSSION_TITLE_1);
 
         waitForText(DISCUSSION_TITLE_1);
         assertTextPresent(DISCUSSION_BODY_1);
 
         clickButton("Respond");
-        waitForPageToLoad();
         waitForElement(Locator.id("body"));
         setFormElement("body", DISCUSSION_BODY_2);
         clickButton("Submit");
-        waitForPageToLoad();
 
         assertTextPresent(DISCUSSION_BODY_2);
 
         clickAndWait(Locator.linkContainingText("edit"));
-        waitForPageToLoad();
         waitForElement(Locator.id("body"));
         setFormElement("body", DISCUSSION_BODY_3);
         clickButton("Submit");
-        waitForPageToLoad();
 
         assertTextPresent(DISCUSSION_BODY_3);
     }
@@ -297,11 +291,11 @@ public class NonStudyReportsTest extends ReportTest
         clickMenuButton("Create", "Link Report");
         setFormElement("viewName", LINK_REPORT1_NAME);
         setFormElement("description", LINK_REPORT1_DESCRIPTION);
-        assertTextNotPresent("URL must be absolute");
+        assertElementNotPresent(Locator.tag("li").containing("URL must be absolute"));
         setFormElement("linkUrl", "mailto:kevink@example.com");
-        assertTextPresent("URL must be absolute");
+        waitForElement(Locator.tag("li").containing("URL must be absolute"));
         setFormElement("linkUrl", getContextPath() + LINK_REPORT1_URL);
-        assertTextNotPresent("URL must be absolute");
+        waitForElementToDisappear(Locator.tag("li").containing("URL must be absolute"));
         Assert.assertTrue("Expected targetNewWindow checkbox to be checked", _extHelper.isChecked("Open link report in new window?"));
         _extHelper.uncheckCheckbox("Open link report in new window?");
         clickButton("Save");
@@ -314,7 +308,7 @@ public class NonStudyReportsTest extends ReportTest
         setFormElement("viewName", LINK_REPORT2_NAME);
         setFormElement("description", LINK_REPORT2_DESCRIPTION);
         setFormElement("linkUrl", getBaseURL() + LINK_REPORT1_URL);
-        assertTextNotPresent("URL must be absolute");
+        assertElementNotPresent(Locator.tag("li").containing("URL must be absolute"));
         Assert.assertTrue("Expected targetNewWindow checkbox to be checked", _extHelper.isChecked("Open link report in new window?"));
         clickButton("Save");
         // save should return back to Portal

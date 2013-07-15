@@ -23,8 +23,14 @@ import org.labkey.test.util.LogMethod;
  * User: klum
  * Date: Jul 31, 2009
  */
-public abstract class ReportTest extends StudyBaseTest
+public abstract class ReportTest extends StudyBaseTestWD
 {
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
     @LogMethod
     protected void deleteReport(String reportName)
     {
@@ -33,14 +39,14 @@ public abstract class ReportTest extends StudyBaseTest
 
         // select the report and click the delete button
         waitForElement(report, 10000);
-        selenium.mouseDown(report.toString());
+        click(report);
 
         String id = _extHelper.getExtElementId("btn_deleteView");
         click(Locator.id(id));
 
         _extHelper.waitForExtDialog("Delete Views", WAIT_FOR_JAVASCRIPT);
 
-        String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
+        String btnId = (String)executeScript("return Ext.MessageBox.getDialog().buttons[1].getId();");
         click(Locator.id(btnId));
 
         // make sure the report is deleted
@@ -72,7 +78,7 @@ public abstract class ReportTest extends StudyBaseTest
 
         // click the row to expand it
         Locator expander = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']");
-        selenium.click(expander.toString());
+        click(expander);
 
         final Locator link = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']//..//..//..//td//a[contains(text(),'" + linkText + "')]");
 
@@ -96,6 +102,19 @@ public abstract class ReportTest extends StudyBaseTest
     protected void clickReportGridLink(String reportName, String linkText)
     {
         clickReportGridLink(reportName, linkText, true);
+    }
+
+    protected void goToMainTitleTab(String mainTitle)
+    {
+        waitAndClick(Locator.css("svg text").containing(mainTitle));
+        waitForElement(Locator.button("Cancel"));
+    }
+
+    protected void goToAxisTab(String axisLabel)
+    {
+        // Workaround: (Selenium 2.33) Unable to click axis labels reliably for some reason. Use javascript
+        fireEvent(Locator.css("svg text").containing(axisLabel).waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT), SeleniumEvent.click);
+        waitForElement(Locator.button("Cancel")); // Axis label windows always have a cancel button. It should be the only one on the page
     }
 
     @Override

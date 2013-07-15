@@ -252,18 +252,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
     }
 
-    public String getBrowserType()
+    public String getBrowser()
     {
         String seleniumBrowser = System.getProperty("selenium.browser", FIREFOX_BROWSER);
         if (seleniumBrowser.equals("*best"))
             seleniumBrowser = FIREFOX_BROWSER;
 
-        return seleniumBrowser;
-    }
-
-    public String getBrowser()
-    {
-        String browser = getBrowserType();
         String browserPath = System.getProperty("selenium.browser.path", "");
         if (browserPath.length() > 0)
             browserPath = " " + browserPath;
@@ -273,19 +267,19 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         if (isFileUploadTest())
         {
             // IE is currently unable to do a file upload
-            if (browser.startsWith(IE_BROWSER))
+            if (seleniumBrowser.startsWith(IE_BROWSER))
             {
                 log("Warning: Internet Explorer cannot do file uploads!");
                 //browser = IE_UPLOAD_BROWSER;
                 _fileUploadAvailable = false;
             }
-            else if (browser.startsWith(FIREFOX_BROWSER))
+            else if (seleniumBrowser.startsWith(FIREFOX_BROWSER))
             {
-                browser = FIREFOX_UPLOAD_BROWSER;
+                seleniumBrowser = FIREFOX_UPLOAD_BROWSER;
                 _fileUploadAvailable = true;
             }
         }
-        return browser + browserPath;
+        return seleniumBrowser + browserPath;
     }
 
     static String getStreamContentsAsString(InputStream is) throws IOException
@@ -892,6 +886,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void goToManageViews()
     {
         clickAdminMenuItem("Manage Views");
+        waitForElement(Locator.id("viewsGrid"));
     }
 
     public void goToManageStudy()
@@ -2747,7 +2742,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void assertTextPresent(String text, int amount, boolean browserDependent)
     {
         // IE doesn't getHtmlSource the same as Firefox, it replaces \t and \n with spaces, so skip if IE
-        if (!getBrowserType().equals(IE_BROWSER))
+        if (!getBrowser().equals(IE_BROWSER))
         {
             int count = countText(text);
 

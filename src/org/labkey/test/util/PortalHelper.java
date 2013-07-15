@@ -54,17 +54,16 @@ public class PortalHelper extends AbstractHelper
         clickTabMenuItem(tabText, false, "Move", direction.toString());
         int expectedEndIndex = startIndex;
 
-        if (direction == Direction.LEFT && startIndex > 0 || direction == Direction.RIGHT && startIndex < (tabCount - 2))
-        {
             switch (direction)
             {
                 case LEFT:
+                    if (startIndex > 0)
                     expectedEndIndex = startIndex - 1;
                     break;
                 case RIGHT:
+                    if (startIndex < (tabCount - 2))
                     expectedEndIndex = startIndex + 1;
                     break;
-            }
         }
 
         _test.waitForElement(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab')]["+(expectedEndIndex+1)+"][./a[@id="+Locator.xq(tabId)+"]]"));

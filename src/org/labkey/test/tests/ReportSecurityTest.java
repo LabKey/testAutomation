@@ -87,8 +87,9 @@ public class ReportSecurityTest extends ReportTest
         enterStudySecurity();
 
         // enable advanced study security
+        prepForPageLoad();
         selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
-        waitForPageToLoad(30000);
+        newWaitForPageToLoad(30000);
 
         click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));
         clickAndWait(Locator.id("groupUpdateButton"));
@@ -109,7 +110,8 @@ public class ReportSecurityTest extends ReportTest
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
-        checkCheckbox("participantChart");
+        fireEvent(Locator.name("columnsY"), SeleniumEvent.change);
+        checkCheckbox(Locator.name("participantChart"));
         clickButton("Save", 0);
         sleep(2000);
 
@@ -126,6 +128,7 @@ public class ReportSecurityTest extends ReportTest
         // create a non-participant chart
         selectOptionByText("columnsX", "1. Weight");
         selectOptionByText("columnsY", "4. Pulse");
+        fireEvent(Locator.name("columnsY"), SeleniumEvent.change);
         clickButton("Save", 0);
         sleep(2000);
 
@@ -150,12 +153,12 @@ public class ReportSecurityTest extends ReportTest
         clickFolder("My Study");
 
         clickReportGridLink("participant chart", "permissions");
-        selenium.click("useCustom");
+        click(Locator.id("useCustom"));
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickButton("Save");
 
         clickReportGridLink(TEST_GRID_VIEW, "permissions");
-        selenium.click("useCustom");
+        click(Locator.id("useCustom"));
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickButton("Save");
 
@@ -164,7 +167,7 @@ public class ReportSecurityTest extends ReportTest
         clickProject(getProjectName());
         clickFolder("My Study");
 
-        assertLinkNotPresentWithText("APX-1: Abbreviated Physical Exam");
+        assertElementNotPresent(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
         clickAndWait(Locator.linkWithText("participant chart"));
 
         clickFolder(getFolderName());

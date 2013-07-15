@@ -124,7 +124,7 @@ public class Ext4HelperWD extends AbstractHelperWD
             @Override
             public boolean check()
             {
-                return (Boolean)_test.executeScript("return Ext4.getCmp('" + componentId + "').isDirty();");
+                return !(Boolean)_test.executeScript("return Ext4.getCmp('" + componentId + "').isDirty();");
             }
         }, "Page still marked as dirty", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
@@ -234,6 +234,7 @@ public class Ext4HelperWD extends AbstractHelperWD
      */
     public void clickParticipantFilterGridRowText(String cellText, int index)
     {
+        _test.waitForElementToDisappear(Locator.tag("div").withClass("x4-tip").notHidden()); // tooltip breaks test in Chrome
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
         _test.waitForElement(rowLoc);
         _test.click(rowLoc.append("//span[contains(@class, 'lk-filter-panel-label')][normalize-space() = '"+cellText+"']"));

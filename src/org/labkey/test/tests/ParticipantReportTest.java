@@ -70,7 +70,6 @@ public class ParticipantReportTest extends ReportTest
         startSpecimenImport(2);
 
         // wait for study and specimens to finish loading
-        waitForPipelineJobsToComplete(1, "study import", false);
         waitForSpecimenImport();
 
         //Need to create participant groups before we flip the demographics bit on DEM-1.
@@ -121,13 +120,13 @@ public class ParticipantReportTest extends ReportTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Mouse Groups"));
         _extHelper.waitForLoadingMaskToDisappear(10000);
-        _studyHelper.editCustomParticipantGroup(MICE_C, "Mouse", MOUSE_GROUP_CATEGORY_B, true, true);
+        _studyHelper.editCustomParticipantGroup(MICE_C, "Mouse", MOUSE_GROUP_CATEGORY_B, true, true, false, false);
         waitForText(MOUSE_GROUP_CATEGORY_B);
-        _studyHelper.editCustomParticipantGroup(MICE_C, "Mouse", MOUSE_GROUP_CATEGORY_A, false, true);
+        _studyHelper.editCustomParticipantGroup(MICE_C, "Mouse", MOUSE_GROUP_CATEGORY_A, false, true, false, false);
         waitForTextToDisappear(MOUSE_GROUP_CATEGORY_B);
 
         // Add more participants to a group
-        _studyHelper.editCustomParticipantGroup(MICE_C, "Mouse", null, false, true, "999320703,999320719");
+        _studyHelper.editCustomParticipantGroup(MICE_C, "Mouse", null, false, true, false, false, "999320703,999320719");
 
         // Check that group has correct number of participants
         clickAndWait(Locator.linkWithText("Mice"));
@@ -456,8 +455,7 @@ public class ParticipantReportTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickTab("Clinical and Assay Data");
-        waitAndClick(Locator.linkWithText(PARTICIPANT_REPORT5_NAME));
-        waitForPageToLoad();
+        waitAndClickAndWait(Locator.linkWithText(PARTICIPANT_REPORT5_NAME));
 
         waitForText("Showing 24 Results");
         waitForElement(Locator.css(".report-filter-window.x4-collapsed"));

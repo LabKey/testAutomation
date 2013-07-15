@@ -20,6 +20,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,12 @@ public abstract class GenericChartsTest extends ReportTest
 
     private List<String> _plots = new ArrayList<>();
     private List<String> _plotDescriptions = new ArrayList<>();
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
     final protected void doCreateSteps()
@@ -63,12 +70,14 @@ public abstract class GenericChartsTest extends ReportTest
         clickTab("Clinical and Assay Data");
         for(int i = 0; i < _plots.size(); i++)
         {
+            log("Verify " + _plots.get(i));
             Locator loc = Locator.linkWithText(_plots.get(i));
             waitForElement(loc);
             mouseOver(loc);
-            waitForText(_plotDescriptions.get(i));
-            mouseOut(loc);
-            waitForTextToDisappear(_plotDescriptions.get(i));
+            Locator.XPathLocator tipWindow = Locator.tag("div").withClass("data-views-tip-content").notHidden().containing(_plotDescriptions.get(i));
+            waitForElement(tipWindow);
+            mouseOver(Locator.css("a")); // Just to dismiss the dialog
+            waitForElementToDisappear(tipWindow);
         }
     }
 
@@ -82,7 +91,7 @@ public abstract class GenericChartsTest extends ReportTest
             public boolean check()
             {
                 return isElementPresent(Locator.css("svg")) &&
-                        expectedSvgText.equals(getText(Locator.css("svg")));
+                       getText(Locator.css("svg")).equals(getBrowserType() == BrowserType.CHROME ? expectedSvgText : expectedSvgText.replaceAll("\n", ""));
             }
         }, WAIT_FOR_JAVASCRIPT);
         Assert.assertEquals("SVG did not look as expected", expectedSvgText, getText(Locator.css("svg")));
@@ -113,9 +122,9 @@ public abstract class GenericChartsTest extends ReportTest
             @Override
             public boolean check()
             {
-                return !Boolean.parseBoolean(selenium.getEval("var p = selenium.browserbot.getCurrentWindow().Ext4.getCmp('generic-report-panel-1'); " +
-                        "if (p) p.isDirty(); " +
-                        "else false;"));
+                return !(Boolean)executeScript("var p = Ext4.getCmp('generic-report-panel-1'); " +
+                        "if (p) return p.isDirty(); " +
+                        "else return false;");
             }
         }, "Page still dirty", WAIT_FOR_JAVASCRIPT);
 
@@ -139,8 +148,7 @@ public abstract class GenericChartsTest extends ReportTest
         Locator quickChart = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":quick-chart"));
 
         click(header);
-        waitAndClick(quickChart);
-        waitForPageToLoad();
+        waitAndClickAndWait(quickChart);
     }
 
     protected void clickOptionButtonAndWaitForDialog(String btnTxt, String dialogTitle)

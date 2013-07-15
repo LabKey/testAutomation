@@ -27,7 +27,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
-public abstract class TimeChartTest extends StudyBaseTestWD
+public abstract class TimeChartTest extends ReportTest
 {
     private static final String PROJECT_NAME =  "TimeChartTest Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String FOLDER_NAME =  "Demo Study";
@@ -275,19 +275,6 @@ public abstract class TimeChartTest extends StudyBaseTestWD
     {
         clickButton("Grouping", 0);
         waitForElement(Locator.button("Cancel"));
-    }
-
-    protected void goToMainTitleTab(String mainTitle)
-    {
-        waitAndClick(Locator.css("svg text").containing(mainTitle));
-        waitForElement(Locator.button("Cancel"));
-    }
-
-    protected void goToAxisTab(String axisLabel)
-    {
-        // Workaround: (Selenium 2.33) Unable to click axis labels reliably for some reason. Use javascript
-        fireEvent(Locator.css("svg text").containing(axisLabel).waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT), SeleniumEvent.click);
-        waitForElement(Locator.button("Cancel")); // Axis label windows always have a cancel button. It should be the only one on the page
     }
 
     protected void goToDeveloperTab()

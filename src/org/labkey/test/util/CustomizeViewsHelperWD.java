@@ -51,6 +51,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     {
         super(test);
         _dataRegion = dataRegion;
+        test.assertElementPresent(dataRegion); // Fail fast if no such dataregion
     }
 
     public void openCustomizeViewPanel()
@@ -73,7 +74,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
                 @Override
                 public String toString()
                 {
-                    return "Customize view panel did not open";
+                    return "customize view panel to open";
                 }
             });
         }
@@ -123,6 +124,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
      */
     public void saveCustomView(String name, boolean shared)
     {
+        _test.scrollIntoView(_test.getButtonLocator("Save"));
         _test.clickButton("Save", 0);
 
         _test._extHelper.waitForExtDialog("Save Custom View");
@@ -225,7 +227,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     {
         if (_test.isElementPresent(_dataRegion.append("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]") ))
             // Tab hasn't rendered yet
-            _test.click(_dataRegion.append("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab.toString() + "')]]"));
+            _test.click(_dataRegion.append(Locator.tag("li").withClass("x-grouptabs-main").containing(tab.toString())));
         else
             // Tab has rendered
             _test.click(_dataRegion.append("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab.toString() + "')]]"));
@@ -255,10 +257,8 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
             if (_test.isElementPresent(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]")))
             {
                 _test.click(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'plus')]"));
-                _test.sleep(1000); //TODO:  replace with wait for animation
             }
-            _test.waitForElement(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "]/img[1][contains(@class, 'minus')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 2);
-//            _test._shortWait.until(LabKeyExpectedConditions.animationIsDone());
+            _test.waitForElement(_dataRegion.append("//div[contains(@class, 'x-tree-node') and @fieldkey=" + Locator.xq(nodePath) + "][img[1][contains(@class, 'minus')]]/following-sibling::ul").notHidden(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 2);
             nodePath += "/";
         }
 
@@ -373,10 +373,11 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
         for (WebElement el : elements)
         {
+            _test.scrollIntoView(el);
             builder.moveToElement(el).click().build().perform();
+            el.click();
+            _test.shortWait().until(ExpectedConditions.stalenessOf(el));
         }
-
-        _test.waitForElementToDisappear(Locator.xpath(itemXPath + closeXPath), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     //enable customize view grid to show hidden fields
