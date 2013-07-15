@@ -1,25 +1,14 @@
 * text=auto !eol
 bin/linux/amd64/VERSION -text
 bin/linux/amd64/chromedriver -text
-bin/linux/amd64/chromedriver2a/VERSION -text
-bin/linux/amd64/chromedriver2a/adb_commands.py -text
-bin/linux/amd64/chromedriver2a/chromedriver -text
 bin/linux/i386/VERSION -text
 bin/linux/i386/chromedriver -text
-bin/linux/i386/chromedriver2a/VERSION -text
-bin/linux/i386/chromedriver2a/adb_commands.py -text
-bin/linux/i386/chromedriver2a/chromedriver -text
 bin/mac/VERSION -text
 bin/mac/chromedriver -text
-bin/mac/chromedriver2a/VERSION -text
-bin/mac/chromedriver2a/adb_commands.py -text
-bin/mac/chromedriver2a/chromedriver -text
 bin/windows/VERSION -text
 bin/windows/amd64/IEDriverServer.exe -text
 bin/windows/amd64/VERSION -text
 bin/windows/chromedriver.exe -text
-bin/windows/chromedriver2a/VERSION -text
-bin/windows/chromedriver2a/chromedriver.exe -text
 bin/windows/i386/IEDriverServer.exe -text
 bin/windows/i386/VERSION -text
 /bootstrap_stress_test.cmd -text
