@@ -127,6 +127,7 @@ public class StudyDemoModeTest extends StudyBaseTest
         {
             List<ControllerActionId> list = super.getExcludedActions();
             list.add(new ControllerActionId("search", "search"));    // Search results page displays PTIDs
+            list.add(new ControllerActionId("study", "datasetReport")); // Reports aren't expected to hide ptids
             return list;
         }
 
