@@ -107,7 +107,7 @@ public class DataViewsTest extends StudyRedesignTest
         _extHelper.uncheckCheckbox("datasets");
         setFormElement(Locator.name("webpart.title"), RENAMED_WEBPART_TITLE);
         clickButton("Save", 0);
-        _extHelper.waitForLoadingMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _ext4Helper.waitForMaskToDisappear();
         setDataBrowseSearch("");
         waitForElement(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden());
         waitForElement(Locator.linkWithText(REPORT_NAME), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
