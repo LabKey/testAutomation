@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
 import org.labkey.remoteapi.query.Filter;
@@ -36,6 +37,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.WorkbookHelper;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +76,16 @@ public class ContainerContextTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         if (afterTest)
-            deleteVehicleRecords();
+        {
+            try
+            {
+                deleteVehicleRecords();
+            }
+            catch (IOException | CommandException rethrow)
+            {
+                throw new RuntimeException(rethrow);
+            }
+        }
         deleteProject(getProjectName(), afterTest);
     }
 
@@ -511,10 +522,8 @@ public class ContainerContextTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private String insertEmissionTest(String workbookId, String suffix, int vehicleId, String parentRowId)
+    private String insertEmissionTest(String workbookId, String suffix, int vehicleId, String parentRowId) throws IOException, CommandException
     {
-        try
-        {
             Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
             InsertRowsCommand insertCmd = new InsertRowsCommand("vehicle", "EmissionTest");
@@ -532,18 +541,11 @@ public class ContainerContextTest extends BaseWebDriverTest
             Map<String, Object> row = response.getRows().get(0);
             Long rowId = (Long)row.get("RowId");
             return rowId.toString();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 
     @LogMethod
-    private void deleteVehicleRecords()
+    private void deleteVehicleRecords() throws IOException, CommandException
     {
-        try
-        {
             log("deleting records from vehicle schema that may have been created by this test");
             Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
@@ -598,18 +600,11 @@ public class ContainerContextTest extends BaseWebDriverTest
             DeleteRowsCommand del2 = new DeleteRowsCommand("vehicle", "colors");
             del2.addRow(Maps.<String, Object>of("name", COLOR + "!"));
             del2.execute(cn, getProjectName());
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 
     @LogMethod
-    private int createRequiredRecords()
+    private int createRequiredRecords() throws IOException, CommandException
     {
-        try
-        {
             deleteVehicleRecords();  //schema should be enabled, so dont ignore exceptions
 
             Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
@@ -648,11 +643,6 @@ public class ContainerContextTest extends BaseWebDriverTest
             Map<String, Object> row = response.getRows().get(0);
             Long rowId = (Long)row.get("RowId");
             return rowId.intValue();
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
