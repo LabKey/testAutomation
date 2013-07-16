@@ -93,8 +93,6 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         doTestTabbedFolder();
         doTestContainerTabConversion();
-
-        clickProject(getProjectName());
         doTestCustomFolder();
         doTestSchemas();
         doTestTableAudit();
@@ -116,6 +114,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestCustomFolder()
     {
+        clickProject(getProjectName());
         SecurityHelperWD securityHelper = new SecurityHelperWD(this);
 
         assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Sample Sets", "Assay List");
