@@ -375,7 +375,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         {
             _test.scrollIntoView(el);
             builder.moveToElement(el).click().build().perform();
-            el.click();
+            if(_test.getBrowserType() == BaseWebDriverTest.BrowserType.CHROME) el.click();
             _test.shortWait().until(ExpectedConditions.stalenessOf(el));
         }
     }

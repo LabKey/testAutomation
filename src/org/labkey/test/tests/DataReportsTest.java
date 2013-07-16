@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.RReportHelperWD;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class DataReportsTest extends ReportTest
 {
-    protected final RReportHelper _rReportHelper = new RReportHelper(this);
+    protected final RReportHelperWD _rReportHelper = new RReportHelperWD(this);
 
     protected static final String AUTHOR_REPORT = "Author report";
 
