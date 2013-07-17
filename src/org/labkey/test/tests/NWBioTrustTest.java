@@ -393,8 +393,6 @@ public class NWBioTrustTest extends SurveyTest
             setFormElement(Locator.name("collectionstartdate"), "2013-03-20");
             setFormElement(Locator.name("collectionenddate"), "2013-03-21");
             clickButton("Next", 0);
-            _ext4Helper.checkCheckbox("Stomach");
-            clickButton("Next", 0);
             setFormElement(Locator.name("totalspecimendonors"), "6");
             setFormElement(Locator.name("genderrequirements"), "males 50%, females 50%");
             setFormElement(Locator.name("agerequirements"), ">=21yr");
