@@ -211,6 +211,13 @@
                allowBlank: false
            });
 
+        var paramField = Ext4.create('Ext.form.field.Text', {
+            name: "param1",
+            fieldLabel: "parameter",
+            allowBlank: false
+        });
+
+
         Ext4.create('Ext.form.Panel', {
                renderTo: 'divForm',
                width: 800,
@@ -219,7 +226,7 @@
                defaults: {
                  margin: '5 0 5 5'
                },
-               items: [ textField ],
+               items: [ textField, paramField ],
                buttons: [{
                    text: 'Execute as Script',
                    handler: function() {
@@ -233,6 +240,7 @@
                    handler: function() {
                        preparePage();
                        webpartReportConfig.reportId = 'module:/scriptpad/' + textField.value;
+                       webpartReportConfig.param1 = paramField.value;
                        webpartReport.render();
                     }},
                    {
