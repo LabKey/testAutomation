@@ -64,6 +64,9 @@ public class NonStudyReportsTest extends ReportTest
         enableEmailRecorder();
 
         _containerHelper.createProject(getProjectName(), "Study");
+
+        RReportHelperWD rReportHelper = new RReportHelperWD(this);
+        rReportHelper.ensureRConfig();
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
