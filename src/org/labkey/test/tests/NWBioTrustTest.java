@@ -261,6 +261,7 @@ public class NWBioTrustTest extends SurveyTest
         goToProjectHome();
         clickTab("New Sample Requests");
         waitForGridToLoad("tr", "x4-grid-row", submittedRequestTypes.length);
+        _ext4Helper.waitForMaskToDisappear();
         waitAndClickAndWait(Locator.linkWithText("view document set"));
         waitForText(registrationLabel);
         waitForText(TEST_FILE_1.getName());
@@ -480,7 +481,10 @@ public class NWBioTrustTest extends SurveyTest
 
         log("Update request status and categories");
         for (int i = 0; i < submittedRequestTypes.length; i++)
+        {
+            _ext4Helper.waitForMaskToDisappear(); // each status change causes a grid reload, which has a loading mask
             setRequestStatusAndCategory(i, submittedRequestTypes[i], NWBT_REQUEST_STATUSES[i].toString(), NWBT_REQUEST_CATEGORIES[i]);
+        }
         goToProjectHome();
         clickTab("New Sample Requests");
         waitForGridToLoad("div", "x4-grid-group-title", 1); // requests grouped by study
@@ -584,7 +588,7 @@ public class NWBioTrustTest extends SurveyTest
         fields.add(createFieldInfo("Study Information", "irbexpirationdate", "2013-03-07"));
         fields.add(createComboFieldInfo("Study Information", "Reviewing IRB", "Other"));
         fields.add(createRadioFieldInfo("Study Information", "Do you anticipate submitting data from this study to a public database (e.g. dbGAP)?", "Yes"));
-        fields.add(createComboFieldInfo("Contact Information", "Study Principal Investigator", "pi nwbiotrust"));
+        fields.add(createComboFieldInfo("Contact Information", "Study Principal Investigator:", "pi nwbiotrust"));
         fields.add(createFieldInfo("Billing", "billingcomments", "test funding source comments"));
         createNewStudyRegistration(registrationLabel, fields);
         waitForGridToLoad("tr", "x4-grid-row", 1);
@@ -862,6 +866,7 @@ public class NWBioTrustTest extends SurveyTest
         click(Locator.linkContainingText("1-2"));
 
         waitForText("Oversight Review Assessment Details");
+        waitForText("Oversight Review Approval Response");
         _ext4Helper.selectRadioButton("Recommendation:", "Approve, no changes needed");
 
         if (isElementPresent(Locator.xpath("//textarea[@name='Comment']")))
@@ -881,6 +886,7 @@ public class NWBioTrustTest extends SurveyTest
         waitForGridToLoad("div", "x4-grid-group-title", 1); // requests grouped by study
         waitForGridToLoad("tr", "x4-grid-row", submittedRequestTypes.length);
 
+        _ext4Helper.waitForMaskToDisappear();
         click(Locator.linkContainingText("1-2"));
         waitForText("Sample Request Details");
         assertTextPresent("Oversight Review Approval Response");
