@@ -688,6 +688,16 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
         waitForText("SIVmac239-Gag"); //proxy for DR load
 
+        log("DataRegion column count was: " + results.getColumnCount());
+
+        //recreate the DR to see if this removes intermittent test failures
+        results = new DataRegionTable(results.getTableName(), this);
+
+        log("DataRegion column count was: " + results.getColumnCount());
+
+        //recreate the DR to see if this removes intermittent test failures
+        results = new DataRegionTable(results.getTableName(), this);
+
         DecimalFormat formatter = new DecimalFormat("0.#E00");
         int i = 0;
         while (i < totalRows)
@@ -714,7 +724,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
             }
             Assert.assertNotNull("Unable to find expected values: " + sb.toString(), expectedVals);
 
-            Assert.assertEquals("Incorrec subjectId on row: " + i, expectedVals[0], subjectId);
+            Assert.assertEquals("Incorrect subjectId on row: " + i, expectedVals[0], subjectId);
             Assert.assertEquals("Incorrect category on row: " + i, expectedVals[1], category);
 
             if (!("".equals(expectedVals[2]) && " ".equals(date)))

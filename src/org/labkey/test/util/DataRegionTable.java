@@ -76,6 +76,11 @@ public class DataRegionTable
         return "dataregion_" + _tableName;
     }
 
+    public int getColumnCount()
+    {
+        return _columnCount;
+    }
+
     public void reload(BaseSeleniumWebTest test)
     {
         _test = test;

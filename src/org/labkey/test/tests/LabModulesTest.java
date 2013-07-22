@@ -592,14 +592,11 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             assertElementNotPresent(LabModuleHelper.getNavPanelItem(pair.getValue() + ":", IMPORT_DATA_TEXT));
         }
 
-        _helper.verifyNavPanelRowItemPresent("DNA_Oligos:");
-        assertElementNotPresent(LabModuleHelper.getNavPanelItem("DNA_Oligos:", IMPORT_DATA_TEXT));
-
-        _helper.verifyNavPanelRowItemPresent("Peptides:");
-        assertElementNotPresent(LabModuleHelper.getNavPanelItem("Peptides:", IMPORT_DATA_TEXT));
-
-        _helper.verifyNavPanelRowItemPresent("Samples:");
-        assertElementNotPresent(LabModuleHelper.getNavPanelItem("Samples:", IMPORT_DATA_TEXT));
+        for (String item : getSampleItems())
+        {
+            _helper.verifyNavPanelRowItemPresent(item + ":");
+            assertElementNotPresent(LabModuleHelper.getNavPanelItem(item + ":", IMPORT_DATA_TEXT));
+        }
 
         //now try UI will normal permissions
         stopImpersonatingRole();
@@ -865,6 +862,11 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         sleep(40); //wait for listener to act
         Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Peptides").getValue());
 
+        //antibodies
+        Ext4FieldRefWD.getForBoxLabel(this, "Antibodies").setValue(false);
+        sleep(40); //wait for listener to act
+        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Antibodies").getValue());
+
         click(Locator.ext4Button("Submit"));
         waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
@@ -876,6 +878,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assertElementNotPresent(LabModuleHelper.getNavPanelRow("Samples:"));
         assertElementNotPresent(LabModuleHelper.getNavPanelRow("DNA_Oligos:"));
         assertElementNotPresent(LabModuleHelper.getNavPanelRow("Peptides:"));
+        assertElementNotPresent(LabModuleHelper.getNavPanelRow("Antibodies:"));
+
         i = 1;
         for (Pair<String, String> pair : getAssaysToCreate())
         {
@@ -902,7 +906,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         }
         assertElementPresent(Locator.linkContainingText("TruCount Test: Results By Run"));
 
-        assertElementNotPresent(Locator.linkContainingText("View All")); //covers samples, peptides, oligos
+        assertElementNotPresent(Locator.linkContainingText("View All")); //covers samples, peptides, oligos, antibodies
         assertElementNotPresent(Locator.linkContainingText("Browse Sequence Data"));
 
         //restore defaults
@@ -920,6 +924,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Ext4FieldRefWD.getForBoxLabel(this, "Samples").setValue(true);
         Ext4FieldRefWD.getForBoxLabel(this, "DNA_Oligos").setValue(true);
         Ext4FieldRefWD.getForBoxLabel(this, "Peptides").setValue(true);
+        Ext4FieldRefWD.getForBoxLabel(this, "Antibodies").setValue(true);
 
         click(Locator.ext4Button("Submit"));
         waitForElement(Ext4HelperWD.ext4Window("Success"));
@@ -983,6 +988,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         assertElementPresent(Locator.linkContainingText("View All DNA Oligos"));
         assertElementPresent(Locator.linkContainingText("View All Peptides"));
+        assertElementPresent(Locator.linkContainingText("View All Antibodies"));
         assertElementPresent(Locator.linkContainingText("View All Samples"));
         assertElementPresent(Locator.linkContainingText("Freezer Summary"));
 
@@ -1205,7 +1211,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         cv.applyCustomView();
 
         dr.setFilter("container", "Does Not Equal", getProjectName());
-        dr.setSort("rowid", SortDirection.ASC);
+        dr.setSort("freezerid", SortDirection.ASC);
 
         i = 0;
         while (i < max)
@@ -1385,6 +1391,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     private List<String> getSampleItems()
     {
         List<String> list = new ArrayList<>();
+        list.add("Antibodies");
         list.add("DNA_Oligos");
         list.add("Peptides");
         list.add("Samples");

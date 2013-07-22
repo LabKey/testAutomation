@@ -276,6 +276,11 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         waitForText("cells/uL"); //proxy for DR loading
         Assert.assertEquals("Incorrect row count", expected.size(), results.getDataRowCount());
 
+        log("DataRegion column count was: " + results.getColumnCount());
+
+        //recreate the DR to see if this removes intermittent test failures
+        results = new DataRegionTable(results.getTableName(), this);
+
         int i = 0;
         while (i < expected.size())
         {

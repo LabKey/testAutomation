@@ -348,6 +348,11 @@ public class ElectrochemiluminescenceAssayTest extends AbstractLabModuleAssayTes
         int totalRows = 100;
         Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
 
+        log("DataRegion column count was: " + results.getColumnCount());
+
+        //recreate the DR to see if this removes intermittent test failures
+        results = new DataRegionTable(results.getTableName(), this);
+
         int i = 0;
         while (i < totalRows)
         {

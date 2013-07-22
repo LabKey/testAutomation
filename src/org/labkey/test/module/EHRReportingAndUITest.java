@@ -342,21 +342,21 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Compare Weights");
         _extHelper.waitForExtDialog("Weights");
         _extHelper.clickExtButton("Weights", "OK", 0);
-        assertTextNotPresent("Weight1");
+        assertTextNotPresent("Weight 1");
 
         log("Compare Weights - two selections");
         checkDataRegionCheckbox(dataRegionName, 1);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Compare Weights");
         _extHelper.waitForExtDialog("Weights");
         _extHelper.clickExtButton("Weights", "OK", 0);
-        assertTextNotPresent("Weight1");
+        assertTextNotPresent("Weight 1");
 
         log("Compare Weights - three selections");
         checkDataRegionCheckbox(dataRegionName, 2);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_" + dataRegionName + "']" + Locator.navButton("More Actions").getPath()), "Compare Weights");
         _extHelper.waitForExtDialog("Error"); // After error dialog.
         _extHelper.clickExtButton("Error", "OK", 0);
-        assertTextNotPresent("Weight1");
+        assertTextNotPresent("Weight 1");
 
         log("Jump to Other Dataset - no selection");
         uncheckAllOnPage(dataRegionName);
@@ -396,7 +396,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
     private void refreshAnimalHistoryReport()
     {
         waitForText("Abstract");
-        sleep(100);
+        sleep(200);
         waitAndClick(Locator.ext4Button("Refresh"));
     }
 
@@ -430,7 +430,7 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         clickProject(getProjectName());
         clickFolder(FOLDER_NAME);
         waitForElement(Locator.linkWithText("Advanced Animal Search"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.name("room"), ROOM_ID);
+        _ext4Helper.queryOne("#roomField", Ext4FieldRefWD.class).setValue(ROOM_ID);
         clickButton("Show Room");
         waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT);
     }

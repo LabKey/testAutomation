@@ -218,6 +218,10 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         DataRegionTable results = new DataRegionTable("Data", this);
         Assert.assertEquals("Incorrect row count", expected.size(), results.getDataRowCount());
         waitForText("TestPrimer2"); //proxy for DR load
+        log("DataRegion column count was: " + results.getColumnCount());
+
+        //recreate the DR to see if this removes intermittent test failures
+        results = new DataRegionTable(results.getTableName(), this);
 
         int i = 0;
         while (i < expected.size())
@@ -229,11 +233,11 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
             String result = results.getDataAsText(i, "Result");
             String freezer = results.getDataAsText(i, "Freezer Id");
 
-            Assert.assertEquals("Incorrect subjectId", expectedVals[0], subjectId);
-            Assert.assertEquals("Incorrect freezerId", expectedVals[1], freezer);
-            Assert.assertEquals("Incorrect date", expectedVals[2], date);
-            Assert.assertEquals("Incorrect result", expectedVals[3], result);
-            Assert.assertEquals("Incorrect primer pair", expectedVals[4], pair);
+            Assert.assertEquals("Incorrect subjectId on row: " + i, expectedVals[0], subjectId);
+            Assert.assertEquals("Incorrect freezerId on row: " + i, expectedVals[1], freezer);
+            Assert.assertEquals("Incorrect date on row: " + i, expectedVals[2], date);
+            Assert.assertEquals("Incorrect result on row: " + i, expectedVals[3], result);
+            Assert.assertEquals("Incorrect primer pair on row: " + i, expectedVals[4], pair);
 
             i++;
         }
@@ -470,6 +474,10 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         expected.add(new String[]{"15548", "D11S2002", "248"});
 
         Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
+        log("DataRegion column count was: " + results.getColumnCount());
+
+        //recreate the DR to see if this removes intermittent test failures
+        results = new DataRegionTable(results.getTableName(), this);
 
         int i = 0;
         while (i < totalRows)
@@ -479,9 +487,9 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
             String result = results.getDataAsText(i, "Result");
             String[] expectedVals = expected.get(i);
 
-            Assert.assertEquals("Incorrec subjectId", expectedVals[0], subjectId);
-            Assert.assertEquals("Incorrect marker", expectedVals[1], marker);
-            Assert.assertEquals("Incorrect result", expectedVals[2], result);
+            Assert.assertEquals("Incorrect subjectId on row: " + i, expectedVals[0], subjectId);
+            Assert.assertEquals("Incorrect marker on row: " + i, expectedVals[1], marker);
+            Assert.assertEquals("Incorrect result on row: " + i, expectedVals[2], result);
 
             i++;
         }
