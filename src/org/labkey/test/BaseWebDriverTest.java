@@ -2164,13 +2164,37 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 pushLocation();
                 click(thisView);
 
-                String schemaName = getText(Locator.xpath("//div[contains(@class, 'x-grid3-row-expanded')]//div[contains(@class, 'x-grid3-row-body')]//td[normalize-space()='schema name']/following-sibling::td"));
-                String queryName = getText(Locator.xpath("//div[contains(@class, 'x-grid3-row-expanded')]//div[contains(@class, 'x-grid3-row-body')]//td[normalize-space()='query name']/following-sibling::td"));
-                String viewString = viewName + " of " + schemaName + "." + queryName;
-                log("Checking view: " + viewString);
+                Locator.XPathLocator expandedReport = Locator.tag("div").withClass("x-grid3-row-expanded");
 
-                waitAndClick(Locator.linkWithText("VIEW"));
-                waitForText(viewName);
+                String reportType = getAttribute(expandedReport.append("//div").withClass("x-grid3-col-1").append("/img"), "alt");
+                String schemaName = getText(expandedReport.append("//td[normalize-space()='schema name']/following-sibling::td"));
+                String queryName = getText(expandedReport.append("//td[normalize-space()='query name']/following-sibling::td"));
+                String viewString = viewName + " of " + schemaName + "." + queryName;
+
+                if ("Stand-alone views".equals(queryName))
+                {
+                    log("Checking view: " + viewName);
+                    waitAndClick(Locator.linkWithText("VIEW"));
+                    Set<String> windows = getDriver().getWindowHandles();
+                    if (windows.size() > 1)
+                    {
+                        getDriver().switchTo().window((String)windows.toArray()[1]);
+                        Assert.assertEquals(200, getResponseCode());
+                        getDriver().close();
+                        getDriver().switchTo().window((String)windows.toArray()[0]);
+                    }
+                    else
+                    {
+                        Assert.assertEquals(200, getResponseCode());
+                    }
+                }
+                else
+                {
+                    log("Checking view: " + viewString);
+                    waitAndClickAndWait(Locator.linkWithText("VIEW"));
+                    waitForText(viewName);
+                }
+
                 popLocation();
                 _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
             }
@@ -3531,6 +3555,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected void clickExportToText()
     {
         clickButton("Export", 0);
+        shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(null));
         _extHelper.clickSideTab("Text");
         clickButton("Export to Text");
     }
@@ -4188,12 +4213,20 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         WebElement toEl = to.findElement(_driver);
 
         int y;
-        if ( pos == Position.top )
-            y = 1;
-        else if ( pos == Position.bottom )
-            y = toEl.getSize().getHeight() - 1;
-        else // pos == Position.middle
-            y = toEl.getSize().getHeight() / 2;
+        switch (pos)
+        {
+            case top:
+                y = 1;
+                break;
+            case bottom:
+                y = toEl.getSize().getHeight() - 1;
+                break;
+            case middle:
+                y = toEl.getSize().getHeight() / 2;
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected position: " + pos.toString());
+        }
 
         Actions builder = new Actions(_driver);
         builder.clickAndHold(fromEl).moveToElement(toEl, 1, y).release().build().perform();
