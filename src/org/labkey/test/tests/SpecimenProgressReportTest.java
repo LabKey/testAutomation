@@ -17,7 +17,7 @@ package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.APIContainerHelper;
@@ -38,7 +38,7 @@ import java.util.Collections;
  * Date: 9/11/12
  * Time: 2:42 PM
  */
-public class SpecimenProgressReportTest extends BaseSeleniumWebTest
+public class SpecimenProgressReportTest extends BaseWebDriverTest
 {
     public static final String STUDY_PIPELINE_ROOT = getLabKeyRoot() + "/sampledata/specimenprogressreport";
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
@@ -54,6 +54,18 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     private Locator.XPathLocator tableLoc = Locator.xpath("//table[@id='dataregion_ProgressReport']");
 
     @Override
+    public String getAssociatedModuleDirectory()
+    {
+        return null;
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    @Override
     protected String getProjectName()
     {
         //Issue 16247: tricky characters in project name cause alert when trying to add a lookup to a rho query in the folder
@@ -63,6 +75,12 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
     public boolean isFileUploadTest()
     {
         return true;
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        deleteProject(getProjectName(), afterTest);
     }
 
     @Override
@@ -351,17 +369,5 @@ public class SpecimenProgressReportTest extends BaseSeleniumWebTest
         click(ignoreSamplemindedCheckbox);
         assertElementPresent(ignoreSamplemindedCheckboxChecked);
         clickButton("Save");
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteProject(getProjectName(), afterTest);
-    }
-
-    @Override
-    public String getAssociatedModuleDirectory()
-    {
-        return null;
     }
 }

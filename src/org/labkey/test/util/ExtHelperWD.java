@@ -549,7 +549,7 @@ public class ExtHelperWD extends AbstractHelperWD
         Locator file = locateGridRowCheckbox(fileName);
 
         _test.waitForElement(file, WAIT_FOR_PAGE);
-        _test.mouseDown(file);
+        _test.click(file);
     }
 
     @LogMethod(quiet = true)
@@ -697,10 +697,10 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         if (_test.isElementPresent(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab + "')]]")))
             // Tab hasn't rendered yet
-            _test.mouseDown(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab + "')]]"));
+            _test.click(Locator.xpath("//a[contains(@class, 'x-grouptabs-text') and span[contains(text(), '" + tab + "')]]"));
         else
             // Tab has rendered
-            _test.mouseDown(Locator.xpath("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab + "')]]"));
+            _test.click(Locator.xpath("//ul[contains(@class, 'x-grouptabs-strip')]/li[a[contains(@class, 'x-grouptabs-text') and contains(text(), '" + tab + "')]]"));
     }
 
     public void clickExtTabContainingText(String tabText)

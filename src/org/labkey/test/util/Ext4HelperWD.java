@@ -185,7 +185,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
         if (!isChecked(rowLoc))
-            _test.mouseDown(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
+            _test.click(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
     }
 
     /**
@@ -209,7 +209,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
         if (isChecked(rowLoc))
-            _test.mouseDown(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
+            _test.click(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
     }
 
     /**

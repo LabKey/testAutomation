@@ -17,7 +17,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.EmailRecordTable;
@@ -31,7 +31,7 @@ import java.util.List;
  * User: tamram
  * Date: May 15, 2006
  */
-public class IssuesTest extends BaseSeleniumWebTest
+public class IssuesTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "IssuesVerifyProject";
     protected static final String SUB_FOLDER_NAME = "SubFolder";
@@ -62,6 +62,12 @@ public class IssuesTest extends BaseSeleniumWebTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/issues";
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     @Override
@@ -133,33 +139,33 @@ public class IssuesTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("set"));
         // check that AAA is bold and [clear] link is on that row
         assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[1]/b"), "AAA");
-        assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[2]/a[2]"), "clear");
+        assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[2]/a[2]"), "CLEAR");
         //SetKeywordDefaultAction
         clickAndWait(Locator.linkWithText("clear"));
         // check that AAA is not bold and [set] link is now on that row
         assertElementNotPresent(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[1]/b"));
-        assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[2]/a[2]"), "set");
+        assertElementContains(Locator.xpath("id('formtype')/table/tbody/tr[1]/td[2]/a[2]"), "SET");
         clickAndWait(Locator.linkWithText("delete"));
         assertTextNotPresent("AAA");
 
         // Check that non-integer priority results in an error message
         addKeyword("priority", "Priority", "ABC");
-        assertTextPresent("Priority must be an integer");
-        assertTextNotPresent("ABC");
+        assertElementPresent(Locator.css(".labkey-error").withText("Priority must be an integer"));
+        assertElementNotPresent(Locator.css("#formPriority td").withText("ABC"));
         addKeyword("priority", "Priority", "1.2");
-        assertTextPresent("Priority must be an integer");
-        assertTextNotPresent("1.2");
+        assertElementPresent(Locator.css(".labkey-error").withText("Priority must be an integer"));
+        assertElementNotPresent(Locator.css("#formPriority td").withText("1.2"));
 
         // SetCustomColumnConfigurationAction
-        setText("int1", "MyInteger");
-        setText("int2", "MySecondInteger");
-        setText("string1", "MyFirstString");
+        setFormElement(Locator.name("int1"), "MyInteger");
+        setFormElement(Locator.name("int2"), "MySecondInteger");
+        setFormElement(Locator.name("string1"), "MyFirstString");
         // Omit string2 to test using it in email template.
-        setText("string3", "MyThirdString");
-        setText("string4", "MyFourthString");
-        setText("string5", "MyFifthString");
-        checkCheckbox("pickListColumns", "string1");
-        checkCheckbox("pickListColumns", "string5");
+        setFormElement(Locator.name("string3"), "MyThirdString");
+        setFormElement(Locator.name("string4"), "MyFourthString");
+        setFormElement(Locator.name("string5"), "MyFifthString");
+        checkCheckbox(Locator.checkboxByNameAndValue("pickListColumns", "string1"));
+        checkCheckbox(Locator.checkboxByNameAndValue("pickListColumns", "string5"));
         clickButton("Update");
 
         // AddKeywordAction
@@ -168,9 +174,9 @@ public class IssuesTest extends BaseSeleniumWebTest
         addKeywordsAndVerify("string5", "MyFifthString", "Cadmium", "Polonium");
 
         // UpdateRequiredFieldsAction
-        checkCheckbox("requiredFields", "Milestone");
-        checkCheckbox("requiredFields", "String4");
-        checkCheckbox("requiredFields", "String5");
+        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "Milestone"));
+        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "String4"));
+        checkCheckbox(Locator.checkboxByNameAndValue("requiredFields", "String5"));
         clickButton("Update");
 
         // ListAction (empty)
@@ -192,7 +198,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         assignedToText = getText(Locator.xpath("//select[@name='assignedTo']"));
         Assert.assertEquals(assignedToText, getDisplayName());
         String customStringText = getText(Locator.xpath("//select[@name='string5']"));
-        Assert.assertEquals(customStringText, "Cadmium Polonium");
+        Assert.assertEquals(customStringText, "Cadmium\nPolonium");
         setFormElement("title", ISSUE_TITLE_0);
         selectOptionByText("type", "UFO");
         selectOptionByText("area", "Area51");
@@ -258,7 +264,7 @@ public class IssuesTest extends BaseSeleniumWebTest
         testLastFilter(issueId);
 
         // JumpToIssueAction
-        setText("issueId", "" + issueId);
+        setFormElement(Locator.name("issueId"), "" + issueId);
         submit(Locator.formWithName("jumpToIssue"));
         assertTextPresent(ISSUE_TITLE_0);
         assertTextNotPresent("Invalid");
@@ -312,14 +318,14 @@ public class IssuesTest extends BaseSeleniumWebTest
     }
 
     // Add a keyword to the given field, without verifying the operation.  Need to be on the issues admin page already.
-    private static void addKeyword(BaseSeleniumWebTest test, String fieldName, String caption, String value)
+    private static void addKeyword(BaseWebDriverTest test, String fieldName, String caption, String value)
     {
         test.setFormElement(Locator.xpath("//form[@name='add" + fieldName + "']/input[@name='keyword']"), value);
         test.clickButton("Add " + caption);
     }
 
     // Add new keyword(s) to the given field and verify they were added without error.  Need to be on the issues admin page already.
-    public static void addKeywordsAndVerify(BaseSeleniumWebTest test, String fieldName, String caption, String... values)
+    public static void addKeywordsAndVerify(BaseWebDriverTest test, String fieldName, String caption, String... values)
     {
         for (String value : values)
         {

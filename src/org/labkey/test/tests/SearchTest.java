@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.SearchHelper;
@@ -29,7 +30,7 @@ import java.util.HashMap;
  * Time: 9:10:47 AM
  */
 
-public class SearchTest extends StudyTest
+public class SearchTest extends StudyWDTest
 {
     private final SearchHelper _searchHelper = new SearchHelper(this);
     
@@ -58,6 +59,12 @@ public class SearchTest extends StudyTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/search";
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     @Override
@@ -162,17 +169,15 @@ public class SearchTest extends StudyTest
 
     private void checkSyntaxErrorMessage(String... expectedPhrases)
     {
+        String errorText = getText(Locator.css("#searchResults + table"));
         // We want our nice, custom error messages to appear
-        assertTextPresent(expectedPhrases);
+        for (String phrase : expectedPhrases)
+        {
+            Assert.assertTrue("Did not find expected error message: " + phrase, errorText.contains(phrase));
+        }
 
         // Various phrases that appear in the standard Lucene system error message
-        assertTextNotPresent("Cannot parse");
-        assertTextNotPresent("encountered");
-        assertTextNotPresent("Was expecting");
-        assertTextNotPresent("<NOT>");
-        assertTextNotPresent("<OR>");
-        assertTextNotPresent("<AND>");
-        assertTextNotPresent("<EOF>");
+        assertTextNotPresent("Cannot parse", "encountered", "Was expecting", "<NOT>", "<OR>", "<AND>", "<EOF>");
     }
 
     @Override

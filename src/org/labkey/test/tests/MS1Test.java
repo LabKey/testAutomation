@@ -17,7 +17,7 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
@@ -31,7 +31,7 @@ import java.io.File;
  * Date: Nov 7, 2007
  * Time: 9:33:52 AM
  */
-public class MS1Test extends BaseSeleniumWebTest
+public class MS1Test extends BaseWebDriverTest
 {
     public static final String PROJ_MAIN = "~~MS1 BVT PROJECT~~"; //use spaces to test for url encoding issues
     public static final String MS1_FOLDER_TYPE = "MS1";
@@ -59,6 +59,12 @@ public class MS1Test extends BaseSeleniumWebTest
     public static final String PIPELINE_IMPORT_MS1_FEATURES_BUTTON = "Import";
 
     private static final File _pipelinePathMain = new File(getLabKeyRoot(), "/sampledata/ms1/bvt");
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 
     protected void doTestSteps()
     {
@@ -192,7 +198,7 @@ public class MS1Test extends BaseSeleniumWebTest
 
         assertTextNotPresent("No data to show");
         assertTextPresent("1,432.8550");
-        assertTextPresent("of 183"); //Showing 1 - 100 of 183
+        assertElementPresent(Locator.paginationText(1, 100, 183));
 
         log("Features rendered OK");
     }
@@ -469,13 +475,13 @@ public class MS1Test extends BaseSeleniumWebTest
 
     protected void assertChartRendered(Locator.XPathLocator loc)
     {
-        String src = selenium.getValue(loc.toString() + "/@src");
+        String src = getAttribute(loc, "src");
+        pushLocation();
         String urlCur = getURL().toString();
         String base = urlCur.substring(0, urlCur.indexOf("showFeatureDetails.view"));
-
-        selenium.open(base + src.substring(src.indexOf("showChart.view?")));
+        beginAt(base + src.substring(src.indexOf("showChart.view?")));
         Assert.assertTrue(200 == getResponseCode());
-        selenium.open(urlCur);
+        popLocation();
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException

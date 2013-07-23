@@ -20,7 +20,7 @@ import org.junit.Assert;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
@@ -28,7 +28,7 @@ import java.io.File;
 import java.util.Arrays;
 
 
-public class MessagesTest extends BaseSeleniumWebTest
+public class MessagesTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "MessagesVerifyProject";
 
@@ -45,6 +45,12 @@ public class MessagesTest extends BaseSeleniumWebTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/announcements";
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     @Override
@@ -103,7 +109,7 @@ public class MessagesTest extends BaseSeleniumWebTest
         log("test attachments too");
         if (isFileUploadAvailable())
         {
-            click(Locator.linkWithText("Attach a file"));
+            click(Locator.linkContainingText("Attach a file"));
             File file = new File(getLabKeyRoot() + "/common.properties");
             setFormElement("formFiles[00]", file);
         }
@@ -142,14 +148,12 @@ public class MessagesTest extends BaseSeleniumWebTest
         Locator subscribeButton = Locator.tagWithText("span", "subscribe");
         assertElementPresent(subscribeButton);
         click(subscribeButton);
-        click(Locator.tagWithText("span", "thread"));
-        waitForPageToLoad();
+        clickAndWait(Locator.tagWithText("span", "thread"));
         clickAndWait(Locator.linkWithText("unsubscribe"));
         assertElementPresent(subscribeButton);
 
         click(subscribeButton);
-        click(Locator.tagWithText("span", "forum"));
-        waitForPageToLoad();
+        clickAndWait(Locator.tagWithText("span", "forum"));
         clickButton("Update");
         clickButton("Done");
 
@@ -184,8 +188,7 @@ public class MessagesTest extends BaseSeleniumWebTest
 
         log("test filtering of messages grid");
         clickAndWait(Locator.linkWithText("view list"));
-        setFilterAndWait("Announcements", "Title", "Equals", "foo", 0);
-        waitForPageToLoad();
+        setFilterAndWait("Announcements", "Title", "Equals", "foo", WAIT_FOR_PAGE);
 
         assertTextNotPresent(RESP1_TITLE);
 
@@ -194,7 +197,6 @@ public class MessagesTest extends BaseSeleniumWebTest
         log("test delete message works and is recognized");
         goToProjectHome();
         clickAndWait(Locator.linkWithText(RESP1_TITLE));
-        waitForPageToLoad();
         clickButton("Delete Message");
         clickButton("Delete");
         assertTextNotPresent(MSG1_TITLE);

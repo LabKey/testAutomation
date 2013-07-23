@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
@@ -24,12 +24,24 @@ import org.labkey.test.TestTimeoutException;
  * Date: 8/25/12
  * Time: 6:23 PM
  */
-public class SystemMaintenanceTest extends BaseSeleniumWebTest
+public class SystemMaintenanceTest extends BaseWebDriverTest
 {
+    @Override
+    public String getAssociatedModuleDirectory()
+    {
+        return null;
+    }
+
     @Override
     protected String getProjectName()
     {
         return null;
+    }
+
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+
     }
 
     @Override
@@ -53,17 +65,5 @@ public class SystemMaintenanceTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("running threads"));
         assertTextNotPresent("SystemMaintenance");
 
-    }
-
-    @Override
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-
-    }
-
-    @Override
-    public String getAssociatedModuleDirectory()
-    {
-        return null;
     }
 }

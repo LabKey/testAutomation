@@ -17,10 +17,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.PasswordUtil;
 
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
  * User: tamram
  * Date: May 15, 2006
  */
-public class MessagesLongTest extends BaseSeleniumWebTest
+public class MessagesLongTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "MessagesVerifyProject";
     private static final String EXPIRES1 = "2107-07-19";
@@ -52,6 +53,12 @@ public class MessagesLongTest extends BaseSeleniumWebTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/announcements";
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     @Override
@@ -124,8 +131,8 @@ public class MessagesLongTest extends BaseSeleniumWebTest
 
         assertElementNotPresent(Locator.xpath("//a[text()='messages']"));
         click(Locator.navButton("Update Settings"));
-        waitForElement(Locator.xpath("//li/a[text()='messages']"), WAIT_FOR_JAVASCRIPT);
-        selenium.mouseDown("//li/a[text()='messages']");
+        shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(Locator.id("Users")));
+        _extHelper.clickSideTab("messages");
         Locator.XPathLocator folderDefaultCombo = Locator.xpath("//input[@name='defaultEmailOption']/../../div");
 
         waitForElement(Locator.xpath("//input[@name='defaultEmailOption']"), WAIT_FOR_JAVASCRIPT);
@@ -157,7 +164,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         setFormElement("body", HTML_BODY);
         selectOptionByText("rendererType", "HTML");
         submit();
-        assertTextPresent("1 x");
+        assertElementPresent(Locator.tag("div").withClass("message-text").withPredicate("starts-with(normalize-space(), '1 x')"));
         assertLinkPresentWithText(HTML_BODY_WEBPART_TEST);
 
         log("Check that edit works");
@@ -185,7 +192,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         submit();
         assertTextPresent(RESP2_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
-        assertTextPresent("2 responses");
+        assertElementPresent(Locator.css("#table1 td").withText(" (2 responses)")); // xpath doesn't work with nbsp
 
         log("Create fake user for permissions check");
         enterPermissionsUI();
@@ -302,7 +309,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         submit();
         clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent("Members: "+USER1);
-        assertTextPresent("Assigned To: "+ displayNameFromEmail(USER3));
+        assertElementPresent(Locator.css("#webpart_-1 td").withText("Assigned To: "+ displayNameFromEmail(USER3)));
         impersonate(USER1);
         clickProject(PROJECT_NAME);
         assertTextPresent(MSG3_TITLE);
@@ -321,7 +328,7 @@ public class MessagesLongTest extends BaseSeleniumWebTest
         clickButton("Delete");
         assertTextNotPresent(RESP1_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
-        assertTextPresent("2 response");
+        assertElementPresent(Locator.css("#table1 td").withText(" (2 responses)")); // xpath doesn't work with nbsp
         clickProject(PROJECT_NAME);
         assertTextNotPresent(MSG2_TITLE);
         clickAndWait(Locator.linkWithText("view message or respond"));

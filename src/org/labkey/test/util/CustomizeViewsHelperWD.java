@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -59,24 +60,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         if (Locator.button("View Grid").findElements(_test._driver).size() < 1)
         {
             _test._extHelper.clickExtMenuButton(false, Locator.navButton("Views"), "Customize View");
-            _test._shortWait.until(new ExpectedCondition<WebElement>()
-            {
-                @Override
-                public WebElement apply(WebDriver d)
-                {
-                    WebElement el = _test._driver.findElement(_dataRegion.toCssLocator().append(".labkey-data-region-header-container .labkey-ribbon").toBy());
-                    if ("static".equalsIgnoreCase(el.getCssValue("position")) && el.isDisplayed())
-                        return el;
-                    else
-                        return null;
-                }
-
-                @Override
-                public String toString()
-                {
-                    return "customize view panel to open";
-                }
-            });
+            _test.shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(_dataRegion));
         }
         _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test._shortWait.until(LabKeyExpectedConditions.animationIsDone(_dataRegion.toCssLocator().append(".customizeViewPanel")));
@@ -373,9 +357,8 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
         for (WebElement el : elements)
         {
-            _test.scrollIntoView(el);
             builder.moveToElement(el).click().build().perform();
-            if(_test.getBrowserType() == BaseWebDriverTest.BrowserType.CHROME) el.click();
+            try {el.click();} catch (StaleElementReferenceException ignore) {}
             _test.shortWait().until(ExpectedConditions.stalenessOf(el));
         }
     }
@@ -598,7 +581,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     private void moveCustomizeViewItem(int field_index, boolean moveUp, ViewItemType type)
     {
         String fromItemXPath = itemXPath(type, field_index);
-        String toItemXPath = itemXPath(type, moveUp ? field_index - 1 : field_index + 1 );
+        String toItemXPath = itemXPath(type, moveUp ? field_index - 1 : field_index + 1 ) + "/tbody/" + (moveUp ? "tr[1]" : "tr[2]");
 
         changeTab(type);
         _test.dragAndDrop(Locator.xpath(fromItemXPath), Locator.xpath(toItemXPath));
