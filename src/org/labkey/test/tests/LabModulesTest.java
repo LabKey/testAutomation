@@ -321,7 +321,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             Assert.assertEquals("Incorrect container", workbook.getId(), container);
             Assert.assertEquals("Incorrect container name", workbook.getName(), containerName);
             String path = workbook.getName();
-            Integer rowId = Integer.parseInt(path.split("-")[1]);
+            Integer rowId = Integer.parseInt(path);
             Assert.assertEquals("Incorrect container rowId", rowId, containerRowId);
 
             Integer expectedId = 1 + highestWorkbookId + idx;
@@ -360,7 +360,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             Assert.assertEquals("Incorrect container name", workbook.getName(), containerName);
 
             String path = workbook.getName();
-            Integer rowId = Integer.parseInt(path.split("-")[1]);
+            Integer rowId = Integer.parseInt(path);
             Assert.assertEquals("Incorrect container rowId", rowId, containerRowId);
 
             Integer expectedId = workbookIdOffset + idx;
