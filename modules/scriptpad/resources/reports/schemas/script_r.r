@@ -26,6 +26,8 @@ ptm <- proc.time();
 if (!exists("sharedSession")) {
     print('running setup code ...');
     require("RJSONIO");
+    print('taking our sweet, sweet time');
+    Sys.sleep(15);
     library(Cairo)
     datafile <- paste(labkey.url.base, "input_data.tsv", sep="");
     labkey.data <- read.table(datafile, header=TRUE, sep="\t", quote="\"", comment.char="")

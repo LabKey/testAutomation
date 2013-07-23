@@ -9,8 +9,6 @@
 </div>
 
 <script type="text/javascript">
-    var _sessionId;
-
     function preparePage()
     {
         document.getElementById('divOutput').innerHTML = "";
@@ -33,6 +31,39 @@
         htmlOut += "<img id=\"resultImage\" src=\"";
         htmlOut += image;
         htmlOut += "\"></td></tr></table>";
+        return htmlOut;
+    }
+
+    var _reportSessionRow = 0;
+    function renderReportSessionListHeader()
+    {
+        _reportSessionRow = 0;
+        var htmlOut = "<table class=\"labkey-data-region labkey-show-borders\">";
+        htmlOut += "<tr><td class=\"labkey-column-header\">Session Id</td>";
+        htmlOut += "<td class=\"labkey-column-header\">In Use</td>";
+        htmlOut += "<td class=\"labkey-column-header\">Client Context</td>";
+        htmlOut += "</tr>";
+        return htmlOut;
+    }
+
+    function renderReportSessionListFooter()
+    {
+       return "</table>";
+    }
+
+    function renderReportSession(reportSession)
+    {
+        var htmlOut = "";
+        if (1 == _reportSessionRow%2)
+            htmlOut += "<tr class=\"labkey-alternate-row\">";
+        else
+            htmlOut += "<tr class=\"labkey-row\">";
+
+        htmlOut += "<td>" + reportSession.reportSessionId + "</td>";
+        htmlOut += "<td>" + reportSession.inUse + "</td>";
+        htmlOut += "<td>" + reportSession.clientContext + "</td>";
+
+        _reportSessionRow++;
         return htmlOut;
     }
 
@@ -90,6 +121,10 @@
         msg: "Deleting the session, please wait ..."
     });
 
+    var maskGetSessions = new Ext4.LoadMask('divForm', {
+        msg: "Retrieing existing sessions, please wait ..."
+    });
+
     function onFailure(errorInfo, responseObj, options){
         maskGraph.hide();
         var htmlOut = renderText(null, "error", errorInfo.exceptionClass + ': ' + errorInfo.exception);
@@ -98,12 +133,36 @@
 
     function onCreateSessionSuccess(responseObj) {
         maskCreateSession.hide();
-        _sessionId = responseObj.reportSessionId;
+        getSessions();
     }
 
     function onDeleteSessionSuccess(responseObj) {
         maskDeleteSession.hide();
-        _sessionId = null;
+        getSessions();
+    }
+
+    function getSessions()
+    {
+        preparePage();
+        maskGetSessions.show();
+        LABKEY.Report.getSessions({
+            success : onGetSessionsSuccess
+        });
+    }
+
+    function onGetSessionsSuccess(responseObj) {
+        maskGetSessions.hide();
+        var htmlOut = "";
+        var sessions = responseObj.reportSessions;
+
+        htmlOut = renderReportSessionListHeader();
+        for (i = 0; i < sessions.length; i++)
+        {
+            htmlOut += renderReportSession(sessions[i]);
+        }
+        htmlOut += renderReportSessionListFooter();
+
+        renderFinal(htmlOut);
     }
 
     function onSuccess(responseObj){
@@ -209,28 +268,27 @@
                allowBlank: false
            });
 
-        var paramField = Ext4.create('Ext.form.field.Text', {
-            name: "param1",
-            fieldLabel: "parameter",
-            allowBlank: false
+        var sessionField = Ext4.create('Ext.form.field.Text', {
+            name: "session",
+            fieldLabel: "report session",
+            allowBlank: true
         });
 
         Ext4.create('Ext.form.Panel', {
                renderTo: 'divForm',
-               width: 800,
+               //width: 800,
                //layout: 'anchor',
                title:  'Scriptpad',
                defaults: {
                  margin: '5 0 5 5'
                },
-               items: [ textField, paramField ],
+               items: [ textField, sessionField ],
                buttons: [{
                    text: 'Execute as Script',
                    handler: function() {
                        preparePage();
                        scriptConfig.reportId = 'module:/scriptpad/' + textField.value;
-                       scriptParams.param1 = paramField.value;
-                       scriptConfig.reportSessionId = _sessionId;
+                       scriptConfig.reportSessionId = sessionField.value;
                        LABKEY.Report.execute(scriptConfig);
                    }},
                    {
@@ -238,15 +296,17 @@
                    handler: function() {
                        preparePage();
                        webpartReportConfig.reportId = 'module:/scriptpad/' + textField.value;
-                       webpartReportConfig.param1 = paramField.value;
+                       webpartReportConfig.reportSessionId = sessionField.value;
                        webpartReport1.render();
 //                       webpartReport2.render();
                     }},
                    {
                    text: 'Create Report Session',
                    handler: function() {
+                       var myContext = "xyzAAA1";
                        maskCreateSession.show();
                        LABKEY.Report.createSession({
+                           clientContext : myContext,
                            success : onCreateSessionSuccess
                       });
                    }},
@@ -256,9 +316,13 @@
                        maskDeleteSession.show();
                        LABKEY.Report.deleteSession({
                            success : onDeleteSessionSuccess,
-                           reportSessionId : _sessionId
+                           reportSessionId : sessionField.value
                        });
-                   }}
+                   }},
+                   {
+                   text: 'List Report Sessions',
+                   handler: getSessions
+                   }
                ]
            });
     });
