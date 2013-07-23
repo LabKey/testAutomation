@@ -17,12 +17,15 @@ package org.labkey.test.util;
 
 
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+
+import java.util.List;
 
 /**
  * User: tchadick
@@ -110,6 +113,38 @@ public class LabKeyExpectedConditions
             public String toString()
             {
                 return "element to be enabled: " + loc.getLoggableDescription();
+            }
+        };
+    }
+
+    public static ExpectedCondition<WebElement> dataRegionPanelIsExpanded(@Nullable Locator.IdLocator dataRegion)
+    {
+        final Locator.IdLocator _dataRegion = dataRegion == null ? Locator.id("") : dataRegion;
+        return new ExpectedCondition<WebElement>()
+        {
+            @Override
+            public WebElement apply(WebDriver d)
+            {
+                List<WebElement> els = _dataRegion.toCssLocator().append(".labkey-data-region-header td.labkey-ribbon > div").findElements(d);
+                for (WebElement el : els)
+                {
+                    try
+                    {
+                        if ("static".equalsIgnoreCase(el.getCssValue("position")) && el.isDisplayed())
+                            return el;
+                    }
+                    catch (StaleElementReferenceException retry)
+                    {
+                        return null;
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            public String toString()
+            {
+                return "data region panel to open";
             }
         };
     }
