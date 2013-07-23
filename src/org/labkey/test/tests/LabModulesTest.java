@@ -1136,7 +1136,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
-        waitForElement(Locator.name("samplespecies"));
+        waitForElement(Locator.name("samplename"));
 
         verifyFreezerColOrder();
 
@@ -1148,8 +1148,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Ext4ComboRefWD.getForLabel(this, "Sample Source").setValue("DNA");
         Ext4ComboRefWD.getForLabel(this, "Additive").setValue("EDTA");
         Ext4ComboRefWD.getForLabel(this, "Molecule Type").setValue("vRNA");
-
-        _helper.setFormField("samplespecies", "Species");
 
         assertElementNotPresent(Ext4HelperWD.invalidField());
         clickButton("Submit", 0);
@@ -1426,6 +1424,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.waitForCmp("#cancelBtn");
         Ext4CmpRefWD btn = _ext4Helper.queryOne("#cancelBtn", Ext4CmpRefWD.class);
+        btn.waitForEnabled();
         waitAndClick(Locator.id(btn.getId() + "-btnEl"));
 
         Alert alert = getDriver().switchTo().alert();

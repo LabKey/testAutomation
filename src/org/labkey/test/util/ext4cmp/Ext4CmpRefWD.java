@@ -73,4 +73,16 @@ public class Ext4CmpRefWD
         String script = "var cmp = Ext4.getCmp('" + _id + "'); return (function(){" + expr + "}).apply(cmp, arguments);";
         return _test.executeScript(script, args);
     }
+
+    public void waitForEnabled()
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return (Boolean)getFnEval("return !this.isDisabled();");
+            }
+        }, "Component was not enabled", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
 }

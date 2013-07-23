@@ -139,13 +139,15 @@ abstract public class AbstractEHRTest extends SimpleApiTestWD implements Advance
         if(isTextPresent(getProjectName()))
         {
             log("Wait extra long for folder to finish deleting.");
-            while (isTextPresent(getProjectName()) && System.currentTimeMillis() - startTime < 300000) // 5 minutes max.
+            while (isElementPresent(Locator.linkWithText(getProjectName())) && System.currentTimeMillis() - startTime < 300000) // 5 minutes max.
             {
                 sleep(5000);
                 refresh();
             }
-            if (!isTextPresent(getProjectName())) log("Test Project deleted in " + (System.currentTimeMillis() - startTime) + "ms");
-            else Assert.fail("Test Project not finished deleting after 5 minutes");
+            if (!isElementPresent(Locator.linkWithText(getProjectName())))
+                log("Test Project deleted in " + (System.currentTimeMillis() - startTime) + "ms");
+            else
+                Assert.fail("Test Project not finished deleting after 5 minutes");
         }
 
         deleteUsers(afterTest,

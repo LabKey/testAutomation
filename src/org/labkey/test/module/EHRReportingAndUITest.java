@@ -23,13 +23,10 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
+import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
+import org.labkey.test.util.ext4cmp.Ext4ComboRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
-/**
- * User: Treygdor
- * Date: Mar 21, 2011
- * Time: 1:59:12 PM
- */
 public class EHRReportingAndUITest extends AbstractEHRTest
 {
     @Override
@@ -244,10 +241,13 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         waitForElement(Ext4Helper.ext4Window("Search By Project/Protocol"));
         _ext4Helper.selectComboBoxItem("Center Project:", PROJECT_ID, true);
         _extHelper.clickExtButton("Search By Project/Protocol", "Submit", 0);
-        
+
         waitForElement(Locator.ext4Button(PROJECT_MEMBER_ID + " (X)"), WAIT_FOR_JAVASCRIPT);
         refreshAnimalHistoryReport();
-        waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT * 3);
+
+        //NOTE: unsure why this causes the page to lock up
+        //waitForElement(Locator.linkWithText(PROJECT_MEMBER_ID), WAIT_FOR_JAVASCRIPT * 3);
+        waitForElement(Locator.xpath("//th[text() = 'Details: " + PROJECT_MEMBER_ID + "']"), WAIT_FOR_JAVASCRIPT * 2);
 
         log("Verify Protocol search");
         waitAndClick(Locator.ext4Radio("Multiple Animals"));
@@ -289,8 +289,13 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         refreshAnimalHistoryReport();
         dataRegionName = _helper.getAnimalHistoryDataRegionName("Abstract");
         Assert.assertEquals("Did not find the expected number of Animals", 5, getDataRegionRowCount(dataRegionName));
-        waitForElementToDisappear(Locator.linkWithText(PROTOCOL_MEMBER_IDS[1]));
-        assertElementNotPresent(Locator.linkWithText(PROTOCOL_MEMBER_IDS[2]));
+
+        //NOTE: this cause the page to lock up.
+        //waitForElementToDisappear(Locator.linkWithText(PROTOCOL_MEMBER_IDS[1]));
+        //assertElementNotPresent(Locator.linkWithText(PROTOCOL_MEMBER_IDS[2]));
+
+        waitForElementToDisappear(Locator.xpath("//td//a[contains(text(), '" + PROTOCOL_MEMBER_IDS[1] + "')]").notHidden(), WAIT_FOR_JAVASCRIPT * 3);
+        assertElementNotPresent(Locator.xpath("//td//a[contains(text(), '" + PROTOCOL_MEMBER_IDS[2] + "')]").notHidden());
 
         waitAndClick(Locator.ext4Button("Clear"));
         refreshAnimalHistoryReport();
@@ -312,9 +317,9 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         log("Return Distinct Values");
         String dataRegionName = "query";
         checkAllOnPage(dataRegionName);
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Return Distinct Values");
-        _extHelper.waitForExtDialog("Return Distinct Values");
-        _extHelper.selectComboBoxItem("Select Field:", "Animal Id");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_" + dataRegionName + "']" + Locator.navButton("More Actions").getPath()), "Return Distinct Values");
+        waitForElement(Ext4Helper.ext4Window("Return Distinct Values"));
+        new Ext4ComboRefWD(Ext4ComboRefWD.getForLabel(this, "Select Field"), this).setComboByDisplayValue("Animal Id");
         _extHelper.clickExtButton("Return Distinct Values", "Submit", 0);
         _extHelper.waitForExtDialog("Distinct Values");
         assertFormElementEquals("distinctValues", PROTOCOL_MEMBER_IDS[0]+"\n"+PROTOCOL_MEMBER_IDS[1]+"\n"+PROTOCOL_MEMBER_IDS[2]+"\n");
@@ -325,12 +330,14 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         setFilterAndWait(dataRegionName, "Id", "Does Not Equal", PROTOCOL_MEMBER_IDS[1], 0);
         waitForText("(Id <> " + PROTOCOL_MEMBER_IDS[1], WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Return Distinct Values");
-        _extHelper.waitForExtDialog("Return Distinct Values");
-        _extHelper.selectComboBoxItem("Select Field:", "Animal Id");
-        _extHelper.clickExtButton("Return Distinct Values", "Submit", 0);
-        _extHelper.waitForExtDialog("Distinct Values");
+        waitForElement(Ext4Helper.ext4Window("Return Distinct Values"));
+        Ext4CmpRefWD btn = _ext4Helper.queryOne("button[text='Submit']", Ext4CmpRefWD.class);
+        waitAndClick(Locator.id(btn.getId()));
+        waitForElement(Ext4Helper.ext4Window("Distinct Values"));
         assertFormElementEquals("distinctValues", PROTOCOL_MEMBER_IDS[0]+"\n"+PROTOCOL_MEMBER_IDS[2] + "\n");
-        _extHelper.clickExtButton("Distinct Values", "Close", 0);
+
+        btn = _ext4Helper.queryOne("button[text='Close']", Ext4CmpRefWD.class);
+        waitAndClick(Locator.id(btn.getId()));
 
         log("Compare Weights - no selection");
         uncheckAllOnPage(dataRegionName);
@@ -357,22 +364,6 @@ public class EHRReportingAndUITest extends AbstractEHRTest
         _extHelper.waitForExtDialog("Error"); // After error dialog.
         _extHelper.clickExtButton("Error", "OK", 0);
         assertTextNotPresent("Weight 1");
-
-        log("Jump to Other Dataset - no selection");
-        uncheckAllOnPage(dataRegionName);
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Jump To Other Dataset");
-        assertAlert("No records selected");
-
-        log("Jump to Other Dataset - two selections");
-        checkAllOnPage(dataRegionName);
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_"+dataRegionName+"']" +Locator.navButton("More Actions").getPath()), "Jump To Other Dataset");
-        _extHelper.selectComboBoxItem("Dataset:", "Blood Draws");
-        _extHelper.selectComboBoxItem("Filter On:", "Animal Id");
-        clickButton("Submit", 0);
-        waitForTextToDisappear("Loading...");
-        waitForElement(Locator.xpath("//span[contains(text(), 'Blood Draws')]"));
-        waitForElement(Locator.linkWithText(PROTOCOL_MEMBER_IDS[0]), WAIT_FOR_JAVASCRIPT);
-        assertTextNotPresent(PROTOCOL_MEMBER_IDS[1]);
 
         log("Jump to History");
         checkDataRegionCheckbox("query", 0); // PROTOCOL_MEMBER_IDS[0]

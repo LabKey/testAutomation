@@ -181,7 +181,7 @@ public class EHRDataEntryTest extends AbstractEHRTest
 
         setFilter("query", "date", "Equals", DATE_FORMAT.format(new Date()));
         assertTextPresent("3.333", "4.444", "5.555");
-        assertTextPresent("Completed", 3);
+        Assert.assertEquals("Completed was not present the expected number of times", 3, getElementCount(Locator.xpath("//td[text() = 'Completed']")));
     }
 
     @LogMethod
@@ -252,7 +252,10 @@ public class EHRDataEntryTest extends AbstractEHRTest
         sleep(250);
         _extHelper.selectComboBoxItem("Code:", "Antibiotic");
         sleep(250);
-        _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='code']/.."), "Antibiotic: amoxicillin (c-54620)\u00a0");
+
+        //this is a poor solution, but the normal helper was unreliable.  when converting to Ext4 this should be removed
+        _helper.selectSnomedComboBoxItem(Locator.xpath("//input[@name='code']/.."), "amoxicillin (c-54620)");
+
         _extHelper.selectComboBoxItem("Route:", "oral\u00a0");
         _helper.setDataEntryFieldInTab("Treatments & Procedures", "concentration", "5");
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@name='conc_units']/.."), "mg/tablet\u00a0");

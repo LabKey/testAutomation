@@ -491,6 +491,9 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
         verifyImportedVLs(totalRows, expected, results, null);
 
+        //recreate DR in attempt to fix intermittent failure
+        results = new DataRegionTable(results.getTableName(), this);
+
         int j = 0;
         while (j < 4)
         {

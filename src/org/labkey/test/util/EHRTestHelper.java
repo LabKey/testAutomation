@@ -30,6 +30,9 @@ import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 
 import java.io.IOException;
 
+import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.Locator.NOT_HIDDEN;
+
 /**
  * User: bbimber
  * Date: 8/6/12
@@ -117,6 +120,14 @@ public class EHRTestHelper
               return null != _test._ext4Helper.queryOne(query, Ext4CmpRefWD.class);
             }
         }, "Component did not appear for query: " + query, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    @LogMethod(quiet = true)
+    public void selectSnomedComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
+    {
+        _test.click(Locator.xpath(parentLocator.getPath() + "//*[contains(@class, 'x-form-arrow-trigger')]"));
+        _test.waitAndClick(Locator.xpath("//div["+NOT_HIDDEN+"]/div/div[contains(normalize-space(), '" + selection + "')]"));
+        _test.waitForElementToDisappear(Locator.xpath("//div["+NOT_HIDDEN+"]/div/div[contains(normalize-space(), '" + selection + "')]"), WAIT_FOR_JAVASCRIPT);
     }
 }
 

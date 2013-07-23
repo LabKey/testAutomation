@@ -29,6 +29,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.UIContainerHelper;
+import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
 
@@ -207,6 +208,10 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         String originalTest = "P4";
         String errorText = text.replaceAll(originalTest, "FakeTest");
         textarea.setValue(errorText);
+
+        Ext4CmpRefWD button = _ext4Helper.queryOne("button[text=\"Upload\"]", Ext4CmpRefWD.class);
+        button.waitForEnabled();
+
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4HelperWD.ext4Window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
         waitAndClick(Locator.ext4Button("OK"));
@@ -480,6 +485,9 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
 
         Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
         waitForText("48.51");
+
+        //recreate the DR to see if this removes intermittent test failures
+        results = new DataRegionTable(results.getTableName(), this);
 
         int i = 0;
         while (i < totalRows)
