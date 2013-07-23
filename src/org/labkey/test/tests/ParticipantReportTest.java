@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
@@ -186,7 +187,7 @@ public class ParticipantReportTest extends ReportTest
         assertTextPresent("Showing partial results while in edit mode.");
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
-        waitForText("Showing 8 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results"));
 
         // verify form validation
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
@@ -194,14 +195,41 @@ public class ParticipantReportTest extends ReportTest
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Error");
         waitAndClickButton("OK", 0);
-        log("assert text prsent in original form");
-        assertTextPresentInThisOrder("Visit", "Visit Date", "Screening");
-        assertTextPresentInThisOrder("3.5", "45", "1.9");
 
-         clickButton("Transpose", 0);
+        String transposeCheckPtid = "999320646";
+        Locator.XPathLocator reportRow = Locator.tag("table").withClass("report").append("/tbody/tr").containing(transposeCheckPtid).append("/following-sibling::tr");
+        log("assert text prsent in original form");
+        String[] initialData = {
+                "Visit Label Visit Date 2a. Creatinine 1a.ALT AE Severity Grade 1a. ALT (SGPT) 2a. Creatinine",
+                "2 week Post-V#1   3.5   45  ",
+                "Int. Vis. %{S.1.1} .%{S.2.1}   1.9      "};
+        waitForElement(Locator.linkContainingText(transposeCheckPtid));
+        for (int i = 0; i < initialData.length; i++)
+        {
+            WebElement row = reportRow.index(i).findElement(getDriver());
+            scrollIntoView(row);
+            Assert.assertEquals("Data not as expected for participant : " + transposeCheckPtid,
+                    initialData[i],
+                    row.getText());
+        }
+
+        clickButton("Transpose", 0);
         log("assert text tranposed");
-        assertTextPresentInThisOrder("Screening",  "2 week Post", "Visit Date");
-        assertTextPresentInThisOrder("3.5", "1.9", "45");
+        String[] transposedData = {
+                "  2 week Post-V#1 Int. Vis. %{S.1.1} .%{S.2.1}",
+                "Visit Date    ",
+                "2a. Creatinine 3.5 1.9",
+                "1a.ALT AE Severity Grade    ",
+                "1a. ALT (SGPT) 45  ",
+                "2a. Creatinine    "};
+        for (int i = 0; i < transposedData.length; i++)
+        {
+            WebElement row = reportRow.index(i).findElement(getDriver());
+            scrollIntoView(row);
+            Assert.assertEquals("Data not transposed for participant : " + transposeCheckPtid,
+                    transposedData[i],
+                    row.getText());
+        }
 
         // save the report for real
         _extHelper.setExtFormElementByLabel("Report Name", PARTICIPANT_REPORT_NAME);
@@ -216,7 +244,7 @@ public class ParticipantReportTest extends ReportTest
         assertTextPresent(PARTICIPANT_REPORT_NAME);
         assertTextPresent("1a.ALT AE Severity Grade", 17); // 8 mice + 8 grid field tooltips + 1 hidden grid row in customization panel
         assertTextPresent("1a. ALT (SGPT)", 17); // 8 mice + 8 grid field tooltips + 1 hidden grid row in customization panel
-        assertTextPresent("Showing 8 Results");
+        assertElementPresent(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results"));
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
 
         // Delete a column and save report
@@ -258,12 +286,12 @@ public class ParticipantReportTest extends ReportTest
         clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
 
         waitForText("Creatinine", 17, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
-        waitForText("Showing 8 Results", 1, WAIT_FOR_JAVASCRIPT); // There should only be 8 results, and it should state that.
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results")); // There should only be 8 results, and it should state that.
 
         assertTextPresent(PARTICIPANT_REPORT_NAME);
         assertTextPresent("1a.ALT AE Severity Grade", 17); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
         assertTextPresent("1a. ALT (SGPT)", 17); // 8 mice + 8 grid field tooltips  + 1 in hidden customize panel
-        assertTextPresent("Showing 8 Results");
+        assertElementPresent(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results"));
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
@@ -279,7 +307,7 @@ public class ParticipantReportTest extends ReportTest
         assertTextPresent(PARTICIPANT_REPORT2_NAME);
         assertTextNotPresent("1a.ALT AE Severity Grade");
         assertTextPresent("1a. ALT (SGPT)", 17); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
-        assertTextPresent("Showing 8 Results");
+        assertElementPresent(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results"));
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
@@ -301,18 +329,18 @@ public class ParticipantReportTest extends ReportTest
 
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
-        waitForText("Showing 25 Results", WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 25 Results"));
 
         //Deselect All
         Locator filterExpander = Locator.xpath("(//img[contains(@class, 'x4-tool-expand-right')])[1]");
         click(filterExpander);
 
         deselectAllFilterGroups();
-        waitForText("Showing 0 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
         //Mouse down on GROUP 1
         _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0);
-        waitForText("Showing 12 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 12 Results"));
 
         //Check if all PTIDs of GROUP 1 are visible.
         List<String> ptid_list2 = Arrays.asList(PTIDS_TWO);
@@ -332,10 +360,10 @@ public class ParticipantReportTest extends ReportTest
 
         _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_TWO, 0);
         // groups are disjoint
-        waitForText("Showing 0 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
         _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0);
-        waitForText("Showing 13 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 13 Results"));
 
         //Check if all PTIDs of GROUP 2 are visible
         for(String ptid : PTIDS_TWO)
@@ -371,25 +399,25 @@ public class ParticipantReportTest extends ReportTest
 
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
-        waitForText("Showing 116 Results", WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 116 Results"));
 
         //Deselect All
         click(filterExpander);
         deselectAllFilterGroups();
-        waitForText("Showing 0 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
         //Mouse down on SPEC GROUP 1
         _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_ONE, 0);
-        waitForText("Showing 1 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 1 Results"));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
 
         //Add SPEC GROUP 2
         _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_TWO, 0);
-        waitForText("Showing 0 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
         //Remove SPEC GROUP 1
         _ext4Helper.uncheckGridRowCheckbox(SPECIMEN_GROUP_ONE, 0);
-        waitForText("Showing 1 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 1 Results"));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
         Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
 
@@ -457,7 +485,7 @@ public class ParticipantReportTest extends ReportTest
         clickTab("Clinical and Assay Data");
         waitAndClickAndWait(Locator.linkWithText(PARTICIPANT_REPORT5_NAME));
 
-        waitForText("Showing 24 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 24 Results"));
         waitForElement(Locator.css(".report-filter-window.x4-collapsed"));
         log("Verify report filter window");
         expandReportFilterWindow();
@@ -467,38 +495,38 @@ public class ParticipantReportTest extends ReportTest
         openReportFilterWindow();
 
         deselectAllFilterGroups();
-        waitForText("Showing 0 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
         selectAllFilterGroups();
-        waitForText("Showing 24 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 24 Results"));
 
         _ext4Helper.clickParticipantFilterGridRowText("Not in any cohort", 0);
-        waitForText("Showing 0 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
         _ext4Helper.checkGridRowCheckbox(COHORT_1);
-        waitForText("Showing 10 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 10 Results"));
 
         _ext4Helper.clickParticipantFilterGridRowText(COHORT_2, 0);
-        waitForText("Showing 14 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 14 Results"));
 
         // Selecting all or none of an entire category should not filter report
         _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 0); // click group, not category with the same name
-        waitForText("Showing 6 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 6 Results"));
         _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0); // click group, not category with the same name
-        waitForText("Showing 14 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 14 Results"));
         _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 0); // click group, not category with the same name
-        waitForText("Showing 6 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 6 Results"));
         _ext4Helper.clickParticipantFilterCategory(PARTICIPANT_GROUP_ONE); // click category
-        waitForText("Showing 14 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 14 Results"));
 
         //Check intersection between cohorts and multiple categories
         _ext4Helper.clickParticipantFilterGridRowText(MICE_A, 0);
-        waitForText("Showing 3 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 3 Results"));
         _ext4Helper.clickParticipantFilterGridRowText(SPECIMEN_GROUP_TWO, 0); // click group, not category with the same name
-        waitForText("Showing 1 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 1 Results"));
 
         selectAllFilterGroups();
-        waitForText("Showing 24 Results");
+        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 24 Results"));
 
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[" + Locator.NOT_HIDDEN + "]"), WAIT_FOR_JAVASCRIPT);
