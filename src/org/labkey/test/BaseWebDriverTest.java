@@ -3555,7 +3555,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected void clickExportToText()
     {
         clickButton("Export", 0);
-        shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(null));
+        //shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(null));
         _extHelper.clickSideTab("Text");
         clickButton("Export to Text");
     }
