@@ -136,7 +136,8 @@ public class BoxPlotTest extends GenericChartsTest
 
         //Change filter and check box plot again
         clickButton("View Data", 0);
-        clearFilter("aqwp3", "RCHtempc", 0);
+        String tableId = Locator.css(".labkey-data-region").waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT).getAttribute("id").substring("dataregion_".length());
+        clearFilter(tableId, "RCHtempc", 0);
         waitForText("40.0");
         clickButton("View Chart", 0);
         assertSVG(BOX_PLOT_DR_2);
