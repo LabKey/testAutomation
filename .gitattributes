@@ -440,6 +440,7 @@ src/org/labkey/test/util/Ext4HelperWD.java -text
 src/org/labkey/test/util/ExtHelper.java -text
 src/org/labkey/test/util/ExtHelperWD.java -text
 src/org/labkey/test/util/ImpersonationLoggingAspect.java -text
+src/org/labkey/test/util/IssuesHelper.java -text
 src/org/labkey/test/util/JSONHelper.java -text
 src/org/labkey/test/util/JUnitFooter.java -text
 src/org/labkey/test/util/JUnitHeader.java -text

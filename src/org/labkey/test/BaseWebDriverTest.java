@@ -5077,12 +5077,21 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void setUpFacetedFilter(String regionName, String columnName, String... values)
     {
-        String log = "Setting filter in " + regionName + " for " + columnName+" to one of: [";
-        for(String v : values)
+        String log;
+        if (values.length > 0)
         {
-            log += v + ", ";
+            log = "Setting filter in " + regionName + " for " + columnName + " to one of: [";
+            for(String v : values)
+            {
+                log += v + ", ";
+            }
+            log = log.substring(0, log.length() - 2) + "]";
         }
-        log = log.substring(0, log.length() - 2) + "]";
+        else
+        {
+            log = "Clear filter in " + regionName + " for " + columnName;
+        }
+
         log(log);
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":filter");
         Locator header = Locator.id(EscapeUtil.filter(regionName + ":" + columnName + ":header"));

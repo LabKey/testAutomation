@@ -29,13 +29,18 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelperWD;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**conceptually filter and list are separate, but
  * it was convenient to use the list test helpers for filter
@@ -47,6 +52,22 @@ public class FilterTest extends ListTest
     protected final static String FACET_TEST_LIST = "FacetList";
     protected String listUrl = "";
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        deleteProject(getProjectName(), afterTest);
+    }
+
     @LogMethod
     public void doTestSteps()
     {
@@ -57,6 +78,8 @@ public class FilterTest extends ListTest
 
         createList2();
         facetedFilterTest();
+        maskedFacetTest();
+        containerFilterFacetTest();
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -143,10 +166,10 @@ public class FilterTest extends ListTest
     protected void startFilter(String column)
     {
         click(Locator.tagWithText("div", column));
-        click(Locator.tagWithText("span", "Filter..."));
+        waitAndClick(Locator.tagWithText("span", "Filter...").notHidden());
         _extHelper.waitForExtDialog("Show Rows Where " + column + "...");
-        waitForText("[All]");
-        sleep(400);
+        waitForElement(Locator.linkWithText("[All]"));
+        waitForElement(Locator.css(".labkey-filter-dialog .x-grid3-body"));
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -236,12 +259,110 @@ public class FilterTest extends ListTest
         verifyColumnValues("query", "year", "1980", "1970", "1990");
     }
 
+    @LogMethod
+    private void maskedFacetTest()
+    {
+        setFacetedFilter("query", "year", "1980", "1990");
+        verifyFacetOptions("Car", "1", "3");
+
+        setFacetedFilter("query", "Car", "1");
+        verifyFacetOptions("Color", "Light");
+    }
+
+    @LogMethod
+    private void containerFilterFacetTest()
+    {
+        IssuesHelper issuesHelper = new IssuesHelper(this);
+        goToModule("Issues");
+        issuesHelper.goToAdmin();
+        issuesHelper.setIssueAssignmentList("Site:Administrators");
+        issuesHelper.addPickListOption("Type", "typea");
+        issuesHelper.addPickListOption("Type", "typeb");
+
+        HashMap<String, String> projectIssue = new HashMap<>();
+        projectIssue.put("title", "project issue1");
+        projectIssue.put("assignedTo", displayNameFromEmail(PasswordUtil.getUsername()));
+        projectIssue.put("type", "typea");
+        projectIssue.put("priority", "1");
+        issuesHelper.addIssue(projectIssue);
+        HashMap<String, String> projectIssue2 = new HashMap<>();
+        projectIssue2.put("title", "project issue2");
+        projectIssue2.put("assignedTo", displayNameFromEmail(PasswordUtil.getUsername()));
+        projectIssue2.put("type", "typeb");
+        projectIssue2.put("priority", "2");
+        issuesHelper.addIssue(projectIssue2);
+
+        _containerHelper.createSubfolder(getProjectName(), "subfolder", null);
+        clickProject(getProjectName());
+        clickFolder("subfolder");
+
+        goToModule("Issues");
+        issuesHelper.goToAdmin();
+        issuesHelper.setIssueAssignmentList("Site:Administrators");
+        issuesHelper.addPickListOption("Type", "typed");
+        issuesHelper.addPickListOption("Type", "typee");
+
+        HashMap<String, String> subfolderIssue = new HashMap<>();
+        subfolderIssue.put("title", "subfolder issue1");
+        subfolderIssue.put("assignedTo", displayNameFromEmail(PasswordUtil.getUsername()));
+        subfolderIssue.put("type", "typed");
+        subfolderIssue.put("priority", "3");
+        issuesHelper.addIssue(subfolderIssue);
+        HashMap<String, String> subfolderIssue2 = new HashMap<>();
+        subfolderIssue2.put("title", "subfolder issue2");
+        subfolderIssue2.put("assignedTo", displayNameFromEmail(PasswordUtil.getUsername()));
+        subfolderIssue2.put("type", "typee");
+        subfolderIssue2.put("priority", "4");
+        issuesHelper.addIssue(subfolderIssue2);
+
+        clickProject(getProjectName());
+        goToModule("Issues");
+
+        assertElementPresent(Locator.linkWithText(projectIssue.get("title")));
+        assertElementPresent(Locator.linkWithText(projectIssue2.get("title")));
+        assertElementNotPresent(Locator.linkWithText(subfolderIssue.get("title")));
+        assertElementNotPresent(Locator.linkWithText(subfolderIssue2.get("title")));
+
+        _extHelper.clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
+        assertElementPresent(Locator.linkWithText(projectIssue.get("title")));
+        assertElementPresent(Locator.linkWithText(projectIssue2.get("title")));
+        assertElementPresent(Locator.linkWithText(subfolderIssue.get("title")));
+        assertElementPresent(Locator.linkWithText(subfolderIssue2.get("title")));
+
+        verifyFacetOptions("Type",
+                projectIssue.get("type"),
+                projectIssue2.get("type"),
+                subfolderIssue.get("type"),
+                subfolderIssue2.get("type"));
+
+        verifyFacetOptions("Pri",
+                projectIssue.get("priority"),
+                projectIssue2.get("priority"),
+                subfolderIssue.get("priority"),
+                subfolderIssue2.get("priority"));
+
+        setFacetedFilter("Issues", "Priority", projectIssue2.get("priority"), subfolderIssue.get("priority"));
+        assertElementNotPresent(Locator.linkWithText(projectIssue.get("title")));
+        assertElementPresent(Locator.linkWithText(projectIssue2.get("title")));
+        assertElementPresent(Locator.linkWithText(subfolderIssue.get("title")));
+        assertElementNotPresent(Locator.linkWithText(subfolderIssue2.get("title")));
+
+        verifyFacetOptions("Type",
+                projectIssue2.get("type"),
+                subfolderIssue.get("type"));
+    }
+
+    private void verifyFacetOptions(String column, String... options)
+    {
+        startFilter(column);
+        verifyOptionsInFilterDialog(options);
+        _extHelper.clickExtButton("CANCEL", 0);}
+
     private void verifyColumnValues(String dataregion, String columnName, String... expectedValues)
     {
         List<String> expectedList = Arrays.asList(expectedValues);
         Assert.assertEquals(expectedList, new DataRegionTable(dataregion, this).getColumnDataAsText(columnName));
     }
-
 
     private void verifyTextPresentInFilterDialog(String... texts)
     {
@@ -250,6 +371,14 @@ public class FilterTest extends ListTest
 
         for (String text : texts)
             Assert.assertEquals(1, StringUtils.countMatches(filterDialogText, text));
+    }
+
+    private void verifyOptionsInFilterDialog(String... options)
+    {
+        String expectedOptions = StringUtils.join(options, "\n");
+        String actualOptions = getText(Locator.css(".labkey-filter-dialog .x-grid3-body")).replaceAll(" ", "");
+
+        Assert.assertEquals("Unexpected filter options", expectedOptions, actualOptions);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -455,7 +584,7 @@ public class FilterTest extends ListTest
         String id = EscapeUtil.filter(TABLE_NAME + ":" + _listCol4.getName() + ":filter");
         runMenuItemHandler(id);
 
-        clickButton("CANCEL",0);
+        clickButton("CANCEL", 0);
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         assertTextNotPresent("Show Rows Where");
@@ -467,7 +596,7 @@ public class FilterTest extends ListTest
                     a.columnName,
                     a.filter1Type, a.filter1Value,
                     a.filter2Type, a.filter2Value,
-                    a.present, a.notPresent.clone(),  a.filterUrl);
+                    a.present, a.notPresent.clone(), a.filterUrl);
     }
 
     @LogMethod
@@ -582,15 +711,5 @@ public class FilterTest extends ListTest
             assertFilterTextPresent(columnName, filter2Type, filter2);
         }
 
-    }
-
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteProject(getProjectName(), afterTest);
-    }
-
-    protected String getProjectName()
-    {
-        return PROJECT_NAME;
     }
 }
