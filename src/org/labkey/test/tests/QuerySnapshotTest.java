@@ -96,10 +96,6 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         prepForPageLoad();
         selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
         newWaitForPageToLoad();
-
-        // shut off demographics bit to allow for insert
-        clickFolder(folderName);
-        setDemographicsBit("DEM-1: Demographics", false);
     }
 
     @Override
@@ -141,7 +137,6 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButton("Insert New");
         setFormElement("quf_MouseId", "999121212");
-        setFormElement("quf_SequenceNum", "101");
         setFormElement("quf_DEMraco", "Armenian");
 
         clickButton("Submit");
@@ -187,7 +182,7 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         log("delete the snapshot");
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Delete Snapshot", 0);
-        getConfirmationAndWait();
+        getAlert();
 
         // snapshot over a custom query
         log("create a snapshot over a custom query");
@@ -221,13 +216,13 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         clickButton("Save");
         Assert.assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
         clickButton("Update Snapshot", 0);
-        getConfirmationAndWait();
+        getAlert();
         waitForText("Dataset: Custom Query Snapshot", 10000);
 
         log("delete the snapshot");
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Delete Snapshot", 0);
-        getConfirmationAndWait();
+        getAlert();
 
         clickTab("Manage");
         waitForText("Manage Datasets", 10000);
@@ -249,7 +244,6 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButton("Insert New");
         setFormElement("quf_MouseId", "999121212");
-        setFormElement("quf_SequenceNum", "101");
         setFormElement("quf_DEMsex", "Unknown");
 
         clickButton("Submit");
@@ -262,7 +256,6 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButton("Insert New");
         setFormElement("quf_MouseId", "999151515");
-        setFormElement("quf_SequenceNum", "104");
         setFormElement("quf_DEMsexor", "Undecided");
 
         clickButton("Submit");
@@ -273,7 +266,7 @@ public class QuerySnapshotTest extends StudyBaseTestWD
 
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Delete Snapshot", 0);
-        getConfirmationAndWait();
+        getAlert();
 
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
@@ -287,7 +280,7 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         clickAndWait(Locator.linkWithText("New Demographics"));
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Delete Snapshot", 0);
-        getConfirmationAndWait();
+        getAlert();
     }
 
     private void createQuerySnapshot(String snapshotName, boolean autoUpdate, boolean isDemographic)
@@ -314,7 +307,7 @@ public class QuerySnapshotTest extends StudyBaseTestWD
 
             click(Locator.name("ff_name0"));
             clickRadioButtonById("button_managedField");
-            selectOptionByText("list_managedField", keyField);
+            selectOptionByText(Locator.xpath("//select[@id='list_managedField']"), keyField);
             clickButton("Save", WAIT_FOR_JAVASCRIPT);
         }
         clickButton("Create Snapshot");
