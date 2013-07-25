@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -62,6 +63,7 @@ public class TargetedMSExperimentTest extends TargetedMSTest
         setupAndImportData(FolderType.Experiment);
         verifyImportedData();
         verifyModificationSearch();
+        verifyProteinSearch();
         clientApiTest();
     }
 
@@ -111,5 +113,30 @@ public class TargetedMSExperimentTest extends TargetedMSTest
         File getDataTestFile = new File(getApiScriptFolder(), "getDataTest.js");
         WikiHelper wikiHelper = new WikiHelper(this);
         wikiHelper.createWikiPage("getDataTest", null, "getData API Test", scriptText, true, null, false);
+    }
+
+
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    protected void verifyProteinSearch()
+    {
+        clickAndWait(Locator.linkContainingText("Targeted MS Dashboard"));
+        assertTextPresent("Mass Spec Search");
+        assertTextPresent("Protein Search");
+        _ext4Helper.clickExt4Tab("Protein Search");
+        waitForElement(Locator.name("identifier"));
+
+        // Test fix for issue 18217
+        // MRMer.zip contains the protein YAL038W.  MRMer_renamed_protein.zip contains the same protein with the
+        // name YAL038W_renamed.  MRMer.zip is imported first and  a new entry is created in prot.sequences with YAL038W
+        // as the bestname. MRMer_renamed_protein is imported second, and an entry is created in prot.identifiers
+        // for YAL038W_renamed. A search for YAL038W_renamed should return one protein result.
+        setFormElement(Locator.name("identifier"), "YAL038W_renamed");
+        waitAndClickAndWait(Locator.linkWithSpan("Search"));
+        waitForText("Protein Search Results");
+        //waitForText("1 - 7 of 7");
+        assertTextPresentInThisOrder("Protein Search", "Matching Proteins (1)", "Targeted MS Peptides");
+        Assert.assertEquals(1, getElementCount(Locator.xpath("id('dataregion_PotentialProteins')/tbody/tr/td/a[contains(text(),'YAL038W')]")));
+        Assert.assertEquals(7, getElementCount( Locator.xpath("//td/span/a[contains(text(), 'YAL038W')]")));
+        Assert.assertEquals(1, getElementCount( Locator.xpath("//td/span/a[contains(text(), 'YAL038W_renamed')]")));
     }
 }

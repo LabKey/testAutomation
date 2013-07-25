@@ -30,7 +30,8 @@ import org.labkey.test.util.LogMethod;
  */
 public abstract class TargetedMSTest extends BaseWebDriverTest
 {
-    protected static final String SKY_FILE = "MRMer.sky";
+    protected static final String SKY_FILE = "MRMer.zip";
+    protected static final String SKY_FILE2 = "MRMer_renamed_protein.zip";
 
     public enum FolderType {
         Experiment, Library, LibraryProtein, Undefined
@@ -48,10 +49,17 @@ public abstract class TargetedMSTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), "Targeted MS");
         selectFolderType(folderType);
         setPipelineRoot(getSampledataPath() + "/TargetedMS");
+
+        importData(SKY_FILE);
+        importData(SKY_FILE2);
+    }
+
+    protected void importData(String file)
+    {
         goToModule("Pipeline");
         clickButton("Process and Import Data");
-        waitForText("MRMer", 5*defaultWaitForPage);
-        selectPipelineFileAndImportAction("MRMer/" + SKY_FILE, "Import Skyline Results");
+        waitForText(file, 5*defaultWaitForPage);
+        selectPipelineFileAndImportAction(file, "Import Skyline Results");
         waitForText("Skyline document import");
         waitForPipelineJobsToFinish(1);
     }
