@@ -168,8 +168,7 @@ public class FilterTest extends ListTest
         click(Locator.tagWithText("div", column));
         waitAndClick(Locator.tagWithText("span", "Filter...").notHidden());
         _extHelper.waitForExtDialog("Show Rows Where " + column + "...");
-        waitForElement(Locator.linkWithText("[All]"));
-        waitForElement(Locator.css(".labkey-filter-dialog .x-grid3-body"));
+        waitForElement(Locator.tag("div").withClass("labkey-filter-dialog").append("//tr").withClass("x-grid3-row-table").withPredicate(Locator.tag("a").withText("[All]")).append("//div").withClass("x-grid3-hd-checker-on"));
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -267,6 +266,10 @@ public class FilterTest extends ListTest
 
         setFacetedFilter("query", "Car", "1");
         verifyFacetOptions("Color", "Light");
+
+        clearAllFilters("query", "Car");
+        setFilter("query", "year", "Is Greater Than", "1980");
+        verifyFacetOptions("Car", "3");
     }
 
     @LogMethod
@@ -370,7 +373,7 @@ public class FilterTest extends ListTest
         String filterDialogText = getText(loc);
 
         for (String text : texts)
-            Assert.assertEquals(1, StringUtils.countMatches(filterDialogText, text));
+            Assert.assertEquals("'" + text + "' not found", 1, StringUtils.countMatches(filterDialogText, text));
     }
 
     private void verifyOptionsInFilterDialog(String... options)
