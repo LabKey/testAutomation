@@ -40,6 +40,15 @@ public class CAVDStudyTest extends StudyBaseTest
     private ArrayList<String> _expectedImmunizationText = new ArrayList<>();
     private ArrayList<String> _expectedAssayDesignText = new ArrayList<>();
 
+    private static final String[] IMMUNOGEN_TYPES = {"Canarypox", "Subunit Protein", "Fowlpox"};
+    private static final String[] GENES = {"Gag", "Env", "Tat", "Nef"};
+    private static final String[] SUB_TYPES = {"Clade B", "Clade C", "Clade D"};
+    private static final String[] ROUTES = {"Intramuscular (IM)"};
+    private static final String[] ASSAYS = {"ELISPOT", "Neutralizing Antibodies Panel 1", "ICS", "CAVDTestAssay"};
+    private static final String[] LABS = {"Schmitz", "Seaman", "McElrath", "CAVDLab1"};
+    private static final String[] UNITS = {"ul"};
+    private static final String[] SAMPLE_TYPES = {"Platelets"};
+
     @Override
     protected void doCreateSteps()
     {
@@ -110,18 +119,15 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void doVerifyStudyDesign()
     {
-        clickFolder(STUDY_NAME);
+        populateStudyDesignLookups();
+
+        clickFolder(FOLDER_NAME);
 
         clickAndWait(Locator.linkWithText("Vaccine Design"));
         clickEditDesign();
-        // clear defaults
-        deleteStudyDesignRow(RowType.Immunogen, 1);
-        deleteStudyDesignRow(RowType.Immunogen, 1);
-        deleteStudyDesignRow(RowType.Adjuvant, 1);
-        deleteStudyDesignRow(RowType.Adjuvant, 1);
 
-        addStudyDesignRow(RowType.Immunogen, "Immunogen1", "Canarypox", "1.5e10 Ad vg", "Intramuscular (IM)");
-        addStudyDesignRow(RowType.Immunogen, "gp120", "Subunit Protein", "1.6e8 Ad vg", "Intramuscular (IM)");
+        addStudyDesignRow(RowType.Immunogen, "Immunogen1", IMMUNOGEN_TYPES[0], "1.5e10 Ad vg", ROUTES[0]);
+        addStudyDesignRow(RowType.Immunogen, "gp120", IMMUNOGEN_TYPES[1], "1.6e8 Ad vg", ROUTES[0]);
 
         saveRevision();
         assertElementPresent(Locator.xpath("//a[@class='labkey-disabled-button']/span[text()='Save']"));
@@ -135,12 +141,12 @@ public class CAVDStudyTest extends StudyBaseTest
         assertTextPresent(_expectedVaccineDesignText);
 
         clickEditDesign();
-        addStudyDesignRow(RowType.Immunogen, "Immunogen3", "Fowlpox", "1.9e8 Ad vg", "Intramuscular (IM)");
+        addStudyDesignRow(RowType.Immunogen, "Immunogen3", IMMUNOGEN_TYPES[2], "1.9e8 Ad vg", ROUTES[0]);
         addStudyDesignRow(RowType.Adjuvant, "Adjuvant2");
-        addAntigen(1, "Gag", "Clade B");
-        addAntigen(2, "Env");
-        addAntigen(3, "Tat", "Clade C");
-        addAntigen(3, "Nef", "Clade D");
+        addAntigen(1, GENES[0], SUB_TYPES[0]);
+        addAntigen(2, GENES[1]);
+        addAntigen(3, GENES[2], SUB_TYPES[1]);
+        addAntigen(3, GENES[3], SUB_TYPES[2]);
 
         finishRevision();
         waitForText("Immunogens");
@@ -148,13 +154,11 @@ public class CAVDStudyTest extends StudyBaseTest
 
         clickAndWait(Locator.linkWithText("Immunizations"));
         clickEditDesign();
-        // clear defaults
-        deleteStudyDesignRow(RowType.Immunization, 1);
-        deleteStudyDesignRow(RowType.Immunization, 1);
         addStudyDesignRow(RowType.Immunization, "Vaccine", "1");
         addStudyDesignRow(RowType.Immunization, "Placebo", "2");
         saveRevision();
         addStudyDesignRow(RowType.Immunization, "Vaccine2", "3");
+        addTimepoint("CAVDImmTimepoint", "0", TimeUnit.Days);
         finishRevision();
         waitForText("Immunization Schedule", 3, defaultWaitForPage);
         assertTextPresent(_expectedImmunizationText);
@@ -166,38 +170,10 @@ public class CAVDStudyTest extends StudyBaseTest
         clickFolder(STUDY_NAME);
         clickAndWait(Locator.linkWithText("Assays"));
         clickEditDesign();
-        deleteStudyDesignRow(RowType.Assay, 1);
-        deleteStudyDesignRow(RowType.Assay, 1);
-        deleteStudyDesignRow(RowType.Assay, 1);
-        deleteStudyDesignRow(RowType.Assay, 1);
-        addStudyDesignRow(RowType.Assay, "ELISPOT", "Schmitz");
-        addStudyDesignRow(RowType.Assay, "Neutralizing Antibodies Panel 1", "Seaman");
-        addStudyDesignRow(RowType.Assay, "ICS", "McElrath");
+        addStudyDesignRow(RowType.Assay, ASSAYS[0], LABS[0]);
+        addStudyDesignRow(RowType.Assay, ASSAYS[1], LABS[1]);
+        addStudyDesignRow(RowType.Assay, ASSAYS[2], LABS[2]);
         saveRevision();
-
-        log("Add sample type");
-        clickButton("Edit Sample Types", 0);
-        waitForElement(Locator.xpath("//div[@class='Caption'][text()='Define Sample Type']"));
-        clickButton("Add", 0);
-        setFormElement("sampleTypeName", "Platelets");
-        setFormElement("primaryType", "Blood");
-        setFormElement("sampleCode", "LK");
-        clickButton("Done", 0);
-        waitForElementToDisappear(Locator.xpath("//div[@class='Caption'][text()='Define Sample Type']"), WAIT_FOR_JAVASCRIPT);
-
-        log("Add assay type");
-        clickButton("Edit Assay List", 0);
-        waitForElement(Locator.xpath("//div[@class='Caption'][text()='Define Assay']"));
-        clickButton("Add", 0);
-        waitForFormElementToEqual(Locator.name("assayName"), "New Assay1");
-        setFormElement("assayName", "CAVDTestAssay");
-        setFormElement("assayDescription", "This Assay created by CAVD Study Test");
-        setFormElement("assayLabs", "CAVDLab1\nCAVDLab2");
-        setFormElement("materialAmount", "13");
-        selectOptionByText("materialUnits", "ul");
-        selectOptionByText("materialType", "Platelets");
-        clickButton("Done", 0);
-        waitForElementToDisappear(Locator.xpath("//div[@class='Caption'][text()='Define Assay']"), WAIT_FOR_JAVASCRIPT);
 
         clickButton("Create Study Timepoints", 0);
         assertAlert("No timepoints are defined in the assay schedule.");
@@ -205,9 +181,68 @@ public class CAVDStudyTest extends StudyBaseTest
         addTimepoint("CAVDTestTimepoint", "13", TimeUnit.Days);
         waitForText("CAVDTestTimepoint: 13 days", WAIT_FOR_JAVASCRIPT);
 
-        addStudyDesignRow(RowType.Assay, "CAVDTestAssay", "CAVDLab2");
+        addStudyDesignRow(RowType.Assay, ASSAYS[3], LABS[3]);
 
         finishRevision();
+    }
+
+    private void populateStudyDesignLookups()
+    {
+        goToProjectHome();
+
+        goToQuery("StudyDesignAssays");
+        for (String assay : ASSAYS)
+            insertLookupRecord(assay, assay + " Label");
+
+        goToQuery("StudyDesignLabs");
+        for (String lab : LABS)
+            insertLookupRecord(lab, lab + " Label");
+
+        goToQuery("StudyDesignRoutes");
+        for (String route : ROUTES)
+            insertLookupRecord(route, route + " Label");
+
+        goToQuery("StudyDesignImmunogenTypes");
+        for (String immunogenType : IMMUNOGEN_TYPES)
+            insertLookupRecord(immunogenType, immunogenType + " Label");
+
+        goToQuery("StudyDesignGenes");
+        for (String gene : GENES)
+            insertLookupRecord(gene, gene + " Label");
+
+        goToQuery("StudyDesignSubTypes");
+        for (String subType : SUB_TYPES)
+            insertLookupRecord(subType, subType + " Label");
+
+        goToQuery("StudyDesignUnits");
+        for (String unit : UNITS)
+            insertLookupRecord(unit, unit + " Label");
+
+        goToQuery("StudyDesignSampleTypes");
+        for (String sampleType : SAMPLE_TYPES)
+        {
+            clickButton("Insert New");
+            setFormElement(Locator.name("quf_Name"), sampleType);
+            setFormElement(Locator.name("quf_PrimaryType"), "Blood");
+            setFormElement(Locator.name("quf_ShortSampleCode"), sampleType.substring(0, 1).toUpperCase());
+            clickButton("Submit");
+        }
+    }
+
+    private void insertLookupRecord(String name, String label)
+    {
+        clickButton("Insert New");
+        if (name != null) setFormElement(Locator.name("quf_Name"), name);
+        if (label != null) setFormElement(Locator.name("quf_Label"), label);
+        clickButton("Submit");
+    }
+
+    private void goToQuery(String queryName)
+    {
+        goToSchemaBrowser();
+        selectQuery("study", queryName);
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
     }
 
     private void doVerifyDatasets()
