@@ -3,10 +3,11 @@
  *
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
-// TODO: Query APIs added to this script should be matched by updates to test/modules/simpletest/scripts/simpletest/queryTest.js
+// TODO: Query APIs added to this script should be matched by updates to test/modules/simpletest/scripts/validationTest/queryTest.js
 
 var schemaName = 'lists';
 var queryName = 'People';
+var viewName = 'QueryTestView';
 
 var testResults = [];
 var testFunctions = [
@@ -94,7 +95,7 @@ var testFunctions = [
         });
     },
 
-// Test QUERY.saveRows (transacted)
+    // Test QUERY.saveRows (transacted)
     function() //testResults[11]
     {
         try
@@ -119,7 +120,7 @@ var testFunctions = [
         }
     },
 
-// Test QUERY.saveRows (not transacted)
+    // Test QUERY.saveRows (not transacted)
     function() //testResults[12]
     {
         try
@@ -162,7 +163,42 @@ var testFunctions = [
 // Verify QUERY.selectRows handles QueryParseException
     function() //testResults[15]
     {
-        LABKEY.Query.executeSql({schemaName: 'lists', sql: 'Bad Query', successCallback: successHandler, errorCallback: failureHandler});
+        LABKEY.Query.executeSql({schemaName: schemaName, sql: 'Bad Query', successCallback: successHandler, errorCallback: failureHandler});
+    },
+
+// Create a CustomView with a filter applied of Age > 35
+    function() //testResults[16]
+    {
+        LABKEY.Query.getQueryViews({
+            schemaName: schemaName, queryName: queryName,
+            success: function(query) {
+
+                var view = query.views[3];
+                var filter = new LABKEY.Query.Filter('Age', 35, LABKEY.Filter.Types.GREATER_THAN);
+                view.name = viewName;
+                view.default = false;
+                view.filter = [{
+                    fieldKey: filter.getColumnName(),
+                    op: filter.getFilterType().getURLSuffix(),
+                    value: filter.getValue().toString()
+                }];
+                LABKEY.Query.saveQueryViews({ schemaName: schemaName, queryName: queryName,
+                    views: [view],
+                    success: successHandler, failure: failureHandler });
+
+            },
+            failure: failureHandler
+        });
+    },
+
+    function() //testResults[17]
+    {
+        LABKEY.Query.selectDistinctRows({ schemaName: schemaName, queryName: queryName, column: 'Age', success: successHandler, failure: failureHandler });
+    },
+
+    function() //testResults[18]
+    {
+        LABKEY.Query.selectDistinctRows({ schemaName: schemaName, queryName: queryName, column: 'Age', viewName: viewName, success: successHandler, failure: failureHandler });
     },
 
     // last function sets the contents of the results div.
@@ -261,6 +297,21 @@ var testFunctions = [
                 html += '15)FAILURE: Bad query generated wrong exception: ' + testResults[15].exceptionClass + '<br>';
         else
             html += '15)FAILURE: Bad query did not generate an exception.<br>';
+
+        if (testResults[16].exception)
+            html += '16)FAILURE: Failed to create custom view for list<br>';
+        else
+            html += '16)SUCCESS: Created Custom View: \'' + viewName + '\' for list<br>';
+
+        if (testResults[17].values && testResults[17].values.length == 6)
+            html += '17)SUCCESS: SelectDistinctRows returned correct result set<br>';
+        else
+            html += '17)FAILURE: SelectDistinctRows failed to return expected result of 6 values<br>';
+
+        if (testResults[18].values && testResults[18].values.length == 2)
+            html += '18)SUCCESS: SelectDistinctRows returned correct custom view filtered result set<br>';
+        else
+            html += '18)FAILURE: SelectDistinctRows failed to return expected result of 2 values<br>';
 
         document.getElementById('testDiv').innerHTML = html;
     }

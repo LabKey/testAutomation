@@ -600,6 +600,9 @@ public class ClientAPITest extends BaseWebDriverTest
         assertElementContains(loc, "SUCCESS: executeSql returned a session-based query");
         assertElementContains(loc, "SUCCESS: cross-folder executeSql succeeded");
         assertElementContains(loc, "SUCCESS: cross-project executeSql succeeded");
+        assertElementContains(loc, "SUCCESS: Created Custom View: 'QueryTestView' for list");
+        assertElementContains(loc, "SUCCESS: SelectDistinctRows returned correct result set");
+        assertElementContains(loc, "SUCCESS: SelectDistinctRows returned correct custom view filtered result set");
         clearTestPage("Query portion of test page complete");
     }
 
