@@ -363,7 +363,7 @@ public class ScatterPlotTest extends GenericChartsTest
         Integer buttonsCount = getElementCount(Locator.xpath("//div[contains(@id, \"generic-report-div\")]//div//button"));
         Integer disabledButtonsCount = getElementCount(Locator.xpath("//div[contains(@id, \"generic-report-div\")]//div[contains(@class, 'x4-item-disabled')]//button"));
 
-        Assert.assertTrue("Only the help button should be enabled. More than one button was enabled.", 1 == (buttonsCount - disabledButtonsCount));
+        Assert.assertTrue("Only the help and export buttons should be enabled. More than two buttons was enabled.", 2 == (buttonsCount - disabledButtonsCount));
     }
 
     private static final String TEST_DATA_API_PATH = "server/test/data/api";
