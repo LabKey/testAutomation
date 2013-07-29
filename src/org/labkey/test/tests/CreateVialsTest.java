@@ -17,9 +17,12 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.DataRegionTable;
 
 import java.util.Arrays;
@@ -28,6 +31,7 @@ import java.util.Arrays;
  * User: kevink
  * Date: Feb 23, 2011
  */
+@Category({DailyB.class, Specimen.class})
 public class CreateVialsTest extends AbstractViabilityTest
 {
     public static final String PROJECT_NAME = "CreateVialsTest";

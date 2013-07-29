@@ -16,15 +16,18 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.BaseFlowTestWD;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
 
 /**
  * User: elvan
  * Date: 1/10/13
  * Time: 4:40 PM
  */
+@Category({DailyB.class})
 public class FlowAnalysisResolverTest extends FlowTest
 {
 

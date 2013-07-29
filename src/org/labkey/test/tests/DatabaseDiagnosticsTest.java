@@ -15,8 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineHelper;
 
@@ -25,6 +28,7 @@ import org.labkey.test.util.PipelineHelper;
  * Date: 1/15/13
  * Time: 12:32 PM
  */
+@Category({DailyA.class, DailyB.class})
 public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 {
     @Override

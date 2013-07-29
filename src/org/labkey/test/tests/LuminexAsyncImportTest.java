@@ -15,8 +15,12 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.MiniTest;
 
 import java.io.File;
 import java.util.Calendar;
@@ -26,6 +30,7 @@ import java.util.Calendar;
  * Date: 2/20/12
  * Time: 1:02 PM
  */
+@Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexAsyncImportTest extends LuminexTest
 {
     @Override

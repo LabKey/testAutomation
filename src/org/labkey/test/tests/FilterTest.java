@@ -25,8 +25,11 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.IssuesHelper;
@@ -45,6 +48,7 @@ import java.util.Map;
 /**conceptually filter and list are separate, but
  * it was convenient to use the list test helpers for filter
  */
+@Category({BVT.class, Data.class})
 public class FilterTest extends ListTest
 {
     protected final static String PROJECT_NAME = "FilterVerifyProject";

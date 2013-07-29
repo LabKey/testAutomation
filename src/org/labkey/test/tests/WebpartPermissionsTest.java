@@ -17,9 +17,11 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.apache.commons.lang3.ArrayUtils;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
 
 import java.io.File;
 
@@ -28,6 +30,7 @@ import java.io.File;
  * Date: 1/16/13
  * Time: 2:37 PM
  */
+@Category({DailyB.class})
 public class WebpartPermissionsTest extends BaseWebDriverTest
 {
 

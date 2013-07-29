@@ -16,8 +16,10 @@
 package org.labkey.test.tests;
 
 import com.google.common.base.Function;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Crawler;
 import org.labkey.test.util.ListHelperWD;
 
@@ -31,6 +33,7 @@ import java.util.Map;
  * Date: Oct 14, 2010
  * Time: 11:37:20 AM
  */
+@Category({DailyB.class})
 public class CustomizeViewTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "CustomizeViewTest";

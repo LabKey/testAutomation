@@ -15,8 +15,10 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
@@ -27,6 +29,7 @@ import java.io.File;
  * Date: Jul 2, 2008
  * Time: 2:03:39 PM
  */
+@Category({DailyA.class})
 public class HTTPApiTest extends SimpleApiTest
 {
     private static final String PROJECT_NAME = "HTTPApiVerifyProject";

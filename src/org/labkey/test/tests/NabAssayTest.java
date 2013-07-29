@@ -17,10 +17,13 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -30,6 +33,7 @@ import java.util.regex.Pattern;
  * User: jeckels
  * Date: Nov 20, 2007
  */
+@Category({DailyA.class, Assays.class})
 public class NabAssayTest extends AbstractQCAssayTest
 {
     private final static String TEST_ASSAY_PRJ_NAB = "Nab Test Verify Project";            //project for nab test

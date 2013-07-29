@@ -17,14 +17,18 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.ListHelper;
 
 /**
  * User: klum
  * Date: Jul 31, 2009
  */
+@Category({DailyA.class, Study.class})
 public class QuerySnapshotTest extends StudyBaseTestWD
 {
     private final String DEMOGRAPHICS_SNAPSHOT = "Demographics Snapshot";

@@ -19,9 +19,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.*;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Data;
 import org.labkey.test.util.JSONHelper;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.Maps;
@@ -35,6 +38,7 @@ import java.util.Map;
 /**
  * Test JavaScript validation in file-based modules.
  */
+@Category({DailyB.class, Data.class})
 public class ScriptValidationTest extends SimpleModuleTest
 {
     public static class ColorRecord

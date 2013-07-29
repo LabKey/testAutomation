@@ -16,9 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
@@ -29,6 +31,7 @@ import java.util.List;
  * Date: Mar 9, 2010
  * Time: 3:44:04 PM
  */
+@Category({DailyB.class})
 public class RlabkeyTest extends SimpleApiTest
 {
     RReportHelper _rReportHelper = new RReportHelper(this);

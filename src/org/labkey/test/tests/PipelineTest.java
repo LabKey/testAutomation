@@ -16,8 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.ms2.MS2PipelineFolder;
 import org.labkey.test.ms2.params.MS2EmailSuccessParams;
 import org.labkey.test.pipeline.PipelineFolder;
@@ -34,6 +36,7 @@ import java.io.File;
 /**
  * <code>PipelineTest</code>
  */
+@Category(BVT.class)
 public class PipelineTest extends PipelineWebTestBase
 {
     protected static final int MAX_WAIT_SECONDS = 60*5;

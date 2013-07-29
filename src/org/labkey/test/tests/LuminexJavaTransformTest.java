@@ -15,11 +15,17 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.MiniTest;
+
 /**
  * User: elvan
  * Date: 8/11/11
  * Time: 5:14 PM
  */
+@Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexJavaTransformTest extends LuminexTest
 {
     public void runUITests()

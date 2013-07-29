@@ -16,9 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.interactions.Actions;
@@ -28,6 +30,7 @@ import org.openqa.selenium.interactions.Actions;
  * Date: Sep 13, 2010
  * Time: 1:41:34 PM
  */
+@Category(BVT.class)
 public class ReagentTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "ReagentProject";

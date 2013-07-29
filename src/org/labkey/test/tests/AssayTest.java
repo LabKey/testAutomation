@@ -17,8 +17,12 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.CustomizeViewsHelperWD;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
@@ -32,6 +36,7 @@ import static org.labkey.test.util.ListHelperWD.ListColumnType;
  * User: jeckels
  * Date: Aug 10, 2007
  */
+@Category({BVT.class, Study.class, Assays.class})
 public class AssayTest extends AbstractAssayTestWD
 {
     private final PortalHelper portalHelper = new PortalHelper(this);

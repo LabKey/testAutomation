@@ -15,15 +15,19 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.MS2;
 
 /**
  * User: elvan
  * Date: 8/19/11
  * Time: 3:32 PM
  */
+@Category({DailyB.class, MS2.class})
 public class LibraTest extends MS2Test
 {
     private String standardView = "Standard View";

@@ -17,9 +17,12 @@
 package org.labkey.test.ms2;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.MS2;
+import org.labkey.test.categories.Sequest;
 
 import java.io.File;
 
@@ -29,6 +32,7 @@ import java.io.File;
  * Time: 1:04:36 PM
  *
  */
+@Category({MS2.class, Sequest.class})
 public class SequestTest extends AbstractMS2SearchEngineTest
 {
     protected static final String PEPTIDE = "K.VFHFVR.Q";

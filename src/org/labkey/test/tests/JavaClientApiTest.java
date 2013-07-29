@@ -16,12 +16,14 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.*;
 import org.labkey.remoteapi.query.*;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PasswordUtil;
 
@@ -41,6 +43,7 @@ import java.util.Map;
  * the API, so this test will setup a list and then use the Java
  * client API library to insert, read, update, and delete from that list
  */
+@Category({DailyA.class})
 public class JavaClientApiTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "~Java Client Api Verify Project~";

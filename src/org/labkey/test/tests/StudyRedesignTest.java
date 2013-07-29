@@ -16,7 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -27,6 +30,7 @@ import org.labkey.test.util.RReportHelper;
  * Date: 8/16/11
  * Time: 3:22 PM
  */
+@Category({BVT.class, DailyA.class})
 public class StudyRedesignTest extends StudyBaseTest
 {
     protected static final String[] BITS = {"ABCD", "EFGH", "IJKL", "MNOP", "QRST", "UVWX"};

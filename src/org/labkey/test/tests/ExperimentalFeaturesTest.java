@@ -15,9 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.NoSuite;
 import org.labkey.test.util.DevModeOnlyTest;
 
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import java.util.HashMap;
  * Time: 1:37 PM
  */
 
+@Category(NoSuite.class)
 public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevModeOnlyTest
 {
     @Override

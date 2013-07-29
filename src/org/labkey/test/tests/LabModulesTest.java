@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
+import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -31,6 +32,8 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.External;
+import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AdvancedSqlTest;
 import org.labkey.test.util.CustomizeViewsHelper;
@@ -65,6 +68,7 @@ import java.util.Map;
  * Contains a series of tests designed to test the UI in the laboratory module.
  * Also contains considerable coverage of Ext4 components and the client API
  */
+@Category({External.class, ONPRC.class})
 public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);

@@ -16,8 +16,12 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.MiniTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PerlHelper;
 
@@ -30,6 +34,7 @@ import java.util.List;
  * Date: 2/21/12
  * Time: 1:37 PM
  */
+@Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexPositivityTest extends LuminexTest
 {
     private int _expectedThresholdValue = 100;

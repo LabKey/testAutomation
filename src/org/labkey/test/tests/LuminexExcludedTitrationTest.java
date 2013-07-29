@@ -16,7 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.MiniTest;
 import org.labkey.test.util.LogMethod;
 
 import java.util.List;
@@ -25,6 +29,7 @@ import java.util.List;
  * User: RyanS
  * Date: 5/31/13
  */
+@Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexExcludedTitrationTest extends LuminexTest
 {
     protected static final Locator AVAILABLE_ANALYTES_CHECKBOX = Locator.xpath("//div[@class='x-grid3-hd-inner x-grid3-hd-checker']/div[@class='x-grid3-hd-checker']");

@@ -17,9 +17,12 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -29,6 +32,7 @@ import java.io.File;
  * Date: Jun 7, 2007
  * Time: 5:40:36 PM
  */
+@Category({DailyA.class, Study.class})
 public class VaccineProtocolTest extends BaseSeleniumWebTest
 {
     protected static final String PROJECT_NAME = "ProtocolVerifyProject";

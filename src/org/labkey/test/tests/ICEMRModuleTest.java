@@ -19,8 +19,10 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.ExcelHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -35,6 +37,7 @@ import java.util.Map;
  * Date: 12/27/12
  * Time: 7:02 PM
  */
+@Category({DailyB.class})
 public class ICEMRModuleTest extends BaseWebDriverTest
 {
     public static final String ID = "myid";

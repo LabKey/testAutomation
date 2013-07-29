@@ -15,8 +15,10 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
 
 import java.io.File;
 
@@ -25,6 +27,7 @@ import java.io.File;
  * Date: 2/29/12
  * Time: 6:48 PM
  */
+@Category({DailyB.class})
 public class PipelineCancelTest  extends BaseWebDriverTest
 {
     private static final String STUDY_ZIP = "/sampledata/pipelineCancel/LabkeyDemoStudy.zip";

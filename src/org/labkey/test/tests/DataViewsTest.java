@@ -16,8 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -28,6 +30,7 @@ import org.labkey.test.util.RReportHelper;
  * User: klum
  * Date: Feb 29, 2012
  */
+@Category({DailyA.class})
 public class DataViewsTest extends StudyRedesignTest
 {
     private static final String REPORT_NAME = "TestReport";

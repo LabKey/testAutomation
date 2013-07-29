@@ -15,7 +15,10 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ import java.util.List;
  * User: tchadick
  * Date: 6/11/13
  */
+@Category({DailyA.class, Reports.class})
 public class BoxPlotTest extends GenericChartsTest
 {
     @LogMethod

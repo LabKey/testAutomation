@@ -17,8 +17,11 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.jetbrains.annotations.Nullable;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelperWD;
@@ -34,6 +37,7 @@ import java.nio.file.Paths;
  * Date: 5/30/13
  * Time: 12:34 PM
  */
+@Category({DailyA.class, Reports.class})
 public class KnitrReportTest extends BaseWebDriverTest
 {
     private static final Path scriptpadReports = Paths.get(getLabKeyRoot(), "server/test/modules/scriptpad/resources/reports/schemas");

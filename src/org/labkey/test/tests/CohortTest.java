@@ -17,8 +17,11 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.jetbrains.annotations.Nullable;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
@@ -31,6 +34,7 @@ import java.util.List;
  * Date: Jan 13, 2010
  * Time: 4:50:24 PM
  */
+@Category({DailyB.class, Study.class})
 public class CohortTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "Cohort Test Project";

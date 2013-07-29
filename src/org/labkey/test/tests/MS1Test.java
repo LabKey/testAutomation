@@ -17,10 +17,12 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
@@ -31,6 +33,7 @@ import java.io.File;
  * Date: Nov 7, 2007
  * Time: 9:33:52 AM
  */
+@Category({DailyA.class})
 public class MS1Test extends BaseWebDriverTest
 {
     public static final String PROJ_MAIN = "~~MS1 BVT PROJECT~~"; //use spaces to test for url encoding issues

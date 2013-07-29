@@ -15,9 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 
 import java.io.*;
@@ -27,6 +29,7 @@ import java.io.*;
  * Date: Apr 6, 2009
  * Time: 4:39:49 PM
  */
+@Category({DailyA.class})
 public class ProgrammaticQCTest extends AbstractQCAssayTest
 {
     protected final static String TEST_PROGRAMMATIC_QC_PRJ = "Programmatic QC Test";

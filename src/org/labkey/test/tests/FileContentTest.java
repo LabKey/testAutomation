@@ -17,9 +17,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -30,6 +32,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
+@Category(BVT.class)
 public class FileContentTest extends BaseWebDriverTest
 {
     private final SearchHelper _searchHelper = new SearchHelper(this);

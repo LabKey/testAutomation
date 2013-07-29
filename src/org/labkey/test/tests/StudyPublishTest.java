@@ -17,8 +17,11 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -38,6 +41,7 @@ import java.util.Set;
  * Date: 8/24/12
  * Time: 11:00 AM
  */
+@Category({DailyB.class, Study.class})
 public class StudyPublishTest extends StudyProtectedExportTest
 {
     private final String ID_PREFIX = "PUBLISHED-";

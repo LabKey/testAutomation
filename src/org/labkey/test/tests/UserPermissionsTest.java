@@ -16,9 +16,11 @@
 
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 
@@ -26,6 +28,7 @@ import org.labkey.test.util.PasswordUtil;
  * User: Mark Griffith
  * Date: Jan 18, 2006
  */
+@Category({DailyA.class})
 public class UserPermissionsTest extends BaseWebDriverTest
 {
     protected static final String PERM_PROJECT_NAME = "PermissionCheckProject";

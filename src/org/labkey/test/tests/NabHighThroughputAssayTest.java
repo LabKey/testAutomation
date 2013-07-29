@@ -16,8 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
@@ -27,6 +30,7 @@ import java.io.File;
  * User: klum
  * Date: 2/27/13
  */
+@Category({DailyA.class, Assays.class})
 public class NabHighThroughputAssayTest extends AbstractAssayTest
 {
     private final static String TEST_ASSAY_PRJ_NAB = "Nab High Throughput Test Verify Project";            //project for nab test

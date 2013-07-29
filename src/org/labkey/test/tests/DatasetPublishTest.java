@@ -16,13 +16,16 @@
 
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 
 import java.io.File;
 
+@Category({DailyA.class})
 public class DatasetPublishTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "DatasetPublishTestProject";

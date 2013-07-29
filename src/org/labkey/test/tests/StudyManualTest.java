@@ -17,7 +17,10 @@
 package org.labkey.test.tests;
 
 import com.thoughtworks.selenium.SeleniumException;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.Study;
+import org.labkey.test.categories.Disabled;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.StudyHelper;
 
@@ -30,6 +33,7 @@ import java.util.Set;
  * Date: Mar 9, 2006
  * Time: 1:54:57 PM
  */
+@Category({Study.class, Disabled.class})
 public class StudyManualTest extends StudyTest
 {
 

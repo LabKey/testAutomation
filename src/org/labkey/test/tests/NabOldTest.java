@@ -16,8 +16,11 @@
 
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyA;
 
 import java.io.File;
 
@@ -26,6 +29,7 @@ import java.io.File;
  * Date: May 13, 2006
  * Time: 2:53:13 PM
  */
+@Category({DailyA.class, Assays.class})
 public class NabOldTest extends AbstractQCAssayTestWD
 {
     protected static final String PROJECT_NAME = "NabVerifyProject";

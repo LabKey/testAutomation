@@ -17,10 +17,12 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -40,6 +42,7 @@ import java.util.Map;
  * User: Mark Igra
  * Date: March 23, 2007
  */
+@Category(BVT.class)
 public class SecurityTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "SecurityVerifyProject";

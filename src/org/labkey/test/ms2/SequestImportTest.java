@@ -15,9 +15,12 @@
  */
 package org.labkey.test.ms2;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ModulePropertyValue;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.MS2;
 import org.labkey.test.util.CustomizeViewsHelperWD;
 
 import java.util.ArrayList;
@@ -27,6 +30,7 @@ import java.util.List;
  * User: jeckels
  * Date: 2/8/13
  */
+@Category({DailyB.class, MS2.class})
 public class SequestImportTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SequestImport" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;

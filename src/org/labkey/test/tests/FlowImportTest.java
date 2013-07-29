@@ -17,10 +17,13 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 
 import java.util.Arrays;
@@ -30,6 +33,7 @@ import java.util.List;
  * User: kevink
  * Date: Mar 31, 2009
  */
+@Category({DailyA.class, Flow.class})
 public class FlowImportTest extends BaseFlowTest
 {
     protected void _doTestSteps() throws Exception

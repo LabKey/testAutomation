@@ -16,6 +16,8 @@
 package org.labkey.test;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIAssayHelper;
 
 import java.io.File;
@@ -26,6 +28,7 @@ import java.util.Collections;
  * Date: 9/14/12
  * Time: 2:06 PM
  */
+@Category({DailyA.class})
 public class AssayAPITest extends BaseSeleniumWebTest
 {
     @Override

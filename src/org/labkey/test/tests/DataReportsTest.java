@@ -17,8 +17,11 @@ package org.labkey.test.tests;
 
 import com.sun.istack.internal.NotNull;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.Reports;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelperWD;
@@ -30,6 +33,7 @@ import java.util.Map;
  * User: tchadick
  * Date: 6/10/13
  */
+@Category({BVT.class, Reports.class})
 public class DataReportsTest extends ReportTest
 {
     protected final RReportHelperWD _rReportHelper = new RReportHelperWD(this);

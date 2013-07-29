@@ -18,9 +18,12 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
@@ -32,6 +35,7 @@ import java.io.File;
  * User: brittp
  * Created: Mar 12, 2008 9:36:47 AM
  */
+@Category({BVT.class, Wiki.class})
 public class ClientAPITest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ClientAPITestProject";

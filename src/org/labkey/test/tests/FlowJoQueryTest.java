@@ -17,8 +17,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 
 import java.util.Arrays;
@@ -34,6 +37,7 @@ import java.util.regex.Matcher;
  * It then runs a query 'Comparison' to ensure than the difference between LabKey's results and FlowJo's is not greater
  * than 25 for any statistic.
  */
+@Category({DailyA.class, Flow.class})
 public class FlowJoQueryTest extends BaseFlowTest
 {
     protected void _doTestSteps() throws Exception

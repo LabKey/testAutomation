@@ -17,7 +17,10 @@ package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Reports;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -29,6 +32,7 @@ import java.util.List;
  * User: cnathe
  * Date: 11/5/12
  */
+@Category({DailyB.class, Reports.class})
 public class TimeChartAPITest extends TimeChartTest
 {
     private static final String WIKIPAGE_NAME = "VisualizationGetDataAPITest";

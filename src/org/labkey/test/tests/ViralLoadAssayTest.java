@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
+import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -26,6 +27,8 @@ import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.External;
+import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.Ext4HelperWD;
@@ -47,6 +50,7 @@ import java.util.Map;
  * Date: 11/6/12
  * Time: 5:43 PM
  */
+@Category({External.class, ONPRC.class})
 public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 {
     private static final String ASSAY_NAME = "Viral Load Test";

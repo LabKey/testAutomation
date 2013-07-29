@@ -16,6 +16,11 @@
 
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.MS2;
+
+@Category({MS2.class, DailyA.class})
 public class MS2GZTest extends MS2Test
 {
     protected void doTestSteps()

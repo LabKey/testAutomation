@@ -17,8 +17,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
@@ -29,6 +32,7 @@ import java.util.List;
  * User: kevink
  * Date: Sep 30, 2009
  */
+@Category({DailyB.class, Assays.class})
 public class ViabilityTest extends AbstractViabilityTest
 {
     public static final String PROJECT_NAME = "Viability";

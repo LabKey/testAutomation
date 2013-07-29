@@ -16,8 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Study;
 
 import java.io.File;
 
@@ -26,6 +29,7 @@ import java.io.File;
  * Date: Aug 4, 2009
  * Time: 1:59:39 PM
  */
+@Category({DailyA.class, Study.class})
 public class SCHARPStudyTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME="SCHARP Study Test";

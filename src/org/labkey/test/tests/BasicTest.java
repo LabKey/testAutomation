@@ -18,8 +18,12 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DRT;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIContainerHelper;
 
@@ -28,6 +32,7 @@ import org.labkey.test.util.UIContainerHelper;
  * Date: March 23, 2007
  * Time: 1:57:05 PM
  */
+@Category({DRT.class, BVT.class, DailyA.class})
 public class BasicTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "BasicVerifyProject";

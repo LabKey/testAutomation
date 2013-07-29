@@ -241,18 +241,6 @@ public enum TestSet
         LuminexExcludedTitrationTest.class
     ),
 
-    IE(
-        BasicTest.class,
-        FlowTest.class,
-        SecurityTest.class,
-        WikiTest.class,
-        GpatAssayTest.class,
-        EmbeddedWebPartTest.class,
-        AssayTest.class,
-        FolderTest.class,
-        StudyTest.class
-    ),
-
     Cluster(
         MS2ClusterTest.class
     ),
@@ -362,10 +350,6 @@ public enum TestSet
 
     UnitTests(
         JUnitTest.class
-    ),
-
-    Chrome(
-        ListExportTest.class
     ),
 
     Data(

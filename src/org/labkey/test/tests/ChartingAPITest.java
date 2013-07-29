@@ -26,9 +26,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 
@@ -41,6 +43,7 @@ import java.util.List;
  * Date: 3/11/13
  * Time: 1:55 PM
  */
+@Category(BVT.class)
 public class ChartingAPITest extends ClientAPITest
 {
     @Override

@@ -15,7 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Specimen;
+import org.labkey.test.categories.Study;
 
 import java.io.File;
 
@@ -24,6 +28,7 @@ import java.io.File;
  * Date: 2/27/13
  * Time: 10:16 PM
  */
+@Category({DailyA.class, Study.class, Specimen.class})
 public class SpecimenReplaceTest extends SpecimenMergeTest
 {
     protected static final String LAB_EDITED_SPECIMENS = "/sampledata/study/specimens/lab19edit.specimens";

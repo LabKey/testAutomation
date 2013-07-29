@@ -17,9 +17,12 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -29,6 +32,7 @@ import java.io.File;
  * Date: Nov 15, 2005
  * Time: 1:55:56 PM
  */
+@Category({DailyA.class, Wiki.class})
 public class WikiLongTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "WikiVerifyProject";

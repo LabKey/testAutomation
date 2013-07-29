@@ -15,8 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 
@@ -24,6 +27,7 @@ import org.labkey.test.util.RReportHelper;
  * User: tchadick
  * Date: 6/10/13
  */
+@Category({DailyA.class, Reports.class})
 public class ReportSecurityTest extends ReportTest
 {
     private static final String TEST_GRID_VIEW = "Test Grid View";

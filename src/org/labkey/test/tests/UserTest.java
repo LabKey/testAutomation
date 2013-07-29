@@ -17,8 +17,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.DataRegionTable;
 
@@ -26,6 +28,7 @@ import org.labkey.test.util.DataRegionTable;
  * User: Karl Lum
  * Date: Jan 11, 2007
  */
+@Category({DailyA.class})
 public class UserTest extends SecurityTest
 {
     private static final String[] REQUIRED_FIELDS = {"FirstName", "LastName", "Phone", "Mobile", "Pager",

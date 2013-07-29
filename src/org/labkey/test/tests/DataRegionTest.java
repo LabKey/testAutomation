@@ -17,9 +17,12 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.ListHelper;
@@ -35,6 +38,7 @@ import java.util.regex.Pattern;
  * User: kevink
  * Date: Mar 4, 2008 1:05:38 PM
  */
+@Category({DailyA.class, Data.class})
 public class DataRegionTest extends BaseWebDriverTest
 {
     private static final String FIRST_LINK = "First Page";

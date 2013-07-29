@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -26,6 +27,8 @@ import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.Specimen;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.ChartHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
@@ -50,6 +53,7 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
  * Date: Apr 3, 2009
  * Time: 9:18:32 AM
  */
+@Category({Study.class, Specimen.class})
 public class StudyTest extends StudyBaseTest
 {
     public String datasetLink = datasetCount + " datasets";

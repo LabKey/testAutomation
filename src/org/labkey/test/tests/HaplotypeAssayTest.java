@@ -16,8 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -29,6 +31,7 @@ import java.util.List;
  * User: cnathe
  * Date: 10/23/12
  */
+@Category({DailyB.class})
 public class HaplotypeAssayTest extends GenotypingTest
 {
     private static final String PROJECT_NAME = "HaplotypeAssayVerifyProject";

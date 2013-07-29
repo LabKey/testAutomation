@@ -15,7 +15,9 @@
  */
 package org.labkey.test.ms2;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
 
 import java.io.File;
 
@@ -23,6 +25,7 @@ import java.io.File;
  * User: jeckels
  * Date: May 27, 2011
  */
+@Category({DailyA.class})
 public class QuantitationTest extends AbstractXTandemTest
 {
     protected static final String LIBRA_PROTOCOL_NAME = "BasicLibra";

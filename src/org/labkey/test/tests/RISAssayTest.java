@@ -15,10 +15,12 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.ExtHelperWD;
 import org.labkey.test.util.LogMethod;
@@ -36,6 +38,7 @@ import java.io.IOException;
  * Date: 2/18/13
  * Time: 2:50 PM
  */
+@Category({DailyA.class})
 public class RISAssayTest extends BaseWebDriverTest implements PostgresOnlyTest
 {
     private final File risXarFile = new File(getDownloadDir(), "ris.xar");

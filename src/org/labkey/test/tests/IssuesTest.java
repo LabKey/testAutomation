@@ -17,9 +17,12 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Data;
 import org.labkey.test.util.EmailRecordTable;
 import org.labkey.test.util.EmailRecordTable.EmailMessage;
 import org.labkey.test.util.PasswordUtil;
@@ -31,6 +34,7 @@ import java.util.List;
  * User: tamram
  * Date: May 15, 2006
  */
+@Category({DailyA.class, Data.class})
 public class IssuesTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "IssuesVerifyProject";

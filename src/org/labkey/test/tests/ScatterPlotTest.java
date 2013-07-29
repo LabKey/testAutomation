@@ -16,14 +16,18 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 
 /**
  * User: tchadick
  * Date: 6/11/13
  */
+@Category({BVT.class, Reports.class})
 public class ScatterPlotTest extends GenericChartsTest
 {
     protected static final String DEVELOPER_USER = "developer_user1@report.test";

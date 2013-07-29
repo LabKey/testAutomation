@@ -16,8 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTestWD;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -36,6 +39,7 @@ import java.io.File;
  *     - verifies URLs go to correct container
  * - custom query combining CBC and Flow datasets with expression columns.
  */
+@Category({DailyA.class, Flow.class})
 public class FlowCBCTest extends BaseFlowTestWD
 {
     public static final String STUDY_FOLDER = "KoStudy";

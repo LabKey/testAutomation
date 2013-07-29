@@ -28,10 +28,15 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONValue;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.DRT;
+import org.labkey.test.categories.UnitTests;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -45,6 +50,7 @@ import java.util.Map;
  * Date: Nov 30, 2005
  * Time: 10:53:59 PM
  */
+@Category({DRT.class, BVT.class, UnitTests.class})
 public class JUnitTest extends TestSuite
 {
     private static final DecimalFormat commaf0 = new DecimalFormat("#,##0");

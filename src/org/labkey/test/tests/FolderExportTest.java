@@ -16,9 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.UIContainerHelper;
@@ -35,6 +37,7 @@ import java.util.Set;
  * Date: 1/24/12
  * Time: 1:26 PM
  */
+@Category({DailyB.class})
 public class FolderExportTest extends BaseWebDriverTest
 {
 

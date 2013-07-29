@@ -17,12 +17,17 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.MS2;
+import org.labkey.test.categories.XTandem;
 import org.labkey.test.ms2.AbstractXTandemTest;
 
 import java.io.File;
 
+@Category({BVT.class, MS2.class, XTandem.class})
 public class XTandemTest extends AbstractXTandemTest
 {
     protected static final String SEARCH = "gi|4689022";

@@ -16,15 +16,18 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
 
 /**
  * User: elvan
  * Date: 3/14/12
  * Time: 12:03 PM
  */
+@Category({DailyB.class})
 public class ProjectSettingsTest extends BaseWebDriverTest
 {
     private static final Locator supportLink = Locator.xpath("//a[contains(@href, 'support')]/span[text()='Support']");

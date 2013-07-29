@@ -18,7 +18,10 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.External;
+import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.UIContainerHelper;
@@ -33,6 +36,7 @@ import java.util.List;
  * Date: 12/9/12
  * Time: 11:24 PM
  */
+@Category({External.class, ONPRC.class})
 public class FlowAssaysTest extends AbstractLabModuleAssayTest
 {
     private static final String ICS_ASSAY_NAME = "ICS Assay Test";

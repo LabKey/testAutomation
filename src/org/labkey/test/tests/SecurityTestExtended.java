@@ -21,9 +21,13 @@ package org.labkey.test.tests;
  * Time: 11:40 AM
  */
 
+import org.junit.experimental.categories.Category;
+import org.labkey.test.categories.Weekly;
+
 /**This class is for security related tests that should be run only weekly,
  * because they are time consuming, unlikely to fail, or otherwise do not need
  */
+@Category({Weekly.class})
 public class SecurityTestExtended extends SecurityTest
 {
 

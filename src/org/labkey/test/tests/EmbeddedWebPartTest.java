@@ -16,9 +16,12 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.ResetTracker;
 import org.labkey.test.util.UIContainerHelper;
@@ -28,6 +31,7 @@ import org.labkey.test.util.UIContainerHelper;
  * Date: 8/4/11
  * Time: 3:23 PM
  */
+@Category({DailyA.class, Wiki.class})
 public class EmbeddedWebPartTest extends BaseWebDriverTest
 {
     ResetTracker resetTracker = null;

@@ -16,8 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -26,6 +28,7 @@ import org.openqa.selenium.WebElement;
  * Date: 2/21/13
  * Time: 4:10 PM
  */
+@Category({DailyA.class})
 public class AdminConsoleTest extends BaseWebDriverTest
 {
     public String getProjectName()

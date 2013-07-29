@@ -15,9 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 
 /*
@@ -25,6 +27,7 @@ import org.labkey.test.util.ListHelper;
 * Date: Sep 23, 2009
 * Time: 1:19:40 PM
 */
+@Category({DailyA.class})
 public class SchemaBrowserTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "Schema Browser Test Project";

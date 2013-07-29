@@ -17,9 +17,12 @@
 package org.labkey.test.ms2;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.MS2;
+import org.labkey.test.categories.Mascot;
 
 import java.io.File;
 import java.net.URL;
@@ -43,6 +46,7 @@ import java.net.MalformedURLException;
  *          Rule 5 ">[^ ]* \(.*\)"   (the rule number can be different, but regex must be the same or equivalent)
  *
  */
+@Category({MS2.class, Mascot.class})
 public class MascotTest extends AbstractMS2SearchEngineTest
 {
     protected static final String PEPTIDE = "R.RLPVGADR.G";

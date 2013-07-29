@@ -16,8 +16,11 @@
 
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Flow;
 import org.labkey.test.util.RReportHelper;
 
 import java.util.Arrays;
@@ -27,6 +30,7 @@ import java.util.Collections;
  * User: kevink
  * Date: 10/14/11
  */
+@Category({DailyA.class, Flow.class})
 public class FlowNormalizationTest extends BaseFlowTest
 {
     @Override

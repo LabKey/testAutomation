@@ -15,10 +15,10 @@
  */
 package org.labkey.test.tests.perf;
 
-import org.aspectj.lang.annotation.Aspect;
+import org.junit.experimental.categories.Category;
+import org.labkey.test.categories.Perf;
 
 import java.io.File;
-import java.io.FileWriter;
 
 /**
  * User: elvan
@@ -26,7 +26,7 @@ import java.io.FileWriter;
  * Time: 11:52 AM
  */
 
-@Aspect
+@Category(Perf.class)
 public class StudyImportPerfTest extends PerformanceTest
 {
     @Override

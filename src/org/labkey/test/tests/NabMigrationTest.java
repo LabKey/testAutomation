@@ -16,7 +16,9 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.Weekly;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
 
@@ -25,6 +27,7 @@ import org.labkey.test.util.ListHelper;
  * Date: 5/10/12
  * Time: 6:26 PM
  */
+@Category({Weekly.class})
 public class NabMigrationTest extends NabOldTest
 {
 

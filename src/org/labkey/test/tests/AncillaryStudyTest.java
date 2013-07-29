@@ -16,8 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.ChartHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.WikiHelper;
@@ -31,6 +34,7 @@ import java.util.Map;
  * Date: Sep 8, 2011
  * Time: 1:55:05 PM
  */
+@Category({DailyB.class, Study.class})
 public class AncillaryStudyTest extends StudyBaseTest
 {
     private static final String PROJECT_NAME = "AncillaryStudyTest Project";

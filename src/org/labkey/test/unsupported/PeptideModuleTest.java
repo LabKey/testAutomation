@@ -15,6 +15,7 @@
  */
 package org.labkey.test.unsupported;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -24,6 +25,8 @@ import org.labkey.remoteapi.query.RowMap;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.categories.External;
+import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -39,9 +42,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertTrue;
 
-/**
- *
- */
+@Category({External.class, ONPRC.class})
 public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnlyTest
 {
 

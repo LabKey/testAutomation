@@ -16,8 +16,11 @@
 
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.Ext4HelperWD;
 import org.junit.Assert;
 
@@ -28,6 +31,7 @@ import java.io.File;
  * Date: Dec 8, 2006
  * Time: 4:30:24 PM
  */
+@Category({DailyB.class, Study.class})
 public class StudyExportTest extends StudyManualTest
 {
     private static final String SPECIMEN_ARCHIVE_B = "/sampledata/study/specimens/sample_b.specimens";

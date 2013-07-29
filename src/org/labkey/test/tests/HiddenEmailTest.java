@@ -15,9 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -27,6 +29,7 @@ import org.labkey.test.util.PortalHelper;
  * User: klum
  * Date: 11/14/12
  */
+@Category({DailyB.class})
 public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTest
 {
     private static final String TEST_GROUP = "HiddenEmail Test group";

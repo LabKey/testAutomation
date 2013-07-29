@@ -17,9 +17,11 @@ package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -29,6 +31,7 @@ import java.io.File;
  * User: cnathe
  * Date: 1/4/13
  */
+@Category({DailyB.class})
 public class SurveyTest extends BaseWebDriverTest
 {
     private final String folderName = "subfolder";

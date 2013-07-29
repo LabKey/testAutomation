@@ -15,7 +15,9 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -26,6 +28,7 @@ import java.io.File;
  * User: klum
  * Date: 5/18/13
  */
+@Category({DailyB.class})
 public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
 {
     private final static String TEST_ASSAY_PROJECT = "Drug Sensitivity Test Verify Project";

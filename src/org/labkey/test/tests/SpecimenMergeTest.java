@@ -15,9 +15,13 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Specimen;
+import org.labkey.test.categories.Study;
 
 import java.io.File;
 
@@ -27,6 +31,7 @@ import java.io.File;
  *
  * CreateVialsTest also uses the specimen merge feature.
  */
+@Category({DailyB.class, Study.class, Specimen.class})
 public class SpecimenMergeTest extends BaseSeleniumWebTest
 {
     protected static final String PROJECT_NAME = "SpecimenMergeTest";

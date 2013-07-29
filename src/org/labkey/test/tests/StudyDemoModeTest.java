@@ -16,7 +16,9 @@
 
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Crawler;
 
 import java.util.Arrays;
@@ -29,7 +31,7 @@ import java.util.List;
 * Time: 7:06:56 AM
 */
 
-// Consider: roll this test into StudyExportTest to avoid creating/deleting the study yet again
+@Category({DailyB.class})
 public class StudyDemoModeTest extends StudyBaseTest
 {
     @Override

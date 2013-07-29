@@ -16,8 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -25,6 +28,7 @@ import org.labkey.test.util.PortalHelper;
  * User: cnathe
  * Date: 11/5/12
  */
+@Category({DailyB.class, Reports.class})
 public class TimeChartDateBasedTest extends TimeChartTest
 {
     private static final String REPORT_NAME_1 = "TimeChartTest Report";

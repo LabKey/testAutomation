@@ -15,13 +15,17 @@
  */
 package org.labkey.test.tests;
 
-import java.nio.channels.IllegalBlockingModeException;
+import org.junit.experimental.categories.Category;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.MiniTest;
 
 /**
  * User: elvan
  * Date: 8/11/11
  * Time: 5:23 PM
  */
+@Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexRTransformTest extends LuminexTest
 {
     @Override

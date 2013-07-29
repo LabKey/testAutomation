@@ -16,8 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.WikiHelper;
 
@@ -30,6 +32,7 @@ import java.util.HashMap;
  * Time: 9:10:47 AM
  */
 
+@Category({DailyB.class})
 public class SearchTest extends StudyWDTest
 {
     private final SearchHelper _searchHelper = new SearchHelper(this);

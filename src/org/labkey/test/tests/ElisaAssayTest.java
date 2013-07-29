@@ -16,7 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
@@ -26,6 +29,7 @@ import java.io.File;
  * Date: 10/17/12
  * Time: 3:44 PM
  */
+@Category({DailyB.class, Assays.class})
 public class ElisaAssayTest extends ElispotAssayTest
 {
     private final static String TEST_ASSAY_PRJ_ELISA = "ELISA Test Verify Project";

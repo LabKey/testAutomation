@@ -16,8 +16,11 @@
 
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.UIContainerHelper;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -29,6 +32,7 @@ import java.io.File;
  * Date: Nov 15, 2005
  * Time: 1:55:56 PM
  */
+@Category({BVT.class, Wiki.class})
 public class WikiTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = TRICKY_CHARACTERS_FOR_PROJECT_NAMES +  "WikiVerifyProject";

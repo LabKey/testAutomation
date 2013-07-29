@@ -16,7 +16,9 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
@@ -30,6 +32,7 @@ import java.util.Map;
  * Date: 8/14/12
  * Time: 9:55 AM
  */
+@Category({DailyB.class})
 public class StudyProtectedExportTest extends StudyExportTest
 {
     int pipelineJobCount = 1;

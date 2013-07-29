@@ -16,7 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.CustomizeViewsHelper;
 
 /**
@@ -24,6 +27,7 @@ import org.labkey.test.util.CustomizeViewsHelper;
  * Date: 4/29/12
  * Time: 1:17 PM
  */
+@Category({DailyB.class, Study.class})
 public class ExtraKeyStudyTest extends StudyBaseTest
 {
     static String studyFolder = "/ExtraKeyStudy/folder.xml";

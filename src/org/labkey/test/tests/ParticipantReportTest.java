@@ -16,7 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
@@ -27,6 +30,7 @@ import java.util.List;
  * User: tchadick
  * Date: 6/10/13
  */
+@Category({DailyA.class, Reports.class})
 public class ParticipantReportTest extends ReportTest
 {
     private static final String PARTICIPANT_REPORT_NAME = "Test Participant Report";

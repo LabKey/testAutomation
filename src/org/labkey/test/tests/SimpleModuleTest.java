@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.json.simple.JSONObject;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
@@ -32,6 +33,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
@@ -57,6 +59,7 @@ import java.util.Map;
 *
 * Tests the simple module and file-based resources introduced in version 9.1
 */
+@Category({DailyA.class})
 public class SimpleModuleTest extends BaseWebDriverTest
 {
     public static final String FOLDER_TYPE = "My XML-defined Folder Type"; // Folder type defined in customFolder.foldertype.xml

@@ -17,13 +17,16 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 
+@Category({DailyB.class})
 public class ReportThumbnailTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ReportThumbnailTest";

@@ -15,9 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.ListHelper;
 
 /**
@@ -25,6 +27,7 @@ import org.labkey.test.util.ListHelper;
  * Date: Apr 6, 2011
  * Time: 2:19:10 PM
  */
+@Category({DailyB.class})
 public class GpatAssayTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "GpatAssayTest Project";

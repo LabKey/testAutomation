@@ -18,9 +18,12 @@ package org.labkey.test.tests;
 
 //import org.labkey.test.ModuleUtil;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyA;
 
 import java.io.File;
 
@@ -28,6 +31,7 @@ import java.io.File;
  * User: kevink
  * Date: Dec 28, 2008
  */
+@Category({DailyA.class, Assays.class})
 public class ModuleAssayTest extends AbstractAssayTest
 {
     private final static String PROJECT_NAME = "ModuleAssayTest";

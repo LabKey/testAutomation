@@ -11,6 +11,15 @@
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../intellijBuild/test/build/classes" />
     <exclude-output />
+    <content url="file://$MODULE_DIR$/../customModules/OConnorExperiments/test">
+      <sourceFolder url="file://$MODULE_DIR$/../customModules/OConnorExperiments/test/src" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../customModules/cds/test">
+      <sourceFolder url="file://$MODULE_DIR$/../customModules/cds/test/src" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../customModules/ehr/test">
+      <sourceFolder url="file://$MODULE_DIR$/../customModules/ehr/test/src" isTestSource="false" />
+    </content>
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
@@ -175,6 +184,15 @@
         <SOURCES>
           <root url="jar://$MODULE_DIR$/../../external/lib/server/hamcrest-core-1.3-sources.jar!/" />
         </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/reflections-0.9.9-RC1-uberjar.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
       </library>
     </orderEntry>
   </component>

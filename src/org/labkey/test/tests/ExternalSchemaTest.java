@@ -24,6 +24,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.*;
@@ -32,6 +33,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PasswordUtil;
 
@@ -44,6 +47,7 @@ import java.util.*;
  * User: kevink
  * Date: Oct 29, 2008 3:52:53 PM
  */
+@Category({DailyA.class, Data.class})
 public class ExternalSchemaTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ExternalSchemaProject";

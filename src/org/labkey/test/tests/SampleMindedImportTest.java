@@ -16,9 +16,13 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Specimen;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 
@@ -30,6 +34,7 @@ import java.io.File;
  *
  * Imports a SampleMinded data export (.xlsx) into the specimen repository.
  */
+@Category({DailyB.class, Study.class, Specimen.class})
 public class SampleMindedImportTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SampleMindedImportTest";

@@ -15,7 +15,9 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.LogMethod;
 import org.junit.Assert;
 
@@ -26,6 +28,7 @@ import java.io.File;
  * Date: 4/5/12
  * Time: 3:16 PM
  */
+@Category({DailyA.class})
 public class StudyReloadTest extends StudyBaseTest
 {
     public boolean isFileUploadTest()

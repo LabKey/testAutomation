@@ -17,7 +17,9 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -25,6 +27,7 @@ import org.labkey.test.util.PortalHelper;
 import java.util.HashMap;
 import java.util.Map;
 
+@Category({DailyA.class})
 public class StudyDatasetsTest extends StudyBaseTest
 {
     private static final String CATEGORY1 = "Category1";

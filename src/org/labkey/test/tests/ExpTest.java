@@ -17,9 +17,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.util.ListHelper;
 
 import java.text.DateFormat;
@@ -31,6 +33,7 @@ import java.util.Date;
  * Date: Nov 22, 2005
  * Time: 1:31:42 PM
  */
+@Category(BVT.class)
 public class ExpTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "ExpVerifyProject";

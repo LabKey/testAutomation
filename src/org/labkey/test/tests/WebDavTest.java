@@ -20,14 +20,17 @@ import com.googlecode.sardine.DavResource;
 import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Category(BVT.class)
 public class WebDavTest extends BaseWebDriverTest
 {
     final String PROJECT_NAME="WebDavTest";

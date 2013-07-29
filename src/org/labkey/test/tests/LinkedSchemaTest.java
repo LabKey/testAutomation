@@ -16,10 +16,13 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
@@ -80,6 +83,7 @@ import java.util.Arrays;
  *   (overrides title and URL for P)
  *   (BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.)
  */
+@Category({DailyA.class, Data.class})
 public class LinkedSchemaTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = LinkedSchemaTest.class.getSimpleName() + "Project";

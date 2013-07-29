@@ -17,7 +17,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.Assays;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -29,6 +33,7 @@ import java.util.Random;
  * User: kevink
  * Date: Jan 6, 2011
  */
+@Category({DailyB.class, Study.class, Assays.class})
 public class TargetStudyTest extends AbstractAssayTestWD
 {
     private static final String ASSAY_NAME = "Assay";

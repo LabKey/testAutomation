@@ -16,9 +16,12 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Data;
 
 import java.io.File;
 
@@ -26,6 +29,7 @@ import java.io.File;
  * User: kevink
  * Date: 6/27/12
  */
+@Category({DailyB.class, Data.class})
 public class PivotQueryTest extends BaseWebDriverTest
 {
     private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
