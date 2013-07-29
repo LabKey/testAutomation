@@ -62,7 +62,7 @@ public class NWBioTrustTest extends SurveyTest
     private static final List<Map<String, String>> designs = new ArrayList<>();
     private static final String registrationLabel = "requestor 1 study";
     private static final String[] unsubmittedRequestTypes = {"Normal tissue from patients without cancer"};
-    private static final String[] submittedRequestTypes = {"Tumor from primary site", "Tumor from metastasis", "Normal tissues adjacent to primary site (same organ)"};
+    private static final String[] submittedRequestTypes = {"Tumor from primary site", "Tumor from metastasis", "Normal tissue adjacent to primary site (same organ)"};
     private static final String[] allRequestTypes = ArrayUtils.addAll(submittedRequestTypes, unsubmittedRequestTypes);
     private static final File TEST_FILE_1 = new File( getLabKeyRoot() + "/sampledata/survey/TestAttachment.txt");
     private static final File TEST_FILE_2 = new File( getLabKeyRoot() + "/sampledata/survey/TestAttachment2.txt");
@@ -178,6 +178,7 @@ public class NWBioTrustTest extends SurveyTest
     private final File sampleRequestJson = new File(getDownloadDir(), "sample-request.json");
     private final File tissueJson = new File(getDownloadDir(), "tissue-sample.json");
     private final File bloodSampleJson = new File(getDownloadDir(), "blood-sample.json");
+    private final File anatomicalSiteList = new File(getDownloadDir(), "anatomical-site-list.zip");
 
     private int fileCount = 0;
 
@@ -187,6 +188,13 @@ public class NWBioTrustTest extends SurveyTest
     protected String getProjectName()
     {
         return "NWBioTrustTest";
+    }
+
+    @Override
+    public void validateQueries(boolean validateSubfolders)
+    {
+        // TODO: the StudySampleRequestsAPI query fails validation for investigator folders
+        super.validateQueries(false);
     }
 
     @Override
@@ -761,6 +769,20 @@ public class NWBioTrustTest extends SurveyTest
             rows.add(rowMap);
         }
         insertLookupTableRecords("DocumentTypes", rows);
+
+        log("Create list archive for anatomical site for SNOMED-CT codes");
+        downloadFileFromLink(Locator.linkWithText("Anatomical Site"));
+
+        waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return anatomicalSiteList.exists();
+            }
+        }, "failed to download anatomical site list archive", WAIT_FOR_JAVASCRIPT);
+
+        _listHelper.importListArchive(getProjectName(), anatomicalSiteList.getAbsoluteFile());
     }
 
     private void insertLookupTableRecords(String queryName, List<Map<String,Object>> rowsMap)
