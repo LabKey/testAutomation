@@ -320,7 +320,8 @@ public enum TestSet
         CreateVialsTest.class,
         SpecimenExportTest.class,
         AliquotTest.class,
-        SpecimenMultipleImportTest.class
+        SpecimenMultipleImportTest.class,
+        SpecimenExtendedTest.class
     ),
 
     Assays(
