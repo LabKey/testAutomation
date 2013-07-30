@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -46,6 +45,9 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, PROJECT_NAME, FOLDER_NAME, "None", null);
 
+        populateStudyDesignLookups();
+
+        clickFolder(FOLDER_NAME);
         addWebPart("Vaccine Study Protocols");
         clickButton("New Protocol");
 
@@ -59,20 +61,63 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         selenium.fireEvent(Locator.xpath("//div[contains(text(), 'Click to edit description')]/..").toString(), "focus");
         setFormElement("protocolDescription", "This is a very important protocol");
 
-        clickButton("Save", 0);
-        waitForText("Revision 1 saved successfully", WAIT_FOR_JAVASCRIPT);
+        clickButton("Finished");
+        waitForText("No assays have been scheduled.");
+        clickButton("Edit");
+        waitForText("Enter vaccine information in the grids below.");
 
+        // set the initial study design information to match the previous defaults, prior to 13.3 changes to remove all default values
+        setText("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[2]/input", "Cp1");
+        selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[3]/select", "label=Canarypox");
+        setText("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[4]/input", "1.5e10 Ad vg");
+        selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[5]/select", "label=Intramuscular (IM)");
+        setText("//table[@id='ImmunogenGrid']/tbody/tr[3]/td[2]/input", "gp120");
+        selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[3]/td[3]/select", "label=Subunit Protein");
+        setText("//table[@id='ImmunogenGrid']/tbody/tr[3]/td[4]/input", "1.6e8 Ad vg");
+        selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[3]/td[5]/select", "label=Intramuscular (IM)");
+        setText("//table[@id='AdjuvantGrid']/tbody/tr[2]/td[2]/input", "Adjuvant1");
+        setText("//table[@id='AdjuvantGrid']/tbody/tr[3]/td[2]/input", "Adjuvant2");
+        setText("//table[@id='ImmunizationGrid']/tbody/tr[3]/td[2]/input", "Vaccine");
+        setText("//table[@id='ImmunizationGrid']/tbody/tr[3]/td[3]/input", "30");
+        setText("//table[@id='ImmunizationGrid']/tbody/tr[4]/td[2]/input", "Placebo");
+        setText("//table[@id='ImmunizationGrid']/tbody/tr[4]/td[3]/input", "30");
+        selenium.click("//table[@id='ImmunizationGrid']//div[contains(text(), 'Add Timepoint')]");
+        selenium.type("timepointCount", "0");
+        click(Locator.tagWithText("button", "OK"));
+        selenium.click("//table[@id='ImmunizationGrid']//div[contains(text(), 'Add Timepoint')]");
+        selenium.type("timepointCount", "28");
+        click(Locator.tagWithText("button", "OK"));
+        selenium.click("//div[contains(text(), '(none)')]");
+        selenium.click("//label[text()='Cp1']/../input");
+        selenium.click("//label[text()='Adjuvant1']/../input");
+        click(Locator.tagWithText("button", "Done"));
+        selenium.click("//div[contains(text(), '(none)')]");
+        selenium.click("//label[text()='gp120']/../input");
+        selenium.click("//label[text()='Adjuvant1']/../input");
+        click(Locator.tagWithText("button", "Done"));
+        selenium.click("//div[contains(text(), '(none)')]");
+        selenium.click("//label[text()='Adjuvant1']/../input");
+        click(Locator.tagWithText("button", "Done"));
+        selenium.click("//div[contains(text(), '(none)')]");
+        selenium.click("//label[text()='Adjuvant1']/../input");
+        click(Locator.tagWithText("button", "Done"));
+        selenium.select("//table[@id='AssayGrid']/tbody/tr[3]/td[2]/select", "label=ELISPOT");
+        selenium.select("//table[@id='AssayGrid']/tbody/tr[3]/td[3]/select", "label=Schmitz");
+        selenium.select("//table[@id='AssayGrid']/tbody/tr[4]/td[2]/select", "label=Neutralizing Antibodies Panel 1");
+        selenium.select("//table[@id='AssayGrid']/tbody/tr[4]/td[3]/select", "label=Montefiori");
+        selenium.select("//table[@id='AssayGrid']/tbody/tr[5]/td[2]/select", "label=ICS");
+        selenium.select("//table[@id='AssayGrid']/tbody/tr[5]/td[3]/select", "label=McElrath");
+        selenium.select("//table[@id='AssayGrid']/tbody/tr[6]/td[2]/select", "label=ELISA");
+        selenium.select("//table[@id='AssayGrid']/tbody/tr[6]/td[3]/select", "label=Lab 1");
+
+        // change study design information to test GWT UI components
         setText("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[2]/input", "Immunogen1");
-        //Make sure that Immunization schedule updated
-        assertTextPresent("Immunogen1|Adjuvant1");
+        assertTextPresent("Immunogen1|Adjuvant1"); //Make sure that Immunization schedule updated
         setText("//table[@id='ImmunogenGrid']/tbody/tr[4]/td[2]/input", "Immunogen3");
         selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[4]/td[3]/select", "label=Fowlpox");
         setText("//table[@id='ImmunogenGrid']/tbody/tr[4]/td[4]/input", "1.9e8 Ad vg");
         selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[4]/td[5]/select", "label=Intramuscular (IM)");
 
-        selenium.answerOnNextPrompt("New Gene");
-        selenium.select("//table[@id='AntigenGrid3']/tbody/tr[2]/td[2]/select", "label=<Add New>");
-        Assert.assertEquals("Enter new value.", selenium.getPrompt());
         selenium.select("//table[@id='AntigenGrid3']/tbody/tr[2]/td[3]/select", "label=Clade C");
         selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[3]/td[3]/input", "1");
         selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[4]/td[3]/input", "2");
@@ -347,5 +392,50 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
+    }
+
+    private void populateStudyDesignLookups()
+    {
+        goToProjectHome();
+
+        goToQuery("StudyDesignAssays");
+        for (String assay : new String[]{"ELISPOT", "Neutralizing Antibodies Panel 1", "ICS", "ELISA"})
+            insertLookupRecord(assay, assay + " Label");
+
+        goToQuery("StudyDesignLabs");
+        for (String lab : new String[]{"Schmitz", "Montefiori", "McElrath", "Lab 1"})
+            insertLookupRecord(lab, lab + " Label");
+
+        goToQuery("StudyDesignRoutes");
+        for (String route : new String[]{"Intramuscular (IM)"})
+            insertLookupRecord(route, route + " Label");
+
+        goToQuery("StudyDesignImmunogenTypes");
+        for (String immunogenType : new String[]{"Canarypox", "Fowlpox", "Subunit Protein"})
+            insertLookupRecord(immunogenType, immunogenType + " Label");
+
+        goToQuery("StudyDesignGenes");
+        for (String gene : new String[]{"Gag", "Env"})
+            insertLookupRecord(gene, gene + " Label");
+
+        goToQuery("StudyDesignSubTypes");
+        for (String subType : new String[]{"Clade B", "Clade C"})
+            insertLookupRecord(subType, subType + " Label");
+    }
+
+    private void insertLookupRecord(String name, String label)
+    {
+        clickButton("Insert New");
+        if (name != null) setFormElement(Locator.name("quf_Name"), name);
+        if (label != null) setFormElement(Locator.name("quf_Label"), label);
+        clickButton("Submit");
+    }
+
+    private void goToQuery(String queryName)
+    {
+        goToSchemaBrowser();
+        selectQuery("study", queryName);
+        waitForText("view data");
+        clickAndWait(Locator.linkContainingText("view data"));
     }
 }
