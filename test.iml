@@ -127,15 +127,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/slf4j-nop-1.6.6.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="library" name="aspectjrt" level="project" />
     <orderEntry type="module-library">
       <library>
@@ -153,17 +144,6 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$JDK_HOME$/lib/tools.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$JDK_HOME$/lib/tools.jar!/" />
-        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
@@ -189,7 +169,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/reflections-0.9.9-RC1-uberjar.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/reflections-0.9.9-RC1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

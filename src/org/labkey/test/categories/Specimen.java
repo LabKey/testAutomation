@@ -4,6 +4,6 @@ package org.labkey.test.categories;
  * User: tchadick
  * Date: 7/26/13
  */
-public interface Specimen extends LabKeySuite
+public abstract class Specimen extends Test
 {
 }

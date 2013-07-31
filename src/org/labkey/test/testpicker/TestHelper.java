@@ -16,9 +16,13 @@
 
 package org.labkey.test.testpicker;
 
+import org.labkey.test.SuiteBuilder;
 import org.labkey.test.TestConfig;
 import org.labkey.test.TestSet;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.categories.Continue;
+import org.labkey.test.categories.SuiteComparator;
+import org.labkey.test.categories.Test;
 
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -263,12 +267,18 @@ public class TestHelper
         _treeRoot = new CheckNode(_rootName);
         _testTree = new JTree(_treeRoot);
 
-        for (TestSet suite : TestSet.values())
+        SuiteBuilder suiteBuilder = SuiteBuilder.getInstance();
+
+        List<Class> suites = new ArrayList<>(suiteBuilder.getSuites());
+        Collections.sort(suites, new SuiteComparator());
+
+        for (Class suite : suites)
         {
-            if (suite.isSuite())
+            TestSet testSet = suiteBuilder.getTestSet(suite);
+            if (testSet.isSuite())
             {
-                CheckNode suiteNode = new CheckNode(suite);
-                List<String> testNames = suite.getTestNames();
+                CheckNode suiteNode = new CheckNode(testSet.getSuite().getSimpleName());
+                List<String> testNames = testSet.getTestNames();
                 Collections.sort(testNames);
                 for (String test : testNames)
                 {
@@ -374,7 +384,7 @@ public class TestHelper
         continueButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e)
             {
-                setResult(TestSet.CONTINUE, new ArrayList<String>());
+                setResult(SuiteBuilder.getInstance().getTestSet(Continue.class), new ArrayList<String>());
                 _window.dispose();
             }
         });
@@ -809,7 +819,7 @@ public class TestHelper
 
             if (selectedTests.size() != 0 )
             {
-                setResult(TestSet.TEST, selectedTests);
+                setResult(SuiteBuilder.getInstance().getTestSet(Test.class), selectedTests);
             }
             _window.dispose();
         }

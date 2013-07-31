@@ -26,6 +26,7 @@ import junit.runner.BaseTestRunner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.labkey.test.categories.Continue;
 import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.tests.BasicTest;
 import org.labkey.test.tests.DatabaseDiagnosticsTest;
@@ -73,7 +74,8 @@ import java.util.TreeMap;
 public class Runner extends TestSuite
 {
     private static final int DEFAULT_MAX_TEST_FAILURES = 10;
-    private static final TestSet DEFAULT_TEST_SET = TestSet.DRT;
+    private static final Class DEFAULT_SUITE = org.labkey.test.categories.DRT.class;
+    private static SuiteBuilder _suites = SuiteBuilder.getInstance();
     private static Map<Test, Long> _testStats = new LinkedHashMap<>();
     private static int _testCount;
     private static List<Class> _remainingTests;
@@ -611,20 +613,6 @@ public class Runner extends TestSuite
         return result.toString();
     }
 
-    public static List<Class> getAllTests()
-    {
-        List<Class> tests = new ArrayList<>();
-        for (TestSet testSet : TestSet.values())
-        {
-            for (Class testClass : testSet.getTestList())
-            {
-                if (!tests.contains(testClass))
-                    tests.add(testClass);
-            }
-        }
-        return tests;
-    }
-
     protected static TestSet getTestSet()
     {
         String suiteName = System.getProperty("suite");
@@ -632,16 +620,17 @@ public class Runner extends TestSuite
         {
             try
             {
-                return TestSet.valueOf(suiteName);
+                return _suites.getTestSet(suiteName);
             }
             catch (Exception e)
             {
                 System.out.println("Couldn't find suite '" + suiteName + "'.  Valid suites are:");
-                for (TestSet s : TestSet.values())
-                    System.out.println("   " + s.name());
+                for (Class suite : _suites.getSuites())
+                    System.out.println("   " + suite.getSimpleName());
             }
         }
-        return DEFAULT_TEST_SET;
+
+        return _suites.getTestSet(DEFAULT_SUITE);
     }
 
     protected static List<String> getTestNames()
@@ -680,7 +669,7 @@ public class Runner extends TestSuite
             TestSet set = getTestSet();
             List<String> testNames = getTestNames();
 
-            if (TestSet.TEST == set && testNames.isEmpty())
+            if (set.getSuite() == org.labkey.test.categories.Test.class && testNames.isEmpty())
             {
                 TestHelper.ResultPair pair = TestHelper.run();
                 if (pair != null)
@@ -726,7 +715,7 @@ public class Runner extends TestSuite
             throw new RuntimeException("Invalid parameters: 'memCheck = true' and 'disableAssertions = true'.  Unable to do leak check with assertions disabled.");
         }
 
-        if (TestSet.CONTINUE == set)
+        if (Continue.class == set.getSuite())
         {
             set.setTests(readClasses(getRemainingTestsFile()));
             if (shuffleTests)
@@ -734,9 +723,9 @@ public class Runner extends TestSuite
                 set.randomizeTests();
             }
         }
-        else if (TestSet.TEST == set && !testNames.isEmpty())
+        else if (org.labkey.test.categories.Test.class == set.getSuite() && testNames.isEmpty())
         {
-            set.setTests(getAllTests());
+            set.setTests(new ArrayList<Class>());
         }
         else if (testNames.isEmpty())
         {

@@ -173,8 +173,8 @@ src/org/labkey/test/Cleanable.java -text
 src/org/labkey/test/Locator.java -text
 src/org/labkey/test/ModulePropertyValue.java -text
 src/org/labkey/test/Runner.java -text
-src/org/labkey/test/RunnerNew.java -text
 src/org/labkey/test/SortDirection.java -text
+src/org/labkey/test/SuiteBuilder.java -text
 src/org/labkey/test/TestConfig.java -text
 src/org/labkey/test/TestSet.java -text
 src/org/labkey/test/TestTimeoutException.java -text
@@ -184,6 +184,7 @@ src/org/labkey/test/categories/Assays.java -text
 src/org/labkey/test/categories/BVT.java -text
 src/org/labkey/test/categories/CDSPopulation.java -text
 src/org/labkey/test/categories/Cluster.java -text
+src/org/labkey/test/categories/Continue.java -text
 src/org/labkey/test/categories/DRT.java -text
 src/org/labkey/test/categories/Daily.java -text
 src/org/labkey/test/categories/DailyA.java -text
@@ -195,7 +196,6 @@ src/org/labkey/test/categories/External.java -text
 src/org/labkey/test/categories/Flow.java -text
 src/org/labkey/test/categories/IDRI.java -text
 src/org/labkey/test/categories/InDevelopment.java -text
-src/org/labkey/test/categories/LabKeySuite.java -text
 src/org/labkey/test/categories/MS2.java -text
 src/org/labkey/test/categories/Mascot.java -text
 src/org/labkey/test/categories/MiniTest.java -text
@@ -207,6 +207,8 @@ src/org/labkey/test/categories/Reports.java -text
 src/org/labkey/test/categories/Sequest.java -text
 src/org/labkey/test/categories/Specimen.java -text
 src/org/labkey/test/categories/Study.java -text
+src/org/labkey/test/categories/SuiteComparator.java -text
+src/org/labkey/test/categories/Test.java -text
 src/org/labkey/test/categories/UnitTests.java -text
 src/org/labkey/test/categories/Weekly.java -text
 src/org/labkey/test/categories/Wiki.java -text
