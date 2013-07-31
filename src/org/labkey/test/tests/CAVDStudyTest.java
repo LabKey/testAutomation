@@ -167,6 +167,26 @@ public class CAVDStudyTest extends StudyBaseTest
         waitForText("Immunization Schedule", 3, defaultWaitForPage);
         assertTextPresent(_expectedImmunizationText);
         assertElementNotPresent(Locator.tagWithText("div", "30")); // From deleted rows
+
+        //
+        // Test 'inactive' study design option
+        //
+        // 1. inactivate the Canarypox type
+        clickTab("Vaccine Design");
+        waitForText("Adjuvants");
+        clickAndWait(Locator.linkContainingText("Edit"));
+        waitForText("Configure Lookup Values");
+        click(Locator.linkContainingText("Configure Lookup Values"));
+        clickAndWait(Locator.linkWithText("folder").index(0));  // configure the first type 'Immunogen Types'
+        clickAndWait(Locator.linkWithText("edit").index(0));    // edit the first value "Canarypox"
+        click(Locator.checkboxByName("quf_Inactive"));
+        clickAndWait(Locator.linkWithText("Submit"));
+        // 2. verify that the Canarypox option, although inactive is still present.
+        clickTab("Vaccine Design");
+        waitForText("Edit");
+        clickAndWait(Locator.linkContainingText("Edit"));
+        waitForElement(Locator.navButton("Finished"));
+        selectOptionByText(Locator.xpath("//select[@title='Immunogen 1 type']"), "Canarypox");
     }
 
     private void doVerifyAssaySchedule()
@@ -192,37 +212,43 @@ public class CAVDStudyTest extends StudyBaseTest
 
     private void populateStudyDesignLookups()
     {
-        goToProjectHome();
-
-        goToQuery("StudyDesignAssays");
+        // StudyDesignAssays
+        goToAssayConfigureLookupValues(true, 0);
         for (String assay : ASSAYS)
             insertLookupRecord(assay, assay + " Label");
 
-        goToQuery("StudyDesignLabs");
+        // StudyDesignLabs
+        goToAssayConfigureLookupValues(false, 1);
         for (String lab : LABS)
             insertLookupRecord(lab, lab + " Label");
 
-        goToQuery("StudyDesignRoutes");
+        // StudyDesignRoutes
+        goToVaccineConfigureLookupValues(true, 1);
         for (String route : ROUTES)
             insertLookupRecord(route, route + " Label");
 
-        goToQuery("StudyDesignImmunogenTypes");
+        // StudyDesignImmunogenTypes
+        goToVaccineConfigureLookupValues(false, 0);
         for (String immunogenType : IMMUNOGEN_TYPES)
             insertLookupRecord(immunogenType, immunogenType + " Label");
 
-        goToQuery("StudyDesignGenes");
+        // StudyDesignGenes
+        goToVaccineConfigureLookupValues(true, 2);
         for (String gene : GENES)
             insertLookupRecord(gene, gene + " Label");
 
-        goToQuery("StudyDesignSubTypes");
+        // StudyDesignSubTypes
+        goToVaccineConfigureLookupValues(false, 3);
         for (String subType : SUB_TYPES)
             insertLookupRecord(subType, subType + " Label");
 
-        goToQuery("StudyDesignUnits");
+        // StudyDesignUnits
+        goToAssayConfigureLookupValues(true, 2);
         for (String unit : UNITS)
             insertLookupRecord(unit, unit + " Label");
 
-        goToQuery("StudyDesignSampleTypes");
+        // StudyDesignSampleTypes
+        goToAssayConfigureLookupValues(false, 3);
         for (String sampleType : SAMPLE_TYPES)
         {
             clickButton("Insert New");
@@ -233,20 +259,52 @@ public class CAVDStudyTest extends StudyBaseTest
         }
     }
 
+    private void goToAssayConfigureLookupValues(boolean project, int index)
+    {
+        // project true - project
+        // project false - folder
+        // index 0 - Assays
+        // index 1 - Labs
+        // index 2 - Units
+        // index 3 - SampleTypes
+
+        String projectStr = project ? "project" : "folder";
+
+        clickFolder("CAVDStudyTest Folder");
+        clickTab("Assays");
+        waitForText("Edit");
+        clickAndWait(Locator.linkContainingText("Edit"));
+        waitForText("Configure Lookup Values");
+        click(Locator.linkContainingText("Configure Lookup Values"));
+        clickAndWait(Locator.linkWithText(projectStr).index(index));
+    }
+
+    private void goToVaccineConfigureLookupValues(boolean project, int index)
+    {
+        // project true - project
+        // project false - folder
+        // index 0 - Immunogen Types
+        // index 1 - Routes
+        // index 2 - Genes
+        // index 3 - SubTypes
+
+        String projectStr = project ? "project" : "folder";
+
+        clickFolder("CAVDStudyTest Folder");
+        clickTab("Vaccine Design");
+        waitForText("Edit");
+        clickAndWait(Locator.linkContainingText("Edit"));
+        waitForText("Configure Lookup Values");
+        click(Locator.linkContainingText("Configure Lookup Values"));
+        clickAndWait(Locator.linkWithText(projectStr).index(index));
+    }
+
     private void insertLookupRecord(String name, String label)
     {
         clickButton("Insert New");
         if (name != null) setFormElement(Locator.name("quf_Name"), name);
         if (label != null) setFormElement(Locator.name("quf_Label"), label);
         clickButton("Submit");
-    }
-
-    private void goToQuery(String queryName)
-    {
-        goToSchemaBrowser();
-        selectQuery("study", queryName);
-        waitForText("view data");
-        clickAndWait(Locator.linkContainingText("view data"));
     }
 
     private void doVerifyDatasets()
