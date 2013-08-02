@@ -336,6 +336,10 @@ public class ScatterPlotTest extends GenericChartsTest
         clickAndWait(Locator.linkContainingText(SCATTER_PLOT_NAME_DR + " Colored"));
         _ext4Helper.waitForMaskToDisappear();
 
+        // Issue 18186
+        // When not in edit mode, there shouldnt be a pop up message.
+        waitForText("The measure Form Language was not found. It may have been renamed or removed.");
+        clickButton("Edit");
         waitForText("The measure Form Language was not found. It may have been renamed or removed.");
         clickButton("OK", 0);
     }
