@@ -726,6 +726,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         click(Locator.ext4Button("OK"));
 
         waitForText("Table Name");
+        waitForText("New Data Sources");
         Assert.assertEquals("Incorrect number of remove buttons", 1, getRemoveBtns(manageDemographicsSources).size());
 
         _helper.goToLabHome();
@@ -1176,7 +1177,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //we only care that these items are present
         _ext4Helper.selectComboBoxItem("Choose Template:", "Default Template");
-        _ext4Helper.selectComboBoxItem("Choose Template:", "Cells Template");
         _ext4Helper.selectComboBoxItem("Choose Template:", "DNA Samples Template");
     }
 
