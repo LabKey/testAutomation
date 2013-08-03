@@ -64,6 +64,7 @@ import org.openqa.selenium.WebDriverBackedSelenium;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
@@ -97,6 +98,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -151,6 +153,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private ArrayList<JavaScriptError> _jsErrors;
     public WebDriverWait _shortWait; // TODO: Refactor to private with getter
     public WebDriverWait _longWait; // TODO: Refactor to private with getter
+    private JSErrorChecker _jsErrorChecker = null;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public ExtHelperWD _extHelper = new ExtHelperWD(this);
@@ -288,8 +291,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 prefs.put("download.prompt_for_download", "false");
                 prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
 
+                ChromeOptions options = new ChromeOptions();
+                if (enableScriptCheck())
+                {
+                    options.addExtensions(new File(WebTestHelper.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker.crx"));
+                }
+
                 DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                 capabilities.setCapability("chrome.prefs", prefs);
+//                capabilities.setCapability("chrome.switches", Arrays.asList("--load-extension=\"" + new File(WebTestHelper.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker").getCanonicalPath() + "\""));
+                capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+                _jsErrorChecker = new ChromeJSErrorChecker();
                 _driver = new ChromeDriver(capabilities);
                 break;
             }
@@ -344,6 +356,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 profile.setEnableNativeEvents(useNativeEvents());
 
                 _driver = new FirefoxDriver(profile);
+                _jsErrorChecker = new FirefoxJSErrorChecker();
                 break;
             }
             default:
@@ -367,21 +380,35 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return exec.executeScript(script, arguments);
     }
 
-    public void resetJsErrorChecker()
+    public void pauseJsErrorChecker()
     {
-        if (this.enableScriptCheck())
+        if (_jsErrorChecker != null && enableScriptCheck())
         {
-            _jsErrors = new ArrayList<>();
-            JavaScriptError.readErrors(_driver); // clear errors
-            jsCheckerPaused = false;
+            _jsErrorChecker.pause();
         }
     }
 
-    private boolean jsCheckerPaused = false;
-    private static int _jsErrorPauseCount = 0; // To keep track of nested pauses
-    public void pauseJsErrorChecker()
+    public void resumeJsErrorChecker()
     {
-        if (this.enableScriptCheck())
+        if (_jsErrorChecker != null && enableScriptCheck())
+        {
+            _jsErrorChecker.resume();
+        }
+    }
+
+    private interface JSErrorChecker
+    {
+        public void pause();
+        public void resume();
+    }
+
+    private class FirefoxJSErrorChecker implements JSErrorChecker
+    {
+        private boolean jsCheckerPaused = false;
+        private int _jsErrorPauseCount = 0; // To keep track of nested pauses
+
+        @Override
+        public void pause()
         {
             _jsErrorPauseCount++;
             if (!jsCheckerPaused)
@@ -390,11 +417,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 _jsErrors.addAll(JavaScriptError.readErrors(_driver));
             }
         }
-    }
 
-    public void resumeJsErrorChecker()
-    {
-        if (this.enableScriptCheck())
+        @Override
+        public void resume()
         {
             if (--_jsErrorPauseCount < 1 && jsCheckerPaused)
             {
@@ -403,6 +428,24 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
         }
     }
+
+    private class ChromeJSErrorChecker implements JSErrorChecker
+    {
+        @Override
+        public void pause()
+        {
+            executeScript(
+                "window.dispatchEvent(new Event('pauseJsErrorChecker'))");
+        }
+
+        @Override
+        public void resume()
+        {
+            executeScript(
+                "window.dispatchEvent(new Event('resumeJsErrorChecker'))");
+        }
+    }
+
 
     /**
      * Override if using file upload features in the test. Returning true will attempt to use
@@ -1830,7 +1873,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean enableScriptCheck()
     {
-        return !onTeamCity() && "true".equals(System.getProperty("scriptCheck")) && BROWSER_TYPE == BrowserType.FIREFOX; //TODO: hanging tests on TeamCity
+        return !onTeamCity() && "true".equals(System.getProperty("scriptCheck")); //TODO: hanging tests on TeamCity
     }
 
     public boolean enableDevMode()

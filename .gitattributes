@@ -13,6 +13,11 @@ bin/windows/i386/IEDriverServer.exe -text
 bin/windows/i386/VERSION -text
 /bootstrap_stress_test.cmd -text
 /build.xml -text
+chromeextensions/jsErrorChecker.crx -text
+chromeextensions/jsErrorChecker.pem -text
+chromeextensions/jsErrorChecker/background.js -text
+chromeextensions/jsErrorChecker/jserrors.js -text
+chromeextensions/jsErrorChecker/manifest.json -text
 data/api/EmbeddedQueryWebPart.html -text
 data/api/LuminexGuideSet.html -text
 data/api/assayTest.js -text

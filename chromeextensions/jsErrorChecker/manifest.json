@@ -1,0 +1,18 @@
+{
+    "manifest_version": 2,
+
+    "name": "JS Error Exploder",
+    "description": "This extension will record javascript errors.",
+    "version": "1.0",
+
+    "content_scripts": [{
+        "all_frames": true,
+        "matches": ["http://*/*", "https://*/*"],
+        "js": ["jserrors.js"],
+        "run_at": "document_start"
+    }],
+
+    "background":{
+        "scripts":["background.js"]
+    }
+}
