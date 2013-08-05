@@ -61,7 +61,7 @@ public class NWBioTrustTest extends SurveyTest
     private static final String provisionTableName = "Sample Request Responses";
     private static final List<Map<String, String>> designs = new ArrayList<>();
     private static final String registrationLabel = "requestor 1 study";
-    private static final String[] unsubmittedRequestTypes = {"Normal tissue from patients without cancer"};
+    private static final String[] unsubmittedRequestTypes = {"Normal tissue (any organ)"};
     private static final String[] submittedRequestTypes = {"Tumor from primary site", "Tumor from metastasis", "Normal tissue adjacent to primary site (same organ)"};
     private static final String[] allRequestTypes = ArrayUtils.addAll(submittedRequestTypes, unsubmittedRequestTypes);
     private static final File TEST_FILE_1 = new File( getLabKeyRoot() + "/sampledata/survey/TestAttachment.txt");
@@ -399,7 +399,7 @@ public class NWBioTrustTest extends SurveyTest
         log("Create sample requests - from surguries or clinic procedures");
         for (String requestType : allRequestTypes)
         {
-            clickButton("Request sample collection");
+            clickButton("Request Sample Collection");
             _ext4Helper.selectComboBoxItem(Locator.xpath("//tr").withPredicate(Locator.xpath("td/label").containing("Associated study")).append("/td[2]/table"), registrationLabel);
             _ext4Helper.checkCheckbox("Tissue collected at surgery");
             setFormElement(Locator.name("collectionstartdate"), "2013-03-20");
@@ -591,7 +591,7 @@ public class NWBioTrustTest extends SurveyTest
         popLocation();
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForText("No study registrations to show", 1, WAIT_FOR_PAGE);
-        clickButton("Create new study registration");
+        clickButton("Create New Study Registration");
         List<Map<String, String>> fields = new ArrayList<Map<String, String>>();
         fields.add(createFieldInfo("Study Information", "studydescription", "test study description: " + registrationLabel));
         fields.add(createComboFieldInfo("Study Information", "IRB approval status", "Approved Human Subjects Research"));
@@ -662,7 +662,7 @@ public class NWBioTrustTest extends SurveyTest
                 setFormElement(Locator.name(field.get("name")), field.get("value"));
             }
         }
-        click(Locator.xpath("//li[text()='Save / Cancel']"));
+        click(Locator.xpath("//li[text()='Save / Register / Cancel']"));
         clickButton("Save");
 
     }
