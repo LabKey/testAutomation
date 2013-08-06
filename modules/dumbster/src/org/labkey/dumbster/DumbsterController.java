@@ -65,7 +65,7 @@ public class DumbsterController extends SpringActionController
     {
         public ModelAndView getView(Object o, BindException errors) throws Exception
         {
-            if (getUser().isAdministrator())
+            if (getUser().isSiteAdmin())
                 return new MailWebPart();
             else
                 return new HtmlView("You must be a site administrator to view the email record");

@@ -184,7 +184,7 @@ function toggleRecorder(checkbox)
     <tr id="emailRecordEmpty" style="display: <%=text(messages.length > 0 ? "none" : "")%>;"><td colspan="3">No email recorded.</td></tr>
 </table>
 <%
-    if (context.getUser().isAdministrator())
+    if (context.getUser().isSiteAdmin())
     {
 %>
         <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this);" <%=text(recorder ? "checked" : "")%>> Record email messages sent
