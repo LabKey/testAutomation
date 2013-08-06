@@ -51,18 +51,6 @@ public class ClientAPITest extends BaseWebDriverTest
     protected final static String LIST_KEY_NAME = "Key";
     protected static final String TEST_ASSAY = "TestAssay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
-    protected static final String[] CHARTING_API_TITLES = {
-            "Line Plot - no y-scale defined",
-            "Line Plot - y-scale defined, no legend, no shape aes",
-            "Line Plot - No Layer AES, Changed Opacity",
-            "Two Axis Scatter, plot null points",
-            "Discrete X Scale Scatter No Geom Config",
-            "Discrete X Scale Scatter, Log Y",
-            "Boxplot no Geom Config",
-            "Boxplot No Outliers",
-            "Boxplot No Outliers, All Points"
-    };
-
     protected final static ListHelperWD.ListColumn[] LIST_COLUMNS = new ListHelperWD.ListColumn[]
     {
         new ListHelperWD.ListColumn("FirstName", "First Name", ListHelperWD.ListColumnType.String, "The first name"),

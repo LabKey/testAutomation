@@ -83,23 +83,6 @@ public abstract class GenericChartsTest extends ReportTest
 
     protected abstract void testPlots();
 
-    protected void assertSVG(final String expectedSvgText)
-    {
-        final boolean isFirefox = getBrowserType() == BrowserType.FIREFOX;
-        final String expectedText = isFirefox ? expectedSvgText.replaceAll("[\n ]", "") : expectedSvgText;
-        doesElementAppear(new BaseSeleniumWebTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return isElementPresent(Locator.css("svg")) &&
-                       expectedText.equals(isFirefox ? getText(Locator.css("svg")).replaceAll("[\n ]", "") : getText(Locator.css("svg")));
-            }
-        }, WAIT_FOR_JAVASCRIPT);
-        String svgText = getText(Locator.css("svg"));
-        Assert.assertEquals("SVG did not look as expected", expectedText, isFirefox ? svgText.replaceAll("[\n ]", "") : svgText);
-    }
-
     protected void clickDialogButtonAndWaitForMaskToDisappear(String dialogTitle, String btnTxt)
     {
         _extHelper.clickExtButton(dialogTitle, btnTxt, 0);

@@ -7050,4 +7050,21 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         sleep(5000);
     }
+
+    public void assertSVG(final String expectedSvgText)
+    {
+        final boolean isFirefox = getBrowserType() == BrowserType.FIREFOX;
+        final String expectedText = isFirefox ? expectedSvgText.replaceAll("[\n ]", "") : expectedSvgText;
+        doesElementAppear(new BaseSeleniumWebTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return isElementPresent(Locator.css("svg")) &&
+                        expectedText.equals(isFirefox ? getText(Locator.css("svg")).replaceAll("[\n ]", "") : getText(Locator.css("svg")));
+            }
+        }, WAIT_FOR_JAVASCRIPT);
+        String svgText = getText(Locator.css("svg"));
+        Assert.assertEquals("SVG did not look as expected", expectedText, isFirefox ? svgText.replaceAll("[\n ]", "") : svgText);
+    }
 }
