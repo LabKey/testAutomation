@@ -132,6 +132,6 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
         assertTextPresent(EXCEL_FILE_NAME);
         popLocation();
         click(Locator.linkContainingText(CEL_FILE_NAME));
-        assertTextPresent(EXCEL_FILE_NAME);
+        waitForElement(Locator.linkWithText(EXCEL_FILE_NAME));
     }
 }
