@@ -68,7 +68,7 @@ public class LuminexExcludedTitrationTest extends LuminexTest
 
     protected void excludeTitration(String Titration)
     {
-        clickButton("Exclude Titration","Analytes excluded for a replicate group will not be re-included by changes in assay level exclusions" );
+        clickButton("Exclude Titration","Analytes excluded for a replicate group or at the assay level will not be re-included by changes in titration exclusions" );
         waitForElement(Locator.xpath("//td/div").withText(Titration));
         mouseDown(Locator.xpath("//td/div").withText(Titration));
         waitForElement(AVAILABLE_ANALYTES_CHECKBOX);
@@ -84,7 +84,7 @@ public class LuminexExcludedTitrationTest extends LuminexTest
 
     protected void excludeAnalyteWithinTitration(String Titration, String Analyte)
     {
-        clickButton("Exclude Titration","Analytes excluded for a replicate group will not be re-included by changes in assay level exclusions" );
+        clickButton("Exclude Titration","Analytes excluded for a replicate group or at the assay level will not be re-included by changes in titration exclusions" );
         waitForElement(Locator.xpath("//td/div").withText(Titration));
         mouseDown(Locator.xpath("//td/div").withText(Titration));
         waitForElement(Locator.xpath("//td/div[@class='x-grid3-cell-inner x-grid3-col-1 x-unselectable']").containing(Analyte));
