@@ -37,6 +37,7 @@ import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.Assert;
@@ -299,7 +300,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
                 DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                 capabilities.setCapability("chrome.prefs", prefs);
-//                capabilities.setCapability("chrome.switches", Arrays.asList("--load-extension=\"" + new File(WebTestHelper.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker").getCanonicalPath() + "\""));
                 capabilities.setCapability(ChromeOptions.CAPABILITY, options);
                 _jsErrorChecker = new ChromeJSErrorChecker();
                 _driver = new ChromeDriver(capabilities);
@@ -400,6 +400,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         public void pause();
         public void resume();
+        public @NotNull List<String> ignored();
     }
 
     private class FirefoxJSErrorChecker implements JSErrorChecker
@@ -427,6 +428,23 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 JavaScriptError.readErrors(_driver); // clear errors
             }
         }
+
+        @Override @NotNull
+        public List<String> ignored()
+        {
+            return Arrays.asList(
+                    "__webdriver_evaluate",
+                    "setting a property that has only a getter",
+                    "records[0].get is not a function",
+                    "{file: \"chrome://",
+                    "ext-all-sandbox-debug.js",
+                    "ext-all-sandbox.js",
+                    "ext-all-sandbox-dev.js",
+                    "XULElement.selectedIndex", // Ignore known Firefox Issue
+                    "Failed to decode base64 string!", // Firefox issue
+                    "xulrunner-1.9.0.14/components/FeedProcessor.js", // Firefox problem
+                    "Image corrupt or truncated: <unknown>");
+        }
     }
 
     private class ChromeJSErrorChecker implements JSErrorChecker
@@ -443,6 +461,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             executeScript(
                 "window.dispatchEvent(new Event('resumeJsErrorChecker'))");
+        }
+
+        @Override @NotNull
+        public List<String> ignored()
+        {
+            return Collections.emptyList(); // Add ignored chromedriver errors to jserrors.js
         }
     }
 
@@ -580,16 +604,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     private boolean validateJsError(JavaScriptError error)
     {
-        return !error.getErrorMessage().contains("setting a property that has only a getter") &&
-                !error.getErrorMessage().contains("records[0].get is not a function") &&
-                !error.getErrorMessage().contains("{file: \"chrome://") &&
-                !error.getErrorMessage().contains("ext-all-sandbox-debug.js") && // Ignore error caused by project webpart
-                !error.getErrorMessage().contains("ext-all-sandbox.js") && // Ignore error that's junking up the weekly
-                !error.getErrorMessage().contains("ext-all-sandbox-dev.js") && // Ignore error that's junking up the weekly
-                !error.getErrorMessage().contains("XULElement.selectedIndex") && // Ignore known Firefox Issue
-                !error.getErrorMessage().contains("Failed to decode base64 string!") && // Firefox issue
-                !error.getErrorMessage().contains("xulrunner-1.9.0.14/components/FeedProcessor.js") && // Firefox problem
-                !error.getErrorMessage().contains("Image corrupt or truncated: <unknown>");  // Selenium problem with pages that lack a favicon (e.g., errors since reset)
+        for (String ignoredText : _jsErrorChecker.ignored())
+        {
+            if(error.getErrorMessage().contains(ignoredText))
+                return false;
+        }
+
+        return true;
     }
 
     public void log(String str)

@@ -5,7 +5,7 @@
  */
 window.addEventListener('error', function(text, url, line)
 {
-    var excludedErrors = [];
+    var excludedErrors = ["ext-all-sandbox"];
 
     // Event parsing logic from https://github.com/barbushin/javascript-error-notifier
 	if(text.filename) {
@@ -32,7 +32,7 @@ window.addEventListener('error', function(text, url, line)
     var error = text + "\n" + url + "\n" + line;
 	
     for (var i = excludedErrors.length - 1; i >= 0; i--) {
-		if (text.indexOf(excludedErrors[i]) != -1) {return;}
+		if (error.indexOf(excludedErrors[i]) != -1) {return;}
     }
 
     chrome.runtime.sendMessage({command: 'get'}, function(response){

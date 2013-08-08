@@ -27,6 +27,7 @@
     <property name="test.src.home" value="${test.dir}/src"/>
     <property name="project.root" value="${test.dir}/../.." />
     <property name="test.lib.home" value="${test.dir}/lib"/>
+    <property name="chrome.extensions.dir" value="${test.dir}/chromeextensions"/>
     <property name="external.lib.home" value="${project.root}/external/lib/server"/>
     <property name="test.log.dir" value="${test.dir}/logs"/>
     <property name="test.log.output.dir" value="${test.build.home}/logs" />
@@ -284,6 +285,29 @@
             </fileset>
         </copy>
         <touch file="${test.build.uptodate}" />
+    </target>
+
+    <path id="ant.contrib.classpath">
+        <pathelement path="${external.lib.home}/../build/ant-contrib/ant-contrib-1.0b3.jar" />
+        <fileset dir="${external.lib.home}/../build/ant-contrib/lib">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+    <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="ant.contrib.classpath" />
+
+    <target name="package-chrome-extensions">
+        <delete>
+            <fileset dir="${chrome.extensions.dir}" includes="*.crx"/>
+        </delete>
+        <foreach target="zip_extension" param="srcdir">
+            <path><dirset dir="${chrome.extensions.dir}" includes="**"/></path>
+        </foreach>
+    </target>
+
+    <target name="zip_extension">
+        <zip destfile="${srcdir}.crx">
+            <zipfileset dir="${srcdir}" includes="*"/>
+        </zip>
     </target>
 
     <target name="test_with_clover" if="test.with.clover">
@@ -1156,7 +1180,7 @@
       </waitfor>
     </target>
 
-    <target name="runsuite" depends="compile,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started">
+    <target name="runsuite" depends="compile,package-chrome-extensions,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started">
         <junit fork="true" forkmode="once" maxmemory="512m" showoutput="true"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="${sysprop.haltOnError}"
