@@ -387,7 +387,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertLinkPresentWithText("view history");
         clickAndWait(Locator.linkContainingText("view history"));
 
-        DataRegionTable table = new DataRegionTable("query", this, false, true);
+        DataRegionTable table = new DataRegionTable("audit", this, false, true);
         Assert.assertEquals("3 row(s) were inserted.", table.getDataAsText(0, "Comment"));
 
         // models should have an audit level of detailed
@@ -399,7 +399,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertLinkPresentWithText("view history");
         clickAndWait(Locator.linkContainingText("view history"));
 
-        table = new DataRegionTable("query", this, false, true);
+        table = new DataRegionTable("audit", this, false, true);
         Assert.assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
         Assert.assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 
@@ -425,7 +425,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         table.clickLink(0,1);
 
         assertElementPresent(Locator.xpath("//span[@class='labkey-nav-page-header' and text() = 'Details']"));
-        table = new DataRegionTable("query", this, false, true);
+        table = new DataRegionTable("audit", this, false, true);
         Assert.assertEquals("Row was updated.", table.getDataAsText(0, "Comment"));
         Assert.assertEquals("A row was inserted.", table.getDataAsText(1, "Comment"));
 
