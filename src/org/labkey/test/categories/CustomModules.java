@@ -19,6 +19,6 @@ package org.labkey.test.categories;
  * User: tchadick
  * Date: 7/26/13
  */
-public abstract class Module extends Test
+public abstract class CustomModules extends Test
 {
 }

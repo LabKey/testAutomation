@@ -30,7 +30,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.CustomModules;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -53,7 +53,7 @@ import java.util.Map;
  * User: cnathe
  * Date: 1/25/13
  */
-@Category({DailyB.class})
+@Category({CustomModules.class})
 public class NWBioTrustTest extends SurveyTest
 {
     private static final String requestorFolder1 = "Requestor 1";

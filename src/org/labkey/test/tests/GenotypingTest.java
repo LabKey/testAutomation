@@ -35,7 +35,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.CustomModules;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
@@ -59,7 +59,7 @@ import java.util.zip.GZIPInputStream;
  * Date: 10/22/11
  * Time: 7:14 PM
  */
-@Category({DailyB.class})
+@Category({CustomModules.class})
 public class GenotypingTest extends BaseSeleniumWebTest
 {
     public static final String first454importNum = "207";

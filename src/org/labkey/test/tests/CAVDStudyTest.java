@@ -20,7 +20,7 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.CustomModules;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.ListHelper;
 
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
-@Category({DailyB.class, Study.class})
+@Category({CustomModules.class, Study.class})
 public class CAVDStudyTest extends StudyBaseTest
 {
     private static final String PROJECT_NAME = "CAVDStudyTest Project";

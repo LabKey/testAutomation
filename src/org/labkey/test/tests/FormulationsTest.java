@@ -24,7 +24,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.CustomModules;
 import org.labkey.test.categories.IDRI;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -45,7 +45,7 @@ import java.util.List;
  * Date: Jan 21, 2011
  * Time: 11:36:22 AM
  */
-@Category({DailyB.class, Assays.class, IDRI.class})
+@Category({CustomModules.class, Assays.class, IDRI.class})
 public class FormulationsTest extends BaseWebDriverTest
 {
     private static final String COMPOUNDS_NAME = "Compounds";

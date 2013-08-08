@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.CustomModules;
 import org.labkey.test.categories.MS2;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -27,7 +27,7 @@ import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 
-@Category({DailyB.class, MS2.class})
+@Category({CustomModules.class, MS2.class})
 public class TargetedMSExperimentTest extends TargetedMSTest
 {
     String CLIENT_API_CORE1 = "{"+

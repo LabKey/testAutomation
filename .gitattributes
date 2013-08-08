@@ -189,6 +189,7 @@ src/org/labkey/test/categories/BVT.java -text
 src/org/labkey/test/categories/CDSPopulation.java -text
 src/org/labkey/test/categories/Cluster.java -text
 src/org/labkey/test/categories/Continue.java -text
+src/org/labkey/test/categories/CustomModules.java -text
 src/org/labkey/test/categories/DRT.java -text
 src/org/labkey/test/categories/Daily.java -text
 src/org/labkey/test/categories/DailyA.java -text
@@ -203,7 +204,6 @@ src/org/labkey/test/categories/InDevelopment.java -text
 src/org/labkey/test/categories/MS2.java -text
 src/org/labkey/test/categories/Mascot.java -text
 src/org/labkey/test/categories/MiniTest.java -text
-src/org/labkey/test/categories/Module.java -text
 src/org/labkey/test/categories/NoSuite.java -text
 src/org/labkey/test/categories/ONPRC.java -text
 src/org/labkey/test/categories/Perf.java -text
