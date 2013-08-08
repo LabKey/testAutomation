@@ -152,7 +152,7 @@ public class Crawler
             new ControllerActionId("user", "impersonate"),
             new ControllerActionId("wiki", "download"),
 
-            // Actions from unsupported modules
+            // Actions from external modules
             new ControllerActionId("targetedms", "downloadDocument"),
 
             // Script injection exclusions

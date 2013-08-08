@@ -276,7 +276,7 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
 
     public static String getSampledataPath()
     {
-        File path = new File(getLabKeyRoot(), "unsupportedModules/scharp/peptide/test/sampledata");
+        File path = new File(getLabKeyRoot(), "externalModules/scharp/peptide/test/sampledata");
         return path.toString();
     }
 }

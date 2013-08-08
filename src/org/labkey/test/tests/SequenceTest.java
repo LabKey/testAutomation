@@ -67,7 +67,7 @@ public class SequenceTest extends BaseWebDriverTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
     protected String _pipelineRoot = null;
-    protected final String _sequencePipelineLoc =  getLabKeyRoot() + "/unsupportedModules/labModules/SequenceAnalysis/resources/sampleData";
+    protected final String _sequencePipelineLoc =  getLabKeyRoot() + "/externalModules/labModules/SequenceAnalysis/resources/sampleData";
     protected final String _illuminaPipelineLoc =  getLabKeyRoot() + "/sampledata/genotyping";
     protected final String _readsetPipelineName = "Import sequence data";
 
