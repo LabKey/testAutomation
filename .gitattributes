@@ -278,11 +278,9 @@ src/org/labkey/test/tests/AuditLogTest.java -text
 src/org/labkey/test/tests/BasicTest.java -text
 src/org/labkey/test/tests/BoxPlotTest.java -text
 src/org/labkey/test/tests/ButtonCustomizationTest.java -text
-src/org/labkey/test/tests/CAVDStudyTest.java -text
 src/org/labkey/test/tests/ChartingAPITest.java -text
 src/org/labkey/test/tests/ClientAPITest.java -text
 src/org/labkey/test/tests/CohortTest.java -text
-src/org/labkey/test/tests/ComplianceTrainingTest.java -text
 src/org/labkey/test/tests/ContainerContextTest.java -text
 src/org/labkey/test/tests/CreateVialsTest.java -text
 src/org/labkey/test/tests/CustomizeViewTest.java -text
@@ -316,17 +314,13 @@ src/org/labkey/test/tests/FlowSpecimenTest.java -text
 src/org/labkey/test/tests/FlowTest.java -text
 src/org/labkey/test/tests/FolderExportTest.java -text
 src/org/labkey/test/tests/FolderTest.java -text
-src/org/labkey/test/tests/FormulationsTest.java -text
 src/org/labkey/test/tests/GenericChartsTest.java -text
 src/org/labkey/test/tests/GenotypeAssaysTest.java -text
-src/org/labkey/test/tests/GenotypingTest.java -text
 src/org/labkey/test/tests/GpatAssayTest.java -text
 src/org/labkey/test/tests/GroupTest.java -text
 src/org/labkey/test/tests/HTTPApiTest.java -text
-src/org/labkey/test/tests/HaplotypeAssayTest.java -text
 src/org/labkey/test/tests/HiddenEmailTest.java -text
 src/org/labkey/test/tests/HormoneAssayTest.java -text
-src/org/labkey/test/tests/ICEMRModuleTest.java -text
 src/org/labkey/test/tests/IssuesTest.java -text
 src/org/labkey/test/tests/JUnitTest.java -text
 src/org/labkey/test/tests/JavaClientApiTest.java -text
@@ -358,7 +352,6 @@ src/org/labkey/test/tests/MessagesTest.java -text
 src/org/labkey/test/tests/MicroarrayTest.java -text
 src/org/labkey/test/tests/MissingValueIndicatorsTest.java -text
 src/org/labkey/test/tests/ModuleAssayTest.java -text
-src/org/labkey/test/tests/NWBioTrustTest.java -text
 src/org/labkey/test/tests/NabAssayTest.java -text
 src/org/labkey/test/tests/NabHighThroughputAssayTest.java -text
 src/org/labkey/test/tests/NabMigrationTest.java -text
@@ -371,7 +364,6 @@ src/org/labkey/test/tests/PivotQueryTest.java -text
 src/org/labkey/test/tests/ProgrammaticQCTest.java -text
 src/org/labkey/test/tests/ProjectSettingsTest.java -text
 src/org/labkey/test/tests/QuerySnapshotTest.java -text
-src/org/labkey/test/tests/RISAssayTest.java -text
 src/org/labkey/test/tests/ReagentTest.java -text
 src/org/labkey/test/tests/ReportSecurityTest.java -text
 src/org/labkey/test/tests/ReportTest.java -text
@@ -419,8 +411,6 @@ src/org/labkey/test/tests/StudyWDTest.java -text
 src/org/labkey/test/tests/SurveyTest.java -text
 src/org/labkey/test/tests/SystemMaintenanceTest.java -text
 src/org/labkey/test/tests/TargetStudyTest.java -text
-src/org/labkey/test/tests/TargetedMSExperimentTest.java -text
-src/org/labkey/test/tests/TargetedMSLibraryTest.java -text
 src/org/labkey/test/tests/TargetedMSTest.java -text
 src/org/labkey/test/tests/TimeChartAPITest.java -text
 src/org/labkey/test/tests/TimeChartDateBasedTest.java -text
