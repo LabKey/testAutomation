@@ -30,7 +30,7 @@ import java.util.Collections;
  * User: kevink
  * Date: 10/14/11
  */
-@Category({DailyA.class, Flow.class})
+@Category({/*DailyA.class,*/ Flow.class})
 public class FlowNormalizationTest extends BaseFlowTest
 {
     @Override
