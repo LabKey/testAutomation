@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
@@ -162,7 +163,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
     }
 
     @LogMethod
-    private void doNAbTest(String assayName, String dataFileName, String metadataFileName)
+    private void doNAbTest(String assayName, String dataFileName, @Nullable String metadataFileName)
     {
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_NAB);
