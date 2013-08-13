@@ -220,11 +220,6 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("K.EEEESDEDMGFG.-");
         popLocation();
 
-        log("Test export selected expects at least one selected");
-        peptidesTable.uncheckAllOnPage();
-        clickMenuButtonAndContinue("Export Selected", "AMT");
-        assertAlert("Please select one or more peptides.");
-
         log("Test sort");
         pushLocation();
         setSort("MS2Peptides", "Hyper", SortDirection.DESC);
