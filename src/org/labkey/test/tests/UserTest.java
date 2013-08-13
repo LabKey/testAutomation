@@ -209,7 +209,7 @@ public class UserTest extends SecurityTest
         assertTextPresent("This field is required");
         clickButton("Cancel");
 
-        clickButton("Show All Users");
+        clickButton("Show Users");
     }
 
     private void simplePasswordResetTest()
