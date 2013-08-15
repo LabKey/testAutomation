@@ -138,7 +138,7 @@ public class ChartingAPITest extends ClientAPITest
         {
             waitForText(CHARTING_API_TITLES[currentTest], WAIT_FOR_JAVASCRIPT);
             checkSVGConversion();
-            click(Locator.buttonContainingText("Next"));
+            click(Locator.ext4Button("Next"));
         }
     }
 

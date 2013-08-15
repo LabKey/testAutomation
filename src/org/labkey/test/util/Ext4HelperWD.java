@@ -136,6 +136,14 @@ public class Ext4HelperWD extends AbstractHelperWD
         _test.click(l);
     }
 
+    public void clickWindowButton(String windowTitle, String buttonText, int wait, int index)
+    {
+        _test.log("Clicking Ext4 button with text: " + buttonText + " inside window with title: " + windowTitle);
+        Locator loc = Locator.xpath(ext4Window(windowTitle).toString() + Locator.ext4Button(buttonText).toString());
+        _test.waitForElement(loc, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.clickAndWait(loc, wait);
+    }
+
     @LogMethod(quiet = true)
     public void checkCheckbox(@LoggedParam String label)
     {
@@ -451,12 +459,12 @@ public class Ext4HelperWD extends AbstractHelperWD
 
         public static Locator.XPathLocator formItemWithLabel(String label)
         {
-            return Locator.xpath("(//table|//tbody)").withClass("x4-form-item").withPredicate("(tbody/tr|tr)/td/label[normalize-space()='" + label + "']").notHidden();
+            return Locator.xpath("(//table|//tbody)").withClass("x4-form-item").withPredicate("(tbody/tr|tr)/td/div/label[normalize-space()='" + label + "']").notHidden();
         }
 
         public static Locator.XPathLocator formItemWithLabelContaining(String label)
         {
-            return Locator.xpath("(//table|//tbody)").withClass("x4-form-item").withPredicate("(tbody/tr|tr)/td/label[contains(normalize-space(), '" + label + "')]").notHidden();
+            return Locator.xpath("(//table|//tbody)").withClass("x4-form-item").withPredicate("(tbody/tr|tr)/td/div/label[contains(normalize-space(), '" + label + "')]").notHidden();
         }
 
         public static Locator.XPathLocator mask()

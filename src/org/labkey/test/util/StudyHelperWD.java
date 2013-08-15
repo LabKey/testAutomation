@@ -106,7 +106,8 @@ public class StudyHelperWD extends AbstractHelperWD
             }
         }
 
-        _test._extHelper.clickExtButton("Define " + participantString + " Group", "Save", 0);
+        _test.click(Locator.ext4Button("Save"));
+//        _test._extHelper.clickExtButton("Define " + participantString + " Group", "Save", 0);
         _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 

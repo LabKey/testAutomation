@@ -460,8 +460,8 @@ var beginTest = function(){
         layout: 'hbox',
         border: false,
         frame: false,
-        width: '400',
-        height: '100',
+        width: 400,
+        height: 100,
         items: [
             testNumberField,
             totalNumberField,
@@ -481,8 +481,8 @@ var beginTest = function(){
         layout: 'fit',
         border: false,
         frame: false,
-        width: '400',
-        height: '100',
+        width: 400,
+        height: 100,
         items: [
             svgArea
         ]
