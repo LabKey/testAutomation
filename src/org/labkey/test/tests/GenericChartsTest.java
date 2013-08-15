@@ -85,7 +85,7 @@ public abstract class GenericChartsTest extends ReportTest
 
     protected void clickDialogButtonAndWaitForMaskToDisappear(String dialogTitle, String btnTxt)
     {
-        _extHelper.clickExtButton(dialogTitle, btnTxt, 0);
+        _ext4Helper.clickWindowButton(dialogTitle, btnTxt, 0, 0);
         _extHelper.waitForExtDialogToDisappear(dialogTitle);
         sleep(500);
         _ext4Helper.waitForMaskToDisappear();

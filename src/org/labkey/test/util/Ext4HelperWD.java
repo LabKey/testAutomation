@@ -139,7 +139,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     public void clickWindowButton(String windowTitle, String buttonText, int wait, int index)
     {
         _test.log("Clicking Ext4 button with text: " + buttonText + " inside window with title: " + windowTitle);
-        Locator loc = Locator.xpath(ext4Window(windowTitle).toString() + Locator.ext4Button(buttonText).toString());
+        Locator loc = ext4WindowButton(windowTitle, buttonText);
         _test.waitForElement(loc, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.clickAndWait(loc, wait);
     }
@@ -440,6 +440,14 @@ public class Ext4HelperWD extends AbstractHelperWD
     public static Locator.XPathLocator ext4Window(String title)
     {
         return Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x4-window-header')]//span[text() = '" + title + "']");
+    }
+
+    public static Locator.XPathLocator ext4WindowButton(String windowTitle, String buttonText)
+    {
+        // TOD0: Check not hidden
+        String windowPath = "//div[contains(@class, 'x4-window') and ./div/div/div/div/div/span[contains(@class, 'x4-window-header-text')" +
+                " and contains(string(), '" + windowTitle + "')]]";
+        return Locator.xpath(windowPath + Locator.ext4Button(buttonText).toXpath());
     }
 
     public static class Locators

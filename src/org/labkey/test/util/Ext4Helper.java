@@ -128,6 +128,14 @@ public class Ext4Helper extends AbstractHelper
         _test.waitAndClick(l);
     }
 
+    public void clickWindowButton(String windowTitle, String buttonText, int wait, int index)
+    {
+        _test.log("Clicking Ext4 button with text: " + buttonText + " inside window with title: " + windowTitle);
+        Locator loc = Ext4HelperWD.ext4WindowButton(windowTitle, buttonText);
+         _test.waitForElement(loc, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.clickAndWait(loc, wait);
+    }
+
     public void checkCheckbox(String label)
     {
         if (!isChecked(label))

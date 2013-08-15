@@ -108,7 +108,7 @@ public class StudyHelper extends AbstractHelper
             }
         }
 
-        _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
+        _test._ext4Helper.clickWindowButton("Define "+participantString+" Group", "Save", 0, 0);
         _test._ext4Helper.waitForMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 

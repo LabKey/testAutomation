@@ -332,7 +332,7 @@ public abstract class Locator
     public static XPathLocator ext4Button(String text)
     {
         // TODO: Add back coverage for NOT_HIDDEN
-        return xpath("//a//span[contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]/../../..");  // select the clickable 'a'
+        return xpath("//a[.//span["+ NOT_HIDDEN + " and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]]");  // select the clickable 'a'
     }
 
     public static XPathLocator ext4Button(String text, Integer index)

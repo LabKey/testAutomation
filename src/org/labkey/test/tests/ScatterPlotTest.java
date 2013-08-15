@@ -73,11 +73,11 @@ public class ScatterPlotTest extends GenericChartsTest
 
         // Todo: put better wait here
         sleep(5000);
-        _extHelper.clickExtButton("Select Chart Query", "Save", 0);
+        _ext4Helper.clickWindowButton("Select Chart Query", "Save", 0, 0);
         _extHelper.waitForExtDialog("Y Axis");
         waitForText("1. Weight", WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath(_extHelper.getExtDialogXPath("Y Axis") + "//div[text()='1. Weight']"));
-        _extHelper.clickExtButton("Y Axis", "Ok", 0);
+        _ext4Helper.clickWindowButton("Y Axis", "Ok", 0, 0);
         _extHelper.waitForExtDialog("X Axis");
         waitForText("4. Pulse", WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='4. Pulse']"));
@@ -120,15 +120,15 @@ public class ScatterPlotTest extends GenericChartsTest
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Save");
         //Verify name requirement
-        _extHelper.clickExtButton("Save", "Save", 0);
+        _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
         _extHelper.waitForExtDialog("Error");
-        _extHelper.clickExtButton("Error", "OK", 0);
+        _ext4Helper.clickWindowButton("Error", "OK", 0, 0);
         _extHelper.waitForExtDialogToDisappear("Error");
 
         //Test cancel button
         setFormElement("reportName", "TestReportName");
         setFormElement("reportDescription", "TestReportDescription");
-        _extHelper.clickExtButton("Save", "Cancel", 0);
+        _ext4Helper.clickWindowButton("Save", "Cancel", 0, 0);
         assertTextNotPresent("TestReportName");
 
         savePlot(SCATTER_PLOT_NAME_MV, SCATTER_PLOT_DESC_MV);
@@ -151,7 +151,7 @@ public class ScatterPlotTest extends GenericChartsTest
         _extHelper.waitForExtDialog("Y Axis");
         waitForText("1. Weight", WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath(_extHelper.getExtDialogXPath("Y Axis") + "//div[text()='1. Weight']"));
-        _extHelper.clickExtButton("Y Axis", "Ok", 0);
+        _ext4Helper.clickWindowButton("Y Axis", "Ok", 0, 0);
         _extHelper.waitForExtDialog("X Axis");
         waitForText("4. Pulse", WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='4. Pulse']"));
@@ -413,14 +413,14 @@ public class ScatterPlotTest extends GenericChartsTest
         // open developer panel and test JS function validation
         clickOptionButtonAndWaitForDialog("Developer", "Developer Options");
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", "");
-        _extHelper.clickExtButton("Developer Options", "OK", 0);
+        _ext4Helper.clickWindowButton("Developer Options", "OK", 0, 0);
         assertTextPresent("Error: the value provided does not begin with a function declaration.");
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", "function(){");
-        _extHelper.clickExtButton("Developer Options", "OK", 0);
+        _ext4Helper.clickWindowButton("Developer Options", "OK", 0, 0);
         assertTextPresent("Error parsing the function:");
         clickButton("Disable", 0);
         _extHelper.waitForExtDialog("Confirmation...");
-        _extHelper.clickExtButton("Confirmation...", "Yes", 0);
+        _ext4Helper.clickWindowButton("Confirmation...", "Yes", 0, 0);
         assertTextNotPresent("Error");
         // test use-case to navigate to query page on click
         clickButton("Enable", 0);
