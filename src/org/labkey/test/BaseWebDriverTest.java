@@ -2779,7 +2779,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickButton("Create New Group", 0);
         _extHelper.waitForExtDialog(groupName + " Information");
         assertTextPresent("Group " + groupName);
-        _extHelper.clickExtButton(groupName + " Information", "Done", 0);
+        click(Locator.ext4Button("Done"));
         waitForElement(Locator.css(".groupPicker .x4-grid-cell-inner").withText(groupName), WAIT_FOR_JAVASCRIPT);
     }
 
@@ -4810,6 +4810,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         // check for Ext button:
         locator = Locator.extButtonContainingText(text);
+        if (isElementPresent(locator))
+            return locator;
+
+        // check for Ext 4 button:
+        locator = Locator.ext4ButtonContainingText(text);
         if (isElementPresent(locator))
             return locator;
 

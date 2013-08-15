@@ -221,7 +221,7 @@ public class DataViewsTest extends StudyRedesignTest
     private void openCustomizePanel(String title)
     {
         clickWebpartMenuItem(title, false, "Customize");
-        waitForElement(Locator.button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.ext4Button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     private void enableEditMode()
@@ -352,7 +352,7 @@ public class DataViewsTest extends StudyRedesignTest
         waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[3]));
         assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1], "Subcategory1-" + CATEGORIES[2], "Subcategory2-" + CATEGORIES[2]);
 
-        _extHelper.clickExtButton("Manage Categories", "Done", 0);
+        click(Locator.ext4Button("Done"));
         _extHelper.waitForExtDialogToDisappear("Manage Categories");
         openEditPanel("DEM-1: Demographics");
         click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").withClass("x4-form-arrow-trigger"));

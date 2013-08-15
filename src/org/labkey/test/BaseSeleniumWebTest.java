@@ -2371,7 +2371,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             }
         }
 
-        waitAndClick(Locator.xpath("//button[./span[text()='Next']]"));
+        waitAndClick(Locator.ext4Button("Next"));
         _createdFolders.add(new FolderIdentifier(project, child));
         waitForPageToLoad();
 
@@ -2384,7 +2384,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             waitAndClick(Locator.xpath("//td[./label[text()='My User Only']]/input"));
         }
 
-        waitAndClick(Locator.xpath("//button[./span[text()='Finish']]")); //Leave permissions where they are
+        waitAndClick(Locator.ext4Button("Finish")); //Leave permissions where they are
         waitForPageToLoad();
 
         //unless we need addtional tabs, we end here.
@@ -5396,7 +5396,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             enterPermissionsUI();
             openGroupPermissionsDisplay(groupName);
             boolean ret = isElementPresent(Locator.xpath("//table[contains(@class,'userinfo')]//td[starts-with(text(), '" + email + "')]"));
-            click(Locator.xpath("//div[contains(@class, 'x4-window')]//button[./span[text()='Done']]"));
+//            click(Locator.xpath("//div[contains(@class, 'x4-window')]//button[./span[text()='Done']]"));
+            click(Locator.ext4Button("Done"));
             exitPermissionsUI();
             return ret;
         }

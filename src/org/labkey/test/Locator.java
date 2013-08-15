@@ -331,12 +331,13 @@ public abstract class Locator
 
     public static XPathLocator ext4Button(String text)
     {
-        return xpath("//button/span["+ NOT_HIDDEN +" and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]");
+        // TODO: Add back coverage for NOT_HIDDEN
+        return xpath("//a//span[contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]/../../..");  // select the clickable 'a'
     }
 
     public static XPathLocator ext4Button(String text, Integer index)
     {
-        return xpath("(//button/span["+ NOT_HIDDEN +" and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "])[" + (index + 1) + "]");
+        return xpath("(//a/span["+ NOT_HIDDEN +" and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "])[" + (index + 1) + "]");
     }
 
     public static XPathLocator ext4ButtonAsHref(String text)
@@ -362,6 +363,11 @@ public abstract class Locator
     public static XPathLocator extButtonContainingText(String text)
     {
         return xpath("//button[@class='x-btn-text' and contains(text(), " + xq(text) + ")]");
+    }
+
+    public static XPathLocator ext4ButtonContainingText(String text)
+    {
+        return xpath("//a//span[contains(@class, 'x4-btn-inner') and contains(text(), " + xq(text) + ")]/../../..");
     }
 
     public static XPathLocator ext4Checkbox(String label)

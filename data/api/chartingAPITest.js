@@ -501,7 +501,7 @@ var loadVis = function(){
 };
 
 var loadPatches = function(){
-    LABKEY.requiresScript(LABKEY.extJsRoot_41 + "/ext-patches.js", true);
+    LABKEY.requiresScript(LABKEY.extJsRoot_42 + "/ext-patches.js", true);
     LABKEY.Utils.onTrue({
         testCallback: function(){
             return Ext4.USE_NATIVE_JSON === true;
@@ -513,7 +513,7 @@ var loadPatches = function(){
     });
 };
 
-LABKEY.requiresScript(LABKEY.extJsRoot_41 + "/ext-all-sandbox-debug.js", true);
+LABKEY.requiresScript(LABKEY.extJsRoot_42 + "/ext-all-sandbox-debug.js", true);
 
 LABKEY.Utils.onTrue({
     testCallback:function() {
