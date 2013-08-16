@@ -4777,11 +4777,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (isElementPresent(locator))
             return locator;
 
-        // check for Ext 4 button as href
-        locator = Locator.ext4ButtonAsHref(text);
-        if (isElementPresent(locator))
-            return locator;
-
         // check for GWT button:
         locator = Locator.gwtButton(text);
         if (isElementPresent(locator))

@@ -329,25 +329,19 @@ public abstract class Locator
         return xpath("//button[" + NOT_HIDDEN + " and contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
     }
 
+    private static String ext4ButtonPath(String text)
+    {
+        return "//a[.//span["+ NOT_HIDDEN + " and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]]"; // select the clickable 'a'
+    }
+
     public static XPathLocator ext4Button(String text)
     {
-        // TODO: Add back coverage for NOT_HIDDEN
-        return xpath("//a[.//span["+ NOT_HIDDEN + " and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]]");  // select the clickable 'a'
+        return xpath(ext4ButtonPath(text));
     }
 
     public static XPathLocator ext4Button(String text, Integer index)
     {
-        return xpath("(//a/span["+ NOT_HIDDEN +" and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "])[" + (index + 1) + "]");
-    }
-
-    public static XPathLocator ext4ButtonAsHref(String text)
-    {
-        return xpath("//a/span["+ NOT_HIDDEN +" and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]");
-    }
-
-    public static XPathLocator ext4ButtonEnabled(String text)
-    {
-        return xpath("//div[contains(@class, 'x4-btn') and not(contains(@class, 'x4-item-disabled'))]//button/span["+ NOT_HIDDEN +" and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]");
+        return xpath("(" + ext4ButtonPath(text) + ")[" + (index + 1) + "]");
     }
 
     public static XPathLocator extButtonEnabled(String text)
