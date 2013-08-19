@@ -66,6 +66,7 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
@@ -355,7 +356,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
                 profile.setEnableNativeEvents(useNativeEvents());
 
-                _driver = new FirefoxDriver(profile);
+                String browserPath = System.getProperty("selenium.browser.path", "");
+                if (browserPath.length() > 0)
+                {
+                    FirefoxBinary binary = new FirefoxBinary(new File(browserPath));
+                    _driver = new FirefoxDriver(binary, profile);
+                }
+                else
+                {
+                    _driver = new FirefoxDriver(profile);
+                }
+
                 _jsErrorChecker = new FirefoxJSErrorChecker();
                 break;
             }
