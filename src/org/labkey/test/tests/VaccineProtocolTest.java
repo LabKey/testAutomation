@@ -77,9 +77,9 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[3]/td[5]/select", "label=Intramuscular (IM)");
         setText("//table[@id='AdjuvantGrid']/tbody/tr[2]/td[2]/input", "Adjuvant1");
         setText("//table[@id='AdjuvantGrid']/tbody/tr[3]/td[2]/input", "Adjuvant2");
-        setText("//table[@id='ImmunizationGrid']/tbody/tr[3]/td[2]/input", "Vaccine");
+        addGroup("Vaccine");
         setText("//table[@id='ImmunizationGrid']/tbody/tr[3]/td[3]/input", "30");
-        setText("//table[@id='ImmunizationGrid']/tbody/tr[4]/td[2]/input", "Placebo");
+        addGroup("Placebo");
         setText("//table[@id='ImmunizationGrid']/tbody/tr[4]/td[3]/input", "30");
         selenium.click("//table[@id='ImmunizationGrid']//div[contains(text(), 'Add Timepoint')]");
         selenium.type("timepointCount", "0");
@@ -121,7 +121,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         selenium.select("//table[@id='AntigenGrid3']/tbody/tr[2]/td[3]/select", "label=Clade C");
         selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[3]/td[3]/input", "1");
         selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[4]/td[3]/input", "2");
-        selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[5]/td[2]/input", "Vaccine2");
+        addGroup("Vaccine2");
         selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[5]/td[3]/input", "3");
         selenium.click("//div[contains(text(), '(none)')]");
         selenium.click("//label[text()='Immunogen3']/../input");
@@ -283,6 +283,15 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("Study Navigator"));
         //Make sure our guy picked up the his personal start date
         assertTextPresent("Day 10");
+    }
+
+    private void addGroup(String name)
+    {
+        click(Locator.xpath("//div[text() = 'Add New']"));
+        waitForElement(Locator.id("DefineGroupDialog"));
+        setFormElement("newName", name);
+        clickButton("OK", 0);
+        waitForElementToDisappear(Locator.id("DefineGroupDialog"), WAIT_FOR_JAVASCRIPT);
     }
 
     protected static final String TEST_ASSAY = "TestAssay1";
