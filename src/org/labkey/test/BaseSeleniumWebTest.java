@@ -5035,6 +5035,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     protected void addUserToGroupFromGroupScreen(String userName)
     {
+        waitForElement(Locator.name("names"));
         setFormElement("names", userName);
         uncheckCheckbox("sendEmail");
         clickButton("Update Group Membership");

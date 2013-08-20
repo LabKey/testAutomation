@@ -1170,6 +1170,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void goToSiteDevelopers()
     {
         clickAdminMenuItem("Site", "Site Developers");
+        waitForElement(Locator.name("names"));
     }
 
     public void goToSiteAdmins()
@@ -2827,6 +2828,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         openGroupPermissionsDisplay(groupName);
         waitAndClickAndWait(Locator.tagContainingText("a","manage group"));
+        waitForElement(Locator.name("names"));
     }
 
     public void clickManageSiteGroup(String groupName)
@@ -2839,6 +2841,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
         ref.eval("getSelectionModel().select(" + idx + ")");
         waitAndClickAndWait(Locator.tagContainingText("a","manage group"));
+        waitForElement(Locator.name("names"));
     }
 
     @LogMethod(quiet = true)

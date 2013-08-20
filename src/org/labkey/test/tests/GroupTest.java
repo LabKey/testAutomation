@@ -285,6 +285,7 @@ public class GroupTest extends BaseWebDriverTest
     {
         selectGroup(COMPOUND_GROUP, true);
         clickAndWait(Locator.linkWithText("manage group"));
+        waitForElement(Locator.name("names"));
         //Selenium can't handle file exports, so there's nothing to be done here.
         assertElementPresent(getButtonLocatorContainingText("Export All to Excel"));
 
