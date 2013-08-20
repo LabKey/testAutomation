@@ -121,9 +121,9 @@ public class StudyScheduleTest extends StudyBaseTest
 
         // test paging
         goToStudySchedule();
-        waitForElement(Locator.xpath("//div[contains(@class, 'button-next')][1]"), WAIT_FOR_JAVASCRIPT); //wait for next button to appear
+        waitForElement(Locator.css("a.button-next"), WAIT_FOR_JAVASCRIPT); //wait for next button to appear
         assertTextNotPresent("Cycle 2");
-        click(Locator.xpath("//div[contains(@class, 'button-next')][1]")); //click next button
+        click(Locator.css("a.button-next")); //click next button
         waitForText("Cycle 2");
         waitForText(dataset);
     }
