@@ -1905,7 +1905,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public boolean enableScriptCheck()
     {
-        return !onTeamCity() && "true".equals(System.getProperty("scriptCheck")); //TODO: hanging tests on TeamCity
+        return "true".equals(System.getProperty("scriptCheck"));
     }
 
     public boolean enableDevMode()
@@ -3096,7 +3096,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void hoverProjectBar()
     {
         waitForElement(Locator.id("projectBar"));
-        executeScript("HoverNavigation._project.show();"); // mouseOver doesn't work in Firefox
+        mouseOver(Locator.id("projectBar"));
         waitForElement(Locator.css("#projectBar_menu .project-nav"));
     }
 
@@ -3108,15 +3108,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void clickProject(String project, boolean assertDestination)
     {
         hoverProjectBar();
-        if (BROWSER_TYPE == BrowserType.CHROME)
-        {
-            WebElement el = Locator.linkWithText(project).findElement(getDriver());
-            prepForPageLoad();
-            fireEvent(el, SeleniumEvent.click);
-            newWaitForPageToLoad();
-        }
-        else
-            waitAndClickAndWait(Locator.linkWithText(project));
+        waitAndClickAndWait(Locator.linkWithText(project));
         if (assertDestination)
             waitForElement(Locator.id("folderBar").withText(project));
     }
@@ -3124,7 +3116,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void hoverFolderBar()
     {
         waitForElement(Locator.id("folderBar"));
-        executeScript("HoverNavigation._folder.show();"); // mouseOver doesn't work in Firefox
+        mouseOver(Locator.id("folderBar"));
         waitForElement(Locator.css("#folderBar_menu .folder-nav"));
     }
 
