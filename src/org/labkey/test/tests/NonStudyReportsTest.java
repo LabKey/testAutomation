@@ -93,7 +93,7 @@ public class NonStudyReportsTest extends ReportTest
         clickMenuButton("Create", "Attachment Report");
         setFormElement("viewName", ATTACHMENT_REPORT_NAME);
         setFormElement("description", ATTACHMENT_REPORT_DESCRIPTION);
-        setFormElement(Locator.id("uploadFile-fileInputEl"), ATTACHMENT_REPORT_FILE);
+        setFormElement(Locator.id("uploadFile-button-fileInputEl"), ATTACHMENT_REPORT_FILE);
 
         Ext4FileFieldRefWD ref = Ext4FileFieldRefWD.create(this);
         ref.setToFile(ATTACHMENT_REPORT_FILE);
