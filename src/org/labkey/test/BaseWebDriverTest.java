@@ -2775,6 +2775,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         log("Adding\n" + namesList.toString() + " to group " + groupName + "...");
         waitAndClickAndWait(Locator.tagContainingText("a","manage group"));
+        waitForElement(Locator.name("names"));
         setFormElement(Locator.name("names"), namesList.toString());
         uncheckCheckbox(Locator.name("sendEmail"));
         clickButton("Update Group Membership");
@@ -5838,6 +5839,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     protected void addUserToGroupFromGroupScreen(String userName)
     {
+        waitForElement(Locator.name("names"));
         setFormElement(Locator.name("names"), userName );
         uncheckCheckbox(Locator.name("sendEmail"));
         clickButton("Update Group Membership");
