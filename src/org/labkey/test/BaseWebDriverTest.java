@@ -3096,7 +3096,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void hoverProjectBar()
     {
         waitForElement(Locator.id("projectBar"));
-        mouseOver(Locator.id("projectBar"));
+        waitForHoverNavigationReady();
+        executeScript("HoverNavigation._project.show();"); // mouseOver timing is unreliable
         waitForElement(Locator.css("#projectBar_menu .project-nav"));
     }
 
@@ -3116,7 +3117,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void hoverFolderBar()
     {
         waitForElement(Locator.id("folderBar"));
-        mouseOver(Locator.id("folderBar"));
+        waitForHoverNavigationReady();
+        executeScript("HoverNavigation._folder.show();"); // mouseOver timing is unreliable
         waitForElement(Locator.css("#folderBar_menu .folder-nav"));
     }
 
@@ -3125,6 +3127,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         hoverFolderBar();
         expandFolderTree(folder);
         waitAndClickAndWait(Locator.linkWithText(folder));
+    }
+
+    public void waitForHoverNavigationReady()
+    {
+        waitFor(new Checker(){
+            @Override
+            public boolean check()
+            {
+                return (Boolean)executeScript("if (HoverNavigation) return true; else return false;");
+            }
+        }, "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
     }
 
     /**
