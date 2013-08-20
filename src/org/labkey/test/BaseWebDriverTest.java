@@ -448,9 +448,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     "setting a property that has only a getter",
                     "records[0].get is not a function",
                     "{file: \"chrome://",
-                    "ext-all-sandbox-debug.js",
-                    "ext-all-sandbox.js",
-                    "ext-all-sandbox-dev.js",
+//                    "ext-all-sandbox-debug.js",
+//                    "ext-all-sandbox.js",
+//                    "ext-all-sandbox-dev.js",
                     "XULElement.selectedIndex", // Ignore known Firefox Issue
                     "Failed to decode base64 string!", // Firefox issue
                     "xulrunner-1.9.0.14/components/FeedProcessor.js", // Firefox problem
@@ -2283,6 +2283,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if (this.enableScriptCheck())
         {
+            int duplicateCount = 0;
+            int ignoredCount = 0;
             try
             {
                 _jsErrors.addAll(JavaScriptError.readErrors(_driver));
@@ -2294,14 +2296,25 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             List<JavaScriptError> validErrors = new ArrayList<>();
             for (JavaScriptError error : _jsErrors)
             {
-                if (!validErrors.contains(error) && validateJsError(error))
+                if (!validErrors.contains(error)) // Don't log duplicate errors
                 {
-                    if (validErrors.size() == 0)
-                        log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>"); // first error
-                    validErrors.add(error);
-                    log(error.toString());
+                    if (validateJsError(error)) // Don't log ignored errors
+                    {
+                        if (validErrors.size() == 0)
+                            log("<<<<<<<<<<<<<<<JAVASCRIPT ERRORS>>>>>>>>>>>>>>>"); // first error
+                        validErrors.add(error);
+                        log(error.toString());
+                    }
+                    else
+                        ignoredCount++;
                 }
+                else
+                    duplicateCount++;
             }
+            if (ignoredCount > 0)
+                log("Ignored " + ignoredCount + " errors.");
+            if (duplicateCount > 0)
+                log(duplicateCount + " duplicate errors.");
             if (validErrors.size() > 0)
             {
                 String errorCtStr = "";
