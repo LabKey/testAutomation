@@ -62,6 +62,8 @@ public class WebTestHelper
     public static final int DEFAULT_BUTTON_FONT_SIZE = 11;
     public static long leakCRC = 0;
 
+    public enum DatabaseType {PostgreSQL, MicrosoftSQLServer}
+
     public static String getWebPort()
     {
         synchronized (DEFAULT_WEB_PORT)
@@ -120,6 +122,22 @@ public class WebTestHelper
             }
             return _labkeyRoot;
         }
+    }
+
+    public static DatabaseType getDatabaseType()
+    {
+        String databaseType = System.getProperty("databaseType");
+
+        if (null == databaseType)
+            throw new IllegalStateException("Can't determine database type: databaseType property is not set");
+
+        if ("postgres".equals(databaseType) || "pg".equals(databaseType))
+            return DatabaseType.PostgreSQL;
+
+        if ("sqlserver".equals(databaseType) || "mssql".equals(databaseType))
+            return DatabaseType.MicrosoftSQLServer;
+
+        throw new IllegalStateException("Unknown database type: " + databaseType);
     }
 
     public static String canonicalizePath(String path)

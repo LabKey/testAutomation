@@ -200,6 +200,22 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
     protected void doTestSteps() throws Exception
     {
+//        TODO: Test an external schema without applying metadata; verify that table and column names match JDBC meta
+//        data casing, which will differ between PostgreSQL and SQL Server. Use code like the below to distinguish.
+//
+//        // External schemas report JDBC names, so we expect different casing on PostgreSQL vs. Microsoft SQL Server
+//        switch (WebTestHelper.getDatabaseType())
+//        {
+//            case PostgreSQL:
+//                TABLE_NAME = "testtable";
+//                break;
+//            case MicrosoftSQLServer:
+//                TABLE_NAME = "TestTable";
+//                break;
+//            default:
+//                throw new IllegalStateException("Unknown database type");
+//        }
+//
         createProject();
         ensureExternalSchema(PROJECT_NAME);
         doTestContainer();
