@@ -377,17 +377,10 @@ public class Runner extends TestSuite
             {
                 // ok
             }
-            /* TODO: reinstate once upgradeHelper is removed from JUnitTest
-            // For now, fail suite if JUnit test fails to get its test list.
-            catch (InvocationTargetException e)
+            catch (InvocationTargetException | IllegalAccessException e)
             {
                 test = new ErrorTest(testClass.getName(), e.getCause());
             }
-            catch (IllegalAccessException e)
-            {
-                test = new ErrorTest(testClass.getName(), e.getCause());
-            }
-            */
 
             if (test == null)
             {
