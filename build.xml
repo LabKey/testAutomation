@@ -300,7 +300,7 @@
             <fileset dir="${chrome.extensions.dir}" includes="*.crx"/>
         </delete>
         <foreach target="zip_extension" param="srcdir">
-            <path><dirset dir="${chrome.extensions.dir}" includes="**"/></path>
+            <path><dirset dir="${chrome.extensions.dir}" includes="*"/></path>
         </foreach>
     </target>
 
