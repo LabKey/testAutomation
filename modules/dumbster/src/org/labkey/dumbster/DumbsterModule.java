@@ -16,6 +16,7 @@
 
 package org.labkey.dumbster;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.settings.AppProps;
@@ -46,6 +47,7 @@ public class DumbsterModule extends DefaultModule
         DumbsterManager.setInstance(new DumbsterManager());
     }
 
+    @NotNull
     protected Collection<WebPartFactory> createWebPartFactories()
     {
         return new ArrayList<WebPartFactory>(Arrays.asList(new BaseWebPartFactory("Mail Record") {
