@@ -187,7 +187,7 @@ function toggleRecorder(checkbox)
     if (context.getUser().isSiteAdmin())
     {
 %>
-        <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this);" <%=text(recorder ? "checked" : "")%>> Record email messages sent
+        <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this);"<%=checked(recorder)%>> Record email messages sent
 <%
     }
 %>
