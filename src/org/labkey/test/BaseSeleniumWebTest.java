@@ -3989,7 +3989,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             return locator;
 
         // check for Ext 4 button:
-        locator = Locator.ext4Button(text, index);
+        locator = Locator.ext4Button(text).index(index);
         if (isElementPresent(locator))
             return locator;
 

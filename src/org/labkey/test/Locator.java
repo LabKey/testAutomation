@@ -306,12 +306,12 @@ public abstract class Locator
 
     public static XPathLocator button(String text)
     {
-        return xpath("//button[" + NOT_HIDDEN + "][not(contains(@class, 'tab'))][descendant-or-self::*[text() = '" + text + "']]");
+        return tag("button").notHidden().withPredicate("not(contains(@class, 'tab'))").withText(text);
     }
 
     public static XPathLocator buttonContainingText(String text)
     {
-        return xpath("//button[" + NOT_HIDDEN + " and descendant-or-self::*[contains(text(), '" + text + "')]]");
+        return tag("button").notHidden().withPredicate("not(contains(@class, 'tab'))").containing(text);
     }
 
     public static XPathLocator navButton(String text)
@@ -329,19 +329,9 @@ public abstract class Locator
         return xpath("//button[" + NOT_HIDDEN + " and contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
     }
 
-    private static String ext4ButtonPath(String text)
-    {
-        return "//a[.//span["+ NOT_HIDDEN + " and contains(@class, 'x4-btn-inner') and text() = " + xq(text) + "]]"; // select the clickable 'a'
-    }
-
     public static XPathLocator ext4Button(String text)
     {
-        return xpath(ext4ButtonPath(text));
-    }
-
-    public static XPathLocator ext4Button(String text, Integer index)
-    {
-        return xpath("(" + ext4ButtonPath(text) + ")[" + (index + 1) + "]");
+        return xpath("//a").notHidden().withClass("x4-btn").withText(text);
     }
 
     public static XPathLocator extButtonEnabled(String text)
@@ -568,13 +558,13 @@ public abstract class Locator
     public static XPathLocator permissionButton(String groupName, String role)
     {
         // Supports permission types from a variety of modules.
-        return xpath("//div[contains(@class, 'rolepanel')][.//h3[text()=" + xq(role) + "]]//span[contains(@class, 'x4-btn-inner') and text()=" + xq(groupName) + "]");
+        return tag("div").withClass("rolepanel").withDescendant(Locator.tag("h3").withText(role)).append(Locator.tag("a").withClass("x4-btn").withText(groupName));
     }
 
     public static XPathLocator closePermissionButton(String groupName, String role)
     {
         // Supports permission types from a variety of modules.
-        return xpath("//div[contains(@class, 'rolepanel')][.//h3[text()=" + xq(role) + "]]//span[contains(@class, 'x4-btn-inner') and text()=" + xq(groupName) + "]/../span[contains(@class, 'x4-btn-icon')]");
+        return permissionButton(groupName, role).append(Locator.tag("span").withClass("closeicon"));
     }
 
     public static XPathLocator fileTreeByName(String name)

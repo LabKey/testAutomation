@@ -4787,7 +4787,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             return locator;
 
         // check for Ext 4 button:
-        locator = Locator.ext4Button(text, index);
+        locator = Locator.ext4Button(text).index(index);
         if (isElementPresent(locator))
             return locator;
 
@@ -5848,6 +5848,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (isElementPresent(close))
         {
             click(close);
+            waitForElementToDisappear(close);
             savePermissions();
             assertNoPermission(groupName, permissionString);
         }
