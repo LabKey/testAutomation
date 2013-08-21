@@ -86,7 +86,7 @@ public class StudyScheduleTest extends StudyBaseTest
         //studyScheduleWebPartTest();
     }
 
-    @LogMethod
+    @LogMethod (category = LogMethod.MethodType.VERIFICATION)
     public void basicTest()
     {
         log("Study Schedule Test");
@@ -135,7 +135,7 @@ public class StudyScheduleTest extends StudyBaseTest
         addWebPart("Study Schedule");
     }
 
-    @LogMethod
+    @LogMethod (category = LogMethod.MethodType.VERIFICATION)
     public void linkDatasetTest()
     {
         goToStudySchedule();
@@ -194,7 +194,7 @@ public class StudyScheduleTest extends StudyBaseTest
         assertTextPresent("Dataset:", GHOST_DATASET_3);
     }
 
-    @LogMethod
+    @LogMethod (category = LogMethod.MethodType.VERIFICATION)
     public void linkFromDatasetDetailsTest()
     {
         goToStudySchedule();
@@ -207,9 +207,9 @@ public class StudyScheduleTest extends StudyBaseTest
         goToManageStudy();
         clickAndWait(Locator.linkWithText("Manage Datasets"));
 
-        linkDatasetFromDetails(GHOST_DATASET_4, DatasetType.linkeToExisting, GHOST_DATASET_1);
-        assertElementPresent(Locator.xpath("//a[text()='" + GHOST_DATASET_4 + "']"));
-        assertElementNotPresent(Locator.xpath("//a[text()='" + GHOST_DATASET_1 + "']"));
+        linkDatasetFromDetails(GHOST_DATASET_4, DatasetType.linkeToExisting, "CPS-1: Screening Chemistry Panel");
+        assertElementPresent(Locator.linkWithText(GHOST_DATASET_4));
+        assertElementNotPresent(Locator.linkWithText("CPS-1: Screening Chemistry Panel"));
         linkDatasetFromDetails(GHOST_DATASET_5, DatasetType.defineManually, null);
         linkDatasetFromDetails(GHOST_DATASET_6, DatasetType.importFromFile, null);
     }
@@ -367,7 +367,7 @@ public class StudyScheduleTest extends StudyBaseTest
         }
     }
 
-    @LogMethod
+    @LogMethod (category = LogMethod.MethodType.VERIFICATION)
     public void datasetStatusTest()
     {
         log("Testing status settings for datasets");
