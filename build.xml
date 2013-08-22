@@ -226,14 +226,14 @@
         </loadfile>
         <echo>${moduleDirectories}</echo>
 
-        <!-- This selector detects all GWT modules plus the core module -->
+        <!-- This selector detects all modules with tests -->
         <selector id="test.module.selector">
              <present targetdir="${project.root}">
                   <mapper type="glob" from="*" to="*/src"/>
              </present>
         </selector>
 
-        <!-- Create a path that includes all individual module directories, starting with core and any GWT modules -->
+        <!-- Create a path that includes all individual module test directories -->
         <path id="module.test.src.dirs">
             <dirset dir="${project.root}" includes="${moduleDirectories}">
                 <selector refid="test.module.selector"/>
@@ -245,21 +245,25 @@
         </pathconvert>
         <echo>${srcdir.list}</echo>
 
-        <uptodate targetfile="${test.build.uptodate}" property="testClassesUpToDate">
-            <srcfiles dir="${test.src.home}" />
-            <srcfiles dir=".." includes="${srcdir.list}"/>
-        </uptodate>
-
-
         <path id="full.test.build.classpath">
             <path refid="test.build.classpath"/>
             <path refid="module.test.src.dirs"/>
         </path>
 
+        <!--TODO: figure out how to set testClassesUpToDate properly based on module tests as well as core tests-->
+        <!--<pathtofileset dir="${project.root}"-->
+                       <!--pathrefid="module.test.src.dirs"-->
+                       <!--name="module.test.src.fileset"-->
+                       <!--id="module.test.src.fileset"/>-->
+
+        <!--<uptodate targetfile="${test.build.uptodate}" property="testClassesUpToDate">-->
+            <!--<srcfiles dir="${test.src.home}" />-->
+        <!--</uptodate>-->
+
         <antcall target="compileIfDirty" inheritrefs="true"/>
     </target>
 
-    <target name="compileIfDirty" unless="testClassesUpToDate">
+    <target name="compileIfDirty">
         <taskdef
             resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties">
           <classpath>
