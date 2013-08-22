@@ -514,11 +514,8 @@ public class ListTest extends BaseWebDriverTest
         log("Test single list web part");
         addWebPart("List - Single");
         setFormElement(Locator.name("title"), "This is my single list web part title");
-        //TODO:  This didn't work with the convetional _ext4Helper.selectComboBoxItem(), so we are using two clicks instead.
-        click(Locator.xpath("//input[@name='listName']"));
-        click(Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains( text(), '>')]"));
-        //This will only work so long as it's the only button on the page.
-        click(Locator.xpath("//button"));
+        _ext4Helper.selectComboBoxItem("List:", LIST_NAME_COLORS);
+        clickButton("Submit");
         waitForText("Import Data");
         assertTextPresent("View Design");
         clickAndWait(Locator.linkWithSpan("This is my single list web part title"), WAIT_FOR_PAGE);
