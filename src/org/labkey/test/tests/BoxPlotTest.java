@@ -61,7 +61,7 @@ public class BoxPlotTest extends GenericChartsTest
 
         // Todo: put better wait here
         sleep(5000);
-        _extHelper.clickExtButton("Select Chart Query", "Save", 0);
+        _ext4Helper.clickWindowButton("Select Chart Query", "Save", 0, 0);
         _extHelper.waitForExtDialog("Y Axis");
         waitForText("4c.Induration 1st measure", WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//div[text()='4c.Induration 1st measure']"));
@@ -102,9 +102,9 @@ public class BoxPlotTest extends GenericChartsTest
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Save");
         //Verify name requirement
-        _extHelper.clickExtButton("Save", "Save", 0);
+        _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
         _extHelper.waitForExtDialog("Error");
-        _extHelper.clickExtButton("Error", "OK", 0);
+        _ext4Helper.clickWindowButton("Error", "OK", 0, 0);
         _extHelper.waitForExtDialogToDisappear("Error");
 
         //Test cancel button
