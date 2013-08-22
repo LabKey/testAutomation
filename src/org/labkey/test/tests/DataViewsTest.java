@@ -162,7 +162,7 @@ public class DataViewsTest extends StudyRedesignTest
         assertTextPresentInThisOrder(CATEGORIES[2], CATEGORIES[3], "Uncategorized", REPORT_NAME, "APX-1");
 
         log("Verify modify dataset");
-        openCustomizePanel(RENAMED_WEBPART_TITLE);
+        enableEditMode();
         openEditPanel(EDITED_DATASET);
         setFormElement(Locator.name("description"), NEW_DESCRIPTION);
         saveDatasetProperties(EDITED_DATASET);
@@ -177,12 +177,13 @@ public class DataViewsTest extends StudyRedesignTest
         waitForElement(Locator.linkContainingText(REPORT_TO_DELETE));
         enableEditMode();
         openEditPanel(REPORT_TO_DELETE);
-        clickButtonContainingText("Delete Report", 0);
+        waitForElement(Locator.ext4Button("Delete Report"));
+        clickButton("Delete Report", 0);
         waitForText("Delete Report?");
-        clickButtonContainingText("Yes", 0);
+        clickButton("Yes", 0);
         waitForElementToDisappear(Locator.linkContainingText(REPORT_TO_DELETE));
     }
-    private final static String EDITED_DATASET_TOOLTIP = "Source:Subcategory1-EFGHIJKL></% 1Type:DatasetDescription:Description set in data views webpart";
+    private final static String EDITED_DATASET_TOOLTIP = "Source:Subcategory1-EFGHIJKL></% 1Type:DatasetStatus:NoneDescription:Description set in data views webpart";
 
     @LogMethod
     public void datasetStatusTest()
@@ -204,7 +205,7 @@ public class DataViewsTest extends StudyRedesignTest
 
             _ext4Helper.selectComboBoxItem("Status", entry[1]);
 
-            _extHelper.clickExtButton(entry[0], "Save", 0);
+            clickButton("Save", 0);
 
             Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(), '" + entry[0] + "')]/../../../../..//div//img[@alt='" + entry[1] + "']");
             waitForElement(statusLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
@@ -222,6 +223,12 @@ public class DataViewsTest extends StudyRedesignTest
     {
         clickWebpartMenuItem(title, false, "Customize");
         waitForElement(Locator.ext4Button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    private void closeCustomizePanel(String title)
+    {
+        clickWebpartMenuItem(title, false, "Customize");
+        waitForElementToDisappear(Locator.ext4Button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     private void enableEditMode()
@@ -296,11 +303,11 @@ public class DataViewsTest extends StudyRedesignTest
         waitForElementToDisappear(manageButton, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         waitForText("Data Cut Date");
         waitForText("Modified");
-        openCustomizePanel(RENAMED_WEBPART_TITLE);
+        enableEditMode();
         openEditPanel(EDITED_DATASET);
         _extHelper.waitForExtDialog(EDITED_DATASET);
         setFormElement("refreshDate", refreshDate);
-        _extHelper.clickExtButton(EDITED_DATASET, "Save", 0);
+        clickButton("Save", 0);
         waitForText(refreshDate, 1, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         // check hover box
         mouseOver(Locator.linkWithText(EDITED_DATASET));
@@ -354,9 +361,12 @@ public class DataViewsTest extends StudyRedesignTest
 
         click(Locator.ext4Button("Done"));
         _extHelper.waitForExtDialogToDisappear("Manage Categories");
+        closeCustomizePanel(ORIGINAL_WEBPART_TITLE);
+        enableEditMode();
         openEditPanel("DEM-1: Demographics");
         click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").withClass("x4-form-arrow-trigger"));
         Assert.assertEquals("Available categories are not as expected", CATEGORY_LIST, getText(Locator.css(".x4-boundlist")));
+        click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").withClass("x4-form-arrow-trigger"));
         saveDatasetProperties("DEM-1: Demographics");
 
         openEditPanel(datasets[0][0]);
@@ -443,10 +453,10 @@ public class DataViewsTest extends StudyRedesignTest
 
     public void saveDatasetProperties(String dataset)
     {
-        _extHelper.clickExtButton(dataset, "Save", 0);
+        clickButton("Save", 0);
         _extHelper.waitForExtDialogToDisappear(dataset);
         _ext4Helper.waitForMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.css("table[name='data-browser-table'] .x4-grid-row"));
+        waitForElement(Locator.css(".x4-grid-row"));
     }
 
     public static class Locators
