@@ -1778,10 +1778,8 @@ public class LuminexTest extends AbstractQCAssayTest
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
-        String qcUrlInRuns = getQCLink();
         clickAndWait(Locator.linkWithText("view results"));
-        String qcUrlInResults = getQCLink();
-        clickAndWait(Locator.linkContainingText("view qc report"));
+        _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'view qc report']"), "view titration qc report");
 
     }
 
@@ -1825,13 +1823,6 @@ public class LuminexTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText("graph", 0));
         waitForText(" - " + isotype + " " + conjugate);
         assertTextPresent("Levey-Jennings Report: Standard1");
-    }
-
-    private String getQCLink()
-    {
-        Locator l = Locator.tagContainingText("a", "view qc report");
-        assertElementPresent(l);
-        return getAttribute(l,  "href");
     }
 
     protected void excludeWellFromRun(String run, String well)
