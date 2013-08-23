@@ -211,11 +211,11 @@ public class ScatterPlotTest extends GenericChartsTest
         _ext4Helper.waitForMaskToDisappear();
 
         // verify that we originally are in view mode and can switch to edit mode
-        assertElementNotPresent(Locator.button("Grouping"));
-        assertElementNotPresent(Locator.button("Save"));
+        assertElementNotPresent(Locator.ext4Button("Grouping"));
+        assertElementNotPresent(Locator.ext4Button("Save"));
         waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
         _ext4Helper.waitForMaskToDisappear();
-        assertElementNotPresent(Locator.button("Edit"));
+        assertElementNotPresent(Locator.ext4Button("Edit"));
 
         // Verify default styling for point at origin - blue circles
         waitForElement(Locator.css("svg > a > circle"));
@@ -383,20 +383,20 @@ public class ScatterPlotTest extends GenericChartsTest
         _ext4Helper.waitForMaskToDisappear();
 
         // verify that we originally are in view mode and can switch to edit mode
-        assertElementNotPresent(Locator.button("Grouping"));
-        assertElementNotPresent(Locator.button("Save"));
+        assertElementNotPresent(Locator.ext4Button("Grouping"));
+        assertElementNotPresent(Locator.ext4Button("Save"));
         waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
         _ext4Helper.waitForMaskToDisappear();
-        assertElementNotPresent(Locator.button("Edit"));
+        assertElementNotPresent(Locator.ext4Button("Edit"));
 
         log("Check Scatter Plot Point Click Function (Developer Only)");
         // open the developer panel and verify that it is disabled by default
-        assertElementPresent(Locator.button("Developer"));
+        assertElementPresent(Locator.ext4Button("Developer"));
         clickOptionButtonAndWaitForDialog("Developer", "Developer Options");
-        assertElementPresent(Locator.button("Enable"));
-        assertElementNotPresent(Locator.button("Disable"));
+        assertElementPresent(Locator.ext4Button("Enable"));
+        assertElementNotPresent(Locator.ext4Button("Disable"));
         // enable the feature and verify that you can switch tabs
-        clickButton("Enable", 0);
+        click(Locator.ext4Button("Enable"));
         _ext4Helper.clickTabContainingText("Help");
         assertTextPresentInThisOrder("Your code should define a single function", "data:", "measureInfo:", "clickEvent:");
         assertTextPresentInThisOrder("YAxisMeasure:", "XAxisMeasure:", "ColorMeasure:", "PointMeasure:");
@@ -409,7 +409,7 @@ public class ScatterPlotTest extends GenericChartsTest
         waitForElement(svgCircleLoc);
         fireEvent(svgCircleLoc, SeleniumEvent.click);
         _extHelper.waitForExtDialog("Data Point Information");
-        clickButton("OK", 0);
+        click(Locator.ext4Button("OK"));
         // open developer panel and test JS function validation
         clickOptionButtonAndWaitForDialog("Developer", "Developer Options");
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", "");
@@ -418,12 +418,12 @@ public class ScatterPlotTest extends GenericChartsTest
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", "function(){");
         _ext4Helper.clickWindowButton("Developer Options", "OK", 0, 0);
         assertTextPresent("Error parsing the function:");
-        clickButton("Disable", 0);
+        click(Locator.ext4Button("Disable"));
         _extHelper.waitForExtDialog("Confirmation...");
         _ext4Helper.clickWindowButton("Confirmation...", "Yes", 0, 0);
         assertTextNotPresent("Error");
         // test use-case to navigate to query page on click
-        clickButton("Enable", 0);
+        click(Locator.ext4Button("Enable"));
         String function = getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", function);
         clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
@@ -442,10 +442,10 @@ public class ScatterPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(SCATTER_PLOT_NAME_MV + " PointClickFn"));
-        waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
+        clickAndWait(Locator.ext4Button("Edit"), WAIT_FOR_PAGE);
         waitForText(CHART_TITLE);
         pushLocation();
-        assertElementNotPresent(Locator.button("Developer"));
+        assertElementNotPresent(Locator.ext4Button("Developer"));
         prepForPageLoad();
         fireEvent(svgCircleLoc, SeleniumEvent.click);
         newWaitForPageToLoad();
@@ -456,7 +456,7 @@ public class ScatterPlotTest extends GenericChartsTest
         impersonate(DEVELOPER_USER);
         popLocation();
         waitForText(CHART_TITLE);
-        assertElementPresent(Locator.button("Developer"));
+        assertElementPresent(Locator.ext4Button("Developer"));
         stopImpersonating();
     }
 }

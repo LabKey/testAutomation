@@ -139,7 +139,7 @@ public abstract class GenericChartsTest extends ReportTest
 
     protected void clickOptionButtonAndWaitForDialog(String btnTxt, String dialogTitle)
     {
-        clickButton(btnTxt, 0);
+        click(Locator.ext4Button(btnTxt));
         _extHelper.waitForExtDialog(dialogTitle);
     }
 }

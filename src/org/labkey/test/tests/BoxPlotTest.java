@@ -40,7 +40,7 @@ public class BoxPlotTest extends GenericChartsTest
     }
 
     private static final String BOX_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0\nRCF-1: Reactogenicity-Day 2 - 4c.Induration 1st measure\nGroup 1\nGroup 2\nCohort\n4c.Induration 1st measure\n0.0\n5.0\n10.0\n15.0\n20.0\n25.0";
-    private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0\nTest Title\nMice A\nMice B\nNot in Cat Mice Let\nMice C\nTestXAxis\nTestYAxis\n36.5\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\n40.0";
+    private static final String BOX_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0\nTest Title\nMice A\nMice B\nNot in Cat Mice Let\nMice C\nTestXAxis\nTestYAxis\n40.0";
     private static final String BOX_PLOT_NAME_MV = "ManageViewsBoxPlot";
     private static final String BOX_PLOT_DESC_MV = "This box plot was created through the manage views UI";
     @LogMethod
