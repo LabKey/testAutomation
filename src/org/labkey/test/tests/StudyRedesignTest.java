@@ -30,7 +30,7 @@ import org.labkey.test.util.RReportHelper;
  * Date: 8/16/11
  * Time: 3:22 PM
  */
-@Category({BVT.class, DailyA.class})
+@Category({BVT.class})
 public class StudyRedesignTest extends StudyBaseTest
 {
     protected static final String[] BITS = {"ABCD", "EFGH", "IJKL", "MNOP", "QRST", "UVWX"};
