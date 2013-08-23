@@ -175,7 +175,7 @@ public class StudyHelperWD extends AbstractHelperWD
                 _test._ext4Helper.uncheckCheckbox("Share Category?");
             }
         }
-        _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
+        _test._ext4Helper.clickWindowButton("Define " + participantString + " Group", "Save", 0, 0);
         _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
@@ -192,7 +192,7 @@ public class StudyHelperWD extends AbstractHelperWD
         selectParticipantCategoriesGridRow(groupName);
         _test.clickButton("Delete Selected", 0);
         _test._extHelper.waitForExtDialog("Delete Group");
-        _test._extHelper.clickExtButton("Delete Group", "Yes", 0);
+        _test._ext4Helper.clickWindowButton("Delete Group", "Yes", 0, 0);
     }
 
     public void selectParticipantCategoriesGridRow(String groupName)
