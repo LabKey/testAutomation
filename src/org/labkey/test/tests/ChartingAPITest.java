@@ -65,8 +65,8 @@ public class ChartingAPITest extends ClientAPITest
     protected static final String BOX_TWO = "Box Plot Two (Custom)";
     protected static final String BOX_THREE = "Box Plot Three (Custom, Broken)";
 
-    protected static final String SCATTER_ONE_TEXT = "Created with Rapha\u00ebl 2.1.0\nScatter Plot One\n200\n400\n600\n800\n1000\n1200\n1400\nCD4+ (cells/mm3)\nLymphs (cells/mm3)\n800\n1000\n1200\n1400\n1600\n1800\n2000";
-    protected static final String SCATTER_TWO_TEXT = "Created with Rapha\u00ebl 2.1.0\nScatter Plot Two (Custom)\n200\n400\n600\n800\n1000\n1200\n1400\nCD4\nLymphs\n800\n1000\n1200\n1400\n1600\n1800\n2000\nMales\nFemales";
+    protected static final String SCATTER_ONE_TEXT = "Created with Rapha\u00ebl 2.1.0\nScatter Plot One\n0\n200\n400\n600\n800\n1000\n1200\n1400\nCD4+ (cells/mm3)\nLymphs (cells/mm3)\n800\n1000\n1200\n1400\n1600\n1800\n2000";
+    protected static final String SCATTER_TWO_TEXT = "Created with Rapha\u00ebl 2.1.0\nScatter Plot Two (Custom)\n0\n200\n400\n600\n800\n1000\n1200\n1400\nCD4\nLymphs\n800\n1000\n1200\n1400\n1600\n1800\n2000\nMales\nFemales";
     protected static final String BOX_ONE_TEXT = "Created with Rapha\u00ebl 2.1.0\nBox Plot One\nMales\nFemales\nGender\nLymphs (cells/mm3)\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200";
     protected static final String BOX_TWO_TEXT = "Created with Rapha\u00ebl 2.1.0\nBox Plot Two (Custom)\nMales\nFemales\nGender\nCD4\n200\n400\n600\n800\n1000\n1200\n1400\n1600\nFemales";
 
