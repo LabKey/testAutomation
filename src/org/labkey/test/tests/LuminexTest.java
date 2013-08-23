@@ -1535,7 +1535,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         beginAt(ljUrl);
         setUpGuideSet("GS Analyte (2)");
-        assertTextPresent("Levey-Jennings Report: Standard1");
+        assertTextPresent("Levey-Jennings Reports", "Standard1");
         assertTextNotPresent("Apply Guide Set");
         stopImpersonating();
         deleteUser(reader);
@@ -1822,7 +1822,7 @@ public class LuminexTest extends AbstractQCAssayTest
         //verify the Levey-Jennings plot
         clickAndWait(Locator.linkWithText("graph", 0));
         waitForText(" - " + isotype + " " + conjugate);
-        assertTextPresent("Levey-Jennings Report: Standard1");
+        assertTextPresent("Levey-Jennings Report", "Standard1");
     }
 
     protected void excludeWellFromRun(String run, String well)
@@ -2128,7 +2128,8 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("view data");
         clickAndWait(Locator.linkContainingText("view data"));
         clickAndWait(Locator.linkContainingText(titrationName));
-        waitForText("Levey-Jennings Report: " + titrationName);
+        waitForText("Levey-Jennings Report");
+        waitForText(titrationName);
         // Make sure we have the expected help text
         waitForText("To begin, choose an Antigen, Isotype, and Conjugate from the panel to the left and click the Apply button.");
     }
