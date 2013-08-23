@@ -726,38 +726,40 @@ public class StudyPublishTest extends StudyProtectedExportTest
         goToManageViews();
         clickMenuButton("Create", "Time Chart");
 
-        waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Choose a Measure", 0);
+        waitForElement(Locator.ext4Button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
+        click(Locator.ext4Button("Choose a Measure"));
         _extHelper.waitForExtDialog("Add Measure...");
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         setFormElement(Locator.name("filterSearch"), datasetMeasurePairs[0][0]);
         String measureXpath = _extHelper.getExtDialogXPath("Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+datasetMeasurePairs[0][1]+"')]]";
-        waitForElementToDisappear(Locator.xpath("("+measureXpath+")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
+        waitForElementToDisappear(Locator.xpath("(" + measureXpath + ")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
+        waitForElement(Locator.xpath(measureXpath));
         mouseDown(Locator.xpath(measureXpath));
-        clickButton("Select", 0);
+        click(Locator.ext4Button("Select"));
         waitForText("No data found for the following measures/dimensions", WAIT_FOR_JAVASCRIPT);
 
         if (datasetMeasurePairs.length > 1)
         {
             clickButton("Measures", 0);
             waitForText("Divide data into Series");
-            waitForElement(Locator.button("Add Measure"));
+            waitForElement(Locator.ext4Button("Add Measure"));
             for (int i = 1; i < datasetMeasurePairs.length; i++)
             {
-                clickButton("Add Measure", 0);
+                click(Locator.ext4Button("Add Measure"));
                 _extHelper.waitForExtDialog("Add Measure...");
                 _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
                 setFormElement(Locator.name("filterSearch", i), datasetMeasurePairs[i][0]);
                 measureXpath = _extHelper.getExtDialogXPath("Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+datasetMeasurePairs[i][1]+"')]]";
                 waitForElementToDisappear(Locator.xpath("("+measureXpath+")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
+                waitForElement(Locator.xpath(measureXpath));
                 mouseDown(Locator.xpath(measureXpath));
-                clickButton("Select", 0);
+                click(Locator.ext4Button("Select"));
 
                 waitForText(datasetMeasurePairs[i][1] + " from " + datasetMeasurePairs[i][0]);
             }
-            clickButton("OK", 0);
+            click(Locator.ext4Button("OK"));
         }
 
         _ext4Helper.checkGridRowCheckbox("All");
@@ -772,17 +774,17 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Add point click function
         clickButton("Developer", 0);
-        waitForElement(Locator.button("Cancel"));
+        waitForElement(Locator.ext4Button("Cancel"));
         clickButton("Enable", 0);
         setFormElement("point-click-fn-textarea", getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js"));
-        waitAndClick(Locator.button("OK"));
+        waitAndClick(Locator.ext4Button("OK"));
         _ext4Helper.waitForMaskToDisappear();
 
         // Visit-based chart
         waitAndClick(Locator.css("svg text:contains('Days Since Contact Date')"));
-        waitForElement(Locator.button("Cancel"));
+        waitForElement(Locator.ext4Button("Cancel"));
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
-        waitAndClick(Locator.button("OK"));
+        waitAndClick(Locator.ext4Button("OK"));
         _ext4Helper.waitForMaskToDisappear();
         waitForTextToDisappear("Days Since Contact Date");
 

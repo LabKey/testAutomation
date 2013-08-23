@@ -53,11 +53,6 @@ public class ParticipantReportTest extends ReportTest
     private static final String[] PTIDS_TWO = {"999320613", "999320624", "999320638", "999320646", "999320652", "999320660",
                                                "999320671", "999320687", "999320695", "999320703", "999320719", "999321029",
                                                "999321033"};
-    private static final String[] PTIDS = {"999320016", "999320485", "999320518", "999320529", "999320533", "999320541",
-                                           "999320557", "999320565", "999320576", "999320582", "999320590", "999320609",
-                                           "999320613", "999320624", "999320638", "999320646", "999320652", "999320660",
-                                           "999320671", "999320687", "999320695", "999320703", "999320719", "999321029",
-                                           "999321033"};
     private static final String PARTICIPANT_REPORT4_NAME = "Specimen Filter Report";
     private static final String SPECIMEN_GROUP_ONE = "SPEC GROUP 1";
     private static final String SPECIMEN_GROUP_TWO = "SPEC GROUP 2";
