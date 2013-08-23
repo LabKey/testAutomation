@@ -128,6 +128,7 @@ public class SurveyTest extends BaseWebDriverTest
         _ext4Helper.selectComboBoxItem("Schema", schemaName);
         // the schema selection enables the query combo, so wait for it to enable
         waitForElementToDisappear(Locator.xpath("//table[contains(@class,'item-disabled')]//label[text() = 'Query']"), WAIT_FOR_JAVASCRIPT);
+        sleep(1000); // give it a second to get the queries for the selected schema
         _ext4Helper.selectComboBoxItem("Query", queryName);
 
         clickButton("Generate Survey Questions", 0);
