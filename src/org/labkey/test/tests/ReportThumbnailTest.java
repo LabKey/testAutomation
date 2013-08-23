@@ -98,7 +98,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
             waitAndClick(Locator.xpath("//input[@type='button' and ../label[text()='Auto-generate']]"));
         }
 
-        _extHelper.clickExtButton("", "Save", 0);
+        _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
         // Timing is tight, don't step through this bit.
         _extHelper.waitForExtDialog("Saved");
     }
@@ -148,8 +148,8 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         waitAndClick(Locator.xpath("//img[@title='Edit']"));
         DataViewsTest.clickCustomizeView(chart, this);
         waitForElement(Locator.id("customThumbnail"));
-        setFormElement(Locator.xpath("//input[@id='customThumbnail-fileInputEl']"), thumbnail);
-        _extHelper.clickExtButton(chart, "Save", 0);
+        setFormElement(Locator.xpath("//input[@id='customThumbnail-button-fileInputEl']"), thumbnail);
+        _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         waitForTextToDisappear("Saving...");
     }
 }
