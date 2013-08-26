@@ -166,7 +166,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelperWD _securityHelper = new SecurityHelperWD(this);
-    private File _downloadDir;
+    private final File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
