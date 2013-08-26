@@ -464,7 +464,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 Assert.assertTrue("Expected and actual [edit] links differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual  : " + href,
-                        href.contains(expectedHref));
+                        href != null && href.contains(expectedHref));
             }
 
             // details link
@@ -476,7 +476,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 Assert.assertTrue("Expected and actual [details] links differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual:   " + href,
-                        href.contains(expectedHref));
+                        href != null && href.contains(expectedHref));
             }
 
             // vehicle link
@@ -486,7 +486,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             Assert.assertTrue("Expected and actual Vehicle column URL differ:\n" +
                     "Expected: " + expectedHref + "\n" +
                     "Actual:   " + href,
-                    href.contains(expectedHref));
+                    href != null && href.contains(expectedHref));
 
             // parent sample ID link (table has a container so URL should go to lookup's container)
             if (parentRowIds[i] != null && !parentRowIds[i].equals("") && parentDetailsAction != null)
@@ -516,7 +516,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 Assert.assertTrue("Expected and actual container column URL differ:\n" +
                         "Expected container: " + workbookContainer + "\n" +
                         "Actual URL        : " + href,
-                        href.contains(expectedHref));
+                        href != null && href.contains(expectedHref));
             }
 
             log("");
