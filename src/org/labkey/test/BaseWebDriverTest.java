@@ -5970,7 +5970,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Impersonate");
         selectOptionByText(Locator.id("email"), fakeUser);
-        clickAndWait(Locator.linkWithText("Impersonate"));
+        clickButton("Impersonate");
         _impersonationStack.push(fakeUser);
     }
 
