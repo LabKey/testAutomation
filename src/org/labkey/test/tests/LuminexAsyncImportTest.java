@@ -58,6 +58,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(2);
         clickAndWait(Locator.linkWithText("COMPLETE", 0));
+        assertLuminexLogInfoPresent();
         assertTextNotPresent("ERROR"); //Issue 14082
         assertTextPresent("Starting assay upload", "Finished assay upload");
         clickButton("Data"); // data button links to the run results
@@ -136,6 +137,31 @@ public class LuminexAsyncImportTest extends LuminexTest
         click(Locator.xpath("//a[contains(@class, 'labkey-file-add-icon-enabled')]"));
         setFormElement("__primaryFile__", file);
         clickButton("Next", 60000);
+    }
+
+    protected void assertLuminexLogInfoPresent()
+    {
+        waitForText("----- Start Luminex Analyte Properties -----");
+        assertTextPresent("----- Stop Luminex Analyte Properties -----");
+        assertTextPresent("----- Start Luminex Titration Properties -----", "----- Stop Luminex Titration Properties -----");
+
+        //Check for Analyte Properties
+        assertTextPresent("Properties for GS Analyte (2)", "Properties for GS Analyte (1)");
+
+        //Check for Titration Properties
+        assertTextPresent("Standard", "QC Control", "Unknown");
+
+        //TODO Move these to a better test
+        //Check for Run Properties
+        assertTextPresent("----- Start Run Properties -----", "----- End Run Properties -----");
+        assertTextPresent("Isotype", "Conjugate", "Test Date", "Replaces Previous File", "Date file was modified",
+                "Specimen Type", "Additive", "Derivative", "Subtract Blank Bead", "Calc of Standards", "Calc of Unknown",
+                "Curve Fit Log", "Notebook Number", "Assay Type", "Experiment Performer", "Calculate Positivity",
+                "Baseline Visit", "Positivity Fold Change");
+
+        //Check for Batch Properties
+        assertTextPresent("----- Start Batch Properties -----", "----- End Batch Properties -----");
+        assertTextPresent("Participant Visit", "Target Study", "Species", "Lab ID", "Analysis", "Network", "Transform Script", "Ruminex Version");
     }
 
 }
