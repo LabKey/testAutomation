@@ -456,7 +456,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
     private static final String SVG_PARTICIPANTGROUP_OTHER = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Other Participants\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n249320127 Lymphs(cells/mm3)\n249320489 Lymphs(cells/mm3)\n249320127 CD4+(cells/mm3)\n249320489 CD4+(cells/mm3)";
     private static final String SVG_PARTICIPANTGROUP_YET_MORE = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Yet More Participants\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n249320489 Lymphs(cells/mm3)\n249320897 Lymphs(cells/mm3)\n249325717 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320897 CD4+(cells/mm3)\n249325717 CD4+(cells/mm3)";
     private static final String SVG_PARTICIPANTGROUP_1 = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Group 1: Accute HIV-1\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n249318596 Lymphs(cells/mm3)\n249320107 Lymphs(cells/mm3)\n249320489 Lymphs(cells/mm3)\n249318596 CD4+(cells/mm3)\n249320107 CD4+(cells/mm3)\n249320489 CD4+(cells/mm3)";
-    private static final String SVG_PARTICIPANTGROUP_2 = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Group 2: HIV-1 Negative\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n249320127 Lymphs(cells/mm3)\n249320897 Lymphs(cells/mm3)\n249325717 Lymphs(cells/mm3)\n249320127 CD4+(cells/mm3)\n249320897 CD4+(cells/mm3)\n249325717 CD4+(cells/mm3)";    @LogMethod public void participantGroupTimeChartTest()
+    private static final String SVG_PARTICIPANTGROUP_2 = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Group 2: HIV-1 Negative\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n249320127 Lymphs(cells/mm3)\n249320897 Lymphs(cells/mm3)\n249325717 Lymphs(cells/mm3)\n249320127 CD4+(cells/mm3)\n249320897 CD4+(cells/mm3)\n249325717 CD4+(cells/mm3)";
+
+    @LogMethod public void participantGroupTimeChartTest()
     {
         log("Test charting with participant groups");
 
@@ -482,7 +484,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         applyChanges();
         waitForText(GROUP1_NAME);
         assertElementPresent(Locator.linkWithText("Manage Groups"));
-        _ext4Helper.checkGridRowCheckbox(GROUP3_NAME); //TODO: unresolved Ext4.2.1 issue
+        _ext4Helper.checkGridRowCheckbox(GROUP3_NAME);
 
         log("Verify one line per measure per participant. All groups.");
         waitForElement(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_SOME));
@@ -493,7 +495,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         log("Verify one line per measure per participant. 2/3 groups.");
         // uncheck group 2 (leaving group 1 and 3 checked)
-        _ext4Helper.uncheckGridRowCheckbox(GROUP2_NAME);  //TODO: unresolved Ext4.2.1 issue
+        _ext4Helper.uncheckGridRowCheckbox(GROUP2_NAME);
         waitForCharts(4);
         waitForElement(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_SOME));
         assertElementNotPresent(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_OTHER));
@@ -508,10 +510,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickFolder(getFolderName());
         modifyParticipantGroups();
         clickFolder(getFolderName());
-        clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
-        waitAndClickAndWait(Locator.linkWithText(REPORT_NAME_3));
-        waitForText(REPORT_NAME_3);
-        waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
+        goToManageViews();
+        waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
+        clickAndWait(Locator.linkWithText("edit"));
         waitForText("One or more of the participant groups originally saved with this chart are not currently visible", WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent(GROUP3_NAME);
 
@@ -563,8 +564,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         stopImpersonating();
     }
 
-    private static final String SVG_MULTI_MANUAL_1 = "Created with Rapha\u00ebl 2.1.0New Chart Title: Other Participants050100150200250Days Since Start DateCD4+ (cells/mm3), Lymphs (cells/mm3)200.0400.0600.0800.01000.01200.01400.01600.01800.02000.02200.0Hemogoblins12.51313.51414.51515.516 249320127Hemoglobin 249320489Hemoglobin 249320127 Lymphs(cells/mm3) 249320489 Lymphs(cells/mm3) 249320127 CD4+(cells/mm3) 249320489 CD4+(cells/mm3)";
-    private static final String SVG_MULTI_MANUAL_2 = "Created with Rapha\u00ebl 2.1.0New Chart Title: Other Participants050100150200250Days Since Start DateCD4+ (cells/mm3), Lymphs (cells/mm3)200.0400.0600.0800.01000.01200.01400.01600.01800.02000.02200.0Hemogoblins20 249320127Hemoglobin 249320489Hemoglobin 249320127 Lymphs(cells/mm3) 249320489 Lymphs(cells/mm3) 249320127 CD4+(cells/mm3) 249320489 CD4+(cells/mm3)";
+    private static final String SVG_MULTI_MANUAL_1 = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Other Participants\n0\n50\n100\n150\n200\n250\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nHemogoblins\n12.5\n13\n13.5\n14\n14.5\n15\n15.5\n16\n249320127 Hemoglobin\n249320489 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 Lymphs(cells/mm3)\n249320127 CD4+(cells/mm3)\n249320489 CD4+(cells/mm3)";
+    private static final String SVG_MULTI_MANUAL_2 = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Other Participants\n0\n50\n100\n150\n200\n250\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nHemogoblins\n20\n249320127 Hemoglobin\n249320489 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 Lymphs(cells/mm3)\n249320127 CD4+(cells/mm3)\n249320489 CD4+(cells/mm3)";
     @LogMethod public void multiAxisTimeChartTest()
     {
         clickProject(getProjectName());
@@ -586,11 +587,12 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickButton("Select", 0);
         waitForText("Hemoglobin from Lab Results");
         applyChanges();
-        waitForText(GROUP2_PTIDS[0]); // TODO: WebDriver waitForText(GROUP2_PTIDS[0]+" Hemoglobin");
+        waitForElement(Locator.css("svg").withText(GROUP2_PTIDS[0]+" Hemoglobin"), WAIT_FOR_JAVASCRIPT, false);
 
         enterMeasuresPanel();
         _ext4Helper.selectComboBoxItem("Draw y-axis on:", "Right");
         applyChanges();
+        waitForElement(Locator.css("svg").withText(GROUP2_PTIDS[0]+" Hemoglobin"), WAIT_FOR_JAVASCRIPT, false);
 
         goToAxisTab("Hemoglobin");
         setAxisValue(Axis.RIGHT, "rightaxis_range_manual", "12", "16", "Hemogoblins", null, null, null, null);
@@ -612,6 +614,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         //choose measure
         _ext4Helper.clickGridRowText("CD4+ (cells/mm3)", 0);
         clickButton("Select", 0);
+        waitForElement(Locator.css("svg").withText("Days Since Start Date"), WAIT_FOR_JAVASCRIPT, false);
 
         //set to aggregate
         goToGroupingTab();
@@ -637,14 +640,17 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
 
         waitForElement(Locator.tag("td").withText("Please select at least one group from the filter panel on the right."));
+        // wait for tool tip to disappear, as it is covering what we want to click
+        waitForElement(Locator.xpath("//div[contains(@class, 'x4-tip') and contains(@style, 'display: none')]//div[contains(text(), 'Click the label to select only this item')]"));
+
         // re-select group 1 and 2
         _ext4Helper.checkGridRowCheckbox(GROUP1_NAME);
         _ext4Helper.checkGridRowCheckbox(GROUP2_NAME);
         waitForCharts(2);
 
-        // Count data points in charts by checking the title attribute of the points ('*' here due to xpath namespace limitations in svgs
-        assertElementPresent(Locator.tag("div").withoutClass("thumbnail").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP1_NAME + ",\n Days"), 10);
-        assertElementPresent(Locator.tag("div").withoutClass("thumbnail").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP2_NAME + ",\n Days"), 12);
+        // Count data points in charts by checking the title attribute of the points ('*' here due to xpath namespace limitations in svgs)
+        assertElementPresent(Locator.tag("div").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP1_NAME + ",\n Days"), 20); // 10 in chart and 10 in thumbnail
+        assertElementPresent(Locator.tag("div").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP2_NAME + ",\n Days"), 12);
 
         goToGroupingTab();
         _extHelper.uncheckCheckbox("Show Mean"); // select show mean

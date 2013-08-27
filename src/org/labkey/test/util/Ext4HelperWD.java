@@ -397,7 +397,7 @@ public class Ext4HelperWD extends AbstractHelperWD
      */
     private Locator.XPathLocator getGridRow(String cellText, int index)
     {
-        return Locator.xpath("(//tr[contains(@class, 'x4-grid-row')][td[string() = '" + cellText + "']]["+Locator.NOT_HIDDEN+"])[" + (index + 1) + "]");
+        return Locator.xpath("(//tr[contains(@class, 'x4-grid-row')][(td|td/table/tbody/tr/td)[string() = '" + cellText + "']]["+Locator.NOT_HIDDEN+"])[" + (index + 1) + "]");
     }
 
     public static Locator.XPathLocator invalidField()
