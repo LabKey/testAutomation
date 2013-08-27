@@ -148,9 +148,9 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
         // add the specimen configurations to the manage page
         goToModule("rho"); // for containers with a study, the rho beginAction will redirect to manageSpecimenConfiguration
-        addSpecimenConfiguration("PCR", "R", locationId, "CEF-R Cryovial");
-        addSpecimenConfiguration("PCR", "R", locationId, "UPR Micro Tube");
-        addSpecimenConfiguration("RNA", "R", locationId, "TGE Cryovial");
+        addSpecimenConfiguration("PCR", "R", locationId, "CEF-R Cryovial", false);
+        addSpecimenConfiguration("PCR", "R", locationId, "UPR Micro Tube", true);
+        addSpecimenConfiguration("RNA", "R", locationId, "TGE Cryovial", true);
         sleep(1000); // give the store a second to save the configurations
 
         // lookup the config IDs to use in setting the visits
@@ -182,11 +182,14 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         Assert.assertEquals("Unexpected number of rows in the query", expectedCount, drt.getDataRowCount());
     }
 
-    private void addSpecimenConfiguration(String assayName, String source, int locationId, String tubeType)
+    private void addSpecimenConfiguration(String assayName, String source, int locationId, String tubeType, boolean expectRows)
     {
         Locator.XPathLocator configGridRow = Locator.xpath("id('SpecimenConfigGrid')//table").withClass("x4-grid-table").append("/tbody/tr");
-        waitForElement(configGridRow);
-        int rowCount = getXpathCount(configGridRow) - 1;
+        if (expectRows)
+            waitForElement(configGridRow);
+        else
+            waitForText("No specimen configurations");
+        int expectedRowIndex = getXpathCount(configGridRow);
         clickButton("Add Specimen Configuration", 0);
         waitForElement(Locator.name("AssayName"));
         setFormElement(Locator.name("AssayName"), assayName);
@@ -195,7 +198,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         setFormElement(Locator.name("LocationId"), String.valueOf(locationId));
         setFormElement(Locator.name("TubeType"), tubeType);
         clickButton("Submit");
-        waitForElement(configGridRow.index(rowCount));
+        waitForElement(configGridRow.index(expectedRowIndex));
     }
 
     private void setSpecimenConfigurationVisit(String scRowId, String[] labels)
@@ -252,8 +255,6 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         flagSpecimenForReview(assayName, assay2File, "2011-03-02");
 
         clickFolder(assayFolder);
-        waitForElement(tableLoc);
-
         verifyProgressReport(assayName, false);
 
         clickAndWait(Locator.linkWithText("8 results from " + assayName + " have been uploaded."));
@@ -265,6 +266,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     {
         int ignored = ignoreSampleminded ? 2 : 0;
 
+        waitForElement(tableLoc);
         _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
         waitForElement(tableLoc);
         assertTextPresentInThisOrder("SR1", "SR2");
