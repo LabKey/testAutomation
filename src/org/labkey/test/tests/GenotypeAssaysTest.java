@@ -377,6 +377,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         int totalRows = 100; //current page size
         List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"13294", "D10S1412", "157"});
+        expected.add(new String[]{"13294", "D10S1412", "157"});
         expected.add(new String[]{"13294", "D11S2002", "260"});
         expected.add(new String[]{"13294", "D11S2002", "264"});
         expected.add(new String[]{"13294", "D11S925", "308"});
@@ -394,7 +395,10 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         expected.add(new String[]{"13294", "D17S1300", "228"});
         expected.add(new String[]{"13294", "D17S1300", "276"});
         expected.add(new String[]{"13294", "D18S537", "162"});
+        expected.add(new String[]{"13294", "D18S537", "162"});
         expected.add(new String[]{"13294", "D18S72", "308"});
+        expected.add(new String[]{"13294", "D18S72", "308"});
+        expected.add(new String[]{"13294", "D1S548", "206"});
         expected.add(new String[]{"13294", "D1S548", "206"});
         expected.add(new String[]{"13294", "D2S1333", "277"});
         expected.add(new String[]{"13294", "D2S1333", "301"});
@@ -405,8 +409,10 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         expected.add(new String[]{"13294", "D4S413", "131"});
         expected.add(new String[]{"13294", "D4S413", "151"});
         expected.add(new String[]{"13294", "D5S1457", "136"});
+        expected.add(new String[]{"13294", "D5S1457", "136"});
         expected.add(new String[]{"13294", "D6S1691", "197"});
         expected.add(new String[]{"13294", "D6S1691", "215"});
+        expected.add(new String[]{"13294", "D6S276", "233"});
         expected.add(new String[]{"13294", "D6S276", "233"});
         expected.add(new String[]{"13294", "D6S291", "206"});
         expected.add(new String[]{"13294", "D6S291", "208"});
@@ -415,14 +421,18 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         expected.add(new String[]{"13294", "D7S513", "209"});
         expected.add(new String[]{"13294", "D7S513", "217"});
         expected.add(new String[]{"13294", "D7S794", "108"});
+        expected.add(new String[]{"13294", "D7S794", "108"});
         expected.add(new String[]{"13294", "D8S1106", "148"});
         expected.add(new String[]{"13294", "D8S1106", "152"});
         expected.add(new String[]{"13294", "D9S921", "187"});
         expected.add(new String[]{"13294", "D9S921", "191"});
         expected.add(new String[]{"13294", "DXS2506", "262"});
+        expected.add(new String[]{"13294", "DXS2506", "262"});
         expected.add(new String[]{"13294", "MFGT21", "115"});
         expected.add(new String[]{"13294", "MFGT21", "125"});
         expected.add(new String[]{"13294", "MFGT22", "110"});
+        expected.add(new String[]{"13294", "MFGT22", "110"});
+        expected.add(new String[]{"15227", "D10S1412", "157"});
         expected.add(new String[]{"15227", "D10S1412", "157"});
         expected.add(new String[]{"15227", "D11S2002", "256"});
         expected.add(new String[]{"15227", "D11S2002", "260"});
@@ -443,6 +453,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         expected.add(new String[]{"15227", "D18S537", "162"});
         expected.add(new String[]{"15227", "D18S537", "178"});
         expected.add(new String[]{"15227", "D18S72", "308"});
+        expected.add(new String[]{"15227", "D18S72", "308"});
         expected.add(new String[]{"15227", "D1S548", "190"});
         expected.add(new String[]{"15227", "D1S548", "202"});
         expected.add(new String[]{"15227", "D2S1333", "289"});
@@ -456,26 +467,15 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         expected.add(new String[]{"15227", "D5S1457", "132"});
         expected.add(new String[]{"15227", "D5S1457", "136"});
         expected.add(new String[]{"15227", "D6S1691", "197"});
+        expected.add(new String[]{"15227", "D6S1691", "197"});
         expected.add(new String[]{"15227", "D6S276", "215"});
         expected.add(new String[]{"15227", "D6S276", "225"});
+        expected.add(new String[]{"15227", "D6S291", "208"});
         expected.add(new String[]{"15227", "D6S291", "208"});
         expected.add(new String[]{"15227", "D6S501", "180"});
         expected.add(new String[]{"15227", "D6S501", "184"});
         expected.add(new String[]{"15227", "D7S513", "193"});
         expected.add(new String[]{"15227", "D7S513", "210"});
-        expected.add(new String[]{"15227", "D7S794", "124"});
-        expected.add(new String[]{"15227", "D7S794", "128"});
-        expected.add(new String[]{"15227", "D8S1106", "160"});
-        expected.add(new String[]{"15227", "D8S1106", "164"});
-        expected.add(new String[]{"15227", "D9S921", "183"});
-        expected.add(new String[]{"15227", "D9S921", "187"});
-        expected.add(new String[]{"15227", "DXS2506", "286"});
-        expected.add(new String[]{"15227", "MFGT21", "123"});
-        expected.add(new String[]{"15227", "MFGT21", "127"});
-        expected.add(new String[]{"15227", "MFGT22", "100"});
-        expected.add(new String[]{"15227", "MFGT22", "122"});
-        expected.add(new String[]{"15548", "D10S1412", "157"});
-        expected.add(new String[]{"15548", "D11S2002", "248"});
 
         Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
         log("DataRegion column count was: " + results.getColumnCount());

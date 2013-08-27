@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import java.util.ArrayList;
@@ -154,6 +155,15 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
 
         Assert.assertFalse("Grid input should not be visible", el.isDisplayed());
         _test.sleep(300);
+    }
+
+    public void stopEditing()
+    {
+        String selector = "div.x4-grid-editor input";
+        _test.waitForElement(Locator.css(selector));
+        WebElement el = _test.getDriver().findElement(By.cssSelector(selector));
+        if (el.isDisplayed())
+            el.sendKeys(Keys.ESCAPE);
     }
 
     private void waitForGridEditor()

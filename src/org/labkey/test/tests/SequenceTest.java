@@ -889,11 +889,7 @@ public class SequenceTest extends BaseWebDriverTest
         waitForElement(Ext4GridRefWD.locateExt4GridRow(2, grid.getId()));
 
         //the first field is pre-selected
-        String selector = "div.x4-grid-editor input";
-        waitForElement(Locator.css(selector));
-        WebElement el = _driver.findElement(By.cssSelector(selector));
-        if (el.isDisplayed())
-            el.sendKeys(Keys.ESCAPE);
+        grid.stopEditing();
 
         grid.setGridCell(1, 1, filename1);
         grid.setGridCell(2, 1, filename1);
@@ -916,14 +912,14 @@ public class SequenceTest extends BaseWebDriverTest
         waitAndClick(Locator.ext4Button("Import Data"));
         waitForElement(Ext4HelperWD.ext4Window("Error"));
         waitForElement(Locator.xpath("//div[contains(text(), \"Duplicate Sample: " + filename1 + ". Please remove or edit rows\")]"));
-        click(Locator.ext4Button("OK"));
+        waitAndClick(Locator.ext4Button("OK"));
 
         //verify paired end
         pairedField.setChecked(true);
         waitAndClick(Locator.ext4Button("Import Data"));
         waitForElement(Ext4HelperWD.ext4Window("Error"));
         assertTextPresent("Either choose a file or unchecked paired-end.");
-        click(Locator.ext4Button("OK"));
+        waitAndClick(Locator.ext4Button("OK"));
         pairedField.setChecked(false);
 
         //try duplicate barcodes
