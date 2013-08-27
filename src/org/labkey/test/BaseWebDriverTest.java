@@ -6761,6 +6761,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         log("Selecting query " + schemaName + "." + queryName + " in the schema browser...");
         selectSchema(schemaName);
+        // wait for tool tip to disappear, in case it is covering the element we want to click on
+        waitForElement(Locator.xpath("//div[contains(@class, 'x-tip') and contains(@style, 'display: none')]//div[contains(@class, 'x-tip-body')]"));
         waitAndClick(Locator.queryTreeNode(schemaName, queryName));
         waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + queryName + "']"), 1000);
     }

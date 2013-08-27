@@ -155,7 +155,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         log("Create a Time Chart from the measure in the new query");
         _extHelper.clickMenuButton("Charts", "Create Time Chart");
         clickChooseInitialMeasure();
-        waitForText("My APX Query", 2); // once in filter textbox, and once for the Body Temp measure grid row
+        waitForText("My APX Query");
         _ext4Helper.clickGridRowText("2. Body Temp", 0);
         clickButton("Select", 0);
         waitForText("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.", WAIT_FOR_JAVASCRIPT);
@@ -168,8 +168,9 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         assertTextPresent("2. Body Temp: ", 6); // hover text label (3 for chart and 3 for thumbnail in save dialog)
         clickButton("View Data", 0);
         waitForElement(Locator.paginationText(9));
-        assertTextNotPresent("801.0"); // sequenceNum filtered out by default view filter
+        assertTextNotPresent("801.0", "G1: 6wk/G2: 2wk"); // sequenceNum filtered out by default view filter
         clickButton("View Chart(s)", 0);
+        waitForElement(Locator.css("svg").withText("My APX Query"), WAIT_FOR_JAVASCRIPT, false);
 
         openSaveMenu();
         setFormElement(Locator.name("reportName"), VISIT_REPORT_NAME + " 2");

@@ -104,12 +104,6 @@ public abstract class ReportTest extends StudyBaseTestWD
         clickReportGridLink(reportName, linkText, true);
     }
 
-    protected void goToMainTitleTab(String mainTitle)
-    {
-        waitAndClick(Locator.css("svg text").containing(mainTitle));
-        waitForElement(Locator.button("Cancel"));
-    }
-
     protected void goToAxisTab(String axisLabel)
     {
         // Workaround: (Selenium 2.33) Unable to click axis labels reliably for some reason. Use javascript

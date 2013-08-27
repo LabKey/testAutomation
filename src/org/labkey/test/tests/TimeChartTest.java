@@ -113,7 +113,7 @@ public abstract class TimeChartTest extends ReportTest
 
     protected void clickChooseInitialMeasure()
     {
-        waitForElement(Locator.button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(getButtonLocator("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         clickButton("Choose a Measure", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_DIALOG);
         _extHelper.waitForLoadingMaskToDisappear(5*WAIT_FOR_JAVASCRIPT);
@@ -237,7 +237,7 @@ public abstract class TimeChartTest extends ReportTest
     {
         clickButton("Measures", 0);
         waitForText("Divide data into Series");
-        waitForElement(Locator.button("Add Measure"));
+        waitForElement(getButtonLocator("Add Measure"));
     }
 
     protected void openSaveMenu()
@@ -274,19 +274,18 @@ public abstract class TimeChartTest extends ReportTest
     protected void goToGroupingTab()
     {
         clickButton("Grouping", 0);
-        waitForElement(Locator.button("Cancel"));
+        waitForElement(getButtonLocator("Cancel"));
     }
 
     protected void goToDeveloperTab()
     {
         clickButton("Developer", 0);
-        waitForElement(Locator.button("Cancel"));
+        waitForElement(getButtonLocator("Cancel"));
     }
 
     protected void applyChanges()
     {
-        waitAndClick(Locator.button("OK"));
-        waitForElementToDisappear(Locator.button("Cancel"));
+        waitAndClick(getButtonLocator("OK"));
         _ext4Helper.waitForMaskToDisappear();
     }
 
