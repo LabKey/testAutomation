@@ -238,9 +238,9 @@ public class Ext4Helper extends AbstractHelper
      */
     public void clickParticipantFilterGridRowText(String cellText, int index)
     {
-        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
+        Locator.XPathLocator rowLoc = Locator.xpath("//tr[contains(@class, 'x4-grid-row')]//span[contains(@class, 'lk-filter-panel-label') and text() = " + Locator.xq(cellText) + "]");
         _test.waitForElement(rowLoc);
-        _test.click(rowLoc.append("//span[contains(@class, 'lk-filter-panel-label')][string() = '"+cellText+"']"));
+        _test.click(rowLoc);
     }
 
     /**

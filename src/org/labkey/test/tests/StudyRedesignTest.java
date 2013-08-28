@@ -19,7 +19,6 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
-import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
@@ -37,7 +36,6 @@ public class StudyRedesignTest extends StudyBaseTest
     protected static final String[] CATEGORIES = {BITS[0]+BITS[1]+TRICKY_CHARACTERS_NO_QUOTES, BITS[1]+BITS[2]+TRICKY_CHARACTERS_NO_QUOTES,
             BITS[2]+BITS[3]+TRICKY_CHARACTERS_NO_QUOTES, BITS[3]+BITS[4]+TRICKY_CHARACTERS_NO_QUOTES, BITS[4]+BITS[5]+TRICKY_CHARACTERS_NO_QUOTES};
     protected static final String[] someDataSets = {"Data Views","DEM-1: Demographics", "URF-1: Follow-up Urinalysis (Page 1)", CATEGORIES[3], "AE-1:(VTN) AE Log"};
-    private static final String REPORT_NAME = "TestReport";
     protected static final String EDITED_DATASET = "CPS-1: Screening Chemistry Panel";
     private static final String PARTICIPANT_GROUP_ONE = "GROUP 1";
     private static final String PARTICIPANT_GROUP_TWO = "GROUP 2";
@@ -112,55 +110,6 @@ public class StudyRedesignTest extends StudyBaseTest
         portalHelper.removeTab("RENAMED TAB 1");
     }
 
-    private void clickExt4HeaderMenu(String title, String selection)
-    {
-        click(Locator.xpath("//div[./span[@class='x4-column-header-text' and text() = '"+title+"']]/div[@class='x4-column-header-trigger']"));
-        click(Locator.xpath("//div[@role='menuitem']/a/span[text()='"+selection+"']"));
-    }
-
-    private void setDataBrowseSearch(String value)
-    {
-        setFormElement(Locator.xpath("//div[contains(@class, 'dataset-search')]//input"), value);
-    }
-
-    private void collapseCategory(String category)
-    {
-        log("Collapse category: " + category);
-        assertElementPresent(Locator.xpath("//div[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and @class='x4-grid-group-title' and contains(text(), '" + category + "')]"));
-        click(Locator.xpath("//div[@class='x4-grid-group-title' and contains(text(), '" + category + "')]"));
-        waitForElement(Locator.xpath("//tr[contains(@class, 'collapsed')]//div[@class='x4-grid-group-title' and contains(text(), '" + category + "')]"), WAIT_FOR_JAVASCRIPT);
-    }
-
-    private void expandCategory(String category)
-    {
-        log("Expand category: " + category);
-        assertElementPresent(Locator.xpath("//div[ancestor-or-self::tr[contains(@class, 'collapsed')] and @class='x4-grid-group-title' and text()='" + category + "']"));
-        click(Locator.xpath("//div[@class='x4-grid-group-title' and text()='" + category + "']"));
-        waitForElement(Locator.xpath("//div[not(ancestor-or-self::tr[contains(@class, 'collapsed')]) and @class='x4-grid-group-title' and text()='" + category + "']"), WAIT_FOR_JAVASCRIPT);
-    }
-
-    private void datasetBrowseClickDataTest()
-    {
-
-        log("Test click behavior for datasets");
-
-        Object[][] vals = getDPDataOnClick();
-
-        for(Object[] val : vals)
-        {
-            clickSingleDataSet((String) val[0], (String) val[1], (String) val[2], true);
-        }
-    }
-
-    private Object[][] getDPDataOnClick()
-    {
-        //TODO when hypermove fixed
-        Object[][] ret = {
-                {"AE-1:(VTN) AE Log", "", ""},
-        };
-        return ret;
-    }
-
     protected void setupDatasetCategories()
     {
         clickAndWait(Locator.linkWithText("Manage"));
@@ -194,32 +143,6 @@ public class StudyRedesignTest extends StudyBaseTest
         clickButton("Save");
     }
 
-    private void clickSingleDataSet(String title, String source, String type, boolean testDelete)
-    {
-        Locator l = Locator.tagWithText("div", title);
-        click(l);
-        assertTextPresentInThisOrder(title, "Source: " + source, "Type: " + type);
-        clickButtonContainingText("View", 0);
-        assertTextPresent(title);
-        selenium.goBack();
-        if(testDelete)
-        {
-            //this feature is scheduled for removal
-        }
-    }
-
-     private void clickSingleDataSet(String title, String source, String type)
-    {
-       clickSingleDataSet(title, source, type, false);
-    }
-
-    //Issue 12914: dataset browse web part not displaying data sets alphabetically
-    private void assertDataDisplayedAlphabetically()
-    {
-      //ideally we'd grab the test names from the normal dataset part, but that would take a lot of time to write
-        assertTextPresentInThisOrder(someDataSets);
-    }
-
     private void participantListWebpartTest()
     {
         log("Participant List Webpart Test");
@@ -230,7 +153,10 @@ public class StudyRedesignTest extends StudyBaseTest
         waitForElement(Locator.css(".participant-filter-panel"));
         waitForText("Showing all 138 mice."); // Wait for participant list to appear.
 
-        deselectAllFilterGroups();
+        // Deselect All Filter Groups
+        Locator all = Locator.tag("tr").withClass("x4-grid-row-selected").withDescendant(Locator.tag("b").withClass("filter-description").containing("All")).append(Locator.tag("div").withClass("x4-grid-row-checker"));
+        waitForElement(all);
+        click(all);
 
         waitForText("No matching Mice");
 
@@ -285,12 +211,4 @@ public class StudyRedesignTest extends StudyBaseTest
         group3Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 11)"));
         Assert.assertTrue("Expected panel width to allow " + PARTICIPANT_GROUP_THREE + " grid cell on one line", group3Height == group2Height);
     }
-
-    private void deselectAllFilterGroups()
-    {
-        Locator all = Locator.tag("tr").withClass("x4-grid-row-selected").withDescendant(Locator.tag("b").withClass("filter-description").containing("All")).append(Locator.tag("div").withClass("x4-grid-row-checker"));
-        waitForElement(all);
-        mouseDown(all);
-    }
-
 }
