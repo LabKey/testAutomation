@@ -184,7 +184,7 @@ public class StudyHelper extends AbstractHelper
                 _test._ext4Helper.uncheckCheckbox("Share Category?");
             }
         }
-        _test._extHelper.clickExtButton("Define "+participantString+" Group", "Save", 0);
+        _test._ext4Helper.clickWindowButton("Define "+participantString+" Group", "Save", 0, 0);
         _test._ext4Helper.waitForMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
@@ -200,9 +200,9 @@ public class StudyHelper extends AbstractHelper
         _test.log("Delete " + participantString + " Group: " + groupName);
         selectParticipantCategoriesGridRow(groupName);
         _test.clickButton("Delete Selected", 0);
-        _test._extHelper.waitForExtDialog("Delete Group");
+        _test.waitForElement(Ext4HelperWD.Locators.window("Delete Group"));
         _test.sleep(100);
-        _test._extHelper.clickExtButton("Delete Group", "Yes", 0);
+        _test._ext4Helper.clickWindowButton("Delete Group", "Yes", 0, 0);
     }
 
     public void selectParticipantCategoriesGridRow(final String groupName)
