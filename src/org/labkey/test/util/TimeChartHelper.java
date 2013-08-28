@@ -37,8 +37,8 @@ public class TimeChartHelper
     public void addAMeasure(String measure)
     {
         _test.log("Adding measure " + measure + " to time chart");
-        _test.waitForElement(Locator.button("Choose a Measure"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.clickButton("Choose a Measure", "mem naive");
+        _test.waitAndClickButton("Choose a Measure");
+        _test.waitForText("mem naive");
 
         _test.setFormElement(Locator.name("filterSearch"), measure);
         String measureXpath = _extHelper.getExtDialogXPath("Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+ measure +"')]]";
