@@ -132,7 +132,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void clickExt4Tab(@LoggedParam String tabname)
     {
-        Locator l = Locator.xpath("//span[contains(@class, 'x4-tab') and text() = '" + tabname + "']");
+        Locator l = Locators.tab(tabname);
         _test.click(l);
     }
 
@@ -367,7 +367,7 @@ public class Ext4HelperWD extends AbstractHelperWD
 
     public void clickTabContainingText(String tabText)
     {
-        _test.click(Locator.xpath("//span[contains(@class, 'x4-tab-inner') and contains( text(), '" + tabText + "')]"));
+        _test.click(Locators.tab(tabText));
     }
 
     public void waitForMaskToDisappear()
@@ -483,6 +483,11 @@ public class Ext4HelperWD extends AbstractHelperWD
         public static Locator.XPathLocator folderManagementTreeNode(String nodeText)
         {
             return Locator.xpath("//tr").withClass("x4-grid-row").append("/td/div").withText(nodeText);
+        }
+
+        public static Locator.XPathLocator tab(String tabName)
+        {
+            return Locator.xpath("//a[contains(@class, 'x4-tab') and contains( normalize-space(), '" + tabName + "')]");
         }
     }
 
