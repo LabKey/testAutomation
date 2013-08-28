@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 /**
  * User: bbimber
@@ -137,12 +138,12 @@ public class LabModuleHelper
         return Locator.xpath("//span[contains(@class, 'labkey-wp-title-text') and text() = '" + title + "']");
     }
 
-    public String createWorkbook(String workbookTitle, String workbookDescription)
+    public String createWorkbook(String projectName, String workbookTitle, String workbookDescription)
     {
-        return createWorkbook(workbookTitle, workbookDescription, true);
+        return createWorkbook(projectName, workbookTitle, workbookDescription, true);
     }
 
-    public String createWorkbook(String workbookTitle, String workbookDescription, boolean shouldNavigateToTab)
+    public String createWorkbook(String projectName, String workbookTitle, String workbookDescription, boolean shouldNavigateToTab)
     {
         if (shouldNavigateToTab)
             _test.clickTab("Workbooks");
@@ -157,7 +158,8 @@ public class LabModuleHelper
         try
         {
             String path = _test.getURL().toURI().getPath();
-            path = path.replaceAll(".*/workbook-", "");
+            String prefix = projectName.replaceAll("begin.view", "");
+            path = path.replaceAll(".*" + Pattern.quote(prefix) + "/", "");
             path = path.replaceAll("/begin.view", "");
             return path;
         }

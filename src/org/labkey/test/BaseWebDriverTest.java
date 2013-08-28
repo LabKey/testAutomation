@@ -3704,6 +3704,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("setting module properties");
         clickAndWait(Locator.linkWithText("Module Properties"));
         waitForText("Save Changes");
+        waitForText("Property:");  //proxy for the panel actually loading
+
         boolean changed = false;
         for (ModulePropertyValue value : values)
         {

@@ -106,7 +106,7 @@ public class APIContainerHelper extends AbstractContainerHelper
 
     public void deleteWorkbook(String parent, int rowId, boolean failIfNotFound, int wait) throws TestTimeoutException
     {
-        String path = parent + "/workbook-" + rowId;
+        String path = parent + "/" + rowId;
         deleteContainer(path, failIfNotFound, wait);
     }
 

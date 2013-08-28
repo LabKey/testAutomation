@@ -318,7 +318,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             Integer workbookId = (Integer)row.get("workbookId");
             String container = (String)row.get("container");
             String containerName = (String)row.get("container/name");
-            Integer containerRowId = (Integer)row.get("containerRowId");
 
             CreateContainerResponse workbook = workbooks.get(idx);
 
@@ -358,7 +357,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             Integer workbookId = (Integer)row.get("workbookId");
             String container = (String)row.get("container");
             String containerName = (String)row.get("container/name");
-            Integer containerRowId = (Integer)row.get("containerRowId");
 
             CreateContainerResponse workbook = workbooks.get(idx);
 
@@ -393,9 +391,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         int highestWorkbookId = 0;
         for (Map<String, Object> row : resp0.getRows())
         {
-            Integer rowId = (Integer)row.get("container/rowid");
             highestWorkbookId = (Integer)row.get("workbookId");
-            _apiContainerHelper.deleteWorkbook(getProjectName(), rowId, true, 90000);
+            _apiContainerHelper.deleteWorkbook(getProjectName(), highestWorkbookId, true, 90000);
         }
 
         return highestWorkbookId;
@@ -628,7 +625,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
         clickTab("Data Browser");
         waitForText("Type of Search");
-        
+
         waitForElement(Ext4HelperWD.ext4Tab("Samples"));
 
         Ext4FieldRefWD ref = _ext4Helper.queryOne("textfield[itemId='subjArea']", Ext4FieldRefWD.class);
@@ -929,16 +926,18 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             Ext4FieldRefWD.getForBoxLabel(this, pair.getValue()).setValue(true);
         }
         Ext4FieldRefWD.getForBoxLabel(this, "Sequence").setValue(true);
-        Ext4FieldRefWD.getForBoxLabel(this, "Samples").setValue(true);
+        String samplesSelector = "container[itemCategory='samples'] > checkbox[boxLabel='Samples']";
+        _ext4Helper.queryOne(samplesSelector, Ext4FieldRefWD.class).setValue(true);
         Ext4FieldRefWD.getForBoxLabel(this, "DNA_Oligos").setValue(true);
         Ext4FieldRefWD.getForBoxLabel(this, "Peptides").setValue(true);
         Ext4FieldRefWD.getForBoxLabel(this, "Antibodies").setValue(true);
 
+        sleep(100);
+        Assert.assertTrue("Incorrect value for samples checkbox", (Boolean)_ext4Helper.queryOne(samplesSelector, Ext4FieldRefWD.class).getValue());
+
         click(Locator.ext4Button("Submit"));
         waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
-
-
     }
 
     private void siteSettingsTest()
@@ -1046,7 +1045,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         String workbookTitle = "NewWorkbook_" + INJECT_CHARS_1;
         String workbookDescription = "I am a workbook.  I am trying to inject javascript into your page.  " + INJECT_CHARS_1 + INJECT_CHARS_2;
-        _helper.createWorkbook(workbookTitle, workbookDescription);
+        _helper.createWorkbook(getProjectName(), workbookTitle, workbookDescription);
 
         //verify correct name and correct webparts present
         assertElementPresent(LabModuleHelper.webpartTitle("Lab Tools"));
@@ -1198,7 +1197,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         int max = 3;
         while (i < max)
         {
-            String id = _helper.createWorkbook("Workbook" + i, "Description");
+            String id = _helper.createWorkbook(getProjectName(), "Workbook" + i, "Description");
             workbookIds[i] = id;
             insertDummySampleRow(i.toString());
             i++;
@@ -1223,7 +1222,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         {
             //first record for each workbook
             int rowNum = dr.getRow("Folder", "Workbook" + i);
-            String workbook = getProjectName() + "/workbook-" + workbookIds[i];
+            String workbook = getProjectName() + "/" + workbookIds[i];
 
             //NOTE: these URLs should point to the workbook where the record was created, not the current folder
 
