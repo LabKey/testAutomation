@@ -110,20 +110,20 @@ public class TimeChartDateBasedTest extends TimeChartTest
         goToAxisTab("Days Since Start Date");
         click(Locator.id("xaxis_range_automatic_per_chart-inputEl"));
         applyChanges();
-        waitForElement(Locator.css("svg").withText(SVG_AXIS_X), WAIT_FOR_JAVASCRIPT, false);
-        Assert.assertEquals("Second SVG was not as expected", SVG_AXIS_X, getText(Locator.css("svg").index(1)));
+        waitForElement(Locator.css("svg").withText("HIV Test Results, Lab Results: 249320107"), WAIT_FOR_JAVASCRIPT, false);
+        assertSVG(SVG_AXIS_X, 1);
 
         goToAxisTab("Viral Load Quantified (copies/ml)");
         click(Locator.id("leftaxis_range_automatic_per_chart-inputEl"));
         applyChanges();
-        waitForElement(Locator.css("svg").withText(SVG_AXIS_X_LEFT), WAIT_FOR_JAVASCRIPT, false);
-        Assert.assertEquals("Second SVG was not as expected", SVG_AXIS_X_LEFT, getText(Locator.css("svg").index(1)));
+        waitForElement(Locator.css("svg").withText("HIV Test Results, Lab Results: 249320107"), WAIT_FOR_JAVASCRIPT, false);
+        assertSVG(SVG_AXIS_X_LEFT, 1);
 
         goToAxisTab("CD4+ (cells/mm3)");
         click(Locator.id("rightaxis_range_automatic_per_chart-inputEl"));
         applyChanges();
-        waitForElement(Locator.css("svg").withText(SVG_AXIS_X_LEFT_RIGHT), WAIT_FOR_JAVASCRIPT, false);
-        Assert.assertEquals("Second SVG was not as expected", SVG_AXIS_X_LEFT_RIGHT, getText(Locator.css("svg").index(1)));
+        waitForElement(Locator.css("svg").withText("HIV Test Results, Lab Results: 249320107"), WAIT_FOR_JAVASCRIPT, false);
+        assertSVG(SVG_AXIS_X_LEFT_RIGHT, 1);
 
         openSaveMenu();
         setFormElement(Locator.name("reportName"), AXIS_TIME_CHART);
@@ -342,10 +342,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
         assertElementNotPresent(Locator.ext4Button("Disable"));
         // enable the feature and verify that you can switch tabs
         clickButton("Enable", 0);
-        // TODO: issue clicking the help tab (Ext4.2.1 upgrade)
-        //_ext4Helper.clickTabContainingText("Help");
-        //assertTextPresentInThisOrder("Your code should define a single function", "data:", "columnMap:", "measureInfo:", "clickEvent:");
-        //_ext4Helper.clickTabContainingText("Source");
+        _ext4Helper.clickTabContainingText("Help");
+        assertTextPresentInThisOrder("Your code should define a single function", "data:", "columnMap:", "measureInfo:", "clickEvent:");
+        _ext4Helper.clickTabContainingText("Source");
         String fn = _extHelper.getCodeMirrorValue("point-click-fn-textarea");
         if (fn != null)
             Assert.assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
@@ -487,21 +486,21 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _ext4Helper.checkGridRowCheckbox(GROUP3_NAME);
 
         log("Verify one line per measure per participant. All groups.");
-        waitForElement(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_SOME));
-        assertElementPresent(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_OTHER));
-        assertElementPresent(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_YET_MORE));
-        assertElementPresent(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_1));
-        assertElementPresent(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_2));
+        waitForCharts(5);
+        assertSVG(SVG_PARTICIPANTGROUP_SOME, 0);
+        assertSVG(SVG_PARTICIPANTGROUP_OTHER, 1);
+        assertSVG(SVG_PARTICIPANTGROUP_YET_MORE, 2);
+        assertSVG(SVG_PARTICIPANTGROUP_1, 3);
+        assertSVG(SVG_PARTICIPANTGROUP_2, 4);
 
         log("Verify one line per measure per participant. 2/3 groups.");
         // uncheck group 2 (leaving group 1 and 3 checked)
         _ext4Helper.uncheckGridRowCheckbox(GROUP2_NAME);
         waitForCharts(4);
-        waitForElement(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_SOME));
-        assertElementNotPresent(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_OTHER));
-        assertElementPresent(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_YET_MORE));
-        assertElementPresent(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_1));
-        assertElementPresent(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_2));
+        assertSVG(SVG_PARTICIPANTGROUP_SOME, 0);
+        assertSVG(SVG_PARTICIPANTGROUP_YET_MORE, 1);
+        assertSVG(SVG_PARTICIPANTGROUP_1, 2);
+        assertSVG(SVG_PARTICIPANTGROUP_2, 3);
 
         openSaveMenu();
         saveReport(false);
@@ -521,7 +520,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         _ext4Helper.clickParticipantFilterCategory("Cohorts");
         waitForCharts(1);
-        assertElementPresent(Locator.css("svg").withText(SVG_PARTICIPANTGROUP_SOME_MODIFIED));
+        assertSVG(SVG_PARTICIPANTGROUP_SOME_MODIFIED);
 
         log("Verify one line per measure per participant.");
         // re-select group 2
