@@ -59,6 +59,7 @@ public class CohortTest extends BaseWebDriverTest
     private static final String[] PTIDS_POSITIVE = {INFECTED_1, INFECTED_2, INFECTED_3};
     private static final String[] PTIDS_NEGATIVE = {INFECTED_4};
     private static final String[] PTIDS_NOCOHORT = {UNASSIGNED_1};
+    private static final String[] PTIDS_POSITIVE_NEGATIVE = {INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4};
     private static final String[] PTIDS_POSITIVE_NOCOHORT = {INFECTED_1, INFECTED_2, INFECTED_3, UNASSIGNED_1};
 
     @Override
@@ -375,11 +376,11 @@ public class CohortTest extends BaseWebDriverTest
         // 2.  if unenrolled cohorts exist and all selected cohorts are enrolled then use the enrolled text to describe them
         // 3.  if unenrolled cohorts exist and all selected cohorts are unenrolled, do not use enrolled text
         // 4.  if unenrolled cohorts exist and selected cohorts include both enrolled and unenrolled cohorts, then do not show the enrolled text
-        // note:  participants that don't belong to any cohort are enrolled
+        // note:  participants that don't belong to any cohort are unenrolled (changed with r18435)
 
         log("verify enrolled text: all cohorts are enrolled");
         // rule #1:  no unenrolled cohorts exist so do not expect the enrolled text.
-        verifyParticipantList(PTIDS_ALL, false);
+        verifyParticipantList(PTIDS_POSITIVE_NEGATIVE, true);
 
         // All cohorts are enrolled... should not see "Enrolled" filter item
         verifyDatasetEnrolledCohortFilter("Test Results", false, 16, 0);
@@ -392,10 +393,9 @@ public class CohortTest extends BaseWebDriverTest
         refreshParticipantList();
 
         log("verify enrolled text: all cohorts are unenrolled");
-        // rule #2:  we expect the "enrolled" text since we've selected the 'not in any cohort' group by default
-        verifyParticipantList(PTIDS_NOCOHORT, true);
-        // rule #3:  since "all" includes both enrolled and unenrolled cohorts, don't show the enrolled text
-        verifyCohortSelection(true, null, null, PTIDS_ALL, false, "Found 5 participants of 5.");
+        // rule #3:  all selected cohorts are unenrolled (including "Not in any cohort")
+        verifyParticipantList(PTIDS_ALL, false);
+        verifyCohortSelection(false, null, null, PTIDS_ALL, false, "Found 5 participants of 5.");
 
         // rule #3: Negative cohort is not enrolled, so don't show enrolled text
         verifyCohortSelection(true, null, COHORT_NEGATIVE, PTIDS_NEGATIVE, false, "Found 1 participant of 5.");
@@ -403,8 +403,8 @@ public class CohortTest extends BaseWebDriverTest
         // rule #3: Positive cohort is not enrolled, so don't show enrolled text
         verifyCohortSelection(false, COHORT_NEGATIVE, COHORT_POSITIVE, PTIDS_POSITIVE, false, "Found 3 participants of 5.");
 
-        // rule #2: "not in any cohort" is enrolled so show text
-        verifyCohortSelection(false, COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, true, "Found 1 enrolled participant of 5.");
+        // rule #3: "not in any cohort" is unenrolled, so don't show enrolled text
+        verifyCohortSelection(false, COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, false, "Found 1 participant of 5.");
 
         // All cohorts are unenrolled... should not see "Enrolled" filter item
         verifyDatasetEnrolledCohortFilter("Test Results", false, 16, 0);
@@ -417,8 +417,8 @@ public class CohortTest extends BaseWebDriverTest
         refreshParticipantList();
 
         log("verify enrolled text: Positive cohort enrolled; negative cohort unenrolled");
-        // rule #2, showing enrolled cohorts (positive and not in any cohort)
-        verifyParticipantList(PTIDS_POSITIVE_NOCOHORT, true);
+        // rule #2, showing enrolled cohorts (positive cohort)
+        verifyParticipantList(PTIDS_POSITIVE, true);
 
         // rule #4, don't show enrolled text since we have a mix of enrolled and unenrolled
         verifyCohortSelection(true, null, null, PTIDS_ALL, false, "Found 5 participants of 5.");
@@ -429,8 +429,8 @@ public class CohortTest extends BaseWebDriverTest
         // rule #2, only showing enrolled cohorts
         verifyCohortSelection(false, COHORT_NEGATIVE, COHORT_POSITIVE, PTIDS_POSITIVE, true, "Found 3 enrolled participants of 5.");
 
-        // rule #2, only showing enrolled cohorts
-        verifyCohortSelection(false, COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, true, "Found 1 enrolled participant of 5.");
+        // rule #3, only showing unenrolled cohorts
+        verifyCohortSelection(false, COHORT_POSITIVE, COHORT_NOCOHORT, PTIDS_NOCOHORT, false, "Found 1 participant of 5.");
 
         verifyDatasetEnrolledCohortFilter("Test Results", true, 16, 12);
         verifySpecimenEnrolledCohortFilter("By Individual Vial", true, 20, 16);
