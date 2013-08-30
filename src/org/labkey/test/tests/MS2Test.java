@@ -20,68 +20,23 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MS2;
-import org.labkey.test.ms2.MS2TestBase;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @Category({MS2.class, DailyA.class})
-public class MS2Test extends MS2TestBase
+public class MS2Test extends AbstractMS2ImportTest
 {
-
-    public static final String DEFAULT_EXPERIMENT = "Default Experiment";
-
-    protected void doTestSteps()
-    {
-        goTestIt("DRT1","DRT2");
-        verifyGroupAudit();
-    }
-
-    //verify audit trail registers runs added to or removed from groups.
-    private void verifyGroupAudit()
-    {
-        List<Map<String, Object>> rows = executeSelectRowCommand("auditLog", "ExperimentAuditEvent").getRows();
-        Assert.assertEquals("Unexpected number of audit rows", 10, rows.size());
-        int addedCount = 0;
-        int removedCount = 0;
-        for(Map row : rows)
-        {
-            if(((String)row.get("Comment")).contains("was added to the run group"))
-                addedCount++;
-            else if(((String)row.get("Comment")).contains("was removed from the run group"))
-                removedCount++;
-        }
-
-        Assert.assertEquals(8, addedCount);
-        Assert.assertEquals(1, removedCount);
-        //Issue 16265: need to filter group created during export from RunGroupMap query
-        //add test for this when fixed
-    }
-
-    protected static final String VIEW2 = "proteinView";
-    protected static final String VIEW3 = "proteinGroupView";
-    protected static final String VIEW4 = "queryView1";
-    protected static final String VIEW5 = "queryView2";
-    protected static final String PEPTIDE1 = "K.GSDSLSDGPACKR.S";
-    protected static final String PEPTIDE2 = "R.TIDPVIAR.K";
-    protected static final String PEPTIDE3 = "K.HVSGKIIGFFY.-";
-    protected static final String PEPTIDE4 = "R.ISSTKMDGIGPK.K";
-    protected static final String SEARCH_TYPE = "xtandem";
-    protected static final String SEARCH_NAME3 = "X! Tandem";
-    protected static final String ENZYME = "trypsin";
-    protected static final String MASS_SPEC = "ThermoFinnigan";
     protected static final String RUN_GROUP1_NAME1 = "Test Run Group 1";
     //Issue #16260, "Exception when including run group with tricky characters in name," has been updated
-    //reactivate tricky_char_names when this is fixed
-    protected static final String RUN_GROUP1_NAME2 = "Test Run Group 1 New Name";// + TRICKY_CHARACTERS;
+    protected static final String RUN_GROUP1_NAME2 = "Test Run Group 1 New Name" + TRICKY_CHARACTERS;
     protected static final String RUN_GROUP1_CONTACT = "Test Contact";
     protected static final String RUN_GROUP1_DESCRIPTION = "This is a description";
     protected static final String RUN_GROUP1_HYPOTHESIS = "I think this is happening";
@@ -89,61 +44,33 @@ public class MS2Test extends MS2TestBase
     protected static final String RUN_GROUP2_NAME = "Test Run Group 2";
     protected static final String RUN_GROUP3_NAME = "Test Run Group 3";
 
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        cleanPipe(SEARCH_TYPE);
-        deleteProject(getProjectName(), afterTest);
-    }
-
-    protected void goTestIt(String testFile1, String testFile2)
-    {
-        setupMS2(testFile1);
-        verifyMS2(testFile1, testFile2);
-    }
-
+    @Override
     @LogMethod(category = LogMethod.MethodType.SETUP)
-    protected void setupMS2(String testFile1)
+    protected void setupMS2()
     {
-        log("Verifying that pipeline files were cleaned up properly");
-        File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
-        if (test2.exists())
-            Assert.fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
-
-        super.doTestSteps();
-
-        log("Upload existing MS2 data.");
-        clickFolder(FOLDER_NAME);
-        clickButton("Process and Import Data");
-        _extHelper.selectFileBrowserItem("bov_sample/" + SEARCH_TYPE + "/" + testFile1 + "/" + SAMPLE_BASE_NAME + ".search.xar.xml");
-
-        selectImportDataAction("Import Experiment");
-
-        log("Going to the list of all pipeline jobs");
-        clickAndWait(Locator.linkWithText("All"));
-
-        log("Verify upload started.");
-        assertTextPresent(SAMPLE_BASE_NAME + ".search.xar.xml");
-        int seconds = 0;
-        while (countLinksWithText("COMPLETE") < 1 && seconds++ < MAX_WAIT_SECONDS)
-        {
-            log("Waiting upload to complete");
-            if (countLinksWithText("ERROR") > 0)
-            {
-                Assert.fail("Job in ERROR state found in the list");
-            }
-            sleep(1000);
-            refresh();
-        }
-        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-        assertElementPresent(Locator.linkWithSpan("MS2 Runs"));
-        assertLinkPresentContainingText(SAMPLE_BASE_NAME);
+        super.setupMS2();
+        importMS2Run("DRT2", 2);
     }
 
+    @Override
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    protected void verifyMS2(String testFile1, String testFile2)
+    protected void verifyMS2()
+    {
+        verifyFirstRun();
+
+        validateSecondRun();
+
+        validateRunGroups();
+
+        queryValidationTest();
+        pepXMLtest();
+    }
+
+    private void verifyFirstRun()
     {
         log("Verify run view.");
-        clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
+        clickAndWait(Locator.linkContainingText("DRT1"));
 
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");
@@ -161,8 +88,7 @@ public class MS2Test extends MS2TestBase
         log("Test Show Modifications");
         click(Locator.linkWithText("Show Modifications"));
         // Wait for tooltip to show up
-        sleep(2000);
-        assertTextPresent("Variable");
+        waitForText("Variable", 2000);
         assertTextPresent("E^");
         assertTextPresent("Q^");
 
@@ -189,9 +115,9 @@ public class MS2Test extends MS2TestBase
         popLocation();
 
         // Make sure we're not using a custom default view for the current user
-        selectOptionByText("viewParams", "<Standard View>");
+        selectOptionByText(Locator.name("viewParams"), "<Standard View>");
         clickButton("Go");
-        selectOptionByText("grouping", "Peptides (Legacy)");
+        selectOptionByText(Locator.name("grouping"), "Peptides (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
 
         log("Test export selected");
@@ -258,20 +184,15 @@ public class MS2Test extends MS2TestBase
 
         log("Test Scan, Z, Hyper, Next, B, Y, and Expect filters");
         pushLocation();
-        setFilter("MS2Peptides", "Scan", "Is Greater Than", "6", "Is Less Than or Equal To", "100");
+        selectOptionByText(Locator.name("viewParams"), VIEW);
+        clickButton("Go");
         assertTextNotPresent("K.FANIGDVIVASVK.Q");
         assertTextPresent("-.MELFSNELLYK.T");
         assertTextNotPresent("K.TESGYGSESSLR.R");
         assertTextPresent("R.EADKVLVQMPSGK.Q");
 
-        log("Test sort with filters");
-        setSort("MS2Peptides", "Scan", SortDirection.DESC);
+        log("Test filter was remembered");
         assertTextPresent("Scan DESC");
-
-        log("Save view for later");
-        clickButton("Save View");
-        setFormElement("name", VIEW);
-        clickButton("Save View");
 
         log("Continue with filters");
         setFilter("MS2Peptides", "Charge", "Equals", "2");
@@ -293,22 +214,20 @@ public class MS2Test extends MS2TestBase
         log("Test spectrum page");
         assertLinkPresentWithText("R.LSSMRDSR.S");
         String address = getAttribute(Locator.linkWithText("R.LSSMRDSR.S"), "href");
-        // TODO - Reenable after upgrading TeamCity Firefox installations on Linux agents
-        // https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=12994
-//        pushLocation();
-//        beginAt(address);
-//
-//        log("Verify spectrum page.");
-//        assertTextPresent("R.LSSMRDSR.S");
-//        assertTextPresent("gi|29650192|ribosomal_protein");
-//        assertTextPresent("56");
-//        assertTextPresent("0.000");
-//        clickAndWait(Locator.linkWithText("Next"));
-//        assertTextPresent("R.GGNEESTK.T");
-//        assertTextPresent("gi|442754|A_Chain_A,_Superoxi");
-//
-//        log("Return to run.");
-//        popLocation();
+        beginAt(address);
+
+        log("Verify spectrum page.");
+        assertTextPresent("R.LSSMRDSR.S");
+        assertTextPresent("gi|29650192|ribosomal_protein");
+        assertTextPresent("56");
+        assertTextPresent("0.000");
+        clickAndWait(Locator.linkWithText("Next"));
+        assertTextPresent("R.GGNEESTK.T");
+        assertTextPresent("gi|442754|A_Chain_A,_Superoxi");
+
+        log("Return to run.");
+        goBack();
+        goBack();
 
         log("Verify still filtered.");
         assertTextPresent("(Scan > 6) AND (Scan <= 100) AND (Charge = 2) AND (Hyper >= 14.6) AND (Next <> 9.5) AND (B < 11.6) AND (Y < 11.3) AND (Expect > 1.2)");
@@ -320,7 +239,7 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("RetTime");
 
         log("Test export");
-        pushLocation();
+        addUrlParameter("exportAsWebPage=true");
         clickMenuButton("Export All", "TSV");
         assertTextPresent("Scan");
         assertTextPresent("Run Description");
@@ -333,7 +252,7 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("gi|442754|A_Chain_A,_Superoxi");
         assertTextNotPresent("K.FVKKSNDVR.L");
         assertTextPresent("\n", 3, true);
-        popLocation();
+        goBack();
         clickMenuButton("Export All", "AMT");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
@@ -342,27 +261,15 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("\n", 5, true);
         popLocation();
 
-        log("Make saved view for Protein Group for Comparison");
-        pushLocation();
-        setFilter("MS2Peptides", "DeltaMass", "Is Greater Than", "0");
-        selectOptionByText("grouping", "Protein (Legacy)");
-        clickAndWait(Locator.id("viewTypeSubmitButton"));
-        setFilter("MS2Proteins", "SequenceMass", "Is Greater Than", "20000");
-        log("Save view for later");
-        clickButton("Save View");
-        setFormElement("name", VIEW2);
-        clickButton("Save View");
-
         log("Test using saved view");
-        popLocation();
         pushLocation();
-        selectOptionByText("viewParams", VIEW);
+        selectOptionByText(Locator.name("viewParams"), LEGACY_PEPTIDES_SCAN_6_100_VIEW_NAME);
         clickButton("Go");
 
         log("Test hyper charge filters too");
-        setFormElement("Charge1", "11");
-        setFormElement("Charge2", "13");
-        setFormElement("Charge3", "14");
+        setFormElement(Locator.id("Charge1"), "11");
+        setFormElement(Locator.id("Charge2"), "13");
+        setFormElement(Locator.id("Charge3"), "14");
         clickAndWait(Locator.id("AddChargeScoreFilterButton"));
         assertTextPresent("R.KVTTGR.A");
         assertTextNotPresent("K.KLHQK.L");
@@ -370,7 +277,7 @@ public class MS2Test extends MS2TestBase
         assertTextNotPresent("-.MELFSNELLYK.T");
 
         log("Test Protein View and if viewParams hold");
-        selectOptionByText("grouping", "Protein (Legacy)");
+        selectOptionByText(Locator.name("grouping"), "Protein (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         assertTextPresent("Description");
         assertTextPresent("Coverage");
@@ -401,12 +308,12 @@ public class MS2Test extends MS2TestBase
         popLocation();
 
         log("Test sorting in Protein View");
+        addUrlParameter("exportAsWebPage=true");
         setSort("MS2Proteins", "SequenceMass", SortDirection.ASC);
         assertTextPresent("SequenceMass ASC");
         assertTextBefore("gi|15668549|LSU_ribosomal_pro", "gi|14318169|AF379640_1_riboso");
 
         log("Test export Protein View");
-        pushLocation();
         clickMenuButton("Export All", "TSV");
         assertTextPresent("Protein");
         assertTextPresent("Description");
@@ -416,13 +323,12 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("gi|29650192|ribosomal_protein");
         assertTextPresent("ribosomal protein S6 [Anopheles stephensi]");
         assertTextPresent("\n", 18, true);
-        popLocation();
+        goBack();
 
         log("Test export expanded view");
-        selectOptionByText("grouping", "Protein (Legacy)");
+        selectOptionByText(Locator.name("grouping"), "Protein (Legacy)");
         checkCheckbox("expanded");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
-        pushLocation();
         clickMenuButton("Export All", "TSV");
         assertTextPresent("Protein");
         assertTextPresent("IonPercent");
@@ -433,7 +339,7 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("gi|29650192|ribosomal_protein");
         assertTextPresent("R.E^PVSPWGTPAKGYR.T");
         assertTextPresent("\n", 18, true);
-        popLocation();
+        goBack();
         clickMenuButton("Export All", "AMT");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
@@ -445,7 +351,7 @@ public class MS2Test extends MS2TestBase
 
         log("Test Protein Prophet");
         pushLocation();
-        selectOptionByText("grouping", "ProteinProphet (Legacy)");
+        selectOptionByText(Locator.name("grouping"), "ProteinProphet (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         assertTextPresent("Group");
         assertTextPresent("Prob");
@@ -455,83 +361,26 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("gi|4883902|APETALA3_homolog_R");
 
         log("Test Protein Prophet with filters");
-        selectOptionByText("viewParams", VIEW);
+        selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_PROPHET_VIEW_NAME);
         clickButton("Go");
-        selectOptionByText("grouping", "ProteinProphet (Legacy)");
-        clickAndWait(Locator.id("viewTypeSubmitButton"));
-        assertTextNotPresent("gi|4689022|ribosomal_protein_");
-        assertTextPresent("gi|16078254|similar_to_riboso");
         assertTextPresent("(Scan > 6) AND (Scan <= 100)");
         assertTextPresent("Scan DESC");
-        setFilter("ProteinGroupsWithQuantitation", "GroupProbability", "Is Greater Than", "0.7");
         assertTextNotPresent("gi|30089158|low_density_lipop");
-
-        log("Save view for later");
-        clickButton("Save View");
-        setFormElement("name", VIEW3);
-        clickButton("Save View");
 
         setFilter("ProteinGroupsWithQuantitation", "PercentCoverage", "Is Not Blank");
         assertTextNotPresent("gi|13442951|MAIL");
         assertTextPresent("(GroupProbability > 0.7) AND (PercentCoverage IS NOT NULL)");
 
-        log("Test export");
-        pushLocation();
-        clickMenuButton("Export All", "AMT");
-        assertTextPresent("Run");
-        assertTextPresent("Peptide");
-        assertTextBefore("K.MLNMAKSKMHK.M", "R.E^VNAEDLAPGEPGR.L");
-        assertTextPresent("1318.6790");
-        assertTextPresent("1435.6810");
-        assertTextNotPresent("gi|27684893|similar_to_60S_RI");
-        assertTextPresent("\n", 5, true);
-
-        log("Test export selected in expanded view with different protein and peptide columns and sorting");
-        popLocation();
-        log("Test sorting in Protein Prophet");
-        setSort("ProteinGroupsWithQuantitation", "GroupProbability", SortDirection.ASC);
-        assertTextPresent("GroupProbability ASC");
-        assertTextBefore("gi|548772|RL4_HALHA_50S_RIBOS", "gi|23619029|60S_ribosomal_pro");
-        clickButton("Pick Peptide Columns");
-        clickButton("Pick", 0);
-        clickButton("Pick Columns");
-        clickButton("Pick Peptide Columns");
-        clickButton("Pick", 0);
-        clickButton("Pick Columns");
-        selectOptionByText("grouping", "ProteinProphet (Legacy)");
-        checkCheckbox("expanded");
-        clickAndWait(Locator.id("viewTypeSubmitButton"));
-        pushLocation();
-        checkDataRegionCheckbox("ProteinGroupsWithQuantitation", 0);
-        clickMenuButton("Export Selected", "TSV");
-        assertTextPresent("Group");
-        assertTextPresent("PP Unique");
-        assertTextPresent("Run Description");
-        assertTextPresent("IonPercent");
-        assertTextPresent("ObsMHPlus");
-        assertTextPresent("Peptide");
-        assertTextPresent("SeqId");
-        assertTextPresent("gi|548772|RL4_HALHA_50S_RIBOS");
-        assertTextPresent("EVNAEDLAPGEPGR");
-        assertTextNotPresent("gi|23619029|60S_ribosomal_pro");
-        assertTextPresent("\n", 2, true);
-        popLocation();
-
-        log("Make sure sort is exported correctly too");
-        clickMenuButton("Export All", "TSV");
-        assertTextBefore("gi|548772|RL4_HALHA_50S_RIBOS", "gi|23619029|60S_ribosomal_pro");
-        assertTextPresent("MLNMAKSKMHK");
-        assertTextPresent("\n", 3, true);
-        popLocation();
+        validateLegacySingleRunExport();
 
         log("Create saved view to test query groupings");
-        selectOptionByText("grouping", "Peptides (Legacy)");
+        selectOptionByText(Locator.name("grouping"), "Peptides (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
-        selectOptionByText("views", VIEW);
+        selectOptionByText(Locator.id("views"), LEGACY_PEPTIDES_SCAN_6_100_VIEW_NAME);
         clickButton("Go");
 
         log("Test Query - Peptides Grouping");
-        selectOptionByText("grouping", "Standard");
+        selectOptionByText(Locator.name("grouping"), "Standard");
         checkCheckbox("expanded");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
 
@@ -775,7 +624,7 @@ public class MS2Test extends MS2TestBase
         popLocation();
 
         log("Test Query - Proteins Grouping");
-        selectOptionByText("grouping", "Protein Groups");
+        selectOptionByText(Locator.name("grouping"), "Protein Groups");
         checkCheckbox("expanded");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         assertTextPresent("Protein");
@@ -824,320 +673,135 @@ public class MS2Test extends MS2TestBase
         assertTextPresent("\n", 3);
         popLocation();
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
+    }
 
-        log("Upload second MS2 Run");
-        clickButton("Process and Import Data");
-        _extHelper.selectFileBrowserItem("bov_sample/" + SEARCH_TYPE + "/" + testFile2 + "/" + SAMPLE_BASE_NAME + ".search.xar.xml");
-
-        selectImportDataAction("Import Experiment");
-
-        log("Verify upload finished.");
-        int seconds = 0;
-        clickAndWait(Locator.linkWithText("Data Pipeline"));
-        while (countLinksWithText("COMPLETE") < 2 && seconds++ < MAX_WAIT_SECONDS)
-        {
-            log("Waiting upload to complete");
-            if (countLinksWithText("ERROR") > 0)
-            {
-                Assert.fail("Job in ERROR state found in the list");
-            }
-            sleep(1000);
-            refresh();
-        }
-        clickFolder(FOLDER_NAME);
-
-        log("Test export 2 runs together");
+    private void validateLegacySingleRunExport()
+    {
+        log("Test export");
+        addUrlParameter("exportAsWebPage=true");
         pushLocation();
-        DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
-        searchRunsTable.checkAllOnPage();
-        clickButton("MS2 Export");
-        checkRadioButton("exportFormat", "TSV");
-        selectOptionByText("viewParams", VIEW);
-        clickButton("Export");
-        assertTextPresent("Scan");
-        assertTextPresent("Protein");
-        assertTextBefore("K.QLDSIHVTILHK.E", "R.GRRNGPRPVHPTSHNR.Q");
-        assertTextBefore("R.EADKVLVQMPSGK.Q", "K.E^TSSKNFDASVDVAIRLGVDPR.K");
-        assertTextPresent("gi|5002198|AF143203_1_interle");
-        assertTextPresent("1386.6970");
-        assertTextPresent("gi|6049221|AF144467_1_nonstru");
-        assertTextPresent("\n", 86, true);
-        popLocation();
-        pushLocation();
-
-        searchRunsTable.checkAllOnPage();
-        clickButton("MS2 Export");
-        checkRadioButton("exportFormat", "AMT");
-        selectOptionByText("viewParams", VIEW);
-        clickButton("Export");
+        clickMenuButton("Export All", "AMT");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
-        assertTextBefore("K.QLDSIHVTILHK.E", "R.GRRNGPRPVHPTSHNR.Q");
-        assertTextBefore("R.EADKVLVQMPSGK.Q", "K.E^TSSKNFDASVDVAIRLGVDPR.K");
-        assertTextPresent("-.MELFSNELLYK.T");
-        assertTextPresent("1386.6970");
-        assertTextPresent("\n", 89, true);
+        assertTextBefore("K.MLNMAKSKMHK.M", "R.E^VNAEDLAPGEPGR.L");
+        assertTextPresent("1318.6790");
+        assertTextPresent("1435.6810");
+        assertTextNotPresent("gi|27684893|similar_to_60S_RI");
+        assertTextPresent("\n", 5, true);
+
+        log("Test export selected in expanded view with different protein and peptide columns and sorting");
+        popLocation();
+        log("Test sorting in Protein Prophet");
+        setSort("ProteinGroupsWithQuantitation", "GroupProbability", SortDirection.ASC);
+        assertTextPresent("GroupProbability ASC");
+        assertTextBefore("gi|548772|RL4_HALHA_50S_RIBOS", "gi|23619029|60S_ribosomal_pro");
+        clickButton("Pick Peptide Columns");
+        clickButton("Pick", 0);
+        clickButton("Pick Columns");
+        clickButton("Pick Peptide Columns");
+        clickButton("Pick", 0);
+        clickButton("Pick Columns");
+        selectOptionByText(Locator.name("grouping"), "ProteinProphet (Legacy)");
+        checkCheckbox("expanded");
+        clickAndWait(Locator.id("viewTypeSubmitButton"));
+        pushLocation();
+        checkDataRegionCheckbox("ProteinGroupsWithQuantitation", 0);
+        clickMenuButton("Export Selected", "TSV");
+        assertTextPresent("Group");
+        assertTextPresent("PP Unique");
+        assertTextPresent("Run Description");
+        assertTextPresent("IonPercent");
+        assertTextPresent("ObsMHPlus");
+        assertTextPresent("Peptide");
+        assertTextPresent("SeqId");
+        assertTextPresent("gi|548772|RL4_HALHA_50S_RIBOS");
+        assertTextPresent("EVNAEDLAPGEPGR");
+        assertTextNotPresent("gi|23619029|60S_ribosomal_pro");
+        assertTextPresent("\n", 2, true);
         popLocation();
 
-        if ("DRT2".equals(testFile1) || "DRT2".equals(testFile2))
+        log("Make sure sort is exported correctly too");
+        clickMenuButton("Export All", "TSV");
+        assertTextBefore("gi|548772|RL4_HALHA_50S_RIBOS", "gi|23619029|60S_ribosomal_pro");
+        assertTextPresent("MLNMAKSKMHK");
+        assertTextPresent("\n", 3, true);
+        popLocation();
+    }
+
+    protected void validateSecondRun()
+    {
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
+        clickAndWait(Locator.linkWithText("drt/CAexample_mini (DRT2)"));
+
+        selectOptionByText("viewParams", "<Standard View>");
+        clickButton("Go");
+
+        log("Test peptide filtering on protein page");
+        assertLinkPresentWithText("gi|15645924|ribosomal_protein");
+        String address = getAttribute(Locator.linkWithText("gi|15645924|ribosomal_protein"), "href");
+        pushLocation();
+        beginAt(address);
+
+        log("Verify protein page.");
+        assertTextPresent("gi|15645924|ribosomal_protein");
+        assertTextPresent("7,683");
+        String selectedValue = getSelectedOptionValue(Locator.name("allPeps"));
+        boolean userPref = selectedValue == null || "".equals(selectedValue) || "false".equals(selectedValue);
+        if (!userPref)
         {
-            clickAndWait(Locator.linkWithText("drt/CAexample_mini (DRT2)"));
-
-            selectOptionByText("viewParams", "<Standard View>");
-            clickButton("Go");
-
-            log("Test peptide filtering on protein page");
-            assertLinkPresentWithText("gi|15645924|ribosomal_protein");
-            address = getAttribute(Locator.linkWithText("gi|15645924|ribosomal_protein"), "href");
-            pushLocation();
-            beginAt(address);
-
-            log("Verify protein page.");
-            assertTextPresent("gi|15645924|ribosomal_protein");
-            assertTextPresent("7,683");
-            String selectedValue = getSelectedOptionValue(Locator.name("allPeps"));
-            boolean userPref = selectedValue == null || "".equals(selectedValue) || "false".equals(selectedValue);
-            if (!userPref)
-            {
-                // User last viewed all peptides, regardless of search engine assignment, so flip to the other option
-                // before checking that the values match our expectations
-                selectOptionByValue(Locator.name("allPeps"), "false");
-                waitForPageToLoad();
-            }
-            assertTextPresent("27% (18 / 66)");
-            assertTextPresent("27% (2,050 / 7,683)");
-            assertTextPresent("1 total, 1 distinct");
-            assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
-            assertTextNotPresent("K.YTELK.D");
-
-            selectOptionByValue(Locator.name("allPeps"), "true");
+            // User last viewed all peptides, regardless of search engine assignment, so flip to the other option
+            // before checking that the values match our expectations
+            selectOptionByValue(Locator.name("allPeps"), "false");
             waitForPageToLoad();
+        }
+        assertTextPresent("27% (18 / 66)");
+        assertTextPresent("27% (2,050 / 7,683)");
+        assertTextPresent("1 total, 1 distinct");
+        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+        assertTextNotPresent("K.YTELK.D");
 
-            assertTextPresent("35% (23 / 66)");
-            assertTextPresent("35% (2,685 / 7,683)");
-            assertTextPresent("Matches sequence of");
-            assertTextPresent("2 total, 2 distinct");
-            assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
-            assertTextPresent("K.YTELK.D");
+        selectOptionByValue(Locator.name("allPeps"), "true");
+        waitForPageToLoad();
 
-            log("Return to run and set a filter");
-            popLocation();
-            setFilter("MS2Peptides", "Scan", "Is Less Than", "25");
-            address = getAttribute(Locator.linkWithText("gi|15645924|ribosomal_protein"), "href");
-            pushLocation();
-            beginAt(address);
+        assertTextPresent("35% (23 / 66)");
+        assertTextPresent("35% (2,685 / 7,683)");
+        assertTextPresent("Matches sequence of");
+        assertTextPresent("2 total, 2 distinct");
+        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+        assertTextPresent("K.YTELK.D");
 
-            // Be sure that our selection is sticky
-            assertTextPresent("Matches sequence of");
-            // Be sure that our scan filter was propagated to the protein page
-            assertTextPresent("1 total, 1 distinct");
-            assertTextPresent("27% (18 / 66)");
-            assertTextPresent("27% (2,050 / 7,683)");
-            assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
-            assertTextNotPresent("K.YTELK.D");
+        log("Return to run and set a filter");
+        popLocation();
+        setFilter("MS2Peptides", "Scan", "Is Less Than", "25");
+        address = getAttribute(Locator.linkWithText("gi|15645924|ribosomal_protein"), "href");
+        pushLocation();
+        beginAt(address);
 
-            if (userPref)
-            {
-                // User last only peptides assigned by the search engine, so flip back to restore their preference
-                selectOptionByValue(Locator.name("allPeps"), "false");
-                waitForPageToLoad();
-            }
+        // Be sure that our selection is sticky
+        assertTextPresent("Matches sequence of");
+        // Be sure that our scan filter was propagated to the protein page
+        assertTextPresent("1 total, 1 distinct");
+        assertTextPresent("27% (18 / 66)");
+        assertTextPresent("27% (2,050 / 7,683)");
+        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+        assertTextNotPresent("K.YTELK.D");
 
-            popLocation();
-            clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-
-            log("Test Compare MS2 Runs");
-
-            log("Test Compare Peptides using Query");
-            searchRunsTable.checkAllOnPage();
-            waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-            clickButton("Compare", 0);
-            clickAndWait(Locator.linkWithText("Peptide"));
-            click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
-            setFormElement(Locator.input("targetProtein"), "");
-            clickButton("Compare");
-            assertTextPresent("K.EEEESDEDMGFG.-");
-            assertTextPresent("R.Q^YALHVDGVGTK.A");
-            assertTextPresent("K.GSDSLSDGPACKR.S");
-            assertTextPresent("K.EYYLLHKPPKTISSTK.D");
-
-            // verify the bulk protein coverage map export
-            pushLocation();
-            addUrlParameter("exportAsWebPage=true");
-            clickButton("Export Protein Coverage");
-            assertTextPresentInThisOrder("22001886", "Q963B6");
-            assertTextPresentInThisOrder("29827410", "NP_822044.1");
-            assertTextPresentInThisOrder("17508693", "NP_492384.1");
-            assertTextPresentInThisOrder("27716987", "XP_233992.1");
-            assertTextPresent("(search engine matches)");
-            assertTextNotPresent("(all matching peptides)");
-            assertTextPresent("57 Total qualifying peptides in run", 56); // two peptides have the same search engine protein
-            assertTextPresent("57 Distinct qualifying peptides in run", 56); // two peptides have the same search engine protein
-            assertTextPresent("59 Total qualifying peptides in run", 59);
-            assertTextPresent("59 Distinct qualifying peptides in run", 59);
-            assertTextPresent("peptide-marker", 117);
-            popLocation();
-
-            clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
-            click(Locator.radioButtonByNameAndValue("peptideFilterType", "probability"));
-            setFormElement(Locator.input("peptideProphetProbability"), "0.9");
-            clickButton("Compare");
-            assertTextPresent("K.EEEESDEDMGFG.-");
-            assertTextPresent("R.Q^YALHVDGVGTK.A");
-            assertTextNotPresent("K.GSDSLSDGPACKR.S");
-            assertTextPresent("K.EYYLLHKPPKTISSTK.D");
-
-            // verify the bulk protein coverage map export for the peptideProphet probability filter
-            pushLocation();
-            addUrlParameter("exportAsWebPage=true");
-            clickButton("Export Protein Coverage");
-            assertTextPresentInThisOrder("4689022", "CAA80880.2");
-            assertTextPresentInThisOrder("18311790", "NP_558457.1");
-            assertTextPresentInThisOrder("15828808", "NP_326168.1");
-            assertTextPresentInThisOrder("34849400", "AAP58899.1");
-            assertTextNotPresent("BAB39767.1"); // for peptide K.GSDSLSDGPACKR.S
-            assertTextPresent("(search engine matches)");
-            assertTextNotPresent("(all matching peptides)");
-            assertTextPresent("2 Total qualifying peptides in run", 4);
-            assertTextPresent("2 Distinct qualifying peptides in run", 4);
-            assertTextPresent("peptide-marker", 4);
-            assertTextPresent(" 1  / 1(Q^) ", 1); // TODO: how do we verify the location of the match in the coverage map table?
-            popLocation();
-
-            clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
-            setFormElement(Locator.input("targetProtein"), "gi|18311790|phosphoribosylfor");
-            clickButton("Compare");
-            assertTextPresent("R.Q^YALHVDGVGTK.A");
-            assertTextNotPresent("K.EEEESDEDMGFG.-");
-            assertTextNotPresent("K.GSDSLSDGPACKR.S");
-            assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
-
-            // verify the bulk protein coverage map export for peptideProphet filter with target protein
-            pushLocation();
-            addUrlParameter("exportAsWebPage=true");
-            clickButton("Export Protein Coverage");
-            assertTextPresentInThisOrder("18311790", "NP_558457.1");
-            assertTextNotPresent("CAA80880.2"); // for peptide K.EEEESDEDMGFG.-
-            assertTextPresent("(all matching peptides)");
-            assertTextNotPresent("(search engine matches)");
-            assertTextPresent("(PeptideProphet &gt;= 0.9) AND (Matches sequence of ", 2);
-            assertTextPresent("Peptide Counts:", 2);
-            assertTextPresent("1 Total peptide matching sequence", 1);
-            assertTextPresent("1 Distinct peptide matching sequence", 1);
-            assertTextPresent("0 Total peptides matching sequence", 1);
-            assertTextPresent("0 Distinct peptides matching sequence", 1);
-            assertTextPresent("2 Total qualifying peptides in run", 2);
-            assertTextPresent("2 Distinct qualifying peptides in run", 2);
-            assertTextPresent("peptide-marker", 1);
-            assertTextPresent(" 1  / 1(Q^) ", 1); // TODO: how do we verify the location of the match in the coverage map table?
-            popLocation();            
-
-            clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
-            setFormElement(Locator.input("targetProtein"), "gi|15645924|ribosomal_protein");
-            click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
-            clickButton("Compare");
-            assertTextPresent("K.YTELK.D");
-            assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
-            assertTextNotPresent("R.Q^YALHVDGVGTK.A");
-            assertTextNotPresent("K.EEEESDEDMGFG.-");
-            assertTextNotPresent("K.GSDSLSDGPACKR.S");
-            assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
-
-            // verify the bulk protein coverage map export for target protein
-            pushLocation();
-            addUrlParameter("exportAsWebPage=true");
-            clickButton("Export Protein Coverage");
-            assertTextPresentInThisOrder("15645924", "NP_208103.1");
-            assertTextPresent("NP_208103.1", 4);
-            assertTextNotPresent("15612296", "NP_223949.1");
-            assertTextPresent("(all matching peptides)");
-            assertTextNotPresent("(search engine matches)");
-            assertTextPresent("Peptide Counts:", 2);
-            assertTextPresent("0 Total peptides matching sequence", 1);
-            assertTextPresent("0 Distinct peptides matching sequence", 1);
-            assertTextPresent("57 Total qualifying peptides in run", 1);
-            assertTextPresent("57 Distinct qualifying peptides in run", 1);
-            assertTextPresent("2 Total peptides matching sequence", 1);
-            assertTextPresent("2 Distinct peptides matching sequence", 1);
-            assertTextPresent("59 Total qualifying peptides in run", 1);
-            assertTextPresent("59 Distinct qualifying peptides in run", 1);
-            assertTextPresent("peptide-marker", 2);
-            popLocation();
-
-            clickAndWait(Locator.linkWithText("MS2 Dashboard"));
+        if (userPref)
+        {
+            // User last only peptides assigned by the search engine, so flip back to restore their preference
+            selectOptionByValue(Locator.name("allPeps"), "false");
+            waitForPageToLoad();
         }
 
-        log("Test Protein Prophet Compare");
-        searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("ProteinProphet (Legacy)"));
-        selectOptionByText("viewParams", VIEW3);
-        clickButton("Compare");
-        assertTextPresent("(GroupProbability > 0.7)");
-        assertTextNotPresent("gi|30089158|emb|CAD89505.1|");
-        assertTextPresent("GroupNumber");
-        assertTextPresent("0.78");
-        setSort("MS2Compare", "Protein", SortDirection.ASC);
-        assertTextBefore("gi|13442951|dbj|BAB39767.1|", "gi|13470573|ref|NP_102142.1|");
-        setSort("MS2Compare", "Run0GroupProbability", SortDirection.DESC);
-        if (!isTextBefore("gi|13470573|ref|NP_102142.1|", "gi|13442951|dbj|BAB39767.1|"))
-            setSort("MS2Compare", "Run0GroupProbability", SortDirection.ASC);
-        assertTextBefore("gi|13470573|ref|NP_102142.1|", "gi|13442951|dbj|BAB39767.1|");
-
-        log("Test adding columns");
+        popLocation();
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
-        searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("ProteinProphet (Legacy)"));
-        checkCheckbox("light2HeavyRatioMean");
-        uncheckCheckbox("groupProbability");
-        clickButton("Compare");
-        assertTextPresent("ratiomean");
-        assertTextNotPresent("GroupProbability");
-
-        log("Test Compare Search Engine Proteins");
+        validateCompare();
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
+    }
 
-        searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("Search Engine Protein"));
-        selectOptionByText("viewParams", VIEW2);
-        checkCheckbox("total");
-        clickButton("Compare");
-        assertTextPresent("(SequenceMass > 20000)");
-        assertTextPresent("(DeltaMass > 0)");
-        assertTextPresent("Total");
-        assertTextNotPresent("gi|32307556|ribosomal_protein");
-        assertTextNotPresent("gi|136348|TRPF_YEAST_N-(5'-ph");
-        assertTextPresent("gi|33241155|ref|NP_876097.1|");
-        assertTextPresent("Pattern");
-        setSort("MS2Compare", "Protein", SortDirection.ASC);
-        assertTextBefore("gi|11499506|ref|NP_070747.1|", "gi|13507919|");
-
-        log("Test Compare Peptides (Legacy)");
-        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-
-        searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare", 0);
-        clickAndWait(Locator.linkWithText("Peptide (Legacy)"));
-        selectOptionByText("viewParams", VIEW2);
-        clickButton("Compare");
-        assertTextPresent("(DeltaMass > 0)");
-        assertTextNotPresent("R.TIDPVIAR.K");
-        assertTextNotPresent("K.KLYNEELK.A");
-        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
-        assertTextPresent("R.SVAHITK.L");
-        assertTextPresent("Pattern");
-        setSort("MS2Compare", "Peptide", SortDirection.DESC);
-        if (!isTextBefore("-.MELFSNELLYK.T", "K.EIRQRQGDDLDGLSFAELR.G"))
-            setSort("MS2Compare", "Peptide", SortDirection.ASC);
-        assertTextBefore("-.MELFSNELLYK.T", "K.EIRQRQGDDLDGLSFAELR.G");
-
+    private void validateRunGroups()
+    {
         log("Test creating run groups");
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickAndWait(Locator.linkWithImage(getContextPath() + "/Experiment/images/graphIcon.gif"));
@@ -1181,21 +845,19 @@ public class MS2Test extends MS2TestBase
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickAndWait(Locator.linkWithText("MS2 Runs"));
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("RunGroupToggle/" + RUN_GROUP1_NAME2, "Run Groups " + RUN_GROUP1_NAME2);
-        _customizeViewsHelper.addCustomizeViewColumn("RunGroupToggle/" + RUN_GROUP2_NAME, "Run Groups " + RUN_GROUP2_NAME);
-        _customizeViewsHelper.addCustomizeViewColumn("RunGroupToggle/Default Experiment", "Run Groups Default Experiment");
+        _customizeViewsHelper.addCustomizeViewColumn(new String[] { "RunGroupToggle", EscapeUtil.fieldKeyEncodePart(RUN_GROUP1_NAME2) }, RUN_GROUP1_NAME2);
+        _customizeViewsHelper.addCustomizeViewColumn(new String[] { "RunGroupToggle", RUN_GROUP2_NAME } , "Run Groups " + RUN_GROUP2_NAME);
+        _customizeViewsHelper.addCustomizeViewColumn(new String[] { "RunGroupToggle", "Default Experiment" }, "Run Groups Default Experiment");
         _customizeViewsHelper.applyCustomView();
 
         assertTextPresent(RUN_GROUP1_NAME2);
         assertTextPresent(RUN_GROUP2_NAME);
         assertTextPresent(DEFAULT_EXPERIMENT);
 
-        checkCheckbox("experimentMembership", 0);
-        checkCheckbox("experimentMembership", 1);
-        checkCheckbox("experimentMembership", 2);
-        checkCheckbox("experimentMembership", 3);
-        checkCheckbox("experimentMembership", 4);
-        checkCheckbox("experimentMembership", 5);
+        for (int i = 0; i <= 5; i++)
+        {
+            checkCheckbox(Locator.checkboxByName("experimentMembership").index(i));
+        }
 
         log("Test editing a run group's runs");
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
@@ -1206,12 +868,15 @@ public class MS2Test extends MS2TestBase
         assertTextPresent(DEFAULT_EXPERIMENT);
         checkDataRegionCheckbox("XTandemSearchRuns", 1);
         clickButton("Remove");
-        assert(!isTextPresent(testFile1) || !isTextPresent(testFile2));
 
-        verifyRunGroupMap(testFile1, testFile2);
+        assertTextPresent("DRT2");
+        assertTextNotPresent("DRT1");
+
+        verifyRunGroupMapQuery();
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         log("Test that the compare run groups works");
+        DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
         searchRunsTable.checkAllOnPage();
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
@@ -1267,77 +932,36 @@ public class MS2Test extends MS2TestBase
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         assertTextNotPresent(RUN_GROUP1_NAME2);
 
-
-
-        // Try to put this in once GWT components are testable
-//        log("Test the cross comparison feature at top of query comparison");
-//        selenium.click("//div[@id='org.labkey.ms2.RunComparator']/table/tbody/tr[1]/td/table/tbody/tr[2]/td/table/tbody/tr[3]/td[5]/img");
-//        selenium.click("//input[@type='checkbox'][1]");
-//        clickButton("OK", 0);
-//        Assert.assertTrue(getText(Locator.raw("//div[@id='org.labkey.ms2.RunComparator']/table/tbody/tr[1]/td/table/tbody/tr[2]/td/table/tbody/tr[3]/td[3]/div")).compareTo("10") == 0);
-//        Assert.assertTrue(getText(Locator.raw("//div[contains(text(), 'Group #2')]/../td[2]")).compareTo("7") == 0);
-
-
-/*      DISABLED, as we're not shipping with query-based peptides comparison for now
-        log("Test Compare Runs using Query Peptides");
-        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
-        click(Locator.name(".toggle"));
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
-        clickButton("Compare");
-        checkCheckbox("column", "QueryPeptides", true);
-        clickButton("Compare");
-        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
-        assertTextPresent("R.VEKALLDNAGVR.N");
-        assertTextPresent("PepProphet");
-
-        log("Test Customize View in Query Peptides");
-        clickAndWait(Locator.linkWithText("Customize View"));
-        selenium.click("expand_Run");
-        addCustomizeViewColumn("Run/IonPercent", "Run Ion%");
-        removeCustomizeViewColumn("Run Count");
-        addCustomizeViewFilter("Run/IonPercent", "Run Ion%", "Is Greater Than", "0.15");
-        clickButton("Save");
-
-        log("Check filtering and columns were added correctly");
-        assertTextPresent("Ion%");
-        assertTextNotPresent("K.EIRQRQGDDLDGLSFAELR.G");
-        assertTextPresent("33");
-        assertTextPresent("34");
-
-        log("Check Ignore/Apply View Filter");
-        clickAndWait(Locator.linkWithText("Ignore View Filter"));
-        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
-        assertTextPresent("Ion%");
-        clickAndWait(Locator.linkWithText("Apply View Filter"));
-        assertTextNotPresent("K.EIRQRQGDDLDGLSFAELR.G");
-
-        log("Check sorting");
-        setSort("MS2Compare", "Ion%", SortDirection.ASC);
-        assertTextBefore("K.KHGGPKDEER.H", "K.QGTTRYR.V");
-
-        log("Test exporting in Query Peptides Comparision");
-        addUrlParameter("exportAsWebPage=true");
-        pushLocation();
-        clickButton("Export to TSV");
-        assertTextPresent("Ion%");
-        assertTextNotPresent("K.EIRQRQGDDLDGLSFAELR.G");
-        assertTextBefore("K.KHGGPKDEER.H", "K.QGTTRYR.V");
-        assertTextPresent("R.TIDPVIAR.K");
-        assertTextPresent("K.YTELK.D");
-        assertTextPresent("29%");
-        popLocation();
-*/
-
-        pepXMLtest();
-        queryValidationTest();
-
+        verifyGroupAudit();
     }
 
-    private void verifyRunGroupMap(String protocol1Name, String protocol2Name)
+        //verify audit trail registers runs added to or removed from groups.
+    private void verifyGroupAudit()
     {
+        List<Map<String, Object>> rows = executeSelectRowCommand("auditLog", "ExperimentAuditEvent").getRows();
+        Assert.assertEquals("Unexpected number of audit rows", 9, rows.size());
+        int addedCount = 0;
+        int removedCount = 0;
+        for(Map row : rows)
+        {
+            if(((String)row.get("Comment")).contains("was added to the run group"))
+                addedCount++;
+            else if(((String)row.get("Comment")).contains("was removed from the run group"))
+                removedCount++;
+        }
 
-        //have to go to the actual page to test lookup
-        beginAt("/query/MS2VerifyProject/ms2folder/executeQuery.view?schemaName=exp&query.queryName=RunGroupMap");
+        Assert.assertEquals(8, addedCount);
+        Assert.assertEquals(1, removedCount);
+
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
+    }
+
+    private void verifyRunGroupMapQuery()
+    {
+        goToSchemaBrowser();
+
+        selectQuery("exp", "RunGroupMap");
+        waitAndClickAndWait(Locator.linkWithText("view data"));
 
         List<Map<String, Object>> rows = executeSelectRowCommand("exp", "RunGroupMap").getRows();
         Assert.assertEquals("Unexpected number of rows in RunGroupMap", 5, rows.size());
@@ -1348,16 +972,183 @@ public class MS2Test extends MS2TestBase
             Assert.assertTrue("Run Group Map missing column: " + header, keys.contains(header));
         }
         Map<String, Integer> textAndCount = new HashMap<>();
-        textAndCount.put(DEFAULT_EXPERIMENT, new Integer(2));
-        textAndCount.put(RUN_GROUP1_NAME2, new Integer(2));
-        textAndCount.put("Test Run Group 2", new Integer(1));
-        textAndCount.put(protocol2Name, new Integer(3));
-        textAndCount.put(protocol1Name, new Integer(2));
+        textAndCount.put(DEFAULT_EXPERIMENT, 2);
+        textAndCount.put("Test Run Group 1 New Name", 2); // Intentionally don't include the special characters because it's hard to match up the HTML encoding exactly
+        textAndCount.put(RUN_GROUP2_NAME, 1);
+        textAndCount.put("DRT2", 3);
+        textAndCount.put("DRT1", 2);
 
         for(String key : textAndCount.keySet())
         {
             assertTextPresent(key, textAndCount.get(key).intValue());
         }
+    }
+
+
+    private void validateCompare()
+    {
+        log("Test Compare MS2 Runs");
+
+        log("Test Compare Peptides using Query");
+        DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
+        searchRunsTable.checkAllOnPage();
+        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        clickButton("Compare", 0);
+        clickAndWait(Locator.linkWithText("Peptide"));
+        click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
+        setFormElement(Locator.input("targetProtein"), "");
+        clickButton("Compare");
+        assertTextPresent("K.EEEESDEDMGFG.-");
+        assertTextPresent("R.Q^YALHVDGVGTK.A");
+        assertTextPresent("K.GSDSLSDGPACKR.S");
+        assertTextPresent("K.EYYLLHKPPKTISSTK.D");
+
+        // verify the bulk protein coverage map export
+        pushLocation();
+        addUrlParameter("exportAsWebPage=true");
+        clickButton("Export Protein Coverage");
+        assertTextPresentInThisOrder("22001886", "Q963B6");
+        assertTextPresentInThisOrder("29827410", "NP_822044.1");
+        assertTextPresentInThisOrder("17508693", "NP_492384.1");
+        assertTextPresentInThisOrder("27716987", "XP_233992.1");
+        assertTextPresent("(search engine matches)");
+        assertTextNotPresent("(all matching peptides)");
+        assertTextPresent("57 Total qualifying peptides in run", 56); // two peptides have the same search engine protein
+        assertTextPresent("57 Distinct qualifying peptides in run", 56); // two peptides have the same search engine protein
+        assertTextPresent("59 Total qualifying peptides in run", 59);
+        assertTextPresent("59 Distinct qualifying peptides in run", 59);
+        assertTextPresent("peptide-marker", 117);
+        popLocation();
+
+        clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
+        click(Locator.radioButtonByNameAndValue("peptideFilterType", "probability"));
+        setFormElement(Locator.input("peptideProphetProbability"), "0.9");
+        clickButton("Compare");
+        assertTextPresent("K.EEEESDEDMGFG.-");
+        assertTextPresent("R.Q^YALHVDGVGTK.A");
+        assertTextNotPresent("K.GSDSLSDGPACKR.S");
+        assertTextPresent("K.EYYLLHKPPKTISSTK.D");
+
+        // verify the bulk protein coverage map export for the peptideProphet probability filter
+        pushLocation();
+        addUrlParameter("exportAsWebPage=true");
+        clickButton("Export Protein Coverage");
+        assertTextPresentInThisOrder("4689022", "CAA80880.2");
+        assertTextPresentInThisOrder("18311790", "NP_558457.1");
+        assertTextPresentInThisOrder("15828808", "NP_326168.1");
+        assertTextPresentInThisOrder("34849400", "AAP58899.1");
+        assertTextNotPresent("BAB39767.1"); // for peptide K.GSDSLSDGPACKR.S
+        assertTextPresent("(search engine matches)");
+        assertTextNotPresent("(all matching peptides)");
+        assertTextPresent("2 Total qualifying peptides in run", 4);
+        assertTextPresent("2 Distinct qualifying peptides in run", 4);
+        assertTextPresent("peptide-marker", 4);
+        assertTextPresent(" 1  / 1(Q^) ", 1); // TODO: how do we verify the location of the match in the coverage map table?
+        popLocation();
+
+        clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
+        setFormElement(Locator.input("targetProtein"), "gi|18311790|phosphoribosylfor");
+        clickButton("Compare");
+        assertTextPresent("R.Q^YALHVDGVGTK.A");
+        assertTextNotPresent("K.EEEESDEDMGFG.-");
+        assertTextNotPresent("K.GSDSLSDGPACKR.S");
+        assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
+
+        // verify the bulk protein coverage map export for peptideProphet filter with target protein
+        pushLocation();
+        addUrlParameter("exportAsWebPage=true");
+        clickButton("Export Protein Coverage");
+        assertTextPresentInThisOrder("18311790", "NP_558457.1");
+        assertTextNotPresent("CAA80880.2"); // for peptide K.EEEESDEDMGFG.-
+        assertTextPresent("(all matching peptides)");
+        assertTextNotPresent("(search engine matches)");
+        assertTextPresent("(PeptideProphet &gt;= 0.9) AND (Matches sequence of ", 2);
+        assertTextPresent("Peptide Counts:", 2);
+        assertTextPresent("1 Total peptide matching sequence", 1);
+        assertTextPresent("1 Distinct peptide matching sequence", 1);
+        assertTextPresent("0 Total peptides matching sequence", 1);
+        assertTextPresent("0 Distinct peptides matching sequence", 1);
+        assertTextPresent("2 Total qualifying peptides in run", 2);
+        assertTextPresent("2 Distinct qualifying peptides in run", 2);
+        assertTextPresent("peptide-marker", 1);
+        assertTextPresent(" 1  / 1(Q^) ", 1); // TODO: how do we verify the location of the match in the coverage map table?
+        popLocation();
+
+        clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
+        setFormElement(Locator.input("targetProtein"), "gi|15645924|ribosomal_protein");
+        click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
+        clickButton("Compare");
+        assertTextPresent("K.YTELK.D");
+        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
+        assertTextNotPresent("R.Q^YALHVDGVGTK.A");
+        assertTextNotPresent("K.EEEESDEDMGFG.-");
+        assertTextNotPresent("K.GSDSLSDGPACKR.S");
+        assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
+
+        // verify the bulk protein coverage map export for target protein
+        pushLocation();
+        addUrlParameter("exportAsWebPage=true");
+        clickButton("Export Protein Coverage");
+        assertTextPresentInThisOrder("15645924", "NP_208103.1");
+        assertTextPresent("NP_208103.1", 4);
+        assertTextNotPresent("15612296", "NP_223949.1");
+        assertTextPresent("(all matching peptides)");
+        assertTextNotPresent("(search engine matches)");
+        assertTextPresent("Peptide Counts:", 2);
+        assertTextPresent("0 Total peptides matching sequence", 1);
+        assertTextPresent("0 Distinct peptides matching sequence", 1);
+        assertTextPresent("57 Total qualifying peptides in run", 1);
+        assertTextPresent("57 Distinct qualifying peptides in run", 1);
+        assertTextPresent("2 Total peptides matching sequence", 1);
+        assertTextPresent("2 Distinct peptides matching sequence", 1);
+        assertTextPresent("59 Total qualifying peptides in run", 1);
+        assertTextPresent("59 Distinct qualifying peptides in run", 1);
+        assertTextPresent("peptide-marker", 2);
+        popLocation();
+
+        log("Test Compare Runs using Query Peptides");
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
+        click(Locator.name(".toggle"));
+        clickMenuButton("Compare", "Peptide");
+        checkRadioButton(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
+        setFormElement(Locator.name("targetProtein"), "");
+        clickButton("Compare");
+        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
+        assertTextPresent("R.TQMPAASICVNYK.G");
+        assertTextPresent("Avg PepProphet");
+
+        log("Test Customize View in Query Peptides");
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("CTAGG_AVG_XCorr");
+        _customizeViewsHelper.removeCustomizeViewColumn("InstanceCount");
+        _customizeViewsHelper.addCustomizeViewFilter("CTAGG_AVG_XCorr", "Avg XCorr", "Is Greater Than", "10");
+        _customizeViewsHelper.saveCustomView();
+
+        log("Check filtering and columns were added correctly");
+        assertTextPresent("Avg XCorr");
+        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
+        assertTextNotPresent("R.TQMPAASICVNYK.G");
+        assertTextPresent("11.200", "13.800");
+
+        log("Check Ignore/Apply View Filter");
+        clickMenuButton("Views", "Apply View Filter");
+        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
+        assertTextPresent("R.TQMPAASICVNYK.G");
+        assertTextPresent("Avg XCorr");
+
+        clickMenuButton("Views", "Apply View Filter");
+        assertTextPresent("Avg XCorr");
+        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
+        assertTextNotPresent("R.TQMPAASICVNYK.G");
+
+        log("Test exporting in Query Peptides Comparision");
+        addUrlParameter("exportAsWebPage=true");
+        clickExportToText();
+        assertTextPresent("AVG_XCorr");
+        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
+        assertTextNotPresent("R.TQMPAASICVNYK.G");
+        assertTextPresent("11.200", "13.800");
+        goBack();
     }
 
     private void pepXMLtest()
@@ -1387,7 +1178,6 @@ public class MS2Test extends MS2TestBase
     {
         log("Validate previously failing queiries");
 
-
         String  sqlGroupNumberDisplay =    "SELECT ProteinGroups.\"Group\", \n" +
                 "ProteinGroups.GroupProbability, \n" +
                 "ProteinGroups.ErrorRate, \n" +
@@ -1416,7 +1206,7 @@ public class MS2Test extends MS2TestBase
         _extHelper.clickExtTab("Source");
         clickButtonContainingText("Execute Query", 0);
         assertTextNotPresent(expectedError);
-        goToHome();
 
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
     }
 }

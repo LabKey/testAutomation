@@ -17,9 +17,9 @@
 package org.labkey.test.ms2;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 
@@ -49,7 +49,6 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
             "  <note label=\"pipeline quantitation, residue label mass\" type=\"input\">9.0@C</note> \n" +
             "  <note label=\"pipeline quantitation, algorithm\" type=\"input\">xpress</note> \n" +
         "</bioml>";
-    protected static final int MAX_WAIT_SECONDS = 60*5;
 
     public final static String PIPELINE_PATH = getLabKeyRoot() + "/sampledata/xarfiles/ms2pipe";
 
