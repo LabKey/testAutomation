@@ -641,7 +641,7 @@ public abstract class Locator
     {
         if (!value.contains("'")) {
             return "'" + value + "'";
-        } else if (value.indexOf('"') < 0) {
+        } else if (!value.contains("\"")) {
             return '"' + value + '"';
         } else {
             String result = "concat(";

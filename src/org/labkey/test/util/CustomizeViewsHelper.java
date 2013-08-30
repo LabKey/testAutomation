@@ -161,7 +161,12 @@ public class CustomizeViewsHelper extends AbstractHelper
 
     public void addCustomizeViewColumn(String[] fieldKeyParts)
     {
-        addCustomizeViewItem(fieldKeyParts, StringUtils.join(fieldKeyParts, "/"), ViewItemType.Columns);
+        addCustomizeViewColumn(fieldKeyParts, StringUtils.join(fieldKeyParts, "/"));
+    }
+
+    public void addCustomizeViewColumn(String[] fieldKeyParts, String label)
+    {
+        addCustomizeViewItem(fieldKeyParts, label, ViewItemType.Columns);
     }
 
     public void changeTab(ViewItemType tab)

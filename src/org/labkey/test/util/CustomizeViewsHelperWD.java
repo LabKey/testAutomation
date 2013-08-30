@@ -22,10 +22,8 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
@@ -204,7 +202,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
     public void addCustomizeViewColumn(String[] fieldKeyParts)
     {
-        addCustomizeViewItem(fieldKeyParts, StringUtils.join(fieldKeyParts, "/"), ViewItemType.Columns);
+        addCustomizeViewColumn(fieldKeyParts, StringUtils.join(fieldKeyParts, "/"));
     }
 
     public void changeTab(ViewItemType tab)
@@ -261,6 +259,11 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         Locator checkbox = columnItem.append("/input[@type='checkbox']");
 
         _test.checkCheckbox(checkbox);
+    }
+
+    public void addCustomizeViewColumn(String[] fieldKeyParts, String label)
+    {
+        addCustomizeViewItem(fieldKeyParts, label, ViewItemType.Columns);
     }
 
     public void addCustomizeViewColumn(String fieldKey, String column_name)

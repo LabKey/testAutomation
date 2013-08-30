@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.MS2;
+import org.labkey.test.ms2.MS2TestBase;
 
 /**
  * User: elvan
@@ -28,7 +29,7 @@ import org.labkey.test.categories.MS2;
  * Time: 3:32 PM
  */
 @Category({DailyB.class, MS2.class})
-public class LibraTest extends MS2Test
+public class LibraTest extends MS2TestBase
 {
     private String standardView = "Standard View";
     protected String proteinProphetView = "Protein Prophet View";

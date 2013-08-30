@@ -349,6 +349,7 @@ src/org/labkey/test/tests/LuminexRTransformTest.java -text
 src/org/labkey/test/tests/LuminexTest.java -text
 src/org/labkey/test/tests/LuminexUploadAndCopyTest.java -text
 src/org/labkey/test/tests/MS1Test.java -text
+src/org/labkey/test/tests/MS2ExportTest.java -text
 src/org/labkey/test/tests/MS2GZTest.java -text
 src/org/labkey/test/tests/MS2Test.java -text
 src/org/labkey/test/tests/MassFilterTest.java -text
