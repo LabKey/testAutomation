@@ -35,6 +35,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
     private static final String REPORT_NAME_2 = "TimeChartTest 2Report";
     private static final String REPORT_NAME_3 = "TimeChartTest Multi-Measure Report";
     private static final String X_AXIS_LABEL = "New X-Axis Label";
+    private static final String X_AXIS_LABEL_MANUAL = "New X-Axis Label Manual";
     private static final String Y_AXIS_LABEL = "New Y-Axis Label";
     private static final String CHART_TITLE = "New Chart Title";
     private static final String PER_GROUP = "One Chart Per Group";
@@ -228,7 +229,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         // set manual x-axis range
         goToAxisTab(X_AXIS_LABEL);
-        setAxisValue(Axis.X, "xaxis_range_manual", "15", "40", null, null, null, new String[] {"15\n20\n25\n30\n35\n40"}, null);
+        setAxisValue(Axis.X, "xaxis_range_manual", "15", "40", X_AXIS_LABEL_MANUAL, null, null, new String[] {X_AXIS_LABEL_MANUAL,"15","20","25","30","35","40"}, null);
 
         log("Test Y-Axis");
         goToAxisTab("Viral Load Quantified (copies/ml)");
@@ -286,7 +287,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         click(Locator.tagWithText("div", REPORT_NAME_1));
         assertTextPresent(REPORT_DESCRIPTION);
         clickAndWait(Locator.xpath("//a[text()='edit' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
-        waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
+        waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
         assertTextPresent(CHART_TITLE, 6); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
         pushLocation();
         pushLocation();
@@ -328,11 +329,11 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
         click(Locator.tagWithText("div", REPORT_NAME_1));
         clickAndWait(Locator.xpath("//a[text()='edit' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
-        waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
+        waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
         // change to the data points are visible again
         goToAxisTab(Y_AXIS_LABEL);
         setAxisValue(Axis.LEFT, "leftaxis_range_automatic", null, null, null, "leftaxis_scale", "Linear", null, null);
-        goToAxisTab(X_AXIS_LABEL);
+        goToAxisTab(X_AXIS_LABEL_MANUAL);
         setAxisValue(Axis.X, "xaxis_range_automatic", null, null, null, null, null, null, null);
         waitForText("249318596,\n Days", 20, WAIT_FOR_JAVASCRIPT); // 10 in first ptid chart and 10 in save dialog thumbnail preview
         // open the developer panel and verify that it is disabled by default
@@ -379,7 +380,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
         click(Locator.tagWithText("div", REPORT_NAME_1));
         clickAndWait(Locator.xpath("//a[text()='edit' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
-        waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
+        waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
         clickAndWait(Locator.css("svg a circle"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Participant - 249318596");
 
@@ -392,14 +393,14 @@ public class TimeChartDateBasedTest extends TimeChartTest
         // USER2 is not yet a developer, so shouldn't have permissions to this feature
         impersonate(USER2);
         popLocation();
-        waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
+        waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
         assertElementNotPresent(Locator.ext4Button("Developer"));
         stopImpersonating();
         // give USER2 developer perms and try again
         createSiteDeveloper(USER2);
         impersonate(USER2);
         popLocation();
-        waitForText(X_AXIS_LABEL, WAIT_FOR_JAVASCRIPT);
+        waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
         assertElementPresent(Locator.ext4Button("Developer"));
         stopImpersonating();
     }
@@ -639,8 +640,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
 
         waitForElement(Locator.tag("td").withText("Please select at least one group from the filter panel on the right."));
-        // wait for tool tip to disappear, as it is covering what we want to click
-        waitForElement(Locator.xpath("//div[contains(@class, 'x4-tip') and contains(@style, 'display: none')]//div[contains(text(), 'Click the label to select only this item')]"));
+        sleep(5500);// wait for tool tip to disappear, as it is covering what we want to click. it has a timeout of 5 sec
 
         // re-select group 1 and 2
         _ext4Helper.checkGridRowCheckbox(GROUP1_NAME);
