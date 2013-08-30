@@ -238,9 +238,10 @@ public class Ext4Helper extends AbstractHelper
      */
     public void clickParticipantFilterGridRowText(String cellText, int index)
     {
-        Locator.XPathLocator rowLoc = Locator.xpath("//tr[contains(@class, 'x4-grid-row')]//span[contains(@class, 'lk-filter-panel-label') and text() = " + Locator.xq(cellText) + "]");
+        _test.waitForElementToDisappear(Locator.tag("div").withClass("x4-tip").notHidden()); // tooltip breaks test in Chrome
+        Locator.XPathLocator rowLoc = getGridRow(cellText, index);
         _test.waitForElement(rowLoc);
-        _test.click(rowLoc);
+        _test.click(rowLoc.append("//span[contains(@class, 'lk-filter-panel-label')][normalize-space() = '"+cellText+"']"));
     }
 
     /**
@@ -250,7 +251,7 @@ public class Ext4Helper extends AbstractHelper
      */
     public void clickParticipantFilterCategory(String categoryLabel)
     {
-        Locator.XPathLocator loc = Locator.xpath("//div[contains(@class, 'category-label') and text()='" + categoryLabel + "']/../../td/input[contains(@class, 'category-header')]");
+        Locator.XPathLocator loc = Locator.xpath("//div[contains(@class, 'category-label') and text()='" + categoryLabel + "']/../../td/div[contains(@class, 'category-header')]");
         _test.click(loc);
     }
 
@@ -377,7 +378,7 @@ public class Ext4Helper extends AbstractHelper
      */
     private Locator.XPathLocator getGridRow(String cellText, int index)
     {
-        return Locator.xpath("(//tr[contains(@class, 'x4-grid-row')][td[string() = " + Locator.xq(cellText) + "]][" + Locator.NOT_HIDDEN + "])[" + (index + 1) + "]");
+        return Locator.xpath("(//tr[contains(@class, 'x4-grid-row')][(td|td/table/tbody/tr/td)[string() = " + Locator.xq(cellText) + "]][" + Locator.NOT_HIDDEN + "])[" + (index + 1) + "]");
     }
 
     public static Locator.XPathLocator invalidField()

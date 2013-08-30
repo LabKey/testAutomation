@@ -651,7 +651,7 @@ public class DataRegionTable
 
         public static Locator.XPathLocator expandedFacetPanel(String tableName)
         {
-            return facetPanel(tableName).withDescendant(Locator.xpath("div/div").withPredicate("not(contains(@class, 'x4-panel-collapsed'))").withClass("labkey-data-region-facet"));
+            return facetPanel(tableName).withDescendant(Locator.xpath("div").withPredicate("not(contains(@class, 'x4-panel-collapsed'))").withClass("labkey-data-region-facet"));
         }
 
         public static Locator.XPathLocator collapsedFacetPanel(String tableName)
