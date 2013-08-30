@@ -194,38 +194,38 @@ public class StudyDatasetsTest extends StudyBaseTest
         dataset.openSideFilterPanel();
 
         waitForElement(Locator.paginationText(24));
-        dataset.clickFacetLabel(CATEGORY1, GROUP1A); // Select only GROUP1A
+        _ext4Helper.clickParticipantFilterGridRowText(GROUP1A, 0);
         waitForElementToDisappear(Locator.css(".labkey-pagination"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.linkWithText(PTIDS[0]));
         assertElementPresent(Locator.linkWithText(PTIDS[1]));
         Assert.assertEquals("Wrong number of rows after filter", 2, dataset.getDataRowCount());
 
-        dataset.clickFacetCheckbox(CATEGORY1, GROUP1B); // GROUP1A OR GROU1B
+        _ext4Helper.checkGridRowCheckbox(GROUP1B); // GROUP1A OR GROU1B
         waitForElement(Locator.linkWithText(PTIDS[2]));
         assertElementPresent(Locator.linkWithText(PTIDS[0]));
         assertElementPresent(Locator.linkWithText(PTIDS[1]));
         assertElementPresent(Locator.linkWithText(PTIDS[3]));
         Assert.assertEquals("Wrong number of rows after filter", 4, dataset.getDataRowCount());
 
-        dataset.clickFacetLabel(CATEGORY2, GROUP2A); // (GROUP1A OR GROU1B) AND GROUP2A
+        _ext4Helper.clickParticipantFilterGridRowText(GROUP2A, 0);// (GROUP1A OR GROU1B) AND GROUP2A
         waitForElementToDisappear(Locator.linkWithText(PTIDS[2]));
         waitForElement(Locator.linkWithText(PTIDS[1]));
         assertElementPresent(Locator.linkWithText(PTIDS[3]));
         Assert.assertEquals("Wrong number of rows after filter", 2, dataset.getDataRowCount());
 
-        dataset.clickFacetLabel(CATEGORY2, "Not in any group"); // (GROUP1A OR GROUP1B) AND (CATEGORY2 = NULL)
+        _ext4Helper.clickParticipantFilterGridRowText("Not in any group", 1); // (GROUP1A OR GROUP1B) AND (CATEGORY2 = NULL)
         waitForElementToDisappear(Locator.linkWithText(PTIDS[1]));
         waitForElement(Locator.linkWithText(PTIDS[0]));
         Assert.assertEquals("Wrong number of rows after filter", 1, dataset.getDataRowCount());
 
-        dataset.clickFacetCheckbox(CATEGORY2); // (GROUP1A OR GROUP1B)
+        _ext4Helper.clickParticipantFilterCategory(CATEGORY2); // (GROUP1A OR GROUP1B)
         waitForElement(Locator.linkWithText(PTIDS[2]));
         assertElementPresent(Locator.linkWithText(PTIDS[0]));
         assertElementPresent(Locator.linkWithText(PTIDS[1]));
         assertElementPresent(Locator.linkWithText(PTIDS[3]));
         Assert.assertEquals("Wrong number of rows after filter", 4, dataset.getDataRowCount());
 
-        dataset.clickFacetCheckbox("Cohorts", "Group 1"); // (GROUP1A OR GROUP1B) AND (NOT(COHORT 1))
+        _ext4Helper.clickParticipantFilterGridRowText("Group 1", 0); // (GROUP1A OR GROUP1B) AND (NOT(COHORT 1))
         waitForElementToDisappear(Locator.linkWithText(PTIDS[0]));
         waitForElement(Locator.linkWithText(PTIDS[1]));
         assertElementPresent(Locator.linkWithText(PTIDS[2]));

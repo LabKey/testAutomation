@@ -612,21 +612,6 @@ public class DataRegionTable
         _test.waitForElement(Locator.css(".lk-filter-panel-label"));
     }
 
-    public void clickFacetCheckbox(String category, String group)
-    {
-        _test.click(Locators.facetPanel(_tableName).append(Locators.facetCheckbox(category, group)));
-    }
-
-    public void clickFacetLabel(String category, String group)
-    {
-        _test.click(Locators.facetPanel(_tableName).append(Locators.facetRow(category, group)).append("//span").withClass("lk-filter-panel-label"));
-    }
-
-    public void clickFacetCheckbox(String category)
-    {
-        _test.click(Locators.facetPanel(_tableName).append(Locators.facetCheckbox(category)));
-    }
-
     public void toggleAllFacetsCheckbox()
     {
         _test.mouseDown(Locator.xpath("//b").withClass("lk-filter-panel-label").withText("All"));
