@@ -9,7 +9,7 @@
         <url>participant-group/StudyVerifyProject/My%20Study/createParticipantCategory.view?</url>
         <response>{
             "category": {
-            "shared": false,
+            "shared": true,
             "autoUpdate": false,
             "label": "Controller",
             "type": "list",
@@ -29,7 +29,7 @@
         <url>participant-group/StudyVerifyProject/My%20Study/createParticipantCategory.view?</url>
         <response>{
             "category": {
-            "shared": false,
+            "shared": true,
             "autoUpdate": false,
             "label": "Elite Controller",
             "type": "list",
@@ -50,7 +50,7 @@
         <url>participant-group/StudyVerifyProject/My%20Study/createParticipantCategory.view?</url>
         <response>{
             "category": {
-            "shared": false,
+            "shared": true,
             "autoUpdate": false,
             "label": "Non Controller",
             "type": "list",
@@ -78,7 +78,7 @@
                 ]
             },
             {
-                "shared": false,
+                "shared": true,
                 "autoUpdate": false,
                 "label": "Controller",
                 "type": "list",
@@ -91,7 +91,7 @@
                 ]
             },
             {
-                "shared": false,
+                "shared": true,
                 "autoUpdate": false,
                 "label": "Elite Controller",
                 "rowId": 317,
@@ -103,7 +103,7 @@
                 ]
             },
             {
-                "shared": false,
+                "shared": true,
                 "autoUpdate": false,
                 "label": "Non Controller",
                 "type": "list",
