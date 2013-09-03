@@ -225,7 +225,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         assertElementPresent(Locator.linkWithText(PTIDS[3]));
         Assert.assertEquals("Wrong number of rows after filter", 4, dataset.getDataRowCount());
 
-        _ext4Helper.clickParticipantFilterGridRowText("Group 1", 0); // (GROUP1A OR GROUP1B) AND (NOT(COHORT 1))
+        _ext4Helper.uncheckGridRowCheckbox("Group 1"); // (GROUP1A OR GROUP1B) AND (NOT(COHORT 1))
         waitForElementToDisappear(Locator.linkWithText(PTIDS[0]));
         waitForElement(Locator.linkWithText(PTIDS[1]));
         assertElementPresent(Locator.linkWithText(PTIDS[2]));
@@ -238,7 +238,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         _extHelper.clickMenuButton(false, "Mouse Groups", "Create Mouse Group", "From All Mice");
         _extHelper.waitForExtDialog("Define Mouse Group");
         setFormElement(Locator.id("groupLabel-inputEl"), EXTRA_GROUP);
-        _extHelper.clickExtButton("Define Mouse Group", "Save", 0);
+        _ext4Helper.clickWindowButton("Define Mouse Group", "Save", 0, 0);
         waitForElement(DataRegionTable.Locators.facetRow(EXTRA_GROUP, EXTRA_GROUP));
     }
 
@@ -378,7 +378,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         // verify that the main title reset goes back to the dataset label - measue name
         waitAndClick(Locator.css("svg text:contains('APX Main Title')"));
         setFormElement(Locator.name("chart-title-textfield"), "test");
-        waitForElementToDisappear(Locator.xpath("//div[contains(@class, 'x4-btn-disabled')]//span[contains(@class, 'iconReload')]"));
+        waitForElementToDisappear(Locator.xpath("//a[contains(@class, 'x4-btn-disabled')]//span[contains(@class, 'iconReload')]"));
         click(Locator.xpath("//span[contains(@class, 'iconReload')]"));
         Assert.assertEquals(datasetLabel + " - 3. BP systolic xxx/", getFormElement(Locator.name("chart-title-textfield")));
         clickButton("Cancel", 0);

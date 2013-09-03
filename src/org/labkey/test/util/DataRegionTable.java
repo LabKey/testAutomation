@@ -646,22 +646,12 @@ public class DataRegionTable
 
         public static Locator.XPathLocator facetRow(String category)
         {
-            return Locator.xpath("//tr").withClass("x4-grid-group-hd").withText(category);
+            return Locator.xpath("//div").withClass("x4-grid-body").withPredicate(Locator.xpath("//div").withClass("lk-filter-panel-label").withText(category));
         }
 
         public static Locator.XPathLocator facetRow(String category, String group)
         {
-            return facetRow(category).append("/following-sibling::tr[1]").withClass("x4-grid-group-body").append("//tr").withClass("x4-grid-row").withPredicate(Locator.xpath("td").withText(group));
-        }
-
-        public static Locator.XPathLocator facetCheckbox(String category)
-        {
-            return Locator.xpath("//div[contains(@class, 'category-label') and text()='" + category + "']/../../td/input[contains(@class, 'category-header')]");
-        }
-
-        public static Locator.XPathLocator facetCheckbox(String category, String group)
-        {
-            return facetRow(category, group).append("//div").withClass("x4-grid-row-checker");
+            return facetRow(category).withPredicate(Locator.xpath("//span").withClass("lk-filter-panel-label").withText(group));
         }
     }
 }
