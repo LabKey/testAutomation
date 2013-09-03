@@ -734,7 +734,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         //assert custom data element present.  core.users cannot be edited, so it should hide the import UI
-        assertElementPresent(LabModuleHelper.getNavPanelRow(GROUP_SOURCE));
+        assertElementPresent(Locator.linkContainingText(GROUP_SOURCE));
         assertElementNotPresent(LabModuleHelper.getNavPanelItem("Users:", IMPORT_DATA_TEXT));
 
         //verify that the demographics source has been added

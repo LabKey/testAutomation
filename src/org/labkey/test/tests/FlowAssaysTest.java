@@ -119,6 +119,8 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Trying to save invalid data");
         String errorText = text.replaceAll("CD14 Mono", "NotRealPopulation");
         textarea.setValue(errorText);
+        Ext4CmpRefWD btn = _ext4Helper.queryOne("#upload", Ext4CmpRefWD.class);
+        btn.waitForEnabled();
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
