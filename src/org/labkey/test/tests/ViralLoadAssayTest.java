@@ -28,6 +28,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.External;
+import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -50,7 +51,7 @@ import java.util.Map;
  * Date: 11/6/12
  * Time: 5:43 PM
  */
-@Category({External.class, ONPRC.class})
+@Category({External.class, ONPRC.class, LabModule.class})
 public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 {
     private static final String ASSAY_NAME = "Viral Load Test";
@@ -362,7 +363,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         templates.clickLink(0, 1);
         
         //use the same data included with this assay
-        Locator btn = Locator.xpath("//span[text() = 'Download Example Data']");
+        Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
         Assert.assertEquals("Incorrect value for field", "ABI 7500", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
@@ -525,7 +526,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         //switch import method
         Ext4FieldRefWD field = Ext4FieldRefWD.getForBoxLabel(this, "LC480");
         field.setChecked(true);
-        Locator btn = Locator.xpath("//span[text() = 'Download Example Data']");
+        Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
         Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
@@ -616,7 +617,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         //switch import method
         Ext4FieldRefWD field = Ext4FieldRefWD.getForBoxLabel(this, "Light Cycler");
         field.setChecked(true);
-        Locator btn = Locator.xpath("//span[text() = 'Download Example Data']");
+        Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
         //set other field values

@@ -33,6 +33,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.External;
+import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AdvancedSqlTest;
@@ -52,10 +53,12 @@ import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * User: bbimber
@@ -68,7 +71,7 @@ import java.util.Map;
  * Contains a series of tests designed to test the UI in the laboratory module.
  * Also contains considerable coverage of Ext4 components and the client API
  */
-@Category({External.class, ONPRC.class})
+@Category({External.class, ONPRC.class, LabModule.class})
 public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);
@@ -237,7 +240,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _containerHelper.createProject(getProjectName(), "Laboratory Folder");
         enableModules(getEnabledModules(), true);
 
-
         setupAssays();
     }
 
@@ -288,8 +290,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Long expected = format.parse(dateStr).getTime();
         String clientDateStr = (String)executeScript("return (new Date()).toString()");
         Long actual = (Long)executeScript("return LDK.ConvertUtils.parseDate('" + dateStr + "').getTime();");
+        String clientTimezone = (String)executeScript("return Ext4.Date.getTimezone(LDK.ConvertUtils.parseDate('" + dateStr + "'));");
+        String serverTimezone = Calendar.getInstance().getTimeZone().getDisplayName(false, TimeZone.SHORT);
         Date now = new Date();
-        Assert.assertEquals("Incorrect JS date parsing for date: " + dateStr + " at: " + now + ", client date was: " + clientDateStr, expected, actual);
+        Assert.assertEquals("Incorrect JS date parsing for date: " + dateStr + " at: " + now + ", client date was: " + clientDateStr + ", with timezone: " + clientTimezone + ", with server timezone: " + serverTimezone, expected, actual);
     }
 
     private void workbookNumberingTest() throws Exception
@@ -636,12 +640,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         assertTextPresent("You must select a report to display by clicking the one of the 2nd tier tabs below");
         waitAndClick(Locator.ext4Button("OK"));
 
-        //NOTE: this is turned off by earlier test steps
-//        waitAndClick(Ext4HelperWD.ext4Tab("Sequence Data"));
-//        waitForElement(Ext4HelperWD.ext4Tab("Sequence Readsets"));
-//        waitAndClick(Ext4HelperWD.ext4Tab("Sequence Readsets"));
-//        waitForText("Sequence Readsets - 12345, 23456");
-        assertElementNotPresent(Ext4HelperWD.ext4Tab("Sequence Data"));
+        waitAndClick(Ext4HelperWD.ext4Tab("Sequence Data"));
+        waitForElement(Ext4HelperWD.ext4Tab("Sequence Readsets"));
+        waitAndClick(Ext4HelperWD.ext4Tab("Sequence Readsets"));
+        waitForText("Sequence Readsets - 12345, 23456");
 
         //now walk assay tabs
         for (Pair<String, String> pair : getAssaysToCreate())
@@ -662,7 +664,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     {
         goToAdminConsole();
         waitAndClick(Locator.linkContainingText("laboratory module admin"));
-        waitAndClick(Locator.xpath("//span[contains(text(), 'Manage Default Data and Demographics Sources')]"));
+        waitAndClick(Locator.linkContainingText("Manage Default Data and Demographics Sources"));
         waitForText("You are currently editing the data and demographics sources for the Shared project");  //proxy for data loading
 
         cleanupDataSources();
@@ -762,7 +764,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         //now validate site-summary reports
         goToAdminConsole();
         waitAndClick(Locator.linkContainingText("laboratory module admin"));
-        waitAndClick(Locator.xpath("//span[contains(text(), 'Manage Default Data and Demographics Sources')]"));
+        waitAndClick(Locator.linkContainingText("Manage Default Data and Demographics Sources"));
 
         waitAndClick(Locator.ext4Button("View Summary of Data Sources"));
         waitForText("The following sources have been defined:");

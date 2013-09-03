@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.External;
+import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -39,7 +40,7 @@ import java.util.Map;
  * Date: 11/19/12
  * Time: 5:06 PM
  */
-@Category({External.class, ONPRC.class})
+@Category({External.class, ONPRC.class, LabModule.class})
 public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 {
     private static final String ASSAY_NAME = "ELISPOT Test";
@@ -222,7 +223,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         templates.clickLink(0, 1);
 
         //use the same data included with this assay
-        Locator btn = Locator.xpath("//span[text() = 'Download Example Data']");
+        Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
         Assert.assertEquals("Incorrect value for field", "AID Plate Reader", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());

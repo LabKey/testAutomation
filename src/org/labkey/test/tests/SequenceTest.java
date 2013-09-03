@@ -34,6 +34,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.External;
+import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
@@ -62,7 +63,7 @@ import java.util.zip.GZIPInputStream;
  * Date: 5/28/12
  * Time: 7:12 PM
  */
-@Category({External.class, ONPRC.class})
+@Category({External.class, ONPRC.class, LabModule.class})
 public class SequenceTest extends BaseWebDriverTest
 {
     protected LabModuleHelper _helper = new LabModuleHelper(this);

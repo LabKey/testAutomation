@@ -56,7 +56,7 @@ public class TestSet
         try
         {
             Method isSuite = _suite.getMethod("isSuite");
-            return (boolean)isSuite.invoke(null);
+            return (Boolean)isSuite.invoke(null);
         }
         catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex)
         {
