@@ -37,7 +37,7 @@ public class MS2ExportTest extends AbstractMS2ImportTest
         searchRunsTable.checkAllOnPage();
         clickButton("MS2 Export");
 
-        assertTextPresent("Bibliospec");
+        assertTextPresent("BiblioSpec");
 
         Runnable tsvPeptideValidator = new Runnable()
         {
