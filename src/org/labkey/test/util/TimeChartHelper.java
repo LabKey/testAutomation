@@ -37,7 +37,7 @@ public class TimeChartHelper
     public void addAMeasure(String measure)
     {
         _test.log("Adding measure " + measure + " to time chart");
-        _test.waitAndClickButton("Choose a Measure");
+        _test.waitAndClickButton("Choose a Measure", 0);
         _test.waitForText("mem naive");
 
         _test.setFormElement(Locator.name("filterSearch"), measure);
