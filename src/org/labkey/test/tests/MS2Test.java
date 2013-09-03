@@ -184,7 +184,7 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test Scan, Z, Hyper, Next, B, Y, and Expect filters");
         pushLocation();
-        selectOptionByText(Locator.name("viewParams"), VIEW);
+        selectOptionByText(Locator.name("viewParams"), LEGACY_PEPTIDES_SCAN_6_100_VIEW_NAME);
         clickButton("Go");
         assertTextNotPresent("K.FANIGDVIVASVK.Q");
         assertTextPresent("-.MELFSNELLYK.T");
