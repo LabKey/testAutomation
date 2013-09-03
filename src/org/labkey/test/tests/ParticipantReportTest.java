@@ -108,7 +108,7 @@ public class ParticipantReportTest extends ReportTest
 
         // no longer an all check box
         deselectAllFilterGroups();
-        waitForText("No matching Mice");
+        waitForText("No matching enrolled Mice");
 
         _ext4Helper.checkGridRowCheckbox(MICE_C);
         waitForText("Found 3 mice of 138.");
@@ -132,7 +132,7 @@ public class ParticipantReportTest extends ReportTest
         clickAndWait(Locator.linkWithText("Mice"));
         waitForElement(Locator.css(".lk-filter-panel-label")); // Wait for participant list to appear.
         deselectAllFilterGroups();
-        waitForText("No matching Mice");
+        waitForText("No matching enrolled Mice");
         _ext4Helper.checkGridRowCheckbox(MICE_C);
         waitForText("Found 5 mice of 138.");
     }
