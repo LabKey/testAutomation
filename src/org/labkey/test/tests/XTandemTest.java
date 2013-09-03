@@ -114,7 +114,7 @@ public class XTandemTest extends AbstractXTandemTest
         clickAndWait(Locator.linkWithText("Peptide (Legacy)"));
         selectOptionByText("viewParams", VIEW);
         clickButton("Compare");
-        assertTextPresent("(Mass > 1000)");
+        assertTextPresent("(Mass > 1000.0)");
 
         //Put in once bug with filters in postgres is fixed
         assertTextNotPresent(PEPTIDE);
