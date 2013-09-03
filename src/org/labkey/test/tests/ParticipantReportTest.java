@@ -111,10 +111,10 @@ public class ParticipantReportTest extends ReportTest
         waitForText("No matching enrolled Mice");
 
         _ext4Helper.checkGridRowCheckbox(MICE_C);
-        waitForText("Found 3 mice of 138.");
+        waitForText("Found 3 enrolled mice of 138.");
 
         _ext4Helper.checkGridRowCheckbox(MICE_B);
-        waitForText("Found 7 mice of 138.");
+        waitForText("Found 7 enrolled mice of 138.");
 
         // Test changing category and changing it back
         clickTab("Manage");
@@ -134,7 +134,7 @@ public class ParticipantReportTest extends ReportTest
         deselectAllFilterGroups();
         waitForText("No matching enrolled Mice");
         _ext4Helper.checkGridRowCheckbox(MICE_C);
-        waitForText("Found 5 mice of 138.");
+        waitForText("Found 5 enrolled mice of 138.");
     }
 
     @LogMethod
@@ -150,11 +150,11 @@ public class ParticipantReportTest extends ReportTest
         // select some measures from a dataset
         waitAndClickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "cpf-1");
         pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
-        waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][18]"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Wrong number of measures visible after filtering.", 17, getXpathCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')]")));
+        waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][18]"));
+        Assert.assertEquals("Wrong number of measures visible after filtering.", 17, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')]")));
 
         _extHelper.clickX4GridPanelCheckbox("label", "2a. Creatinine", "measuresGridPanel", true);
         _extHelper.clickX4GridPanelCheckbox("label", "1a.ALT AE Severity Grade", "measuresGridPanel", true);
@@ -170,11 +170,11 @@ public class ParticipantReportTest extends ReportTest
         // select additional measures from another dataset
         clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "2a. Creatinine");
         pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
         waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')][5]"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Wrong number of measures visible after filtering.", 4, getXpathCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
+        Assert.assertEquals("Wrong number of measures visible after filtering.", 4, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
         _extHelper.clickX4GridPanelCheckbox("queryName", "CPS-1", "measuresGridPanel", true);
         clickButton("Select", 0);
 
@@ -239,10 +239,10 @@ public class ParticipantReportTest extends ReportTest
         goToManageViews();
         clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
 
-        waitForText("Creatinine", 34, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 column headers) + 8 mice (x2 column tooltips) + 2 in hidden customize panel
+        waitForText("Creatinine", 32, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 column headers) + 8 mice (x2 column tooltips)
         assertTextPresent(PARTICIPANT_REPORT_NAME);
-        assertTextPresent("1a.ALT AE Severity Grade", 17); // 8 mice + 8 grid field tooltips + 1 hidden grid row in customization panel
-        assertTextPresent("1a. ALT (SGPT)", 17); // 8 mice + 8 grid field tooltips + 1 hidden grid row in customization panel
+        assertTextPresent("1a.ALT AE Severity Grade", 16); // 8 mice + 8 grid field tooltips
+        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice + 8 grid field tooltips
         assertElementPresent(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results"));
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
 
@@ -284,12 +284,12 @@ public class ParticipantReportTest extends ReportTest
         goToManageViews();
         clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
 
-        waitForText("Creatinine", 17, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
+        waitForText("Creatinine", 16, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results")); // There should only be 8 results, and it should state that.
 
         assertTextPresent(PARTICIPANT_REPORT_NAME);
-        assertTextPresent("1a.ALT AE Severity Grade", 17); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
-        assertTextPresent("1a. ALT (SGPT)", 17); // 8 mice + 8 grid field tooltips  + 1 in hidden customize panel
+        assertTextPresent("1a.ALT AE Severity Grade", 16); // 8 mice + 8 grid field tooltips
+        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice + 8 grid field tooltips
         assertElementPresent(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results"));
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
@@ -302,10 +302,10 @@ public class ParticipantReportTest extends ReportTest
         goToManageViews();
         clickReportGridLink(PARTICIPANT_REPORT2_NAME, "view");
 
-        waitForText("Creatinine", 17, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
+        waitForText("Creatinine", 16, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips
         assertTextPresent(PARTICIPANT_REPORT2_NAME);
         assertTextNotPresent("1a.ALT AE Severity Grade");
-        assertTextPresent("1a. ALT (SGPT)", 17); // 8 mice + 8 grid field tooltips + 1 in hidden customize panel
+        assertTextPresent("1a. ALT (SGPT)", 16); // 8 mice + 8 grid field tooltips
         assertElementPresent(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results"));
         assertElementPresent(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]")); // Edit panel should be hidden
         log("Verify report name and description.");
@@ -319,7 +319,7 @@ public class ParticipantReportTest extends ReportTest
         // select some measures from a dataset
         waitAndClickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
 
         _extHelper.clickX4GridPanelCheckbox("label", "17a. Preg. test result", "measuresGridPanel", true);
         _extHelper.clickX4GridPanelCheckbox("label", "1.Adverse Experience (AE)", "measuresGridPanel", true);
@@ -386,7 +386,7 @@ public class ParticipantReportTest extends ReportTest
         // select some measures from a dataset
         waitAndClickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "primary type vial counts blood");
         pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
 
@@ -440,7 +440,7 @@ public class ParticipantReportTest extends ReportTest
         // select some measures from the demographics
         waitAndClickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "demographic");
         pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
 

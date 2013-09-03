@@ -63,7 +63,7 @@ public class StudyHelperWD extends AbstractHelperWD
     public void createCustomParticipantGroup(String projectName, String studyFolder, String groupName, String participantString,
                                              @Nullable String categoryName, boolean isCategoryNameNew, @Nullable Boolean shared, Boolean demographicsPresent, String... ptids)
     {
-        if( !_test.isElementPresent(Locator.xpath("//div[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
+        if( !_test.isElementPresent(Locator.xpath("//span[contains(@class, 'labkey-nav-page-header') and text() = 'Manage "+participantString+" Groups']")) )
         {
             _test.clickProject(projectName);
             _test.clickFolder(studyFolder);
@@ -151,15 +151,15 @@ public class StudyHelperWD extends AbstractHelperWD
         }
         if( categoryName != null )
         {
-            Locator categoryField = Ext4HelperWD.Locators.formItemWithLabel(participantString + " Category:").append("//input");
+            Locator categoryField = Locator.name("participantCategory");
             if (!"".equals(oldCategory))
                 _test.waitForFormElementToEqual(categoryField, oldCategory);
 
             if (isCategoryNameNew)
-                _test.setFormElement(Locator.name("participantCategory"), categoryName);
+                _test.setFormElement(categoryField, categoryName);
             else
                 _test._ext4Helper.selectComboBoxItem(participantString + " Category:", categoryName);
-            _test.pressTab(Locator.name("participantCategory"));
+            _test.pressTab(categoryField);
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
             Assert.assertEquals("Mouse category not set", categoryName, _test.getFormElement(categoryField));
         }
