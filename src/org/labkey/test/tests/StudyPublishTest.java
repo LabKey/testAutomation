@@ -276,8 +276,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Verify published participant count
         clickAndWait(Locator.linkWithText("Mice"));
-        // TODO: 15978: Too many participants published with study
-        // assertTextPresent("Showing all "+ptids.length+" mice.");
+        waitForElement(Locator.id("participantsDiv1.status").withText("Found "+ptids.length+" mice of "+ptids.length+"."));
         if (alternateIDs)
             assertTextNotPresent(ptids);
         else
