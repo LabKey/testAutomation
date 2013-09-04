@@ -107,7 +107,7 @@ public class ParticipantReportTest extends ReportTest
         sleep(500); // Sleep because the list takes a while to populate.
 
         // no longer an all check box
-        deselectAllFilterGroups();
+        _ext4Helper.deselectAllParticipantFilter();
         waitForText("No matching enrolled Mice");
 
         _ext4Helper.checkGridRowCheckbox(MICE_C);
@@ -131,7 +131,7 @@ public class ParticipantReportTest extends ReportTest
         // Check that group has correct number of participants
         clickAndWait(Locator.linkWithText("Mice"));
         waitForElement(Locator.css(".lk-filter-panel-label")); // Wait for participant list to appear.
-        deselectAllFilterGroups();
+        _ext4Helper.deselectAllParticipantFilter();
         waitForText("No matching enrolled Mice");
         _ext4Helper.checkGridRowCheckbox(MICE_C);
         waitForText("Found 5 enrolled mice of 138.");
@@ -334,7 +334,7 @@ public class ParticipantReportTest extends ReportTest
         Locator filterExpander = Locator.xpath("(//img[contains(@class, 'x4-tool-expand-right')])[1]");
         click(filterExpander);
         waitForElement(Locator.css(".initSelectionComplete"));
-        deselectAllFilterGroups();
+        _ext4Helper.deselectAllParticipantFilter();
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
         //Mouse down on GROUP 1
@@ -403,7 +403,7 @@ public class ParticipantReportTest extends ReportTest
         //Deselect All
         click(filterExpander);
         waitForElement(Locator.css(".initSelectionComplete"));
-        deselectAllFilterGroups();
+        _ext4Helper.deselectAllParticipantFilter();
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
         //Mouse down on SPEC GROUP 1
@@ -494,10 +494,10 @@ public class ParticipantReportTest extends ReportTest
         closeReportFilterWindow();
         openReportFilterWindow();
 
-        deselectAllFilterGroups();
+        _ext4Helper.deselectAllParticipantFilter();
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
-        selectAllFilterGroups();
+        _ext4Helper.selectAllParticipantFilter();
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 24 Results"));
 
         _ext4Helper.clickParticipantFilterGridRowText("Not in any cohort", 0);
@@ -525,7 +525,7 @@ public class ParticipantReportTest extends ReportTest
         _ext4Helper.clickParticipantFilterGridRowText(SPECIMEN_GROUP_TWO, 0); // click group, not category with the same name
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 1 Results"));
 
-        selectAllFilterGroups();
+        _ext4Helper.selectAllParticipantFilter();
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 24 Results"));
 
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
@@ -544,10 +544,10 @@ public class ParticipantReportTest extends ReportTest
         clickTab("Mice");
         waitForText("Found 25 enrolled mice of 138."); // Not in any cohort deselected initially
 
-        deselectAllFilterGroups();
+        _ext4Helper.deselectAllParticipantFilter();
         waitForText("No matching enrolled Mice.");
 
-        selectAllFilterGroups();
+        _ext4Helper.selectAllParticipantFilter();
         waitForText("Found 138 mice of 138.");
 
         _ext4Helper.clickParticipantFilterGridRowText("Not in any cohort", 0);
@@ -577,7 +577,7 @@ public class ParticipantReportTest extends ReportTest
 
         setFormElement(Locator.id("participantsDiv1.filter"), PTIDS_ONE[0]);
         waitForText("No mouse IDs contain \""+PTIDS_ONE[0]+"\".");
-        selectAllFilterGroups();
+        _ext4Helper.selectAllParticipantFilter();
         waitForText("Found 1 enrolled mouse of 138.");
     }
 
@@ -611,17 +611,4 @@ public class ParticipantReportTest extends ReportTest
         clickButton("Filter Report", 0);
         waitForElementToDisappear(Locator.css(".report-filter-window.x4-hide-offsets"), WAIT_FOR_JAVASCRIPT);
     }
-
-    @LogMethod
-    private void deselectAllFilterGroups()
-    {
-        _ext4Helper.checkGridRowCheckbox("All");
-        _ext4Helper.uncheckGridRowCheckbox("All");
-    }
-
-    private void selectAllFilterGroups()
-    {
-        _ext4Helper.checkGridRowCheckbox("All");
-    }
-
 }

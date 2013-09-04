@@ -256,6 +256,23 @@ public class Ext4Helper extends AbstractHelper
     }
 
     /**
+     * Deselect the "All" Participant filter panel category checkbox
+     */
+    public void deselectAllParticipantFilter()
+    {
+        checkGridRowCheckbox("All");
+        uncheckGridRowCheckbox("All");
+    }
+
+    /**
+     * Select the "All" Participant filter panel category checkbox
+     */
+    public void selectAllParticipantFilter()
+    {
+        checkGridRowCheckbox("All");
+    }
+
+    /**
      * Determines if the specified row has a checked checkbox
      * @param rowLoc Locator provided by {@link #getGridRow(String, int)}
      * @return true if the specified row has a checked checkbox

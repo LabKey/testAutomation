@@ -150,26 +150,23 @@ public class StudyRedesignTest extends StudyBaseTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Overview"));
         addWebPart("Mouse List");
-        waitForElement(Locator.css(".participant-filter-panel"));
-        waitForText("Showing all 138 mice."); // Wait for participant list to appear.
+        waitForElement(Locator.css(".lk-filter-panel-label"));
+        waitForText("Found 25 enrolled mice of 138."); // Wait for participant list to appear with Not in any cohort deselected by default
 
         // Deselect All Filter Groups
-        Locator all = Locator.tag("tr").withClass("x4-grid-row-selected").withDescendant(Locator.tag("b").withClass("filter-description").containing("All")).append(Locator.tag("div").withClass("x4-grid-row-checker"));
-        waitForElement(all);
-        click(all);
-
-        waitForText("No matching Mice");
+        _ext4Helper.deselectAllParticipantFilter();
+        waitForText("No matching enrolled Mice");
 
         //Mouse down on GROUP 1
         _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 0);
-        waitForText("Found 10 mice of 138.");
+        waitForText("Found 10 enrolled mice of 138.");
 
         //Check if all PTIDs of GROUP 1 are visible.
         assertTextPresent(PTIDS_ONE);
 
-        //Mouse down GROUP 2
+        // intersection of GROUP 1 and GROUP 2
         _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_TWO, 0);
-        waitForText("Found 1 mouse of 138.");
+        waitForText("Found 1 enrolled mouse of 138.");
 
         //Mouse down on GROUP 1 to remove it.
         _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0);
@@ -197,8 +194,8 @@ public class StudyRedesignTest extends StudyBaseTest
         assertElementPresent(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-east')]"), 1);
         assertElementPresent(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-south')]"), 2); //twice, one for south and one for southeast
         assertElementPresent(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-southeast')]"), 1);
-        assertElementPresent(Locator.xpath("//div[contains(@class, 'participant-filter-panel')]//tr[contains(@class, 'x4-grid-row')]"), 10); // All + 3 Cohorts + 3 participant groups and 3 not in any group
-        assertElementPresent(Locator.xpath("//div[contains(@class, 'participant-filter-panel')]//tr[contains(@class, 'x4-grid-group-hd')]"), 4); // 4 cohort/ptid group category labels
+        assertElementPresent(Locator.xpath("//span[contains(@class, 'lk-filter-panel-label')]"), 9); // 3 Cohorts + 3 participant groups and 3 not in any group
+        assertElementPresent(Locator.xpath("//div[contains(@class, 'lk-filter-panel-label')]"), 4); // 4 cohort/ptid group category labels
 
         // compare the height of a non text-wrapped group grid cell to a wrapped one
         _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_THREE);
