@@ -305,25 +305,4 @@ public abstract class TimeChartTest extends ReportTest
         if (count > 0)
             waitForElement(Locator.css("div:not(.thumbnail) > svg").index(count - 1));
     }
-
-    /**
-     * Wait for an SVG with the specified text (Ignores thumbnails)
-     * @param svgText exact text expected. Spaces will be ignored due to inconsistencies accross different platforms.
-     * @param svgIndex the zero-based index of the svg which is expected to match
-     */
-    protected void waitForSvg(final String svgText, final int svgIndex)
-    {
-        if (doesElementAppear(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                String actualSvgText = getText(Locator.css("div:not(.thumbnail) > svg").index(svgIndex));
-                return actualSvgText.equals(svgText) || actualSvgText.replaceAll(" ", "").equals(svgText.replaceAll(" ", "")); // Spaces from SVGs are not consistent, try stripping them out
-            }
-        }, WAIT_FOR_JAVASCRIPT))
-            return;
-
-        Assert.assertEquals("SVG text was not as expected", svgText, getText(Locator.css("div:not(.thumbnail) > svg").index(svgIndex)));
-    }
 }

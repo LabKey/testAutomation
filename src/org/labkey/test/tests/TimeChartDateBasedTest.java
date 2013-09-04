@@ -596,11 +596,11 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         goToAxisTab("Hemoglobin");
         setAxisValue(Axis.RIGHT, "rightaxis_range_manual", "12", "16", "Hemogoblins", null, null, null, null);
-        waitForSvg(SVG_MULTI_MANUAL_1, 0);
+        assertSVG(SVG_MULTI_MANUAL_1, 0);
 
         goToAxisTab("Hemogoblins");
         setAxisValue(Axis.RIGHT, "rightaxis_range_automatic", null, null, null, "rightaxis_scale", "Log", null, null);
-        waitForSvg(SVG_MULTI_MANUAL_2, 0);
+        assertSVG(SVG_MULTI_MANUAL_2, 0);
 
         openSaveMenu();
         saveReport(false);

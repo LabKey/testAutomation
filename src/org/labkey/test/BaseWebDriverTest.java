@@ -7122,6 +7122,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertSVG(expectedSvgText, 0);
     }
 
+    /**
+     * Wait for an SVG with the specified text (Ignores thumbnails)
+     * @param expectedSvgText exact text expected. Whitespace will be ignored on Firefox due to inconsistencies in getText results.
+     * @param svgIndex the zero-based index of the svg which is expected to match
+     */
     public void assertSVG(final String expectedSvgText, final int svgIndex)
     {
         final boolean isFirefox = getBrowserType() == BrowserType.FIREFOX;
@@ -7131,8 +7136,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             @Override
             public boolean check()
             {
-                return isElementPresent(Locator.css("svg").index(svgIndex)) &&
-                        expectedText.equals(isFirefox ? getText(Locator.css("svg").index(svgIndex)).replaceAll("[\n ]", "") : getText(Locator.css("svg").index(svgIndex)));
+                return isElementPresent(Locator.css("div:not(.thumbnail) > svg").index(svgIndex)) &&
+                        expectedText.equals(
+                                isFirefox ?
+                                        getText(Locator.css("svg").index(svgIndex)).replaceAll("[\n ]", "") :
+                                        getText(Locator.css("svg").index(svgIndex)));
             }
         }, WAIT_FOR_JAVASCRIPT);
         String svgText = getText(Locator.css("svg").index(svgIndex));
