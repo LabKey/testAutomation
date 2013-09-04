@@ -80,7 +80,7 @@ public class SequestImportTest extends BaseWebDriverTest
         assertTextNotPresent("A.ADSNPAP.S", "A.VPSGQDNIHR.F");
 
         // Make sure that our target protein is remembered across page views
-        click(Locator.linkWithText("MS2 Dashboard"));
+        clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         assertTextPresent("IPI00176617");
     }
 
