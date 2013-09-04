@@ -42,7 +42,7 @@ public class TimeChartHelper
 
         _test.setFormElement(Locator.name("filterSearch"), measure);
         String measureXpath = _extHelper.getExtDialogXPath("Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+ measure +"')]]";
-        _test.waitForElement(Locator.css("button > span.iconDelete"));
+        _test.waitForElement(Locator.css("a.x4-btn span.iconDelete"));
         _test.mouseDown(Locator.xpath(measureXpath));
         _test.clickButton("Select", BaseSeleniumWebTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         _test.assertTextPresent(measure);
