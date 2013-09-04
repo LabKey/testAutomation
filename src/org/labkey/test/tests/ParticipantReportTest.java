@@ -333,7 +333,7 @@ public class ParticipantReportTest extends ReportTest
         //Deselect All
         Locator filterExpander = Locator.xpath("(//img[contains(@class, 'x4-tool-expand-right')])[1]");
         click(filterExpander);
-
+        waitForElement(Locator.css(".initSelectionComplete"));
         deselectAllFilterGroups();
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
@@ -402,6 +402,7 @@ public class ParticipantReportTest extends ReportTest
 
         //Deselect All
         click(filterExpander);
+        waitForElement(Locator.css(".initSelectionComplete"));
         deselectAllFilterGroups();
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
@@ -541,12 +542,10 @@ public class ParticipantReportTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickTab("Mice");
-        waitForElement(Locator.css(".participant-filter-panel"));
-
-        waitForText("Showing all 138 mice.");
+        waitForText("Found 25 enrolled mice of 138."); // Not in any cohort deselected initially
 
         deselectAllFilterGroups();
-        waitForText("No matching Mice.");
+        waitForText("No matching enrolled Mice.");
 
         selectAllFilterGroups();
         waitForText("Found 138 mice of 138.");
@@ -558,28 +557,28 @@ public class ParticipantReportTest extends ReportTest
         waitForText("Found 123 mice of 138.");
 
         _ext4Helper.clickParticipantFilterGridRowText(COHORT_2, 0);
-        waitForText("Found 15 mice of 138.");
+        waitForText("Found 15 enrolled mice of 138.");
 
         // Selecting all or none of an entire category should not filter report
         _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 0);
-        waitForText("Found 7 mice of 138.");
+        waitForText("Found 7 enrolled mice of 138.");
         _ext4Helper.uncheckGridRowCheckbox(PARTICIPANT_GROUP_ONE, 0);
-        waitForText("Found 15 mice of 138.");
+        waitForText("Found 15 enrolled mice of 138.");
         _ext4Helper.clickParticipantFilterGridRowText(PARTICIPANT_GROUP_ONE, 0);
-        waitForText("Found 7 mice of 138.");
+        waitForText("Found 7 enrolled mice of 138.");
         _ext4Helper.clickParticipantFilterCategory(PARTICIPANT_GROUP_ONE);
-        waitForText("Found 15 mice of 138.");
+        waitForText("Found 15 enrolled mice of 138.");
 
         //Check intersection between cohorts and multiple categories
         _ext4Helper.clickParticipantFilterGridRowText(MICE_A, 0);
-        waitForText("Found 3 mice of 138.");
+        waitForText("Found 3 enrolled mice of 138.");
         _ext4Helper.clickParticipantFilterGridRowText(SPECIMEN_GROUP_TWO, 0);
-        waitForText("Found 1 mouse of 138.");
+        waitForText("Found 1 enrolled mouse of 138.");
 
         setFormElement(Locator.id("participantsDiv1.filter"), PTIDS_ONE[0]);
         waitForText("No mouse IDs contain \""+PTIDS_ONE[0]+"\".");
         selectAllFilterGroups();
-        waitForText("Found 1 mouse of 138.");
+        waitForText("Found 1 enrolled mouse of 138.");
     }
 
     private void expandReportFilterWindow()

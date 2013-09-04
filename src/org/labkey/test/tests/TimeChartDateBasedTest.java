@@ -488,20 +488,20 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         log("Verify one line per measure per participant. All groups.");
         waitForCharts(5);
-        assertSVG(SVG_PARTICIPANTGROUP_SOME, 0);
-        assertSVG(SVG_PARTICIPANTGROUP_OTHER, 1);
-        assertSVG(SVG_PARTICIPANTGROUP_YET_MORE, 2);
-        assertSVG(SVG_PARTICIPANTGROUP_1, 3);
-        assertSVG(SVG_PARTICIPANTGROUP_2, 4);
+        assertSVG(SVG_PARTICIPANTGROUP_1, 0);
+        assertSVG(SVG_PARTICIPANTGROUP_2, 1);
+        assertSVG(SVG_PARTICIPANTGROUP_SOME, 2);
+        assertSVG(SVG_PARTICIPANTGROUP_OTHER, 3);
+        assertSVG(SVG_PARTICIPANTGROUP_YET_MORE, 4);
 
         log("Verify one line per measure per participant. 2/3 groups.");
         // uncheck group 2 (leaving group 1 and 3 checked)
         _ext4Helper.uncheckGridRowCheckbox(GROUP2_NAME);
         waitForCharts(4);
-        assertSVG(SVG_PARTICIPANTGROUP_SOME, 0);
-        assertSVG(SVG_PARTICIPANTGROUP_YET_MORE, 1);
-        assertSVG(SVG_PARTICIPANTGROUP_1, 2);
-        assertSVG(SVG_PARTICIPANTGROUP_2, 3);
+        assertSVG(SVG_PARTICIPANTGROUP_1, 0);
+        assertSVG(SVG_PARTICIPANTGROUP_2, 1);
+        assertSVG(SVG_PARTICIPANTGROUP_SOME, 2);
+        assertSVG(SVG_PARTICIPANTGROUP_YET_MORE, 3);
 
         openSaveMenu();
         saveReport(false);
