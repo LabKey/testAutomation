@@ -368,10 +368,9 @@ public class ScatterPlotTest extends GenericChartsTest
         _ext4Helper.waitForMaskToDisappear();
         waitForText("The source dataset, list, or query may have been deleted.");
 
-        Integer buttonsCount = getElementCount(Locator.xpath("//div[contains(@id, \"generic-report-div\")]//div//button"));
-        Integer disabledButtonsCount = getElementCount(Locator.xpath("//div[contains(@id, \"generic-report-div\")]//div[contains(@class, 'x4-item-disabled')]//button"));
-
-        Assert.assertTrue("Only the help and export buttons should be enabled. More than two buttons was enabled.", 2 == (buttonsCount - disabledButtonsCount));
+        Integer buttonsCount = getElementCount(Locator.xpath("//div[contains(@id, 'generic-report-div')]//div/a[contains(@class, 'x4-btn')]"));
+        Integer disabledButtonsCount = getElementCount(Locator.xpath("//div[contains(@id, 'generic-report-div')]//div/a[contains(@class, 'x4-btn') and contains(@class, 'x4-item-disabled')]"));
+        Assert.assertTrue("Only the help and export buttons should be enabled. More than two buttons were enabled.", 2 == (buttonsCount - disabledButtonsCount));
     }
 
     private static final String TEST_DATA_API_PATH = "server/test/data/api";
