@@ -86,13 +86,13 @@ public class LabModuleHelper
     public static Locator getNavPanelItem(String label, String itemText)
     {
         //NOTE: this should return only visible items
-        return Locator.xpath("//span[text() = '" + label + "']/../../../div[not(contains(@style, 'display: none'))]//a[text() = '" + itemText + "']");
+        return Locator.tag("div").withClass("ldk-navpanel-section-row").withDescendant(Locator.tag("span").withText(label)).append(Locator.linkWithText(itemText)).notHidden();
     }
 
     public static Locator getNavPanelItem(String label, int index)
     {
         //NOTE: this should return only visible items.  add 1 to index to exclude label
-        return Locator.xpath("(//span[text() = '" + label + "']/../../../div[not(contains(@style, 'display: none'))]//span)[" +  (index + 1) + "]//a");
+        return Locator.tag("div").withClass("ldk-navpanel-section-row").withDescendant(Locator.tag("span").withText(label)).append("//a").index(index).notHidden();
     }
 
     public void clickNavPanelItem(String label, int index)
