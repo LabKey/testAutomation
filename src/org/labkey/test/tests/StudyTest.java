@@ -859,7 +859,7 @@ public class StudyTest extends StudyBaseTest
         pushLocation();
         exportDataRegion("Script", "R");
         goToAuditLog();
-        selectOptionByText("view", "Query events");
+        selectOptionByText("view", "Query export events");
         waitForPageToLoad();
 
         DataRegionTable auditTable =  new DataRegionTable("audit", this);

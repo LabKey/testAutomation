@@ -127,7 +127,7 @@ public class DataRegionTest extends BaseWebDriverTest
         exportDataRegion("Script", "R");
         goToAuditLog();
         prepForPageLoad();
-        selectOptionByText(Locator.name("view"), "Query events");
+        selectOptionByText(Locator.name("view"), "Query export events");
         newWaitForPageToLoad();
 
         DataRegionTable auditTable =  new DataRegionTable("audit", this);

@@ -852,7 +852,7 @@ public class StudyWDTest extends StudyBaseTestWD
         exportDataRegion("Script", "R");
         goToAuditLog();
         prepForPageLoad();
-        selectOptionByText("view", "Query events");
+        selectOptionByText("view", "Query export events");
         newWaitForPageToLoad();
 
         DataRegionTable auditTable =  new DataRegionTable("audit", this);
