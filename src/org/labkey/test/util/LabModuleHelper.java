@@ -89,9 +89,10 @@ public class LabModuleHelper
         return Locator.tag("div").withClass("ldk-navpanel-section-row").withDescendant(Locator.tag("span").withText(label)).append(Locator.linkWithText(itemText)).notHidden();
     }
 
+    //NOTE: uses 1-based index
     public static Locator getNavPanelItem(String label, int index)
     {
-        //NOTE: this should return only visible items.  add 1 to index to exclude label
+        index--;
         return Locator.tag("div").withClass("ldk-navpanel-section-row").withDescendant(Locator.tag("span").withText(label)).append("//a").index(index).notHidden();
     }
 
