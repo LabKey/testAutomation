@@ -174,7 +174,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         expectedCols.add("sampleId");
         expectedCols.add("concentration");
 
-        waitForElement(Locator.xpath("//span[contains(text(), 'Freezer Id') and contains(@class, 'x4-column-header-text')]")); //ensure grid loaded
+        waitForElement(Locator.xpath("//span[contains(text(), 'Freezer Id') and contains(@class, 'x4-column-header-text')]"), WAIT_FOR_PAGE); //ensure grid loaded
         String originalID = TEMPLATE_DATA[1][1];
         TEMPLATE_DATA[1][1] = "";
 
@@ -195,7 +195,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 
         //save data using a fake ID
         Ext4GridRefWD grid = _ext4Helper.queryOne("grid", Ext4GridRefWD.class);
-        grid.setGridCell(1, 4, "FakeId");
+        grid.setGridCell(1, 3, "FakeId");
 
         click(Locator.ext4Button("Save"));
         waitForElement(Ext4HelperWD.ext4Window("Error"));
@@ -204,7 +204,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("OK"));
 
         //restore valid values
-        grid.setGridCell(1, 4, originalID);
+        grid.setGridCell(1, 3, originalID);
         waitAndClick(Locator.ext4Button("Save and Close"));
         waitForText("Save Complete");
         waitAndClick(Locator.ext4Button("OK"));

@@ -275,7 +275,7 @@ public class LabModuleHelper
 
     public Locator getAssayWell(String text, String color)
     {
-        return Locator.xpath("//div[contains(@style, '" + color + "') and text() = '" + text + "']");
+        return Locator.xpath("//div[contains(@style, '" + color + "') and normalize-space() = '" + text + "']");
     }
 
     public String getPageText()
