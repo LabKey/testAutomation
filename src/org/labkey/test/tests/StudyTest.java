@@ -200,7 +200,7 @@ public class StudyTest extends StudyBaseTest
         _extHelper.clickX4GridPanelCheckbox(4, "measuresGridPanel", true);
         _extHelper.clickX4GridPanelCheckbox(40, "measuresGridPanel", true);
         _extHelper.clickX4GridPanelCheckbox(20, "measuresGridPanel", true);
-        _extHelper.clickExtButton("Select", 0);
+        clickButton("Select", 0);
         waitForExtMaskToDisappear();
 
         log("Verify report page looks as expected");
@@ -450,7 +450,7 @@ public class StudyTest extends StudyBaseTest
         clickButtonContainingText("Save", 0);
         waitForExtMaskToDisappear();
         sleep(1000);
-        waitForElement(Locator.xpath("//button[contains(@id, 'deleteSelected')]"));
+        waitForElement(Locator.xpath("//span[contains(@id, 'deleteSelected')]"));
         selectListName(listName);
         clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
 
