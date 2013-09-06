@@ -304,7 +304,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
 
     protected void importFCSFiles()
     {
-        clickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
+        waitAndClickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
 
 
         _extHelper.selectFileBrowserItem("flowjoquery/microFCS");
