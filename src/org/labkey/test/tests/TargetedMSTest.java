@@ -46,7 +46,7 @@ public abstract class TargetedMSTest extends BaseWebDriverTest
     @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void setupAndImportData(FolderType folderType)
     {
-        _containerHelper.createProject(getProjectName(), "Targeted MS");
+        _containerHelper.createProject(getProjectName(), "Panorama");
         selectFolderType(folderType);
         setPipelineRoot(getSampledataPath() + "/TargetedMS");
 
@@ -149,7 +149,7 @@ public abstract class TargetedMSTest extends BaseWebDriverTest
     protected void verifyModificationSearch()
     {
         // add modificaiton search webpart and do an initial search by AminoAcid and DeltaMass
-        clickAndWait(Locator.linkContainingText("Targeted MS Dashboard"));
+        clickAndWait(Locator.linkContainingText("Panorama Dashboard"));
         assertTextPresent("Mass Spec Search");
         _ext4Helper.clickExt4Tab("Modification Search");
         waitForElement(Locator.name("aminoAcids"));
