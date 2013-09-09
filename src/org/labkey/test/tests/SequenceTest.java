@@ -766,7 +766,7 @@ public class SequenceTest extends BaseWebDriverTest
             Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Type")[0].getValue().startsWith("application/x-gzip"));
 
             //TODO: remove this once finished debugging
-            File output = new File(getLabKeyRoot(), "output.fastq.gz");
+            File output = new File(getLabKeyRoot(), "output.fastq");
             if (output.exists())
                 output.delete();
             output.createNewFile();
@@ -787,7 +787,7 @@ public class SequenceTest extends BaseWebDriverTest
                     count++;
                     totalChars+= thisLine.length();
                     lines.add(thisLine);
-                    out.write(thisLine);
+                    out.write(thisLine + System.getProperty("line.separator"));
                 }
 
                 int expectedLength = 504;

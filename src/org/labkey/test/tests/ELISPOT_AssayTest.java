@@ -195,7 +195,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 
         //save data using a fake ID
         Ext4GridRefWD grid = _ext4Helper.queryOne("grid", Ext4GridRefWD.class);
-        grid.setGridCell(1, "subjectid", "FakeId");
+        grid.setGridCell(1, "subjectId", "FakeId");
 
         click(Locator.ext4Button("Save"));
         waitForElement(Ext4HelperWD.ext4Window("Error"));
@@ -204,7 +204,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         waitAndClick(Locator.ext4Button("OK"));
 
         //restore valid values
-        grid.setGridCell(1, "subjectid", originalID);
+        grid.setGridCell(1, "subjectId", originalID);
         waitAndClick(Locator.ext4Button("Save and Close"));
         waitForText("Save Complete");
         waitAndClick(Locator.ext4Button("OK"));

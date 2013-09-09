@@ -592,6 +592,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         impersonateRole("Reader");
         _helper.goToLabHome();
 
+        waitForElement(_helper.getNavPanelRow("Sequence:"));
         _helper.verifyNavPanelRowItemPresent("Sequence:");
 
         for(Pair<String, String> pair : getAssaysToCreate())
