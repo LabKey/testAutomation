@@ -201,8 +201,8 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         waitForText("Import Samples");
 
         log("Verifying results");
-        _helper.clickNavPanelItem(SSP_ASSAY_NAME + " Runs:", 1);
-        waitAndClick(Locator.linkContainingText("view results"));
+        _helper.clickNavPanelItemAndWait(SSP_ASSAY_NAME + " Runs:", 1);
+        waitAndClickAndWait(Locator.linkContainingText("view results"));
 
         List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"Subj1", "<3>", "2011-01-01", "POS", "TestPrimer1"});
@@ -302,8 +302,8 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         waitForText("Import Samples");
 
         log("Verifying results");
-        _helper.clickNavPanelItem(SSP_ASSAY_NAME + " Runs:", 1);
-        waitAndClick(Locator.linkContainingText("view results"));
+        _helper.clickNavPanelItemAndWait(SSP_ASSAY_NAME + " Runs:", 1);
+        waitAndClickAndWait(Locator.linkContainingText("view results"));
 
         List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"Subj1", "<1>", "2011-01-02", "POS", "TestPrimer1"});
@@ -370,8 +370,8 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         waitForText("Import Samples");
 
         log("Verifying results");
-        _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
-        waitAndClick(Locator.linkContainingText("view results"));
+        _helper.clickNavPanelItemAndWait(ASSAY_NAME + " Runs:", 1);
+        waitAndClickAndWait(Locator.linkContainingText("view results"));
 
         DataRegionTable results = new DataRegionTable("Data", this);
 

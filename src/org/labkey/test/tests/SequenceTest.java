@@ -50,6 +50,7 @@ import org.openqa.selenium.WebElement;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -113,9 +114,9 @@ public class SequenceTest extends BaseWebDriverTest
         //create readset records for illumina run
         goToProjectHome();
         waitForText("Create Readsets");
-        _helper.clickNavPanelItem("Create Readsets");
+        waitAndClickAndWait(Locator.linkWithText("Create Readsets"));
 
-        waitForElement(Locator.xpath("//label[contains(text(), 'Sample Id')]"));
+        _helper.waitForField("Sample Id", WAIT_FOR_PAGE);
         _ext4Helper.clickTabContainingText("Import Spreadsheet");
         waitForText("Copy/Paste Data");
 
@@ -139,7 +140,7 @@ public class SequenceTest extends BaseWebDriverTest
     private void createIlluminaSampleSheet()
     {
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Total Readsets Imported:", 1);
         _helper.waitForDataRegion("query");
 
         //verify CSV file creation
@@ -208,7 +209,7 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("Sample_ID");
 
         int expectRows = (11 * (14 +  1));  //11 cols, 14 rows, plus header
-        Assert.assertEquals(expectRows, getXpathCount(Locator.xpath("//td[contains(@class, 'x4-table-layout-cell')]")));
+        Assert.assertEquals(expectRows, getElementCount(Locator.xpath("//td[contains(@class, 'x4-table-layout-cell')]")));
 
         //NOTE: hitting download will display the text in the browser; however, this replaces newlines w/ spaces.  therefore we use selenium
         //to directly get the output
@@ -271,11 +272,11 @@ public class SequenceTest extends BaseWebDriverTest
         setFormElement(Locator.name("fastqPrefix"), "Il");
 
         click(Locator.ext4Button("Import Data"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClickAndWait(Locator.ext4Button("OK"));
 
-        waitAndClick(Locator.linkContainingText("All"));
+        waitAndClickAndWait(Locator.linkContainingText("All"));
         _startedPipelineJobs++;
-        waitForElement(Locator.xpath("//span[contains(text(), 'Data Pipeline')]"));
+        waitForElement(Locator.tagContainingText("span", "Data Pipeline"));
         waitForPipelineJobsToComplete(_startedPipelineJobs, "Import Illumina", false);
         assertTextPresent("COMPLETE");
     }
@@ -290,7 +291,7 @@ public class SequenceTest extends BaseWebDriverTest
     {
         //verify import and instrument run creation
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Total Readsets Imported:", 1);
         _helper.waitForDataRegion("query");
 
         DataRegionTable dr = new DataRegionTable("query", this);
@@ -324,7 +325,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("Verifying readset details page");
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Total Readsets Imported:", 1);
         _helper.waitForDataRegion("query");
         dr = new DataRegionTable("query", this);
         dr.clickLink(1, 1);
@@ -343,7 +344,7 @@ public class SequenceTest extends BaseWebDriverTest
         //verify export
         log("Verifying FASTQ Export");
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Total Readsets Imported:", 1);
         _helper.waitForDataRegion("query");
         dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
@@ -379,7 +380,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("Verifying View Analyses");
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Total Readsets Imported:", 1);
 
         waitForText("Instrument Run"); //proxy for dataRegion loading
         dr = new DataRegionTable("query", this);
@@ -401,7 +402,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("Verifying Readset Edit");
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Total Readsets Imported:", 1);
 
         waitForText("Instrument Run"); //proxy for dataRegion loading
         dr.clickLink(1, 0);
@@ -432,7 +433,7 @@ public class SequenceTest extends BaseWebDriverTest
         log("Verifying Analysis Panel UI");
 
         goToProjectHome();
-        _helper.clickNavPanelItem("Total Readsets Imported:", 1);
+        _helper.clickNavPanelItemAndWait("Total Readsets Imported:", 1);
         _helper.waitForDataRegion("query");
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.uncheckAllOnPage();
@@ -445,7 +446,7 @@ public class SequenceTest extends BaseWebDriverTest
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "Analyze Selected");
         waitForElement(Ext4HelperWD.ext4Window("Import Data"));
         waitForText("Description");
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Locator.ext4Button("Submit"));
 
         log("Verifying analysis UI");
 
@@ -764,31 +765,36 @@ public class SequenceTest extends BaseWebDriverTest
             Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
             Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Type")[0].getValue().startsWith("application/x-gzip"));
 
+            //TODO: remove this once finished debugging
+            File output = new File(getLabKeyRoot(), "output.fastq.gz");
+            if (output.exists())
+                output.delete();
+            output.createNewFile();
+
             try (
                     InputStream is = response.getEntity().getContent();
                     GZIPInputStream gz = new GZIPInputStream(is);
                     BufferedReader br = new BufferedReader(new InputStreamReader(gz));
+                    FileWriter out = new FileWriter(output);
             )
             {
                 int count = 0;
+                int totalChars = 0;
                 String thisLine;
                 List<String> lines = new ArrayList<>();
                 while ((thisLine = br.readLine()) != null)
                 {
                     count++;
+                    totalChars+= thisLine.length();
                     lines.add(thisLine);
+                    out.write(thisLine);
                 }
 
                 int expectedLength = 504;
                 if (count != expectedLength)
                 {
-                    log("SequenceTest ERROR: Response length was " + count + ", expected " + expectedLength);
-                    int idx = 1;
-                    for (String line : lines)
-                    {
-                        log(idx + ": [" + line + "]");
-                        idx++;
-                    }
+                    log("SequenceTest ERROR: Response line length was " + count + ", expected " + expectedLength + ".  Total characters: " + totalChars);
+                    publishArtifact(output);
                 }
                 Assert.assertEquals("Length of file doesnt match expected value", expectedLength, count);
             }
@@ -806,7 +812,7 @@ public class SequenceTest extends BaseWebDriverTest
     {
         goToProjectHome();
         waitForText("Upload Files");
-        _helper.clickNavPanelItem("Upload Files / Start Analysis");
+        waitAndClickAndWait(Locator.linkContainingText("Upload Files / Start Analysis"));
 
         waitForText("fileset");
         _extHelper.selectFileBrowserRoot();
@@ -899,20 +905,20 @@ public class SequenceTest extends BaseWebDriverTest
         assertTextPresent("For each file, you must provide either the Id of an existing, unused readset or a name/platform to create a new one");
         click(Locator.ext4Button("OK"));
 
-        grid.setGridCell(1, 6, "Readset1");
+        grid.setGridCell(1, "readsetname", "Readset1");
         grid.setGridCellJS(1, "platform", "ILLUMINA");
-        grid.setGridCell(1, 8, "InputMaterial");
-        grid.setGridCell(1, 9, "Subject1");
+        grid.setGridCell(1, "inputmaterial", "InputMaterial");
+        grid.setGridCell(1, "subjectid", "Subject1");
 
-        grid.setGridCell(2, 6, "Readset2");
+        grid.setGridCell(2, "readsetname", "Readset2");
         grid.setGridCellJS(2, "platform", "LS454");
-        grid.setGridCell(2, 8, "InputMaterial2");
-        grid.setGridCell(2, 9, "Subject2");
-        grid.setGridCell(2, 10, "2010-10-20");
+        grid.setGridCell(2, "inputmaterial", "InputMaterial2");
+        grid.setGridCell(2, "subjectid", "Subject2");
+        grid.setGridCell(2, "sampledate", "2010-10-20");
 
         waitAndClick(Locator.ext4Button("Import Data"));
         waitForElement(Ext4HelperWD.ext4Window("Error"));
-        waitForElement(Locator.xpath("//div[contains(text(), \"Duplicate Sample: " + filename1 + ". Please remove or edit rows\")]"));
+        waitForElement(Locator.tagContainingText("div", "Duplicate Sample: " + filename1 + ". Please remove or edit rows"));
         waitAndClick(Locator.ext4Button("OK"));
 
         //verify paired end
@@ -1095,23 +1101,23 @@ public class SequenceTest extends BaseWebDriverTest
         String readset1 = "ReadsetTest1";
         String readset2 = "ReadsetTest2";
 
-        grid.setGridCell(1, 6, readset1);
+        grid.setGridCell(1, "readsetname", readset1);
         grid.setGridCellJS(1, "platform", "ILLUMINA");
-        grid.setGridCell(1, 8, "InputMaterial");
-        grid.setGridCell(1, 9, "Subject1");
-        grid.setGridCell(1, 10, "2011-02-03");
+        grid.setGridCell(1, "inputmaterial", "InputMaterial");
+        grid.setGridCell(1, "subjectid", "Subject1");
+        grid.setGridCell(1, "sampledate", "2011-02-03");
 
-        grid.setGridCell(2, 6, readset2);
+        grid.setGridCell(2, "readsetname", readset2);
         grid.setGridCellJS(2, "platform", "LS454");
-        grid.setGridCell(2, 8, "InputMaterial2");
-        grid.setGridCell(2, 9, "Subject2");
+        grid.setGridCell(2, "inputmaterial", "InputMaterial2");
+        grid.setGridCell(2, "subjectid", "Subject2");
 
-        click(Locator.ext4Button("Import Data"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Locator.ext4Button("Import Data"));
+        waitAndClickAndWait(Locator.ext4Button("OK"));
 
-        waitAndClick(Locator.linkWithText("All"));
+        waitAndClickAndWait(Locator.linkWithText("All"));
         _startedPipelineJobs++;
-        waitForElement(Locator.xpath("//span[contains(text(), 'Data Pipeline')]"));
+        waitForElement(Locator.tagContainingText("span", "Data Pipeline"));
         waitForPipelineJobsToComplete(_startedPipelineJobs, "Import Readsets", false);
         assertTextPresent("COMPLETE");
 
@@ -1127,7 +1133,7 @@ public class SequenceTest extends BaseWebDriverTest
         initiatePipelineJob(_readsetPipelineName, filename1, filename2);
         waitForText("Job Name");
         waitForElement(Ext4HelperWD.ext4Window("Error"));
-        waitForElement(Locator.xpath("//div[contains(text(), 'There are errors with the input files')]"));
+        waitForElement(Locator.tagContainingText("div", "There are errors with the input files"));
         isTextPresent("File is already used in existing readsets')]");
         assertElementPresent(Locator.xpath("//td[contains(@style, 'background: red')]"));
         waitAndClick(Locator.ext4Button("OK"));

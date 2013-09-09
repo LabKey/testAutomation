@@ -135,8 +135,8 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         waitForText("Import Samples");
 
         log("Verifying results");
-        _helper.clickNavPanelItem(PHENOTYPE_ASSAY_NAME + " Runs:", 1);
-        waitAndClick(Locator.linkContainingText("view results"));
+        _helper.clickNavPanelItemAndWait(PHENOTYPE_ASSAY_NAME + " Runs:", 1);
+        waitAndClickAndWait(Locator.linkContainingText("view results"));
 
         List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD4 T-cells", "103", "cells/uL", "<1>", " ", "Comment"});
@@ -195,8 +195,8 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         waitForText("Import Samples");
 
         log("Verifying results");
-        _helper.clickNavPanelItem(PHENOTYPE_ASSAY_NAME + " Runs:", 1);
-        waitAndClick(Locator.linkContainingText("view results"));
+        _helper.clickNavPanelItemAndWait(PHENOTYPE_ASSAY_NAME + " Runs:", 1);
+        waitAndClickAndWait(Locator.linkContainingText("view results"));
 
         List<String[]> expected = new ArrayList<>();
         expected.add(new String[]{"Subj1", "2012-12-20", "PBMC", "CD4 T-cells", "103", "cells/uL", "<1>", " ", "Comment"});
@@ -265,8 +265,8 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         waitForText("Import Samples");
 
         log("Verifying results");
-        _helper.clickNavPanelItem(ICS_ASSAY_NAME + " Runs:", 1);
-        waitAndClick(Locator.linkContainingText("view results"));
+        _helper.clickNavPanelItemAndWait(ICS_ASSAY_NAME + " Runs:", 1);
+        waitAndClickAndWait(Locator.linkContainingText("view results"));
 
         List<String[]> expected = new ArrayList<>();
 

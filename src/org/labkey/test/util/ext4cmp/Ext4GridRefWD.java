@@ -60,16 +60,18 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         return Locator.xpath("(" + ((Locator.XPathLocator) row).getPath() + "//td[contains(@class, 'x4-grid-cell')])[" + cellIndex + "]");
     }
 
+    //1-based rowIdx
     public Object getFieldValue(int rowIdx, String fieldName)
     {
-        String recordId = getRecordId(rowIdx);
-        return getEval("store.data.get('" + recordId + "').get('" + fieldName + "')");
+        rowIdx--;
+        return getEval("store.getAt('" + rowIdx + "').get('" + fieldName + "')");
     }
 
+    //1-based rowIdx
     public Date getDateFieldValue(int rowIdx, String fieldName)
     {
-        String recordId = getRecordId(rowIdx);
-        Long val = (Long)getFnEval("return this.store.data.get('" + recordId + "').get('" + fieldName + "') ? this.store.data.get('" + recordId + "').get('" + fieldName + "').getTime() : null");
+        rowIdx--;
+        Long val = (Long)getFnEval("return this.store.getAt('" + rowIdx+ "').get('" + fieldName + "') ? this.store.getAt('" + rowIdx + "').get('" + fieldName + "').getTime() : null");
         return val == null ? null : new Date(val);
     }
 
@@ -81,24 +83,8 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
     //uses 1-based coordinates
     public void setGridCellJS(int rowIdx, String columnName, Object value)
     {
-        String recordId = getRecordId(rowIdx);
-        getEval("store.data.get('" + recordId + "').set('" + columnName + "', arguments[0])", value);
-    }
-
-    //uses 1-based coordinates
-    public void setGridCellJS(int rowIdx, int cellIdx, Object value)
-    {
-        String dataIndex = (String)getEval("columns[" + cellIdx + "].dataIndex");
-        setGridCellJS(rowIdx, dataIndex, value);
-    }
-
-    //does Ext really not have a cleaner API for this?  i dont think we can rely on the grid row index being the same as the store index
-    //rowIdx is 1-based for consistency with other methods
-    public String getRecordId(int rowIdx)
-    {
-        rowIdx = rowIdx - 1;
-        String script = "return this.getView().getNodes(" + rowIdx + "," + rowIdx + ")[0].viewRecordId;";
-        return (String)getFnEval(script);
+        rowIdx--;
+        getEval("store.getAt('" + rowIdx + "').set('" + columnName + "', arguments[0])", value);
     }
 
     //uses 1-based coordinates
@@ -114,12 +100,12 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         return getIndexOfColumn(column, "name");
     }
 
-    //1-based result for consistency w/ other methods
+    //1-based result for consistency w/ other methods.  includes visible columns only
     public int getIndexOfColumn(String value, String propName)
     {
-        Long idx = (Long)getFnEval("for (var i=0;i<this.columns.length;i++){if (this.columns[i]['"+propName+"'] == '" + value + "') return i;}; return -1");
-        Assert.assertTrue("Unable to find column where property: " + propName + " has value: " + value, idx >= 0);
-        return idx.intValue() > -1 ? idx.intValue() + 1 : -1;
+        Long idx = (Long)getFnEval("var visibleIdx = 0; for (var i=0;i<this.columns.length;i++){if (!this.columns[i].isHidden()) visibleIdx++;if (this.columns[i]['"+propName+"'] == '" + value + "' && !this.columns[i].isHidden()) return visibleIdx;}; return -1");
+        Assert.assertTrue("Unable to find visible column where property: " + propName + " has value: " + value, idx >= 0);
+        return idx.intValue() > -1 ? idx.intValue() : -1;
     }
 
     //uses 1-based coordinates

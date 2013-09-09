@@ -296,7 +296,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         click(Locator.ext4Button("OK"));
 
         Ext4GridRefWD grid = _ext4Helper.queryOne("grid", Ext4GridRefWD.class);
-        grid.setGridCellJS(1, 2, "Blank");
+        grid.setGridCellJS(1, "category", "Blank");
         templateData[1][1] = "Blank"; //restore original value to array
 
         //validate values
@@ -483,8 +483,8 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
     private void verifyResults(int totalRows, Map<String, String[]> expected)
     {
         log("Verifying results");
-        _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
-        waitAndClick(Locator.linkContainingText("view results"));
+        _helper.clickNavPanelItemAndWait(ASSAY_NAME + " Runs:", 1);
+        waitAndClickAndWait(Locator.linkContainingText("view results"));
 
         DataRegionTable results = new DataRegionTable("Data", this);
 

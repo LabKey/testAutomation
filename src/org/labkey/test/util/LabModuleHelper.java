@@ -96,11 +96,11 @@ public class LabModuleHelper
         return Locator.tag("div").withClass("ldk-navpanel-section-row").withDescendant(Locator.tag("span").withText(label)).append("//a").index(index).notHidden();
     }
 
-    public void clickNavPanelItem(String label, int index)
+    public void clickNavPanelItemAndWait(String label, int index)
     {
         Locator l = getNavPanelItem(label, index);
         _test.waitForElement(l);
-        _test.waitAndClick(l);
+        _test.waitAndClickAndWait(l);
     }
 
     public void clickNavPanelItem(String label, String itemText)
@@ -110,16 +110,9 @@ public class LabModuleHelper
         _test.waitAndClick(l);
     }
 
-    public void clickNavPanelItem(String itemText)
-    {
-        Locator l = Locator.linkContainingText(itemText);
-        _test.waitForElement(l);
-        _test.waitAndClick(l);
-    }
-
     public static Locator getNavPanelRow(String label)
     {
-        return Locator.xpath("//div[descendant::span[text() = '" + label + "']]");
+        return Locator.tag("div").withClass("ldk-navpanel-section-row").withDescendant(Locator.xpath("span[text() = '" + label + "']"));
     }
 
     public void goToLabHome()
@@ -196,6 +189,11 @@ public class LabModuleHelper
 
     public void waitForField(final String label)
     {
+        waitForField(label, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void waitForField(final String label, int wait)
+    {
         _test.waitFor(new BaseWebDriverTest.Checker()
         {
             @Override
@@ -203,7 +201,7 @@ public class LabModuleHelper
             {
                 return Ext4FieldRefWD.isFieldPresent(_test, label);
             }
-        }, "Field did not appear: " + label, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        }, "Field did not appear: " + label, wait);
     }
 
     public void waitForCmp(final String query)
@@ -306,9 +304,8 @@ public class LabModuleHelper
             _test._ext4Helper.clickExt4MenuItem(UPLOAD_RESULTS_TEXT);
 
         _test.waitForElement(Ext4Helper.ext4Window(supportsTemplates ? UPLOAD_RESULTS_TEXT : IMPORT_DATA_TEXT));
-        _test.waitAndClick(Locator.ext4Button("Submit"));
+        _test.waitAndClickAndWait(Locator.ext4Button("Submit"));
         _test.waitForText("Data Import");
-
     }
 
     public String getExampleData()

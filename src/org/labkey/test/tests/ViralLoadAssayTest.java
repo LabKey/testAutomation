@@ -216,7 +216,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("Prepare Run");
         waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Locator.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<>();
         expectedCols.add("well");
@@ -261,6 +261,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
 
         log("Reopening saved run plan");
+        waitForElement(Locator.tagContainingText("span", "Planned Assay Runs"), WAIT_FOR_PAGE);
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.clickLink(0, 0);
 
@@ -273,20 +274,20 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
         //no duplicate wells allowed
         Ext4GridRefWD grid = _ext4Helper.queryOne("grid", Ext4GridRefWD.class);
-        grid.setGridCell(1, 1, "H11\t");
+        grid.setGridCell(1, "well", "H11\t");
         click(Locator.ext4Button("Save"));
         waitForElement(Ext4HelperWD.ext4Window("Error"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("another sample is already present in well: H11");
-        grid.setGridCell(1, 1, "A5\t");  //restore original contents
+        grid.setGridCell(1, "well", "A5\t");  //restore original contents
 
         //verify neg controls enforced
-        grid.setGridCell(70, 3, "Unknown\t");
+        grid.setGridCell(70, "category", "Unknown\t");
         click(Locator.ext4Button("Download"));
         waitForElement(Ext4HelperWD.ext4Window("Error"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("Must provide at least 2 negative controls per run");
-        grid.setGridCell(70, 3, "Neg Control");  //restore original contents
+        grid.setGridCell(70, "category", "Neg Control");  //restore original contents
 
         //save valid data
         click(Locator.ext4Button("Save"));
@@ -359,6 +360,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
 
         log("Entering results for saved run");
+        waitForElement(Locator.tagContainingText("span", "Planned Assay Runs"), WAIT_FOR_PAGE);
         DataRegionTable templates = new DataRegionTable("query", this);
         templates.clickLink(0, 1);
         
@@ -378,7 +380,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("Subject1", "");
         errorText = errorText.replaceAll("Subject2\tDETECTOR1", "Subject2\tDETECTOR2");
         textarea.setValue(errorText);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(WAIT_FOR_PAGE, Locator.ext4Button("Upload"), 0);
         waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
@@ -390,12 +392,12 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4HelperWD.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        clickAndWait(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");
-        _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
-        waitAndClick(Locator.linkContainingText("view results"));
+        _helper.clickNavPanelItemAndWait(ASSAY_NAME + " Runs:", 1);
+        waitAndClickAndWait(Locator.linkContainingText("view results"));
 
         DataRegionTable results = new DataRegionTable("Data", this);
 
@@ -511,6 +513,8 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
+        waitForElement(Locator.tagContainingText("span", "Planned Assay Runs"), WAIT_FOR_PAGE);
+
         DataRegionTable dr2 = new DataRegionTable("query", this);
         Assert.assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
     }
@@ -553,12 +557,12 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4HelperWD.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        waitAndClickAndWait(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");
-        _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
-        waitAndClick(Locator.linkContainingText("view results"));
+        _helper.clickNavPanelItemAndWait(ASSAY_NAME + " Runs:", 1);
+        waitAndClickAndWait(Locator.linkContainingText("view results"));
 
         DataRegionTable results = new DataRegionTable("Data", this);
 
@@ -644,12 +648,12 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
         waitForElement(Ext4HelperWD.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        waitAndClickAndWait(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");
-        _helper.clickNavPanelItem(ASSAY_NAME + " Runs:", 1);
-        waitAndClick(Locator.linkContainingText("view results"));
+        _helper.clickNavPanelItemAndWait(ASSAY_NAME + " Runs:", 1);
+        waitAndClickAndWait(Locator.linkContainingText("view results"));
 
         DataRegionTable results = new DataRegionTable("Data", this);
         int totalRows = 28;

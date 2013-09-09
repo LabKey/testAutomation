@@ -663,8 +663,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     private void dataSourcesTest()
     {
         goToAdminConsole();
-        waitAndClick(Locator.linkContainingText("laboratory module admin"));
-        waitAndClick(Locator.linkContainingText("Manage Default Data and Demographics Sources"));
+        waitAndClickAndWait(Locator.linkContainingText("laboratory module admin"));
+        waitAndClickAndWait(Locator.linkContainingText("Manage Default Data and Demographics Sources"));
         waitForText("You are currently editing the data and demographics sources for the Shared project");  //proxy for data loading
 
         cleanupDataSources();
@@ -697,7 +697,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         //now go to folder and make sure it worked
         _helper.goToLabHome();
         waitAndClick(_helper.toolIcon("Settings"));
-        _helper.clickNavPanelItem("Manage Data and Demographics Sources");
+        waitAndClickAndWait(Locator.linkContainingText("Manage Data and Demographics Sources"));
         waitForText("Below are the extra data and sample sources registered for this folder");  //proxy for data loading
         waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), WAIT_FOR_JAVASCRIPT);
 
@@ -763,15 +763,15 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //now validate site-summary reports
         goToAdminConsole();
-        waitAndClick(Locator.linkContainingText("laboratory module admin"));
-        waitAndClick(Locator.linkContainingText("Manage Default Data and Demographics Sources"));
+        waitAndClickAndWait(Locator.linkContainingText("laboratory module admin"));
+        waitAndClickAndWait(Locator.linkContainingText("Manage Default Data and Demographics Sources"));
 
-        waitAndClick(Locator.ext4Button("View Summary of Data Sources"));
+        waitAndClickAndWait(Locator.ext4Button("View Summary of Data Sources"));
         waitForText("The following sources have been defined:");
         waitForText("/" + getProjectName());
         assertTextPresent(DATA_SOURCE + " (\"/home\".core.Users)");
 
-        waitAndClick(Locator.ext4Button("View Summary of Demographics Sources"));
+        waitAndClickAndWait(Locator.ext4Button("View Summary of Demographics Sources"));
         waitForText("The following sources have been defined:");
         assertTextPresent("/" + getProjectName());
         assertTextPresent(SUBJECT_LIST + " (laboratory.subjects)");
@@ -821,13 +821,12 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     {
         log("Testing Settings");
         _helper.goToLabHome();
-        waitAndClick(_helper.toolIcon("Settings"));
-
+        waitAndClickAndWait(_helper.toolIcon("Settings"));
 
         waitForElement(Locator.linkContainingText("Control Item Visibility"));
         assertElementPresent(LabModuleHelper.getNavPanelRow("Manage Freezers:"));
 
-        waitAndClick(Locator.linkContainingText("Control Item Visibility"));
+        waitAndClickAndWait(Locator.linkContainingText("Control Item Visibility"));
 
         waitForText("Sequence"); //proxy for page load
         waitForText("TruCount", WAIT_FOR_JAVASCRIPT * 2); //proxy for page load
@@ -918,8 +917,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //restore defaults
         _helper.goToLabHome();
-        waitAndClick(_helper.toolIcon("Settings"));
-        waitAndClick(Locator.linkContainingText("Control Item Visibility"));
+        waitAndClickAndWait(_helper.toolIcon("Settings"));
+        waitAndClickAndWait(Locator.linkContainingText("Control Item Visibility"));
         waitForText("Sequence"); //proxy for page load
         waitForText("TruCount", WAIT_FOR_JAVASCRIPT * 2); //proxy for page load
 
@@ -946,7 +945,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     {
         log("Testing Site Settings");
         goToAdminConsole();
-        waitAndClick(Locator.linkContainingText("laboratory module admin"));
+        waitAndClickAndWait(Locator.linkContainingText("laboratory module admin"));
 
         waitForText("Reference Sequences"); //proxy for page load
 
@@ -1009,7 +1008,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         log("testing lab tools webpart");
         _helper.goToLabHome();
 
-        waitAndClick(_helper.toolIcon("Import Data"));
+        waitAndClickAndWait(_helper.toolIcon("Import Data"));
         assertElementPresent(Ext4HelperWD.ext4MenuItem("Sequence"));
         for(Pair<String, String> pair : getAssaysToCreate())
         {
@@ -1085,7 +1084,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.clickNavPanelItem("DNA_Oligos:", IMPORT_DATA_TEXT);
         waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Locator.ext4Button("Submit"));
 
         waitForElement(Locator.name("purification"));
 
@@ -1143,7 +1142,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.clickNavPanelItem("Samples:", IMPORT_DATA_TEXT);
         waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Locator.ext4Button("Submit"));
 
         waitForElement(Locator.name("samplename"));
 
@@ -1307,7 +1306,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.clickNavPanelItem("Peptides:", IMPORT_DATA_TEXT);
         waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Locator.ext4Button("Submit"));
 
         waitForElement(Locator.name("sequence"));
 
@@ -1416,14 +1415,14 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
         click(Locator.xpath("//a//span[text() = 'Settings']"));
         waitForText("Set Assay Defaults");
-        _helper.clickNavPanelItem("Set Assay Defaults");
+        waitAndClickAndWait(Locator.linkContainingText("Set Assay Defaults"));
         String defaultVal = "LC480";
         _helper.waitForField(VIRAL_LOAD_ASSAYNAME);
         Ext4FieldRefWD.getForLabel(this, VIRAL_LOAD_ASSAYNAME).setValue(defaultVal);
         waitAndClick(Locator.ext4Button("Submit"));
 
         waitForElement(Ext4HelperWD.ext4Window("Success"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClickAndWait(Locator.ext4Button("OK"));
         waitForText("Types of Data");
         _helper.goToAssayResultImport(VIRAL_LOAD_ASSAYNAME);
         _helper.waitForField("Source Material");
