@@ -511,8 +511,9 @@ public class CohortTest extends BaseWebDriverTest
         DataRegionTable dataset = new DataRegionTable("Dataset", this);
         dataset.createQuickChart("SequenceNum");
         clickButton("View Data", 0);
-        waitForElement(Locator.id("aqwp3"));
-        DataRegionTable chartData = new DataRegionTable("aqwp3", this);
+        waitForElement(Locator.xpath("//*[starts-with(@id, 'aqwp')]"));
+        String drtId = getAttribute(Locator.xpath("//*[starts-with(@id, 'aqwp')]"), "id");
+        DataRegionTable chartData = new DataRegionTable(drtId, this);
         Assert.assertEquals("Wrong amount of data rows in quick chart", 12, chartData.getDataRowCount());
         List<String> participants = chartData.getColumnDataAsText("ParticipantID");
         Assert.assertTrue("Expected participant was not present in chart data", participants.contains("Infected1"));
