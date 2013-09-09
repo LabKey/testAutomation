@@ -112,7 +112,7 @@ public class LabModuleHelper
 
     public static Locator getNavPanelRow(String label)
     {
-        return Locator.tag("div").withClass("ldk-navpanel-section-row").withDescendant(Locator.xpath("span[text() = '" + label + "']"));
+        return Locator.tag("div").withClass("ldk-navpanel-section-row").withDescendant(Locator.tagContainingText("span",label));
     }
 
     public void goToLabHome()
