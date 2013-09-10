@@ -50,9 +50,10 @@ import org.openqa.selenium.WebElement;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -366,9 +367,8 @@ public class SequenceTest extends BaseWebDriverTest
         Assert.assertEquals("Wrong number of files selected", 14, StringUtils.countMatches(url, "dataIds="));
         Assert.assertTrue("Improper URL to download sequences", url.contains("mergeFastqFiles.view?"));
 
-        waitAndClick(Locator.ext4Button("Cancel"));
-
-        validateFastqDownload(url);
+        waitAndClick(Locator.ext4Button("Submit"));
+        validateFastqDownload(fileName + ".fastq.gz");
 
         log("Verifying FASTQC Report");
         dr.uncheckAllOnPage();
@@ -742,69 +742,41 @@ public class SequenceTest extends BaseWebDriverTest
 
     /**
      * This method will make a request to download merged FASTQ files created during the illumina test
-     * @param url
+     * @param filename
      * @throws Exception
      */
-    private void validateFastqDownload(String url) throws Exception
+    private void validateFastqDownload(String filename) throws Exception
     {
         log("Verifying merged FASTQ export");
 
-        HttpClient httpClient = WebTestHelper.getHttpClient();
-        HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpGet method = null;
-        HttpResponse response = null;
+        File output = new File(getDownloadDir(), filename);
+        _helper.waitForFile(output);
 
-        try
+        Assert.assertTrue("Unable to find file: " + output.getPath(), output.exists());
+
+        try (
+                InputStream fileStream = new FileInputStream(output);
+                InputStream gzipStream = new GZIPInputStream(fileStream);
+                Reader decoder = new InputStreamReader(gzipStream);
+                BufferedReader br = new BufferedReader(decoder);
+        )
         {
-            //first try FASTQ merge
-            url = getBaseURL().replaceAll(getContextPath(), "") + url;
-            method = new HttpGet(url);
-            response = httpClient.execute(method, context);
-            int status = response.getStatusLine().getStatusCode();
-            Assert.assertEquals("FASTQ was not Downloaded", HttpStatus.SC_OK, status);
-            Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
-            Assert.assertTrue("Response header incorrect", response.getHeaders("Content-Type")[0].getValue().startsWith("application/x-gzip"));
-
-            //TODO: remove this once finished debugging
-            File output = new File(getLabKeyRoot(), "output.fastq");
-            if (output.exists())
-                output.delete();
-            output.createNewFile();
-
-            try (
-                    InputStream is = response.getEntity().getContent();
-                    GZIPInputStream gz = new GZIPInputStream(is);
-                    BufferedReader br = new BufferedReader(new InputStreamReader(gz));
-                    FileWriter out = new FileWriter(output);
-            )
+            int count = 0;
+            int totalChars = 0;
+            String thisLine;
+            List<String> lines = new ArrayList<>();
+            while ((thisLine = br.readLine()) != null)
             {
-                int count = 0;
-                int totalChars = 0;
-                String thisLine;
-                List<String> lines = new ArrayList<>();
-                while ((thisLine = br.readLine()) != null)
-                {
-                    count++;
-                    totalChars+= thisLine.length();
-                    lines.add(thisLine);
-                    out.write(thisLine + System.getProperty("line.separator"));
-                }
-
-                int expectedLength = 504;
-                if (count != expectedLength)
-                {
-                    log("SequenceTest ERROR: Response line length was " + count + ", expected " + expectedLength + ".  Total characters: " + totalChars);
-                    publishArtifact(output);
-                }
-                Assert.assertEquals("Length of file doesnt match expected value", expectedLength, count);
+                count++;
+                totalChars+= thisLine.length();
+                lines.add(thisLine);
             }
-        }
-        finally
-        {
-            if (null != response)
-                EntityUtils.consume(response.getEntity());
-            if (httpClient != null)
-                httpClient.getConnectionManager().shutdown();
+
+            int expectedLength = 504;
+            Assert.assertEquals("Length of file doesnt match expected value.  Total characters: " + totalChars, expectedLength, count);
+
+            //TODO: see if this works on team city.  delete file is true
+            //output.delete();
         }
     }
 

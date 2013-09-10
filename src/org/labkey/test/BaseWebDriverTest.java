@@ -322,6 +322,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
                         "application/vnd.ms-excel," +
                         "application/octet-stream," +
+                        "application/x-gzip," +
                         "application/x-zip-compressed," +
                         "text/x-script.perl");
                 profile.setPreference("browser.download.manager.showWhenStarting",false);

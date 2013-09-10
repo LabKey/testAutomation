@@ -25,11 +25,14 @@ import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
 import org.openqa.selenium.Alert;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
+
+import static org.labkey.test.BaseSeleniumWebTest.WAIT_FOR_PAGE;
 
 /**
  * User: bbimber
@@ -449,5 +452,17 @@ public class LabModuleHelper
                 buf.append(chars[i]);
 
         return buf.toString();
+    }
+
+    public void waitForFile(final File file)
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return file.exists();
+            }
+        }, "Unable to find file: " + file.getPath(), WAIT_FOR_PAGE);
     }
 }

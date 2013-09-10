@@ -284,16 +284,22 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         checkDate("3/5/99", dateFormat3);
     }
 
-    private void checkDate(String dateStr, String formatStr) throws Exception
+    private void checkDate(String dateStr, String javaFormatStr) throws Exception
     {
-        SimpleDateFormat format = new SimpleDateFormat(formatStr);
-        Long expected = format.parse(dateStr).getTime();
+        SimpleDateFormat stdFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        SimpleDateFormat format = new SimpleDateFormat(javaFormatStr);
+        Date expectedDate = format.parse(dateStr);
+        String expectedString = stdFormat.format(expectedDate);
+
         String clientDateStr = (String)executeScript("return (new Date()).toString()");
-        Long actual = (Long)executeScript("return LDK.ConvertUtils.parseDate('" + dateStr + "').getTime();");
+        String clientFormattedString = (String)executeScript("return LDK.ConvertUtils.parseDate('" + dateStr + "').format('Y-m-d');");
+
         String clientTimezone = (String)executeScript("return Ext4.Date.getTimezone(LDK.ConvertUtils.parseDate('" + dateStr + "'));");
         String serverTimezone = Calendar.getInstance().getTimeZone().getDisplayName(false, TimeZone.SHORT);
         Date now = new Date();
-        Assert.assertEquals("Incorrect JS date parsing for date: " + dateStr + " at: " + now + ", client date was: " + clientDateStr + ", with timezone: " + clientTimezone + ", with server timezone: " + serverTimezone, expected, actual);
+
+        Assert.assertEquals("Incorrect JS date parsing for date: " + dateStr + " at: " + now + ", client date was: " + clientDateStr + ", with timezone: " + clientTimezone + ", with server timezone: " + serverTimezone, expectedString, clientFormattedString);
     }
 
     private void workbookNumberingTest() throws Exception
@@ -1236,7 +1242,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             //update link
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("edit", rowNum), "href"), "UTF-8");
             Assert.assertTrue("Expected [edit] link to go to the container: " + workbook + ", href was: " + href,
-                    href.contains("/query/" + workbook + "/manageRecord.view?"));
+                    href.contains("/ldk/" + workbook + "/manageRecord.view?"));
 
             //sample type
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA", rowNum), "href"), "UTF-8");

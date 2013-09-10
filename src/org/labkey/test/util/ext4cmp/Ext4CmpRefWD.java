@@ -16,6 +16,8 @@
 package org.labkey.test.util.ext4cmp;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -84,5 +86,18 @@ public class Ext4CmpRefWD
                 return (Boolean)getFnEval("return !this.isDisabled();");
             }
         }, "Component was not enabled", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    @LogMethod(quiet = true)
+    public static void waitForComponent(final BaseWebDriverTest test, @LoggedParam final String query)
+    {
+        test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return (Boolean)test.executeScript("return !!Ext4.ComponentQuery.query('" + query + "');");
+            }
+        }, "Component did not appear: " + query, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 }
