@@ -373,7 +373,6 @@ src/org/labkey/test/tests/PivotQueryTest.java -text
 src/org/labkey/test/tests/ProgrammaticQCTest.java -text
 src/org/labkey/test/tests/ProjectSettingsTest.java -text
 src/org/labkey/test/tests/QuerySnapshotTest.java -text
-src/org/labkey/test/tests/ReagentTest.java -text
 src/org/labkey/test/tests/ReportSecurityTest.java -text
 src/org/labkey/test/tests/ReportTest.java -text
 src/org/labkey/test/tests/ReportThumbnailTest.java -text
@@ -420,7 +419,6 @@ src/org/labkey/test/tests/StudyWDTest.java -text
 src/org/labkey/test/tests/SurveyTest.java -text
 src/org/labkey/test/tests/SystemMaintenanceTest.java -text
 src/org/labkey/test/tests/TargetStudyTest.java -text
-src/org/labkey/test/tests/TargetedMSTest.java -text
 src/org/labkey/test/tests/TimeChartAPITest.java -text
 src/org/labkey/test/tests/TimeChartDateBasedTest.java -text
 src/org/labkey/test/tests/TimeChartTest.java -text
