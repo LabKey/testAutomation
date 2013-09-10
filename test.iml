@@ -35,6 +35,9 @@
     <content url="file://$MODULE_DIR$/../customModules/kiem/test">
       <sourceFolder url="file://$MODULE_DIR$/../customModules/kiem/test/src" isTestSource="false" />
     </content>
+    <content url="file://$MODULE_DIR$/../customModules/npod/test">
+      <sourceFolder url="file://$MODULE_DIR$/../customModules/npod/test/src" isTestSource="false" />
+    </content>
     <content url="file://$MODULE_DIR$/../customModules/reagent/test">
       <sourceFolder url="file://$MODULE_DIR$/../customModules/reagent/test/src" isTestSource="false" />
     </content>
