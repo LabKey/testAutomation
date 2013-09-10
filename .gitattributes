@@ -365,6 +365,7 @@ src/org/labkey/test/tests/NabHighThroughputAssayTest.java -text
 src/org/labkey/test/tests/NabMigrationTest.java -text
 src/org/labkey/test/tests/NabOldTest.java -text
 src/org/labkey/test/tests/NonStudyReportsTest.java -text
+src/org/labkey/test/tests/NpodDonorSamplesTest.java -text
 src/org/labkey/test/tests/ParticipantReportTest.java -text
 src/org/labkey/test/tests/PipelineCancelTest.java -text
 src/org/labkey/test/tests/PipelineTest.java -text
