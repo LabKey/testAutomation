@@ -28,6 +28,7 @@ import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.SchemaHelper;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
@@ -86,6 +87,7 @@ import java.util.Arrays;
 @Category({DailyA.class, Data.class})
 public class LinkedSchemaTest extends BaseWebDriverTest
 {
+    private SchemaHelper _schemaHelper = new SchemaHelper(this);
     private static final String PROJECT_NAME = LinkedSchemaTest.class.getSimpleName() + "Project";
     private static final String SOURCE_FOLDER = "SourceFolder";
     private static final String TARGET_FOLDER = "TargetFolder";
@@ -359,7 +361,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         verifyLinkedSchema();
 
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        createLinkedSchema(TARGET_FOLDER, "BasicLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", null);
+        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, "BasicLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", null);
 
         //Ensure that all the columns we would expect to come through are coming through
         assertColumnsPresent(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", "SubjectID", "Name", "Family", "Mother", "Father", "Species", "Occupation",
@@ -381,7 +383,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         createLinkedSchemaQuery(SOURCE_FOLDER, "lists", "QueryOverLookup", "NIMHDemographics");
 
         //Create a new linked schema that includes that query, and ensure that it is propogating lookups in the expected manner
-        createLinkedSchema(TARGET_FOLDER, "QueryLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions,QueryOverLookup", null);
+        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, "QueryLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions,QueryOverLookup", null);
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", false, "Mother");
 
@@ -458,7 +460,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema APeople without template");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        createLinkedSchema(TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", LIST_NAME + "," + QUERY_NAME, A_PEOPLE_METADATA);
+        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", LIST_NAME + "," + QUERY_NAME, A_PEOPLE_METADATA);
 
         // UNDONE
 //        // Issue 17592: Query: inconsistent handling of query metadata xml -- skip applying metadata override until we get clarification of expected behavior...
@@ -589,7 +591,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema BPeople using BPeopleTemplate");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        createLinkedSchema(TARGET_FOLDER, B_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, null, null);
+        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, B_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, null, null);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -615,7 +617,7 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     {
         log("** Creating linked schema BPeople using BPeopleTemplate with metadata override to only show 'D' people");
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
-        createLinkedSchema(TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, LIST_NAME + "," + QUERY_NAME, D_PEOPLE_METADATA);
+        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, D_PEOPLE_SCHEMA_NAME, sourceContainerPath, "BPeopleTemplate", null, LIST_NAME + "," + QUERY_NAME, D_PEOPLE_METADATA);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -754,99 +756,6 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         clickButton("Create and Edit Source");
         waitForElement(Locator.xpath("//button[text()='Save & Finish']"));
         clickButton("Save & Finish");
-    }
-
-
-    @LogMethod(category = LogMethod.MethodType.SETUP)
-    void createLinkedSchema(String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
-    {
-        _editLinkedSchema(true, targetFolder, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
-    }
-
-    @LogMethod(category = LogMethod.MethodType.SETUP)
-    void updateLinkedSchema(String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
-    {
-        _editLinkedSchema(false, targetFolder, name, sourceContainerPath, schemaTemplate, sourceSchemaName, tables, metadata);
-    }
-
-    void _editLinkedSchema(boolean create, String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
-    {
-        beginAt("/query/" + getProjectName() + "/" + targetFolder + "/admin.view");
-
-        // Click the create new or edit existing link.
-        Locator link;
-        if (create)
-            link = Locator.xpath("//a[text()='new linked schema']");
-        else
-            link = Locator.xpath("//td[text()='" + name + "']/..//a[text()='edit']");
-        waitAndClickAndWait(link);
-
-        waitForElement(Locator.xpath("//input[@name='userSchemaName']"));
-        setFormElement(Locator.xpath("//input[@name='userSchemaName']"), name);
-        setFormElement(Locator.xpath("//input[@name='dataSource']"), sourceContainerPath);
-        waitForElement(Locator.xpath("//li[text()='" + sourceContainerPath + "']"));
-        click(Locator.xpath("//li[text()='" + sourceContainerPath + "']"));
-
-        if (schemaTemplate != null)
-        {
-            _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='schemaTemplate']")));
-            setFormElement(Locator.xpath("//input[@name='schemaTemplate']"), schemaTemplate);
-            waitForElement(Locator.xpath("//li[text()='" + schemaTemplate + "']"));
-            click(Locator.xpath("//li[text()='" + schemaTemplate + "']"));
-        }
-
-        if (sourceSchemaName != null)
-        {
-            if (schemaTemplate != null)
-            {
-                // click "Override template value" widget
-                click(Locator.xpath("id('sourceSchemaOverride')/span[text()='Override template value']"));
-            }
-            _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='sourceSchemaName']")));
-
-            setFormElement(Locator.xpath("//input[@name='sourceSchemaName']"), sourceSchemaName);
-            waitForElement(Locator.xpath("//li[text()='"+ sourceSchemaName + "']"));
-            click(Locator.xpath("//li[text()='"+ sourceSchemaName + "']"));
-        }
-
-        if (tables != null)
-        {
-            if (schemaTemplate != null)
-            {
-                // click "Override template value" widget
-                click(Locator.xpath("id('tablesOverride')/span[text()='Override template value']"));
-            }
-            _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='tables']")));
-
-            click(Locator.xpath("//input[@name='tables']"));
-            for (String table : tables.split(","))
-            {
-                WebElement li = Locator.xpath("//li").containing(table).notHidden().waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT);
-                if (!li.getAttribute("class").contains("selected"))
-                    li.click();
-            }
-            click(Locator.xpath("//input[@name='tables']"));
-        }
-
-        if (metadata != null)
-        {
-            if (schemaTemplate != null)
-            {
-                // click "Override template value" widget
-                click(Locator.xpath("id('metadataOverride')/span[text()='Override template value']"));
-            }
-            _shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//textarea[@name='metaData']")));
-
-            setFormElement(Locator.xpath("//textarea[@name='metaData']"), metadata);
-        }
-
-        if (create)
-            clickButton("Create");
-        else
-            clickButton("Update");
-
-        // Back on schema admin page, check the linked schema was created/updated.
-        waitForElement(Locator.xpath("//td[text()='" + name + "']"));
     }
 
 }
