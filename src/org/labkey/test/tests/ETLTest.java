@@ -62,6 +62,10 @@ public class ETLTest extends BaseWebDriverTest
         runETLMergeJob();
         assertInTarget("Subject 0", "Subject 1", "Subject 2");
 
+        deleteSourceRow("1");
+        runETLTruncateJob();
+        assertInTarget("Subject 2");
+        assertNotInTarget("Subject 0", "Subject 1");
 //        disableModules("simpletest");
     }
 
@@ -118,6 +122,13 @@ public class ETLTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
+    private void runETLTruncateJob()
+    {
+        goToModule("DataIntegration");
+        waitAndClick(Locator.xpath("//tr[contains(@transformid,'truncate')]/td/a"));
+        goToProjectHome();
+    }
+
     private void deleteSourceRow(String... ids)
     {
         goToProjectHome();
@@ -144,6 +155,16 @@ public class ETLTest extends BaseWebDriverTest
         }
     }
 
+    private void assertNotInTarget(String... targets)
+    {
+        goToProjectHome();
+        click(Locator.xpath("//span[text()='Target']"));
+        waitForText("etl_target2");
+        for(String target : targets)
+        {
+            assertTextNotPresent(target);
+        }
+    }
 
     protected void checkRun(int amount)
     {
@@ -175,6 +196,6 @@ public class ETLTest extends BaseWebDriverTest
     @Override
     public BrowserType bestBrowser()
     {
-        return BrowserType.CHROME;
+        return BrowserType.FIREFOX;
     }
 }
