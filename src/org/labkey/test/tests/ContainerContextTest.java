@@ -336,7 +336,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Override detailsURL in metadata...");
         String customMetadata =
                 "<ns:tables xmlns:ns=\"http://labkey.org/data/xml\">\n" +
-                "  <ns:table tableName=\"CustomQuery\" tableDbType=\"TABLE\" useColumnOrder=\"true\">\n" +
+                "  <ns:table tableName=\"EmissionTest\" tableDbType=\"TABLE\" useColumnOrder=\"true\">\n" +
                 "    <ns:tableTitle>Custom Query</ns:tableTitle>\n" +
                 "    <!--<ns:javaCustomizer>org.labkey.ldk.query.BuiltInColumnsCustomizer</ns:javaCustomizer>-->\n" +
                 "    <ns:titleColumn>rowid</ns:titleColumn>\n" +
