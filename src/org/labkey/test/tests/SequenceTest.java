@@ -750,7 +750,7 @@ public class SequenceTest extends BaseWebDriverTest
         log("Verifying merged FASTQ export");
 
         File output = new File(getDownloadDir(), filename);
-        _helper.waitForFile(output);
+        _helper.waitForFileOfSize(output, 15000);  //size measured at 15924
 
         Assert.assertTrue("Unable to find file: " + output.getPath(), output.exists());
 
