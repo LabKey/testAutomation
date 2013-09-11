@@ -623,8 +623,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _ext4Helper.clickExt4MenuItem("Create Readsets");
         waitForElement(Ext4HelperWD.ext4Window("Create Readsets"));
-        waitForElement(Locator.ext4Button("Close"));
-        click(Locator.ext4Button("Close"));
+        waitAndClick(Locator.ext4Button("Close"));
 
     }
 
@@ -1281,8 +1280,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     private  void insertDummySampleRow(String suffix)
     {
         Locator locator = _helper.toolIcon("Import Samples");
-        waitForElement(locator);
-        click(locator);
+        waitAndClickAndWait(locator);
         //NOTE: we are in a workbook
         _ext4Helper.clickExt4MenuItem("Samples");
 
@@ -1380,7 +1378,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitForElement(Locator.name("name"));
         sleep(50);
         _helper.setFormField("name", "TestPrimer");
-        click(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Locator.ext4Button("Submit"));
         DataRegionTable table = new DataRegionTable("query", this);
         Assert.assertEquals("Wrong number of rows found", _oligosTotal, table.getDataRowCount());
 
@@ -1420,7 +1418,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     {
         log("verifying ability to set default import method");
         _helper.goToLabHome();
-        click(Locator.xpath("//a//span[text() = 'Settings']"));
+        waitAndClickAndWait(_helper.toolIcon("Settings"));
         waitForText("Set Assay Defaults");
         waitAndClickAndWait(Locator.linkContainingText("Set Assay Defaults"));
         String defaultVal = "LC480";
