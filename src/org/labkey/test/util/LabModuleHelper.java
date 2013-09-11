@@ -331,7 +331,7 @@ public class LabModuleHelper
 
     public Locator toolIcon(String name)
     {
-        return Locator.tag("div").withClass("tool-icon").append(Locator.tagContainingText("span", name));
+        return Locator.tag("div").withClass("tool-icon").append(Locator.tagContainingText("a", name));
     }
 
     public void waitForDataRegion(String name)
