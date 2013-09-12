@@ -1014,7 +1014,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         log("testing lab tools webpart");
         _helper.goToLabHome();
 
-        waitAndClickAndWait(_helper.toolIcon("Import Data"));
+        waitAndClick(_helper.toolIcon("Import Data"));
         assertElementPresent(Ext4HelperWD.ext4MenuItem("Sequence"));
         for(Pair<String, String> pair : getAssaysToCreate())
         {
@@ -1280,7 +1280,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     private  void insertDummySampleRow(String suffix)
     {
         Locator locator = _helper.toolIcon("Import Samples");
-        waitAndClickAndWait(locator);
+        waitAndClick(locator);
         //NOTE: we are in a workbook
         _ext4Helper.clickExt4MenuItem("Samples");
 
