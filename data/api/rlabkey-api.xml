@@ -373,5 +373,40 @@
                  ]]>
              </response>
          </test>
+    <test name="import rows" type="post">
+        <url>
+            <![CDATA[
+                library(Rlabkey)
 
+                # setup new rows data frame with 1,000 identical rows
+                newrows <- data.frame(
+	                DisplayFld="Imported from R"
+	                , RequiredText="abc"
+	                , RequiredInt=1
+	                , stringsAsFactors=FALSE)
+                newrows = newrows[rep(1:nrow(newrows),each=1000),]
+
+                importedInfo <- labkey.importRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toImport=newrows)
+
+                print(paste("Rows imported = ", importedInfo$rowsAffected, sep=""))
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                Rows imported = 1000
+            ]]>
+        </response>
+    </test>
+    <test name="final test" type="post">
+        <url>
+            <![CDATA[
+                print("We are done!");
+            ]]>
+        </url>
+        <response>
+            <![CDATA[
+                We are done!
+            ]]>
+        </response>
+    </test>
 </ApiTests>
