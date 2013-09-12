@@ -121,6 +121,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
         // verify RNA assay with ignored sampleminded data
         clickFolder(assayFolder);
+        waitForElement(tableLoc);
         ignoreSampleMindedData(assay2);
         verifyProgressReport(assay2, true);
         verifyUnassayedSpecimenQuery(assay2);
@@ -235,6 +236,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private void verifyAdditionalGroupingColumn(String assayName, String groupCol)
     {
         clickFolder(assayFolder);
+        waitForElement(tableLoc);
         waitForText("48 " + assayName + " queries");
         configureGroupingColumn(assayName, groupCol);
         waitForElement(tableLoc);
@@ -295,7 +297,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private void flagSpecimenForReview(String assayName, String runName, @Nullable String collectionDateFilterStr)
     {
         clickFolder(assayFolder);
-
+        waitForElement(tableLoc);
         clickAndWait(Locator.linkWithText(assayName));
         clickAndWait(Locator.linkWithText(runName));
 
@@ -310,6 +312,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         waitForElement(Locator.tagWithAttribute("img", "title", "Flagged for review"));
 
         clickFolder(assayFolder);
+        waitForElement(tableLoc);
     }
 
     @LogMethod
@@ -334,6 +337,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         configureAssayProgressDashboard(assay1);
         configureAssaySchema(assay1);
         clickFolder(assayFolder);
+        waitForElement(tableLoc);
     }
 
     @LogMethod
