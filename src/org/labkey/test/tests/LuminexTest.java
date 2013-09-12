@@ -2034,7 +2034,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     }
 
-    private void setUpGuideSet(String analyte)
+    public void setUpGuideSet(String analyte)
     {
         log("Setting Levey-Jennings Report graph parameters for Analyte " + analyte);
         waitForText(analyte);
@@ -2064,7 +2064,7 @@ public class LuminexTest extends AbstractQCAssayTest
         }
 
     }
-    private void createGuideSet(String analyte, boolean initialGuideSet)
+    public void createGuideSet(String analyte, boolean initialGuideSet)
     {
         if (initialGuideSet)
             waitForText("No current guide set for the selected graph parameters");
@@ -2076,7 +2076,7 @@ public class LuminexTest extends AbstractQCAssayTest
         }
     }
 
-    private void editGuideSet(String[] rows, String comment, boolean creating)
+    public void editGuideSet(String[] rows, String comment, boolean creating)
     {
         if (creating)
         {
