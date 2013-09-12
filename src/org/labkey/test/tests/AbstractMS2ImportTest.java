@@ -75,7 +75,7 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         assertTextPresent(SAMPLE_BASE_NAME + ".search.xar.xml");
 
         log("Verify upload finished.");
-        waitForPipelineJobsToComplete(totalJobCount, "Waiting upload to complete", false);
+        waitForPipelineJobsToComplete(totalJobCount, "Waiting for upload to complete", false);
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
