@@ -915,7 +915,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", TABBED_FOLDER_TYPE);
-        clickAndWait(Locator.linkWithText("Update Folder"));
+        clickAndWait(Locator.button("Update Folder"));
 
         // Verify that subfolders got moved into tabs
         assertElementPresent(Locator.linkWithText(STUDYTAB_NAME));
@@ -936,7 +936,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", "Collaboration");
-        clickAndWait(Locator.linkWithText("Update Folder"));
+        clickAndWait(Locator.button("Update Folder"));
 
         // Study and Assay should be hidden now
         assertTextNotPresent(STUDYTAB_NAME, ASSAYTAB_NAME, STUDYCONTAINER_NAME, ASSAYCONTAINER_NAME);
@@ -946,7 +946,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", TABBED_FOLDER_TYPE);
-        clickAndWait(Locator.linkWithText("Update Folder"));
+        clickAndWait(Locator.button("Update Folder"));
 
         // Verify that folder tabs are back
         assertTextPresent(STUDYTAB_NAME, ASSAYTAB_NAME);
