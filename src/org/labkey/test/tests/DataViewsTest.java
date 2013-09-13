@@ -177,9 +177,9 @@ public class DataViewsTest extends StudyRedesignTest
         waitForElement(Locator.linkContainingText(REPORT_TO_DELETE));
         enableEditMode();
         openEditPanel(REPORT_TO_DELETE);
-        waitForElement(Locator.ext4Button("Delete Report"));
-        clickButton("Delete Report", 0);
-        waitForText("Delete Report?");
+        waitForElement(Locator.ext4Button("Delete View"));
+        clickButton("Delete View", 0);
+        waitForText("Delete View?");
         clickButton("Yes", 0);
         waitForElementToDisappear(Locator.linkContainingText(REPORT_TO_DELETE));
     }
