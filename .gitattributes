@@ -97,9 +97,9 @@ modules/scriptpad/src/org/labkey/scriptpad/scriptpadController.java -text
 modules/scriptpad/src/org/labkey/scriptpad/scriptpadModule.java -text
 modules/scriptpad/src/org/labkey/scriptpad/view/scriptpad.jsp -text
 modules/simpletest/config/module.xml -text
-modules/simpletest/etls/append/config.xml -text svneol=unset#application/xml
-modules/simpletest/etls/merge/config.xml -text
-modules/simpletest/etls/truncate/config.xml -text
+modules/simpletest/etls/append.xml -text svneol=unset#application/xml
+modules/simpletest/etls/merge.xml -text
+modules/simpletest/etls/truncate.xml -text
 modules/simpletest/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/customFolder.foldertype.xml -text
