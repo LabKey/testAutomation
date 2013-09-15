@@ -772,12 +772,12 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitAndClickAndWait(Locator.linkContainingText("laboratory module admin"));
         waitAndClickAndWait(Locator.linkContainingText("Manage Default Data and Demographics Sources"));
 
-        waitAndClickAndWait(Locator.ext4Button("View Summary of Data Sources"));
+        waitAndClick(Locator.ext4Button("View Summary of Data Sources"));
         waitForText("The following sources have been defined:");
         waitForText("/" + getProjectName());
         assertTextPresent(DATA_SOURCE + " (\"/home\".core.Users)");
 
-        waitAndClickAndWait(Locator.ext4Button("View Summary of Demographics Sources"));
+        waitAndClick(Locator.ext4Button("View Summary of Demographics Sources"));
         waitForText("The following sources have been defined:");
         assertTextPresent("/" + getProjectName());
         assertTextPresent(SUBJECT_LIST + " (laboratory.subjects)");
