@@ -592,7 +592,7 @@ public class AssayTest extends AbstractAssayTestWD
         clickAndWait(Locator.linkWithText("view copy-to-study history"));
 
         // Set a filter so that we know we're recalling SecondRun
-        setFilter("audit", "Comment", "Starts With", "3 row(s) were copied to a study from the assay");
+        setFilter("query", "Comment", "Starts With", "3 row(s) were copied to a study from the assay");
         clickAndWait(Locator.linkWithText("details"));
         checkCheckbox(Locator.checkboxByName(".toggle"));
         prepForPageLoad();
@@ -602,7 +602,7 @@ public class AssayTest extends AbstractAssayTestWD
         assertTextPresent("row(s) were recalled to the assay: " + TEST_ASSAY);
 
         // Set a filter so that we know we're looking at the copy event for SecondRun again
-        setFilter("audit", "Comment", "Starts With", "3 row(s) were copied to a study from the assay");
+        setFilter("query", "Comment", "Starts With", "3 row(s) were copied to a study from the assay");
 
         // verify audit entry was adjusted
         clickAndWait(Locator.linkWithText("details"));

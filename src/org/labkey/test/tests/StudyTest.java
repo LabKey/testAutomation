@@ -862,7 +862,7 @@ public class StudyTest extends StudyBaseTest
         selectOptionByText("view", "Query export events");
         waitForPageToLoad();
 
-        DataRegionTable auditTable =  new DataRegionTable("audit", this);
+        DataRegionTable auditTable =  new DataRegionTable("query", this);
         String[][] columnAndValues = new String[][] {{"Created By", getDisplayName()},
                 {"Project", PROJECT_NAME}, {"Container", STUDY_NAME}, {"SchemaName", "study"},
                 {"QueryName", "DEM-1"}, {"Comment", "Exported to script type r"}};

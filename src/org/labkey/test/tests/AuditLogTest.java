@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -140,7 +139,7 @@ public class AuditLogTest extends BaseWebDriverTest
             instance.newWaitForPageToLoad();
         }
         instance.log("searching for audit entry: " + msg);
-        DataRegionTable table = new DataRegionTable("audit", instance, false);
+        DataRegionTable table = new DataRegionTable("query", instance, false);
         int i = table.getColumn(column);
         Assert.assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
     }

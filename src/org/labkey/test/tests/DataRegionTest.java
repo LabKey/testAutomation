@@ -130,7 +130,7 @@ public class DataRegionTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("view"), "Query export events");
         newWaitForPageToLoad();
 
-        DataRegionTable auditTable =  new DataRegionTable("audit", this);
+        DataRegionTable auditTable =  new DataRegionTable("query", this);
         String[][] columnAndValues = new String[][] {{"Created By", getDisplayName()},
                 {"Project", PROJECT_NAME}, {"Container", PROJECT_NAME}, {"SchemaName", "lists"},
                 {"QueryName", LIST_NAME}, {"Comment", "Exported to script type r"}};
