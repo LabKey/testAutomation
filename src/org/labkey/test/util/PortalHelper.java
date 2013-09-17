@@ -72,7 +72,7 @@ public class PortalHelper extends AbstractHelper
     @LogMethod(quiet = true)
     public void removeTab(@LoggedParam String tabText)
     {
-        clickTabMenuItem(tabText, true, "Remove");
+        clickTabMenuItem(tabText, true, "Hide");
         _test.assertElementNotPresent(Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
     }
 
