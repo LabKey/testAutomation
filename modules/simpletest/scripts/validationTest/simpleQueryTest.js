@@ -10,7 +10,7 @@ var LABKEY = require("labkey");
 var Ext = require("Ext").Ext;
 
 var schemaName = "auditLog";
-var queryName = "audit";
+var queryName = "Client API Actions";
 
 var startTime = new Date();
 var month = startTime.getMonth() + 1;
