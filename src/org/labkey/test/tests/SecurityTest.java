@@ -685,7 +685,7 @@ public class SecurityTest extends BaseWebDriverTest
         selectOptionByText("view", "User events");
         newWaitForPageToLoad();
 
-        DataRegionTable table = new DataRegionTable("audit", this, false);
+        DataRegionTable table = new DataRegionTable("query", this, false);
 
         table.getDataAsText(2, 2);
         String createdBy      = table.getDataAsText(2, "Created By");
