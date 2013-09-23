@@ -75,6 +75,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
             "Britt\t30\tFalse\n" +
             "Josh\t30\tTrue";
 
+    public static final String STUDY_FOLDER_TAB_NAME = "Study Container Tab";
+
     protected String getProjectName()
     {
         return getClass().getSimpleName() + " Project";
@@ -883,6 +885,51 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Manage Study", "Study Container", "Overview", "Specimen Data");
         clickAndWait(Locator.linkWithText("Specimen Data"));
         assertTextPresent("Vial Search", "Specimens");
+/*
+        // Test container tab enhancements: change tab folder's type, revert type, delete tab folder
+        // Change study's type to collaboration
+        goToFolderManagement();
+        waitForText(STUDY_FOLDER_TAB_NAME);
+        Assert.assertEquals("", 4, getVisibleFolderTreeButtonCount());
+        clickAndWait(Locator.linkWithText("Folder Type"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
+        clickButton("Update Folder", 0);
+        _extHelper.waitForExtDialog("Change Folder Type");
+        click(Locator.extButton("Yes"));
+        waitForText("The Wiki web part displays a single wiki page.");
+        // TODO: assert that study tabs are gone
+        // change type back to study
+        goToFolderManagement();
+        waitForText(STUDY_FOLDER_TAB_NAME);
+        Assert.assertEquals("", 5, getVisibleFolderTreeButtonCount());
+        clickAndWait(Locator.linkWithText("Folder Type"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Study"));
+        clickButton("Update Folder", 0);
+        _extHelper.waitForExtDialog("Change Folder Type");
+        click(Locator.extButton("Yes"));
+        waitForText("Study tracks data in");
+        // change to collaboration again
+        goToFolderManagement();
+        waitForText(STUDY_FOLDER_TAB_NAME);
+        Assert.assertEquals("", 4, getVisibleFolderTreeButtonCount());
+        clickAndWait(Locator.linkWithText("Folder Type"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
+        clickButton("Update Folder", 0);
+        _extHelper.waitForExtDialog("Change Folder Type");
+        click(Locator.extButton("Yes"));
+        waitForText("The Wiki web part displays a single wiki page.");
+        // revert type
+        goToFolderManagement();
+        waitForText(STUDY_FOLDER_TAB_NAME);
+        Assert.assertEquals("", 5, getVisibleFolderTreeButtonCount());
+        clickButton("Revert");
+        _extHelper.waitForExtDialog("Revert Folder(s)");
+        click(Locator.extButton("OK"));
+        _extHelper.waitForExtDialog("Revert Folder");
+        click(Locator.extButton("OK"));
+        clickTab("Study Container");
+        waitForText("Study tracks data in");
+        */
     }
 
     @LogMethod
@@ -915,7 +962,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", TABBED_FOLDER_TYPE);
-        clickAndWait(Locator.button("Update Folder"));
+        clickButton("Update Folder");
 
         // Verify that subfolders got moved into tabs
         assertElementPresent(Locator.linkWithText(STUDYTAB_NAME));
@@ -936,7 +983,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", "Collaboration");
-        clickAndWait(Locator.button("Update Folder"));
+        clickButton("Update Folder");
 
         // Study and Assay should be hidden now
         assertTextNotPresent(STUDYTAB_NAME, ASSAYTAB_NAME, STUDYCONTAINER_NAME, ASSAYCONTAINER_NAME);
@@ -946,7 +993,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", TABBED_FOLDER_TYPE);
-        clickAndWait(Locator.button("Update Folder"));
+        clickButton("Update Folder");
 
         // Verify that folder tabs are back
         assertTextPresent(STUDYTAB_NAME, ASSAYTAB_NAME);
@@ -1030,4 +1077,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
         return null;
     }
 
+    private int getVisibleFolderTreeButtonCount()
+    {
+        Locator.XPathLocator locator = Locator.xpath("//a[contains(@class, 'x4-btn-toolbar')]").notHidden();
+        return getElementCount(locator);
+    }
 }
