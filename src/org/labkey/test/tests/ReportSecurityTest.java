@@ -147,7 +147,7 @@ public class ReportSecurityTest extends ReportTest
         clickFolder(getFolderName());
         goToManageViews();
 
-        _extHelper.clickMenuButton("Create", "Grid View");
+        clickAddReport("Grid View", false);
         setFormElement(Locator.name("label"), TEST_GRID_VIEW);
         selectOptionByText(Locator.id("datasetSelection"), "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create View");
@@ -156,12 +156,14 @@ public class ReportSecurityTest extends ReportTest
         clickProject(getProjectName());
         clickFolder("My Study");
 
-        clickReportGridLink("participant chart", "permissions");
+        goToManageViews();
+        clickReportPermissionsLink("participant chart");
         click(Locator.id("useCustom"));
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickButton("Save");
 
-        clickReportGridLink(TEST_GRID_VIEW, "permissions");
+        goToManageViews();
+        clickReportPermissionsLink(TEST_GRID_VIEW);
         click(Locator.id("useCustom"));
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));
         clickButton("Save");

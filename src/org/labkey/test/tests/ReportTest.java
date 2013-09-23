@@ -35,19 +35,16 @@ public abstract class ReportTest extends StudyBaseTestWD
     protected void deleteReport(String reportName)
     {
         clickAndWait(Locator.linkWithText("Manage Views"));
-        final Locator report = Locator.tagContainingText("div", reportName);
+        final Locator report = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName);
 
         // select the report and click the delete button
         waitForElement(report, 10000);
         click(report);
 
-        String id = _extHelper.getExtElementId("btn_deleteView");
-        click(Locator.id(id));
+        click(Locator.linkContainingText("Delete Selected"));
 
         _extHelper.waitForExtDialog("Delete Views", WAIT_FOR_JAVASCRIPT);
-
-        String btnId = (String)executeScript("return Ext.MessageBox.getDialog().buttons[1].getId();");
-        click(Locator.id(btnId));
+        _ext4Helper.clickWindowButton("Delete Views", "OK", 0, 0);
 
         // make sure the report is deleted
         waitFor(new Checker()
@@ -60,48 +57,49 @@ public abstract class ReportTest extends StudyBaseTestWD
     }
 
     @LogMethod
-    protected Locator getReportGridLink(String reportName, String linkText)
+    protected Locator getReportGridLink(String reportName)
     {
-        return getReportGridLink(reportName, linkText, true);
+        return getReportGridLink(reportName, true);
     }
 
     @LogMethod
-    protected Locator getReportGridLink(String reportName, String linkText, boolean isAdmin)
+    protected Locator getReportGridLink(String reportName, boolean isAdmin)
     {
         if (isAdmin)
         {
             goToManageViews();
         }
-        final Locator report = Locator.tagContainingText("div", reportName);
-
-        waitForElement(report, 10000);
-
-        // click the row to expand it
-        Locator expander = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']");
-        click(expander);
-
-        final Locator link = Locator.xpath("//div[@id='viewsGrid']//td//div[.='" + reportName + "']//..//..//..//td//a[contains(text(),'" + linkText + "')]");
-
-        // make sure the row has expanded
-        waitFor(new Checker() {
-            public boolean check()
-            {
-                return isElementPresent(link);
-            }
-        }, "Unable to click the link: " + linkText + " for report: " + reportName, WAIT_FOR_JAVASCRIPT);
-
-        return link;
+        waitForElement(Locator.linkContainingText(reportName), WAIT_FOR_JAVASCRIPT);
+        return Locator.linkContainingText(reportName);
     }
 
-    protected void clickReportGridLink(String reportName, String linkText, boolean isAdmin)
+    protected void clickReportGridLink(String reportName, boolean isAdmin)
     {
-        Locator link = getReportGridLink(reportName, linkText, isAdmin);
+        Locator link = getReportGridLink(reportName, isAdmin);
+        clickAndWait(link, WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+    }
+
+    protected void clickReportGridLink(String reportName)
+    {
+        clickReportGridLink(reportName, true);
+    }
+
+    protected void clickReportDetailsLink(String reportName)
+    {
+        Locator link = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName).append("//a[contains(@data-qtip, 'Click to navigate to the Detail View')]");
+
+        waitForElement(link);
+        scrollIntoView(link);
         clickAndWait(link);
     }
 
-    protected void clickReportGridLink(String reportName, String linkText)
+    protected void clickReportPermissionsLink(String reportName)
     {
-        clickReportGridLink(reportName, linkText, true);
+        Locator link = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName).append("//a[contains(@data-qtip, 'Click to customize the permissions')]");
+
+        waitForElement(link);
+        clickAndWait(link);
     }
 
     protected void goToAxisTab(String axisLabel)
@@ -129,5 +127,10 @@ public abstract class ReportTest extends StudyBaseTestWD
             clickButton("Delete");
             assertTextNotPresent(item);
         }
+    }
+
+    protected void clickAddReport(String reportName, boolean wait)
+    {
+        _extHelper.clickExtMenuButton(wait, Locator.linkContainingText("Add Report"), reportName);
     }
 }

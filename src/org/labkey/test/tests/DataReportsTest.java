@@ -154,7 +154,7 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         goToManageViews();
 
-        _extHelper.clickMenuButton("Create", "Query Report");
+        clickAddReport("Query Report", false);
 
         setFormElement(Locator.name("viewName"), QUERY_REPORT_NAME);
         setFormElement(Locator.name("description"), QUERY_REPORT_DESCRIPTION);
@@ -168,7 +168,7 @@ public class DataReportsTest extends ReportTest
         waitForText("Manage Views");
         waitForText(QUERY_REPORT_NAME);
 
-        clickReportGridLink(QUERY_REPORT_NAME, "view");
+        clickReportGridLink(QUERY_REPORT_NAME);
         assertTextPresent(QUERY_REPORT_NAME);
         waitForElement(Locator.paginationText(26));
 
@@ -181,7 +181,7 @@ public class DataReportsTest extends ReportTest
 
         goToManageViews();
 
-        _extHelper.clickMenuButton("Create", "Query Report");
+        clickAddReport("Query Report", false);
 
         setFormElement(Locator.name("viewName"), QUERY_REPORT_NAME_2);
         setFormElement(Locator.name("description"), QUERY_REPORT_DESCRIPTION_2);
@@ -258,7 +258,7 @@ public class DataReportsTest extends ReportTest
     {
         // create new grid view report:
         String viewName = "DRT Eligibility Query";
-        _extHelper.clickMenuButton("Create", "Grid View");
+        clickAddReport("Grid View", false);
         setFormElement(Locator.name("label"), viewName);
         selectOptionByText(Locator.name("params"), "ECI-1 (ECI-1: Eligibility Criteria)");
         clickButton("Create View");
@@ -458,7 +458,7 @@ public class DataReportsTest extends ReportTest
         signIn();
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        clickReportGridLink(R_SCRIPTS[0], "edit");
+        clickReportGridLink(R_SCRIPTS[0]);
         if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
             if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
                 Assert.fail("There was an error running the script");
@@ -469,7 +469,7 @@ public class DataReportsTest extends ReportTest
         log("Check that edit worked");
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        clickReportGridLink(R_SCRIPTS[1], "edit");
+        clickReportGridLink(R_SCRIPTS[1]);
 
         clickViewTab();
         waitForElement(Locator.navButton("Start Job"), WAIT_FOR_JAVASCRIPT);
@@ -519,26 +519,6 @@ public class DataReportsTest extends ReportTest
         setFormElement(l, name);
         _extHelper.clickExtButton("Save");
 
-    }
-
-    @LogMethod
-    protected void deleteRReports()
-    {
-        log("Clean up R Reports");
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
-        goToManageViews();
-        for (String script : R_SCRIPTS)
-        {
-            while (isTextPresent(script))
-            {
-                prepForPageLoad();
-                click(Locator.xpath("//a[contains(text(),'" + script + "')]/../../td[3]/a"));
-                Assert.assertTrue(getAlert().matches("^Permanently delete the selected view[\\s\\S]$"));
-                newWaitForPageToLoad();
-            }
-            assertTextNotPresent(script);
-        }
     }
 
     @LogMethod

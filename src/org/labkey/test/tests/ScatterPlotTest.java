@@ -61,7 +61,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        _extHelper.clickMenuButton("Create", "Scatter Plot");
+        clickAddReport("Scatter Plot", false);
 
         _extHelper.waitForExtDialog("Select Chart Query");
         //TODO: weird timing with these combo scatteres.
@@ -208,7 +208,7 @@ public class ScatterPlotTest extends GenericChartsTest
     @LogMethod
     private void doCustomizeScatterPlotTest()
     {
-        clickReportGridLink(SCATTER_PLOT_NAME_DR, "view");
+        clickReportGridLink(SCATTER_PLOT_NAME_DR);
         _ext4Helper.waitForMaskToDisappear();
 
         // verify that we originally are in view mode and can switch to edit mode
@@ -379,7 +379,7 @@ public class ScatterPlotTest extends GenericChartsTest
     @LogMethod
     private void doPointClickScatterPlotTest()
     {
-        clickReportGridLink(SCATTER_PLOT_NAME_MV, "view");
+        clickReportGridLink(SCATTER_PLOT_NAME_MV);
         _ext4Helper.waitForMaskToDisappear();
 
         // verify that we originally are in view mode and can switch to edit mode

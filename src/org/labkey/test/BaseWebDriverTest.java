@@ -1182,7 +1182,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void goToManageViews()
     {
         clickAdminMenuItem("Manage Views");
-        waitForElement(Locator.id("viewsGrid"));
+        waitForElement(Locator.xpath("//*[starts-with(@id, 'dataviews-panel')]"));
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 

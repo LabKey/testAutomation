@@ -63,7 +63,7 @@ public class DataViewsTest extends StudyRedesignTest
         goToModule("StudyRedesign");
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
-        clickMenuButton("Create", "R View");
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R View");
         clickButton("Save", "Please enter a view name:");
         setFormElement(Locator.xpath("//div[./span[.='Please enter a view name:']]/div/input"), REPORT_NAME);
         _extHelper.clickExtButton("Save");

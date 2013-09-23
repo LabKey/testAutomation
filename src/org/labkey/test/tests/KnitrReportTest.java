@@ -38,7 +38,7 @@ import java.nio.file.Paths;
  * Time: 12:34 PM
  */
 @Category({DailyA.class, Reports.class})
-public class KnitrReportTest extends BaseWebDriverTest
+public class KnitrReportTest extends ReportTest
 {
     private static final Path scriptpadReports = Paths.get(getLabKeyRoot(), "server/test/modules/scriptpad/resources/reports/schemas");
     private static final Path rhtmlReport = scriptpadReports.resolve("script_rhtml.rhtml");
@@ -52,9 +52,14 @@ public class KnitrReportTest extends BaseWebDriverTest
     }
 
     @Override
-    protected void doTestSteps() throws Exception
+    protected void doCreateSteps()
     {
         setupProject();
+    }
+
+    @Override
+    protected void doVerifySteps()
+    {
         verifyKnitrHTMLFormat();
         verifyKnitrMarkupFormat();
     }
@@ -131,7 +136,7 @@ public class KnitrReportTest extends BaseWebDriverTest
         clickProject(getProjectName());
         goToManageViews();
 
-        _extHelper.clickMenuButton("Create", "R View");
+        clickAddReport("R View", false);
         checkRadioButton(Locator.radioButtonByNameAndValue("knitrFormat", format.toString()));
         setCodeEditorValue("script-report-editor", reportSource);
         clickButton("Save", 0);
@@ -175,9 +180,8 @@ public class KnitrReportTest extends BaseWebDriverTest
 
     private void openView(String viewName)
     {
-        Actions builder = new Actions(_driver);
-        builder.contextClick(Locator.tag("div").withText(viewName).waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT)).build().perform();
-        waitAndClickAndWait(Locator.linkWithText("View"));
+        clickReportDetailsLink(viewName);
+        clickAndWait(Locator.linkContainingText("View Report"));
     }
 
     @Override

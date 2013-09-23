@@ -886,7 +886,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void goToManageViews()
     {
         clickAdminMenuItem("Manage Views");
-        waitForElement(Locator.id("viewsGrid"));
+        waitForElement(Locator.xpath("//*[starts-with(@id, 'dataviews-panel')]"));
     }
 
     public void goToManageStudy()

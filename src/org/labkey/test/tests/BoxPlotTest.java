@@ -49,9 +49,8 @@ public class BoxPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickMenuButton("Create", "Box Plot");
+        clickAddReport("Box Plot", false);
 
-        _extHelper.waitForExtDialog("Select Chart Query");
         //TODO: weird timing with these combo boxes.
         //Try once bug fixed: 15520: Box Plot - Allows selection of invalid schema/Query combination
         //_extHelper.selectExt4ComboBoxItem("Schema", "assay");

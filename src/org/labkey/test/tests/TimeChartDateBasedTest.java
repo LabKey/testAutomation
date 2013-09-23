@@ -88,7 +88,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
     {
         clickFolder(getFolderName());
         goToManageViews();
-        _extHelper.clickMenuButton("Create", "Time Chart");
+        clickAddReport("Time Chart", false);
         clickChooseInitialMeasure();
         _ext4Helper.clickGridRowText("Viral Load Quantified (copies/ml)", 0);
         clickButton("Select", 0);
@@ -140,7 +140,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         portalHelper.addWebPart("Datasets");
         portalHelper.addWebPart("Specimens");
         goToManageViews();
-        _extHelper.clickMenuButton("Create", "Time Chart");
+        clickAddReport("Time Chart", false);
         clickChooseInitialMeasure();
         waitForText("NAbAssay", WAIT_FOR_JAVASCRIPT);
 
@@ -284,9 +284,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
         goToManageViews();
         waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
         assertTextPresent(REPORT_NAME_2);
-        click(Locator.tagWithText("div", REPORT_NAME_1));
+        clickReportDetailsLink(REPORT_NAME_1);
         assertTextPresent(REPORT_DESCRIPTION);
-        clickAndWait(Locator.xpath("//a[text()='edit' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
+        click(Locator.linkContainingText("Edit Report"));
         waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
         assertTextPresent(CHART_TITLE, 6); // once for each individual chart title (note: save dialog thumbnail preview hasn't been rendered yet)
         pushLocation();
@@ -327,8 +327,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickFolder(getFolderName());
         goToManageViews();
         waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
-        click(Locator.tagWithText("div", REPORT_NAME_1));
-        clickAndWait(Locator.xpath("//a[text()='edit' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
+        clickReportDetailsLink(REPORT_NAME_1);
+        click(Locator.linkContainingText("Edit Report"));
         waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
         // change to the data points are visible again
         goToAxisTab(Y_AXIS_LABEL);
@@ -378,8 +378,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         goToManageViews();
         waitForText(REPORT_NAME_1, WAIT_FOR_JAVASCRIPT);
-        click(Locator.tagWithText("div", REPORT_NAME_1));
-        clickAndWait(Locator.xpath("//a[text()='edit' and contains(@href, '"+REPORT_NAME_1.replace(" ", "%20")+"')]"));
+        clickReportDetailsLink(REPORT_NAME_1);
+        click(Locator.linkContainingText("Edit Report"));
         waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
         clickAndWait(Locator.css("svg a circle"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Participant - 249318596");
@@ -411,7 +411,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        _extHelper.clickMenuButton("Create", "Time Chart");
+        clickAddReport("Time Chart", false);
         clickChooseInitialMeasure();
         _ext4Helper.clickGridRowText("CD4+ (cells/mm3)", 0);
         clickButton("Select", 0);
@@ -442,8 +442,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         clickFolder(getFolderName());
         goToManageViews();
-        waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
-        clickAndWait(Locator.linkWithText("edit"));
+        clickReportDetailsLink(REPORT_NAME_3);
+        click(Locator.linkContainingText("Edit Report"));
         waitForText(CHART_TITLE);
         assertTextPresent("Days Since Start Date", 2); // X-Axis labels for each measure
         assertTextPresent(CHART_TITLE+": Lymphs (cells/mm3)", 1); // Title
@@ -464,8 +464,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         clickFolder(getFolderName());
         goToManageViews();
-        waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
-        clickAndWait(Locator.linkWithText("edit"));
+        clickReportDetailsLink(REPORT_NAME_3);
+        click(Locator.linkContainingText("Edit Report"));
         waitForText(CHART_TITLE);
 
         // kbl : TODO, filter panel behavior has changed and it's still not certain what the proper AND / OR behavior for categories is
@@ -511,8 +511,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         modifyParticipantGroups();
         clickFolder(getFolderName());
         goToManageViews();
-        waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
-        clickAndWait(Locator.linkWithText("edit"));
+        clickReportDetailsLink(REPORT_NAME_3);
+        click(Locator.linkContainingText("Edit Report"));
         waitForText("One or more of the participant groups originally saved with this chart are not currently visible", WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent(GROUP3_NAME);
 
@@ -571,8 +571,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        waitAndClick(Locator.tagWithText("div", REPORT_NAME_3));
-        clickAndWait(Locator.linkWithText("edit"));
+        clickReportDetailsLink(REPORT_NAME_3);
+        click(Locator.linkContainingText("Edit Report"));
         waitForText(CHART_TITLE);
 
         waitForText("Group 1: Accute HIV-1");

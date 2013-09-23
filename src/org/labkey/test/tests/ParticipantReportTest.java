@@ -145,7 +145,7 @@ public class ParticipantReportTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickMenuButton("Create", "Mouse Report");
+        clickAddReport("Mouse Report", true);
 
         // select some measures from a dataset
         waitAndClickButton("Choose Measures", 0);
@@ -237,7 +237,7 @@ public class ParticipantReportTest extends ReportTest
 
         // verify visiting saved report
         goToManageViews();
-        clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
+        clickReportGridLink(PARTICIPANT_REPORT_NAME);
 
         waitForText("Creatinine", 32, WAIT_FOR_JAVASCRIPT); // 8 mice (x2 column headers) + 8 mice (x2 column tooltips)
         assertTextPresent(PARTICIPANT_REPORT_NAME);
@@ -282,7 +282,7 @@ public class ParticipantReportTest extends ReportTest
 
         // verify modified, saved report
         goToManageViews();
-        clickReportGridLink(PARTICIPANT_REPORT_NAME, "view");
+        clickReportGridLink(PARTICIPANT_REPORT_NAME);
 
         waitForText("Creatinine", 16, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 8 Results")); // There should only be 8 results, and it should state that.
@@ -300,7 +300,7 @@ public class ParticipantReportTest extends ReportTest
 
         // verify modified, saved-as report
         goToManageViews();
-        clickReportGridLink(PARTICIPANT_REPORT2_NAME, "view");
+        clickReportGridLink(PARTICIPANT_REPORT2_NAME);
 
         waitForText("Creatinine", 16, WAIT_FOR_JAVASCRIPT); // 8 mice + 8 grid field tooltips
         assertTextPresent(PARTICIPANT_REPORT2_NAME);
@@ -315,7 +315,7 @@ public class ParticipantReportTest extends ReportTest
 
         // Test group filtering
         goToManageViews();
-        clickMenuButton("Create", "Mouse Report");
+        clickAddReport("Mouse Report", false);
         // select some measures from a dataset
         waitAndClickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
@@ -382,7 +382,7 @@ public class ParticipantReportTest extends ReportTest
 
         //Participant report with specimen fields.
         goToManageViews();
-        clickMenuButton("Create", "Mouse Report");
+        clickAddReport("Mouse Report", false);
         // select some measures from a dataset
         waitAndClickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
@@ -436,7 +436,7 @@ public class ParticipantReportTest extends ReportTest
         clickButton("Save");
 
         goToManageViews();
-        clickMenuButton("Create", "Mouse Report");
+        clickAddReport("Mouse Report", false);
 
         // select some measures from the demographics
         waitAndClickButton("Choose Measures", 0);

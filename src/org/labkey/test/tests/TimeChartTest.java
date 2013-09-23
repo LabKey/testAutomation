@@ -107,7 +107,7 @@ public abstract class TimeChartTest extends ReportTest
     {
         clickFolder(getFolderName());
         goToManageViews();
-        _extHelper.clickMenuButton(true, "Create", "Time Chart");
+        clickAddReport("Time Chart", true);
         clickChooseInitialMeasure();
     }
 

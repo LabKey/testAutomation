@@ -227,8 +227,8 @@ public class SearchTest extends StudyWDTest
         clickButton("Save");
 
         // create new grid view report:
-        clickMenuButton("Views", "Manage Views");
-        clickMenuButton("Create", "Grid View");
+        goToManageViews();
+        _extHelper.clickExtMenuButton(false, Locator.linkContainingText("Add Report"), "Grid View");
         setFormElement("label", GRID_VIEW_NAME);
         selectOptionByText("params", "ECI-1 (ECI-1: Eligibility Criteria)");
         clickButton("Create View");
