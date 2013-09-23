@@ -378,13 +378,13 @@
             <![CDATA[
                 library(Rlabkey)
 
-                # setup new rows data frame with 1,000 identical rows
+                # setup new rows data frame with 10,000 identical rows
                 newrows <- data.frame(
 	                DisplayFld="Imported from R"
 	                , RequiredText="abc"
 	                , RequiredInt=1
 	                , stringsAsFactors=FALSE)
-                newrows = newrows[rep(1:nrow(newrows),each=1000),]
+                newrows = newrows[rep(1:nrow(newrows),each=10000),]
 
                 importedInfo <- labkey.importRows("%baseUrl%", folderPath="/RlabkeyVerifyProject",schemaName="lists", queryName="AllTypes", toImport=newrows)
 
@@ -393,7 +393,7 @@
         </url>
         <response>
             <![CDATA[
-                Rows imported = 1000
+                Rows imported = 10000
             ]]>
         </response>
     </test>
