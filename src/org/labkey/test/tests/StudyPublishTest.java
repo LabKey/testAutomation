@@ -280,6 +280,10 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Verify published participant count
         clickAndWait(Locator.linkWithText("Mice"));
+        waitForElement(Locator.id("participantsDiv1.status"));
+        _ext4Helper.deselectAllParticipantFilter();
+        waitForText("No matching");
+        _ext4Helper.selectAllParticipantFilter();
         waitForElement(Locator.id("participantsDiv1.status").withText("Found "+ptids.length+" mice of "+ptids.length+"."));
         if (alternateIDs)
             assertTextNotPresent(ptids);
