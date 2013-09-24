@@ -395,6 +395,7 @@ src/org/labkey/test/tests/SimpleModuleTest.java -text
 src/org/labkey/test/tests/SpecimenBaseTest.java -text
 src/org/labkey/test/tests/SpecimenExportTest.java -text
 src/org/labkey/test/tests/SpecimenExtendedTest.java -text
+src/org/labkey/test/tests/SpecimenImportTest.java -text
 src/org/labkey/test/tests/SpecimenMergeTest.java -text
 src/org/labkey/test/tests/SpecimenMultipleImportTest.java -text
 src/org/labkey/test/tests/SpecimenProgressReportTest.java -text
