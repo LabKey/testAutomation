@@ -280,7 +280,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Verify published participant count
         clickAndWait(Locator.linkWithText("Mice"));
-        waitForElement(Locator.id("participantsDiv1.status"));
+        waitForElement(Locator.xpath("//*[contains(@class, 'lk-filter-panel-label') and text()='All']"));
         _ext4Helper.deselectAllParticipantFilter();
         waitForText("No matching");
         _ext4Helper.selectAllParticipantFilter();
@@ -369,7 +369,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
                 waitForText(views[0]);
             }
 
-            String viewXpath = "//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]";
+            String viewXpath = "//tr[contains(@class, 'x4-grid-tree-node-leaf')]";
             Assert.assertEquals("Unexpected number of views/reports", views.length + reports.length, getXpathCount(Locator.xpath(viewXpath)));
         }
 
@@ -377,14 +377,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
         if (reports.length > 0)
         {
             assertTextPresent(reports);
-            String reportXpath = "//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]";
             for (final String report : reports)
             {
                 pushLocation();
-                String thisViewXpath = reportXpath+"[.//*[string()='"+report+"']]";
-                click(Locator.xpath(thisViewXpath));
-                waitAndClick(Locator.linkWithText("view"));
-                waitForPageToLoad();
+                clickAndWait(Locator.linkWithText(report));
+
                 waitFor(new Checker()
                     {
                         public boolean check()
@@ -429,16 +426,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
         if(views.length > 0)
         {
             assertTextPresent(views);
-            String viewXpath = "//div[contains(@class, 'x-grid-group-body')]/div[contains(@class, 'x-grid3-row')]";
-
             for (final String view : views)
             {
                 // Verify the views.
                 pushLocation();
-                String thisViewXpath = viewXpath+"[.//*[string()='"+view+"']]";
-                click(Locator.xpath(thisViewXpath));
-                waitAndClick(Locator.linkWithText("view"));
-                waitForPageToLoad();
+                clickAndWait(Locator.linkWithText(view));
 
                 // Do some sort of check.
                 assertTextPresent(view);
@@ -731,7 +723,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private void createTimeChart(String name, String[]... datasetMeasurePairs)
     {
         goToManageViews();
-        clickMenuButton("Create", "Time Chart");
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Time Chart");
 
         waitForElement(Locator.ext4Button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
         click(Locator.ext4Button("Choose a Measure"));
@@ -806,7 +798,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private void createMouseReport(String reportName, String[]... datasetMeasurePairs)
     {
         goToManageViews();
-        clickMenuButton("Create", "Mouse Report");
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Mouse Report");
         waitAndClickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
