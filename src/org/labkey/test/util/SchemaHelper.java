@@ -66,7 +66,7 @@ public class SchemaHelper extends AbstractHelperWD
 
         if (schemaTemplate != null)
         {
-            _test._shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='schemaTemplate']")));
+            _test.shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='schemaTemplate']")));
             _test.setFormElement(Locator.xpath("//input[@name='schemaTemplate']"), schemaTemplate);
             _test.waitForElement(Locator.xpath("//li[text()='" + schemaTemplate + "']"));
             _test.click(Locator.xpath("//li[text()='" + schemaTemplate + "']"));
@@ -79,7 +79,7 @@ public class SchemaHelper extends AbstractHelperWD
                 // click "Override template value" widget
                 _test.click(Locator.xpath("id('sourceSchemaOverride')/span[text()='Override template value']"));
             }
-            _test._shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='sourceSchemaName']")));
+            _test.shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='sourceSchemaName']")));
 
             _test.setFormElement(Locator.xpath("//input[@name='sourceSchemaName']"), sourceSchemaName);
             _test.waitForElement(Locator.xpath("//li[text()='"+ sourceSchemaName + "']"));
@@ -93,7 +93,7 @@ public class SchemaHelper extends AbstractHelperWD
                 // click "Override template value" widget
                 _test.click(Locator.xpath("id('tablesOverride')/span[text()='Override template value']"));
             }
-            _test._shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='tables']")));
+            _test.shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='tables']")));
 
             _test.click(Locator.xpath("//input[@name='tables']"));
             for (String table : tables.split(","))
@@ -112,7 +112,7 @@ public class SchemaHelper extends AbstractHelperWD
                 // click "Override template value" widget
                 _test.click(Locator.xpath("id('metadataOverride')/span[text()='Override template value']"));
             }
-            _test._shortWait.until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//textarea[@name='metaData']")));
+            _test.shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//textarea[@name='metaData']")));
 
             _test.setFormElement(Locator.xpath("//textarea[@name='metaData']"), metadata);
         }

@@ -67,8 +67,6 @@ import static org.labkey.test.WebTestHelper.*;
 @Deprecated
 public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 {
-    public static final String ADMIN_MENU_XPATH = "id('adminMenuPopupLink')[@onclick]";
-    public static final Locator USER_MENU_LOC = Locator.id("userMenuPopupLink");
     @Deprecated protected DefaultSeleniumWrapper selenium;
     private static final int DEFAULT_SELENIUM_PORT = 4444;
     private static final String DEFAULT_SELENIUM_SERVER = "localhost";
@@ -827,8 +825,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     // Clicks admin menu items. Tests should use helpers to make admin menu changes less disruptive.
     protected void clickAdminMenuItem(String... items)
     {
-        waitForElement(Locator.xpath(ADMIN_MENU_XPATH));
-        _ext4Helper.clickExt4MenuButton(true, Locator.xpath(ADMIN_MENU_XPATH), false, items);
+        waitForElement(Locators.ADMIN_MENU);
+        _ext4Helper.clickExt4MenuButton(true, Locators.ADMIN_MENU, false, items);
     }
 
     public void clickUserMenuItem(String... items)
@@ -838,8 +836,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void clickUserMenuItem(boolean wait, boolean onlyOpen, String... items)
     {
-        waitForElement(USER_MENU_LOC);
-        _ext4Helper.clickExt4MenuButton(true, USER_MENU_LOC, onlyOpen, items);
+        waitForElement(Locators.USER_MENU);
+        _ext4Helper.clickExt4MenuButton(true, Locators.USER_MENU, onlyOpen, items);
     }
 
     // Click on a module listed on the admin menu

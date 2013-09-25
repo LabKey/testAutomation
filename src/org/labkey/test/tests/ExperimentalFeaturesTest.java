@@ -97,7 +97,7 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
 
     private void goToExperimentalFeatures()
     {
-        if (!_driver.getTitle().equals("Experimental Features"))
+        if (!getDriver().getTitle().equals("Experimental Features"))
         {
             goToAdminConsole();
             clickAndWait(Locator.linkWithText("experimental features"));

@@ -39,11 +39,9 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelperWD;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**conceptually filter and list are separate, but
  * it was convenient to use the list test helpers for filter
@@ -649,7 +647,7 @@ public class FilterTest extends ListTest
             }, "Filter dialog loading failed", WAIT_FOR_JAVASCRIPT);
 
             _extHelper.clickExtTab("Choose Filters");
-            _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(_driver)));
+            shortWait().until(ExpectedConditions.visibilityOf(Locator.id("value_1").findElement(getDriver())));
 
         if (filter1 != null)
         {

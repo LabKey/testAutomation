@@ -99,7 +99,7 @@ public class FileContentTest extends BaseWebDriverTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Notifications"));
         click(Locator.navButton("Update Settings"));
-        _shortWait.until(LabKeyExpectedConditions.animationIsDone(Locator.css(".labkey-ribbon > div")));
+        shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css(".labkey-ribbon > div")));
         // Set folder default
         _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "15 minute digest");
         click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Folder Default']"));
@@ -232,7 +232,7 @@ public class FileContentTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         _extHelper.waitForFileGridReady();
         click(Locator.css("button.iconFolderTree"));
-        _shortWait.until(ExpectedConditions.visibilityOf(Locator.xpath("id('fileBrowser')//div[contains(@id, 'xsplit')]").findElement(_driver)));
+        shortWait().until(ExpectedConditions.visibilityOf(Locator.xpath("id('fileBrowser')//div[contains(@id, 'xsplit')]").findElement(getDriver())));
         _extHelper.selectFileBrowserItem(folderName + "/" + filename);
         click(Locator.css("button.iconDelete"));
         clickButton("Yes", 0);

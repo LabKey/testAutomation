@@ -863,24 +863,24 @@ public class ListTest extends BaseWebDriverTest
         // Check for appropriate tooltips
         assertElementNotPresent(Locator.id("helpDivBody")
                         .withText("Formatting applied because column > 5."));
-        Actions builder = new Actions(_driver);
-        builder.moveToElement(Locator.xpath("//td[text()='6' and contains(@style, 'bold')]").findElement(_driver)).build().perform();
+        Actions builder = new Actions(getDriver());
+        builder.moveToElement(Locator.xpath("//td[text()='6' and contains(@style, 'bold')]").findElement(getDriver())).build().perform();
         // Tooltip doesn't show instantly, so wait for a bit
-        _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("helpDivBody")
-                .withText("Formatting applied because column > 5.").waitForElmement(_driver, WAIT_FOR_JAVASCRIPT)));
+        shortWait().until(ExpectedConditions.visibilityOf(Locator.id("helpDivBody")
+                .withText("Formatting applied because column > 5.").waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT)));
         click(Locator.css("img[alt=close]"));
         // Tooltip doesn't hide instantly, so wait for a bit
-        _shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("helpDiv")));
+        shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.id("helpDiv")));
 
         assertElementNotPresent(Locator.id("helpDivBody")
                         .withText("Formatting applied because column = true."));
-        builder.moveToElement(Locator.xpath("//td[text()='true']").findElement(_driver)).build().perform();
+        builder.moveToElement(Locator.xpath("//td[text()='true']").findElement(getDriver())).build().perform();
         // Tooltip doesn't show instantly, so wait for a bit
-        _shortWait.until(ExpectedConditions.visibilityOf(Locator.id("helpDivBody")
-                .withText("Formatting applied because column = true.").waitForElmement(_driver, WAIT_FOR_JAVASCRIPT)));
+        shortWait().until(ExpectedConditions.visibilityOf(Locator.id("helpDivBody")
+                .withText("Formatting applied because column = true.").waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT)));
         click(Locator.css("img[alt=close]"));
         // Tooltip doesn't hide instantly, so wait for a bit
-        _shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("helpDiv")));
+        shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.id("helpDiv")));
     }
 
     @LogMethod

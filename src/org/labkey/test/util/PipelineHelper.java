@@ -122,7 +122,7 @@ public class PipelineHelper
         //TODO:  this doesn't yet support nested folders
         Locator folder =Locator.xpath("(//a/span[contains(text(),'" + destinationPath + "')])[2]");
         _test.waitForElement(folder, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);  //if it still isn't coming up, that's a product bug
-        _test._shortWait.until(LabKeyExpectedConditions.animationIsDone(Locator.css(".x-window ul.x-tree-node-ct").withText(destinationPath)));
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css(".x-window ul.x-tree-node-ct").withText(destinationPath)));
         _test.click(folder);
         _test.clickButton("Move", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
     }

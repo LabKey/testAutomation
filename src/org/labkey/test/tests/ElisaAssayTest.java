@@ -167,7 +167,7 @@ public class ElisaAssayTest extends ElispotAssayTest
             clickButton(finalButton); // cause errors
             clickAndWait(Locator.linkWithText("Too many errors to display (click to show all).\n"));
             _extHelper.waitForExtDialog("All Errors");
-            allErrors = Locator.css(".x-window-body").findElement(_driver).getText();
+            allErrors = Locator.css(".x-window-body").findElement(getDriver()).getText();
             _extHelper.clickExtButton("All Errors", "Close", 0);
             _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         }

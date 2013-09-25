@@ -87,7 +87,7 @@ public class WikiTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("full-text search"));
         if (isTextPresent("pause crawler"))
             clickButton("pause crawler");
-        beginAt(_driver.getCurrentUrl().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
+        beginAt(getDriver().getCurrentUrl().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
 
         clickProject(PROJECT_NAME);
         addWebPart("Wiki");

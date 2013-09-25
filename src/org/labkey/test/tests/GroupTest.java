@@ -383,7 +383,7 @@ public class GroupTest extends BaseWebDriverTest
         // Run the Test Script
         clickButton("Start Test", 0);
         waitForText("Done!", defaultWaitForPage);
-        Assert.assertFalse("Security API error.", Locator.id("log-info").findElement(_driver).getText().contains("Error"));
+        Assert.assertFalse("Security API error.", Locator.id("log-info").findElement(getDriver()).getText().contains("Error"));
     }
 
     @Override protected BrowserType bestBrowser()

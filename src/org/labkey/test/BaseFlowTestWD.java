@@ -225,7 +225,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     // if we aren't already on the Flow Dashboard, try to get there.
     protected void goToFlowDashboard()
     {
-        String title = _driver.getTitle();
+        String title = getDriver().getTitle();
         if (!title.startsWith("Flow Dashboard: "))
         {
             // All flow pages have a link back to the Flow Dashboard

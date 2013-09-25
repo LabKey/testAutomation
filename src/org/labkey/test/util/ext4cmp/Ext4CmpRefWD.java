@@ -38,7 +38,7 @@ public class Ext4CmpRefWD
     {
         this._id = id;
         this._test = test;
-        this._el = test._driver.findElement(By.id(id));
+        this._el = test.getDriver().findElement(By.id(id));
     }
 
     public Ext4CmpRefWD(WebElement el, BaseWebDriverTest test)

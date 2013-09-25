@@ -47,7 +47,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         waitAndClick(Locator.linkContainingText("site settings"));
         waitForElement(Locator.name("showRibbonMessage"));
 
-        WebElement el = Locator.name("ribbonMessageHtml").findElement(_driver);
+        WebElement el = Locator.name("ribbonMessageHtml").findElement(getDriver());
         el.clear();
 
         WebElement checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());

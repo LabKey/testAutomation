@@ -333,7 +333,7 @@ public class CohortTest extends BaseWebDriverTest
 
     private void assignId(Locator loc, String id)
     {
-        executeScript("arguments[0].id = arguments[1];", loc.findElement(_driver), id);
+        executeScript("arguments[0].id = arguments[1];", loc.findElement(getDriver()), id);
     }
     
     /**
@@ -497,7 +497,7 @@ public class CohortTest extends BaseWebDriverTest
         addUrlParameter("exportAsWebPage=true");
         clickExportToText();
         assertTextNotPresent("Infected4");
-        _driver.navigate().back();
+        getDriver().navigate().back();
     }
 
     @LogMethod

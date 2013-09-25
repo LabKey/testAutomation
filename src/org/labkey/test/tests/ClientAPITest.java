@@ -721,7 +721,7 @@ public class ClientAPITest extends BaseWebDriverTest
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "Test Started");
         waitForText("Test Complete");
-        Assert.assertFalse(loc.findElement(_driver).getText().contains("ERROR"));
+        Assert.assertFalse(loc.findElement(getDriver()).getText().contains("ERROR"));
         clearTestPage("WebDav Client API Test complete.");
     }
 

@@ -125,7 +125,7 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public int getExtElementHeight(String className, int index)
     {
-        List<WebElement> elements = _test._driver.findElements(By.className(className));
+        List<WebElement> elements = _test.getDriver().findElements(By.className(className));
         return elements.get(index).getSize().height;        
     }
 
@@ -516,10 +516,10 @@ public class ExtHelperWD extends AbstractHelperWD
     //Pick measure from split panel measure picker
     public void pickMeasure(final String source, final String measure, boolean keepSelection)
     {
-        _test._shortWait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".sourcepanel .x4-grid-row"))); // if one row is ready, all should be
+        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector(".sourcepanel .x4-grid-row"))); // if one row is ready, all should be
         selectExt4GridItem("queryName", source, -1, "sourcegrid", keepSelection);
         //select measure
-        _test._shortWait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(".measuresgrid .x4-grid-row"))); // if one row is ready, all should be
+        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector(".measuresgrid .x4-grid-row"))); // if one row is ready, all should be
         selectExt4GridItem("label", measure, -1, "measuresgrid", keepSelection);
     }
 
@@ -531,10 +531,10 @@ public class ExtHelperWD extends AbstractHelperWD
     //Pick measure from one of multiple split panel measure pickers
     public void pickMeasure(String panelCls, String source, String measure, boolean keepSelection)
     {
-        _test._shortWait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("."+panelCls+" .sourcepanel .x4-grid-row"))); // if one row is ready, all should be
+        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .sourcepanel .x4-grid-row"))); // if one row is ready, all should be
         selectExt4GridItem("queryName", source, -1, panelCls + " .sourcegrid", keepSelection);
         //select measure
-        _test._shortWait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("."+panelCls+" .measuresgrid .x4-grid-row"))); // if one row is ready, all should be
+        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .measuresgrid .x4-grid-row"))); // if one row is ready, all should be
         selectExt4GridItem("label", measure, -1, panelCls + " .measuresgrid", keepSelection);
     }
 

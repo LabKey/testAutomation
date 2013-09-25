@@ -75,7 +75,7 @@ public class Ext4HelperWD extends AbstractHelperWD
             _test.click(arrowTrigger);
 
         // menu should disappear
-        _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".x4-boundlist-item")));
+        _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".x4-boundlist-item")));
     }
 
     @LogMethod(quiet = true)
@@ -324,7 +324,7 @@ public class Ext4HelperWD extends AbstractHelperWD
         List<String> ids = new ArrayList<>();
         for (String id : unfilteredIds)
         {
-            if (Locator.id(id).findElements(_test._driver).size() > 0)
+            if (Locator.id(id).findElements(_test.getDriver()).size() > 0)
                 ids.add(id); // ignore uninitialized ext components
         }
         return _test._ext4Helper.componentsFromIds(ids, clazz);

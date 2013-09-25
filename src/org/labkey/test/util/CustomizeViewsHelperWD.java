@@ -55,19 +55,19 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
 
     public void openCustomizeViewPanel()
     {
-        if (Locator.button("View Grid").findElements(_test._driver).size() < 1)
+        if (Locator.button("View Grid").findElements(_test.getDriver()).size() < 1)
         {
             _test._extHelper.clickExtMenuButton(false, Locator.navButton("Views"), "Customize View");
             _test.shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(_dataRegion));
         }
         _test.waitForElement(Locator.css(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test._shortWait.until(LabKeyExpectedConditions.animationIsDone(_dataRegion.toCssLocator().append(".customizeViewPanel")));
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(_dataRegion.toCssLocator().append(".customizeViewPanel")));
     }
 
     public void closeCustomizeViewPanel()
     {
         _test.click(_dataRegion.toCssLocator().append(".x-panel-header > .x-tool-close"));
-        _test._shortWait.until(ExpectedConditions.invisibilityOfElementLocated(_dataRegion.toCssLocator().append(".labkey-data-region-header-container .labkey-ribbon").toBy()));
+        _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(_dataRegion.toCssLocator().append(".labkey-data-region-header-container .labkey-ribbon").toBy()));
     }
 
     public void applyCustomView()
@@ -354,9 +354,9 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         String itemXPath = itemXPath(type, fieldKey);
         String closeXPath = "//*[contains(@class, 'labkey-tool-close')]";
 
-        Actions builder = new Actions(_test._driver);
+        Actions builder = new Actions(_test.getDriver());
 
-        List<WebElement> elements = _test._driver.findElements(By.xpath(itemXPath + closeXPath));
+        List<WebElement> elements = _test.getDriver().findElements(By.xpath(itemXPath + closeXPath));
 
         for (WebElement el : elements)
         {
@@ -510,7 +510,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     {
         changeTab(ViewItemType.Filter);
         Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Filter, fieldkey);
-        if (!_dataRegion.toCssLocator().append(itemClip).findElement(_test._driver).getAttribute("class").contains("pressed"))
+        if (!_dataRegion.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }
@@ -520,7 +520,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     {
         changeTab(ViewItemType.Filter);
         Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Filter, fieldkey);
-        if (_dataRegion.toCssLocator().append(itemClip).findElement(_test._driver).getAttribute("class").contains("pressed"))
+        if (_dataRegion.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }
@@ -530,7 +530,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     {
         changeTab(ViewItemType.Sort);
         Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Sort, fieldkey);
-        if (!_dataRegion.toCssLocator().append(itemClip).findElement(_test._driver).getAttribute("class").contains("pressed"))
+        if (!_dataRegion.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }
@@ -540,7 +540,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
     {
         changeTab(ViewItemType.Sort);
         Locator.CssLocator itemClip = Locators.viewItemClip(ViewItemType.Sort, fieldkey);
-        if (_dataRegion.toCssLocator().append(itemClip).findElement(_test._driver).getAttribute("class").contains("pressed"))
+        if (_dataRegion.toCssLocator().append(itemClip).findElement(_test.getDriver()).getAttribute("class").contains("pressed"))
         {
             _test.click(itemClip);
         }

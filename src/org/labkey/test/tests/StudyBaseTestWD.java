@@ -308,7 +308,7 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
 
     protected void assertSelectOption(String name, int i, String expected)
     {
-        Select select = new Select(Locator.tagWithName("select", name).index(i).findElement(_driver));
+        Select select = new Select(Locator.tagWithName("select", name).index(i).findElement(getDriver()));
         Assert.assertEquals("Expected option was not selected", expected, select.getFirstSelectedOption().getAttribute("value"));
     }
 

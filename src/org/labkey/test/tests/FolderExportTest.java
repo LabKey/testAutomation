@@ -171,7 +171,7 @@ public class FolderExportTest extends BaseWebDriverTest
     private void verifyExpectedWebPartsPresent()
     {
         Locator titleLoc = Locator.css(".labkey-wp-title-text");
-        List<WebElement> titlesElements = titleLoc.findElements(_driver);
+        List<WebElement> titlesElements = titleLoc.findElements(getDriver());
         Iterator<WebElement> it = titlesElements.iterator();
         WebElement curEl = it.next();
         for (String expectedTitle : webParts)

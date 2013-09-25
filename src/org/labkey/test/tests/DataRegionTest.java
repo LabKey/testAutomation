@@ -280,7 +280,7 @@ public class DataRegionTest extends BaseWebDriverTest
     private void assertPaginationText(int firstRow, int lastRow, int totalRows)
     {
         String expected = firstRow + " - " + lastRow + " of " + totalRows;
-        String fullPaginationText = Locator.css(".labkey-pagination").findElement(_driver).getText();
+        String fullPaginationText = Locator.css(".labkey-pagination").findElement(getDriver()).getText();
         Pattern pattern = Pattern.compile("\\d+ - \\d+ of \\d+");
         Matcher matcher = pattern.matcher(fullPaginationText);
         matcher.find();

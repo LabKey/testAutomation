@@ -89,7 +89,7 @@ public class FolderTest extends BaseWebDriverTest
         waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(PROJECT_NAME));
 
         log("Ensure folders will be visible");
-        _driver.manage().window().maximize();
+        getDriver().manage().window().maximize();
 
         clickButton("Change Display Order");
         checkRadioButton("resetToAlphabetical", "false");

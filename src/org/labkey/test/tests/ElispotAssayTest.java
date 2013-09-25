@@ -319,10 +319,10 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         Locator nameField = Locator.id("templateName");
         waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
 
-        Locator.css(".gwt-Label").withText("CONTROL").waitForElmement(_driver, WAIT_FOR_JAVASCRIPT).click();
+        Locator.css(".gwt-Label").withText("CONTROL").waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
 
         click(Locator.xpath("//div[contains(@class, 'x-form-trigger-arrow')]"));
-        Locator.css(".x-combo-list-item").withText("Background Wells").waitForElmement(_driver, WAIT_FOR_JAVASCRIPT).click();
+        Locator.css(".x-combo-list-item").withText("Background Wells").waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
         clickButton("Create", 0);
         waitForElement(Locator.tagWithText("label", "Background Wells"));
 
@@ -522,7 +522,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         {
             if(!getText(Locator.css(".gwt-TabBarItem-selected")).equals(type))
             {
-                Locator.css(".gwt-Label").withText(type).findElement(_driver).click();
+                Locator.css(".gwt-Label").withText(type).findElement(getDriver()).click();
                 //want for switch
             }
             if(!isChecked(Locator.xpath("//input[@name='wellGroup' and following-sibling::label[text()='"+group+"']]")))
@@ -532,7 +532,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         }
         else
         {
-            Locator.css(".gwt-Label").withText(type).findElement(_driver).click();
+            Locator.css(".gwt-Label").withText(type).findElement(getDriver()).click();
             //select no group in order to clear area
         }
         dragAndDrop(start, end);
