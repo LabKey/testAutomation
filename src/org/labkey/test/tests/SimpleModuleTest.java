@@ -76,6 +76,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
             "Josh\t30\tTrue";
 
     public static final String STUDY_FOLDER_TAB_NAME = "Study Container Tab";
+    public static final String ASSAY_FOLDER_TAB_NAME = "Assay Container Tab 2";
 
     protected String getProjectName()
     {
@@ -885,12 +886,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTextPresent("Manage Study", "Study Container", "Overview", "Specimen Data");
         clickAndWait(Locator.linkWithText("Specimen Data"));
         assertTextPresent("Vial Search", "Specimens");
-/*
+
         // Test container tab enhancements: change tab folder's type, revert type, delete tab folder
         // Change study's type to collaboration
+        log("Container tab enhancements: change tab folder type, revert");
         goToFolderManagement();
         waitForText(STUDY_FOLDER_TAB_NAME);
-        Assert.assertEquals("", 4, getVisibleFolderTreeButtonCount());
+        assertTreeButtonHidden("Revert", true);
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         clickButton("Update Folder", 0);
@@ -901,7 +903,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         // change type back to study
         goToFolderManagement();
         waitForText(STUDY_FOLDER_TAB_NAME);
-        Assert.assertEquals("", 5, getVisibleFolderTreeButtonCount());
+        assertTreeButtonHidden("Revert", false);
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Study"));
         clickButton("Update Folder", 0);
@@ -911,7 +913,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         // change to collaboration again
         goToFolderManagement();
         waitForText(STUDY_FOLDER_TAB_NAME);
-        Assert.assertEquals("", 4, getVisibleFolderTreeButtonCount());
+        assertTreeButtonHidden("Revert", true);
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         clickButton("Update Folder", 0);
@@ -921,15 +923,66 @@ public class SimpleModuleTest extends BaseWebDriverTest
         // revert type
         goToFolderManagement();
         waitForText(STUDY_FOLDER_TAB_NAME);
-        Assert.assertEquals("", 5, getVisibleFolderTreeButtonCount());
-        clickButton("Revert");
+        assertTreeButtonHidden("Revert", false);
+        clickButton("Revert", 0);
         _extHelper.waitForExtDialog("Revert Folder(s)");
-        click(Locator.extButton("OK"));
+        click(Locator.ext4Button("Yes"));
         _extHelper.waitForExtDialog("Revert Folder");
-        click(Locator.extButton("OK"));
+        click(Locator.ext4Button("OK"));
         clickTab("Study Container");
         waitForText("Study tracks data in");
-        */
+
+        // Revert via parent container
+        goToFolderManagement();
+        waitForText(STUDY_FOLDER_TAB_NAME);
+        assertTreeButtonHidden("Revert", true);
+        clickAndWait(Locator.linkWithText("Folder Type"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
+        clickButton("Update Folder", 0);
+        _extHelper.waitForExtDialog("Change Folder Type");
+        click(Locator.extButton("Yes"));
+        waitForText("The Wiki web part displays a single wiki page.");
+        clickTab("Tab 1");
+        goToFolderManagement();
+        waitForText(STUDY_FOLDER_TAB_NAME);
+        assertTreeButtonHidden("Revert", false);
+        clickButton("Revert", 0);
+        _extHelper.waitForExtDialog("Revert Folder(s)");
+        click(Locator.ext4Button("Yes"));
+        _extHelper.waitForExtDialog("Revert Folders");
+        click(Locator.ext4Button("OK"));
+        clickTab("Study Container");
+        waitForText("Study tracks data in");
+
+        // Delete tab folder
+        log("Container tab enhancements: delete tab folder type, recreate");
+        goToFolderManagement();
+        waitForText(STUDY_FOLDER_TAB_NAME);
+        clickButton("Delete");
+        assertTextPresent("You are about to delete the following folder:");
+        clickButton("Delete");
+        assertTextNotPresent(STUDY_FOLDER_TAB_NAME);
+
+        // Resurrect tab folder
+        clickTab("Tab 1");
+        goToFolderManagement();
+        waitForText(ASSAY_FOLDER_TAB_NAME);
+        clickAndWait(Locator.linkWithText("Folder Type"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
+        clickButton("Update Folder");
+        goToFolderManagement();
+        waitForText(ASSAY_FOLDER_TAB_NAME);
+        clickAndWait(Locator.linkWithText("Folder Type"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("folderType", TABBED_FOLDER_TYPE));
+        clickButton("Update Folder", 0);
+        _extHelper.waitForExtDialog("Change Folder Type");
+        assertTextPresent("Study Container");
+        _ext4Helper.checkCheckbox("Study Container");     // recreate folder
+        click(Locator.ext4Button("OK"));
+        waitForText("A customized web part");
+        clickTab("Study Container");
+        clickAndWait(Locator.linkWithText("Create Study"));     // Create study
+        clickAndWait(Locator.linkWithText("Create Study"));
     }
 
     @LogMethod
@@ -1077,9 +1130,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
         return null;
     }
 
-    private int getVisibleFolderTreeButtonCount()
+    private void assertTreeButtonHidden(String buttonText, boolean hidden)
     {
-        Locator.XPathLocator locator = Locator.xpath("//a[contains(@class, 'x4-btn-toolbar')]").notHidden();
-        return getElementCount(locator);
+        Locator.XPathLocator locator = Locator.ext4Button(buttonText);
+/*        if (hidden && (isElementPresent(locator) && !isElementPresent(locator.withClass("x4-btn-disabled"))))   // if present should be disabled
+            Assert.fail("Button '" + buttonText + "' not hidden.");
+        else if (!hidden && (!isElementPresent(locator) || isElementPresent(locator.withClass("x4-btn-disabled"))))
+            Assert.fail("Button '" + buttonText + "' is hidden.");                */
     }
 }
