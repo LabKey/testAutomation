@@ -712,6 +712,12 @@
         <condition property="selenium.server.shut.down">
             <http url="http://localhost:${sysprop.selenium.server.port}/selenium-server/driver/?cmd=shutDownSeleniumServer"/>
         </condition>
+        <exec osfamily="windows" executable="taskkill">
+            <arg line="/F /IM chromedriver.exe"/>
+        </exec>
+        <exec osfamily="unix" executable="killall">
+            <arg line="-q chromedriver"/>
+        </exec>
     </target>
 
     <target name="module" description="Run Module test only">
