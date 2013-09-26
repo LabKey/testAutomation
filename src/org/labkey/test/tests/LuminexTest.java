@@ -1315,7 +1315,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     protected void importLuminexRunPageTwo(String name, String isotype, String conjugate, String stndCurveFitInput,
                                            String unkCurveFitInput, String notebookNo, String assayType, String expPerformer,
-                                           String testDate, String file, int i)
+                                           String testDate, File file, int i)
     {
             setFormElement("name", name);
             setFormElement("isotype", isotype);
@@ -1363,7 +1363,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
             testDate.add(Calendar.DATE, 1);
             importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
-                        "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i].toString(), i);
+                        "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i], i);
             uncheckCheckbox("_titrationRole_standard_Standard1");
             checkCheckbox("_titrationRole_qccontrol_Standard1");
             clickButton("Save and Finish");
@@ -1404,7 +1404,7 @@ public class LuminexTest extends AbstractQCAssayTest
             clickButton("Next");
 
             importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
-                        "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i].toString(), i);
+                        "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i], i);
             uncheckCheckbox("_titrationRole_standard_Standard1");
             checkCheckbox("_titrationRole_qccontrol_Standard1");
             clickButton("Save and Finish");
@@ -1449,7 +1449,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         testDate.add(Calendar.DATE, 1);
         importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
-                    "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), file.toString(), i);
+                    "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), file, i);
         uncheckCheckbox("_titrationRole_standard_Standard1");
         checkCheckbox("_titrationRole_qccontrol_Standard1");
         clickButton("Save and Finish");
@@ -1667,7 +1667,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Next");
 
         importLuminexRunPageTwo(newGuideSetPlate, isotype, conjugate, "", "", "Notebook" + 11,
-                    "Experimental", "TECH" + (11), "",  TEST_ASSAY_LUM_FILE9.toString(), 6);
+                    "Experimental", "TECH" + (11), "",  TEST_ASSAY_LUM_FILE9, 6);
         uncheckCheckbox("_titrationRole_standard_Standard1");
         checkCheckbox("_titrationRole_qccontrol_Standard1");
         clickButton("Save and Finish");

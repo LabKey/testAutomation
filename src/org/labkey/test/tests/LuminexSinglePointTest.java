@@ -69,7 +69,7 @@ public class LuminexSinglePointTest  extends LuminexTest
         assertTextNotPresent("ERROR");
 
         createGuideSet("ENV1 (31)", true);
-        editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_0"}, "Single Point Control Guide", true);
+        editGuideSet(new String[]{"allRunsRow_1", "allRunsRow_0"}, "Single Point Control Guide", true);
 
         importRun(file3, 3);
         waitForPipelineJobsToFinish(4);
@@ -102,7 +102,7 @@ public class LuminexSinglePointTest  extends LuminexTest
         testDate.add(Calendar.DATE, 1);
 
         importLuminexRunPageTwo(filename, isotype, conjugate, "", "", "Notebook",
-                "Experimental", "TECH", df.format(testDate.getTime()), getLabKeyRoot()+"/sampledata/Luminex/"+filename, 1);
+                "Experimental", "TECH", df.format(testDate.getTime()), new File(getLabKeyRoot(),"sampledata/Luminex/"+filename), 1);
 
          switch(runNumber){
              case 1 :

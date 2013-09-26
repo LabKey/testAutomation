@@ -85,7 +85,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         clickButton("Next");
         testDate.add(Calendar.DATE, 1);
         importLuminexRunPageTwo("Guide Set plate " + (i+1), "new"+isotype, "new"+conjugate, "", "", "NewNote" + (i+1),
-                "new Experimental", "NewTECH" + (i+1), df.format(testDate.getTime()), file.toString(), i);
+                "new Experimental", "NewTECH" + (i+1), df.format(testDate.getTime()), file, i);
         uncheckCheckbox("_titrationRole_standard_Standard1");
         checkCheckbox("_titrationRole_qccontrol_Standard1");
         clickButton("Save and Finish");
