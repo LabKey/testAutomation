@@ -53,33 +53,41 @@ public class ETLTest extends BaseWebDriverTest
 
         //append into empty target
         insertSourceRow("0", "Subject 0", null);
-        runETLAppendJob();
+        runETLjob("append");
         assertInTarget1("Subject 0");
         checkRun(1);
 
         //append into populated target
         insertSourceRow("1", "Subject 1", null);
         deleteSourceRow("0");
-        runETLAppendJob();
+        runETLjob("append");
         checkRun(2);
         assertInTarget1("Subject 0", "Subject 1");
 
         //merge into populated target
         insertSourceRow("2", "Subject 2", null);
-        runETLMergeJob();
+        runETLjob("merge");
         assertInTarget1("Subject 0", "Subject 1", "Subject 2");
 
         //truncate into populated target
         deleteSourceRow("1");
-        runETLTruncateJob();
+        runETLjob("truncate");
         assertInTarget1("Subject 2");
         assertNotInTarget1("Subject 0", "Subject 1");
 
         //identify by run into populated target
         insertSourceRow("3", "Subject 3", "42");
         insertTransferRow("42", getDate(), getDate(), "new transfer", "added by test automation", "pending");
-        runETLAppendByIdJob();
+        runETLjob("appendIdByRun");
         assertInTarget1("Subject 2", "Subject 3");
+
+        //error logging test, casting error
+        runETLjob("badCast");
+        assertInLog("java.lang.String cannot be cast to java.util.Date");
+
+        //error logging test, bad run table name
+        runETLjob("badTableName");
+        assertInLog("Table not found:");
     }
 
 
@@ -93,6 +101,9 @@ public class ETLTest extends BaseWebDriverTest
         addQueryWebpart("Target1", "vehicle", "etl_target");
         //addQueryWebpart("Target2", "vehicle", "etl_target2");
         addQueryWebpart("Transfers", "vehicle", "transfer");
+        addQueryWebpart("TransformRun", "dataintegration", "TransformRun");
+        addQueryWebpart("TransformHistory", "dataintegration", "TransformHistory");
+        addQueryWebpart("TransformRun", "dataintegration", "TransformSummary");
     }
 
     private void addQueryWebpart(String name, String schema, String query)
@@ -114,7 +125,8 @@ public class ETLTest extends BaseWebDriverTest
     private void insertSourceRow(String id, String name, String RunId)
     {
         log("inserting source row " + name);
-        goToProjectHome();
+        //goToProjectHome();
+        clickTab("Portal");
         click(Locator.xpath("//span[text()='Source']"));
         waitAndClick(Locator.xpath("//span[text()='Insert New']"));
         waitForElement(Locator.name("quf_id"));
@@ -126,7 +138,8 @@ public class ETLTest extends BaseWebDriverTest
         }
         clickButton("Submit");
         log("returning to project home");
-        goToProjectHome();
+        //goToProjectHome();
+        clickTab("Portal");
     }
 
     private void insertTransferRow(String rowId, String transferStart, String transferComplete,  String description, String log, String status)
@@ -144,7 +157,8 @@ public class ETLTest extends BaseWebDriverTest
         setFormElement(Locator.name("quf_status"), status);
         clickButton("Submit");
         log("returning to project home");
-        goToProjectHome();
+        //goToProjectHome();
+        clickTab("Portal");
     }
 
     private void runETLAppendJob()
@@ -185,6 +199,16 @@ public class ETLTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
+    private void runETLjob(String transformId)
+    {
+        log("running " + transformId + " job");
+        goToModule("DataIntegration");
+        waitAndClick(Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td/a"));
+        log("returning to project home");
+        goToProjectHome();
+        //clickTab("Portal");
+    }
+
     private void deleteSourceRow(String... ids)
     {
         goToProjectHome();
@@ -199,12 +223,14 @@ public class ETLTest extends BaseWebDriverTest
         dismissAlerts();
         newWaitForPageToLoad();
         log("returning to project home");
-        goToProjectHome();
+        //goToProjectHome();
+        clickTab("Portal");
     }
 
     private void assertInTarget1(String... targets)
     {
-        goToProjectHome();
+        //goToProjectHome();
+        clickTab("Portal");
         click(Locator.xpath("//span[text()='Target1']"));
         waitForText("etl_target");
         for(String target : targets)
@@ -215,7 +241,8 @@ public class ETLTest extends BaseWebDriverTest
 
     private void assertNotInTarget1(String... targets)
     {
-        goToProjectHome();
+        //goToProjectHome();
+        clickTab("Portal");
         click(Locator.xpath("//span[text()='Target1']"));
         waitForText("etl_target");
         for(String target : targets)
@@ -246,9 +273,22 @@ public class ETLTest extends BaseWebDriverTest
         }
     }
 
+    private void assertInLog(String... targets)
+    {
+        //goToProjectHome();
+        clickTab("Portal");
+        click(Locator.xpath("//span[text()='TransformRun']"));
+        waitForText("TransformRun");
+        for(String target : targets)
+        {
+            assertTextPresent(target);
+        }
+    }
+
     protected void checkRun(int amount)
     {
-        goToProjectHome();
+        //goToProjectHome();
+        clickTab("Portal");
         goToModule("Pipeline");
         waitForPipelineJobsToComplete(amount, "ETL Job", false);
     }

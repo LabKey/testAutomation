@@ -99,6 +99,8 @@ modules/scriptpad/src/org/labkey/scriptpad/view/scriptpad.jsp -text
 modules/simpletest/config/module.xml -text
 modules/simpletest/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/etls/appendIdByRun.xml -text
+modules/simpletest/etls/badCast.xml -text
+modules/simpletest/etls/badTableName.xml -text
 modules/simpletest/etls/merge.xml -text
 modules/simpletest/etls/truncate.xml -text
 modules/simpletest/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
