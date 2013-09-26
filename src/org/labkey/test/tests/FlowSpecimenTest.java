@@ -40,7 +40,7 @@ public class FlowSpecimenTest extends BaseFlowTestWD
     public static final String DATE = "2012-09-12";
 
     public static final String SPECIMEN_DATA =
-           "Global Unique Id\tDraw Timestamp\tParticipant Id\tVolume\tVolume Units\tPrimary Type\tDerivative Type\tAdditive Type\n" +
+           "Vial Id\tDraw Date\tParticipant\tVolume\tUnits\tSpecimen Type\tDerivative Type\tAdditive Type\n" +
            "Sample_002\t" + DATE + "\t" + PTID + "\t100\tml\t\t\t\n" +
            "Sample_003\t11/13/12\tP7312\t200\tml\t\t\t";
 
