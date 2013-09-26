@@ -192,7 +192,7 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         log("create a snapshot over a custom query");
         clickFolder(getStudyLabel());
         goToManageViews();
-        _extHelper.clickMenuButton("Create", "Grid View");
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
 
         clickAndWait(Locator.linkWithText("Modify Dataset List (Advanced)"));
         createNewQuery("study");
