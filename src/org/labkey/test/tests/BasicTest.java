@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.DRT;
 import org.labkey.test.categories.DailyA;
@@ -115,7 +116,7 @@ public class BasicTest extends BaseWebDriverTest
 
         goToAdminConsole();
 
-        if (enableDevMode())
+        if (TestProperties.devModeEnabled())
             assertTextNotPresent("Production"); // Verify that we're running in dev mode
         else
             assertTextNotPresent("Development"); // Unless we're not supposed to be.

@@ -204,7 +204,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 //        data casing, which will differ between PostgreSQL and SQL Server. Use code like the below to distinguish.
 //
 //        // External schemas report JDBC names, so we expect different casing on PostgreSQL vs. Microsoft SQL Server
-//        switch (WebTestHelper.getDatabaseType())
+//        switch (TestProperties.getDatabaseType())
 //        {
 //            case PostgreSQL:
 //                TABLE_NAME = "testtable";

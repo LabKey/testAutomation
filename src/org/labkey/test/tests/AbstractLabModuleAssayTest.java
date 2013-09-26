@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.labkey.test.TestProperties;
+
 /**
  * User: bimber
  * Date: 12/12/12
@@ -23,10 +25,9 @@ package org.labkey.test.tests;
 abstract public class AbstractLabModuleAssayTest extends LabModulesTest
 {
     @Override
-    public boolean enableLinkCheck()
+    public void checkLinks()
     {
-        if ( super.enableLinkCheck() )
+        if ( TestProperties.linkCheckEnabled() )
             log("LabModulesTest uses essentially the same UI and will check links, so link checking is skipped");
-        return false;
     }
 }

@@ -182,7 +182,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
 
     protected void after() throws Exception
     {
-        if (!skipCleanup())
+        if (!TestProperties.skipCleanup())
             deleteAllRuns();
     }
 

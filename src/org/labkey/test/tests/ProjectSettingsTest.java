@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 
@@ -34,7 +35,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     private static final Locator helpLink = Locator.xpath("//a[@target='labkeyHelp']/span[contains(text(), 'LabKey Documentation')]");
     private static final Locator helpMenuLinkDev =  Locator.tagWithText("span", "Help (default)");
     private static final Locator helpMenuLinkProduction =  Locator.tagWithText("span", "Help");
-    private Locator helpMenuLink = enableDevMode() ? helpMenuLinkDev : helpMenuLinkProduction;
+    private Locator helpMenuLink = TestProperties.devModeEnabled() ? helpMenuLinkDev : helpMenuLinkProduction;
 
     @Override
     //this project will remain unaltered and copy every property from the site.

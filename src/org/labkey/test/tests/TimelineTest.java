@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
@@ -160,7 +161,7 @@ public class TimelineTest extends BaseWebDriverTest
 
     private void removeTestPage()
     {
-        if (enableLinkCheck())
+        if (TestProperties.linkCheckEnabled())
         {
             clickFolder(FOLDER_NAME);
             _portalHelper.removeWebPart(WIKIPAGE_NAME);

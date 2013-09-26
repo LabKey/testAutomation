@@ -122,6 +122,7 @@ import static org.labkey.test.WebTestHelper.getHttpGetResponse;
 import static org.labkey.test.WebTestHelper.getTargetServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
 import static org.labkey.test.WebTestHelper.logToServer;
+import static org.labkey.test.TestProperties.*;
 
 /**
  * User: Mark Igra
@@ -293,7 +294,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
 
                 ChromeOptions options = new ChromeOptions();
-                if (enableScriptCheck())
+                if (scriptCheckEnabled())
                 {
                     options.addExtensions(new File(WebTestHelper.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker.crx"));
                 }
@@ -325,7 +326,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                         "application/x-zip-compressed," +
                         "text/x-script.perl");
                 profile.setPreference("browser.download.manager.showWhenStarting",false);
-                if (enableScriptCheck())
+                if (scriptCheckEnabled())
                 {
                     try
                         {JavaScriptError.addExtension(profile);}
@@ -393,7 +394,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void pauseJsErrorChecker()
     {
-        if (_jsErrorChecker != null && enableScriptCheck())
+        if (_jsErrorChecker != null && scriptCheckEnabled())
         {
             _jsErrorChecker.pause();
         }
@@ -401,7 +402,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void resumeJsErrorChecker()
     {
-        if (_jsErrorChecker != null && enableScriptCheck())
+        if (_jsErrorChecker != null && scriptCheckEnabled())
         {
             _jsErrorChecker.resume();
         }
@@ -1048,7 +1049,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected void setSystemMaintenance(boolean enable)
     {
         // Not available in production mode
-        if (enableDevMode())
+        if (devModeEnabled())
         {
             goToAdminConsole();
             clickAndWait(Locator.linkWithText("system maintenance"));
@@ -1672,7 +1673,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             enableEmailRecorder();
 			resetErrors();
 
-            if (isMaintenanceDisabled())
+            if (systemMaintenanceDisabled())
             {
                 // Disable scheduled system maintenance to prevent timeouts during nightly tests.
                 disableMaintenance();
@@ -1712,13 +1713,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             if(!isPerfTest)
                 checkActionCoverage();
 
-            if (enableLinkCheck())
-            {
-                pauseJsErrorChecker();
-                Crawler crawler = new Crawler(this, Runner.getTestSet().getCrawlerTimeout());
-                crawler.crawlAllLinks(enableInjectCheck());
-                resumeJsErrorChecker();
-            }
+            checkLinks();
 
             if (!skipCleanup())
             {
@@ -1887,76 +1882,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             tearDown();
         }
-    }
-
-    protected boolean skipCleanup()
-    {
-        return "false".equals(System.getProperty("clean"));
-    }
-
-    public boolean enableLinkCheck()
-    {
-        return "true".equals(System.getProperty("linkCheck")) || enableInjectCheck();
-    }
-
-	public boolean enableInjectCheck()
-	{
-		return "true".equals(System.getProperty("injectCheck"));
-	}
-
-    public boolean enableScriptCheck()
-    {
-        return "true".equals(System.getProperty("scriptCheck"));
-    }
-
-    public boolean enableDevMode()
-    {
-        return "true".equals(System.getProperty("devMode"));
-    }
-
-    public boolean firebugPanelsEnabled()
-    {
-        return "true".equals(System.getProperty("enableFirebugPanels"));
-    }
-
-    public boolean firefoxExtensionsEnabled()
-    {
-        return "true".equals(System.getProperty("enableFirefoxExtensions"));
-    }
-
-    public boolean onTeamCity()
-    {
-        return System.getProperty("teamcity.buildType.id") != null;
-    }
-
-    public boolean skipLeakCheck()
-    {
-        return "false".equals(System.getProperty("memCheck"));
-    }
-
-    public boolean skipQueryCheck()
-    {
-        return "false".equals(System.getProperty("queryCheck"));
-    }
-
-    public boolean skipViewCheck()
-    {
-        return "false".equals(System.getProperty("viewCheck"));
-    }
-
-    public boolean isMaintenanceDisabled()
-    {
-        return "never".equals(System.getProperty("systemMaintenance"));
-    }
-
-    public String getDatabaseType()
-    {
-        return System.getProperty("databaseType");
-    }
-
-    public String getDatabaseVersion()
-    {
-        return System.getProperty("databaseVersion");
     }
 
     public WebDriver getDriver()
@@ -2281,7 +2206,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     private void checkJsErrors()
     {
-        if (this.enableScriptCheck())
+        if (scriptCheckEnabled())
         {
             int duplicateCount = 0;
             try
@@ -2363,6 +2288,18 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         beginAt("/admin/exportActions.view?asWebPage=true");
         publishArtifact(saveTsv(Runner.getDumpDir(), "ActionCoverage"));
         popLocation();
+    }
+
+    @LogMethod
+    protected void checkLinks()
+    {
+        if (linkCheckEnabled())
+        {
+            pauseJsErrorChecker();
+            Crawler crawler = new Crawler(this, Runner.getTestSet().getCrawlerTimeout());
+            crawler.crawlAllLinks(injectCheckEnabled());
+            resumeJsErrorChecker();
+        }
     }
 
     private void writeActionStatistics(int totalActions, int coveredActions, Double actionCoveragePercent)

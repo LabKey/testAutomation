@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
@@ -130,7 +131,7 @@ public class ViabilityTest extends AbstractViabilityTest
         Assert.assertEquals("6.000E7", table.getDataAsText(0, "Original Cells"));
 
         Assert.assertEquals("foobar,vial1,vial2,vial3", table.getDataAsText(0, "Specimen IDs"));
-        if (isGroupConcatSupported())
+        if (TestProperties.groupConcatSupported())
             Assert.assertEquals("vial1,vial2,vial3", table.getDataAsText(0, "SpecimenMatches"));
         else
             Assert.assertEquals("", table.getDataAsText(0, "SpecimenMatches"));

@@ -770,10 +770,9 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
     }
 
     @Override
-    public boolean skipViewCheck()
+    public void checkViews()
     {
         //the module contains an R report tied to a specific assay name, so view check fails when an assay of that name isnt present
         //when module-based assays can supply reports this should be corrected
-        return true;
     }
 }
