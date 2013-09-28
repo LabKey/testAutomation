@@ -86,7 +86,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         waitForElement(Locator.paginationText(19));
 
         // verify that other toolbar buttons have been hidden
-        assertElementNotPresent(Locator.button("Export PDF"));
+        assertElementNotPresent(Locator.button("Export"));
         assertElementNotPresent(Locator.button("Measures"));
         assertElementNotPresent(Locator.button("Grouping"));
         assertElementNotPresent(Locator.button("Options"));

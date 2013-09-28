@@ -556,7 +556,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _ext4Helper.uncheckGridRowCheckbox("Group 1: Accute HIV-1");
         _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
 
-        waitForText("Please select at least one group");
+        waitForText("No group selected. Please select at least one group.");
         assertElementNotPresent(Locator.css("svg"));
         waitForText("One or more of the participant groups originally saved with this chart are not currently visible.", WAIT_FOR_JAVASCRIPT);
         assertTextPresent(GROUP1_NAME);
@@ -639,7 +639,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _ext4Helper.uncheckGridRowCheckbox("Group 1: Accute HIV-1");
         _ext4Helper.uncheckGridRowCheckbox("Group 2: HIV-1 Negative");
 
-        waitForElement(Locator.tag("td").withText("Please select at least one group from the filter panel on the right."));
+        waitForElement(Locator.tag("td").withText("No group selected. Please select at least one group."));
         sleep(5500);// wait for tool tip to disappear, as it is covering what we want to click. it has a timeout of 5 sec
 
         // re-select group 1 and 2
