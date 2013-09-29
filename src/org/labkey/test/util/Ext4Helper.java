@@ -430,7 +430,8 @@ public class Ext4Helper extends AbstractHelper
 
     public static Locator.XPathLocator ext4MenuItem(String text)
     {
-        return Locator.xpath("//span[contains(@class, 'x4-menu-item-text') and text() = '" + text + "']");
+        // For now, menu lookup is no longer Ext 4 specific due to Ext 4 menus not escpaing properly
+        return Locator.xpath("//span[contains(@class, 'menu-item-text') and text() = '" + text + "']");
     }
 
     public static Locator.XPathLocator ext4Window(String title)
