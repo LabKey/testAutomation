@@ -95,17 +95,12 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         getEval("store.getAt('" + rowIdx + "').set('" + columnName + "', arguments[0])", value);
     }
 
-    //1-based result for consistency w/ other methods
-    public int getIndexOfColumn(String column)
-    {
-        return getIndexOfColumn(column, false);
-    }
-
     public boolean isColumnPresent(String colName, boolean visibleOnly)
     {
         return getIndexOfColumn(colName, visibleOnly, false) > -1;
     }
 
+    //1-based result for consistency w/ other methods
     public int getIndexOfColumn(String column, boolean visibleOnly)
     {
         return getIndexOfColumn(column, visibleOnly, true);
@@ -238,7 +233,7 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
     //uses 1-based coordinates
     public WebElement startEditing(int rowIdx, String colName)
     {
-        int cellIdx = getIndexOfColumn(colName);
+        int cellIdx = getIndexOfColumn(colName, true);  //NOTE: Ext 4.2.1 seems to not render hidden columns, unlike previous ext versions
         Locator cell = Ext4GridRefWD.locateExt4GridCell(rowIdx, cellIdx, _id);
         _test.assertElementPresent(cell);
 
@@ -260,7 +255,7 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
     //1-based
     public WebElement startEditingJS(int rowIdx, String colName)
     {
-        Integer colIdx = getIndexOfColumn(colName);
+        Integer colIdx = getIndexOfColumn(colName, false);
         completeEdit();
 
         Boolean didStart = (Boolean)getFnEval("return this.editingPlugin.startEdit(" + (rowIdx-1) + ", " + (colIdx-1) + ");");
