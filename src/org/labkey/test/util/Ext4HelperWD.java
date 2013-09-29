@@ -510,6 +510,6 @@ public class Ext4HelperWD extends AbstractHelperWD
 
     public static Locator.XPathLocator ext4Tab(String label)
     {
-        return Locator.xpath("//span[contains(@class, 'x4-tab-inner') and text() = '" + label + "']");
+        return Locator.tagWithText("span", label).withClass("x4-tab-inner").notHidden();
     }
 }

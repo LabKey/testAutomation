@@ -18,6 +18,8 @@ package org.labkey.test.util.ext4cmp;
 import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -33,11 +35,17 @@ import java.util.List;
  */
 public class Ext4GridRefWD extends Ext4CmpRefWD
 {
+    private int _clicksToEdit = 2;
+
     public Ext4GridRefWD(String id, BaseWebDriverTest test)
     {
         super(id, test);
     }
 
+    public void setClicksToEdit(int clicksToEdit)
+    {
+        _clicksToEdit = clicksToEdit;
+    }
 
     public static Locator locateExt4GridRow(int rowIndex, String parentId)
     {
@@ -57,7 +65,7 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
     public static Locator locateExt4GridCell(int rowIdx, int cellIndex, String parentId)
     {
         Locator row = Ext4GridRefWD.locateExt4GridRow(rowIdx, parentId);
-        return Locator.xpath("(" + ((Locator.XPathLocator) row).getPath() + "//td[contains(@class, 'x4-grid-cell')])[" + cellIndex + "]");
+        return Locator.xpath("(" + ((Locator.XPathLocator) row).getPath() + "//td[contains(@class, 'x4-grid-cell')])[" + cellIndex + "]").append(Locator.tag("div")).notHidden();
     }
 
     //1-based rowIdx
@@ -87,43 +95,57 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         getEval("store.getAt('" + rowIdx + "').set('" + columnName + "', arguments[0])", value);
     }
 
-    //uses 1-based coordinates
-    public void setGridCell(int rowIdx, String colName, String value)
-    {
-        Integer cellIdx = getIndexOfColumn(colName);
-        setGridCell(rowIdx, cellIdx, value);
-    }
-
     //1-based result for consistency w/ other methods
     public int getIndexOfColumn(String column)
     {
-        return getIndexOfColumn(column, "name");
+        return getIndexOfColumn(column, false);
     }
 
-    //1-based result for consistency w/ other methods.  includes visible columns only
-    public int getIndexOfColumn(String value, String propName)
+    public boolean isColumnPresent(String colName, boolean visibleOnly)
     {
-        Long idx = (Long)getFnEval("var visibleIdx = 0; for (var i=0;i<this.columns.length;i++){if (!this.columns[i].isHidden()) visibleIdx++;if (this.columns[i]['"+propName+"'] == '" + value + "' && !this.columns[i].isHidden()) return visibleIdx;}; return -1");
-        Assert.assertTrue("Unable to find visible column where property: " + propName + " has value: " + value, idx >= 0);
-        return idx.intValue() > -1 ? idx.intValue() : -1;
+        return getIndexOfColumn(colName, visibleOnly, false) > -1;
+    }
+
+    public int getIndexOfColumn(String column, boolean visibleOnly)
+    {
+        return getIndexOfColumn(column, visibleOnly, true);
+    }
+
+    protected int getIndexOfColumn(String column, boolean visibleOnly, boolean assertPresent)
+    {
+        int idx = getIndexOfColumn(column, "name", visibleOnly);
+        if (idx == -1)
+            idx = getIndexOfColumn(column, "dataIndex", visibleOnly);
+
+        if (assertPresent)
+            Assert.assertTrue("Unable to find column where either name or dataIndex has value: " + column, idx >= 0);
+
+        return idx;
+    }
+
+    //1-based result for consistency w/ other methods
+    protected int getIndexOfColumn(String value, String propName, boolean visibleOnly)
+    {
+        Long idx = (Long)getFnEval("for (var i=0;i<this.columns.length;i++){if (this.columns[i]['"+propName+"'] == '" + value + "') return " + (visibleOnly ? "this.columns[i].getVisibleIndex()" : "i") + ";}; return -1");
+
+        return idx.intValue() > -1 ? idx.intValue() + 1 : -1;
     }
 
     //uses 1-based coordinates
-    public void setGridCell(int rowIdx, int cellIdx, String value)
+    @LogMethod
+    public void setGridCell(@LoggedParam int rowIdx, @LoggedParam String colName, @LoggedParam String value)
     {
-        Locator cell = Ext4GridRefWD.locateExt4GridCell(rowIdx, cellIdx, _id);
-        _test.doubleClick(cell);
-        _test.sleep(200);
-
-        WebElement el = getActiveGridEditor();
-        if (el == null)
+        // NOTE: sometimes this editor is picky about appearing
+        // for now, solve this by repeating.  however, it would be better to resolve this issue.
+        // one theory is that we need to shift focus prior to the doubleclick
+        WebElement el = null;
+        int i = 0;
+        while (el == null)
         {
-            _test.doubleClick(cell);
-            _test.sleep(200);
-            el = getActiveGridEditor();
+            el = startEditing(rowIdx, colName);
+            assert i < 4 : "Unable to trigger editor after " + i + " attempts";
+            i++;
         }
-
-        waitForGridEditor();
 
         Locator moreSpecific = Locator.id(el.getAttribute("id"));
         _test.setFormElement(moreSpecific, value);
@@ -131,28 +153,14 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         //if the editor is still displayed, try to close it
         if (el.isDisplayed())
         {
-            //this is an alternate method to complete the edit, instead of calling Ext
-            //el.sendKeys(Keys.TAB);
-            //_test.getDriver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
-
-            eval("editingPlugin.completeEdit()");
-            _test.sleep(100);
+            completeEdit();
         }
 
         Assert.assertFalse("Grid input should not be visible", el.isDisplayed());
-        _test.sleep(300);
+        waitForGridEditorToDisappear();
     }
 
-    public void stopEditing()
-    {
-        String selector = "div.x4-grid-editor input";
-        _test.waitForElement(Locator.css(selector));
-        WebElement el = _test.getDriver().findElement(By.cssSelector(selector));
-        if (el.isDisplayed())
-            el.sendKeys(Keys.ESCAPE);
-    }
-
-    private void waitForGridEditor()
+    public void waitForGridEditor()
     {
         _test.waitFor(new BaseWebDriverTest.Checker()
         {
@@ -165,11 +173,40 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         }, "Unable to find element", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    private WebElement getActiveGridEditor()
+    public void waitForGridEditorToDisappear()
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return getActiveGridEditor() == null;
+
+            }
+        }, "Unable to find element", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public Long getRowCount()
+    {
+        return (Long)getEval("store.getCount()");
+    }
+
+    public void waitForRowCount(final int count)
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return getRowCount() == count;
+            }
+        }, "Expected row count did not appear", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public WebElement getActiveGridEditor()
     {
         //TODO: we need a more specific selector
         String selector = "div.x4-grid-editor input";
-        _test.waitForElement(Locator.css(selector));
 
         List<WebElement> visible = new ArrayList<>();
         for (WebElement element : _test.getDriver().findElements(By.cssSelector(selector)))
@@ -186,5 +223,63 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         }
 
         return visible.size() == 1 ? visible.get(0) : null;
+    }
+
+    public Locator getTbarButton(String label)
+    {
+        return Locator.id(_id).append(Locator.tag("div").withClass("x4-toolbar-item")).withText(label);
+    }
+
+    public void clickTbarButton(String label)
+    {
+        _test.waitAndClick(getTbarButton(label));
+    }
+
+    //uses 1-based coordinates
+    public WebElement startEditing(int rowIdx, String colName)
+    {
+        int cellIdx = getIndexOfColumn(colName);
+        Locator cell = Ext4GridRefWD.locateExt4GridCell(rowIdx, cellIdx, _id);
+        _test.assertElementPresent(cell);
+
+        WebElement el = getActiveGridEditor();
+        if (el == null)
+        {
+            if (_clicksToEdit > 1)
+                _test.doubleClick(cell);
+            else
+                _test.click(cell);
+
+            _test.sleep(200);
+            el = getActiveGridEditor();
+        }
+
+        return el;
+    }
+
+    //1-based
+    public WebElement startEditingJS(int rowIdx, String colName)
+    {
+        Integer colIdx = getIndexOfColumn(colName);
+        completeEdit();
+
+        Boolean didStart = (Boolean)getFnEval("return this.editingPlugin.startEdit(" + (rowIdx-1) + ", " + (colIdx-1) + ");");
+        Assert.assertTrue("Unable to start grid edit", didStart);
+
+        waitForGridEditor();
+
+        return getActiveGridEditor();
+    }
+
+    public void cancelEdit()
+    {
+        getFnEval("this.editingPlugin.cancelEdit();");
+        waitForGridEditorToDisappear();
+    }
+
+    public void completeEdit()
+    {
+        getFnEval("this.editingPlugin.completeEdit();");
+        waitForGridEditorToDisappear();
     }
 }

@@ -274,15 +274,15 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
         //no duplicate wells allowed
         Ext4GridRefWD grid = _ext4Helper.queryOne("grid", Ext4GridRefWD.class);
-        grid.setGridCell(1, "well", "H11\t");
+        grid.setGridCell(1, "well", "H11");
         click(Locator.ext4Button("Save"));
         waitForElement(Ext4HelperWD.ext4Window("Error"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("another sample is already present in well: H11");
-        grid.setGridCell(1, "well", "A5\t");  //restore original contents
+        grid.setGridCell(1, "well", "A5");  //restore original contents
 
         //verify neg controls enforced
-        grid.setGridCell(70, "category", "Unknown\t");
+        grid.setGridCell(70, "category", "Unknown");
         click(Locator.ext4Button("Download"));
         waitForElement(Ext4HelperWD.ext4Window("Error"));
         click(Locator.ext4Button("OK"));

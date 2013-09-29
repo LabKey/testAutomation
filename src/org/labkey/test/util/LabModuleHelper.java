@@ -357,9 +357,15 @@ public class LabModuleHelper
             _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
 
-        Ext4FieldRefWD.getForLabel(_test, "Schema").setValue(schema);
-        _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        Ext4FieldRefWD.getForLabel(_test, "Query").setValue(query);
+        Ext4FieldRefWD schemaField = Ext4FieldRefWD.getForLabel(_test, "Schema");
+        schemaField.waitForEnabled();
+        schemaField.setValue(schema);
+        _test.waitForElementToDisappear(Locator.tagWithText("div", "Loading..."), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+
+        Ext4FieldRefWD queryField = Ext4FieldRefWD.getForLabel(_test, "Query");
+        queryField.waitForEnabled();
+        queryField.setValue(query);
+
         _test.waitAndClick(Locator.ext4Button("Save"));
         _test.waitForElement(Ext4HelperWD.ext4Window("Success"));
         _test.click(Locator.ext4Button("OK"));

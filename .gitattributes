@@ -234,6 +234,7 @@ src/org/labkey/test/categories/XTandem.java -text
 src/org/labkey/test/debug/DummyProcess.java -text
 src/org/labkey/test/debug/ThreadDumpAndKill.java -text
 src/org/labkey/test/module/ModuleTest.java -text
+src/org/labkey/test/module/WNPRCEHRDataEntryTest.java -text
 src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text
 src/org/labkey/test/ms1/params/FeaturesTestParams.java -text
 src/org/labkey/test/ms1/params/PepMatchTestParams.java -text
@@ -466,6 +467,7 @@ src/org/labkey/test/util/CustomizeViewsHelperWD.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
 src/org/labkey/test/util/DevModeOnlyTest.java -text
 src/org/labkey/test/util/Diff.java -text
+src/org/labkey/test/util/EHRClientAPIHelper.java -text
 src/org/labkey/test/util/Echo.java -text
 src/org/labkey/test/util/EmailRecordTable.java -text
 src/org/labkey/test/util/EscapeUtil.java -text

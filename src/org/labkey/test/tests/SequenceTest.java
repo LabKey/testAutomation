@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -408,7 +409,7 @@ public class SequenceTest extends BaseWebDriverTest
         dr.clickLink(1, 0);
 
         waitForText("3-Barcode:");
-        waitForText("Run Id:");
+        waitForText("Run:");
         String newName = "ChangedSample";
         Ext4FieldRefWD.getForLabel(this, "Name").setValue(newName);
         sleep(250); //wait for value to save
@@ -753,6 +754,7 @@ public class SequenceTest extends BaseWebDriverTest
         _helper.waitForFileOfSize(output, 15000);  //size measured at 15924
 
         Assert.assertTrue("Unable to find file: " + output.getPath(), output.exists());
+        log("File size: " + FileUtils.sizeOf(output));
 
         try (
                 InputStream fileStream = new FileInputStream(output);
@@ -775,8 +777,7 @@ public class SequenceTest extends BaseWebDriverTest
             int expectedLength = 504;
             Assert.assertEquals("Length of file doesnt match expected value.  Total characters: " + totalChars, expectedLength, count);
 
-            //TODO: see if this works on team city.  delete file is true
-            //output.delete();
+            output.delete();
         }
     }
 
@@ -868,10 +869,10 @@ public class SequenceTest extends BaseWebDriverTest
         waitForElement(Ext4GridRefWD.locateExt4GridRow(2, grid.getId()));
 
         //the first field is pre-selected
-        grid.stopEditing();
+        grid.cancelEdit();
 
-        grid.setGridCell(1, 1, filename1);
-        grid.setGridCell(2, 1, filename1);
+        grid.setGridCell(1, "fileName", filename1);
+        grid.setGridCell(2, "fileName", filename1);
         waitAndClick(Locator.ext4Button("Import Data"));
         waitForElement(Ext4HelperWD.ext4Window("Error"));
         assertTextPresent("For each file, you must provide either the Id of an existing, unused readset or a name/platform to create a new one");
@@ -911,7 +912,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertTextPresent("All samples must either use no barcodes, 5' only, 3' only or both ends");
         click(Locator.ext4Button("OK"));
         barcodeField.setChecked(false);
-        grid.setGridCell(2, 1, filename2);
+        grid.setGridCell(2, "fileName", filename2);
 
         Ext4CmpRefWD panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRefWD.class);
         Map<String, Object> params = (Map)panel.getEval("getJsonParams()");
