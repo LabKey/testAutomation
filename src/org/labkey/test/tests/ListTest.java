@@ -127,6 +127,7 @@ public class ListTest extends BaseWebDriverTest
             LIST3_KEY_NAME + "\t" + _list3Col2.getName() + "\n" +
             LIST2_FOREIGN_KEY_OUTSIDE + "\t" + LIST3_COL2;
     public static final String LIST_AUDIT_EVENT = "List events";
+    public static final String DOMAIN_AUDIT_EVENT = "Domain events";
 
     private final String EXCEL_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/fruits.xls";
     private final String TSV_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/fruits.tsv";
@@ -500,7 +501,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("created", 1);
-        Assert.assertEquals("details Links", 6, countLinksWithText("DETAILS"));
+        Assert.assertEquals("details Links", 8, countLinksWithText("DETAILS"));
         Assert.assertEquals("Project Links", 17 + 1, countLinksWithText(PROJECT_VERIFY)); // Table links + header link
         Assert.assertEquals("List Links", 17 + 1, countLinksWithText(LIST_NAME_COLORS)); // Table links + header link
         clickAndWait(Locator.linkWithText("DETAILS"));
@@ -630,7 +631,8 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("Query '" + LIST_NAME_COLORS + "' in schema 'lists' doesn't exist.");
 
         clickButton("Folder");
-        AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "The domain " + LIST_NAME_COLORS + " was deleted", 5);
+        // after the 13.2 audit log migration, we are no longer going to co-mingle domain and list events in the same table
+        AuditLogTest.verifyAuditEvent(this, DOMAIN_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "The domain " + LIST_NAME_COLORS + " was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was deleted", 5);
         AuditLogTest.verifyAuditEvent(this, LIST_AUDIT_EVENT, AuditLogTest.COMMENT_COLUMN, "An existing list record was modified", 10);
 
