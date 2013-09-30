@@ -444,9 +444,9 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(TEST_DATA[0][3]);
 
         log("Test Customize View");
-        executeScript("LABKEY.DataRegions['query'].clearAllFilters();");
-        waitForElementToDisappear(Locator.css(".labkey-dataregion-msg"), WAIT_FOR_JAVASCRIPT);
-        //clickButton("Clear All"); // Can't trigger :hover pseudo-class with webdriver
+        // Re-navigate to the list to clear filters and sorts
+        clickTab("List");
+        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn(_listCol4.getName());
         _customizeViewsHelper.addCustomizeViewFilter(_listCol4.getName(), _listCol4.getLabel(), "Is Less Than", "10");
