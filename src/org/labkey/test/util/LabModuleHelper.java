@@ -360,7 +360,7 @@ public class LabModuleHelper
         Ext4FieldRefWD schemaField = Ext4FieldRefWD.getForLabel(_test, "Schema");
         schemaField.waitForEnabled();
         schemaField.setValue(schema);
-        _test.waitForElementToDisappear(Locator.tagWithText("div", "Loading..."), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElementToDisappear(Locator.tagWithText("div", "Loading..."), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 3);
 
         Ext4FieldRefWD queryField = Ext4FieldRefWD.getForLabel(_test, "Query");
         queryField.waitForEnabled();
@@ -394,7 +394,7 @@ public class LabModuleHelper
         }
 
         Ext4FieldRefWD.getForLabel(_test, "Schema").setValue(schema);
-        _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 3);
 
         Ext4FieldRefWD.getForLabel(_test, "Query").setValue(query);
         _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);

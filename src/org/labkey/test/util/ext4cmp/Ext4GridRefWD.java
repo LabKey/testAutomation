@@ -181,9 +181,14 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         }, "Unable to find element", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public Long getRowCount()
+    public int getRowCount()
     {
-        return (Long)getEval("store.getCount()");
+        return ((Long)getEval("store.getCount()")).intValue();
+    }
+
+    public int getSelectedCount()
+    {
+        return ((Long)getEval("getSelectionModel().getSelection().length;")).intValue();
     }
 
     public void waitForRowCount(final int count)
@@ -196,6 +201,18 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
                 return getRowCount() == count;
             }
         }, "Expected row count did not appear", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void waitForSelected(final int count)
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return getSelectedCount() == count;
+            }
+        }, "Expected selected row count did not appear", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public WebElement getActiveGridEditor()
