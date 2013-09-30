@@ -210,14 +210,14 @@ public class GroupTest extends BaseWebDriverTest
         stopImpersonatingGroup();
 
 
-        Locator unavailableEditorChoice = Locator.xpath("//div[contains(@class, 'x-item-disabled')]//a//span[text()='Editor']");
+        Locator unavailableEditorChoice = Locator.xpath("//li[contains(@class, 'x-item-disabled')]/a/span[text()='Editor']");
         impersonateRole("Author");
         assertElementNotPresent(unavailableEditorChoice);
         verifyAuthorPermission(nameTitleBody);
         impersonateRole("Editor");
         clickUserMenuItem(false, true, "Impersonate", "Role", "Editor");
         waitForElement(unavailableEditorChoice);
-        assertElementPresent(Locator.xpath("//div[contains(@class, 'x-item-disabled')]//a//span[text()='Author']"));
+        assertElementPresent(Locator.xpath("//li[contains(@class, 'x-item-disabled')]/a/span[text()='Author']"));
         verifyEditorPermission(nameTitleBody);
         stopImpersonatingRole();
 
