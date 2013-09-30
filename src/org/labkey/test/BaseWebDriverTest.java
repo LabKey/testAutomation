@@ -5659,11 +5659,21 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void addUrlParameter(String parameter)
     {
-        if (!getCurrentRelativeURL().contains(parameter))
-            if (getCurrentRelativeURL().contains("?"))
-                beginAt(getCurrentRelativeURL().concat("&" + parameter));
+        String currentURL = getCurrentRelativeURL();
+        // Strip off any '#' on the end of the URL
+        String suffix = "";
+        if (currentURL.contains("#"))
+        {
+            String[] parts = currentURL.split("#");
+            currentURL = parts[0];
+            // There might not be anything after the '#'
+            suffix = "#" + (parts.length > 1 ? parts[1] : "");
+        }
+        if (!currentURL.contains(parameter))
+            if (currentURL.contains("?"))
+                beginAt(currentURL.concat("&" + parameter + suffix));
             else
-                beginAt(getCurrentRelativeURL().concat("?" + parameter));
+                beginAt(currentURL.concat("?" + parameter + suffix));
     }
 
     String toRole(String perm)

@@ -393,6 +393,9 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextNotPresent("K.RFSGTVKLK.Y");
         setSort("MS2Peptides", "Next", SortDirection.ASC);
         assertTextBefore("K.ERQPPPR.L", "K.KLHQK.L");
+        // Explicitly clear out the sorts, since we want to be just dealing with the ones set in Customize View
+        clearSort("MS2Peptides", "Next");
+        clearSort("MS2Peptides", "Scan");
 
         log("Test customize view");
         clickButton("Clear All");
