@@ -35,8 +35,10 @@ import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -77,6 +79,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     public static final String STUDY_FOLDER_TAB_NAME = "Study Container Tab";
     public static final String ASSAY_FOLDER_TAB_NAME = "Assay Container Tab 2";
+    public static final String STUDY_FOLDER_TAB_LABEL = "Study Container";
+    public static final String ASSAY_FOLDER_TAB_LABEL = "Assay Container";
 
     protected String getProjectName()
     {
@@ -566,13 +570,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
                 new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
 
         log("Create list in container tab containers to prevent query validation failure");
-        _listHelper.createListFromTab("Study Container", LIST_NAME,
+        _listHelper.createListFromTab(STUDY_FOLDER_TAB_LABEL, LIST_NAME,
                 ListHelperWD.ListColumnType.AutoInteger, "Key",
                 new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
                 new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
                 new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
 
-        _listHelper.createListFromTab("Assay Container", LIST_NAME,
+        _listHelper.createListFromTab(ASSAY_FOLDER_TAB_LABEL, LIST_NAME,
                 ListHelperWD.ListColumnType.AutoInteger, "Key",
                 new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
                 new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
@@ -879,7 +883,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         // Test Container tabs
         clickTab("Assay Container");
         assertTextPresent("Assay List");
-        clickTab("Study Container");
+        clickTab(STUDY_FOLDER_TAB_LABEL);
         assertTextPresent("Study Overview");
         clickAndWait(Locator.linkWithText("Create Study"));
         clickAndWait(Locator.linkWithText("Create Study"));
@@ -890,7 +894,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         // Test container tab enhancements: change tab folder's type, revert type, delete tab folder
         // Change study's type to collaboration
         log("Container tab enhancements: change tab folder type, revert");
-        goToFolderManagement();
+        goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
         waitForText(STUDY_FOLDER_TAB_NAME);
         assertTreeButtonHidden("Revert", true);
         clickAndWait(Locator.linkWithText("Folder Type"));
@@ -901,7 +905,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         waitForText("The Wiki web part displays a single wiki page.");
         // TODO: assert that study tabs are gone
         // change type back to study
-        goToFolderManagement();
+        goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
         waitForText(STUDY_FOLDER_TAB_NAME);
         assertTreeButtonHidden("Revert", false);
         clickAndWait(Locator.linkWithText("Folder Type"));
@@ -911,7 +915,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         click(Locator.extButton("Yes"));
         waitForText("Study tracks data in");
         // change to collaboration again
-        goToFolderManagement();
+        goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
         waitForText(STUDY_FOLDER_TAB_NAME);
         assertTreeButtonHidden("Revert", true);
         clickAndWait(Locator.linkWithText("Folder Type"));
@@ -921,7 +925,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         click(Locator.extButton("Yes"));
         waitForText("The Wiki web part displays a single wiki page.");
         // revert type
-        goToFolderManagement();
+        goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
         waitForText(STUDY_FOLDER_TAB_NAME);
         assertTreeButtonHidden("Revert", false);
         clickButton("Revert", 0);
@@ -933,7 +937,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         waitForText("Study tracks data in");
 
         // Revert via parent container
-        goToFolderManagement();
+        goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
         waitForText(STUDY_FOLDER_TAB_NAME);
         assertTreeButtonHidden("Revert", true);
         clickAndWait(Locator.linkWithText("Folder Type"));
@@ -956,7 +960,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         // Delete tab folder
         log("Container tab enhancements: delete tab folder type, recreate");
-        goToFolderManagement();
+        goToTabFolderManagement(STUDY_FOLDER_TAB_LABEL);
         waitForText(STUDY_FOLDER_TAB_NAME);
         clickButton("Delete");
         assertTextPresent("You are about to delete the following folder:");
@@ -990,44 +994,40 @@ public class SimpleModuleTest extends BaseWebDriverTest
     {
         // Set up a Collaboration folder with study and assay subfolders
         final String COLLAB_FOLDER = "collab1";
-        final String STUDYCONTAINER_NAME = "Study Container Tab";
-        final String STUDYTAB_NAME = "Study Container";
-        final String ASSAYCONTAINER_NAME = "Assay Container Tab 2";
-        final String ASSAYTAB_NAME = "Assay Container";
         final String COLLABFOLDER_PATH = getProjectName() + "/" + COLLAB_FOLDER;
         final String EXTRA_ASSAY_WEBPART = "Run Groups";
         clickProject(getProjectName());
         _containerHelper.createSubfolder(getProjectName(), COLLAB_FOLDER, "Collaboration");
-        _containerHelper.createSubfolder(COLLABFOLDER_PATH, STUDYCONTAINER_NAME, "Study");
-        _containerHelper.createSubfolder(COLLABFOLDER_PATH, ASSAYCONTAINER_NAME, "Assay");
+        _containerHelper.createSubfolder(COLLABFOLDER_PATH, STUDY_FOLDER_TAB_NAME, "Study");
+        _containerHelper.createSubfolder(COLLABFOLDER_PATH, ASSAY_FOLDER_TAB_NAME, "Assay");
         clickFolder(COLLAB_FOLDER);
-        clickFolder(STUDYCONTAINER_NAME);
+        clickFolder(STUDY_FOLDER_TAB_NAME);
         assertTextPresent("Study Overview");
         clickAndWait(Locator.linkWithText("Create Study"));
         clickAndWait(Locator.linkWithText("Create Study"));
-        clickFolder(ASSAYCONTAINER_NAME);
+        clickFolder(ASSAY_FOLDER_TAB_NAME);
         addWebPart(EXTRA_ASSAY_WEBPART);
 
         // Change folder type to XML Tabbed
         clickFolder(COLLAB_FOLDER);
-        assertElementNotPresent(Locator.linkWithText(STUDYTAB_NAME));
-        assertElementNotPresent(Locator.linkWithText(ASSAYTAB_NAME));
+        assertElementNotPresent(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));
+        assertElementNotPresent(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         checkRadioButton("folderType", TABBED_FOLDER_TYPE);
         clickButton("Update Folder");
 
         // Verify that subfolders got moved into tabs
-        assertElementPresent(Locator.linkWithText(STUDYTAB_NAME));
-        assertElementPresent(Locator.linkWithText(ASSAYTAB_NAME));
+        assertElementPresent(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));
+        assertElementPresent(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
         hoverFolderBar();
-        assertElementNotPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(STUDYTAB_NAME)));
-        assertElementNotPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(ASSAYTAB_NAME)));
-        clickAndWait(Locator.linkWithText(STUDYTAB_NAME));
+        assertElementNotPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL)));
+        assertElementNotPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL)));
+        clickAndWait(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));
         assertTextPresent("Study Overview");
         clickAndWait(Locator.linkWithText("Specimen Data"));
         assertTextPresent("Vial Search", "Import Specimens");
-        clickAndWait(Locator.linkWithText(ASSAYTAB_NAME));
+        clickAndWait(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
         assertTextPresent("Assay List");
         assertTextPresent(EXTRA_ASSAY_WEBPART);
 
@@ -1039,7 +1039,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Update Folder");
 
         // Study and Assay should be hidden now
-        assertTextNotPresent(STUDYTAB_NAME, ASSAYTAB_NAME, STUDYCONTAINER_NAME, ASSAYCONTAINER_NAME);
+        assertTextNotPresent(STUDY_FOLDER_TAB_LABEL, ASSAY_FOLDER_TAB_LABEL, STUDY_FOLDER_TAB_NAME, ASSAY_FOLDER_TAB_NAME);
 
         // Now change back to TABBED
         clickFolder(COLLAB_FOLDER);
@@ -1049,12 +1049,12 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("Update Folder");
 
         // Verify that folder tabs are back
-        assertTextPresent(STUDYTAB_NAME, ASSAYTAB_NAME);
-        clickAndWait(Locator.linkWithText(STUDYTAB_NAME));
+        assertTextPresent(STUDY_FOLDER_TAB_LABEL, ASSAY_FOLDER_TAB_LABEL);
+        clickAndWait(Locator.linkWithText(STUDY_FOLDER_TAB_LABEL));
         assertTextPresent("Study Overview");
         clickAndWait(Locator.linkWithText("Specimen Data"));
         assertTextPresent("Vial Search", "Import Specimens");
-        clickAndWait(Locator.linkWithText(ASSAYTAB_NAME));
+        clickAndWait(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
         assertTextPresent("Assay List");
         assertTextPresent(EXTRA_ASSAY_WEBPART);
 
@@ -1132,10 +1132,27 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
     private void assertTreeButtonHidden(String buttonText, boolean hidden)
     {
-        Locator.XPathLocator locator = Locator.ext4Button(buttonText);
-/*        if (hidden && (isElementPresent(locator) && !isElementPresent(locator.withClass("x4-btn-disabled"))))   // if present should be disabled
+        // TODO: Dave: the locator's presence seems to be inconsistent. These are not central to the test but would be nice
+/*        Locator.XPathLocator locator = Locator.ext4Button(buttonText);
+        if (hidden && (isElementPresent(locator) && !isElementPresent(locator.withClass("x4-btn-disabled"))))   // if present should be disabled
             Assert.fail("Button '" + buttonText + "' not hidden.");
         else if (!hidden && (!isElementPresent(locator) || isElementPresent(locator.withClass("x4-btn-disabled"))))
             Assert.fail("Button '" + buttonText + "' is hidden.");                */
+    }
+
+    @LogMethod(quiet = true)
+    public void goToTabFolderManagement(@LoggedParam String tabText)
+    {
+        Locator tabMenuXPath = Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']/following-sibling::span//a");
+        waitForElement(tabMenuXPath);
+
+//        _ext4Helper.clickExt4MenuButton(true, tabMenuXPath, false, "Folder", "Management");       // Tab menu hidden so this doesn't work; do it inline with fireEvent instead
+        fireEvent(tabMenuXPath, SeleniumEvent.click);
+        Locator parentLocator = Ext4HelperWD.ext4MenuItem("Folder");
+        waitForElement(parentLocator, 1000);
+        mouseOver(parentLocator);
+
+        Locator itemLocator = Ext4HelperWD.ext4MenuItem("Management");
+        waitAndClickAndWait(itemLocator);
     }
 }
