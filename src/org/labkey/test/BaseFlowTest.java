@@ -182,7 +182,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
     protected void after() throws Exception
     {
-        if (!TestProperties.skipCleanup())
+        if (!TestProperties.isTestCleanupSkipped())
             deleteAllRuns();
     }
 

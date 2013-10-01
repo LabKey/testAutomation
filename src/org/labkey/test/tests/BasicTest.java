@@ -116,7 +116,7 @@ public class BasicTest extends BaseWebDriverTest
 
         goToAdminConsole();
 
-        if (TestProperties.devModeEnabled())
+        if (TestProperties.isDevModeEnabled())
             assertTextNotPresent("Production"); // Verify that we're running in dev mode
         else
             assertTextNotPresent("Development"); // Unless we're not supposed to be.

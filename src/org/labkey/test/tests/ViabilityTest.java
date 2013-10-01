@@ -131,7 +131,7 @@ public class ViabilityTest extends AbstractViabilityTest
         Assert.assertEquals("6.000E7", table.getDataAsText(0, "Original Cells"));
 
         Assert.assertEquals("foobar,vial1,vial2,vial3", table.getDataAsText(0, "Specimen IDs"));
-        if (TestProperties.groupConcatSupported())
+        if (TestProperties.isGroupConcatSupported())
             Assert.assertEquals("vial1,vial2,vial3", table.getDataAsText(0, "SpecimenMatches"));
         else
             Assert.assertEquals("", table.getDataAsText(0, "SpecimenMatches"));

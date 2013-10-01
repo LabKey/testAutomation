@@ -184,7 +184,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         System.out.println("Loading scripts from seleniumHelpers.js");
         System.out.println(selenium.getEval(script));
 
-        if (scriptCheckEnabled())
+        if (isScriptCheckEnabled())
             beginJsErrorChecker();
     }
 
@@ -336,14 +336,14 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         if (selenium != null)
         {
-            if (scriptCheckEnabled())
+            if (isScriptCheckEnabled())
             {
                 dismissAlerts();
                 endJsErrorChecker();
             }
             boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
 
-            if (!skipTearDown || onTeamCity())
+            if (!skipTearDown || isTestRunningOnTeamCity())
             {
                 //selenium.close(); // unnecessary since selenium.stop will close windows.
                 selenium.stop();
@@ -752,7 +752,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     protected void setSystemMaintenance(boolean enable)
     {
         // Not available in production mode
-        if (devModeEnabled())
+        if (isDevModeEnabled())
         {
             goToAdminConsole();
             clickAndWait(Locator.linkWithText("system maintenance"));
@@ -1292,7 +1292,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             signIn();
 			resetErrors();
 
-            if( systemMaintenanceDisabled() )
+            if( isSystemMaintenanceDisabled() )
             {
                 // Disable scheduled system maintenance to prevent timeouts during nightly tests.
                 disableMaintenance();
@@ -1332,7 +1332,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
             checkLinks();
 
-            if (!skipCleanup())
+            if (!isTestCleanupSkipped())
             {
                 goToHome();
                 doCleanup(true);
@@ -1370,7 +1370,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 try
                 {
                     dumpPageSnapshot();
-                    if (onTeamCity())
+                    if (isTestRunningOnTeamCity())
                     {
                         dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
                         dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
@@ -1493,7 +1493,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
 		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
 			return;
-        if (skipLeakCheck())
+        if (isLeakCheckSkipped())
             return;
         if (isGuestModeTest())
             return;
@@ -1585,7 +1585,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @LogMethod
     protected void checkQueries()
     {
-        if (skipQueryCheck())
+        if (isQueryCheckSkipped())
             return;
         if(getProjectName() != null)
         {
@@ -1600,7 +1600,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @LogMethod
     protected void checkViews()
     {
-        if (skipViewCheck())
+        if (isViewCheckSkipped())
             return;
 
         List<String> checked = new ArrayList<>();
@@ -1740,11 +1740,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     @LogMethod
     protected void checkLinks()
     {
-        if (linkCheckEnabled())
+        if (isLinkCheckEnabled())
         {
             pauseJsErrorChecker();
             Crawler crawler = new Crawler(this, Runner.getTestSet().getCrawlerTimeout());
-            crawler.crawlAllLinks(injectCheckEnabled());
+            crawler.crawlAllLinks(isInjectCheckEnabled());
             resumeJsErrorChecker();
         }
     }

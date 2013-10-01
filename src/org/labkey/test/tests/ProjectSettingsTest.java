@@ -35,7 +35,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     private static final Locator helpLink = Locator.xpath("//a[@target='labkeyHelp']/span[contains(text(), 'LabKey Documentation')]");
     private static final Locator helpMenuLinkDev =  Locator.tagWithText("span", "Help (default)");
     private static final Locator helpMenuLinkProduction =  Locator.tagWithText("span", "Help");
-    private Locator helpMenuLink = TestProperties.devModeEnabled() ? helpMenuLinkDev : helpMenuLinkProduction;
+    private Locator helpMenuLink = TestProperties.isDevModeEnabled() ? helpMenuLinkDev : helpMenuLinkProduction;
 
     @Override
     //this project will remain unaltered and copy every property from the site.

@@ -203,7 +203,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || "".equals(seleniumBrowser) || "*best".equals(seleniumBrowser.toLowerCase()))
         {
-            if (onTeamCity())
+            if (isTestRunningOnTeamCity())
                 BROWSER_TYPE = BrowserType.FIREFOX;
             else
                 BROWSER_TYPE = bestBrowser();
@@ -294,7 +294,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
 
                 ChromeOptions options = new ChromeOptions();
-                if (scriptCheckEnabled())
+                if (isScriptCheckEnabled())
                 {
                     options.addExtensions(new File(WebTestHelper.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker.crx"));
                 }
@@ -326,14 +326,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                         "application/x-zip-compressed," +
                         "text/x-script.perl");
                 profile.setPreference("browser.download.manager.showWhenStarting",false);
-                if (scriptCheckEnabled())
+                if (isScriptCheckEnabled())
                 {
                     try
                         {JavaScriptError.addExtension(profile);}
                     catch(IOException e)
                         {Assert.fail("Failed to load JS error checker: " + e.getMessage());}
                 }
-                if (firefoxExtensionsEnabled() && !onTeamCity()) // Firebug just clutters up screenshots on TeamCity
+                if (isFirefoxExtensionsEnabled() && !isTestRunningOnTeamCity()) // Firebug just clutters up screenshots on TeamCity
                 {
                     try
                     {
@@ -344,7 +344,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                         profile.setPreference("extensions.firebug.previousPlacement", 3);
                         profile.setPreference("extensions.firebug.net.enabledSites", true);
 
-                        if (firebugPanelsEnabled()) // Enabling Firebug panels slows down test and is usually not needed
+                        if (isFirebugPanelsEnabled()) // Enabling Firebug panels slows down test and is usually not needed
                         {
                             profile.setPreference("extensions.firebug.net.enableSites", true);
                             profile.setPreference("extensions.firebug.script.enableSites", true);
@@ -394,7 +394,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void pauseJsErrorChecker()
     {
-        if (_jsErrorChecker != null && scriptCheckEnabled())
+        if (_jsErrorChecker != null && isScriptCheckEnabled())
         {
             _jsErrorChecker.pause();
         }
@@ -402,7 +402,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void resumeJsErrorChecker()
     {
-        if (_jsErrorChecker != null && scriptCheckEnabled())
+        if (_jsErrorChecker != null && isScriptCheckEnabled())
         {
             _jsErrorChecker.resume();
         }
@@ -605,7 +605,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void tearDown() throws Exception
     {
         boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
-        if ((!skipTearDown || onTeamCity()) && getDriver() != null)
+        if ((!skipTearDown || isTestRunningOnTeamCity()) && getDriver() != null)
             getDriver().quit();
 
         if (!_testFailed && getDownloadDir().exists())
@@ -1049,7 +1049,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     protected void setSystemMaintenance(boolean enable)
     {
         // Not available in production mode
-        if (devModeEnabled())
+        if (isDevModeEnabled())
         {
             goToAdminConsole();
             clickAndWait(Locator.linkWithText("system maintenance"));
@@ -1673,7 +1673,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             enableEmailRecorder();
 			resetErrors();
 
-            if (systemMaintenanceDisabled())
+            if (isSystemMaintenanceDisabled())
             {
                 // Disable scheduled system maintenance to prevent timeouts during nightly tests.
                 disableMaintenance();
@@ -1715,7 +1715,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             checkLinks();
 
-            if (!skipCleanup())
+            if (!isTestCleanupSkipped())
             {
                 goToHome();
                 doCleanup(true);
@@ -1774,7 +1774,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 try
                 {
                     dumpPageSnapshot();
-                    if (onTeamCity())
+                    if (isTestRunningOnTeamCity())
                     {
                         dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
                         dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
@@ -1973,7 +1973,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
 		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
 			return;
-        if (skipLeakCheck())
+        if (isLeakCheckSkipped())
             return;
         if (isGuestModeTest())
             return;
@@ -2065,7 +2065,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @LogMethod
     protected void checkQueries()
     {
-        if (skipQueryCheck())
+        if (isQueryCheckSkipped())
             return;
         if(getProjectName() != null)
         {
@@ -2080,7 +2080,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @LogMethod
     protected void checkViews()
     {
-        if (skipViewCheck())
+        if (isViewCheckSkipped())
             return;
 
         List<String> checked = new ArrayList<>();
@@ -2206,7 +2206,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     private void checkJsErrors()
     {
-        if (scriptCheckEnabled())
+        if (isScriptCheckEnabled())
         {
             int duplicateCount = 0;
             try
@@ -2293,11 +2293,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @LogMethod
     protected void checkLinks()
     {
-        if (linkCheckEnabled())
+        if (isLinkCheckEnabled())
         {
             pauseJsErrorChecker();
             Crawler crawler = new Crawler(this, Runner.getTestSet().getCrawlerTimeout());
-            crawler.crawlAllLinks(injectCheckEnabled());
+            crawler.crawlAllLinks(isInjectCheckEnabled());
             resumeJsErrorChecker();
         }
     }
@@ -2402,7 +2402,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     // http://www.jetbrains.net/confluence/display/TCD4/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-PublishingArtifactswhiletheBuildisStillinProgress
     public void publishArtifact(File file)
     {
-        if (file != null && onTeamCity())
+        if (file != null && isTestRunningOnTeamCity())
         {
             // relativize path to labkey project root
             String labkeyRoot = WebTestHelper.getLabKeyRoot();
@@ -2455,7 +2455,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         File screenFile = new File(dir, baseName + "Fullscreen.png");
 
         // Windows doesn't support OS level screenshots for headless environment
-        if (!onTeamCity() || !System.getProperty("os.name").toLowerCase().contains("win"))
+        if (!isTestRunningOnTeamCity() || !System.getProperty("os.name").toLowerCase().contains("win"))
         {
             try
             {
@@ -6797,7 +6797,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             shortWait().until(ExpectedConditions.elementToBeClickable(By.id("lk-vq-subfolders")));
             checkCheckbox(Locator.id("lk-vq-subfolders"));
         }
-//        if (!skipViewCheck())
+//        if (!isViewCheckSkipped())
 //            checkCheckbox(Locator.id("lk-vq-validatemetadata"));
         checkCheckbox(Locator.id("lk-vq-systemqueries"));
         clickButton("Start Validation", 0);

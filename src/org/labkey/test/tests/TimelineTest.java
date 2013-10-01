@@ -161,7 +161,7 @@ public class TimelineTest extends BaseWebDriverTest
 
     private void removeTestPage()
     {
-        if (TestProperties.linkCheckEnabled())
+        if (TestProperties.isLinkCheckEnabled())
         {
             clickFolder(FOLDER_NAME);
             _portalHelper.removeWebPart(WIKIPAGE_NAME);

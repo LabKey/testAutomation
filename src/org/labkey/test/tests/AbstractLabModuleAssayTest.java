@@ -27,7 +27,7 @@ abstract public class AbstractLabModuleAssayTest extends LabModulesTest
     @Override
     public void checkLinks()
     {
-        if ( TestProperties.linkCheckEnabled() )
+        if ( TestProperties.isLinkCheckEnabled() )
             log("LabModulesTest uses essentially the same UI and will check links, so link checking is skipped");
     }
 }
