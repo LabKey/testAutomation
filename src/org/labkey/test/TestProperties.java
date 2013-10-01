@@ -6,62 +6,62 @@ package org.labkey.test;
  */
 public abstract class TestProperties
 {
-    public static boolean skipCleanup()
+    public static boolean isTestCleanupSkipped()
     {
         return "false".equals(System.getProperty("clean"));
     }
 
-    public static boolean linkCheckEnabled()
+    public static boolean isLinkCheckEnabled()
     {
-        return "true".equals(System.getProperty("linkCheck")) || injectCheckEnabled();
+        return "true".equals(System.getProperty("linkCheck")) || isInjectCheckEnabled();
     }
 
-    public static boolean injectCheckEnabled()
+    public static boolean isInjectCheckEnabled()
     {
         return "true".equals(System.getProperty("injectCheck"));
     }
 
-    public static boolean scriptCheckEnabled()
+    public static boolean isScriptCheckEnabled()
     {
         return "true".equals(System.getProperty("scriptCheck"));
     }
 
-    public static boolean devModeEnabled()
+    public static boolean isDevModeEnabled()
     {
         return "true".equals(System.getProperty("devMode"));
     }
 
-    public static boolean firebugPanelsEnabled()
+    public static boolean isFirebugPanelsEnabled()
     {
         return "true".equals(System.getProperty("enableFirebugPanels"));
     }
 
-    public static boolean firefoxExtensionsEnabled()
+    public static boolean isFirefoxExtensionsEnabled()
     {
         return "true".equals(System.getProperty("enableFirefoxExtensions"));
     }
 
-    public static boolean onTeamCity()
+    public static boolean isTestRunningOnTeamCity()
     {
         return System.getProperty("teamcity.buildType.id") != null;
     }
 
-    public static boolean skipLeakCheck()
+    public static boolean isLeakCheckSkipped()
     {
         return "false".equals(System.getProperty("memCheck"));
     }
 
-    public static boolean skipQueryCheck()
+    public static boolean isQueryCheckSkipped()
     {
         return "false".equals(System.getProperty("queryCheck"));
     }
 
-    public static boolean skipViewCheck()
+    public static boolean isViewCheckSkipped()
     {
         return "false".equals(System.getProperty("viewCheck"));
     }
 
-    public static boolean systemMaintenanceDisabled()
+    public static boolean isSystemMaintenanceDisabled()
     {
         return "never".equals(System.getProperty("systemMaintenance"));
     }
@@ -76,7 +76,7 @@ public abstract class TestProperties
         return System.getProperty("databaseVersion");
     }
 
-    public static boolean groupConcatSupported()
+    public static boolean isGroupConcatSupported()
     {
         return  "pg".equals(getDatabaseType()) ||
                 "mssql".equals(getDatabaseType()) && !"2005".equals(getDatabaseVersion());
