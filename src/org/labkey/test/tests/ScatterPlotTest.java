@@ -162,8 +162,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         //Change filter and check scatter plot again
         clickButton("View Data", 0);
-        String drtId = Locator.xpath("//*[starts-with(@id, 'aqwp')]").waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT).getAttribute("id");
-        clearFilter(drtId, "APXpulse", 0);
+        clearFilter("Dataset", "APXpulse", 0);
         waitForText("36.0"); // Body temp for filtered out row
         clickButton("View Chart", 0);
         assertSVG(SCATTER_PLOT_DR_2);
