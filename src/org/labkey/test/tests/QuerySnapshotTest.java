@@ -81,13 +81,6 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         super.doCleanup(afterTest);
     }
 
-    @Override
-    public void checkLeaksAndErrors()
-    {
-        //TODO: 14929: SQLException from org.labkey.study.visitmanager.VisitManager.performParticipantPurge() after dataset deletion
-        //WORKAROUND: check for errors before cleanup.
-    }
-
     private void waitForStudyLoad(String folderName)
     {
         // Navigate
