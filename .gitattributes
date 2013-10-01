@@ -240,6 +240,7 @@ src/org/labkey/test/ms1/params/FeaturesTestParams.java -text
 src/org/labkey/test/ms1/params/PepMatchTestParams.java -text
 src/org/labkey/test/ms2/AbstractMS2SearchEngineTest.java -text
 src/org/labkey/test/ms2/AbstractXTandemTest.java -text
+src/org/labkey/test/ms2/CometTest.java -text
 src/org/labkey/test/ms2/MS2ClusterTest.java -text
 src/org/labkey/test/ms2/MS2PipelineFolder.java -text
 src/org/labkey/test/ms2/MS2TestBase.java -text
