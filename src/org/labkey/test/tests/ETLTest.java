@@ -93,33 +93,18 @@ public class ETLTest extends BaseWebDriverTest
 
     protected void runInitialSetup()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
         log("running setup");
         _containerHelper.createProject(PROJECT_NAME, null);
         enableModule("DataIntegration", true);
         enableModule("simpletest", true);
-        addQueryWebpart("Source", "vehicle", "etl_source");
-        addQueryWebpart("Target1", "vehicle", "etl_target");
-        //addQueryWebpart("Target2", "vehicle", "etl_target2");
-        addQueryWebpart("Transfers", "vehicle", "transfer");
-        addQueryWebpart("TransformRun", "dataintegration", "TransformRun");
-        addQueryWebpart("TransformHistory", "dataintegration", "TransformHistory");
-        addQueryWebpart("TransformRun", "dataintegration", "TransformSummary");
-    }
-
-    private void addQueryWebpart(String name, String schema, String query)
-    {
-        log("adding query webpart " + name);
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Query");
-        waitForElement(Locator.name("title"));
-        setFormElement(Locator.name("title"), name);
-        waitForTextToDisappear("Loading...");
-        setFormElement(Locator.xpath("//input[@id='schemaName-inputEl']"), schema);
-        click(Locator.id("selectQueryContents-inputEl"));
-        waitForTextToDisappear("Loading...");
-        setFormElement(Locator.xpath("//input[@id='queryName-inputEl']"), query);
-        waitForTextToDisappear("Loading...");
-        clickButton("Submit");
+        portalHelper.addQueryWebPart("Source", "vehicle", "etl_source", null);
+        portalHelper.addQueryWebPart("Target1", "vehicle", "etl_target", null);
+        //portalHelper.addQueryWebPart("Target2", "vehicle", "etl_target2", null);
+        portalHelper.addQueryWebPart("Transfers", "vehicle", "transfer", null);
+        portalHelper.addQueryWebPart("TransformRun", "dataintegration", "TransformRun", null);
+        portalHelper.addQueryWebPart("TransformHistory", "dataintegration", "TransformHistory", null);
+        portalHelper.addQueryWebPart("TransformRun", "dataintegration", "TransformSummary", null);
     }
 
     private void insertSourceRow(String id, String name, String RunId)
