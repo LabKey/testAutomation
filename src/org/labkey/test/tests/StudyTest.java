@@ -958,13 +958,10 @@ public class StudyTest extends StudyBaseTest
     {
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("Study Navigator"));
-        assertTextNotPresent("Screening Cycle");
-        assertTextNotPresent("Cycle 1");
+        assertTextNotPresent("Screening Cycle", "Cycle 1");
         assertTextPresent("Pre-exist Cond");
         clickAndWait(Locator.linkWithText("Show All Datasets"));
-        assertTextPresent("Screening Cycle");
-        assertTextPresent("Cycle 1");
-        assertTextPresent("Pre-exist Cond");
+        assertTextPresent("Screening Cycle", "Cycle 1", "Pre-exist Cond");
     }
 
     @LogMethod
