@@ -239,7 +239,7 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
 
     public Locator getTbarButton(String label)
     {
-        return Locator.id(_id).append(Locator.tag("div").withClass("x4-toolbar-item")).withText(label);
+        return Locator.id(_id).append(Locator.tag("a").withClass("x4-toolbar-item")).append(Locator.tag("span").withText(label));
     }
 
     public void clickTbarButton(String label)
