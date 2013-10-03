@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
@@ -25,11 +24,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONValue;
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
 import org.labkey.test.TestTimeoutException;
@@ -206,6 +207,14 @@ public class JUnitTest extends TestSuite
         /** Timeout in seconds to wait for the whole testcase to finish on the server */
         private final int _timeout;
 
+        private static HttpClient client = WebTestHelper.getHttpClient();
+        private static HttpContext context = WebTestHelper.getBasicHttpContext();
+
+        static
+        {
+            context.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
+        }
+
         public RemoteTest(String remoteClass, int timeout)
         {
             super(remoteClass);
@@ -216,8 +225,6 @@ public class JUnitTest extends TestSuite
         @Override
         protected void runTest() throws Throwable
         {
-            HttpClient client = WebTestHelper.getHttpClient();
-            HttpContext context = WebTestHelper.getBasicHttpContext();
             HttpResponse response = null;
             try
             {
@@ -229,8 +236,7 @@ public class JUnitTest extends TestSuite
                 int status = response.getStatusLine().getStatusCode();
                 String responseBody = WebTestHelper.getHttpResponseBody(response);
 
-                WebTestHelper.logToServer(getLogTestString("successful", startTime));
-                WebTestHelper.logToServer(dump(responseBody, false));
+                WebTestHelper.logToServer(getLogTestString("successful", startTime) + ", " + dump(responseBody, false));
                 if (status == HttpStatus.SC_OK)
                 {
                     log(getLogTestString("successful", startTime));
@@ -250,8 +256,6 @@ public class JUnitTest extends TestSuite
             {
                 if (response != null)
                     EntityUtils.consume(response.getEntity());
-                if (client != null)
-                    client.getConnectionManager().shutdown();
             }
         }
 
