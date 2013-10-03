@@ -133,12 +133,11 @@ public class JUnitTest extends TestSuite
     {
         HttpClient client = WebTestHelper.getHttpClient();
         HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpGet method = null;
         HttpResponse response = null;
         try
         {
             String url = WebTestHelper.getBaseURL() + "/junit/testlist.view?";
-            method = new HttpGet(url);
+            HttpGet method = new HttpGet(url);
             response = client.execute(method, context);
             int status = response.getStatusLine().getStatusCode();
             if (status == HttpStatus.SC_OK)
@@ -207,11 +206,13 @@ public class JUnitTest extends TestSuite
         /** Timeout in seconds to wait for the whole testcase to finish on the server */
         private final int _timeout;
 
+        /** Stash and reuse so that we can keep using the same session instead of re-authenticating with every request */
         private static HttpClient client = WebTestHelper.getHttpClient();
         private static HttpContext context = WebTestHelper.getBasicHttpContext();
 
         static
         {
+            /** Configure to use cookies so that we remember our session ID */
             context.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
         }
 
@@ -236,7 +237,7 @@ public class JUnitTest extends TestSuite
                 int status = response.getStatusLine().getStatusCode();
                 String responseBody = WebTestHelper.getHttpResponseBody(response);
 
-                WebTestHelper.logToServer(getLogTestString("successful", startTime) + ", " + dump(responseBody, false));
+                WebTestHelper.logToServer(getLogTestString("successful", startTime) + ", " + dump(responseBody, false), client, context);
                 if (status == HttpStatus.SC_OK)
                 {
                     log(getLogTestString("successful", startTime));

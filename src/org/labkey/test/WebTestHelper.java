@@ -204,26 +204,36 @@ public class WebTestHelper
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
     public static void logToServer(String message) throws Exception
     {
+        DefaultHttpClient client = getHttpClient();
+        try
+        {
+            logToServer(message, client, WebTestHelper.getBasicHttpContext());
+        }
+        finally
+        {
+            if (client != null)
+                client.getConnectionManager().shutdown();
+        }
+    }
+
+    public static void logToServer(String message, HttpClient client, HttpContext context) throws Exception
+    {
         if (message.contains("\n"))
         {
             String [] splitMessage = message.split("\n");
             for (String thisMessage: splitMessage)
             {
                 if (thisMessage.length() > 0)
-                    logToServer(thisMessage);
+                    logToServer(thisMessage, client, context);
             }
             return;
         }
         String encodedUrl = getBaseURL() + "/admin/log.view?message=" + encodeURI(message);
-        HttpClient client = null;
-        HttpContext context = null;
         HttpResponse response = null;
         int responseCode;
         String responseStatusLine = "";
         try
         {
-            client = getHttpClient();
-            context = WebTestHelper.getBasicHttpContext();
             HttpGet get = new HttpGet(encodedUrl);
             response = client.execute(get, context);
             responseCode = response.getStatusLine().getStatusCode();
@@ -233,8 +243,6 @@ public class WebTestHelper
         {
             if (null != response)
                 EntityUtils.consume(response.getEntity());
-            if (client != null)
-                client.getConnectionManager().shutdown();
         }
         if (responseCode != HttpStatus.SC_OK)
             throw new Exception("Contacting server failed: " + responseStatusLine);
