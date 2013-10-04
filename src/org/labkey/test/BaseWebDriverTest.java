@@ -445,6 +445,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         public List<String> ignored()
         {
             return Arrays.asList(
+                    "[:0]", // Truncated JSON: "Ext.Error: You're trying to decode an invalid JSON String:"
                     "__webdriver_evaluate",
                     "setting a property that has only a getter",
                     "records[0].get is not a function",
