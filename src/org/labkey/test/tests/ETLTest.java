@@ -191,8 +191,8 @@ UNDONE: need to fix this case.  Looks like the transform does not reference a ba
     private void verifyLogFileLink(String status)
     {
         click(Locator.linkContainingText(status));
-        waitForText(".etl.log");
-        click(Locator.ext4ButtonContainingText("Close"));
+        waitForElement(Locator.tag("span").withClass("x4-window-header-text").containing(".etl.log"));
+        waitAndClick(Locator.ext4ButtonContainingText("Close"));
     }
 
     private void verifyTransformSummary(String[][] data)

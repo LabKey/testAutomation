@@ -351,7 +351,7 @@ public abstract class Locator
 
     public static XPathLocator ext4ButtonContainingText(String text)
     {
-        return xpath("//a//span[contains(@class, 'x4-btn-inner') and contains(text(), " + xq(text) + ")]/../../..");
+        return tag("a").withClass("x-btn").containing(text);
     }
 
     public static XPathLocator ext4Checkbox(String label)
