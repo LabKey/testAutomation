@@ -958,10 +958,13 @@ public class StudyTest extends StudyBaseTest
     {
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("Study Navigator"));
-        assertTextNotPresent("Screening Cycle", "Cycle 1");
-        assertTextPresent("Pre-exist Cond");
+        assertElementPresent(Locator.tag("td").withClass("labkey-column-header").withText("Pre-exist Cond"));
+        assertElementNotPresent(Locator.tag("td").withClass("labkey-column-header").withText("Screening Cycle"));
+        assertElementNotPresent(Locator.tag("td").withClass("labkey-column-header").withText("Cycle 1"));
         clickAndWait(Locator.linkWithText("Show All Datasets"));
-        assertTextPresent("Screening Cycle", "Cycle 1", "Pre-exist Cond");
+        assertElementPresent(Locator.tag("td").withClass("labkey-column-header").withText("Screening Cycle"));
+        assertElementPresent(Locator.tag("td").withClass("labkey-column-header").withText("Cycle 1"));
+        assertElementPresent(Locator.tag("td").withClass("labkey-column-header").withText("Pre-exist Cond"));
     }
 
     @LogMethod
