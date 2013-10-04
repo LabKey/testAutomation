@@ -48,8 +48,7 @@ public class WebDavTest extends BaseWebDriverTest
     @Override
     protected void doTestSteps() throws Exception
     {
-        if (!isLinkPresentWithText(getProjectName()))
-            _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.createProject(getProjectName(), null);
 
         // including context Path
         String baseURL = getBaseURL();
