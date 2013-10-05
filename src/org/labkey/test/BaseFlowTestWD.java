@@ -568,7 +568,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     {
         assertTitleEquals("Import Analysis: Confirm: " + containerPath);
 
-        assertTextPresent("Workspace:", workspacePath);
+        assertTextPresent(workspacePath);
 
         if (analysisEngine.equals("FlowJoWorkspace"))
             assertTextPresent("Analysis Engine: No analysis engine selected");
