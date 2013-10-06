@@ -34,9 +34,22 @@ public class PortalHelper extends AbstractHelper
         super(test);
     }
 
+    public void enableTabEditMode()
+    {
+        _test.click(Locator.linkWithTitle("Toggle Edit Mode"));
+        _test.waitForElement(Locator.xpath("//div[@class='button-bar tab-edit-mode-enabled']"));
+    }
+
+    public void disableTabEditMode()
+    {
+        _test.click(Locator.linkWithTitle("Toggle Edit Mode"));
+        _test.waitForElement(Locator.xpath("//div[@class='button-bar tab-edit-mode-disabled']"));
+    }
+
     @LogMethod(quiet = true)
     private void clickTabMenuItem(@LoggedParam String tabText, boolean wait, @LoggedParam String... items)
     {
+        _test.mouseOver(Locator.linkWithText(tabText));
         Locator tabMenuXPath = Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']/following-sibling::span//a");
         _test.waitForElement(tabMenuXPath);
         _test._extHelper.clickExtMenuButton(wait, tabMenuXPath, items);
@@ -70,10 +83,32 @@ public class PortalHelper extends AbstractHelper
     }
 
     @LogMethod(quiet = true)
-    public void removeTab(@LoggedParam String tabText)
+    public void hideTab(@LoggedParam String tabText)
     {
         clickTabMenuItem(tabText, true, "Hide");
-        _test.assertElementNotPresent(Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
+        disableTabEditMode();
+        _test.assertElementNotVisible(Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
+        enableTabEditMode();
+    }
+
+    @LogMethod(quiet = true)
+    public void showTab(@LoggedParam String tabText)
+    {
+        clickTabMenuItem(tabText, true, "Show");
+        disableTabEditMode();
+        _test.assertElementVisible(Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']"));
+        enableTabEditMode();
+    }
+
+    @LogMethod(quiet = true)
+    public void deleteTab(@LoggedParam String tabText)
+    {
+        Locator tabLocator = Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']");
+//        ((BaseWebDriverTest)_test).prepForPageLoad(); // using prepForPageLoad and newWaitForPageLoad does not work. I feel like it should.
+        clickTabMenuItem(tabText, true, "Delete");
+        _test.waitForElementToDisappear(tabLocator);
+//        ((BaseWebDriverTest)_test).newWaitForPageToLoad(BaseSeleniumWebTest.WAIT_FOR_PAGE);
+        _test.assertElementNotPresent(tabLocator);
     }
 
     @LogMethod(quiet = true)
@@ -85,14 +120,21 @@ public class PortalHelper extends AbstractHelper
     @LogMethod(quiet = true)
     public void addTab(@LoggedParam String tabName, @Nullable @LoggedParam String expectedError)
     {
-        _test.clickAndWait(Locator.linkWithText("+"));
+        _test.click(Locator.linkWithText("+"));
         _test.waitForText("Add Tab");
         _test.setFormElement(Locator.input("tabName"), tabName);
-        _test.clickButton("save");
+
         if (expectedError != null)
-            Assert.assertEquals("Did not find expected error", expectedError, _test.getText(Locator.id("errors")));
+        {
+            _test.clickButton("Ok", 0);
+            _test.waitForText(expectedError);
+            _test.clickButton("OK", 0);
+        }
         else
+        {
+            _test.clickButton("Ok");
             _test.waitForElement(Locator.folderTab(tabName));
+        }
     }
 
     @LogMethod(quiet = true)
@@ -104,15 +146,21 @@ public class PortalHelper extends AbstractHelper
     @LogMethod(quiet = true)
     public void renameTab(@LoggedParam String tabText, @LoggedParam String newName, @Nullable @LoggedParam String expectedError)
     {
-        clickTabMenuItem(tabText, true, "Rename");
-        _test.setFormElement(Locator.name("tabName"), newName);
-        _test.clickButton("save");
+        clickTabMenuItem(tabText, false, "Rename");
+        _test.waitForText("Rename Tab");
+        _test.setFormElement(Locator.input("tabName"),newName);
+        _test.clickButton("Ok", 0);
         if (expectedError != null)
-            Assert.assertEquals("Did not find expected error", expectedError, _test.getText(Locator.id("errors")));
+        {
+            _test.waitForText(expectedError);
+            _test.clickButton("OK", 0);
+            // Close the rename tab window.
+            _test.clickButton("Cancel", 0);
+        }
         else
         {
-            _test.waitForElement(Locator.folderTab(newName));
-            _test.assertElementNotPresent(Locator.folderTab(tabText));
+            _test.waitForElement(Locator.linkWithText(newName));
+            _test.assertElementNotPresent(Locator.linkWithText(tabText));
         }
     }
 

@@ -3336,6 +3336,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertFalse("Element was visible in page: " + loc, selenium.isVisible(loc.toString()));
     }
 
+    public void assertElementVisible(Locator loc)
+    {
+        Assert.assertTrue("Element was not visible in page: " + loc, selenium.isVisible(loc.toString()));
+    }
+
     /**
      * @deprecated Use {@link #isElementPresent(Locator)}
      */

@@ -62,7 +62,6 @@ public class StudyRedesignTest extends StudyBaseTest
         // wait for study and specimens to finish loading
         waitForSpecimenImport();
         setStudyRedesign();
-        //setupDatasetCategories();
 
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_ONE, "Mouse", PTIDS_ONE);
         _studyHelper.createCustomParticipantGroup(getProjectName(), getFolderName(), PARTICIPANT_GROUP_TWO, "Mouse", PTIDS_TWO);
@@ -72,42 +71,7 @@ public class StudyRedesignTest extends StudyBaseTest
     @Override @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
-        customizeTabsTest();
         participantListWebpartTest();
-    }
-
-    @LogMethod
-    private void customizeTabsTest()
-    {
-        PortalHelper portalHelper = new PortalHelper(this);
-        // Move tabs
-        portalHelper.moveTab("Overview", PortalHelper.Direction.LEFT); // Nothing should happen.
-        portalHelper.moveTab("Overview", PortalHelper.Direction.RIGHT);
-        Assert.assertTrue("Mice".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[1]//a[1]")))); // Verify Mice is in the first position.
-        Assert.assertTrue("Overview".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[2]//a[1]")))); // Verify Overview is in the second.
-        portalHelper.moveTab("Manage", PortalHelper.Direction.RIGHT); // Nothing should happen.
-        Assert.assertTrue("Manage".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[5]//a[1]")))); // Verify Manage did not swap with +
-
-        // Remove tab
-        portalHelper.removeTab("Specimens");
-
-        // Add tab
-        portalHelper.addTab("TEST TAB 1");
-        clickAndWait(Locator.linkWithText("TEST TAB 1"));
-        addWebPart("Wiki");
-
-        // Rename tabs
-        portalHelper.renameTab("TEST TAB 1", "Specimens", "You cannot change a tab's name to another tab's original name even if the original name is not visible.");
-        portalHelper.renameTab("Overview", "TEST TAB 1", "A tab with the same name already exists in this folder.");
-        portalHelper.renameTab("Overview", "test tab 1", "A tab with the same name already exists in this folder.");
-        portalHelper.renameTab("TEST TAB 1", "RENAMED TAB 1");
-        clickAndWait(Locator.linkWithText("RENAMED TAB 1"));
-        Assert.assertEquals("Wiki not present after tab rename", "Wiki", getText(Locator.css(".labkey-wp-title-text")));
-
-        // TODO: Test import/export of renamed tabs if applicable
-        // See Issue 16929: Folder tab order & names aren't retained through folder export/import
-
-        portalHelper.removeTab("RENAMED TAB 1");
     }
 
     protected void setupDatasetCategories()
@@ -128,7 +92,6 @@ public class StudyRedesignTest extends StudyBaseTest
             waitForElement(Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden());
             setFormElement(Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden(), category);
             waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//div").withText(category));
-
             clickButton("Done", 0);
             _extHelper.waitForExtDialogToDisappear("Manage Categories");
         }
