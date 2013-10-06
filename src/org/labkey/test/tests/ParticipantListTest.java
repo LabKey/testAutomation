@@ -21,7 +21,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 
 /**
@@ -30,7 +29,7 @@ import org.labkey.test.util.RReportHelper;
  * Time: 3:22 PM
  */
 @Category({BVT.class})
-public class StudyRedesignTest extends StudyBaseTest
+public class ParticipantListTest extends StudyBaseTest
 {
     protected static final String[] BITS = {"ABCD", "EFGH", "IJKL", "MNOP", "QRST", "UVWX"};
     protected static final String[] CATEGORIES = {BITS[0]+BITS[1]+TRICKY_CHARACTERS_NO_QUOTES, BITS[1]+BITS[2]+TRICKY_CHARACTERS_NO_QUOTES,
@@ -71,7 +70,7 @@ public class StudyRedesignTest extends StudyBaseTest
     @Override @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     protected void doVerifySteps()
     {
-        participantListWebpartTest();
+        doParticipantListWebPartTest();
     }
 
     protected void setupDatasetCategories()
@@ -106,7 +105,7 @@ public class StudyRedesignTest extends StudyBaseTest
         clickButton("Save");
     }
 
-    private void participantListWebpartTest()
+    private void doParticipantListWebPartTest()
     {
         log("Participant List Webpart Test");
         clickProject(getProjectName());

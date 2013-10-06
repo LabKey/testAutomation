@@ -31,7 +31,7 @@ import org.labkey.test.util.RReportHelper;
  * Date: Feb 29, 2012
  */
 @Category({DailyA.class})
-public class DataViewsTest extends StudyRedesignTest
+public class DataViewsTest extends ParticipantListTest
 {
     private static final String REPORT_NAME = "TestReport";
     private static final String RENAMED_WEBPART_TITLE = "TestDataViews";

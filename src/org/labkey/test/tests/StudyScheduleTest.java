@@ -21,8 +21,6 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.tests.StudyBaseTest;
-import org.labkey.test.tests.StudyRedesignTest;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
