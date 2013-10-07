@@ -164,7 +164,7 @@ UNDONE: need to fix the merge case
         assertInLog("java.lang.String cannot be cast to java.util.Date");
 
         //error logging test, bad run table name
-        runETL("badTableName");
+        runETL_CheckerError("badTableName");
         assertInLog("Table not found:");
 
         // be sure to check for all expected errors here so that the test won't fail on exit
