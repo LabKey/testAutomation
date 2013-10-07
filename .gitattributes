@@ -432,6 +432,7 @@ src/org/labkey/test/tests/TabTest.java -text
 src/org/labkey/test/tests/TargetStudyTest.java -text
 src/org/labkey/test/tests/TimeChartAPITest.java -text
 src/org/labkey/test/tests/TimeChartDateBasedTest.java -text
+src/org/labkey/test/tests/TimeChartImportTest.java -text
 src/org/labkey/test/tests/TimeChartTest.java -text
 src/org/labkey/test/tests/TimeChartVisitBasedTest.java -text
 src/org/labkey/test/tests/TimelineTest.java -text
