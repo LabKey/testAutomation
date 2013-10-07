@@ -114,7 +114,7 @@ public class ETLTest extends BaseWebDriverTest
         // rerun append and verify that no work is done
         runETL_NoWork("append");
 
-        // verify only two pipeline jobs existed sine the "no work" one should not
+        // verify only two pipeline jobs existed since the "no work" one should not
         // have fired off a pipeline job
         checkRun(2);
         // verify transform summary should only have the most recent entry since
@@ -163,19 +163,13 @@ UNDONE: need to fix the merge case
         runETL_CheckerError("badCast");
         assertInLog("java.lang.String cannot be cast to java.util.Date");
 
-/*
-UNDONE: need to fix this case.  Looks like the transform does not reference a bad table name
-
         //error logging test, bad run table name
         runETL("badTableName");
         assertInLog("Table not found:");
-*/
 
         // be sure to check for all expected errors here so that the test won't fail on exit
-        // undone: should we have just 2 errors instead of 3 or are we double-reporting (pipeline and sql)
         // 1) duplicate key error
         // 2) bad cast error
-
         // looks like postgres inserts an "ERROR" word in their error string for the duplicate key
         // but mssql doesn't, hack around that here
         checkExpectedErrors(WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL ? 3 : 2);
