@@ -126,7 +126,6 @@ public class KnitrReportTest extends ReportTest
     {
         final String reportSource = readReport(reportSourcePath);
         final String reportName = reportSourcePath.getFileName() + " Report";
-        Locator reportDiv = Locator.css("#viewDiv > div.labkey-knitr");
 
         clickProject(getProjectName());
         goToManageViews();
@@ -134,8 +133,11 @@ public class KnitrReportTest extends ReportTest
         clickAddReport("R View", false);
         checkRadioButton(Locator.radioButtonByNameAndValue("knitrFormat", format.toString()));
         setCodeEditorValue("script-report-editor", reportSource);
-        _extHelper.clickExtTab("Data");
-        waitForElement(Locator.id("dataDiv").withText("Failed to retrieve data grid.")); // Regression test: Issue #18602
+
+        // Regression test: Issue #18602
+        _extHelper.clickExtTab("View");
+        assertReportContents(reportContains, reportNotContains);
+
         _extHelper.clickExtTab("Source");
         Assert.assertEquals("Incorrect number of lines present in code editor.", reportSource.split("\n").length, getElementCount(Locator.css(".CodeMirror-gutter-text pre")));
         clickButton("Save", 0);
@@ -145,6 +147,12 @@ public class KnitrReportTest extends ReportTest
 
         openView(reportName);
 
+        assertReportContents(reportContains, reportNotContains);
+    }
+
+    private void assertReportContents(Locator[] reportContains, String[] reportNotContains)
+    {
+        Locator reportDiv = Locator.css("#viewDiv > div.labkey-knitr");
         waitForElement(reportDiv);
         String reportText = getText(reportDiv);
 
