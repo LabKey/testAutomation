@@ -610,8 +610,9 @@ public class ListTest extends BaseWebDriverTest
         String exportUrl = exportButtonScript.substring(exportButtonScript.indexOf("window.location=") + 17, exportButtonScript.indexOf("document.getElementById") - 11);
         clickAndWait(Locator.linkWithText("View Design"));
 
-        log("Test deleting data");
+        log("Test deleting data (should any list custom views)");
         clickDeleteList();
+        assertTextPresent("The following depend upon this list:", "Custom view '" + TEST_VIEW + "'");
         clickButton("OK");
 
         log("Test that deletion happened");
