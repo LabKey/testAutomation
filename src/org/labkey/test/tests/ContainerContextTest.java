@@ -354,11 +354,11 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Create custom query with custom metadata over vehicle.emissiontest table WITH container");
         String customQueryWithContainer =
                 "SELECT emissiontest.rowid,\n" +
-                    "emissiontest.name,\n" +
-                    "emissiontest.vehicleid,\n" +
-                    "emissiontest.result,\n" +
-                    "emissiontest.parenttest,\n" +
-                    "emissiontest.container\n" +
+                    "emissiontest.Name,\n" +
+                    "emissiontest.VehicleId,\n" +
+                    "emissiontest.Result,\n" +
+                    "emissiontest.ParentTest,\n" +
+                    "emissiontest.Container\n" +
                 "FROM emissiontest";
 
         createQuery(getProjectName(), "EmissionTests With Container", "vehicle", customQueryWithContainer, customMetadata, false);
@@ -367,12 +367,12 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Create custom query with custom metadata over vehicle.emissiontest table WITH container AS folder");
         String customQueryFolderContainer =
-                "SELECT emissiontest.rowid,\n" +
-                    "emissiontest.name,\n" +
-                    "emissiontest.vehicleid,\n" +
-                    "emissiontest.result,\n" +
-                    "emissiontest.parenttest,\n" +
-                    "emissiontest.container AS folder\n" +
+                "SELECT emissiontest.Rowid,\n" +
+                    "emissiontest.Name,\n" +
+                    "emissiontest.VehicleId,\n" +
+                    "emissiontest.Result,\n" +
+                    "emissiontest.ParentTest,\n" +
+                    "emissiontest.Container AS Folder\n" +
                 "FROM emissiontest";
 
         createQuery(getProjectName(), "EmissionTests With Folder", "vehicle", customQueryFolderContainer, customMetadata, false);
@@ -399,12 +399,12 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Create custom query with custom metadata over vehicle.emissiontest table WITHOUT container.");
         log("** The container column should be added as a suggested column.");
         String customQueryWithoutContainer =
-                "SELECT emissiontest.rowid,\n" +
-                    "emissiontest.name,\n" +
-                    "emissiontest.vehicleid,\n" +
-                    "emissiontest.result,\n" +
-                    "emissiontest.parenttest,\n" +
-                    "--emissiontest.container\n" +
+                "SELECT emissiontest.Rowid,\n" +
+                    "emissiontest.Name,\n" +
+                    "emissiontest.VehicleId,\n" +
+                    "emissiontest.Result,\n" +
+                    "emissiontest.ParentTest,\n" +
+                    "--emissiontest.Container\n" +
                 "FROM emissiontest";
 
         createQuery(getProjectName(), "EmissionTests Without Container", "vehicle", customQueryWithoutContainer, customMetadata, false);
