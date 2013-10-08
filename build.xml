@@ -1393,6 +1393,7 @@
         <antcall target="install-flowWorkspace" />
         <antcall target="install-flowStats" />
         <antcall target="install-knitr" />
+        <antcall target="install-ehr-dependencies" />
         <touch file="${basedir}/rPackageDeployment.timestamp" />
     </target>
 
@@ -1529,6 +1530,13 @@
     <target name="install-knitr" if="R.present" depends="check-rlabkey-installed">
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="true" searchpath="true"
               input="${project.root}/tools/Rpackages/install-knitr.R">
+            <arg line="--vanilla --quiet"/>
+        </exec>
+    </target>
+
+    <target name="install-ehr-dependencies" if="R.present" depends="check-rlabkey-installed">
+        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="true" searchpath="true"
+              input="${project.root}/tools/Rpackages/install-ehr-dependencies.R">
             <arg line="--vanilla --quiet"/>
         </exec>
     </target>
