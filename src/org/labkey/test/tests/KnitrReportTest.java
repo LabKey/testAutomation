@@ -68,12 +68,7 @@ public class KnitrReportTest extends ReportTest
     private void setupProject()
     {
         RReportHelperWD rReportHelper = new RReportHelperWD(this);
-        String rVersion = rReportHelper.ensureRConfig();
-
-//        if (!rVersion.startsWith("3"))
-//        {
-//            Assert.fail("Knitr reports require R v3. Found: " + rVersion);
-//        }
+        rReportHelper.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), "Collaboration");
         enableModule(getProjectName(), "scriptpad");
@@ -139,6 +134,10 @@ public class KnitrReportTest extends ReportTest
         clickAddReport("R View", false);
         checkRadioButton(Locator.radioButtonByNameAndValue("knitrFormat", format.toString()));
         setCodeEditorValue("script-report-editor", reportSource);
+        _extHelper.clickExtTab("Data");
+        waitForElement(Locator.id("dataDiv").withText("Failed to retrieve data grid.")); // Regression test: Issue #18602
+        _extHelper.clickExtTab("Source");
+        Assert.assertEquals("Incorrect number of lines present in code editor.", reportSource.split("\n").length, getElementCount(Locator.css(".CodeMirror-gutter-text pre")));
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Save View");
         _extHelper.setExtFormElement(reportName);
