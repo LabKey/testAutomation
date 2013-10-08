@@ -251,7 +251,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickFolder(getFolderName());
 
         // verify the reports and views dataset label/name references after study import
-        verifyExpectedReportsAndViewsExist();
+        //verifyExpectedReportsAndViewsExist();
         verifyCustomViewWithDatasetJoins("CPS-1: Screening Chemistry Panel", CUSTOM_VIEW_WITH_DATASET_JOINS, true, true, "DataSets/DEM-1/DEMbdt", "DataSets/DEM-1/DEMsex");
         verifyTimeChart("APX-1", "APX-1: Abbreviated Physical Exam");
         verifyScatterPlot("APX-1: Abbreviated Physical Exam");
@@ -268,7 +268,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         renameDataset("CPS-1", "scrchem", "CPS-1: Screening Chemistry Panel", "Screening Chemistry Panel");
 
         // verify the reports and views dataset label/name references after dataset rename and relabel
-        verifyExpectedReportsAndViewsExist();
+        //verifyExpectedReportsAndViewsExist();
         verifyCustomViewWithDatasetJoins("Screening Chemistry Panel", CUSTOM_VIEW_WITH_DATASET_JOINS, true, true, "DataSets/eligcrit/ECIelig", "DataSets/demo/DEMbdt", "DataSets/demo/DEMsex");
         verifyCustomViewWithDatasetJoins("Screening Chemistry Panel", CUSTOM_VIEW_PRIVATE, false, false, "DataSets/eligcrit/ECIelig", "DataSets/demo/DEMbdt", "DataSets/demo/DEMsex");
         verifyTimeChart("abbrphy", "Abbreviated Physical Exam");
@@ -276,6 +276,10 @@ public class StudyDatasetsTest extends StudyBaseTest
         verifyParticipantReport("demo: 1.Date of Birth", "demo: 2.What is your sex?", "abbrphy: 1. Weight", "abbrphy: 2. Body Temp", "eligcrit: 1.Meet eligible criteria?");
     }
 
+    /**
+     * In 13.3 we merged dataViews and manageViews. The implicit categories prevelant in manageViews was discarded in favor of the
+     * explicit category management created for dataViews. Don't use this obsolete method for the near future.
+     */
     private void verifyExpectedReportsAndViewsExist()
     {
         if (EXPECTED_REPORTS.size() == 0)
@@ -326,8 +330,7 @@ public class StudyDatasetsTest extends StudyBaseTest
     {
         log("Verify dataset label to name fixup for custom view import");
         goToManageViews();
-        expandManageViewsRow(viewName, datasetLabel);
-        clickAndWait(Locator.linkWithText("view"));
+        clickAndWait(getViewLocator(viewName));
         waitForElement(Locator.tagWithText("span", viewName));
 
         if (checkSort)
@@ -352,8 +355,8 @@ public class StudyDatasetsTest extends StudyBaseTest
     {
         log("Verfiy dataset label to name fixup for Time Chart");
         goToManageViews();
-        expandManageViewsRow(TIME_CHART_REPORT_NAME, datasetLabel);
-        clickAndWait(Locator.linkWithText("edit"));
+        clickViewDetailsLink(TIME_CHART_REPORT_NAME);
+        clickAndWait(Locator.linkContainingText("Edit Report"));
         waitForText("APX Main Title");
         assertTextNotPresent("Error: Could not find query"); // error message from 13.1 when dataset label was changed
         waitAndClick(Locator.css("svg a>path")); // click first data point
@@ -371,8 +374,8 @@ public class StudyDatasetsTest extends StudyBaseTest
     {
         log("Verify dataset label to name fixup for Scatter Plot");
         goToManageViews();
-        expandManageViewsRow(SCATTER_PLOT_REPORT_NAME, datasetLabel);
-        clickAndWait(Locator.linkWithText("edit"));
+        clickViewDetailsLink(SCATTER_PLOT_REPORT_NAME);
+        clickAndWait(Locator.linkContainingText("Edit Report"));
         _ext4Helper.waitForMaskToDisappear();
         assertTextNotPresent("An unexpected error occurred while retrieving data", "doesn't exist", "may have been deleted");
         // verify that the main title reset goes back to the dataset label - measue name
@@ -388,8 +391,7 @@ public class StudyDatasetsTest extends StudyBaseTest
     {
         log("Verify dataset label to name fixup for Participant Report");
         goToManageViews();
-        expandManageViewsRow(PTID_REPORT_NAME, "Stand-alone views");
-        clickAndWait(Locator.linkWithText("view"));
+        clickAndWait(getViewLocator(PTID_REPORT_NAME));
         waitForText("999320016");
         assertTextPresent("Showing 10 Results");
         for (String measureKey : measureKeys)
@@ -409,4 +411,17 @@ public class StudyDatasetsTest extends StudyBaseTest
         click(Locator.tagWithText("div", name));
     }
 
+    private Locator getViewLocator(String viewName)
+    {
+        waitForElement(Locator.linkContainingText(viewName), WAIT_FOR_JAVASCRIPT);
+        return Locator.linkContainingText(viewName);
+    }
+
+    protected void clickViewDetailsLink(String reportName)
+    {
+        Locator link = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName).append("//a[contains(@data-qtip, 'Click to navigate to the Detail View')]");
+
+        waitForElement(link);
+        clickAndWait(link);
+    }
 }
