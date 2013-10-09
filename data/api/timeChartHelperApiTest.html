@@ -107,7 +107,7 @@
         var scales = TCH.generateScales(chartConfig, tickMap, responseData.numberFormats);
 
         messages = [];
-        validation = TCH.validateChartData(responseData, seriesList, DEFAULT_DATA_LIMIT, false);
+        validation = TCH.validateChartData(responseData, chartConfig, seriesList, DEFAULT_DATA_LIMIT, false);
         if (validation.message != null)
         {
             messages.push(validation.message);
