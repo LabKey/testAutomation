@@ -133,7 +133,7 @@ public class SurveyTest extends BaseWebDriverTest
 
         clickButton("Generate Survey Questions", 0);
         sleep(1000); // give it a second to generate the metadata
-        String metadataValue = getFormElement(Locator.name("metadata"));
+        String metadataValue = _extHelper.getCodeMirrorValue("metadata");
         Assert.assertNotNull("No generate survey question metadata available", metadataValue);
         if (metadataFilePath != null)
         {
@@ -142,10 +142,7 @@ public class SurveyTest extends BaseWebDriverTest
 
             Assert.assertTrue(metadataFile.exists());
             String json = getFileContents(metadataFile);
-            // hack: since we are not able to update the CodeMirror input field via selenium, we reshow the
-            // textarea and enter the value there, the SurveyDesignPanel will then use that value instead of the CodeMirror value
-            executeScript("document.getElementsByName('metadata')[0].style.display = 'block';");
-            setFormElement(Locator.name("metadata"), json);
+            _extHelper.setCodeMirrorValue("metadata", json);
         }
 
         clickButton("Save Survey");
@@ -278,10 +275,7 @@ public class SurveyTest extends BaseWebDriverTest
         clickFolder(folderName);
         clickEditForLabel(subfolderSurveyDesign);
         String json = getFileContents(pipelineLoc + "/CustomSurveyMetadata.json");
-        // hack: since we are not able to update the CodeMirror input field via selenium, we reshow the
-        // textarea and enter the value there, the SurveyDesignPanel will then use that value instead of the CodeMirror value
-        executeScript("document.getElementsByName('metadata')[0].style.display = 'block';");
-        setFormElement(Locator.name("metadata"), json);
+        _extHelper.setCodeMirrorValue("metadata", json);
         clickButton("Save Survey");
 
         // add the subfolder survey design webpart
