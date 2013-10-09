@@ -70,6 +70,20 @@ public class ChartingAPITest extends ClientAPITest
     protected static final String BOX_ONE_TEXT = "Created with Rapha\u00ebl 2.1.0\nBox Plot One\nMales\nFemales\nGender\nLymphs (cells/mm3)\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200";
     protected static final String BOX_TWO_TEXT = "Created with Rapha\u00ebl 2.1.0\nBox Plot Two (Custom)\nMales\nFemales\nGender\nCD4\n200\n400\n600\n800\n1000\n1200\n1400\n1600\nFemales";
 
+    protected static final String TIME_CHART_1 = "Luminex: 249318596";
+    protected static final String TIME_CHART_1_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\nLuminex: 249318596\n10\n15\n20\n25\n30\n35\nWeeks Since Demographic Start Date\nFluorescence Intensity\n70\n700\nObserved Concentration\n50\n100\n150\n200\n250\n300\n350\n249318596 ObsConcTNF-alpha\n249318596 ObsConcIL-2\n249318596 ObsConcIL-10\n249318596 Fi TNF-alpha\n249318596 Fi IL-2\n249318596 Fi IL-10";
+    protected static final String TIME_CHART_1_TEXT_2 = "Created with Rapha\u00ebl 2.1.0\nLuminex: 249320107\n0\n5\n10\n15\n20\n25\n30\nWeeks Since Demographic Start Date\nFluorescence Intensity\n70\n700\n7000\nObserved Concentration\n50\n100\n150\n200\n250\n300\n350\n249320107 ObsConcTNF-alpha\n249320107 ObsConcIL-2\n249320107 ObsConcIL-10\n249320107 Fi TNF-alpha\n249320107 Fi IL-2\n249320107 Fi IL-10";
+    protected static final String TIME_CHART_1_TEXT_3 = "Created with Rapha\u00ebl 2.1.0\nLuminex: 249320127\n0\n5\n10\n15\n20\n25\n30\nWeeks Since Demographic Start Date\nFluorescence Intensity\n80\n90\n100\n200\n300\nObserved Concentration\n50\n100\n150\n200\n250\n300\n350\n249320127 ObsConcTNF-alpha\n249320127 ObsConcIL-2\n249320127 ObsConcIL-10\n249320127 Fi TNF-alpha\n249320127 Fi IL-2\n249320127 Fi IL-10";
+    protected static final String TIME_CHART_2 = "Luminex Two";
+    protected static final String TIME_CHART_2_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\nLuminex Two\n1\n2\n3\n4\n5\nVisits\nFI\n0.2\n0.4\n0.6\n0.8\n1.0\n1.2\n1.4\n1.6\n1.8\n2.0\n249318596\n249320127";
+    protected static final String TIME_CHART_3 = "Male";
+    protected static final String TIME_CHART_3_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\nMale\n1\n2\n3\n4\n5\nVisit\nObs Conc\n0\n5\n10\n15\n20\n25\n30\n35\n40\n45\n50\nMale";
+    protected static final String TIME_CHART_3_TEXT_2 = "Created with Rapha\u00ebl 2.1.0\nFemale\n1\n2\n3\n4\n5\nVisit\nObs Conc\n0\n50\n100\n150\n200\n250\n300\nFemale";
+    protected static final String TIME_CHART_4 = "Luminex Four";
+    protected static final String TIME_CHART_4_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\nLuminex Four\nDays Since Start Date\nFi\n200\n400\n600\n800\n1000\n1200\n1400";
+    protected static final String TIME_CHART_5 = "Luminex Five";
+    protected static final String TIME_CHART_5_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\nLuminex Five\n0\n50\n100\n150\n200\nDays Since Start Date\nFi\n1000\n2000\n3000\n4000\n5000\n6000\n7000\n249318596 TNF-alpha\n249320107 TNF-alpha\n249320127 TNF-alpha\n249318596 IL-2\n249320107 IL-2\n249320127 IL-2\n249318596 IL-10\n249320107 IL-10\n249320127 IL-10";
+
     @Override
     public BrowserType bestBrowser()
     {
@@ -103,6 +117,7 @@ public class ChartingAPITest extends ClientAPITest
         chartTest();
         chartAPITest();
         genericChartHelperTest();
+        timeChartHelperTest();
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -130,13 +145,13 @@ public class ChartingAPITest extends ClientAPITest
         createAPITestWiki("chartTestWiki2", chartTestFile, true);
 
         //Some things we know about test 0. After this we loop through some others and just test to see if they convert
-        waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
+        waitForText("Current Config");
 
         String testCountStr = getFormElement(Locator.id("configCount"));
         int testCount = Integer.parseInt(testCountStr);
         for (int currentTest = 0; currentTest < testCount; currentTest++)
         {
-            waitForText(CHARTING_API_TITLES[currentTest], WAIT_FOR_JAVASCRIPT);
+            waitForText(CHARTING_API_TITLES[currentTest]);
             checkSVGConversion();
             click(Locator.ext4Button("Next"));
         }
@@ -180,43 +195,92 @@ public class ChartingAPITest extends ClientAPITest
     private void genericChartHelperTest()
     {
         File chartTestFile = new File(getApiFileRoot(), "genericChartHelperApiTest.html");
-        createAPITestWiki("exportChartTestWiki", chartTestFile, false);
+        createAPITestWiki("exportGenericChartTestWiki", chartTestFile, false);
 
-        waitForText(SCATTER_ONE, WAIT_FOR_JAVASCRIPT);
+        waitForText(SCATTER_ONE);
         checkExportedChart(SCATTER_ONE, SCATTER_ONE_TEXT);
 
         click(Locator.input("next-btn"));
-        waitForText(SCATTER_TWO, WAIT_FOR_JAVASCRIPT);
+        waitForText(SCATTER_TWO);
         checkExportedChart(SCATTER_TWO, SCATTER_TWO_TEXT);
 
         click(Locator.input("next-btn"));
-        waitForText(BOX_ONE, WAIT_FOR_JAVASCRIPT);
+        waitForText(BOX_ONE);
         checkExportedChart(BOX_ONE, BOX_ONE_TEXT);
 
         click(Locator.input("next-btn"));
-        waitForText(BOX_TWO, WAIT_FOR_JAVASCRIPT);
+        waitForText(BOX_TWO);
         checkExportedChart(BOX_TWO, BOX_TWO_TEXT, true);
 
         click(Locator.input("next-btn"));
-        waitForText("The measure Cohort was not found. It may have been renamed or removed.", WAIT_FOR_JAVASCRIPT);
-        checkExportedChart(BOX_THREE, null, true, false);
+        waitForText("The measure Cohort was not found. It may have been renamed or removed.");
+        checkExportedChart(BOX_THREE, null, true, 0);
+    }
+
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    private void timeChartHelperTest()
+    {
+        File chartTestFile = new File(getApiFileRoot(), "timeChartHelperApiTest.html");
+        createAPITestWiki("exportTimeChartTestWiki", chartTestFile, false);
+
+        waitForText(TIME_CHART_1);
+        checkExportedChart(TIME_CHART_1, TIME_CHART_1_TEXT_1, false, 3, 0);
+        checkExportedChart(TIME_CHART_1, TIME_CHART_1_TEXT_2, false, 3, 1);
+        checkExportedChart(TIME_CHART_1, TIME_CHART_1_TEXT_3, false, 3, 2);
+
+        click(Locator.input("next-btn"));
+        waitForText(TIME_CHART_2);
+        checkExportedChart(TIME_CHART_2, TIME_CHART_2_TEXT_1);
+
+        click(Locator.input("next-btn"));
+        waitForText(TIME_CHART_3);
+        checkExportedChart(TIME_CHART_3, TIME_CHART_3_TEXT_1, false, 2, 0);
+        checkExportedChart(TIME_CHART_3, TIME_CHART_3_TEXT_2, false, 2, 1);
+
+        click(Locator.input("next-btn"));
+        waitForText(TIME_CHART_4);
+        checkExportedChart(TIME_CHART_4, TIME_CHART_4_TEXT_1, true);
+        assertTextPresent("No calculated interval values (i.e. Days, Months, etc.) for the selected 'Measure Date' and 'Interval Start Date'.");
+
+        click(Locator.input("next-btn"));
+        waitForText(TIME_CHART_5);
+        checkExportedChart(TIME_CHART_5, TIME_CHART_5_TEXT_1, true);
+        assertTextPresent("The data limit for plotting has been reached. Consider filtering your data.");
+        assertTextPresent("No data found for the following measures/dimensions: IL-6");
+
+        click(Locator.input("next-btn"));
+        waitForText("No measure selected. Please select at lease one measure.");
+        click(Locator.input("next-btn"));
+        waitForText("Could not find x-axis in chart measure information.");
+        click(Locator.input("next-btn"));
+        waitForText("No participant selected. Please select at least one participant.");
+        click(Locator.input("next-btn"));
+        waitForText("No group selected. Please select at least one group.");
+        click(Locator.input("next-btn"));
+        waitForText("No series or dimension selected. Please select at least one series/dimension value.");
+        click(Locator.input("next-btn"));
+        waitForText("Please select either \"Show Individual Lines\" or \"Show Mean\".");
     }
 
 
     private void checkExportedChart(String title, String svgText)
     {
-        checkExportedChart(title, svgText, false, true);
+        checkExportedChart(title, svgText, false, 1);
     }
 
     private void checkExportedChart(String title, String svgText, boolean hasError)
     {
-        checkExportedChart(title, svgText, hasError, true);
+        checkExportedChart(title, svgText, hasError, 1);
+    }
+
+    private void checkExportedChart(String title, @Nullable String svgText, boolean hasError, int svgCount)
+    {
+        checkExportedChart(title, svgText, hasError, svgCount, 0);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void checkExportedChart(String title, @Nullable String svgText, boolean hasError, boolean hasSVG)
+    private void checkExportedChart(String title, @Nullable String svgText, boolean hasError, int svgCount, int svgIndex)
     {
-
         if (hasError)
         {
             Assert.assertTrue("Expected one error", getElementCount(Locator.css(".labkey-error")) == 1);
@@ -226,10 +290,10 @@ public class ChartingAPITest extends ClientAPITest
             Assert.assertTrue("Expected zero errors.", getElementCount(Locator.css(".labkey-error")) == 0);
         }
 
-        if (hasSVG)
+        if (svgCount > 0)
         {
             assertTextPresent(title);
-            Assert.assertTrue("Expected 1 SVG element.", getElementCount(Locator.css("svg")) == 1);
+            Assert.assertTrue("Expected " + svgCount + " SVG element(s).", getElementCount(Locator.css("svg")) == svgCount);
         }
         else
         {
@@ -238,7 +302,7 @@ public class ChartingAPITest extends ClientAPITest
 
         if (svgText != null)
         {
-            assertSVG(svgText);
+            assertSVG(svgText, svgIndex);
         }
     }
 }
