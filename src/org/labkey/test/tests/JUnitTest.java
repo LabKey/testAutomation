@@ -127,10 +127,10 @@ public class JUnitTest extends TestSuite
 
     public static TestSuite suite() throws Exception
     {
-        return suite(false);
+        return suite(0, false);
     }
 
-    public static TestSuite suite(boolean secondAttempt) throws Exception
+    public static TestSuite suite(int attempt, boolean performedUpgrade) throws Exception
     {
         HttpClient client = WebTestHelper.getHttpClient();
         HttpContext context = WebTestHelper.getBasicHttpContext();
@@ -150,18 +150,29 @@ public class JUnitTest extends TestSuite
                     throw new AssertionFailedError("Failed to fetch remote junit test list: empty response");
 
                 Object json = JSONValue.parse(responseBody);
-                if (json == null &&
-                        responseBody.contains("<title>Upgrade Status</title>") ||
+                if (json == null)
+                {
+                    if (responseBody.contains("<title>Startup Modules</title>"))
+                    {
+                        // Server still starting up.  We don't need to use the upgradeHelper to sign in.
+                        log("Remote JUnitTest: Server modules starting up (attempt " + attempt + ") ...");
+                        Thread.sleep(1000);
+                        return suite(attempt+1, false);
+                    }
+                    else if (responseBody.contains("<title>Upgrade Status</title>") ||
+                        responseBody.contains("<title>Install Modules</title>") ||
                         responseBody.contains("<title>Upgrade Modules</title>") ||
                         responseBody.contains("<title>Account Setup</title>") ||
                         responseBody.contains("This server is being upgraded to a new version of LabKey Server."))
-                {
-                    if (secondAttempt)
-                        throw new AssertionFailedError("Failed to update or bootstrap on second attempt: " + responseBody);
+                    {
+                        log("Remote JUnitTest: Server needs install or upgrade ...");
+                        if (performedUpgrade)
+                            throw new AssertionFailedError("Failed to update or bootstrap on second attempt: " + responseBody);
 
-                    // perform upgrade then try to fetch the list again
-                    upgradeHelper();
-                    return suite(true);
+                        // perform upgrade then try to fetch the list again
+                        upgradeHelper();
+                        return suite(attempt+1, true);
+                    }
                 }
 
                 if (json == null || !(json instanceof Map))
@@ -183,6 +194,7 @@ public class JUnitTest extends TestSuite
                     remotesuite.addTest(testsuite);
                 }
 
+                log("Remote JUnitTest: found " + remotesuite.countTestCases() + " tests.");
                 return remotesuite;
             }
             else
