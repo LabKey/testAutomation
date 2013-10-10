@@ -37,6 +37,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.DRT;
+import org.labkey.test.categories.External;
 import org.labkey.test.categories.UnitTests;
 
 import java.io.IOException;
@@ -51,7 +52,7 @@ import java.util.Map;
  * Date: Nov 30, 2005
  * Time: 10:53:59 PM
  */
-@Category({DRT.class, BVT.class, UnitTests.class})
+@Category({DRT.class, BVT.class, UnitTests.class, External.class})
 public class JUnitTest extends TestSuite
 {
     private static final DecimalFormat commaf0 = new DecimalFormat("#,##0");
