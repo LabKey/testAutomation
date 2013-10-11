@@ -104,7 +104,7 @@ public class ParticipantReportTest extends ReportTest
         // Check that groups have correct number of members
         clickAndWait(Locator.linkWithText("Mice"));
         waitForText("Cohorts"); // Wait for participant list to appear.
-        sleep(500); // Sleep because the list takes a while to populate.
+        waitForText("Found 25 enrolled mice of 138.");
 
         // no longer an all check box
         _ext4Helper.deselectAllParticipantFilter();
