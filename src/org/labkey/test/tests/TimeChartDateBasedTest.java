@@ -693,6 +693,13 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickButton("Select", 0);
         waitForText("Days Since Start Date", WAIT_FOR_JAVASCRIPT);
 
+        enterMeasuresPanel();
+        waitForText("This chart data is filtered");
+        assertTextPresent("(ParticipantId =");
+        click(getButtonLocator("Cancel"));
+        clickButton("View Data", 0);
+        waitForElement(Locator.paginationText(10));
+
         openSaveMenu();
         setFormElement(Locator.name("reportName"), "Filtered Time Chart");
         setFormElement(Locator.name("reportDescription"), REPORT_DESCRIPTION);
