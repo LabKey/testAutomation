@@ -50,6 +50,7 @@ public class WikiTest extends BaseWebDriverTest
     {
         setContainerHelper(new UIContainerHelper(this));
     }
+
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/wiki";
@@ -159,7 +160,7 @@ public class WikiTest extends BaseWebDriverTest
 
         log("** test inline wiki webpart editor");
         goToProjectHome();
-        click(Locator.tagWithAttribute("img", "title", "Edit"));
+        click(Locator.tagWithAttribute("img", "title", "Edit Inline"));
         waitForElement(inlineEditor);
         String editorId = getAttribute(inlineEditor.child("textarea"), "id");
 
@@ -172,7 +173,7 @@ public class WikiTest extends BaseWebDriverTest
         assertNavButtonNotPresent("Save");
 
         log("** test second edit on inline wiki webpart editor");
-        click(Locator.tagWithAttribute("img", "title", "Edit"));
+        click(Locator.tagWithAttribute("img", "title", "Edit Inline"));
         waitForElement(inlineEditor);
         addedContent = "Second inline edited content: " + WIKI_CHECK_CONTENT;
         setInlineEditorContent(editorId, addedContent);
@@ -181,7 +182,7 @@ public class WikiTest extends BaseWebDriverTest
         assertTextPresent(addedContent);
 
         log("** test cancel on inline wiki webpart editor");
-        click(Locator.tagWithAttribute("img", "title", "Edit"));
+        click(Locator.tagWithAttribute("img", "title", "Edit Inline"));
         waitForElement(inlineEditor);
         setInlineEditorContent(editorId, addedContent);
         clickButton("Cancel", 0);
