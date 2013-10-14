@@ -457,7 +457,7 @@ public class Ext4HelperWD extends AbstractHelperWD
 
     public static Locator.XPathLocator ext4Window(String title)
     {
-        return Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x4-window-header')]//span[text() = '" + title + "']");
+        return Locators.window(title);
     }
 
     public static Locator.XPathLocator ext4WindowButton(String windowTitle, String buttonText)

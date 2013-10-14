@@ -65,8 +65,13 @@ public class DataViewsTest extends ParticipantListTest
         clickAndWait(Locator.linkWithText("Manage Views"));
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R View");
         clickButton("Save", "Please enter a view name:");
-        setFormElement(Locator.xpath("//div[./span[.='Please enter a view name:']]/div/input"), REPORT_NAME);
-        _extHelper.clickExtButton("Save");
+
+        Locator locator = _ext4Helper.ext4Window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+        if (isElementPresent(locator))
+        {
+            setFormElement(locator, REPORT_NAME);
+            _ext4Helper.clickWindowButton("Save View", "OK", WAIT_FOR_JAVASCRIPT, 0);
+        }
     }
 
     @Override

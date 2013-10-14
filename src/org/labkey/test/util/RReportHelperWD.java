@@ -62,17 +62,15 @@ public class RReportHelperWD extends AbstractHelperWD
         _test.log("execute script");
 
         // running a saved script
-        if (!_test.isLinkPresentWithText("Download input data") && _test.isLinkPresentWithText("Source"))
-        {
-            _test._extHelper.clickExtTab("Source");
-        }
+        _test._ext4Helper.clickTabContainingText("Source");
 
         _test.setCodeEditorValue("script-report-editor", script);
-        _test._extHelper.clickExtTab("View");
-        _test._extHelper.waitForLoadingMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 5);
+        _test._ext4Helper.clickTabContainingText("View");
+        _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 5);
         _test.waitForElement(Locator.xpath("//table[@class='labkey-output']"), _test.getDefaultWaitForPage());
 
-        Locator l = Locator.xpath("//div[@id='viewDiv']//pre");
+        Locator l = Locator.xpath("//div[@class='reportView']//pre");
+        _test.waitForElement(l);
         String html = _test.getText(l);
 
         if (failOnError)

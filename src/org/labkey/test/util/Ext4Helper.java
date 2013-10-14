@@ -436,6 +436,6 @@ public class Ext4Helper extends AbstractHelper
 
     public static Locator.XPathLocator ext4Window(String title)
     {
-        return Locator.xpath("//div[contains(@class, 'x4-window-header')]//span[text() = '" + title + "']");
+        return Locator.xpath("//div").withClass("x4-window").notHidden().withDescendant(Locator.xpath("//span").withClass("x4-window-header-text").withText(title));
     }
 }
