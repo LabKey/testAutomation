@@ -896,7 +896,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 break;
             }
         }
-        Assert.assertNotNull("Link for found", link);
+        Assert.assertNotNull("Link for '" + user + "' not found", link);
 
         String emailSubject = link.getText();
         link.click();
