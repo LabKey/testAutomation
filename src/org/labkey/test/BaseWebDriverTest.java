@@ -40,9 +40,14 @@ import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
@@ -111,6 +116,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
@@ -136,8 +142,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * private in order to block access of object in BSWT and force full migration
      */
     @Deprecated private WebDriverBackedSelenium selenium;
+    public static BaseWebDriverTest currentTest;
 
-    private WebDriver _driver;
+    private static WebDriver _driver;
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
     private String _lastPageText = null;
@@ -145,17 +152,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private String _savedLocation = null;
     private Stack<String> _impersonationStack = new Stack<>();
     private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
-    protected boolean _testFailed = true;
+    protected static boolean _testFailed = false;
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 30000;
     public int defaultWaitForPage = WAIT_FOR_PAGE;
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public int longWaitForPage = defaultWaitForPage * 5;
-    protected long _startTime;
+    protected static long _startTime;
     private ArrayList<JavaScriptError> _jsErrors;
-    private WebDriverWait _shortWait;
-    private WebDriverWait _longWait;
-    private JSErrorChecker _jsErrorChecker = null;
+    private static WebDriverWait _shortWait;
+    private static WebDriverWait _longWait;
+    private static JSErrorChecker _jsErrorChecker = null;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public ExtHelperWD _extHelper = new ExtHelperWD(this);
@@ -166,7 +173,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelperWD _securityHelper = new SecurityHelperWD(this);
-    private final File _downloadDir;
+    private static File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
@@ -269,118 +276,169 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return WebTestHelper.getContextPath();
     }
 
-
     protected abstract @Nullable String getProjectName();
 
-    @Before
     public void setUp() throws Exception
     {
+        Boolean reusingDriver = false;
+
         switch (BROWSER_TYPE)
         {
             case IE: //experimental
             {
-                _driver = new InternetExplorerDriver();
+                if(_driver != null && !(_driver instanceof InternetExplorerDriver))
+                {
+                    _driver.quit();
+                    _driver = null;
+                }
+                if(_driver == null)
+                {
+                    _driver = new InternetExplorerDriver();
+                }
+                else
+                {
+                    reusingDriver = true;
+                }
                 break;
             }
             case HTML: //experimental
             {
-                _driver = new HtmlUnitDriver(true);
+                if(_driver != null && !(_driver instanceof HtmlUnitDriver))
+                {
+                    _driver.quit();
+                    _driver = null;
+                }
+                if(_driver == null)
+                {
+                    _driver = new HtmlUnitDriver(true);
+                }
+                else
+                {
+                    reusingDriver = true;
+                }
                 break;
             }
             case CHROME: //experimental
             {
-                Map<String, String> prefs = new Hashtable<>();
-                prefs.put("download.prompt_for_download", "false");
-                prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
-
-                ChromeOptions options = new ChromeOptions();
-                if (isScriptCheckEnabled())
+                if(_driver != null && !(_driver instanceof ChromeDriver))
                 {
-                    options.addExtensions(new File(WebTestHelper.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker.crx"));
+                    _driver.quit();
+                    _driver = null;
                 }
+                if(_driver == null)
+                {
+                    Map<String, String> prefs = new Hashtable<>();
+                    prefs.put("download.prompt_for_download", "false");
+                    prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
 
-                DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-                capabilities.setCapability("chrome.prefs", prefs);
-                capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-                _jsErrorChecker = new ChromeJSErrorChecker();
-                _driver = new ChromeDriver(capabilities);
+                    ChromeOptions options = new ChromeOptions();
+                    if (isScriptCheckEnabled())
+                    {
+                        options.addExtensions(new File(WebTestHelper.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker.crx"));
+                    }
+
+                    DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+                    capabilities.setCapability("chrome.prefs", prefs);
+                    capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+                    _jsErrorChecker = new ChromeJSErrorChecker();
+                    _driver = new ChromeDriver(capabilities);
+                }
+                else
+                {
+                    reusingDriver = true;
+                }
                 break;
             }
             case FIREFOX:
             {
-                final FirefoxProfile profile = new FirefoxProfile();
-                profile.setPreference("app.update.auto", false);
-                profile.setPreference("extensions.update.autoUpdate", false);
-                profile.setPreference("extensions.update.enabled", false);
-                profile.setPreference("dom.max_script_run_time", 0);
-                profile.setPreference("dom.max_chrome_script_run_time", 0);
-
-                profile.setPreference("browser.download.folderList", 2);
-                profile.setPreference("browser.download.downloadDir", getDownloadDir().getAbsolutePath());
-                profile.setPreference("browser.download.dir", getDownloadDir().getAbsolutePath());
-                profile.setPreference("browser.helperApps.alwaysAsk.force", false);
-                profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
-                        "application/vnd.ms-excel," +
-                        "application/octet-stream," +
-                        "application/x-gzip," +
-                        "application/x-zip-compressed," +
-                        "text/x-script.perl");
-                profile.setPreference("browser.download.manager.showWhenStarting",false);
-                if (isScriptCheckEnabled())
+                if(_driver != null && !(_driver instanceof FirefoxDriver))
                 {
-                    try
-                        {JavaScriptError.addExtension(profile);}
-                    catch(IOException e)
-                        {Assert.fail("Failed to load JS error checker: " + e.getMessage());}
+                    _driver.quit();
+                    _driver = null;
                 }
-                if (isFirefoxExtensionsEnabled() && !isTestRunningOnTeamCity()) // Firebug just clutters up screenshots on TeamCity
+                if (_driver == null)
                 {
-                    try
+                    final FirefoxProfile profile = new FirefoxProfile();
+                    profile.setPreference("app.update.auto", false);
+                    profile.setPreference("extensions.update.autoUpdate", false);
+                    profile.setPreference("extensions.update.enabled", false);
+                    profile.setPreference("dom.max_script_run_time", 0);
+                    profile.setPreference("dom.max_chrome_script_run_time", 0);
+
+                    profile.setPreference("browser.download.folderList", 2);
+                    profile.setPreference("browser.download.downloadDir", getDownloadDir().getAbsolutePath());
+                    profile.setPreference("browser.download.dir", getDownloadDir().getAbsolutePath());
+                    profile.setPreference("browser.helperApps.alwaysAsk.force", false);
+                    profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+                            "application/vnd.ms-excel," +
+                            "application/octet-stream," +
+                            "application/x-gzip," +
+                            "application/x-zip-compressed," +
+                            "text/x-script.perl");
+                    profile.setPreference("browser.download.manager.showWhenStarting",false);
+                    if (isScriptCheckEnabled())
                     {
-                        profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/firebug-1.11.0.xpi"));
-                        profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/fireStarter-0.1a6.xpi"));
-                        profile.setPreference("extensions.firebug.currentVersion", "1.11.0"); // prevent upgrade spash page
-                        profile.setPreference("extensions.firebug.allPagesActivation", "on");
-                        profile.setPreference("extensions.firebug.previousPlacement", 3);
-                        profile.setPreference("extensions.firebug.net.enabledSites", true);
-
-                        if (isFirebugPanelsEnabled()) // Enabling Firebug panels slows down test and is usually not needed
-                        {
-                            profile.setPreference("extensions.firebug.net.enableSites", true);
-                            profile.setPreference("extensions.firebug.script.enableSites", true);
-                            profile.setPreference("extensions.firebug.console.enableSites", true);
-                        }
+                        try
+                            {JavaScriptError.addExtension(profile);}
+                        catch(IOException e)
+                            {Assert.fail("Failed to load JS error checker: " + e.getMessage());}
                     }
-                    catch(IOException e)
-                        {Assert.fail("Failed to load Firebug: " + e.getMessage());}
-                }
+                    if (isFirefoxExtensionsEnabled() && !isTestRunningOnTeamCity()) // Firebug just clutters up screenshots on TeamCity
+                    {
+                        try
+                        {
+                            profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/firebug-1.11.0.xpi"));
+                            profile.addExtension(new File(getLabKeyRoot() + "/server/test/selenium/fireStarter-0.1a6.xpi"));
+                            profile.setPreference("extensions.firebug.currentVersion", "1.11.0"); // prevent upgrade spash page
+                            profile.setPreference("extensions.firebug.allPagesActivation", "on");
+                            profile.setPreference("extensions.firebug.previousPlacement", 3);
+                            profile.setPreference("extensions.firebug.net.enabledSites", true);
 
-                profile.setEnableNativeEvents(useNativeEvents());
+                            if (isFirebugPanelsEnabled()) // Enabling Firebug panels slows down test and is usually not needed
+                            {
+                                profile.setPreference("extensions.firebug.net.enableSites", true);
+                                profile.setPreference("extensions.firebug.script.enableSites", true);
+                                profile.setPreference("extensions.firebug.console.enableSites", true);
+                            }
+                        }
+                        catch(IOException e)
+                            {Assert.fail("Failed to load Firebug: " + e.getMessage());}
+                    }
 
-                String browserPath = System.getProperty("selenium.browser.path", "");
-                if (browserPath.length() > 0)
-                {
-                    FirefoxBinary binary = new FirefoxBinary(new File(browserPath));
-                    _driver = new FirefoxDriver(binary, profile);
+                    profile.setEnableNativeEvents(useNativeEvents());
+
+                    String browserPath = System.getProperty("selenium.browser.path", "");
+                    if (browserPath.length() > 0)
+                    {
+                        FirefoxBinary binary = new FirefoxBinary(new File(browserPath));
+                        _driver = new FirefoxDriver(binary, profile);
+                    }
+                    else
+                    {
+                        _driver = new FirefoxDriver(profile);
+                    }
+
+                    _jsErrorChecker = new FirefoxJSErrorChecker();
                 }
                 else
                 {
-                    _driver = new FirefoxDriver(profile);
+                    reusingDriver = true;
                 }
-
-                _jsErrorChecker = new FirefoxJSErrorChecker();
                 break;
             }
             default:
                 Assert.fail("Browser not yet implemented: " + BROWSER_TYPE);
         }
 
-        Capabilities caps = ((RemoteWebDriver) getDriver()).getCapabilities();
-        String browserName = caps.getBrowserName();
-        String browserVersion = caps.getVersion();
-        log("Browser: " + browserName + " " + browserVersion);
+        if (!reusingDriver)
+        {
+            Capabilities caps = ((RemoteWebDriver) getDriver()).getCapabilities();
+            String browserName = caps.getBrowserName();
+            String browserVersion = caps.getVersion();
+            log("Browser: " + browserName + " " + browserVersion);
 
-        getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS);
+            getDriver().manage().timeouts().setScriptTimeout(WAIT_FOR_JAVASCRIPT, TimeUnit.MILLISECONDS);
+        }
 
         _shortWait = new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT/1000);
         _longWait = new WebDriverWait(getDriver(), WAIT_FOR_PAGE/1000);
@@ -567,6 +625,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return getBrowserType().toString();
     }
 
+    public void sleep(long ms)
+    {
+        try
+        {
+            Thread.sleep(ms);
+        }
+        catch (InterruptedException ignore)
+        {
+        }
+    }
+
     public static String getStreamContentsAsString(InputStream is) throws IOException
     {
         StringBuilder contents = new StringBuilder();
@@ -605,13 +674,24 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @After
     public void tearDown() throws Exception
     {
-        boolean skipTearDown = _testFailed && System.getProperty("close.on.fail", "true").equalsIgnoreCase("false");
+        //Prevent tearDown after each test case
+    }
+
+    public void doTearDown()
+    {
+        boolean skipTearDown = _testFailed && "false".equalsIgnoreCase(System.getProperty("close.on.fail"));
         if ((!skipTearDown || isTestRunningOnTeamCity()) && getDriver() != null)
+        {
             getDriver().quit();
+            _driver = null;
+        }
 
         if (!_testFailed && getDownloadDir().exists())
         {
-            FileUtils.deleteDirectory(getDownloadDir());
+            try{
+                FileUtils.deleteDirectory(getDownloadDir());
+            }
+            catch (IOException ignore) { }
         }
     }
 
@@ -768,17 +848,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
 
-    public void sleep(long ms)
-    {
-        try
-        {
-            Thread.sleep(ms);
-        }
-        catch (InterruptedException ignore)
-        {
-        }
-    }
-
     @LogMethod
     public void signIn()
     {
@@ -812,7 +881,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if ( isGuestModeTest() )
             return;
-        ensureSignedOut();
+
         if (!isTitleEqual("Sign In"))
             beginAt("/login/login.view");
 
@@ -836,8 +905,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void assertSignOutAndMyAccountPresent()
     {
         click(Locator.id("userMenuPopupLink"));
-        assertTextNotPresent("Sign In");
-//        assertTextPresent("My Account");
+        assertElementPresent(Locator.id("userMenu").append(Locator.linkWithText("My Account")));
+        assertElementPresent(Locator.id("userMenu").append(Locator.linkWithText("Sign Out")));
     }
 
     // Just sign in & verify -- don't check for startup, upgrade, admin mode, etc.
@@ -1660,162 +1729,162 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return true;
     }
 
+    @LogMethod @BeforeClass
+    public static void performInitialChecks() throws Throwable
+    {
+        _startTime = System.currentTimeMillis();
+        WebDriverTestPreamble preamble = new WebDriverTestPreamble();
+
+        try
+        {
+            preamble.setUp();
+            preamble.preamble();
+        }
+        catch (Exception t)
+        {
+            AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(t);
+            preamble.handleFailure(errorRef, "performInitialChecks");
+            throw errorRef.get();
+        }
+    }
+
+    @Before
+    public void preClean() throws TestTimeoutException
+    {
+        simpleSignIn();
+
+        if (currentTest == null && getDriver() != null)
+        {
+            currentTest = this;
+            log("Pre-cleaning " + getClass().getSimpleName());
+            currentTest.doCleanup(false);
+        }
+    }
+
     @Test(timeout=2700000) // 45 minute default test timeout
     public void testSteps() throws Exception
     {
-        try
+        doTestSteps();
+    }
+
+    @Rule
+    public TestWatcher _watcher = new TestWatcher()
+    {
+        @Override @LogMethod
+        protected void failed(Throwable e, Description description)
         {
-            log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
+            handleFailure(new AtomicReference<Throwable>(e), description.getMethodName());
 
-            _startTime = System.currentTimeMillis();
-
-            logToServer("=== Starting " + getClass().getSimpleName() + Runner.getProgress() + " ===");
-            signIn();
-            enableEmailRecorder();
-			resetErrors();
-
-            if (isSystemMaintenanceDisabled())
-            {
-                // Disable scheduled system maintenance to prevent timeouts during nightly tests.
-                disableMaintenance();
-            }
-
-
-            if ( !isGuestModeTest() )
-            {
-                if (!isConfigurationSupported()) // skip this check if it returns true with no database info.
-                {
-                    log("** Skipping " + getClass().getSimpleName() + " test for unsupported configurarion");
-                    _testFailed = false;
-                    return;
-                }
-            }
-
-            log("Pre-cleaning " + getClass().getSimpleName());
-            doCleanup(false);
-
-            // Only do this as part of test startup if we haven't already checked. Since we do this as the last
-            // step in the test, there's no reason to bother doing it again at the beginning of the next test
-            if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
-            {
-                checkLeaksAndErrors();
-            }
-
-            doTestSteps();
-
-            //make sure you're signed in as admin, because this won't work otherwise
-            ensureSignedInAsAdmin();
-
-            checkQueries();
-
-            checkViews();
-
-
-            if(!isPerfTest)
-                checkActionCoverage();
-
-            checkLinks();
-
-            if (!isTestCleanupSkipped())
-            {
-                goToHome();
-                doCleanup(true);
-            }
-            else
-            {
-                log("Skipping test cleanup as requested.");
-            }
-
-            if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
-            {
-                checkLeaksAndErrors();
-            }
-
-            _testFailed = false;
+            super.failed(e, description);
         }
-        catch (UnhandledAlertException e)
+    };
+
+    /**
+     * Collect additional information about test failures and publish build artifacts for TeamCity
+     * @param errorRef Reference to the cause of the test failure. Reference allows us to insert alert text into failure
+     * @param testName The method name or short description of the failed test case or setup/teardown method
+     */
+    public void handleFailure(AtomicReference<Throwable> errorRef, String testName)
+    {
+        _testFailed = true;
+
+        if (errorRef.get() instanceof UnhandledAlertException)    // Catch so we can record the alert's text
         {
-            // Catch so we can record the alert's text
-            throw new RuntimeException("Unexpected Alert: " + e.getAlertText(), e);
+            errorRef.set(new RuntimeException("Unexpected Alert: " + ((UnhandledAlertException) errorRef.get()).getAlertText(), errorRef.get()));
         }
-        catch (TestTimeoutException e)
+        else if (errorRef.get() instanceof TestTimeoutException)
         {
             _testTimeout = true;
-            throw e;
+        }
+
+        try
+        {
+            populateLastPageInfo();
+        }
+        catch (Throwable t)
+        {
+            System.out.println("Unable to determine information about the last page: server not started or -Dlabkey.port incorrect?");
+        }
+
+        if (_lastPageTitle != null && !_lastPageTitle.startsWith("404") && _lastPageURL != null)
+        {
+            try
+            {
+                // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
+                String lastPage = _lastPageURL.toString();
+                URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
+                log("Re-invoking last action with _debug parameter set: " + url.toString());
+                url.getContent();
+            }
+            catch (Exception t)
+            {
+                System.out.println("Unable to re-invoke last page");
+                t.printStackTrace();
+            }
+        }
+        try
+        {
+            dumpPageSnapshot(testName, null);
+            if (isTestRunningOnTeamCity())
+            {
+                dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
+                dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
+            }
+            if (_testTimeout)
+                dumpThreads();
+        }
+        catch (Exception t)
+        {
+            System.out.println("Unable to dump failure information");
+            t.printStackTrace();
         }
         finally
         {
             try
             {
-                 populateLastPageInfo();
+                resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
             }
-            catch (Throwable t)
+            catch(Throwable t){
+                log("Failed to reset DB login config after test failure");
+                dumpPageSnapshot(testName, "resetDbLogin");
+            }
+
+            try
             {
-                System.out.println("Unable to determine information about the last page: server not started or -Dlabkey.port incorrect?");
+                if (isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
+                    fixPipelineToolsDirectory();
             }
+            catch(Throwable t){
+                log("Failed to fix pipeline tools directory after test failure");
+                dumpPageSnapshot(testName, "fixPipelineToolsDir");
+            }
+        }
 
-            if (_testFailed)
+        doTearDown();
+        _driver = null;
+    }
+
+    @LogMethod @AfterClass
+    public static void performFinalChecks() throws Throwable
+    {
+        WebDriverTestPostamble postamble = new WebDriverTestPostamble();
+        try
+        {
+            if(!_testFailed)
             {
-                if (_lastPageTitle != null && !_lastPageTitle.startsWith("404") && _lastPageURL != null)
-                {
-                    try
-                    {
-                        // On failure, re-invoke the last action with _debug paramter set, which lets the action log additional debugging information
-                        String lastPage = _lastPageURL.toString();
-                        URL url = new URL(lastPage + (lastPage.contains("?") ? "&" : "?") + "_debug=1");
-                        log("Re-invoking last action with _debug parameter set: " + url.toString());
-                        url.getContent();
-                    }
-                    catch (Exception t)
-                    {
-                        System.out.println("Unable to re-invoke last page");
-                        t.printStackTrace();
-                    }
-                }
-                try
-                {
-                    dumpPageSnapshot();
-                    if (isTestRunningOnTeamCity())
-                    {
-                        dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
-                        dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
-                    }
-                    if (_testTimeout)
-                        dumpThreads();
-                }
-                catch (Exception t)
-                {
-                    System.out.println("Unable to dump failure information");
-                    t.printStackTrace();
-                }
-                finally
-                {
-                    try
-                    {
-                        resetDbLoginConfig(); // Make sure to return DB config to its pre-test state.
-                    }
-                    catch(Throwable t){
-                        log("Failed to reset DB login config after test failure");
-                        dumpPageSnapshot("resetDbLogin");
-                    }
-
-                    try
-                    {
-                        if (isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
-                            fixPipelineToolsDirectory();
-                    }
-                    catch(Throwable t){
-                        log("Failed to fix pipeline tools directory after test failure");
-                        dumpPageSnapshot("fixPipelineToolsDir");
-                    }
-                }
+                postamble.setUp();
+                postamble.postamble();
             }
-
-            checkJsErrors();
-
-            logToServer("=== Completed " + getClass().getSimpleName() + Runner.getProgress() + " ===");
-
-            log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
+        }
+        catch (Throwable t)
+        {
+            AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(t);
+            postamble.handleFailure(errorRef, "performFinalChecks");
+            throw errorRef.get();
+        }
+        finally
+        {
+            postamble.doTearDown();
         }
     }
 
@@ -1845,6 +1914,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             signIn();
     }
 
+    @LogMethod
     protected abstract void doTestSteps() throws Exception;
 
     // Standard cleanup: delete the project
@@ -1890,7 +1960,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return _driver;
     }
 
-    public File getDownloadDir()
+    public static File getDownloadDir()
     {
         return _downloadDir;
     }
@@ -2205,7 +2275,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-    private void checkJsErrors()
+    @LogMethod
+    protected void checkJsErrors()
     {
         if (isScriptCheckEnabled())
         {
@@ -2264,7 +2335,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     @LogMethod
-    private void checkActionCoverage()
+    protected void checkActionCoverage()
     {
         if ( isGuestModeTest() )
             return;
@@ -2287,7 +2358,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         // Download full action coverage table and add to TeamCity artifacts.
         beginAt("/admin/exportActions.view?asWebPage=true");
-        publishArtifact(saveTsv(Runner.getDumpDir(), "ActionCoverage"));
+        publishArtifact(saveTsv(ensureDumpDir(), "ActionCoverage"));
         popLocation();
     }
 
@@ -2322,12 +2393,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     protected File ensureDumpDir()
     {
-        File dumpDir = new File(Runner.getDumpDir(), getClass().getSimpleName());
+        File dumpDir = new File(TestProperties.getDumpDir(), getClass().getSimpleName());
         if ( !dumpDir.exists() )
             dumpDir.mkdirs();
 
         return dumpDir;
     }
+
+    private static final String DEFAULT_TEST_NAME = "testSteps";
 
     public void dumpPageSnapshot()
     {
@@ -2335,6 +2408,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     public void dumpPageSnapshot(@Nullable String subdir)
+    {
+        dumpPageSnapshot(DEFAULT_TEST_NAME, subdir);
+    }
+
+    public void dumpPageSnapshot(String testName, @Nullable String subdir)
     {
         File dumpDir = ensureDumpDir();
         if (subdir != null && subdir.length() > 0)
@@ -2346,6 +2424,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
         String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
+        if (!DEFAULT_TEST_NAME.equals(testName))
+            baseName += "#" + testName;
 
         publishArtifact(dumpFullScreen(dumpDir, baseName));
         publishArtifact(dumpScreen(dumpDir, baseName));
@@ -2828,6 +2908,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
 
+    public void createSubfolder(String project, String child, String folderType, String[] tabsToAdd)
+    {
+        // create a child of the top-level project folder:
+        createSubfolder(project, project, child, folderType, tabsToAdd);
+    }
+
+
     public void createSubfolder(String project, String parent, String child, String folderType, @Nullable String[] tabsToAdd)
     {
         createSubfolder(project, parent, child, folderType, tabsToAdd, false);
@@ -3007,7 +3094,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickFolder(folderName);
         ensureAdminMode();
         goToFolderManagement();
-        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName));
+        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName).notHidden());
         clickButton("Rename");
         setFormElement(Locator.name("name"), newFolderName);
         if (createAlias)
@@ -6751,10 +6838,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void createNewQuery(String schemaName)
     {
         selectSchema(schemaName);
-        String url = (String)executeScript("return window._browser.getCreateQueryUrl('" + schemaName + "')");
-        if (null == url || url.length() == 0)
-            Assert.fail("Could not get the URL for creating a new query in schema " + schemaName);
-        beginAt(url);
+        clickButton("Create New Query");
+//        String url = (String)executeScript("return window._browser.getCreateQueryUrl('" + schemaName + "')");
+//        if (null == url || url.length() == 0)
+//            Assert.fail("Could not get the URL for creating a new query in schema " + schemaName);
+//        beginAt(url);
     }
 
 

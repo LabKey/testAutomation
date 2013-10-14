@@ -184,6 +184,7 @@ src/org/labkey/test/AssayAPITest.java -text
 src/org/labkey/test/BaseFlowTest.java -text
 src/org/labkey/test/BaseFlowTestWD.java -text
 src/org/labkey/test/BaseSeleniumWebTest.java -text
+src/org/labkey/test/BaseWebDriverMultipleTest.java -text
 src/org/labkey/test/BaseWebDriverTest.java -text
 src/org/labkey/test/Cleanable.java -text
 src/org/labkey/test/Locator.java -text
@@ -196,6 +197,8 @@ src/org/labkey/test/TestConfig.java -text
 src/org/labkey/test/TestProperties.java -text
 src/org/labkey/test/TestSet.java -text
 src/org/labkey/test/TestTimeoutException.java -text
+src/org/labkey/test/WebDriverTestPostamble.java -text
+src/org/labkey/test/WebDriverTestPreamble.java -text
 src/org/labkey/test/WebTest.java -text
 src/org/labkey/test/WebTestHelper.java -text
 src/org/labkey/test/categories/Assays.java -text
@@ -235,7 +238,6 @@ src/org/labkey/test/categories/XTandem.java -text
 src/org/labkey/test/debug/DummyProcess.java -text
 src/org/labkey/test/debug/ThreadDumpAndKill.java -text
 src/org/labkey/test/module/ModuleTest.java -text
-src/org/labkey/test/module/WNPRCEHRDataEntryTest.java -text
 src/org/labkey/test/ms1/params/AbstractInspectTestParams.java -text
 src/org/labkey/test/ms1/params/FeaturesTestParams.java -text
 src/org/labkey/test/ms1/params/PepMatchTestParams.java -text

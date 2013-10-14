@@ -42,10 +42,7 @@ public class JUnitHeader extends BaseWebDriverTest
     @Override
     public void testSteps() throws Exception
     {
-        log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
-        logToServer("=== Starting Server-side JUnit Tests ===");
-
-        log("** This test should precede JUnitTest.");
+        log("** This should precede JUnitTest.");
         log("** It will enable the dumbster and clean up any errors caused by the previous test");
 
         signIn();
@@ -59,7 +56,7 @@ public class JUnitHeader extends BaseWebDriverTest
 
         _testFailed = false;
 
-        log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
+        logToServer("=== Starting Server-side JUnit Tests ===");
     }
 
 

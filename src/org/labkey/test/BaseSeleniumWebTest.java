@@ -1733,7 +1733,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         // Download full action coverage table and add to TeamCity artifacts.
         beginAt("/admin/exportActions.view?asWebPage=true");
-        publishArtifact(saveTsv(Runner.getDumpDir(), "ActionCoverage"));
+        publishArtifact(saveTsv(ensureDumpDir(), "ActionCoverage"));
         popLocation();
     }
 
@@ -1781,7 +1781,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     protected File ensureDumpDir()
     {
-        File dumpDir = new File(Runner.getDumpDir(), getClass().getSimpleName());
+        File dumpDir = new File(TestProperties.getDumpDir(), getClass().getSimpleName());
         if ( !dumpDir.exists() )
             dumpDir.mkdirs();
 

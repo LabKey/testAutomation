@@ -63,6 +63,12 @@ public class MS1Test extends BaseWebDriverTest
 
     private static final File _pipelinePathMain = new File(getLabKeyRoot(), "/sampledata/ms1/bvt");
 
+    public MS1Test()
+    {
+        super();
+        _containerHelper = new UIContainerHelper(this);
+    }
+
     @Override
     protected BrowserType bestBrowser()
     {
@@ -77,13 +83,6 @@ public class MS1Test extends BaseWebDriverTest
         importData(PROJ_MAIN, X_PROTOCOL, FEATURES_PROTOCOL);
 
         testViews(PROJ_MAIN);
-    }
-
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
-        _containerHelper = new UIContainerHelper(this);
     }
 
     protected void setupEnvironment()

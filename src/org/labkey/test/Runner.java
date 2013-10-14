@@ -638,22 +638,6 @@ public class Runner extends TestSuite
         return tests;
     }
 
-    protected static File getDumpDir()
-    {
-        File dumpDir = null;
-        String outputDir = System.getProperty("failure.output.dir");
-        if (outputDir != null)
-            dumpDir = new File(outputDir);
-        if (dumpDir == null || !dumpDir.exists())
-            dumpDir = new File(System.getProperty("java.io.tmpdir"));
-        if (!dumpDir.exists())
-        {
-            throw new RuntimeException("Couldn't determine directory for placement of output files. " +
-                    "Tried system properties failure.output.dir and java.io.tmpdir");
-        }
-        return dumpDir;
-    }
-
     /** Entry point for Ant JUnit runner. */
     public static TestSuite suite() throws Throwable
     {

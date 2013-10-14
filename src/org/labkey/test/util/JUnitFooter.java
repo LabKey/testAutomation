@@ -44,21 +44,11 @@ public class JUnitFooter extends BaseWebDriverTest
     @Override
     public void testSteps() throws Exception
     {
-        log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
-
-        log("** This test should follow JUnitTest.");
-        log("** It will check for any errors or memory leaks caused by the tests therein");
+        log("** This should follow JUnitTest.");
+        log("** It will check for any errors or memory leaks caused by server-side tests");
 
         signIn();
         try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
-        checkLeaksAndErrors();
-        resetErrors();
-
-        _testFailed = false;
-
-        log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
-
-        logToServer("=== Starting Server-side JUnit Tests ===");
     }
 
     public void doTestSteps() {}

@@ -15,6 +15,8 @@
  */
 package org.labkey.test;
 
+import java.io.File;
+
 /**
  * User: tchadick
  * Date: 9/26/13
@@ -95,5 +97,21 @@ public abstract class TestProperties
     {
         return  "pg".equals(getDatabaseType()) ||
                 "mssql".equals(getDatabaseType()) && !"2005".equals(getDatabaseVersion());
+    }
+
+    public static File getDumpDir()
+    {
+        File dumpDir = null;
+        String outputDir = System.getProperty("failure.output.dir");
+        if (outputDir != null)
+            dumpDir = new File(outputDir);
+        if (dumpDir == null || !dumpDir.exists())
+            dumpDir = new File(System.getProperty("java.io.tmpdir"));
+        if (!dumpDir.exists())
+        {
+            throw new RuntimeException("Couldn't determine directory for placement of output files. " +
+                    "Tried system properties failure.output.dir and java.io.tmpdir");
+        }
+        return dumpDir;
     }
 }
