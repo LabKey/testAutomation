@@ -162,21 +162,9 @@
         renderChart(chartConfig);
     };
 
-    var scripts = [
-        '/vis/lib/d3-2.0.4.min.js',
-        '/vis/lib/raphael-min-2.1.0.js',
-        '/vis/lib/patches.js',
-        '/vis/src/utils.js',
-        '/vis/src/geom.js',
-        '/vis/src/stat.js',
-        '/vis/src/scale.js',
-        '/vis/src/layer.js',
-        '/vis/src/plot.js',
-        '/vis/timeChart/timeChartHelper.js'
-    ];
-
-    LABKEY.requiresScript(scripts, true, function(){
-        // After dependencies are loaded render the first chart.
-        renderChart(charts[chartIdx]);
+    LABKEY.requiresScript('/vis/timeChart/timeChartHelper.js', true, function(){
+        LABKEY.vis.TimeChartHelper.loadVisDependencies(function(){
+            renderChart(charts[chartIdx]);
+        });
     }, null, true);
 </script>
