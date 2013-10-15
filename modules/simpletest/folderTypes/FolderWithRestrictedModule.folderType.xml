@@ -1,0 +1,66 @@
+<ft:folderType xmlns:ft="http://labkey.org/data/xml/folderType">
+    <ft:name>Folder With Restricted Module</ft:name>
+    <ft:description>Folder has restricted modules and tabs</ft:description>
+    <ft:folderTabs>
+        <ft:folderTab>
+            <ft:name>Tab1</ft:name>
+            <ft:caption>Tab 1</ft:caption>
+            <ft:selectors>
+                <ft:selector>
+                    <ft:controller>query</ft:controller>
+                </ft:selector>
+                <ft:selector>
+                    <ft:regex>(.*)showUploadMaterials\.view\?$</ft:regex>
+                </ft:selector>
+            </ft:selectors>
+            <ft:requiredWebParts>
+                <ft:webPart>
+                    <ft:name>Query</ft:name>
+                    <ft:location>body</ft:location>
+                    <ft:property name="title" value="A customized web part" />
+                    <ft:property name="schemaName" value="study" />
+                    <ft:property name="queryName" value="StudyProperties" />
+                </ft:webPart>
+            </ft:requiredWebParts>
+            <ft:preferredWebParts>
+                <ft:webPart>
+                    <ft:name>Sample Sets</ft:name>
+                    <ft:location>body</ft:location>
+                </ft:webPart>
+            </ft:preferredWebParts>
+        </ft:folderTab>
+        <ft:folderTab>
+            <ft:name>Tab2</ft:name>
+            <ft:caption>Tab 2</ft:caption>
+            <ft:selectors>
+                <ft:selector>
+                    <ft:controller>assay</ft:controller>
+                </ft:selector>
+                <ft:selector>
+                    <ft:view>showList</ft:view>
+                </ft:selector>
+            </ft:selectors>
+            <ft:requiredWebParts>
+                <ft:webPart>
+                    <ft:name>Query</ft:name>
+                    <ft:location>body</ft:location>
+                    <ft:property name="title" value="A customized web part" />
+                    <ft:property name="schemaName" value="study" />
+                    <ft:property name="queryName" value="StudyProperties" />
+                </ft:webPart>
+            </ft:requiredWebParts>
+        </ft:folderTab>
+        <ft:folderTab tabType="container" folderType="Study">
+            <ft:name>Study Container Tab</ft:name>
+            <ft:caption>Study Container</ft:caption>
+        </ft:folderTab>
+    </ft:folderTabs>
+    <ft:modules>
+        <ft:moduleName>Core</ft:moduleName>
+        <ft:moduleName>simpletest</ft:moduleName>
+        <ft:moduleName>Study</ft:moduleName>
+        <ft:moduleName>Query</ft:moduleName>
+        <ft:moduleName>restrictedmodule</ft:moduleName>
+    </ft:modules>
+    <ft:defaultModule>Core</ft:defaultModule>
+</ft:folderType>

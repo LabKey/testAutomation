@@ -80,6 +80,10 @@ modules/miniassay/queries/assay/My[!!-~]Simple[!!-~]Assay[!!-~]Runs/AssayDesignR
 modules/miniassay/queries/assay/simple/My[!!-~]Simple[!!-~]Assay/Batches/AssayDesignChildSchemaBatches.qview.xml -text
 modules/miniassay/queries/assay/simple/My[!!-~]Simple[!!-~]Assay/Data/AssayDesignChildSchemaData.qview.xml -text
 modules/miniassay/queries/assay/simple/My[!!-~]Simple[!!-~]Assay/Runs/AssayDesignChildSchemaRuns.qview.xml -text
+modules/restrictedModule/module.xml -text
+modules/restrictedModule/views/RestrictedWebPart.webpart.xml -text
+modules/restrictedModule/views/begin.html -text
+modules/restrictedModule/views/webpart.html -text
 modules/scriptpad/build.xml -text
 modules/scriptpad/module.properties -text
 modules/scriptpad/resources/reports/schemas/consoleOnly.r -text
@@ -106,6 +110,7 @@ modules/simpletest/etls/merge.xml -text
 modules/simpletest/etls/truncate.xml -text
 modules/simpletest/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text
+modules/simpletest/folderTypes/FolderWithRestrictedModule.folderType.xml -text
 modules/simpletest/folderTypes/customFolder.foldertype.xml -text
 modules/simpletest/folderTypes/customTabbedFolder.folderType.xml -text
 modules/simpletest/module.xml -text
