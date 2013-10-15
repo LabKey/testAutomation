@@ -147,6 +147,8 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         goToDataViews();
         waitAndClick(Locator.xpath("//img[@title='Edit']"));
         DataViewsTest.clickCustomizeView(chart, this);
+        waitForElement(Locator.name("viewName"));
+        _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customThumbnail"));
         setFormElement(Locator.xpath("//input[@id='customThumbnail-button-fileInputEl']"), thumbnail);
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
