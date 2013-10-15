@@ -15,53 +15,46 @@ public class WebDriverTestPostamble extends BaseWebDriverTest
 {
     public void postamble() throws Exception
     {
-        try
+        if (currentTest != null)
         {
-            if (currentTest != null)
+            //make sure you're signed in as admin, because this won't work otherwise
+            ensureSignedInAsAdmin();
+
+            checkQueries();
+
+            checkViews();
+
+            if(!isPerfTest)
+                checkActionCoverage();
+
+            checkLinks();
+
+            if (!isTestCleanupSkipped())
             {
-                //make sure you're signed in as admin, because this won't work otherwise
-                ensureSignedInAsAdmin();
-
-                checkQueries();
-
-                checkViews();
-
-                if(!isPerfTest)
-                    checkActionCoverage();
-
-                checkLinks();
-
-                if (!isTestCleanupSkipped() && currentTest != null)
-                {
-                    goToHome();
-                    currentTest.doCleanup(true);
-                }
-                else
-                {
-                    log("Skipping test cleanup as requested.");
-                }
-
-                if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
-                {
-                    checkLeaksAndErrors();
-                }
-
-                checkJsErrors();
-
-                logToServer("=== Completed " + currentTest.getClass().getSimpleName() + Runner.getProgress() + " ===");
-
-                log("=============== Completed " + currentTest.getClass().getSimpleName() + Runner.getProgress() + " =================");
+                goToHome();
+                currentTest.doCleanup(true);
             }
             else
             {
-                logToServer("=== Completed Test - Setup failed " + Runner.getProgress() + " ===");
-
-                log("=============== Completed Test - Setup failed " + Runner.getProgress() + " =================");
+                log("Skipping test cleanup as requested.");
             }
+
+            if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
+            {
+                checkLeaksAndErrors();
+            }
+
+            checkJsErrors();
+
+            logToServer("=== Completed " + currentTest.getClass().getSimpleName() + Runner.getProgress() + " ===");
+
+            log("=============== Completed " + currentTest.getClass().getSimpleName() + Runner.getProgress() + " =================");
         }
-        finally
+        else
         {
-            currentTest = null;
+            logToServer("=== Completed Test - Setup failed " + Runner.getProgress() + " ===");
+
+            log("=============== Completed Test - Setup failed " + Runner.getProgress() + " =================");
         }
     }
 

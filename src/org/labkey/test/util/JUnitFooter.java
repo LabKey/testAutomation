@@ -42,16 +42,13 @@ public class JUnitFooter extends BaseWebDriverTest
     }
 
     @Override
-    public void testSteps() throws Exception
+    public void doTestSteps() throws Exception
     {
         log("** This should follow JUnitTest.");
         log("** It will check for any errors or memory leaks caused by server-side tests");
 
-        signIn();
         try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
     }
-
-    public void doTestSteps() {}
 
     @Override public BrowserType bestBrowser()
     {

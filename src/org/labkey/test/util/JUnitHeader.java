@@ -40,29 +40,18 @@ public class JUnitHeader extends BaseWebDriverTest
     }
 
     @Override
-    public void testSteps() throws Exception
+    public void doTestSteps() throws Exception
     {
         log("** This should precede JUnitTest.");
         log("** It will enable the dumbster and clean up any errors caused by the previous test");
-
-        signIn();
-        resetErrors();
-        enableEmailRecorder();
 
         RReportHelperWD reportHelper = new RReportHelperWD(this);
         reportHelper.ensureRConfig(); // reportTest.js (via RhinoService) executes an R script
 
         try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
 
-        _testFailed = false;
-
         logToServer("=== Starting Server-side JUnit Tests ===");
     }
-
-
-    @Override
-    public void doTestSteps()
-    { }
 
     @Override public BrowserType bestBrowser()
     {

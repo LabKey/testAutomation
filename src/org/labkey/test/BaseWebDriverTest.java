@@ -1742,6 +1742,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (Exception t)
         {
+            _testFailed = true;
             AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(t);
             preamble.handleFailure(errorRef, "performInitialChecks");
             throw errorRef.get();
@@ -1878,12 +1879,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (Throwable t)
         {
+            _testFailed = true;
             AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(t);
             postamble.handleFailure(errorRef, "performFinalChecks");
             throw errorRef.get();
         }
         finally
         {
+            currentTest = null;
             postamble.doTearDown();
         }
     }
