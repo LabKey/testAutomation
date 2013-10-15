@@ -2361,7 +2361,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         // Download full action coverage table and add to TeamCity artifacts.
         beginAt("/admin/exportActions.view?asWebPage=true");
-        publishArtifact(saveTsv(ensureDumpDir(), "ActionCoverage"));
+        publishArtifact(saveTsv(TestProperties.getDumpDir(), "ActionCoverage"));
         popLocation();
     }
 
@@ -2588,7 +2588,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         File tsvFile = new File(dir, fileName);
 
-        try(FileWriter writer = new FileWriter(tsvFile);)
+        try(FileWriter writer = new FileWriter(tsvFile))
         {
             writer.write(contents);
             return tsvFile;
