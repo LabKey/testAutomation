@@ -192,10 +192,17 @@ public class PortalHelper extends AbstractHelper
 
     @LogMethod(quiet = true)public void removeWebPart(@LoggedParam String webPartTitle)
     {
-        Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[img[@title='Remove From Page']]");
-        int startCount = _test.getXpathCount(removeButton);
-        _test.click(removeButton);
-        _test.waitForElementToDisappear(removeButton.index(startCount), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        int startCount = _test.getXpathCount(Locators.webPartTitle(webPartTitle));
+        if (_test.isElementPresent(Locators.sideWebpartTitle.withText(webPartTitle)))
+        {
+            clickWebpartMenuItem(webPartTitle, false, "Remove From Page");
+        }
+        else
+        {
+            Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[img[@title='Remove From Page']]");
+            _test.click(removeButton);
+        }
+        _test.waitForElementToDisappear(Locators.webPartTitle(webPartTitle).index(startCount), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void addQueryWebPart(@LoggedParam String schemaName)
@@ -347,5 +354,13 @@ public class PortalHelper extends AbstractHelper
         {
             return Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title);
         }
+
+        public static Locator.XPathLocator webPartTitleMenu(String title)
+        {
+            return Locator.xpath("//img[@id='more-" + title.toLowerCase() + "']");
+        }
+
+        public static Locator.CssLocator bodyWebpartTitle = Locator.css("#bodypanel .labkey-wp-title-text");
+        public static Locator.CssLocator sideWebpartTitle = Locator.css(".labkey-side-panel .labkey-wp-title-text");
     }
 }

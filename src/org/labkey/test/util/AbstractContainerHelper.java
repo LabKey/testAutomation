@@ -17,6 +17,7 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
 import java.util.ArrayList;
@@ -72,4 +73,13 @@ public abstract class AbstractContainerHelper extends AbstractHelper
     }
 
     public abstract void doDeleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException;
+
+    @LogMethod(quiet = true)
+    public void setFolderType(@LoggedParam String folderType)
+    {
+        _test.goToFolderManagement();
+        _test.clickAndWait(Locator.linkWithText("Folder Type"));
+        _test.click(Locator.radioButtonByNameAndValue("folderType", folderType));
+        _test.clickButton("Update Folder");
+    }
 }
