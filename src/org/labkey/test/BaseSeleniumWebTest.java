@@ -1733,7 +1733,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         // Download full action coverage table and add to TeamCity artifacts.
         beginAt("/admin/exportActions.view?asWebPage=true");
-        publishArtifact(saveTsv(ensureDumpDir(), "ActionCoverage"));
+        publishArtifact(saveTsv(TestProperties.getDumpDir(), "ActionCoverage"));
         popLocation();
     }
 
