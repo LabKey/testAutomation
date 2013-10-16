@@ -34,19 +34,21 @@ import java.io.FilenameFilter;
 public class RReportHelper extends AbstractHelper
 {
     public enum ReportOption {
-        shareReport("Make this view available to all users", true),
-        showSourceTab("Show source tab to all users", true),
-        runInPipeline("Run this view in the background as a pipeline job", true),
-        knitrNone("None", false),
-        knitrHtml("Html", false),
-        knitrMarkdown("Markdown", false);
+        shareReport("Make this view available to all users", null, true),
+        showSourceTab("Show source tab to all users", null, true),
+        runInPipeline("Run this view in the background as a pipeline job", null, true),
+        knitrNone("None", "Knitr Options", false),
+        knitrHtml("Html", "Knitr Options", false),
+        knitrMarkdown("Markdown", "Knitr Options", false);
 
         public String _label;
         public boolean _isCheckbox;
+        public String _fieldSet;
 
-        ReportOption(String label, boolean isCheckbox)
+        ReportOption(String label, String fieldSet, boolean isCheckbox)
         {
             _label = label;
+            _fieldSet = fieldSet;
             _isCheckbox = isCheckbox;
         }
     }
@@ -278,10 +280,19 @@ public class RReportHelper extends AbstractHelper
 
     public void selectOption(ReportOption option)
     {
+        ensureFieldSetExpanded(option._fieldSet);
         if (option._isCheckbox)
+        {
+            Locator checkbox = Ext4Helper.Locators.checkbox(_test, option._label);
+            _test.waitForElement(checkbox);
             _test._ext4Helper.checkCheckbox(option._label);
+        }
         else
+        {
+            Locator checkbox = Ext4Helper.Locators.radiobutton(_test, option._label);
+            _test.waitForElement(checkbox);
             _test._ext4Helper.selectRadioButton(option._label);
+        }
     }
 
     public void clickViewTab()
@@ -298,5 +309,18 @@ public class RReportHelper extends AbstractHelper
     {
         _test._ext4Helper.clickTabContainingText(name);
         _test.sleep(2000); // TODO
+    }
+
+    public void ensureFieldSetExpanded(String name)
+    {
+        if (name != null)
+        {
+            Locator fieldSet = Locator.xpath("//fieldset").withClass("x4-fieldset-collapsed").withDescendant(Locator.xpath("//div").withClass("x4-fieldset-header-text").containing(name)).append("//div/img");
+
+            if (_test.isElementPresent(fieldSet))
+            {
+                _test.click(fieldSet);
+            }
+        }
     }
 }

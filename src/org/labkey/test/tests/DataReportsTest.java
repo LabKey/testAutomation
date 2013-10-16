@@ -401,6 +401,7 @@ public class DataReportsTest extends ReportTest
 
         log("Create second R script");
         clickMenuButton("Views", "Create", "R View");
+        _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         if (!_rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
             if (!_rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
@@ -454,6 +455,7 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
         clickMenuButton("Views", "Create", "R View");
+        _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         _ext4Helper.checkCheckbox(R_SCRIPTS[1]);
         if (!_rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
@@ -511,6 +513,7 @@ public class DataReportsTest extends ReportTest
         // if there are any shared scripts, check the check box so they get included when the report is rendered
         if (sharedScripts != null && sharedScripts.length > 0)
         {
+            _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
             for (String script : sharedScripts)
                 _ext4Helper.checkCheckbox(script);
         }
