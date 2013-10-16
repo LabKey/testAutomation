@@ -359,9 +359,9 @@
             <include name="simpletest.module"/>
             <include name="restrictedModule.module"/>
             <include name="linkedschematest.module"/>
+            <include name="scriptpad.module"/>
           </fileset>
         </copy>
-        <ant dir="${project.root}/server/test/modules/scriptpad" target="build" usenativebasedir="true"/>
 
         <!-- See if the test modules have been updated in the deployment directory (the copy will no-op
         if the source files are older, so the timestamps won't change) than the last time we remember deploying them --> 
@@ -371,6 +371,7 @@
                 <include name="simpletest.module"/>
                 <include name="restrictedModule.module"/>
                 <include name="linkedschematest.module"/>
+                <include name="scriptpad.module"/>
             </srcfiles>
         </uptodate>
         <antcall target="wait-for-redeploy-if-needed" />
