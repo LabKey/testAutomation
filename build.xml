@@ -387,7 +387,7 @@
         <touch file="${basedir}/testModuleDeployment.timestamp" />
     </target>
 
-    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, stage-restrictedModule-module, install-rpackages">
+    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, stage-linkedschematest-module, stage-restrictedModule-module, install-rpackages">
     </target>
 
     <target name="stage-linkedschematest-module">
