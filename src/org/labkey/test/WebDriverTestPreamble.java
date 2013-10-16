@@ -13,11 +13,11 @@ public class WebDriverTestPreamble extends BaseWebDriverTest
 {
     public void preamble() throws Exception
     {
-        log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
+        log("\n\n=============== Starting " + Runner.getCurrentTestName() + Runner.getProgress() + " =================");
 
         _startTime = System.currentTimeMillis();
 
-        logToServer("=== Starting " + getClass().getSimpleName() + Runner.getProgress() + " ===");
+        logToServer("=== Starting " + Runner.getCurrentTestName() + Runner.getProgress() + " ===");
         signIn();
         enableEmailRecorder();
         resetErrors();
@@ -32,7 +32,7 @@ public class WebDriverTestPreamble extends BaseWebDriverTest
         {
             if (!isConfigurationSupported()) // skip this check if it returns true with no database info.
             {
-                log("** Skipping " + getClass().getSimpleName() + " test for unsupported configurarion");
+                log("** Skipping " + Runner.getCurrentTestName() + " test for unsupported configurarion");
                 _testFailed = false;
                 return;
             }

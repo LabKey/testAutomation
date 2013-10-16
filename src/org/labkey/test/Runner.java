@@ -78,6 +78,7 @@ public class Runner extends TestSuite
     private static SuiteBuilder _suites = SuiteBuilder.getInstance();
     private static Map<Test, Long> _testStats = new LinkedHashMap<>();
     private static int _testCount;
+    private static Class _curentTest;
     private static List<Class> _remainingTests;
     private static List<String> _passedTests = new ArrayList<>();
     private static List<String> _failedTests = new ArrayList<>();
@@ -186,6 +187,11 @@ public class Runner extends TestSuite
         return " (" + completed + " of " + _testCount + ")";
     }
 
+    public static String getCurrentTestName()
+    {
+        return _curentTest != null ? _curentTest.getSimpleName() : "Unknown Test";
+    }
+
     public static boolean isFinalTest()
     {
         return 0 == (_remainingTests.size() - 1);
@@ -245,6 +251,7 @@ public class Runner extends TestSuite
             {
                 int failCount = testResult.failureCount();
                 int errorCount = testResult.errorCount();
+                _curentTest = ((JUnit4TestAdapter)test).getTestClass();
                 super.runTest(test, testResult);
                 failed = testResult.failureCount() > failCount;
                 errored = testResult.errorCount() > errorCount;

@@ -1754,6 +1754,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         simpleSignIn();
 
+        // Perform initial cleanup for tests using doTestSteps.
         if (currentTest == null && getDriver() != null)
         {
             currentTest = this;
@@ -2396,7 +2397,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     protected File ensureDumpDir()
     {
-        File dumpDir = new File(TestProperties.getDumpDir(), getClass().getSimpleName());
+        File dumpDir = new File(TestProperties.getDumpDir(), Runner.getCurrentTestName());
         if ( !dumpDir.exists() )
             dumpDir.mkdirs();
 

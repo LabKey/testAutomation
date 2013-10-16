@@ -45,17 +45,11 @@ public class WebDriverTestPostamble extends BaseWebDriverTest
             }
 
             checkJsErrors();
-
-            logToServer("=== Completed " + currentTest.getClass().getSimpleName() + Runner.getProgress() + " ===");
-
-            log("=============== Completed " + currentTest.getClass().getSimpleName() + Runner.getProgress() + " =================");
         }
-        else
-        {
-            logToServer("=== Completed Test - Setup failed " + Runner.getProgress() + " ===");
 
-            log("=============== Completed Test - Setup failed " + Runner.getProgress() + " =================");
-        }
+        logToServer("=== Completed " + Runner.getCurrentTestName() + Runner.getProgress() + " ===");
+
+        log("=============== Completed " + Runner.getCurrentTestName() + Runner.getProgress() + " =================");
     }
 
     @Override
