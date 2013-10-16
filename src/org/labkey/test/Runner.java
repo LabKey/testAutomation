@@ -251,7 +251,11 @@ public class Runner extends TestSuite
             {
                 int failCount = testResult.failureCount();
                 int errorCount = testResult.errorCount();
-                _curentTest = ((JUnit4TestAdapter)test).getTestClass();
+                if (test instanceof JUnit4TestAdapter)
+                    _curentTest = ((JUnit4TestAdapter)test).getTestClass();
+                else
+                    _curentTest = test.getClass();
+
                 super.runTest(test, testResult);
                 failed = testResult.failureCount() > failCount;
                 errored = testResult.errorCount() > errorCount;
