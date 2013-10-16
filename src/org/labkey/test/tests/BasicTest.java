@@ -88,7 +88,7 @@ public class BasicTest extends BaseWebDriverTest
 
         // Navigate to the credits page and verify that all external components are documented
         clickAndWait(Locator.linkWithText("credits"));
-//        assertTextNotPresent("WARNING:");
+        assertTextNotPresent("WARNING:");
 
         ensureAdminMode();
         clickProject(PROJECT_NAME);
