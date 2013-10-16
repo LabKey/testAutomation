@@ -39,11 +39,13 @@ import java.util.Map;
 public class CustomizeViewsHelperWD extends AbstractHelperWD
 {
     private final Locator.IdLocator _dataRegion;
+    private RReportHelperWD _reportHelper;
 
     public CustomizeViewsHelperWD(BaseWebDriverTest test)
     {
         super(test);
         _dataRegion = Locator.id("");
+        _reportHelper = new RReportHelperWD(test);
     }
 
     public CustomizeViewsHelperWD(BaseWebDriverTest test, Locator.IdLocator dataRegion)
@@ -694,15 +696,9 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
             Assert.fail("Unimplemented");
 
         if (shareView)
-        {
-            _test.checkCheckbox("shareReport");
-        }
+            _reportHelper.selectOption(RReportHelperWD.ReportOption.shareReport);
 
-        _test.clickButton("Save", 0);
-
-
-        _test.setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), name);
-        _test._extHelper.clickExtButton("Save");
+        _reportHelper.saveReport(name);
     }
 
     /** Check that a column is present. */

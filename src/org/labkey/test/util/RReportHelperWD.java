@@ -35,6 +35,24 @@ import java.util.regex.Pattern;
  */
 public class RReportHelperWD extends AbstractHelperWD
 {
+    public enum ReportOption {
+        shareReport("Make this view available to all users", true),
+        showSourceTab("Show source tab to all users", true),
+        runInPipeline("Run this view in the background as a pipeline job", true),
+        knitrNone("None", false),
+        knitrHtml("Html", false),
+        knitrMarkdown("Markdown", false);
+
+        public String _label;
+        public boolean _isCheckbox;
+
+        ReportOption(String label, boolean isCheckbox)
+        {
+            _label = label;
+            _isCheckbox = isCheckbox;
+        }
+    }
+
     public RReportHelperWD(BaseWebDriverTest test)
     {
         super(test);
@@ -278,12 +296,42 @@ public class RReportHelperWD extends AbstractHelperWD
         }
     }
 
-    @LogMethod
     public void saveReport(String name)
     {
-        _test.click(Locator.linkWithText("Source"));
         _test.clickButton("Save", 0);
-        _test._extHelper.setExtFormElement(name);
-        _test._extHelper.clickExtButton("Save");
+
+        if (null != name)
+        {
+            Locator locator = _test._ext4Helper.ext4Window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+            if (_test.isElementPresent(locator))
+            {
+                _test.setFormElement(locator, name);
+                _test._ext4Helper.clickWindowButton("Save View", "OK", _test.WAIT_FOR_JAVASCRIPT, 0);
+            }
+        }
+    }
+
+    public void selectOption(ReportOption option)
+    {
+        if (option._isCheckbox)
+            _test._ext4Helper.checkCheckbox(option._label);
+        else
+            _test._ext4Helper.selectRadioButton(option._label);
+    }
+
+    public void clickViewTab()
+    {
+        clickDesignerTab("View");
+    }
+
+    public void clickSourceTab()
+    {
+        clickDesignerTab("Source");
+    }
+
+    public void clickDesignerTab(String name)
+    {
+        _test._ext4Helper.clickTabContainingText(name);
+        _test.sleep(2000); // TODO
     }
 }

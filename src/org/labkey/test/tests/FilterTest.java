@@ -616,6 +616,7 @@ public class FilterTest extends ListTest
                 log("** Second filter: " + filter2Type + ".  value:" + filter2);
             setFilter(TABLE_NAME, fieldKey, filter1Type, filter1, filter2Type, filter2);
 
+            _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
             log("** Checking filter present in R view");
@@ -625,6 +626,7 @@ public class FilterTest extends ListTest
             beginAt(url);
 
 
+        _ext4Helper.waitForMaskToDisappear();
         checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
         if(url==null)
@@ -706,7 +708,6 @@ public class FilterTest extends ListTest
     @LogMethod
     protected void checkFilterWasApplied(String[] textPresentAfterFilter, String[] textNotPresentAfterFilter, String columnName, String filter1Type, String filter1, String filter2Type, String filter2 )
     {
-        _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         assertTextPresent(textPresentAfterFilter);
         assertTextNotPresent(textNotPresentAfterFilter);
         //make sure we show user a description of what's going on.  See 11.2-3_make_filters_work.docx

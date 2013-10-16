@@ -120,6 +120,12 @@ public class Ext4Helper extends AbstractHelper
         _test.click(l);
     }
 
+    public void selectRadioButton(@LoggedParam String selection)
+    {
+        Locator l = Locators.radiobutton(_test, selection);
+        _test.click(l);
+    }
+
     public void clickExt4Tab(String tabname)
     {
 
@@ -140,7 +146,7 @@ public class Ext4Helper extends AbstractHelper
     {
         if (!isChecked(label))
         {
-            Locator l = Locator.xpath("//table[contains(@class, 'x4-form-item')][.//label[text()='" + label + "']]//input[contains(@class,'x4-form-checkbox')]");
+            Locator l = Locators.checkbox(_test, label);
             _test.click(l);
         }
     }
@@ -437,5 +443,24 @@ public class Ext4Helper extends AbstractHelper
     public static Locator.XPathLocator ext4Window(String title)
     {
         return Locator.xpath("//div").withClass("x4-window").notHidden().withDescendant(Locator.xpath("//span").withClass("x4-window-header-text").withText(title));
+    }
+
+    public static class Locators
+    {
+        public static Locator.XPathLocator checkbox(BaseSeleniumWebTest test, String label)
+        {
+            Locator.XPathLocator l = Locator.xpath("//input[contains(@class,'x4-form-checkbox')][../label[text()='" + label + "']]");
+            if (!test.isElementPresent(l))
+                l = Locator.xpath("//input[contains(@class,'x4-form-checkbox')][../../td/label[text()='" + label + "']]");
+            return l;
+        }
+
+        public static Locator.XPathLocator radiobutton(BaseSeleniumWebTest test, String label)
+        {
+            Locator.XPathLocator l = Locator.xpath("//input[contains(@class,'x4-form-radio')][../label[contains(text(), '" + label + "')]]");
+            if (!test.isElementPresent(l))
+                l = Locator.xpath("//input[contains(@class,'x4-form-radio')][../../td/label[text()='" + label + "']]");
+            return l;
+        }
     }
 }

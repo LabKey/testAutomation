@@ -32,9 +32,12 @@ import java.util.Map;
 
 public class CustomizeViewsHelper extends AbstractHelper
 {
+    private RReportHelper _reportHelper;
+
     public CustomizeViewsHelper(BaseSeleniumWebTest test)
     {
         super(test);
+        _reportHelper = new RReportHelper(test);
     }
 
     public void openCustomizeViewPanel()
@@ -620,15 +623,9 @@ public class CustomizeViewsHelper extends AbstractHelper
             Assert.fail("Unimplemented");
 
         if (shareView)
-        {
-            _test.checkCheckbox("shareReport");
-        }
+            _reportHelper.selectOption(RReportHelper.ReportOption.shareReport);
 
-        _test.clickButton("Save", 0);
-
-
-        _test.setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), name);
-        _test._extHelper.clickExtButton("Save");
+        _reportHelper.saveReport(name);
     }
 
     /** Check that a column is present. */

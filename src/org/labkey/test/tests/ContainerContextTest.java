@@ -57,6 +57,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     private static final String COLOR = "Red";
     private static final String MANUFACTURER = "Toyota";
     private static final String MODEL = "Prius C";
+    private RReportHelperWD _rReportHelperWD = new RReportHelperWD(this);
 
     @Override
     protected boolean isFileUploadTest()
@@ -107,8 +108,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
     protected void doSetup() throws Exception
     {
-        RReportHelperWD rReportHelperWD = new RReportHelperWD(this);
-        rReportHelperWD.ensureRConfig();
+        _rReportHelperWD.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), null);
         enableModule(getProjectName(), "simpletest");
@@ -276,10 +276,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         clickFolder(folder);
         clickAndWait(Locator.linkWithText(listName));
         clickMenuButton("Views", "Create", "R View");
-        clickCheckboxById("runInBackground");
-        clickButton("Save", 0);
-        setFormElement(Locator.xpath("//input[@class='ext-mb-input']"), folder + "-BackgroundReport");
-        _extHelper.clickExtButton("Save", 0);
+        _rReportHelperWD.selectOption(RReportHelperWD.ReportOption.runInPipeline);
+        _rReportHelperWD.saveReport(folder + "-BackgroundReport");
         waitForElement(Locator.id("query"));
 
         log("** Executing background R script");

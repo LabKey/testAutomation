@@ -19,6 +19,7 @@ import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 
@@ -32,6 +33,24 @@ import java.io.FilenameFilter;
  */
 public class RReportHelper extends AbstractHelper
 {
+    public enum ReportOption {
+        shareReport("Make this view available to all users", true),
+        showSourceTab("Show source tab to all users", true),
+        runInPipeline("Run this view in the background as a pipeline job", true),
+        knitrNone("None", false),
+        knitrHtml("Html", false),
+        knitrMarkdown("Markdown", false);
+
+        public String _label;
+        public boolean _isCheckbox;
+
+        ReportOption(String label, boolean isCheckbox)
+        {
+            _label = label;
+            _isCheckbox = isCheckbox;
+        }
+    }
+
     public RReportHelper(BaseSeleniumWebTest test)
     {
         super(test);
@@ -59,17 +78,14 @@ public class RReportHelper extends AbstractHelper
         _test.log("execute script");
 
         // running a saved script
-        if (!_test.isLinkPresentWithText("Download input data") && _test.isLinkPresentWithText("Source"))
-        {
-            _test._extHelper.clickExtTab("Source");
-        }
+        _test._ext4Helper.clickTabContainingText("Source");
 
         _test.setCodeEditorValue("script-report-editor", script);
-        _test._extHelper.clickExtTab("View");
-        _test._extHelper.waitForLoadingMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT * 5);
+        _test._ext4Helper.clickTabContainingText("View");
+        _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 5);
         _test.waitForElement(Locator.xpath("//table[@class='labkey-output']"), _test.getDefaultWaitForPage());
 
-        Locator l = Locator.xpath("//div[@id='viewDiv']//pre");
+        Locator l = Locator.xpath("//div[@class='reportView']//pre");
         String html = _test.getText(l);
 
         if (failOnError)
@@ -247,9 +263,40 @@ public class RReportHelper extends AbstractHelper
     @LogMethod
     public void saveReport(String name)
     {
-        _test.click(Locator.linkWithText("Source"));
         _test.clickButton("Save", 0);
-        _test._extHelper.setExtFormElement(name);
-        _test._extHelper.clickExtButton("Save");
+
+        if (null != name)
+        {
+            Locator locator = _test._ext4Helper.ext4Window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+            if (_test.isElementPresent(locator))
+            {
+                _test.setFormElement(locator, name);
+                _test._ext4Helper.clickWindowButton("Save View", "OK", _test.WAIT_FOR_JAVASCRIPT, 0);
+            }
+        }
+    }
+
+    public void selectOption(ReportOption option)
+    {
+        if (option._isCheckbox)
+            _test._ext4Helper.checkCheckbox(option._label);
+        else
+            _test._ext4Helper.selectRadioButton(option._label);
+    }
+
+    public void clickViewTab()
+    {
+        clickDesignerTab("View");
+    }
+
+    public void clickSourceTab()
+    {
+        clickDesignerTab("Source");
+    }
+
+    public void clickDesignerTab(String name)
+    {
+        _test._ext4Helper.clickTabContainingText(name);
+        _test.sleep(2000); // TODO
     }
 }

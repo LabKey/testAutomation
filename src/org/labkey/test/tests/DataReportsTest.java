@@ -396,8 +396,8 @@ public class DataReportsTest extends ReportTest
             if (!_rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
                 Assert.fail("There was an error running the script");
         clickSourceTab();
-        _ext4Helper.checkCheckbox("Make this view available to all users");
-        _ext4Helper.checkCheckbox("Run this view in the background as a pipeline job");
+        _rReportHelper.selectOption(RReportHelperWD.ReportOption.shareReport);
+        _rReportHelper.selectOption(RReportHelperWD.ReportOption.runInPipeline);
         clickViewTab();
 
         log("Check that R script worked");
@@ -507,9 +507,9 @@ public class DataReportsTest extends ReportTest
 
         if(share)
         {
-            _ext4Helper.checkCheckbox("Make this view available to all users");
+            _rReportHelper.selectOption(RReportHelperWD.ReportOption.shareReport);
             if(shareSource)
-                _ext4Helper.checkCheckbox("Show source tab to all users");
+                _rReportHelper.selectOption(RReportHelperWD.ReportOption.showSourceTab);
         }
         saveReport(name);
 
@@ -519,17 +519,7 @@ public class DataReportsTest extends ReportTest
     private void saveReport(String name)
     {
         clickSourceTab();
-        clickButton("Save", 0);
-
-        if (null != name)
-        {
-            Locator locator = _ext4Helper.ext4Window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
-            if (isElementPresent(locator))
-            {
-                setFormElement(locator, name);
-                _ext4Helper.clickWindowButton("Save View", "OK", WAIT_FOR_JAVASCRIPT, 0);
-            }
-        }
+        _rReportHelper.saveReport(name);
     }
 
     private void resaveReport()

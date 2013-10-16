@@ -116,6 +116,12 @@ public class Ext4HelperWD extends AbstractHelperWD
         _test.click(l);
     }
 
+    public void selectRadioButton(String selection)
+    {
+        Locator l = Locators.radiobutton(_test, selection);
+        _test.click(l);
+    }
+
     @LogMethod(quiet = true)
     public void waitForComponentNotDirty(@LoggedParam final String componentId)
     {
@@ -475,6 +481,14 @@ public class Ext4HelperWD extends AbstractHelperWD
             Locator.XPathLocator l = Locator.xpath("//input[contains(@class,'x4-form-checkbox')][../label[text()='" + label + "']]");
             if (!test.isElementPresent(l))
                 l = Locator.xpath("//input[contains(@class,'x4-form-checkbox')][../../td/label[text()='" + label + "']]");
+            return l;
+        }
+
+        public static Locator.XPathLocator radiobutton(BaseWebDriverTest test, String label)
+        {
+            Locator.XPathLocator l = Locator.xpath("//input[contains(@class,'x4-form-radio')][../label[contains(text(), '" + label + "')]]");
+            if (!test.isElementPresent(l))
+                l = Locator.xpath("//input[contains(@class,'x4-form-radio')][../../td/label[text()='" + label + "']]");
             return l;
         }
 
