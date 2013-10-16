@@ -43,6 +43,7 @@ public class KnitrReportTest extends ReportTest
     private static final Path scriptpadReports = Paths.get(getLabKeyRoot(), "server/test/modules/scriptpad/resources/reports/schemas");
     private static final Path rhtmlReport = scriptpadReports.resolve("script_rhtml.rhtml");
     private static final Path rmdReport = scriptpadReports.resolve("script_rmd.rmd");
+    private final RReportHelperWD _rReportHelper = new RReportHelperWD(this);
 
     @Nullable
     @Override
@@ -85,7 +86,7 @@ public class KnitrReportTest extends ReportTest
         Locator[] reportContains = {Locator.tag("p").withText("This is a minimal example which shows knitr working with HTML pages in LabKey."),
                                     Locator.tag("img").withAttribute("title", "plot of chunk blood-pressure-scatter"),
                                     Locator.tag("pre").containing("## \"1\",249318596,\"2008-05-17\",86,36,129,76,64,17,0,\"false\",\"English\",\"urn:lsid:labkey.com:Study.Data-2156:5004.249318596.20080517.0000\""),
-                                    Locator.css("span.hl.kwd").withText("message"),
+                                    Locator.css("span.functioncall").withText("message"),
                                     Locator.tag("pre").withText("## knitr says hello to HTML!"),
                                     Locator.tag("pre").withText("## Error: non-numeric argument to binary operator"),
                                     Locator.tag("p").withText("Well, everything seems to be working. Let's ask R what is the value of \u03C0? Of course it is 3.1416.")};
@@ -95,7 +96,7 @@ public class KnitrReportTest extends ReportTest
                                       "begin.rcode",                     // knitr commands shouldn't be visible
                                       "opts_chunk"};                     // Un-echoed R code
 
-        createAndVerifyKnitrReport(rhtmlReport, KnitrFormat.Html, reportContains, reportNotContains);
+        createAndVerifyKnitrReport(rhtmlReport, RReportHelperWD.ReportOption.knitrHtml, reportContains, reportNotContains);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -112,17 +113,10 @@ public class KnitrReportTest extends ReportTest
                                       "{r",               // Markdown for R code chunks
                                       "data_means"};      // Non-echoed R code
 
-        createAndVerifyKnitrReport(rmdReport, KnitrFormat.Markdown, reportContains, reportNotContains);
+        createAndVerifyKnitrReport(rmdReport, RReportHelperWD.ReportOption.knitrMarkdown, reportContains, reportNotContains);
     }
 
-    private enum KnitrFormat
-    {
-        Markdown,
-        Html,
-        None
-    }
-
-    private void createAndVerifyKnitrReport(Path reportSourcePath, KnitrFormat format, Locator[] reportContains, String[] reportNotContains)
+    private void createAndVerifyKnitrReport(Path reportSourcePath, RReportHelperWD.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains)
     {
         final String reportSource = readReport(reportSourcePath);
         final String reportName = reportSourcePath.getFileName() + " Report";
@@ -131,19 +125,16 @@ public class KnitrReportTest extends ReportTest
         goToManageViews();
 
         clickAddReport("R View", false);
-        checkRadioButton(Locator.radioButtonByNameAndValue("knitrFormat", format.toString()));
+        _rReportHelper.selectOption(knitrOption);
         setCodeEditorValue("script-report-editor", reportSource);
 
         // Regression test: Issue #18602
-        _extHelper.clickExtTab("View");
+        _rReportHelper.clickViewTab();
         assertReportContents(reportContains, reportNotContains);
 
-        _extHelper.clickExtTab("Source");
+        _rReportHelper.clickSourceTab();
         Assert.assertEquals("Incorrect number of lines present in code editor.", reportSource.split("\n").length, getElementCount(Locator.css(".CodeMirror-gutter-text pre")));
-        clickButton("Save", 0);
-        _extHelper.waitForExtDialog("Save View");
-        _extHelper.setExtFormElement(reportName);
-        _extHelper.clickExtButton("Save View", "Save");
+        _rReportHelper.saveReport(reportName);
 
         openView(reportName);
 
@@ -152,7 +143,7 @@ public class KnitrReportTest extends ReportTest
 
     private void assertReportContents(Locator[] reportContains, String[] reportNotContains)
     {
-        Locator reportDiv = Locator.css("#viewDiv > div.labkey-knitr");
+        Locator reportDiv = Locator.css("div.reportView > div.labkey-knitr");
         waitForElement(reportDiv);
         String reportText = getText(reportDiv);
 
