@@ -84,7 +84,6 @@ modules/restrictedModule/module.xml -text
 modules/restrictedModule/views/RestrictedWebPart.webpart.xml -text
 modules/restrictedModule/views/begin.html -text
 modules/restrictedModule/views/webpart.html -text
-modules/scriptpad/build.xml -text
 modules/scriptpad/module.properties -text
 modules/scriptpad/resources/reports/schemas/consoleOnly.r -text
 modules/scriptpad/resources/reports/schemas/err.r -text
