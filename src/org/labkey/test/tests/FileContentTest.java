@@ -32,6 +32,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
+import static org.labkey.test.WebTestHelper.getHttpGetResponse;
+
 @Category(BVT.class)
 public class FileContentTest extends BaseWebDriverTest
 {
@@ -88,6 +90,8 @@ public class FileContentTest extends BaseWebDriverTest
         PipelineHelper pipelineHelper = new PipelineHelper(this);
 
         _containerHelper.createProject(PROJECT_NAME, null);
+        // Trigger email digest in order to reset timer
+        beginAt(getBaseURL() + "/filecontent/" + EscapeUtil.encode(PROJECT_NAME) + "/sendShortDigest.view");
         createPermissionsGroup(TEST_GROUP, TEST_USER);
         setPermissions(TEST_GROUP, "Editor");
         exitPermissionsUI();
@@ -247,20 +251,10 @@ public class FileContentTest extends BaseWebDriverTest
         goToModule("Dumbster");
         assertTextNotPresent(TEST_USER);  // User opted out of notifications
 
-        // All notifications might not appear in one digest
-        if (isElementPresent(Locator.linkWithText("File Management Notification").index(1)))
-        {
-            click(Locator.linkWithText("File Management Notification"));
-            click(Locator.linkWithText("File Management Notification").index(1));
-            assertTextBefore("File deleted", "File uploaded"); // Deletion notification in most recent notification
-            assertTextBefore("File uploaded", "annotations updated"); // Upload and update in the older notification
-        }
-        else
-        {
-            click(Locator.linkWithText("File Management Notification"));
-            assertTextBefore("File uploaded", "annotations updated"); // All notifications in one email
-            assertTextBefore("annotations updated", "File deleted");
-        }
+        // Notifications should all be in a single digest as long as test runs in less than 15 minutes
+        click(Locator.linkWithText("File Management Notification"));
+        assertTextBefore("File uploaded", "annotations updated"); // All notifications in one email
+        assertTextBefore("annotations updated", "File deleted");
     }
 
     @Override public BrowserType bestBrowser()
