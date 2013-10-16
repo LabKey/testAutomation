@@ -5,11 +5,11 @@
     <transforms>
         <transform id="step1" type="org.labkey.di.pipeline.TransformTask">
             <description>Copy to target</description>
-            <source schemaName="vehicle" queryName="etl_source" timestampcolumnname="container" />
+            <source schemaName="vehicle" queryName="etl_source" timestampcolumnname="name" />
             <destination schemaName="vehicle" queryName="etl_target" />
         </transform>
     </transforms>
-    <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="container" />
+    <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="name" />
     <schedule>
     </schedule>
 </etl>
