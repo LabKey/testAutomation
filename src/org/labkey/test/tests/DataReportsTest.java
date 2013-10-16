@@ -17,6 +17,9 @@ package org.labkey.test.tests;
 
 import com.sun.istack.internal.NotNull;
 import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -119,34 +122,37 @@ public class DataReportsTest extends ReportTest
         super.doCleanup(afterTest);
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
-    protected void doCreateSteps()
+    @BeforeClass
+    public static void doSetup() throws Exception
     {
-        enableEmailRecorder();
+        DataReportsTest initTest = new DataReportsTest();
+        initTest.doCleanup(false);
+
         // fail fast if R is not configured
-        _rReportHelper.ensureRConfig();
+        initTest._rReportHelper.ensureRConfig();
 
         // import study and wait; no specimens needed
-        importStudy();
-        waitForPipelineJobsToComplete(1, "study import", false);
+        initTest.importStudy();
+        initTest.waitForPipelineJobsToComplete(1, "study import", false);
 
         // need this to turn off the demographic bit in the DEM-1 dataset
-        clickFolder(getFolderName());
-        setDemographicsBit("DEM-1: Demographics", false);
+        initTest.clickFolder(initTest.getFolderName());
+        initTest.setDemographicsBit("DEM-1: Demographics", false);
+
+        currentTest = initTest;
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    protected void doVerifySteps()
-    {
-        doQueryReportTests();
-        doCrosstabViewTest();
-        doGridViewTest();
-        doRReportsTest();
-        doAdvancedViewTest();
-    }
+    @Test @Ignore
+    public void testSteps(){}
 
-    @LogMethod
-    private void doQueryReportTests()
+    @Override
+    protected void doVerifySteps(){}
+
+    @Override
+    protected void doCreateSteps(){}
+
+    @Test
+    public void doQueryReportTests()
     {
         log("Create a query report.");
 
@@ -223,10 +229,11 @@ public class DataReportsTest extends ReportTest
         Assert.assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[3]) == 3);
     }
 
-    @LogMethod
-    private void doCrosstabViewTest()
+    @Test
+    public void doCrosstabViewTest()
     {
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
         clickMenuButton("Views", "Create", "Crosstab View");
@@ -253,10 +260,13 @@ public class DataReportsTest extends ReportTest
         deleteReport("TestReport");
     }
 
-    @LogMethod
-    private void doGridViewTest()
+    @Test
+    public void doGridViewTest()
     {
         // create new grid view report:
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        goToManageViews();
         String viewName = "DRT Eligibility Query";
         clickAddReport("Grid View", false);
         setFormElement(Locator.name("label"), viewName);
@@ -267,14 +277,14 @@ public class DataReportsTest extends ReportTest
         clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
         deleteReport(viewName);
-
     }
 
-    @LogMethod
-    private void doAdvancedViewTest()
+    @Test
+    public void doAdvancedViewTest()
     {
         // create new external report
-        clickAndWait(Locator.linkWithText(getStudyLabel()));
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickMenuButton("Views", "Create", "Advanced View");
         selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
@@ -294,8 +304,8 @@ public class DataReportsTest extends ReportTest
         assertTextPresent("Female");
     }
 
-    @LogMethod
-    protected void doRReportsTest()
+    @Test
+    public void doRReportsTest()
     {
         log("Create an R Report");
 
