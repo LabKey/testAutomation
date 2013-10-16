@@ -3874,7 +3874,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 sleep(1000);
             refresh();
         }
-        Assert.fail(text + " did not appear");
+        Assert.fail(text + " did not appear [" + wait + "ms]");
     }
     public void waitForText(final String text, int wait)
     {

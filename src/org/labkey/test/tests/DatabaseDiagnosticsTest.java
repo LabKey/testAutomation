@@ -15,12 +15,14 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PipelineHelper;
 
 /**
@@ -29,7 +31,7 @@ import org.labkey.test.util.PipelineHelper;
  * Time: 12:32 PM
  */
 @Category({DailyA.class, DailyB.class})
-public class DatabaseDiagnosticsTest extends BaseWebDriverTest
+public class DatabaseDiagnosticsTest extends BaseWebDriverMultipleTest
 {
     @Override
     protected String getProjectName()
@@ -37,15 +39,8 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
         return null;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
-    {
-        validateDomainsTest();
-        databaseCheckTest();
-    }
-
-    @LogMethod
-    private void validateDomainsTest()
+    @Test
+    public void validateDomainsTest()
     {
         goToAdmin();
 
@@ -57,12 +52,12 @@ public class DatabaseDiagnosticsTest extends BaseWebDriverTest
 
         clickAndWait(PipelineHelper.Locators.pipelineStatusLink(0));
 
-        waitForTextWithRefresh("Check complete", WAIT_FOR_JAVASCRIPT);
+        waitForTextWithRefresh("Check complete", 30000);
         assertTextPresent("Check complete, 0 errors found");
     }
 
-    @LogMethod
-    private void databaseCheckTest()
+    @Test
+    public void databaseCheckTest()
     {
         goToAdmin();
         clickAndWait(Locator.linkWithText("Check Database"));
