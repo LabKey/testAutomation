@@ -41,6 +41,11 @@ public class TestSet
         _tests = tests;
     }
 
+    void addTests(TestSet tests)
+    {
+        _tests.addAll(tests.getTestList());
+    }
+
     public String name()
     {
         return _suite.getSimpleName();

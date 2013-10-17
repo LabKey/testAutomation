@@ -619,21 +619,33 @@ public class Runner extends TestSuite
 
     protected static TestSet getTestSet()
     {
-        String suiteName = System.getProperty("suite");
-        if (suiteName != null)
+        String suites = System.getProperty("suite");
+        if (suites != null)
         {
-            try
+            TestSet tests = null;
+            String[] suitesColl = StringUtils.split(suites, ",");
+            for(String suiteName : suitesColl)
             {
-                return _suites.getTestSet(suiteName);
+                try
+                {
+                    if(null == tests)
+                    {
+                        tests = _suites.getTestSet(suiteName);
+                    }
+                    else
+                    {
+                        tests.addTests(_suites.getTestSet(suiteName));
+                    }
+                }
+                catch (Exception e)
+                {
+                    System.out.println("Couldn't find suite '" + suiteName + "'.  Valid suites are:");
+                    for (Class suite : _suites.getSuites())
+                        System.out.println("   " + suite.getSimpleName());
+                }
             }
-            catch (Exception e)
-            {
-                System.out.println("Couldn't find suite '" + suiteName + "'.  Valid suites are:");
-                for (Class suite : _suites.getSuites())
-                    System.out.println("   " + suite.getSimpleName());
-            }
+            return tests;
         }
-
         return _suites.getTestSet(DEFAULT_SUITE);
     }
 
