@@ -161,6 +161,7 @@ public class DataReportsTest extends ReportTest
         goToManageViews();
 
         clickAddReport("Query Report", false);
+        waitForElement(Locator.name("viewName"));
 
         setFormElement(Locator.name("viewName"), QUERY_REPORT_NAME);
         setFormElement(Locator.name("description"), QUERY_REPORT_DESCRIPTION);
@@ -188,6 +189,7 @@ public class DataReportsTest extends ReportTest
         goToManageViews();
 
         clickAddReport("Query Report", false);
+        waitForElement(Locator.name("viewName"));
 
         setFormElement(Locator.name("viewName"), QUERY_REPORT_NAME_2);
         setFormElement(Locator.name("description"), QUERY_REPORT_DESCRIPTION_2);
