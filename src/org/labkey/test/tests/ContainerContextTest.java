@@ -41,6 +41,7 @@ import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.WorkbookHelper;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -111,7 +112,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         _rReportHelperWD.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), null);
-        enableModule(getProjectName(), "simpletest");
+        enableModules(Arrays.asList("simpletest", "ViscStudies"), true);
         addWebPart("Workbooks");
 
         createSubfolder(getProjectName(), SUB_FOLDER_A, new String[] {"List", "Study", "ViscStudies"});
