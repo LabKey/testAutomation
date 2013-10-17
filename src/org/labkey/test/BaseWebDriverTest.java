@@ -47,6 +47,7 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestWatcher;
+import org.junit.rules.Timeout;
 import org.junit.runner.Description;
 import org.labkey.remoteapi.Connection;
 import org.labkey.test.util.*;
@@ -1763,11 +1764,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
-    @Test(timeout=2700000) // 45 minute default test timeout
+    @Test
     public void testSteps() throws Exception
     {
         doTestSteps();
     }
+
+    @Rule
+    public Timeout globalTimeout = new Timeout(1800000); // 30 minutes max per method tested
 
     @Rule
     public TestWatcher _watcher = new TestWatcher()
