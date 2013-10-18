@@ -47,6 +47,7 @@ import java.util.ArrayList;
 public class TimeChartImportTest extends TimeChartTest
 {
     private static final String MULTI_FOLDER_ZIP = "/sampledata/study/TimeChartTesting.folder.zip";
+    private static final String EXPORT_TEST_FOLDER = "exportTestFolder";
     private static final String DATE_STUDY_FOLDER_NAME = "Date Based Study";
     private static ArrayList<TimeChartInfo> DATE_CHARTS = new ArrayList<>();
     private static final String VISIT_STUDY_FOLDER_NAME = "Visit Based Study";
@@ -60,6 +61,7 @@ public class TimeChartImportTest extends TimeChartTest
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest.importFolderFromZip(new File(getLabKeyRoot(), MULTI_FOLDER_ZIP));
+        initTest._containerHelper.createSubfolder(initTest.getProjectName(), EXPORT_TEST_FOLDER, "Collaboration");
         initTest.populateChartConfigs();
 
         currentTest = initTest;
@@ -251,7 +253,7 @@ public class TimeChartImportTest extends TimeChartTest
         String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
         waitAndClick(Locator.ext4Button("Close"));
 
-        clickTab("Overview");
+        clickFolder(EXPORT_TEST_FOLDER);
         new PortalHelper(this).addWebPart("Wiki");
         createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "timeChartExportTest");
