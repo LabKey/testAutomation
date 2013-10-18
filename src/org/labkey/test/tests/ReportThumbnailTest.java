@@ -32,7 +32,11 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "ReportThumbnailTest";
     private static final File TEST_STUDY = new File(getSampledataPath(), "study/LabkeyDemoStudyWithCharts.folder.zip");
     private static final File TEST_THUMBNAIL = new File(getSampledataPath(), "Microarray/test1.jpg");
+    private static final File TEST_ICON = new File(getSampledataPath(), "icemr/piggy.JPG");
+    private static final String BOX_PLOT = "Example Box Plot";
+    private static final String SCATTER_PLOT = "Example Scatter Plot";
     private String THUMBNAIL_DATA;
+    private String ICON_DATA;
 
     @Override
     protected String getProjectName()
@@ -44,19 +48,38 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     protected void doTestSteps() throws Exception
     {
         doSetup();
+        doVerifySteps();
+    }
+
+    protected void doVerifySteps() throws Exception
+    {
+        testGenericChartThumbnails();
+        testCustomIcon();
+    }
+
+    private void testGenericChartThumbnails() throws Exception
+    {
         goToDataViews();
-        setThumbnailSRC("Example Box Plot");
-        toggleThumbnailType("Example Box Plot", true);
-        assertNewThumbnail("Example Box Plot");
-        assignCustomThumbnail("Example Box Plot", TEST_THUMBNAIL);
-        assertNewThumbnail("Example Box Plot");
+        setThumbnailSRC(BOX_PLOT);
+        toggleThumbnailType(BOX_PLOT, true);
+        assertNewThumbnail(BOX_PLOT);
+        assignCustomThumbnail(BOX_PLOT, TEST_THUMBNAIL);
+        assertNewThumbnail(BOX_PLOT);
 
         goToDataViews();
-        setThumbnailSRC("Example Scatter Plot");
-        toggleThumbnailType("Example Scatter Plot", true);
-        assertNewThumbnail("Example Scatter Plot");
-        assignCustomThumbnail("Example Scatter Plot", TEST_THUMBNAIL);
-        assertNewThumbnail("Example Scatter Plot");
+        setThumbnailSRC(SCATTER_PLOT);
+        toggleThumbnailType(SCATTER_PLOT, true);
+        assertNewThumbnail(SCATTER_PLOT);
+        assignCustomThumbnail(SCATTER_PLOT, TEST_THUMBNAIL);
+        assertNewThumbnail(SCATTER_PLOT);
+    }
+
+    private void testCustomIcon() throws Exception
+    {
+        goToDataViews();
+        setIconSRC(BOX_PLOT);
+        assignCustomIcon(BOX_PLOT, TEST_ICON);
+        assertNewIcon(BOX_PLOT);
     }
 
     @Override
@@ -151,6 +174,64 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         _ext4Helper.clickExt4Tab("Images");
         waitForElement(Locator.id("customThumbnail"));
         setFormElement(Locator.xpath("//input[@id='customThumbnail-button-fileInputEl']"), thumbnail);
+        _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
+        waitForTextToDisappear("Saving...");
+    }
+
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    protected void setIconSRC(String chart)
+    {
+        waitForElement(Locator.linkWithText(chart));
+        waitAndClick(Locator.xpath("//img[@title='Edit']"));
+        DataViewsTest.clickCustomizeView(chart, this);
+        waitForElement(Locator.name("viewName"));
+        _ext4Helper.clickExt4Tab("Images");
+        Locator iconLocator = Locator.xpath("//div[@class=\"icon\"]/img").notHidden();
+        waitForElement(iconLocator);
+        try
+        {
+            ICON_DATA = WebTestHelper.getHttpGetResponseBody(getAttribute(iconLocator, "src"));
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    protected void assertNewIcon(String chart)
+    {
+        goToDataViews();
+        waitForElement(Locator.xpath("//a[text()='"+chart+"']"));
+        waitAndClick(Locator.xpath("//img[@title='Edit']"));
+        DataViewsTest.clickCustomizeView(chart, this);
+        waitForElement(Locator.name("viewName"));
+        _ext4Helper.clickExt4Tab("Images");
+        Locator iconLocator = Locator.xpath("//div[@class=\"icon\"]/img").notHidden();
+        waitForElement(iconLocator);
+        String iconData;
+        try
+        {
+            iconData = WebTestHelper.getHttpGetResponseBody(getAttribute(iconLocator, "src"));
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+        Assert.assertFalse("Icon was still default", ICON_DATA.equals(iconData));
+        ICON_DATA = iconData;
+    }
+
+    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
+    protected void assignCustomIcon(String chart, File icon)
+    {
+        goToDataViews();
+        waitAndClick(Locator.xpath("//img[@title='Edit']"));
+        DataViewsTest.clickCustomizeView(chart, this);
+        waitForElement(Locator.name("viewName"));
+        _ext4Helper.clickExt4Tab("Images");
+        waitForElement(Locator.id("customIcon"));
+        setFormElement(Locator.xpath("//input[@id='customIcon-button-fileInputEl']"), icon);
         _ext4Helper.clickWindowButton(chart, "Save", 0, 0);
         waitForTextToDisappear("Saving...");
     }
