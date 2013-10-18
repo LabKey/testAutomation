@@ -387,7 +387,7 @@
         <touch file="${basedir}/testModuleDeployment.timestamp" />
     </target>
 
-    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, stage-linkedschematest-module, stage-restrictedModule-module, install-rpackages">
+    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, stage-linkedschematest-module, stage-restrictedModule-module, stage-scriptpad-module, install-rpackages">
     </target>
 
     <target name="stage-linkedschematest-module">
@@ -402,6 +402,13 @@
         <param name="module.name" value="simpletest"/>
         <param name="module.src.dir" value="${project.root}/server/test/modules"/>
       </antcall>
+    </target>
+
+    <target name="stage-scriptpad-module">
+        <antcall target="stage-test-module">
+            <param name="module.name" value="scriptpad"/>
+            <param name="module.src.dir" value="${project.root}/server/test/modules"/>
+        </antcall>
     </target>
 
     <target name="stage-restrictedModule-module">
