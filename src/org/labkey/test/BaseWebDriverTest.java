@@ -4046,11 +4046,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public String getFormElement(Locator loc)
     {
-        WebElement formElement = loc.findElement(getDriver());
-        if ("select".equals(formElement.getTagName()))
-            return new Select(formElement).getFirstSelectedOption().getText();
-        else
-            return formElement.getAttribute("value");
+        return loc.findElement(getDriver()).getAttribute("value");
     }
 
     /**

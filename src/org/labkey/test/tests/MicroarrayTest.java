@@ -102,7 +102,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         setFormElement(Locator.id("name"), SAMPLE_SET);
         setFormElement(Locator.name("data"), SAMPLE_SET_ROWS);
         fireEvent(Locator.name("data"), SeleniumEvent.change);
-        waitForFormElementToEqual(Locator.id("idCol1"), "Name");
+        waitForFormElementToEqual(Locator.id("idCol1"), "0");
         clickButton("Submit");
         waitForElement(Locator.id("Material"));
 
