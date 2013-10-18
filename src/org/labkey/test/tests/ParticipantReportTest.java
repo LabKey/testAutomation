@@ -145,7 +145,7 @@ public class ParticipantReportTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddReport("Mouse Report", true);
+        clickAddReport("Mouse Report");
 
         // select some measures from a dataset
         waitAndClickButton("Choose Measures", 0);
@@ -315,7 +315,7 @@ public class ParticipantReportTest extends ReportTest
 
         // Test group filtering
         goToManageViews();
-        clickAddReport("Mouse Report", false);
+        clickAddReport("Mouse Report");
         // select some measures from a dataset
         waitAndClickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
@@ -382,7 +382,7 @@ public class ParticipantReportTest extends ReportTest
 
         //Participant report with specimen fields.
         goToManageViews();
-        clickAddReport("Mouse Report", false);
+        clickAddReport("Mouse Report");
         // select some measures from a dataset
         waitAndClickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
@@ -436,7 +436,7 @@ public class ParticipantReportTest extends ReportTest
         clickButton("Save");
 
         goToManageViews();
-        clickAddReport("Mouse Report", false);
+        clickAddReport("Mouse Report");
 
         // select some measures from the demographics
         waitAndClickButton("Choose Measures", 0);

@@ -21,7 +21,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.RReportHelper;
 
 /**
  * User: tchadick
@@ -147,7 +146,7 @@ public class ReportSecurityTest extends ReportTest
         clickFolder(getFolderName());
         goToManageViews();
 
-        clickAddReport("Grid View", false);
+        clickAddReport("Grid View");
         setFormElement(Locator.name("label"), TEST_GRID_VIEW);
         selectOptionByText(Locator.id("datasetSelection"), "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create View");

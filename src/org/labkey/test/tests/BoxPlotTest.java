@@ -21,9 +21,6 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * User: tchadick
  * Date: 6/11/13
@@ -49,7 +46,7 @@ public class BoxPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddReport("Box Plot", false);
+        clickAddReport("Box Plot");
 
         //TODO: weird timing with these combo boxes.
         //Try once bug fixed: 15520: Box Plot - Allows selection of invalid schema/Query combination

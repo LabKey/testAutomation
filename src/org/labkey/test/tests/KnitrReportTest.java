@@ -18,14 +18,12 @@ package org.labkey.test.tests;
 import org.junit.Assert;
 import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelperWD;
-import org.openqa.selenium.interactions.Actions;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -124,7 +122,7 @@ public class KnitrReportTest extends ReportTest
         clickProject(getProjectName());
         goToManageViews();
 
-        clickAddReport("R View", false);
+        clickAddReport("R View");
         _rReportHelper.selectOption(knitrOption);
         setCodeEditorValue("script-report-editor", reportSource);
 

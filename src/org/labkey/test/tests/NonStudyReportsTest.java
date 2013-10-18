@@ -21,7 +21,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
-import org.labkey.test.util.CustomizeViewsHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelperWD;
@@ -87,10 +86,10 @@ public class NonStudyReportsTest extends ReportTest
     {
         clickProject(getProjectName());
         goToManageViews();
-        clickAddReport("Attachment Report", false);
+        clickAddReport("Attachment Report");
         clickButton("Cancel");
 
-        clickAddReport("Attachment Report", false);
+        clickAddReport("Attachment Report");
         setFormElement("viewName", ATTACHMENT_REPORT_NAME);
         setFormElement("description", ATTACHMENT_REPORT_DESCRIPTION);
         setFormElement(Locator.id("uploadFile-button-fileInputEl"), ATTACHMENT_REPORT_FILE);
@@ -256,7 +255,7 @@ public class NonStudyReportsTest extends ReportTest
         clickProject(getProjectName());
 
         goToManageViews();
-        clickAddReport("R View", false);
+        clickAddReport("R View");
         RReportHelperWD RReportHelperWD = new RReportHelperWD(this);
         RReportHelperWD.executeScript("# Placeholder script for discussion", "");
         RReportHelperWD.saveReport(DISCUSSED_REPORT);
@@ -302,7 +301,7 @@ public class NonStudyReportsTest extends ReportTest
         clickProject(getProjectName());
         goToManageViews();
 
-        clickAddReport("Link Report", false);
+        clickAddReport("Link Report");
         setFormElement("viewName", LINK_REPORT1_NAME);
         setFormElement("description", LINK_REPORT1_DESCRIPTION);
         assertElementNotPresent(Locator.tag("li").containing("URL must be absolute"));

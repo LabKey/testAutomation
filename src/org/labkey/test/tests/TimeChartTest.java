@@ -21,9 +21,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.UIContainerHelper;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -107,7 +104,7 @@ public abstract class TimeChartTest extends ReportTest
     {
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddReport("Time Chart", true);
+        clickAddReport("Time Chart");
         clickChooseInitialMeasure();
     }
 

@@ -160,7 +160,7 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         goToManageViews();
 
-        clickAddReport("Query Report", false);
+        clickAddReport("Query Report");
         waitForElement(Locator.name("viewName"));
 
         setFormElement(Locator.name("viewName"), QUERY_REPORT_NAME);
@@ -188,7 +188,7 @@ public class DataReportsTest extends ReportTest
 
         goToManageViews();
 
-        clickAddReport("Query Report", false);
+        clickAddReport("Query Report");
         waitForElement(Locator.name("viewName"));
 
         setFormElement(Locator.name("viewName"), QUERY_REPORT_NAME_2);
@@ -270,7 +270,7 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         goToManageViews();
         String viewName = "DRT Eligibility Query";
-        clickAddReport("Grid View", true);
+        clickAddReport("Grid View");
         setFormElement(Locator.id("label"), viewName);
         selectOptionByText(Locator.name("params"), "ECI-1 (ECI-1: Eligibility Criteria)");
         clickButton("Create View");

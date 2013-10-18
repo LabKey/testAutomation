@@ -129,8 +129,8 @@ public abstract class ReportTest extends StudyBaseTestWD
         }
     }
 
-    protected void clickAddReport(String reportName, boolean wait)
+    protected void clickAddReport(String reportName)
     {
-        _extHelper.clickExtMenuButton(wait, Locator.linkContainingText("Add Report"), reportName);
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), reportName);
     }
 }

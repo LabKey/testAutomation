@@ -88,7 +88,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
     {
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddReport("Time Chart", false);
+        clickAddReport("Time Chart");
         clickChooseInitialMeasure();
         _ext4Helper.clickGridRowText("Viral Load Quantified (copies/ml)", 0);
         clickButton("Select", 0);
@@ -140,7 +140,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         portalHelper.addWebPart("Datasets");
         portalHelper.addWebPart("Specimens");
         goToManageViews();
-        clickAddReport("Time Chart", false);
+        clickAddReport("Time Chart");
         clickChooseInitialMeasure();
         waitForText("NAbAssay", WAIT_FOR_JAVASCRIPT);
 
@@ -411,7 +411,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddReport("Time Chart", false);
+        clickAddReport("Time Chart");
         clickChooseInitialMeasure();
         _ext4Helper.clickGridRowText("CD4+ (cells/mm3)", 0);
         clickButton("Select", 0);

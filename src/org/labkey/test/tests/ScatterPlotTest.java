@@ -61,7 +61,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         goToManageViews();
-        clickAddReport("Scatter Plot", false);
+        clickAddReport("Scatter Plot");
 
         _extHelper.waitForExtDialog("Select Chart Query");
         //TODO: weird timing with these combo scatteres.
