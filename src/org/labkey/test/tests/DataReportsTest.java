@@ -270,8 +270,8 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         goToManageViews();
         String viewName = "DRT Eligibility Query";
-        clickAddReport("Grid View", false);
-        setFormElement(Locator.name("label"), viewName);
+        clickAddReport("Grid View", true);
+        setFormElement(Locator.id("label"), viewName);
         selectOptionByText(Locator.name("params"), "ECI-1 (ECI-1: Eligibility Criteria)");
         clickButton("Create View");
         assertElementPresent(Locator.linkWithText("999320016"));
