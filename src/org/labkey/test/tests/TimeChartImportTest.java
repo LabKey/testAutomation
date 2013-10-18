@@ -15,12 +15,13 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
-import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -51,25 +52,29 @@ public class TimeChartImportTest extends TimeChartTest
     private static final String VISIT_STUDY_FOLDER_NAME = "Visit Based Study";
     private static ArrayList<TimeChartInfo> VISIT_CHARTS = new ArrayList<>();
 
-    @Override
-    @LogMethod(category = LogMethod.MethodType.SETUP)
-    protected void doCreateSteps()
+    @BeforeClass
+    public static void doSetup() throws Exception
     {
-        _containerHelper.createProject(getProjectName(), null);
-        importFolderFromZip(new File(getLabKeyRoot(), MULTI_FOLDER_ZIP));
+        TimeChartImportTest initTest = new TimeChartImportTest();
+        initTest.doCleanup(false);
+
+        initTest._containerHelper.createProject(initTest.getProjectName(), null);
+        initTest.importFolderFromZip(new File(getLabKeyRoot(), MULTI_FOLDER_ZIP));
+        initTest.populateChartConfigs();
+
+        currentTest = initTest;
     }
 
-    @Override
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    protected void doVerifySteps()
-    {
-        populateChartConfigs();
-        verifyVisitBasedCharts();
-        verifyDateBasedCharts();
-        verifyExportToScript(VISIT_CHARTS.get(0));
-    }
+    @Test @Ignore
+    public void testSteps(){}
 
-    protected void populateChartConfigs()
+    @Override
+    protected void doVerifySteps(){}
+
+    @Override
+    protected void doCreateSteps(){}
+
+    private void populateChartConfigs()
     {
         VISIT_CHARTS.add(new TimeChartInfo(
                 "One Measure: visit based plot per participant", 17, 47, false,
@@ -164,8 +169,10 @@ public class TimeChartImportTest extends TimeChartTest
         ));
     }
 
-    protected void verifyVisitBasedCharts()
+    @Test
+    public void verifyVisitBasedCharts()
     {
+        goToProjectHome();
         clickFolder(VISIT_STUDY_FOLDER_NAME);
         for (TimeChartInfo chartInfo : VISIT_CHARTS)
         {
@@ -176,8 +183,10 @@ public class TimeChartImportTest extends TimeChartTest
         }
     }
 
-    protected void verifyDateBasedCharts()
+    @Test
+    public void verifyDateBasedCharts()
     {
+        goToProjectHome();
         clickFolder(DATE_STUDY_FOLDER_NAME);
         for (TimeChartInfo chartInfo : DATE_CHARTS)
         {
@@ -188,7 +197,7 @@ public class TimeChartImportTest extends TimeChartTest
         }
     }
 
-    protected void verifyTimeChartInfo(TimeChartInfo info, boolean isTimeChartWizard)
+    private void verifyTimeChartInfo(TimeChartInfo info, boolean isTimeChartWizard)
     {
         log("Verify chart information: " + info.getName());
 
@@ -224,12 +233,15 @@ public class TimeChartImportTest extends TimeChartTest
         waitForElement(Locator.paginationText(info.getGridCount()));
     }
 
-    protected void verifyExportToScript(TimeChartInfo info)
+    @Test
+    public void verifyExportToScript()
     {
         log("Export Time Chart as Script and paste into Wiki");
-
+        goToProjectHome();
         clickFolder(VISIT_STUDY_FOLDER_NAME);
         clickTab("Clinical and Assay Data");
+
+        TimeChartInfo info = VISIT_CHARTS.get(0);
         waitForElement(Locator.linkWithText(info.getName()));
         clickAndWait(Locator.linkWithText(info.getName()));
         waitForCharts(info.getCountSVGs());
@@ -255,7 +267,7 @@ public class TimeChartImportTest extends TimeChartTest
         return BrowserType.CHROME;
     }
 
-    public class TimeChartInfo
+    private class TimeChartInfo
     {
         private String _name;
         private int _countSVGs;
