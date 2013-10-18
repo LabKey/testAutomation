@@ -242,6 +242,7 @@ public class NonStudyReportsTest extends ReportTest
         //set change thumbnail
 //        setFormElement(Locator.xpath("//input[contains(@id, 'customThumbnail')]"), ATTACHMENT_REPORT2_FILE.toString(), false);
 
+        _ext4Helper.clickExt4Tab("Images");
         Ext4FileFieldRefWD ref = Ext4FileFieldRefWD.create(this);
         ref.setToFile(ATTACHMENT_REPORT2_FILE);
         clickButton("Save", 0);
@@ -258,6 +259,7 @@ public class NonStudyReportsTest extends ReportTest
         clickAddReport("R View");
         RReportHelperWD RReportHelperWD = new RReportHelperWD(this);
         RReportHelperWD.executeScript("# Placeholder script for discussion", "");
+        click(Locator.linkWithText("Source"));
         RReportHelperWD.saveReport(DISCUSSED_REPORT);
         clickReportGridLink(DISCUSSED_REPORT);
 
