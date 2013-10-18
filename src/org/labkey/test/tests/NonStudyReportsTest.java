@@ -176,7 +176,6 @@ public class NonStudyReportsTest extends ReportTest
 
         // cannot edit server
         clickTab("Overview");
-        clickWebpartMenuItem("Data Views", true, "Manage Views");
         clickReportDetailsLink(ATTACHMENT_REPORT2_NAME);
         waitForText("Report Details");
         l = getButtonLocator("Edit Report");
