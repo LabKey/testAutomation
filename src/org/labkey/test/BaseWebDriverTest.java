@@ -154,6 +154,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private Stack<String> _impersonationStack = new Stack<>();
     private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
     protected static boolean _testFailed = false;
+    protected static boolean _setupFailed;
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 30000;
     public int defaultWaitForPage = WAIT_FOR_PAGE;
@@ -1733,6 +1734,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @LogMethod @BeforeClass
     public static void performInitialChecks() throws Throwable
     {
+        _setupFailed = true;
+
         _startTime = System.currentTimeMillis();
         WebDriverTestPreamble preamble = new WebDriverTestPreamble();
 
@@ -1762,6 +1765,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             log("Pre-cleaning " + getClass().getSimpleName());
             currentTest.doCleanup(false);
         }
+
+        _setupFailed = false;
     }
 
     @Test
@@ -1864,35 +1869,52 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 log("Failed to fix pipeline tools directory after test failure");
                 dumpPageSnapshot(testName, "fixPipelineToolsDir");
             }
-        }
 
-        doTearDown();
-        _driver = null;
+            doTearDown();
+            _driver = null;
+        }
     }
 
     @LogMethod @AfterClass
     public static void performFinalChecks() throws Throwable
     {
         WebDriverTestPostamble postamble = new WebDriverTestPostamble();
-        try
+
+        if (_setupFailed)
         {
-            if(!_testFailed)
+            try
             {
-                postamble.setUp();
-                postamble.postamble();
+                AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(null);
+                postamble.handleFailure(errorRef, "TestSetup");
+            }
+            finally
+            {
+                currentTest = null;
+                postamble.doTearDown();
             }
         }
-        catch (Throwable t)
+        else
         {
-            _testFailed = true;
-            AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(t);
-            postamble.handleFailure(errorRef, "performFinalChecks");
-            throw errorRef.get();
-        }
-        finally
-        {
-            currentTest = null;
-            postamble.doTearDown();
+            try
+            {
+                if (!_testFailed)
+                {
+                    postamble.setUp();
+                    postamble.postamble();
+                }
+            }
+            catch (Throwable t)
+            {
+                _testFailed = true;
+                AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(t);
+                postamble.handleFailure(errorRef, "performFinalChecks");
+                throw errorRef.get();
+            }
+            finally
+            {
+                currentTest = null;
+                postamble.doTearDown();
+            }
         }
     }
 
@@ -4234,7 +4256,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void clickAt(Locator l, int xCoord, int yCoord, int pageTimeout)
     {
         WebElement el = l.waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        clickAt(el, xCoord, yCoord, pageTimeout);
+    }
 
+    public void clickAt(WebElement el, int xCoord, int yCoord, int pageTimeout)
+    {
         if (pageTimeout > 0)
             prepForPageLoad();
 
@@ -7166,7 +7192,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     /**
      * Wait for an SVG with the specified text (Ignores thumbnails)
-     * @param expectedSvgText exact text expected. Whitespace will be ignored on Firefox due to inconsistencies in getText results.
+     * @param expectedSvgText exact text expected. Whitespace will be ignored on Firefox due to inconsistencies in getText results. Use getText value from Chrome.
      * @param svgIndex the zero-based index of the svg which is expected to match
      */
     public void assertSVG(final String expectedSvgText, final int svgIndex)
