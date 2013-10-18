@@ -17,11 +17,12 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PortalHelper;
 
 /**
  * User: Erik
@@ -29,7 +30,7 @@ import org.labkey.test.util.ListHelper;
  * Time: 4:20:38 PM
  */
 @Category(BVT.class)
-public class MicroarrayTest extends BaseSeleniumWebTest
+public class MicroarrayTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "MicroarrayBVTProject";
     private static final String EXTRACTION_SERVER = "http://www.google.com";
@@ -69,16 +70,12 @@ public class MicroarrayTest extends BaseSeleniumWebTest
     protected void doTestSteps()
     {
         log("Create Project");
-        _containerHelper.createProject(PROJECT_NAME, null);
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Folder Type"));
-        checkRadioButton(Locator.radioButtonByNameAndValue("folderType", "Microarray"));
-        submit();
+        _containerHelper.createProject(PROJECT_NAME, "Microarray");
 
         log("Create an assay");
         clickButton("Manage Assays");
         clickButton("New Assay Design");
-        checkRadioButton("providerName", "Microarray");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "Microarray"));
         clickButton("Next");
         waitForElement(Locator.xpath("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
         setFormElement(Locator.xpath("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);
@@ -99,11 +96,15 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("Microarray Dashboard"));
 
         log("Create Sample Set");
-        addWebPart("Sample Sets");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Sample Sets");
         clickButton("Import Sample Set");
-        setFormElement("name", SAMPLE_SET);
-        setFormElement("data", SAMPLE_SET_ROWS);
-        submit();
+        setFormElement(Locator.id("name"), SAMPLE_SET);
+        setFormElement(Locator.name("data"), SAMPLE_SET_ROWS);
+        fireEvent(Locator.name("data"), SeleniumEvent.change);
+        waitForFormElementToEqual(Locator.id("idCol1"), "Name");
+        clickButton("Submit");
+        waitForElement(Locator.id("Material"));
 
         // First try importing the runs individually
         clickAndWait(Locator.linkWithText("Microarray Dashboard"));
@@ -115,18 +116,18 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
         selectImportDataAction("Use " + ASSAY_NAME);
 
-        setFormElement("batchStringField", "SingleRunProperties");
+        setFormElement(Locator.name("batchStringField"), "SingleRunProperties");
         clickButton("Next");
         assertTextPresent(MAGEML_FILE1);
         waitForElement(Locator.xpath("//div[contains(text(), 'Sample 1')]/../..//tr/td/select"));
         waitForElement(Locator.xpath("//option[contains(text(), 'Second')]"));
-        setFormElement("runIntegerField", "115468001");
+        setFormElement(Locator.name("runIntegerField"), "115468001");
         clickButton("Save and Import Next File");
 
         log("Import second run");
         waitForElement(Locator.xpath("//div[contains(text(), 'Sample 2')]/../..//tr/td/select"));
         assertTextPresent(MAGEML_FILE2);
-        setFormElement("runIntegerField", "115468002");
+        setFormElement(Locator.name("runIntegerField"), "115468002");
         selectOptionByText(Locator.xpath("//div[contains(text(), 'Sample 1')]/../..//tr/td/select"), "Third");
         selectOptionByText(Locator.xpath("//div[contains(text(), 'Sample 2')]/../..//tr/td/select"), "Fourth");
         clickButton("Save and Finish");
@@ -149,10 +150,10 @@ public class MicroarrayTest extends BaseSeleniumWebTest
 
         selectImportDataAction("Use " + ASSAY_NAME);
 
-        setFormElement("batchStringField", "BulkProperties");
+        setFormElement(Locator.name("batchStringField"), "BulkProperties");
 
         assertFormElementEquals("batchStringField", "BulkProperties");
-        checkRadioButton("__enableBulkProperties", "on");
+        checkRadioButton(Locator.radioButtonByNameAndValue("__enableBulkProperties", "on"));
         // Try with an invalid sample name first
         setFormElement(Locator.name("__bulkProperties"), "Barcode\tProbeID_Cy3\tProbeID_Cy5\t" + RUN_STRING_FIELD + "\t" + RUN_INTEGER_FIELD + "\n" +
                 "251379110131_A01\tBogusSampleName!!\tSecond\tFirstString\t11\n" +
@@ -214,8 +215,8 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         _customizeViewsHelper.openCustomizeViewPanel();
         String name = "unneeded view";
         _customizeViewsHelper.saveCustomView(name);
-        assertTextNotPresent(("Error"));
-        assertTextPresent("View: " + name);
+        assertTextNotPresent("Error");
+        assertElementPresent(Locator.css(".labkey-dataregion-msg").withText("View: " + name));
 
         //Issue 16936: Microarray, Viability, Elispot, and other assays fail to find custom run view
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -260,5 +261,11 @@ public class MicroarrayTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         assertTextPresent("Agilent Feature Extraction Software");
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
