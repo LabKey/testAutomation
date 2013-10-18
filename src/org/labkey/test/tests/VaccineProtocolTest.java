@@ -406,6 +406,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
     private void populateStudyDesignLookups()
     {
         goToProjectHome();
+        enableModule("Study", true);
 
         goToQuery("StudyDesignAssays");
         for (String assay : new String[]{"ELISPOT", "Neutralizing Antibodies Panel 1", "ICS", "ELISA"})
