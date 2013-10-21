@@ -491,9 +491,10 @@ var beginTest = function(){
 
 var loadVis = function(){
     LABKEY.requiresVisualization();
+    LABKEY.requiresScript('/vis/SVGConverter.js', true);
     LABKEY.Utils.onTrue({
         testCallback: function(){
-            return LABKEY.vis && LABKEY.vis.Geom && LABKEY.vis.Stat && LABKEY.vis.Layer && LABKEY.vis.Plot;
+            return LABKEY.vis && LABKEY.vis.Geom && LABKEY.vis.Stat && LABKEY.vis.Layer && LABKEY.vis.Plot && LABKEY.vis.SVGConverter;
         },
         successCallback: function(){beginTest.defer(100)},
         errorCallback: doError
