@@ -733,7 +733,7 @@
             <arg line="/F /IM chromedriver.exe"/>
         </exec>
         <exec osfamily="unix" executable="killall">
-            <arg line="-q chromedriver"/>
+            <arg line="-HUP chromedriver"/>
         </exec>
     </target>
 
