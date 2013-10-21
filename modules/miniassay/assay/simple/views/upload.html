@@ -60,7 +60,7 @@
 function setDirty(dirty) {
   LABKEY.setDirty(dirty);
   var save_btns = Ext.DomQuery.select("a:has(span:contains(Save))");
-  if (LABKEY.dirty) {
+  if (LABKEY.isDirty()) {
     Ext.each(save_btns, function (item, index) {
         Ext.get(item).replaceClass('labkey-disabled-button', 'labkey-button');
     });
@@ -74,7 +74,7 @@ function setDirty(dirty) {
 
 function saveBatch()
 {
-  if (!LABKEY.dirty) return;
+  if (!LABKEY.isDirty()) return;
 
   // XXX: do some basic validation before saving...
   LABKEY.Experiment.saveBatch({
