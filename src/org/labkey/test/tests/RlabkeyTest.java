@@ -127,6 +127,7 @@ public class RlabkeyTest extends SimpleApiTest
                     if (!_rReportHelper.executeScript(sb.toString(), verify))
                         Assert.fail("Failed executing R script for test case: " + test.getName());
                 }
+                _rReportHelper.clickSourceTab();
                 _rReportHelper.saveReport("dummy");
             }
         }
