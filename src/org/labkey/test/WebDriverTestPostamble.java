@@ -15,7 +15,10 @@
  */
 package org.labkey.test;
 
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
 
 import static org.labkey.test.TestProperties.isTestCleanupSkipped;
 import static org.labkey.test.WebTestHelper.logToServer;
@@ -30,7 +33,7 @@ public class WebDriverTestPostamble extends BaseWebDriverTest
 {
     public void postamble() throws Exception
     {
-        if (currentTest != null)
+        if (!_anyTestFailed && currentTest != null)
         {
             //make sure you're signed in as admin, because this won't work otherwise
             ensureSignedInAsAdmin();
@@ -60,6 +63,14 @@ public class WebDriverTestPostamble extends BaseWebDriverTest
             }
 
             checkJsErrors();
+        }
+
+        if (!_anyTestFailed && getDownloadDir().exists())
+        {
+            try{
+                FileUtils.deleteDirectory(getDownloadDir());
+            }
+            catch (IOException ignore) { }
         }
 
         logToServer("=== Completed " + Runner.getCurrentTestName() + Runner.getProgress() + " ===");

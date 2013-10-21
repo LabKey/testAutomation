@@ -128,7 +128,6 @@ import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.getHttpGetResponse;
 import static org.labkey.test.WebTestHelper.getTargetServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
-import static org.labkey.test.WebTestHelper.logToServer;
 import static org.labkey.test.TestProperties.*;
 
 /**
@@ -154,6 +153,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private Stack<String> _impersonationStack = new Stack<>();
     private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
     protected static boolean _testFailed = false;
+    protected static Boolean _anyTestFailed;
     protected static boolean _setupFailed;
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 30000;
@@ -206,6 +206,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _ext4Helper = new Ext4HelperWD(this);
         _listHelper = new ListHelperWD(this);
         _customizeViewsHelper = new CustomizeViewsHelperWD(this);
+        if (null == _anyTestFailed) _anyTestFailed = false;
         _jsErrors = new ArrayList<>();
         _downloadDir = new File(ensureDumpDir(), "downloads");
 
@@ -686,14 +687,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             getDriver().quit();
             _driver = null;
-        }
-
-        if (!_testFailed && getDownloadDir().exists())
-        {
-            try{
-                FileUtils.deleteDirectory(getDownloadDir());
-            }
-            catch (IOException ignore) { }
         }
     }
 
@@ -1746,7 +1739,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (Exception t)
         {
-            _testFailed = true;
             AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(t);
             preamble.handleFailure(errorRef, "performInitialChecks");
             throw errorRef.get();
@@ -1798,6 +1790,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void handleFailure(AtomicReference<Throwable> errorRef, String testName)
     {
         _testFailed = true;
+        _anyTestFailed = true;
 
         if (errorRef.get() instanceof UnhandledAlertException)    // Catch so we can record the alert's text
         {
@@ -1878,6 +1871,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @LogMethod @AfterClass
     public static void performFinalChecks() throws Throwable
     {
+        _testFailed = false;
         WebDriverTestPostamble postamble = new WebDriverTestPostamble();
 
         if (_setupFailed)
@@ -1885,6 +1879,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             try
             {
                 AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(null);
+                postamble.setUp();
                 postamble.handleFailure(errorRef, "TestSetup");
             }
             finally
@@ -1897,15 +1892,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         {
             try
             {
-                if (!_testFailed)
-                {
-                    postamble.setUp();
-                    postamble.postamble();
-                }
+                postamble.postamble();
             }
             catch (Throwable t)
             {
-                _testFailed = true;
                 AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(t);
                 postamble.handleFailure(errorRef, "performFinalChecks");
                 throw errorRef.get();
@@ -4344,8 +4334,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void mouseOver(Locator l)
     {
+        WebElement el = l.findElement(getDriver());
+
         Actions builder = new Actions(getDriver());
-        builder.moveToElement(l.findElement(getDriver())).build().perform();
+        builder.moveToElement(el).build().perform();
     }
 
     /**
@@ -5759,7 +5751,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void selectOptionByValue(Locator locator, String value)
     {
-        Select select = new Select(locator.findElement(getDriver()));
+        WebElement selectElement = locator.findElement(getDriver());
+        selectOptionByValue(selectElement, value);
+    }
+
+    public void selectOptionByValue(WebElement selectElement, String value)
+    {
+        Select select = new Select(selectElement);
         select.selectByValue(value);
     }
 
@@ -5773,8 +5771,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void selectOptionByText(Locator locator, String text)
     {
-        Select select = new Select(locator.findElement(getDriver()));
-        select.selectByVisibleText(text);
+        WebElement selectElement = locator.findElement(getDriver());
+        selectOptionByText(selectElement, text);
+    }
+
+    public void selectOptionByText(WebElement selectElement, String value)
+    {
+        Select select = new Select(selectElement);
+        select.selectByVisibleText(value);
     }
 
     public void addUrlParameter(String parameter)
