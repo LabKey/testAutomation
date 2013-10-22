@@ -857,7 +857,9 @@ public class AssayTest extends AbstractAssayTestWD
         assertTextPresent("SecondRun");
 
         log("Setting the customized view to include subfolders");
-        CustomizeViewsHelperWD customizeViewsHelper = new CustomizeViewsHelperWD(this, Locator.id("Runs2"));
+        Locator dataregionLoc = Locator.xpath("//form[starts-with(@id, 'Runs')]");
+        String dataregionId = dataregionLoc.findElement(getDriver()).getAttribute("id");
+        CustomizeViewsHelperWD customizeViewsHelper = new CustomizeViewsHelperWD(this, Locator.id(dataregionId));
         customizeViewsHelper.openCustomizeViewPanel();
 
         customizeViewsHelper.clipFolderFilter();
