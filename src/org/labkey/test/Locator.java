@@ -359,6 +359,11 @@ public abstract class Locator
         return xpath("//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
     }
 
+    public static XPathLocator ext4CheckboxById(String label)
+    {
+        return xpath("//input[@type = 'button' and contains(@class, 'checkbox') and contains(@id, '" + label + "')]");
+    }
+
     public static XPathLocator ext4Radio(String label)
     {
         return xpath("//input["+ NOT_HIDDEN +" and @type = 'button' and contains(@class, 'radio') and following-sibling::label[contains(text(), '" + label + "')]]");

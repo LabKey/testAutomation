@@ -73,17 +73,17 @@ public class PipelineHelper
     }
     public void addCreateFolderButton()
     {
-        _test.dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Create Folder']"),
-                         Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
-        _test.waitForElement(Locator.css(".test-custom-toolbar .iconFolderNew"), _test.defaultWaitForPage);
+//        _test.dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Create Folder']"),
+//                         Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
+//        _test.waitForElement(Locator.css(".test-custom-toolbar .iconFolderNew"), _test.defaultWaitForPage);
+        _test.click(Locator.xpath("//tr[@data-recordid='createDirectory']/td[1]"));
     }
 
     //TODO
     //won't work for adding and then removing something
-    public void removeButton(String name)
+    public void removeButton(String rowId)
     {
-        _test.click(Locator.buttonContainingText(name).index(2));
-        _test.click(Locator.tagContainingText("span", "remove"));
+        _test.click(Locator.xpath("//tr[@data-recordid='"+ rowId +"']/td[1]"));
     }
 
     public void commitPipelineAdminChanges()
@@ -96,14 +96,24 @@ public class PipelineHelper
     {
         goToAdminMenu();
 
-        _test._extHelper.clickExtTab("Toolbar and Grid Settings");
+        _test._ext4Helper.clickExtTab("Toolbar and Grid Settings");
         _test.waitForText("Configure Grid columns and Toolbar");
     }
 
     public void goToAdminMenu()
     {
-        _test.clickButton("Admin", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_APPEAR);
-        _test._extHelper.waitForExtDialog("Manage File Browser Configuration", 5000);
+
+        try
+        {
+            _test.assertElementVisible(Locator.ext4ButtonContainingText("Admin"));
+            _test.click(Locator.ext4ButtonContainingText("Admin"));
+        }
+        catch(AssertionError e)
+        {
+            _test.click(Locator.xpath("//span[contains(@class, 'x4-toolbar-more-icon')]"));
+            _test.click(Locator.xpath("//span[text()='Admin' and contains(@class, 'x4-menu-item-text')]"));
+        }
+        _test.waitForElement(Ext4HelperWD.Locators.window("Manage File Browser Configuration"));
     }
 
     /**
@@ -138,9 +148,9 @@ public class PipelineHelper
         _test.clickButton("Done", 0);
         _test._extHelper.waitForExt3MaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
-        _test.waitForText(description, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForText(customProperty, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForText(lookupColumn, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+//        _test.waitForText(description, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+//        _test.waitForText(customProperty, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+//        _test.waitForText(lookupColumn, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void uploadFile(File file)
@@ -159,6 +169,7 @@ public class PipelineHelper
 
     private void chooseSingleFileUpload(File file)
     {
+        _test.click(Locator.xpath("//span[text()='Upload Files']"));
         WebElement displayField = Locator.css(".single-upload-panel input.x-form-file-text").findElement(_test.getDriver());
         _test.executeScript("arguments[0].style.display = 'none';", displayField);
         _test.setFormElement(Locator.css(".single-upload-panel input[type=file]"), file);

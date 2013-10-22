@@ -373,9 +373,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         log("browse pipeline to begin import analysis wizard");
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("FCS files to be imported"));
-        _extHelper.selectFileBrowserItem(workspacePath);
+        _fileBrowserHelper.selectFileBrowserItem(workspacePath);
 
-        selectImportDataAction("Import FlowJo Workspace");
+        _fileBrowserHelper.selectImportDataAction("Import FlowJo Workspace");
     }
 
     @LogMethod
@@ -391,7 +391,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
         assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
-        _extHelper.selectFileBrowserItem(workspacePath);
+        _fileBrowserHelper.selectFileBrowserItem(workspacePath);
         clickButton("Next");
     }
 
@@ -420,9 +420,9 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
             case Browse:
                 clickRadioButtonById("Browse");
-                _extHelper.waitForFileGridReady();
+                _fileBrowserHelper.waitForFileGridReady();
                 // UNDONE: Currently, only one file path supported
-                _extHelper.selectFileBrowserItem(keywordDirs.get(0));
+                _fileBrowserHelper.selectFileBrowserItem(keywordDirs.get(0));
                 break;
 
             default:

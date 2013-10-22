@@ -307,8 +307,8 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         waitAndClickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
 
 
-        _extHelper.selectFileBrowserItem("flowjoquery/microFCS");
-        selectImportDataAction("Import Directory of FCS Files");
+        _fileBrowserHelper.selectFileBrowserItem("flowjoquery/microFCS");
+        _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
         clickButton("Import Selected Runs");
         waitForPipeline(getContainerPath());
     }
@@ -386,9 +386,9 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
         log("browse pipeline to begin import analysis wizard");
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("FCS files to be imported"));
-        _extHelper.selectFileBrowserItem(workspacePath);
+        _fileBrowserHelper.selectFileBrowserItem(workspacePath);
 
-        selectImportDataAction("Import FlowJo Workspace");
+        _fileBrowserHelper.selectImportDataAction("Import FlowJo Workspace");
     }
 
     @LogMethod
@@ -404,7 +404,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
         assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
-        _extHelper.selectFileBrowserItem(workspacePath);
+        _fileBrowserHelper.selectFileBrowserItem(workspacePath);
         clickButton("Next");
     }
 
@@ -435,7 +435,7 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
                 clickRadioButtonById("Browse");
                 _extHelper.waitForFileGridReady();
                 // UNDONE: Currently, only one file path supported
-                _extHelper.selectFileBrowserItem(keywordDirs.get(0));
+                _fileBrowserHelper.selectFileBrowserItem(keywordDirs.get(0));
                 break;
 
             default:

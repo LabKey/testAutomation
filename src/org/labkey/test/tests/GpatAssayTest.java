@@ -176,8 +176,8 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         log("Verify standard column aliases");
         clickProject(PROJECT_NAME);
-        _extHelper.selectFileBrowserItem(ALIASED_ASSAY_1);
-        selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.selectFileBrowserItem(ALIASED_ASSAY_1);
+        _fileBrowserHelper.selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "specId");
         assertFormElementEquals("ParticipantID", "ParticipantID");
@@ -185,8 +185,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertFormElementEquals("Date", "draw_date");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        _extHelper.selectFileBrowserItem(ALIASED_ASSAY_2);
-        selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.selectFileBrowserItem(ALIASED_ASSAY_2);
+        _fileBrowserHelper.selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "vialId1");
         assertFormElementEquals("ParticipantID", "ptid");
@@ -194,8 +194,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertFormElementEquals("Date", "drawDate");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        _extHelper.selectFileBrowserItem(ALIASED_ASSAY_3);
-        selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.selectFileBrowserItem(ALIASED_ASSAY_3);
+        _fileBrowserHelper.selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "vialId");
         assertFormElementEquals("ParticipantID", "ptid");
@@ -203,8 +203,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertFormElementEquals("Date", "date");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        _extHelper.selectFileBrowserItem(ALIASED_ASSAY_4);
-        selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.selectFileBrowserItem(ALIASED_ASSAY_4);
+        _fileBrowserHelper.selectImportDataAction("Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "guspec");
         assertFormElementEquals("ParticipantID", "ptid");

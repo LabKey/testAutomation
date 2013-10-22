@@ -406,6 +406,7 @@ public class ExtHelper extends AbstractHelper
                 //it sometimes takes time to populate the list, this should fix that problem
                 _test.waitForElement(Locator.tagWithText("div", parts[i]));
                 // select last item: click on tree node name
+
                 clickFileBrowserFileCheckbox(parts[i]);
             }
             else

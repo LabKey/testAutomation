@@ -1158,8 +1158,8 @@ public class MS2Test extends AbstractMS2ImportTest
     {
         clickButton("Process and Import Data");
 //        sleep(2000);
-        _extHelper.selectFileBrowserItem("pepXML/truncated.pep.xml");
-        selectImportDataAction("Import Search Results");
+        _fileBrowserHelper.selectFileBrowserItem("pepXML/truncated.pep.xml");
+        _fileBrowserHelper.selectImportDataAction("Import Search Results");
         String ms2Run = "ms2pipe/truncated (pepXML)";
         waitForTextWithRefresh(ms2Run, defaultWaitForPage);
         clickAndWait(Locator.linkWithText(ms2Run));
