@@ -343,6 +343,12 @@ public class LinkedSchemaTest extends BaseWebDriverTest
     }
 
     @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
