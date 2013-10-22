@@ -301,7 +301,7 @@
 
     <target name="package-chrome-extensions">
         <delete>
-            <fileset dir="${chrome.extensions.dir}" includes="*.crx"/>
+            <fileset dir="${chrome.extensions.dir}" includes="*.zip"/>
         </delete>
         <foreach target="zip_extension" param="srcdir">
             <path><dirset dir="${chrome.extensions.dir}" includes="*"/></path>
@@ -309,7 +309,7 @@
     </target>
 
     <target name="zip_extension">
-        <zip destfile="${srcdir}.crx">
+        <zip destfile="${srcdir}.zip">
             <zipfileset dir="${srcdir}" includes="*"/>
         </zip>
     </target>

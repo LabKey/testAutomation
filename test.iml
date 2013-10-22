@@ -128,7 +128,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/selenium-server-standalone-2.33.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/selenium-server-standalone-2.37.0.jar!/" />
         </CLASSES>
         <JAVADOC>
           <root url="http://selenium.googlecode.com/svn/trunk/docs/api/java/index.html" />
@@ -140,15 +140,6 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/sardine.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/slf4j-api-1.6.6.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

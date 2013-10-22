@@ -335,9 +335,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
 
                     ChromeOptions options = new ChromeOptions();
-                    if (isScriptCheckEnabled())
+
+                    //TODO: Extensions broken in chromedriver 2.4
+                    //TODO: WebDriverException: unknown error: cannot process extension #1
+                    if (false)//isScriptCheckEnabled())
                     {
-                        options.addExtensions(new File(WebTestHelper.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker.crx"));
+                        options.addExtensions(new File(WebTestHelper.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker.zip"));
                     }
 
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
@@ -4325,7 +4328,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * @deprecated Use {@link Actions}
+     * @deprecated Use {@link Actions} or {@link #fireEvent(Locator, org.labkey.test.BaseSeleniumWebTest.SeleniumEvent)}
      */
     @Deprecated public void mouseOut(Locator l)
     {
@@ -4345,7 +4348,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void mouseDown(Locator l)
     {
-        l.findElement(getDriver()).click();
+        click(l);
     }
 
     public int getElementIndex(Locator.XPathLocator l)
