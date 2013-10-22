@@ -58,7 +58,7 @@ public class WebTestHelper
     private static String _webPort = null;
     private static String _contextPath = null;
     public static final int MAX_LEAK_LIMIT = 0;
-    public static final int GC_ATTEMPT_LIMIT = 5;
+    public static final int GC_ATTEMPT_LIMIT = 6;
     public static final int DEFAULT_BUTTON_FONT_SIZE = 11;
     public static long leakCRC = 0;
 

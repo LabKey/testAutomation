@@ -16,7 +16,11 @@
 package org.labkey.test.tests;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -85,7 +89,7 @@ import java.util.Arrays;
  *   (BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.)
  */
 @Category({DailyA.class, Data.class})
-public class LinkedSchemaTest extends BaseWebDriverTest
+public class LinkedSchemaTest extends BaseWebDriverMultipleTest
 {
     private SchemaHelper _schemaHelper = new SchemaHelper(this);
     private static final String PROJECT_NAME = LinkedSchemaTest.class.getSimpleName() + "Project";
@@ -354,18 +358,29 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         super.doCleanup(afterTest);
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @BeforeClass
+    public static void doSetup() throws Exception
     {
-        setupProject();
-        createList();
-        importListData();
+        LinkedSchemaTest initTest = new LinkedSchemaTest();
+        initTest.doCleanup(false);
 
-        clickProject("LinkedSchemaTestProject");
+        initTest.setupProject();
+        initTest.createList();
+        initTest.importListData();
 
+        currentTest = initTest;
+    }
+
+    @Test
+    public void basicLinkedSchemaTest()
+    {
         createLinkedSchema();
         verifyLinkedSchema();
+    }
 
+    @Test
+    public void lookupTest()
+    {
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
         _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, "BasicLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", null);
 
@@ -396,11 +411,18 @@ public class LinkedSchemaTest extends BaseWebDriverTest
         //Change the Mother column lookup to point to the query, and then make sure that the table has lookups appropriately.
         changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup"));
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
+    }
 
-
+    @Test
+    public void schemaTemplateTest()
+    {
         createLinkedSchemaUsingTemplate();
         verifyLinkedSchemaUsingTemplate();
+    }
 
+    @Test
+    public void templateOverrideTest()
+    {
         createLinkedSchemaTemplateOverride();
         verifyLinkedSchemaTemplateOverride();
     }

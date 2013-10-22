@@ -42,36 +42,47 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String selection)
     {
-        selectComboBoxItem(comboBox, selection, false);
+        selectComboBoxItem(comboBox, false, selection);
     }
 
     @LogMethod(quiet = true)
-    public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String selection, boolean containsText)
+    public void selectComboBoxItem(Locator.XPathLocator comboBox, boolean containsText, @LoggedParam String... selections)
     {
         Locator arrowTrigger = Locator.xpath(comboBox.getPath()+"//div[contains(@class,'arrow')]");
         _test.waitAndClick(arrowTrigger);
         Locator.XPathLocator listItem;
-        if (containsText)
-            listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().containing(selection);
-        else
-            listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
-
-        // wait for and select the list item
-        try
+        for (String selection : selections)
         {
-            WebElement element = listItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            _test.scrollIntoView(element); // Workaround: Auto-scrolling in chrome isn't working well
-            _test.click(listItem);
-        }
-        catch (StaleElementReferenceException retry)
-        { // Workaround: Ext4 combo boxes do something wierd as they open; elements become stale for some reason
-            WebElement element = listItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            _test.scrollIntoView(element); // Workaround: Auto-scrolling in chrome isn't working well
-            _test.click(listItem);
+            if (containsText)
+                listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().containing(selection);
+            else
+                listItem = Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().withText(selection);
+
+            // wait for and select the list item
+            try
+            {
+                WebElement element = listItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
+                if (!elementAlreadySelected)
+                {
+                    _test.scrollIntoView(element); // Workaround: Auto-scrolling in chrome isn't working well
+                    _test.click(listItem);
+                }
+            }
+            catch (StaleElementReferenceException retry)
+            { // Workaround: Ext4 combo boxes do something wierd as they open; elements become stale for some reason
+                WebElement element = listItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
+                if (!elementAlreadySelected)
+                {
+                    _test.scrollIntoView(element); // Workaround: Auto-scrolling in chrome isn't working well
+                    _test.click(listItem);
+                }
+            }
         }
 
         // close combo manually if it is a checkbox combo-box
-        if (_test.isElementPresent(listItem.append("/span").withClass("x4-combo-checker")))
+        if (_test.isElementPresent(Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().append("/span").withClass("x4-combo-checker")))
             _test.click(arrowTrigger);
 
         // menu should disappear
@@ -81,13 +92,13 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
-        selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(label), selection, false);
+        selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(label), false, selection);
     }
 
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection, boolean containsText)
     {
-        selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(label), selection, containsText);
+        selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(label), containsText, selection);
     }
 
     @LogMethod(quiet = true)
