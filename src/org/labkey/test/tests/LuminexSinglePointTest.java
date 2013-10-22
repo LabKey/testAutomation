@@ -53,7 +53,6 @@ public class LuminexSinglePointTest  extends LuminexTest
     protected void runSinglePointTest()
     {
         click(Locator.name("backgroundUpload"));
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
         saveAssay();
 
         importRun(file1, 1);
