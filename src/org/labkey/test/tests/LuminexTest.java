@@ -536,6 +536,7 @@ public class LuminexTest extends AbstractQCAssayTest
         pushLocation();
         clickMenuButton("Views", "Create", "R View");
         boolean is64bit = _rReportHelper.executeScript("print(.Machine$sizeof.pointer)", "[1] 8", true);
+        _rReportHelper.clickSourceTab();
         _rReportHelper.saveReport("dummy");
         popLocation();
         waitForText("CurveFit");
