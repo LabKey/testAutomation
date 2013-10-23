@@ -7205,7 +7205,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void assertSVG(final String expectedSvgText, final int svgIndex)
     {
-        final String ignoredSvgTestInFirefox = "Created with Rapha\u00ebl 2.1.0\n";
+        final String ignoredSvgTestInFirefox = "Created with Rapha\u00ebl 2.1.0";
         final boolean isFirefox = getBrowserType() == BrowserType.FIREFOX;
         final String expectedText = isFirefox ?
                 expectedSvgText.replace(ignoredSvgTestInFirefox, "").replaceAll("[\n ]", "") :
@@ -7218,7 +7218,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 return isElementPresent(Locator.css("div:not(.thumbnail) > svg").index(svgIndex)) &&
                         expectedText.equals(
                                 isFirefox ?
-                                        getText(Locator.css("svg").index(svgIndex)).replaceAll("[\n ]", "") :
+                                        getText(Locator.css("svg").index(svgIndex)).replace(ignoredSvgTestInFirefox, "").replaceAll("[\n ]", "") :
                                         getText(Locator.css("svg").index(svgIndex)));
             }
         }, WAIT_FOR_JAVASCRIPT);
