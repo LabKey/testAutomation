@@ -93,6 +93,7 @@ public class ThreadDumpAndKill
         }
         catch (ConnectException e)
         {
+            e.printStackTrace();
             System.out.println("Unable to connect to VM at localhost:" + port + ", VM may already be shut down");
         }
     }
@@ -126,7 +127,15 @@ public class ThreadDumpAndKill
             line.append("\t");
             line.append(stackFrame.location().declaringType().name());
             line.append(".").append(stackFrame.location().method().name());
-            line.append("(").append(stackFrame.location().sourceName());
+            line.append("(");
+            try
+            {
+                line.append(stackFrame.location().sourceName());
+            }
+            catch (AbsentInformationException e)
+            {
+                line.append("UnknownSource");
+            }
             line.append(":").append(stackFrame.location().lineNumber());
             line.append(")");
             System.out.println(line.toString());

@@ -660,6 +660,7 @@
         <javac srcdir="${test.src.home}/org/labkey/test/debug"
             destdir="${test.build.home}/classes"
             deprecation="${test.compile.deprecation}"
+            debug="true"
             optimize="${test.compile.optimize}"
             source="1.7"
             classpathref="shutdown.build.classpath"
