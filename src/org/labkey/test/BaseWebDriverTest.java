@@ -7205,8 +7205,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void assertSVG(final String expectedSvgText, final int svgIndex)
     {
+        final String ignoredSvgTestInFirefox = "Created with Rapha\u00ebl 2.1.0\n";
         final boolean isFirefox = getBrowserType() == BrowserType.FIREFOX;
-        final String expectedText = isFirefox ? expectedSvgText.replaceAll("[\n ]", "") : expectedSvgText;
+        final String expectedText = isFirefox ?
+                expectedSvgText.replace(ignoredSvgTestInFirefox, "").replaceAll("[\n ]", "") :
+                expectedSvgText;
         doesElementAppear(new BaseSeleniumWebTest.Checker()
         {
             @Override
