@@ -122,7 +122,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
     {
         goToAdminMenu();
 
-        _test._ext4Helper.clickExtTab("Toolbar and Grid Settings");
+        _test._ext4Helper.clickExt4Tab("Toolbar and Grid Settings");
         _test.waitForText("Configure Grid columns and Toolbar");
     }
 

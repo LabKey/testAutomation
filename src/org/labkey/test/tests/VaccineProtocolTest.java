@@ -406,31 +406,40 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
     private void populateStudyDesignLookups()
     {
         goToProjectHome();
-        enableModule("Study", true);
+        addWebPart("Vaccine Study Protocols");
 
-        goToQuery("StudyDesignAssays");
-        for (String assay : new String[]{"ELISPOT", "Neutralizing Antibodies Panel 1", "ICS", "ELISA"})
-            insertLookupRecord(assay, assay + " Label");
-
-        goToQuery("StudyDesignLabs");
-        for (String lab : new String[]{"Schmitz", "Montefiori", "McElrath", "Lab 1"})
-            insertLookupRecord(lab, lab + " Label");
-
-        goToQuery("StudyDesignRoutes");
-        for (String route : new String[]{"Intramuscular (IM)"})
-            insertLookupRecord(route, route + " Label");
-
-        goToQuery("StudyDesignImmunogenTypes");
+        goToAssayConfigureLookupValues(0); // index 0 = Immunogen Types
         for (String immunogenType : new String[]{"Canarypox", "Fowlpox", "Subunit Protein"})
             insertLookupRecord(immunogenType, immunogenType + " Label");
 
-        goToQuery("StudyDesignGenes");
+        goToAssayConfigureLookupValues(1); // index 1 = Routes
+        for (String route : new String[]{"Intramuscular (IM)"})
+            insertLookupRecord(route, route + " Label");
+
+        goToAssayConfigureLookupValues(2); // index 2 = Genes
         for (String gene : new String[]{"Gag", "Env"})
             insertLookupRecord(gene, gene + " Label");
 
-        goToQuery("StudyDesignSubTypes");
+        goToAssayConfigureLookupValues(3); // index 3 = SubTypes
         for (String subType : new String[]{"Clade B", "Clade C"})
             insertLookupRecord(subType, subType + " Label");
+
+        goToAssayConfigureLookupValues(4); // index 4 = Assays
+        for (String assay : new String[]{"ELISPOT", "Neutralizing Antibodies Panel 1", "ICS", "ELISA"})
+            insertLookupRecord(assay, assay + " Label");
+
+        goToAssayConfigureLookupValues(5); // index 5 = Labs
+        for (String lab : new String[]{"Schmitz", "Montefiori", "McElrath", "Lab 1"})
+            insertLookupRecord(lab, lab + " Label");
+    }
+
+    private void goToAssayConfigureLookupValues(int index)
+    {
+        goToProjectHome();
+        clickButton("New Protocol");
+        waitForText("Configure Dropdown Options");
+        click(Locator.linkContainingText("Configure Dropdown Options"));
+        clickAndWait(Locator.linkWithText("project").index(index));
     }
 
     private void insertLookupRecord(String name, String label)
