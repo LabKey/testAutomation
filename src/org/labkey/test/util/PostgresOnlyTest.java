@@ -16,9 +16,8 @@
 package org.labkey.test.util;
 
 /**
- * User: Treygdor
+ * User: t.chadick
  * Date: Mar 19, 2012
- * Time: 4:01:12 PM
  */
 
 /**

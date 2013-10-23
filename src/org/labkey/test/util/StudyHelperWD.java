@@ -21,9 +21,8 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 /**
- * User: Treygdor
+ * User: t.chadick
  * Date: Aug 16, 2011
- * Time: 3:45:02 PM
  */
 public class StudyHelperWD extends AbstractHelperWD
 {

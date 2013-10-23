@@ -30,9 +30,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * User: Treygdor
+ * User: t.chadick
  * Date: Sep 8, 2011
- * Time: 1:55:05 PM
  */
 @Category({DailyB.class, Study.class})
 public class AncillaryStudyTest extends StudyBaseTest

@@ -21,9 +21,8 @@ import org.labkey.test.Runner;
 import static org.labkey.test.WebTestHelper.logToServer;
 
 /**
- * User: Treygdor
+ * User: t.chadick
  * Date: May 3, 2011
- * Time: 3:34:58 PM
  */
 public class JUnitHeader extends BaseWebDriverTest
 {
