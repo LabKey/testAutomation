@@ -149,9 +149,9 @@ public class MS1Test extends BaseWebDriverTest
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
-        _fileBrowserHelper.selectFileBrowserItem(PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/");
+        _extHelper.selectFileBrowserItem(PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/");
 
-        _fileBrowserHelper.selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
+        selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
 
     protected void importFeaturesExp(String project, String xProtocol, String featuresProtocol)
@@ -161,9 +161,9 @@ public class MS1Test extends BaseWebDriverTest
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
-        _fileBrowserHelper.selectFileBrowserItem(PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/" + PIPELINE_MS1PEP_DIR + "/" + featuresProtocol + "/");
+        _extHelper.selectFileBrowserItem(PIPELINE_XTANDEM_DIR + "/" + xProtocol + "/" + PIPELINE_MS1PEP_DIR + "/" + featuresProtocol + "/");
 
-        _fileBrowserHelper.selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
+        selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
 
     protected void importPepTsvFile(String project, String protocol)
@@ -173,9 +173,9 @@ public class MS1Test extends BaseWebDriverTest
 
         clickButton(PIPELINE_PROCESS_AND_IMPORT_BUTTON);
 
-        _fileBrowserHelper.selectFileBrowserItem(PIPELINE_INSPECT_DIR + "/" + protocol + "/");
+        _extHelper.selectFileBrowserItem(PIPELINE_INSPECT_DIR + "/" + protocol + "/");
 
-        _fileBrowserHelper.selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
+        selectImportDataAction(PIPELINE_IMPORT_EXPR_BUTTON);
     }
 
     protected void testViews(String project)

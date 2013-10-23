@@ -90,7 +90,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public ExtHelper _extHelper = new ExtHelper(this);
     public Ext4Helper _ext4Helper = new Ext4Helper(this);
-    public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
     public CustomizeViewsHelper _customizeViewsHelper = new CustomizeViewsHelper(this);
     public StudyHelper _studyHelper = new StudyHelper(this);
     public ListHelper _listHelper = new ListHelper(this);
@@ -5719,8 +5718,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Import Folder Using Pipeline");
-        _fileBrowserHelper.selectFileBrowserItem(folderFile);
-        _fileBrowserHelper.selectImportDataAction("Import Folder");
+        _extHelper.selectFileBrowserItem(folderFile);
+        selectImportDataAction("Import Folder");
         waitForPipelineJobsToComplete(1, "Folder import", false);
     }
     public String getFileContents(String rootRelativePath)
@@ -6422,11 +6421,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             for (String dir : dirNames)
                 path += dir + "/";
 
-            _fileBrowserHelper.selectFileBrowserItem(path);
+            _extHelper.selectFileBrowserItem(path);
 
             for (File copiedArchive : _copiedArchives)
-                _fileBrowserHelper.clickFileBrowserFileCheckbox(copiedArchive.getName());
-            _fileBrowserHelper.selectImportDataAction("Import Specimen Data");
+                _extHelper.clickFileBrowserFileCheckbox(copiedArchive.getName());
+            selectImportDataAction("Import Specimen Data");
             clickButton("Start Import");
         }
 
@@ -6525,8 +6524,8 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void selectPipelineFileAndImportAction(String file, String actionName)
     {
-        _fileBrowserHelper.selectFileBrowserItem(file);
-        _fileBrowserHelper.selectImportDataAction(actionName);
+        _extHelper.selectFileBrowserItem(file);
+        selectImportDataAction(actionName);
     }
 
     public void selectImportDataActionNoWaitForGrid(String actionName)

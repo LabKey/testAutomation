@@ -463,9 +463,4 @@ public class Ext4Helper extends AbstractHelper
             return l;
         }
     }
-
-    public void clickExtTab(String tabname)
-    {
-        _test.waitAndClick(Locator.xpath("//span[contains(@class, 'x4-tab-inner') and text() = '" + tabname + "']"));
-    }
 }

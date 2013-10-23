@@ -538,28 +538,4 @@ public class Ext4HelperWD extends AbstractHelperWD
     {
         return Locator.tagWithText("span", label).withClass("x4-tab-inner").notHidden();
     }
-
-    //Filebrowser Specific ext 4 help functions
-    public void waitForFileAdminEnabled()
-    {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-admin-enabled')]"), 6 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    /**
-     * Used for directory refreshes or folder changes for the file webpart grid to be ready and initialized.
-     */
-    public void waitForFileGridReady()
-    {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-file-grid-initialized')]"), 6 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void waitForImportDataEnabled()
-    {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void clickExtTab(String tabname)
-    {
-        _test.waitAndClick(Locator.xpath("//span[contains(@class, 'x4-tab-inner') and text() = '" + tabname + "']"));
-    }
 }
