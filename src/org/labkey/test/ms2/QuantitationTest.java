@@ -78,9 +78,7 @@ public class QuantitationTest extends AbstractXTandemTest
         clickAndWait(Locator.linkContainingText(runDescription));
         selectOptionByText("viewParams", "<Standard View>");
         clickButton("Go");
-        assertTextPresent(PEPTIDE2);
         assertTextPresent(PEPTIDE3);
-        assertTextPresent(PEPTIDE4);
         assertTextPresent(PEPTIDE5);
 
         clickFolder(FOLDER_NAME);
