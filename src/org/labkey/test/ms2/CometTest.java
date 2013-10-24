@@ -20,11 +20,12 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.MS2;
 
 import java.io.File;
 
-@Category({MS2.class})
+@Category({MS2.class, BVT.class})
 public class CometTest extends AbstractMS2SearchEngineTest
 {
     protected static final String SEARCH_BUTTON = "Comet";
@@ -79,6 +80,9 @@ public class CometTest extends AbstractMS2SearchEngineTest
         // Make sure we're not using a custom default view for the current user
         selectOptionByText("viewParams", "<Standard View>");
         clickButton("Go");
+
+        // Check for a few high-scoring peptides
+        assertTextPresent("K.MSKIRQVIAAR.L", "K.LRRPDPYK.G", "K.KSGRSSDLTSVR.L");
     }
 
     @Override
