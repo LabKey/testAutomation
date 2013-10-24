@@ -133,9 +133,8 @@ public class XTandemTest extends AbstractXTandemTest
     {
         clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
         clickRadioButtonById(PEPTIDE_CROSSTAB_RADIO_PROBABILITY_ID);
-        setFormElement(PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME, "0.75");
+        setFormElement(PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME, "0.25");
         clickButton("Compare");
-        assertTextPresent(PEPTIDE3);
         assertTextPresent(PEPTIDE4);
         assertTextNotPresent(PEPTIDE);
 
