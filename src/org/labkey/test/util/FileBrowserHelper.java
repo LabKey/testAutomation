@@ -88,12 +88,6 @@ public class FileBrowserHelper implements FileBrowserHelperParams
     }
 
     @Override
-    public void prevClickFileBrowserFileCheckbox(String fileName)
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
     public void selectFileBrowserRoot()
     {
         //To change body of implemented methods use File | Settings | File Templates.

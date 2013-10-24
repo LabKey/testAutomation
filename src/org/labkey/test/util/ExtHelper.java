@@ -367,15 +367,6 @@ public class ExtHelper extends AbstractHelper
         pickMeasure(panelCls, source, measure, false);
     }
 
-    @Deprecated
-    public void prevClickFileBrowserFileCheckbox(String fileName)
-    {
-        Locator file = locateGridRowCheckbox(fileName);
-
-        _test.waitForElement(file, 60000);
-        _test.mouseDown(file);
-    }
-
     @LogMethod(quiet = true)
     public void selectFileBrowserItem(@LoggedParam String path)
     {

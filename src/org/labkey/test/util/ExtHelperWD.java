@@ -543,15 +543,6 @@ public class ExtHelperWD extends AbstractHelperWD
         pickMeasure(panelCls, source, measure, false);
     }
 
-    @Deprecated
-    public void prevClickFileBrowserFileCheckbox(String fileName)
-    {
-        Locator file = locateGridRowCheckbox(fileName);
-
-        _test.waitForElement(file, WAIT_FOR_PAGE);
-        _test.click(file);
-    }
-
     @LogMethod(quiet = true)
     public void expandFileBrowserRootNode()
     {

@@ -669,7 +669,7 @@ public class LuminexTest extends AbstractQCAssayTest
         String exclusionComment = "exclude single analyte for single well";
         setText(EXCLUDE_COMMENT_FIELD, exclusionComment);
         clickRadioButtonById(EXCLUDE_SELECTED_BUTTON);
-        clickExcludeAnalyteCheckBox(excludedAnalyte, true);
+        clickExcludeAnalyteCheckBox(excludedAnalyte);
         clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
 
         excludeForSingleWellVerify("Excluded for replicate group: " + exclusionComment, new HashSet<>((Arrays.asList(excludedAnalyte))));
@@ -774,9 +774,9 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         clickButtonContainingText("Exclude Analytes", 0);
         _extHelper.waitForExtDialog("Exclude Analytes from Analysis");
-        clickExcludeAnalyteCheckBox(analyte, true);
+        clickExcludeAnalyteCheckBox(analyte);
         String comment = "Changed for all analytes";
-        setText(EXCLUDE_COMMENT_FIELD, comment);
+        setFormElement(Locator.id(EXCLUDE_COMMENT_FIELD), comment);
         waitForElement(Locator.xpath("//table[@id='saveBtn' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
         clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
 
@@ -830,12 +830,11 @@ public class LuminexTest extends AbstractQCAssayTest
 
 
 
-    private void clickExcludeAnalyteCheckBox(String analyte, boolean b)
+    private void clickExcludeAnalyteCheckBox(String analyte)
     {
-        if(b)
-            _extHelper.prevClickFileBrowserFileCheckbox(analyte);
-        else
-            Assert.fail("not supported at this time");
+        Locator l = ExtHelper.locateGridRowCheckbox(analyte);
+        waitForElement(l);
+        clickAt(l, "1,1");
     }
 
     private String excludedWellDescription = "Sample 2";

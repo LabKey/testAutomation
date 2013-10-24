@@ -10,9 +10,6 @@ public interface FileBrowserHelperParams
     @LogMethod(quiet = true)
     public void clickFileBrowserFileCheckbox(@LoggedParam String fileName);
 
-    @Deprecated
-    public void prevClickFileBrowserFileCheckbox(String fileName);
-
     public void selectFileBrowserRoot();
 
     @LogMethod

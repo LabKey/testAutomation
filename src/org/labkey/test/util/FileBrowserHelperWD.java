@@ -6,6 +6,8 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
+import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+
 public class FileBrowserHelperWD implements FileBrowserHelperParams
 {
     BaseWebDriverTest _test;
@@ -17,7 +19,9 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void expandFileBrowserRootNode()
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // expand root tree node
+        _test.waitAndClick(Locator.xpath("//tr[contains(@class, 'x4-grid-tree-node') and @*='/']//div[contains(@class, 'x4-grid-cell-inner-treecolumn')]"));
+        _test.waitForElement(Locator.xpath("//tr[contains(@class, 'x4-grid-row-selected') and @*='/']//div[contains(@class, 'x4-grid-cell-inner-treecolumn')]"), WAIT_FOR_JAVASCRIPT);
     }
 
     @Override
@@ -88,12 +92,6 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
         WebElement element = gridItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.waitForElement(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]/td//span[text()='"+fileName+"']"));
         _test.click(gridItem);
-    }
-
-    @Override
-    public void prevClickFileBrowserFileCheckbox(String fileName)
-    {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
