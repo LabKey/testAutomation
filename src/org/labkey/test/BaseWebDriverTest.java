@@ -7204,24 +7204,38 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void assertSVG(final String expectedSvgText, final int svgIndex)
     {
-        final String ignoredSvgTestInFirefox = "Created with Rapha\u00ebl 2.1.0";
-        final boolean isFirefox = getBrowserType() == BrowserType.FIREFOX;
-        final String expectedText = isFirefox ?
-                expectedSvgText.replace(ignoredSvgTestInFirefox, "").replaceAll("[\n ]", "") :
-                expectedSvgText;
-        doesElementAppear(new BaseSeleniumWebTest.Checker()
+        final String expectedText = prepareSvgText(expectedSvgText);
+        final Locator svgLoc = Locator.css("div:not(.thumbnail) > svg").index(svgIndex);
+
+        doesElementAppear(new BaseWebDriverTest.Checker()
         {
             @Override
             public boolean check()
             {
-                return isElementPresent(Locator.css("div:not(.thumbnail) > svg").index(svgIndex)) &&
-                        expectedText.equals(
-                                isFirefox ?
-                                        getText(Locator.css("svg").index(svgIndex)).replace(ignoredSvgTestInFirefox, "").replaceAll("[\n ]", "") :
-                                        getText(Locator.css("svg").index(svgIndex)));
+                if (isElementPresent(svgLoc))
+                {
+                    String svgText = prepareSvgText(getText(svgLoc));
+                    return expectedText.equals(svgText);
+                }
+                else
+                    return false;
             }
         }, WAIT_FOR_JAVASCRIPT);
-        String svgText = getText(Locator.css("svg").index(svgIndex));
-        Assert.assertEquals("SVG did not look as expected", expectedText, isFirefox ? svgText.replaceAll("[\n ]", "") : svgText);
+
+        String svgText = prepareSvgText(getText(svgLoc));
+        Assert.assertEquals("SVG did not look as expected", expectedText, svgText);
+    }
+
+    private String prepareSvgText(String svgText)
+    {
+        final boolean isFirefox = getBrowserType() == BrowserType.FIREFOX;
+
+        // Firfox doesn't always include the Raphael credits in getText
+        final String ignoredSvgTestInFirefox = "Created with Rapha\u00ebl 2.1.0";
+
+        // Strip out all the whitespace on Firefox to deal with different return of getText from svgs
+        return isFirefox ?
+                svgText.replace(ignoredSvgTestInFirefox, "").replaceAll("[\n ]", "") :
+                svgText;
     }
 }
