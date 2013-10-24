@@ -106,7 +106,7 @@ public class DataReportsTest extends ReportTest
     private final static String R_SCRIPT2_TEXT1 = "999320648";
 
     private final static String DATA_SET = "DEM-1: Demographics";
-    private final static String DATA_BASE_PREFIX = "DEM";
+    private final static String DATA_BASE_PREFIX = "dem";
     private final static String R_SCRIPT1_ORIG_FUNC = "length(x)";
     private final static String R_SCRIPT1_EDIT_FUNC = "length(x) * 2";
 
@@ -320,28 +320,18 @@ public class DataReportsTest extends ReportTest
         log("Execute bad scripts");
         clickViewTab();
         assertTextPresent("Empty script, a script must be provided.");
-        if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1))
-            if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()) + "\nbadString", R_SCRIPT1_TEXT1))
-                Assert.fail("There was an error running the script");
-        assertTextPresent("Error");//("Error executing command");
-//        assertTextPresent("Error: object \"badString\" not found");
+        Assert.assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1));
+
         // horrible hack to get around single versus double quote difference when running R on Linux or Windows systems.
-        assertTextPresent("Error: object ");
-        assertTextPresent("badString");
-        assertTextPresent(R_SCRIPT1_TEXT1);
-        assertTextPresent(R_SCRIPT1_TEXT2);
+        assertTextPresent("Error: object ", "badString", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
-        assertTextPresent(R_SCRIPT1_PDF);
 
         log("Execute and save a script");
-        if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
-            if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
-                Assert.fail("There was an error running the script");
+        Assert.assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
+
         log("Check that the script executed properly");
-        assertTextPresent(R_SCRIPT1_TEXT1);
-        assertTextPresent(R_SCRIPT1_TEXT2);
+        assertTextPresent(R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
-        assertTextPresent(R_SCRIPT1_PDF);
 
         saveReport(R_SCRIPTS[0]);
 
@@ -378,12 +368,9 @@ public class DataReportsTest extends ReportTest
         //clickAndWait(Locator.linkWithText(R_SCRIPTS[0]));
         clickMenuButton("Views", R_SCRIPTS[0]);
         waitForText("Console output", WAIT_FOR_PAGE);
-        assertTextPresent("null device");
-        assertTextNotPresent("Error executing command");
-        assertTextPresent(R_SCRIPT1_TEXT1);
-        assertTextPresent(R_SCRIPT1_TEXT2);
+        assertTextPresent("null device", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
-        assertTextPresent(R_SCRIPT1_PDF);
+        assertTextNotPresent("Error executing command");
         popLocation();
 
         log("Test user permissions");
@@ -405,9 +392,7 @@ public class DataReportsTest extends ReportTest
         clickMenuButton("Views", "Create", "R View");
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
-        if (!_rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
-            if (!_rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
-                Assert.fail("There was an error running the script");
+        Assert.assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
         clickSourceTab();
         _rReportHelper.selectOption(RReportHelperWD.ReportOption.shareReport);
         _rReportHelper.selectOption(RReportHelperWD.ReportOption.runInPipeline);
@@ -460,10 +445,7 @@ public class DataReportsTest extends ReportTest
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         _ext4Helper.checkCheckbox(R_SCRIPTS[1]);
-        if (!_rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseId"), R_SCRIPT2_TEXT1))
-            if (!_rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX.toLowerCase(), "mouseid"), R_SCRIPT2_TEXT1))
-                Assert.fail("There was an error running the script");
-        assertTextPresent(R_SCRIPT2_TEXT1);
+        Assert.assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
         saveReport(R_SCRIPTS[2]);
 
         log("Test editing R scripts");
@@ -472,9 +454,7 @@ public class DataReportsTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickReportGridLink(R_SCRIPTS[0]);
-        if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1))
-            if (!_rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX.toLowerCase()), R_SCRIPT1_TEXT1))
-                Assert.fail("There was an error running the script");
+        Assert.assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
         prepForPageLoad();
         resaveReport();
         newWaitForPageToLoad();
