@@ -20,6 +20,8 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.FileBrowserHelperParams;
+import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.WikiHelper;
 
@@ -338,26 +340,11 @@ public class SearchTest extends StudyWDTest
         File file = new File(getLabKeyRoot() + "/sampledata/security", "InlineFile.html");
         File MLfile = new File(getLabKeyRoot() + "/sampledata/mzxml", "test_nocompression.mzXML");
 
-        uploadFile(file);
-        uploadFile(MLfile);
+        FileBrowserHelperParams fileBrowserHelper = new FileBrowserHelperWD(this);
+        fileBrowserHelper.uploadFile(file);
+        fileBrowserHelper.uploadFile(MLfile);
 
         _searchHelper.enqueueSearchItem("antidisestablishmentarianism", true, Locator.linkWithText(file.getName()));
         _searchHelper.enqueueSearchItem("ThermoFinnigan", true, Locator.linkWithText(MLfile.getName()));
-    }
-
-    private void uploadFile(File f)
-    {
-        waitFor(new Checker() {
-            public boolean check()
-            {
-                return getFormElement(Locator.xpath("//label[./span[text() = 'Choose a File:']]//..//input[contains(@class, 'x-form-file-text')]")).equals("");
-            }
-        }, "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.xpath("//label[./span[text() = 'Choose a File:']]//..//input[@class = 'x-form-file']"), f.toString());
-        clickButton("Upload", 0);
-        // Wait for the mask to disappear
-        waitForTextToDisappear("Uploading");
-        // Then wait for the file to show up in the list
-        waitForText(f.getName(), 10000);
     }
 }

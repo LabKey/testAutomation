@@ -1,9 +1,11 @@
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 import java.io.File;
+import java.util.List;
 
 public class FileBrowserHelper implements FileBrowserHelperParams
 {
@@ -116,7 +118,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
     {
         goToAdminMenu();
 
-        _test._ext4Helper.clickExt4Tab("Toolbar and Grid Settings");
+        _test._extHelper.clickExtTab("Toolbar and Grid Settings");
         _test.waitForText("Configure Grid columns and Toolbar");
     }
 
@@ -138,6 +140,12 @@ public class FileBrowserHelper implements FileBrowserHelperParams
 
     @Override
     public void uploadFile(File file)
+    {
+        uploadFile(file, null, null);
+    }
+
+    @Override
+    public void uploadFile(File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties)
     {
         //To change body of implemented methods use File | Settings | File Templates.
     }

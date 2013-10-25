@@ -24,6 +24,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.FileBrowserExtendedProperty;
+import org.labkey.test.util.FileBrowserHelperParams;
+import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PipelineHelper;
@@ -31,8 +34,8 @@ import org.labkey.test.util.SearchHelper;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
-
-import static org.labkey.test.WebTestHelper.getHttpGetResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 @Category(BVT.class)
 public class FileContentTest extends BaseWebDriverTest
@@ -87,6 +90,7 @@ public class FileContentTest extends BaseWebDriverTest
 
         _searchHelper.initialize();
 
+        FileBrowserHelperParams fileBrowserHelper = new FileBrowserHelperWD(this);
         PipelineHelper pipelineHelper = new PipelineHelper(this);
 
         _containerHelper.createProject(PROJECT_NAME, null);
@@ -127,13 +131,13 @@ public class FileContentTest extends BaseWebDriverTest
         // Setup custom file properties
         _extHelper.waitForFileGridReady();
         _extHelper.waitForFileAdminEnabled();
-        pipelineHelper.goToAdminMenu();
+        fileBrowserHelper.goToAdminMenu();
         // Setup custom file actions
-        uncheckCheckbox("importAction");
+        uncheckCheckbox(Locator.checkboxByName("importAction"));
 
 
         _extHelper.clickExtTab("File Properties");
-        checkRadioButton("fileOption", "useCustom");
+        checkCheckbox(Locator.radioButtonByNameAndValue("fileOption", "useCustom"));
         clickButton("Edit Properties...");
         waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("ff_name0"), CUSTOM_PROPERTY);
@@ -144,11 +148,11 @@ public class FileContentTest extends BaseWebDriverTest
         waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
         _extHelper.waitForFileGridReady();
         _extHelper.waitForFileAdminEnabled();
-        pipelineHelper.goToAdminMenu();
+        fileBrowserHelper.goToAdminMenu();
 
         // enable custom file properties.
         _extHelper.clickExtTab("File Properties");
-        checkRadioButton("fileOption", "useCustom");
+        checkCheckbox(Locator.radioButtonByNameAndValue("fileOption", "useCustom"));
 
         // Modify toolbar.
         _extHelper.clickExtTab("Toolbar and Grid Settings");
@@ -178,7 +182,7 @@ public class FileContentTest extends BaseWebDriverTest
 //        clickButton("Submit", 0);
 //
 //        windowMaximize();
-        pipelineHelper.goToConfigureButtonsTab();
+        fileBrowserHelper.goToConfigureButtonsTab();
         pipelineHelper.removeButton("Import Data");
         pipelineHelper.addCreateFolderButton();
         pipelineHelper.commitPipelineAdminChanges();
@@ -188,10 +192,13 @@ public class FileContentTest extends BaseWebDriverTest
         String filename = "InlineFile.html";
         String sampleRoot = getLabKeyRoot() + "/sampledata/security";
         File f = new File(sampleRoot, filename);
-        pipelineHelper.uploadFile(f, FILE_DESCRIPTION, CUSTOM_PROPERTY_VALUE, LOOKUP_VALUE_2);
+        List<FileBrowserExtendedProperty> fileProperties = new ArrayList<>();
+        fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE, false));
+        fileProperties.add(new FileBrowserExtendedProperty("LookupColumn:", LOOKUP_VALUE_2, true));
+        fileBrowserHelper.uploadFile(f, FILE_DESCRIPTION, fileProperties);
 
-        assertLinkPresentWithText(LOOKUP_VALUE_2);
-        assertLinkPresentWithText(CUSTOM_PROPERTY_VALUE);
+        assertElementPresent(Locator.linkWithText(LOOKUP_VALUE_2));
+        assertElementPresent(Locator.linkWithText(CUSTOM_PROPERTY_VALUE));
         assertAttributeEquals(Locator.linkWithText(CUSTOM_PROPERTY_VALUE), "href", "http://labkey.test/?a="+CUSTOM_PROPERTY_VALUE+"&b="+LOOKUP_VALUE_2);
 
         log("rename file");

@@ -28,7 +28,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 /**
- * User: Cory
+ * User: cnathe
  * Date: 10/4/13
  *
  * This test imports a folder archive that has 2 subfolders (a date based study and a visit based study) which have been

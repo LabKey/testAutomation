@@ -29,7 +29,6 @@ import java.io.File;
 public class PipelineHelper
 {
     BaseWebDriverTest _test = null;
-    private static final String CUSTOM_PROPERTY = "customProperty";
 
     public PipelineHelper(BaseWebDriverTest test)
     {
@@ -67,10 +66,6 @@ public class PipelineHelper
         _test.waitForElement(Locator.css("#fileBrowser td.x-grid3-cell").withText(folderName));
     }
 
-    public void goToConfigureTab()
-    {
-
-    }
     public void addCreateFolderButton()
     {
         _test.dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='Create Folder']"),
@@ -92,20 +87,6 @@ public class PipelineHelper
         _test.clickButton("Submit", 0);
     }
 
-    public void goToConfigureButtonsTab()
-    {
-        goToAdminMenu();
-
-        _test._extHelper.clickExtTab("Toolbar and Grid Settings");
-        _test.waitForText("Configure Grid columns and Toolbar");
-    }
-
-    public void goToAdminMenu()
-    {
-        _test.clickButton("Admin", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_APPEAR);
-        _test._extHelper.waitForExtDialog("Manage File Browser Configuration", 5000);
-    }
-
     /**
      * From pipeline screen, move a file to a folder
      * @param fileName  Name of file to move
@@ -125,44 +106,6 @@ public class PipelineHelper
         _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css(".x-window ul.x-tree-node-ct").withText(destinationPath)));
         _test.click(folder);
         _test.clickButton("Move", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
-    }
-
-    public void uploadFile(File file, String description, String customProperty, String lookupColumn )
-    {
-        chooseSingleFileUpload(file);
-        _test._extHelper.setExtFormElementByLabel("Description:", description);
-        _test.clickButton("Upload", 0);
-        _test._extHelper.waitForExtDialog("Extended File Properties", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.setFormElement(Locator.name(CUSTOM_PROPERTY), customProperty);
-        _test._extHelper.selectComboBoxItem("LookupColumn:",lookupColumn);
-        _test.clickButton("Done", 0);
-        _test._extHelper.waitForExt3MaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-        _test.waitForText(description, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForText(customProperty, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForText(lookupColumn, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void uploadFile(File file)
-    {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            public boolean check()
-            {
-                return _test.getFormElement(Locator.xpath("//label[./span[text() = 'Choose a File:']]//..//input[contains(@class, 'x-form-file-text')]")).equals("");
-            }
-        }, "Upload field did not clear after upload.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        chooseSingleFileUpload(file);
-        _test.clickButton("Upload", 0);
-        _test.waitForElement(Locator.css("#fileBrowser div.x-grid3-col-2").withText(file.getName()), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    private void chooseSingleFileUpload(File file)
-    {
-        WebElement displayField = Locator.css(".single-upload-panel input.x-form-file-text").findElement(_test.getDriver());
-        _test.executeScript("arguments[0].style.display = 'none';", displayField);
-        _test.setFormElement(Locator.css(".single-upload-panel input[type=file]"), file);
-        _test.executeScript("arguments[0].style.display = '';", displayField);
     }
 
     public void importFile(String fileName, String importAction)

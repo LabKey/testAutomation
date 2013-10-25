@@ -1,6 +1,9 @@
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
+import java.util.List;
 
 public interface FileBrowserHelperParams
 {
@@ -27,6 +30,8 @@ public interface FileBrowserHelperParams
     public void goToAdminMenu();
 
     public void uploadFile(File file);
+
+    public void uploadFile(File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties);
 
     public void importFile(String fileName, String importAction);
 

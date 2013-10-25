@@ -1,10 +1,13 @@
 package org.labkey.test.util;
 
+import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.WebElement;
 
 import java.io.File;
+import java.util.List;
+import java.util.Set;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 
@@ -123,7 +126,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     {
         goToAdminMenu();
 
-        _test._ext4Helper.clickExt4Tab("Toolbar and Grid Settings");
+        _test._extHelper.clickExtTab("Toolbar and Grid Settings");
         _test.waitForText("Configure Grid columns and Toolbar");
     }
 
@@ -132,15 +135,18 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     {
         try
         {
-            _test.assertElementVisible(Locator.ext4ButtonContainingText("Admin"));
-            _test.click(Locator.ext4ButtonContainingText("Admin"));
+            _test.assertElementVisible(_test.getButtonLocator("Admin"));
+            _test.clickButton("Admin", 0);
         }
         catch(AssertionError e)
         {
             _test.click(Locator.xpath("//span[contains(@class, 'x4-toolbar-more-icon')]"));
             _test.click(Locator.xpath("//span[text()='Admin' and contains(@class, 'x4-menu-item-text')]"));
         }
-        _test.waitForElement(Ext4HelperWD.Locators.window("Manage File Browser Configuration"));
+
+        _test._extHelper.waitForExtDialog("Manage File Browser Configuration");
+        // TODO: enable this in place of waitForExtDialog above
+        // _test.waitForElement(Ext4HelperWD.Locators.window("Manage File Browser Configuration"));
     }
 
     @Override
@@ -157,7 +163,58 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void uploadFile(File file)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        uploadFile(file, null, null);
+    }
+
+    @Override
+    public void uploadFile(File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties)
+    {
+        // TODO: convert to Ext4 when new file webpart is enabled
+
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            public boolean check()
+            {
+                return _test.getFormElement(Locator.xpath("//label[./span[text() = 'Choose a File:']]//..//input[contains(@class, 'x-form-file-text')]")).equals("");
+            }
+        }, "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
+
+        chooseSingleFileUpload(file);
+        if (description != null)
+            _test._extHelper.setExtFormElementByLabel("Description:", description);
+
+        _test.clickButton("Upload", 0);
+
+        if (fileProperties != null && fileProperties.size() > 0)
+        {
+            _test._extHelper.waitForExtDialog("Extended File Properties");
+            for (FileBrowserExtendedProperty prop : fileProperties)
+            {
+                if (prop.isCombobox())
+                    _test._extHelper.selectComboBoxItem(prop.getName(), prop.getValue());
+                else
+                    _test.setFormElement(Locator.name(prop.getName()), prop.getValue());
+            }
+            _test.clickButton("Done", 0);
+            _test._extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+
+            for (FileBrowserExtendedProperty prop : fileProperties)
+            {
+                _test.waitForText(prop.getValue());
+            }
+        }
+
+        _test.waitForElement(Locator.css("#fileBrowser div.x-grid3-col-2").withText(file.getName()));
+        if (description != null)
+            _test.waitForText(description);
+    }
+
+    private void chooseSingleFileUpload(File file)
+    {
+        WebElement displayField = Locator.css(".single-upload-panel input.x-form-file-text").findElement(_test.getDriver());
+        _test.executeScript("arguments[0].style.display = 'none';", displayField);
+        _test.setFormElement(Locator.css(".single-upload-panel input[type=file]"), file);
+        _test.executeScript("arguments[0].style.display = '';", displayField);
     }
 
     @Override
