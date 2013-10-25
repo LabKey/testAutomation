@@ -7134,12 +7134,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         selectImportDataActionNoWaitForGrid(actionName);
     }
 
-    public void selectPipelineFileAndImportAction(String file, String actionName)
-    {
-        _extHelper.selectFileBrowserItem(file);
-        selectImportDataAction(actionName);
-    }
-
     public void selectImportDataActionNoWaitForGrid(String actionName)
     {
         clickButton("Import Data", 0);

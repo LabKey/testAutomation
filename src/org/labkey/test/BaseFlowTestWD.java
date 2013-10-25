@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
@@ -317,7 +318,8 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     {
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("FCS files to be imported"));
-        selectPipelineFileAndImportAction(analysisZipPath, "Import External Analysis");
+        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
+        fileBrowserHelper.importFile(analysisZipPath, "Import External Analysis");
 
         importAnalysis_selectFCSFiles(containerPath, SelectFCSFileOption.None, null);
         importAnalysis_reviewSamples(containerPath, false, null, null);

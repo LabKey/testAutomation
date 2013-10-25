@@ -25,7 +25,6 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserExtendedProperty;
-import org.labkey.test.util.FileBrowserHelperParams;
 import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
@@ -89,7 +88,7 @@ public class FileContentTest extends BaseWebDriverTest
 
         _searchHelper.initialize();
 
-        FileBrowserHelperParams fileBrowserHelper = new FileBrowserHelperWD(this);
+        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
 
         _containerHelper.createProject(PROJECT_NAME, null);
         // Trigger email digest in order to reset timer

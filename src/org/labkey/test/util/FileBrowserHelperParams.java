@@ -39,7 +39,7 @@ public interface FileBrowserHelperParams
 
     public void uploadFile(File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties);
 
-    public void importFile(String fileName, String importAction);
+    public void importFile(String filePath, String importAction);
 
     public void selectImportDataAction(@LoggedParam String actionName);
 

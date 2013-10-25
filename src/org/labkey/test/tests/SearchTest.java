@@ -20,7 +20,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.FileBrowserHelperParams;
 import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.WikiHelper;
@@ -340,7 +339,7 @@ public class SearchTest extends StudyWDTest
         File file = new File(getLabKeyRoot() + "/sampledata/security", "InlineFile.html");
         File MLfile = new File(getLabKeyRoot() + "/sampledata/mzxml", "test_nocompression.mzXML");
 
-        FileBrowserHelperParams fileBrowserHelper = new FileBrowserHelperWD(this);
+        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
         fileBrowserHelper.uploadFile(file);
         fileBrowserHelper.uploadFile(MLfile);
 

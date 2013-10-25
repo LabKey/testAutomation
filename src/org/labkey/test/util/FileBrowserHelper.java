@@ -220,9 +220,9 @@ public class FileBrowserHelper implements FileBrowserHelperParams
             _test.waitForText(description);    }
 
     @Override
-    public void importFile(String fileName, String importAction)
+    public void importFile(String filePath, String importAction)
     {
-        clickFileBrowserFileCheckbox(fileName);
+        selectFileBrowserItem(filePath);
         selectImportDataAction(importAction);
     }
 

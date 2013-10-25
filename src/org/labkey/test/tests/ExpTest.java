@@ -23,7 +23,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.util.FileBrowserHelper;
-import org.labkey.test.util.FileBrowserHelperParams;
 import org.labkey.test.util.ListHelper;
 
 import java.text.DateFormat;
@@ -72,7 +71,7 @@ public class ExpTest extends BaseSeleniumWebTest
         clickFolder(FOLDER_NAME);
         clickButton("Process and Import Data");
 
-        FileBrowserHelperParams fileBrowserHelper = new FileBrowserHelper(this);
+        FileBrowserHelper fileBrowserHelper = new FileBrowserHelper(this);
         fileBrowserHelper.importFile("experiment.xar.xml", "Import Experiment");
         clickAndWait(Locator.linkWithText("Data Pipeline"));
         assertLinkNotPresentWithText("ERROR");

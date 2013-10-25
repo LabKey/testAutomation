@@ -6504,12 +6504,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         selectImportDataActionNoWaitForGrid(actionName);
     }
 
-    public void selectPipelineFileAndImportAction(String file, String actionName)
-    {
-        _extHelper.selectFileBrowserItem(file);
-        selectImportDataAction(actionName);
-    }
-
     public void selectImportDataActionNoWaitForGrid(String actionName)
     {
         clickButton("Import Data", 0);
