@@ -516,10 +516,17 @@ public class ExtHelperWD extends AbstractHelperWD
     //Pick measure from split panel measure picker
     public void pickMeasure(final String source, final String measure, boolean keepSelection)
     {
-        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector(".sourcepanel .x4-grid-row"))); // if one row is ready, all should be
+        //select source query
+        Locator queryLoc = Locator.css(".sourcepanel .x4-grid-row");
+        WebElement queryElement = queryLoc.waitForElmement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
+        _test.scrollIntoView(queryElement); // in case window is too short
+        _test.shortWait().until(ExpectedConditions.elementToBeClickable(queryLoc.toBy())); // if one row is ready, all should be
         selectExt4GridItem("queryName", source, -1, "sourcegrid", keepSelection);
         //select measure
-        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector(".measuresgrid .x4-grid-row"))); // if one row is ready, all should be
+        Locator measureLoc = Locator.css(".measuresgrid .x4-grid-row");
+        WebElement measureElement = measureLoc.waitForElmement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
+        _test.scrollIntoView(measureElement); // in case window is too short
+        _test.shortWait().until(ExpectedConditions.elementToBeClickable(measureLoc.toBy())); // if one row is ready, all should be
         selectExt4GridItem("label", measure, -1, "measuresgrid", keepSelection);
     }
 
