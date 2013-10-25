@@ -161,7 +161,7 @@ UNDONE: need to fix the merge case
         //error logging test, casting error, note that this causes an error in the checker
         // before a pipeline job is even scheduled
         runETL_CheckerError("badCast");
-        assertInLog("java.lang.String cannot be cast to java.util.Date");
+        assertInLog("contains value not castable to a date:");
 
         //error logging test, bad run table name
         runETL_CheckerError("badTableName");
@@ -169,10 +169,9 @@ UNDONE: need to fix the merge case
 
         // be sure to check for all expected errors here so that the test won't fail on exit
         // 1) duplicate key error
-        // 2) bad cast error
         // looks like postgres inserts an "ERROR" word in their error string for the duplicate key
         // but mssql doesn't, hack around that here
-        checkExpectedErrors(WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL ? 3 : 2);
+        checkExpectedErrors(WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL ? 2 : 1);
     }
 
     //
