@@ -39,6 +39,7 @@ import org.labkey.test.util.MethodPerfAspect;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.AdvancedSqlTest;
+import org.labkey.test.util.WindowsOnlyTest;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -398,9 +399,10 @@ public class Runner extends TestSuite
                 Class interfaces[] = testClass.getInterfaces();
                 String databaseType = System.getProperty("databaseType");
                 String databaseVersion = System.getProperty("databaseVersion");
+                String osName = System.getProperty("os.name");
                 for (Class i : interfaces)
                 {
-                    if (i.getName().equals(PostgresOnlyTest.class.getCanonicalName()))
+                    if (i.equals(PostgresOnlyTest.class))
                     {
                         if(databaseType != null && !("postgres".equals(databaseType) || "pg".equals(databaseType)))
                         {
@@ -409,7 +411,7 @@ public class Runner extends TestSuite
                         }
                         break;
                     }
-                    if (i.getName().equals(SqlserverOnlyTest.class.getCanonicalName()))
+                    if (i.equals(SqlserverOnlyTest.class))
                     {
                         if(databaseType != null && !("sqlserver".equals(databaseType) || "mssql".equals(databaseType)))
                         {
@@ -418,7 +420,7 @@ public class Runner extends TestSuite
                         }
                         break;
                     }
-                    if (i.getName().equals(DevModeOnlyTest.class.getCanonicalName()))
+                    if (i.equals(DevModeOnlyTest.class))
                     {
                         if(!"true".equals(System.getProperty("devMode")))
                         {
@@ -427,12 +429,21 @@ public class Runner extends TestSuite
                         }
                         break;
                     }
-                    if (i.getName().equals(AdvancedSqlTest.class.getCanonicalName()))
+                    if (i.equals(AdvancedSqlTest.class))
                     {
                         if(databaseType != null && "2005".equals(databaseVersion))
                         {
                             illegalTest = true;
                             System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported database: " + databaseType + " " + databaseVersion);
+                        }
+                        break;
+                    }
+                    if (i.equals(WindowsOnlyTest.class))
+                    {
+                        if(osName != null && !osName.toLowerCase().contains("windows"))
+                        {
+                            illegalTest = true;
+                            System.out.println("** Skipping " + testClass.getSimpleName() + " test for unsupported operating system: " + osName);
                         }
                         break;
                     }

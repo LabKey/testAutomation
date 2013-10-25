@@ -22,11 +22,12 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.MS2;
+import org.labkey.test.util.WindowsOnlyTest;
 
 import java.io.File;
 
 @Category({MS2.class, BVT.class})
-public class CometTest extends AbstractMS2SearchEngineTest
+public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnlyTest
 {
     protected static final String SEARCH_BUTTON = "Comet";
     protected static final String SEARCH_TYPE = "comet";
