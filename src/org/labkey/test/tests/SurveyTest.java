@@ -345,7 +345,7 @@ public class SurveyTest extends BaseWebDriverTest
     {
         log("Configure Surveys webpart");
         portalHelper.addWebPart("Surveys");
-        waitForElementToDisappear(Locator.xpath("//table[contains(@class, 'x4-item-disabled')]//input[@id = 'SurveyDesignComboId-inputEl']"));
+        waitForElement(Locator.css(".survey-designs-loaded-marker"));
         _ext4Helper.selectComboBoxItem("Survey Design:", surveyDesignName);
         clickButton("Submit");
         waitForText("Surveys: " + surveyDesignName);
