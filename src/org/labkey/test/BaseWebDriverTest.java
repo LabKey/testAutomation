@@ -6633,12 +6633,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 
-    protected void importFolderFromZip(File folderFile)
+    protected void importFolderFromZip(File folderFile, boolean validateQueries, int completedJobs)
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
         waitForElement(Locator.name("folderZip"));
         setFormElement(Locator.name("folderZip"), folderFile);
+        if (!validateQueries)
+            uncheckCheckbox(Locator.name("validateQueries"));
         clickButtonContainingText("Import Folder From Local Zip Archive");
         waitForText("Data Pipeline");
         waitForPipelineJobsToComplete(1, "Folder import", false);

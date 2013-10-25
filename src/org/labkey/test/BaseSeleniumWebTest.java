@@ -5681,18 +5681,20 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     protected void importFolderFromZip(File folderFile)
     {
-        importFolderFromZip(folderFile, 1);
+        importFolderFromZip(folderFile, true, 1);
     }
 
-    protected void importFolderFromZip(File folderFile, int completedJobs)
+    protected void importFolderFromZip(File folderFile, boolean validateQueries, int completedJobs)
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
         waitForElement(Locator.name("folderZip"));
         setFormElement(Locator.name("folderZip"), folderFile);
+        if (!validateQueries)
+            uncheckCheckbox(Locator.name("validateQueries"));
         clickButtonContainingText("Import Folder From Local Zip Archive");
         waitForText("Data Pipeline");
-        waitForPipelineJobsToComplete(completedJobs, "Folder import", false);
+        waitForPipelineJobsToComplete(1, "Folder import", false);
     }
 
     protected void importFolderFromPipeline(String folderFile)
