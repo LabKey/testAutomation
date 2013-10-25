@@ -23,7 +23,13 @@ public interface FileBrowserHelperParams
 
     public void renameFile(String currentName, String newName);
 
+    public void moveFile(String fileName, String destinationPath);
+
     public void createFolder(String folderName);
+
+    public void addToolbarButton(String buttonName);
+
+    public void removeToolbarButton(String buttonName);
 
     public void goToConfigureButtonsTab();
 
@@ -42,5 +48,7 @@ public interface FileBrowserHelperParams
     public void waitForFileGridReady();
 
     public void waitForImportDataEnabled();
+
+    public void waitForFileAdminEnabled();
 
 }

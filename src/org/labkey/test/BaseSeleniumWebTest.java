@@ -2387,24 +2387,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertLinkNotPresentWithText(folderName);
     }
 
-    /**
-     * from the file management page, select a file and rename it
-     *
-     * @param oldFilename the name of the file to select
-     * @param newFilename the new file name
-     */
-    public void renameFile(String oldFilename, String newFilename)
-    {
-        Locator l = Locator.xpath("//div[text()='" + oldFilename + "']");
-        clickAt(l, "1,1");
-        click(Locator.css("button.iconRename"));
-
-        waitForDraggableMask();
-        _extHelper.setExtFormElementByLabel("Filename:", newFilename);
-        Locator btnLocator = Locator.extButton("Rename");
-        click(btnLocator);
-    }
-
     @LogMethod
     public void renameFolder(String project, String folderName, String newFolderName, boolean createAlias)
     {

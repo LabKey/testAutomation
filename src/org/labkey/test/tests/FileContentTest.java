@@ -29,7 +29,6 @@ import org.labkey.test.util.FileBrowserHelperParams;
 import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.PipelineHelper;
 import org.labkey.test.util.SearchHelper;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -91,7 +90,6 @@ public class FileContentTest extends BaseWebDriverTest
         _searchHelper.initialize();
 
         FileBrowserHelperParams fileBrowserHelper = new FileBrowserHelperWD(this);
-        PipelineHelper pipelineHelper = new PipelineHelper(this);
 
         _containerHelper.createProject(PROJECT_NAME, null);
         // Trigger email digest in order to reset timer
@@ -175,17 +173,10 @@ public class FileContentTest extends BaseWebDriverTest
         waitForElementToDisappear(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
         assertElementPresent(Locator.xpath("//button[text()='Parent Folder']"));
 
-        //TODO: Re-add new folder button to test adding new button. Fails on TeamCity
-        // Re-add upload button
-//        clickButton("Admin", 0);
-//        ExtHelper.waitForExtDialog(this, "Manage File Browser Configuration", 5000);
-//        clickButton("Submit", 0);
-//
-//        windowMaximize();
         fileBrowserHelper.goToConfigureButtonsTab();
-        pipelineHelper.removeButton("Import Data");
-        pipelineHelper.addCreateFolderButton();
-        pipelineHelper.commitPipelineAdminChanges();
+        fileBrowserHelper.removeToolbarButton("Import Data");
+        fileBrowserHelper.addToolbarButton("Create Folder");
+        clickButton("Submit", 0);
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
 
@@ -203,14 +194,13 @@ public class FileContentTest extends BaseWebDriverTest
 
         log("rename file");
         String newFileName = "changedFilename.html";
-        pipelineHelper.renameFile(filename, newFileName);
+        fileBrowserHelper.renameFile(filename, newFileName);
         filename = newFileName;
 
         log("move file");
         String folderName = "Test folder";
-        pipelineHelper.createFolder(folderName);
-        sleep(1000); //TODO:  if this works, look for a better solution
-        pipelineHelper.moveFile(newFileName, folderName);
+        fileBrowserHelper.createFolder(folderName);
+        fileBrowserHelper.moveFile(newFileName, folderName);
 
         // Check custom actions as non-administrator.
         impersonate(TEST_USER);

@@ -7,7 +7,6 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.List;
-import java.util.Set;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 
@@ -90,11 +89,21 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void clickFileBrowserFileCheckbox(@LoggedParam String fileName)
     {
-        Locator.XPathLocator gridItem;
-        gridItem = Locator.xpath("//td[contains(@class, 'x4-grid-cell-row-checker')]/..//span[text()='"+fileName+"']");
-        WebElement element = gridItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElement(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]/td//span[text()='"+fileName+"']"));
-        _test.click(gridItem);
+        waitForFileGridReady();
+        _test.waitForElement(Locator.css("div.labkey-filecontent-grid"));
+        _test.waitForElement(ExtHelperWD.locateBrowserFileName(fileName));
+        Locator rowSelected = Locator.css(".labkey-filecontent-grid div.x-grid3-row-selected > table > tbody > tr > td > div").withText(fileName);
+        Boolean wasChecked = _test.isElementPresent(rowSelected);
+
+        if (_test.isElementPresent(ExtHelperWD.locateGridRowCheckbox(fileName)))
+            _test.click(Locator.xpath("//div").withClass("labkey-filecontent-grid").append(ExtHelperWD.locateGridRowCheckbox(fileName)));
+        else
+            _test.click(Locator.xpath("//div").withClass("labkey-filecontent-grid").append("//td").withClass("x-grid3-td-1").withText(fileName));
+
+        if (wasChecked)
+            _test.waitForElementToDisappear(rowSelected);
+        else
+            _test.waitForElement(rowSelected);
     }
 
     @Override
@@ -112,13 +121,51 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void renameFile(String currentName, String newName)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        _test.click(Locator.xpath("//div[text()='" + currentName + "']"));
+        _test.click(Locator.css("button.iconRename"));
+        _test.waitForDraggableMask();
+        _test._extHelper.setExtFormElementByLabel("Filename:", newName);
+        _test.click(Locator.extButton("Rename"));
+        _test.waitForText(newName);
+    }
+
+    @Override
+    public void moveFile(String fileName, String destinationPath)
+    {
+        selectFileBrowserItem(fileName);
+        _test.click(Locator.css("button.iconMove"));
+        _test._extHelper.waitForExtDialog("Choose Destination");
+        //TODO:  this doesn't yet support nested folders
+        Locator folder =Locator.xpath("(//a/span[contains(text(),'" + destinationPath + "')])[2]");
+        _test.waitForElement(folder);  //if it still isn't coming up, that's a product bug
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css(".x-window ul.x-tree-node-ct").withText(destinationPath)));
+        _test.click(folder);
+        _test.clickButton("Move", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
     }
 
     @Override
     public void createFolder(String folderName)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        _test.clickButton("Create Folder", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_APPEAR);
+        _test.setFormElement(Locator.name("folderName"), folderName);
+        _test.clickButton("Submit", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        _test.waitForElement(Locator.css("#fileBrowser td.x-grid3-cell").withText(folderName));
+    }
+
+    @Override
+    public void addToolbarButton(String buttonName)
+    {
+        _test.dragAndDrop(Locator.xpath("//td[contains(@class, 'x-table-layout-cell')]//button[text()='" + buttonName + "']"),
+                Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]"));
+        _test.waitForElement(Locator.css(".test-custom-toolbar .iconFolderNew"), _test.defaultWaitForPage);
+    }
+
+    @Override
+    public void removeToolbarButton(String buttonName)
+    {
+        // the button should appear twice, once in the full button list and again in the toolbar. we want the 2nd one.
+        _test.click(Locator.buttonContainingText(buttonName).index(2));
+        _test.click(Locator.tagContainingText("span", "remove"));
     }
 
     @Override
@@ -136,6 +183,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
         try
         {
             _test.assertElementVisible(_test.getButtonLocator("Admin"));
+            waitForFileAdminEnabled();
             _test.clickButton("Admin", 0);
         }
         catch(AssertionError e)
@@ -152,12 +200,11 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void selectImportDataAction(@LoggedParam String actionName)
     {
-         waitForFileGridReady();
-//       waitForImportDataEnabled();
-        _test.click(Locator.linkContainingText("Import Data"));
-
-        _test.waitAndClick(Locator.xpath("//input[@type='button' and not(@disabled)]/../label[contains(text(), " + Locator.xq(actionName) + ")]"));
-        _test.clickAndWait(Locator.ext4Button("Import"));
+        waitForFileGridReady();
+        waitForImportDataEnabled();
+        _test.clickButton("Import Data", 0);
+        _test.waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction' and not(@disabled)]/../label[text()=" + Locator.xq(actionName) + "]"));
+        _test.clickButton("Import");
     }
 
     @Override
@@ -220,7 +267,8 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void importFile(String fileName, String importAction)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        clickFileBrowserFileCheckbox(fileName);
+        selectImportDataAction(importAction);
     }
 
     @Override
@@ -242,12 +290,18 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void waitForFileGridReady()
     {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-file-grid-initialized')]"), 6 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-file-grid-initialized')]"), 6 * WAIT_FOR_JAVASCRIPT);
     }
 
     @Override
     public void waitForImportDataEnabled()
     {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * WAIT_FOR_JAVASCRIPT);
+    }
+
+    @Override
+    public void waitForFileAdminEnabled()
+    {
+        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-admin-enabled')]"), 6 * WAIT_FOR_JAVASCRIPT);
     }
 }
