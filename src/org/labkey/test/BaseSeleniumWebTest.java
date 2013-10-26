@@ -5703,8 +5703,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Import Folder Using Pipeline");
-        _fileBrowserHelper.selectFileBrowserItem(folderFile);
-        _fileBrowserHelper.selectImportDataAction("Import Folder");
+        _fileBrowserHelper.importFile(folderFile, "Import Folder");
         waitForPipelineJobsToComplete(1, "Folder import", false);
     }
     public String getFileContents(String rootRelativePath)
@@ -6389,7 +6388,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
             clickAndWait(Locator.linkWithText("Manage Files"));
             waitAndClickButton("Process and Import Data");
-            _extHelper.waitForFileGridReady();
+            _fileBrowserHelper.waitForFileGridReady();
 
             // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
             File testDir = _tempDir;
@@ -6490,36 +6489,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void setCodeEditorValue(String id, String value)
     {
         _extHelper.setCodeEditorValue(id, value);
-    }
-
-    /**
-     * For invoking pipeline actions from the file web part. Displays the import data
-     * dialog and selects and submits the specified action.
-     *
-     * @param actionName
-     */
-    @LogMethod
-    public void selectImportDataAction(String actionName)
-    {
-        sleep(200);
-        _extHelper.waitForFileGridReady();
-        _extHelper.waitForImportDataEnabled();
-        selectImportDataActionNoWaitForGrid(actionName);
-    }
-
-    public void selectPipelineFileAndImportAction(String file, String actionName)
-    {
-        _fileBrowserHelper.selectFileBrowserItem(file);
-        _fileBrowserHelper.selectImportDataAction(actionName);
-    }
-
-    public void selectImportDataActionNoWaitForGrid(String actionName)
-    {
-        clickButton("Import Data", 0);
-
-        waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction' and not(@disabled)]/../label[text()=" + Locator.xq(actionName) + "]"));
-        String id = _extHelper.getExtElementId("btn_submit");
-        clickAndWait(Locator.id(id));
     }
 
     public void ensureSignedOut()

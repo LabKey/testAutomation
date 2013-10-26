@@ -22,7 +22,6 @@ import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.MS2;
 import org.labkey.test.util.CustomizeViewsHelperWD;
-import org.labkey.test.util.FileBrowserHelperWD;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,8 +89,7 @@ public class SequestImportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         // Import a Sequest run
         clickButton("Process and Import Data");
-        _fileBrowserHelper.selectFileBrowserItem("raftflow10.pep.xml");
-        _fileBrowserHelper.selectImportDataAction("Import Search Results");
+        _fileBrowserHelper.importFile("raftflow10.pep.xml", "Import Search Results");
 
         click(Locator.linkWithText("MS2 Dashboard"));
         waitAndClick(Locator.linkWithText("Data Pipeline"));

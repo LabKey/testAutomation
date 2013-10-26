@@ -59,6 +59,12 @@ public class GpatAssayTest extends BaseWebDriverTest
     }
 
     @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    @Override
     public void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
@@ -73,9 +79,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
 
         log("Import XLS GPAT assay");
-        sleep(2000);
-        _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_XLS);
-        selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.importFile(GPAT_ASSAY_XLS, "Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_XLS);
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
@@ -84,6 +88,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         _extHelper.waitForExtDialog("Score Column Properties");
         _extHelper.clickExtTab("Validators");
         checkCheckbox("required");
+        clickButton("OK", 0);
         click(Locator.xpath("//tr[./td/span[@id='id_import_Primary']]//div[contains(@class, 'x-tbar-page-next')]"));
         _extHelper.waitForExtDialog("Primary Column Properties");
         _extHelper.clickExtTab("Advanced");
@@ -106,9 +111,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         log("Import XLSX GPAT assay");
         clickProject(PROJECT_NAME);
-        _extHelper.waitForFileGridReady();
-        _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_XLSX);
-        selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.importFile(GPAT_ASSAY_XLSX, "Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_XLSX);
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
@@ -117,6 +120,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         _extHelper.waitForExtDialog("Score Column Properties");
         _extHelper.clickExtTab("Validators");
         checkCheckbox("required");
+        clickButton("OK", 0);
         click(Locator.xpath("//tr[./td/span[@id='id_import_Primary']]//div[contains(@class, 'x-tbar-page-next')]"));
         _extHelper.waitForExtDialog("Primary Column Properties");
         _extHelper.clickExtTab("Advanced");
@@ -136,9 +140,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         log("Import TSV GPAT assay");
         clickProject(PROJECT_NAME);
-        _extHelper.waitForFileGridReady();
-        _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_TSV);
-        selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.importFile(GPAT_ASSAY_TSV, "Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_TSV);
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
@@ -147,6 +149,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         _extHelper.waitForExtDialog("Score Column Properties");
         _extHelper.clickExtTab("Validators");
         checkCheckbox("required");
+        clickButton("OK", 0);
         click(Locator.xpath("//tr[./td/span[@id='id_import_Primary']]//div[contains(@class, 'x-tbar-page-next')]"));
         _extHelper.waitForExtDialog("Primary Column Properties");
         _extHelper.clickExtTab("Advanced");
@@ -176,8 +179,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         log("Verify standard column aliases");
         clickProject(PROJECT_NAME);
-        _fileBrowserHelper.selectFileBrowserItem(ALIASED_ASSAY_1);
-        _fileBrowserHelper.selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.importFile(ALIASED_ASSAY_1, "Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "specId");
         assertFormElementEquals("ParticipantID", "ParticipantID");
@@ -185,8 +187,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertFormElementEquals("Date", "draw_date");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        _fileBrowserHelper.selectFileBrowserItem(ALIASED_ASSAY_2);
-        _fileBrowserHelper.selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.importFile(ALIASED_ASSAY_2, "Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "vialId1");
         assertFormElementEquals("ParticipantID", "ptid");
@@ -194,8 +195,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertFormElementEquals("Date", "drawDate");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        _fileBrowserHelper.selectFileBrowserItem(ALIASED_ASSAY_3);
-        _fileBrowserHelper.selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.importFile(ALIASED_ASSAY_3, "Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "vialId");
         assertFormElementEquals("ParticipantID", "ptid");
@@ -203,8 +203,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertFormElementEquals("Date", "date");
         clickButton("Cancel");
         refresh(); // avoid file selection timeout
-        _fileBrowserHelper.selectFileBrowserItem(ALIASED_ASSAY_4);
-        _fileBrowserHelper.selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.importFile(ALIASED_ASSAY_4, "Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         assertFormElementEquals("SpecimenID", "guspec");
         assertFormElementEquals("ParticipantID", "ptid");
@@ -214,9 +213,7 @@ public class GpatAssayTest extends BaseWebDriverTest
 
         log("Import FASTA GPAT assay");
         clickProject(PROJECT_NAME);
-        _extHelper.waitForFileGridReady();
-        _extHelper.clickFileBrowserFileCheckbox(GPAT_ASSAY_FNA);
-        selectImportDataAction("Create New General Assay Design");
+        _fileBrowserHelper.importFile(GPAT_ASSAY_FNA, "Create New General Assay Design");
         waitForText("SpecimenID", WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("AssayDesignerName"), ASSAY_NAME_FNA);
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);

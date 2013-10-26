@@ -25,7 +25,6 @@ import org.labkey.test.categories.Specimen;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.FileBrowserHelperWD;
 
 import java.io.File;
 
@@ -104,8 +103,7 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Manage Files"));
 
         clickButton("Process and Import Data");
-        _fileBrowserHelper.selectFileBrowserItem("specimens/" + FILE);
-        _fileBrowserHelper.selectImportDataAction("Import Specimen Data");
+        _fileBrowserHelper.importFile("specimens/" + FILE, "Import Specimen Data");
         clickButton("Start Import");
         waitForPipelineJobsToComplete(1, "Import specimens: SampleMindedExport.xlsx", false);
         clickTab("Specimen Data");

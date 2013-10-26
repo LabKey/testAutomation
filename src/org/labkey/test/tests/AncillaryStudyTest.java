@@ -393,8 +393,7 @@ public class AncillaryStudyTest extends StudyBaseTest
                 "dataset300.tsv", "dataset350.tsv", "dataset420.tsv", "dataset423.tsv", "dataset490.tsv");
 
         log("Verify reloading study");
-        _fileBrowserHelper.selectFileBrowserItem("export/study/study.xml");
-        _fileBrowserHelper.selectImportDataAction("Reload Study");
+        _fileBrowserHelper.importFile("export/study/study.xml", "Reload Study");
         waitForPipelineJobsToComplete(1, "study import", false);
     }
 

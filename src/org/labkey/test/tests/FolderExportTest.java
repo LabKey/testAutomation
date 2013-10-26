@@ -254,10 +254,10 @@ public class FolderExportTest extends BaseWebDriverTest
         log("verify container tabs were imported");
         hoverFolderBar();
         clickAndWait(Locator.linkWithText("Subfolder1", subfolderIndex));
-        assertLinkPresentWithText("Assay Container");
-        assertLinkPresentWithText("Tab 2");
-        assertLinkPresentWithText("Study Container");
-        assertLinkNotPresentWithText("Tab 1");
+        assertElementPresent(Locator.linkWithText("Assay Container"));
+        assertElementPresent(Locator.linkWithText("Tab 2"));
+        assertElementPresent(Locator.linkWithText("Study Container"));
+        assertElementNotPresent(Locator.linkWithText("Tab 1"));
         clickAndWait(Locator.linkWithText("Tab 2"));
         assertTextPresentInThisOrder("A customized web part", "Experiment Runs", "Assay List");
         clickAndWait(Locator.linkWithText("Study Container"));

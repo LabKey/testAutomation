@@ -48,7 +48,7 @@ public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnl
     protected void setupEngine()
     {
         log("Analyze " + SEARCH_BUTTON + " sample data.");
-        selectImportDataAction(SEARCH_BUTTON +  " Peptide Search");
+        _fileBrowserHelper.selectImportDataAction(SEARCH_BUTTON +  " Peptide Search");
     }
 
     protected void doTestStepsSetDepth(boolean isQuickTest)

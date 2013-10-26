@@ -191,7 +191,7 @@ public class FlowTest extends BaseFlowTestWD
         // Should allow for import all directories containing FCS Files
         _fileBrowserHelper.selectFileBrowserItem("8color/");
         _fileBrowserHelper.waitForImportDataEnabled();
-        waitForElement(_fileBrowserHelper.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
+        waitForElement(_fileBrowserHelper.locateGridRowCheckbox(FCS_FILE_2, false), WAIT_FOR_JAVASCRIPT);
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
 
         assertTextPresent("The following directories within",  "8color");
@@ -201,7 +201,7 @@ public class FlowTest extends BaseFlowTestWD
 
         // Entering L02-060120-QUV-JS directory should allow import of current directory
         _fileBrowserHelper.selectFileBrowserItem("8color/" + FCS_FILE_1 + "/");
-        waitForElement(_fileBrowserHelper.locateGridRowCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(_fileBrowserHelper.locateGridRowCheckbox("91761.fcs", false), WAIT_FOR_JAVASCRIPT);
         _fileBrowserHelper.selectImportDataAction("Current directory of 25 FCS Files");
         assertTextPresent("The following directories within" ,"'8color",  FCS_FILE_1);
         assertTextPresent("Current Directory (25 fcs files)");
@@ -335,6 +335,7 @@ public class FlowTest extends BaseFlowTestWD
 
         _fileBrowserHelper.selectFileBrowserItem("8color/");
         _fileBrowserHelper.waitForImportDataEnabled();
+        waitForElement(_fileBrowserHelper.locateGridRowCheckbox(FCS_FILE_2, false), WAIT_FOR_JAVASCRIPT);
         _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
         assertTextNotPresent(FCS_FILE_1);
         assertTextPresent(FCS_FILE_2);

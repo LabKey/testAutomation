@@ -20,7 +20,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
@@ -305,8 +304,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("FCS files to be imported"));
-        FileBrowserHelper fileBrowserHelper = new FileBrowserHelper(this);
-        fileBrowserHelper.importFile(analysisZipPath, "Import External Analysis");
+        _fileBrowserHelper.importFile(analysisZipPath, "Import External Analysis");
 
         importAnalysis_selectFCSFiles(containerPath, SelectFCSFileOption.None, null);
         importAnalysis_reviewSamples(containerPath, false, null, null);
@@ -375,9 +373,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         log("browse pipeline to begin import analysis wizard");
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("FCS files to be imported"));
-        _fileBrowserHelper.selectFileBrowserItem(workspacePath);
-
-        _fileBrowserHelper.selectImportDataAction("Import FlowJo Workspace");
+        _fileBrowserHelper.importFile(workspacePath, "Import FlowJo Workspace");
     }
 
     @LogMethod
@@ -402,7 +398,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         waitForExtReady();
         if (isChecked(Locator.id(SelectFCSFileOption.Browse.name())))
-            _extHelper.waitForFileGridReady();
+            _fileBrowserHelper.waitForFileGridReady();
 
         assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
         switch (selectFCSFilesOption)

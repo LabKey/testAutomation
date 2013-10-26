@@ -25,7 +25,6 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserExtendedProperty;
-import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.SearchHelper;
@@ -88,8 +87,6 @@ public class FileContentTest extends BaseWebDriverTest
 
         _searchHelper.initialize();
 
-        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
-
         _containerHelper.createProject(PROJECT_NAME, null);
         // Trigger email digest in order to reset timer
         beginAt(getBaseURL() + "/filecontent/" + EscapeUtil.encode(PROJECT_NAME) + "/sendShortDigest.view");
@@ -126,9 +123,9 @@ public class FileContentTest extends BaseWebDriverTest
         _listHelper.uploadData(PROJECT_NAME, LIST_NAME, COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
         clickProject(PROJECT_NAME);
         // Setup custom file properties
-        _ext4Helper.waitForFileGridReady();
-//        _ext4Helper.waitForFileAdminEnabled();
-        fileBrowserHelper.goToAdminMenu();
+        _fileBrowserHelper.waitForFileGridReady();
+        //_fileBrowserHelper.waitForFileAdminEnabled();
+        _fileBrowserHelper.goToAdminMenu();
         // Setup custom file actions
 
         waitAndClick(Locator.ext4CheckboxById("importAction"));
@@ -144,9 +141,9 @@ public class FileContentTest extends BaseWebDriverTest
         clickButton("Save & Close");
 
         waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
-        _ext4Helper.waitForFileGridReady();
-//        _ext4Helper.waitForFileAdminEnabled();
-        fileBrowserHelper.goToAdminMenu();
+        _fileBrowserHelper.waitForFileGridReady();
+        //_fileBrowserHelper.waitForFileAdminEnabled();
+        _fileBrowserHelper.goToAdminMenu();
 
         // enable custom file properties.
         _ext4Helper.clickExtTab("File Properties");
@@ -157,25 +154,21 @@ public class FileContentTest extends BaseWebDriverTest
         waitForText("Configure Grid columns and Toolbar");
 
         waitForText("Import Data");
-        Locator folderBtn = Locator.xpath("//tr[@data-recordid='createDirectory']/td[1]");
-        waitForElement(folderBtn, WAIT_FOR_JAVASCRIPT);
-        click(folderBtn); // Remove new folder button
+        _fileBrowserHelper.removeToolbarButton("createDirectory");
         click(Locator.xpath("//tr[@data-recordid='parentFolder']/td[2]")); // Add text to 'Parent Folder' button
 
         // Save settings.
         click(Locator.ext4Button("submit"));
-//        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         // Verify custom action buttons
-        waitForElementToDisappear(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Locator.xpath("//span[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.xpath("//span[text()='Parent Folder']"));
 
-        fileBrowserHelper.goToConfigureButtonsTab();
-        fileBrowserHelper.removeToolbarButton("Import Data");
-        fileBrowserHelper.addToolbarButton("Create Folder");
-        clickButton("Submit", 0);
-        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
+        _fileBrowserHelper.goToConfigureButtonsTab();
+        _fileBrowserHelper.removeToolbarButton("importData");
+        _fileBrowserHelper.addToolbarButton("createDirectory");
+        click(Locator.ext4Button("submit"));
+        waitForElement(Locator.xpath("//span[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
 
         String filename = "InlineFile.html";
         String sampleRoot = getLabKeyRoot() + "/sampledata/security";
@@ -183,7 +176,7 @@ public class FileContentTest extends BaseWebDriverTest
         List<FileBrowserExtendedProperty> fileProperties = new ArrayList<>();
         fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE, false));
         fileProperties.add(new FileBrowserExtendedProperty("LookupColumn:", LOOKUP_VALUE_2, true));
-        fileBrowserHelper.uploadFile(f, FILE_DESCRIPTION, fileProperties);
+        _fileBrowserHelper.uploadFile(f, FILE_DESCRIPTION, fileProperties);
 
         assertElementPresent(Locator.linkWithText(LOOKUP_VALUE_2));
         assertElementPresent(Locator.linkWithText(CUSTOM_PROPERTY_VALUE));
@@ -191,13 +184,13 @@ public class FileContentTest extends BaseWebDriverTest
 
         log("rename file");
         String newFileName = "changedFilename.html";
-        fileBrowserHelper.renameFile(filename, newFileName);
+        _fileBrowserHelper.renameFile(filename, newFileName);
         filename = newFileName;
 
         log("move file");
         String folderName = "Test folder";
-        fileBrowserHelper.createFolder(folderName);
-        fileBrowserHelper.moveFile(newFileName, folderName);
+        _fileBrowserHelper.createFolder(folderName);
+        _fileBrowserHelper.moveFile(filename, folderName);
 
         // Check custom actions as non-administrator.
         impersonate(TEST_USER);

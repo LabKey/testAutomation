@@ -28,9 +28,9 @@ public interface FileBrowserHelperParams
 
     public void createFolder(String folderName);
 
-    public void addToolbarButton(String buttonName);
+    public void addToolbarButton(String buttonId);
 
-    public void removeToolbarButton(String buttonName);
+    public void removeToolbarButton(String buttonId);
 
     public void goToConfigureButtonsTab();
 
@@ -46,7 +46,7 @@ public interface FileBrowserHelperParams
 
     public void clickFileBrowserButton(@LoggedParam String actionName);
 
-    public Locator locateGridRowCheckbox(String file);
+    public Locator locateGridRowCheckbox(String file, boolean checkForSelected);
 
     public void waitForFileGridReady();
 

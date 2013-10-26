@@ -261,14 +261,9 @@ public class ExtHelper extends AbstractHelper
         _test.waitForElement(Locator.xpath("//div[contains(@class, 'ext-el-mask') and contains(@style, 'block')]"), wait);
     }
 
-    public static Locator locateGridRowCheckbox(String rowTextContent)
+    public static Locator.XPathLocator locateGridRowCheckbox(String rowTextContent)
     {
         return Locator.xpath("//div[contains(@class, 'x-grid3-row')]//td/div[text()='" + rowTextContent + "']//..//..//div[@class='x-grid3-row-checker']");
-    }
-
-    public static Locator locateBrowserFileName(String fileName)
-    {
-        return Locator.xpath("//div[contains(@class, 'x-grid3-row')]//td/div[text()='" + fileName + "']");
     }
 
     public static Locator locateExt3GridRow(int rowIndex, String parent)
@@ -284,20 +279,6 @@ public class ExtHelper extends AbstractHelper
     public static Locator locateExt3GridCell(Locator row, int cellIndex)
     {
         return Locator.xpath("(" + ((Locator.XPathLocator)row).getPath() + "//td[contains(@class, 'x-grid3-cell')])[" + cellIndex + "]");
-    }
-
-    @LogMethod(quiet = true)
-    public void clickFileBrowserFileCheckbox(@LoggedParam String fileName)
-    {
-        waitForFileGridReady();
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-filecontent-grid')]"), 60000);
-        _test.waitForElement(locateBrowserFileName(fileName), 60000);
-        Boolean wasChecked = _test.isElementPresent(Locator.xpath("//div").withClass("x-grid3-row-selected").append("/table/tbody/tr/td/div").withText(fileName));
-        _test.getWrapper().getEval("selenium.selectFileBrowserCheckbox('" + fileName + "');");
-        if (wasChecked)
-            _test.waitForElementToDisappear(Locator.xpath("//div").withClass("x-grid3-row-selected").append("/table/tbody/tr/td/div").withText(fileName));
-        else
-            _test.waitForElement(Locator.xpath("//div").withClass("x-grid3-row-selected").append("/table/tbody/tr/td/div").withText(fileName));
     }
 
     public void clickXGridPanelCheckbox(int index, boolean keepExisting)
@@ -365,83 +346,6 @@ public class ExtHelper extends AbstractHelper
     public void pickMeasure(String panelCls, String source, String measure)
     {
         pickMeasure(panelCls, source, measure, false);
-    }
-
-    @LogMethod(quiet = true)
-    public void selectFileBrowserItem(@LoggedParam String path)
-    {
-        String[] parts = {};
-        StringBuilder nodeId = new StringBuilder();
-        if (path.startsWith("/"))
-            path = path.substring(1);
-        if (!path.equals(""))
-        {
-            parts = path.split("/");
-            nodeId.append('/');
-        }
-        waitForFileGridReady();
-
-        // expand root tree node
-        _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-
-        for (int i = 0; i < parts.length; i++)
-        {
-            waitForLoadingMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-            waitForFileGridReady();
-
-            nodeId.append(parts[i]).append('/');
-
-            if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory
-            {
-                //it sometimes takes time to populate the list, this should fix that problem
-                _test.waitForElement(Locator.tagWithText("div", parts[i]));
-                // select last item: click on tree node name
-
-                clickFileBrowserFileCheckbox(parts[i]);
-            }
-            else
-            {
-                // expand tree node: click on expand/collapse icon
-                _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + nodeId + "']"));
-                _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='" + nodeId + "']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-            }
-        }
-    }
-
-    public void selectFileBrowserRoot()
-    {
-        selectFileBrowserItem("/");
-    }
-
-    public void waitForImportDataEnabled()
-    {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void waitForFileAdminEnabled()
-    {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-admin-enabled')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    /**
-     * Used for directory refreshes or folder changes for the file webpart grid to be ready and initialized.
-     */
-    public void waitForFileGridReady()
-    {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-file-grid-initialized')]"), 6 * BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-    }
-
-    @LogMethod
-    public void selectAllFileBrowserFiles()
-    {
-        Locator file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-checker']");
-        _test.waitForElement(file, 60000);
-        _test.sleep(1000);
-        _test.mouseClick(file.toString());
-
-        file = Locator.xpath("//tr[@class='x-grid3-hd-row']//div[@class='x-grid3-hd-inner x-grid3-hd-checker x-grid3-hd-checker-on']");
-        _test.waitForElement(file, 60000);
     }
 
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, String selection)
