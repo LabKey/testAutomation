@@ -126,16 +126,17 @@ public class FileContentTest extends BaseWebDriverTest
         _listHelper.uploadData(PROJECT_NAME, LIST_NAME, COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
         clickProject(PROJECT_NAME);
         // Setup custom file properties
-        _extHelper.waitForFileGridReady();
-        _extHelper.waitForFileAdminEnabled();
+        _ext4Helper.waitForFileGridReady();
+//        _ext4Helper.waitForFileAdminEnabled();
         fileBrowserHelper.goToAdminMenu();
         // Setup custom file actions
-        uncheckCheckbox(Locator.checkboxByName("importAction"));
 
+        waitAndClick(Locator.ext4CheckboxById("importAction"));
 
-        _extHelper.clickExtTab("File Properties");
-        checkCheckbox(Locator.radioButtonByNameAndValue("fileOption", "useCustom"));
-        clickButton("Edit Properties...");
+        _ext4Helper.clickExtTab("File Properties");
+        click(Locator.ext4Radio("Use Custom File Properties"));
+        clickButton("edit properties");
+
         waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("ff_name0"), CUSTOM_PROPERTY);
         setFormElement(Locator.id("url"), "http://labkey.test/?a=${"+CUSTOM_PROPERTY+"}&b=${"+COLUMN_NAME+"}");
@@ -143,34 +144,31 @@ public class FileContentTest extends BaseWebDriverTest
         clickButton("Save & Close");
 
         waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
-        _extHelper.waitForFileGridReady();
-        _extHelper.waitForFileAdminEnabled();
+        _ext4Helper.waitForFileGridReady();
+//        _ext4Helper.waitForFileAdminEnabled();
         fileBrowserHelper.goToAdminMenu();
 
         // enable custom file properties.
-        _extHelper.clickExtTab("File Properties");
-        checkCheckbox(Locator.radioButtonByNameAndValue("fileOption", "useCustom"));
+        _ext4Helper.clickExtTab("File Properties");
+        click(Locator.ext4Radio("Use Custom File Properties"));
 
         // Modify toolbar.
-        _extHelper.clickExtTab("Toolbar and Grid Settings");
+        _ext4Helper.clickExtTab("Toolbar and Grid Settings");
         waitForText("Configure Grid columns and Toolbar");
 
         waitForText("Import Data");
-        waitForText("file1.xls");
-        Locator folderBtn = Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconFolderNew')]");
+        Locator folderBtn = Locator.xpath("//tr[@data-recordid='createDirectory']/td[1]");
         waitForElement(folderBtn, WAIT_FOR_JAVASCRIPT);
-        click(folderBtn);
-        click(Locator.xpath("//a[./span[text()='remove']]")); // Remove upload button
-        click(Locator.xpath("//div[contains(@class, 'test-custom-toolbar')]//button[contains(@class, 'iconUp')]"));
-        click(Locator.xpath("//a[./span[text()='show/hide text']]")); // Add text to 'Parent Folder' button
+        click(folderBtn); // Remove new folder button
+        click(Locator.xpath("//tr[@data-recordid='parentFolder']/td[2]")); // Add text to 'Parent Folder' button
 
         // Save settings.
-        clickButton("Submit", 0);
-        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        click(Locator.ext4Button("submit"));
+//        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         // Verify custom action buttons
         waitForElementToDisappear(Locator.xpath("//button[contains(@class, 'iconFolderNew')]"), WAIT_FOR_JAVASCRIPT);
-        assertElementPresent(Locator.xpath("//button[text()='Parent Folder']"));
+        waitForElement(Locator.xpath("//span[text()='Parent Folder']"));
 
         fileBrowserHelper.goToConfigureButtonsTab();
         fileBrowserHelper.removeToolbarButton("Import Data");
@@ -204,7 +202,7 @@ public class FileContentTest extends BaseWebDriverTest
         // Check custom actions as non-administrator.
         impersonate(TEST_USER);
         clickProject(PROJECT_NAME);
-        waitForElementToDisappear(Locator.xpath("//button[text()='Import Data']"), WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Locator.xpath("//span[text()='Import Data']"), WAIT_FOR_JAVASCRIPT);
 
         stopImpersonating();
 
@@ -230,10 +228,10 @@ public class FileContentTest extends BaseWebDriverTest
 
         // Delete file.
         clickProject(PROJECT_NAME);
-        _extHelper.waitForFileGridReady();
+        _fileBrowserHelper.waitForFileGridReady();
         click(Locator.css("button.iconFolderTree"));
         shortWait().until(ExpectedConditions.visibilityOf(Locator.xpath("id('fileBrowser')//div[contains(@id, 'xsplit')]").findElement(getDriver())));
-        _extHelper.selectFileBrowserItem(folderName + "/" + filename);
+        _fileBrowserHelper.selectFileBrowserItem(folderName + "/" + filename);
         click(Locator.css("button.iconDelete"));
         clickButton("Yes", 0);
         waitForElementToDisappear(Locator.xpath("//*[text()='"+filename+"']"), 5000);

@@ -22,24 +22,13 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     public void expandFileBrowserRootNode()
     {
         // expand root tree node
-        _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='/']"));
-        _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='/']"), WAIT_FOR_JAVASCRIPT);
-        // TODO: here are the Ext4 versions
-        //        _test.waitAndClick(Locator.xpath("//tr[contains(@class, 'x4-grid-tree-node') and @*='/']//div[contains(@class, 'x4-grid-cell-inner-treecolumn')]"));
-        //        _test.waitForElement(Locator.xpath("//tr[contains(@class, 'x4-grid-row-selected') and @*='/']//div[contains(@class, 'x4-grid-cell-inner-treecolumn')]"), WAIT_FOR_JAVASCRIPT);
+        _test.waitAndClick(Locator.xpath("//tr[contains(@class, 'x4-grid-tree-node')]//div[contains(@class, 'x4-grid-cell-inner-treecolumn')]"));
+        _test.waitForElement(Locator.xpath("//tr[contains(@class, 'x4-grid-row-selected')]//div[contains(@class, 'x4-grid-cell-inner-treecolumn')]"), WAIT_FOR_JAVASCRIPT);
     }
 
     @Override
     public void selectFileBrowserItem(@LoggedParam String path)
     {
-        try
-        {
-            Thread.sleep(500);
-        }
-        catch(InterruptedException e)
-        {
-            _test.log("Sleep for file browser item selection interupted.");
-        }
 
         String[] parts = {};
         StringBuilder nodeId = new StringBuilder();
@@ -66,6 +55,10 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
             if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory
             {
                 // select last item: click on tree node name
+                clickFileBrowserFileCheckbox(parts[i]);
+            }
+            else
+            {
                 try
                 {
                     Thread.sleep(500);
@@ -74,18 +67,12 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
                 {
                     _test.log("Sleep for file browser item selection interupted.");
                 }
-                clickFileBrowserFileCheckbox(parts[i]);
-            }
-            else
-            {
                 // expand tree node: click on expand/collapse icon
-                _test.waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node') and @*='" + nodeId + "']"));
-                _test.waitForElement(Locator.xpath("//div[contains(@class, 'tree-selected') and @*='" + nodeId + "']"), WAIT_FOR_JAVASCRIPT);
-                // TODO: here is the Ext4 version
-                //_test.waitForElement(Locator.xpath("//tr[contains(@id, '"+nodeId+"')]//span[contains(@class, 'x4-tree-node') and text()='"+parts[i]+"']"));
-                //LabKeyExpectedConditions.animationIsDone(Locator.xpath("//tr[contains(@id, '"+nodeId+"')]//span[contains(@class, 'x4-tree-node') and text()='"+parts[i]+"']"));
-                //_test.scrollIntoView(Locator.xpath("//tr[contains(@id, '"+nodeId+"')]//span[contains(@class, 'x4-tree-node') and text()='"+parts[i]+"']"));
-                //_test.clickAt(Locator.xpath("//tr[contains(@id, '" + nodeId + "')]//span[contains(@class, 'x4-tree-node') and text()='" + parts[i] + "']"), 1, 1, 0);
+                _test.waitForElement(Locator.xpath("//tr[contains(@id, '"+nodeId+"')]//span[contains(@class, 'x4-tree-node') and text()='"+parts[i]+"']"));
+                LabKeyExpectedConditions.animationIsDone(Locator.xpath("//tr[contains(@id, '"+nodeId+"')]//span[contains(@class, 'x4-tree-node') and text()='"+parts[i]+"']"));
+                _test.scrollIntoView(Locator.xpath("//tr[contains(@id, '"+nodeId+"')]//span[contains(@class, 'x4-tree-node') and text()='"+parts[i]+"']"));
+                _test.clickAt(Locator.xpath("//tr[contains(@id, '" + nodeId + "')]//span[contains(@class, 'x4-tree-node') and text()='" + parts[i] + "']"), 1, 1, 0);
+                _test._ext4Helper.waitForMaskToDisappear();
 
             }
         }
@@ -94,21 +81,11 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void clickFileBrowserFileCheckbox(@LoggedParam String fileName)
     {
-        waitForFileGridReady();
-        _test.waitForElement(Locator.css("div.labkey-filecontent-grid"));
-        _test.waitForElement(ExtHelperWD.locateBrowserFileName(fileName));
-        Locator rowSelected = Locator.css(".labkey-filecontent-grid div.x-grid3-row-selected > table > tbody > tr > td > div").withText(fileName);
-        Boolean wasChecked = _test.isElementPresent(rowSelected);
-
-        if (_test.isElementPresent(ExtHelperWD.locateGridRowCheckbox(fileName)))
-            _test.click(Locator.xpath("//div").withClass("labkey-filecontent-grid").append(ExtHelperWD.locateGridRowCheckbox(fileName)));
-        else
-            _test.click(Locator.xpath("//div").withClass("labkey-filecontent-grid").append("//td").withClass("x-grid3-td-1").withText(fileName));
-
-        if (wasChecked)
-            _test.waitForElementToDisappear(rowSelected);
-        else
-            _test.waitForElement(rowSelected);
+        Locator.XPathLocator gridItem;
+        gridItem = Locator.xpath("//td[contains(@class, 'x4-grid-cell-row-checker')]/..//span[text()='"+fileName+"']");
+        WebElement element = gridItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]/td//span[text()='"+fileName+"']"));
+        _test.click(gridItem);
     }
 
     @Override
@@ -188,7 +165,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
         try
         {
             _test.assertElementVisible(_test.getButtonLocator("Admin"));
-            waitForFileAdminEnabled();
+//            waitForFileAdminEnabled();
             _test.clickButton("Admin", 0);
         }
         catch(AssertionError e)
@@ -205,11 +182,12 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void selectImportDataAction(@LoggedParam String actionName)
     {
-        waitForFileGridReady();
-        waitForImportDataEnabled();
-        _test.clickButton("Import Data", 0);
-        _test.waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction' and not(@disabled)]/../label[text()=" + Locator.xq(actionName) + "]"));
-        _test.clickButton("Import");
+         waitForFileGridReady();
+//       waitForImportDataEnabled();
+        _test.click(Locator.linkContainingText("Import Data"));
+
+        _test.waitAndClick(Locator.xpath("//input[@type='button' and not(@disabled)]/../label[contains(text(), " + Locator.xq(actionName) + ")]"));
+        _test.clickAndWait(Locator.ext4Button("Import"));
     }
 
     @Override
@@ -290,6 +268,13 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
             _test.click(Locator.xpath("//span[contains(@class, 'x4-toolbar-more-icon')]"));
             _test.click(Locator.xpath("//span[text()='"+actionName+"' and contains(@class, 'x4-menu-item-text')]"));
         }
+    }
+
+    @Override
+    public Locator locateGridRowCheckbox(String file)
+    {
+        _test.waitForElement(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]/td//span[text()='"+file+"']"));
+        return Locator.xpath("//tr[contains(@class, 'x4-grid-row')]/td//span[text()='"+file+"']");
     }
 
     @Override

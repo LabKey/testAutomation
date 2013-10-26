@@ -104,8 +104,8 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Manage Files"));
 
         clickButton("Process and Import Data");
-        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
-        fileBrowserHelper.importFile("specimens/" + FILE, "Import Specimen Data");
+        _fileBrowserHelper.selectFileBrowserItem("specimens/" + FILE);
+        _fileBrowserHelper.selectImportDataAction("Import Specimen Data");
         clickButton("Start Import");
         waitForPipelineJobsToComplete(1, "Import specimens: SampleMindedExport.xlsx", false);
         clickTab("Specimen Data");

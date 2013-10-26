@@ -6651,8 +6651,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Import Folder Using Pipeline");
-        _extHelper.selectFileBrowserItem(folderFile);
-        selectImportDataAction("Import Folder");
+        _fileBrowserHelper.selectFileBrowserItem(folderFile);
+        _fileBrowserHelper.selectImportDataAction("Import Folder");
         waitForPipelineJobsToComplete(1, "Folder import", false);
     }
 
@@ -7035,11 +7035,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             for (String dir : dirNames)
                 path += dir + "/";
 
-            _extHelper.selectFileBrowserItem(path);
+            _fileBrowserHelper.selectFileBrowserItem(path);
 
             for (File copiedArchive : _copiedArchives)
-                _extHelper.clickFileBrowserFileCheckbox(copiedArchive.getName());
-            selectImportDataAction("Import Specimen Data");
+                _fileBrowserHelper.clickFileBrowserFileCheckbox(copiedArchive.getName());
+            _fileBrowserHelper.selectImportDataAction("Import Specimen Data");
             clickButton("Start Import");
         }
 

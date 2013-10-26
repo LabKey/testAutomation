@@ -161,11 +161,11 @@ public class FolderExportTest extends BaseWebDriverTest
         clickButton("Export");
 
         // verify some of the folder export items by selecting them in the file browser
-        _extHelper.selectFileBrowserItem("export/folder.xml");
-        _extHelper.selectFileBrowserItem("export/subfolders/subfolders.xml");
-        _extHelper.selectFileBrowserItem("export/subfolders/Subfolder1/folder.xml");
-        _extHelper.selectFileBrowserItem("export/subfolders/Subfolder1/subfolders/_hidden/folder.xml");
-        _extHelper.selectFileBrowserItem("export/subfolders/Subfolder2/folder.xml");
+        _fileBrowserHelper.selectFileBrowserItem("export/folder.xml");
+        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/subfolders.xml");
+        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/Subfolder1/folder.xml");
+        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/Subfolder1/subfolders/_hidden/folder.xml");
+        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/Subfolder2/folder.xml");
     }
 
     private void verifyExpectedWebPartsPresent()

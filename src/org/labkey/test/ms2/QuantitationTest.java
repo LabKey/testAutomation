@@ -51,7 +51,7 @@ public class QuantitationTest extends AbstractXTandemTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickButton("Process and Import Data");
 
-        _extHelper.selectFileBrowserItem("bov_sample/" + SAMPLE_BASE_NAME + ".mzXML");
+        _fileBrowserHelper.selectFileBrowserItem("bov_sample/" + SAMPLE_BASE_NAME + ".mzXML");
 
         setupEngine();
 
