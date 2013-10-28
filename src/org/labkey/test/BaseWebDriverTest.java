@@ -185,7 +185,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1";
-    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#";
+    public static String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = null;// = "\u2603~!@$&()_+{}-=[],.#";
 
     public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
     public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>\u2639";
@@ -235,6 +235,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 log("Unknown browser [" + seleniumBrowser + "]; Using best compatible browser [" + BROWSER_TYPE + "]");
             }
         }
+
+        //TODO: Workaround for Chrome Unicode bug: https://code.google.com/p/chromium/issues/detail?id=304131
+        //TODO: Fix expected in Chrome 31
+        if (TRICKY_CHARACTERS_FOR_PROJECT_NAMES == null)
+            TRICKY_CHARACTERS_FOR_PROJECT_NAMES = (seleniumBrowser != null && seleniumBrowser.toLowerCase().startsWith("*firefox") ? "\u2603" : "") + "~!@$&()_+{}-=[],.#";
     }
 
 
