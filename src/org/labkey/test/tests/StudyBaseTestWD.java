@@ -240,14 +240,11 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
 
     protected void initializePipeline()
     {
-        initializePipeline(null);
+        initializePipeline(getPipelinePath());
     }
     
     protected void initializePipeline(String pipelinePath)
     {
-        if(pipelinePath==null)
-            pipelinePath = getPipelinePath();
-
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         toggleCheckboxByTitle("Pipeline");
