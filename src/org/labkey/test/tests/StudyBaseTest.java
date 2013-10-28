@@ -242,6 +242,9 @@ public abstract class StudyBaseTest extends SimpleApiTest
     
     protected void initializePipeline(String pipelinePath)
     {
+        if(pipelinePath==null)
+            pipelinePath = getPipelinePath();
+
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
         toggleCheckboxByTitle("Pipeline");
