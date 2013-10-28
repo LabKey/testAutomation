@@ -107,8 +107,9 @@ public class FileBrowserHelper implements FileBrowserHelperParams
     @Override
     public void clickFileBrowserFileCheckbox(@LoggedParam String fileName)
     {
-        _test.waitForElement(Locator.xpath("//tr[contains(@class, 'x4-grid-row')]/td//span[text()='"+fileName+"']"));
-        _test.click(Locator.xpath("//td[contains(@class, 'x4-grid-cell-row-checker')]/..//span[text()='"+fileName+"']"));
+        waitForFileGridReady();
+        _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(fileName));
+        _test.getWrapper().getEval("selenium.selectFileBrowserCheckbox('" + fileName + "');");
     }
 
     @Override
@@ -134,7 +135,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
     {
         selectFileBrowserItem(currentName);
         _test.click(Locator.css(".iconRename"));
-        _test._extHelper.waitForExtDialog("Rename");
+        _test.waitForElement(Ext4HelperWD.Locators.window("Rename"));
         _test.setFormElement(Locator.name("renameText-inputEl"), newName);
         _test.clickButton("Rename", BaseSeleniumWebTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(newName));
@@ -145,10 +146,10 @@ public class FileBrowserHelper implements FileBrowserHelperParams
     {
         selectFileBrowserItem(fileName);
         _test.click(Locator.css(".iconMove"));
-        _test._extHelper.waitForExtDialog("Choose Destination");
+        _test.waitForElement(Ext4HelperWD.Locators.window("Choose Destination"));
         //TODO:  this doesn't yet support nested folders
-        Locator folder =Locator.xpath("(//a/span[contains(text(),'" + destinationPath + "')])[2]");
-        _test.waitForElement(folder);  //if it still isn't coming up, that's a product bug
+        Locator folder = Locator.xpath("//tr//span[contains(@class, 'x4-tree-node-text') and text() = '" + destinationPath + "']");
+        _test.waitForElement(folder);
         _test.click(folder);
         _test.clickButton("Move", BaseSeleniumWebTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
     }
@@ -189,7 +190,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
     {
         goToAdminMenu();
 
-        _test._extHelper.clickExtTab("Toolbar and Grid Settings");
+        _test._ext4Helper.clickExt4Tab("Toolbar and Grid Settings");
         _test.waitForText("Configure Grid columns and Toolbar");
     }
 
@@ -197,7 +198,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
     public void goToAdminMenu()
     {
         clickFileBrowserButton("Admin");
-        _test._extHelper.waitForExtDialog("Manage File Browser Configuration");
+        _test.waitForElement(Ext4HelperWD.Locators.window("Manage File Browser Configuration"));
     }
 
     @Override
@@ -225,7 +226,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
 
         if (fileProperties != null && fileProperties.size() > 0)
         {
-            _test._extHelper.waitForExtDialog("Extended File Properties");
+            _test.waitForElement(Ext4HelperWD.ext4Window("Extended File Properties"));
             for (FileBrowserExtendedProperty prop : fileProperties)
             {
                 if (prop.isCombobox())

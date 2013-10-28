@@ -127,9 +127,6 @@ public class StudyManualTest extends StudyTest
         _fileBrowserHelper.selectImportDataAction("Import Datasets");
         clickButton("Start Import");
         waitForPipelineJobsToComplete(1, "study import", false);
-
-        //create w
-
     }
 
 
