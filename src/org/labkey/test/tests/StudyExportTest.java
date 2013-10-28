@@ -101,9 +101,11 @@ public class StudyExportTest extends StudyManualTest
         log("Importing exported study (xml formats)");
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
-        waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node-expanded') and @*='/']"));//TODO: Bad cookie. Marker class won't appear without this step.
         _fileBrowserHelper.selectFileBrowserItem("export/");
-        _fileBrowserHelper.selectAllFileBrowserFiles();
+        // select the first exported zip archive file by row
+        Locator.XPathLocator gridRow = Locator.xpath("//div/span[contains(text(), 'My Study_')]");
+        waitForElement(gridRow);
+        clickAt(gridRow, "1,1");
         _fileBrowserHelper.selectImportDataAction("Import Study");
 
         // wait for study & specimen load
