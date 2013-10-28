@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.labkey.test.Locator;
+import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.UIContainerHelper;
@@ -93,7 +94,8 @@ public abstract class TimeChartTest extends ReportTest
 
         clickFolder(VISIT_FOLDER_NAME);
         clickButton("Process and Import Data");
-        _fileBrowserHelper.importFile("study.xml", "Import Study");
+        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
+        fileBrowserHelper.importFile("study.xml", "Import Study");
 
         waitForPipelineJobsToComplete(1, "study import", false);
     }

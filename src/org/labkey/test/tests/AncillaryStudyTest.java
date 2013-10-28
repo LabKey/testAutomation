@@ -381,19 +381,20 @@ public class AncillaryStudyTest extends StudyBaseTest
         goToModule("Pipeline");
         clickButton("Process and Import Data");
 
-        _fileBrowserHelper.selectFileBrowserItem("export/study/participant_groups.xml");
+        _extHelper.selectFileBrowserItem("export/study/participant_groups.xml");
         log("Verify protocol document in export");
-        _fileBrowserHelper.selectFileBrowserItem("export/study/protocolDocs/" + PROTOCOL_DOC.getName());
+        _extHelper.selectFileBrowserItem("export/study/protocolDocs/" + PROTOCOL_DOC.getName());
         assertTextPresent(PROTOCOL_DOC2.getName());
 
-        _fileBrowserHelper.selectFileBrowserItem("export/study/datasets/datasets_metadata.xml");
+        _extHelper.selectFileBrowserItem("export/study/datasets/datasets_metadata.xml");
         assertTextPresent(".tsv", (DATASETS.length + DEPENDENT_DATASETS.length) * 3);
         assertTextPresent("dataset001.tsv", "dataset019.tsv", "dataset023.tsv", "dataset125.tsv",
                 "dataset136.tsv", "dataset144.tsv", "dataset171.tsv", "dataset172.tsv", "dataset200.tsv",
                 "dataset300.tsv", "dataset350.tsv", "dataset420.tsv", "dataset423.tsv", "dataset490.tsv");
 
         log("Verify reloading study");
-        _fileBrowserHelper.importFile("export/study/study.xml", "Reload Study");
+        _extHelper.selectFileBrowserItem("export/study/study.xml");
+        selectImportDataAction("Reload Study");
         waitForPipelineJobsToComplete(1, "study import", false);
     }
 

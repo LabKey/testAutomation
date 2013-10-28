@@ -1,7 +1,6 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.Locator;
 
 import java.io.File;
 import java.util.List;
@@ -28,9 +27,9 @@ public interface FileBrowserHelperParams
 
     public void createFolder(String folderName);
 
-    public void addToolbarButton(String buttonId);
+    public void addToolbarButton(String buttonName);
 
-    public void removeToolbarButton(String buttonId);
+    public void removeToolbarButton(String buttonName);
 
     public void goToConfigureButtonsTab();
 
@@ -45,8 +44,6 @@ public interface FileBrowserHelperParams
     public void selectImportDataAction(@LoggedParam String actionName);
 
     public void clickFileBrowserButton(@LoggedParam String actionName);
-
-    public Locator locateGridRowCheckbox(String file, boolean checkForSelected);
 
     public void waitForFileGridReady();
 

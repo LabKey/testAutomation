@@ -788,13 +788,13 @@ public class SequenceTest extends BaseWebDriverTest
         waitAndClickAndWait(Locator.linkContainingText("Upload Files / Start Analysis"));
 
         waitForText("fileset");
-        _fileBrowserHelper.expandFileBrowserRootNode();
+        _extHelper.selectFileBrowserRoot();
         for (String f : files)
         {
-            _fileBrowserHelper.clickFileBrowserFileCheckbox(f);
+            _extHelper.clickFileBrowserFileCheckbox(f);
         }
 
-        _fileBrowserHelper.selectImportDataAction(importAction);
+        selectImportDataAction(importAction);
 
     }
 

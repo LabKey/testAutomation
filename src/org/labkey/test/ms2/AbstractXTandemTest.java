@@ -45,7 +45,7 @@ public abstract class AbstractXTandemTest extends AbstractMS2SearchEngineTest
     {
         log("Analyze " + SEARCH_BUTTON + " sample data.");
         sleep(1500);
-        _fileBrowserHelper.selectImportDataAction(SEARCH_BUTTON +  " Peptide Search");
+        selectImportDataAction(SEARCH_BUTTON +  " Peptide Search");
     }
 
 }

@@ -71,7 +71,7 @@ selenium.getExtElementId = function (id) {
 };
 
 selenium.selectFileBrowserCheckbox = function (filename) {
-    selenium.selectExt4GridItem('name', filename, -1, 'labkey-filecontent-grid', true);
+    selenium.selectExtGridItem('name', filename, -1, 'labkey-filecontent-grid', true);
 };
 
 selenium.selectExtGridItem = function (columnName, columnVal, idx, markerCls, keepExisting) {
@@ -129,7 +129,7 @@ selenium.selectExt4GridItem = function (columnName, columnVal, idx, markerCls, k
         if (grid)
         {
             if (idx == -1)
-                idx = grid.getStore().findExact(columnName, columnVal);
+                idx = grid.getStore().find(columnName, columnVal);
 
             if (idx == -1)
                 throw new Error("Unable to locate " + columnName + ": " + columnVal);

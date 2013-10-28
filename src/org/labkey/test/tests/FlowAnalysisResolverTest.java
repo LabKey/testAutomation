@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.FileBrowserHelperWD;
 
 /**
  * User: elvan
@@ -46,7 +47,8 @@ public class FlowAnalysisResolverTest extends FlowTest
 
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("FCS files to be imported"));
-        _fileBrowserHelper.importFile(analysisZipPath, "Import External Analysis");
+        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
+        fileBrowserHelper.importFile(analysisZipPath, "Import External Analysis");
         importAnalysis_selectFCSFiles(getContainerPath(), SelectFCSFileOption.Previous, null);
         assertTextPresent("Matched 3 of 4 samples");
 

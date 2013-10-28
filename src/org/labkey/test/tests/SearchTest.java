@@ -20,6 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.WikiHelper;
 
@@ -338,8 +339,9 @@ public class SearchTest extends StudyWDTest
         File file = new File(getLabKeyRoot() + "/sampledata/security", "InlineFile.html");
         File MLfile = new File(getLabKeyRoot() + "/sampledata/mzxml", "test_nocompression.mzXML");
 
-        _fileBrowserHelper.uploadFile(file);
-        _fileBrowserHelper.uploadFile(MLfile);
+        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
+        fileBrowserHelper.uploadFile(file);
+        fileBrowserHelper.uploadFile(MLfile);
 
         _searchHelper.enqueueSearchItem("antidisestablishmentarianism", true, Locator.linkWithText(file.getName()));
         _searchHelper.enqueueSearchItem("ThermoFinnigan", true, Locator.linkWithText(MLfile.getName()));

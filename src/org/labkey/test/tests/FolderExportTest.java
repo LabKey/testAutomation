@@ -161,11 +161,11 @@ public class FolderExportTest extends BaseWebDriverTest
         clickButton("Export");
 
         // verify some of the folder export items by selecting them in the file browser
-        _fileBrowserHelper.selectFileBrowserItem("export/folder.xml");
-        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/subfolders.xml");
-        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/Subfolder1/folder.xml");
-        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/Subfolder1/subfolders/_hidden/folder.xml");
-        _fileBrowserHelper.selectFileBrowserItem("export/subfolders/Subfolder2/folder.xml");
+        _extHelper.selectFileBrowserItem("export/folder.xml");
+        _extHelper.selectFileBrowserItem("export/subfolders/subfolders.xml");
+        _extHelper.selectFileBrowserItem("export/subfolders/Subfolder1/folder.xml");
+        _extHelper.selectFileBrowserItem("export/subfolders/Subfolder1/subfolders/_hidden/folder.xml");
+        _extHelper.selectFileBrowserItem("export/subfolders/Subfolder2/folder.xml");
     }
 
     private void verifyExpectedWebPartsPresent()
@@ -254,10 +254,10 @@ public class FolderExportTest extends BaseWebDriverTest
         log("verify container tabs were imported");
         hoverFolderBar();
         clickAndWait(Locator.linkWithText("Subfolder1", subfolderIndex));
-        assertElementPresent(Locator.linkWithText("Assay Container"));
-        assertElementPresent(Locator.linkWithText("Tab 2"));
-        assertElementPresent(Locator.linkWithText("Study Container"));
-        assertElementNotPresent(Locator.linkWithText("Tab 1"));
+        assertLinkPresentWithText("Assay Container");
+        assertLinkPresentWithText("Tab 2");
+        assertLinkPresentWithText("Study Container");
+        assertLinkNotPresentWithText("Tab 1");
         clickAndWait(Locator.linkWithText("Tab 2"));
         assertTextPresentInThisOrder("A customized web part", "Experiment Runs", "Assay List");
         clickAndWait(Locator.linkWithText("Study Container"));

@@ -54,7 +54,7 @@ public class MS2TestParams extends AbstractPipelineTestParams
     public void clickActionButton()
     {
         _test.log("X! Tandem Search");
-        _test._fileBrowserHelper.selectImportDataAction("X!Tandem Peptide Search");
+        _test.selectImportDataAction("X!Tandem Peptide Search");
     }
 
     protected void setGrouping(String grouping)

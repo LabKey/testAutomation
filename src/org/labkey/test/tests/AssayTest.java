@@ -192,7 +192,7 @@ public class AssayTest extends AbstractAssayTestWD
     private void verifyWebdavTree()
     {
         beginAt("_webdav");
-        _fileBrowserHelper.selectFileBrowserItem(TEST_ASSAY_PRJ_SECURITY + "/Studies/Study 1");
+        _extHelper.selectFileBrowserItem(TEST_ASSAY_PRJ_SECURITY + "/Studies/Study 1");
         assertTextPresent("@pipeline", 2);
         Locator.XPathLocator l = Locator.xpath("//span[text()='@pipeline']");
         assertElementPresent(l,  1);

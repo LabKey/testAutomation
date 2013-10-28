@@ -16,6 +16,7 @@
 package org.labkey.test.ms1.params;
 
 import org.labkey.test.pipeline.PipelineWebTestBase;
+import org.labkey.test.util.ExtHelper;
 
 /**
  * InspectTestParams class
@@ -37,14 +38,14 @@ public class FeaturesTestParams extends AbstractInspectTestParams
         String[] names = getSampleNames();
         if (names.length != 0)
         {
-            _test._fileBrowserHelper.waitForImportDataEnabled();
+            _test._extHelper.waitForImportDataEnabled();
             for (String name : names)
             {
-                _test._fileBrowserHelper.clickFileBrowserFileCheckbox(name + ".mzXML");
+                _test._extHelper.clickFileBrowserFileCheckbox(name + ".mzXML");
                 getTest().sleep(1000);
             }
         }
         _test.log("msInspect run");
-        _test._fileBrowserHelper.selectImportDataAction("msInspect Find Features");
+        _test.selectImportDataAction("msInspect Find Features");
     }
 }

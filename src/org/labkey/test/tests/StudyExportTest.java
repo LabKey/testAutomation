@@ -71,7 +71,10 @@ public class StudyExportTest extends StudyManualTest
         log("Importing exported study (legacy formats)");
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
-        _fileBrowserHelper.importFile("export/study/study.xml", "Import Study");
+        _extHelper.selectFileBrowserItem("export/study/study.xml");
+
+        selectImportDataAction("Import Study");
+
         // wait for study & specimen load to complete
         waitForPipelineJobsToComplete(3, "study and specimen import (legacy formats)", false);
 
@@ -101,12 +104,11 @@ public class StudyExportTest extends StudyManualTest
         log("Importing exported study (xml formats)");
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
-        _fileBrowserHelper.selectFileBrowserItem("export/");
-        // select the first exported zip archive file by row
-        Locator.XPathLocator gridRow = Locator.xpath("//div/span[contains(text(), 'My Study_')]");
-        waitForElement(gridRow);
-        clickAt(gridRow, "1,1");
-        _fileBrowserHelper.selectImportDataAction("Import Study");
+        waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node-expanded') and @*='/']"));//TODO: Bad cookie. Marker class won't appear without this step.
+        _extHelper.selectFileBrowserItem("export/");
+        _extHelper.selectAllFileBrowserFiles();
+
+        selectImportDataAction("Import Study");
 
         // wait for study & specimen load
         waitForPipelineJobsToComplete(4, "study and specimen import (xml formats)", false);

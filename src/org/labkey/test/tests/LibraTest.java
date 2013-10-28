@@ -48,7 +48,8 @@ public class LibraTest extends MS2TestBase
         clickProject(getProjectName());
 
         clickButton("Process and Import Data");
-        _fileBrowserHelper.importFile("xtandem/Libra/iTRAQ.search.xar.xml", "Import Experiment");
+        _extHelper.selectFileBrowserItem("xtandem/Libra/iTRAQ.search.xar.xml");
+        selectImportDataAction("Import Experiment");
         goToModule("Pipeline");
         waitForPipelineJobsToComplete(1, "Experiment Import - iTRAQ.search.xar.xml", false);
         clickProject(getProjectName());
