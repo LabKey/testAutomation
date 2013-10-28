@@ -134,9 +134,10 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
         _test.click(Locator.css(".iconMove"));
         _test.waitForElement(Ext4HelperWD.Locators.window("Choose Destination"));
         //TODO:  this doesn't yet support nested folders
-        Locator folder = Locator.xpath("//tr//span[contains(@class, 'x4-tree-node-text') and text() = '" + destinationPath + "']");
+        Locator folder = Locator.xpath("//div[contains(@class, 'x4-window')]//div/span[contains(@class, 'x4-tree-node-text') and text() = '" + destinationPath + "']");
         _test.waitForElement(folder);
         _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(folder));
+        _test.sleep(500);
         _test.click(folder);
         _test.clickButton("Move", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
     }
