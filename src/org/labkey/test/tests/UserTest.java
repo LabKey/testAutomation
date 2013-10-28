@@ -23,6 +23,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.WebElement;
 
 /**
  * User: Karl Lum
@@ -59,6 +61,9 @@ public class UserTest extends SecurityTest
         simplePasswordResetTest();
         changeUserEmailTest();
         deactivatedUserTest();
+        longUserPropertiesTest();
+        specialCharactersUserPropertiesTest();
+        scriptInjectionUserPropertiesTest();
         addCustomPropertiesTest();
     }
 
@@ -75,6 +80,7 @@ public class UserTest extends SecurityTest
         deleteUsers(false, NORMAL_USER2, NORMAL_USER2_ALTERNATE); // Deleted/renamed during test. Only needed during pre-clean
     }
 
+    @LogMethod
     private void siteUsersTest()
     {
         goToSiteUsers();
@@ -96,7 +102,8 @@ public class UserTest extends SecurityTest
     }
 
     // Issue 3876: Add more security tests
-    private void changeUserEmailTest()//boolean fromAdmin)
+    @LogMethod
+    private void changeUserEmailTest()
     {
         boolean fromAdmin = false;
         //get appropriate user
@@ -121,6 +128,7 @@ public class UserTest extends SecurityTest
         deleteUser(newUserEmail);
     }
 
+    @LogMethod
     private void deactivatedUserTest()
     {
         goToSiteUsers();
@@ -180,6 +188,7 @@ public class UserTest extends SecurityTest
      * Selects required user information fields and tests to see they are
      * enforced in the user info form.
      */
+    @LogMethod
     private void requiredFieldsTest()
     {
         goToSiteUsers();
@@ -204,6 +213,7 @@ public class UserTest extends SecurityTest
 
         navigateToUserDetails(NORMAL_USER);
         clickButton("Edit");
+        setFormElement(Locator.name("quf_FirstName"), "");
         clickButton("Submit");
 
         assertTextPresent("This field is required");
@@ -212,6 +222,7 @@ public class UserTest extends SecurityTest
         clickButton("Show Users");
     }
 
+    @LogMethod
     private void simplePasswordResetTest()
     {
         enableEmailRecorder();
@@ -287,9 +298,88 @@ public class UserTest extends SecurityTest
         clickAndWait(details);
     }
 
+    @LogMethod
+    public void longUserPropertiesTest()
+    {
+        goToSiteUsers();
+        navigateToUserDetails(PROJECT_ADMIN_USER);
+        clickButton("Edit");
+
+        StringBuilder illegalLongProperty = new StringBuilder();
+        final int maxFieldLength = 64;
+        for (int i = 0; i < maxFieldLength + 1; i++)
+            illegalLongProperty.append("X");
+
+        StringBuilder illegalLongDescription = new StringBuilder();
+        final int maxDescriptionLength = 255;
+        for (int i = 0; i < maxDescriptionLength + 1; i++)
+            illegalLongDescription.append("X");
+
+        log("Set illegal properties");
+        setFormElement(Locator.name("quf_DisplayName"), illegalLongProperty.toString());
+        setFormElement(Locator.name("quf_FirstName"), illegalLongProperty.toString());
+        setFormElement(Locator.name("quf_LastName"), illegalLongProperty.toString());
+        setFormElement(Locator.name("quf_Phone"), illegalLongProperty.toString());
+        setFormElement(Locator.name("quf_Mobile"), illegalLongProperty.toString());
+        setFormElement(Locator.name("quf_Pager"), illegalLongProperty.toString());
+        setFormElement(Locator.name("quf_IM"), illegalLongProperty.toString());
+        setFormElement(Locator.name("quf_Description"), illegalLongDescription.toString());
+
+        log("Check error messages");
+        clickButton("Submit");
+        WebElement errors = Locator.css(".labkey-error").waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        String errorText = errors.getText();
+
+        Assert.assertTrue("No error for 'Display Name'", errorText.contains(String.format("Value is too long for field Display Name, a maximum length of %d is allowed.", maxFieldLength)));
+        Assert.assertTrue("No error for 'First Name'", errorText.contains(String.format("Value is too long for field First Name, a maximum length of %d is allowed.", maxFieldLength)));
+        Assert.assertTrue("No error for 'Last Name'", errorText.contains(String.format("Value is too long for field Last Name, a maximum length of %d is allowed.", maxFieldLength)));
+        Assert.assertTrue("No error for 'Phone'", errorText.contains(String.format("Value is too long for field Phone, a maximum length of %d is allowed.", maxFieldLength)));
+        Assert.assertTrue("No error for 'Mobile'", errorText.contains(String.format("Value is too long for field Mobile, a maximum length of %d is allowed.", maxFieldLength)));
+        Assert.assertTrue("No error for 'Pager'", errorText.contains(String.format("Value is too long for field Pager, a maximum length of %d is allowed.", maxFieldLength)));
+        Assert.assertTrue("No error for 'IM'", errorText.contains(String.format("Value is too long for field IM, a maximum length of %d is allowed.", maxFieldLength)));
+        Assert.assertTrue("No error for 'Description'", errorText.contains(String.format("Value is too long for field Description, a maximum length of %d is allowed.", maxDescriptionLength)));
+
+        clickButton("Cancel");
+
+        Locator userInfoPanel = Locator.id("SiteUsers");
+        String userInfo = getText(userInfoPanel);
+        Assert.assertFalse("Illegal text [XXX] present after cancel", userInfo.contains(illegalLongProperty.substring(0, 3)));
+    }
+
+    @LogMethod
+    public void specialCharactersUserPropertiesTest()
+    {
+        goToSiteUsers();
+        navigateToUserDetails(PROJECT_ADMIN_USER);
+        clickButton("Edit");
+
+        setFormElement(Locator.name("quf_FirstName"), TRICKY_CHARACTERS_FOR_PROJECT_NAMES);
+        setFormElement(Locator.name("quf_Description"), TRICKY_CHARACTERS_FOR_PROJECT_NAMES);
+
+        clickButton("Submit");
+
+        assertElementPresent(Locator.css("#SiteUsers td.labkey-form-label + td").withText(TRICKY_CHARACTERS_FOR_PROJECT_NAMES), 2);
+    }
+
+    @LogMethod
+    public void scriptInjectionUserPropertiesTest()
+    {
+        goToSiteUsers();
+        navigateToUserDetails(PROJECT_ADMIN_USER);
+        clickButton("Edit");
+
+        setFormElement(Locator.name("quf_FirstName"), INJECT_CHARS_1);
+        setFormElement(Locator.name("quf_Description"), INJECT_CHARS_1);
+
+        clickButton("Submit");
+
+        assertElementPresent(Locator.css("#SiteUsers td.labkey-form-label + td").withText(INJECT_CHARS_1), 2);
+    }
+
     private static final String PROP_NAME1 = "Institution";
     private static final String PROP_NAME2 = "InstitutionId";
 
+    @LogMethod
     private void addCustomPropertiesTest()
     {
         goToSiteUsers();
@@ -342,5 +432,11 @@ public class UserTest extends SecurityTest
         // there are currently 6 default non-editable fields, without any customizations, the first
         // field would be 7th.
         return 7;
+    }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
