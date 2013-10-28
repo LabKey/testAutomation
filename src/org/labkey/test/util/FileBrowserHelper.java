@@ -100,6 +100,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
     public void expandFileBrowserRootNode()
     {
         waitForFileGridReady();
+        // TODO: change to use fileset-root-node cls
         _test.waitAndClick(Locator.xpath("//tr[contains(@class, 'x4-grid-tree-node')]//div[contains(@class, 'x4-grid-cell-inner-treecolumn')]"));
         _test.waitForElement(Locator.xpath("//tr[contains(@class, 'x4-grid-row-selected')]//div[contains(@class, 'x4-grid-cell-inner-treecolumn')]"));
     }

@@ -399,8 +399,18 @@ abstract public class BaseFlowTestWD extends BaseWebDriverTest
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
         assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
-        _fileBrowserHelper.selectFileBrowserItem(workspacePath);
-        clickButton("Next");
+        // note: this isn't the file browser, so we can't use those helpers (i.e. _fileBrowserHelper.selectFileBrowserItem(workspacePath) )
+        String [] pathParts = workspacePath.split("/");
+        for (String pathPart : pathParts)
+        {
+            if (pathPart == null || pathPart.length() == 0)
+                continue; // skip blank parts (i.e. leading / in workspacePath)
+
+            Locator pathLoc = Locator.xpath("//td[contains(@class, 'x-grid3-td-1')]/div[text() = '" + pathPart + "']");
+            waitForElement(pathLoc);
+            // double click a path subdirectory to open it, and double click the XML file will select file and go to Next step
+            doubleClick(pathLoc);
+        }
     }
 
     @LogMethod
