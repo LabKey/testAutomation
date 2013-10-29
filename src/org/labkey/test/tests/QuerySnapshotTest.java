@@ -145,10 +145,7 @@ public class QuerySnapshotTest extends StudyBaseTestWD
 
         log("delete the snapshot");
         clickMenuButton("Views", "Edit Snapshot");
-        prepForPageLoad();
-        clickButton("Delete Snapshot", 0);
-        getAlert();
-        newWaitForPageToLoad();
+        deleteSnapshot();
 
         // snapshot over a custom view
         // test automatic updates by altering the source dataset
@@ -178,8 +175,7 @@ public class QuerySnapshotTest extends StudyBaseTestWD
 
         log("delete the snapshot");
         clickMenuButton("Views", "Edit Snapshot");
-        clickButton("Delete Snapshot", 0);
-        getAlert();
+        deleteSnapshot();
 
         // snapshot over a custom query
         log("create a snapshot over a custom query");
@@ -212,14 +208,12 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
         clickButton("Save");
         Assert.assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
-        clickButton("Update Snapshot", 0);
-        getAlert();
+        deleteSnapshot();
         waitForText("Dataset: Custom Query Snapshot", 10000);
 
         log("delete the snapshot");
         clickMenuButton("Views", "Edit Snapshot");
-        clickButton("Delete Snapshot", 0);
-        getAlert();
+        deleteSnapshot();
 
         clickTab("Manage");
         waitForText("Manage Datasets", 10000);
@@ -262,8 +256,7 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         waitForSnapshotUpdate("Undecided");
 
         clickMenuButton("Views", "Edit Snapshot");
-        clickButton("Delete Snapshot", 0);
-        getAlert();
+        deleteSnapshot();
 
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
@@ -276,8 +269,7 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("New Demographics"));
         clickMenuButton("Views", "Edit Snapshot");
-        clickButton("Delete Snapshot", 0);
-        getAlert();
+        deleteSnapshot();
     }
 
     private void createQuerySnapshot(String snapshotName, boolean autoUpdate, boolean isDemographic)
@@ -342,5 +334,13 @@ public class QuerySnapshotTest extends StudyBaseTestWD
             refresh();
         }
         assertTextPresent(text);
+    }
+
+    private void deleteSnapshot()
+    {
+        prepForPageLoad();
+        clickButton("Delete Snapshot", 0);
+        getAlert();
+        newWaitForPageToLoad();
     }
 }
