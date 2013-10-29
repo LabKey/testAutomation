@@ -35,16 +35,15 @@ import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.SecurityHelperWD;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -82,6 +81,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
     public static final String STUDY_FOLDER_TAB_LABEL = "Study Container";
     public static final String ASSAY_FOLDER_TAB_LABEL = "Assay Container";
 
+    public static final String RESTRICTED_MODULE_NAME = "restrictedModule";
+    public static final String RESTRICTED_FOLDER_NAME = "Restricted Folder";
+    public static final String RESTRICTED_FOLDER_TYPE = "Folder With Restricted Module";
+    public static final String NEW_FOLDER_NAME = "New Folder";
+    public static final String RESTRICTED_FOLDER_IMPORT_NAME =
+            "/sampledata/SimpleAndRestrictedModule/FolderWithRestricted.folder.zip";
+
     protected String getProjectName()
     {
         return getClass().getSimpleName() + " Project";
@@ -113,6 +119,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     protected void doVerifySteps() throws Exception
     {
+        doTestRestrictedModule();
         doTestCustomFolder();
         doTestSchemas();
         doTestTableAudit();
@@ -561,31 +568,32 @@ public class SimpleModuleTest extends BaseWebDriverTest
         addWebPart("Lists");
 
         log("Creating list for query/view/report test...");
-        _listHelper.createList(getProjectName(), LIST_NAME,
-                ListHelperWD.ListColumnType.AutoInteger, "Key",
-                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
-                new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
-                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
+        createPeopleListInFolder(getProjectName());
 
         log("Importing some data...");
         clickButton("Import Data");
         _listHelper.submitTsvData(LIST_DATA);
 
         log("Create list in subfolder to prevent query validation failure");
-        _listHelper.createList(FOLDER_NAME, LIST_NAME,
-                ListHelperWD.ListColumnType.AutoInteger, "Key",
-                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
-                new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
-                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
+        createPeopleListInFolder(FOLDER_NAME);
 
         log("Create list in container tab containers to prevent query validation failure");
-        _listHelper.createListFromTab(STUDY_FOLDER_TAB_LABEL, LIST_NAME,
+        createPeopleListInTab(STUDY_FOLDER_TAB_LABEL);
+        createPeopleListInFolder(ASSAY_FOLDER_TAB_LABEL);
+    }
+
+    private void createPeopleListInFolder(String folderName)
+    {
+        _listHelper.createList(folderName, LIST_NAME,
                 ListHelperWD.ListColumnType.AutoInteger, "Key",
                 new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
                 new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
                 new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
+    }
 
-        _listHelper.createListFromTab(ASSAY_FOLDER_TAB_LABEL, LIST_NAME,
+    private void createPeopleListInTab(String tabLabel)
+    {
+        _listHelper.createListFromTab(tabLabel, LIST_NAME,
                 ListHelperWD.ListColumnType.AutoInteger, "Key",
                 new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
                 new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
@@ -879,6 +887,46 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickButton("View Data");
         assertTextPresent("My Custom View", "Hello Dataset", "Sequence Number");
         assertTextNotPresent("Participant Identifier");
+    }
+
+    @LogMethod
+    private void doTestRestrictedModule()
+    {
+        log("Create folder with restricted");
+        clickProject(getProjectName());
+        _containerHelper.createSubfolder(getProjectName(), RESTRICTED_FOLDER_NAME, RESTRICTED_FOLDER_TYPE);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Restricted Module Web Part");
+        assertTextPresent("This is a web part view in the restricted module.");
+        assertModuleEnabledByDefault(RESTRICTED_MODULE_NAME);
+        createPeopleListInFolder(RESTRICTED_FOLDER_NAME);
+
+        log("folder admin without restricted permission can still see existing restricted folder, web parts");
+        clickFolder(RESTRICTED_FOLDER_NAME);
+        impersonateRole("Reader");
+        assertTextPresent("This is a web part view in the restricted module.");     // Can still see web part
+        stopImpersonatingRole();
+        clickProject(getProjectName());
+        clickFolder(RESTRICTED_FOLDER_NAME);
+        impersonateRole("Folder Administrator");
+        goToFolderManagement();
+        clickAndWait(Locator.linkWithText("Folder Type"));
+        // Shouldn't see folder type, module name
+        assertElementNotPresent(Locator.xpath("//input[@type='checkbox' and @title='" + RESTRICTED_MODULE_NAME + "']"));
+        assertElementNotPresent(Locator.xpath("//input[@type='radio' and @value='" + RESTRICTED_FOLDER_TYPE + "']"));
+
+        log("folder admin without restricted permission cannot import restricted folder");
+        createSubfolder(getProjectName(), getProjectName(), NEW_FOLDER_NAME, "Collaboration", null);
+        createPeopleListInFolder(NEW_FOLDER_NAME);
+        clickFolder(NEW_FOLDER_NAME);
+        importFolderFromZip(new File(getLabKeyRoot(), RESTRICTED_FOLDER_IMPORT_NAME), false, 1, true);
+        clickAndWait(Locator.linkWithText("ERROR"));
+        assertTextPresent(
+                "Folder type 'Folder With Restricted Module' not set because it requires a restricted module for which you do not have permission.",
+                "Modules not enabled because module 'restrictedModule' is restricted and you do not have the necessary permission to enable it."
+        );
+        stopImpersonatingRole();
+        checkExpectedErrors(2);
     }
 
     protected void assertModuleDeployed(String moduleName)
