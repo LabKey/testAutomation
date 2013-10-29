@@ -163,12 +163,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         createWiki("Test Wiki", "Test Wiki Title");
 
         //Add a module to find later
-        goToFolderManagement();
-        waitForElement(Locator.xpath("//a[text()='Folder Type']"));
-        click(Locator.xpath("//a[text()='Folder Type']"));
-        waitForElement(Locator.xpath("//input[@value='Visualization']"));
-        checkCheckbox(Locator.xpath("//input[@value='Visualization']"));
-        clickButton("Update Folder");
+        enableModule("Visualization", false);
 
 
         // Create some views and reports
