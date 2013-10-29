@@ -433,6 +433,7 @@ src/org/labkey/test/tests/StudyReloadTest.java -text
 src/org/labkey/test/tests/StudyScheduleTest.java -text
 src/org/labkey/test/tests/StudySecurityTest.java -text
 src/org/labkey/test/tests/StudyShortTest.java -text
+src/org/labkey/test/tests/StudySimpleExportTest.java -text
 src/org/labkey/test/tests/StudyTest.java -text
 src/org/labkey/test/tests/StudyWDTest.java -text
 src/org/labkey/test/tests/SurveyTest.java -text

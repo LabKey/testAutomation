@@ -6653,12 +6653,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     protected void importFolderFromPipeline(String folderFile)
     {
+        importFolderFromPipeline(folderFile, 1);
+    }
+
+    protected void importFolderFromPipeline(String folderFile, int completedJobsExpected)
+    {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Import Folder Using Pipeline");
         _extHelper.selectFileBrowserItem(folderFile);
         selectImportDataAction("Import Folder");
-        waitForPipelineJobsToComplete(1, "Folder import", false);
+        waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
     }
 
     public String getFileContents(String rootRelativePath)
