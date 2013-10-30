@@ -240,10 +240,12 @@ public class SearchTest extends StudyWDTest
         clickMenuButton("Views", "Create", "Advanced View");
         selectOptionByText("queryName", "DEM-1 (DEM-1: Demographics)");
         String java = System.getProperty("java.home") + "/bin/java";
-        setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
+        setFormElement("program", java);
+        setFormElement("arguments", "-cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
         clickButton("Submit");
         assertTextPresent("Female");
-        setFormElement("commandLine", java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
+        setFormElement("program", java);
+        setFormElement("arguments", "-cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
         selectOptionByValue("fileExtension", "tsv");
         clickButton("Submit");
         assertTextPresent("Female");

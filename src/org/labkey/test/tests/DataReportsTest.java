@@ -151,7 +151,6 @@ public class DataReportsTest extends ReportTest
     @Override
     protected void doCreateSteps(){}
 
-    @Test
     public void doQueryReportTests()
     {
         log("Create a query report.");
@@ -231,7 +230,6 @@ public class DataReportsTest extends ReportTest
         Assert.assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[3]) == 3);
     }
 
-    @Test
     public void doCrosstabViewTest()
     {
         clickProject(getProjectName());
@@ -262,7 +260,6 @@ public class DataReportsTest extends ReportTest
         deleteReport("TestReport");
     }
 
-    @Test
     public void doGridViewTest()
     {
         // create new grid view report:
@@ -291,10 +288,12 @@ public class DataReportsTest extends ReportTest
         clickMenuButton("Views", "Create", "Advanced View");
         selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
         String java = System.getProperty("java.home") + "/bin/java";
-        setFormElement(Locator.name("commandLine"), java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
+        setFormElement(Locator.name("program"), java);
+        setFormElement(Locator.name("arguments"), "-cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
         clickButton("Submit");
         assertTextPresent("Female");
-        setFormElement(Locator.name("commandLine"), java + " -cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
+        setFormElement(Locator.name("program"), java);
+        setFormElement(Locator.name("arguments"), "-cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
         selectOptionByValue(Locator.name("fileExtension"), "tsv");
         clickButton("Submit");
         assertTextPresent("Female");
@@ -306,7 +305,6 @@ public class DataReportsTest extends ReportTest
         assertTextPresent("Female");
     }
 
-    @Test
     public void doRReportsTest()
     {
         log("Create an R Report");
