@@ -196,11 +196,11 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://C:/Program Files/Java/jdk1.7.0_25/lib/tools.jar!/" />
+          <root url="jar://$JDK_HOME$/lib/tools.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://C:/Program Files/Java/jdk1.7.0_25/lib/tools.jar!/" />
+          <root url="jar://$JDK_HOME$/lib/tools.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
