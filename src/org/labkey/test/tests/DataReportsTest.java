@@ -151,6 +151,7 @@ public class DataReportsTest extends ReportTest
     @Override
     protected void doCreateSteps(){}
 
+    @Test
     public void doQueryReportTests()
     {
         log("Create a query report.");
@@ -230,6 +231,7 @@ public class DataReportsTest extends ReportTest
         Assert.assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[3]) == 3);
     }
 
+    @Test
     public void doCrosstabViewTest()
     {
         clickProject(getProjectName());
@@ -260,6 +262,7 @@ public class DataReportsTest extends ReportTest
         deleteReport("TestReport");
     }
 
+    @Test
     public void doGridViewTest()
     {
         // create new grid view report:
@@ -305,6 +308,7 @@ public class DataReportsTest extends ReportTest
         assertTextPresent("Female");
     }
 
+    @Test
     public void doRReportsTest()
     {
         log("Create an R Report");
