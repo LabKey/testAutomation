@@ -52,6 +52,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/modules/simpletest/schemas/dbscripts/postgresql/obsolete" />
       <excludeFolder url="file://$MODULE_DIR$/modules/simpletest/schemas/dbscripts/sqlserver/obsolete" />
+      <excludeFolder url="file://$MODULE_DIR$/src/org/labkey/test/debug" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -191,17 +192,6 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$JDK_HOME$/lib/tools.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$JDK_HOME$/lib/tools.jar!/" />
-        </SOURCES>
       </library>
     </orderEntry>
   </component>
