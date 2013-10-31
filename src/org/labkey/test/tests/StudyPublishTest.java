@@ -163,7 +163,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         createWiki("Test Wiki", "Test Wiki Title");
 
         //Add a module to find later
-        enableModule("Visualization", false);
+        enableModule("List", false);
 
 
         // Create some views and reports
@@ -271,7 +271,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         click(Locator.xpath("//span[@id='adminMenuPopupText']"));
         waitForElement(Locator.xpath("//span[text()='Go To Module']"));
         mouseOver(Locator.xpath("//span[text()='Go To Module']"));
-        waitForElement(Locator.xpath("//span[text()='Visualization']"));
+        waitForElement(Locator.xpath("//span[text()='List']"));
 
         // Verify published participant count
         clickAndWait(Locator.linkWithText("Mice"));
