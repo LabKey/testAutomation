@@ -559,8 +559,11 @@ UNDONE: need to fix the merge case
     {
         // remove the remote connection we created; it's okay to call this if
         // no connection was created
-        RemoteConnectionHelperWD rconnHelper = new RemoteConnectionHelperWD(this);
-        rconnHelper.deleteConnection(TRANSFORM_REMOTE_CONNECTION);
+        if (afterTest)
+        {
+            RemoteConnectionHelperWD rconnHelper = new RemoteConnectionHelperWD(this);
+            rconnHelper.deleteConnection(TRANSFORM_REMOTE_CONNECTION);
+        }
         super.doCleanup(afterTest);
     }
 
