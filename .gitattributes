@@ -106,6 +106,7 @@ modules/simpletest/etls/appendIdByRun.xml -text
 modules/simpletest/etls/badCast.xml -text
 modules/simpletest/etls/badTableName.xml -text
 modules/simpletest/etls/merge.xml -text
+modules/simpletest/etls/remote.xml -text svneol=unset#application/xml
 modules/simpletest/etls/truncate.xml -text
 modules/simpletest/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text
@@ -392,6 +393,7 @@ src/org/labkey/test/tests/PortalTest.java -text
 src/org/labkey/test/tests/ProgrammaticQCTest.java -text
 src/org/labkey/test/tests/ProjectSettingsTest.java -text
 src/org/labkey/test/tests/QuerySnapshotTest.java -text
+src/org/labkey/test/tests/RemoteConnectionTest.java -text
 src/org/labkey/test/tests/ReportSecurityTest.java -text
 src/org/labkey/test/tests/ReportTest.java -text
 src/org/labkey/test/tests/ReportThumbnailTest.java -text
@@ -518,6 +520,7 @@ src/org/labkey/test/util/PostgresOnlyTest.java -text
 src/org/labkey/test/util/ProteinRegionTable.java -text
 src/org/labkey/test/util/RReportHelper.java -text
 src/org/labkey/test/util/RReportHelperWD.java -text
+src/org/labkey/test/util/RemoteConnectionHelperWD.java -text
 src/org/labkey/test/util/ResetTracker.java -text
 src/org/labkey/test/util/SchemaHelper.java -text
 src/org/labkey/test/util/SearchHelper.java -text

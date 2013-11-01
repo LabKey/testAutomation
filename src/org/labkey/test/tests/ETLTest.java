@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -23,11 +24,15 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.RemoteConnectionHelperWD;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 /**
  * User: Rylan
@@ -45,37 +50,35 @@ public class ETLTest extends BaseWebDriverTest
     //
     private static final String TRANSFORM_APPEND = "{simpletest}/append";
     private static final String TRANSFORM_APPEND_DESC = "Append Test";
+    private static final String TRANSFORM_BADCAST = "{simpletest}/badCast";
+    private static final String TRANSFORM_BADCAST_DESC = "Bad Cast";
+    private static final String TRANSFORM_BADTABLE = "{simpletest}/badTableName";
+    private static final String TRANSFORM_BADTABLE_DESC = "BadTableName";
     private static final String TRANSFORM_TRUNCATE = "{simpletest}/truncate";
     private static final String TRANSFORM_TRUNCATE_DESC = "Truncate Test";
     private static final String TRANSFORM_BYRUNID = "{simpletest}/appendIdByRun";
+    private static final String TRANSFORM_REMOTE = "{simpletest}/remote";
+    private static final String TRANSFORM_REMOTE_DESC = "Remote Test";
+    private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";
+    private static final String TRANSFORM_REMOTE_STUDY = "/sampledata/dataintegration/ETLTestStudy.zip";
     private static final String TRANSFORM_BYRUNID_DESC = "ByRunId";
 
+    //
+    // internal counters
+    //
+    private static int _jobsComplete;
+    private static int _expectedErrors;
+    //
+    // holds expected results for the TransformHistory table.  The transform history table
+    // shows all the runs for a specific ETL type
+    //
+    HashMap<String, ArrayList<String[]>> _transformHistories = new HashMap<>();
 
-    private static final String[][] TRANSFORM_SUMMARY_EMPTY = {};
-    private static final String[][] TRANSFORM_SUMMARY1 = {
-        {TRANSFORM_APPEND, "1", null, "COMPLETE", "2", null}
-    };
-    private static final String[][] TRANSFORM_SUMMARY2 = {
-            {TRANSFORM_APPEND, "1", null, "COMPLETE", "2", null},
-            {TRANSFORM_TRUNCATE, "1", null, "COMPLETE", "2", null}
-    };
-    private static final String[][] TRANSFORM_SUMMARY3 = {
-            {TRANSFORM_APPEND, "1", null, "ERROR", null, null},
-            {TRANSFORM_BYRUNID, "1", null, "COMPLETE", "2", null},
-            {TRANSFORM_TRUNCATE, "1", null, "COMPLETE", "2", null},
-    };
-    private static final String[][] TRANSFORM_HISTORY1 = {
-            {"1", null, "COMPLETE", "2", null}
-    };
-    private static final String[][] TRANSFORM_HISTORY2 = {
-            {"1", null, "COMPLETE", "2", null},
-            {"1", null, "COMPLETE", "2", null}
-    };
-    private static final String[][] TRANSFORM_HISTORY3 = {
-            {"1", null, "ERROR", null, null},
-            {"1", null, "COMPLETE", "2", null},
-            {"1", null, "COMPLETE", "2", null}
-    };
+    //
+    // holdes expected results for the TransformSummary table.  This will show
+    // one row for each different ETL type run.
+    //
+    ArrayList<String []> _transformSummaries = new ArrayList<>();
 
     @Override
     protected String getProjectName()
@@ -90,37 +93,41 @@ public class ETLTest extends BaseWebDriverTest
 
         // verify we don't show any rows for this newly created
         // project (test container filter)
-        verifyTransformSummary(TRANSFORM_SUMMARY_EMPTY);
+        verifyTransformSummary();
 
         //append into empty target
         insertSourceRow("0", "Subject 0", null);
-        runETL("append");
-        assertInTarget1("Subject 0");
-        checkRun(1);
 
-        verifyTransformSummary(TRANSFORM_SUMMARY1);
-        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC, TRANSFORM_HISTORY1);
+        runETL("append");
+        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "2");
+        assertInTarget1("Subject 0");
+        checkRun();
+        verifyTransformSummary();
+        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
         //append into populated target
         insertSourceRow("1", "Subject 1", null);
         runETL("append");
-        checkRun(2);
+        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "2");
+        checkRun();
         assertInTarget1("Subject 0", "Subject 1");
 
-        // verify transform summary should only have the most recent entry
-        verifyTransformSummary(TRANSFORM_SUMMARY1);
-        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC, TRANSFORM_HISTORY2);
+        // verify transform summary should only have the most recent entry (i.e., doesn't change)
+        verifyTransformSummary();
+        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
         // rerun append and verify that no work is done
         runETL_NoWork("append");
 
         // verify only two pipeline jobs existed since the "no work" one should not
         // have fired off a pipeline job
-        checkRun(2);
+        checkRun();
+
         // verify transform summary should only have the most recent entry since
         // it should filter out "no work" rows
-        verifyTransformSummary(TRANSFORM_SUMMARY1);
-        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC, TRANSFORM_HISTORY2);
+        verifyTransformSummary();
+        // summary should be where it was as well
+        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
 
 /*
@@ -139,39 +146,54 @@ UNDONE: need to fix the merge case
         //truncate into populated target
         deleteSourceRow("0", "1");
         runETL("truncate");
+        // add a row for the 'truncate' etl - this should show up in our summary view
+        addTransformResult(TRANSFORM_TRUNCATE, "1", "COMPLETE", "2");
         assertInTarget1("Subject 2");
         assertNotInTarget1("Subject 0", "Subject 1");
-        verifyTransformSummary(TRANSFORM_SUMMARY2);
-        // verify 1 history row
-        verifyTransformHistory(TRANSFORM_TRUNCATE, TRANSFORM_TRUNCATE_DESC, TRANSFORM_HISTORY1);
+        verifyTransformSummary();
+        verifyTransformHistory(TRANSFORM_TRUNCATE, TRANSFORM_TRUNCATE_DESC);
 
         //identify by run into populated target
         insertSourceRow("3", "Subject 3", "42");
         insertTransferRow("42", getDate(), getDate(), "new transfer", "added by test automation", "pending");
         runETL("appendIdByRun");
+        addTransformResult(TRANSFORM_BYRUNID, "1", "COMPLETE", "2");
         assertInTarget1("Subject 2", "Subject 3");
 
         // intentionally fail transform by running append again after
         // the records were modified above
         runETL("append");
-        checkRun(5, true /*expectError*/);
-        verifyTransformSummary(TRANSFORM_SUMMARY3);
-        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC, TRANSFORM_HISTORY3);
+        addTransformResult(TRANSFORM_APPEND, "1", "ERROR", null);
+        checkRun(true /*expectError*/);
+        verifyTransformSummary();
+        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
         //error logging test, casting error, note that this causes an error in the checker
         // before a pipeline job is even scheduled
         runETL_CheckerError("badCast");
+        addTransformResult(TRANSFORM_BADCAST, "1", "ERROR", null);
+        // verify we log the error regardless of whether the pipeline job runs or not
+        verifyTransformSummary();
+
         assertInLog("contains value not castable to a date:");
 
         //error logging test, bad run table name
         runETL_CheckerError("badTableName");
+        addTransformResult(TRANSFORM_BADTABLE, "1", "ERROR", null);
+        _expectedErrors++;
         assertInLog("Table not found:");
+
+        // run tests over remote transform types
+        verifyRemoteTransform();
 
         // be sure to check for all expected errors here so that the test won't fail on exit
         // 1) duplicate key error
         // looks like postgres inserts an "ERROR" word in their error string for the duplicate key
         // but mssql doesn't, hack around that here
-        checkExpectedErrors(WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL ? 2 : 1);
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
+            _expectedErrors++;
+
+        checkExpectedErrors(_expectedErrors);
     }
 
     //
@@ -188,16 +210,11 @@ UNDONE: need to fix the merge case
         waitAndClick(Locator.ext4ButtonContainingText("Close"));
     }
 
-    private void verifyTransformSummary(String[][] data)
+    private void verifyTransformSummary()
     {
         gotoQueryWebPart("TransformSummary");
-        TransformSummaryVerifier verifier = new TransformSummaryVerifier(this, data);
+        TransformSummaryVerifier verifier = new TransformSummaryVerifier(this, _transformSummaries);
         verifier.verifyResults();
-    }
-
-    private void waitForTransformPage(String linkText, String title)
-    {
-        waitForTransformPage(linkText, title, "COMPLETE");
     }
 
     private void waitForTransformPage(String linkText, String title, String status)
@@ -209,11 +226,59 @@ UNDONE: need to fix the merge case
         waitForText(status);
     }
 
-    private void verifyTransformHistory(String transformId, String transformDesc, String [][] data)
+    private void verifyTransformHistory(String transformId, String transformDesc)
     {
-        waitForTransformPage(transformId, "Transform History - " + transformDesc);
-        TransformHistoryVerifier verifier = new TransformHistoryVerifier(this, transformId, transformDesc, data);
+        verifyTransformHistory(transformId, transformDesc, "COMPLETE");
+    }
+    private void verifyTransformHistory(String transformId, String transformDesc, String status)
+    {
+        waitForTransformPage(transformId, "Transform History - " + transformDesc, status);
+        TransformHistoryVerifier verifier = new TransformHistoryVerifier(this, transformId, transformDesc,
+                _transformHistories.get(transformId));
         verifier.verifyResults();
+    }
+
+    //
+    // test a "remote" ETL that transfers data into datasets (instead of just base tables)
+    //
+    private void verifyRemoteTransform()
+    {
+        //
+        // prepare our "remote" source dataset
+        //
+        gotoDataset("ETL Source");
+        for (int i = 1; i < 4; i++)
+        {
+            insertDatasetRow(String.valueOf(i), "Subject " + String.valueOf(i));
+        }
+        clickTab("Portal");
+
+        //
+        // attempt to run the remote transform without a remote connection
+        //
+        runETL(TRANSFORM_REMOTE);
+        checkRun(true /*expect error*/);
+        addTransformResult(TRANSFORM_REMOTE, "1", "ERROR", null);
+        assertNotInDatasetTarget1("Subject 1", "Subject 2", "Subject 3");
+        _expectedErrors++;
+
+        //
+        // create our remote connection
+        //
+        RemoteConnectionHelperWD rconnHelper = new RemoteConnectionHelperWD(this);
+        rconnHelper.createConnection(TRANSFORM_REMOTE_CONNECTION, getBaseURL(), getProjectName());
+
+        //
+        // run the remote transform again.  At the end of this we should have one summary entry for the
+        // most recently run transform and then two history entries (1 error, 1 complete)
+        //
+        runETL(TRANSFORM_REMOTE);
+        // note we do expect an error in the pipeline log from the above failure
+        checkRun(true /*expect error*/);
+        addTransformResult(TRANSFORM_REMOTE, "1", "COMPLETE", "3");
+        assertInDatasetTarget1("Subject 1", "Subject 2", "Subject 3");
+        verifyTransformSummary();
+        verifyTransformHistory(TRANSFORM_REMOTE, TRANSFORM_REMOTE_DESC);
     }
 
     protected void runInitialSetup()
@@ -221,11 +286,13 @@ UNDONE: need to fix the merge case
         PortalHelper portalHelper = new PortalHelper(this);
         log("running setup");
         _containerHelper.createProject(PROJECT_NAME, null);
+
         enableModule("DataIntegration", true);
         enableModule("simpletest", true);
+        enableModule("Study", true);
+
         portalHelper.addQueryWebPart("Source", "vehicle", "etl_source", null);
         portalHelper.addQueryWebPart("Target1", "vehicle", "etl_target", null);
-        //portalHelper.addQueryWebPart("Target2", "vehicle", "etl_target2", null);
         portalHelper.addQueryWebPart("Transfers", "vehicle", "transfer", null);
 
         // UNDONE: remove when we finalize casing of table names versus views across pg and mssql
@@ -235,6 +302,76 @@ UNDONE: need to fix the merge case
         portalHelper.addQueryWebPart("TransformRun", "dataintegration", transformRun, null);
         portalHelper.addQueryWebPart("TransformHistory", "dataintegration", "TransformHistory", null);
         portalHelper.addQueryWebPart("TransformSummary", "dataintegration", "TransformSummary", null);
+
+        //
+        // import our study (used by the remote transform tests).  This study is a continuous time point
+        // study to use the same type of ETL source and target that one of our customer uses.
+        //
+        clickTab("Study");
+        importStudyFromZip(new File(getLabKeyRoot(), TRANSFORM_REMOTE_STUDY), true /*ignore query validation*/);
+        // bump our pipeline job count since we used the pipeline to import the study
+        _jobsComplete++;
+    }
+
+    private void addTransformResult(String transformId, String version, String status, String recordsAffected)
+    {
+        addTransformSummary(new String[] {transformId, version, null, status, recordsAffected, null});
+        addTransformHistory(transformId, new String[] {version, null, status, recordsAffected, null});
+    }
+
+    // The summary table should only have one row per transform sorted by transform id so make sure
+    // our expectred results match that
+    private void addTransformSummary(String[] newSummary)
+    {
+        String newTransformId = newSummary[0];
+        int insertIdx;
+        boolean replace = false;
+
+        for (insertIdx = 0; insertIdx < _transformSummaries.size(); insertIdx++)
+        {
+            String transformId = _transformSummaries.get(insertIdx)[0];
+            int cmp = transformId.compareToIgnoreCase(newTransformId);
+            if (cmp >= 0)
+            {
+                replace = (cmp == 0);
+                break;
+            }
+        }
+
+        if (replace)
+            _transformSummaries.remove(insertIdx);
+
+        _transformSummaries.add(insertIdx, newSummary);
+    }
+
+    private void addTransformHistory(String transformName, String[] historyRow)
+    {
+        ArrayList<String[]> rows = null;
+
+        if (_transformHistories.containsKey(transformName))
+        {
+            rows = _transformHistories.get(transformName);
+        }
+
+        if (null == rows)
+        {
+            rows = new ArrayList<>();
+        }
+
+        rows.add(0, historyRow);
+        _transformHistories.put(transformName, rows);
+    }
+
+    private void insertDatasetRow(String id, String name)
+    {
+        log("inserting dataset row " + name);
+        waitAndClick(Locator.xpath("//span[text()='Insert New']"));
+        waitForElement(Locator.name("quf_ParticipantId"));
+        setFormElement(Locator.name("quf_ParticipantId"), name);
+        setFormElement(Locator.name("quf_date"), getDate());
+        setFormElement(Locator.name("quf_id"), id);
+        setFormElement(Locator.name("quf_name"), name);
+        clickButton("Submit");
     }
 
     private void insertSourceRow(String id, String name, String RunId)
@@ -279,6 +416,7 @@ UNDONE: need to fix the merge case
     private void runETL(String transformId)
     {
         _runETL(transformId, true, false);
+        _jobsComplete++;
     }
 
     private void runETL_CheckerError(String transformId)
@@ -343,6 +481,25 @@ UNDONE: need to fix the merge case
         gotoQueryWebPart(webpartName, webpartName);
     }
 
+    private void gotoDataset(String name)
+    {
+        clickTab("Study");
+        clickAndWait(Locator.linkContainingText("2 datasets"));
+        clickAndWait(Locator.linkContainingText(name));
+    }
+
+    private void assertInDatasetTarget1(String... targets)
+    {
+        gotoDataset("ETL Target");
+        assertData(true, targets);
+    }
+
+    private void assertNotInDatasetTarget1(String... targets)
+    {
+        gotoDataset("ETL Target");
+        assertData(false, targets);
+    }
+
     private void gotoQueryWebPart(String webpartName, String queryName)
     {
         clickTab("Portal");
@@ -350,9 +507,8 @@ UNDONE: need to fix the merge case
         waitForText(webpartName);
     }
 
-    private void assertQueryWebPart(String webpartName, String queryName, boolean assertTextPresent, String ... targets)
+    private void assertData(boolean assertTextPresent, String... targets)
     {
-        gotoQueryWebPart(webpartName, queryName);
         for(String target : targets)
         {
             if (assertTextPresent)
@@ -360,6 +516,12 @@ UNDONE: need to fix the merge case
             else
                 assertTextNotPresent(target);
         }
+    }
+
+    private void assertQueryWebPart(String webpartName, String queryName, boolean assertTextPresent, String ... targets)
+    {
+        gotoQueryWebPart(webpartName, queryName);
+        assertData(assertTextPresent, targets);
     }
 
     private void assertNotInTarget1(String... targets)
@@ -372,17 +534,17 @@ UNDONE: need to fix the merge case
         assertQueryWebPart("TransformRun", "TransformRun", true, targets);
     }
 
-    protected void checkRun(int amount)
+    protected void checkRun()
     {
-        checkRun(amount, false);
+        checkRun(false);
     }
 
-    protected void checkRun(int amount, boolean expectError)
+    protected void checkRun(boolean expectError)
     {
         //goToProjectHome();
         clickTab("Portal");
         goToModule("Pipeline");
-        waitForPipelineJobsToComplete(amount, "ETL Job", expectError);
+        waitForPipelineJobsToComplete(_jobsComplete, "ETL Job", expectError);
     }
 
     private String getDate()
@@ -395,6 +557,10 @@ UNDONE: need to fix the merge case
     @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
+        // remove the remote connection we created; it's okay to call this if
+        // no connection was created
+        RemoteConnectionHelperWD rconnHelper = new RemoteConnectionHelperWD(this);
+        rconnHelper.deleteConnection(TRANSFORM_REMOTE_CONNECTION);
         super.doCleanup(afterTest);
     }
 
@@ -421,10 +587,10 @@ UNDONE: need to fix the merge case
     {
         // table of results to verify
         protected String[] _columns;
-        protected String [][] _data;
+        protected ArrayList<String[]> _data;
         protected ETLTest _test;
 
-        BaseTransformVerifier(ETLTest test, String[] columns, String [][] data)
+        BaseTransformVerifier(ETLTest test, String[] columns, ArrayList<String[]> data)
         {
             _test = test;
             _columns = columns;
@@ -442,10 +608,10 @@ UNDONE: need to fix the merge case
         void verifyResults()
         {
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
-            assert(_columns.length == drt.getColumnCount());
-            assert(_data.length == drt.getDataRowCount());
+            Assert.assertTrue(_columns.length == drt.getColumnCount());
+            Assert.assertTrue(_data.size() == drt.getDataRowCount());
 
-            for (int row = 0; row < _data.length; row ++)
+            for (int row = 0; row < _data.size(); row ++)
             {
                 for (int col = 0; col < _columns.length; col++)
                 {
@@ -459,9 +625,9 @@ UNDONE: need to fix the merge case
                     // just means that it is note easily comparable (execution times, for example)
                     //
                     String actual = drt.getDataAsText(row, _columns[col]);
-                    String expected = _data[row][col];
+                    String expected = _data.get(row)[col];
                     if (null != expected)
-                        assert(actual.equalsIgnoreCase(expected));
+                        Assert.assertTrue(actual.equalsIgnoreCase(expected));
                 }
             }
         }
@@ -469,7 +635,7 @@ UNDONE: need to fix the merge case
 
     class TransformSummaryVerifier extends BaseTransformVerifier
     {
-        TransformSummaryVerifier(ETLTest test, String [][] data)
+        TransformSummaryVerifier(ETLTest test, ArrayList<String[]> data)
         {
             super(test, new String[]{
                     "Name",
@@ -488,7 +654,7 @@ UNDONE: need to fix the merge case
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
 
             // just spot check the file log
-            for (int row = 0; row < _data.length; row ++)
+            for (int row = 0; row < _data.size(); row ++)
             {
                 String status = drt.getDataAsText(row, "Last Status");
                 verifyLogFileLink(status);
@@ -502,7 +668,7 @@ UNDONE: need to fix the merge case
         protected String _transformId;
         protected String _transformDesc;
 
-        TransformHistoryVerifier(ETLTest test, String transformId, String transformDesc, String [][] data)
+        TransformHistoryVerifier(ETLTest test, String transformId, String transformDesc, ArrayList<String[]> data)
         {
             super(test, new String[]{
                     "Version",
@@ -530,7 +696,7 @@ UNDONE: need to fix the merge case
 
             // walk through all the history rows and verify the link to the file log works (just the first one)
             // and the link to the details page works
-            for (int row = 0; row < _data.length; row ++)
+            for (int row = 0; row < _data.size(); row ++)
             {
                 String status = drt.getDataAsText(row, "Status");
                 if (0 == row)
@@ -591,10 +757,10 @@ UNDONE: need to fix the merge case
         protected void verifyResults()
         {
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
-            assert(_columns.length == drt.getColumnCount());
-            assert(1 == drt.getDataRowCount());
+            Assert.assertTrue(_columns.length == drt.getColumnCount());
+            Assert.assertTrue(1 == drt.getDataRowCount());
             String actual = drt.getDataAsText(0, "Transform Id");
-            assert(_transformId.equalsIgnoreCase(actual));
+            Assert.assertTrue(_transformId.equalsIgnoreCase(actual));
         }
     }
 }

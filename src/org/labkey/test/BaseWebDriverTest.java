@@ -6620,8 +6620,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     protected void startImportStudyFromZip(File studyFile)
     {
+        startImportStudyFromZip(studyFile, false);
+    }
+
+    protected void startImportStudyFromZip(File studyFile, boolean ignoreQueryValidation)
+    {
         clickButton("Import Study");
         setFormElement(Locator.name("folderZip"), studyFile);
+        if (ignoreQueryValidation)
+        {
+            click(Locator.checkboxByName("validateQueries"));
+        }
         clickButton("Import Study From Local Zip Archive");
         if (isElementPresent(Locator.css(".labkey-error")))
         {
@@ -6632,7 +6641,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     protected void importStudyFromZip(File studyFile)
     {
-        startImportStudyFromZip(studyFile);
+        importStudyFromZip(studyFile, false);
+    }
+
+    protected void importStudyFromZip(File studyFile, boolean ignoreQueryValidation)
+    {
+        startImportStudyFromZip(studyFile, ignoreQueryValidation);
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 
