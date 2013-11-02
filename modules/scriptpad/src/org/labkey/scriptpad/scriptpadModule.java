@@ -16,6 +16,7 @@
 
 package org.labkey.scriptpad;
 
+import org.jetbrains.annotations.NotNull;
 import org.labkey.api.module.DefaultModule;
 import org.labkey.api.module.ModuleContext;
 import org.labkey.api.view.WebPartFactory;
@@ -34,7 +35,7 @@ public class scriptpadModule extends DefaultModule
     @Override
     public double getVersion()
     {
-        return 13.20;
+        return 13.30;
     }
 
     @Override
@@ -49,6 +50,7 @@ public class scriptpadModule extends DefaultModule
         return false;
     }
 
+    @NotNull
     @Override
     protected Collection<WebPartFactory> createWebPartFactories()
     {
