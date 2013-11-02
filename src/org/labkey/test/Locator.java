@@ -284,6 +284,11 @@ public abstract class Locator
         return Locator.tag(tag).withAttribute(attrName, attrVal);
     }
 
+    public static XPathLocator tagWithClass(String tag, String cssClass)
+    {
+        return Locator.tag(tag).withClass(cssClass);
+    }
+
     public static XPathLocator tagWithText(String tag, String text)
     {
         return Locator.tag(tag).withText(text);
