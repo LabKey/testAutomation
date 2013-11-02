@@ -61,7 +61,7 @@ public class Ext4HelperWD extends AbstractHelperWD
             // wait for and select the list item
             try
             {
-                WebElement element = listItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                WebElement element = listItem.waitForElement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
                 boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
                 if (!elementAlreadySelected)
                 {
@@ -71,7 +71,7 @@ public class Ext4HelperWD extends AbstractHelperWD
             }
             catch (StaleElementReferenceException retry)
             { // Workaround: Ext4 combo boxes do something wierd as they open; elements become stale for some reason
-                WebElement element = listItem.waitForElmement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+                WebElement element = listItem.waitForElement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
                 boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
                 if (!elementAlreadySelected)
                 {

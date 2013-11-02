@@ -172,7 +172,7 @@ public abstract class Locator
         }
     }
 
-    public WebElement waitForElmement(final WebDriver driver, final int msTimeout)
+    public WebElement waitForElement(final WebDriver driver, final int msTimeout)
     {
         long secTimeout = msTimeout / 1000;
         secTimeout = secTimeout > 0 ? secTimeout : 1;
@@ -194,7 +194,7 @@ public abstract class Locator
         }
     }
 
-    public void waitForElmementToDisappear(final WebDriver driver, final int msTimeout)
+    public void waitForElementToDisappear(final WebDriver driver, final int msTimeout)
     {
         long secTimeout = msTimeout / 1000;
         secTimeout = secTimeout > 0 ? secTimeout : 1;
@@ -216,9 +216,9 @@ public abstract class Locator
         }
     }
 
-    public List<WebElement> waitForElmements(final WebDriver driver, final int msTimeout)
+    public List<WebElement> waitForElements(final WebDriver driver, final int msTimeout)
     {
-        waitForElmement(driver, msTimeout);
+        waitForElement(driver, msTimeout);
         return findElements(driver);
     }
 

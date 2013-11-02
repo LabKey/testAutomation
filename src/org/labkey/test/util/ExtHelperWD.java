@@ -518,13 +518,13 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         //select source query
         Locator queryLoc = Locator.css(".sourcepanel .x4-grid-row");
-        WebElement queryElement = queryLoc.waitForElmement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
+        WebElement queryElement = queryLoc.waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
         _test.scrollIntoView(queryElement); // in case window is too short
         _test.shortWait().until(ExpectedConditions.elementToBeClickable(queryLoc.toBy())); // if one row is ready, all should be
         selectExt4GridItem("queryName", source, -1, "sourcegrid", keepSelection);
         //select measure
         Locator measureLoc = Locator.css(".measuresgrid .x4-grid-row");
-        WebElement measureElement = measureLoc.waitForElmement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
+        WebElement measureElement = measureLoc.waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
         _test.scrollIntoView(measureElement); // in case window is too short
         _test.shortWait().until(ExpectedConditions.elementToBeClickable(measureLoc.toBy())); // if one row is ready, all should be
         selectExt4GridItem("label", measure, -1, "measuresgrid", keepSelection);
@@ -639,7 +639,7 @@ public class ExtHelperWD extends AbstractHelperWD
     {
         _test.click(parentLocator.append("//*[contains(@class, 'x-form-arrow-trigger')]"));
         Locator.XPathLocator listItem = Locator.xpath("//div").withClass("x-combo-list-item").notHidden().withText(selection);
-        _test.executeScript("arguments[0].scrollIntoView(true);", listItem.waitForElmement(_test.getDriver(), WAIT_FOR_JAVASCRIPT));
+        _test.executeScript("arguments[0].scrollIntoView(true);", listItem.waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT));
         _test.click(listItem);
         _test.waitForElementToDisappear(Locator.xpath("//div[" + NOT_HIDDEN + "]/div/div[text()='" + selection + "']"), WAIT_FOR_JAVASCRIPT);
     }

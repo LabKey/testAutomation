@@ -3807,13 +3807,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         if (failIfNotFound)
         {
-            locator.waitForElmement(getDriver(), elementTimeout);
+            locator.waitForElement(getDriver(), elementTimeout);
         }
         else
         {
             try
             {
-                locator.waitForElmement(getDriver(), elementTimeout);
+                locator.waitForElement(getDriver(), elementTimeout);
             }
             catch(Exception e)
             {
@@ -3849,7 +3849,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void waitForElementToDisappear(final Locator locator, int wait)
     {
-        locator.waitForElmementToDisappear(getDriver(), wait);
+        locator.waitForElementToDisappear(getDriver(), wait);
     }
 
     public void waitForTextToDisappear(final String text)
@@ -4239,7 +4239,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void clickAt(Locator l, int xCoord, int yCoord, int pageTimeout)
     {
-        WebElement el = l.waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        WebElement el = l.waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         clickAt(el, xCoord, yCoord, pageTimeout);
     }
 
@@ -4990,7 +4990,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     public void waitAndClick(int waitFor, Locator l, int waitForPageToLoad)
     {
-        WebElement el = l.waitForElmement(getDriver(), waitFor);
+        WebElement el = l.waitForElement(getDriver(), waitFor);
         clickAndWait(el, waitForPageToLoad);
     }
 
@@ -6166,7 +6166,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String dialogTitle = groupName + " Information";
 
         _ext4Helper.selectComboBoxItem(Locator.xpath(_extHelper.getExtDialogXPath(dialogTitle) + "//table[contains(@id, 'labkey-principalcombo')]"), userName);
-        Locator.css(".userinfo td").withText(userName).waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        Locator.css(".userinfo td").withText(userName).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         _extHelper.clickExtButton(dialogTitle, "Done", 0);
         _extHelper.waitForExtDialogToDisappear(dialogTitle);
 

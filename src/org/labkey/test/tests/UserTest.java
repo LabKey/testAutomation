@@ -327,7 +327,7 @@ public class UserTest extends SecurityTest
 
         log("Check error messages");
         clickButton("Submit");
-        WebElement errors = Locator.css(".labkey-error").waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        WebElement errors = Locator.css(".labkey-error").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         String errorText = errors.getText();
 
         Assert.assertTrue("No error for 'Display Name'", errorText.contains(String.format("Value is too long for field Display Name, a maximum length of %d is allowed.", maxFieldLength)));

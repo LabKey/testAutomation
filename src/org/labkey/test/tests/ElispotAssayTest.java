@@ -319,17 +319,17 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         Locator nameField = Locator.id("templateName");
         waitForElement(nameField, WAIT_FOR_JAVASCRIPT);
 
-        Locator.css(".gwt-Label").withText("CONTROL").waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
+        Locator.css(".gwt-Label").withText("CONTROL").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
 
         click(Locator.xpath("//div[contains(@class, 'x-form-trigger-arrow')]"));
-        Locator.css(".x-combo-list-item").withText("Background Wells").waitForElmement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
+        Locator.css(".x-combo-list-item").withText("Background Wells").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT).click();
         clickButton("Create", 0);
         waitForElement(Locator.tagWithText("label", "Background Wells"));
 
         //TODO: Causes template creation to fail
 //        log("Fail to create duplicate well group");
 //        click(Locator.xpath("//div[contains(@class, 'x-form-trigger-arrow')]"));
-//        Locator.css(".x-combo-list-item").contains("Background Wells").waitForElmement(_driver, WAIT_FOR_JAVASCRIPT).click();
+//        Locator.css(".x-combo-list-item").contains("Background Wells").waitForElement(_driver, WAIT_FOR_JAVASCRIPT).click();
 //        clickButton("Create", 0);
 //        assertAlert("Group : Background Wells already exists.");
 
