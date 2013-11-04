@@ -43,18 +43,17 @@ import java.util.HashMap;
 public class ETLTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ETLTestProject";
-    private boolean _debugTest = false;
 
     //
     // expected results for transform UI testing
     //
-    private static final String TRANSFORM_APPEND = "{simpletest}/append";
+    protected static final String TRANSFORM_APPEND = "{simpletest}/append";
     private static final String TRANSFORM_APPEND_DESC = "Append Test";
     private static final String TRANSFORM_BADCAST = "{simpletest}/badCast";
     private static final String TRANSFORM_BADCAST_DESC = "Bad Cast";
     private static final String TRANSFORM_BADTABLE = "{simpletest}/badTableName";
     private static final String TRANSFORM_BADTABLE_DESC = "BadTableName";
-    private static final String TRANSFORM_TRUNCATE = "{simpletest}/truncate";
+    protected static final String TRANSFORM_TRUNCATE = "{simpletest}/truncate";
     private static final String TRANSFORM_TRUNCATE_DESC = "Truncate Test";
     private static final String TRANSFORM_BYRUNID = "{simpletest}/appendIdByRun";
     private static final String TRANSFORM_REMOTE = "{simpletest}/remote";
@@ -66,7 +65,7 @@ public class ETLTest extends BaseWebDriverTest
     //
     // internal counters
     //
-    private static int _jobsComplete;
+    protected static int _jobsComplete;
     private static int _expectedErrors;
     //
     // holds expected results for the TransformHistory table.  The transform history table
@@ -89,7 +88,7 @@ public class ETLTest extends BaseWebDriverTest
     @Override
     protected void doTestSteps() throws Exception
     {
-        runInitialSetup();
+        runInitialSetup(false);
 
         // verify we don't show any rows for this newly created
         // project (test container filter)
@@ -187,13 +186,14 @@ UNDONE: need to fix the merge case
         verifyRemoteTransform();
 
         // be sure to check for all expected errors here so that the test won't fail on exit
-        // 1) duplicate key error
-        // looks like postgres inserts an "ERROR" word in their error string for the duplicate key
-        // but mssql doesn't, hack around that here
-        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
-            _expectedErrors++;
+        checkExpectedErrors(getExpectedErrorCount(_expectedErrors));
+    }
 
-        checkExpectedErrors(_expectedErrors);
+    // looks like postgres inserts an "ERROR" word in their error string for the duplicate key
+    // but mssql doesn't, hack around that here
+    protected int getExpectedErrorCount(int original)
+    {
+        return (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL) ? (original+ 1) : original;
     }
 
     //
@@ -281,18 +281,26 @@ UNDONE: need to fix the merge case
         verifyTransformHistory(TRANSFORM_REMOTE, TRANSFORM_REMOTE_DESC);
     }
 
-    protected void runInitialSetup()
+    protected void runInitialSetup(boolean remoteOnly)
     {
         PortalHelper portalHelper = new PortalHelper(this);
         log("running setup");
-        _containerHelper.createProject(PROJECT_NAME, null);
+        _containerHelper.createProject(getProjectName(), null);
+        _expectedErrors = 0;
+        _jobsComplete = 0;
 
         enableModule("DataIntegration", true);
         enableModule("simpletest", true);
-        enableModule("Study", true);
+
+        if(!remoteOnly)
+            enableModule("Study", true);
 
         portalHelper.addQueryWebPart("Source", "vehicle", "etl_source", null);
         portalHelper.addQueryWebPart("Target1", "vehicle", "etl_target", null);
+
+        if (remoteOnly)
+            return;
+
         portalHelper.addQueryWebPart("Transfers", "vehicle", "transfer", null);
 
         // UNDONE: remove when we finalize casing of table names versus views across pg and mssql
@@ -374,7 +382,7 @@ UNDONE: need to fix the merge case
         clickButton("Submit");
     }
 
-    private void insertSourceRow(String id, String name, String RunId)
+    protected void insertSourceRow(String id, String name, String RunId)
     {
         log("inserting source row " + name);
         //goToProjectHome();
@@ -471,7 +479,7 @@ UNDONE: need to fix the merge case
         clickTab("Portal");
     }
 
-    private void assertInTarget1(String... targets)
+    protected void assertInTarget1(String... targets)
     {
         assertQueryWebPart("etl_target", "Target1", true, targets);
     }
