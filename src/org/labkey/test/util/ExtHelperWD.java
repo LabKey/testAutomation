@@ -561,6 +561,10 @@ public class ExtHelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectFileBrowserItem(@LoggedParam String path)
     {
+        boolean startAtRoot = false;
+        if (path.startsWith("/"))
+            startAtRoot = true;
+
         String[] parts = {};
         StringBuilder nodeId = new StringBuilder();
         if (path.startsWith("/"))
@@ -570,9 +574,11 @@ public class ExtHelperWD extends AbstractHelperWD
             parts = path.split("/");
             nodeId.append('/');
         }
+        startAtRoot = startAtRoot || parts.length > 1;
+
         waitForFileGridReady();
 
-        if (parts.length > 1)
+        if (startAtRoot)
         {
             expandFileBrowserRootNode();
         }

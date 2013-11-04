@@ -16,12 +16,14 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
-import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.RReportHelperWD;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,8 +40,10 @@ public class FlowNormalizationTest extends BaseFlowTest
     {
         // fail fast if R is not configured
         // R is needed for the positivity report
-        RReportHelper _rReportHelper = new RReportHelper(this);
-        _rReportHelper.ensureRConfig();
+        RReportHelperWD _rReportHelper = new RReportHelperWD(this);
+        String rVersion = _rReportHelper.ensureRConfig();
+
+        Assume.assumeTrue("Wrong version of R: flowNormalization package require 2.15.x", rVersion.startsWith("2.15"));
 
         super.init();
     }
@@ -76,10 +80,10 @@ public class FlowNormalizationTest extends BaseFlowTest
         clickAndWait(Locator.linkContainingText("Show Jobs"));
         waitForPipelineJobsToComplete(1, "R Analysis", false);
         clickAndWait(Locator.linkWithText("COMPLETE"));
-        assertTextPresent("/flowjoquery/miniFCS/mini-fcs.xml and loading group Sample Order 5: Gag1&2");
-        assertTextPresent("finished parsing 2 samples");
-        assertTextPresent("finished normalizing 2 samples");
-        assertTextPresent("Transaction completed successfully for mini-fcs.xml");
-        assertTextPresent("Transaction completed successfully for Normalized mini-fcs.xml");
+        assertTextPresent("/flowjoquery/miniFCS/mini-fcs.xml and loading group Sample Order 5: Gag1&2",
+                "finished parsing 2 samples",
+                "finished normalizing 2 samples",
+                "Transaction completed successfully for mini-fcs.xml",
+                "Transaction completed successfully for Normalized mini-fcs.xml");
     }
 }

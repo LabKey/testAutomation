@@ -22,6 +22,7 @@ import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-abstract public class BaseFlowTest extends BaseSeleniumWebTest
+abstract public class BaseFlowTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "Flow Verify Project";
     protected static final String PIPELINE_PATH = "/sampledata/flow";
@@ -37,6 +38,12 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/flow";
+    }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     //need not fill all three, but must be the same length.  If you wish to skip a field, set it to an empty string,
@@ -207,10 +214,10 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         {
             // Delete all runs
             table.checkAllOnPage();
-            selenium.chooseOkOnNextConfirmation();
+            prepForPageLoad();
             clickButton("Delete", 0);
-            Assert.assertTrue(selenium.getConfirmation().contains("Are you sure you want to delete the selected row"));
-            waitForPageToLoad();
+            assertAlertContains("Are you sure you want to delete the selected row");
+            newWaitForPageToLoad();
             Assert.assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
 
             // Check all DataInputs were deleted
@@ -226,7 +233,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     // if we aren't already on the Flow Dashboard, try to get there.
     protected void goToFlowDashboard()
     {
-        String title = selenium.getTitle();
+        String title = getDriver().getTitle();
         if (!title.startsWith("Flow Dashboard: "))
         {
             // All flow pages have a link back to the Flow Dashboard
@@ -408,7 +415,7 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
         switch (selectFCSFilesOption)
         {
             case None:
-                clickRadioButtonById("None");
+                checkRadioButton(Locator.radioButtonById("None"));
                 break;
 
             case Included:
@@ -417,13 +424,12 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
                 break;
 
             case Previous:
-                clickRadioButtonById("Previous");
+                checkRadioButton(Locator.radioButtonById("Previous"));
                 break;
 
             case Browse:
-                clickRadioButtonById("Browse");
+                checkRadioButton(Locator.radioButtonById("Browse"));
                 _extHelper.waitForFileGridReady();
-                // UNDONE: Currently, only one file path supported
                 _extHelper.selectFileBrowserItem(keywordDirs.get(0));
                 break;
 
@@ -455,7 +461,8 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
 
         if (selectedGroupNames != null && selectedGroupNames.size() > 0)
         {
-            setFormElement(Locator.id("importGroupNames"), StringUtils.join(selectedGroupNames, ","));
+            selectOptionByValue(Locator.id("importGroupNames"), StringUtils.join(selectedGroupNames, ","));
+            fireEvent(Locator.id("importGroupNames"), SeleniumEvent.change); // TODO: Workaround for reselection not changing checkboxes
         }
         else if (selectedSampleIds != null && selectedSampleIds.size() > 0)
         {
@@ -559,28 +566,30 @@ abstract public class BaseFlowTest extends BaseSeleniumWebTest
     {
         assertTitleEquals("Import Analysis: Confirm: " + containerPath);
 
-        assertTextPresent("Workspace: " + workspacePath);
+        assertElementPresent(Locator.tag("li").startsWith("FlowJo ").containing("Workspace: " + workspacePath));
 
-        if (analysisEngine.equals("FlowJoWorkspace"))
-            assertTextPresent("Analysis Engine: No analysis engine selected");
-        else if (analysisEngine.equals("R"))
-            assertTextPresent("Analysis Engine: External R analysis engine");
+        if (analysisEngine == AnalysisEngine.FlowJoWorkspace)
+            assertElementPresent(Locator.tag("li").withText("Analysis Engine: No analysis engine selected"));
+        else if (analysisEngine == AnalysisEngine.R)
+            assertElementPresent(Locator.tag("li").withText("Analysis Engine: External R analysis engine with normalization"));
 
         if (rEngineNormalization)
         {
-            assertTextPresent("Reference Sample: " + rEngineNormalizationReference);
-            assertTextPresent("Normalize Subsets: " + (rEngineNormalizationSubsets == null ? "All subsets" : StringUtils.join(rEngineNormalizationSubsets, ", ")));
-            assertTextPresent("Normalize Parameters: " + (rEngineNormalizationParameters == null ? "All parameters" : StringUtils.join(rEngineNormalizationParameters, ", ")));
+            WebElement normalizationOptions = Locator.tag("li").startsWith("Normalization Options:").findElement(getDriver());
+            String normalizationOptionsText = normalizationOptions.getText();
+            Assert.assertTrue("Wrong Refernce Sample", normalizationOptionsText.contains("Reference Sample: " + rEngineNormalizationReference));
+            Assert.assertTrue("Wrong Normalize Subsets", normalizationOptionsText.contains("Normalize Subsets: " + (rEngineNormalizationSubsets == null ? "All subsets" : StringUtils.join(rEngineNormalizationSubsets, ", "))));
+            Assert.assertTrue("Wrong Normalize Parameters", normalizationOptionsText.contains("Normalize Parameters: " + (rEngineNormalizationParameters == null ? "All parameters" : StringUtils.join(rEngineNormalizationParameters, ", "))));
         }
 
         if (existingAnalysisFolder)
-            assertTextPresent("Existing Analysis Folder: " + analysisFolder);
+            assertElementPresent(Locator.tag("li").withText("Existing Analysis Folder: " + analysisFolder));
         else
-            assertTextPresent("New Analysis Folder: " + analysisFolder);
+            assertElementPresent(Locator.tag("li").withText("New Analysis Folder: " + analysisFolder));
 
         // XXX: assert fcsPath is present: need to normalize windows path backslashes
         if (selectFCSFilesOption == SelectFCSFileOption.Browse && keywordDirs == null)
-            assertTextPresent("FCS File Path: none set");
+            assertElementPresent(Locator.tag("li").withText("FCS File Path: none set"));
 
         clickButton("Finish");
         waitForPipeline(containerPath);

@@ -105,7 +105,7 @@ public class FlowImportTest extends BaseFlowTest
         assertChecked(Locator.name("selectedSamples.rows[296].selected"));
         assertOptionEquals(Locator.name("selectedSamples.rows[296].matchedFile"), "118797.fcs (microFCS)");
         importAnalysis_reviewSamples(getContainerPath(), false, Arrays.asList("All Samples"), null);
-        assertTextPresent("All selected rows must be matched to a previously imported FCS file.");
+        assertElementPresent(Locator.css(".labkey-error").withText("All selected rows must be matched to a previously imported FCS file."));
         importAnalysis_reviewSamples(getContainerPath(), false, Arrays.asList("labkey-demo-samples"), null);
         importAnalysis_analysisEngine(getContainerPath(), AnalysisEngine.FlowJoWorkspace);
         // assert FlowJoAnalysis analysis folder doesn't show up in list of folders

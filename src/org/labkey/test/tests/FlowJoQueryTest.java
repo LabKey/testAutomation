@@ -76,7 +76,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         createQuery(PROJECT_NAME, "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), true);
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 run"));
-        clickMenuButton("Query", "PassFailQuery");
+        _extHelper.clickMenuButton("Query", "PassFailQuery");
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
 //        The DeviationFromMean query does not work on SQL server.
@@ -107,30 +107,30 @@ public class FlowJoQueryTest extends BaseFlowTest
         setFilter("query", "Name", "Equals", "118795.fcs");
         clickAndWait(Locator.linkContainingText("workspaceScript"));
         clickAndWait(Locator.linkWithText("Make a copy of this analysis script"));
-        setFormElement("name", "LabKeyScript");
-        checkCheckbox("copyAnalysis");
+        setFormElement(Locator.name("name"), "LabKeyScript");
+        checkCheckbox(Locator.name("copyAnalysis"));
         submit();
 
         // Only run LabKeyScript on sample wells
         // NOTE: we use 'Contains' since it is case-insensitive. Some values are Non-comp and other are Non-Comp.
         clickAndWait(Locator.linkWithText("Edit Settings"));
-        selectOptionByText(Locator.name("ff_filter_field", 0), "Comp");
-        selectOptionByText(Locator.name("ff_filter_op", 0), "Contains");
-        setFormElement(Locator.name("ff_filter_value", 0), "non-comp"); clickButton("Update");
+        selectOptionByText(Locator.name("ff_filter_field"), "Comp");
+        selectOptionByText(Locator.name("ff_filter_op"), "Contains");
+        setFormElement(Locator.name("ff_filter_value"), "non-comp"); clickButton("Update");
 
         clickAndWait(Locator.linkWithText("Analyze some runs"));
-        selectOptionByValue("ff_targetExperimentId", "");
-        waitForPageToLoad();
+        prepForPageLoad();
+        selectOptionByValue(Locator.name("ff_targetExperimentId"), "");
+        newWaitForPageToLoad();
         // select mini-fcs.xml Analysis run
-        checkCheckbox(".select", String.valueOf(runId));
+        checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(runId)));
         clickButton("Analyze selected runs");
-        setFormElement("ff_analysisName", "LabKeyAnalysis");
+        setFormElement(Locator.name("ff_analysisName"), "LabKeyAnalysis");
         clickButton("Analyze runs");
         waitForPipeline(getContainerPath());
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("LabKeyAnalysis"));
-        clickMenuButton("Query", "Comparison");
-        waitForPageToLoad(longWaitForPage);
+        _extHelper.clickMenuButton("Query", "Comparison");
         assertTextNotPresent("No data to show");
         setFilterAndWait("query", "AbsDifference", "Is Greater Than or Equal To", "2", longWaitForPage);
         // UNDONE: sample '118902.fcs' differs by 2.46%
@@ -141,7 +141,7 @@ public class FlowJoQueryTest extends BaseFlowTest
 
     private void verifyWSPImport()
     {
-        importAnalysis(getContainerPath(), "/advanced/advanced-v7.6.5.wsp", SelectFCSFileOption.Browse, Arrays.asList("advanced"), "Windows File", false, true);
+        importAnalysis(getContainerPath(), "/advanced/advanced-v7.6.5.wsp", SelectFCSFileOption.Browse, Arrays.asList("/advanced"), "Windows File", false, true);
         assertTextPresent("931115-B02- Sample 01.fcs");
     }
 
