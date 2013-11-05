@@ -15,11 +15,13 @@
  */
 package org.labkey.test.tests;
 
+import org.json.simple.JSONObject;
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.di.BaseTransformCommand;
+import org.labkey.remoteapi.di.BaseTransformResponse;
 import org.labkey.remoteapi.di.ResetTransformStateCommand;
 import org.labkey.remoteapi.di.ResetTransformStateResponse;
 import org.labkey.remoteapi.di.RunTransformCommand;
@@ -28,6 +30,8 @@ import org.labkey.remoteapi.di.UpdateTransformConfigurationCommand;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationResponse;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PasswordUtil;
+
+import java.util.Date;
 
 /**
  * User: dax
@@ -52,24 +56,37 @@ public class RemoteETLCommandTest extends ETLTest
         verifyRemoteApi();
     }
 
+    private void verifyBaseTransformResponse(BaseTransformResponse response)
+    {
+        Assert.assertTrue("success should be true", response.getSuccess());
+    }
+
     private void verifyUpdateTransformConfigurationResponse(UpdateTransformConfigurationResponse response, UpdateTransformConfigurationCommand command)
     {
-        // UNDONE: issue 18947 - the config property doesn't work - not sure if the result object should be surfaced or new getters should
-        // be added for things like 'lastChecked' and 'descriptionId'
-        String result = response.getResult().toString();
-        Assert.assertTrue("success should be true", response.getSuccess().equalsIgnoreCase("true"));
-        Assert.assertTrue("response.enabled should equal command.enabled", command.getEnabled() == null ? true : response.getEnabled() == command.getEnabled());
-        Assert.assertTrue("response.verbose should equal command.verbose", command.getVerboseLogging() == null ? true : response.getVerboseLogging() == command.getVerboseLogging());
+        verifyBaseTransformResponse(response);
+        // just verify this method doesn't choke
+        JSONObject obj = response.getResult();
+        // currently not filled in, verify the methods don't choke
+        Date d = response.getLastChecked();
+        obj = response.getState();
+
+        // verify the accessors now (which look at the returned JSON data anyway)
+        Assert.assertTrue("response.enabled should equal command.enabled",
+                command.getEnabled() == null ? true : response.getEnabled() == command.getEnabled());
+        Assert.assertTrue("response.verbose should equal command.verbose",
+                command.getVerboseLogging() == null ? true : response.getVerboseLogging() == command.getVerboseLogging());
+        Assert.assertTrue("response.description should equal truncation description",
+                response.getDescriptionId().equalsIgnoreCase(command.getTransformId()));
     }
 
     private void verifyResetTransformStateResponse(ResetTransformStateResponse response)
     {
-        Assert.assertTrue("success should be true", response.getSuccess().equalsIgnoreCase("true"));
+        verifyBaseTransformResponse(response);
     }
 
     private void verifyRunTransformResponse(RunTransformResponse response, boolean noWork)
     {
-        Assert.assertTrue("success should be true", response.getSuccess().equalsIgnoreCase("true"));
+        verifyBaseTransformResponse(response);
 
         if (noWork)
         {
