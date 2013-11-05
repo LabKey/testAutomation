@@ -56,13 +56,10 @@ public class RemoteETLCommandTest extends ETLTest
     {
         // UNDONE: issue 18947 - the config property doesn't work - not sure if the result object should be surfaced or new getters should
         // be added for things like 'lastChecked' and 'descriptionId'
-        //String config = response.getConfig();
+        String result = response.getResult().toString();
         Assert.assertTrue("success should be true", response.getSuccess().equalsIgnoreCase("true"));
-        // issue: 18946 inconsistencies between the response and command object prop names and types
-        // type should be both boolean or string
-        Assert.assertTrue("response.enabled should equal command.enabled", response.getEnabled().equalsIgnoreCase(command.getEnabled().toString()));
-        // both should be named getVerboseLogging
-        Assert.assertTrue("response.verbose should equal command.verbose", response.getVerbose().equalsIgnoreCase(command.getVerboseLogging().toString()));
+        Assert.assertTrue("response.enabled should equal command.enabled", command.getEnabled() == null ? true : response.getEnabled() == command.getEnabled());
+        Assert.assertTrue("response.verbose should equal command.verbose", command.getVerboseLogging() == null ? true : response.getVerboseLogging() == command.getVerboseLogging());
     }
 
     private void verifyResetTransformStateResponse(ResetTransformStateResponse response)
