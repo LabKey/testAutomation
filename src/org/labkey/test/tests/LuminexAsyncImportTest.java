@@ -141,27 +141,27 @@ public class LuminexAsyncImportTest extends LuminexTest
 
     protected void assertLuminexLogInfoPresent()
     {
-        waitForText("----- Start Luminex Analyte Properties -----");
-        assertTextPresent("----- Stop Luminex Analyte Properties -----");
-        assertTextPresent("----- Start Luminex Titration Properties -----", "----- Stop Luminex Titration Properties -----");
+        waitForText("Finished assay upload");
 
         //Check for Analyte Properties
+        assertTextPresentInThisOrder("----- Start Analyte Properties -----", "----- Stop Analyte Properties -----");
         assertTextPresent("Properties for GS Analyte (2)", "Properties for GS Analyte (1)");
+        assertTextPresent("*PositivityThreshold:", "*LotNumber:");
 
-        //Check for Titration Properties
+        //Check for Well Role Properties
+        assertTextPresentInThisOrder("----- Start Well Role Properties -----", "----- Stop Well Role Properties -----");
         assertTextPresent("Standard", "QC Control", "Unknown");
 
-        //TODO Move these to a better test
         //Check for Run Properties
-        assertTextPresent("----- Start Run Properties -----", "----- End Run Properties -----");
-        assertTextPresent("Isotype", "Conjugate", "Test Date", "Replaces Previous File", "Date file was modified",
+        assertTextPresentInThisOrder("----- Start Run Properties -----", "----- End Run Properties -----");
+        assertTextPresent("Uploaded Files", "Assay ID", "Isotype", "Conjugate", "Test Date", "Replaces Previous File", "Date file was modified",
                 "Specimen Type", "Additive", "Derivative", "Subtract Blank Bead", "Calc of Standards", "Calc of Unknown",
                 "Curve Fit Log", "Notebook Number", "Assay Type", "Experiment Performer", "Calculate Positivity",
                 "Baseline Visit", "Positivity Fold Change");
 
         //Check for Batch Properties
-        assertTextPresent("----- Start Batch Properties -----", "----- End Batch Properties -----");
-        assertTextPresent("Participant Visit", "Target Study", "Species", "Lab ID", "Analysis", "Network", "Transform Script", "Ruminex Version");
+        assertTextPresentInThisOrder("----- Start Batch Properties -----", "----- End Batch Properties -----");
+        assertTextPresent("Participant Visit", "Target Study", "Species", "Lab ID", "Analysis", "Network", "Transform Script Version", "Ruminex Version");
     }
 
 }

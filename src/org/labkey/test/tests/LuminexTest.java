@@ -1803,7 +1803,7 @@ public class LuminexTest extends AbstractQCAssayTest
         _customizeViewsHelper.addCustomizeViewColumn("Five ParameterCurveFit/EC50");
         _customizeViewsHelper.saveCustomView();
 
-        assertTextPresent(TEST_ASSAY_LUM + " QC Report");
+        assertTextPresent("Titration QC Report");
         DataRegionTable drt = new DataRegionTable("AnalyteTitration", this);
         String isotype = drt.getDataAsText(0, "Isotype");
         if(isotype.length()==0)
