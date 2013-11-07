@@ -91,8 +91,6 @@ public class FileContentTest extends BaseWebDriverTest
         FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
 
         _containerHelper.createProject(PROJECT_NAME, null);
-        // Trigger email digest in order to reset timer
-        beginAt(getBaseURL() + "/filecontent/" + EscapeUtil.encode(PROJECT_NAME) + "/sendShortDigest.view");
         createPermissionsGroup(TEST_GROUP, TEST_USER);
         setPermissions(TEST_GROUP, "Editor");
         exitPermissionsUI();
@@ -106,6 +104,11 @@ public class FileContentTest extends BaseWebDriverTest
         click(Locator.navButton("Update Settings"));
         shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css(".labkey-ribbon > div")));
         // Set folder default
+        // Attempt to reset digest timer so that all notifications appear in one email
+        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "No Email");
+        click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Folder Default']"));
+        _extHelper.waitForExtDialog("Update complete", WAIT_FOR_JAVASCRIPT);
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "15 minute digest");
         click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Folder Default']"));
         _extHelper.waitForExtDialog("Update complete", WAIT_FOR_JAVASCRIPT);
