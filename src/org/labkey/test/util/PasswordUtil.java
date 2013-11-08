@@ -189,8 +189,6 @@ public class PasswordUtil
         if (_cachedCredentials == null)
         {
             File file = findPasswordFile();
-            if (file == null || !file.exists())
-                return null;
 
             try (InputStream istream = new FileInputStream(file))
             {
@@ -202,7 +200,7 @@ public class PasswordUtil
             }
             catch (IOException e)
             {
-                return null;
+                throw new RuntimeException(e);
             }
         }
         return _cachedCredentials;
