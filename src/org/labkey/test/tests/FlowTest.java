@@ -163,20 +163,13 @@ public class FlowTest extends BaseFlowTest
     @LogMethod
     protected void setupQuery()
     {
-        beginAt("/query" + getContainerPath() + "/begin.view?schemaName=flow");
-        createNewQuery("flow");
-        setFormElement(Locator.name("ff_newQueryName"), query1);
-        selectOptionByText(Locator.name("ff_baseTableName"), analysisName);
-        clickButton("Create and Edit Source");
+        String querySql = "SELECT " + analysisName + ".RowId, " +
+            analysisName + ".Statistic.\"Count\", " +
+            analysisName + ".Run.FilePathRoot, " +
+            analysisName + ".FCSFile.Run.WellCount " +
+            "FROM " + analysisName + " AS " + analysisName;
 
-        // Start Query Editing
-        setCodeEditorValue("queryText", "SELECT " + analysisName + ".RowId, " +
-                analysisName + ".Statistic.\"Count\", " +
-                analysisName + ".Run.FilePathRoot, " +
-                analysisName + ".FCSFile.Run.WellCount " +
-                "FROM " + analysisName + " AS " + analysisName);
-        clickButton("Save", 0);
-        waitForText("Saved", WAIT_FOR_JAVASCRIPT);
+        createQuery(getContainerPath(), query1, "flow", querySql, null, false);
 
         clickButton("Execute Query", 0);
         waitForText("No data to show.", WAIT_FOR_JAVASCRIPT);

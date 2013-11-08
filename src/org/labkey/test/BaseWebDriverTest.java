@@ -6890,10 +6890,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         selectSchema(schemaName);
         clickButton("Create New Query");
-//        String url = (String)executeScript("return window._browser.getCreateQueryUrl('" + schemaName + "')");
-//        if (null == url || url.length() == 0)
-//            Assert.fail("Could not get the URL for creating a new query in schema " + schemaName);
-//        beginAt(url);
     }
 
 
@@ -6905,15 +6901,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         setFormElement(Locator.name("ff_newQueryName"), name);
         clickButton("Create and Edit Source", 0);
         waitForElement(Locator.id("labkey-nav-trail-current-page").withText("Edit " + name));
-//        toggleSQLQueryEditor();
         setCodeEditorValue("queryText", sql);
-//        setFormElement("queryText", sql);
         if (xml != null)
         {
             _extHelper.clickExtTab("XML Metadata");
             setCodeEditorValue("metadataText", xml);
-//        toggleMetadataQueryEditor();
-//        setFormElement("metadataText", xml);
         }
         clickButton("Save", 0);
         waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
