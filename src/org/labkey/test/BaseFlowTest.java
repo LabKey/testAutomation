@@ -20,7 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.FileBrowserHelper;
+import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 abstract public class BaseFlowTest extends BaseWebDriverTest
@@ -262,8 +263,9 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Upload Sample Descriptions"));
         setFormElement("data", getFileContents(sampleFilePath));
+        click(Locator.name("idColumn1")); //need to trigger an event to populate the columns
         for (int i = 0; i < idCols.length; i++)
-            selectOptionByText("idColumn" + (i+1), idCols[i]);
+            selectOptionByText(Locator.name("idColumn" + (i+1)), idCols[i]);
         submit();
 
         log("** Join sample set with FCSFile keywords");
@@ -308,11 +310,23 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         submit();
     }
 
+
+    protected void importFCSFiles()
+    {
+        waitAndClickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
+
+
+        _extHelper.selectFileBrowserItem("flowjoquery/microFCS");
+        selectImportDataAction("Import Directory of FCS Files");
+        clickButton("Import Selected Runs");
+        waitForPipeline(getContainerPath());
+    }
+
     protected void importExternalAnalysis(String containerPath, String analysisZipPath)
     {
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("FCS files to be imported"));
-        FileBrowserHelper fileBrowserHelper = new FileBrowserHelper(this);
+        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
         fileBrowserHelper.importFile(analysisZipPath, "Import External Analysis");
 
         importAnalysis_selectFCSFiles(containerPath, SelectFCSFileOption.None, null);
@@ -430,6 +444,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             case Browse:
                 checkRadioButton(Locator.radioButtonById("Browse"));
                 _extHelper.waitForFileGridReady();
+                // UNDONE: Currently, only one file path supported
                 _extHelper.selectFileBrowserItem(keywordDirs.get(0));
                 break;
 
@@ -568,10 +583,15 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
         assertElementPresent(Locator.tag("li").startsWith("FlowJo ").containing("Workspace: " + workspacePath));
 
-        if (analysisEngine == AnalysisEngine.FlowJoWorkspace)
-            assertElementPresent(Locator.tag("li").withText("Analysis Engine: No analysis engine selected"));
-        else if (analysisEngine == AnalysisEngine.R)
-            assertElementPresent(Locator.tag("li").withText("Analysis Engine: External R analysis engine with normalization"));
+        switch (analysisEngine)
+        {
+            case FlowJoWorkspace:
+                assertElementPresent(Locator.tag("li").withText("Analysis Engine: No analysis engine selected"));
+                break;
+            case R:
+                assertElementPresent(Locator.tag("li").withText("Analysis Engine: External R analysis engine with normalization"));
+                break;
+        }
 
         if (rEngineNormalization)
         {
@@ -656,7 +676,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             _workspacePath = workspacePath;
             _selectFCSFilesOption = selectFCSFilesOption;
             _keywordDirs = keywordDirs;
-            _selectedGroupNames = Arrays.asList("All Samples");
+            _selectedGroupNames = Collections.emptyList();
             _selectedSampleIds = null;
             _analysisEngine = AnalysisEngine.FlowJoWorkspace;
             _rEngineNormalization = false;

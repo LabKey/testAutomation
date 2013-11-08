@@ -19,6 +19,7 @@ import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Flow;
 import org.labkey.test.util.FileBrowserHelperWD;
 
 /**
@@ -26,7 +27,7 @@ import org.labkey.test.util.FileBrowserHelperWD;
  * Date: 1/10/13
  * Time: 4:40 PM
  */
-@Category({DailyB.class})
+@Category({DailyB.class, Flow.class})
 public class FlowAnalysisResolverTest extends FlowTest
 {
 

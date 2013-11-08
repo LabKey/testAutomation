@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.Assert;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseFlowTestWD;
+import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
@@ -36,7 +36,7 @@ import java.net.URL;
 import java.util.List;
 
 @Category({BVT.class, Flow.class})
-public class FlowTest extends BaseFlowTestWD
+public class FlowTest extends BaseFlowTest
 
 {
     public static final String SELECT_CHECKBOX_NAME = ".select";
@@ -616,11 +616,5 @@ public class FlowTest extends BaseFlowTestWD
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
         waitForText("Ignoring filter/sort on column");
         assertTextPresent("Ignoring filter/sort on column '" , reportName , ".Response' because it does not exist.");
-    }
-
-    @Override
-    protected BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
     }
 }
