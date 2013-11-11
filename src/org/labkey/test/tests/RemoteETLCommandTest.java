@@ -114,7 +114,7 @@ public class RemoteETLCommandTest extends ETLTest
     {
         //create a new connection, specifying base URL,
         //user email, and password
-        Connection cn = new Connection("http://localhost:8080/labkey", PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
 
         // expect error with missing transform
         invokeCommand(new RunTransformCommand(TRANSFORM_NOTFOUND), cn, TRANSFORM_NOTFOUND);
