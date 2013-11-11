@@ -553,6 +553,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         }
 
         assertSignOutAndMyAccountPresent();
+
+        if (isElementPresent(Locator.css(".labkey-nav-page-header").withText("Startup Modules")))
+        {
+            waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"));
+            clickButton("Next");
+        }
     }
 
     public void assertSignOutAndMyAccountPresent()
