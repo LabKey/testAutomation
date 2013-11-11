@@ -98,7 +98,9 @@ public class RemoteETLCommandTest extends ETLTest
         {
             Assert.assertTrue("job id should not be null", response.getJobId() != null);
             Assert.assertFalse("status should not be error", response.getStatus().equalsIgnoreCase("error"));
-            Assert.assertTrue("pipeline url should be valid",
+            Assert.assertTrue("pipeline url should be valid\n" +
+                    "Expected substring: " + getPipelineURLFragment(response.getJobId()) + "\n" +
+                    "Actual: " + response.getPipelineURL(),
                     response.getPipelineURL().contains(getPipelineURLFragment(response.getJobId())));
         }
     }
@@ -182,7 +184,10 @@ public class RemoteETLCommandTest extends ETLTest
             else
             {
                 String s = e.getMessage();
-                Assert.assertTrue(s.contains(expectedError));
+                Assert.assertTrue("Did not receive expected error.\n" +
+                        "Expected substring: " + expectedError + "\n" +
+                        "Received: " + s,
+                        s.contains(expectedError));
             }
         }
 
