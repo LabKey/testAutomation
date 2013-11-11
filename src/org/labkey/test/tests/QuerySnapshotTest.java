@@ -208,7 +208,10 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
         clickButton("Save");
         Assert.assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
-        deleteSnapshot();
+        prepForPageLoad();
+        clickButton("Update Snapshot", 0);
+        getAlert();
+        newWaitForPageToLoad();
         waitForText("Dataset: Custom Query Snapshot", 10000);
 
         log("delete the snapshot");
