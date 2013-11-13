@@ -3341,6 +3341,33 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
+     * Verifies that one of the strings is present in the page html source
+     * @param texts
+     */
+    public void assertOneOfTheseTextsPresent(String... texts)
+    {
+        if(null==texts)
+            return;
+
+        String source = getHtmlSource();
+        String targets = "";
+
+        for (String text : texts)
+        {
+            targets.concat(text + ", ");
+            String escapedText = text
+                    .replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;");
+            if(source.contains(escapedText))
+            {
+                return;
+            }
+        }
+        Assert.fail("Did not find any of the following values on page " + targets);
+    }
+
+    /**
      * Verifies that all the strings are present in the page html source
      */
     public void assertTextPresent(List<String> texts)
