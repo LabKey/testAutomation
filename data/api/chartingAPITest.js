@@ -489,40 +489,4 @@ var beginTest = function(){
     });
 };
 
-var loadVis = function(){
-    LABKEY.requiresVisualization();
-    LABKEY.requiresScript('/vis/SVGConverter.js', true);
-    LABKEY.Utils.onTrue({
-        testCallback: function(){
-            return LABKEY.vis && LABKEY.vis.Geom && LABKEY.vis.Stat && LABKEY.vis.Layer && LABKEY.vis.Plot && LABKEY.vis.SVGConverter;
-        },
-        successCallback: function(){beginTest.defer(100)},
-        errorCallback: doError
-    });
-};
-
-var loadPatches = function(){
-    LABKEY.requiresScript(LABKEY.extJsRoot_42 + "/ext-patches.js", true);
-    LABKEY.Utils.onTrue({
-        testCallback: function(){
-            return Ext4.USE_NATIVE_JSON === true;
-        },
-        successCallback: function(){
-            loadVis();
-        },
-        errorCallback: doError
-    });
-};
-
-LABKEY.requiresScript(LABKEY.extJsRoot_42 + "/ext-all-sandbox-debug.js", true);
-
-LABKEY.Utils.onTrue({
-    testCallback:function() {
-        return ('Ext4' in window) &&  Ext4.isReady;
-    },
-    successCallback:function () {
-//        loadPatches.defer(250);
-        loadPatches();
-    },
-    errorCallback:doError
-});
+LABKEY.requiresExt4Sandbox(true, LABKEY.requiresScript('/vis/SVGConverter.js', true, function(){ LABKEY.requiresVisualization(beginTest);}));
