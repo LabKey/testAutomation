@@ -17,6 +17,7 @@
 package org.labkey.dumbster;
 
 import com.dumbster.smtp.SmtpMessage;
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.api.action.ApiAction;
 import org.labkey.api.action.ApiResponse;
 import org.labkey.api.action.ApiSimpleResponse;
@@ -165,33 +166,43 @@ public class DumbsterController extends SpringActionController
             String key = null;
             StringBuilder content = new StringBuilder();
 
-            for (String line : lines)
+            // Check if we have a simple (non-multipart html message
+            String messageContentType = message.getHeaderValue("Content-Type");
+            if (messageContentType != null && messageContentType.startsWith("text/html"))
             {
-                if (line.startsWith("------=_"))
+                map.put("text/html", StringUtils.join(lines, "\n"));
+            }
+            else
+            {
+                // It's multipart, so parse the boundaries
+                for (String line : lines)
                 {
-                    if (null != key)
-                        map.put(key, content.toString());
+                    if (line.startsWith("------=_"))
+                    {
+                        if (null != key)
+                            map.put(key, content.toString());
 
-                    content = new StringBuilder();
-                }
-                else if (line.startsWith("Content-Type: "))
-                {
-                    key = line.substring(14, line.indexOf(';'));
-                }
-                else if (!line.startsWith("Content-Transfer-Encoding:"))
-                {
-                    content.append(line);
-                    content.append('\n');
+                        content = new StringBuilder();
+                    }
+                    else if (line.startsWith("Content-Type: "))
+                    {
+                        key = line.substring(14, line.indexOf(';'));
+                    }
+                    else if (!line.startsWith("Content-Transfer-Encoding:"))
+                    {
+                        content.append(line);
+                        content.append('\n');
+                    }
                 }
             }
 
             String output;
-            String contentType = "text/plain";
+            String desiredContentType = "text/plain";
 
             if ("html".equals(form.getType()))
             {
                 String contents = map.get("text/html");
-                String html = null;
+                String html = contents;
 
                 if (null != contents)
                 {
@@ -204,9 +215,9 @@ public class DumbsterController extends SpringActionController
                         if (htmlEnd > -1)
                         {
                             html = contents.substring(htmlStart, htmlEnd);
-                            contentType = "text/html";
                         }
                     }
+                    desiredContentType = "text/html";
                 }
 
                 output = null != html ? html : "No HTML found";
@@ -221,7 +232,7 @@ public class DumbsterController extends SpringActionController
             getPageConfig().setTemplate(PageConfig.Template.None);
 
             // Just blast the HTML contents... no debug comments, view divs, etc.
-            response.setContentType(contentType);
+            response.setContentType(desiredContentType);
             response.getWriter().print(output);
             response.flushBuffer();
         }
