@@ -180,7 +180,7 @@ public class RemoteETLCommandTest extends ETLTest
         catch(Exception e)
         {
             if (null == expectedError)
-                Assert.assertTrue("unexpected error on remote commmand", false);
+                throw new RuntimeException(e);
             else
             {
                 String s = e.getMessage();
