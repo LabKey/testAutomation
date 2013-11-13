@@ -57,6 +57,8 @@ public class SchemaHelper extends AbstractHelperWD
 
         _test.waitForElement(Locator.xpath("//input[@name='userSchemaName']"));
         _test.setFormElement(Locator.xpath("//input[@name='userSchemaName']"), name);
+
+        _test.waitForElement(Locator.css(".containers-loaded-marker"));
         _test._ext4Helper.selectComboBoxItem("Source Container:", sourceContainerPath);
 
         if (schemaTemplate != null)
