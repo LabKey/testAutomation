@@ -161,7 +161,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public int longWaitForPage = defaultWaitForPage * 5;
     protected static long _startTime;
-    private ArrayList<JavaScriptError> _jsErrors;
+    private List<JavaScriptError> _jsErrors;
     private static WebDriverWait _shortWait;
     private static WebDriverWait _longWait;
     private static JSErrorChecker _jsErrorChecker = null;
@@ -683,7 +683,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @After
     public void tearDown() throws Exception
     {
-        //Prevent tearDown after each test case
+        //Poorly named method to prevent tearDown after each test case
+        checkJsErrors();
     }
 
     public void doTearDown()
@@ -1875,6 +1876,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 dumpPageSnapshot(testName, "fixPipelineToolsDir");
             }
 
+            checkJsErrors();
+
             doTearDown();
             _driver = null;
         }
@@ -2315,7 +2318,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             int duplicateCount = 0;
             try
             {
-                _jsErrors.addAll(JavaScriptError.readErrors(getDriver()));
+                _jsErrors = JavaScriptError.readErrors(getDriver());
             }
             catch (WebDriverException ex)
             {
