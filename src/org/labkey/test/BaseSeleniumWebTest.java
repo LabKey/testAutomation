@@ -3218,6 +3218,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         Assert.assertTrue("Element '" + loc + "' is not present", isElementPresent(loc));
     }
 
+    public void assertElementPresent(String message, Locator loc)
+    {
+        Assert.assertTrue(message, isElementPresent(loc));
+    }
+
     public void assertElementPresent(Locator.XPathLocator loc, int amount)
     {
         Assert.assertEquals("Xpath '" + loc.getPath() + "' not present expected number of times.", amount, getXpathCount(loc));
