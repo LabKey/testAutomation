@@ -603,7 +603,7 @@ public abstract class Locator
         if ("+".equals(text))
             return Locator.id("addTab");
         else
-            return Locator.id(text + "Tab");
+            return Locator.id(text.replace(" ", "") + "Tab");
     }
 
     public static XPathLocator paginationText(int firstRow, int lastRow, int maxRows)

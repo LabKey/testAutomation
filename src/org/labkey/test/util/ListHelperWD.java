@@ -493,7 +493,7 @@ public class ListHelperWD extends ListHelper
 
     public void beginCreateListFromTab(String tabName, String listName)
     {
-        _test.clickTab(tabName);
+        _test.clickTab(tabName.replace(" ", ""));
         beginCreateListHelper(listName);
     }
 

@@ -61,7 +61,7 @@ public class PortalHelper extends AbstractHelper
         if (direction.isVertical())
             throw new IllegalArgumentException("Can't move folder tabs vertically.");
 
-        String tabId = tabText + "Tab";
+        String tabId = tabText.replace(" ", "") + "Tab";
         int tabCount = _test.getXpathCount(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab')]"));
         int startIndex = _test.getElementIndex(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab')][./a[@id="+Locator.xq(tabId)+"]]"));
         clickTabMenuItem(tabText, false, "Move", direction.toString());
