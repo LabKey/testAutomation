@@ -3124,7 +3124,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, newFolderName));
         assertElementPresent(Locator.currentProject().withText(project));
         hoverFolderBar();
-        assertElementPresent(Locator.linkWithText(newFolderName));
+        waitForElement(Locator.linkWithText(newFolderName));
         assertElementNotPresent(Locator.linkWithText(folderName));
     }
 
@@ -3151,7 +3151,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         // verify that we're not on an error page with a check for folder link:
         assertElementPresent(Locator.currentProject().withText(projectName));
         hoverFolderBar();
-        assertElementPresent(Locator.xpath("//li").withClass("clbl").withPredicate(Locator.xpath("a").withText(newParent)).append("/ul/li/a").withText(folderName));
+        waitForElement(Locator.xpath("//li").withClass("clbl").withPredicate(Locator.xpath("a").withText(newParent)).append("/ul/li/a").withText(folderName));
         String newProject = getText(Locator.currentProject());
         _createdFolders.remove(new WebTestHelper.FolderIdentifier(projectName, folderName));
         _createdFolders.add(new WebTestHelper.FolderIdentifier(newProject, folderName));
@@ -3160,9 +3160,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void hoverProjectBar()
     {
         waitForElement(Locator.id("projectBar"));
-        waitForHoverNavigationReady();
-        executeScript("HoverNavigation._project.show();"); // mouseOver timing is unreliable
-        waitForElement(Locator.css("#projectBar_menu .project-nav"));
+        mouseOver(Locator.id("projectBar"));
+        shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("#projectBar_menu a")));
     }
 
     public void clickProject(String project)
@@ -3181,9 +3180,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void hoverFolderBar()
     {
         waitForElement(Locator.id("folderBar"));
-        waitForHoverNavigationReady();
-        executeScript("HoverNavigation._folder.show();"); // mouseOver timing is unreliable
-        waitForElement(Locator.css("#folderBar_menu .folder-nav"));
+        mouseOver(Locator.id("folderBar"));
+        shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("#folderBar_menu a")));
     }
 
     public void clickFolder(String folder)
