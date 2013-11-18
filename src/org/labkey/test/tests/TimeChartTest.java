@@ -27,7 +27,7 @@ import java.io.File;
 
 public abstract class TimeChartTest extends ReportTest
 {
-    private static final String PROJECT_NAME =  "TimeChartTest Project"; // + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
+    private static final String PROJECT_NAME =  "TimeChartTest Project" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private static final String FOLDER_NAME =  "Demo Study";
     protected static final String VISIT_FOLDER_NAME =  "Demo Visit Study";
     private static final String STUDY_ZIP = "/sampledata/study/LabkeyDemoStudy.zip";
