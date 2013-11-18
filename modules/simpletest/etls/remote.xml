@@ -5,7 +5,7 @@
 <transforms>
     <transform type="RemoteQueryTransformStep" id="step1">
         <description>Copy to target</description>
-        <source remoteSource="EtlTest_RemoteConnection" schemaName="study" queryName="etl source" timestampcolumnname="modified" />
+        <source remoteSource="EtlTest_RemoteConnection" schemaName="study" queryName="etl source" />
         <destination schemaName="study" queryName="etl target" targetOption="truncate"/>
     </transform>
 </transforms>
