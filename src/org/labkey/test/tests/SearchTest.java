@@ -72,12 +72,6 @@ public class SearchTest extends StudyWDTest
     }
 
     @Override
-    public boolean isFileUploadTest()
-    {
-        return true;
-    }
-
-    @Override
     protected String getFolderName()
     {
         return FOLDER_NAME;
@@ -93,11 +87,7 @@ public class SearchTest extends StudyWDTest
         addSearchableWiki();
         addSearchableIssues();
         //addSearchableMessages();
-        if (isFileUploadAvailable())
-        {
-            // TODO: enable once files move with their container
-            addSearchableFiles();
-        }
+        addSearchableFiles();
     }
 
     String fullySearchableList = "List1";       //index both number and text colums
@@ -298,12 +288,9 @@ public class SearchTest extends StudyWDTest
         selectOptionByText("priority", "1");
         setFormElement("comment", ISSUE_BODY);
         selectOptionByText("assignedTo", USER1_DISPLAY_NAME);
-        if (isFileUploadAvailable())
-        {
-            click(Locator.linkWithText("Attach a file"));
-            File file = new File(getLabKeyRoot() + "/common.properties");
-            setFormElement("formFiles[00]", file);
-        }
+        click(Locator.linkWithText("Attach a file"));
+        File file = new File(getLabKeyRoot() + "/common.properties");
+        setFormElement("formFiles[00]", file);
         clickButton("Save");
 
         _searchHelper.enqueueSearchItem(ISSUE_TITLE, Locator.linkContainingText(ISSUE_TITLE));
@@ -321,12 +308,9 @@ public class SearchTest extends StudyWDTest
         clickWebpartMenuItem("Messages", "New");
         setFormElement("title", MESSAGE_TITLE);
         setFormElement("body", MESSAGE_BODY);
-        if (isFileUploadAvailable())
-        {
-            click(Locator.linkWithText("Attach a file"));
-            File file = new File(getLabKeyRoot() + "/sampledata/dataloading/excel/fruits.tsv");
-            setFormElement("formFiles[0]", file);
-        }
+        click(Locator.linkWithText("Attach a file"));
+        File file = new File(getLabKeyRoot() + "/sampledata/dataloading/excel/fruits.tsv");
+        setFormElement("formFiles[0]", file);
         clickButton("Submit");
 
         _searchHelper.enqueueSearchItem(MESSAGE_TITLE, Locator.linkContainingText(MESSAGE_TITLE));
