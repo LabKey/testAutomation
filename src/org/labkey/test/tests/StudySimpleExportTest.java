@@ -205,6 +205,7 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         log("Default Formats: verify imported settings");
         clickFolder("Default Dataset Formats");
         goToManageDatasets();
+        waitForElement(Locator.name("dateFormat"));
         assertFormElementEquals(Locator.name("dateFormat"), "MMM dd, yyyy");
         assertFormElementEquals(Locator.name("numberFormat"), "#.000");
         clickAndWait(Locator.linkWithText("TestDataset"));
