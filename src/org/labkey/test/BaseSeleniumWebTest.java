@@ -1947,11 +1947,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public File dumpHtml(File dir, String baseName)
     {
-        FileWriter writer = null;
-        try
+        if (getLastPageText() == null)
+            return null;
+
+        File htmlFile = new File(dir, baseName + ".html");
+        try (FileWriter writer = new FileWriter(htmlFile))
         {
-            File htmlFile = new File(dir, baseName + ".html");
-            writer = new FileWriter(htmlFile);
             writer.write(getLastPageText());
             return htmlFile;
         }
@@ -1959,18 +1960,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         {
             e.printStackTrace();
             return null;
-        }
-        finally
-        {
-            if (writer != null)
-                try
-                {
-                    writer.close();
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
         }
     }
 

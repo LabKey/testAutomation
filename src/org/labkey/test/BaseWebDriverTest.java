@@ -2592,8 +2592,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public File dumpHtml(File dir, String baseName)
     {
-        File htmlFile = new File(dir, baseName + ".html");
+        if (getLastPageText() == null)
+            return null;
 
+        File htmlFile = new File(dir, baseName + ".html");
         try(FileWriter writer = new FileWriter(htmlFile))
         {
             writer.write(getLastPageText());
