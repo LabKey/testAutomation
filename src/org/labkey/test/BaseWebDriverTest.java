@@ -3162,8 +3162,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void hoverProjectBar()
     {
         waitForElement(Locator.id("projectBar"));
-        mouseOver(Locator.id("projectBar"));
-        shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("#projectBar_menu a")));
+        waitForHoverNavigationReady();
+        executeScript("HoverNavigation._project.show();"); // mouseOver doesn't work on old Firefox
+        waitForElement(Locator.css("#projectBar_menu .project-nav"));
     }
 
     public void clickProject(String project)
@@ -3182,8 +3183,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void hoverFolderBar()
     {
         waitForElement(Locator.id("folderBar"));
-        mouseOver(Locator.id("folderBar"));
-        shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("#folderBar_menu a")));
+        waitForHoverNavigationReady();
+        executeScript("HoverNavigation._folder.show();"); // mouseOver doesn't work on old Firefox
+        waitForElement(Locator.css("#folderBar_menu .folder-nav"));
     }
 
     public void clickFolder(String folder)
