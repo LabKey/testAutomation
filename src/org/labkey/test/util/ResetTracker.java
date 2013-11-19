@@ -15,25 +15,20 @@
  */
 package org.labkey.test.util;
 
-/**
- * User: elvan
- * Date: 8/5/11
- * Time: 11:13 AM
- */
-
-import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
+import static org.junit.Assert.*;
 
 /**
+ * User: elvan
+ * Date: 8/5/11
+ *
  * This class tracks whether or not a page has been updated.
  * currently, it does so by populating the search bar and verifying
  * that it is unchanged at a specified point.  If this proves unsatisfactory
  * in the future, we could consider doing something with javascript.
  */
-
-
 public class ResetTracker
 {
     BaseSeleniumWebTest test = null;
@@ -64,7 +59,7 @@ public class ResetTracker
     {
         if(searchBoxEntry==null)
         {
-            Assert.fail("search box was not iniitalized to wait for refresh");
+            fail("search box was not iniitalized to wait for refresh");
         }
         String searchBoxContents = test.getFormElement(Locator.id(searchBoxId));
         return !searchBoxContents.equals(searchBoxEntry);
@@ -72,7 +67,7 @@ public class ResetTracker
 
     public void assertWasNotRefreshed()
     {
-        Assert.assertFalse("Page was unexpectedly refreshed", wasPageRefreshed());
+        assertFalse("Page was unexpectedly refreshed", wasPageRefreshed());
     }
 
 }

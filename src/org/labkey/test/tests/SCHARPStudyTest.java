@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -23,6 +22,8 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Study;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: dave
@@ -54,7 +55,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest
         {
             String curMessage = _test.getText(_loc);
             if (null == curMessage)
-                Assert.fail("Can't get message in locator " + _loc.toString());
+                fail("Can't get message in locator " + _loc.toString());
             return (curMessage.startsWith(_waitForMessage));
         }
     }
@@ -108,7 +109,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest
         {
             if (countLinksWithText("ERROR") > 0)
             {
-                Assert.fail("Job in ERROR state found in the list");
+                fail("Job in ERROR state found in the list");
             }
 
             log("Waiting for study to finish loading...");

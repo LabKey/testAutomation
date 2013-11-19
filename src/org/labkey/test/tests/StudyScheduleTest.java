@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -24,6 +23,8 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: klum
@@ -276,7 +277,7 @@ public class StudyScheduleTest extends StudyBaseTest
                     clickButton("Import");
                 }
                 else
-                    Assert.fail("The dataset import .tsv file (plate002.tsv) does not exist");
+                    fail("The dataset import .tsv file (plate002.tsv) does not exist");
                 break;
             case placeholder:
                 click(Locator.ext4Radio("do this later"));
@@ -352,7 +353,7 @@ public class StudyScheduleTest extends StudyBaseTest
                     clickButton("Import");
                 }
                 else
-                    Assert.fail("The dataset import .tsv file (plate002.tsv) does not exist");
+                    fail("The dataset import .tsv file (plate002.tsv) does not exist");
                 break;
             case linkeToExisting:
                 click(Locator.ext4Radio("Link to existing dataset"));

@@ -15,9 +15,10 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+
+import static org.junit.Assert.*;
 
 /**
  * User: klum
@@ -45,7 +46,7 @@ public class ExtHelper extends AbstractHelper
         if (!_test.isElementPresent(menu))
             menu = Locator.navButton(menusLabel);
         if (!_test.isElementPresent(menu))
-            Assert.fail("No Ext or LabKey menu for label '" + menusLabel + "' found");
+            fail("No Ext or LabKey menu for label '" + menusLabel + "' found");
         clickExtMenuButton(wait, menu, subMenuLabels);
     }
 
@@ -77,7 +78,7 @@ public class ExtHelper extends AbstractHelper
         if (!_test.isElementPresent(menu))
             menu = Locator.navButton(menuLabel);
         if (!_test.isElementPresent(menu))
-            Assert.fail("No Ext or LabKey menu for label '" + menuLabel + "' found");
+            fail("No Ext or LabKey menu for label '" + menuLabel + "' found");
         _test.click(menu);
 
         for (int i = 0; i < subMenuLabels.length - 1; i++)
@@ -137,7 +138,7 @@ public class ExtHelper extends AbstractHelper
             _test.sleep(500);
         }
 
-        Assert.fail("Failed to get element id for Ext component '" + extId + "'");
+        fail("Failed to get element id for Ext component '" + extId + "'");
         return null;
     }
 
@@ -242,7 +243,7 @@ public class ExtHelper extends AbstractHelper
         else if( _test.isElementPresent(Locator.xpath(ext4Dialog)) )
             return ext4Dialog;
         else
-            Assert.fail("Unable to locate Ext dialog: '" + windowTitle + "'");
+            fail("Unable to locate Ext dialog: '" + windowTitle + "'");
         return null; // unreachable
     }
 
@@ -550,7 +551,7 @@ public class ExtHelper extends AbstractHelper
         if(!isChecked(label))
             _test.click(checkbox);
         if(!isChecked(label))
-            Assert.fail("Failed to check checkbox '" + label + "'.");
+            fail("Failed to check checkbox '" + label + "'.");
     }
 
     public void uncheckCheckbox(String label)
@@ -559,7 +560,7 @@ public class ExtHelper extends AbstractHelper
         if(isChecked(label))
             _test.click(checkbox);
         if(isChecked(label))
-            Assert.fail("Failed to uncheck checkbox '" + label + "'.");
+            fail("Failed to uncheck checkbox '" + label + "'.");
     }
 
     public boolean isChecked(String label)

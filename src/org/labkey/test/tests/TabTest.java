@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
@@ -25,6 +24,8 @@ import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
+
+import static org.junit.Assert.*;
 
 @Category({BVT.class})
 public class TabTest extends SimpleModuleTest
@@ -64,10 +65,10 @@ public class TabTest extends SimpleModuleTest
         portalHelper.enableTabEditMode();
         portalHelper.moveTab("Tab 1", PortalHelper.Direction.LEFT); // Nothing should happen.
         portalHelper.moveTab("Tab 1", PortalHelper.Direction.RIGHT);
-        Assert.assertTrue("Tab 2".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[1]//a[1]")))); // Verify Mice is in the first position.
-        Assert.assertTrue("Tab 1".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[2]//a[1]")))); // Verify Overview is in the second.
+        assertTrue("Tab 2".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[1]//a[1]")))); // Verify Mice is in the first position.
+        assertTrue("Tab 1".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[2]//a[1]")))); // Verify Overview is in the second.
         portalHelper.moveTab("Assay Container", PortalHelper.Direction.RIGHT); // Nothing should happen.
-        Assert.assertTrue("Assay Container".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[4]//a[1]")))); // Verify Assay did not swap with +
+        assertTrue("Assay Container".equals(getText(Locator.xpath("//div[@class='labkey-app-bar']//ul//li[4]//a[1]")))); // Verify Assay did not swap with +
 
         // Remove tab
         portalHelper.hideTab("Tab 2");
@@ -83,7 +84,7 @@ public class TabTest extends SimpleModuleTest
         portalHelper.renameTab("Tab 1", "test tab 1", "A tab with the same name already exists in this folder.");
         portalHelper.renameTab("TEST TAB 1", "RENAMED TAB 1");
         clickAndWait(Locator.linkWithText("RENAMED TAB 1"));
-        Assert.assertEquals("Wiki not present after tab rename", "Wiki", getText(Locator.css(".labkey-wp-title-text")));
+        assertEquals("Wiki not present after tab rename", "Wiki", getText(Locator.css(".labkey-wp-title-text")));
 
         portalHelper.showTab("Tab 2");
 
@@ -340,9 +341,9 @@ public class TabTest extends SimpleModuleTest
         // TODO: Dave: the locator's presence seems to be inconsistent. These are not central to the test but would be nice
 /*        Locator.XPathLocator locator = Locator.ext4Button(buttonText);
         if (hidden && (isElementPresent(locator) && !isElementPresent(locator.withClass("x4-btn-disabled"))))   // if present should be disabled
-            Assert.fail("Button '" + buttonText + "' not hidden.");
+            fail("Button '" + buttonText + "' not hidden.");
         else if (!hidden && (!isElementPresent(locator) || isElementPresent(locator.withClass("x4-btn-disabled"))))
-            Assert.fail("Button '" + buttonText + "' is hidden.");                */
+            fail("Button '" + buttonText + "' is hidden.");                */
     }
 
     @LogMethod(quiet = true)

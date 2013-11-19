@@ -26,6 +26,8 @@ import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 
+import static org.junit.Assert.*;
+
 /**
  * User: Mark Igra
  * Date: Jun 7, 2007
@@ -240,7 +242,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         else if (isQueryPresent("VerifySnapshot", "testassay1"))
             viewQueryData("VerifySnapshot", "testassay1");
         else
-            Assert.fail("TestAssay1 table not present");
+            fail("TestAssay1 table not present");
 */
 
         clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));

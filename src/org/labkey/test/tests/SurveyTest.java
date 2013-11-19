@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -26,6 +25,8 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: cnathe
@@ -134,13 +135,13 @@ public class SurveyTest extends BaseWebDriverTest
         clickButton("Generate Survey Questions", 0);
         sleep(1000); // give it a second to generate the metadata
         String metadataValue = _extHelper.getCodeMirrorValue("metadata");
-        Assert.assertNotNull("No generate survey question metadata available", metadataValue);
+        assertNotNull("No generate survey question metadata available", metadataValue);
         if (metadataFilePath != null)
         {
             // the metadata file path needs to be a full path
             File metadataFile = new File(metadataFilePath);
 
-            Assert.assertTrue(metadataFile.exists());
+            assertTrue(metadataFile.exists());
             String json = getFileContents(metadataFile);
             _extHelper.setCodeMirrorValue("metadata", json);
         }
@@ -160,8 +161,8 @@ public class SurveyTest extends BaseWebDriverTest
         clickButtonByIndex("Create Survey", 0, WAIT_FOR_JAVASCRIPT);
         waitForText("Survey Label*");
         // verify that the save and submit buttons are disabled (and that they are visible, since this is the "auto" survey layout)
-        Assert.assertTrue("Save button should be initially disabled", isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Save']")));
-        Assert.assertTrue("Submit button should be initially disabled", isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Submit completed form']")));
+        assertTrue("Save button should be initially disabled", isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Save']")));
+        assertTrue("Submit button should be initially disabled", isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Submit completed form']")));
         // set form field values
         setFormElement(Locator.name("_surveyLabel_"), firstSurvey);
         setFormElement(Locator.name("txtfield"), "txtField");
@@ -233,7 +234,7 @@ public class SurveyTest extends BaseWebDriverTest
         log("Verify that only admins can make changes to a submitted survey");
         // we should currently be logged in as site admin
         assertTextPresent("You are allowed to make changes to this form because you are a project/site administrator.");
-        Assert.assertTrue("Save button should be disabled", isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Save']")));
+        assertTrue("Save button should be disabled", isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Save']")));
         setFormElement(Locator.name("txtareafield"), "edit by admin after submit");
         _ext4Helper.checkCheckbox("Bool Field");
         sleep(500); // give the save button a split second to enable based on form changes
@@ -246,7 +247,7 @@ public class SurveyTest extends BaseWebDriverTest
         impersonate(EDITOR);
         popLocation();
         waitForText("Survey Label*");
-        Assert.assertTrue(getFormElement(Locator.name("txtareafield")).equals("edit by admin after submit"));
+        assertTrue(getFormElement(Locator.name("txtareafield")).equals("edit by admin after submit"));
         assertTextPresent("Submitted by");
         assertTextNotPresent("You are allowed to make changes to this form");
         assertElementNotPresent(Locator.ext4Button("Save"));
@@ -332,7 +333,7 @@ public class SurveyTest extends BaseWebDriverTest
         assertTextPresent("Section 1 (2)");
         assertTextPresent("Section 2 (5)");
         assertTextNotPresent("-Txt Field", "-Int Field", "-Dt Field");
-        Assert.assertTrue("Submit button should not be disabled", !isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Submit completed form']")));
+        assertTrue("Submit button should not be disabled", !isElementPresent(Locator.xpath("//a[contains(@class,'item-disabled')]//span[text() = 'Submit completed form']")));
         clickButton("Submit completed form");
         waitForText("Surveys: " + subfolderSurveyDesign);
         assertTextPresent(secondSurvey);
@@ -381,7 +382,7 @@ public class SurveyTest extends BaseWebDriverTest
         _ext4Helper.clickGridRowText("field1", 0);
         clickButton("Edit Selected", 0);
         _extHelper.waitForExtDialog("Edit Record");
-        Assert.assertTrue(getFormElement(Locator.name("field1")).equals(val1));
+        assertTrue(getFormElement(Locator.name("field1")).equals(val1));
         setFormElement(Locator.name("field2"), val2);
         clickButton("Update", 0);
 

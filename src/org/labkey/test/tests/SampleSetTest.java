@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -26,6 +25,8 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: jeckels
@@ -360,8 +361,8 @@ public class SampleSetTest extends BaseWebDriverTest
         DataRegionTable drt = new DataRegionTable("Material", this);
 
         String path = drt.getDataAsText(index, "File Attachment");
-        Assert.assertNotNull("Path shouldn't be null", path);
-        Assert.assertTrue("Path didn't contain " + attachment.getName() + ", but was: " + path, path.contains(attachment.getName()));
+        assertNotNull("Path shouldn't be null", path);
+        assertTrue("Path didn't contain " + attachment.getName() + ", but was: " + path, path.contains(attachment.getName()));
     }
 
     @Override

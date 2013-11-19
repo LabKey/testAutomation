@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
@@ -26,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -89,18 +90,18 @@ public class StudyProtectedExportTest extends StudyExportTest
         goToDatasets();
         clickAndWait(Locator.linkContainingText("LLS-2"));
         DataRegionTable drt = new DataRegionTable( "Dataset", this);
-        Assert.assertEquals("unexpected number of rows on initial viewing", 5, drt.getDataRowCount());
+        assertEquals("unexpected number of rows on initial viewing", 5, drt.getDataRowCount());
         clickMenuButton("Mouse Groups", "Cohorts", "Group 1");
-        Assert.assertEquals("unexpected number of rows for group 1", 3, drt.getDataRowCount());
+        assertEquals("unexpected number of rows for group 1", 3, drt.getDataRowCount());
         clickMenuButton("Mouse Groups", "Cohorts", "Group 2");
-        Assert.assertEquals("unexpected number of rows for cohort 2", 2, drt.getDataRowCount());
+        assertEquals("unexpected number of rows for cohort 2", 2, drt.getDataRowCount());
     }
 
     private void verifyStatsDoNotMatch(Map originalFirstMouseStats, Map alteredFirstMouseStats)
     {
         for(String columnName : defaultStatsToCollect)
         {
-            Assert.assertNotSame(originalFirstMouseStats.get(columnName), alteredFirstMouseStats.get(columnName));
+            assertNotSame(originalFirstMouseStats.get(columnName), alteredFirstMouseStats.get(columnName));
         }
     }
 
@@ -108,7 +109,7 @@ public class StudyProtectedExportTest extends StudyExportTest
     {
         for(String columnName : defaultStatsToCollect)
         {
-            Assert.assertEquals(originalFirstMouseStats.get(columnName), alteredFirstMouseStats.get(columnName));
+            assertEquals(originalFirstMouseStats.get(columnName), alteredFirstMouseStats.get(columnName));
         }
     }
 
@@ -141,14 +142,14 @@ public class StudyProtectedExportTest extends StudyExportTest
         assertTextNotPresent(protectedColumnLabel);
 
         Map<String,String> alteredFirstMouseStats = getFirstMouseStats();
-        Assert.assertTrue(alteredFirstMouseStats.get("Mouse Id").startsWith(idPreface));
-        Assert.assertEquals(idPreface.length() + idLength, alteredFirstMouseStats.get("Mouse Id").length());
+        assertTrue(alteredFirstMouseStats.get("Mouse Id").startsWith(idPreface));
+        assertEquals(idPreface.length() + idLength, alteredFirstMouseStats.get("Mouse Id").length());
         DataRegionTable drt = new DataRegionTable( "Dataset", this);
         /* DOB doesn't change because it's a text field, not a true date.
            since it's the most unique thing on the page, we can use it to see a specific user and verify that
            the date fields did change
          */
-        Assert.assertNotSame("2005-01-01", drt.getDataAsText(drt.getRow("1.Date of Birth", "1965-03-06"), "Contact Date"));
+        assertNotSame("2005-01-01", drt.getDataAsText(drt.getRow("1.Date of Birth", "1965-03-06"), "Contact Date"));
         verifyStatsDoNotMatch(_originalFirstMouseStats, alteredFirstMouseStats);
         verifyParticipantGroups(_originalFirstMouseStats.get("Mouse Id"), alteredFirstMouseStats.get("Mouse Id"));
 
@@ -218,15 +219,15 @@ public class StudyProtectedExportTest extends StudyExportTest
             if (query.getDataAsText(i, clinicCol).equals("true"))
             {
                 foundClinics++;
-                Assert.assertTrue("Clinic Location name was not masked", query.getDataAsText(i, labelCol).equals("Clinic"));
-                Assert.assertTrue("Clinic Labware Lab Code was not masked", query.getDataAsText(i, labCodeCol).equals(""));
+                assertTrue("Clinic Location name was not masked", query.getDataAsText(i, labelCol).equals("Clinic"));
+                assertTrue("Clinic Labware Lab Code was not masked", query.getDataAsText(i, labCodeCol).equals(""));
             }
             else // non-clinic
             {
-                Assert.assertFalse("Non-clinic Location name was masked", query.getDataAsText(i, labelCol).equals("Clinic"));
+                assertFalse("Non-clinic Location name was masked", query.getDataAsText(i, labelCol).equals("Clinic"));
             }
         }
-        Assert.assertEquals("Unexpected number of clinics", clinicCount, foundClinics);
+        assertEquals("Unexpected number of clinics", clinicCount, foundClinics);
 
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Locations"));
@@ -239,16 +240,16 @@ public class StudyProtectedExportTest extends StudyExportTest
             String locTypes = getText(rowLoc.append("/td[4]"));
             if (locTypes.contains("Clinic"))
             {
-                Assert.assertTrue("Clinic Location name not masked", locName.equals("Clinic"));
+                assertTrue("Clinic Location name not masked", locName.equals("Clinic"));
                 foundClinics++;
             }
             else
             {
-                Assert.assertFalse("Clinic Location name not masked", locName.equals("Clinic"));
+                assertFalse("Clinic Location name not masked", locName.equals("Clinic"));
                 nonClinics.add(locName);
             }
         }
-        Assert.assertEquals("Unexpected number of clinics", clinicCount, foundClinics);
+        assertEquals("Unexpected number of clinics", clinicCount, foundClinics);
 
         clickTab("Specimen Data");
         waitAndClickAndWait(Locator.linkWithText("Blood (Whole)"));
@@ -257,13 +258,13 @@ public class StudyProtectedExportTest extends StudyExportTest
         procLocs.remove(procLocs.size() - 1); // Skip aggregate row
         for (String procLoc : procLocs)
         {
-            Assert.assertTrue("Processing Locations was not masked", procLoc.equals("Clinic") || nonClinics.contains(procLoc));
+            assertTrue("Processing Locations was not masked", procLoc.equals("Clinic") || nonClinics.contains(procLoc));
         }
         List<String> siteNames = vialsTable.getColumnDataAsText("Site Name");
         siteNames.remove(siteNames.size() - 1); // Skip aggregate row
         for (String siteName : siteNames)
         {
-            Assert.assertTrue("Site Name was not masked", siteName.equals("Clinic") || siteName.equals("In Transit"));
+            assertTrue("Site Name was not masked", siteName.equals("Clinic") || siteName.equals("In Transit"));
         }
     }
 

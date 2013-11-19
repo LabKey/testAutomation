@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -30,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.junit.Assert.*;
 
 @Category({MS2.class, DailyA.class})
 public class MS2Test extends AbstractMS2ImportTest
@@ -942,7 +943,7 @@ public class MS2Test extends AbstractMS2ImportTest
     private void verifyGroupAudit()
     {
         List<Map<String, Object>> rows = executeSelectRowCommand("auditLog", "ExperimentAuditEvent").getRows();
-        Assert.assertEquals("Unexpected number of audit rows", 9, rows.size());
+        assertEquals("Unexpected number of audit rows", 9, rows.size());
         int addedCount = 0;
         int removedCount = 0;
         for(Map row : rows)
@@ -953,8 +954,8 @@ public class MS2Test extends AbstractMS2ImportTest
                 removedCount++;
         }
 
-        Assert.assertEquals(8, addedCount);
-        Assert.assertEquals(1, removedCount);
+        assertEquals(8, addedCount);
+        assertEquals(1, removedCount);
 
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
     }
@@ -967,12 +968,12 @@ public class MS2Test extends AbstractMS2ImportTest
         waitAndClickAndWait(Locator.linkWithText("view data"));
 
         List<Map<String, Object>> rows = executeSelectRowCommand("exp", "RunGroupMap").getRows();
-        Assert.assertEquals("Unexpected number of rows in RunGroupMap", 5, rows.size());
+        assertEquals("Unexpected number of rows in RunGroupMap", 5, rows.size());
 
         Set<String> keys = rows.get(0).keySet();
         for(String header : new String[] {"RunGroup", "Created", "CreatedBy", "Run"})
         {
-            Assert.assertTrue("Run Group Map missing column: " + header, keys.contains(header));
+            assertTrue("Run Group Map missing column: " + header, keys.contains(header));
         }
         Map<String, Integer> textAndCount = new HashMap<>();
         textAndCount.put(DEFAULT_EXPERIMENT, 2);
@@ -1169,7 +1170,7 @@ public class MS2Test extends AbstractMS2ImportTest
         selenium.waitForPopUp(windowName, "10000");
         selenium.selectWindow(windowName);
         assertElementPresent(Locator.imageWithAltText("Charge 3+ Cumulative Observed vs. Model", false));
-        Assert.assertEquals("Incorrect number of graphs", 13, getXpathCount(Locator.imageWithSrc("labkey/ms2/MS2VerifyProject/ms2folder", true)));
+        assertEquals("Incorrect number of graphs", 13, getXpathCount(Locator.imageWithSrc("labkey/ms2/MS2VerifyProject/ms2folder", true)));
         assertTextPresent("PeptideProphet Details: ms2pipe/truncated (pepXML)");
         selenium.close();
         selenium.selectWindow(null);

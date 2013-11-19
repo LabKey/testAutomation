@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -37,6 +36,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: Mark Igra
@@ -103,7 +104,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         log("Check welcome emails [6 new users]");
         goToModule("Dumbster");
-        Assert.assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount("dataregion_EmailRecord"));
+        assertEquals("Expected 12 notification emails (+3 rows).", 15, getTableRowCount("dataregion_EmailRecord"));
         // Once in the message itself, plus copies in the headers
         assertTextPresent(": Welcome", 18);
 
@@ -280,7 +281,7 @@ public class SecurityTest extends BaseWebDriverTest
         switch (changeType)
         {
             case CHANGE_PASSWORD:
-                Assert.fail("unsupported use of change password type");
+                fail("unsupported use of change password type");
                 break;
             case RESET_PASSWORD:
                 setFormElement("password", passwords[0]);
@@ -507,7 +508,7 @@ public class SecurityTest extends BaseWebDriverTest
             assertLinkPresentWithTextCount(groupName, expectedCount);
             return;
         }
-        Assert.fail("Unable to verify group membership of cloned user privileges");
+        fail("Unable to verify group membership of cloned user privileges");
     }
 
     @LogMethod protected void tokenAuthenticationTest()
@@ -526,7 +527,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         beginAt(baseUrl + "createToken.view?returnUrl=" + homePageUrl);
         // Make sure we redirected to the right place
-        Assert.assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
+        assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
 
         Map<String, String> params = getUrlParameters();
         String email = params.get("labkeyEmail");
@@ -541,14 +542,14 @@ public class SecurityTest extends BaseWebDriverTest
         {
             emailName = email;
         }
-        Assert.assertTrue(emailName.equals(userName));
+        assertTrue(emailName.equals(userName));
         String token = params.get("labkeyToken");
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertSuccessAuthenticationToken(xml, token, email, 32783);
 
         beginAt(baseUrl + "invalidateToken.view?labkeyToken=" + token + "&returnUrl=" + homePageUrl);
         // Make sure we redirected to the right place
-        Assert.assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
+        assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
         // Should fail now
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertFailureAuthenticationToken(xml);
@@ -557,11 +558,11 @@ public class SecurityTest extends BaseWebDriverTest
 
         beginAt(baseUrl + "createToken.view?returnUrl=" + homePageUrl);
         // Make sure we redirected to the right place
-        Assert.assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
+        assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
 
         params = getUrlParameters();
         email = params.get("labkeyEmail");
-        Assert.assertTrue(email.equals(NORMAL_USER));
+        assertTrue(email.equals(NORMAL_USER));
         token = params.get("labkeyToken");
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertSuccessAuthenticationToken(xml, token, email, 15);
@@ -577,14 +578,14 @@ public class SecurityTest extends BaseWebDriverTest
 
     protected void assertFailureAuthenticationToken(String xml)
     {
-        Assert.assertTrue(xml.startsWith("<TokenAuthentication success=\"false\" message=\"Unknown token\"/>"));
+        assertTrue(xml.startsWith("<TokenAuthentication success=\"false\" message=\"Unknown token\"/>"));
     }
 
 
     protected void assertSuccessAuthenticationToken(String xml, String token, String email, int permissions)
     {
         String correct = "<TokenAuthentication success=\"true\" token=\"" + token + "\" email=\"" + email + "\" permissions=\"" + permissions + "\"/>";
-        Assert.assertTrue(xml.startsWith(correct));
+        assertTrue(xml.startsWith(correct));
     }
 
 
@@ -613,7 +614,7 @@ public class SecurityTest extends BaseWebDriverTest
         {
             log("Failure attempting to retrieve " + relativeUrl);
             log(e.getMessage());
-            Assert.fail();
+            fail();
             return null;
         }
     }
@@ -631,7 +632,7 @@ public class SecurityTest extends BaseWebDriverTest
         catch (URISyntaxException e)
         {
             log(e.getMessage());
-            Assert.fail();
+            fail();
         }
 
         Map<String, String> map = new HashMap<>();
@@ -693,8 +694,8 @@ public class SecurityTest extends BaseWebDriverTest
         String user           = table.getDataAsText(2, "User");
         String comment        = table.getDataAsText(2, "Comment");
 
-        Assert.assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
-        Assert.assertEquals("Incorrect log entry for deleted user",
+        assertTrue("Incorrect display for deleted user -- expected '<nnnn>', found '" + user + "'", user.matches("<\\d{4,}>"));
+        assertEquals("Incorrect log entry for deleted user",
                 siteAdminDisplayName + '|' + testUserDisplayName + '|' + user + '|' + TO_BE_DELETED_USER + " was deleted from the system",
                 createdBy + '|' + impersonatedBy + '|' + user + '|' + comment);
 

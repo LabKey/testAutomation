@@ -16,7 +16,6 @@
 
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
@@ -25,6 +24,8 @@ import org.openqa.selenium.NoSuchElementException;
 
 import java.io.File;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: jeckels
@@ -550,7 +551,7 @@ public class ListHelperWD extends ListHelper
 
     public void importListArchive(String folderName, File inputFile)
     {
-        Assert.assertTrue("Unable to locate input file: " + inputFile, inputFile.exists());
+        assertTrue("Unable to locate input file: " + inputFile, inputFile.exists());
 
         _test.clickFolder(folderName);
         if (!_test.isElementPresent(Locator.linkWithText("Lists")))

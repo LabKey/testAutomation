@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -30,6 +29,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Collections;
 import java.util.Set;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -309,7 +310,7 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
     protected void assertSelectOption(String name, int i, String expected)
     {
         Select select = new Select(Locator.tagWithName("select", name).index(i).findElement(getDriver()));
-        Assert.assertEquals("Expected option was not selected", expected, select.getFirstSelectedOption().getAttribute("value"));
+        assertEquals("Expected option was not selected", expected, select.getFirstSelectedOption().getAttribute("value"));
     }
 
     protected void goToManageStudyPage(String projectName, String studyName)

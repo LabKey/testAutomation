@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -26,6 +25,8 @@ import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: brittp
@@ -388,7 +389,7 @@ public class WikiLongTest extends BaseWebDriverTest
             ++waitCycles;
         }
         if(waitCycles == MAX_AJAX_WAIT_CYCLES)
-            Assert.fail("AJAX population of page names in wiki web part customize view took longer than " + (MAX_AJAX_WAIT_CYCLES/2) + " seconds!");
+            fail("AJAX population of page names in wiki web part customize view took longer than " + (MAX_AJAX_WAIT_CYCLES/2) + " seconds!");
 
         selectOptionByText(Locator.name("name"), WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
         sleep(500);
@@ -446,7 +447,7 @@ public class WikiLongTest extends BaseWebDriverTest
             ++waitCycles;
         }
         if(waitCycles == MAX_AJAX_WAIT_CYCLES)
-            Assert.fail("AJAX population of page names in wiki web part customize view took longer than " + (MAX_AJAX_WAIT_CYCLES/2) + " seconds!");
+            fail("AJAX population of page names in wiki web part customize view took longer than " + (MAX_AJAX_WAIT_CYCLES/2) + " seconds!");
 
         selectOptionByText("name", WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
         submit();

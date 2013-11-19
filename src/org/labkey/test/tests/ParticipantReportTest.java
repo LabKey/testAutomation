@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
@@ -25,6 +24,8 @@ import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -154,7 +155,7 @@ public class ParticipantReportTest extends ReportTest
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "cpf-1");
         pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
         waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][18]"));
-        Assert.assertEquals("Wrong number of measures visible after filtering.", 17, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')]")));
+        assertEquals("Wrong number of measures visible after filtering.", 17, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')]")));
 
         _extHelper.clickX4GridPanelCheckbox("label", "2a. Creatinine", "measuresGridPanel", true);
         _extHelper.clickX4GridPanelCheckbox("label", "1a.ALT AE Severity Grade", "measuresGridPanel", true);
@@ -174,7 +175,7 @@ public class ParticipantReportTest extends ReportTest
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "2a. Creatinine");
         pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
         waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')][5]"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Wrong number of measures visible after filtering.", 4, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
+        assertEquals("Wrong number of measures visible after filtering.", 4, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
         _extHelper.clickX4GridPanelCheckbox("queryName", "CPS-1", "measuresGridPanel", true);
         clickButton("Select", 0);
 
@@ -207,7 +208,7 @@ public class ParticipantReportTest extends ReportTest
         {
             WebElement row = reportRow.index(i).findElement(getDriver());
             scrollIntoView(row);
-            Assert.assertEquals("Data not as expected for participant : " + transposeCheckPtid,
+            assertEquals("Data not as expected for participant : " + transposeCheckPtid,
                     initialData[i],
                     row.getText());
         }
@@ -225,7 +226,7 @@ public class ParticipantReportTest extends ReportTest
         {
             WebElement row = reportRow.index(i).findElement(getDriver());
             scrollIntoView(row);
-            Assert.assertEquals("Data not transposed for participant : " + transposeCheckPtid,
+            assertEquals("Data not transposed for participant : " + transposeCheckPtid,
                     transposedData[i],
                     row.getText());
         }
@@ -295,7 +296,7 @@ public class ParticipantReportTest extends ReportTest
         log("Verify report name and description.");
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Wrong report description", PARTICIPANT_REPORT_DESCRIPTION, _extHelper.getExtFormElementByLabel("Report Description"));
+        assertEquals("Wrong report description", PARTICIPANT_REPORT_DESCRIPTION, _extHelper.getExtFormElementByLabel("Report Description"));
 
 
         // verify modified, saved-as report
@@ -311,7 +312,7 @@ public class ParticipantReportTest extends ReportTest
         log("Verify report name and description.");
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
-        Assert.assertEquals("Wrong report description", PARTICIPANT_REPORT2_DESCRIPTION, _extHelper.getExtFormElementByLabel("Report Description"));
+        assertEquals("Wrong report description", PARTICIPANT_REPORT2_DESCRIPTION, _extHelper.getExtFormElementByLabel("Report Description"));
 
         // Test group filtering
         goToManageViews();
@@ -409,8 +410,8 @@ public class ParticipantReportTest extends ReportTest
         //Mouse down on SPEC GROUP 1
         _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_ONE, 0);
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 1 Results"));
-        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
-        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
 
         //Add SPEC GROUP 2
         _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_TWO, 0);
@@ -418,8 +419,8 @@ public class ParticipantReportTest extends ReportTest
         //Remove SPEC GROUP 1
         _ext4Helper.uncheckGridRowCheckbox(SPECIMEN_GROUP_ONE, 0);
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 1 Results"));
-        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
-        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
 
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);

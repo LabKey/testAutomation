@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -25,6 +24,8 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
+
+import static org.junit.Assert.*;
 
 /**
  * User: brittp
@@ -216,7 +217,7 @@ public class TimelineTest extends BaseWebDriverTest
                 return divHtml;
             sleep(1000);
         }
-        Assert.fail("Div failed to render.");
+        fail("Div failed to render.");
         return null;
     }
 

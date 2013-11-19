@@ -15,13 +15,14 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -61,8 +62,8 @@ public class ProjectSettingsTest extends BaseWebDriverTest
         if(projectName!=null)
             clickProject(projectName);
         click(helpMenuLink);
-        Assert.assertEquals("Support link state unexpected.", supportLinkPresent, isElementPresent(supportLink));
-        Assert.assertEquals("Help link state unexpected.", helpLinkPresent, isElementPresent(helpLink));
+        assertEquals("Support link state unexpected.", supportLinkPresent, isElementPresent(supportLink));
+        assertEquals("Help link state unexpected.", helpLinkPresent, isElementPresent(helpLink));
     }
 
     protected void setUpTest()

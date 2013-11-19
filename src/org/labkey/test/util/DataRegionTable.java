@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -28,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import static org.junit.Assert.*;
 
 /**
  * DataRegionTable class
@@ -258,7 +259,7 @@ public class DataRegionTable
     {
         int col = getColumn(columnName);
         if (col == -1)
-            Assert.fail("Couldn't find column '" + columnName + "'");
+            fail("Couldn't find column '" + columnName + "'");
         clickLink(row, col);
     }
 
@@ -321,7 +322,7 @@ public class DataRegionTable
     /** Find the row number for the given primary key. */
     public int getRow(String pk)
     {
-        Assert.assertTrue("Need the selector checkbox's value to find the row with the given pk", _selectors);
+        assertTrue("Need the selector checkbox's value to find the row with the given pk", _selectors);
 
         Integer cached = _mapRows.get(pk);
         if (cached != null)
@@ -453,7 +454,7 @@ public class DataRegionTable
     {
         int col = getColumn(columnName);
         if (col == -1)
-            Assert.fail("Column '" + columnName + "' not found.");
+            fail("Column '" + columnName + "' not found.");
         return hasHref(row, col);
     }
 

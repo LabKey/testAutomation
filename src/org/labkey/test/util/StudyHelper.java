@@ -15,9 +15,10 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+
+import static org.junit.Assert.*;
 
 /**
  * User: t.chadick
@@ -169,7 +170,7 @@ public class StudyHelper extends AbstractHelper
                 _test._ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(participantString + " Category:"), categoryName, false, Locator.xpath("//div"));
             _test.pressTab(Locator.xpath("//input[@name='participantCategory']"));
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-            Assert.assertEquals("Mouse category not set", categoryName, _test.getFormElement(categoryField));
+            assertEquals("Mouse category not set", categoryName, _test.getFormElement(categoryField));
         }
         if ( shared != null )
         {

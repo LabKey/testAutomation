@@ -15,12 +15,13 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 import java.io.File;
 import java.io.FilenameFilter;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -107,7 +108,7 @@ public class PerlHelper extends AbstractHelper
             _test.log("");   // Blank line helps make the following message more readable
             _test.log("PERL_HOME environment variable is not set.  Set PERL_HOME to your R bin directory to enable automatic configuration.");
         }
-        Assert.fail("Perl is not configured on this system.");
+        fail("Perl is not configured on this system.");
         return false;
     }
 }

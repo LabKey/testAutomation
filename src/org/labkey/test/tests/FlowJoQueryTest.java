@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
@@ -27,6 +26,8 @@ import org.labkey.test.util.DataRegionTable;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+
+import static org.junit.Assert.*;
 
 /**
  * This test tests uploading a FlowJo workspace that has results calculated in it, but no associated FCS files.
@@ -99,9 +100,9 @@ public class FlowJoQueryTest extends BaseFlowTest
         }
         else
         {
-            Assert.fail("Failed to match runId pattern for url: " + currentURL);
+            fail("Failed to match runId pattern for url: " + currentURL);
         }
-        Assert.assertTrue("Failed to find runId of mini-fcs.xml run", runId > 0);
+        assertTrue("Failed to find runId of mini-fcs.xml run", runId > 0);
 
         // Copy the generated 'workspaceScript1' from one of the sample wells (not one of the comp wells)
         setFilter("query", "Name", "Equals", "118795.fcs");
@@ -161,7 +162,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         setFlowFilter(new String[] {"Name", "Keyword/Comp"}, new String[] { "startswith","eq"}, new String[] {"118", "PE CD8"});
         importAnalysis(getContainerPath(), "/flowjoquery/miniFCS/mini-fcs.xml", SelectFCSFileOption.Previous, Arrays.asList("miniFCS"), "FilterAnalysis", false, true);
         DataRegionTable queryTable = new DataRegionTable("query", this);
-        Assert.assertEquals(1, queryTable.getDataRowCount());
+        assertEquals(1, queryTable.getDataRowCount());
     }
 
 }

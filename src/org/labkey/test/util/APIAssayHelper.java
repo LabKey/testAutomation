@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.assay.AssayListCommand;
@@ -28,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -78,11 +79,11 @@ public class APIAssayHelper extends AbstractAssayHelper
         catch (Exception e)
         {
             if(e.getMessage().contains("Not Found"))
-                Assert.fail("Assay or project not found");
+                fail("Assay or project not found");
         }
 
         if(alr.getDefinition(assayName)==null)
-            Assert.fail("Assay not found");
+            fail("Assay not found");
         return ((Long) alr.getDefinition(assayName).get("id")).intValue();
 
     }

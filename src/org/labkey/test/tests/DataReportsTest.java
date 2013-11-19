@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import com.sun.istack.internal.NotNull;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -31,6 +30,8 @@ import org.labkey.test.util.RReportHelperWD;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -225,10 +226,10 @@ public class DataReportsTest extends ReportTest
                 counts.put(value, count + 1);
             }
         }
-        Assert.assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[0]) == 3);
-        Assert.assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[1]) == 1);
-        Assert.assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[2]) == 3);
-        Assert.assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[3]) == 3);
+        assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[0]) == 3);
+        assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[1]) == 1);
+        assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[2]) == 3);
+        assertTrue(counts.get(PTIDS_FOR_CUSTOM_VIEW[3]) == 3);
     }
 
     @Test
@@ -322,14 +323,14 @@ public class DataReportsTest extends ReportTest
         log("Execute bad scripts");
         clickViewTab();
         assertTextPresent("Empty script, a script must be provided.");
-        Assert.assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1));
+        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX) + "\nbadString", R_SCRIPT1_TEXT1));
 
         // horrible hack to get around single versus double quote difference when running R on Linux or Windows systems.
         assertTextPresent("Error: object ", "badString", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
 
         log("Execute and save a script");
-        Assert.assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
+        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_ORIG_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
 
         log("Check that the script executed properly");
         assertTextPresent(R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
@@ -394,7 +395,7 @@ public class DataReportsTest extends ReportTest
         clickMenuButton("Views", "Create", "R View");
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
-        Assert.assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
+        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
         clickSourceTab();
         _rReportHelper.selectOption(RReportHelperWD.ReportOption.shareReport);
         _rReportHelper.selectOption(RReportHelperWD.ReportOption.runInPipeline);
@@ -447,7 +448,7 @@ public class DataReportsTest extends ReportTest
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         _ext4Helper.checkCheckbox(R_SCRIPTS[1]);
-        Assert.assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
+        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT3(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
         saveReport(R_SCRIPTS[2]);
 
         log("Test editing R scripts");
@@ -456,7 +457,7 @@ public class DataReportsTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickReportGridLink(R_SCRIPTS[0]);
-        Assert.assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
+        assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
         prepForPageLoad();
         resaveReport();
         newWaitForPageToLoad();

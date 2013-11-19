@@ -20,8 +20,9 @@ import org.labkey.test.BaseSeleniumWebTest;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.junit.Assert;
 import org.labkey.test.Locator;
+
+import static org.junit.Assert.*;
 
 /**
  * <code>ExperimentRunTable</code>
@@ -116,7 +117,7 @@ public class ExperimentRunTable extends DataRegionTable
     private int getExpectedRunRow(String name)
     {
         int row = getRunRow(name);
-        Assert.assertTrue("Run not found " + name, row != -1);
+        assertTrue("Run not found " + name, row != -1);
         return row;
     }
 }

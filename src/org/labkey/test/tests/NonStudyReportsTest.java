@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -27,6 +26,8 @@ import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.ext4cmp.Ext4FileFieldRefWD;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -168,7 +169,7 @@ public class NonStudyReportsTest extends ReportTest
         clickReportDetailsLink(ATTACHMENT_REPORT_NAME);
         waitForText("Report Details");
         Locator.XPathLocator l = getButtonLocator("Edit Report");
-        Assert.assertTrue("Expected 'Edit Report' button to be present", l != null);
+        assertTrue("Expected 'Edit Report' button to be present", l != null);
         clickButton("Edit Report");
         clickButton("Save");
         waitForText("Report Details");
@@ -178,7 +179,7 @@ public class NonStudyReportsTest extends ReportTest
         clickReportDetailsLink(ATTACHMENT_REPORT2_NAME);
         waitForText("Report Details");
         l = getButtonLocator("Edit Report");
-        Assert.assertTrue("Expected 'Edit Report' button to not be present", l == null);
+        assertTrue("Expected 'Edit Report' button to not be present", l == null);
         stopImpersonating();
 
         goToHome();
@@ -219,14 +220,14 @@ public class NonStudyReportsTest extends ReportTest
         // verify we can set a property
         clickAndWait(Locator.linkContainingText("Edit Report"));
         waitForText(UPDATE_ATTACHMENT_REPORT);
-        Assert.assertFalse("Locked".equals(getFormElement(statusElement)));
+        assertFalse("Locked".equals(getFormElement(statusElement)));
         setFormElement("status", "Locked");
         clickButton("Save");
         waitForText(ATTACHMENT_REPORT3_NAME);
 
         clickAndWait(Locator.linkContainingText("Edit Report"));
         waitForText(UPDATE_ATTACHMENT_REPORT);
-        Assert.assertTrue("Locked".equals(getFormElement(statusElement)));
+        assertTrue("Locked".equals(getFormElement(statusElement)));
         clickButton("Cancel");
         waitForText(ATTACHMENT_REPORT3_NAME);
     }
@@ -311,7 +312,7 @@ public class NonStudyReportsTest extends ReportTest
         waitForElement(Locator.tag("li").containing("URL must be absolute"));
         setFormElement("linkUrl", getContextPath() + LINK_REPORT1_URL);
         waitForElementToDisappear(Locator.tag("li").containing("URL must be absolute"));
-        Assert.assertTrue("Expected targetNewWindow checkbox to be checked", _extHelper.isChecked("Open link report in new window?"));
+        assertTrue("Expected targetNewWindow checkbox to be checked", _extHelper.isChecked("Open link report in new window?"));
         _extHelper.uncheckCheckbox("Open link report in new window?");
         clickButton("Save");
         // save should return back to manage views page
@@ -324,7 +325,7 @@ public class NonStudyReportsTest extends ReportTest
         setFormElement("description", LINK_REPORT2_DESCRIPTION);
         setFormElement("linkUrl", getBaseURL() + LINK_REPORT1_URL);
         assertElementNotPresent(Locator.tag("li").containing("URL must be absolute"));
-        Assert.assertTrue("Expected targetNewWindow checkbox to be checked", _extHelper.isChecked("Open link report in new window?"));
+        assertTrue("Expected targetNewWindow checkbox to be checked", _extHelper.isChecked("Open link report in new window?"));
         clickButton("Save");
         // save should return back to Portal
         waitForText("Data Views");
@@ -332,7 +333,7 @@ public class NonStudyReportsTest extends ReportTest
         goToManageViews();
         pushLocation();
         clickReportGridLink(LINK_REPORT1_NAME);
-        Assert.assertTrue("Expected link report to go to '" + LINK_REPORT1_URL + "', but was '" + getCurrentRelativeURL() + "'",
+        assertTrue("Expected link report to go to '" + LINK_REPORT1_URL + "', but was '" + getCurrentRelativeURL() + "'",
                 getURL().toString().contains(LINK_REPORT1_URL));
         popLocation();
 
@@ -340,6 +341,6 @@ public class NonStudyReportsTest extends ReportTest
         // To avoid opening a new browser window, let's just check that the link has the target="_blank" attribute.
         //Locator link = getReportGridLink(LINK_REPORT2_NAME);
         //String target = getAttribute(link, "target");
-        //Assert.assertEquals("_blank", target);
+        //assertEquals("_blank", target);
     }
 }

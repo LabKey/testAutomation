@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
@@ -27,6 +26,8 @@ import org.labkey.test.util.RReportHelperWD;
 
 import java.util.Arrays;
 import java.util.Collections;
+
+import static org.junit.Assert.*;
 
 /**
  * User: kevink

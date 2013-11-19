@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -25,6 +24,8 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+
+import static org.junit.Assert.*;
 
 /**
  * User: klum
@@ -103,14 +104,14 @@ public class DataViewsTest extends ParticipantListTest
         assertTextNotPresent(CATEGORIES[0]);
         assertTextNotPresent(CATEGORIES[1]);
         assertTextNotPresent(CATEGORIES[4]);
-        Assert.assertEquals("Incorrect number of dataset categories visible.", 4, getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden())); // Two categories contain filter text.
-        Assert.assertEquals("Incorrect number of datasets after filter", 22, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        assertEquals("Incorrect number of dataset categories visible.", 4, getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden())); // Two categories contain filter text.
+        assertEquals("Incorrect number of datasets after filter", 22, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
         collapseCategory("Subcategory1-" + CATEGORIES[2]);
-        Assert.assertEquals("Incorrect number of datasets after collapsing subcategory.", 21, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
-        Assert.assertEquals("Incorrect number of dataset categories visible after collapsing subcategory.", 4, getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
+        assertEquals("Incorrect number of datasets after collapsing subcategory.", 21, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        assertEquals("Incorrect number of dataset categories visible after collapsing subcategory.", 4, getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
         collapseCategory(CATEGORIES[2]);
-        Assert.assertEquals("Incorrect number of datasets after collapsing category.", 10, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
-        Assert.assertEquals("Incorrect number of dataset categories visible after collapsing category.", 2, getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
+        assertEquals("Incorrect number of datasets after collapsing category.", 10, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        assertEquals("Incorrect number of dataset categories visible after collapsing category.", 2, getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
         _extHelper.uncheckCheckbox("datasets");
         setFormElement(Locator.name("webpart.title"), RENAMED_WEBPART_TITLE);
@@ -120,7 +121,7 @@ public class DataViewsTest extends ParticipantListTest
         waitForElement(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden());
         waitForElement(Locator.linkWithText(REPORT_NAME), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
         assertElementPresent(PortalHelper.Locators.webPartTitle(RENAMED_WEBPART_TITLE));
-        Assert.assertEquals("Incorrect number of datasets after filter", 9, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        assertEquals("Incorrect number of datasets after filter", 9, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
         log("Verify cancel button");
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
@@ -133,7 +134,7 @@ public class DataViewsTest extends ParticipantListTest
         waitForText(REPORT_NAME); //TODO: /
         assertTextNotPresent("nothing");
         assertTextPresent(RENAMED_WEBPART_TITLE);
-        Assert.assertEquals("Incorrect number of datasets after filter", 9, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        assertEquals("Incorrect number of datasets after filter", 9, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
         log("Verify category management: delete");
         openCustomizePanel(RENAMED_WEBPART_TITLE);
@@ -173,7 +174,7 @@ public class DataViewsTest extends ParticipantListTest
         saveDatasetProperties(EDITED_DATASET);
         mouseOver(Locator.linkWithText(EDITED_DATASET));
         waitForElement(Locator.css(".data-views-tip-content"));
-        Assert.assertEquals("Dataset hover tip not as expected", EDITED_DATASET_TOOLTIP, getText(Locator.css(".data-views-tip-content")));
+        assertEquals("Dataset hover tip not as expected", EDITED_DATASET_TOOLTIP, getText(Locator.css(".data-views-tip-content")));
         clickAndWait(Locator.linkWithText(EDITED_DATASET));
         assertTextPresent(NEW_DESCRIPTION);
 
@@ -370,7 +371,7 @@ public class DataViewsTest extends ParticipantListTest
         enableEditMode();
         openEditPanel("DEM-1: Demographics");
         click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").withClass("x4-form-arrow-trigger"));
-        Assert.assertEquals("Available categories are not as expected", CATEGORY_LIST, getText(Locator.css(".x4-boundlist")));
+        assertEquals("Available categories are not as expected", CATEGORY_LIST, getText(Locator.css(".x4-boundlist")));
         click(Locator.xpath("//tr[./td/input[@name='category']]/td/div").withClass("x4-form-arrow-trigger"));
         saveDatasetProperties("DEM-1: Demographics");
 

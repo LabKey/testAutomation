@@ -15,15 +15,14 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick

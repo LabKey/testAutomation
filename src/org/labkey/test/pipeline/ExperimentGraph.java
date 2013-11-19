@@ -15,8 +15,9 @@
  */
 package org.labkey.test.pipeline;
 
-import org.junit.Assert;
 import org.labkey.test.Locator;
+
+import static org.junit.Assert.*;
 
 /**
  * <code>ExperimentGraph</code>
@@ -74,17 +75,17 @@ public class ExperimentGraph
 
     public void assertNodePresent(String link)
     {
-        Assert.assertTrue("Missing node in experiment graph " + link, isNodePresent(link));
+        assertTrue("Missing node in experiment graph " + link, isNodePresent(link));
     }
 
     public void assertInputPresent(String input)
     {
-        Assert.assertTrue("Missing input in experiment graph " + input, isInputPresent(input));
+        assertTrue("Missing input in experiment graph " + input, isInputPresent(input));
     }
 
     public void assertOutputPresent(String output)
     {
-        Assert.assertTrue("Missing output in experiment graph " + output, isOutputPresent(output));
+        assertTrue("Missing output in experiment graph " + output, isOutputPresent(output));
     }
 
     public void validate(PipelineTestParams tp)
@@ -105,7 +106,7 @@ public class ExperimentGraph
             }
         }
 
-        Assert.assertTrue("Unable to find experiment", false);
+        assertTrue("Unable to find experiment", false);
     }
 
     private String getBaseName(PipelineTestParams tp)

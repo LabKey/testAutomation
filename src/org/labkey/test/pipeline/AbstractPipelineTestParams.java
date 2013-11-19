@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pipeline;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -29,6 +28,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * MS2TestParams class
@@ -216,7 +217,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
     {
         File analysisDir = new File(rootDir, getDataPath() + File.separatorChar + getProtocolType());
         if (analysisDir.exists())
-            Assert.fail("Pipeline files were not cleaned up; "+ analysisDir.toString() + " directory still exists");
+            fail("Pipeline files were not cleaned up; "+ analysisDir.toString() + " directory still exists");
     }
 
     public void clean(File rootDir)
@@ -292,7 +293,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
     public void validateEmailSuccess()
     {
-        Assert.assertNotNull("Email validation requires mail settings", _mailSettings);
+        assertNotNull("Email validation requires mail settings", _mailSettings);
 
         validateEmail("COMPLETE", getDirStatusDesciption(), _mailSettings.isNotifyOnSuccess(),
                 _mailSettings.getNotifyUsersOnSuccess());
@@ -316,7 +317,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
     public void validateEmailError()
     {
-        Assert.assertNotNull("Email validation requires mail settings", _mailSettings);
+        assertNotNull("Email validation requires mail settings", _mailSettings);
 
         for (String sampleExp : getExperimentLinks())
         {
@@ -335,7 +336,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         String userEmail = PasswordUtil.getUsername();
         EmailRecordTable emailTable = new EmailRecordTable(_test);
         EmailRecordTable.EmailMessage message = emailTable.getMessage(description);
-        Assert.assertNotNull("No email message found for " + description, message);
+        assertNotNull("No email message found for " + description, message);
         emailTable.clickMessage(message);
         // Reload after the message has been expanded so Selenium can get the text that it's showing
         emailTable = new EmailRecordTable(_test);
@@ -370,7 +371,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
     public void validateEmailEscalation(int sampleIndex)
     {
-        Assert.assertNotNull("Email validation requires mail settings", _mailSettings);
+        assertNotNull("Email validation requires mail settings", _mailSettings);
 
         String userEmail = PasswordUtil.getUsername();
         String escalateEmail = _mailSettings.getEscalateUsers()[0];
@@ -392,11 +393,11 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _test.popLocation();
 
         EmailRecordTable.EmailMessage message = emailTable.getMessage(sampleExp);
-        Assert.assertNotNull("Escalation message not sent", message);
-        Assert.assertTrue("Escalation not sent to " + escalateEmail, escalateEmail.equals(message.getTo()[0]));
+        assertNotNull("Escalation message not sent", message);
+        assertTrue("Escalation not sent to " + escalateEmail, escalateEmail.equals(message.getTo()[0]));
 
         // Not sure why the angle-brackets are added...
         String escalateFrom = '<' + userEmail + '>';
-        //Assert.assertTrue("Escalation not sent from " + escalateFrom, message.getFrom()[0].contains(escalateFrom));
+        //assertTrue("Escalation not sent from " + escalateFrom, message.getFrom()[0].contains(escalateFrom));
     }
 }

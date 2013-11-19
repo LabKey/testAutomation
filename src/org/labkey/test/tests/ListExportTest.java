@@ -15,12 +15,13 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
 import java.io.File;
 import java.io.FilenameFilter;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -45,7 +46,7 @@ public class ListExportTest extends ListTest
         exportList();
         sleep(1000);
         File[] fileAfterDownload =  getFilesWithNameInDlDir(getDownloadDir(), filter);
-        Assert.assertEquals(1, fileAfterDownload.length - fileCount);
+        assertEquals(1, fileAfterDownload.length - fileCount);
 
         File exportedFile = fileAfterDownload[fileAfterDownload.length-1];
         exportedFile.deleteOnExit();

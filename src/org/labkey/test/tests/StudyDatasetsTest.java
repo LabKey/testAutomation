@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
@@ -26,6 +25,8 @@ import org.labkey.test.util.PortalHelper;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 @Category({DailyA.class})
 public class StudyDatasetsTest extends StudyBaseTest
@@ -198,42 +199,42 @@ public class StudyDatasetsTest extends StudyBaseTest
         waitForElementToDisappear(Locator.css(".labkey-pagination"), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.linkWithText(PTIDS[0]));
         assertElementPresent(Locator.linkWithText(PTIDS[1]));
-        Assert.assertEquals("Wrong number of rows after filter", 2, dataset.getDataRowCount());
+        assertEquals("Wrong number of rows after filter", 2, dataset.getDataRowCount());
 
         _ext4Helper.checkGridRowCheckbox(GROUP1B); // GROUP1A OR GROU1B
         waitForElement(Locator.linkWithText(PTIDS[2]));
         assertElementPresent(Locator.linkWithText(PTIDS[0]));
         assertElementPresent(Locator.linkWithText(PTIDS[1]));
         assertElementPresent(Locator.linkWithText(PTIDS[3]));
-        Assert.assertEquals("Wrong number of rows after filter", 4, dataset.getDataRowCount());
+        assertEquals("Wrong number of rows after filter", 4, dataset.getDataRowCount());
 
         _ext4Helper.clickParticipantFilterGridRowText(GROUP2A, 0);// (GROUP1A OR GROU1B) AND GROUP2A
         waitForElementToDisappear(Locator.linkWithText(PTIDS[2]));
         waitForElement(Locator.linkWithText(PTIDS[1]));
         assertElementPresent(Locator.linkWithText(PTIDS[3]));
-        Assert.assertEquals("Wrong number of rows after filter", 2, dataset.getDataRowCount());
+        assertEquals("Wrong number of rows after filter", 2, dataset.getDataRowCount());
 
         _ext4Helper.clickParticipantFilterGridRowText("Not in any group", 1); // (GROUP1A OR GROUP1B) AND (CATEGORY2 = NULL)
         waitForElementToDisappear(Locator.linkWithText(PTIDS[1]));
         waitForElement(Locator.linkWithText(PTIDS[0]));
-        Assert.assertEquals("Wrong number of rows after filter", 1, dataset.getDataRowCount());
+        assertEquals("Wrong number of rows after filter", 1, dataset.getDataRowCount());
 
         _ext4Helper.clickParticipantFilterCategory(CATEGORY2); // (GROUP1A OR GROUP1B)
         waitForElement(Locator.linkWithText(PTIDS[2]));
         assertElementPresent(Locator.linkWithText(PTIDS[0]));
         assertElementPresent(Locator.linkWithText(PTIDS[1]));
         assertElementPresent(Locator.linkWithText(PTIDS[3]));
-        Assert.assertEquals("Wrong number of rows after filter", 4, dataset.getDataRowCount());
+        assertEquals("Wrong number of rows after filter", 4, dataset.getDataRowCount());
 
         _ext4Helper.uncheckGridRowCheckbox("Group 1"); // (GROUP1A OR GROUP1B) AND (NOT(COHORT 1))
         waitForElementToDisappear(Locator.linkWithText(PTIDS[0]));
         waitForElement(Locator.linkWithText(PTIDS[1]));
         assertElementPresent(Locator.linkWithText(PTIDS[2]));
-        Assert.assertEquals("Wrong number of rows after filter", 2, dataset.getDataRowCount());
+        assertEquals("Wrong number of rows after filter", 2, dataset.getDataRowCount());
 
         dataset.toggleAllFacetsCheckbox();
         waitForElement(Locator.linkWithText(PTIDS[5]));
-        Assert.assertEquals("Wrong number of rows after filter", 24, dataset.getDataRowCount());
+        assertEquals("Wrong number of rows after filter", 24, dataset.getDataRowCount());
 
         _extHelper.clickMenuButton(false, "Mouse Groups", "Create Mouse Group", "From All Mice");
         _extHelper.waitForExtDialog("Define Mouse Group");
@@ -340,7 +341,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         if (checkAggregates)
         {
             DataRegionTable drt = new DataRegionTable("Dataset", this); // verify joined fields in filter
-            Assert.assertEquals("Unexpected number of rows, filter was not applied correctly", 4, drt.getDataRowCount()); // 3 data rows + aggregates
+            assertEquals("Unexpected number of rows, filter was not applied correctly", 4, drt.getDataRowCount()); // 3 data rows + aggregates
             assertTextPresentInThisOrder("Avg Cre:", "Agg Count:"); // verify joined fields in aggregates
         }
         for (String colFieldKey : colFieldKeys) // verify joined fields in column select
@@ -366,7 +367,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickButton("OK", 0);
         waitAndClick(Locator.css("svg text:contains('APX Main Title')"));
         waitAndClick(Locator.xpath("//span[contains(@class, 'iconReload')]"));
-        Assert.assertEquals(datasetLabel, getFormElement(Locator.name("chart-title-textfield")));
+        assertEquals(datasetLabel, getFormElement(Locator.name("chart-title-textfield")));
         clickButton("Cancel", 0);
     }
 
@@ -383,7 +384,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         setFormElement(Locator.name("chart-title-textfield"), "test");
         waitForElementToDisappear(Locator.xpath("//a[contains(@class, 'x4-btn-disabled')]//span[contains(@class, 'iconReload')]"));
         click(Locator.xpath("//span[contains(@class, 'iconReload')]"));
-        Assert.assertEquals(datasetLabel + " - 3. BP systolic xxx/", getFormElement(Locator.name("chart-title-textfield")));
+        assertEquals(datasetLabel + " - 3. BP systolic xxx/", getFormElement(Locator.name("chart-title-textfield")));
         clickButton("Cancel", 0);
     }
 
@@ -399,7 +400,7 @@ public class StudyDatasetsTest extends StudyBaseTest
             // element will be 'td' for demographic measures and 'th' for others
             if (!isElementPresent(Locator.xpath("//td[contains(@data-qtip, '" + measureKey + "')]")) && !isElementPresent(Locator.xpath("//th[contains(@data-qtip, '" + measureKey + "')]")))
             {
-                Assert.fail("Unable to find measure with key: " + measureKey);
+                fail("Unable to find measure with key: " + measureKey);
             }
         }
     }

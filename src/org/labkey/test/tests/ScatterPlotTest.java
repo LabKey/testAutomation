@@ -15,13 +15,14 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -219,7 +220,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         // Verify default styling for point at origin - blue circles
         waitForElement(Locator.css("svg > a > circle"));
-        Assert.assertEquals("Scatter points doin't have expected initial color", "#3366ff", getAttribute(Locator.css("svg > a > circle"), "fill"));
+        assertEquals("Scatter points doin't have expected initial color", "#3366ff", getAttribute(Locator.css("svg > a > circle"), "fill"));
 
         // Enable Grouping - Colors
         log("Group with colors");
@@ -231,11 +232,11 @@ public class ScatterPlotTest extends GenericChartsTest
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_COLORS);
         // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
-        Assert.assertEquals("Point at (70, 67) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(15) > *"), "fill"));
-        Assert.assertTrue("Point at (70, 67) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(15) > circle")));
+        assertEquals("Point at (70, 67) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(15) > *"), "fill"));
+        assertTrue("Point at (70, 67) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(15) > circle")));
         // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - teal circle
-        Assert.assertEquals("Circle at (92, 89) was an unexpected color", "#66c2a5", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
-        Assert.assertTrue("Circle at (92, 89) was an unexpected width", isElementPresent(Locator.css("svg > a:nth-of-type(25) > circle")));
+        assertEquals("Circle at (92, 89) was an unexpected color", "#66c2a5", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
+        assertTrue("Circle at (92, 89) was an unexpected width", isElementPresent(Locator.css("svg > a:nth-of-type(25) > circle")));
 
 
         // Enable Grouping - Shapes
@@ -248,12 +249,12 @@ public class ScatterPlotTest extends GenericChartsTest
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_SHAPES);
         // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
-        Assert.assertEquals("Point at (60, 48) was an unexpected color", "#3366ff", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "fill"));
-        Assert.assertEquals("Point at (60, 48) was an unexpected shape", "M75,-45L80,-55L70,-55Z", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "d"));
+        assertEquals("Point at (60, 48) was an unexpected color", "#3366ff", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "fill"));
+        assertEquals("Point at (60, 48) was an unexpected shape", "M75,-45L80,-55L70,-55Z", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "d"));
         // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - teal square
-        Assert.assertEquals("Square at (92, 89) was an unexpected color", "#3366ff", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
-        Assert.assertEquals("Square at (92, 89) was an unexpected width", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "width"));
-        Assert.assertEquals("Square at (92, 89) was an unexpected height", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "height"));
+        assertEquals("Square at (92, 89) was an unexpected color", "#3366ff", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
+        assertEquals("Square at (92, 89) was an unexpected width", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "width"));
+        assertEquals("Square at (92, 89) was an unexpected height", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "height"));
 
 
         // Enable Grouping - Shapes & Colors
@@ -266,12 +267,12 @@ public class ScatterPlotTest extends GenericChartsTest
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_BOTH);
         // Verify custom styling for point at origin (APXpulse: 70, APXwtkg: 67) - pink circle
-        Assert.assertEquals("Point at (70, 67) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(15) > *"), "fill"));
-        Assert.assertTrue("Point at (70, 67) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(15) > circle")));
+        assertEquals("Point at (70, 67) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(15) > *"), "fill"));
+        assertTrue("Point at (70, 67) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(15) > circle")));
         // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - teal square
-        Assert.assertEquals("Square at (92, 89) was an unexpected color", "#66c2a5", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
-        Assert.assertEquals("Square at (92, 89) was an unexpected width", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "width"));
-        Assert.assertEquals("Square at (92, 89) was an unexpected height", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "height"));
+        assertEquals("Square at (92, 89) was an unexpected color", "#66c2a5", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
+        assertEquals("Square at (92, 89) was an unexpected width", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "width"));
+        assertEquals("Square at (92, 89) was an unexpected height", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "height"));
 
         savePlot(SCATTER_PLOT_NAME_DR + " Colored", SCATTER_PLOT_DESC_DR + " Colored");
     }
@@ -370,7 +371,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         Integer buttonsCount = getElementCount(Locator.xpath("//div[contains(@id, 'generic-report-div')]//div/a[contains(@class, 'x4-btn')]"));
         Integer disabledButtonsCount = getElementCount(Locator.xpath("//div[contains(@id, 'generic-report-div')]//div/a[contains(@class, 'x4-btn') and contains(@class, 'x4-item-disabled')]"));
-        Assert.assertTrue("Only the help and export buttons should be enabled. More than two buttons were enabled.", 2 == (buttonsCount - disabledButtonsCount));
+        assertTrue("Only the help and export buttons should be enabled. More than two buttons were enabled.", 2 == (buttonsCount - disabledButtonsCount));
     }
 
     private static final String TEST_DATA_API_PATH = "server/test/data/api";
@@ -401,7 +402,7 @@ public class ScatterPlotTest extends GenericChartsTest
         assertTextPresentInThisOrder("YAxisMeasure:", "XAxisMeasure:", "ColorMeasure:", "PointMeasure:");
         _ext4Helper.clickTabContainingText("Source");
         String fn = _extHelper.getCodeMirrorValue("point-click-fn-textarea");
-        Assert.assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, measureInfo, clickEvent) {"));
+        assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, measureInfo, clickEvent) {"));
         // apply the default point click function
         clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
         Locator svgCircleLoc = Locator.css("svg a circle");

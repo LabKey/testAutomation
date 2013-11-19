@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.experimental.categories.Category;
@@ -44,6 +43,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: bimber
@@ -174,7 +175,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
 
         Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
 
-        Assert.assertEquals("Incorrect value for field", "gDNA", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
+        assertEquals("Incorrect value for field", "gDNA", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
 
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
         StringBuilder sb = new StringBuilder();
@@ -221,7 +222,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
     private void verifySSPResults(List<String[]> expected)
     {
         DataRegionTable results = new DataRegionTable("Data", this);
-        Assert.assertEquals("Incorrect row count", expected.size(), results.getDataRowCount());
+        assertEquals("Incorrect row count", expected.size(), results.getDataRowCount());
         waitForText("TestPrimer2"); //proxy for DR load
         log("DataRegion column count was: " + results.getColumnCount());
 
@@ -238,11 +239,11 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
             String result = results.getDataAsText(i, "Result");
             String freezer = results.getDataAsText(i, "Freezer Id");
 
-            Assert.assertEquals("Incorrect subjectId on row: " + i, expectedVals[0], subjectId);
-            Assert.assertEquals("Incorrect freezerId on row: " + i, expectedVals[1], freezer);
-            Assert.assertEquals("Incorrect date on row: " + i, expectedVals[2], date);
-            Assert.assertEquals("Incorrect result on row: " + i, expectedVals[3], result);
-            Assert.assertEquals("Incorrect primer pair on row: " + i, expectedVals[4], pair);
+            assertEquals("Incorrect subjectId on row: " + i, expectedVals[0], subjectId);
+            assertEquals("Incorrect freezerId on row: " + i, expectedVals[1], freezer);
+            assertEquals("Incorrect date on row: " + i, expectedVals[2], date);
+            assertEquals("Incorrect result on row: " + i, expectedVals[3], result);
+            assertEquals("Incorrect primer pair on row: " + i, expectedVals[4], pair);
 
             i++;
         }
@@ -263,7 +264,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         _helper.waitForField("Sample Type"); //form is re-rendered when import method changed
         Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
 
-        Assert.assertEquals("Incorrect value for field", "gDNA", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
+        assertEquals("Incorrect value for field", "gDNA", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
 
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
         StringBuilder sb = new StringBuilder();
@@ -347,7 +348,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
 
         Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
 
-        //Assert.assertEquals("Incorrect value for field", "LC480", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
+        //assertEquals("Incorrect value for field", "LC480", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
         waitAndClick(btn);
 
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
@@ -478,7 +479,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         expected.add(new String[]{"15227", "D7S513", "193"});
         expected.add(new String[]{"15227", "D7S513", "210"});
 
-        Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
+        assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
         log("DataRegion column count was: " + results.getColumnCount());
 
         //recreate the DR to see if this removes intermittent test failures
@@ -492,9 +493,9 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
             String result = results.getDataAsText(i, "Result");
             String[] expectedVals = expected.get(i);
 
-            Assert.assertEquals("Incorrect subjectId on row: " + i, expectedVals[0], subjectId);
-            Assert.assertEquals("Incorrect marker on row: " + i, expectedVals[1], marker);
-            Assert.assertEquals("Incorrect result on row: " + i, expectedVals[2], result);
+            assertEquals("Incorrect subjectId on row: " + i, expectedVals[0], subjectId);
+            assertEquals("Incorrect marker on row: " + i, expectedVals[1], marker);
+            assertEquals("Incorrect result on row: " + i, expectedVals[2], result);
 
             i++;
         }

@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -25,6 +24,8 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
+
+import static org.junit.Assert.*;
 
 /**
  * User: Karl Lum
@@ -156,13 +157,13 @@ public class UserTest extends SecurityTest
         clickAndWait(Locator.linkWithText("include inactive users"));
         usersTable = new DataRegionTable("Users", this, true, true);
         row = usersTable.getRow("Email", NORMAL_USER);
-        Assert.assertEquals(NORMAL_USER + " should not be 'Active'", "false", usersTable.getDataAsText(row, "Active"));
+        assertEquals(NORMAL_USER + " should not be 'Active'", "false", usersTable.getDataAsText(row, "Active"));
         usersTable.checkCheckbox(row);
         clickButton("Re-Activate");
         clickButton("Re-activate");
         usersTable = new DataRegionTable("Users", this, true, true);
         row = usersTable.getRow("Email", NORMAL_USER);
-        Assert.assertEquals(NORMAL_USER + " should be 'Active'", "true", usersTable.getDataAsText(row, "Active"));
+        assertEquals(NORMAL_USER + " should be 'Active'", "true", usersTable.getDataAsText(row, "Active"));
     }
 
     private Locator createAssignedToOptionLocator(String username)
@@ -288,7 +289,7 @@ public class UserTest extends SecurityTest
 
         Locator checkboxLocator = Locator.xpath(prefix + "//span/input[@name='required']");
 
-        Assert.assertTrue("Checkbox not set for element: " + name, isChecked(checkboxLocator));
+        assertTrue("Checkbox not set for element: " + name, isChecked(checkboxLocator));
     }
 
     private void navigateToUserDetails(String userName)
@@ -330,20 +331,20 @@ public class UserTest extends SecurityTest
         WebElement errors = Locator.css(".labkey-error").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         String errorText = errors.getText();
 
-        Assert.assertTrue("No error for 'Display Name'", errorText.contains(String.format("Value is too long for field Display Name, a maximum length of %d is allowed.", maxFieldLength)));
-        Assert.assertTrue("No error for 'First Name'", errorText.contains(String.format("Value is too long for field First Name, a maximum length of %d is allowed.", maxFieldLength)));
-        Assert.assertTrue("No error for 'Last Name'", errorText.contains(String.format("Value is too long for field Last Name, a maximum length of %d is allowed.", maxFieldLength)));
-        Assert.assertTrue("No error for 'Phone'", errorText.contains(String.format("Value is too long for field Phone, a maximum length of %d is allowed.", maxFieldLength)));
-        Assert.assertTrue("No error for 'Mobile'", errorText.contains(String.format("Value is too long for field Mobile, a maximum length of %d is allowed.", maxFieldLength)));
-        Assert.assertTrue("No error for 'Pager'", errorText.contains(String.format("Value is too long for field Pager, a maximum length of %d is allowed.", maxFieldLength)));
-        Assert.assertTrue("No error for 'IM'", errorText.contains(String.format("Value is too long for field IM, a maximum length of %d is allowed.", maxFieldLength)));
-        Assert.assertTrue("No error for 'Description'", errorText.contains(String.format("Value is too long for field Description, a maximum length of %d is allowed.", maxDescriptionLength)));
+        assertTrue("No error for 'Display Name'", errorText.contains(String.format("Value is too long for field Display Name, a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'First Name'", errorText.contains(String.format("Value is too long for field First Name, a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'Last Name'", errorText.contains(String.format("Value is too long for field Last Name, a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'Phone'", errorText.contains(String.format("Value is too long for field Phone, a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'Mobile'", errorText.contains(String.format("Value is too long for field Mobile, a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'Pager'", errorText.contains(String.format("Value is too long for field Pager, a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'IM'", errorText.contains(String.format("Value is too long for field IM, a maximum length of %d is allowed.", maxFieldLength)));
+        assertTrue("No error for 'Description'", errorText.contains(String.format("Value is too long for field Description, a maximum length of %d is allowed.", maxDescriptionLength)));
 
         clickButton("Cancel");
 
         Locator userInfoPanel = Locator.id("SiteUsers");
         String userInfo = getText(userInfoPanel);
-        Assert.assertFalse("Illegal text [XXX] present after cancel", userInfo.contains(illegalLongProperty.substring(0, 3)));
+        assertFalse("Illegal text [XXX] present after cancel", userInfo.contains(illegalLongProperty.substring(0, 3)));
     }
 
     @LogMethod

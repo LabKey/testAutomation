@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -26,6 +25,8 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * MS1 BVT
@@ -482,7 +483,7 @@ public class MS1Test extends BaseWebDriverTest
         String urlCur = getURL().toString();
         String base = urlCur.substring(0, urlCur.indexOf("showFeatureDetails.view"));
         beginAt(base + src.substring(src.indexOf("showChart.view?")));
-        Assert.assertTrue(200 == getResponseCode());
+        assertTrue(200 == getResponseCode());
         popLocation();
     }
 

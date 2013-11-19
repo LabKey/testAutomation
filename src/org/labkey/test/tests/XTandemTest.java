@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -26,6 +25,8 @@ import org.labkey.test.categories.XTandem;
 import org.labkey.test.ms2.AbstractXTandemTest;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 @Category({BVT.class, MS2.class, XTandem.class})
 public class XTandemTest extends AbstractXTandemTest
@@ -51,7 +52,7 @@ public class XTandemTest extends AbstractXTandemTest
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
-            Assert.fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
+            fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
         super.doTestSteps();
     }
@@ -150,19 +151,19 @@ public class XTandemTest extends AbstractXTandemTest
         clickButton("Search");
         assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
-        Assert.assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
+        assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
         selenium.type("minimumProbability", "2.0");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
-        Assert.assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
+        assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
         assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
 
         selenium.type("identifier", "GarbageProteinName");
         selenium.type("minimumProbability", "");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
-        Assert.assertTrue(!(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT)));
+        assertTrue(!(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT)));
         assertTextNotPresent(SEARCH_FIND);
         assertTextPresent("No data to show");
     }

@@ -16,12 +16,13 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: kevink
@@ -152,7 +153,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     private void uploadAssayFile(String path)
     {
         File guavaFile = new File(getLabKeyRoot() + path);
-        Assert.assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
+        assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
         setFormElement("__primaryFile__", guavaFile);
         clickButton("Next", 8000);
     }

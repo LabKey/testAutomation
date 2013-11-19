@@ -16,13 +16,14 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.ListHelper;
+
+import static org.junit.Assert.*;
 
 /**
  * User: klum
@@ -207,7 +208,7 @@ public class QuerySnapshotTest extends StudyBaseTestWD
         clickMenuButton("Views", "Edit Snapshot");
         checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
         clickButton("Save");
-        Assert.assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
+        assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
         prepForPageLoad();
         clickButton("Update Snapshot", 0);
         getAlert();

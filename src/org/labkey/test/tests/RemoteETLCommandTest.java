@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.json.simple.JSONObject;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -32,6 +31,8 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PasswordUtil;
 
 import java.util.Date;
+
+import static org.junit.Assert.*;
 
 /**
  * User: dax
@@ -58,7 +59,7 @@ public class RemoteETLCommandTest extends ETLTest
 
     private void verifyBaseTransformResponse(BaseTransformResponse response)
     {
-        Assert.assertTrue("success should be true", response.getSuccess());
+        assertTrue("success should be true", response.getSuccess());
     }
 
     private void verifyUpdateTransformConfigurationResponse(UpdateTransformConfigurationResponse response, UpdateTransformConfigurationCommand command)
@@ -71,11 +72,11 @@ public class RemoteETLCommandTest extends ETLTest
         obj = response.getState();
 
         // verify the accessors now (which look at the returned JSON data anyway)
-        Assert.assertTrue("response.enabled should equal command.enabled",
+        assertTrue("response.enabled should equal command.enabled",
                 command.getEnabled() == null ? true : response.getEnabled() == command.getEnabled());
-        Assert.assertTrue("response.verbose should equal command.verbose",
+        assertTrue("response.verbose should equal command.verbose",
                 command.getVerboseLogging() == null ? true : response.getVerboseLogging() == command.getVerboseLogging());
-        Assert.assertTrue("response.description should equal truncation description",
+        assertTrue("response.description should equal truncation description",
                 response.getDescriptionId().equalsIgnoreCase(command.getTransformId()));
     }
 
@@ -90,15 +91,15 @@ public class RemoteETLCommandTest extends ETLTest
 
         if (noWork)
         {
-          Assert.assertTrue("status should be 'no work'", response.getStatus().equalsIgnoreCase("no work"));
-          Assert.assertTrue("expect no pipeline job", null == response.getPipelineURL());
-          Assert.assertTrue("expect no pipeline job", null == response.getJobId());
+          assertTrue("status should be 'no work'", response.getStatus().equalsIgnoreCase("no work"));
+          assertTrue("expect no pipeline job", null == response.getPipelineURL());
+          assertTrue("expect no pipeline job", null == response.getJobId());
         }
         else
         {
-            Assert.assertTrue("job id should not be null", response.getJobId() != null);
-            Assert.assertFalse("status should not be error", response.getStatus().equalsIgnoreCase("error"));
-            Assert.assertTrue("pipeline url should be valid\n" +
+            assertTrue("job id should not be null", response.getJobId() != null);
+            assertFalse("status should not be error", response.getStatus().equalsIgnoreCase("error"));
+            assertTrue("pipeline url should be valid\n" +
                     "Expected substring: " + getPipelineURLFragment(response.getJobId()) + "\n" +
                     "Actual: " + response.getPipelineURL(),
                     response.getPipelineURL().contains(getPipelineURLFragment(response.getJobId())));
@@ -184,7 +185,7 @@ public class RemoteETLCommandTest extends ETLTest
             else
             {
                 String s = e.getMessage();
-                Assert.assertTrue("Did not receive expected error.\n" +
+                assertTrue("Did not receive expected error.\n" +
                         "Expected substring: " + expectedError + "\n" +
                         "Received: " + s,
                         s.contains(expectedError));

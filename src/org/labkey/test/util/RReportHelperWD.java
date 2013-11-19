@@ -17,7 +17,6 @@ package org.labkey.test.util;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -27,6 +26,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.junit.Assert.*;
 
 /**
  * User: klum
@@ -135,16 +136,16 @@ public class RReportHelperWD extends AbstractHelperWD
                 File rPackage = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/rlabkey/Rlabkey.zip");
 
                 if (!rPackage.exists())
-                    Assert.fail("Unable to locate the local Rlabkey package: " + rPackage.getName());
+                    fail("Unable to locate the local Rlabkey package: " + rPackage.getName());
 
                 String cmd = String.format(INSTALL_LOCAL_RLABKEY, rPackage.getAbsolutePath());
                 cmd = cmd.replaceAll("\\\\", "/");
                 if (!executeScript(cmd, null, true))
-                    Assert.fail("Unable to install the local Rlabkey package.");
+                    fail("Unable to install the local Rlabkey package.");
             }
         }
         else
-            Assert.fail("Unable to install the base Rlabkey package and dependencies.");
+            fail("Unable to install the base Rlabkey package and dependencies.");
     }
 
     @LogMethod
@@ -247,7 +248,7 @@ public class RReportHelperWD extends AbstractHelperWD
             _test.log("");   // Blank line helps make the following message more readable
             _test.log("R_HOME environment variable is not set.  Set R_HOME to your R bin directory to enable automatic configuration.");
         }
-        Assert.fail("R is not configured on this system. Failed R tests.");
+        fail("R is not configured on this system. Failed R tests.");
         return null; // unreachable
     }
 
@@ -275,7 +276,7 @@ public class RReportHelperWD extends AbstractHelperWD
         catch(IOException ex)
         {
             if (versionOutput.length() > 0) _test.log("R --version > " + versionOutput);
-            Assert.fail("Unable to determine R version: " + r.getAbsolutePath() + " due to " + ex.getMessage());
+            fail("Unable to determine R version: " + r.getAbsolutePath() + " due to " + ex.getMessage());
             return null; // Unreachable
         }
     }

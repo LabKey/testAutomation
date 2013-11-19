@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Assays;
@@ -23,6 +22,8 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -179,7 +180,7 @@ public class ElisaAssayTest extends ElispotAssayTest
 
             if (!testPrepopulation)
             {
-                Assert.assertTrue("Missing error for well group " + letters[i], allErrors.contains("Value for well group: " + letters[i] + "1-" + letters[i] + "2 cannot be blank."));
+                assertTrue("Missing error for well group " + letters[i], allErrors.contains("Value for well group: " + letters[i] + "1-" + letters[i] + "2 cannot be blank."));
             }
         }
 

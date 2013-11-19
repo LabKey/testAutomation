@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -28,6 +27,8 @@ import org.labkey.test.util.PerlHelper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -45,7 +46,7 @@ public class LuminexPositivityTest extends LuminexTest
     {
         PerlHelper perlHelper = new PerlHelper(this);
         if(!perlHelper.ensurePerlConfig())
-            Assert.fail("No Perl engine");
+            fail("No Perl engine");
 
         setUseXarImport(true);
         super.ensureConfigured();
@@ -110,7 +111,7 @@ public class LuminexPositivityTest extends LuminexTest
         {
             Locator l = Locator.xpath("//input[@type='text' and @name='" + inputName + "'][1]");
             waitForElement(l);
-            Assert.assertEquals(Integer.toString(_expectedThresholdValue), getFormElement(l));
+            assertEquals(Integer.toString(_expectedThresholdValue), getFormElement(l));
             setFormElement(l, Integer.toString(_newThresholdValue));
         }
     }
@@ -132,10 +133,10 @@ public class LuminexPositivityTest extends LuminexTest
         DataRegionTable drt = new DataRegionTable("Data", this);
         drt.ensureColumnsPresent("Description", "Specimen ID", "Participant ID", "Visit ID", "Date");
         int rowID = drt.getIndexWhereDataAppears(description, "Description");
-        Assert.assertEquals(specimenID, drt.getDataAsText(rowID, "Specimen ID"));
-        Assert.assertEquals(participantID, drt.getDataAsText(rowID, "Participant ID"));
-        Assert.assertEquals(visitID, drt.getDataAsText(rowID, "Visit ID"));
-        Assert.assertEquals(date, drt.getDataAsText(rowID, "Date"));
+        assertEquals(specimenID, drt.getDataAsText(rowID, "Specimen ID"));
+        assertEquals(participantID, drt.getDataAsText(rowID, "Participant ID"));
+        assertEquals(visitID, drt.getDataAsText(rowID, "Visit ID"));
+        assertEquals(date, drt.getDataAsText(rowID, "Date"));
     }
 
     private void checkPositivityValues(String type, int numExpected, String[] positivityWells)
@@ -152,7 +153,7 @@ public class LuminexPositivityTest extends LuminexTest
         for(String well : positivityWells)
         {
             int i = wells.indexOf(well);
-            Assert.assertEquals(type, posivitiy.get(i));
+            assertEquals(type, posivitiy.get(i));
         }
     }
 }

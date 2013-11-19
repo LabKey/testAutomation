@@ -17,7 +17,6 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -30,6 +29,8 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: brittp
@@ -277,7 +278,7 @@ public class ClientAPITest extends BaseWebDriverTest
             }
             sleep(1000);
         }
-        Assert.fail("Div failed to render.");
+        fail("Div failed to render.");
         return null;
     }
 
@@ -336,14 +337,14 @@ public class ClientAPITest extends BaseWebDriverTest
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
-            Assert.fail("Failed to advance to next edit field");
+            fail("Failed to advance to next edit field");
         setFormElement(Locator.id(activeCellId), "Abeson\t");
 
         // enter a new age
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
-            Assert.fail("Failed to advance to next edit field");
+            fail("Failed to advance to next edit field");
         setFormElement(Locator.id(activeCellId), "51\t");
 
         waitUntilGridUpdateComplete();
@@ -354,19 +355,19 @@ public class ClientAPITest extends BaseWebDriverTest
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
-            Assert.fail("Failed to advance to next edit field");
+            fail("Failed to advance to next edit field");
         setFormElement(Locator.id(activeCellId), "Billy\t");
 
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
-            Assert.fail("Failed to advance to next edit field");
+            fail("Failed to advance to next edit field");
         setFormElement(Locator.id(activeCellId), "Billyson\t");
 
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         if (prevActiveCellId.equals(activeCellId))
-            Assert.fail("Failed to advance to next edit field");
+            fail("Failed to advance to next edit field");
         pressTab(Locator.id(activeCellId));
         sleep(500);
 
@@ -438,7 +439,7 @@ public class ClientAPITest extends BaseWebDriverTest
             sleep(500);
         }while(--tries > 0 && numDirty != 0L);
         if(tries == 0)
-            Assert.fail("Insert or update via the Ext grid did not complete!");
+            fail("Insert or update via the Ext grid did not complete!");
     }
 
     @LogMethod
@@ -721,7 +722,7 @@ public class ClientAPITest extends BaseWebDriverTest
         Locator loc = Locator.id(TEST_DIV_NAME);
         assertElementContains(loc, "Test Started");
         waitForText("Test Complete");
-        Assert.assertFalse(loc.findElement(getDriver()).getText().contains("ERROR"));
+        assertFalse(loc.findElement(getDriver()).getText().contains("ERROR"));
         clearTestPage("WebDav Client API Test complete.");
     }
 

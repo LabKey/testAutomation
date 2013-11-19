@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -23,6 +22,8 @@ import org.labkey.test.Locator;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -58,7 +59,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     @LogMethod
     public void uploadXarFileAsAssayDesign(File file, int pipelineCount, String name)
     {
-        Assert.assertTrue("XAR file does not exist: " + file.toString(), file.exists());
+        assertTrue("XAR file does not exist: " + file.toString(), file.exists());
         //create a new luminex assay
         _test.clickButton("Manage Assays");
         _test.clickButton("New Assay Design");
@@ -165,7 +166,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
             _test.setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
         }
         else
-            Assert.fail("Unable to locate the Transform script: " + transformScript.toString());
+            fail("Unable to locate the Transform script: " + transformScript.toString());
     }
 
 
@@ -182,7 +183,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
             _test.setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
         }
         else
-            Assert.fail("Unable to locate the Transform script: " + transformScript.toString());
+            fail("Unable to locate the Transform script: " + transformScript.toString());
     }
 
     public void saveAssayDesign()

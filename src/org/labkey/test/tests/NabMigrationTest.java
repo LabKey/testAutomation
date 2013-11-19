@@ -15,12 +15,13 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Weekly;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -56,21 +57,21 @@ public class NabMigrationTest extends NabOldTest
         clickFolder(FOLDER_NAME);
         clickTab("Nab");
         clickAndWait(Locator.linkWithText(NEW_ASSAY_NAME));
-        Assert.assertEquals("Data present in NAb assay that should be unused", 0, new DataRegionTable("Runs", this).getDataRowCount());
+        assertEquals("Data present in NAb assay that should be unused", 0, new DataRegionTable("Runs", this).getDataRowCount());
         goBack();
 
         log("verify data present in second assay");
         clickAndWait(Locator.linkWithText(NEW_ASSAY_NAME2));
-        Assert.assertEquals("Newly added value incorrect.", newFieldVal, new DataRegionTable("Runs", this).getDataAsText(1, newField));
-        Assert.assertEquals("No present in NAb assay", 2, new DataRegionTable("Runs", this).getDataRowCount());
+        assertEquals("Newly added value incorrect.", newFieldVal, new DataRegionTable("Runs", this).getDataAsText(1, newField));
+        assertEquals("No present in NAb assay", 2, new DataRegionTable("Runs", this).getDataRowCount());
         DataRegionTable drt = new DataRegionTable("Runs", this);
-        Assert.assertTrue("LegacyID not present in new assay run list", drt.getIndexWhereDataAppears(assayRowId, "LegacyID") > -1);
-//        Assert.assertEquals("RowID from original second nab run not copied into legacyID field", assayRowId, first);
+        assertTrue("LegacyID not present in new assay run list", drt.getIndexWhereDataAppears(assayRowId, "LegacyID") > -1);
+//        assertEquals("RowID from original second nab run not copied into legacyID field", assayRowId, first);
         clickAndWait(Locator.linkWithText("run details"));
         assertElementPresent(Locator.xpath("//img[@alt='Neutralization Graph']"));
-        Assert.assertEquals("Specimen 1 Dilution Factor incorrect", "3.0", getText(Locator.xpath("//tr[td[text()='Specimen 1']]//td[2]")));
-        Assert.assertEquals("Specimen 4 Initial Dilution incorrect", "20.0", getText(Locator.xpath("//tr[td[text()='Specimen 4']]//td[3]")));
-        Assert.assertEquals("Incorrect 80% Curve Based for Specimen 3", "456", getText(Locator.xpath("//tbody[tr/td[text()='Curve Based']]/tr[6]/td[4]")));
+        assertEquals("Specimen 1 Dilution Factor incorrect", "3.0", getText(Locator.xpath("//tr[td[text()='Specimen 1']]//td[2]")));
+        assertEquals("Specimen 4 Initial Dilution incorrect", "20.0", getText(Locator.xpath("//tr[td[text()='Specimen 4']]//td[3]")));
+        assertEquals("Incorrect 80% Curve Based for Specimen 3", "456", getText(Locator.xpath("//tbody[tr/td[text()='Curve Based']]/tr[6]/td[4]")));
     }
 
     private void copyAssay()

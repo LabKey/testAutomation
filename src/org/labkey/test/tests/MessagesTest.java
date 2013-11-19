@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -29,6 +28,7 @@ import org.labkey.test.categories.DailyA;
 import java.io.File;
 import java.util.Arrays;
 
+import static org.junit.Assert.*;
 
 @Category({DailyA.class})
 public class MessagesTest extends BaseWebDriverTest
@@ -221,7 +221,7 @@ public class MessagesTest extends BaseWebDriverTest
         for(int i = 0; i<queries.length; i++)
         {
             selectResp = executeSelectRowCommand("announcement", queries[i]);
-            Assert.assertEquals("Count mismatch with query: " + queries[i], counts[i], selectResp.getRowCount().intValue());
+            assertEquals("Count mismatch with query: " + queries[i], counts[i], selectResp.getRowCount().intValue());
         }
 
     }

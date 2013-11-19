@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -26,6 +25,8 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: klum
@@ -231,19 +232,19 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         log("Verify different graph sizes");
         // Defaults to Medium sized graphs
         Number graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
-        Assert.assertEquals("Graphs aren't the correct size (Large)", 550, graphHeight);
+        assertEquals("Graphs aren't the correct size (Large)", 550, graphHeight);
 
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Large");
         graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
-        Assert.assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
+        assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
 
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Medium");
         graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
-        Assert.assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
+        assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
 
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Small");
         graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
-        Assert.assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
+        assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
 
         log("Verify different samples per graph");
         // Defaults to 20 samples per graph
@@ -287,7 +288,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.8 0.051 0.054"));
         graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
-        Assert.assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
+        assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
         assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 12);
         assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 4); // Correct number of graphs in first row
         assertElementNotPresent(Locator.xpath("//td[position()>4]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row

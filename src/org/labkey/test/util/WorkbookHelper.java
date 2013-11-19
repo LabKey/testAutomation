@@ -15,12 +15,13 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -106,8 +107,8 @@ public class WorkbookHelper extends AbstractHelperWD
         // Create File Workbook
         int id = createWorkbook(projectName, title, description, WorkbookFolderType.FILE_WORKBOOK);
         _test.waitForElement(Locator.linkWithText("Files"));
-        Assert.assertEquals(title, _test.getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
-        Assert.assertEquals(description, _test.getText(Locator.xpath("//div[@id='wb-description']")));
+        assertEquals(title, _test.getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
+        assertEquals(description, _test.getText(Locator.xpath("//div[@id='wb-description']")));
         _test.assertLinkNotPresentWithText(title); // Should not appear in folder tree.
         return id;
     }

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
@@ -29,6 +28,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -131,7 +132,7 @@ public class KnitrReportTest extends ReportTest
         assertReportContents(reportContains, reportNotContains);
 
         _rReportHelper.clickSourceTab();
-        Assert.assertEquals("Incorrect number of lines present in code editor.", reportSource.split("\n").length, getElementCount(Locator.css(".CodeMirror-gutter-text pre")));
+        assertEquals("Incorrect number of lines present in code editor.", reportSource.split("\n").length, getElementCount(Locator.css(".CodeMirror-gutter-text pre")));
         _rReportHelper.saveReport(reportName);
 
         openView(reportName);
@@ -152,7 +153,7 @@ public class KnitrReportTest extends ReportTest
 
         for (String text : reportNotContains)
         {
-            Assert.assertFalse("Report contained undesired text : " + text, reportText.contains(text));
+            assertFalse("Report contained undesired text : " + text, reportText.contains(text));
         }
     }
 
@@ -166,10 +167,10 @@ public class KnitrReportTest extends ReportTest
         }
         catch (IOException fail)
         {
-            Assert.fail("Failed to read report file [" + reportFile.getFileName() + "]: " + fail.getMessage());
+            fail("Failed to read report file [" + reportFile.getFileName() + "]: " + fail.getMessage());
         }
 
-        Assert.assertTrue("No data in report file [" + reportFile.getFileName() + "]", reportSource.length() > 0);
+        assertTrue("No data in report file [" + reportFile.getFileName() + "]", reportSource.length() > 0);
 
         return reportSource;
     }

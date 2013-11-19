@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
@@ -59,6 +58,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+
+import static org.junit.Assert.*;
 
 /**
  * User: bbimber
@@ -299,7 +300,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         String serverTimezone = Calendar.getInstance().getTimeZone().getDisplayName(false, TimeZone.SHORT);
         Date now = new Date();
 
-        Assert.assertEquals("Incorrect JS date parsing for date: " + dateStr + " at: " + now + ", client date was: " + clientDateStr + ", with timezone: " + clientTimezone + ", with server timezone: " + serverTimezone, expectedString, clientFormattedString);
+        assertEquals("Incorrect JS date parsing for date: " + dateStr + " at: " + now + ", client date was: " + clientDateStr + ", with timezone: " + clientTimezone + ", with server timezone: " + serverTimezone, expectedString, clientFormattedString);
     }
 
     private void workbookNumberingTest() throws Exception
@@ -321,7 +322,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         SelectRowsResponse resp1 = select1.execute(cn, getProjectName());
 
-        Assert.assertEquals("Incorrect row number", workbooks.size(), resp1.getRowCount().intValue());
+        assertEquals("Incorrect row number", workbooks.size(), resp1.getRowCount().intValue());
         int idx = 0;
         for (Map<String, Object> row : resp1.getRows())
         {
@@ -331,16 +332,16 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
             CreateContainerResponse workbook = workbooks.get(idx);
 
-            Assert.assertEquals("Incorrect container", workbook.getId(), container);
-            Assert.assertEquals("Incorrect container name", workbook.getName(), containerName);
+            assertEquals("Incorrect container", workbook.getId(), container);
+            assertEquals("Incorrect container name", workbook.getName(), containerName);
 
             //TODO: update for new naming scheme on trunk.  this check isnt very important for now
             //String path = workbook.getName();
             //Integer rowId = Integer.parseInt(path);
-            //Assert.assertEquals("Incorrect container rowId", rowId, containerRowId);
+            //assertEquals("Incorrect container rowId", rowId, containerRowId);
 
             Integer expectedId = 1 + highestWorkbookId + idx;
-            Assert.assertEquals("Incorrect workbookId", expectedId, workbookId);
+            assertEquals("Incorrect workbookId", expectedId, workbookId);
             idx++;
         }
 
@@ -359,7 +360,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         SelectRowsResponse resp2 = select2.execute(cn, getProjectName());
 
-        Assert.assertEquals("Incorrect row number", workbooks.size(), resp2.getRowCount().intValue());
+        assertEquals("Incorrect row number", workbooks.size(), resp2.getRowCount().intValue());
         idx = 0;
         int workbookIdOffset = 1 + highestWorkbookId;
         for (Map<String, Object> row : resp2.getRows())
@@ -370,16 +371,16 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
             CreateContainerResponse workbook = workbooks.get(idx);
 
-            Assert.assertEquals("Incorrect container", workbook.getId(), container);
-            Assert.assertEquals("Incorrect container name", workbook.getName(), containerName);
+            assertEquals("Incorrect container", workbook.getId(), container);
+            assertEquals("Incorrect container name", workbook.getName(), containerName);
 
             //TODO: update for new naming scheme on trunk
             //String path = workbook.getName();
             //Integer rowId = Integer.parseInt(path);
-            //Assert.assertEquals("Incorrect container rowId", rowId, containerRowId);
+            //assertEquals("Incorrect container rowId", rowId, containerRowId);
 
             Integer expectedId = workbookIdOffset + idx;
-            Assert.assertEquals("Incorrect workbookId", expectedId, workbookId);
+            assertEquals("Incorrect workbookId", expectedId, workbookId);
             idx++;
 
             //the second workbook was deleted, so increment the workbookId
@@ -430,7 +431,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         sr.setSorts(Arrays.asList(new Sort("samplename"), new Sort("sampleDate"), new Sort("sampleType")));
 
         SelectRowsResponse resp = sr.execute(cn, getProjectName());
-        Assert.assertEquals("Incorrect number of rows returned", SAMPLE_DATA.length, resp.getRowCount().intValue());
+        assertEquals("Incorrect number of rows returned", SAMPLE_DATA.length, resp.getRowCount().intValue());
 
         List<String> colOrder = Arrays.asList("samplename","subjectId","sampledate","sampletype","overlappingProjects/projects","overlappingProjects/groups","allProjects/projects","allProjects/groups","majorEvents/Appendectomy::DaysPostEvent","majorEvents/Appendectomy::YearsPostEvent","majorEvents/Gave Birth::DaysPostEvent","majorEvents/Vaccination::YearsPostEventDecimal","majorEvents/Biopsy::MonthsPostEvent","majorEvents/Influenza Infection::DaysPostEvent","relativeDates/Project1::DaysPostStart","relativeDates/Project2::MonthsPostStart","relativeDates/Project3::YearsPostStartDecimal");
 
@@ -460,41 +461,41 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         expected.add(new String[]{"Participant0018_gDNA","Participant0018","02/03/2012","gDNA","Project13",null,"Project13",null,null,null,null,null,null,null,null,null,null,null});
         expected.add(new String[]{"Participant0020_DNA","Participant0020","02/03/2012","DNA",null,null,"Project13",null,null,null,null,null,null,null,null,null,null,null});
 
-        Assert.assertEquals("Test has bad values for expected data", SAMPLE_DATA.length, expected.size());
+        assertEquals("Test has bad values for expected data", SAMPLE_DATA.length, expected.size());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
         int i = 0;
         for (Map<String, Object> row : resp.getRows())
         {
-            Assert.assertTrue("Insufficient column number", row.keySet().size() >= columns.size());
+            assertTrue("Insufficient column number", row.keySet().size() >= columns.size());
 
             String[] expectations = expected.get(i);
             int idx = 0;
             for (String col : colOrder)
             {
-                Assert.assertTrue("Row " + i + " is missing value for column: " + col, row.containsKey(col));
+                assertTrue("Row " + i + " is missing value for column: " + col, row.containsKey(col));
 
                 Object serverVal = row.get(col);
                 if (serverVal instanceof JSONArray)
                 {
                     JSONArray arr = ((JSONArray)serverVal);
                     String value = arr.size() == 0 ? null : StringUtils.trimToNull(StringUtils.join(arr, "\n"));
-                    Assert.assertEquals("Incorrect value for: " + col + " on row: " + i, expectations[idx], value);
+                    assertEquals("Incorrect value for: " + col + " on row: " + i, expectations[idx], value);
                 }
                 else if (serverVal instanceof Date)
                 {
                     Date d = dateFormat.parse(expectations[idx]);
-                    Assert.assertEquals("Incorrect value for: " + col + " on row " + i, d, serverVal);
+                    assertEquals("Incorrect value for: " + col + " on row " + i, d, serverVal);
                 }
                 else if (serverVal != null && (serverVal instanceof Integer || serverVal instanceof Double))
                 {
                     Double d = Double.parseDouble(expectations[idx]);
-                    Assert.assertEquals("Incorrect value for: " + col + " on row " + i, d, Double.parseDouble(serverVal.toString()), DELTA);
+                    assertEquals("Incorrect value for: " + col + " on row " + i, d, Double.parseDouble(serverVal.toString()), DELTA);
                 }
                 else
                 {
                     String value = serverVal == null ? null : StringUtils.trimToNull(serverVal.toString());
-                    Assert.assertEquals("Incorrect value for: " + col + " on row " + i, expectations[idx], value);
+                    assertEquals("Incorrect value for: " + col + " on row " + i, expectations[idx], value);
                 }
 
                 idx++;
@@ -520,7 +521,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         }
 
         SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
-        Assert.assertEquals("Incorrect number of rows created", SUBJECTS.length, saveResp.getRowsAffected().intValue());
+        assertEquals("Incorrect number of rows created", SUBJECTS.length, saveResp.getRowsAffected().intValue());
     }
 
     private void insertProjectEnrollment() throws Exception
@@ -543,7 +544,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         }
 
         SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
-        Assert.assertEquals("Incorrect number of rows created", PROJECT_ENROLLMENT.length, saveResp.getRowsAffected().intValue());
+        assertEquals("Incorrect number of rows created", PROJECT_ENROLLMENT.length, saveResp.getRowsAffected().intValue());
     }
 
     private void insertSamples() throws Exception
@@ -566,7 +567,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         }
 
         SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
-        Assert.assertEquals("Incorrect number of rows created", SAMPLE_DATA.length, saveResp.getRowsAffected().intValue());
+        assertEquals("Incorrect number of rows created", SAMPLE_DATA.length, saveResp.getRowsAffected().intValue());
     }
 
     private void insertMajorEvents() throws Exception
@@ -586,7 +587,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         }
 
         SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
-        Assert.assertEquals("Incorrect number of rows created", MAJOR_EVENTS.length, saveResp.getRowsAffected().intValue());
+        assertEquals("Incorrect number of rows created", MAJOR_EVENTS.length, saveResp.getRowsAffected().intValue());
     }
 
     private void overviewUITest()
@@ -682,10 +683,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.addDataSource("misc", GROUP_SOURCE, "New Data Sources", null, "core", "Groups");
         _helper.addDataSource("data", DATA_SOURCE, "New Data Sources", "/home", "core", "Users");
         _helper.addDataSource("data", REMOVED_SOURCE, "Will Be Removed", "/" + getProjectName(), "laboratory", "subjects");
-        Assert.assertEquals("Incorrect number of remove buttons", initialDataBtns + 3, getRemoveBtns(manageDataSources).size());
+        assertEquals("Incorrect number of remove buttons", initialDataBtns + 3, getRemoveBtns(manageDataSources).size());
 
         deleteSourceByLabel(REMOVED_SOURCE, manageDataSources);
-        Assert.assertEquals("Incorrect number of remove buttons", initialDataBtns + 2, getRemoveBtns(manageDataSources).size());
+        assertEquals("Incorrect number of remove buttons", initialDataBtns + 2, getRemoveBtns(manageDataSources).size());
 
         //now add demographics sources
         btns = getRemoveBtns(manageDemographicsSources);
@@ -695,10 +696,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.addDemographicsSource(SUBJECT_LIST, null, "laboratory", "subjects", "subjectname", false, true);
         _helper.addDemographicsSource(ELISPOT_SOURCE, "/" + getProjectName(), "elispot_assay", "elispot_targets", "target", true, false);
         _helper.addDemographicsSource("Failure", null, "core", "containers", null, false, false);
-        Assert.assertEquals("Incorrect number of remove buttons", initialDemographicsBtns + 2, getRemoveBtns(manageDemographicsSources).size());
+        assertEquals("Incorrect number of remove buttons", initialDemographicsBtns + 2, getRemoveBtns(manageDemographicsSources).size());
 
         deleteSourceByLabel(ELISPOT_SOURCE, manageDemographicsSources);
-        Assert.assertEquals("Incorrect number of remove buttons", initialDemographicsBtns + 1, getRemoveBtns(manageDemographicsSources).size());
+        assertEquals("Incorrect number of remove buttons", initialDemographicsBtns + 1, getRemoveBtns(manageDemographicsSources).size());
 
         //now go to folder and make sure it worked
         _helper.goToLabHome();
@@ -724,7 +725,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         click(Locator.ext4Button("OK"));
 
         waitForText("Item Type");
-        Assert.assertEquals("Incorrect number of remove buttons", 2, getRemoveBtns(manageDataSources).size());
+        assertEquals("Incorrect number of remove buttons", 2, getRemoveBtns(manageDataSources).size());
 
         //add demographics source
         Ext4CmpRefWD addDemographicsSourceBtn = _ext4Helper.queryOne("#" + manageDemographicsSources + " button[text='Add Default Sources']", Ext4CmpRefWD.class);
@@ -735,7 +736,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         waitForText("Table Name");
         waitForText("New Data Sources");
-        Assert.assertEquals("Incorrect number of remove buttons", 1, getRemoveBtns(manageDemographicsSources).size());
+        assertEquals("Incorrect number of remove buttons", 1, getRemoveBtns(manageDemographicsSources).size());
 
         _helper.goToLabHome();
 
@@ -762,8 +763,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _customizeViewsHelper.applyCustomView();
         DataRegionTable dr = new DataRegionTable("query", this);
         //dr.setSort("samplename", SortDirection.ASC);
-        Assert.assertEquals("Incorrect values for subject field", subj1, dr.getDataAsText(3, "Subject Id"));
-        Assert.assertEquals("Incorrect values for gender field", "m", dr.getDataAsText(3, "Gender"));
+        assertEquals("Incorrect values for subject field", subj1, dr.getDataAsText(3, "Subject Id"));
+        assertEquals("Incorrect values for gender field", "m", dr.getDataAsText(3, "Gender"));
 
         _customizeViewsHelper.revertUnsavedViewGridClosed();
 
@@ -844,7 +845,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         {
             Ext4FieldRefWD.getForBoxLabel(this, pair.getValue()).setValue(false);
             sleep(40); //wait for listener to act
-            Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, pair.getValue() + ": Raw Data").getValue());
+            assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, pair.getValue() + ": Raw Data").getValue());
 
             if (i == 1)
                 Ext4FieldRefWD.getForBoxLabel(this, pair.getValue()).setValue(true);
@@ -855,29 +856,29 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         //sequence
         Ext4FieldRefWD.getForBoxLabel(this, "Sequence").setValue(false);
         sleep(40); //wait for listener to act
-        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "Browse Sequence Data").getValue());
+        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "Browse Sequence Data").getValue());
 
 
         //samples
         Ext4FieldRefWD.getForBoxLabel(this, "Samples").setValue(false);
         sleep(40); //wait for listener to act
-        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "Freezer Summary").getValue());
-        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Samples").getValue());
+        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "Freezer Summary").getValue());
+        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Samples").getValue());
 
         //oligos
         Ext4FieldRefWD.getForBoxLabel(this, "DNA_Oligos").setValue(false);
         sleep(40); //wait for listener to act
-        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All DNA Oligos").getValue());
+        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All DNA Oligos").getValue());
 
         //peptides
         Ext4FieldRefWD.getForBoxLabel(this, "Peptides").setValue(false);
         sleep(40); //wait for listener to act
-        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Peptides").getValue());
+        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Peptides").getValue());
 
         //antibodies
         Ext4FieldRefWD.getForBoxLabel(this, "Antibodies").setValue(false);
         sleep(40); //wait for listener to act
-        Assert.assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Antibodies").getValue());
+        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Antibodies").getValue());
 
         click(Locator.ext4Button("Submit"));
         waitForElement(Ext4HelperWD.ext4Window("Success"));
@@ -940,7 +941,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Ext4FieldRefWD.getForBoxLabel(this, "Antibodies").setValue(true);
 
         sleep(100);
-        Assert.assertTrue("Incorrect value for samples checkbox", (Boolean)_ext4Helper.queryOne(samplesSelector, Ext4FieldRefWD.class).getValue());
+        assertTrue("Incorrect value for samples checkbox", (Boolean)_ext4Helper.queryOne(samplesSelector, Ext4FieldRefWD.class).getValue());
 
         click(Locator.ext4Button("Submit"));
         waitForElement(Ext4HelperWD.ext4Window("Success"));
@@ -1133,12 +1134,12 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.clickNavPanelItem("DNA_Oligos:", "Browse All");
         String text = sequence.toUpperCase().replaceAll(" ", "");
         waitForText(text);
-        Assert.assertTrue("Sequence was not formatted properly on import", isTextPresent(text));
-        Assert.assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
+        assertTrue("Sequence was not formatted properly on import", isTextPresent(text));
+        assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
 
         DataRegionTable dr = new DataRegionTable("query", this);
-        Assert.assertEquals("Incorrect Oligo ID", "1", dr.getDataAsText(0, "Oligo Id"));
-        Assert.assertEquals("Incorrect Oligo ID", "2", dr.getDataAsText(1, "Oligo Id"));
+        assertEquals("Incorrect Oligo ID", "1", dr.getDataAsText(0, "Oligo Id"));
+        assertEquals("Incorrect Oligo ID", "2", dr.getDataAsText(1, "Oligo Id"));
     }
 
     private void samplesTableTest()
@@ -1235,22 +1236,22 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
             //details link
             String href = URLDecoder.decode(getAttribute(Locator.linkWithText("details", rowNum), "href"), "UTF-8");
-            Assert.assertTrue("Expected [details] link to go to the container: " + workbook + ", href was: " + href,
+            assertTrue("Expected [details] link to go to the container: " + workbook + ", href was: " + href,
                     href.contains(workbook));
 
             //update link
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("edit", rowNum), "href"), "UTF-8");
-            Assert.assertTrue("Expected [edit] link to go to the container: " + workbook + ", href was: " + href,
+            assertTrue("Expected [edit] link to go to the container: " + workbook + ", href was: " + href,
                     href.contains("/ldk/" + workbook + "/manageRecord.view?"));
 
             //sample type
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("DNA", rowNum), "href"), "UTF-8");
-            Assert.assertTrue("Expected sample type column URL to go to the container: " + getProjectName() + ", href was: " + href,
+            assertTrue("Expected sample type column URL to go to the container: " + getProjectName() + ", href was: " + href,
                     href.contains("/query/" + getProjectName() + "/recordDetails.view?schemaName=laboratory&query.queryName=sample_type&keyField=type&key=DNA"));
 
             //container column
             href = URLDecoder.decode(getAttribute(Locator.linkWithText("Workbook" + i), "href"), "UTF-8");
-            Assert.assertTrue("Expected container column to go to the container: " + workbook + ", href was:" + href,
+            assertTrue("Expected container column to go to the container: " + workbook + ", href was:" + href,
                     href.contains("/project/" + workbook + "/begin.view?"));
 
             i++;
@@ -1342,12 +1343,12 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.clickNavPanelItem("Peptides:", "Browse All");
         String text = sequence.toUpperCase().replaceAll(" ", "");
         waitForText(text);
-        Assert.assertTrue("Sequence was not formatted properly on import", isTextPresent(text));
-        Assert.assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
+        assertTrue("Sequence was not formatted properly on import", isTextPresent(text));
+        assertFalse("Sequence was not formatted properly on import", isTextPresent(sequence));
 
         DataRegionTable dr = new DataRegionTable("query", this);
-        Assert.assertEquals("Peptide Id not set correctly.", "1", dr.getDataAsText(0, "Peptide Id"));
-        Assert.assertEquals("MW not set correctly.", "1036.1", dr.getDataAsText(0, "MW"));
+        assertEquals("Peptide Id not set correctly.", "1", dr.getDataAsText(0, "Peptide Id"));
+        assertEquals("MW not set correctly.", "1036.1", dr.getDataAsText(0, "MW"));
 
         log("Attempting to double-insert the same peptide ID");
         try
@@ -1366,7 +1367,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         }
         catch (CommandException e)
         {
-            Assert.assertEquals("A record is already present with ID: 1", e.getMessage());
+            assertEquals("A record is already present with ID: 1", e.getMessage());
         }
     }
 
@@ -1380,7 +1381,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.setFormField("name", "TestPrimer");
         waitAndClickAndWait(Locator.ext4Button("Submit"));
         DataRegionTable table = new DataRegionTable("query", this);
-        Assert.assertEquals("Wrong number of rows found", _oligosTotal, table.getDataRowCount());
+        assertEquals("Wrong number of rows found", _oligosTotal, table.getDataRowCount());
 
         //TODO: test different operators
         //also verify correct options show up on drop down menus
@@ -1432,7 +1433,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToAssayResultImport(VIRAL_LOAD_ASSAYNAME);
         _helper.waitForField("Source Material");
         Boolean state = (Boolean)Ext4FieldRefWD.getForBoxLabel(this, defaultVal).getValue();
-        Assert.assertTrue("Default method not correct", state);
+        assertTrue("Default method not correct", state);
 
         _helper.waitForCmp("#cancelBtn");
         Ext4CmpRefWD btn = _ext4Helper.queryOne("#cancelBtn", Ext4CmpRefWD.class);

@@ -15,10 +15,11 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+
+import static org.junit.Assert.*;
 
 /**
  * User: t.chadick
@@ -160,7 +161,7 @@ public class StudyHelperWD extends AbstractHelperWD
                 _test._ext4Helper.selectComboBoxItem(participantString + " Category:", categoryName);
             _test.pressTab(categoryField);
             _test.waitForElementToDisappear(Locator.css(".x-form-focus"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-            Assert.assertEquals("Mouse category not set", categoryName, _test.getFormElement(categoryField));
+            assertEquals("Mouse category not set", categoryName, _test.getFormElement(categoryField));
         }
         if ( shared != null )
         {

@@ -19,7 +19,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 
 import java.util.*;
 
-import org.junit.Assert;
+import static org.junit.Assert.*;
 
 /**
  * <code>PipelineStatusTable</code>
@@ -115,7 +115,7 @@ public class PipelineStatusTable extends DataRegionTable
     private int getExpectedJobRow(String name)
     {
         int row = getJobRow(name);
-        Assert.assertTrue("Job not found " + name, row != -1);
+        assertTrue("Job not found " + name, row != -1);
         return row;
     }
 }

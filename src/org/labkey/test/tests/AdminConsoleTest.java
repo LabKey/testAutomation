@@ -15,13 +15,14 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+
+import static org.junit.Assert.*;
 
 /**
  * User: bimber
@@ -80,11 +81,11 @@ public class AdminConsoleTest extends BaseWebDriverTest
         assertElementPresent(ribbonLink);
 
         el = getDriver().findElement(By.xpath("//div[contains(@class, 'labkey-warning-messages')]//..//a"));
-        Assert.assertNotNull("Link not present in ribbon bar", el);
+        assertNotNull("Link not present in ribbon bar", el);
 
         String href = el.getAttribute("href");
         String expected = getBaseURL() + "/project/home/begin.view";
-        Assert.assertEquals("Incorrect URL", expected, href);
+        assertEquals("Incorrect URL", expected, href);
 
         goToHome();
         impersonateRole("Reader");

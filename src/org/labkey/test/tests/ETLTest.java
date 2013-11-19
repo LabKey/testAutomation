@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -33,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+
+import static org.junit.Assert.*;
 
 /**
  * User: Rylan
@@ -619,8 +620,8 @@ UNDONE: need to fix the merge case
         void verifyResults()
         {
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
-            Assert.assertTrue(_columns.length == drt.getColumnCount());
-            Assert.assertTrue(_data.size() == drt.getDataRowCount());
+            assertTrue(_columns.length == drt.getColumnCount());
+            assertTrue(_data.size() == drt.getDataRowCount());
 
             for (int row = 0; row < _data.size(); row ++)
             {
@@ -638,7 +639,7 @@ UNDONE: need to fix the merge case
                     String actual = drt.getDataAsText(row, _columns[col]);
                     String expected = _data.get(row)[col];
                     if (null != expected)
-                        Assert.assertTrue(actual.equalsIgnoreCase(expected));
+                        assertTrue(actual.equalsIgnoreCase(expected));
                 }
             }
         }
@@ -768,10 +769,10 @@ UNDONE: need to fix the merge case
         protected void verifyResults()
         {
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
-            Assert.assertTrue(_columns.length == drt.getColumnCount());
-            Assert.assertTrue(1 == drt.getDataRowCount());
+            assertTrue(_columns.length == drt.getColumnCount());
+            assertTrue(1 == drt.getDataRowCount());
             String actual = drt.getDataAsText(0, "Transform Id");
-            Assert.assertTrue(_transformId.equalsIgnoreCase(actual));
+            assertTrue(_transformId.equalsIgnoreCase(actual));
         }
     }
 }

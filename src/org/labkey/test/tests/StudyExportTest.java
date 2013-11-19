@@ -22,9 +22,10 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.Ext4HelperWD;
-import org.junit.Assert;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: brittp
@@ -270,9 +271,9 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Create New Request");
         String inputs = selenium.getValue("inputs");
         System.out.println(inputs);
-        Assert.assertNotEquals(selenium.getEval("selenium.browserbot.getCurrentWindow().document.forms[1].inputs[1].value;"), "Duke University, NC");
+        assertNotEquals(selenium.getEval("selenium.browserbot.getCurrentWindow().document.forms[1].inputs[1].value;"), "Duke University, NC");
         selectOptionByText("destinationLocation", "Duke University (Repository, Site Affiliated Lab, Clinic)");
-        Assert.assertEquals(selenium.getEval("selenium.browserbot.getCurrentWindow().document.forms[1].inputs[1].value;"), "Duke University, NC");
+        assertEquals(selenium.getEval("selenium.browserbot.getCurrentWindow().document.forms[1].inputs[1].value;"), "Duke University, NC");
         clickButton("Cancel");
 
         // manage new request

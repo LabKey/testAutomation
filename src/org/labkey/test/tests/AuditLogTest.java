@@ -16,13 +16,14 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
+
+import static org.junit.Assert.*;
 
 /**
  * User: Karl Lum
@@ -141,7 +142,7 @@ public class AuditLogTest extends BaseWebDriverTest
         instance.log("searching for audit entry: " + msg);
         DataRegionTable table = new DataRegionTable("query", instance, false);
         int i = table.getColumn(column);
-        Assert.assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
+        assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
     }
 
     public static boolean findTextInDataRegion(DataRegionTable table, int column, String txt, int rowsToSearch)

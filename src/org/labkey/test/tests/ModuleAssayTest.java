@@ -16,8 +16,6 @@
 
 package org.labkey.test.tests;
 
-//import org.labkey.test.ModuleUtil;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -26,6 +24,8 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: kevink
@@ -253,7 +253,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     protected void uploadBatch(String batchName, String... uploadedFiles)
     {
         File dataRoot = new File(getLabKeyRoot(), "/sampledata/miniassay/data");
-        Assert.assertTrue(dataRoot.isDirectory());
+        assertTrue(dataRoot.isDirectory());
 
         log("Uploading batch: " + batchName);
         clickProject(PROJECT_NAME);
@@ -269,14 +269,14 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickButton("Save", 0);
 
         // check name and comments stuck
-        Assert.assertEquals(batchName, getFormElement("batch_name_input"));
-        Assert.assertEquals(batchName + " comments...", getFormElement("batch_comment_input"));
+        assertEquals(batchName, getFormElement("batch_name_input"));
+        assertEquals(batchName + " comments...", getFormElement("batch_comment_input"));
 
         for (int i = 0; i < uploadedFiles.length; i++)
         {
             String uploadedFile = uploadedFiles[i];
             File file = new File(dataRoot, uploadedFile);
-            Assert.assertTrue(file.exists());
+            assertTrue(file.exists());
             setFormElement("upload-run-field-file", file);
             int count = 5;
             do

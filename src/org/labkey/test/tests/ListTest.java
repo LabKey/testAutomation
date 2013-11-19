@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -44,6 +43,8 @@ import java.util.Set;
 
 import static org.labkey.test.util.ListHelper.ListColumnType.Integer;
 import static org.labkey.test.util.ListHelper.ListColumnType.String;
+
+import static org.junit.Assert.*;
 
 /**
  * User: ulberge
@@ -223,28 +224,28 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent(TEST_DATA[3][2]);
 
         DataRegionTable table = new DataRegionTable("query", this);
-        Assert.assertEquals(TEST_DATA[2][0],  table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
-        Assert.assertEquals(TEST_DATA[2][1], table.getDataAsText(table.getRow(TEST_DATA[0][1]), _listCol3.getLabel()));
-        Assert.assertEquals(TEST_DATA[2][2],  table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][0],  table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][1], table.getDataAsText(table.getRow(TEST_DATA[0][1]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][2],  table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
 
         log("Test check/uncheck of checkboxes");
         // Second row (Green)
-        Assert.assertEquals(1,table.getRow(TEST_DATA[0][1]));
+        assertEquals(1,table.getRow(TEST_DATA[0][1]));
         clickAndWait(Locator.linkWithText("edit", 1));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
         checkCheckbox("quf_JewelTone");
         submit();
         // Third row (Red)
-        Assert.assertEquals(2,table.getRow(TEST_DATA[0][2]));
+        assertEquals(2,table.getRow(TEST_DATA[0][2]));
         clickAndWait(Locator.linkWithText("edit", 2));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
         uncheckCheckbox("quf_JewelTone");
         submit();
 
         table = new DataRegionTable("query", this);
-        Assert.assertEquals(TEST_DATA[2][0],  table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
-        Assert.assertEquals("true", table.getDataAsText(table.getRow(TEST_DATA[0][1]), _listCol3.getLabel()));
-        Assert.assertEquals("false",  table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][0],  table.getDataAsText(table.getRow(TEST_DATA[0][0]), _listCol3.getLabel()));
+        assertEquals("true", table.getDataAsText(table.getRow(TEST_DATA[0][1]), _listCol3.getLabel()));
+        assertEquals("false",  table.getDataAsText(table.getRow(TEST_DATA[0][2]), _listCol3.getLabel()));
 
         log("Test edit and adding new field with imported data present");
         clickTab("List");
@@ -325,8 +326,8 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(HIDDEN_TEXT); // Hidden from insert view.
         assertTextBefore(_listCol3.getLabel(), _listCol2.getLabel());
         String html = getHtmlSource();
-        Assert.assertTrue("Description \"" + _listCol1.getDescription() + "\" not present.", html.contains(_listCol1.getDescription()));
-        Assert.assertTrue("Description \"" + _listCol3.getDescription() + "\" not present.", html.contains(_listCol3.getDescription()));
+        assertTrue("Description \"" + _listCol1.getDescription() + "\" not present.", html.contains(_listCol1.getDescription()));
+        assertTrue("Description \"" + _listCol3.getDescription() + "\" not present.", html.contains(_listCol3.getDescription()));
         setFormElement(Locator.name("quf_" + _listCol1.getName()), TEST_DATA[1][3]);
         setFormElement(Locator.name("quf_" + _listCol2.getName()), "wrong type");
         // Jewel Tone checkbox is left blank -- we'll make sure it's posted as false below
@@ -345,9 +346,9 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent(TEST_DATA[2][3]);
         assertTextPresent(TEST_DATA[3][3]);
         table = new DataRegionTable("query", this);
-        Assert.assertEquals(TEST_DATA[2][2], table.getDataAsText(2, _listCol3.getLabel()));
-        Assert.assertEquals(3,table.getRow(TEST_DATA[0][3]));
-        Assert.assertEquals(TEST_DATA[2][3], table.getDataAsText(3, _listCol3.getLabel()));
+        assertEquals(TEST_DATA[2][2], table.getDataAsText(2, _listCol3.getLabel()));
+        assertEquals(3,table.getRow(TEST_DATA[0][3]));
+        assertEquals(TEST_DATA[2][3], table.getDataAsText(3, _listCol3.getLabel()));
 
         log("Check hidden field is hidden only where specified.");
         dataregionToEditDesign();
@@ -490,7 +491,7 @@ public class ListTest extends BaseWebDriverTest
         setSort("qwp2", _listCol4.getName(), SortDirection.ASC);
         String source = getHtmlSource();
         int index;
-        Assert.assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&
+        assertTrue(source.indexOf(TEST_DATA[1][2]) < (index = source.indexOf(TEST_DATA[1][1])) &&
                 source.indexOf(TEST_DATA[1][1], index) < source.indexOf(TEST_DATA[1][2], index));
 
         log("Test list history");
@@ -501,9 +502,9 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("created", 1);
-        Assert.assertEquals("details Links", 8, countLinksWithText("DETAILS"));
-        Assert.assertEquals("Project Links", 17 + 1, countLinksWithText(PROJECT_VERIFY)); // Table links + header link
-        Assert.assertEquals("List Links", 17 + 1, countLinksWithText(LIST_NAME_COLORS)); // Table links + header link
+        assertEquals("details Links", 8, countLinksWithText("DETAILS"));
+        assertEquals("Project Links", 17 + 1, countLinksWithText(PROJECT_VERIFY)); // Table links + header link
+        assertEquals("List Links", 17 + 1, countLinksWithText(LIST_NAME_COLORS)); // Table links + header link
         clickAndWait(Locator.linkWithText("DETAILS"));
         assertTextPresent("List Item Details");
         assertTextNotPresent("No details available for this event.");
@@ -628,7 +629,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test exporting a nonexistent list returns a 404");
         beginAt(exportUrl.substring(WebTestHelper.getContextPath().length()));
-        Assert.assertEquals("Incorrect response code", 404, getResponseCode());
+        assertEquals("Incorrect response code", 404, getResponseCode());
         assertTextPresent("Query '" + LIST_NAME_COLORS + "' in schema 'lists' doesn't exist.");
 
         clickButton("Folder");
@@ -1067,7 +1068,7 @@ public class ListTest extends BaseWebDriverTest
             assertElementPresent(inputWithValue("key","1"));
             assertElementPresent(inputWithValue("table","C"));
             assertElementPresent(inputWithValue("title","one C"));
-            Assert.assertTrue(getCurrentRelativeURL().contains("/junit/" + EscapeUtil.encode(PROJECT_VERIFY) + "/echoForm.view"));
+            assertTrue(getCurrentRelativeURL().contains("/junit/" + EscapeUtil.encode(PROJECT_VERIFY) + "/echoForm.view"));
         }
         popLocation();
     }

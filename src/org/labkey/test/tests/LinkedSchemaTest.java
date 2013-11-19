@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,6 +36,8 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
+
+import static org.junit.Assert.*;
 
 /**
  * User: kevink
@@ -518,8 +519,8 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable table = new DataRegionTable("query", this);
         log("** Check template filter is applied");
-        Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
-        Assert.assertEquals("Expected to filter table to only Adam", "Adam", table.getDataAsText(0, A_PEOPLE_METADATA_TITLE));
+        assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
+        assertEquals("Expected to filter table to only Adam", "Adam", table.getDataAsText(0, A_PEOPLE_METADATA_TITLE));
 
         log("** Verify table metadata overrides when simplemodule is not active in TargetFolder");
         // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
@@ -631,13 +632,13 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
 
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable table = new DataRegionTable("query", this);
-        Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
+        assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
         // Check Name column is renamed and 'Britt' is the only value
-        Assert.assertEquals("Expected to filter table to only Britt", "Britt", table.getDataAsText(0, B_PEOPLE_TEMPLATE_METADATA_TITLE));
+        assertEquals("Expected to filter table to only Britt", "Britt", table.getDataAsText(0, B_PEOPLE_TEMPLATE_METADATA_TITLE));
 
         // Check the linkedschematest/other.view details url is used
         String detailsUrl = table.getDetailsHref(0);
-        Assert.assertTrue("Expected details url to contain other.view, got '" + detailsUrl + "'", detailsUrl.contains("other.view"));
+        assertTrue("Expected details url to contain other.view, got '" + detailsUrl + "'", detailsUrl.contains("other.view"));
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -656,9 +657,9 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
 
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable table = new DataRegionTable("query", this, false);
-        Assert.assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
+        assertEquals("Unexpected number of rows", 1, table.getDataRowCount());
         // Check Name column is renamed and 'Dave' is the only value
-        Assert.assertEquals("Expected to filter table to only Dave", "Dave", table.getDataAsText(0, D_PEOPLE_METADATA_TITLE));
+        assertEquals("Expected to filter table to only Dave", "Dave", table.getDataAsText(0, D_PEOPLE_METADATA_TITLE));
 
         // Check the details url has been disabled
         assertElementNotPresent(Locator.linkWithText("details"));
@@ -673,9 +674,9 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         // Query is executed over the original People table, NOT the 'D_People' filtered People table.
         // So all crazy people are available in the original query (Dave, Adam, Josh),
         // but the D_People template metadata filters LinkedSchemaPeopleQuery to those > 30 (Adam, Dave).
-        Assert.assertEquals("Unexpected number of rows", 2, table.getDataRowCount());
-        Assert.assertEquals("Adam", table.getDataAsText(0, "Crazy " + D_PEOPLE_METADATA_TITLE));
-        Assert.assertEquals("Dave", table.getDataAsText(1, "Crazy " + D_PEOPLE_METADATA_TITLE));
+        assertEquals("Unexpected number of rows", 2, table.getDataRowCount());
+        assertEquals("Adam", table.getDataAsText(0, "Crazy " + D_PEOPLE_METADATA_TITLE));
+        assertEquals("Dave", table.getDataAsText(1, "Crazy " + D_PEOPLE_METADATA_TITLE));
     }
 
     protected void goToSchemaBrowserTable(String schemaName, String tableName)
@@ -698,16 +699,16 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
 
     protected void assertHrefContains(DataRegionTable table, String columnTitle, String expected)
     {
-        Assert.assertTrue("Expected column '" + columnTitle + "' to be in table, was not found.", table.getColumn(columnTitle) != -1);
+        assertTrue("Expected column '" + columnTitle + "' to be in table, was not found.", table.getColumn(columnTitle) != -1);
         String href = table.getHref(0, columnTitle);
-        Assert.assertNotNull("Expected column '" + columnTitle + "' to have href containing '" + expected + "', was null", href);
-        Assert.assertTrue("Expected column '" + columnTitle + "' to have href containing '" + expected + "', got '" + href + "'", href.contains(expected));
+        assertNotNull("Expected column '" + columnTitle + "' to have href containing '" + expected + "', was null", href);
+        assertTrue("Expected column '" + columnTitle + "' to have href containing '" + expected + "', got '" + href + "'", href.contains(expected));
     }
 
     protected void assertHrefNotPresent(DataRegionTable table, String columnTitle)
     {
         boolean hasHref = table.hasHref(0, columnTitle);
-        Assert.assertFalse("Expected column '" + columnTitle + "' to have null href", hasHref);
+        assertFalse("Expected column '" + columnTitle + "' to have null href", hasHref);
     }
 
     protected void assertColumnsPresent(String sourceFolder, String schemaName, String tableName, String... columnNames)
@@ -752,7 +753,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
 
         for (String column : lookupColumns)
         {
-            Assert.assertEquals("Expected lookup column '" + column + "' to be " + (present ? "present" : "not present"), present, _customizeViewsHelper.isLookupColumn(column));
+            assertEquals("Expected lookup column '" + column + "' to be " + (present ? "present" : "not present"), present, _customizeViewsHelper.isLookupColumn(column));
         }
     }
 

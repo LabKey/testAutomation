@@ -19,9 +19,10 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.LogMethod;
-import org.junit.Assert;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -67,6 +68,6 @@ public class StudyReloadTest extends StudyBaseTest
         waitForElement(ff_name1);
         click(ff_name1);
         click(Locator.linkContainingText("Advanced"));
-        Assert.assertEquals("on", getAttribute(Locator.name("protected"), "value"));
+        assertEquals("on", getAttribute(Locator.name("protected"), "value"));
     }
 }

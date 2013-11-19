@@ -26,7 +26,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.junit.Assert;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseWebDriverTest;
@@ -40,6 +39,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.*;
 
 /**
  * An abstract class that can be used to test recorded API request/response interactions. A typical usage
@@ -135,7 +135,7 @@ public abstract class SimpleApiTestWD extends BaseWebDriverTest
         }
         catch (Exception e)
         {
-            Assert.fail("An unexpected error occurred: " + e.getMessage());
+            fail("An unexpected error occurred: " + e.getMessage());
         }
         return Collections.emptyList();
     }
@@ -159,7 +159,7 @@ public abstract class SimpleApiTestWD extends BaseWebDriverTest
         if (url != null)
             testCase.setUrl(StringUtils.trim(url));
         else
-            Assert.fail("Test case did not have the required url element");
+            fail("Test case did not have the required url element");
 
         String response = element.getResponse();
         if (response != null)
@@ -207,11 +207,11 @@ public abstract class SimpleApiTestWD extends BaseWebDriverTest
                 _helper.assertEquals("FAILED: test " + name, expectedResponse, responseBody);
             }
             else
-                Assert.fail(String.format("FAILED: test %s failed with status code: %s%s", name, status, responseBody != null ? "\n" + responseBody : ""));
+                fail(String.format("FAILED: test %s failed with status code: %s%s", name, status, responseBody != null ? "\n" + responseBody : ""));
         }
         catch (IOException e)
         {
-            Assert.fail("Test failed requesting the URL: " + e.getMessage());
+            fail("Test failed requesting the URL: " + e.getMessage());
         }
         finally
         {
@@ -243,7 +243,7 @@ public abstract class SimpleApiTestWD extends BaseWebDriverTest
         }
 
         if (isElementPresent(Locator.xpath("//div[@id='lblStatus' and contains(text(), 'ERROR')]")))
-            Assert.fail("The request has failed: " + url);
+            fail("The request has failed: " + url);
 
         waitForText("Request Complete", defaultWaitForPage);
 

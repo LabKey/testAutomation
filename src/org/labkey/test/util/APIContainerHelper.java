@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateContainerCommand;
@@ -27,6 +26,8 @@ import org.labkey.test.TestTimeoutException;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+
+import static org.junit.Assert.*;
 
 /**
  * User: jeckels
@@ -123,11 +124,11 @@ public class APIContainerHelper extends AbstractContainerHelper
             if (e.getMessage().contains("Not Found"))
             {
                 if (failIfNotFound)
-                    Assert.fail("Container not found: " + path);
+                    fail("Container not found: " + path);
             }
             else
             {
-                Assert.fail(e.getMessage());
+                fail(e.getMessage());
             }
         }
         catch (SocketTimeoutException e)

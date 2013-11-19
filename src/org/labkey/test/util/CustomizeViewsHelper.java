@@ -16,13 +16,14 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: Trey Chadick
@@ -620,7 +621,7 @@ public class CustomizeViewsHelper extends AbstractHelper
         _test.clickMenuButton("Views", "Create", "R View");
 
         if(view!=null)
-            Assert.fail("Unimplemented");
+            fail("Unimplemented");
 
         if (shareView)
             _reportHelper.selectOption(RReportHelper.ReportOption.shareReport);

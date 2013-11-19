@@ -17,10 +17,11 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -302,7 +303,7 @@ public class PortalHelper extends AbstractHelper
         }
         else
         {
-            Assert.fail("Unable to analyze webpart type. PortalHelper.java needs updating.");
+            fail("Unable to analyze webpart type. PortalHelper.java needs updating.");
         }
 
         // TODO: Check final webpart index

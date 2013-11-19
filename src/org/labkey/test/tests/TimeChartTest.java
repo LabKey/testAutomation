@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LogMethod;
@@ -24,6 +23,8 @@ import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.UIContainerHelper;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 public abstract class TimeChartTest extends ReportTest
 {
@@ -162,12 +163,12 @@ public abstract class TimeChartTest extends ReportTest
             {
                 Locator minInput = Locator.name(axis + "axis_rangemin");
                 setFormElement(minInput, lowerBound);
-                Assert.assertEquals(lowerBound, getFormElement(minInput));
+                assertEquals(lowerBound, getFormElement(minInput));
 //                sleep(500);
 
                 Locator maxInput = Locator.name(axis + "axis_rangemax");
                 setFormElement(maxInput, upperBound);
-                Assert.assertEquals(upperBound, getFormElement(maxInput));
+                assertEquals(upperBound, getFormElement(maxInput));
             }
         }
 
@@ -185,7 +186,7 @@ public abstract class TimeChartTest extends ReportTest
             waitForElement(Locator.css("svg").containing(textPresent[0]));
             svgText = getText(Locator.css("svg"));
             for (String text : textPresent)
-                Assert.assertTrue("Expected text not found in SVG: " + text, svgText.contains(text));
+                assertTrue("Expected text not found in SVG: " + text, svgText.contains(text));
         }
 
         if (textNotPresent != null)
@@ -196,7 +197,7 @@ public abstract class TimeChartTest extends ReportTest
                 svgText = getText(Locator.css("svg"));
             }
             for (String text : textNotPresent)
-                Assert.assertFalse("Unexpected text found in SVG: " + text, svgText.contains(text));
+                assertFalse("Unexpected text found in SVG: " + text, svgText.contains(text));
         }
     }
 

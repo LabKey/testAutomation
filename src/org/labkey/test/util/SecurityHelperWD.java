@@ -15,10 +15,11 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.WebElement;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan

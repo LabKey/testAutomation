@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -31,6 +30,8 @@ import org.labkey.test.util.PortalHelper;
 import java.io.File;
 
 import static org.labkey.test.util.ListHelperWD.ListColumnType;
+
+import static org.junit.Assert.*;
 
 /**
  * User: jeckels
@@ -343,7 +344,7 @@ public class AssayTest extends AbstractAssayTestWD
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
 
         //nav trail check
-        Assert.assertEquals("Nav trail was not as expected", "Assay List >  " + TEST_ASSAY + " Batches > ", getText(Locator.id("navTrailAncestors")));
+        assertEquals("Nav trail was not as expected", "Assay List >  " + TEST_ASSAY + " Batches > ", getText(Locator.id("navTrailAncestors")));
 
         clickButton("Import Data");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + "3");
@@ -450,13 +451,13 @@ public class AssayTest extends AbstractAssayTestWD
 
         Locator.XPathLocator trueLocator = Locator.xpath("//table[contains(@class, 'labkey-data-region')]//td[text() = 'true']");
         int totalTrues = getElementCount(trueLocator);
-        Assert.assertEquals(4, totalTrues);
+        assertEquals(4, totalTrues);
 
         setFilter("Data", "SpecimenID", "Starts With", "AssayTestControl");
 
         // verify that there are no trues showing for the assay match column that were filtered out
         totalTrues = getElementCount(trueLocator);
-        Assert.assertEquals(0, totalTrues);
+        assertEquals(0, totalTrues);
 
         log("Check out the data for all of the runs");
         clickAndWait(Locator.linkWithText("view results"));
@@ -468,13 +469,13 @@ public class AssayTest extends AbstractAssayTestWD
 
         Locator.XPathLocator falseLocator = Locator.xpath("//table[contains(@class, 'labkey-data-region')]//td[text() = 'false']");
         int totalFalses = getElementCount(falseLocator);
-        Assert.assertEquals(3, totalFalses);
+        assertEquals(3, totalFalses);
 
         setFilter("Data", "SpecimenID", "Does Not Start With", "BAQ");
 
         // verify the falses have been filtered out
         totalFalses = getElementCount(falseLocator);
-        Assert.assertEquals(0, totalFalses);
+        assertEquals(0, totalFalses);
 
         //Check to see that the bad specimen report includes the bad assay results and not the good ones
         //The report doesn't have top level UI (use a wiki) so just jump there.
@@ -700,11 +701,11 @@ public class AssayTest extends AbstractAssayTestWD
         clickTab("Overview");
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Timepoints"));
-        Assert.assertTrue(isTextPresent("Day 0 - 7"));
-        Assert.assertTrue(isTextPresent("Day 32 - 39"));
-        Assert.assertTrue(isTextPresent("Day 90 - 95"));
-        Assert.assertTrue(isTextPresent("Day 120 - 127"));
-        Assert.assertTrue(isTextPresent("Day 152 - 159"));
+        assertTrue(isTextPresent("Day 0 - 7"));
+        assertTrue(isTextPresent("Day 32 - 39"));
+        assertTrue(isTextPresent("Day 90 - 95"));
+        assertTrue(isTextPresent("Day 120 - 127"));
+        assertTrue(isTextPresent("Day 152 - 159"));
     } //publishDataToDateBasedStudy()
 
 
@@ -766,15 +767,15 @@ public class AssayTest extends AbstractAssayTestWD
         clickButton("Re-Validate");
 
         //validate timepoints:
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit3' and following-sibling::td/a[text()='AAA07XMC-02']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='33' and following-sibling::td/a[text()='AAA07XMC-04']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='4' and following-sibling::td/a[text()='AAA07XSF-02']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit3' and following-sibling::td/a[text()='AAA07XMC-02']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='33' and following-sibling::td/a[text()='AAA07XMC-04']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='4' and following-sibling::td/a[text()='AAA07XSF-02']]")));
 
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit2' and following-sibling::td[text()='AssayTestControl1']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='AssayTestControl2']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-09']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-08']]")));
-        Assert.assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-11']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit2' and following-sibling::td[text()='AssayTestControl1']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td[text()='AssayTestControl2']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-09']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-08']]")));
+        assertTrue(isElementPresent(Locator.xpath("//td[text()='Test Visit1' and following-sibling::td/a[text()='BAQ00051-11']]")));
 
         clickButton("Copy to Study");
 
@@ -798,12 +799,12 @@ public class AssayTest extends AbstractAssayTestWD
         clickTab("Overview");
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Visits"));
-        Assert.assertTrue(isTextPresent("Test Visit1"));
-        Assert.assertTrue(isTextPresent("6.0-13.0"));
-        Assert.assertTrue(isTextPresent("Test Visit2"));
-        Assert.assertTrue(isTextPresent("50.0-70.0"));
-        Assert.assertTrue(isTextPresent("Test Visit3"));
-        Assert.assertTrue(isTextPresent("302.0-303.0"));
+        assertTrue(isTextPresent("Test Visit1"));
+        assertTrue(isTextPresent("6.0-13.0"));
+        assertTrue(isTextPresent("Test Visit2"));
+        assertTrue(isTextPresent("50.0-70.0"));
+        assertTrue(isTextPresent("Test Visit3"));
+        assertTrue(isTextPresent("302.0-303.0"));
     } //publishDataToVisitBasedStudy()
 
     /**
@@ -946,10 +947,10 @@ public class AssayTest extends AbstractAssayTestWD
         //verify study properties (grid view)
         clickFolder(TEST_ASSAY_FLDR_STUDIES);
         DataRegionTable table = new DataRegionTable("qwpStudies", this, false);
-        Assert.assertEquals("Studies not sorted correctly.", TEST_ASSAY_FLDR_STUDY1 + " Study", table.getDataAsText(0, "Label"));
-        Assert.assertEquals("Failed to set study investigator.", INVESTIGATOR, table.getDataAsText(0, "Investigator"));
-        Assert.assertEquals("Failed to set study grant.", GRANT, table.getDataAsText(0, "Grant"));
-        Assert.assertEquals("Failed to set study description.", DESCRIPTION, table.getDataAsText(0, "Description"));
+        assertEquals("Studies not sorted correctly.", TEST_ASSAY_FLDR_STUDY1 + " Study", table.getDataAsText(0, "Label"));
+        assertEquals("Failed to set study investigator.", INVESTIGATOR, table.getDataAsText(0, "Investigator"));
+        assertEquals("Failed to set study grant.", GRANT, table.getDataAsText(0, "Grant"));
+        assertEquals("Failed to set study description.", DESCRIPTION, table.getDataAsText(0, "Description"));
 
         //verify study properties (details view)
         portalHelper.clickWebpartMenuItem("Studies", "Customize");

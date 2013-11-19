@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
@@ -27,6 +26,8 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: cnathe
@@ -340,10 +341,10 @@ public class TimeChartAPITest extends TimeChartTest
                     try
                     {
                         double value = Double.parseDouble(values.get(valIndex));
-                        Assert.assertEquals("Unexpected interval value for row " + i, numbercheck[testIndex][i], value, DELTA);
+                        assertEquals("Unexpected interval value for row " + i, numbercheck[testIndex][i], value, DELTA);
                     }
                     catch(NumberFormatException e){
-                        Assert.fail(columnHeader + " column should contain numbers [" + values.get(valIndex) + "]");
+                        fail(columnHeader + " column should contain numbers [" + values.get(valIndex) + "]");
                     }
                 }
             }
@@ -358,7 +359,7 @@ public class TimeChartAPITest extends TimeChartTest
                         colIndex = table.getColumn("Visit Label");
 
                     String colData = table.getDataAsText(i, colIndex);
-                    Assert.assertEquals(stringCheck[testIndex][i], colData);
+                    assertEquals(stringCheck[testIndex][i], colData);
                 }
             }
             // check values in measure column
@@ -376,15 +377,15 @@ public class TimeChartAPITest extends TimeChartTest
                     try
                     {
                         double value = Double.parseDouble(text);
-                        Assert.assertEquals("Unexpected measure value", measureValue[testIndex][i], value, DELTA);
+                        assertEquals("Unexpected measure value", measureValue[testIndex][i], value, DELTA);
                     }
                     catch (NumberFormatException e)
                     {
-//                        Assert.fail("NFE parsing measure " + measure[testIndex] + ": " + text);
+//                        fail("NFE parsing measure " + measure[testIndex] + ": " + text);
                     }
                     catch (NullPointerException e)
                     {
-                        Assert.fail("NPE parsing measure " + measure[testIndex] + ": " + text);
+                        fail("NPE parsing measure " + measure[testIndex] + ": " + text);
                     }
                 }
             }

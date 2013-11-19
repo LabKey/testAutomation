@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.PasswordUtil;
@@ -26,6 +25,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import static org.junit.Assert.*;
 
 /**
  * User: klum
@@ -61,7 +62,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
             {
                 javaExe = new File(javaHome + "/bin/java");
                 if (!javaExe.exists())
-                    Assert.fail("unable to setup the java engine");
+                    fail("unable to setup the java engine");
             }
             setFormElement(Locator.id(id), javaExe.getAbsolutePath());
 
@@ -156,7 +157,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
 
     public void addTransformScript(File transformScript, int index)
     {
-        Assert.assertTrue("unable to locate the Transform script", transformScript.exists());
+        assertTrue("unable to locate the Transform script", transformScript.exists());
 
         waitForElement(Locator.navButton("Add Script"));
         clickButton("Add Script", 0);

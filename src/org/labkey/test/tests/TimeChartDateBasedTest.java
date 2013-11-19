@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -23,6 +22,8 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+
+import static org.junit.Assert.*;
 
 /**
  * User: cnathe
@@ -148,7 +149,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _extHelper.setExtFormElementByType(ADD_MEASURE_DIALOG, "text", "nab");
         sleep(500);
         // Count search results (11 in study's NAb assay)
-        Assert.assertEquals("", 11, getXpathCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_DIALOG) + "//div[contains(@class, 'x4-grid-view')]/table/tbody/tr")));
+        assertEquals("", 11, getXpathCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_DIALOG) + "//div[contains(@class, 'x4-grid-view')]/table/tbody/tr")));
 
         log("Check for appropriate message for measure with no data.");
         _ext4Helper.clickGridRowText("Cutoff Percentage (3)", 0);
@@ -225,7 +226,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         goToAxisTab(X_AXIS_LABEL);
         _ext4Helper.selectComboBoxItem("Draw x-axis as:", "Days");
-        Assert.assertEquals(X_AXIS_LABEL, getFormElement(Locator.name("x-axis-label-textfield"))); // Label shouldn't change automatically once it has been set manually
+        assertEquals(X_AXIS_LABEL, getFormElement(Locator.name("x-axis-label-textfield"))); // Label shouldn't change automatically once it has been set manually
 
         // set manual x-axis range
         goToAxisTab(X_AXIS_LABEL);
@@ -348,7 +349,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _ext4Helper.clickTabContainingText("Source");
         String fn = _extHelper.getCodeMirrorValue("point-click-fn-textarea");
         if (fn != null)
-            Assert.assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
+            assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
         // apply the default point click function
         applyChanges();
         click(Locator.css("svg a circle"));
@@ -649,7 +650,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         // Count data points in charts by checking the title attribute of the points ('*' here due to xpath namespace limitations in svgs)
         int elCount = getElementCount(Locator.tag("div").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP1_NAME + ",\n Days"));
-        Assert.assertTrue(elCount == 10 || elCount == 20); // 10 in chart and 10 in thumbnail (chrome seems to count the thumbnail, but firefox does not)
+        assertTrue(elCount == 10 || elCount == 20); // 10 in chart and 10 in thumbnail (chrome seems to count the thumbnail, but firefox does not)
         assertElementPresent(Locator.tag("div").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP2_NAME + ",\n Days"), 12);
 
         goToGroupingTab();

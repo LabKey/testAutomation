@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -28,6 +27,8 @@ import org.labkey.test.util.ListHelper;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: cnathe
@@ -164,10 +165,10 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         assertFormElementEquals(Locator.name("labels").index(2), "Third QC State");
         assertFormElementEquals(Locator.name("descriptions").index(2), "The third qc state description");
         assertNotChecked(Locator.name("publicData").index(2));
-        Assert.assertEquals("First QC State", getSelectedOptionText(Locator.name("defaultPipelineQCState")).trim());
-        Assert.assertEquals("Second QC State", getSelectedOptionText(Locator.name("defaultAssayQCState")).trim());
-        Assert.assertEquals("Third QC State", getSelectedOptionText(Locator.name("defaultDirectEntryQCState")).trim());
-        Assert.assertEquals("Public data", getSelectedOptionText(Locator.name("showPrivateDataByDefault")).trim());
+        assertEquals("First QC State", getSelectedOptionText(Locator.name("defaultPipelineQCState")).trim());
+        assertEquals("Second QC State", getSelectedOptionText(Locator.name("defaultAssayQCState")).trim());
+        assertEquals("Third QC State", getSelectedOptionText(Locator.name("defaultDirectEntryQCState")).trim());
+        assertEquals("Public data", getSelectedOptionText(Locator.name("showPrivateDataByDefault")).trim());
     }
 
     private void addNewQCState(String name, String description, boolean publicData)

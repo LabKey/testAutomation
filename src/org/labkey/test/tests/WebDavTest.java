@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import com.googlecode.sardine.DavResource;
 import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
@@ -29,6 +28,8 @@ import org.labkey.test.util.PasswordUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 @Category(BVT.class)
 public class WebDavTest extends BaseWebDriverTest
@@ -64,15 +65,15 @@ public class WebDavTest extends BaseWebDriverTest
 
         Sardine sardine = SardineFactory.begin(PasswordUtil.getUsername(), PasswordUtil.getPassword());
         List<String> names = _listNames(sardine, testURL);
-        Assert.assertEquals(1, names.size());
-        Assert.assertFalse(names.contains("testfile1"));
+        assertEquals(1, names.size());
+        assertFalse(names.contains("testfile1"));
 
         sardine.put(testURL + "testfile1.txt", TEXT.getBytes());
         refresh();
         assertTextPresent("testfile1.txt");
         names = _listNames(sardine,testURL);
-        Assert.assertEquals(2, names.size());
-        Assert.assertTrue(names.contains("testfile1.txt"));
+        assertEquals(2, names.size());
+        assertTrue(names.contains("testfile1.txt"));
 
         // TODO test search
 
@@ -93,17 +94,17 @@ public class WebDavTest extends BaseWebDriverTest
         refresh();
         assertTextNotPresent("testfile1.txt");
         names = _listNames(sardine,testURL);
-        Assert.assertEquals(1, names.size());
-        Assert.assertFalse(names.contains("testfile1.txt"));
+        assertEquals(1, names.size());
+        assertFalse(names.contains("testfile1.txt"));
 
         try
         {
             sardine.list(testURL + "nonexistant/");
-            Assert.fail("Expected 404");
+            fail("Expected 404");
         }
         catch (IOException x)
         {
-            Assert.assertTrue(x.toString().contains("404"));
+            assertTrue(x.toString().contains("404"));
         }
     }
 

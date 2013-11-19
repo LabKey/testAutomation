@@ -15,9 +15,10 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+
+import static org.junit.Assert.*;
 
 /**
  * User: jeckels
@@ -45,7 +46,7 @@ public class UIContainerHelper extends AbstractContainerHelper
         _test.log("Creating project with name " + projectName);
         _test.ensureAdminMode();
         if (_test.isElementPresent(Locator.linkWithText(projectName)))
-            Assert.fail("Cannot create project; A link with text " + projectName + " already exists.  " +
+            fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
         _test.goToCreateProject();
         _test.waitForElement(Locator.name("name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
@@ -90,7 +91,7 @@ public class UIContainerHelper extends AbstractContainerHelper
         {
             if (failIfNotFound)
             {
-                Assert.fail("Project \""+ project + "\" not found");
+                fail("Project \""+ project + "\" not found");
             }
             else
             {
@@ -129,7 +130,7 @@ public class UIContainerHelper extends AbstractContainerHelper
         if (!_test.isElementPresent(Locator.linkWithText(project)))
             _test.log(project + " deleted in " + (System.currentTimeMillis() - startTime) + "ms");
         else
-            Assert.fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
+            fail(project + " not finished deleting after " + (System.currentTimeMillis() - startTime) + " ms");
 
         // verify that we're not on an error page with a check for a project link:
         _test.hoverProjectBar();

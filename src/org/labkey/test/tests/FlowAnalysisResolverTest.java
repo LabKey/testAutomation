@@ -15,12 +15,13 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.FileBrowserHelperWD;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -54,7 +55,7 @@ public class FlowAnalysisResolverTest extends FlowTest
         assertTextPresent("Matched 3 of 4 samples");
 
         //verify the first file doesn't resolve
-        Assert.assertEquals("", getMatchedFileForName("selectedSamples.rows[no-resolve01].matchedFile"));
+        assertEquals("", getMatchedFileForName("selectedSamples.rows[no-resolve01].matchedFile"));
 
         verifyCantChooseUnmatchedSample();
 

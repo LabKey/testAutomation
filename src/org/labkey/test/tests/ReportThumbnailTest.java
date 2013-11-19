@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -25,6 +24,8 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 @Category({DailyB.class})
 public class ReportThumbnailTest extends BaseWebDriverTest
@@ -160,7 +161,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         {
             throw new RuntimeException(ex);
         }
-        Assert.assertFalse("Thumbnail was was still default", THUMBNAIL_DATA.equals(thumbnailData));
+        assertFalse("Thumbnail was was still default", THUMBNAIL_DATA.equals(thumbnailData));
         THUMBNAIL_DATA = thumbnailData;
     }
 
@@ -218,7 +219,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         {
             throw new RuntimeException(e);
         }
-        Assert.assertFalse("Icon was still default", ICON_DATA.equals(iconData));
+        assertFalse("Icon was still default", ICON_DATA.equals(iconData));
         ICON_DATA = iconData;
     }
 

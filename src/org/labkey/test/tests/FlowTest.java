@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
@@ -34,6 +33,8 @@ import org.openqa.selenium.WebElement;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 @Category({BVT.class, Flow.class})
 public class FlowTest extends BaseFlowTest
@@ -342,12 +343,12 @@ public class FlowTest extends BaseFlowTest
         prepForPageLoad();
         selectOptionByText(ff_targetExperimentId, "<create new>");
         newWaitForPageToLoad();
-        Assert.assertEquals(2, countEnabledInputs(SELECT_CHECKBOX_NAME));
+        assertEquals(2, countEnabledInputs(SELECT_CHECKBOX_NAME));
         prepForPageLoad();
         selectOptionByText(ff_targetExperimentId, "FlowExperiment2");
         newWaitForPageToLoad();
 
-        Assert.assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
+        assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
         prepForPageLoad();
         selectOptionByText("ff_compensationMatrixOption", "Matrix: " + FCS_FILE_1 + " comp matrix");
         newWaitForPageToLoad();
@@ -424,11 +425,11 @@ public class FlowTest extends BaseFlowTest
         // check no graph errors are present and the graphs have labels
         assertTextNotPresent("Error generating graph");
         String href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
-        Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
 
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
-        Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
 
         // UNDONE: assert background values are correctly calculated
 
@@ -456,16 +457,16 @@ public class FlowTest extends BaseFlowTest
         // verify Issue 16304: query over flow.FCSFiles doesn't include URL for Name column
         DataRegionTable table = new DataRegionTable("query", this);
         String href = table.getHref(0, "Name");
-        Assert.assertTrue("Expected 'Name' href to go to showWell.view: " + href, href.contains("/" + getFolderName() + "/showWell.view"));
+        assertTrue("Expected 'Name' href to go to showWell.view: " + href, href.contains("/" + getFolderName() + "/showWell.view"));
         
         assertTextNotPresent("Error generating graph");
         assertTextPresent("No graph for:", "(<APC-A>)");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
-        Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
 
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
-        Assert.assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
     }
 
     @LogMethod
@@ -588,8 +589,8 @@ public class FlowTest extends BaseFlowTest
         _customizeViewsHelper.saveCustomView();
 
         DataRegionTable table = new DataRegionTable("query", this, false);
-        Assert.assertEquals(4, table.getDataRowCount());
-        Assert.assertEquals("91926.fcs-" + FCS_FILE_1, table.getDataAsText(0, "Name"));
+        assertEquals(4, table.getDataRowCount());
+        assertEquals("91926.fcs-" + FCS_FILE_1, table.getDataAsText(0, "Name"));
     }
 
     @LogMethod(quiet = true)

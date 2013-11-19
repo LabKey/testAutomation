@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -28,6 +27,8 @@ import org.labkey.test.util.LogMethod;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: Trey Chadick
@@ -88,10 +89,10 @@ public class CohortTest extends BaseWebDriverTest
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.linkWithText("Blood"), WAIT_FOR_PAGE);
 
         DataRegionTable specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
-        Assert.assertEquals("Incorrect number of vials.", "Count:  25", specimenTable.getTotal("Global Unique Id")); // 5 participants x 5 visits
+        assertEquals("Incorrect number of vials.", "Count:  25", specimenTable.getTotal("Global Unique Id")); // 5 participants x 5 visits
         List<String> cohortValues = specimenTable.getColumnDataAsText("Collection Cohort");
-        Assert.assertEquals(10, Collections.frequency(cohortValues, "Positive"));
-        Assert.assertEquals(10, Collections.frequency(cohortValues, "Negative"));
+        assertEquals(10, Collections.frequency(cohortValues, "Positive"));
+        assertEquals(10, Collections.frequency(cohortValues, "Negative"));
 
         setCohortFilter("Negative", AdvancedCohortType.INITIAL);
         verifyVialCount(specimenTable, 20); // One participant has no cohorts.
@@ -477,13 +478,13 @@ public class CohortTest extends BaseWebDriverTest
         log("Verify saved cohort filtered views");
         _extHelper.clickMenuButton("Views", "CurrentNegative");
         DataRegionTable dataset = new DataRegionTable("Dataset", this);
-        Assert.assertEquals("Unexpected row count", 4, dataset.getDataRowCount());
+        assertEquals("Unexpected row count", 4, dataset.getDataRowCount());
 
         _extHelper.clickMenuButton("Views", "InitialPositive");
-        Assert.assertEquals("Unexpected row count", 16, dataset.getDataRowCount());
+        assertEquals("Unexpected row count", 16, dataset.getDataRowCount());
 
         _extHelper.clickMenuButton("Views", "DataCollectionPositive");
-        Assert.assertEquals("Unexpected row count", 6, dataset.getDataRowCount());
+        assertEquals("Unexpected row count", 6, dataset.getDataRowCount());
     }
 
     @LogMethod
@@ -514,10 +515,10 @@ public class CohortTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//*[starts-with(@id, 'aqwp')]"));
         String drtId = getAttribute(Locator.xpath("//*[starts-with(@id, 'aqwp')]"), "id");
         DataRegionTable chartData = new DataRegionTable(drtId, this);
-        Assert.assertEquals("Wrong amount of data rows in quick chart", 12, chartData.getDataRowCount());
+        assertEquals("Wrong amount of data rows in quick chart", 12, chartData.getDataRowCount());
         List<String> participants = chartData.getColumnDataAsText("ParticipantID");
-        Assert.assertTrue("Expected participant was not present in chart data", participants.contains("Infected1"));
-        Assert.assertFalse("Filtered out participant was present in chart data", participants.contains("Infected4"));
+        assertTrue("Expected participant was not present in chart data", participants.contains("Infected1"));
+        assertFalse("Filtered out participant was present in chart data", participants.contains("Infected4"));
     }
 
     private void verifyDatasetEnrolledCohortFilter(String datasetName, boolean enrolledMenu, int allRowCount, int enrolledRowCount)
@@ -528,11 +529,11 @@ public class CohortTest extends BaseWebDriverTest
         {
             _extHelper.clickMenuButton("Participant Groups", "Enrolled");
             assertTextPresent("Current cohort is enrolled or unassigned");
-            Assert.assertEquals(enrolledRowCount, table.getDataRowCount());
+            assertEquals(enrolledRowCount, table.getDataRowCount());
         }
         else
         {
-            Assert.assertFalse("Enrolled menu should not be present", _extHelper.isExtMenuPresent("Participant Groups", "Enrolled"));
+            assertFalse("Enrolled menu should not be present", _extHelper.isExtMenuPresent("Participant Groups", "Enrolled"));
         }
     }
 
@@ -542,15 +543,15 @@ public class CohortTest extends BaseWebDriverTest
 
         _extHelper.clickMenuButton("Participant Groups", "Enrolled", AdvancedCohortType.INITIAL.toString());
         assertTextPresent("Initial cohort is enrolled or unassigned");
-        Assert.assertEquals(initialRowCount, table.getDataRowCount());
+        assertEquals(initialRowCount, table.getDataRowCount());
 
         _extHelper.clickMenuButton("Participant Groups", "Enrolled", AdvancedCohortType.CURRENT.toString());
         assertTextPresent("Current cohort is enrolled or unassigned");
-        Assert.assertEquals(currentRowCount, table.getDataRowCount());
+        assertEquals(currentRowCount, table.getDataRowCount());
 
         _extHelper.clickMenuButton("Participant Groups", "Enrolled", AdvancedCohortType.DATA_COLLECTION.toString());
         assertTextPresent("Cohort as of data collection is enrolled or unassigned");
-        Assert.assertEquals(dataCollectionRowCount, table.getDataRowCount());
+        assertEquals(dataCollectionRowCount, table.getDataRowCount());
     }
 
     private DataRegionTable verifyUnfilteredDataset(String datasetName, int allRowCount)
@@ -562,7 +563,7 @@ public class CohortTest extends BaseWebDriverTest
         assertTextNotPresent("Current cohort is enrolled or unassigned");
 
         DataRegionTable table = new DataRegionTable("Dataset", this);
-        Assert.assertEquals(allRowCount, table.getDataRowCount());
+        assertEquals(allRowCount, table.getDataRowCount());
 
         return table;
     }
@@ -579,7 +580,7 @@ public class CohortTest extends BaseWebDriverTest
         }
         else
         {
-            Assert.assertFalse("Enrolled menu should not be present", _extHelper.isExtMenuPresent("Participant Groups", "Enrolled"));
+            assertFalse("Enrolled menu should not be present", _extHelper.isExtMenuPresent("Participant Groups", "Enrolled"));
         }
     }
 
@@ -609,7 +610,7 @@ public class CohortTest extends BaseWebDriverTest
 
     private void verifyVialCount(DataRegionTable table, int expectedCount)
     {
-        Assert.assertEquals("Incorrect number of vials", "Count:  " + expectedCount, table.getTotal("Global Unique Id"));
+        assertEquals("Incorrect number of vials", "Count:  " + expectedCount, table.getTotal("Global Unique Id"));
     }
 
     private void verifyNewCohort()
@@ -663,11 +664,11 @@ public class CohortTest extends BaseWebDriverTest
         // we should not see the "enrolled" text in the participant list status message if no participants are unenrolled
         if (!expectEnrolledText)
         {
-            Assert.assertTrue("Should not see text: enrolled", !statusText.contains("enrolled"));
+            assertTrue("Should not see text: enrolled", !statusText.contains("enrolled"));
         }
         else
         {
-            Assert.assertTrue("Did not find expected text: enrolled", statusText.contains("enrolled"));
+            assertTrue("Did not find expected text: enrolled", statusText.contains("enrolled"));
         }
 
         // make sure everyone in the group is there
@@ -690,7 +691,7 @@ public class CohortTest extends BaseWebDriverTest
     private void assertPtid(String ptid, boolean present)
     {
         Locator loc = Locator.xpath("//li[contains(@class, 'ptid')]/a[string() = '" + ptid + "']");
-        Assert.assertEquals(ptid + " should " + (present ? "" : "not ") + "be present", present, isElementPresent(loc));
+        assertEquals(ptid + " should " + (present ? "" : "not ") + "be present", present, isElementPresent(loc));
     }
 
     // TODO: Same here

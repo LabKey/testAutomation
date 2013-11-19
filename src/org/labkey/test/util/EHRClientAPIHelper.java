@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.DeleteRowsCommand;
@@ -48,6 +47,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: bimber
@@ -256,12 +257,12 @@ public class EHRClientAPIHelper
             if (expectSuccess && HttpStatus.SC_OK != status)
             {
                 logResponse(response);
-                Assert.assertEquals("SaveRows request failed unexpectedly with code: " + status, HttpStatus.SC_OK, status);
+                assertEquals("SaveRows request failed unexpectedly with code: " + status, HttpStatus.SC_OK, status);
             }
             else if (!expectSuccess && HttpStatus.SC_BAD_REQUEST != status)
             {
                 logResponse(response);
-                Assert.assertEquals("SaveRows request failed unexpectedly with code: " + status, HttpStatus.SC_BAD_REQUEST, status);
+                assertEquals("SaveRows request failed unexpectedly with code: " + status, HttpStatus.SC_BAD_REQUEST, status);
             }
 
             String responseBody = WebTestHelper.getHttpResponseBody(response);

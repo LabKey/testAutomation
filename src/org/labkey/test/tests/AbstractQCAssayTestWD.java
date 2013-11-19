@@ -16,12 +16,13 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 
 import java.io.*;
+
+import static org.junit.Assert.*;
 
 /**
  * User: klum
@@ -58,7 +59,7 @@ public abstract class AbstractQCAssayTestWD extends AbstractAssayTestWD
             {
                 javaExe = new File(javaHome + "/bin/java");
                 if (!javaExe.exists())
-                    Assert.fail("unable to setup the java engine");
+                    fail("unable to setup the java engine");
             }
             setFormElement(Locator.id(id), javaExe.getAbsolutePath());
 
@@ -160,7 +161,7 @@ public abstract class AbstractQCAssayTestWD extends AbstractAssayTestWD
             setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
         }
         else
-            Assert.fail("unable to locate the Transform script");
+            fail("unable to locate the Transform script");
     }
 
     protected void startCreateNabAssay(String name)

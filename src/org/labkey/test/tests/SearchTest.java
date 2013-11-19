@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -26,6 +25,8 @@ import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.util.HashMap;
+
+import static org.junit.Assert.*;
 
 /**
  * User: Trey Chadick
@@ -167,7 +168,7 @@ public class SearchTest extends StudyWDTest
         // We want our nice, custom error messages to appear
         for (String phrase : expectedPhrases)
         {
-            Assert.assertTrue("Did not find expected error message: " + phrase, errorText.contains(phrase));
+            assertTrue("Did not find expected error message: " + phrase, errorText.contains(phrase));
         }
 
         // Various phrases that appear in the standard Lucene system error message

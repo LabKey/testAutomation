@@ -16,13 +16,14 @@
 package org.labkey.test.util;
 
 import org.apache.http.HttpStatus;
-import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: Trey Chadick
@@ -51,11 +52,11 @@ public class SearchHelper extends AbstractHelper
             _test.log("Waiting for indexer");
             // Invoke a special server action that waits until all previous indexer tasks are complete
             int response = WebTestHelper.getHttpGetResponse(_test.getBaseURL() + "/search/waitForIndexer.view");
-            Assert.assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
+            assertEquals("WaitForIndexer action timed out", HttpStatus.SC_OK, response);
         }
         catch (Exception e)
         {
-            Assert.fail("WaitForIndexer action failed" + e.getMessage());
+            fail("WaitForIndexer action failed" + e.getMessage());
         }
     }
 
@@ -78,7 +79,7 @@ public class SearchHelper extends AbstractHelper
                 _test.sleep(10000);
                 notFound = verifySearchItems(notFound, container, crawlResults);
 
-                Assert.assertTrue("These items were not found: " + notFound.toString(), notFound.isEmpty());
+                assertTrue("These items were not found: " + notFound.toString(), notFound.isEmpty());
             }
         }
     }
@@ -129,7 +130,7 @@ public class SearchHelper extends AbstractHelper
 
                 if ( crawlResults )
                 {
-                    Assert.fail("Search result crawling not yet implemented");
+                    fail("Search result crawling not yet implemented");
                 }
             }
         }

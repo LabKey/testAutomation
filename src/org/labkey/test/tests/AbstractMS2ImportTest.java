@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
@@ -24,6 +23,8 @@ import org.labkey.test.ms2.MS2TestBase;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /** Base class for MS2 tests that import existing results from the file system, instead of initiating new searches */
 public abstract class AbstractMS2ImportTest extends MS2TestBase
@@ -84,7 +85,7 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
-            Assert.fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
+            fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
         super.doTestSteps();
 

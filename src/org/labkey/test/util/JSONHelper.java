@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -26,6 +25,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import static org.junit.Assert.*;
 
 /**
  * Utilities to compare JSON blobs.
@@ -79,7 +80,7 @@ public class JSONHelper extends AbstractHelper
 
         if(actualJSON == null)
         {
-            Assert.fail("Unable to parse response:\n"+actual);
+            fail("Unable to parse response:\n"+actual);
         }
 
         if (compareElement(expectedJSON, actualJSON))
@@ -92,7 +93,7 @@ public class JSONHelper extends AbstractHelper
             _test.log("Actual:\n" + actual + "\n");
 
             String diff = Diff.diff(expected, actual);
-            Assert.fail(msg + "\n" + diff + "\n");
+            fail(msg + "\n" + diff + "\n");
         }
     }
 
@@ -108,7 +109,7 @@ public class JSONHelper extends AbstractHelper
             _test.log("Actual:\n" + actual.toJSONString() + "\n");
 
             String diff = Diff.diff(expected.toString(), actual.toString());
-            Assert.fail(msg + "\n" + diff + "\n");
+            fail(msg + "\n" + diff + "\n");
         }
     }
 

@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -30,6 +29,8 @@ import org.openqa.selenium.WebElement;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.Assert.*;
 
 @Category(InDevelopment.class)
 public class ListPublishTest extends BaseWebDriverTest
@@ -86,7 +87,7 @@ public class ListPublishTest extends BaseWebDriverTest
         {
             WebElement text = getDriver().findElement(By.xpath("//a[@href = '/labkey/list/ListPublishTestProject/PublishedLists/details.view?listId=4&pk="+i+"']"));
             assertTextNotPresent(ptid);
-            Assert.assertTrue(!text.getText().equals(""));
+            assertTrue(!text.getText().equals(""));
             i++;
         }
     }
@@ -195,7 +196,7 @@ public class ListPublishTest extends BaseWebDriverTest
         {
             clickFolder("PublishedLists");
             goToList(listIds[i]);
-            Assert.assertEquals(getUrlParam(getURL().toString(), "listId", false), ""+(i+1));
+            assertEquals(getUrlParam(getURL().toString(), "listId", false), ""+(i+1));
         }
     }
 

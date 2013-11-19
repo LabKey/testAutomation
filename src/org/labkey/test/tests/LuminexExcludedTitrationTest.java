@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Assays;
@@ -24,6 +23,8 @@ import org.labkey.test.categories.MiniTest;
 import org.labkey.test.util.LogMethod;
 
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: RyanS
@@ -129,12 +130,12 @@ public class LuminexExcludedTitrationTest extends LuminexTest
 
             if (analyte.contains(excludedAnalyte) && description.equals(excludedTitration))
             {
-                Assert.assertTrue(comment.contains(exclusionMessage));
+                assertTrue(comment.contains(exclusionMessage));
             }
 
             if (comment.contains(exclusionMessage))
             {
-                Assert.assertTrue(analyte.contains(excludedAnalyte) && description.equals(excludedTitration));
+                assertTrue(analyte.contains(excludedAnalyte) && description.equals(excludedTitration));
             }
         }
     }
@@ -170,7 +171,7 @@ public class LuminexExcludedTitrationTest extends LuminexTest
 
             if(description.equals(excludedTitration))
             {
-                Assert.assertTrue(comment.contains(exclusionMessage));
+                assertTrue(comment.contains(exclusionMessage));
             }
         }
     }

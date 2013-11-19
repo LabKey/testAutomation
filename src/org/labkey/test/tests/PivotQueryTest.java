@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -24,6 +23,8 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: kevink
@@ -99,9 +100,9 @@ public class PivotQueryTest extends BaseWebDriverTest
         // First "ConcInRange_CONCAT" data cell
         Locator ConcInRange_CONCAT_cell = Locator.xpath("//*[@id=\"dataregion_query\"]/tbody/tr[5]/td[6]");
         String contents = getText(ConcInRange_CONCAT_cell);
-        Assert.assertNotNull("The GROUP_CONCAT cell is empty", contents);
+        assertNotNull("The GROUP_CONCAT cell is empty", contents);
         String[] concats = contents.split(", *");
-        Assert.assertTrue("Expected 5 GROUP_CONCAT values", concats.length == 5);
+        assertTrue("Expected 5 GROUP_CONCAT values", concats.length == 5);
     }
 
     @Override public BrowserType bestBrowser()

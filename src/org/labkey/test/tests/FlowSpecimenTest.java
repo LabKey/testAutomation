@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
@@ -27,6 +26,8 @@ import org.labkey.test.util.LogMethod;
 
 import java.util.Arrays;
 import java.util.Collections;
+
+import static org.junit.Assert.*;
 
 /**
  * This test checks the flow specimen foreign key behavior from flow.FCSFiles and flow.FCSAnalyses.
@@ -110,7 +111,7 @@ public class FlowSpecimenTest extends BaseFlowTest
         log("** Verify Target Study is set on FCSFile run");
         beginAt("/flow-run/" + getContainerPath() + "/showRuns.view");
         DataRegionTable table = new DataRegionTable("query", this);
-        Assert.assertEquals(STUDY_FOLDER + " Study", table.getDataAsText(0, "Target Study"));
+        assertEquals(STUDY_FOLDER + " Study", table.getDataAsText(0, "Target Study"));
         clickAndWait(Locator.linkWithText("details"));
         assertElementPresent(Locator.linkWithText(STUDY_FOLDER + " Study"));
 
@@ -142,12 +143,12 @@ public class FlowSpecimenTest extends BaseFlowTest
         clickButton("Next");
         assertTitleContains("Copy to " + STUDY_FOLDER + " Study: Verify Results");
         // verify specimen information is filled in for '118795.fcs' FCS file
-        Assert.assertEquals(PTID, getFormElement(Locator.name("participantId", 0)));
-        Assert.assertEquals(DATE, getFormElement(Locator.name("date", 0)));
+        assertEquals(PTID, getFormElement(Locator.name("participantId", 0)));
+        assertEquals(DATE, getFormElement(Locator.name("date", 0)));
         clickButton("Copy to Study");
 
         assertTitleContains("Dataset: Flow");
-        Assert.assertTrue("Expected go to STUDY_FOLDER container", getCurrentRelativeURL().contains("/" + STUDY_FOLDER));
+        assertTrue("Expected go to STUDY_FOLDER container", getCurrentRelativeURL().contains("/" + STUDY_FOLDER));
         // PTID and Date from specimen vial 'Sample_002' from specimen repository
         assertTextPresent(PTID, DATE);
     }
@@ -190,10 +191,10 @@ public class FlowSpecimenTest extends BaseFlowTest
         // verify the specimen columns are present
         DataRegionTable table = new DataRegionTable(getDriver().getCurrentUrl().contains("dataset.view") ? "Dataset" : "query", this);
         int row = table.getRow("Name", "118795.fcs");
-        Assert.assertEquals("Sample_002", table.getDataAsText(row, "Specimen ID"));
-        Assert.assertEquals("Sample_002", table.getDataAsText(row, "Specimen Global Unique Id"));
-        Assert.assertEquals("100.0", table.getDataAsText(row, "Specimen Volume"));
-        Assert.assertEquals("20120912", table.getDataAsText(row, "Sequence Num"));
+        assertEquals("Sample_002", table.getDataAsText(row, "Specimen ID"));
+        assertEquals("Sample_002", table.getDataAsText(row, "Specimen Global Unique Id"));
+        assertEquals("100.0", table.getDataAsText(row, "Specimen Volume"));
+        assertEquals("20120912", table.getDataAsText(row, "Sequence Num"));
     }
 
 }

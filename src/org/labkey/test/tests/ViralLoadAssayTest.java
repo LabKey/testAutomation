@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +44,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: bimber
@@ -201,7 +202,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
             rowMap.put("reporter", "FAM");
             insertCmd.addRow(rowMap);
             SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
-            Assert.assertEquals("Prolem creating record", saveResp.getRowsAffected(), (long)1);
+            assertEquals("Prolem creating record", saveResp.getRowsAffected(), (long)1);
         }
         else
         {
@@ -368,9 +369,9 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
-        Assert.assertEquals("Incorrect value for field", "ABI 7500", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
-        Assert.assertEquals("Incorrect value for field", new Long(60), Ext4FieldRefWD.getForLabel(this, "Eluate Volume").getValue());
-        Assert.assertEquals("Incorrect value for field", new Long(20), Ext4FieldRefWD.getForLabel(this, "Sample Vol Per Rxn").getValue());
+        assertEquals("Incorrect value for field", "ABI 7500", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
+        assertEquals("Incorrect value for field", new Long(60), Ext4FieldRefWD.getForLabel(this, "Eluate Volume").getValue());
+        assertEquals("Incorrect value for field", new Long(20), Ext4FieldRefWD.getForLabel(this, "Sample Vol Per Rxn").getValue());
         waitAndClick(btn);
 
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
@@ -504,7 +505,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         int j = 0;
         while (j < 4)
         {
-            Assert.assertEquals("Incorrect QC Flag", "HIGH CV", results.getDataAsText(j, "QC Flags"));
+            assertEquals("Incorrect QC Flag", "HIGH CV", results.getDataAsText(j, "QC Flags"));
             j++;
         }
 
@@ -516,7 +517,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         waitForElement(Locator.tagContainingText("span", "Planned Assay Runs"), WAIT_FOR_PAGE);
 
         DataRegionTable dr2 = new DataRegionTable("query", this);
-        Assert.assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
+        assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
     }
 
     private void importLC480Run()
@@ -535,9 +536,9 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
         Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
 
-        Assert.assertEquals("Incorrect value for field", "LC480", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
-        Assert.assertEquals("Incorrect value for field", new Long(50), Ext4FieldRefWD.getForLabel(this, "Eluate Volume").getValue());
-        Assert.assertEquals("Incorrect value for field", new Long(5), Ext4FieldRefWD.getForLabel(this, "Sample Vol Per Rxn").getValue());
+        assertEquals("Incorrect value for field", "LC480", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
+        assertEquals("Incorrect value for field", new Long(50), Ext4FieldRefWD.getForLabel(this, "Eluate Volume").getValue());
+        assertEquals("Incorrect value for field", new Long(5), Ext4FieldRefWD.getForLabel(this, "Sample Vol Per Rxn").getValue());
         waitAndClick(btn);
 
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
@@ -626,9 +627,9 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
         //set other field values
         Ext4FieldRefWD.getForLabel(this, "Sample Type").setValue("Serum");
-        Assert.assertEquals("Incorrect value for field", "Light Cycler", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
-        Assert.assertEquals("Incorrect value for field", new Long(50), Ext4FieldRefWD.getForLabel(this, "Eluate Volume").getValue());
-        Assert.assertEquals("Incorrect value for field", new Long(5), Ext4FieldRefWD.getForLabel(this, "Sample Vol Per Rxn").getValue());
+        assertEquals("Incorrect value for field", "Light Cycler", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
+        assertEquals("Incorrect value for field", new Long(50), Ext4FieldRefWD.getForLabel(this, "Eluate Volume").getValue());
+        assertEquals("Incorrect value for field", new Long(5), Ext4FieldRefWD.getForLabel(this, "Sample Vol Per Rxn").getValue());
         waitAndClick(btn);
 
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
@@ -692,14 +693,14 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         results = new DataRegionTable(results.getTableName(), this);  //attempt to fix test timing
 
         String sampleType = results.getDataAsText(2, "Sample Type");
-        Assert.assertEquals("Incorrect sample type", "Serum", sampleType);
+        assertEquals("Incorrect sample type", "Serum", sampleType);
 
         verifyImportedVLs(totalRows, expected, results, new String[]{"Subject Id"});
     }
 
     private void verifyImportedVLs(int totalRows, Map<String, String[]> expected, DataRegionTable results, @Nullable String[] keyFields)
     {
-        Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
+        assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
         waitForText("SIVmac239-Gag"); //proxy for DR load
 
         log("DataRegion column count was: " + results.getColumnCount());
@@ -736,17 +737,17 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
                 }
                 expectedVals = expected.get(sb.toString());
             }
-            Assert.assertNotNull("Unable to find expected values: " + sb.toString(), expectedVals);
+            assertNotNull("Unable to find expected values: " + sb.toString(), expectedVals);
 
-            Assert.assertEquals("Incorrect subjectId on row: " + i, expectedVals[0], subjectId);
-            Assert.assertEquals("Incorrect category on row: " + i, expectedVals[1], category);
+            assertEquals("Incorrect subjectId on row: " + i, expectedVals[0], subjectId);
+            assertEquals("Incorrect category on row: " + i, expectedVals[1], category);
 
             if (!("".equals(expectedVals[2]) && " ".equals(date)))
-                Assert.assertEquals("Incorrect sample date on row: " + i, expectedVals[2], date);
+                assertEquals("Incorrect sample date on row: " + i, expectedVals[2], date);
 
             Double vl1 = Double.parseDouble(expectedVals[3]);
             String vlFormatted = formatter.format(vl1);
-            Assert.assertEquals("Incorrect VL on row: " + i, vlFormatted, StringUtils.trimToNull(vl));
+            assertEquals("Incorrect VL on row: " + i, vlFormatted, StringUtils.trimToNull(vl));
 
             i++;
         }

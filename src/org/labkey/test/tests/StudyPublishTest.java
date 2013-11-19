@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -35,6 +34,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -246,9 +247,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         {
             searchHelper.searchForSubjects(ptid);
             if (alternateIDs)
-                Assert.assertFalse("Published study contains non-alternate ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
+                assertFalse("Published study contains non-alternate ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
             else
-                Assert.assertTrue("Published study doesn't contain ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
+                assertTrue("Published study doesn't contain ID: " + ptid, getText(Locator.id("searchResults")).contains(name));
         }
 
         // Go to published study
@@ -292,9 +293,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Verify correct published datasets
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         if (datasets.length > 0)
-            Assert.assertEquals("Unexpected number of datasets", datasets.length + dependentDatasets.length, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
+            assertEquals("Unexpected number of datasets", datasets.length + dependentDatasets.length, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
         else // All visits were published
-            Assert.assertEquals("Unexpected number of datasets", datasetCount, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
+            assertEquals("Unexpected number of datasets", datasetCount, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
         for (String dataset: datasets)
         {
             pushLocation();
@@ -318,9 +319,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         goToManageStudy();
         clickAndWait(Locator.linkWithText("Manage Visits"));
         if (visits.length > 0)
-            Assert.assertEquals("Unexpected number of visits", visits.length, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
+            assertEquals("Unexpected number of visits", visits.length, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
         else // All visits were published
-            Assert.assertEquals("Unexpected number of visits", visitCount, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
+            assertEquals("Unexpected number of visits", visitCount, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
         for (String visit: visits)
         {
             assertTextPresent(visit);
@@ -335,20 +336,20 @@ public class StudyPublishTest extends StudyProtectedExportTest
             DataRegionTable datasetTable = new DataRegionTable("Dataset", this, true, true);
             unshiftedDates.addAll(datasetTable.getColumnDataAsText(UNSHIFTED_DATE_FIELD.getValue()));
             shiftedDates.addAll(datasetTable.getColumnDataAsText(SHIFTED_DATE_FIELD.getValue()));
-            Assert.assertTrue("Column '" + UNSHIFTED_DATE_FIELD.getValue() + "' should not be shifted", unshiftedDatesByStudy.get(name).containsAll(unshiftedDates));
+            assertTrue("Column '" + UNSHIFTED_DATE_FIELD.getValue() + "' should not be shifted", unshiftedDatesByStudy.get(name).containsAll(unshiftedDates));
 
             if (shiftDates)
             {
-                Assert.assertFalse("Column '" + SHIFTED_DATE_FIELD.getValue() + "' should be shifted", preshiftedDatesByStudy.get(name).containsAll(shiftedDates));
+                assertFalse("Column '" + SHIFTED_DATE_FIELD.getValue() + "' should be shifted", preshiftedDatesByStudy.get(name).containsAll(shiftedDates));
             }
             else
             {
-                Assert.assertTrue("Column '" + SHIFTED_DATE_FIELD.getValue() + "' should not be shifted", preshiftedDatesByStudy.get(name).containsAll(shiftedDates));
+                assertTrue("Column '" + SHIFTED_DATE_FIELD.getValue() + "' should not be shifted", preshiftedDatesByStudy.get(name).containsAll(shiftedDates));
             }
         }
         else if (visits.length > 0)
         {
-            Assert.fail("Test error: Please export visit [" + DATE_SHIFT_REQUIRED_VISIT + "] to allow verification of date shifting");
+            fail("Test error: Please export visit [" + DATE_SHIFT_REQUIRED_VISIT + "] to allow verification of date shifting");
         }
 
         if (reports.length > 0 || views.length > 0)
@@ -365,7 +366,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
             }
 
             String viewXpath = "//tr[contains(@class, 'x4-grid-tree-node-leaf')]";
-            Assert.assertEquals("Unexpected number of views/reports", views.length + reports.length, getXpathCount(Locator.xpath(viewXpath)));
+            assertEquals("Unexpected number of views/reports", views.length + reports.length, getXpathCount(Locator.xpath(viewXpath)));
         }
 
         // Verify published reports/views
@@ -441,7 +442,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         {
             goToModule("List");
             assertTextPresent(lists);
-            Assert.assertEquals("Unexpected number of lists", lists.length, getXpathCount(Locator.xpath("id('lists')//tr")));
+            assertEquals("Unexpected number of lists", lists.length, getXpathCount(Locator.xpath("id('lists')//tr")));
             for (String list : lists)
             {
                 pushLocation();
@@ -599,7 +600,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'General Setup']"));
         setFormElement(Locator.name("studyName"), name);
         setFormElement(Locator.name("studyDescription"), description);
-        Assert.assertTrue(PROTOCOL_DOC.exists());
+        assertTrue(PROTOCOL_DOC.exists());
         setFormElement(Locator.name("protocolDoc"), PROTOCOL_DOC);
         selectLocation(parentContainer);
         clickButton("Next", 0);
@@ -891,7 +892,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
                     }
                     nodeXpath += "/../ul/li/div[contains(@class, 'x-tree-node-el') and string()='"+splitPath[i]+"']";
                     if (!isElementPresent(Locator.xpath(nodeXpath)))
-                        Assert.fail("Unable to find folder: " + containerPath);
+                        fail("Unable to find folder: " + containerPath);
                 }
                 selenium.doubleClick(Locator.xpath(nodeXpath).toString());
             }

@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -27,6 +26,8 @@ import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.PasswordUtil;
 
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tamram
@@ -388,10 +389,10 @@ public class MessagesLongTest extends BaseWebDriverTest
         goToModule("Dumbster");
         DataRegionTable record = new DataRegionTable("EmailRecord", this, false, false);
         List<String> subject = record.getColumnDataAsText("Message");
-        Assert.assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(0));
-        Assert.assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(1));
+        assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(0));
+        assertEquals("Message creator and responder should both receive notifications", "RE: "+_messageTitle, subject.get(1));
         List<String> to = record.getColumnDataAsText("To");
-        Assert.assertTrue("Incorrect message notifications.",
+        assertTrue("Incorrect message notifications.",
                 to.get(0).equals(RESPONDER) && to.get(1).equals(PasswordUtil.getUsername()) ||
                 to.get(1).equals(RESPONDER) && to.get(0).equals(PasswordUtil.getUsername()));
 

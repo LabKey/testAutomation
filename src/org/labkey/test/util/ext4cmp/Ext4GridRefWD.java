@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util.ext4cmp;
 
-import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
@@ -27,6 +26,8 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: bimber
@@ -113,7 +114,7 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
             idx = getIndexOfColumn(column, "dataIndex", visibleOnly);
 
         if (assertPresent)
-            Assert.assertTrue("Unable to find column where either name or dataIndex has value: " + column, idx >= 0);
+            assertTrue("Unable to find column where either name or dataIndex has value: " + column, idx >= 0);
 
         return idx;
     }
@@ -151,7 +152,7 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
             completeEdit();
         }
 
-        Assert.assertFalse("Grid input should not be visible", el.isDisplayed());
+        assertFalse("Grid input should not be visible", el.isDisplayed());
         waitForGridEditorToDisappear();
     }
 
@@ -276,7 +277,7 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         completeEdit();
 
         Boolean didStart = (Boolean)getFnEval("return this.editingPlugin.startEdit(" + (rowIdx-1) + ", " + (colIdx-1) + ");");
-        Assert.assertTrue("Unable to start grid edit", didStart);
+        assertTrue("Unable to start grid edit", didStart);
 
         waitForGridEditor();
 

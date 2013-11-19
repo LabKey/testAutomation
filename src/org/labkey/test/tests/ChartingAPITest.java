@@ -26,7 +26,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -38,6 +37,8 @@ import org.labkey.test.util.LogMethod;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -135,7 +136,7 @@ public class ChartingAPITest extends ClientAPITest
         String chartHtml = createAPITestWiki("chartTestWiki", chartTestFile, true);
 
         if (!chartHtml.contains("<img") && !chartHtml.contains("<IMG"))
-            Assert.fail("Test div does not contain an image:\n" + chartHtml);
+            fail("Test div does not contain an image:\n" + chartHtml);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -178,9 +179,9 @@ public class ChartingAPITest extends ClientAPITest
             method.setEntity(new UrlEncodedFormEntity(args));
             response = httpClient.execute(method, context);
             int status = response.getStatusLine().getStatusCode();
-            Assert.assertEquals("SVG Downloaded", HttpStatus.SC_OK, status);
-            Assert.assertTrue(response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
-            Assert.assertTrue(response.getHeaders("Content-Type")[0].getValue().startsWith("application/pdf"));
+            assertEquals("SVG Downloaded", HttpStatus.SC_OK, status);
+            assertTrue(response.getHeaders("Content-Disposition")[0].getValue().startsWith("attachment;"));
+            assertTrue(response.getHeaders("Content-Type")[0].getValue().startsWith("application/pdf"));
         }
         finally
         {
@@ -283,21 +284,21 @@ public class ChartingAPITest extends ClientAPITest
     {
         if (hasError)
         {
-            Assert.assertTrue("Expected one error", getElementCount(Locator.css(".labkey-error")) == 1);
+            assertTrue("Expected one error", getElementCount(Locator.css(".labkey-error")) == 1);
         }
         else
         {
-            Assert.assertTrue("Expected zero errors.", getElementCount(Locator.css(".labkey-error")) == 0);
+            assertTrue("Expected zero errors.", getElementCount(Locator.css(".labkey-error")) == 0);
         }
 
         if (svgCount > 0)
         {
             assertTextPresent(title);
-            Assert.assertTrue("Expected " + svgCount + " SVG element(s).", getElementCount(Locator.css("svg")) == svgCount);
+            assertTrue("Expected " + svgCount + " SVG element(s).", getElementCount(Locator.css("svg")) == svgCount);
         }
         else
         {
-            Assert.assertTrue("Expected 0 SVG elements.", getElementCount(Locator.css("svg")) == 0);
+            assertTrue("Expected 0 SVG elements.", getElementCount(Locator.css("svg")) == 0);
         }
 
         if (svgText != null)

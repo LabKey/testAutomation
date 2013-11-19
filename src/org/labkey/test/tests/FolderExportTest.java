@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -31,6 +30,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -183,7 +184,7 @@ public class FolderExportTest extends BaseWebDriverTest
                 else
                 {
                     assertElementPresent(titleLoc.withText(expectedTitle));
-                    Assert.fail("Webpart found out of order: " + expectedTitle);
+                    fail("Webpart found out of order: " + expectedTitle);
                 }
             }
         }
@@ -214,11 +215,11 @@ public class FolderExportTest extends BaseWebDriverTest
         log("verify search settings as expected");
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Search"));
-        Assert.assertFalse("Folder search settings not imported", isChecked(Locator.checkboxById("searchable")));
+        assertFalse("Folder search settings not imported", isChecked(Locator.checkboxById("searchable")));
 
         log("verify folder type was overwritten on import");
         clickAndWait(Locator.linkContainingText("Folder Type"));
-        Assert.assertTrue("Folder type not overwritten on import", isChecked(Locator.radioButtonByNameAndValue("folderType", "None")));
+        assertTrue("Folder type not overwritten on import", isChecked(Locator.radioButtonByNameAndValue("folderType", "None")));
 
         log("verify notification default settings as expected");
         clickAndWait(Locator.linkWithText("Notifications"));

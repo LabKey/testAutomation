@@ -17,7 +17,6 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
@@ -29,6 +28,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: Trey Chadick
@@ -693,7 +694,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         _test.clickMenuButton("Views", "Create", "R View");
 
         if(view!=null)
-            Assert.fail("Unimplemented");
+            fail("Unimplemented");
 
         if (shareView)
             _reportHelper.selectOption(RReportHelperWD.ReportOption.shareReport);

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.ms1.params;
 
-import org.junit.Assert;
 import org.labkey.test.Locator;
 import org.labkey.test.pipeline.AbstractPipelineTestParams;
 import org.labkey.test.pipeline.PipelineWebTestBase;
@@ -24,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static org.junit.Assert.*;
 
 /**
  * InspectTestParams class
@@ -103,7 +104,7 @@ abstract public class AbstractInspectTestParams extends AbstractPipelineTestPara
             {
                 File cacheFile = new File(cacheDir, sampleName + ext);
                 if (cacheFile.exists())
-                    Assert.fail("Pipeline files were not cleaned up; "+ cacheFile + " still exists");
+                    fail("Pipeline files were not cleaned up; "+ cacheFile + " still exists");
             }
         }
     }

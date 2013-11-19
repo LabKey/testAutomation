@@ -26,7 +26,6 @@ import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ListHelper;
-import org.junit.Assert;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIAssayHelper;
@@ -34,6 +33,8 @@ import org.labkey.test.util.UIAssayHelper;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -180,7 +181,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(name));
         waitForElement(Locator.id("dataregion_query"));
         DataRegionTable drt = new DataRegionTable("query", this);
-        Assert.assertEquals("Unexpected number of rows in the query", expectedCount, drt.getDataRowCount());
+        assertEquals("Unexpected number of rows in the query", expectedCount, drt.getDataRowCount());
     }
 
     private void addSpecimenConfiguration(String assayName, String source, int locationId, String tubeType, boolean expectRows)
@@ -215,17 +216,17 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     {
         clickFolder(assayFolder);
         waitForElement(tableLoc);
-        Assert.assertEquals(0, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
-        Assert.assertEquals(24, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
-        Assert.assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
-        Assert.assertEquals(0, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
-        Assert.assertEquals(54, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
-        Assert.assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
+        assertEquals(0, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
+        assertEquals(24, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
+        assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
+        assertEquals(0, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
+        assertEquals(54, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
 
         flagSpecimenForReview(assayName, runName, null);
 
         waitForElement(tableLoc);
-        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
 
         // verify legend text and ordering
         assertTextPresentInThisOrder("specimen expected", "specimen received by lab", "specimen not collected",
@@ -272,13 +273,13 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
         waitForElement(tableLoc);
         assertTextPresentInThisOrder("SR1", "SR2");
-        Assert.assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
-        Assert.assertEquals(3, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
-        Assert.assertEquals(2 + ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
-        Assert.assertEquals(2 - ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'received')]")));
-        Assert.assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
-        Assert.assertEquals(10, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
-        Assert.assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
+        assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
+        assertEquals(3, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
+        assertEquals(2 + ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
+        assertEquals(2 - ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'received')]")));
+        assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
+        assertEquals(10, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
     }
 
     private void verifyUnassayedSpecimenQuery(String assayName)
@@ -288,7 +289,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         waitForText("view data");
         clickAndWait(Locator.linkContainingText("view data"));
         DataRegionTable drt = new DataRegionTable("query", this);
-        Assert.assertEquals(4, drt.getDataRowCount());
+        assertEquals(4, drt.getDataRowCount());
         assertTextPresent("specimen collected", 2);
         assertTextPresent("specimen received by lab", 2);
     }

@@ -15,11 +15,12 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.CreateUserResponse;
 import org.labkey.test.BaseSeleniumWebTest;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -45,14 +46,14 @@ public class APIUserHelper extends AbstractUserHelper
 
                 if (verifySuccess)
                 {
-                    Assert.assertEquals(userName, response.getEmail());
-                    Assert.assertTrue("Invalid userId", response.getUserId() != null);
+                    assertEquals(userName, response.getEmail());
+                    assertTrue("Invalid userId", response.getUserId() != null);
                 }
             }
             catch (Exception e)
             {
                 if(verifySuccess)
-                    Assert.fail("Error while creating user: " + e.getMessage());
+                    fail("Error while creating user: " + e.getMessage());
             }
     }
 }

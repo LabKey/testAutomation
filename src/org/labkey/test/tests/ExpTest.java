@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
@@ -28,6 +27,8 @@ import org.labkey.test.util.ListHelper;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import static org.junit.Assert.*;
 
 /**
  * User: brittp
@@ -83,7 +84,7 @@ public class ExpTest extends BaseSeleniumWebTest
         }
 
         if (!isLinkPresentWithText("COMPLETE"))
-            Assert.fail("Import did not complete.");
+            fail("Import did not complete.");
 
         clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkWithText(EXPERIMENT_NAME));
@@ -152,7 +153,7 @@ public class ExpTest extends BaseSeleniumWebTest
 
         // Make it a lookup into our custom query
         int fieldCount = getXpathCount(Locator.xpath("//input[contains(@name, 'ff_type')]"));
-        Assert.assertTrue(fieldCount > 0);
+        assertTrue(fieldCount > 0);
         _listHelper.setColumnType(fieldCount - 1, new ListHelper.LookupInfo(null, "exp", "dataCustomQuery"));
         mouseClick(Locator.name("ff_type" + (fieldCount - 1)).toString());
 

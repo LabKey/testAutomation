@@ -15,12 +15,13 @@
  */
 package org.labkey.test;
 
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.labkey.test.tests.SimpleApiTestWD;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tchadick
@@ -73,7 +74,7 @@ public abstract class BaseWebDriverMultipleTest extends SimpleApiTestWD
     public final void testSteps()
     {
         //Block Base @Test method
-        Assert.fail("Test executing incorrectly");
+        fail("Test executing incorrectly");
     }
 
     @Override
@@ -81,7 +82,7 @@ public abstract class BaseWebDriverMultipleTest extends SimpleApiTestWD
     {
         // Don't use SimpleApiTest test methodology
         // Extending SimpleApiTest for its functionality
-        Assert.fail("Test executing incorrectly");
+        fail("Test executing incorrectly");
     }
 
     @Override
@@ -89,6 +90,6 @@ public abstract class BaseWebDriverMultipleTest extends SimpleApiTestWD
     {
         // Don't use SimpleApiTest test methodology
         // Extending SimpleApiTest for its functionality
-        Assert.fail("Test executing incorrectly");
+        fail("Test executing incorrectly");
     }
 }

@@ -33,7 +33,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
-import org.junit.Assert;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.BufferedReader;
@@ -43,6 +42,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import static org.junit.Assert.*;
 
 /**
  * User: Mark Igra
@@ -282,7 +282,7 @@ public class WebTestHelper
         }
         catch (URISyntaxException e)
         {
-            Assert.fail("Unable to parse URL: " + getBaseURL());
+            fail("Unable to parse URL: " + getBaseURL());
             return null; // unreachable
         }
 
@@ -309,7 +309,7 @@ public class WebTestHelper
         }
         catch (URISyntaxException e)
         {
-            Assert.fail("Unable to parse URL: " + getBaseURL());
+            fail("Unable to parse URL: " + getBaseURL());
             return null; // unreachable
         }
     }

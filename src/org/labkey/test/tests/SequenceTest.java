@@ -24,7 +24,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.Filter;
@@ -60,6 +59,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
+
+import static org.junit.Assert.*;
 
 /**
  * User: bbimber
@@ -181,7 +182,7 @@ public class SequenceTest extends BaseWebDriverTest
         for (String[] a : fieldPairs)
         {
             String propName = a.length == 3 ? a[2] : a[0];
-            Assert.assertEquals(a[1], Ext4FieldRefWD.getForLabel(this, propName).getValue());
+            assertEquals(a[1], Ext4FieldRefWD.getForLabel(this, propName).getValue());
         }
 
         clickButton("Edit Sheet", 0);
@@ -204,14 +205,14 @@ public class SequenceTest extends BaseWebDriverTest
 
         //verify template has changed
         _ext4Helper.clickTabContainingText("General Info");
-        Assert.assertEquals("Custom", Ext4FieldRefWD.getForLabel(this, "Application").getValue());
+        assertEquals("Custom", Ext4FieldRefWD.getForLabel(this, "Application").getValue());
 
         //verify samples present
         _ext4Helper.clickTabContainingText("Preview Samples");
         waitForText("Sample_ID");
 
         int expectRows = (11 * (14 +  1));  //11 cols, 14 rows, plus header
-        Assert.assertEquals(expectRows, getElementCount(Locator.xpath("//td[contains(@class, 'x4-table-layout-cell')]")));
+        assertEquals(expectRows, getElementCount(Locator.xpath("//td[contains(@class, 'x4-table-layout-cell')]")));
 
         //NOTE: hitting download will display the text in the browser; however, this replaces newlines w/ spaces.  therefore we use selenium
         //to directly get the output
@@ -301,13 +302,13 @@ public class SequenceTest extends BaseWebDriverTest
         {
             String rowId = dr.getDataAsText(i, "Readset Id");
             String file1 = dr.getDataAsText(i, "Input File");
-            Assert.assertEquals("Incorrect or no filename associated with readset", "Illumina-R1-" + rowId + ".fastq.gz", file1);
+            assertEquals("Incorrect or no filename associated with readset", "Illumina-R1-" + rowId + ".fastq.gz", file1);
 
             String file2 = dr.getDataAsText(i, "Input File2");
-            Assert.assertEquals("Incorrect or no filename associated with readset", "Illumina-R2-" + rowId + ".fastq.gz", file2);
+            assertEquals("Incorrect or no filename associated with readset", "Illumina-R2-" + rowId + ".fastq.gz", file2);
 
             String instrumentRun = dr.getDataAsText(i, "Instrument Run");
-            Assert.assertTrue("Incorrect or no instrument run associated with readset", instrumentRun.startsWith("TestIlluminaRun"));
+            assertTrue("Incorrect or no instrument run associated with readset", instrumentRun.startsWith("TestIlluminaRun"));
         }
 
         log("Verifying instrument run and details page");
@@ -317,13 +318,13 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("Run Id"); //crude proxy for loading of the details panel
         waitForText("Readsets");
         DataRegionTable rs = _helper.getDrForQueryWebpart("Readsets");
-        Assert.assertEquals("Incorrect readset count found", 14, rs.getDataRowCount());
+        assertEquals("Incorrect readset count found", 14, rs.getDataRowCount());
 
         waitForText("Quality Metrics");
         DataRegionTable qm = _helper.getDrForQueryWebpart("Quality Metrics");
-        Assert.assertEquals("Incorrect quality metric count found", 30, qm.getDataRowCount());
+        assertEquals("Incorrect quality metric count found", 30, qm.getDataRowCount());
         String totalSequences = qm.getDataAsText(qm.getRow("File Id", "Illumina-R1-Control.fastq.gz"), "Metric Value");
-        Assert.assertEquals("Incorrect value for total sequences", "9.0", totalSequences);
+        assertEquals("Incorrect value for total sequences", "9.0", totalSequences);
 
         log("Verifying readset details page");
         goToProjectHome();
@@ -337,11 +338,11 @@ public class SequenceTest extends BaseWebDriverTest
 
         waitForText("Analyses Using This Readset");
         DataRegionTable dr1 = _helper.getDrForQueryWebpart("Analyses Using This Readset");
-        Assert.assertEquals("Incorrect analysis count", 0, dr1.getDataRowCount());
+        assertEquals("Incorrect analysis count", 0, dr1.getDataRowCount());
 
         waitForText("Quality Metrics");
         DataRegionTable dr2 = _helper.getDrForQueryWebpart("Quality Metrics");
-        Assert.assertEquals("Incorrect analysis count", 2, dr2.getDataRowCount());
+        assertEquals("Incorrect analysis count", 2, dr2.getDataRowCount());
 
         //verify export
         log("Verifying FASTQ Export");
@@ -357,16 +358,16 @@ public class SequenceTest extends BaseWebDriverTest
         String fileName = "MyFile";
         Ext4FieldRefWD.getForLabel(this, "File Prefix").setValue(fileName);
         String url = window.getEval("getURL()").toString();
-        Assert.assertTrue("Improper URL to download sequences", url.contains("zipFileName=" + fileName));
-        Assert.assertTrue("Improper URL to download sequences", url.contains("exportFiles.view?"));
-        Assert.assertEquals("Wrong number of files selected", 28, StringUtils.countMatches(url, "dataIds="));
+        assertTrue("Improper URL to download sequences", url.contains("zipFileName=" + fileName));
+        assertTrue("Improper URL to download sequences", url.contains("exportFiles.view?"));
+        assertEquals("Wrong number of files selected", 28, StringUtils.countMatches(url, "dataIds="));
 
         _ext4Helper.queryOne("field[boxLabel='Forward Reads']", Ext4FieldRefWD.class).setValue("false");
         _ext4Helper.queryOne("field[boxLabel='Merge into Single FASTQ File']", Ext4FieldRefWD.class).setChecked(true);
 
         url = window.getEval("getURL()").toString();
-        Assert.assertEquals("Wrong number of files selected", 14, StringUtils.countMatches(url, "dataIds="));
-        Assert.assertTrue("Improper URL to download sequences", url.contains("mergeFastqFiles.view?"));
+        assertEquals("Wrong number of files selected", 14, StringUtils.countMatches(url, "dataIds="));
+        assertTrue("Improper URL to download sequences", url.contains("mergeFastqFiles.view?"));
 
         waitAndClick(Locator.ext4Button("Submit"));
         validateFastqDownload(fileName + ".fastq.gz");
@@ -399,7 +400,7 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("Analysis Type"); //proxy for dataRegion loading
 
         assertTextPresent("readset IS ONE OF (");
-        Assert.assertTrue("Filter not applied correct", (isTextPresent(id1 + ", " + id2) || isTextPresent(id2 + ", " + id1)));
+        assertTrue("Filter not applied correct", (isTextPresent(id1 + ", " + id2) || isTextPresent(id2 + ", " + id1)));
 
         log("Verifying Readset Edit");
         goToProjectHome();
@@ -419,7 +420,7 @@ public class SequenceTest extends BaseWebDriverTest
         clickButton("OK");
 
         _helper.waitForDataRegion("query");
-        Assert.assertEquals("Changed sample name not applied", newName, dr.getDataAsText(1, "Name"));
+        assertEquals("Changed sample name not applied", newName, dr.getDataAsText(1, "Name"));
 
         //note: 'Analyze Selected' option is verified separately
     }
@@ -486,10 +487,10 @@ public class SequenceTest extends BaseWebDriverTest
 
         log("Verifying Pre-processing section");
         WebElement el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Total Reads").getId()));
-        Assert.assertFalse("Reads field should be hidden", el.isDisplayed());
+        assertFalse("Reads field should be hidden", el.isDisplayed());
         Ext4FieldRefWD.getForLabel(this, "Downsample Reads").setChecked(true);
         el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Total Reads").getId()));
-        Assert.assertTrue("Reads field should be visible", el.isDisplayed());
+        assertTrue("Reads field should be visible", el.isDisplayed());
 
         Ext4FieldRefWD.getForLabel(this, "Total Reads").setValue(totalReads);
 
@@ -526,27 +527,27 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4FieldRefWD.getForLabel(this, "Simple Clip Threshold").setValue(simpleClipThreshold);
 
         el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Window Size").getId()));
-        Assert.assertFalse("Window Size field should be hidden", el.isDisplayed());
+        assertFalse("Window Size field should be hidden", el.isDisplayed());
         Ext4FieldRefWD.getForLabel(this, "Quality Trimming (by sliding window)").setChecked(true);
 
         el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Window Size").getId()));
-        Assert.assertTrue("Window Size field should be visible", el.isDisplayed());
+        assertTrue("Window Size field should be visible", el.isDisplayed());
 
         Ext4FieldRefWD.getForLabel(this, "Window Size").setValue(qualWindowSize);
         Ext4FieldRefWD.getForLabel(this, "Avg Qual").setValue(qualAvgQual);
 
         el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Min Qual").getId()));
-        Assert.assertFalse("Min Qual field should be hidden", el.isDisplayed());
+        assertFalse("Min Qual field should be hidden", el.isDisplayed());
 
         log("Testing Alignment Section");
 
         log("Testing whether sections are disabled when alignment unchecked");
         Ext4FieldRefWD.getForLabel(this, "Perform Alignment").setChecked(false);
-        Assert.assertEquals("Field should be hidden", false, Ext4FieldRefWD.isFieldPresent(this, "Reference Library Type"));
-        Assert.assertEquals("Field should be hidden", false, Ext4FieldRefWD.isFieldPresent(this, "Aligner"));
+        assertEquals("Field should be hidden", false, Ext4FieldRefWD.isFieldPresent(this, "Reference Library Type"));
+        assertEquals("Field should be hidden", false, Ext4FieldRefWD.isFieldPresent(this, "Aligner"));
 
-        Assert.assertEquals("Field should be disabled", true, Ext4FieldRefWD.getForLabel(this, "Sequence Based Genotyping").getEval("isDisabled()"));
-        Assert.assertEquals("Field should be disabled", true, Ext4FieldRefWD.getForLabel(this, "Min SNP Quality").getEval("isDisabled()"));
+        assertEquals("Field should be disabled", true, Ext4FieldRefWD.getForLabel(this, "Sequence Based Genotyping").getEval("isDisabled()"));
+        assertEquals("Field should be disabled", true, Ext4FieldRefWD.getForLabel(this, "Min SNP Quality").getEval("isDisabled()"));
 
         Ext4FieldRefWD.getForLabel(this, "Perform Alignment").setChecked(true);
         waitForText("Reference Library Type");
@@ -605,94 +606,94 @@ public class SequenceTest extends BaseWebDriverTest
         Map<String, Object> params = (Map)panel.getEval("getJsonParams()");
 
         String container = (String)executeScript("return LABKEY.Security.currentContainer.id");
-        Assert.assertEquals("Incorect param in form JSON", container, params.get("containerId"));
-        Assert.assertEquals("Incorect param in form JSON", getBaseURL() + "/", params.get("baseUrl"));
+        assertEquals("Incorect param in form JSON", container, params.get("containerId"));
+        assertEquals("Incorect param in form JSON", getBaseURL() + "/", params.get("baseUrl"));
 
         Long id1 = (Long)executeScript("return LABKEY.Security.currentUser.id");
         Long id2 = (Long)params.get("userId");
-        Assert.assertEquals("Incorect param in form JSON", id1, id2);
+        assertEquals("Incorect param in form JSON", id1, id2);
         String containerPath = getURL().getPath().replaceAll("/sequenceAnalysis.view", "").replaceAll("(.)*/sequenceanalysis", "");
-        Assert.assertEquals("Incorect param in form JSON", containerPath, params.get("containerPath"));
+        assertEquals("Incorect param in form JSON", containerPath, params.get("containerPath"));
 
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("deleteIntermediateFiles"));
-        Assert.assertEquals("Incorect param in form JSON", analysisDescription, params.get("analysisDescription"));
-        Assert.assertEquals("Incorect param in form JSON", jobName, params.get("protocolName"));
+        assertEquals("Incorect param in form JSON", true, params.get("deleteIntermediateFiles"));
+        assertEquals("Incorect param in form JSON", analysisDescription, params.get("analysisDescription"));
+        assertEquals("Incorect param in form JSON", jobName, params.get("protocolName"));
 
-        Assert.assertEquals("Incorect param in form JSON", false, params.get("saveProtocol"));
+        assertEquals("Incorect param in form JSON", false, params.get("saveProtocol"));
 
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("preprocessing.downsample"));
-        Assert.assertEquals("Incorect param in form JSON", totalReads, params.get("preprocessing.downsampleReadNumber").toString());
+        assertEquals("Incorect param in form JSON", true, params.get("preprocessing.downsample"));
+        assertEquals("Incorect param in form JSON", totalReads, params.get("preprocessing.downsampleReadNumber").toString());
 
-        Assert.assertEquals("Incorect param in form JSON", minReadLength, params.get("preprocessing.minLength").toString());
+        assertEquals("Incorect param in form JSON", minReadLength, params.get("preprocessing.minLength").toString());
 
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("preprocessing.trimAdapters"));
+        assertEquals("Incorect param in form JSON", true, params.get("preprocessing.trimAdapters"));
 
-        Assert.assertEquals("Incorect param in form JSON", seedMismatches, params.get("preprocessing.seedMismatches").toString());
-        Assert.assertEquals("Incorect param in form JSON", simpleClipThreshold, params.get("preprocessing.simpleClipThreshold").toString());
+        assertEquals("Incorect param in form JSON", seedMismatches, params.get("preprocessing.seedMismatches").toString());
+        assertEquals("Incorect param in form JSON", simpleClipThreshold, params.get("preprocessing.simpleClipThreshold").toString());
 
         List<Object> adapter = (List)params.get("adapter_0");
-        Assert.assertEquals("Incorect param in form JSON", rocheAdapters[1][0], adapter.get(0).toString());
-        Assert.assertEquals("Incorect param in form JSON", rocheAdapters[1][1], adapter.get(1).toString());
-        Assert.assertEquals("Incorect param in form JSON", true, adapter.get(2));
-        Assert.assertEquals("Incorect param in form JSON", true, adapter.get(3));
+        assertEquals("Incorect param in form JSON", rocheAdapters[1][0], adapter.get(0).toString());
+        assertEquals("Incorect param in form JSON", rocheAdapters[1][1], adapter.get(1).toString());
+        assertEquals("Incorect param in form JSON", true, adapter.get(2));
+        assertEquals("Incorect param in form JSON", true, adapter.get(3));
 
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("preprocessing.qual2"));
-        Assert.assertEquals("Incorect param in form JSON", qualAvgQual, params.get("preprocessing.qual2_avgQual").toString());
-        Assert.assertEquals("Incorect param in form JSON", qualWindowSize, params.get("preprocessing.qual2_windowSize").toString());
+        assertEquals("Incorect param in form JSON", true, params.get("preprocessing.qual2"));
+        assertEquals("Incorect param in form JSON", qualAvgQual, params.get("preprocessing.qual2_avgQual").toString());
+        assertEquals("Incorect param in form JSON", qualWindowSize, params.get("preprocessing.qual2_windowSize").toString());
 
-//        Assert.assertEquals("Incorect param in form JSON", "true", params.get("preprocessing.mask"));
-//        Assert.assertEquals("Incorect param in form JSON", maskMinQual, params.get("preprocessing.mask_minQual"));
+//        assertEquals("Incorect param in form JSON", "true", params.get("preprocessing.mask"));
+//        assertEquals("Incorect param in form JSON", maskMinQual, params.get("preprocessing.mask_minQual"));
 
-//        Assert.assertEquals("Incorect param in form JSON", "true", params.get("useCustomReference"));
-//        Assert.assertEquals("Incorect param in form JSON", customRefSeq, params.get("virus.refSequence"));
-//        Assert.assertEquals("Incorect param in form JSON", customRefName, params.get("virus.custom_strain_name"));
+//        assertEquals("Incorect param in form JSON", "true", params.get("useCustomReference"));
+//        assertEquals("Incorect param in form JSON", customRefSeq, params.get("virus.refSequence"));
+//        assertEquals("Incorect param in form JSON", customRefName, params.get("virus.custom_strain_name"));
 
-        Assert.assertEquals("Incorect param in form JSON", strain, params.get("dbprefix"));
-        Assert.assertEquals("Incorect param in form JSON", "Virus", params.get("dna.category"));
+        assertEquals("Incorect param in form JSON", strain, params.get("dbprefix"));
+        assertEquals("Incorect param in form JSON", "Virus", params.get("dna.category"));
 
-        Assert.assertEquals("Incorect param in form JSON", "Virus", params.get("analysisType"));
-        Assert.assertEquals("Incorect param in form JSON", strain, params.get("dna.subset"));
+        assertEquals("Incorect param in form JSON", "Virus", params.get("analysisType"));
+        assertEquals("Incorect param in form JSON", strain, params.get("dna.subset"));
 
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("doAlignment"));
-        Assert.assertEquals("Incorect param in form JSON", aligner, params.get("aligner"));
+        assertEquals("Incorect param in form JSON", true, params.get("doAlignment"));
+        assertEquals("Incorect param in form JSON", aligner, params.get("aligner"));
 
-        Assert.assertEquals("Incorect param in form JSON", false, params.get("snp.neighborhoodQual"));
-        Assert.assertEquals("Incorect param in form JSON", minSnpQual, params.get("snp.minQual").toString());
-        Assert.assertEquals("Incorect param in form JSON", minAvgSnpQual, params.get("snp.minAvgSnpQual").toString());
-        Assert.assertEquals("Incorect param in form JSON", minDipQual, params.get("snp.minIndelQual").toString());
-        Assert.assertEquals("Incorect param in form JSON", minAvgDipQual, params.get("snp.minAvgDipQual").toString());
+        assertEquals("Incorect param in form JSON", false, params.get("snp.neighborhoodQual"));
+        assertEquals("Incorect param in form JSON", minSnpQual, params.get("snp.minQual").toString());
+        assertEquals("Incorect param in form JSON", minAvgSnpQual, params.get("snp.minAvgSnpQual").toString());
+        assertEquals("Incorect param in form JSON", minDipQual, params.get("snp.minIndelQual").toString());
+        assertEquals("Incorect param in form JSON", minAvgDipQual, params.get("snp.minAvgDipQual").toString());
 
-        //Assert.assertEquals("Incorect param in form JSON", "true", params.get("assembleUnaligned"));
-        //Assert.assertEquals("Incorect param in form JSON", maxAlignMismatch, params.get("maxAlignMismatch"));
-        //Assert.assertEquals("Incorect param in form JSON", assembleUnalignedPct, params.get("assembleUnalignedPct"));
-        //Assert.assertEquals("Incorect param in form JSON", minContigsForNovel, params.get("minContigsForNovel"));
+        //assertEquals("Incorect param in form JSON", "true", params.get("assembleUnaligned"));
+        //assertEquals("Incorect param in form JSON", maxAlignMismatch, params.get("maxAlignMismatch"));
+        //assertEquals("Incorect param in form JSON", assembleUnalignedPct, params.get("assembleUnalignedPct"));
+        //assertEquals("Incorect param in form JSON", minContigsForNovel, params.get("minContigsForNovel"));
 
-        Assert.assertEquals("Incorect param in form JSON", false, params.get("debugMode"));
+        assertEquals("Incorect param in form JSON", false, params.get("debugMode"));
 
         Map sample = (Map)params.get("sample_0");
         Long readset = (Long)sample.get("readset");
-        Assert.assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.get("fileName"));
-        Assert.assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.get("fileName2"));
-        Assert.assertEquals("Incorect param in form JSON", "ILLUMINA", sample.get("platform"));
-        Assert.assertFalse("Incorect param in form JSON", null == sample.get("instrument_run_id"));
-        Assert.assertFalse("Incorect param in form JSON", null == sample.get("readsetname"));
-        Assert.assertFalse("Incorect param in form JSON", null == sample.get("fileId"));
-        Assert.assertFalse("Incorect param in form JSON", null == sample.get("fileId2"));
+        assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.get("fileName"));
+        assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.get("fileName2"));
+        assertEquals("Incorect param in form JSON", "ILLUMINA", sample.get("platform"));
+        assertFalse("Incorect param in form JSON", null == sample.get("instrument_run_id"));
+        assertFalse("Incorect param in form JSON", null == sample.get("readsetname"));
+        assertFalse("Incorect param in form JSON", null == sample.get("fileId"));
+        assertFalse("Incorect param in form JSON", null == sample.get("fileId2"));
 
         sample = (Map)params.get("sample_1");
         readset = (Long)sample.get("readset");
-        Assert.assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.get("fileName"));
-        Assert.assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.get("fileName2"));
-        Assert.assertEquals("Incorect param in form JSON", "ILLUMINA", sample.get("platform"));
-        Assert.assertFalse("Incorect param in form JSON", null == sample.get("instrument_run_id"));
-        Assert.assertFalse("Incorect param in form JSON", null == sample.get("readsetname"));
-        Assert.assertFalse("Incorect param in form JSON", null == sample.get("fileId"));
-        Assert.assertFalse("Incorect param in form JSON", null == sample.get("fileId2"));
+        assertEquals("Incorect param in form JSON", "Illumina-R1-" + readset + ".fastq.gz", sample.get("fileName"));
+        assertEquals("Incorect param in form JSON", "Illumina-R2-" + readset + ".fastq.gz", sample.get("fileName2"));
+        assertEquals("Incorect param in form JSON", "ILLUMINA", sample.get("platform"));
+        assertFalse("Incorect param in form JSON", null == sample.get("instrument_run_id"));
+        assertFalse("Incorect param in form JSON", null == sample.get("readsetname"));
+        assertFalse("Incorect param in form JSON", null == sample.get("fileId"));
+        assertFalse("Incorect param in form JSON", null == sample.get("fileId2"));
 
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("sbtAnalysis"));
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("aaSnpByCodon"));
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("ntSnpByPosition"));
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("ntCoverage"));
+        assertEquals("Incorect param in form JSON", true, params.get("sbtAnalysis"));
+        assertEquals("Incorect param in form JSON", true, params.get("aaSnpByCodon"));
+        assertEquals("Incorect param in form JSON", true, params.get("ntSnpByPosition"));
+        assertEquals("Incorect param in form JSON", true, params.get("ntCoverage"));
 
         log("Testing UI changes when selecting different analysis settings");
 
@@ -704,7 +705,7 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4FieldRefWD analysisField = Ext4FieldRefWD.getForLabel(this, "Specialized Analysis");
         analysisField.setValue("SBT");
 
-        Assert.assertEquals("Incorrect field value", "DNA", Ext4FieldRefWD.getForLabel(this, "Reference Library Type").getValue());
+        assertEquals("Incorrect field value", "DNA", Ext4FieldRefWD.getForLabel(this, "Reference Library Type").getValue());
         String species = "Human";
         String molType = "gDNA";
 
@@ -723,22 +724,22 @@ public class SequenceTest extends BaseWebDriverTest
 
         params = (Map)panel.getEval("getJsonParams()");
 
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("debugMode"));
-        Assert.assertEquals("Incorect param in form JSON", species, params.get("dna.species"));
-        Assert.assertEquals("Incorect param in form JSON", "KIR;MHC", params.get("dna.subset"));
-        Assert.assertEquals("Incorect param in form JSON", molType, params.get("dna.mol_type"));
-        Assert.assertEquals("Incorect param in form JSON", "KIR1D;HLA-A", params.get("dna.locus"));
+        assertEquals("Incorect param in form JSON", true, params.get("debugMode"));
+        assertEquals("Incorect param in form JSON", species, params.get("dna.species"));
+        assertEquals("Incorect param in form JSON", "KIR;MHC", params.get("dna.subset"));
+        assertEquals("Incorect param in form JSON", molType, params.get("dna.mol_type"));
+        assertEquals("Incorect param in form JSON", "KIR1D;HLA-A", params.get("dna.locus"));
 
         //also test mosaik params
-        Assert.assertEquals("Incorect param in form JSON", "mosaik", params.get("aligner"));
-        Assert.assertEquals("Incorect param in form JSON", 0.02, params.get("mosaik.max_mismatch_pct"));
-        Assert.assertEquals("Incorect param in form JSON", new Long(200), params.get("mosaik.max_hash_positions"));
+        assertEquals("Incorect param in form JSON", "mosaik", params.get("aligner"));
+        assertEquals("Incorect param in form JSON", 0.02, params.get("mosaik.max_mismatch_pct"));
+        assertEquals("Incorect param in form JSON", new Long(200), params.get("mosaik.max_hash_positions"));
 
-        Assert.assertEquals("Incorect param in form JSON", true, params.get("sbtAnalysis"));
-        Assert.assertEquals("Incorect param in form JSON", false, params.get("aaSnpByCodon"));
-        Assert.assertEquals("Incorect param in form JSON", false, params.get("ntCoverage"));
-        Assert.assertEquals("Incorect param in form JSON", false, params.get("ntSnpByPosition"));
-        Assert.assertEquals("Incorect param in form JSON", 4, StringUtils.split((String)params.get("fileNames"), ";").length);
+        assertEquals("Incorect param in form JSON", true, params.get("sbtAnalysis"));
+        assertEquals("Incorect param in form JSON", false, params.get("aaSnpByCodon"));
+        assertEquals("Incorect param in form JSON", false, params.get("ntCoverage"));
+        assertEquals("Incorect param in form JSON", false, params.get("ntSnpByPosition"));
+        assertEquals("Incorect param in form JSON", 4, StringUtils.split((String)params.get("fileNames"), ";").length);
     }
 
     /**
@@ -753,7 +754,7 @@ public class SequenceTest extends BaseWebDriverTest
         File output = new File(getDownloadDir(), filename);
         _helper.waitForFileOfSize(output, 15000);  //size measured at 15924
 
-        Assert.assertTrue("Unable to find file: " + output.getPath(), output.exists());
+        assertTrue("Unable to find file: " + output.getPath(), output.exists());
         log("File size: " + FileUtils.sizeOf(output));
 
         try (
@@ -775,7 +776,7 @@ public class SequenceTest extends BaseWebDriverTest
             }
 
             int expectedLength = 504;
-            Assert.assertEquals("Length of file doesnt match expected value.  Total characters: " + totalChars, expectedLength, count);
+            assertEquals("Length of file doesnt match expected value.  Total characters: " + totalChars, expectedLength, count);
 
             output.delete();
         }
@@ -825,44 +826,44 @@ public class SequenceTest extends BaseWebDriverTest
         Ext4FieldRefWD pairedField = Ext4FieldRefWD.getForLabel(this, "Data Is Paired End");
         Ext4GridRefWD grid = getSampleGrid();
 
-        Assert.assertEquals("Incorrect starting value for input file-handling field", "delete", treatmentField.getValue());
+        assertEquals("Incorrect starting value for input file-handling field", "delete", treatmentField.getValue());
 
         barcodeField.setChecked(true);
         sleep(100);
-        Assert.assertEquals("Incorrect value for input file-handling field after barcode toggle", "compress", treatmentField.getValue());
-        Assert.assertFalse("MID5 column should not be hidden", (Boolean)grid.getEval("columns[2].hidden"));
-        Assert.assertFalse("MID3 column should not be hidden", (Boolean)grid.getEval("columns[3].hidden"));
+        assertEquals("Incorrect value for input file-handling field after barcode toggle", "compress", treatmentField.getValue());
+        assertFalse("MID5 column should not be hidden", (Boolean)grid.getEval("columns[2].hidden"));
+        assertFalse("MID3 column should not be hidden", (Boolean)grid.getEval("columns[3].hidden"));
 
         barcodeField.setChecked(false);
         sleep(100);
-        Assert.assertEquals("Incorrect value for input file-handling field after barcode toggle", "delete", treatmentField.getValue());
-        Assert.assertTrue("MID5 column should be hidden", (Boolean) grid.getEval("columns[2].hidden"));
-        Assert.assertTrue("MID3 column should be hidden", (Boolean) grid.getEval("columns[3].hidden"));
+        assertEquals("Incorrect value for input file-handling field after barcode toggle", "delete", treatmentField.getValue());
+        assertTrue("MID5 column should be hidden", (Boolean) grid.getEval("columns[2].hidden"));
+        assertTrue("MID3 column should be hidden", (Boolean) grid.getEval("columns[3].hidden"));
 
         mergeField.setChecked(true);
         sleep(100);
-        Assert.assertEquals("Incorrect value for input file-handling field after merge toggle", "compress", treatmentField.getValue());
-        Assert.assertTrue("Paired end field should be disabled when merge is checked", pairedField.isDisabled());
+        assertEquals("Incorrect value for input file-handling field after merge toggle", "compress", treatmentField.getValue());
+        assertTrue("Paired end field should be disabled when merge is checked", pairedField.isDisabled());
 
         Ext4FieldRefWD mergenameField = Ext4FieldRefWD.getForLabel(this, "Name For Merged File");
 
-        Assert.assertTrue("Merge name field should be visible", mergenameField.isVisible());
-        Assert.assertEquals("Merged file name not set in grid correctly", "MergedFile", grid.getFieldValue(1, "fileName"));
+        assertTrue("Merge name field should be visible", mergenameField.isVisible());
+        assertEquals("Merged file name not set in grid correctly", "MergedFile", grid.getFieldValue(1, "fileName"));
         mergenameField.setValue("MergeFile2");
         sleep(100);
-        Assert.assertEquals("Merged file name not set in grid correctly", "MergeFile2", grid.getFieldValue(1, "fileName"));
+        assertEquals("Merged file name not set in grid correctly", "MergeFile2", grid.getFieldValue(1, "fileName"));
 
         mergeField.setChecked(false);
         sleep(100);
-        Assert.assertEquals("Incorrect value for input file-handling field after merge toggle", "delete", treatmentField.getValue());
-        Assert.assertFalse("Merge name field should be hidden", mergenameField.isVisible());
-        Assert.assertFalse("Paired end field should be enable when merge is unchecked", pairedField.isDisabled());
+        assertEquals("Incorrect value for input file-handling field after merge toggle", "delete", treatmentField.getValue());
+        assertFalse("Merge name field should be hidden", mergenameField.isVisible());
+        assertFalse("Paired end field should be enable when merge is unchecked", pairedField.isDisabled());
 
         pairedField.setChecked(true);
-        Assert.assertFalse("Paired file column should not be hidden", (Boolean) grid.getEval("columns[1].hidden"));
+        assertFalse("Paired file column should not be hidden", (Boolean) grid.getEval("columns[1].hidden"));
 
         pairedField.setChecked(false);
-        Assert.assertTrue("Paired file column should be hidden", (Boolean) grid.getEval("columns[1].hidden"));
+        assertTrue("Paired file column should be hidden", (Boolean) grid.getEval("columns[1].hidden"));
 
         //now set real values
         click(Locator.ext4Button("Add"));
@@ -921,50 +922,50 @@ public class SequenceTest extends BaseWebDriverTest
         //List<String> fieldsNames = (List)params.get("distinctNames");
 
         String container = (String)executeScript("return LABKEY.Security.currentContainer.id");
-        Assert.assertEquals("Incorect param for containerId", container, fieldsJson.get("containerId"));
-        Assert.assertEquals("Incorect param for baseURL", getBaseURL() + "/", fieldsJson.get("baseUrl"));
+        assertEquals("Incorect param for containerId", container, fieldsJson.get("containerId"));
+        assertEquals("Incorect param for baseURL", getBaseURL() + "/", fieldsJson.get("baseUrl"));
 
         Long id1 = (Long)executeScript("return LABKEY.Security.currentUser.id");
         Long id2 = (Long)fieldsJson.get("userId");
-        Assert.assertEquals("Incorect param for userId", id1, id2);
+        assertEquals("Incorect param for userId", id1, id2);
         String containerPath = getURL().getPath().replaceAll("/importReadset.view(.)*", "").replaceAll("(.)*/sequenceanalysis", "");
-        Assert.assertEquals("Incorect param for containerPath", containerPath, fieldsJson.get("containerPath"));
+        assertEquals("Incorect param for containerPath", containerPath, fieldsJson.get("containerPath"));
 
-        Assert.assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.pairedend"));
-        Assert.assertEquals("Unexpected value for param", filename1 + ";" + filename2, fieldsJson.get("fileNames"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) fieldsJson.get("inputfile.barcodeGroups")));
-        Assert.assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.merge"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) fieldsJson.get("inputfile.merge.basename")));
-        Assert.assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeEditDistance"));
-        Assert.assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeOffset"));
-        Assert.assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeDeletions"));
-        Assert.assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.barcode"));
-        Assert.assertEquals("Unexpected value for param", "delete", fieldsJson.get("inputfile.inputTreatment"));
-        Assert.assertEquals("Unexpected value for param", true, fieldsJson.get("deleteIntermediateFiles"));
+        assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.pairedend"));
+        assertEquals("Unexpected value for param", filename1 + ";" + filename2, fieldsJson.get("fileNames"));
+        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) fieldsJson.get("inputfile.barcodeGroups")));
+        assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.merge"));
+        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) fieldsJson.get("inputfile.merge.basename")));
+        assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeEditDistance"));
+        assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeOffset"));
+        assertEquals("Unexpected value for param", new Long(0), fieldsJson.get("inputfile.barcodeDeletions"));
+        assertEquals("Unexpected value for param", false, fieldsJson.get("inputfile.barcode"));
+        assertEquals("Unexpected value for param", "delete", fieldsJson.get("inputfile.inputTreatment"));
+        assertEquals("Unexpected value for param", true, fieldsJson.get("deleteIntermediateFiles"));
 
         Map<String, Object> sample0 = (Map)fieldsJson.get("sample_0");
         Map<String, Object> sample1 = (Map)fieldsJson.get("sample_1");
 
-        Assert.assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
-        Assert.assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
-        Assert.assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
-        Assert.assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
-        Assert.assertEquals("Unexpected value for param", "InputMaterial", sample0.get("inputmaterial"));
-        Assert.assertFalse("param shold not be present", sample0.containsKey("mid5"));
-        Assert.assertFalse("param shold not be present", sample0.containsKey("mid3"));
+        assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
+        assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
+        assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
+        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
+        assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
+        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
+        assertEquals("Unexpected value for param", "InputMaterial", sample0.get("inputmaterial"));
+        assertFalse("param shold not be present", sample0.containsKey("mid5"));
+        assertFalse("param shold not be present", sample0.containsKey("mid3"));
 
-        Assert.assertEquals("Unexpected value for param", filename2, sample1.get("fileName"));
-        Assert.assertEquals("Unexpected value for param", "Readset2", sample1.get("readsetname"));
-        Assert.assertEquals("Unexpected value for param", "Subject2", sample1.get("subjectid"));
-        Assert.assertTrue("Unexpected value for param", sample1.get("sampledate") instanceof Map); //this is a JS date object.  not worth trying to figure out the value.  it's either null or not
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("readset")));
-        Assert.assertEquals("Unexpected value for param", "LS454", sample1.get("platform"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("fileId")));
-        Assert.assertEquals("Unexpected value for param", "InputMaterial2", sample1.get("inputmaterial"));
-        Assert.assertFalse("param shold not be present", sample1.containsKey("mid5"));
-        Assert.assertFalse("param shold not be present", sample1.containsKey("mid3"));
+        assertEquals("Unexpected value for param", filename2, sample1.get("fileName"));
+        assertEquals("Unexpected value for param", "Readset2", sample1.get("readsetname"));
+        assertEquals("Unexpected value for param", "Subject2", sample1.get("subjectid"));
+        assertTrue("Unexpected value for param", sample1.get("sampledate") instanceof Map); //this is a JS date object.  not worth trying to figure out the value.  it's either null or not
+        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("readset")));
+        assertEquals("Unexpected value for param", "LS454", sample1.get("platform"));
+        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("fileId")));
+        assertEquals("Unexpected value for param", "InputMaterial2", sample1.get("inputmaterial"));
+        assertFalse("param shold not be present", sample1.containsKey("mid5"));
+        assertFalse("param shold not be present", sample1.containsKey("mid3"));
 
         barcodeField.setValue(true);
         Ext4FieldRefWD.getForLabel(this, "Additional Barcodes").setValue("GSMIDs");
@@ -982,28 +983,28 @@ public class SequenceTest extends BaseWebDriverTest
         params = (Map)panel.getEval("getJsonParams()");
         fieldsJson = (Map)params.get("json");
 
-        Assert.assertEquals("Unexpected value for param", true, fieldsJson.get("inputfile.barcode"));
-        Assert.assertEquals("Unexpected value for param", Collections.singletonList("GSMIDs"), fieldsJson.get("inputfile.barcodeGroups"));
-        Assert.assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeEditDistance"));
-        Assert.assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeOffset"));
-        Assert.assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeDeletions"));
+        assertEquals("Unexpected value for param", true, fieldsJson.get("inputfile.barcode"));
+        assertEquals("Unexpected value for param", Collections.singletonList("GSMIDs"), fieldsJson.get("inputfile.barcodeGroups"));
+        assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeEditDistance"));
+        assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeOffset"));
+        assertEquals("Unexpected value for param", new Long(9), fieldsJson.get("inputfile.barcodeDeletions"));
 
-        Assert.assertEquals("Unexpected value for param", true, fieldsJson.get("inputfile.merge"));
-        Assert.assertEquals("Unexpected value for param", mergedName, fieldsJson.get("inputfile.merge.basename"));
+        assertEquals("Unexpected value for param", true, fieldsJson.get("inputfile.merge"));
+        assertEquals("Unexpected value for param", mergedName, fieldsJson.get("inputfile.merge.basename"));
 
-        Assert.assertEquals("Unexpected value for param", "compress", fieldsJson.get("inputfile.inputTreatment"));
-        Assert.assertEquals("Unexpected value for param", false, fieldsJson.get("deleteIntermediateFiles"));
+        assertEquals("Unexpected value for param", "compress", fieldsJson.get("inputfile.inputTreatment"));
+        assertEquals("Unexpected value for param", false, fieldsJson.get("deleteIntermediateFiles"));
 
         sample0 = (Map)fieldsJson.get("sample_0");
-        Assert.assertEquals("Unexpected value for param", mergedName, sample0.get("fileName"));
-        Assert.assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
-        Assert.assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
-        Assert.assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
-        Assert.assertEquals("Unexpected value for param", "InputMaterial", sample0.get("inputmaterial"));
-        Assert.assertFalse("param shold not be present", sample0.containsKey("mid5"));
-        Assert.assertFalse("param shold not be present", sample0.containsKey("mid3"));
+        assertEquals("Unexpected value for param", mergedName, sample0.get("fileName"));
+        assertEquals("Unexpected value for param", "Readset1", sample0.get("readsetname"));
+        assertEquals("Unexpected value for param", "Subject1", sample0.get("subjectid"));
+        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("readset")));
+        assertEquals("Unexpected value for param", "ILLUMINA", sample0.get("platform"));
+        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileId")));
+        assertEquals("Unexpected value for param", "InputMaterial", sample0.get("inputmaterial"));
+        assertFalse("param shold not be present", sample0.containsKey("mid5"));
+        assertFalse("param shold not be present", sample0.containsKey("mid3"));
 
         mergeField.setValue(false);
         barcodeField.setValue(false);
@@ -1014,8 +1015,8 @@ public class SequenceTest extends BaseWebDriverTest
         params = (Map)panel.getEval("getJsonParams()");
         fieldsJson = (Map)params.get("json");
         sample0 = (Map)fieldsJson.get("sample_0");
-        Assert.assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
-        Assert.assertEquals("Unexpected value for param", filename2, sample0.get("fileName2"));
+        assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
+        assertEquals("Unexpected value for param", filename2, sample0.get("fileName2"));
 
         pairedField.setValue(false);
         barcodeField.setValue(true);
@@ -1037,18 +1038,18 @@ public class SequenceTest extends BaseWebDriverTest
         params = (Map)panel.getEval("getJsonParams()");
         fieldsJson = (Map)params.get("json");
         sample0 = (Map)fieldsJson.get("sample_0");
-        Assert.assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileName2")));
-        Assert.assertEquals("Unexpected value for param", barcode, sample0.get("mid5"));
-        Assert.assertEquals("Unexpected value for param", barcode2, sample0.get("mid3"));
-        Assert.assertEquals("Unexpected value for param", "SANGER", sample0.get("platform"));
-        Assert.assertEquals("Unexpected value for param", readsetNew, sample0.get("readsetname"));
+        assertEquals("Unexpected value for param", filename1, sample0.get("fileName"));
+        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample0.get("fileName2")));
+        assertEquals("Unexpected value for param", barcode, sample0.get("mid5"));
+        assertEquals("Unexpected value for param", barcode2, sample0.get("mid3"));
+        assertEquals("Unexpected value for param", "SANGER", sample0.get("platform"));
+        assertEquals("Unexpected value for param", readsetNew, sample0.get("readsetname"));
 
         sample1 = (Map)fieldsJson.get("sample_1");
-        Assert.assertEquals("Unexpected value for param", filename2, sample1.get("fileName"));
-        Assert.assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String)sample1.get("fileName2")));
-        Assert.assertEquals("Unexpected value for param", barcode2, sample1.get("mid5"));
-        Assert.assertEquals("Unexpected value for param", barcode, sample1.get("mid3"));
+        assertEquals("Unexpected value for param", filename2, sample1.get("fileName"));
+        assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String)sample1.get("fileName2")));
+        assertEquals("Unexpected value for param", barcode2, sample1.get("mid5"));
+        assertEquals("Unexpected value for param", barcode, sample1.get("mid3"));
     }
 
     private void readsetImportTest() throws Exception
@@ -1099,7 +1100,7 @@ public class SequenceTest extends BaseWebDriverTest
         SelectRowsCommand sr = new SelectRowsCommand("sequenceanalysis", "sequence_readsets");
         sr.addFilter(new Filter("name", readset1 + ";" + readset2, Filter.Operator.IN));
         SelectRowsResponse resp = sr.execute(cn, getProjectName());
-        Assert.assertEquals("Incorrect readset number", 2, resp.getRowCount().intValue());
+        assertEquals("Incorrect readset number", 2, resp.getRowCount().intValue());
 
         log("attempting to re-import same files");
         goToProjectHome();

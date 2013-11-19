@@ -29,7 +29,6 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONValue;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Runner;
@@ -46,6 +45,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: brittp
@@ -259,12 +260,12 @@ public class JUnitTest extends TestSuite
                 else
                 {
                     log(getLogTestString("failed", startTime));
-                    Assert.fail("remote junit failed: " + _remoteClass + "\n" + dump(responseBody, true));
+                    fail("remote junit failed: " + _remoteClass + "\n" + dump(responseBody, true));
                 }
             }
             catch (IOException ioe)
             {
-                Assert.fail("failed to run remote junit test " + _remoteClass + ": " + ioe.getMessage());
+                fail("failed to run remote junit test " + _remoteClass + ": " + ioe.getMessage());
             }
             finally
             {

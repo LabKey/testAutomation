@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -26,6 +25,8 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.StringHelper;
 import org.openqa.selenium.NoSuchElementException;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -145,13 +146,13 @@ public class GroupTest extends BaseWebDriverTest
         int rowIndex = drt.getRow(userColumn, displayNameFromEmail(TEST_USERS_FOR_GROUP[0]));
 
         //confirm correct perms
-        Assert.assertTrue("Unexpected groups", StringHelper.stringArraysAreEquivalentTrimmed(new String[]{"Author", "Reader", "Editor"},
+        assertTrue("Unexpected groups", StringHelper.stringArraysAreEquivalentTrimmed(new String[]{"Author", "Reader", "Editor"},
                 drt.getDataAsText(rowIndex, accessColumn).replace(" ", "").split(",")));
 
 
         //exapnd plus  to check specific groups
         click(Locator.imageWithSrc("/labkey/_images/plus.gif", true).index(rowIndex));
-//        Assert.assertTrue(StringHelper.stringArraysAreEquivalentTrimmed(("Reader, Author RoleGroup(s) ReaderSite: " + GROUP2 + "AuthorSite: " + GROUP2 + ", Site: Users").split(" "),
+//        assertTrue(StringHelper.stringArraysAreEquivalentTrimmed(("Reader, Author RoleGroup(s) ReaderSite: " + GROUP2 + "AuthorSite: " + GROUP2 + ", Site: Users").split(" "),
 //                drt.getDataAsText(rowIndex, accessColumn).split(" "))); //TODO: Fix
 
         //confirm hover over produces list of groups
@@ -165,13 +166,13 @@ public class GroupTest extends BaseWebDriverTest
 //                "Which is assigned the Author role"};
 //        for (String msg : expectedMessagesInHierarchy)
 //        {
-//                Assert.assertTrue("Expected group hover over: " + msg, groupHierarchy.contains(msg));
+//                assertTrue("Expected group hover over: " + msg, groupHierarchy.contains(msg));
 //        }
 
         //confirm details link leads to right user, page
         clickAndWait(Locator.linkContainingText("details", rowIndex));
         assertTextPresent(TEST_USERS_FOR_GROUP[0]);
-        Assert.assertTrue("details link for user did not lead to folder access page", getURL().getFile().contains("folderAccess.view"));
+        assertTrue("details link for user did not lead to folder access page", getURL().getFile().contains("folderAccess.view"));
         goBack();
 
         //confirm username link leads to right user, page
@@ -233,16 +234,16 @@ public class GroupTest extends BaseWebDriverTest
     private void verifyAuthorPermission(String[][] nameTitleBody)
     {
         clickProject(getProjectName());
-        Assert.assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP,canSeePages(nameTitleBody));
-        Assert.assertFalse("Was able to edit wiki page when impersonating group without privileges", canEditPages(nameTitleBody));
+        assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP,canSeePages(nameTitleBody));
+        assertFalse("Was able to edit wiki page when impersonating group without privileges", canEditPages(nameTitleBody));
         sleep(500);
     }
 
     private void verifyEditorPermission(String[][] nameTitleBody)
     {
         clickProject(getProjectName());
-        Assert.assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP, canSeePages(nameTitleBody));
-        Assert.assertTrue("could not edit wiki pages when impersonating " + SIMPLE_GROUP, canEditPages(nameTitleBody));
+        assertTrue("could not see wiki pages when impersonating " + SIMPLE_GROUP, canSeePages(nameTitleBody));
+        assertTrue("could not edit wiki pages when impersonating " + SIMPLE_GROUP, canEditPages(nameTitleBody));
         sleep(500);
     }
 
@@ -276,7 +277,7 @@ public class GroupTest extends BaseWebDriverTest
         setFormElement(Locator.name("names"), TEST_USERS_FOR_GROUP[0]); //this user is in group1 and so is already in group 2
         clickButton("Update Group Membership");
         assertTextPresent("* These group members already appear in other included member groups and can be safely removed.");
-        Assert.assertTrue("Missing or badly formatted group redundancy warning", getBodyText().contains(TEST_DISPLAY_NAMES_FOR_GROUP[0] + ") *"));
+        assertTrue("Missing or badly formatted group redundancy warning", getBodyText().contains(TEST_DISPLAY_NAMES_FOR_GROUP[0] + ") *"));
 //        expect warning
     }
 
@@ -383,7 +384,7 @@ public class GroupTest extends BaseWebDriverTest
         // Run the Test Script
         clickButton("Start Test", 0);
         waitForText("Done!", defaultWaitForPage);
-        Assert.assertFalse("Security API error.", Locator.id("log-info").findElement(getDriver()).getText().contains("Error"));
+        assertFalse("Security API error.", Locator.id("log-info").findElement(getDriver()).getText().contains("Error"));
     }
 
     @Override protected BrowserType bestBrowser()

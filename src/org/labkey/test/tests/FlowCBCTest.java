@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
@@ -27,6 +26,8 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.TimeChartHelper;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: kevink
@@ -125,31 +126,31 @@ public class FlowCBCTest extends BaseFlowTest
         clickButton("Copy to Study");
 
         assertTitleContains("Dataset: Flow");
-        Assert.assertTrue("Expected go to STUDY_FOLDER container", getCurrentRelativeURL().contains("/" + STUDY_FOLDER));
+        assertTrue("Expected go to STUDY_FOLDER container", getCurrentRelativeURL().contains("/" + STUDY_FOLDER));
         assertTextPresent(PTID1, "2012-03-17"); // PTID entered in copy verify page and DATE from FCS keywords
         assertTextPresent(PTID2, "2012-06-20"); // PTID from FCS keyword and DATE entered in copy verify page
         String href = getAttribute(Locator.linkWithText(PTID2), "href");
-        Assert.assertTrue("Expected PTID link to go to STUDY_FOLDER container: " + href, href.contains("/" + STUDY_FOLDER));
+        assertTrue("Expected PTID link to go to STUDY_FOLDER container: " + href, href.contains("/" + STUDY_FOLDER));
         href = getAttribute(Locator.linkWithText("analysis"), "href");
-        Assert.assertTrue("Expected Run link to go to flow container: " + href, href.contains("/" + getFolderName()));
+        assertTrue("Expected Run link to go to flow container: " + href, href.contains("/" + getFolderName()));
         href = getAttribute(Locator.linkWithText("06-20-12 mem naive"), "href");
-        Assert.assertTrue("Expected Compensation Matrix link to go to flow container: " + href, href.contains("/" + getFolderName()));
+        assertTrue("Expected Compensation Matrix link to go to flow container: " + href, href.contains("/" + getFolderName()));
 
         // verify graph img is displayed (no error) and the src attribute goes to the flow container
         assertTextNotPresent("Error generating graph");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:SSC-H)']"), "src");
-        Assert.assertTrue("Expected graph img to go to flow container: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+        assertTrue("Expected graph img to go to flow container: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
 
         pushLocation();
         clickButton("View Source Assay");
         assertTitleContains("Flow Runs:");
-        Assert.assertTrue("Expected source assay button to go to flow container", getCurrentRelativeURL().contains("/" + getFolderName()));
+        assertTrue("Expected source assay button to go to flow container", getCurrentRelativeURL().contains("/" + getFolderName()));
         popLocation();
 
         pushLocation();
         clickAndWait(Locator.linkWithText("assay"));
         assertTitleContains("FCSAnalysis");
-        Assert.assertTrue("Expected assay button to go to flow container", getCurrentRelativeURL().contains("/" + getFolderName()));
+        assertTrue("Expected assay button to go to flow container", getCurrentRelativeURL().contains("/" + getFolderName()));
         popLocation();
     }
 
@@ -190,22 +191,22 @@ public class FlowCBCTest extends BaseFlowTest
         log("** Verify mem naive query");
         beginAt("/query/" + getProjectName() + "/" + STUDY_FOLDER + "/executeQuery.view?schemaName=study&query.queryName=mem%20naive%20CBCFlow&query.sort=ParticipantId");
         DataRegionTable table = new DataRegionTable("query", this, false, true);
-        Assert.assertEquals("Expected one row", 1, table.getDataRowCount());
-        Assert.assertEquals(PTID1, table.getDataAsText(0, "Participant ID"));
-        Assert.assertEquals("Week 16", table.getDataAsText(0, "Visit"));
-        Assert.assertEquals("2880.0", table.getDataAsText(0, "Total Lymph"));
-        Assert.assertEquals("78.6%", table.getDataAsText(0, "CD3+ Percent"));
-        Assert.assertEquals("2263.18", table.getDataAsText(0, "CD3+ Lymph"));
+        assertEquals("Expected one row", 1, table.getDataRowCount());
+        assertEquals(PTID1, table.getDataAsText(0, "Participant ID"));
+        assertEquals("Week 16", table.getDataAsText(0, "Visit"));
+        assertEquals("2880.0", table.getDataAsText(0, "Total Lymph"));
+        assertEquals("78.6%", table.getDataAsText(0, "CD3+ Percent"));
+        assertEquals("2263.18", table.getDataAsText(0, "CD3+ Lymph"));
 
         log("** Verify 8a/p11c/4/3 query");
         beginAt("/query/" + getProjectName() + "/" + STUDY_FOLDER + "/executeQuery.view?schemaName=study&query.queryName=8a%2Fp11c%2F4%2F3%20CBCFlow&query.sort=ParticipantId");
         table = new DataRegionTable("query", this, false, true);
-        Assert.assertEquals("Expected one row", 1, table.getDataRowCount());
-        Assert.assertEquals(PTID2, table.getDataAsText(0, "Participant ID"));
-        Assert.assertEquals("Week 3", table.getDataAsText(0, "Visit"));
-        Assert.assertEquals("3080.0", table.getDataAsText(0, "Total Lymph"));
-        Assert.assertEquals("87.0%", table.getDataAsText(0, "CD3+ Percent"));
-        Assert.assertEquals("2680.09", table.getDataAsText(0, "CD3+ Lymph"));
+        assertEquals("Expected one row", 1, table.getDataRowCount());
+        assertEquals(PTID2, table.getDataAsText(0, "Participant ID"));
+        assertEquals("Week 3", table.getDataAsText(0, "Visit"));
+        assertEquals("3080.0", table.getDataAsText(0, "Total Lymph"));
+        assertEquals("87.0%", table.getDataAsText(0, "CD3+ Percent"));
+        assertEquals("2680.09", table.getDataAsText(0, "CD3+ Lymph"));
     }
 
     @LogMethod
@@ -214,7 +215,7 @@ public class FlowCBCTest extends BaseFlowTest
         beginAt("/visualization/Flow Verify Project/KoStudy/timeChartWizard.view?edit=true&queryName=mem naive CBCFlow&schemaName=study&dataRegionName=query&filterUrl=%2Flabkey%2Fquery%2FFlow%2520Verify%2520Project%2FKoStudy%2FexecuteQuery.view%3Fquery.queryName%3Dmem%2520naive%2520CBCFlow%26query.sort%3DParticipantId%26schemaName%3Dstudy");
         TimeChartHelper tch = new TimeChartHelper(this);
         tch.addAMeasure("CD3+ Lymph");
-        Assert.assertFalse("OK button appeared, indicating a problem with the graph", isElementPresent(Locator.button("OK")));
+        assertFalse("OK button appeared, indicating a problem with the graph", isElementPresent(Locator.button("OK")));
         assertTextNotPresent("There are no demographic date options available in this study");
         tch.save("Flow Report");
     }

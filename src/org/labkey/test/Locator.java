@@ -16,7 +16,6 @@
 
 package org.labkey.test;
 
-import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -30,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.*;
 
 /**
  * User: Mark Igra
@@ -212,7 +213,7 @@ public abstract class Locator
         }
         catch (TimeoutException ex)
         {
-            Assert.fail("Timeout waiting for element to disappear [" + secTimeout + "sec]: " + getLoggableDescription());
+            fail("Timeout waiting for element to disappear [" + secTimeout + "sec]: " + getLoggableDescription());
         }
     }
 

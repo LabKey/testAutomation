@@ -15,10 +15,11 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+
+import static org.junit.Assert.*;
 
 /**
  * <code>EmailRecordTable</code>
@@ -73,7 +74,7 @@ public class EmailRecordTable extends DataRegionTable
         
         _test.sleep(1000);
         String error = _test.getText(Locator.id("emailRecordError"));
-        Assert.assertTrue("Error setting email recorder", StringUtils.trimToNull(error) == null);
+        assertTrue("Error setting email recorder", StringUtils.trimToNull(error) == null);
     }
 
     public void clickMessage(EmailMessage message)

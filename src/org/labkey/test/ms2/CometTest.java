@@ -16,7 +16,6 @@
 
 package org.labkey.test.ms2;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -25,6 +24,8 @@ import org.labkey.test.categories.MS2;
 import org.labkey.test.util.WindowsOnlyTest;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 @Category({MS2.class, BVT.class})
 public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnlyTest
@@ -58,7 +59,7 @@ public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnl
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
-            Assert.fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
+            fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
         super.doTestSteps();
     }

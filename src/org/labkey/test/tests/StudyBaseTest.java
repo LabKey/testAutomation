@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -29,6 +28,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Collections;
 import java.util.Set;
+
+import static org.junit.Assert.*;
 
 /*
 * User: adam
@@ -305,7 +306,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void assertSelectOption(String name, int i, String expected)
     {
-        Assert.assertEquals(selenium.getSelectedValue(Locator.tagWithName("select", name).index(i).toString()), expected);
+        assertEquals(selenium.getSelectedValue(Locator.tagWithName("select", name).index(i).toString()), expected);
     }
 
     protected void goToManageStudyPage(String projectName, String studyName)

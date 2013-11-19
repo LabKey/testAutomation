@@ -15,9 +15,10 @@
  */
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -49,7 +50,7 @@ public class UIUserHelper extends AbstractUserHelper
             _test.clickButton("Add Users");
 
             if (verifySuccess)
-                Assert.assertTrue("Failed to add user " + userName, _test.isTextPresent(userName + " added as a new user to the system"));
+                assertTrue("Failed to add user " + userName, _test.isTextPresent(userName + " added as a new user to the system"));
 
     }
 }

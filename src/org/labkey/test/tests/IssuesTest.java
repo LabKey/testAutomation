@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -29,6 +28,8 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: tamram
@@ -189,7 +190,7 @@ public class IssuesTest extends BaseWebDriverTest
         // InsertAction -- user isn't in any groups, so shouldn't appear in the assigned-to list yet
         clickButton("New Issue");
         String assignedToText = getText(Locator.xpath("//select[@name='assignedTo']"));
-        Assert.assertEquals(assignedToText, "");
+        assertEquals(assignedToText, "");
 
         // Add to group so user appears
         clickProject("IssuesVerifyProject");
@@ -200,9 +201,9 @@ public class IssuesTest extends BaseWebDriverTest
         // InsertAction
         clickButton("New Issue");
         assignedToText = getText(Locator.xpath("//select[@name='assignedTo']"));
-        Assert.assertEquals(assignedToText, getDisplayName());
+        assertEquals(assignedToText, getDisplayName());
         String customStringText = getText(Locator.xpath("//select[@name='string5']"));
-        Assert.assertEquals(customStringText, "Cadmium\nPolonium");
+        assertEquals(customStringText, "Cadmium\nPolonium");
         setFormElement("title", ISSUE_TITLE_0);
         selectOptionByText("type", "UFO");
         selectOptionByText("area", "Area51");
@@ -407,11 +408,11 @@ public class IssuesTest extends BaseWebDriverTest
 
         // Presumed to get the first message
         List<String> recipients = emailTable.getColumnDataAsText("To");
-        Assert.assertTrue("User did not receive issue notification",      recipients.contains(PasswordUtil.getUsername()));
-        Assert.assertTrue(USER2 + " did not receieve issue notification", recipients.contains(USER2));
-        Assert.assertTrue(USER1 + " did not receieve issue notification", recipients.contains(USER1));
+        assertTrue("User did not receive issue notification",      recipients.contains(PasswordUtil.getUsername()));
+        assertTrue(USER2 + " did not receieve issue notification", recipients.contains(USER2));
+        assertTrue(USER1 + " did not receieve issue notification", recipients.contains(USER1));
 
-        Assert.assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE_TITLE_2));
+        assertTrue("Issue Message does not contain title", message.getSubject().contains(ISSUE_TITLE_2));
 
         assertTextPresent("Customized template line: Cadmium", 3);
         assertTextNotPresent("This line shouldn't appear");
@@ -433,9 +434,9 @@ public class IssuesTest extends BaseWebDriverTest
         message = emailTable.getMessage(ISSUE_TITLE_2 + ",\" has been updated");
 
         // issue 17637 : inactive users as well as users not in the system should not receive emails
-        //Assert.assertTrue(USER3 + " did not receieve updated issue notification" + message.getTo()[0],
+        //assertTrue(USER3 + " did not receieve updated issue notification" + message.getTo()[0],
         //        USER3.equals(emailTable.getDataAsText(0, "To")) || USER3.equals(emailTable.getDataAsText(1, "To")));
-        Assert.assertTrue("User did not receive updated issue notification",
+        assertTrue("User did not receive updated issue notification",
                 PasswordUtil.getUsername().equals(emailTable.getDataAsText(0, "To")) || PasswordUtil.getUsername().equals(emailTable.getDataAsText(1, "To")));
     }
 
@@ -520,7 +521,7 @@ public class IssuesTest extends BaseWebDriverTest
         if (isChecked(Locator.checkboxByNameAndValue("requiredFields", fieldName)))
             return;
 
-        Assert.assertFalse("Checkbox not set for element: " + fieldName, false);
+        assertFalse("Checkbox not set for element: " + fieldName, false);
     }
 
     private void viewSelectedDetailsTest()
@@ -607,7 +608,7 @@ public class IssuesTest extends BaseWebDriverTest
         for(String button : new String[] {"Admin", "Email Preferences"})
         {
             Locator l = Locator.xpath("//span/a[span[text()='" + button + "']]");
-            Assert.assertTrue(getAttribute(l,  "href").contains(PROJECT_NAME + "/" + SUB_FOLDER_NAME));
+            assertTrue(getAttribute(l,  "href").contains(PROJECT_NAME + "/" + SUB_FOLDER_NAME));
 
         }
 
@@ -624,11 +625,11 @@ public class IssuesTest extends BaseWebDriverTest
 
         // Verify the URL of ISSUE_TITLE_0 goes to PROJECT_NAME
         String href = getAttribute(Locator.linkContainingText(ISSUE_TITLE_0), "href");
-        Assert.assertTrue("Expected issue details URL to link to project container", href.contains("/issues/" + PROJECT_NAME + "/details.view"));
+        assertTrue("Expected issue details URL to link to project container", href.contains("/issues/" + PROJECT_NAME + "/details.view"));
 
         // Verify the URL of ISSUE_TITLE_3 goes to PROJECT_NAME/SUB_FOLDER_NAME
         href = getAttribute(Locator.linkContainingText(ISSUE_TITLE_3), "href");
-        Assert.assertTrue("Expected issue details URL to link to sub-folder container", href.contains("/issues/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/details.view"));
+        assertTrue("Expected issue details URL to link to sub-folder container", href.contains("/issues/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/details.view"));
     }
 
 }

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.experimental.categories.Category;
@@ -30,6 +29,8 @@ import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: bimber
@@ -106,7 +107,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
         Ext4FieldRefWD.getForLabel(this, "Assay Type").setValue(3);
 
-        Assert.assertEquals("Incorrect value for field", "PBMC", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
+        assertEquals("Incorrect value for field", "PBMC", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
 
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
         StringBuilder sb = new StringBuilder();
@@ -164,7 +165,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
         Ext4FieldRefWD.getForLabel(this, "Assay Type").setValue(3);
 
-        Assert.assertEquals("Incorrect value for field", "PBMC", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
+        assertEquals("Incorrect value for field", "PBMC", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
 
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
         StringBuilder sb = new StringBuilder();
@@ -238,7 +239,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
         Ext4FieldRefWD.getForLabel(this, "Assay Type").setValue(3);
 
-        Assert.assertEquals("Incorrect value for field", "PBMC", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
+        assertEquals("Incorrect value for field", "PBMC", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
 
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
         StringBuilder sb = new StringBuilder();
@@ -280,7 +281,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
     {
         DataRegionTable results = new DataRegionTable("Data", this);
         waitForText("cells/uL"); //proxy for DR loading
-        Assert.assertEquals("Incorrect row count", expected.size(), results.getDataRowCount());
+        assertEquals("Incorrect row count", expected.size(), results.getDataRowCount());
 
         log("DataRegion column count was: " + results.getColumnCount());
 
@@ -301,15 +302,15 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
             String parentPopulation = results.getDataAsText(i, "Parent Population");
             String comments = results.getDataAsText(i, "Comment");
 
-            Assert.assertEquals("Incorrect subjectId on row " + i, expectedVals[0], subjectId);
-            Assert.assertEquals("Incorrect date on row " + i, expectedVals[1], date);
-            Assert.assertEquals("Incorrect sampleType on row " + i, expectedVals[2], type);
-            Assert.assertEquals("Incorrect population on row " + i, expectedVals[3], population);
-            Assert.assertEquals("Incorrect result on row " + i, expectedVals[4], result);
-            Assert.assertEquals("Incorrect units on row " + i, expectedVals[5], units);
-            Assert.assertEquals("Incorrect freezerId on row " + i, expectedVals[6], freezer);
-            Assert.assertEquals("Incorrect parent population on row " + i, expectedVals[7], parentPopulation);
-            Assert.assertEquals("Incorrect comments on row " + i, expectedVals[8], comments);
+            assertEquals("Incorrect subjectId on row " + i, expectedVals[0], subjectId);
+            assertEquals("Incorrect date on row " + i, expectedVals[1], date);
+            assertEquals("Incorrect sampleType on row " + i, expectedVals[2], type);
+            assertEquals("Incorrect population on row " + i, expectedVals[3], population);
+            assertEquals("Incorrect result on row " + i, expectedVals[4], result);
+            assertEquals("Incorrect units on row " + i, expectedVals[5], units);
+            assertEquals("Incorrect freezerId on row " + i, expectedVals[6], freezer);
+            assertEquals("Incorrect parent population on row " + i, expectedVals[7], parentPopulation);
+            assertEquals("Incorrect comments on row " + i, expectedVals[8], comments);
             i++;
         }
     }

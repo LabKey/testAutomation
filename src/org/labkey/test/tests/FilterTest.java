@@ -24,7 +24,6 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -42,6 +41,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**conceptually filter and list are separate, but
  * it was convenient to use the list test helpers for filter
@@ -192,7 +193,7 @@ public class FilterTest extends ListTest
         _extHelper.clickExtTab("Choose Filters");
         //NOTE: the filter will optimize this to EQUALS, since there is 1 value
         waitForFormElementToEqual(Locator.name("filterType_1"), "Equals");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "Robust", getFormElement(Locator.name("value_1")));
+        assertEquals("Faceted -> logical filter conversion failure", "Robust", getFormElement(Locator.name("value_1")));
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
         verifyColumnValues("query", "Color", "Robust");
@@ -201,7 +202,7 @@ public class FilterTest extends ListTest
         setUpFacetedFilter("query", "Color", "Robust", "Light");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "ZanzibarMasinginiTanzaniaAfrica", getFormElement(Locator.name("value_1")));
+        assertEquals("Faceted -> logical filter conversion failure", "ZanzibarMasinginiTanzaniaAfrica", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtTab("Choose Filters");
@@ -214,7 +215,7 @@ public class FilterTest extends ListTest
         setUpFacetedFilter("query", "Color", "Light");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Equals");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "Light", getFormElement(Locator.name("value_1")));
+        assertEquals("Faceted -> logical filter conversion failure", "Light", getFormElement(Locator.name("value_1")));
 
         setFormElement(Locator.name("value_1"), "Light;Robust");
 
@@ -242,7 +243,7 @@ public class FilterTest extends ListTest
         setUpFacetedFilter("query", "year", "1990");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Equals");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "1990", getFormElement(Locator.name("value_1")));
+        assertEquals("Faceted -> logical filter conversion failure", "1990", getFormElement(Locator.name("value_1")));
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
         verifyColumnValues("query", "year", "1990");
@@ -250,7 +251,7 @@ public class FilterTest extends ListTest
         setUpFacetedFilter("query", "year", "1990", "1980");
         _extHelper.clickExtTab("Choose Filters");
         waitForFormElementToEqual(Locator.name("filterType_1"), "Does Not Equal");
-        Assert.assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement(Locator.name("value_1")));
+        assertEquals("Faceted -> logical filter conversion failure", "1970", getFormElement(Locator.name("value_1")));
         _extHelper.selectComboBoxItem("Filter Type:", "Is Blank");
         _extHelper.clickExtTab("Choose Values");
         _extHelper.clickExtButton("OK");
@@ -366,7 +367,7 @@ public class FilterTest extends ListTest
     private void verifyColumnValues(String dataregion, String columnName, String... expectedValues)
     {
         List<String> expectedList = Arrays.asList(expectedValues);
-        Assert.assertEquals(expectedList, new DataRegionTable(dataregion, this).getColumnDataAsText(columnName));
+        assertEquals(expectedList, new DataRegionTable(dataregion, this).getColumnDataAsText(columnName));
     }
 
     private void verifyTextPresentInFilterDialog(String... texts)
@@ -375,7 +376,7 @@ public class FilterTest extends ListTest
         String filterDialogText = getText(loc);
 
         for (String text : texts)
-            Assert.assertEquals("'" + text + "' not found", 1, StringUtils.countMatches(filterDialogText, text));
+            assertEquals("'" + text + "' not found", 1, StringUtils.countMatches(filterDialogText, text));
     }
 
     private void verifyOptionsInFilterDialog(String... options)
@@ -383,7 +384,7 @@ public class FilterTest extends ListTest
         String expectedOptions = StringUtils.join(options, "\n");
         String actualOptions = getText(Locator.css(".labkey-filter-dialog .x-grid3-body")).replaceAll(" ", "");
 
-        Assert.assertEquals("Unexpected filter options", expectedOptions, actualOptions);
+        assertEquals("Unexpected filter options", expectedOptions, actualOptions);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)

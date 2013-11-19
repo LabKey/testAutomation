@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -25,6 +24,8 @@ import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.ResetTracker;
 import org.labkey.test.util.UIContainerHelper;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -104,7 +105,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
     @Override
     public String getAssociatedModuleDirectory()
     {
-        Assert.fail("Not implemented");
+        fail("Not implemented");
         return null;
     }
 

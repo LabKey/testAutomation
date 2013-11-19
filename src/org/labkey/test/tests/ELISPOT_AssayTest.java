@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
@@ -34,6 +33,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: bimber
@@ -226,8 +227,8 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
-        Assert.assertEquals("Incorrect value for field", "AID Plate Reader", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
-        Assert.assertEquals("Incorrect value for field", new Double(0.05), Ext4FieldRefWD.getForLabel(this, "Positivity Threshold").getValue());
+        assertEquals("Incorrect value for field", "AID Plate Reader", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
+        assertEquals("Incorrect value for field", new Double(0.05), Ext4FieldRefWD.getForLabel(this, "Positivity Threshold").getValue());
         waitAndClick(btn);
 
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
@@ -247,7 +248,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
         DataRegionTable dr2 = new DataRegionTable("query", this);
-        Assert.assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
+        assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
     }
 
     private void verifyExpectedValues()
@@ -351,7 +352,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         expected.put("Subject3_<85>_-31", new String[]{"Subject3", "<85>", "2012-03-04", "-31", "NEG", "High CV: 0.418", "PBMC"});
 
         int totalRows = 90;
-        Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
+        assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
         log("DataRegion column count was: " + results.getColumnCount());
 
         //recreate the DR to see if this removes intermittent test failures
@@ -368,14 +369,14 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
             String key = subjectId + "_" + peptide + "_" + spots;
 
             String[] expectedVals = expected.get(key);
-            Assert.assertNotNull("Unable to find expected values: " + key, expectedVals);
+            assertNotNull("Unable to find expected values: " + key, expectedVals);
 
-            Assert.assertEquals("Incorrect subjectId for: " + key, expectedVals[0], subjectId);
-            Assert.assertEquals("Incorrect peptide for: " + key, expectedVals[1], peptide);
+            assertEquals("Incorrect subjectId for: " + key, expectedVals[0], subjectId);
+            assertEquals("Incorrect peptide for: " + key, expectedVals[1], peptide);
             if (!"".equals(expectedVals[2]))
-                Assert.assertEquals("Incorrect date for: " + key, expectedVals[2], date);
-            Assert.assertEquals("Incorrect spots for: " + key, expectedVals[3], spots);
-            Assert.assertEquals("Incorrect qual result for: " + key, expectedVals[4], result);
+                assertEquals("Incorrect date for: " + key, expectedVals[2], date);
+            assertEquals("Incorrect spots for: " + key, expectedVals[3], spots);
+            assertEquals("Incorrect qual result for: " + key, expectedVals[4], result);
 
             i++;
         }

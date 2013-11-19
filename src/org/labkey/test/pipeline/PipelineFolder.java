@@ -15,11 +15,12 @@
  */
 package org.labkey.test.pipeline;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * <code>PipelineFolder</code>
@@ -130,7 +131,7 @@ public class PipelineFolder
 
         if (getPipelineType() == Type.enterprise)
         {
-            Assert.assertTrue("Globus test requires file upload.", _test.isFileUploadAvailable());
+            assertTrue("Globus test requires file upload.", _test.isFileUploadAvailable());
             String pathLabKey = BaseSeleniumWebTest.getLabKeyRoot();
             _test.setFormElement("keyFile", new File(pathLabKey + USER_KEY));
             _test.setFormElement("keyPassword", USER_KEY_PASSWORD);

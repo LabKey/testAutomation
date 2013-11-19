@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
@@ -24,6 +23,8 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: cnathe
@@ -98,13 +99,13 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         List displayOrders = table.getColumnDataAsText("Study APX1Abbreviated Physical Exam Mouse Visit Visit Display Order");
         for (Object str : displayOrders)
         {
-            Assert.assertEquals("Display order should default to zero.", "0", str.toString());
+            assertEquals("Display order should default to zero.", "0", str.toString());
         }
 
         List<String> visits = table.getColumnDataAsText("Visit Label");
         for( String str : VISIT_STRINGS )
         {
-            Assert.assertTrue("Not all visits present in data table. Missing: " + str, visits.contains(str));
+            assertTrue("Not all visits present in data table. Missing: " + str, visits.contains(str));
         }
 
         clickButton("View Chart(s)", 0);
@@ -190,7 +191,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         clickAndWait(Locator.linkWithText("APX-1"));
         clickButton("Edit Definition");
         waitForElement(Locator.xpath("//input[@name='dsName']"));
-        Assert.assertEquals("APXwtkg", getFormElement(Locator.name("ff_name1")));
+        assertEquals("APXwtkg", getFormElement(Locator.name("ff_name1")));
         setFormElement(Locator.name("ff_name1"), "APXwtkgCHANGED");
         clickButton("Save");
         clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
@@ -204,7 +205,7 @@ public class TimeChartVisitBasedTest extends TimeChartTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("APX-1"));
         clickButton("Delete Dataset", 0);
-        Assert.assertTrue(getAlert().contains("Are you sure you want to delete this dataset?"));
+        assertTrue(getAlert().contains("Are you sure you want to delete this dataset?"));
         waitForText("The study schedule defines"); // text on the Manage Datasets page
         clickAndWait(Locator.linkWithText("Clinical and Assay Data"));
         waitForText(VISIT_REPORT_NAME);

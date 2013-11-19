@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -25,6 +24,8 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.WorkbookHelper;
 
 import java.util.ArrayList;
+
+import static org.junit.Assert.*;
 
 @Category({DailyB.class})
 public class WorkbookTest extends BaseWebDriverTest
@@ -71,7 +72,7 @@ public class WorkbookTest extends BaseWebDriverTest
         int lastid = 0;
         for(int i=0; i>ids.length; i++)
         {
-            Assert.assertEquals("nonsequential name for workbook found",ids[i],lastid + 1);
+            assertEquals("nonsequential name for workbook found",ids[i],lastid + 1);
         }
         // Edit Workbook Name
         waitAndClick(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
@@ -130,7 +131,7 @@ public class WorkbookTest extends BaseWebDriverTest
         addWebPart("Workbooks");
         WorkbookHelper workbookHelper = new WorkbookHelper(this);
         int id = workbookHelper.createWorkbook(PROJECT_NAME2, FILE_WORKBOOK_NAME, FILE_WORKBOOK_DESCRIPTION, WorkbookHelper.WorkbookFolderType.FILE_WORKBOOK);
-        Assert.assertEquals("workbook added to new project did not have id=1",id,1);
+        assertEquals("workbook added to new project did not have id=1",id,1);
     }
 
     public int[] createWorkbooks(String projectName, String fileWorkbookName, String fileWorkbookDescription,
@@ -143,16 +144,16 @@ public class WorkbookTest extends BaseWebDriverTest
         // Create Assay Workbook
         names[1] = (workbookHelper.createWorkbook(projectName, assayWorkbookName, assayWorkbookDescription, WorkbookHelper.WorkbookFolderType.ASSAY_WORKBOOK));
         assertLinkPresentWithText("Experiment Runs");
-        Assert.assertEquals(assayWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
-        Assert.assertEquals(assayWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
+        assertEquals(assayWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
+        assertEquals(assayWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
         assertLinkNotPresentWithText(assayWorkbookName); // Should not appear in folder tree.
 
         // Create Default Workbook
         names[2] = (workbookHelper.createWorkbook(projectName, defaultWorkbookName, defaultWorkbookDescription, WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK));
         assertLinkPresentWithText("Files");
         assertLinkPresentWithText("Experiment Runs");
-        Assert.assertEquals(defaultWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
-        Assert.assertEquals(defaultWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
+        assertEquals(defaultWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
+        assertEquals(defaultWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
         assertLinkNotPresentWithText(defaultWorkbookName); // Should not appear in folder tree.
         return names;
     }

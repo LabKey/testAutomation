@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -34,6 +33,8 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 import static org.labkey.test.BaseSeleniumWebTest.WAIT_FOR_PAGE;
+
+import static org.junit.Assert.*;
 
 /**
  * User: bbimber
@@ -128,7 +129,7 @@ public class LabModuleHelper
     public void verifyNavPanelRowItemPresent(String label)
     {
         _test.log("Verifying NavPanel row present with label: " + label);
-        Assert.assertTrue("Row missing: " + label, _test.isElementPresent(getNavPanelRow(label)));
+        assertTrue("Row missing: " + label, _test.isElementPresent(getNavPanelRow(label)));
     }
 
     public static Locator webpartTitle(String title)
@@ -258,11 +259,11 @@ public class LabModuleHelper
             _test.sleep(1000);
             String fields = (String)win.getEval("getFieldsInTemplateTest()");
             String[] fieldArray = fields.split(";");
-            Assert.assertEquals("Incorrect column number in template", expectedColumns.size(), fieldArray.length);
+            assertEquals("Incorrect column number in template", expectedColumns.size(), fieldArray.length);
 
             for (String field : fieldArray)
             {
-                Assert.assertTrue("Field present in template that should not be: " + field, expectedColumns.contains(field));
+                assertTrue("Field present in template that should not be: " + field, expectedColumns.contains(field));
             }
         }
 

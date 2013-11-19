@@ -16,7 +16,6 @@
 
 package org.labkey.test.util;
 
-import org.junit.Assert;
 import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import static org.junit.Assert.*;
 
 /**
  * User: brittp
@@ -328,7 +329,7 @@ public class Crawler
                 /* controller/folders/ */
                 int postControllerSlashIdx = rootRelativeURL.indexOf('/');
                 if (-1 == postControllerSlashIdx)
-                    Assert.fail("Expected to find a slash but didn't in \"" + rootRelativeURL + "\"");
+                    fail("Expected to find a slash but didn't in \"" + rootRelativeURL + "\"");
                 _controller = rootRelativeURL.substring(0, postControllerSlashIdx);
                 rootRelativeURL = rootRelativeURL.substring(postControllerSlashIdx+1);
             }
@@ -561,19 +562,19 @@ public class Crawler
         // quick unit-test
         {
         ControllerActionId a = new ControllerActionId("/controller/folder/action.view");
-        Assert.assertEquals("controller", a.getController());
-        Assert.assertEquals("folder", a.getFolder());
-        Assert.assertEquals("action", a.getAction());
+        assertEquals("controller", a.getController());
+        assertEquals("folder", a.getFolder());
+        assertEquals("action", a.getAction());
         }
         {
         ControllerActionId b = new ControllerActionId("/folder/controller-action.view");
-        Assert.assertEquals("controller", b.getController());
-        Assert.assertEquals("folder", b.getFolder());
-        Assert.assertEquals("action", b.getAction());
+        assertEquals("controller", b.getController());
+        assertEquals("folder", b.getFolder());
+        assertEquals("action", b.getAction());
         }
         {
         ControllerActionId c = new ControllerActionId("/_webdav/fred");
-        Assert.assertEquals("_webdav", c.getController());
+        assertEquals("_webdav", c.getController());
         }
 
         _test.log("Starting crawl...");
@@ -672,7 +673,7 @@ public class Crawler
             // Check that there was no error
             int code = _test.getResponseCode();
             if (code == 404 || code == 500)
-                Assert.fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
+                fail(relativeURL + " produced response code " + code + ".  Originating page: " + origin.toString());
 
 			testInjection(urlToCheck, currentPageUrl);
         }
@@ -711,7 +712,7 @@ public class Crawler
             {
                 if (responseText.indexOf(word.toLowerCase()) > 0)
                 {
-                    Assert.fail("Illegal use of forbidden word '" + word + "'> " + relativeURL);
+                    fail("Illegal use of forbidden word '" + word + "'> " + relativeURL);
                 }
             }
         }
@@ -750,7 +751,7 @@ public class Crawler
                 if (msg != null)
                 {
                     String url = test.getCurrentRelativeURL();
-                    Assert.fail(msg + "\n" + url);
+                    fail(msg + "\n" + url);
                 }
 
                 throw se;
@@ -772,7 +773,7 @@ public class Crawler
                 if (msg != null)
                 {
                     String url = test.getCurrentRelativeURL();
-                    Assert.fail(msg + "\n" + url);
+                    fail(msg + "\n" + url);
                 }
 
                 throw ex;
@@ -826,11 +827,5 @@ public class Crawler
 			String urlMalicious = base + "?" + queryMalicious;
             tryInject(_test, urlTester, urlMalicious);
 		}
-	}
-
-	protected void fail(String msg)
-	{
-        _test.log(msg);
-		Assert.fail(msg);
 	}
 }

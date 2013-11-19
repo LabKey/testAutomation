@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -25,6 +24,8 @@ import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * User: klum
@@ -57,7 +58,7 @@ public class RlabkeyTest extends SimpleApiTest
         File listArchive = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip");
 
         if (!listArchive.exists())
-            Assert.fail("Unable to locate the list archive: " + listArchive.getName());
+            fail("Unable to locate the list archive: " + listArchive.getName());
 
         _listHelper.importListArchive(PROJECT_NAME, listArchive);
         // create an issues list in a project and subfolder to test ContainerFilters.
@@ -125,7 +126,7 @@ public class RlabkeyTest extends SimpleApiTest
 
                     log("exceute test: " + test.getName());
                     if (!_rReportHelper.executeScript(sb.toString(), verify))
-                        Assert.fail("Failed executing R script for test case: " + test.getName());
+                        fail("Failed executing R script for test case: " + test.getName());
                 }
                 _rReportHelper.clickSourceTab();
                 _rReportHelper.saveReport("dummy");

@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -45,6 +44,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 @Category({DailyB.class, Data.class})
 public class ContainerContextTest extends BaseWebDriverTest
@@ -169,23 +170,23 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText("EDIT"), "href");
-        Assert.assertTrue("Expected [edit] link to go to " + getProjectName() + " container, href=" + href,
+        assertTrue("Expected [edit] link to go to " + getProjectName() + " container, href=" + href,
                 href.contains("/query/" + getProjectName() + "/updateQueryRow.view?"));
 
         href = getAttribute(Locator.linkWithText("DETAILS"), "href");
-        Assert.assertTrue("Expected [details] link to go to " + getProjectName() + " container, href=" + href,
+        assertTrue("Expected [details] link to go to " + getProjectName() + " container, href=" + href,
                 href.contains("/list/" + getProjectName() + "/details.view?"));
 
         href = getAttribute(Locator.linkWithText("MyName"), "href");
-        Assert.assertTrue("Expected MyName link to go to " + getProjectName() + " container, href=" + href,
+        assertTrue("Expected MyName link to go to " + getProjectName() + " container, href=" + href,
                 href.contains("/list/" + getProjectName() + "/details.view?"));
 
         href = getAttribute(Locator.linkWithText("MyLookupItem2"), "href");
-        Assert.assertTrue("Expected ListLookup link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
+        assertTrue("Expected ListLookup link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
                 href.contains("/list/" + getProjectName() + "/" + SUB_FOLDER_A + "/details.view?"));
 
         href = getAttribute(Locator.linkWithText("200"), "href");
-        Assert.assertTrue("Expected ListLookup/LookupAge link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
+        assertTrue("Expected ListLookup/LookupAge link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
                 href.contains("/fake/" + getProjectName() + "/" + SUB_FOLDER_A + "/action.view?key=2"));
 
     }
@@ -230,11 +231,11 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText(SUB_FOLDER_A + "-Study"), "href");
-        Assert.assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container: " + href,
+        assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container: " + href,
                 href.contains("/study/" + getProjectName() + "/" + SUB_FOLDER_A + "/studySchedule.view"));
 
         href = getAttribute(Locator.linkWithText(SUB_FOLDER_B + "-Study"), "href");
-        Assert.assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_B + " container: " + href,
+        assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_B + " container: " + href,
                 href.contains("/study/" + getProjectName() + "/" + SUB_FOLDER_B + "/studySchedule.view"));
     }
 
@@ -251,11 +252,11 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText("COMPLETE", 0), "href");
-        Assert.assertTrue("Expected 'COMPLETE' link 0 to go to current A container: " + href,
+        assertTrue("Expected 'COMPLETE' link 0 to go to current A container: " + href,
                 href.contains("/pipeline-status/" + getProjectName() + "/" + SUB_FOLDER_A + "/details.view"));
 
         href = getAttribute(Locator.linkWithText("COMPLETE", 1), "href");
-        Assert.assertTrue("Expected 'COMPLETE' link 1 to go to current B container: " + href,
+        assertTrue("Expected 'COMPLETE' link 1 to go to current B container: " + href,
                 href.contains("/pipeline-status/" + getProjectName() + "/" + SUB_FOLDER_B + "/details.view"));
     }
 
@@ -460,7 +461,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href = dr.getUpdateHref(i);
                 log("  [edit] column href = " + href);
                 expectedHref = "/query/" + workbookContainer + "/updateQueryRow.view?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
-                Assert.assertTrue("Expected and actual [edit] links differ:\n" +
+                assertTrue("Expected and actual [edit] links differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual  : " + href,
                         href != null && href.contains(expectedHref));
@@ -472,7 +473,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 href = dr.getDetailsHref(i);
                 log("  [details] column href = " + href);
                 expectedHref = "/query/" + workbookContainer + "/" + detailsAction + "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
-                Assert.assertTrue("Expected and actual [details] links differ:\n" +
+                assertTrue("Expected and actual [details] links differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual:   " + href,
                         href != null && href.contains(expectedHref));
@@ -482,7 +483,7 @@ public class ContainerContextTest extends BaseWebDriverTest
             href = dr.getHref(i, "Vehicle Id");
             log("  Vehicle column href = " + href);
             expectedHref = "/simpletest/" + getProjectName() + "/vehicle.view?rowid=" + vehicleId;
-            Assert.assertTrue("Expected and actual Vehicle column URL differ:\n" +
+            assertTrue("Expected and actual Vehicle column URL differ:\n" +
                     "Expected: " + expectedHref + "\n" +
                     "Actual:   " + href,
                     href != null && href.contains(expectedHref));
@@ -498,7 +499,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 if (href != null)
                 {
                     log("  Parent test column href = " + href);
-                    Assert.assertTrue("Expected and actual parent test column URL differ:\n" +
+                    assertTrue("Expected and actual parent test column URL differ:\n" +
                             "Expected: " + expectedHref + "\n" +
                             "Actual:   " + href,
                             href.contains(expectedHref));
@@ -512,7 +513,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
                 log("  Folder column href = " + href);
                 expectedHref = "/project/" + workbookContainer + "/begin.view?";
-                Assert.assertTrue("Expected and actual container column URL differ:\n" +
+                assertTrue("Expected and actual container column URL differ:\n" +
                         "Expected container: " + workbookContainer + "\n" +
                         "Actual URL        : " + href,
                         href != null && href.contains(expectedHref));

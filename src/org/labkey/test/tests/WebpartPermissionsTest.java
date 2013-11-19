@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -24,6 +23,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -70,7 +71,7 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
         }
         catch (TestTimeoutException e)
         {
-            Assert.fail("Unable to delete dummy project");
+            fail("Unable to delete dummy project");
         }
         assertTextNotPresent("Flow Script");
 

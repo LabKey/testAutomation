@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import org.junit.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.experimental.categories.Category;
@@ -44,6 +43,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * User: bimber
@@ -313,20 +314,20 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
                 Object sampleType = grid.getFieldValue(i, "sampleType");
                 Object diluent = grid.getFieldValue(i, "diluent");
 
-                Assert.assertEquals("Incorrect well", StringUtils.trimToNull(arr[0]), well);
-                Assert.assertEquals("Incorrect sample category", StringUtils.trimToNull(arr[1]), categoryVal);
-                Assert.assertEquals("Incorrect subjectId", StringUtils.trimToNull(arr[2]), subjectId);
+                assertEquals("Incorrect well", StringUtils.trimToNull(arr[0]), well);
+                assertEquals("Incorrect sample category", StringUtils.trimToNull(arr[1]), categoryVal);
+                assertEquals("Incorrect subjectId", StringUtils.trimToNull(arr[2]), subjectId);
                 if (sampleDate == null || StringUtils.trimToNull(arr[3]) == null)
                 {
-                    Assert.assertEquals("Incorrect sampleDate", StringUtils.trimToNull(arr[3]), sampleDate);
+                    assertEquals("Incorrect sampleDate", StringUtils.trimToNull(arr[3]), sampleDate);
                 }
                 else
                 {
                     Date expected = dateFormat.parse(StringUtils.trimToNull(arr[3]));
-                    Assert.assertEquals("Incorrect sampleDate", expected, sampleDate);
+                    assertEquals("Incorrect sampleDate", expected, sampleDate);
                 }
 
-                //Assert.assertEquals("Incorrect peptide", StringUtils.trimToNull(arr[4]), peptide);
+                //assertEquals("Incorrect peptide", StringUtils.trimToNull(arr[4]), peptide);
             }
 
             i++;
@@ -353,8 +354,8 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
-        Assert.assertEquals("Incorrect value for field", "Roche E411", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
-        Assert.assertEquals("Incorrect value for field", "Electrochemiluminescence", Ext4FieldRefWD.getForLabel(this, "Method").getValue());
+        assertEquals("Incorrect value for field", "Roche E411", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
+        assertEquals("Incorrect value for field", "Electrochemiluminescence", Ext4FieldRefWD.getForLabel(this, "Method").getValue());
         waitAndClick(btn);
 
         Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
@@ -477,7 +478,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("View Planned Runs");
         DataRegionTable dr2 = new DataRegionTable("query", this);
-        Assert.assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
+        assertEquals("Run plan not marked completed", 0, dr2.getDataRowCount());
     }
 
     private void verifyResults(int totalRows, Map<String, String[]> expected)
@@ -488,7 +489,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
 
         DataRegionTable results = new DataRegionTable("Data", this);
 
-        Assert.assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
+        assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
         waitForText("48.51");
 
         //recreate the DR to see if this removes intermittent test failures
@@ -509,32 +510,32 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
             String key = subjectId + "_" + testName + "_" + result;
 
             String[] expectedVals = expected.get(key);
-            Assert.assertNotNull("Unable to find expected values for key: " + key, expectedVals);
+            assertNotNull("Unable to find expected values for key: " + key, expectedVals);
 
-            Assert.assertEquals("Incorrect subjectId for: " + key, expectedVals[0], subjectId);
+            assertEquals("Incorrect subjectId for: " + key, expectedVals[0], subjectId);
             if (!"".equals(expectedVals[1]))
-                Assert.assertEquals("Incorrect date for: " + key, expectedVals[1], date);
-            Assert.assertEquals("Incorrect testId for: " + key, expectedVals[2], testName);
+                assertEquals("Incorrect date for: " + key, expectedVals[1], date);
+            assertEquals("Incorrect testId for: " + key, expectedVals[2], testName);
             if (!expectedVals[3].equals(result))
             {
                 Double expectedResult = Double.parseDouble(expectedVals[3]);
                 Double observedResult = Double.parseDouble(result);
-                Assert.assertEquals("Incorrect result for: " + key, expectedResult, observedResult);
+                assertEquals("Incorrect result for: " + key, expectedResult, observedResult);
             }
-            Assert.assertEquals("Incorrect units for: " + key, expectedVals[4], units);
-            Assert.assertEquals("Incorrect category for: " + key, expectedVals[5], category);
+            assertEquals("Incorrect units for: " + key, expectedVals[4], units);
+            assertEquals("Incorrect category for: " + key, expectedVals[5], category);
 
             if (!"".equals(expectedVals[6]))
-                Assert.assertEquals("Incorrect diluent for: " + key, expectedVals[6], diluent);
+                assertEquals("Incorrect diluent for: " + key, expectedVals[6], diluent);
 
             if (!"".equals(expectedVals[7]) && !expectedVals[7].equals(df))
             {
                 Double expectedDf = Double.parseDouble(expectedVals[7]);
                 Double observedDf = Double.parseDouble(df);
-                Assert.assertEquals("Incorrect dilution factor for: " + key, expectedDf, observedDf);
+                assertEquals("Incorrect dilution factor for: " + key, expectedDf, observedDf);
             }
 
-            Assert.assertEquals("Incorrect QC flag for: " + key, expectedVals[8], qc);
+            assertEquals("Incorrect QC flag for: " + key, expectedVals[8], qc);
 
             i++;
         }
@@ -574,7 +575,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
                 row.put("units", tests.get(test)[1]);
                 insertCmd.addRow(row);
                 SaveRowsResponse saveResp = insertCmd.execute(cn, getProjectName());
-                Assert.assertEquals("Incorrect row count", 1, saveResp.getRowsAffected().intValue());
+                assertEquals("Incorrect row count", 1, saveResp.getRowsAffected().intValue());
             }
         }
     }

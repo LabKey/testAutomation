@@ -15,13 +15,14 @@
  */
 package org.labkey.test;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIAssayHelper;
 
 import java.io.File;
 import java.util.Collections;
+
+import static org.junit.Assert.*;
 
 /**
  * User: elvan
@@ -71,7 +72,7 @@ public class AssayAPITest extends BaseSeleniumWebTest
         }
         catch (Exception e)
         {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
 
         log("verify import worked");

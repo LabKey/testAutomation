@@ -16,7 +16,6 @@
 
 package org.labkey.test.ms2;
 
-import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -27,6 +26,8 @@ import org.labkey.test.categories.Mascot;
 import java.io.File;
 import java.net.URL;
 import java.net.MalformedURLException;
+
+import static org.junit.Assert.*;
 
 /**
  * User: billnelson@uky.edu
@@ -77,7 +78,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
-            Assert.fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
+            fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
         //cheehong:
         //  starting with v1.7, "Has Mascot server" checkbox removed
@@ -248,7 +249,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
             refresh();
         }
         if (!isLinkPresentWithText("COMPLETE", 1))
-            Assert.fail("Mascot .dat import did not complete.");
+            fail("Mascot .dat import did not complete.");
 
         popLocation();
 
@@ -336,12 +337,12 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         clickButton("Search");
         assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
-        Assert.assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
+        assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
         selenium.type("minimumProbability", "2.0");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
-        Assert.assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
+        assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
         assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
 
         selenium.type("identifier", "GarbageProteinName");

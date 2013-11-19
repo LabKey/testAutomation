@@ -41,7 +41,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -122,6 +121,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
+import static org.junit.Assert.*;
 import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
@@ -390,7 +390,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                         try
                             {JavaScriptError.addExtension(profile);}
                         catch(IOException e)
-                            {Assert.fail("Failed to load JS error checker: " + e.getMessage());}
+                            {fail("Failed to load JS error checker: " + e.getMessage());}
                     }
                     if (isFirefoxExtensionsEnabled() && !isTestRunningOnTeamCity()) // Firebug just clutters up screenshots on TeamCity
                     {
@@ -411,7 +411,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                             }
                         }
                         catch(IOException e)
-                            {Assert.fail("Failed to load Firebug: " + e.getMessage());}
+                            {fail("Failed to load Firebug: " + e.getMessage());}
                     }
 
                     profile.setEnableNativeEvents(useNativeEvents());
@@ -436,7 +436,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 break;
             }
             default:
-                Assert.fail("Browser not yet implemented: " + BROWSER_TYPE);
+                fail("Browser not yet implemented: " + BROWSER_TYPE);
         }
 
         if (!reusingDriver)
@@ -788,7 +788,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
 
         String baseURL = WebTestHelper.getBaseURL();
-        Assert.assertTrue("Expected URL to begin with " + baseURL + ", but found " + urlString, urlString.indexOf(baseURL) == 0);
+        assertTrue("Expected URL to begin with " + baseURL + ", but found " + urlString, urlString.indexOf(baseURL) == 0);
         return urlString.substring(baseURL.length());
     }
 
@@ -805,7 +805,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void popLocation(int millis)
     {
         String location = _locationStack.pop();
-        Assert.assertNotNull("Cannot pop without a push.", location);
+        assertNotNull("Cannot pop without a push.", location);
         beginAt(location, millis);
     }
 
@@ -821,7 +821,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void recallLocation(int wait)
     {
-        Assert.assertNotNull("Cannot recall without saving first.", _savedLocation);
+        assertNotNull("Cannot recall without saving first.", _savedLocation);
         beginAt(_savedLocation, wait);
     }
 
@@ -867,7 +867,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (IOException e)
         {
-            Assert.fail("Unable to ensure credentials: " + e.getMessage());
+            fail("Unable to ensure credentials: " + e.getMessage());
         }
         waitForStartup();
         log("Signing in");
@@ -898,7 +898,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             clickButton("Sign In");
 
             if (isTextPresent("Type in your email address and password"))
-                Assert.fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+                fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
         }
 
         assertSignOutAndMyAccountPresent();
@@ -921,14 +921,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void signIn(String email, String password, boolean failOnError)
     {
         if ( !isElementPresent(Locator.linkWithText("Sign In")) )
-            Assert.fail("You need to be logged out to log in.  Please log out to log in.");
+            fail("You need to be logged out to log in.  Please log out to log in.");
 
         attemptSignIn(email, password);
 
         if ( failOnError )
         {
             if ( isTextPresent("Type in your email address and password") )
-                Assert.fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+                fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
 
             assertSignOutAndMyAccountPresent();
         }
@@ -973,7 +973,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 break;
             }
         }
-        Assert.assertNotNull("Link for '" + user + "' not found", link);
+        assertNotNull("Link for '" + user + "' not found", link);
 
         String emailSubject = link.getText();
         link.click();
@@ -1113,8 +1113,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             clickButton("Save");
 
-            if ( oldStrength != null ) Assert.assertEquals("Unable to reset password strength.", oldStrength, PasswordRule.valueOf(getText(Locator.xpath("//input[@name='strength' and @value='Weak']/.."))));
-            if ( oldExpiration != null ) Assert.assertEquals("Unable to reset password expiration.", oldExpiration, PasswordExpiration.valueOf(getFormElement(Locator.name("expiration"))));
+            if ( oldStrength != null ) assertEquals("Unable to reset password strength.", oldStrength, PasswordRule.valueOf(getText(Locator.xpath("//input[@name='strength' and @value='Weak']/.."))));
+            if ( oldExpiration != null ) assertEquals("Unable to reset password expiration.", oldExpiration, PasswordExpiration.valueOf(getFormElement(Locator.name("expiration"))));
 
             // Back to default.
             oldStrength = null;
@@ -1326,7 +1326,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         if (!hitFirstPage)
         {
-            Assert.fail("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
+            fail("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
         }
         log("Server is running.");
     }
@@ -1400,7 +1400,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                         Thread.sleep(2000);
                         waitMs -= 2000;
                         if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
-                            Assert.fail("A startup failure occurred.");
+                            fail("A startup failure occurred.");
                     }
                     catch (InterruptedException e)
                     {
@@ -1413,7 +1413,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 }
 
                 if (waitMs <= 0)
-                    Assert.fail("Script runner took more than 10 minutes to complete.");
+                    fail("Script runner took more than 10 minutes to complete.");
 
                 if (isNavButtonPresent("Next"))
                 {
@@ -1450,7 +1450,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickAndWait(Locator.linkWithText("Next"));
 
         if (null != expectedText)
-            Assert.assertEquals("Wrong error message.", expectedText, Locator.css(".labkey-error").findElement(getDriver()).getText());
+            assertEquals("Wrong error message.", expectedText, Locator.css(".labkey-error").findElement(getDriver()).getText());
     }
 
 
@@ -1483,15 +1483,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             method = new HttpGet(getBaseURL() + "/login/resetPassword.view");
             response = client.execute(method, context);
             status = response.getStatusLine().getStatusCode();
-            Assert.assertEquals("Unexpected response", HttpStatus.SC_OK, status);
-            Assert.assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
+            assertEquals("Unexpected response", HttpStatus.SC_OK, status);
+            assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
             EntityUtils.consume(response.getEntity());
 
             method = new HttpGet(getBaseURL() + "/admin/maintenance.view");
             response = client.execute(method, context);
             status = response.getStatusLine().getStatusCode();
-            Assert.assertEquals("Unexpected response", HttpStatus.SC_OK, status);
-            Assert.assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
+            assertEquals("Unexpected response", HttpStatus.SC_OK, status);
+            assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
             EntityUtils.consume(response.getEntity());
 
 
@@ -1542,9 +1542,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             ((HttpPost)method).setEntity(new UrlEncodedFormEntity(args));
             response = client.execute(method, context);
             status = response.getStatusLine().getStatusCode();
-            Assert.assertEquals("Unexpected response", HttpStatus.SC_OK, status);
+            assertEquals("Unexpected response", HttpStatus.SC_OK, status);
             // TODO: check login, once http-equiv redirect is sorted out
-            Assert.assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
+            assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
             EntityUtils.consume(response.getEntity());
         }
         catch (IOException ex)
@@ -1589,7 +1589,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void waitForSystemMaintenanceCompletion()
     {
-        Assert.assertTrue("Must call startSystemMaintenance() before waiting for completion", smStart > 0);
+        assertTrue("Must call startSystemMaintenance() before waiting for completion", smStart > 0);
         long elapsed = System.currentTimeMillis() - smStart;
 
         // Ensure that at least 5 seconds has passed since system maintenance was started
@@ -2103,7 +2103,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
             beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))
-                Assert.fail("Asserts must be enabled to track memory leaks; please add -ea to your server VM params and restart.");
+                fail("Asserts must be enabled to track memory leaks; please add -ea to your server VM params and restart.");
             leakCount = getImageWithAltTextCount("expand/collapse");
         }
 
@@ -2117,7 +2117,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             {
                 leakCRC = crc.getValue();
                 dumpHeap();
-                Assert.fail(leakCount + " in-use objects exceeds allowed limit of " + MAX_LEAK_LIMIT + ".");
+                fail(leakCount + " in-use objects exceeds allowed limit of " + MAX_LEAK_LIMIT + ".");
             }
 
             log("Found " + leakCount + " in-use objects.  They appear to be from a previous test.");
@@ -2134,7 +2134,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             return;
         beginAt("/admin/showErrorsSinceMark.view");
 
-       Assert.assertTrue("There were errors during the test run", isPageEmpty());
+       assertTrue("There were errors during the test run", isPageEmpty());
        log("No new errors found.");
        goToHome();         // Don't leave on an empty page
    }
@@ -2159,7 +2159,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             text = text.trim();
         }
 
-        Assert.assertTrue("Expected " + count + " errors during this run", StringUtils.countMatches(text, "ERROR") == count);
+        assertTrue("Expected " + count + " errors during this run", StringUtils.countMatches(text, "ERROR") == count);
         log("Found " + count + " expected errors.");
 
         // Clear the errors to prevent the test from failing.
@@ -2286,13 +2286,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     if (windows.size() > 1)
                     {
                         getDriver().switchTo().window((String)windows.toArray()[1]);
-                        Assert.assertEquals(200, getResponseCode());
+                        assertEquals(200, getResponseCode());
                         getDriver().close();
                         getDriver().switchTo().window((String)windows.toArray()[0]);
                     }
                     else
                     {
-                        Assert.assertEquals(200, getResponseCode());
+                        assertEquals(200, getResponseCode());
                     }
                 }
                 else
@@ -2359,7 +2359,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 if (validErrors.size() > 1)
                     errorCtStr = " (1 of " + validErrors.size() + ") ";
                 if (!_testFailed) // Don't clobber existing failures. Just log them.
-                    Assert.fail("JavaScript error" + errorCtStr + ": " + validErrors.toArray()[0]);
+                    fail("JavaScript error" + errorCtStr + ": " + validErrors.toArray()[0]);
             }
         }
     }
@@ -2731,14 +2731,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void assertAlert(String msg)
     {
         Alert alert = getDriver().switchTo().alert();
-        Assert.assertEquals(msg, alert.getText());
+        assertEquals(msg, alert.getText());
         alert.accept();
     }
 
     public void assertAlertContains(String partialMessage)
     {
         Alert alert = getDriver().switchTo().alert();
-        Assert.assertTrue(alert.getText().contains(partialMessage));
+        assertTrue(alert.getText().contains(partialMessage));
         alert.accept();
     }
 
@@ -2775,7 +2775,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void assertExtMsgBox(String title, String text)
     {
         String actual = _extHelper.getExtMsgBoxText(title);
-        Assert.assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.contains(text));
+        assertTrue("Expected Ext.Msg box text '" + text + "', actual '" + actual + "'", actual.contains(text));
     }
 
     // TODO: Enable once WebDriver conversion is complete
@@ -2820,7 +2820,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if(isElementPresent(Locator.tagWithText("div", groupName)))
         {
             if(failIfAlreadyExists)
-                Assert.fail("Group already exists");
+                fail("Group already exists");
             else
                 return;
         }
@@ -2894,7 +2894,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         List<Ext4CmpRefWD> refs = _ext4Helper.componentQuery("grid", Ext4CmpRefWD.class);
         Ext4CmpRefWD ref = refs.get(0);
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
-        Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
+        assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
         ref.eval("getSelectionModel().select(" + idx + ")");
     }
 
@@ -2912,7 +2912,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         List<Ext4CmpRefWD> refs = _ext4Helper.componentQuery("grid", Ext4CmpRefWD.class);
         Ext4CmpRefWD ref = refs.get(0);
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
-        Assert.assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
+        assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
         ref.eval("getSelectionModel().select(" + idx + ")");
         waitAndClickAndWait(Locator.tagContainingText("a","manage group"));
         waitForElement(Locator.name("names"));
@@ -2966,7 +2966,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         hoverFolderBar();
         if (isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child))))
-            Assert.fail("Folder: " + child + " already exists in project: " + project);
+            fail("Folder: " + child + " already exists in project: " + project);
         log("Creating subfolder " + child + " under " + parent);
         clickAndWait(Locator.xpath("//a[@title='New Subfolder']"));
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
@@ -3257,13 +3257,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertTitleEquals(String match)
     {
-        Assert.assertEquals("Wrong page title", match, getDriver().getTitle());
+        assertEquals("Wrong page title", match, getDriver().getTitle());
     }
 
     public void assertTitleContains(String match)
     {
         String title = getDriver().getTitle();
-        Assert.assertTrue("Page title: '"+title+"' doesn't contain '"+match+"'", title.contains(match));
+        assertTrue("Page title: '"+title+"' doesn't contain '"+match+"'", title.contains(match));
     }
 
     public void assertNoLabkeyErrors()
@@ -3274,7 +3274,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertLabkeyErrorPresent()
     {
-        Assert.assertTrue("No errors found", isElementPresent(Locator.xpath("//div[@class='labkey-error']")) ||
+        assertTrue("No errors found", isElementPresent(Locator.xpath("//div[@class='labkey-error']")) ||
             isElementPresent(Locator.xpath("//font[@class='labkey-error']")));
 
     }
@@ -3341,7 +3341,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 failMsg += ", '" + missingTexts.get(i) + "'";
             }
             failMsg += missingTexts.size() == 1 ? " was not present" : "] were not present";
-            Assert.fail(failMsg);
+            fail(failMsg);
         }
     }
 
@@ -3369,7 +3369,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 return;
             }
         }
-        Assert.fail("Did not find any of the following values on page " + targets);
+        fail("Did not find any of the following values on page " + targets);
     }
 
     /**
@@ -3452,10 +3452,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             if (count == 0)
                 log("Your browser is probably out of date");
             else
-                Assert.assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
+                assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
         }
         else
-            Assert.assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
+            assertTrue("Text '" + text + "' was not present " + amount + " times.  It was present " + count + " times", count == amount);
     }
 
     public int countText(String text)
@@ -3480,7 +3480,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         for(String text : texts)
         {
             text = text.replace("&nbsp;", " ");
-            Assert.assertFalse("Text '" + text + "' was present", isTextPresent(text));
+            assertFalse("Text '" + text + "' was present", isTextPresent(text));
         }
     }
 
@@ -3492,7 +3492,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertTextAtPlaceInTable(String textToCheck, String dataRegion, int row, int column)
     {
-       Assert.assertTrue(textToCheck+" is not at that place in the table", textToCheck.compareTo(getTextInTable(dataRegion, row, column))==0);
+       assertTrue(textToCheck+" is not at that place in the table", textToCheck.compareTo(getTextInTable(dataRegion, row, column))==0);
     }
 
     /**
@@ -3532,7 +3532,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void assertTextPresentInThisOrder(Object... text)
     {
         String success = isPresentInThisOrder(text);
-        Assert.assertTrue(success, success==null);
+        assertTrue(success, success==null);
     }
 
     public void assertTextBefore(String text1, String text2)
@@ -3598,7 +3598,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (TimeoutException to)
         {
-            Assert.fail("Page failed to load");
+            fail("Page failed to load");
         }
     }
 
@@ -3652,7 +3652,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void waitFor(Checker checker, String failMessage, int wait)
     {
         if (!doesElementAppear(checker, wait))
-            Assert.fail(failMessage + " ["+wait+"ms]");
+            fail(failMessage + " ["+wait+"ms]");
     }
 
     //like wait for ExtMask, but waits for a draggable mask (for example, the file rename mask)
@@ -3866,7 +3866,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 sleep(500);
             refresh();
         }
-        Assert.fail("Element did not appear: " + loc.getLoggableDescription());
+        fail("Element did not appear: " + loc.getLoggableDescription());
     }
 
     public void waitForElement(final Locator locator, int wait)
@@ -3916,7 +3916,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 sleep(1000);
             refresh();
         }
-        Assert.fail(text + " did not appear [" + wait + "ms]");
+        fail(text + " did not appear [" + wait + "ms]");
     }
     public void waitForText(final String text, int wait)
     {
@@ -3977,7 +3977,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         Locator l = findButton(buttonName);
 
-        Assert.assertTrue("Button with name '" + buttonName + "' not found", null != l);
+        assertTrue("Button with name '" + buttonName + "' not found", null != l);
 
         clickAndWait(l);
     }
@@ -3999,7 +3999,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertElementPresent(Locator loc)
     {
-        Assert.assertTrue("Element is not present: " + loc.getLoggableDescription(), isElementPresent(loc));
+        assertTrue("Element is not present: " + loc.getLoggableDescription(), isElementPresent(loc));
     }
 
     /**
@@ -4013,16 +4013,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertElementPresent(Locator loc, int amount)
     {
-        Assert.assertEquals("Element '" + loc + "' is not present " + amount + " times", amount, getElementCount(loc));
+        assertEquals("Element '" + loc + "' is not present " + amount + " times", amount, getElementCount(loc));
     }
 
     public void assertElementContains(Locator loc, String text)
     {
         String elemText = loc.findElement(getDriver()).getText();
         if(elemText == null)
-            Assert.fail("The element at location " + loc.toString() + " contains no text! Expected '" + text + "'.");
+            fail("The element at location " + loc.toString() + " contains no text! Expected '" + text + "'.");
         if(!elemText.contains(text))
-            Assert.fail("The element at location '" + loc.toString() + "' contains '" + elemText + "'; expected '" + text + "'.");
+            fail("The element at location '" + loc.toString() + "' contains '" + elemText + "'; expected '" + text + "'.");
     }
 
     public boolean elementContains(Locator loc, String text)
@@ -4076,17 +4076,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertFormElementEquals(Locator loc, String value)
     {
-        Assert.assertEquals("Form element '" + loc + "' was not equal to '" + value + "'", value, getFormElement(loc));
+        assertEquals("Form element '" + loc + "' was not equal to '" + value + "'", value, getFormElement(loc));
     }
 
     public void assertFormElementNotEquals(Locator loc, String value)
     {
-        Assert.assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, getFormElement(loc));
+        assertNotSame("Form element '" + loc + "' was equal to '" + value + "'", value, getFormElement(loc));
     }
 
     public void assertOptionEquals(Locator loc, String value)
     {
-        Assert.assertEquals("Option '" + loc + "' was not equal '" + value + "'", value, getSelectedOptionText(loc));
+        assertEquals("Option '" + loc + "' was not equal '" + value + "'", value, getSelectedOptionText(loc));
     }
 
     public String getSelectedOptionText(Locator loc)
@@ -4113,7 +4113,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertElementNotPresent(String errorMsg, Locator loc)
     {
-        Assert.assertFalse(errorMsg, isElementPresent(loc));
+        assertFalse(errorMsg, isElementPresent(loc));
     }
 
     public void assertElementNotPresent(Locator loc)
@@ -4123,12 +4123,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertElementNotVisible(Locator loc)
     {
-        Assert.assertFalse("Element was visible in page: " + loc, loc.findElement(getDriver()).isDisplayed());
+        assertFalse("Element was visible in page: " + loc, loc.findElement(getDriver()).isDisplayed());
     }
 
     public void assertElementVisible(Locator loc)
     {
-        Assert.assertTrue("Element was not visible: " + loc, loc.findElement(getDriver()).isDisplayed());
+        assertTrue("Element was not visible: " + loc, loc.findElement(getDriver()).isDisplayed());
     }
 
     /**
@@ -4171,7 +4171,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void assertLinkPresentContainingText(String text)
     {
-        Assert.assertTrue("Could not find link containing text '" + text + "'", isLinkPresentContainingText(text));
+        assertTrue("Could not find link containing text '" + text + "'", isLinkPresentContainingText(text));
     }
 
     /**
@@ -4179,7 +4179,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void assertLinkPresentWithText(String text)
     {
-        Assert.assertTrue("Could not find link with text '" + text + "'", isElementPresent(Locator.linkWithText(text)));
+        assertTrue("Could not find link with text '" + text + "'", isElementPresent(Locator.linkWithText(text)));
     }
 
     /**
@@ -4187,7 +4187,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void assertLinkNotPresentWithText(String text)
     {
-        Assert.assertFalse("Found a link with text '" + text + "'", isElementPresent(Locator.linkWithText(text)));
+        assertFalse("Found a link with text '" + text + "'", isElementPresent(Locator.linkWithText(text)));
     }
 
     public void assertAtUserUserLacksPermissionPage()
@@ -4210,7 +4210,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void assertLinkPresentWithTitle(String title)
     {
-        Assert.assertTrue("Could not find link with title '" + title + "'", isLinkPresentWithTitle(title));
+        assertTrue("Could not find link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
     /**
@@ -4218,7 +4218,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void assertLinkNotPresentWithTitle(String title)
     {
-        Assert.assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
+        assertFalse("Found a link with title '" + title + "'", isLinkPresentWithTitle(title));
     }
 
     /**
@@ -4231,7 +4231,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertLinkPresentWithTextCount(String text, int count)
     {
-        Assert.assertEquals("Link with text '" + text + "' was not present the expected number of times", count, countLinksWithText(text));
+        assertEquals("Link with text '" + text + "' was not present the expected number of times", count, countLinksWithText(text));
     }
 
     public void assertNavTrail(String... links)
@@ -4428,7 +4428,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void verifyTabSelected(String caption)
     {
-        Assert.assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '"+caption+"']")));
+        assertTrue("Tab not selected: " + caption, isElementPresent(Locator.xpath("//li[contains(@class, labkey-tab-active)]/a[text() = '"+caption+"']")));
     }
 
     public int getImageWithAltTextCount(String altText)
@@ -4498,15 +4498,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     }
 
     /**
-     * @deprecated Use {@link #getTableCellText(org.labkey.test.Locator.XPathLocator, int, int)} and {@link Assert#assertEquals(Object, Object)}
+     * @deprecated Use {@link #getTableCellText(org.labkey.test.Locator.XPathLocator, int, int)} and {@link org.junit.Assert#assertEquals(Object, Object)}
      */
     @Deprecated public void assertTableCellTextEquals(String tableName, int row, int column, String value)
     {
-        Assert.assertEquals(tableName + "." + String.valueOf(row) + "." + String.valueOf(column) + " != \"" + value + "\"", value, getTableCellText(tableName, row, column));
+        assertEquals(tableName + "." + String.valueOf(row) + "." + String.valueOf(column) + " != \"" + value + "\"", value, getTableCellText(tableName, row, column));
     }
 
     /**
-     * @deprecated Use {@link DataRegionTable#getDataAsText(int, String)} and {@link Assert#assertEquals(Object, Object)}
+     * @deprecated Use {@link DataRegionTable#getDataAsText(int, String)} and {@link org.junit.Assert#assertEquals(Object, Object)}
      */
     @Deprecated public void assertTableCellTextEquals(String tableName, int row, String columnTitle, String value)
     {
@@ -4522,7 +4522,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         for (String str : strs)
         {
-            Assert.assertTrue(tableName + "." + row + "." + column + " should contain \'" + str + "\' (actual value is " + cellText + ")", cellText.contains(str));
+            assertTrue(tableName + "." + row + "." + column + " should contain \'" + str + "\' (actual value is " + cellText + ")", cellText.contains(str));
         }
     }
 
@@ -4543,7 +4543,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         for (String str : strs)
         {
-            Assert.assertFalse(tableName + "." + row + "." + column + " should not contain \'" + str + "\'", cellText.contains(str));
+            assertFalse(tableName + "." + row + "." + column + " should not contain \'" + str + "\'", cellText.contains(str));
         }
     }
 
@@ -4584,7 +4584,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      */
     @Deprecated public void assertTableCellsEqual(String tableNameA, int rowA, int columnA, String tableNameB, int rowB, int columnB)
     {
-        Assert.assertTrue("Table cells not equal: " + tableNameA + "." + String.valueOf(rowA) + "." + String.valueOf(columnA) + " & " + tableNameB + "." + String.valueOf(rowB) + "." + String.valueOf(columnB), areTableCellsEqual(tableNameA, rowA, columnA, tableNameB, rowB, columnB));
+        assertTrue("Table cells not equal: " + tableNameA + "." + String.valueOf(rowA) + "." + String.valueOf(columnA) + " & " + tableNameB + "." + String.valueOf(rowB) + "." + String.valueOf(columnB), areTableCellsEqual(tableNameA, rowA, columnA, tableNameB, rowB, columnB));
     }
 
     /**
@@ -4594,7 +4594,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         int col = Locator.xpath("//table[@id='"+tableName+"']/tbody/tr[contains(@id, 'dataregion_column_header_row') and not(contains(@id, 'spacer'))]/td[./div/.='"+columnTitle+"']/preceding-sibling::*").findElements(getDriver()).size();
         if(col == 0)
-            Assert.fail("Column '" + columnTitle + "' not found in table '" + tableName + "'");
+            fail("Column '" + columnTitle + "' not found in table '" + tableName + "'");
 
         return col;
     }
@@ -4843,7 +4843,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (buttonLocator != null)
             clickAndWait(buttonLocator, wait);
         else
-            Assert.fail("No button found with text \"" + text + "\" at index " + index);
+            fail("No button found with text \"" + text + "\" at index " + index);
     }
 
     public Locator.XPathLocator getButtonLocator(String text, int index)
@@ -4956,7 +4956,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (buttonLocator != null)
             clickAndWait(buttonLocator, waitMillis);
         else
-            Assert.fail("No button found with text \"" + text + "\"");
+            fail("No button found with text \"" + text + "\"");
     }
 
     public void clickButtonContainingText(String text)
@@ -4970,7 +4970,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (buttonLocator != null)
             clickAndWait(buttonLocator, waitMills);
         else
-            Assert.fail("No button found with text \"" + text + "\"");
+            fail("No button found with text \"" + text + "\"");
     }
 
     public void clickButtonContainingText(String buttonText, String textShouldAppearAfterLoading)
@@ -5283,7 +5283,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         sleep(500);
 
         // Clear selections.
-        Assert.assertEquals("Faceted filter tab should be selected.", "Choose Values", getText(Locator.css(".x-tab-strip-active")));
+        assertEquals("Faceted filter tab should be selected.", "Choose Values", getText(Locator.css(".x-tab-strip-active")));
         if(!isElementPresent(Locator.xpath("//div[contains(@class, 'x-grid3-hd-checker-on')]")))
             click(Locator.linkWithText("[All]"));
         click(Locator.linkWithText("[All]"));
@@ -5467,22 +5467,22 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertNavButtonPresent(String buttonText)
     {
-        Assert.assertTrue("Nav button '" + buttonText + "' was not present", isNavButtonPresent(buttonText));
+        assertTrue("Nav button '" + buttonText + "' was not present", isNavButtonPresent(buttonText));
     }
 
     public void assertNavButtonNotPresent(String buttonText)
     {
-        Assert.assertFalse("Nav button '" + buttonText + "' was present", isNavButtonPresent(buttonText));
+        assertFalse("Nav button '" + buttonText + "' was present", isNavButtonPresent(buttonText));
     }
 
     public void assertMenuButtonPresent(String buttonText)
     {
-        Assert.assertTrue("Nav button '" + buttonText + "' was not present", isMenuButtonPresent(buttonText));
+        assertTrue("Nav button '" + buttonText + "' was not present", isMenuButtonPresent(buttonText));
     }
 
     public void assertMenuButtonNotPresent(String buttonText)
     {
-        Assert.assertFalse("Menu button '" + buttonText + "' was present", isMenuButtonPresent(buttonText));
+        assertFalse("Menu button '" + buttonText + "' was present", isMenuButtonPresent(buttonText));
     }
 
     /**
@@ -5665,7 +5665,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log("Checking checkbox " + checkBoxLocator);
         if (!isChecked(checkBoxLocator))
             click(checkBoxLocator);
-        Assert.assertTrue("Checking checkbox failed", isChecked(checkBoxLocator));
+        assertTrue("Checking checkbox failed", isChecked(checkBoxLocator));
     }
 
     public void checkCheckbox(WebElement el)
@@ -5710,7 +5710,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertRadioButtonSelected(Locator radioButtonLocator)
     {
-        Assert.assertTrue("Radio Button is not selected at " + radioButtonLocator.toString(), isChecked(radioButtonLocator));
+        assertTrue("Radio Button is not selected at " + radioButtonLocator.toString(), isChecked(radioButtonLocator));
     }
 
     /**
@@ -5754,12 +5754,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertChecked(Locator checkBoxLocator)
     {
-        Assert.assertTrue("Checkbox not checked at " + checkBoxLocator.toString(), isChecked(checkBoxLocator));
+        assertTrue("Checkbox not checked at " + checkBoxLocator.toString(), isChecked(checkBoxLocator));
     }
 
     public void assertNotChecked(Locator checkBoxLocator)
     {
-        Assert.assertFalse("Checkbox checked at " + checkBoxLocator.toString(), isChecked(checkBoxLocator));
+        assertFalse("Checkbox checked at " + checkBoxLocator.toString(), isChecked(checkBoxLocator));
     }
 
     public boolean isChecked(Locator checkBoxLocator)
@@ -5906,7 +5906,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String role = toRole(permissionString);
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
         {
-            Assert.fail("call removePermission()");
+            fail("call removePermission()");
         }
         else
         {
@@ -6051,11 +6051,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void stopImpersonating()
     {
         String fakeUser = _impersonationStack.pop();
-        Assert.assertEquals(displayNameFromEmail(fakeUser), getDisplayName());
+        assertEquals(displayNameFromEmail(fakeUser), getDisplayName());
         clickUserMenuItem("Stop Impersonating");
         assertSignOutAndMyAccountPresent();
         goToHome();
-        Assert.assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
+        assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
     }
 
     public void impersonateAtProjectLevel(String fakeUser)
@@ -6110,7 +6110,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         else
         {
-            Assert.fail("cloneUserName support has been removed"); //not in use, so was not implemented in new user
+            fail("cloneUserName support has been removed"); //not in use, so was not implemented in new user
             //helpers
         }
     }
@@ -6135,7 +6135,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickButton("Add Users");
 
         if (verifySuccess)
-            Assert.assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
+            assertTrue("Failed to add user " + userName, isTextPresent(userName + " added as a new user to the system"));
     }
 
     public void createSiteDeveloper(String userEmail)
@@ -6223,7 +6223,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             return true;
         }
         else if (failIfNotFound)
-            Assert.fail("Group not found:" + groupName);
+            fail("Group not found:" + groupName);
 
         return false;
     }
@@ -6257,7 +6257,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
 
             if (failIfNotFound)
-                Assert.assertTrue(userEmail + " was not present", isPresent);
+                assertTrue(userEmail + " was not present", isPresent);
 
             if (isPresent)
             {
@@ -6304,14 +6304,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         log("asserting that group " + groupName + " exists in project " + projectName + "...");
         if (!doesGroupExist(groupName, projectName))
-            Assert.fail("group " + groupName + " does not exist in project " + projectName);
+            fail("group " + groupName + " does not exist in project " + projectName);
     }
 
     public void assertGroupDoesNotExist(String groupName, String projectName)
     {
         log("asserting that group " + groupName + " exists in project " + projectName + "...");
         if (doesGroupExist(groupName, projectName))
-            Assert.fail("group " + groupName + " exists in project " + projectName);
+            fail("group " + groupName + " exists in project " + projectName);
     }
 
     public boolean isUserInGroup(String email, String groupName, String projectName)
@@ -6333,14 +6333,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         log("asserting that user " + email + " is in group " + projectName + "/" + groupName + "...");
         if (!isUserInGroup(email, groupName, projectName))
-            Assert.fail("user " + email + " was not in group " + projectName + "/" + groupName);
+            fail("user " + email + " was not in group " + projectName + "/" + groupName);
     }
 
     public void assertUserNotInGroup(String email, String groupName, String projectName)
     {
         log("asserting that user " + email + " is not in group " + projectName + "/" + groupName + "...");
         if (isUserInGroup(email, groupName, projectName))
-            Assert.fail("user " + email + " was found in group " + projectName + "/" + groupName);
+            fail("user " + email + " was found in group " + projectName + "/" + groupName);
     }
 
     public void saveWikiPage()
@@ -6413,7 +6413,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             portalHelper.clickWebpartMenuItem("Pages", "New");
         }
         else
-            Assert.fail("Could not find a link on the current page to create a new wiki page." +
+            fail("Could not find a link on the current page to create a new wiki page." +
                     " Ensure that you navigate to the wiki controller home page or an existing wiki page" +
                     " before calling this method.");
 
@@ -6487,7 +6487,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         int row = getCohortRow(table, cohort);
         String s = table.getDataAsText(row, "Enrolled");
-        Assert.assertTrue("Enrolled column should be " + String.valueOf(enrolled), (0 == s.compareToIgnoreCase(String.valueOf(enrolled))));
+        assertTrue("Enrolled column should be " + String.valueOf(enrolled), (0 == s.compareToIgnoreCase(String.valueOf(enrolled))));
     }
 
     /**
@@ -6667,7 +6667,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (isElementPresent(Locator.css(".labkey-error")))
         {
             String errorText = Locator.css(".labkey-error").findElement(getDriver()).getText();
-            Assert.assertTrue("Error present: " + errorText, errorText.trim().length() == 0);
+            assertTrue("Error present: " + errorText, errorText.trim().length() == 0);
         }
     }
 
@@ -6726,7 +6726,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (IOException fail)
         {
-            Assert.fail(fail.getMessage());
+            fail(fail.getMessage());
             return null;
         }
     }
@@ -6780,31 +6780,31 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void assertAttributeEquals(Locator locator, String attributeName, String value)
     {
         String actual = getAttribute(locator, attributeName);
-        Assert.assertEquals("Expected attribute '" + locator + "@" + attributeName + "' value to be '" + value + "', but was '" + actual + "' instead.", value, actual);
+        assertEquals("Expected attribute '" + locator + "@" + attributeName + "' value to be '" + value + "', but was '" + actual + "' instead.", value, actual);
     }
 
     public void assertAttributeContains(Locator locator, String attributeName, String value)
     {
         String actual = getAttribute(locator, attributeName);
-        Assert.assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to contain '" + value + "', but was '" + actual + "' instead.", actual != null && actual.contains(value));
+        assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to contain '" + value + "', but was '" + actual + "' instead.", actual != null && actual.contains(value));
     }
 
     public void assertAttributeNotContains(Locator locator, String attributeName, String value)
     {
         String actual = getAttribute(locator, attributeName);
-        Assert.assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to not contain '" + value + "', but was '" + actual + "' instead.", actual != null && !actual.contains(value));
+        assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to not contain '" + value + "', but was '" + actual + "' instead.", actual != null && !actual.contains(value));
     }
 
     public void assertSetsEqual(String firstSet, String secondSet, String delimiterRegEx)
     {
         String[] firstArray = firstSet.split(delimiterRegEx);
         String[] secondArray = secondSet.split(delimiterRegEx);
-        Assert.assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstArray.length == secondArray.length);
+        assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstArray.length == secondArray.length);
         Set<String> firstHash= new HashSet<>();
         Collections.addAll(firstHash, firstArray);
         Set<String> secondHash= new HashSet<>();
         Collections.addAll(secondHash, secondArray);
-        Assert.assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
+        assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
     }
 
     public String getAttribute(Locator locator, String attributeName)
@@ -6969,7 +6969,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         //test for success
         if (!isElementPresent(Locator.xpath("//div[contains(@class, 'lk-vq-status-all-ok')]")))
         {
-            Assert.fail("Some queries did not pass validation. See error log for more details.");
+            fail("Some queries did not pass validation. See error log for more details.");
         }
     }
 
@@ -7101,7 +7101,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             for (File copiedArchive : _copiedArchives)
                 if (!copiedArchive.delete())
-                    Assert.fail("Couldn't delete copied specimen archive: " + copiedArchive.getAbsolutePath());
+                    fail("Couldn't delete copied specimen archive: " + copiedArchive.getAbsolutePath());
         }
     }
 
@@ -7132,7 +7132,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
         }, "Pipeline jobs did not complete.", MAX_WAIT_SECONDS * 1000);
 
-        Assert.assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, expectError ? getFinishedCount(getPipelineStatusValues()) : getCompleteCount(getPipelineStatusValues()));
+        assertEquals("Did not find correct number of completed pipeline jobs.", completeJobsExpected, expectError ? getFinishedCount(getPipelineStatusValues()) : getCompleteCount(getPipelineStatusValues()));
     }
 
     // wait until pipeline UI shows that all jobs have finished (either COMPLETE or ERROR status)
@@ -7148,7 +7148,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             refresh();
             statusValues = getPipelineStatusValues();
         }
-        Assert.assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
+        assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
     }
 
     // Note: unverified
@@ -7161,7 +7161,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 return;
 
         //else
-        Assert.fail("Running pipeline jobs were found.  Timeout:" + wait);
+        fail("Running pipeline jobs were found.  Timeout:" + wait);
     }
 
     public void setCodeEditorValue(String id, String value)
@@ -7253,7 +7253,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }, WAIT_FOR_JAVASCRIPT);
 
         String svgText = prepareSvgText(getText(svgLoc));
-        Assert.assertEquals("SVG did not look as expected", expectedText, svgText);
+        assertEquals("SVG did not look as expected", expectedText, svgText);
     }
 
     private String prepareSvgText(String svgText)

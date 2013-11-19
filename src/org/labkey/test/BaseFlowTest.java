@@ -18,7 +18,6 @@ package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LogMethod;
@@ -30,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 abstract public class BaseFlowTest extends BaseWebDriverTest
 {
@@ -219,15 +220,15 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             clickButton("Delete", 0);
             assertAlertContains("Are you sure you want to delete the selected row");
             newWaitForPageToLoad();
-            Assert.assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
+            assertEquals("Expected all experiment Runs to be deleted", 0, table.getDataRowCount());
 
             // Check all DataInputs were deleted
             beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=DataInputs");
-            Assert.assertEquals("Expected all experiment DataInputs to be deleted", 0, table.getDataRowCount());
+            assertEquals("Expected all experiment DataInputs to be deleted", 0, table.getDataRowCount());
 
             // Check all Datas were deleted except for flow analysis scripts (FlowDataType.Script)
             beginAt("/query/" + getProjectName() + "/" + getFolderName() + "/executeQuery.view?schemaName=exp&query.queryName=Datas&query.LSID~doesnotcontain=Flow-AnalysisScript");
-            Assert.assertEquals("Expected all experiment Datas to be deleted", 0, table.getDataRowCount());
+            assertEquals("Expected all experiment Datas to be deleted", 0, table.getDataRowCount());
         }
     }
 
@@ -433,7 +434,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 break;
 
             case Included:
-                Assert.fail("Not yet implemented");
+                fail("Not yet implemented");
                 //clickRadioButtonById("Included");
                 break;
 
@@ -449,7 +450,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 break;
 
             default:
-                Assert.fail();
+                fail();
         }
         waitFor(new Checker() {
             @Override
@@ -513,7 +514,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
                 {
                     selectOptionByText(Locator.id("rEngineNormalizationReference"), rEngineNormalizationReference);
                     String formValue = getFormElement(Locator.id("rEngineNormalizationReference"));
-                    Assert.assertEquals(rEngineNormalizationReference, getText(Locator.xpath("id('rEngineNormalizationReference')/option[@value='" + formValue + "']")));
+                    assertEquals(rEngineNormalizationReference, getText(Locator.xpath("id('rEngineNormalizationReference')/option[@value='" + formValue + "']")));
                 }
 
                 if (rEngineNormalizationSubsets != null)
@@ -530,7 +531,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         else
         {
             if (rEngineNormalization)
-                Assert.fail("Expected to find R normalization options");
+                fail("Expected to find R normalization options");
             log("Not setting normalization options");
         }
         clickButton("Next");
@@ -597,9 +598,9 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         {
             WebElement normalizationOptions = Locator.tag("li").startsWith("Normalization Options:").findElement(getDriver());
             String normalizationOptionsText = normalizationOptions.getText();
-            Assert.assertTrue("Wrong Refernce Sample", normalizationOptionsText.contains("Reference Sample: " + rEngineNormalizationReference));
-            Assert.assertTrue("Wrong Normalize Subsets", normalizationOptionsText.contains("Normalize Subsets: " + (rEngineNormalizationSubsets == null ? "All subsets" : StringUtils.join(rEngineNormalizationSubsets, ", "))));
-            Assert.assertTrue("Wrong Normalize Parameters", normalizationOptionsText.contains("Normalize Parameters: " + (rEngineNormalizationParameters == null ? "All parameters" : StringUtils.join(rEngineNormalizationParameters, ", "))));
+            assertTrue("Wrong Refernce Sample", normalizationOptionsText.contains("Reference Sample: " + rEngineNormalizationReference));
+            assertTrue("Wrong Normalize Subsets", normalizationOptionsText.contains("Normalize Subsets: " + (rEngineNormalizationSubsets == null ? "All subsets" : StringUtils.join(rEngineNormalizationSubsets, ", "))));
+            assertTrue("Wrong Normalize Parameters", normalizationOptionsText.contains("Normalize Parameters: " + (rEngineNormalizationParameters == null ? "All parameters" : StringUtils.join(rEngineNormalizationParameters, ", "))));
         }
 
         if (existingAnalysisFolder)
