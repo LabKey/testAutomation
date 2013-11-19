@@ -50,7 +50,7 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
 
     abstract protected void doCreateSteps();
 
-    abstract protected void doVerifySteps();
+    abstract protected void doVerifySteps() throws Exception;
 
 
     protected void setupRequestStatuses()
