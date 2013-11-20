@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 
@@ -126,7 +125,7 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
 
     private void setPermissionsOnDummyFolder()
     {
-        click(Locator.linkWithText(DUMMY_PROJECT_NAME));
+        clickProject(DUMMY_PROJECT_NAME);
         _securityHelper.setProjectPerm(users[0], DUMMY_PROJECT_NAME, "Reader");
         _securityHelper.setProjectPerm(users[1], "Editor");
         _securityHelper.setProjectPerm(users[2], "Project Administrator");
