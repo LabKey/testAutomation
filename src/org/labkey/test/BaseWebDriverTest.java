@@ -2159,7 +2159,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             text = text.trim();
         }
 
-        assertTrue("Expected " + count + " errors during this run", StringUtils.countMatches(text, "ERROR") == count);
+        assertEquals("Expected error count does not match actual count for this run.", count, StringUtils.countMatches(text, "ERROR"));
         log("Found " + count + " expected errors.");
 
         // Clear the errors to prevent the test from failing.
