@@ -130,7 +130,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             return intNotNull == row.intNotNull &&
                    dateTimeNotNull.equals(row.dateTimeNotNull) &&
                    text.equals(row.text) &&
-                   (rowid == null ? row.rowid == null : rowid.equals(row.rowid));
+                   (rowid == null || rowid.equals(row.rowid));
         }
 
         @Override
@@ -142,6 +142,14 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             return result;
         }
 
+        @Override
+        public String toString()
+        {
+            return String.format("{rowId: %s,\n" +
+                    "text: '%s',\n" +
+                    "intNotNull: %s,\n" +
+                    "dateTimeNotNull: %s}", rowid == null ? null : rowid, text, intNotNull, dateTimeNotNull);
+        }
     }
 
     void createProject()
