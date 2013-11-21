@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<etl xmlns="http://labkey.org/etl/xml">
+    <name>Stored Proc Append</name>
+    <description>Append using Modified Since filter and SPs</description>
+    <transforms>
+        <transform id="step1" type="StoredProcedure">
+            <description>append</description>
+            <source schemaName="vehicle" queryName="etl_source" />
+            <procedure schemaName="vehicle" procedureName="etlTestModifiedSince" useTransaction="false">
+                <parameter name="@desiredErrorOut" value="0" override="false"/>
+            </procedure>
+        </transform>
+    </transforms>
+    <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />
+</etl>

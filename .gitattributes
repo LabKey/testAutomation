@@ -108,6 +108,10 @@ modules/scriptpad/src/org/labkey/scriptpad/view/scriptpad.jsp -text
 modules/simpletest/config/module.xml -text
 modules/simpletest/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/etls/appendIdByRun.xml -text
+modules/simpletest/etls/appendModifiedSinceSP.xml -text
+modules/simpletest/etls/appendModifiedSinceSPlogError.xml -text
+modules/simpletest/etls/appendModifiedSinceSPthrowError.xml -text
+modules/simpletest/etls/appendRunBasedSP.xml -text
 modules/simpletest/etls/badCast.xml -text
 modules/simpletest/etls/badTableName.xml -text
 modules/simpletest/etls/merge.xml -text
