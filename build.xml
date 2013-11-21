@@ -1263,6 +1263,7 @@
             <sysproperty key="enableFirefoxExtensions" value="${sysprop.enableFirefoxExtensions}"/>
             <sysproperty key="webdriver.ie.driver" value="${webdriver.ie.driver}"/>
             <sysproperty key="webdriver.chrome.driver" value="${webdriver.chrome.driver}"/>
+            <sysproperty key="dump.svgs" value="${dump.svgs}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>

@@ -7237,23 +7237,57 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         final String expectedText = prepareSvgText(expectedSvgText);
         final Locator svgLoc = Locator.css("div:not(.thumbnail) > svg").index(svgIndex);
 
-        doesElementAppear(new BaseWebDriverTest.Checker()
+        if (!isDumpSvgs())
         {
-            @Override
-            public boolean check()
+            doesElementAppear(new BaseWebDriverTest.Checker()
             {
-                if (isElementPresent(svgLoc))
+                @Override
+                public boolean check()
                 {
-                    String svgText = prepareSvgText(getText(svgLoc));
-                    return expectedText.equals(svgText);
+                    if (isElementPresent(svgLoc))
+                    {
+                        String svgText = prepareSvgText(getText(svgLoc));
+                        return expectedText.equals(svgText);
+                    }
+                    else
+                        return false;
                 }
-                else
-                    return false;
-            }
-        }, WAIT_FOR_JAVASCRIPT);
+            }, WAIT_FOR_JAVASCRIPT);
 
-        String svgText = prepareSvgText(getText(svgLoc));
-        assertEquals("SVG did not look as expected", expectedText, svgText);
+            String svgText = prepareSvgText(getText(svgLoc));
+            assertEquals("SVG did not look as expected", expectedText, svgText);
+        }
+        else
+        {
+            waitForElement(svgLoc);
+            scrollIntoView(svgLoc);
+            String svgText = getText(svgLoc);
+
+            File svgDir = new File(ensureDumpDir(), "svgs");
+            String baseName;
+            File svgFile;
+
+            int i = 0;
+            do
+            {
+                i++;
+                baseName = String.format("%2d-svg[%d]", i, svgIndex);
+                svgFile = new File(svgDir, baseName + ".txt");
+            }while (svgFile.exists());
+
+            dumpScreen(svgDir, baseName);
+
+            try(FileWriter writer = new FileWriter(svgFile))
+            {
+                writer.write("Expected:\n");
+                writer.write(expectedSvgText);
+                writer.write("\n\nActual:\n");
+                writer.write(svgText);
+            }
+            catch (IOException e){
+                log("Failed to dump svg: " + svgFile.getName() + "Reason: " + e.getMessage());
+            }
+        }
     }
 
     private String prepareSvgText(String svgText)
@@ -7267,5 +7301,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return isFirefox ?
                 svgText.replace(ignoredSvgTestInFirefox, "").replaceAll("[\n ]", "") :
                 svgText;
+    }
+
+    private boolean isDumpSvgs()
+    {
+        return "true".equals(System.getProperty("dump.svgs"));
     }
 }
