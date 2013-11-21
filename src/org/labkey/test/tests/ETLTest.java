@@ -15,12 +15,14 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RemoteConnectionHelperWD;
@@ -32,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
+import org.apache.commons.io.FileUtils;
 
 import static org.junit.Assert.*;
 
@@ -62,7 +66,13 @@ public class ETLTest extends BaseWebDriverTest
     private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";
     private static final String TRANSFORM_REMOTE_STUDY = "/sampledata/dataintegration/ETLTestStudy.zip";
     private static final String TRANSFORM_BYRUNID_DESC = "ByRunId";
-
+    private static final String TRANSFORM_SP_MODIFIED = "{simpletest}/appendModifiedSinceSP";
+    private static final String TRANSFORM_SP_MODIFIED_DESC = "";
+    private static final String TRANSFORM_SP_RUNBASED = "{simpletest}/appendRunBasedSP";
+    private static final String TRANSFORM_SP_RUNBASED_DESC = "";
+    private static final String TransformXMLsource = System.getenv("LABKEY_ROOT") + "\\build\\deploy\\modules\\simpletest\\etls";
+    private static final String TransformXMLdest =  System.getenv("LABKEY_ROOT") + "\\build\\deploy\\modules\\ETLtest\\etls";
+    private DataIntegrationHelper diHelper = new DataIntegrationHelper("/" + PROJECT_NAME);
     //
     // internal counters
     //
@@ -75,7 +85,7 @@ public class ETLTest extends BaseWebDriverTest
     HashMap<String, ArrayList<String[]>> _transformHistories = new HashMap<>();
 
     //
-    // holdes expected results for the TransformSummary table.  This will show
+    // holds expected results for the TransformSummary table.  This will show
     // one row for each different ETL type run.
     //
     ArrayList<String []> _transformSummaries = new ArrayList<>();
@@ -99,16 +109,16 @@ public class ETLTest extends BaseWebDriverTest
         insertSourceRow("0", "Subject 0", null);
 
         runETL("append");
-        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "2");
+        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "1");
         assertInTarget1("Subject 0");
-        checkRun();
+        //checkRun();
         verifyTransformSummary();
         verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
         //append into populated target
         insertSourceRow("1", "Subject 1", null);
         runETL("append");
-        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "2");
+        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "1");
         checkRun();
         assertInTarget1("Subject 0", "Subject 1");
 
@@ -117,7 +127,7 @@ public class ETLTest extends BaseWebDriverTest
         verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
         // rerun append and verify that no work is done
-        runETL_NoWork("append");
+        runETL_NoWork(TRANSFORM_APPEND);
 
         // verify only two pipeline jobs existed since the "no work" one should not
         // have fired off a pipeline job
@@ -147,17 +157,18 @@ UNDONE: need to fix the merge case
         deleteSourceRow("0", "1");
         runETL("truncate");
         // add a row for the 'truncate' etl - this should show up in our summary view
-        addTransformResult(TRANSFORM_TRUNCATE, "1", "COMPLETE", "2");
+        addTransformResult(TRANSFORM_TRUNCATE, "1", "COMPLETE", "1");
         assertInTarget1("Subject 2");
         assertNotInTarget1("Subject 0", "Subject 1");
         verifyTransformSummary();
         verifyTransformHistory(TRANSFORM_TRUNCATE, TRANSFORM_TRUNCATE_DESC);
 
+        //copyETLfiles(TransformXMLsource, TransformXMLdest);
         //identify by run into populated target
         insertSourceRow("3", "Subject 3", "42");
         insertTransferRow("42", getDate(), getDate(), "new transfer", "added by test automation", "pending");
         runETL("appendIdByRun");
-        addTransformResult(TRANSFORM_BYRUNID, "1", "COMPLETE", "2");
+        addTransformResult(TRANSFORM_BYRUNID, "1", "COMPLETE", "1");
         assertInTarget1("Subject 2", "Subject 3");
 
         // intentionally fail transform by running append again after
@@ -169,6 +180,29 @@ UNDONE: need to fix the merge case
         verifyTransformSummary();
         verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
+
+        //stored proc based etl supported only on ms sql
+        if(WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+        {
+            //stored procedure based etl, using modified since into populated target
+            insertSourceRow("4", "Subject 4", "13");
+            //wait(15000);
+            runETL(TRANSFORM_SP_MODIFIED);
+            addTransformResult(TRANSFORM_SP_MODIFIED, "1", "COMPLETE", "1");
+            assertInTarget1("Subject 4");
+
+            //stored prodedure based etl, using run based.  should not be inserted to target since run id doesn't match
+            insertSourceRow("5", "Subject 5", "43");
+            runETL(TRANSFORM_SP_RUNBASED);
+            addTransformResult(TRANSFORM_SP_RUNBASED, "1", "COMPLETE", null);
+            assertNotInTarget1("Subject 5");
+
+            //create transfer row so source row run id 43 is inserted
+            insertTransferRow("43", getDate(), getDate(), "another transfer", "added by test automation", "pending");
+            runETL(TRANSFORM_SP_RUNBASED);
+            addTransformResult(TRANSFORM_SP_RUNBASED, "1", "COMPLETE", "1");
+            assertInTarget1("Subject 5");
+        }
         //error logging test, casting error, note that this causes an error in the checker
         // before a pipeline job is even scheduled
         runETL_CheckerError("badCast");
@@ -481,6 +515,16 @@ UNDONE: need to fix the merge case
         goToProjectHome();
     }
 
+    private void runETL_API(String transformId, boolean hasWork, boolean hasCheckerError)
+    {
+        diHelper.runTransformAndWait("{simpletest}/" + transformId, 30000);
+    }
+
+    private void runETL_API(String transformId)
+    {
+        runETL_API(transformId, true, false);
+    }
+
     private void deleteSourceRow(String... ids)
     {
         goToProjectHome();
@@ -609,6 +653,25 @@ UNDONE: need to fix the merge case
         return "server/modules/dataintegration";
     }
 
+    private void copyETLfiles(String sourcePath, String destinationPath)
+    {
+        File source = new File(sourcePath);
+        File dest = new File(destinationPath);
+
+        File[] files = source.listFiles();
+        try
+        {
+            for(File file : files)
+            {
+                FileUtils.copyFileToDirectory(file, dest);
+            }
+        }
+        catch(Exception e)
+        {
+            Assert.fail("Transform xml file copy failed: " + e.getMessage());
+        }
+    }
+
     @Override
     public BrowserType bestBrowser()
     {
@@ -654,12 +717,12 @@ UNDONE: need to fix the merge case
                     //
                     // if the "expected" data is null, then just verify that
                     // the actual data is non-null.  An expected value of "null"
-                    // just means that it is note easily comparable (execution times, for example)
+                    // just means that it is not easily comparable (execution times, for example)
                     //
                     String actual = drt.getDataAsText(row, _columns[col]);
                     String expected = _data.get(row)[col];
                     if (null != expected)
-                        assertTrue(actual.equalsIgnoreCase(expected));
+                        Assert.assertTrue("Expected value " + expected + " in row " + String.valueOf(row + 1) + " column " + String.valueOf(col + 1) + " of DataRegion " + getDataRegionName() + " but found " + actual, actual.equalsIgnoreCase(expected));
                 }
             }
         }
