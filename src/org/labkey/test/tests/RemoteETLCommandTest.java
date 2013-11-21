@@ -145,6 +145,7 @@ public class RemoteETLCommandTest extends ETLTest
         _jobsComplete++;
         // verify we had two runs complete (one success, one error)
         checkRun(true);
+        incrementExpectedErrorCount(true);
 
         // not found
         invokeCommand(new UpdateTransformConfigurationCommand(TRANSFORM_NOTFOUND), cn, TRANSFORM_NOTFOUND);
@@ -163,7 +164,7 @@ public class RemoteETLCommandTest extends ETLTest
         verifyUpdateTransformConfigurationResponse(utcr, utcc);
 
         // be sure to check for all expected errors here so that the test won't fail on exit
-        checkExpectedErrors(getExpectedErrorCount(1));
+        checkExpectedErrors(_expectedErrors);
     }
 
     private CommandResponse invokeCommand(BaseTransformCommand cmd, Connection cn)

@@ -67,7 +67,7 @@ public class ETLTest extends BaseWebDriverTest
     // internal counters
     //
     protected static int _jobsComplete;
-    private static int _expectedErrors;
+    protected static int _expectedErrors;
     //
     // holds expected results for the TransformHistory table.  The transform history table
     // shows all the runs for a specific ETL type
@@ -165,6 +165,7 @@ UNDONE: need to fix the merge case
         runETL("append");
         addTransformResult(TRANSFORM_APPEND, "1", "ERROR", null);
         checkRun(true /*expectError*/);
+        incrementExpectedErrorCount(true);
         verifyTransformSummary();
         verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
 
@@ -178,16 +179,34 @@ UNDONE: need to fix the merge case
         assertInLog("contains value not castable to a date:");
 
         //error logging test, bad run table name
+        // This test description is slightly off. For the "Run Now" case, the error is only in a popup to the user, not in a log file.
         runETL_CheckerError("badTableName");
         addTransformResult(TRANSFORM_BADTABLE, "1", "ERROR", null);
-        _expectedErrors++;
         assertInLog("Table not found:");
 
         // run tests over remote transform types
         verifyRemoteTransform();
 
         // be sure to check for all expected errors here so that the test won't fail on exit
-        checkExpectedErrors(getExpectedErrorCount(_expectedErrors));
+        checkExpectedErrors(_expectedErrors);
+    }
+
+    /**
+     *  Increment the expected error count to the correct number of occurances in the log file
+     *  of the string "ERROR" which correspond to the individual error.
+     *  <p/>
+     *  This can depend on the source of an expected error, and at the moment all errors generate
+     *  at least two occurances anyway.
+     *
+     * @param dbError true when the expected error is a SQLException from the database
+     */
+    protected void incrementExpectedErrorCount(boolean dbError)
+    {
+         _expectedErrors++;
+        if (dbError)
+            _expectedErrors = getExpectedErrorCount(_expectedErrors);
+        // At the moment, the ETL log files have two occurances of the string "ERROR" for every error that occurs.
+        _expectedErrors++;
     }
 
     // looks like postgres inserts an "ERROR" word in their error string for the duplicate key
@@ -261,7 +280,8 @@ UNDONE: need to fix the merge case
         checkRun(true /*expect error*/);
         addTransformResult(TRANSFORM_REMOTE, "1", "ERROR", null);
         assertNotInDatasetTarget1("Subject 1", "Subject 2", "Subject 3");
-        _expectedErrors++;
+        // The error here is from the app, not the db
+        incrementExpectedErrorCount(false);
 
         //
         // create our remote connection
