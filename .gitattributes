@@ -80,6 +80,11 @@ modules/miniassay/queries/assay/My[!!-~]Simple[!!-~]Assay[!!-~]Runs/AssayDesignR
 modules/miniassay/queries/assay/simple/My[!!-~]Simple[!!-~]Assay/Batches/AssayDesignChildSchemaBatches.qview.xml -text
 modules/miniassay/queries/assay/simple/My[!!-~]Simple[!!-~]Assay/Data/AssayDesignChildSchemaData.qview.xml -text
 modules/miniassay/queries/assay/simple/My[!!-~]Simple[!!-~]Assay/Runs/AssayDesignChildSchemaRuns.qview.xml -text
+modules/pipelinetest/pipeline/pipelines/r-copy-inline.pipeline.xml -text
+modules/pipelinetest/pipeline/pipelines/r-copy.pipeline.xml -text
+modules/pipelinetest/pipeline/tasks/r-copy-inline.task.xml -text
+modules/pipelinetest/pipeline/tasks/r-copy.r -text
+modules/pipelinetest/pipeline/tasks/r-copy.task.xml -text
 modules/restrictedModule/module.xml -text
 modules/restrictedModule/views/RestrictedWebPart.webpart.xml -text
 modules/restrictedModule/views/begin.html -text

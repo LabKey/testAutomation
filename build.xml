@@ -360,6 +360,7 @@
             <include name="restrictedModule.module"/>
             <include name="linkedschematest.module"/>
             <include name="scriptpad.module"/>
+            <include name="pipelinetest.module"/>
           </fileset>
         </copy>
 
@@ -372,6 +373,7 @@
                 <include name="restrictedModule.module"/>
                 <include name="linkedschematest.module"/>
                 <include name="scriptpad.module"/>
+                <include name="pipelinetest.module"/>
             </srcfiles>
         </uptodate>
         <antcall target="wait-for-redeploy-if-needed" />
@@ -387,7 +389,7 @@
         <touch file="${basedir}/testModuleDeployment.timestamp" />
     </target>
 
-    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, stage-linkedschematest-module, stage-restrictedModule-module, stage-scriptpad-module, install-rpackages">
+    <target name="stage-test-modules" depends="stage-miniassay-module, stage-simpletest-module, stage-linkedschematest-module, stage-restrictedModule-module, stage-scriptpad-module, stage-pipelinetest-module, install-rpackages">
     </target>
 
     <target name="stage-linkedschematest-module">
@@ -421,6 +423,13 @@
     <target name="stage-miniassay-module">
       <antcall target="stage-test-module">
         <param name="module.name" value="miniassay"/>
+        <param name="module.src.dir" value="${project.root}/server/test/modules"/>
+      </antcall>
+    </target>
+
+    <target name="stage-pipelinetest-module">
+      <antcall target="stage-test-module">
+        <param name="module.name" value="pipelinetest"/>
         <param name="module.src.dir" value="${project.root}/server/test/modules"/>
       </antcall>
     </target>
