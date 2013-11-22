@@ -702,7 +702,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         for (String ignoredText : _jsErrorChecker.ignored())
         {
-            if(error.getErrorMessage().contains(ignoredText))
+            if(error.toString().contains(ignoredText))
                 return false;
         }
 
