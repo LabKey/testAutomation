@@ -89,6 +89,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
             {
                 Locator.XPathLocator folderTreeNode = Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId.toString());
 
+                _test.waitForElement(folderTreeNode);
                 _test.waitForElementToDisappear(Locator.xpath("//tbody[starts-with(@id, 'treeview')]/tr[not(starts-with(@id, 'treeview'))]")); // temoporary row exists during expansion animation
                 // select/expand tree node
                 _test.scrollIntoView(folderTreeNode);
