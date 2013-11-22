@@ -16,6 +16,7 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
+import org.labkey.test.Locator;
 
 import java.io.File;
 import java.util.List;
@@ -30,11 +31,10 @@ public interface FileBrowserHelperParams
 
     public void selectFileBrowserRoot();
 
-    @LogMethod
-    public void selectAllFileBrowserFiles();
-
     @LogMethod(quiet = true)
     public void expandFileBrowserRootNode();
+
+    public void openFolderTree();
 
     public void renameFile(String currentName, String newName);
 
@@ -42,9 +42,9 @@ public interface FileBrowserHelperParams
 
     public void createFolder(String folderName);
 
-    public void addToolbarButton(String buttonName);
+    public void addToolbarButton(String buttonId);
 
-    public void removeToolbarButton(String buttonName);
+    public void removeToolbarButton(String buttonId);
 
     public void goToConfigureButtonsTab();
 
@@ -52,7 +52,7 @@ public interface FileBrowserHelperParams
 
     public void uploadFile(File file);
 
-    public void uploadFile(File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties);
+    public void uploadFile(File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties, boolean replace);
 
     public void importFile(String filePath, String importAction);
 
@@ -63,7 +63,5 @@ public interface FileBrowserHelperParams
     public void waitForFileGridReady();
 
     public void waitForImportDataEnabled();
-
-    public void waitForFileAdminEnabled();
 
 }

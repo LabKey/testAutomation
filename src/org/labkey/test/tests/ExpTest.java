@@ -21,6 +21,7 @@ import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.ListHelper;
 
@@ -35,7 +36,7 @@ import static org.junit.Assert.*;
  * Date: Nov 22, 2005
  * Time: 1:31:42 PM
  */
-@Category(BVT.class)
+@Category({BVT.class, FileBrowser.class})
 public class ExpTest extends BaseSeleniumWebTest
 {
     private static final String PROJECT_NAME = "ExpVerifyProject";
@@ -72,8 +73,7 @@ public class ExpTest extends BaseSeleniumWebTest
         clickFolder(FOLDER_NAME);
         clickButton("Process and Import Data");
 
-        FileBrowserHelper fileBrowserHelper = new FileBrowserHelper(this);
-        fileBrowserHelper.importFile("experiment.xar.xml", "Import Experiment");
+        _fileBrowserHelper.importFile("experiment.xar.xml", "Import Experiment");
         clickAndWait(Locator.linkWithText("Data Pipeline"));
         assertLinkNotPresentWithText("ERROR");
         int seconds = 0;

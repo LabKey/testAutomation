@@ -22,9 +22,9 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.ListHelper;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -38,7 +38,7 @@ import static org.junit.Assert.*;
  * The @BeforeClass creates a new study manuall using the default settings.
  * Each @Test then sets a property in that study, exports the study, and reimports it into a subfolder
  */
-@Category({DailyB.class, Study.class})
+@Category({DailyB.class, Study.class, FileBrowser.class})
 public class StudySimpleExportTest extends StudyBaseTestWD
 {
     @Override
@@ -145,7 +145,7 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         exportStudyArchive(getFolderName(), "0");
 
         log("QC States: verify xml file was created in export");
-        _extHelper.selectFileBrowserItem("export/study/quality_control_states.xml");
+        _fileBrowserHelper.selectFileBrowserItem("export/study/quality_control_states.xml");
 
         log("QC States: import study into subfolder");
         createSubfolderAndImportStudyFromPipeline("QC States");
@@ -198,7 +198,7 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         exportStudyArchive(getFolderName(), "0");
 
         log("Default Formats: verify xml file was created in export");
-        _extHelper.selectFileBrowserItem("export/study/datasets/datasets_manifest.xml");
+        _fileBrowserHelper.selectFileBrowserItem("export/study/datasets/datasets_manifest.xml");
 
         log("Default Formats: import study into subfolder");
         createSubfolderAndImportStudyFromPipeline("Default Dataset Formats");
@@ -222,12 +222,10 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         createSubfolder(getProjectName(), getProjectName(), "Query Validation", "Collaboration", null, true);
         importFolderFromZip(new File(getPipelinePath(), "LabkeyDemoStudyWithCharts.folder.zip"), false, 1);
         goToModule("FileContent");
-        click(Locator.css(".iconFolderTree"));
-        shortWait().until(ExpectedConditions.visibilityOf(Locator.xpath("id('fileBrowser')//div[contains(@id, 'xsplit')]").findElement(getDriver())));
-        _extHelper.selectFileBrowserItem("/unzip/");
-        doubleClick(Locator.xpath("//div[starts-with(text(), 'folder_load_')]"));
-        waitForText("Loading folder type and active modules");
-        assertTextPresentInThisOrder(" queries imported", "Skipping query validation.");
+        _fileBrowserHelper.selectFileBrowserItem("/unzip/");
+        //TODO: broken: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=19029
+        doubleClick(Locator.tag("div").startsWith("folder_load_"));
+        assertTextPresentInThisOrder("Loading folder type and active modules", " queries imported", "Skipping query validation.");
     }
 
     @Test
@@ -248,8 +246,8 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         exportStudyArchive(getFolderName(), "0");
 
         log("Custom Ptid View: verify xml file was created in export");
-        _extHelper.selectFileBrowserItem("export/study/views/settings.xml");
-        _extHelper.selectFileBrowserItem("export/study/views/participant.html");
+        _fileBrowserHelper.selectFileBrowserItem("export/study/views/settings.xml");
+        _fileBrowserHelper.selectFileBrowserItem("export/study/views/participant.html");
 
         log("Custom Ptid View: import study into subfolder");
         createSubfolderAndImportStudyFromPipeline("Custom Participant View");

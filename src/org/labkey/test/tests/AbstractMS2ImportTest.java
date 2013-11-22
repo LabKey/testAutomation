@@ -66,8 +66,7 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         log("Upload existing MS2 data: ");
         clickFolder(FOLDER_NAME);
         clickButton("Process and Import Data");
-        _extHelper.selectFileBrowserItem("bov_sample/" + SEARCH_TYPE + "/" + directoryName + "/" + SAMPLE_BASE_NAME + ".search.xar.xml");
-        selectImportDataAction("Import Experiment");
+        _fileBrowserHelper.importFile("bov_sample/" + SEARCH_TYPE + "/" + directoryName + "/" + SAMPLE_BASE_NAME + ".search.xar.xml", "Import Experiment");
 
         log("Going to the list of all pipeline jobs");
         clickAndWait(Locator.linkWithText("All"));

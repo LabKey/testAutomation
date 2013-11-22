@@ -24,7 +24,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ExtHelperWD;
+import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.RReportHelperWD;
@@ -183,19 +183,20 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
 
         // Should allow for import all directories containing FCS Files
-        _extHelper.selectFileBrowserItem("8color/");
-        _extHelper.waitForImportDataEnabled();
-        waitForElement(ExtHelperWD.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
-        selectImportDataAction("Import Directory of FCS Files");
+        _fileBrowserHelper.selectFileBrowserItem("8color/");
+        _fileBrowserHelper.waitForImportDataEnabled();
+        waitForElement(FileBrowserHelperWD.Locators.gridRowCheckbox(FCS_FILE_2, false), WAIT_FOR_JAVASCRIPT);
+        _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
+
         assertTextPresent("The following directories within",  "8color");
         assertTextPresent(FCS_FILE_1 + " (25 fcs files)");
         assertTextPresent(FCS_FILE_2 + " (14 fcs files)");
         clickButton("Cancel"); // go back to file-browser
 
         // Entering L02-060120-QUV-JS directory should allow import of current directory
-        _extHelper.selectFileBrowserItem("8color/" + FCS_FILE_1 + "/");
-        waitForElement(ExtHelperWD.locateGridRowCheckbox("91761.fcs"), WAIT_FOR_JAVASCRIPT);
-        selectImportDataAction("Current directory of 25 FCS Files");
+        _fileBrowserHelper.selectFileBrowserItem("8color/" + FCS_FILE_1 + "/");
+        waitForElement(FileBrowserHelperWD.Locators.gridRowCheckbox("91761.fcs", false), WAIT_FOR_JAVASCRIPT);
+        _fileBrowserHelper.selectImportDataAction("Current directory of 25 FCS Files");
         assertTextPresent("The following directories within" ,"'8color",  FCS_FILE_1);
         assertTextPresent("Current Directory (25 fcs files)");
         assertTextNotPresent(FCS_FILE_2);
@@ -326,10 +327,10 @@ public class FlowTest extends BaseFlowTest
          clickAndWait(Locator.linkWithText("Flow Dashboard"));
         clickAndWait(Locator.linkWithText("Browse for more FCS files to be imported"));
 
-        _extHelper.selectFileBrowserItem("8color/");
-        _extHelper.waitForImportDataEnabled();
-        waitForElement(ExtHelperWD.locateGridRowCheckbox(FCS_FILE_2), WAIT_FOR_JAVASCRIPT);
-        selectImportDataAction("Import Directory of FCS Files");
+        _fileBrowserHelper.selectFileBrowserItem("8color/");
+        _fileBrowserHelper.waitForImportDataEnabled();
+        waitForElement(FileBrowserHelperWD.Locators.gridRowCheckbox(FCS_FILE_2, false), WAIT_FOR_JAVASCRIPT);
+        _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
         assertTextNotPresent(FCS_FILE_1);
         assertTextPresent(FCS_FILE_2);
         clickButton("Import Selected Runs");

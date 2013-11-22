@@ -175,6 +175,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelperWD _securityHelper = new SecurityHelperWD(this);
+    public FileBrowserHelperWD _fileBrowserHelper = new FileBrowserHelperWD(this);
     private static File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
@@ -3175,7 +3176,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void clickProject(String project, boolean assertDestination)
     {
         hoverProjectBar();
-        waitAndClickAndWait(Locator.linkWithText(project));
+        WebElement projectLink = Locator.linkWithText(project).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        clickAt(projectLink, 1, 1, WAIT_FOR_PAGE); // Don't click hidden portion of long links
         if (assertDestination)
             waitForElement(Locator.id("folderBar").withText(project));
     }
@@ -6705,8 +6707,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Import Folder Using Pipeline");
-        _extHelper.selectFileBrowserItem(folderFile);
-        selectImportDataAction("Import Folder");
+        _fileBrowserHelper.importFile(folderFile, "Import Folder");
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
     }
 
@@ -7081,11 +7082,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             for (String dir : dirNames)
                 path += dir + "/";
 
-            _extHelper.selectFileBrowserItem(path);
+            _fileBrowserHelper.selectFileBrowserItem(path);
 
             for (File copiedArchive : _copiedArchives)
-                _extHelper.clickFileBrowserFileCheckbox(copiedArchive.getName());
-            selectImportDataAction("Import Specimen Data");
+                _fileBrowserHelper.clickFileBrowserFileCheckbox(copiedArchive.getName());
+            _fileBrowserHelper.selectImportDataAction("Import Specimen Data");
             clickButton("Start Import");
         }
 
@@ -7167,28 +7168,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void setCodeEditorValue(String id, String value)
     {
         _extHelper.setCodeMirrorValue(id, value);
-    }
-
-    /**
-     * For invoking pipeline actions from the file web part. Displays the import data
-     * dialog and selects and submits the specified action.
-     */
-    @LogMethod(quiet = true)
-    public void selectImportDataAction(@LoggedParam String actionName)
-    {
-        sleep(100);
-        _extHelper.waitForFileGridReady();
-        _extHelper.waitForImportDataEnabled();
-        selectImportDataActionNoWaitForGrid(actionName);
-    }
-
-    public void selectImportDataActionNoWaitForGrid(String actionName)
-    {
-        clickButton("Import Data", 0);
-
-        waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction' and not(@disabled)]/../label[text()=" + Locator.xq(actionName) + "]"));
-        String id = _extHelper.getExtElementId("btn_submit");
-        clickAndWait(Locator.id(id));
     }
 
     public void ensureSignedOut()

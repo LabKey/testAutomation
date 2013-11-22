@@ -101,9 +101,9 @@ public class FlowSpecimenTest extends BaseFlowTest
         log("** Import microFCS directory, set TargetStudy");
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
-        _extHelper.selectFileBrowserItem("flowjoquery/microFCS");
-        _extHelper.waitForImportDataEnabled();
-        selectImportDataAction("Import Directory of FCS Files");
+        _fileBrowserHelper.selectFileBrowserItem("flowjoquery/microFCS");
+        _fileBrowserHelper.waitForImportDataEnabled();
+        _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
         selectOptionByText(Locator.id("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         clickButton("Import Selected Runs");
         waitForPipeline(getContainerPath());

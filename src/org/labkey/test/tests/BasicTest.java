@@ -87,7 +87,7 @@ public class BasicTest extends BaseWebDriverTest
             assertTextNotPresent("Development"); // Unless we're not supposed to be.
 
         // Navigate to the credits page and verify that all external components are documented
-        clickAndWait(Locator.linkWithText("credits"));
+        waitAndClick(Locator.linkWithText("credits"));
         assertTextNotPresent("WARNING:");
 
         ensureAdminMode();
@@ -102,7 +102,7 @@ public class BasicTest extends BaseWebDriverTest
 
         // Verify scheduled system maintenance is disabled.
         goToAdminConsole();
-        clickAndWait(Locator.linkWithText("running threads"));
+        waitAndClick(Locator.linkWithText("running threads"));
         assertTextNotPresent("SystemMaintenance");
     }
 

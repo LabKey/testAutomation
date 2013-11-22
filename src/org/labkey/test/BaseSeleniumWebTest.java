@@ -91,6 +91,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public ExtHelper _extHelper = new ExtHelper(this);
     public Ext4Helper _ext4Helper = new Ext4Helper(this);
+    public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
     public CustomizeViewsHelper _customizeViewsHelper = new CustomizeViewsHelper(this);
     public StudyHelper _studyHelper = new StudyHelper(this);
     public ListHelper _listHelper = new ListHelper(this);
@@ -3424,6 +3425,12 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertEquals("Link with text '" + text + "' was not present the expected number of times", count, countLinksWithText(text));
     }
 
+    public void scrollIntoView(Locator loc)
+    {
+        String locId = getAttribute(loc, "id");
+        selenium.getEval("selenium.browserbot.getCurrentWindow().document.getElementById('"+locId+"').scrollIntoView(true);");
+    }
+
     public void click(Locator l)
     {
         clickAndWait(l, 0);
@@ -5713,8 +5720,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Import Folder Using Pipeline");
-        _extHelper.selectFileBrowserItem(folderFile);
-        selectImportDataAction("Import Folder");
+        _fileBrowserHelper.importFile(folderFile, "Import Folder");
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
     }
     public String getFileContents(String rootRelativePath)
@@ -6399,7 +6405,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
             clickAndWait(Locator.linkWithText("Manage Files"));
             waitAndClickButton("Process and Import Data");
-            _extHelper.waitForFileGridReady();
+            _fileBrowserHelper.waitForFileGridReady();
 
             // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
             File testDir = _tempDir;
@@ -6416,11 +6422,11 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
             for (String dir : dirNames)
                 path += dir + "/";
 
-            _extHelper.selectFileBrowserItem(path);
+            _fileBrowserHelper.selectFileBrowserItem(path);
 
             for (File copiedArchive : _copiedArchives)
-                _extHelper.clickFileBrowserFileCheckbox(copiedArchive.getName());
-            selectImportDataAction("Import Specimen Data");
+                _fileBrowserHelper.clickFileBrowserFileCheckbox(copiedArchive.getName());
+            _fileBrowserHelper.selectImportDataAction("Import Specimen Data");
             clickButton("Start Import");
         }
 
@@ -6500,30 +6506,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     public void setCodeEditorValue(String id, String value)
     {
         _extHelper.setCodeEditorValue(id, value);
-    }
-
-    /**
-     * For invoking pipeline actions from the file web part. Displays the import data
-     * dialog and selects and submits the specified action.
-     *
-     * @param actionName
-     */
-    @LogMethod
-    public void selectImportDataAction(String actionName)
-    {
-        sleep(200);
-        _extHelper.waitForFileGridReady();
-        _extHelper.waitForImportDataEnabled();
-        selectImportDataActionNoWaitForGrid(actionName);
-    }
-
-    public void selectImportDataActionNoWaitForGrid(String actionName)
-    {
-        clickButton("Import Data", 0);
-
-        waitAndClick(Locator.xpath("//input[@type='radio' and @name='importAction' and not(@disabled)]/../label[text()=" + Locator.xq(actionName) + "]"));
-        String id = _extHelper.getExtElementId("btn_submit");
-        clickAndWait(Locator.id(id));
     }
 
     public void ensureSignedOut()

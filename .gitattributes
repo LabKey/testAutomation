@@ -231,6 +231,7 @@ src/org/labkey/test/categories/Data.java -text
 src/org/labkey/test/categories/Disabled.java -text
 src/org/labkey/test/categories/EHR.java -text
 src/org/labkey/test/categories/External.java -text
+src/org/labkey/test/categories/FileBrowser.java -text
 src/org/labkey/test/categories/Flow.java -text
 src/org/labkey/test/categories/Hidra.java -text
 src/org/labkey/test/categories/IDRI.java -text
@@ -509,6 +510,7 @@ src/org/labkey/test/util/FileBrowserExtendedProperty.java -text
 src/org/labkey/test/util/FileBrowserHelper.java -text
 src/org/labkey/test/util/FileBrowserHelperParams.java -text
 src/org/labkey/test/util/FileBrowserHelperWD.java -text
+src/org/labkey/test/util/FlowFileBrowserHelper.java -text
 src/org/labkey/test/util/ImpersonationLoggingAspect.java -text
 src/org/labkey/test/util/IssuesHelper.java -text
 src/org/labkey/test/util/JSONHelper.java -text

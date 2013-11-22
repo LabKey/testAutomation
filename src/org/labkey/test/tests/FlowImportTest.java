@@ -22,6 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 
@@ -34,7 +35,7 @@ import static org.junit.Assert.*;
  * User: kevink
  * Date: Mar 31, 2009
  */
-@Category({DailyA.class, Flow.class})
+@Category({DailyA.class, Flow.class, FileBrowser.class})
 public class FlowImportTest extends BaseFlowTest
 {
     protected void _doTestSteps() throws Exception

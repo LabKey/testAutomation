@@ -16,18 +16,19 @@
 
 package org.labkey.test.ms2;
 
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.MS2;
 import org.labkey.test.util.WindowsOnlyTest;
 
 import java.io.File;
-
 import static org.junit.Assert.*;
 
-@Category({MS2.class, BVT.class})
+@Category({MS2.class, BVT.class, FileBrowser.class})
 public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnlyTest
 {
     protected static final String SEARCH_BUTTON = "Comet";
@@ -49,7 +50,7 @@ public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnl
     protected void setupEngine()
     {
         log("Analyze " + SEARCH_BUTTON + " sample data.");
-        selectImportDataAction(SEARCH_BUTTON +  " Peptide Search");
+        _fileBrowserHelper.selectImportDataAction(SEARCH_BUTTON +  " Peptide Search");
     }
 
     protected void doTestStepsSetDepth(boolean isQuickTest)
@@ -59,7 +60,7 @@ public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnl
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
         if (test2.exists())
-            fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
+            fail("Pipeline files were not cleaned up; test2(" + test2.toString() + ") directory still exists");
 
         super.doTestSteps();
     }

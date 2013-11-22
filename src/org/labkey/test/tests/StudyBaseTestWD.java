@@ -191,10 +191,6 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
 
         log("Import new study with alt-ID");
         importFolderFromPipeline("AltIdStudy.folder.zip");
-//        clickButton("Process and Import Data");
-//        _extHelper.waitForImportDataEnabled();
-//        _extHelper.clickFileBrowserFileCheckbox("study.xml");
-//        selectImportDataAction("Import Study");
     }
 
     protected void exportStudy(boolean useXmlFormat, boolean zipFile)

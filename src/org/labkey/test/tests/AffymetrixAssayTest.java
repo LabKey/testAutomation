@@ -22,12 +22,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
-@Category({DailyA.class, Assays.class})
+@Category({DailyA.class, Assays.class, FileBrowser.class})
 public class AffymetrixAssayTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "AffymetrixAssayVerifyProject";
@@ -124,8 +125,7 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
     {
         goToModule("Pipeline");
         clickButton("Process and Import Data");
-        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
-        fileBrowserHelper.importFile(EXCEL_FILE_NAME, "Use " + ASSAY_NAME);
+        _fileBrowserHelper.importFile(EXCEL_FILE_NAME, "Use " + ASSAY_NAME);
         clickButton("Save and Finish");
     }
 

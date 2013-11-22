@@ -20,6 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.Ext4HelperWD;
 
@@ -32,7 +33,7 @@ import static org.junit.Assert.*;
  * Date: Dec 8, 2006
  * Time: 4:30:24 PM
  */
-@Category({DailyB.class, Study.class})
+@Category({DailyB.class, Study.class, FileBrowser.class})
 public class StudyExportTest extends StudyManualTest
 {
     private static final String SPECIMEN_ARCHIVE_B = "/sampledata/study/specimens/sample_b.specimens";
@@ -72,10 +73,7 @@ public class StudyExportTest extends StudyManualTest
         log("Importing exported study (legacy formats)");
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
-        _extHelper.selectFileBrowserItem("export/study/study.xml");
-
-        selectImportDataAction("Import Study");
-
+        _fileBrowserHelper.importFile("export/study/study.xml", "Import Study");
         // wait for study & specimen load to complete
         waitForPipelineJobsToComplete(3, "study and specimen import (legacy formats)", false);
 
@@ -105,11 +103,12 @@ public class StudyExportTest extends StudyManualTest
         log("Importing exported study (xml formats)");
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
-        waitAndClick(Locator.xpath("//div[contains(@class, 'x-tree-node-expanded') and @*='/']"));//TODO: Bad cookie. Marker class won't appear without this step.
-        _extHelper.selectFileBrowserItem("export/");
-        _extHelper.selectAllFileBrowserFiles();
-
-        selectImportDataAction("Import Study");
+        _fileBrowserHelper.selectFileBrowserItem("export/");
+        // select the first exported zip archive file by row
+        Locator.XPathLocator gridRow = Locator.xpath("//div/span[contains(text(), 'My Study_')]");
+        waitForElement(gridRow);
+        clickAt(gridRow, "1,1");
+        _fileBrowserHelper.selectImportDataAction("Import Study");
 
         // wait for study & specimen load
         waitForPipelineJobsToComplete(4, "study and specimen import (xml formats)", false);

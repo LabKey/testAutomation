@@ -19,6 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.ms2.MS2PipelineFolder;
 import org.labkey.test.ms2.params.MS2EmailSuccessParams;
 import org.labkey.test.pipeline.PipelineFolder;
@@ -37,7 +38,7 @@ import static org.junit.Assert.*;
 /**
  * <code>PipelineTest</code>
  */
-@Category(BVT.class)
+@Category({BVT.class, FileBrowser.class})
 public class PipelineTest extends PipelineWebTestBase
 {
     protected static final int MAX_WAIT_SECONDS = 60*5;

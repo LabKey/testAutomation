@@ -20,9 +20,11 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.MS2;
 import org.labkey.test.util.CustomizeViewsHelperWD;
 import org.labkey.test.util.FileBrowserHelperWD;
+import org.labkey.test.util.LogMethod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +33,7 @@ import java.util.List;
  * User: jeckels
  * Date: 2/8/13
  */
-@Category({DailyB.class, MS2.class})
+@Category({DailyB.class, MS2.class, FileBrowser.class})
 public class SequestImportTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "SequestImport" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
@@ -51,8 +53,10 @@ public class SequestImportTest extends BaseWebDriverTest
         setupProject();
         importSequestRun();
         verifyRunGrid();
+        testFileUsageColumn();
     }
 
+    @LogMethod
     private void verifyRunGrid()
     {
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
@@ -85,19 +89,44 @@ public class SequestImportTest extends BaseWebDriverTest
         assertTextPresent("IPI00176617");
     }
 
+    @LogMethod
+    private void testFileUsageColumn()
+    {
+        final String[] runFiles = {"ipi.HUMAN.fasta.v2.31", "raftflow10.mzXML", "raftflow10.pep.xml"};
+        final String runName = "sampledata/raftflow10 (raftflow)";
+        final String runProtocol = "MS2 Import";
+        final Locator.XPathLocator runLink = Locator.linkWithText(runName + " (" + runProtocol + ")");
+
+        goToModule("Pipeline");
+        clickButton("Process and Import Data");
+        _fileBrowserHelper.waitForFileGridReady();
+        for (String file : runFiles)
+        {
+            waitForElement(FileBrowserHelperWD.Locators.gridRowWithNodeId(file).append(runLink));
+        }
+
+        clickAndWait(runLink);
+        assertElementPresent(Locator.pageHeader(runName));
+        clickAndWait(Locator.linkWithText(runProtocol));
+
+        assertElementPresent(Locator.pageHeader("Protocol: " + runProtocol));
+        assertElementPresent(Locator.linkWithText(runName));
+    }
+
+    @LogMethod
     private void importSequestRun()
     {
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         // Import a Sequest run
         clickButton("Process and Import Data");
-        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
-        fileBrowserHelper.importFile("raftflow10.pep.xml", "Import Search Results");
+        _fileBrowserHelper.importFile("raftflow10.pep.xml", "Import Search Results");
 
         click(Locator.linkWithText("MS2 Dashboard"));
         waitAndClick(Locator.linkWithText("Data Pipeline"));
         waitForPipelineJobsToComplete(1, "Experiment Import", false);
     }
 
+    @LogMethod
     private void setupProject()
     {
         _containerHelper.createProject(PROJECT_NAME, "MS2 Extensions");

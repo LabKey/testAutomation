@@ -365,6 +365,11 @@ public abstract class Locator
         return xpath("//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
     }
 
+    public static XPathLocator ext4CheckboxById(String label)
+    {
+        return xpath("//input[@type = 'button' and contains(@class, 'checkbox') and contains(@id, '" + label + "')]");
+    }
+
     public static XPathLocator ext4Radio(String label)
     {
         return xpath("//input["+ NOT_HIDDEN +" and @type = 'button' and contains(@class, 'radio') and following-sibling::label[contains(text(), '" + label + "')]]");
@@ -753,6 +758,11 @@ public abstract class Locator
             if (predicate.startsWith("//"))
                 predicate = predicate.replaceFirst("//", "descendant::");
             return this.append("["+predicate+"]");
+        }
+
+        public XPathLocator attributeEndsWith(String attribute, String substring)
+        {
+            return this.withPredicate(String.format("substring(@%s, string-length(@%s) - %d) = %s", attribute, attribute, substring.length() - 1, xq(substring))); // XPath 1.0 doesn't support ends-with()
         }
 
         public XPathLocator withClass(String cssClass)

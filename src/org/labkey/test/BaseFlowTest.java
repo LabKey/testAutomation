@@ -20,6 +20,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.FileBrowserHelperWD;
+import org.labkey.test.util.FlowFileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
@@ -36,6 +37,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "Flow Verify Project";
     protected static final String PIPELINE_PATH = "/sampledata/flow";
+    private final FlowFileBrowserHelper flowFileBrowserHelper = new FlowFileBrowserHelper(this);
 
     public String getAssociatedModuleDirectory()
     {
@@ -316,9 +318,8 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     {
         waitAndClickAndWait(Locator.linkWithText("Browse for FCS files to be imported"));
 
-
-        _extHelper.selectFileBrowserItem("flowjoquery/microFCS");
-        selectImportDataAction("Import Directory of FCS Files");
+        _fileBrowserHelper.selectFileBrowserItem("flowjoquery/microFCS");
+        _fileBrowserHelper.selectImportDataAction("Import Directory of FCS Files");
         clickButton("Import Selected Runs");
         waitForPipeline(getContainerPath());
     }
@@ -327,8 +328,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     {
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("FCS files to be imported"));
-        FileBrowserHelperWD fileBrowserHelper = new FileBrowserHelperWD(this);
-        fileBrowserHelper.importFile(analysisZipPath, "Import External Analysis");
+        _fileBrowserHelper.importFile(analysisZipPath, "Import External Analysis");
 
         importAnalysis_selectFCSFiles(containerPath, SelectFCSFileOption.None, null);
         importAnalysis_reviewSamples(containerPath, false, null, null);
@@ -397,9 +397,9 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         log("browse pipeline to begin import analysis wizard");
         goToFlowDashboard();
         clickAndWait(Locator.linkContainingText("FCS files to be imported"));
-        _extHelper.selectFileBrowserItem(workspacePath);
+        _fileBrowserHelper.selectFileBrowserItem(workspacePath);
 
-        selectImportDataAction("Import FlowJo Workspace");
+        _fileBrowserHelper.selectImportDataAction("Import FlowJo Workspace");
     }
 
     @LogMethod
@@ -415,7 +415,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     protected void importAnalysis_uploadWorkspace(String containerPath, String workspacePath)
     {
         assertTitleEquals("Import Analysis: Select Analysis: " + containerPath);
-        _extHelper.selectFileBrowserItem(workspacePath);
+        flowFileBrowserHelper.selectFileBrowserItem(workspacePath);
         clickButton("Next");
     }
 
@@ -424,7 +424,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     {
         waitForExtReady();
         if (isChecked(Locator.id(SelectFCSFileOption.Browse.name())))
-            _extHelper.waitForFileGridReady();
+            flowFileBrowserHelper.waitForFileGridReady();
 
         assertTitleEquals("Import Analysis: Select FCS Files: " + containerPath);
         switch (selectFCSFilesOption)
@@ -444,9 +444,9 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
             case Browse:
                 checkRadioButton(Locator.radioButtonById("Browse"));
-                _extHelper.waitForFileGridReady();
+                flowFileBrowserHelper.waitForFileGridReady();
                 // UNDONE: Currently, only one file path supported
-                _extHelper.selectFileBrowserItem(keywordDirs.get(0));
+                flowFileBrowserHelper.selectFileBrowserItem(keywordDirs.get(0));
                 break;
 
             default:
