@@ -184,6 +184,9 @@ public class FileContentTest extends BaseWebDriverTest
 
         log("replace file");
         refresh();
+        fileProperties = new ArrayList<>();
+        fileProperties.add(new FileBrowserExtendedProperty(CUSTOM_PROPERTY, CUSTOM_PROPERTY_VALUE, false));
+        fileProperties.add(new FileBrowserExtendedProperty("LookupColumn:", LOOKUP_VALUE_1, true));
         _fileBrowserHelper.uploadFile(f, FILE_DESCRIPTION, fileProperties, true);
 
         log("rename file");
