@@ -7259,9 +7259,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             try(FileWriter writer = new FileWriter(svgFile))
             {
                 writer.write("Expected:\n");
-                writer.write(expectedSvgText);
+                writer.write(expectedSvgText.replace("\\", "\\\\").replace("\n", "\\n"));
                 writer.write("\n\nActual:\n");
-                writer.write(svgText);
+                writer.write(svgText.replace("\\", "\\\\").replace("\n", "\\n"));
             }
             catch (IOException e){
                 log("Failed to dump svg: " + svgFile.getName() + "Reason: " + e.getMessage());
