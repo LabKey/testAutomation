@@ -217,6 +217,11 @@ src/org/labkey/test/WebDriverTestPostamble.java -text
 src/org/labkey/test/WebDriverTestPreamble.java -text
 src/org/labkey/test/WebTest.java -text
 src/org/labkey/test/WebTestHelper.java -text
+src/org/labkey/test/aspects/ImpersonationLoggingAspect.java -text
+src/org/labkey/test/aspects/MethodLoggingAspect.java -text
+src/org/labkey/test/aspects/MethodPerfAspect.java -text
+src/org/labkey/test/aspects/StaleElementRetryAspect.java -text
+src/org/labkey/test/aspects/TestLoggingAspect.java -text
 src/org/labkey/test/categories/Assays.java -text
 src/org/labkey/test/categories/BVT.java -text
 src/org/labkey/test/categories/CDSPopulation.java -text
@@ -511,7 +516,6 @@ src/org/labkey/test/util/FileBrowserHelper.java -text
 src/org/labkey/test/util/FileBrowserHelperParams.java -text
 src/org/labkey/test/util/FileBrowserHelperWD.java -text
 src/org/labkey/test/util/FlowFileBrowserHelper.java -text
-src/org/labkey/test/util/ImpersonationLoggingAspect.java -text
 src/org/labkey/test/util/IssuesHelper.java -text
 src/org/labkey/test/util/JSONHelper.java -text
 src/org/labkey/test/util/JUnitFooter.java -text
@@ -523,8 +527,6 @@ src/org/labkey/test/util/ListHelperWD.java -text
 src/org/labkey/test/util/LogMethod.java -text
 src/org/labkey/test/util/LoggedParam.java -text
 src/org/labkey/test/util/Maps.java -text
-src/org/labkey/test/util/MethodLoggingAspect.java -text
-src/org/labkey/test/util/MethodPerfAspect.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PerlHelper.java -text
 src/org/labkey/test/util/PerlHelperWD.java -text
@@ -546,7 +548,6 @@ src/org/labkey/test/util/StringHelper.java -text
 src/org/labkey/test/util/StudyHelper.java -text
 src/org/labkey/test/util/StudyHelperWD.java -text
 src/org/labkey/test/util/TestLogger.java -text
-src/org/labkey/test/util/TestLoggingAspect.java -text
 src/org/labkey/test/util/TimeChartHelper.java -text
 src/org/labkey/test/util/UIAssayHelper.java -text
 src/org/labkey/test/util/UIContainerHelper.java -text

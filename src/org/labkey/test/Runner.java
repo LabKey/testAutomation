@@ -35,7 +35,7 @@ import org.labkey.test.util.DevModeOnlyTest;
 import org.labkey.test.util.JUnitFooter;
 import org.labkey.test.util.JUnitHeader;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.MethodPerfAspect;
+import org.labkey.test.aspects.MethodPerfAspect;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.AdvancedSqlTest;

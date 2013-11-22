@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.labkey.test.util;
+package org.labkey.test.aspects;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -22,6 +22,9 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.TestLogger;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
