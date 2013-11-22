@@ -197,7 +197,7 @@ UNDONE: need to fix the merge case
         assertInLog("Table not found:");
 
         // run tests over remote transform types
- //       verifyRemoteTransform();
+        verifyRemoteTransform();
 
         // be sure to check for all expected errors here so that the test won't fail on exit
         checkExpectedErrors(_expectedErrors);
