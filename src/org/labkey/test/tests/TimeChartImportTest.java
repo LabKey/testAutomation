@@ -104,14 +104,14 @@ public class TimeChartImportTest extends TimeChartTest
         DATE_CHARTS.add(new TimeChartInfo(
                 "Four Measures: one axis with point click fn enabled", 1, 17, true,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\nLuminexAssay, Lab Results, GenericAssay, Physical Exam\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nFI, CD4+ (cells/mm3), M1, Weight (kg)\n200\n400\n600\n800\n1000\n1200\n1400\n249318596 Weight (kg)\n249318596 ABI-QSTAR\n249318596 CD4+(cells/mm3)\n249318596 TNF-alpha(40)"
+                        "Created with Rapha\u00ebl 2.1.0\nLuminexAssay, Lab Results, GenericAssay, Physical Exam\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nFI, CD4+ (cells/mm3), M1, Weight (kg)\n200\n400\n600\n800\n1000\n1200\n1400\n249318596 ABI-QSTAR\n249318596 CD4+(cells/mm3)\n249318596 TNF-alpha(40)\n249318596 Weight (kg)"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "Four Measures: one axis with x-axis range and interval changed", 1, 17, true,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\nLuminexAssay, Lab Results, GenericAssay, Physical Exam\n0\n5\n10\n15\n20\n25\n30\n35\nMonths\nFI, CD4+ (cells/mm3), M1, Weight (kg)\n200\n400\n600\n800\n1000\n1200\n1400\n249318596 Weight (kg)\n249318596 ABI-QSTAR\n249318596 CD4+(cells/mm3)\n249318596 TNF-alpha(40)"
+                        "Created with Rapha\u00ebl 2.1.0\nLuminexAssay, Lab Results, GenericAssay, Physical Exam\n0\n5\n10\n15\n20\n25\n30\n35\nMonths\nFI, CD4+ (cells/mm3), M1, Weight (kg)\n200\n400\n600\n800\n1000\n1200\n1400\n249318596 ABI-QSTAR\n249318596 CD4+(cells/mm3)\n249318596 TNF-alpha(40)\n249318596 Weight (kg)"
                 }
         ));
 
@@ -156,17 +156,17 @@ public class TimeChartImportTest extends TimeChartTest
         DATE_CHARTS.add(new TimeChartInfo(
                 "Two Measure: all cohorts and groups", 8, 99, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\nLab Results: Group 1: Accute HIV-1\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nGroup 1: Accute HIV-1Lymphs (cells/mm3)\nGroup 1: Accute HIV-1Hemoglobin",
-                        "Created with Rapha\u00ebl 2.1.0\nLab Results: Group 2: HIV-1 Negative\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nGroup 2: HIV-1 NegativeLymphs (cells/mm3)\nGroup 2: HIV-1 NegativeHemoglobin"
+                        "Created with Rapha\u00ebl 2.1.0\nLab Results: Group 1: Accute HIV-1\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nGroup 1: Accute HIV-1Hemoglobin\nGroup 1: Accute HIV-1Lymphs (cells/mm3)",
+                        "Created with Rapha\u00ebl 2.1.0\nLab Results: Group 2: HIV-1 Negative\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nGroup 2: HIV-1 NegativeHemoglobin\nGroup 2: HIV-1 NegativeLymphs (cells/mm3)"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "Two Measure: showing both individual lines and aggregate", 3, 50, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\nLab Results: Group 1: Accute HIV-1\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n20.0\n200.0\n249318596 Lymphs(cells/mm3)\n249320107 Lymphs(cells/mm3)\n249320489 Lymphs(cells/mm3)\nGroup 1: Accute HIV-1Lymphs (cells/mm3)\n249318596 Hemoglobin\n249320107 Hemoglobin\n249320489 Hemoglobin\nGroup 1: Accute HIV-1Hemoglobin",
-                        "Created with Rapha\u00ebl 2.1.0\nLab Results: First ptid\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n20.0\n200.0\n249318596 Lymphs(cells/mm3)\nFirst ptid Lymphs(cells/mm3)\n249318596 Hemoglobin\nFirst ptid Hemoglobin",
-                        "Created with Rapha\u00ebl 2.1.0\nLab Results: Female\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n20.0\n200.0\n2000.0\n249320107 Lymphs(cells/mm3)\n249320127 Lymphs(cells/mm3)\n249320489 Lymphs(cells/mm3)\n249320897 Lymphs(cells/mm3)\nFemale Lymphs(cells/mm3)\n249320107 Hemoglobin\n249320127 Hemoglobin\n249320489 Hemoglobin\n249320897 Hemoglobin\nFemale Hemoglobin"
+                        "Created with Rapha\u00ebl 2.1.0\nLab Results: Group 1: Accute HIV-1\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n20.0\n200.0\n249318596 Hemoglobin\n249318596 Lymphs(cells/mm3)\n249320107 Hemoglobin\n249320107 Lymphs(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)\nGroup 1: Accute HIV-1Hemoglobin\nGroup 1: Accute HIV-1Lymphs (cells/mm3)",
+                        "Created with Rapha\u00ebl 2.1.0\nLab Results: First ptid\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n20.0\n200.0\n249318596 Hemoglobin\n249318596 Lymphs(cells/mm3)\nFirst ptid Hemoglobin\nFirst ptid Lymphs(cells/mm3)",
+                        "Created with Rapha\u00ebl 2.1.0\nLab Results: Female\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n20.0\n200.0\n2000.0\n249320107 Hemoglobin\n249320107 Lymphs(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)\n249320897 Hemoglobin\n249320897 Lymphs(cells/mm3)\nFemale Hemoglobin\nFemale Lymphs(cells/mm3)"
                 }
         ));
     }
