@@ -8,11 +8,6 @@
             <source schemaName="vehicle" queryName="etl_source" />
             <destination schemaName="vehicle" queryName="etl_target" />
         </transform>
-        <transform id="step2" type="org.labkey.di.pipeline.TransformTask">
-            <description>Copy to target two</description>
-            <source schemaName="vehicle" queryName="etl_source" />
-            <destination schemaName="vehicle" queryName="etl_target2" />
-        </transform>
     </transforms>
     <incrementalFilter className="RunFilterStrategy" runTableSchema="vehicle" runTable="Transfer" pkColumnName="Rowid" fkColumnName= "TransformRun" />
     <schedule>

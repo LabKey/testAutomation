@@ -90,7 +90,7 @@ public class ETLTest extends ETLBaseTest
         insertSourceRow("0", "Subject 0", null);
 
         runETL("append");
-        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "2");
+        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "1");
         assertInTarget1("Subject 0");
         //checkRun();
         verifyTransformSummary();
@@ -99,7 +99,7 @@ public class ETLTest extends ETLBaseTest
         //append into populated target
         insertSourceRow("1", "Subject 1", null);
         runETL("append");
-        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "2");
+        addTransformResult(TRANSFORM_APPEND, "1", "COMPLETE", "1");
         checkRun();
         assertInTarget1("Subject 0", "Subject 1");
 
@@ -138,7 +138,7 @@ UNDONE: need to fix the merge case
         deleteSourceRow("0", "1");
         runETL("truncate");
         // add a row for the 'truncate' etl - this should show up in our summary view
-        addTransformResult(TRANSFORM_TRUNCATE, "1", "COMPLETE", "2");
+        addTransformResult(TRANSFORM_TRUNCATE, "1", "COMPLETE", "1");
         assertInTarget1("Subject 2");
         assertNotInTarget1("Subject 0", "Subject 1");
         verifyTransformSummary();
@@ -149,7 +149,7 @@ UNDONE: need to fix the merge case
         insertSourceRow("3", "Subject 3", "42");
         insertTransferRow("42", getDate(), getDate(), "new transfer", "added by test automation", "pending");
         runETL("appendIdByRun");
-        addTransformResult(TRANSFORM_BYRUNID, "1", "COMPLETE", "2");
+        addTransformResult(TRANSFORM_BYRUNID, "1", "COMPLETE", "1");
         assertInTarget1("Subject 2", "Subject 3");
 
         // intentionally fail transform by running append again after

@@ -8,11 +8,6 @@
             <source schemaName="vehicle" queryName="etl_source" />
             <destination schemaName="vehicle" queryName="etl_target" targetOption="merge"/>
         </transform>
-        <transform id="merge2" type="org.labkey.di.pipeline.TransformTask">
-            <description>Merge to target 2</description>
-            <source schemaName="vehicle" queryName="etl_source" />
-            <destination schemaName="vehicle" queryName="etl_target2" targetOption="merge"/>
-        </transform>
     </transforms>
     <schedule>
     </schedule>
