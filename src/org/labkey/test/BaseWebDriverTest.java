@@ -7269,6 +7269,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
+    public String getTextFromElement(Locator loc)
+    {
+        return getText(loc);
+    }
+
     private String prepareSvgText(String svgText)
     {
         final boolean isFirefox = getBrowserType() == BrowserType.FIREFOX;
