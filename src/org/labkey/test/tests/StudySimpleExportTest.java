@@ -41,6 +41,8 @@ import static org.junit.Assert.*;
 @Category({DailyB.class, Study.class, FileBrowser.class})
 public class StudySimpleExportTest extends StudyBaseTestWD
 {
+    private static final String TEST_DATASET_NAME = "TestDataset";
+
     @Override
     protected BrowserType bestBrowser()
     {
@@ -95,7 +97,7 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         waitForText("Create New Dataset");
         clickAndWait(Locator.linkWithText("Create New Dataset"));
         waitForElement(Locator.name("typeName"));
-        setFormElement(Locator.name("typeName"), "TestDataset");
+        setFormElement(Locator.name("typeName"), TEST_DATASET_NAME);
         clickButton("Next");
         waitForElement(Locator.name("ff_name0"));
         _listHelper.deleteField("Dataset Fields", 0);
@@ -122,8 +124,8 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         log("QC States: go to Manage Dataset QC States page");
         goToProjectHome();
         clickFolder(getFolderName());
-        clickTab("Manage");
-        click(Locator.linkWithText("Manage Dataset QC States"));
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         waitForText("Manage Dataset QC States");
 
         log("QC States: set [none] state to be public data, i.e. opposite of default");
@@ -152,8 +154,8 @@ public class StudySimpleExportTest extends StudyBaseTestWD
 
         log("QC States: verify imported settings");
         clickFolder("QC States");
-        clickTab("Manage");
-        click(Locator.linkWithText("Manage Dataset QC States"));
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         waitForText("Manage Dataset QC States");
         assertFormElementEquals(Locator.name("blankQCStatePublic"), "true");
         assertFormElementEquals(Locator.name("labels").index(0), "First QC State");
@@ -169,6 +171,14 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         assertEquals("Second QC State", getSelectedOptionText(Locator.name("defaultAssayQCState")).trim());
         assertEquals("Third QC State", getSelectedOptionText(Locator.name("defaultDirectEntryQCState")).trim());
         assertEquals("Public data", getSelectedOptionText(Locator.name("showPrivateDataByDefault")).trim());
+
+        log("QC States: reset default visibility state");
+        clickFolder(getFolderName());
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Manage Dataset QC States"));
+        waitForText("Manage Dataset QC States");
+        selectOptionByText(Locator.name("showPrivateDataByDefault"), "All data");
+        clickButton("Save");
     }
 
     private void addNewQCState(String name, String description, boolean publicData)
@@ -209,7 +219,7 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         waitForElement(Locator.name("dateFormat"));
         assertFormElementEquals(Locator.name("dateFormat"), "MMM dd, yyyy");
         assertFormElementEquals(Locator.name("numberFormat"), "#.000");
-        clickAndWait(Locator.linkWithText("TestDataset"));
+        clickAndWait(Locator.linkWithText(TEST_DATASET_NAME));
         clickButton("View Data");
         assertTextPresentInThisOrder("999.000", "Oct 29, 2013");
     }
@@ -223,7 +233,6 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         importFolderFromZip(new File(getPipelinePath(), "LabkeyDemoStudyWithCharts.folder.zip"), false, 1);
         goToModule("FileContent");
         _fileBrowserHelper.selectFileBrowserItem("/unzip/");
-        //TODO: broken: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=19029
         doubleClick(Locator.tag("div").startsWith("folder_load_"));
         assertTextPresentInThisOrder("Loading folder type and active modules", " queries imported", "Skipping query validation.");
     }
@@ -259,6 +268,87 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         waitForElement(Locator.tagWithText("div", "This is my custom participant view"));
         clickAndWait(Locator.linkWithText("Customize View"));
         assertRadioButtonSelected(Locator.radioButtonByNameAndValue("useCustomView", "true"));
+    }
+
+    @Test
+    public void verifyVisitDescription()
+    {
+        String visitLabel = "My visit label";
+        String visitSeqNumMin = "999";
+        String visitDescription = "My visit description";
+
+        log("Visit Description: create visit with description");
+        goToProjectHome();
+        clickFolder(getFolderName());
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Manage Visits"));
+        waitAndClickAndWait(Locator.linkWithText("Create New Visit"));
+        waitForElement(Locator.name("description"));
+        setFormElement(Locator.name("label"), visitLabel);
+        setFormElement(Locator.name("sequenceNumMin"), visitSeqNumMin);
+        setFormElement(Locator.name("description"), visitDescription);
+        clickButton("Save");
+
+        log("Visit Description: edit visit description");
+        waitAndClickAndWait(Locator.xpath("//th[text()='" + visitLabel + "']/../td/a[text()='edit']"));
+        waitForElement(Locator.name("description"));
+        assertFormElementEquals(Locator.name("label"), visitLabel);
+        assertFormElementEquals(Locator.name("description"), visitDescription);
+        visitDescription += " <b>testing</b>";
+        setFormElement(Locator.name("description"), visitDescription);
+        clickButton("Save");
+
+        log("Visit Description: add dataset record using new visit");
+        clickTab("Clinical and Assay Data");
+        waitAndClickAndWait(Locator.linkWithText(TEST_DATASET_NAME));
+        clickButton("Import Data");
+        waitForElement(Locator.name("text"));
+        setFormElement(Locator.name("text"), "ParticipantId\tSequenceNum\nPTID123\t" + visitSeqNumMin);
+        clickButton("Submit");
+
+        log("Visit Description: export study folder to the pipeline as indivisual files");
+        exportStudyArchive(getFolderName(), "0");
+
+        log("Visit Description: verify xml file was created in export");
+        _fileBrowserHelper.selectFileBrowserItem("export/study/visit_map.xml");
+
+        log("Visit Description: import study into subfolder");
+        createSubfolderAndImportStudyFromPipeline("Visit Description");
+
+        log("Visit Description: verify imported settings");
+        clickFolder("Visit Description");
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Manage Visits"));
+        waitAndClickAndWait(Locator.xpath("//th[text()='" + visitLabel + "']/../td/a[text()='edit']"));
+        waitForElement(Locator.name("description"));
+        assertFormElementEquals(Locator.name("label"), visitLabel);
+        assertFormElementEquals(Locator.name("description"), visitDescription);
+
+        log("Visit Description: verify visit description in study navigator hover");
+        clickTab("Overview");
+        waitAndClickAndWait(Locator.linkWithText("Study Navigator"));
+        waitForText(visitLabel);
+        click(Locator.css(".labkey-help-pop-up"));
+        waitForElement(Locator.xpath("id('helpDivBody')").containing(visitDescription));
+
+        log("Visit Description: verify visit description in dataset visit column hover");
+        clickTab("Clinical and Assay Data");
+        waitAndClickAndWait(Locator.linkWithText(TEST_DATASET_NAME));
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn(new String[]{"ParticipantVisit", "Visit"});
+        _customizeViewsHelper.saveDefaultView();
+        mouseOver(Locator.tagWithText("td", visitLabel));
+        waitForElement(Locator.xpath("id('helpDivBody')").containing(visitDescription));
+
+        log("Visit Description: remove visit");
+        clickFolder(getFolderName());
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Manage Visits"));
+        waitAndClickAndWait(Locator.xpath("//th[text()='" + visitLabel + "']/../td/a[text()='edit']"));
+        clickButton("Delete visit");
+        waitForText("Do you want to delete Visit");
+        clickButton("Delete");
+        waitForText("Manage Visits");
     }
 
     private void exportStudyArchive(String folder, String location)
