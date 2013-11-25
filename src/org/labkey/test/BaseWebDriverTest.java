@@ -186,9 +186,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
     public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1";
 
-    //TODO: Workaround for Chrome Unicode bug: https://code.google.com/p/chromium/issues/detail?id=304131
-    //TODO: Fix expected in Chrome 31 : Use \u2603~!@$&()_+{}-=[],.#
-    public static String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "~!@$&()_+{}-=[],.#";
+    public static String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#";
 
     public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
     public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>\u2639";
