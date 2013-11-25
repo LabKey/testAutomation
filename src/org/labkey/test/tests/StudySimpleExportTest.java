@@ -275,7 +275,7 @@ public class StudySimpleExportTest extends StudyBaseTestWD
     {
         String visitLabel = "My visit label";
         String visitSeqNumMin = "999";
-        String visitDescription = "My visit description";
+        String visitDescription = "My visit description - " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + INJECT_CHARS_1 + INJECT_CHARS_2;
 
         log("Visit Description: create visit with description");
         goToProjectHome();
