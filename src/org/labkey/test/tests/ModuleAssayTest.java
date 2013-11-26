@@ -22,6 +22,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
@@ -32,7 +33,7 @@ import static org.junit.Assert.*;
  * Date: Dec 28, 2008
  */
 @Category({DailyA.class, Assays.class})
-public class ModuleAssayTest extends AbstractAssayTest
+public class ModuleAssayTest extends AbstractAssayTestWD
 {
     private final static String PROJECT_NAME = "ModuleAssayTest";
     private static final String MODULE_NAME = "miniassay";
@@ -56,12 +57,6 @@ public class ModuleAssayTest extends AbstractAssayTest
         return PROJECT_NAME;
     }
 
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
-
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteDir(getTestTempDir());
@@ -70,9 +65,6 @@ public class ModuleAssayTest extends AbstractAssayTest
 
     protected void runUITests() throws Exception
     {
-        if (!isFileUploadAvailable())
-            return;
-
         log("Starting ModuleAssayTest");
 
         checkModuleDeployed();
@@ -86,17 +78,17 @@ public class ModuleAssayTest extends AbstractAssayTest
         assertTitleEquals(ASSAY_NAME + " Batches: /" + PROJECT_NAME);
 
         // Verify file-based view associated with assay design shows up, with expected columns
-        clickMenuButton("Views", "AssayDesignBatches");
-        clickMenuButton("Views", "AssayDesignChildSchemaBatches");
+        _extHelper.clickMenuButton("Views", "AssayDesignBatches");
+        _extHelper.clickMenuButton("Views", "AssayDesignChildSchemaBatches");
         assertTextPresent("Modified", "Created By");
         assertTextNotPresent("First Batch", "Target Study", "Target Study", "Run Count");
 
         // Verify file-based view associated with assay type shows up, with expected columns
-        clickMenuButton("Views", "AssayTypeBatches");
+        _extHelper.clickMenuButton("Views", "AssayTypeBatches");
         assertTextPresent("First Batch", "Created By");
         assertTextNotPresent("Modified", "Run Count");
 
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
 
         log("Visit batch details page");
         clickAndWait(Locator.linkWithText("details"));
@@ -111,23 +103,22 @@ public class ModuleAssayTest extends AbstractAssayTest
 
         log("Visit runs page");
         // back to batches page
-        selenium.goBack();
-        waitForPageToLoad();
+        goBack();
         clickAndWait(Locator.linkWithText(batchName));
         assertTitleEquals(ASSAY_NAME + " Runs: /" + PROJECT_NAME);
 
         // Verify file-based view associated with assay design shows up, with expected columns
-        clickMenuButton("Views", "AssayDesignRuns");
-        clickMenuButton("Views", "AssayDesignChildSchemaRuns");
+        _extHelper.clickMenuButton("Views", "AssayDesignRuns");
+        _extHelper.clickMenuButton("Views", "AssayDesignChildSchemaRuns");
         assertTextPresent("Created By", "Modified");
         assertTextNotPresent("Assay Id", "MetaOverride Double Run", "Run Count", "run01.tsv", "run02.tsv");
 
         // Verify file-based view associated with assay type shows up, with expected columns
-        clickMenuButton("Views", "AssayTypeRuns");
+        _extHelper.clickMenuButton("Views", "AssayTypeRuns");
         assertTextPresent("Assay Id", "Created By", "MetaOverride Double Run", "run01.tsv", "run02.tsv");
         assertTextNotPresent("Modified", "Run Count");
 
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
 
         log("Visit run details page");
         setSort("Runs", "Name", SortDirection.ASC);
@@ -138,23 +129,22 @@ public class ModuleAssayTest extends AbstractAssayTest
 
         log("Visit results page");
         // back to runs page
-        selenium.goBack();
-        waitForPageToLoad();
+        goBack();
         clickAndWait(Locator.linkWithText("run01.tsv"));
         assertTitleEquals(ASSAY_NAME + " Results: /" + PROJECT_NAME);
 
                 // Verify file-based view associated with assay design shows up, with expected columns
-        clickMenuButton("Views", "AssayDesignData");
-        clickMenuButton("Views", "AssayDesignChildSchemaData");
+        _extHelper.clickMenuButton("Views", "AssayDesignData");
+        _extHelper.clickMenuButton("Views", "AssayDesignChildSchemaData");
         assertTextPresent("Created By", "Modified");
         assertTextNotPresent("Sample Id", "Monkey 1", "Monkey 2", "MetaOverride Double Run", "Run Count");
 
         // Verify file-based view associated with assay type shows up, with expected columns
-        clickMenuButton("Views", "AssayTypeData");
+        _extHelper.clickMenuButton("Views", "AssayTypeData");
         assertTextPresent("Sample Id", "Monkey 1", "Monkey 2", "Time Point", "Double Data", "Assay Id", "run01.tsv");
         assertTextNotPresent("MetaOverride Double Run", "Run Count", "Target Study");
 
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
 
         log("Visit result details page");
         clickAndWait(Locator.linkWithText("details"));
@@ -165,8 +155,7 @@ public class ModuleAssayTest extends AbstractAssayTest
 
 
         log("Issue 13404: Test assay query metadata is available when module is active or inactive");
-        selenium.goBack();
-        waitForPageToLoad();
+        goBack();
         clickAndWait(Locator.linkContainingText("view runs"));
         assertTextPresent("Simple Assay Button");
         pushLocation();
@@ -218,20 +207,22 @@ public class ModuleAssayTest extends AbstractAssayTest
 
     protected void createAssayDesign()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+
         log("Creating assay design");
         clickProject(PROJECT_NAME);
 
-        addWebPart("Assay List");
+        portalHelper.addWebPart("Assay List");
         clickButton("Manage Assays");
         clickButton("New Assay Design");
-        checkRadioButton("providerName", "Noblis Simple");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "Noblis Simple"));
         clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
         log("Setting up simple assay");
-        selenium.type("//input[@id='AssayDesignerName']", ASSAY_NAME);
-        selenium.type("//textarea[@id='AssayDesignerDescription']", "My Simple Assay Description");
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), ASSAY_NAME);
+        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), "My Simple Assay Description");
 
         sleep(1000);
         clickButton("Save", 0);
@@ -240,13 +231,15 @@ public class ModuleAssayTest extends AbstractAssayTest
 
     protected void createSampleSet()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+
         log("Creating sample set");
         clickProject(PROJECT_NAME);
 
-        addWebPart("Sample Sets");
+        portalHelper.addWebPart("Sample Sets");
         clickButton("Import Sample Set");
-        setFormElement("name", SAMPLE_SET);
-        setFormElement("data", SAMPLE_SET_ROWS);
+        setFormElement(Locator.name("name"), SAMPLE_SET);
+        setFormElement(Locator.name("data"), SAMPLE_SET_ROWS);
         submit();
     }
 
@@ -266,23 +259,23 @@ public class ModuleAssayTest extends AbstractAssayTest
 
         setFormElement(Locator.id("batch_comment_input"), batchName + " comments...");
 
-        clickButton("Save", 0);
+        clickButton("Save");
 
         // check name and comments stuck
-        assertEquals(batchName, getFormElement("batch_name_input"));
-        assertEquals(batchName + " comments...", getFormElement("batch_comment_input"));
+        assertEquals(batchName, getFormElement(Locator.name("batch_name_input")));
+        assertEquals(batchName + " comments...", getFormElement(Locator.name("batch_comment_input")));
 
         for (int i = 0; i < uploadedFiles.length; i++)
         {
             String uploadedFile = uploadedFiles[i];
             File file = new File(dataRoot, uploadedFile);
             assertTrue(file.exists());
-            setFormElement("upload-run-field-file", file);
+            setFormElement(Locator.name("upload-run-field-file"), file);
             int count = 5;
             do
             {
                 sleep(1500);
-                String runCountStr = selenium.getText(Locator.id("batch_runCount_div").toString());
+                String runCountStr = getText(Locator.id("batch_runCount_div"));
                 if (runCountStr != null && !runCountStr.equals("") && Integer.parseInt(runCountStr) == i+1)
                     break;
             } while (--count > 0);
