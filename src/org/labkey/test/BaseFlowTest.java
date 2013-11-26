@@ -20,7 +20,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.FileBrowserHelperWD;
-import org.labkey.test.util.FlowFileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
@@ -31,13 +30,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 abstract public class BaseFlowTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "Flow Verify Project";
     protected static final String PIPELINE_PATH = "/sampledata/flow";
-    private final FlowFileBrowserHelper flowFileBrowserHelper = new FlowFileBrowserHelper(this);
+    private final FileBrowserHelperWD flowFileBrowserHelper = new FileBrowserHelperWD(this);
 
     public String getAssociatedModuleDirectory()
     {
