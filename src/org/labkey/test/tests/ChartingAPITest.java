@@ -66,24 +66,24 @@ public class ChartingAPITest extends ClientAPITest
     protected static final String BOX_TWO = "Box Plot Two (Custom)";
     protected static final String BOX_THREE = "Box Plot Three (Custom, Broken)";
 
-    protected static final String SCATTER_ONE_TEXT = "Created with Rapha\u00ebl 2.1.0\nScatter Plot One\n0\n200\n400\n600\n800\n1000\n1200\n1400\nCD4+ (cells/mm3)\nLymphs (cells/mm3)\n800\n1000\n1200\n1400\n1600\n1800\n2000";
-    protected static final String SCATTER_TWO_TEXT = "Created with Rapha\u00ebl 2.1.0\nScatter Plot Two (Custom)\n0\n200\n400\n600\n800\n1000\n1200\n1400\nCD4\nLymphs\n800\n1000\n1200\n1400\n1600\n1800\n2000\nFemales\nMales";
-    protected static final String BOX_ONE_TEXT = "Created with Rapha\u00ebl 2.1.0\nBox Plot One\nMales\nFemales\nGender\nLymphs (cells/mm3)\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200";
-    protected static final String BOX_TWO_TEXT = "Created with Rapha\u00ebl 2.1.0\nBox Plot Two (Custom)\nMales\nFemales\nGender\nCD4\n200\n400\n600\n800\n1000\n1200\n1400\n1600\nFemales";
+    protected static final String SCATTER_ONE_TEXT = "Created with Rapha\u00ebl 2.1.0\n0\n200\n400\n600\n800\n1000\n1200\n1400\n800\n1000\n1200\n1400\n1600\n1800\n2000\nScatter Plot One\nCD4+ (cells/mm3)\nLymphs (cells/mm3)";
+    protected static final String SCATTER_TWO_TEXT = "Created with Rapha\u00ebl 2.1.0\n0\n200\n400\n600\n800\n1000\n1200\n1400\n800\n1000\n1200\n1400\n1600\n1800\n2000\nScatter Plot Two (Custom)\nCD4\nLymphs\nFemales\nMales";
+    protected static final String BOX_ONE_TEXT = "Created with Rapha\u00ebl 2.1.0\nMales\nFemales\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\nBox Plot One\nGender\nLymphs (cells/mm3)";
+    protected static final String BOX_TWO_TEXT = "Created with Rapha\u00ebl 2.1.0\nMales\nFemales\n200\n400\n600\n800\n1000\n1200\n1400\n1600\nBox Plot Two (Custom)\nGender\nCD4\nFemales";
 
     protected static final String TIME_CHART_1 = "Luminex: 249318596";
-    protected static final String TIME_CHART_1_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\nLuminex: 249318596\n10\n15\n20\n25\n30\n35\nWeeks Since Demographic Start Date\nFluorescence Intensity\n70\n700\nObserved Concentration\n50\n100\n150\n200\n250\n300\n350\n249318596 Fi IL-10\n249318596 Fi IL-2\n249318596 Fi TNF-alpha\n249318596 ObsConcIL-10\n249318596 ObsConcIL-2\n249318596 ObsConcTNF-alpha";
-    protected static final String TIME_CHART_1_TEXT_2 = "Created with Rapha\u00ebl 2.1.0\nLuminex: 249320107\n0\n5\n10\n15\n20\n25\n30\nWeeks Since Demographic Start Date\nFluorescence Intensity\n70\n700\n7000\nObserved Concentration\n50\n100\n150\n200\n250\n300\n350\n249320107 Fi IL-10\n249320107 Fi IL-2\n249320107 Fi TNF-alpha\n249320107 ObsConcIL-10\n249320107 ObsConcIL-2\n249320107 ObsConcTNF-alpha";
-    protected static final String TIME_CHART_1_TEXT_3 = "Created with Rapha\u00ebl 2.1.0\nLuminex: 249320127\n0\n5\n10\n15\n20\n25\n30\nWeeks Since Demographic Start Date\nFluorescence Intensity\n80\n90\n100\n200\n300\nObserved Concentration\n50\n100\n150\n200\n250\n300\n350\n249320127 Fi IL-10\n249320127 Fi IL-2\n249320127 Fi TNF-alpha\n249320127 ObsConcIL-10\n249320127 ObsConcIL-2\n249320127 ObsConcTNF-alpha";
+    protected static final String TIME_CHART_1_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\n10\n15\n20\n25\n30\n35\n70\n700\n50\n100\n150\n200\n250\n300\n350\nLuminex: 249318596\nWeeks Since Demographic Start Date\nFluorescence Intensity\nObserved Concentration\n249318596 Fi IL-10\n249318596 Fi IL-2\n249318596 Fi TNF-alpha\n249318596 ObsConc IL-10\n249318596 ObsConc IL-2\n249318596 ObsConcTNF-alpha";
+    protected static final String TIME_CHART_1_TEXT_2 = "Created with Rapha\u00ebl 2.1.0\n0\n5\n10\n15\n20\n25\n30\n70\n700\n7000\n50\n100\n150\n200\n250\n300\n350\nLuminex: 249320107\nWeeks Since Demographic Start Date\nFluorescence Intensity\nObserved Concentration\n249320107 Fi IL-10\n249320107 Fi IL-2\n249320107 Fi TNF-alpha\n249320107 ObsConc IL-10\n249320107 ObsConc IL-2\n249320107 ObsConcTNF-alpha";
+    protected static final String TIME_CHART_1_TEXT_3 = "Created with Rapha\u00ebl 2.1.0\n0\n5\n10\n15\n20\n25\n30\n80\n90\n100\n200\n300\n50\n100\n150\n200\n250\n300\n350\nLuminex: 249320127\nWeeks Since Demographic Start Date\nFluorescence Intensity\nObserved Concentration\n249320127 Fi IL-10\n249320127 Fi IL-2\n249320127 Fi TNF-alpha\n249320127 ObsConc IL-10\n249320127 ObsConc IL-2\n249320127 ObsConcTNF-alpha";
     protected static final String TIME_CHART_2 = "Luminex Two";
-    protected static final String TIME_CHART_2_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\nLuminex Two\n1\n2\n3\n4\n5\nVisits\nFI\n0.2\n0.4\n0.6\n0.8\n1.0\n1.2\n1.4\n1.6\n1.8\n2.0\n249318596\n249320127";
+    protected static final String TIME_CHART_2_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\n1\n2\n3\n4\n5\n0.2\n0.4\n0.6\n0.8\n1.0\n1.2\n1.4\n1.6\n1.8\n2.0\nLuminex Two\nVisits\nFI\n249318596\n249320127";
     protected static final String TIME_CHART_3 = "Male";
-    protected static final String TIME_CHART_3_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\nMale\n1\n2\n3\n4\n5\nVisit\nObs Conc\n0\n5\n10\n15\n20\n25\n30\n35\n40\n45\n50\nMale";
-    protected static final String TIME_CHART_3_TEXT_2 = "Created with Rapha\u00ebl 2.1.0\nFemale\n1\n2\n3\n4\n5\nVisit\nObs Conc\n0\n50\n100\n150\n200\n250\n300\nFemale";
+    protected static final String TIME_CHART_3_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\n1\n2\n3\n4\n5\n0\n5\n10\n15\n20\n25\n30\n35\n40\n45\n50\nMale\nVisit\nObs Conc\nMale";
+    protected static final String TIME_CHART_3_TEXT_2 = "Created with Rapha\u00ebl 2.1.0\n1\n2\n3\n4\n5\n0\n50\n100\n150\n200\n250\n300\nFemale\nVisit\nObs Conc\nFemale";
     protected static final String TIME_CHART_4 = "Luminex Four";
-    protected static final String TIME_CHART_4_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\nLuminex Four\nDays Since Start Date\nFi\n200\n400\n600\n800\n1000\n1200\n1400";
+    protected static final String TIME_CHART_4_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\n200\n400\n600\n800\n1000\n1200\n1400\nLuminex Four\nDays Since Start Date\nFi\n249318596";
     protected static final String TIME_CHART_5 = "Luminex Five";
-    protected static final String TIME_CHART_5_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\nLuminex Five\n0\n50\n100\n150\n200\nDays Since Start Date\nFi\n1000\n2000\n3000\n4000\n5000\n6000\n7000\n249318596 IL-10\n249318596 IL-2\n249318596 TNF-alpha\n249320107 IL-10\n249320107 IL-2\n249320107 TNF-alpha\n249320127 IL-10\n249320127 IL-2\n249320127 TNF-alpha";
+    protected static final String TIME_CHART_5_TEXT_1 = "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n1000\n2000\n3000\n4000\n5000\n6000\n7000\nLuminex Five\nDays Since Start Date\nFi\n249318596 IL-10\n249318596 IL-2\n249318596 IL-6\n249318596 TNF-alpha\n249320107 IL-10\n249320107 IL-2\n249320107 IL-6\n249320107 TNF-alpha\n249320127 IL-10\n249320127 IL-2\n249320127 IL-6\n249320127 TNF-alpha";
 
     @Override
     public BrowserType bestBrowser()

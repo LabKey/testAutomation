@@ -46,6 +46,24 @@ public class TimeChartDateBasedTest extends TimeChartTest
     @LogMethod protected void doCreateSteps()
     {
         configureStudy();
+        createUser(USER1, null);
+        createUser(USER2, null);
+
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        enterPermissionsUI();
+        setUserPermissions(USER1, "Reader");
+        setUserPermissions(USER2, "Editor");
+        _securityHelper.setSiteGroupPermissions("Guests", "Reader");
+        clickButton("Save and Finish");
+
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Views");
+        portalHelper.addWebPart("Datasets");
+        portalHelper.addWebPart("Specimens");
+
         windowMaximize();
     }
 
@@ -81,9 +99,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
         filteredTimeChartRegressionTest();
     }
 
-    private static final String SVG_AXIS_X =              "Created with Rapha\u00ebl 2.1.0\nHIV Test Results, Lab Results: 249320107\n0\n50\n100\n150\n200\nDays Since Start Date\nViral Load Quantified (copies/ml)\n50000.0\n100000.0\n150000.0\n200000.0\n250000.0\n300000.0\n350000.0\n400000.0\n450000.0\n500000.0\n550000.0\n600000.0\n650000.0\nCD4+ (cells/mm3)\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
-    private static final String SVG_AXIS_X_LEFT =         "Created with Rapha\u00ebl 2.1.0\nHIV Test Results, Lab Results: 249320107\n0\n50\n100\n150\n200\nDays Since Start Date\nViral Load Quantified (copies/ml)\n200000.0\n210000.0\n220000.0\n230000.0\n240000.0\n250000.0\n260000.0\n270000.0\nCD4+ (cells/mm3)\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
-    private static final String SVG_AXIS_X_LEFT_RIGHT =   "Created with Rapha\u00ebl 2.1.0\nHIV Test Results, Lab Results: 249320107\n0\n50\n100\n150\n200\nDays Since Start Date\nViral Load Quantified (copies/ml)\n200000.0\n210000.0\n220000.0\n230000.0\n240000.0\n250000.0\n260000.0\n270000.0\nCD4+ (cells/mm3)\n250.0\n300.0\n350.0\n400.0\n450.0\n500.0\n550.0\n600.0\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
+    private static final String SVG_AXIS_X =              "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n50000.0\n100000.0\n150000.0\n200000.0\n250000.0\n300000.0\n350000.0\n400000.0\n450000.0\n500000.0\n550000.0\n600000.0\n650000.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\nHIV Test Results, Lab Results: 249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
+    private static final String SVG_AXIS_X_LEFT =         "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n200000.0\n210000.0\n220000.0\n230000.0\n240000.0\n250000.0\n260000.0\n270000.0\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\nHIV Test Results, Lab Results: 249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
+    private static final String SVG_AXIS_X_LEFT_RIGHT =   "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n200000.0\n210000.0\n220000.0\n230000.0\n240000.0\n250000.0\n260000.0\n270000.0\n250.0\n300.0\n350.0\n400.0\n450.0\n500.0\n550.0\n600.0\nHIV Test Results, Lab Results: 249320107\nDays Since Start Date\nViral Load Quantified (copies/ml)\nCD4+ (cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Viral LoadQuantified (copies/ml)";
     private static final String AXIS_TIME_CHART = "Axis Time Chart";
     @LogMethod private void axisRangeTest()
     {
@@ -134,12 +152,6 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
     @LogMethod public void createChartTest()
     {
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addWebPart("Views");
-        portalHelper.addWebPart("Datasets");
-        portalHelper.addWebPart("Specimens");
         goToManageViews();
         clickAddReport("Time Chart");
         clickChooseInitialMeasure();
@@ -297,13 +309,6 @@ public class TimeChartDateBasedTest extends TimeChartTest
     @LogMethod public void timeChartPermissionsTest()
     {
         log("Check Time Chart Permissions");
-        createUser(USER1, null);
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
-        enterPermissionsUI();
-        setUserPermissions(USER1, "Reader");
-        _securityHelper.setSiteGroupPermissions("Guests", "Reader");
-        clickButton("Save and Finish");
         impersonate(USER1);
         popLocation(); // Saved chart
         waitForText(CHART_TITLE);
@@ -352,7 +357,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
             assertTrue("Default point click function not inserted in to editor", fn.startsWith("function (data, columnMap, measureInfo, clickEvent) {"));
         // apply the default point click function
         applyChanges();
-        click(Locator.css("svg a circle"));
+        // TODO: Is this actually the selector we want?
+        click(Locator.css("svg a path"));
         _extHelper.waitForExtDialog("Data Point Information");
         waitAndClick(Locator.ext4Button("OK"));
         // open developer panel and test JS function validation
@@ -382,15 +388,11 @@ public class TimeChartDateBasedTest extends TimeChartTest
         clickReportDetailsLink(REPORT_NAME_1);
         click(Locator.linkContainingText("Edit Report"));
         waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
-        clickAndWait(Locator.css("svg a circle"), WAIT_FOR_JAVASCRIPT);
+        // TODO: Is this actually the selector we want?
+        clickAndWait(Locator.css("svg a path"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Participant - 249318596");
 
         // verify that only developers can see the button to add point click function
-        createUser(USER2, null);
-        clickProject(getProjectName());
-        clickFolder(getFolderName());
-        enterPermissionsUI();
-        setUserPermissions(USER2, "Editor");
         // USER2 is not yet a developer, so shouldn't have permissions to this feature
         impersonate(USER2);
         popLocation();
@@ -452,12 +454,12 @@ public class TimeChartDateBasedTest extends TimeChartTest
     }
 
     // This SVG text might change (due to shared axis ranges) if different groups are selected
-    private static final String SVG_PARTICIPANTGROUP_SOME = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Some Participants\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n249318596 CD4+(cells/mm3)\n249318596 Lymphs(cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Lymphs(cells/mm3)";
-    private static final String SVG_PARTICIPANTGROUP_SOME_MODIFIED = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Some Participants\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n249318596 CD4+(cells/mm3)\n249318596 Lymphs(cells/mm3)";
-    private static final String SVG_PARTICIPANTGROUP_OTHER = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Other Participants\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n249320127 CD4+(cells/mm3)\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Lymphs(cells/mm3)";
-    private static final String SVG_PARTICIPANTGROUP_YET_MORE = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Yet More Participants\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n249320489 CD4+(cells/mm3)\n249320489 Lymphs(cells/mm3)\n249320897 CD4+(cells/mm3)\n249320897 Lymphs(cells/mm3)\n249325717 CD4+(cells/mm3)\n249325717 Lymphs(cells/mm3)";
-    private static final String SVG_PARTICIPANTGROUP_1 = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Group 1: Accute HIV-1\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n249318596 CD4+(cells/mm3)\n249318596 Lymphs(cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Lymphs(cells/mm3)";
-    private static final String SVG_PARTICIPANTGROUP_2 = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Group 2: HIV-1 Negative\n0\n50\n100\n150\n200\n250\n300\n350\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n249320127 CD4+(cells/mm3)\n249320127 Lymphs(cells/mm3)\n249320897 CD4+(cells/mm3)\n249320897 Lymphs(cells/mm3)\n249325717 CD4+(cells/mm3)\n249325717 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_SOME = "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title: Some Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249318596 CD4+(cells/mm3)\n249318596 Lymphs(cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_SOME_MODIFIED = "Created with Rapha\u00ebl 2.1.0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\nNew Chart Title: Some Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249318596 CD4+(cells/mm3)\n249318596 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_OTHER = "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title: Other Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249320127 CD4+(cells/mm3)\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_YET_MORE = "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title: Yet More Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Lymphs(cells/mm3)\n249320897 CD4+(cells/mm3)\n249320897 Lymphs(cells/mm3)\n249325717 CD4+(cells/mm3)\n249325717 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_1 = "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title: Group 1: Accute HIV-1\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249318596 CD4+(cells/mm3)\n249318596 Lymphs(cells/mm3)\n249320107 CD4+(cells/mm3)\n249320107 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Lymphs(cells/mm3)";
+    private static final String SVG_PARTICIPANTGROUP_2 = "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nNew Chart Title: Group 2: HIV-1 Negative\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n249320127 CD4+(cells/mm3)\n249320127 Lymphs(cells/mm3)\n249320897 CD4+(cells/mm3)\n249320897 Lymphs(cells/mm3)\n249325717 CD4+(cells/mm3)\n249325717 Lymphs(cells/mm3)";
 
     @LogMethod public void participantGroupTimeChartTest()
     {
@@ -565,8 +567,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         stopImpersonating();
     }
 
-    private static final String SVG_MULTI_MANUAL_1 = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Other Participants\n0\n50\n100\n150\n200\n250\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nHemogoblins\n12.5\n13\n13.5\n14\n14.5\n15\n15.5\n16\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
-    private static final String SVG_MULTI_MANUAL_2 = "Created with Rapha\u00ebl 2.1.0\nNew Chart Title: Other Participants\n0\n50\n100\n150\n200\n250\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nHemogoblins\n20\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
+    private static final String SVG_MULTI_MANUAL_1 = "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n12.5\n13\n13.5\n14\n14.5\n15\n15.5\n16\nNew Chart Title: Other Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\nHemogoblins\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
+    private static final String SVG_MULTI_MANUAL_2 = "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\n20\nNew Chart Title: Other Participants\nDays Since Start Date\nCD4+ (cells/mm3), Lymphs (cells/mm3)\nHemogoblins\n249320127 CD4+(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 CD4+(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)";
     @LogMethod public void multiAxisTimeChartTest()
     {
         clickProject(getProjectName());
