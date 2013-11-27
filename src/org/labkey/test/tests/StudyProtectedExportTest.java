@@ -119,12 +119,12 @@ public class StudyProtectedExportTest extends StudyExportTest
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
         _fileBrowserHelper.selectFileBrowserItem("export/");
-        Locator.XPathLocator checkbox = Locator.xpath("//div/span[contains(text(), 'My Study_')]");
-        waitForElement(checkbox);
-        int exportCount = getXpathCount(checkbox);
-        checkbox = checkbox.index(exportCount - 1); // get most recent export
-        waitForElement(checkbox);
-        clickAt(checkbox, "1,1");
+        Locator.XPathLocator fileRow = Locator.tag("tr").withClass("x4-grid-data-row").withAttributeContaining("data-recordid", "My Study_");
+        waitForElement(fileRow);
+        int exportCount = getXpathCount(fileRow);
+        fileRow = fileRow.index(exportCount - 1); // get most recent export
+        waitForElement(fileRow);
+        click(fileRow);
 
         _fileBrowserHelper.selectImportDataAction("Import Study");
         waitForPipelineJobsToComplete(++pipelineJobCount, "study import", false);

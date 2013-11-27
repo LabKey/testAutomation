@@ -105,9 +105,9 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Import Study Using Pipeline");
         _fileBrowserHelper.selectFileBrowserItem("export/");
         // select the first exported zip archive file by row
-        Locator.XPathLocator gridRow = Locator.xpath("//div/span[contains(text(), 'My Study_')]");
+        Locator.XPathLocator gridRow = Locator.tag("tr").withClass("x4-grid-data-row").withAttributeContaining("data-recordid", "My Study_");
         waitForElement(gridRow);
-        clickAt(gridRow, "1,1");
+        click(gridRow);
         _fileBrowserHelper.selectImportDataAction("Import Study");
 
         // wait for study & specimen load
