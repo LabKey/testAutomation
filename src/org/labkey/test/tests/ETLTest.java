@@ -77,6 +77,11 @@ public class ETLTest extends ETLBaseTest
         return PROJECT_NAME;
     }
 
+    protected void doCleanup() throws Exception
+    {
+        super.doCleanup(true);
+    }
+
     @Override
     protected void doTestSteps() throws Exception
     {
@@ -159,7 +164,7 @@ UNDONE: need to fix the merge case
         checkRun(true /*expectError*/);
         incrementExpectedErrorCount(true);
         verifyTransformSummary();
-        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC);
+        verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC, "ERROR");
 
         //verifyStoreProcTransform();
 

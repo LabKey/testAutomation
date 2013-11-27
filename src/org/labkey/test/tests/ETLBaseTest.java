@@ -109,10 +109,20 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
 
     protected void waitForTransformPage(String linkText, String title, String status)
     {
-        click(Locator.linkContainingText(linkText));
+        log("clicking link with text " + linkText + " and status " + status);
+        if(isElementPresent(Locator.xpath("//a[.='" + status + "']/../..//a[.='" + linkText + "']")))
+        {
+            click(Locator.xpath("//a[.='" + status + "']/../..//a[.='" + linkText + "']"));
+        }
+        else
+        {
+            click(Locator.xpath("//a[.='" + status + "']/../..//a/nobr[.='" + linkText + "']"));
+        }
         // verify title
+        log("waiting for title text " + title);
         waitForText(title);
         // wait for data in data region to appear
+        log("waiting for status text " + status);
         waitForText(status);
     }
 
@@ -429,7 +439,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
     @Override
     public BrowserType bestBrowser()
     {
-        return BrowserType.FIREFOX;
+        return BrowserType.CHROME;
     }
 
     class BaseTransformVerifier
@@ -606,7 +616,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         protected void verifyResults()
         {
             DataRegionTable drt = new DataRegionTable(getDataRegionName(), _test, false /*selectors*/);
-            assertTrue(_columns.length == drt.getColumnCount());
+            assertTrue("column length mismatch for data region " + getDataRegionName() ,_columns.length == drt.getColumnCount());
             assertTrue(1 == drt.getDataRowCount());
             String actual = drt.getDataAsText(0, "Transform Id");
             assertTrue(_transformId.equalsIgnoreCase(actual));
