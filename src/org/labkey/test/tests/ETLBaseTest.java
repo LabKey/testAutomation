@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -278,6 +279,31 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         goToProjectHome();
     }
 
+    protected void runETL_NoNav(String transformId, boolean hasWork, boolean hasCheckerError)
+    {
+        _runETL_NoNav(transformId, hasWork, hasCheckerError);
+    }
+
+    protected void _runETL_NoNav(String transformId, boolean hasWork, boolean hasCheckerError)
+    {
+        log("running " + transformId + " job");
+        goToModule("DataIntegration");
+
+        if (hasWork && !hasCheckerError)
+        {
+            // pipeline job will run
+            prepForPageLoad();
+            waitAndClick(Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td/a"));
+            newWaitForPageToLoad();
+        }
+        else
+        {
+            // pipeline job does not run
+            waitAndClick(Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td/a"));
+            _ext4Helper.clickWindowButton(hasCheckerError ? "Error" : "Success", "OK", 0, 0);
+        }
+    }
+
     protected void runETL_API(String projectName, String transformId, boolean hasWork, boolean hasCheckerError)
     {
         DataIntegrationHelper diHelper = new DataIntegrationHelper("/" + projectName);
@@ -415,6 +441,13 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/dataintegration";
+    }
+
+    protected void verifyErrorLog(String transformName, List<String> errors)
+    {
+        click(Locator.xpath("//a[.='" + transformName + "']//..//..//a[.='ERROR']"));
+
+        assertTextPresent(errors);
     }
 
     protected void copyETLfiles(String sourcePath, String destinationPath)

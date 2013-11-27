@@ -106,6 +106,10 @@ modules/scriptpad/src/org/labkey/scriptpad/scriptpadController.java -text
 modules/scriptpad/src/org/labkey/scriptpad/scriptpadModule.java -text
 modules/scriptpad/src/org/labkey/scriptpad/view/scriptpad.jsp -text
 modules/simpletest/config/module.xml -text
+modules/simpletest/etls/SimpleETLCausesKeyConstraintViolation.xml -text svneol=unset#application/xml
+modules/simpletest/etls/SimpleETLCheckerErrorTimestampColumnNonexistent.xml -text svneol=unset#application/xml
+modules/simpletest/etls/SimpleETLbadConfigXML.xml -text svneol=unset#application/xml
+modules/simpletest/etls/SimpleETLqueryDoesNotExist.xml -text svneol=unset#application/xml
 modules/simpletest/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/etls/appendIdByRun.xml -text
 modules/simpletest/etls/appendModifiedSinceSP.xml -text
@@ -326,6 +330,7 @@ src/org/labkey/test/tests/ClientAPITest.java -text
 src/org/labkey/test/tests/CohortTest.java -text
 src/org/labkey/test/tests/ContainerContextTest.java -text
 src/org/labkey/test/tests/CreateVialsTest.java -text
+src/org/labkey/test/tests/CustomizeEmailTemplateTest.java -text
 src/org/labkey/test/tests/CustomizeViewTest.java -text
 src/org/labkey/test/tests/DataRegionTest.java -text
 src/org/labkey/test/tests/DataReportsTest.java -text
@@ -335,6 +340,7 @@ src/org/labkey/test/tests/DatasetPublishTest.java -text
 src/org/labkey/test/tests/DrugSensitivityAssayTest.java -text
 src/org/labkey/test/tests/ELISPOT_AssayTest.java -text
 src/org/labkey/test/tests/ETLBaseTest.java -text
+src/org/labkey/test/tests/ETLErrorTest.java -text
 src/org/labkey/test/tests/ETLTest.java -text
 src/org/labkey/test/tests/ElisaAssayTest.java -text
 src/org/labkey/test/tests/ElispotAssayTest.java -text
