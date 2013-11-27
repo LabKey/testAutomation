@@ -240,7 +240,7 @@ public class ModuleAssayTest extends AbstractAssayTestWD
         clickButton("Import Sample Set");
         setFormElement(Locator.name("name"), SAMPLE_SET);
         setFormElement(Locator.name("data"), SAMPLE_SET_ROWS);
-        submit();
+        clickButton("Submit");
     }
 
     protected void uploadBatch(String batchName, String... uploadedFiles)
@@ -255,22 +255,25 @@ public class ModuleAssayTest extends AbstractAssayTestWD
         clickButton("Import Data");
         assertTitleEquals("Data Import: /" + PROJECT_NAME);
 
-        setFormElement(Locator.id("batch_name_input"), batchName);
+        Locator.IdLocator batch_name_input = Locator.id("batch_name_input");
+        setFormElement(batch_name_input, batchName);
 
-        setFormElement(Locator.id("batch_comment_input"), batchName + " comments...");
+        Locator.IdLocator batch_comment_input = Locator.id("batch_comment_input");
+        setFormElement(batch_comment_input, batchName + " comments...");
 
-        clickButton("Save");
+        clickButton("Save", 0);
+        waitForText("My Simple Assay Description");
 
         // check name and comments stuck
-        assertEquals(batchName, getFormElement(Locator.name("batch_name_input")));
-        assertEquals(batchName + " comments...", getFormElement(Locator.name("batch_comment_input")));
+        assertEquals(batchName, getFormElement(batch_name_input));
+        assertEquals(batchName + " comments...", getFormElement(batch_comment_input));
 
         for (int i = 0; i < uploadedFiles.length; i++)
         {
             String uploadedFile = uploadedFiles[i];
             File file = new File(dataRoot, uploadedFile);
             assertTrue(file.exists());
-            setFormElement(Locator.name("upload-run-field-file"), file);
+            setFormElement(Locator.id("upload-run-field-file"), file);
             int count = 5;
             do
             {
