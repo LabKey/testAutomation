@@ -4,6 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.PortalHelper;
 
@@ -15,13 +16,14 @@ import java.util.List;
  * User: RyanS
  * Date: 11/26/13
  */
-@Category(InDevelopment.class)
+@Category(DailyA.class)
 public class ETLErrorTest extends ETLBaseTest
 {
     private static final String _projectName = "ETLErrorTestProject";
     private static final String TRANSFORM_REMOTE_STUDY = "/sampledata/dataintegration/ETLTestStudy.zip";
     private static final String TRANSFORM_KEYCONSTRAINT_ERROR = "{simpletest}/SimpleETLCausesKeyConstraintViolation";
     private static final String TRANSFORM_QUERY_ERROR = "{simpletest}/SimpleETLqueryDoesNotExist";
+    private static final String TRANSFORM_NOCOL_ERROR = "{simpletest}/SimpleETLCheckerErrorTimestampColumnNonexistent";
     private static final String TRANSFORM_BAD_XML = "{simpletest/SimpleETLbadConfigXML";
 
     @Nullable
@@ -51,7 +53,9 @@ public class ETLErrorTest extends ETLBaseTest
         errors.clear();
         errors.add("Could not find table: vehicle.etl_source_cheeseburger");
         runETLandCheckErrors(TRANSFORM_QUERY_ERROR, false, true, errors);
-
+        _runETL_NoNav(TRANSFORM_NOCOL_ERROR, false, true);
+        //TODO: update the expected error text once issue 19131 is addressed
+        assertTextPresent("Data truncation");
     }
 
     protected void runETLandCheckErrors(String ETLName, boolean hasWork, boolean hasCheckerError, List<String> errors)

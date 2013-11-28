@@ -131,3 +131,13 @@ END
 
 GO
 
+ALTER TABLE vehicle.[Transfer] Add [container] [dbo].[ENTITYID] NULL
+GO
+
+ALTER TABLE [vehicle].[Transfer]  WITH CHECK ADD  CONSTRAINT [FK_etltransfer_container] FOREIGN KEY([container])
+REFERENCES [core].[Containers] ([EntityId])
+GO
+
+ALTER TABLE [vehicle].[Transfer] CHECK CONSTRAINT [FK_etltransfer_container]
+GO
+
