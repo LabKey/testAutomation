@@ -339,7 +339,6 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
     public void goToManageDatasets()
     {
         goToManageStudy();
-        waitForText("Manage Datasets");
-        click(Locator.xpath("//a[text()='Manage Datasets']"));
+        waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
     }
 }
