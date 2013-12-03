@@ -16,16 +16,14 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
-import org.jetbrains.annotations.Nullable;
-import org.junit.experimental.categories.Category;
+import org.apache.commons.lang3.StringUtils;
+import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
-import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RemoteConnectionHelperWD;
 
 import java.io.File;
@@ -46,8 +44,11 @@ import static org.junit.Assert.fail;
  */
 public abstract class ETLBaseTest extends BaseWebDriverTest
 {
+    protected static String PROJECT_NAME = "ETLTestProject";
     protected static int _jobsComplete;
     protected static int _expectedErrors;
+    protected DataIntegrationHelper _diHelper = new DataIntegrationHelper("/" + PROJECT_NAME);
+
 
     //Internal counters
 
@@ -70,14 +71,21 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
      *  at least two occurances anyway.
      *
      * @param dbError true when the expected error is a SQLException from the database
+     * @param twoErrors true when a given error generates two occurances of the string "ERROR" in the log.
      */
-    protected void incrementExpectedErrorCount(boolean dbError)
+    protected void incrementExpectedErrorCount(boolean dbError, boolean twoErrors)
     {
         _expectedErrors++;
         if (dbError)
             _expectedErrors = getExpectedErrorCount(_expectedErrors);
-        // At the moment, the ETL log files have two occurances of the string "ERROR" for every error that occurs.
-        _expectedErrors++;
+        // At the moment, the ETL log files usually have two occurances of the string "ERROR" for every error that occurs.
+        if (twoErrors)
+            _expectedErrors++;
+    }
+
+    protected void incrementExpectedErrorCount(boolean dbError)
+    {
+        incrementExpectedErrorCount(dbError, true);
     }
 
     // looks like postgres inserts an "ERROR" word in their error string for the duplicate key
@@ -304,15 +312,24 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         }
     }
 
-    protected void runETL_API(String projectName, String transformId, boolean hasWork, boolean hasCheckerError)
+    protected RunTransformResponse runETL_API(String projectName, String transformId, boolean hasWork, boolean hasCheckerError)
     {
-        DataIntegrationHelper diHelper = new DataIntegrationHelper("/" + projectName);
-        diHelper.runTransformAndWait("{simpletest}/" + transformId, 30000);
+        log("running " + transformId + " job");
+        if (!StringUtils.startsWith(transformId, "{"))
+        {
+            transformId = "{simpletest}/" + transformId;
+        }
+        return _diHelper.runTransformAndWait(transformId, 30000);
     }
 
-    protected void runETL_API(String projectName, String transformId)
+    protected RunTransformResponse runETL_API(String projectName, String transformId)
     {
-        runETL_API(projectName, transformId, true, false);
+        return runETL_API(projectName, transformId, true, false);
+    }
+
+    protected RunTransformResponse runETL_API(String transformId)
+    {
+        return runETL_API(PROJECT_NAME, transformId);
     }
 
     protected void deleteSourceRow(String... ids)
@@ -395,6 +412,13 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
     protected void assertInLog(String... targets)
     {
         assertQueryWebPart("TransformRun", "TransformRun", true, targets);
+    }
+
+    protected void assertInEtlLogFile(String jobId, String logString)
+    {
+
+        final String etlLogFile = _diHelper.getEtlLogFile(jobId);
+        assertTrue("Log file did not contain: " + logString, StringUtils.containsIgnoreCase(etlLogFile, logString));
     }
 
     protected void checkRun()

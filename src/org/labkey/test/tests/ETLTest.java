@@ -15,28 +15,13 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.DataIntegrationHelper;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RemoteConnectionHelperWD;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * User: Rylan
@@ -63,13 +48,8 @@ public class ETLTest extends ETLBaseTest
     private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";
     private static final String TRANSFORM_REMOTE_STUDY = "/sampledata/dataintegration/ETLTestStudy.zip";
     private static final String TRANSFORM_BYRUNID_DESC = "ByRunId";
-    private static final String TRANSFORM_SP_MODIFIED = "{simpletest}/appendModifiedSinceSP";
-    private static final String TRANSFORM_SP_MODIFIED_DESC = "";
-    private static final String TRANSFORM_SP_RUNBASED = "{simpletest}/appendRunBasedSP";
-    private static final String TRANSFORM_SP_RUNBASED_DESC = "";
     private static final String TransformXMLsource = System.getenv("LABKEY_ROOT") + "\\build\\deploy\\modules\\simpletest\\etls";
     private static final String TransformXMLdest =  System.getenv("LABKEY_ROOT") + "\\build\\deploy\\modules\\ETLtest\\etls";
-    private static final String PROJECT_NAME = "ETLTestProject";
 
     @Override
     protected String getProjectName()
@@ -165,8 +145,6 @@ UNDONE: need to fix the merge case
         incrementExpectedErrorCount(true);
         verifyTransformSummary();
         verifyTransformHistory(TRANSFORM_APPEND, TRANSFORM_APPEND_DESC, "ERROR");
-
-        //verifyStoreProcTransform();
 
         //error logging test, casting error, note that this causes an error in the checker
         // before a pipeline job is even scheduled
@@ -274,29 +252,4 @@ UNDONE: need to fix the merge case
         verifyTransformHistory(TRANSFORM_REMOTE, TRANSFORM_REMOTE_DESC);
     }
 
-    protected void verifyStoreProcTransform()
-    {
-        //stored proc based etl supported only on ms sql
-        if(WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
-        {
-            //stored procedure based etl, using modified since into populated target
-            insertSourceRow("4", "Subject 4", "13");
-            //wait(15000);
-            runETL(TRANSFORM_SP_MODIFIED);
-            addTransformResult(TRANSFORM_SP_MODIFIED, "1", "COMPLETE", "1");
-            assertInTarget1("Subject 4");
-
-            //stored prodedure based etl, using run based.  should not be inserted to target since run id doesn't match
-            insertSourceRow("5", "Subject 5", "43");
-            runETL(TRANSFORM_SP_RUNBASED);
-            addTransformResult(TRANSFORM_SP_RUNBASED, "1", "COMPLETE", null);
-            assertNotInTarget1("Subject 5");
-
-            //create transfer row so source row run id 43 is inserted
-            insertTransferRow("43", getDate(), getDate(), "another transfer", "added by test automation", "pending");
-            runETL(TRANSFORM_SP_RUNBASED);
-            addTransformResult(TRANSFORM_SP_RUNBASED, "1", "COMPLETE", "1");
-            assertInTarget1("Subject 5");
-        }
-    }
 }

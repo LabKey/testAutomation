@@ -15,17 +15,21 @@
  */
 package org.labkey.test.util;
 
+import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.di.ResetTransformStateCommand;
 import org.labkey.remoteapi.di.ResetTransformStateResponse;
 import org.labkey.remoteapi.di.RunTransformCommand;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationCommand;
 import org.labkey.remoteapi.di.UpdateTransformConfigurationResponse;
-import org.labkey.remoteapi.query.*;
-import org.labkey.remoteapi.Connection;
-import org.labkey.remoteapi.Command;
-import org.labkey.remoteapi.CommandResponse;
+import org.labkey.remoteapi.query.ExecuteSqlCommand;
+import org.labkey.remoteapi.query.InsertRowsCommand;
+import org.labkey.remoteapi.query.SaveRowsResponse;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 /**
@@ -104,13 +108,15 @@ public class DataIntegrationHelper
     {
         RunTransformResponse response = null;
         response = runTransform(transformId);
+        if (response == null) // an error occured starting the job
+            return null;
         String jobId = response.getJobId();
         String status = response.getStatus();
-        if (!status.equalsIgnoreCase("COMPLETE"))
+        if (status.equalsIgnoreCase("Queued"))
             for(int i=0; i<msTimeout; i+=1000)
             {
                 status = getTransformStatus(jobId);
-                if(status.equalsIgnoreCase("COMPLETE"))
+                if(status.equalsIgnoreCase("COMPLETE") || status.equalsIgnoreCase("ERROR"))
                     return response;
                 else
                     sleep(500);
@@ -118,9 +124,18 @@ public class DataIntegrationHelper
         return response;
     }
 
-    private String getTransformStatus(String transformId)
+    public String getTransformStatus(String jobId)
     {
-        String query = "SELECT Status FROM dataintegration.TransformRun WHERE JobId = '" + transformId + "'";
+        // TODO: Proper handling of null jobId
+        String query = "SELECT Status FROM dataintegration.TransformRun WHERE JobId = '" + jobId + "'";
+        SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
+        return response.getRows().get(0).get("Status").toString();
+    }
+
+    public String getTransformStatusByTransformId(String transformId)
+    {
+        // TODO: Proper handling of null transformId
+        String query = "SELECT Status FROM dataintegration.TransformRun WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
         SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
         return response.getRows().get(0).get("Status").toString();
     }
@@ -174,6 +189,25 @@ public class DataIntegrationHelper
         }
         catch (InterruptedException ignore)
         {
+        }
+    }
+
+    public String getEtlLogFile(String jobId)
+    {
+        String query = "SELECT FilePath FROM pipeline.job WHERE RowId = '" + jobId + "'";
+        SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);
+        String filePath = response.getRows().get(0).get("FilePath").toString();
+        if (filePath == null)
+            return null;
+
+        try
+        {
+            return new String(Files.readAllBytes(Paths.get(filePath)));
+        }
+        catch (IOException e)
+        {
+            TestLogger.log("Retrieving job log file failed: " + e.getMessage());
+            return null;
         }
     }
 }

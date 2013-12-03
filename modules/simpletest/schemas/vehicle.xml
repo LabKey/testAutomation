@@ -16,292 +16,293 @@
  * limitations under the License.
 
  -->
-<ns:tables xmlns:ns="http://labkey.org/data/xml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<tables xmlns="http://labkey.org/data/xml">
 
-  <ns:table tableName="transfer" tableDbType="TABLE">
-    <ns:columns>
-      <ns:column columnName="rowid"/>
-      <ns:column columnName="transferstart"/>
-      <ns:column columnName="transfercomplete"/>
-      <ns:column columnName="schemaname"/>
-      <ns:column columnName="description"/>
-      <ns:column columnName="log"/>
-      <ns:column columnName="status"/>
-    </ns:columns>
-  </ns:table>
+  <table tableName="transfer" tableDbType="TABLE">
+    <columns>
+      <column columnName="rowid"/>
+      <column columnName="transferstart"/>
+      <column columnName="transfercomplete"/>
+      <column columnName="schemaname"/>
+      <column columnName="description"/>
+      <column columnName="log"/>
+      <column columnName="status"/>
+      <column columnName="Container"/>
+    </columns>
+  </table>
 
-  <ns:table tableName="Colors" tableDbType="TABLE">
-    <ns:pkColumnName>Name</ns:pkColumnName>
-    <ns:columns>
-      <ns:column columnName="Name">
-        <ns:datatype>varchar</ns:datatype>
-        <ns:scale>30</ns:scale>
-      </ns:column>
-      <ns:column columnName="Hex">
-        <ns:nullable>true</ns:nullable>
-        <ns:datatype>varchar</ns:datatype>
-      </ns:column>
-    </ns:columns>
-  </ns:table>
+  <table tableName="Colors" tableDbType="TABLE">
+    <pkColumnName>Name</pkColumnName>
+    <columns>
+      <column columnName="Name">
+        <datatype>varchar</datatype>
+        <scale>30</scale>
+      </column>
+      <column columnName="Hex">
+        <nullable>true</nullable>
+        <datatype>varchar</datatype>
+      </column>
+    </columns>
+  </table>
 
-  <ns:table tableName="Manufacturers" tableDbType="TABLE">
-    <ns:pkColumnName>RowId</ns:pkColumnName>
-    <ns:auditLogging>SUMMARY</ns:auditLogging>
-    <ns:columns>
-      <ns:column columnName="RowId">
-        <ns:datatype>serial</ns:datatype>
-        <ns:isAutoInc>true</ns:isAutoInc>
-        <ns:scale>10</ns:scale>
-        <ns:nullable>false</ns:nullable>
-        <ns:isReadOnly>true</ns:isReadOnly>
-        <ns:isKeyField>true</ns:isKeyField>
-        <ns:isHidden>true</ns:isHidden>
-      </ns:column>
-      <ns:column columnName="Name">
-        <ns:datatype>varchar</ns:datatype>
-        <ns:scale>255</ns:scale>
-      </ns:column>
-    </ns:columns>
-  </ns:table>
+  <table tableName="Manufacturers" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <auditLogging>SUMMARY</auditLogging>
+    <columns>
+      <column columnName="RowId">
+        <datatype>serial</datatype>
+        <isAutoInc>true</isAutoInc>
+        <scale>10</scale>
+        <nullable>false</nullable>
+        <isReadOnly>true</isReadOnly>
+        <isKeyField>true</isKeyField>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="Name">
+        <datatype>varchar</datatype>
+        <scale>255</scale>
+      </column>
+    </columns>
+  </table>
 
-  <ns:table tableName="Models" tableDbType="TABLE">
-    <ns:pkColumnName>RowId</ns:pkColumnName>
-    <ns:auditLogging>DETAILED</ns:auditLogging>
-    <ns:columns>
-      <ns:column columnName="RowId">
-        <ns:datatype>serial</ns:datatype>
-        <ns:isAutoInc>true</ns:isAutoInc>
-        <ns:scale>10</ns:scale>
-        <ns:nullable>false</ns:nullable>
-        <ns:isReadOnly>true</ns:isReadOnly>
-        <ns:isKeyField>true</ns:isKeyField>
-        <ns:isHidden>true</ns:isHidden>
-        <ns:url>/simpletest/model.view?rowid=${RowId}</ns:url>
-      </ns:column>
-      <ns:column columnName="Name">
-        <ns:datatype>varchar</ns:datatype>
-        <ns:scale>255</ns:scale>
-        <ns:url>/simpletest/model.view?rowid=${RowId}</ns:url>
-      </ns:column>
-      <ns:column columnName="ManufacturerId">
-        <ns:columnTitle>Manufacturer</ns:columnTitle>
-        <ns:fk>
-          <ns:fkColumnName>RowId</ns:fkColumnName>
-          <ns:fkTable>Manufacturers</ns:fkTable>
-          <ns:fkDbSchema>simple</ns:fkDbSchema>
-        </ns:fk>
-        <ns:datatype>int</ns:datatype>
-      </ns:column>
-    </ns:columns>
-  </ns:table>
+  <table tableName="Models" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <auditLogging>DETAILED</auditLogging>
+    <columns>
+      <column columnName="RowId">
+        <datatype>serial</datatype>
+        <isAutoInc>true</isAutoInc>
+        <scale>10</scale>
+        <nullable>false</nullable>
+        <isReadOnly>true</isReadOnly>
+        <isKeyField>true</isKeyField>
+        <isHidden>true</isHidden>
+        <url>/simpletest/model.view?rowid=${RowId}</url>
+      </column>
+      <column columnName="Name">
+        <datatype>varchar</datatype>
+        <scale>255</scale>
+        <url>/simpletest/model.view?rowid=${RowId}</url>
+      </column>
+      <column columnName="ManufacturerId">
+        <columnTitle>Manufacturer</columnTitle>
+        <fk>
+          <fkColumnName>RowId</fkColumnName>
+          <fkTable>Manufacturers</fkTable>
+          <fkDbSchema>simple</fkDbSchema>
+        </fk>
+        <datatype>int</datatype>
+      </column>
+    </columns>
+  </table>
 
-  <ns:table tableName="Vehicles" tableDbType="TABLE">
-    <ns:pkColumnName>RowId</ns:pkColumnName>
-    <ns:tableUrl>/simpletest/vehicle.view?rowid=${RowId}</ns:tableUrl>
-    <ns:importMessage>Hello.  Please read this before you import data</ns:importMessage>
-    <ns:importTemplates>
-        <ns:template label="Template 1" url="/query/exportExcelTemplate.view?schemaName=vehicle&amp;query.queryName=Vehicles&amp;captionType=Label&amp;filenamePrefix=vehicles" />
-        <ns:template label="Template 2" url="/query/exportExcelTemplate.view?schemaName=vehicle&amp;query.queryName=Vehicles&amp;captionType=Label&amp;filenamePrefix=vehicles&amp;query.viewName=AlternateImportTemplate" />
-    </ns:importTemplates>
-    <ns:columns>
-      <ns:column columnName="RowId">
-        <ns:datatype>serial</ns:datatype>
-        <ns:isAutoInc>true</ns:isAutoInc>
-        <ns:scale>10</ns:scale>
-        <ns:nullable>false</ns:nullable>
-        <ns:isReadOnly>true</ns:isReadOnly>
-        <ns:isKeyField>true</ns:isKeyField>
-        <ns:isHidden>true</ns:isHidden>
-      </ns:column>
-      <ns:column columnName="Container">
-        <ns:isUserEditable>false</ns:isUserEditable>
-        <ns:datatype>entityid</ns:datatype>
-        <ns:isHidden>true</ns:isHidden>
-      </ns:column>
-      <ns:column columnName="CreatedBy">
-        <ns:isUserEditable>false</ns:isUserEditable>
-        <ns:datatype>userid</ns:datatype>
-        <ns:isReadOnly>true</ns:isReadOnly>
-        <ns:isHidden>true</ns:isHidden>
-        <ns:fk>
-          <ns:fkColumnName>UserId</ns:fkColumnName>
-          <ns:fkTable>Users</ns:fkTable>
-          <ns:fkDbSchema>core</ns:fkDbSchema>
-        </ns:fk>
-      </ns:column>
-      <ns:column columnName="Created">
-        <ns:isUserEditable>false</ns:isUserEditable>
-        <ns:datatype>timestamp</ns:datatype>
-        <ns:isReadOnly>true</ns:isReadOnly>
-        <ns:isHidden>true</ns:isHidden>
-      </ns:column>
-      <ns:column columnName="ModifiedBy">
-        <ns:isUserEditable>false</ns:isUserEditable>
-        <ns:datatype>userid</ns:datatype>
-        <ns:isReadOnly>true</ns:isReadOnly>
-        <ns:isHidden>true</ns:isHidden>
-        <ns:fk>
-          <ns:fkColumnName>UserId</ns:fkColumnName>
-          <ns:fkTable>Users</ns:fkTable>
-          <ns:fkDbSchema>core</ns:fkDbSchema>
-        </ns:fk>
-      </ns:column>
-      <ns:column columnName="Modified">
-        <ns:isUserEditable>false</ns:isUserEditable>
-        <ns:datatype>timestamp</ns:datatype>
-        <ns:isReadOnly>true</ns:isReadOnly>
-        <ns:isHidden>true</ns:isHidden>
-      </ns:column>
-      <ns:column columnName="ModelId">
-        <ns:columnTitle>Model</ns:columnTitle>
-        <ns:fk>
-          <ns:fkColumnName>Name</ns:fkColumnName>
-          <ns:fkTable>Models</ns:fkTable>
-          <ns:fkDbSchema>simple</ns:fkDbSchema>
-        </ns:fk>
-        <ns:datatype>int</ns:datatype>
-      </ns:column>
-      <ns:column columnName="Color">
-        <ns:fk>
-          <ns:fkColumnName>Name</ns:fkColumnName>
-          <ns:fkTable>Colors</ns:fkTable>
-          <ns:fkDbSchema>simple</ns:fkDbSchema>
-        </ns:fk>
-        <ns:datatype>varchar</ns:datatype>
-        <ns:scale>30</ns:scale>
+  <table tableName="Vehicles" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <tableUrl>/simpletest/vehicle.view?rowid=${RowId}</tableUrl>
+    <importMessage>Hello.  Please read this before you import data</importMessage>
+    <importTemplates>
+        <template label="Template 1" url="/query/exportExcelTemplate.view?schemaName=vehicle&amp;query.queryName=Vehicles&amp;captionType=Label&amp;filenamePrefix=vehicles" />
+        <template label="Template 2" url="/query/exportExcelTemplate.view?schemaName=vehicle&amp;query.queryName=Vehicles&amp;captionType=Label&amp;filenamePrefix=vehicles&amp;query.viewName=AlternateImportTemplate" />
+    </importTemplates>
+    <columns>
+      <column columnName="RowId">
+        <datatype>serial</datatype>
+        <isAutoInc>true</isAutoInc>
+        <scale>10</scale>
+        <nullable>false</nullable>
+        <isReadOnly>true</isReadOnly>
+        <isKeyField>true</isKeyField>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="Container">
+        <isUserEditable>false</isUserEditable>
+        <datatype>entityid</datatype>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="CreatedBy">
+        <isUserEditable>false</isUserEditable>
+        <datatype>userid</datatype>
+        <isReadOnly>true</isReadOnly>
+        <isHidden>true</isHidden>
+        <fk>
+          <fkColumnName>UserId</fkColumnName>
+          <fkTable>Users</fkTable>
+          <fkDbSchema>core</fkDbSchema>
+        </fk>
+      </column>
+      <column columnName="Created">
+        <isUserEditable>false</isUserEditable>
+        <datatype>timestamp</datatype>
+        <isReadOnly>true</isReadOnly>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="ModifiedBy">
+        <isUserEditable>false</isUserEditable>
+        <datatype>userid</datatype>
+        <isReadOnly>true</isReadOnly>
+        <isHidden>true</isHidden>
+        <fk>
+          <fkColumnName>UserId</fkColumnName>
+          <fkTable>Users</fkTable>
+          <fkDbSchema>core</fkDbSchema>
+        </fk>
+      </column>
+      <column columnName="Modified">
+        <isUserEditable>false</isUserEditable>
+        <datatype>timestamp</datatype>
+        <isReadOnly>true</isReadOnly>
+        <isHidden>true</isHidden>
+      </column>
+      <column columnName="ModelId">
+        <columnTitle>Model</columnTitle>
+        <fk>
+          <fkColumnName>Name</fkColumnName>
+          <fkTable>Models</fkTable>
+          <fkDbSchema>simple</fkDbSchema>
+        </fk>
+        <datatype>int</datatype>
+      </column>
+      <column columnName="Color">
+        <fk>
+          <fkColumnName>Name</fkColumnName>
+          <fkTable>Colors</fkTable>
+          <fkDbSchema>simple</fkDbSchema>
+        </fk>
+        <datatype>varchar</datatype>
+        <scale>30</scale>
         <!--used in SimpleModuleTest.doTestInsertUpdateViews()-->
-        <ns:shownInDetailsView>false</ns:shownInDetailsView>
-      </ns:column>
-      <ns:column columnName="ModelYear">
-        <ns:datatype>int</ns:datatype>
-      </ns:column>
-      <ns:column columnName="Milage">
-        <ns:datatype>int</ns:datatype>
-      </ns:column>
-      <ns:column columnName="LastService">
-        <ns:datatype>timestamp</ns:datatype>
-      </ns:column>
-    </ns:columns>
-  </ns:table>
+        <shownInDetailsView>false</shownInDetailsView>
+      </column>
+      <column columnName="ModelYear">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="Milage">
+        <datatype>int</datatype>
+      </column>
+      <column columnName="LastService">
+        <datatype>timestamp</datatype>
+      </column>
+    </columns>
+  </table>
 
-  <ns:table tableName="EmissionTest" tableDbType="TABLE">
-    <ns:pkColumnName>RowId</ns:pkColumnName>
-    <ns:auditLogging>SUMMARY</ns:auditLogging>
-    <ns:columns>
-      <ns:column columnName="RowId">
-        <ns:datatype>serial</ns:datatype>
-        <ns:isAutoInc>true</ns:isAutoInc>
-        <ns:scale>10</ns:scale>
-        <ns:nullable>false</ns:nullable>
-        <ns:isReadOnly>true</ns:isReadOnly>
-        <ns:isKeyField>true</ns:isKeyField>
-        <ns:isHidden>false</ns:isHidden>
-      </ns:column>
-      <ns:column columnName="Name">
+  <table tableName="EmissionTest" tableDbType="TABLE">
+    <pkColumnName>RowId</pkColumnName>
+    <auditLogging>SUMMARY</auditLogging>
+    <columns>
+      <column columnName="RowId">
+        <datatype>serial</datatype>
+        <isAutoInc>true</isAutoInc>
+        <scale>10</scale>
+        <nullable>false</nullable>
+        <isReadOnly>true</isReadOnly>
+        <isKeyField>true</isKeyField>
+        <isHidden>false</isHidden>
+      </column>
+      <column columnName="Name">
 
-      </ns:column>
-      <ns:column columnName="Container">
-        <ns:isUserEditable>false</ns:isUserEditable>
-        <ns:datatype>entityid</ns:datatype>
-        <ns:isHidden>false</ns:isHidden>
-      </ns:column>
-      <ns:column columnName="ParentTest">
-        <ns:columnTitle>Parent Test</ns:columnTitle>
-        <ns:fk>
-          <ns:fkColumnName>RowId</ns:fkColumnName>
-          <ns:fkTable>EmissionTest</ns:fkTable>
-          <ns:fkDbSchema>vehicle</ns:fkDbSchema>
-        </ns:fk>
-      </ns:column>
-      <ns:column columnName="VehicleId">
-        <ns:fk>
-          <ns:fkColumnName>RowId</ns:fkColumnName>
-          <ns:fkTable>Vehicles</ns:fkTable>
-          <ns:fkDbSchema>vehicle</ns:fkDbSchema>
-        </ns:fk>
-      </ns:column>
-      <ns:column columnName="Result">
-      </ns:column>
-    </ns:columns>
-  </ns:table>
+      </column>
+      <column columnName="Container">
+        <isUserEditable>false</isUserEditable>
+        <datatype>entityid</datatype>
+        <isHidden>false</isHidden>
+      </column>
+      <column columnName="ParentTest">
+        <columnTitle>Parent Test</columnTitle>
+        <fk>
+          <fkColumnName>RowId</fkColumnName>
+          <fkTable>EmissionTest</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+      </column>
+      <column columnName="VehicleId">
+        <fk>
+          <fkColumnName>RowId</fkColumnName>
+          <fkTable>Vehicles</fkTable>
+          <fkDbSchema>vehicle</fkDbSchema>
+        </fk>
+      </column>
+      <column columnName="Result">
+      </column>
+    </columns>
+  </table>
   
-  <ns:table tableName="etl_target" tableDbType="TABLE">
-    <ns:columns>
-      <ns:column columnName="rowid"/>
-      <ns:column columnName="container"/>
-      <ns:column columnName="created"/>
-      <ns:column columnName="modified"/>
-      <ns:column columnName="id"/>
-      <ns:column columnName="name"/>
-      <ns:column columnName="ditransformrunid"/>
-    </ns:columns>
-  </ns:table>
+  <table tableName="etl_target" tableDbType="TABLE">
+    <columns>
+      <column columnName="rowid"/>
+      <column columnName="container"/>
+      <column columnName="created"/>
+      <column columnName="modified"/>
+      <column columnName="id"/>
+      <column columnName="name"/>
+      <column columnName="ditransformrunid"/>
+    </columns>
+  </table>
 
-  <ns:table tableName="etl_target2" tableDbType="TABLE">
-    <ns:columns>
-        <ns:column columnName="rowid"/>
-        <ns:column columnName="container"/>
-        <ns:column columnName="created"/>
-        <ns:column columnName="modified"/>
-        <ns:column columnName="id"/>
-        <ns:column columnName="name"/>
-        <ns:column columnName="ditransformrunid"/>
-    </ns:columns>
-  </ns:table>
+  <table tableName="etl_target2" tableDbType="TABLE">
+    <columns>
+        <column columnName="rowid"/>
+        <column columnName="container"/>
+        <column columnName="created"/>
+        <column columnName="modified"/>
+        <column columnName="id"/>
+        <column columnName="name"/>
+        <column columnName="ditransformrunid"/>
+    </columns>
+  </table>
 
-    <ns:table tableName="etl_source" tableDbType="TABLE">
-    <ns:columns>
-      <ns:column columnName="rowid"/>
-      <ns:column columnName="container"/>
-      <ns:column columnName="created"/>
-      <ns:column columnName="modified"/>
-      <ns:column columnName="id"/>
-      <ns:column columnName="name"/>
-      <ns:column columnName="transformrun"/>
-    </ns:columns>
-  </ns:table>
+    <table tableName="etl_source" tableDbType="TABLE">
+    <columns>
+      <column columnName="rowid"/>
+      <column columnName="container"/>
+      <column columnName="created"/>
+      <column columnName="modified"/>
+      <column columnName="id"/>
+      <column columnName="name"/>
+      <column columnName="transformrun"/>
+    </columns>
+  </table>
 
-    <ns:table tableName="Owner" tableDbType="TABLE">
-        <ns:columns>
-            <ns:column columnName="RowId"/>
-            <ns:column columnName="container"/>
-            <ns:column columnName="created"/>
-            <ns:column columnName="createdby"/>
-            <ns:column columnName="modified"/>
-            <ns:column columnName="modifiedby"/>
-            <ns:column columnName="first_name"/>
-            <ns:column columnName="last_name"/>
-            <ns:column columnName="email"/>
-            <ns:column columnName="gender"/>
-            <ns:column columnName="race"/>
-            <ns:column columnName="city"/>
-            <ns:column columnName="state"/>
-            <ns:column columnName="zip"/>
-            <ns:column columnName="text"/>
-            <ns:column columnName="birth_date"/>
-        </ns:columns>
-    </ns:table>
+    <table tableName="Owner" tableDbType="TABLE">
+        <columns>
+            <column columnName="RowId"/>
+            <column columnName="container"/>
+            <column columnName="created"/>
+            <column columnName="createdby"/>
+            <column columnName="modified"/>
+            <column columnName="modifiedby"/>
+            <column columnName="first_name"/>
+            <column columnName="last_name"/>
+            <column columnName="email"/>
+            <column columnName="gender"/>
+            <column columnName="race"/>
+            <column columnName="city"/>
+            <column columnName="state"/>
+            <column columnName="zip"/>
+            <column columnName="text"/>
+            <column columnName="birth_date"/>
+        </columns>
+    </table>
 
-    <ns:table tableName="OwnerBackup" tableDbType="TABLE">
-        <ns:columns>
-            <ns:column columnName="RowId"/>
-            <ns:column columnName="container"/>
-            <ns:column columnName="created"/>
-            <ns:column columnName="createdby"/>
-            <ns:column columnName="modified"/>
-            <ns:column columnName="modifiedby"/>
-            <ns:column columnName="first_name"/>
-            <ns:column columnName="last_name"/>
-            <ns:column columnName="email"/>
-            <ns:column columnName="gender"/>
-            <ns:column columnName="race"/>
-            <ns:column columnName="city"/>
-            <ns:column columnName="state"/>
-            <ns:column columnName="zip"/>
-            <ns:column columnName="text"/>
-            <ns:column columnName="birth_date"/>
-            <ns:column columnName="ditransformrunid"/>
-        </ns:columns>
-    </ns:table>
+    <table tableName="OwnerBackup" tableDbType="TABLE">
+        <columns>
+            <column columnName="RowId"/>
+            <column columnName="container"/>
+            <column columnName="created"/>
+            <column columnName="createdby"/>
+            <column columnName="modified"/>
+            <column columnName="modifiedby"/>
+            <column columnName="first_name"/>
+            <column columnName="last_name"/>
+            <column columnName="email"/>
+            <column columnName="gender"/>
+            <column columnName="race"/>
+            <column columnName="city"/>
+            <column columnName="state"/>
+            <column columnName="zip"/>
+            <column columnName="text"/>
+            <column columnName="birth_date"/>
+            <column columnName="ditransformrunid"/>
+        </columns>
+    </table>
 
-</ns:tables>
+</tables>

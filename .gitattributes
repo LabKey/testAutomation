@@ -106,16 +106,23 @@ modules/scriptpad/src/org/labkey/scriptpad/scriptpadController.java -text
 modules/scriptpad/src/org/labkey/scriptpad/scriptpadModule.java -text
 modules/scriptpad/src/org/labkey/scriptpad/view/scriptpad.jsp -text
 modules/simpletest/config/module.xml -text
+modules/simpletest/etls/SProcBadMissingTransformRunIdParm.xml -text
+modules/simpletest/etls/SProcBadModifiedSinceWithBadSource.xml -text
+modules/simpletest/etls/SProcBadNonZeroReturnCode.xml -text
+modules/simpletest/etls/SProcBadProcedureName.xml -text
+modules/simpletest/etls/SProcBadThrowError.xml -text
+modules/simpletest/etls/SProcModifiedSinceNoSource.xml -text
+modules/simpletest/etls/SProcModifiedSinceWithSource.xml -text
+modules/simpletest/etls/SProcNormalOperation.xml -text
+modules/simpletest/etls/SProcOverridePersistedParameter.xml -text
+modules/simpletest/etls/SProcPersistedParameter.xml -text
+modules/simpletest/etls/SProcRunFilter.xml -text
 modules/simpletest/etls/SimpleETLCausesKeyConstraintViolation.xml -text svneol=unset#application/xml
 modules/simpletest/etls/SimpleETLCheckerErrorTimestampColumnNonexistent.xml -text svneol=unset#application/xml
 modules/simpletest/etls/SimpleETLbadConfigXML.xml -text svneol=unset#application/xml
 modules/simpletest/etls/SimpleETLqueryDoesNotExist.xml -text svneol=unset#application/xml
 modules/simpletest/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/etls/appendIdByRun.xml -text
-modules/simpletest/etls/appendModifiedSinceSP.xml -text
-modules/simpletest/etls/appendModifiedSinceSPlogError.xml -text
-modules/simpletest/etls/appendModifiedSinceSPthrowError.xml -text
-modules/simpletest/etls/appendRunBasedSP.xml -text
 modules/simpletest/etls/badCast.xml -text
 modules/simpletest/etls/badTableName.xml -text
 modules/simpletest/etls/merge.xml -text
@@ -164,6 +171,7 @@ modules/simpletest/schemas/dbscripts/postgresql/vehicle-11.30-12.10.sql -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-12.30-13.10.sql -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-13.10-13.20.sql -text
 modules/simpletest/schemas/dbscripts/postgresql/vehicle-13.20-13.30.sql -text
+modules/simpletest/schemas/dbscripts/postgresql/vehicle-13.30-13.31.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/obsolete/vehicle-11.30-11.31.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/obsolete/vehicle-13.11-13.12.sql -text
 modules/simpletest/schemas/dbscripts/sqlserver/obsolete/vehicle-13.12-13.13.sql -text
@@ -342,6 +350,7 @@ src/org/labkey/test/tests/ELISPOT_AssayTest.java -text
 src/org/labkey/test/tests/ETLBaseTest.java -text
 src/org/labkey/test/tests/ETLErrorTest.java -text
 src/org/labkey/test/tests/ETLTest.java -text
+src/org/labkey/test/tests/ETL_StoredProc_test.java -text
 src/org/labkey/test/tests/ElisaAssayTest.java -text
 src/org/labkey/test/tests/ElispotAssayTest.java -text
 src/org/labkey/test/tests/EmbeddedWebPartTest.java -text

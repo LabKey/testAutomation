@@ -14,123 +14,6 @@
  * limitations under the License.
  */
 
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =============================================
--- Author:		Ryan Standley
--- Create date: 10/24/2013
--- Description:	sp for ETL testing ModifiedSince filter strategy
--- =============================================
-CREATE PROCEDURE vehicle.etlTestModifiedSince
-	@containerId uniqueidentifier = NULL,
-	@rowsInserted int = 0 OUTPUT,
-	@rowsDeleted int = 0 OUTPUT,
-	@rowsModified int = 0 OUTPUT,
-	@returnMsg varchar(100) = 'default message' OUTPUT,
-	@debug varchar(1000) = '',
-	@desiredErrorOut int = 0,
-	@transformRunId int,
-	@created datetime,
-	@modified datetime
-AS
-BEGIN
-	SET NOCOUNT ON;
-	SET IDENTITY_INSERT [vehicle].[etl_target] ON
-	DECLARE @returnVal int = @desiredErrorOut
-	DECLARE @RowId int, @id varchar(9), @name varchar(100), @TransformRun int
-	DECLARE C CURSOR FOR SELECT rowid, name,id FROM vehicle.etl_source where TransformRun => @filterRunId ORDER BY ID
-	OPEN C
-	FETCH NEXT FROM C INTO @RowId, @name, @id
-	WHILE @@FETCH_STATUS = 0
-	BEGIN
-		SET @rowsInserted = @rowsInserted + 1
-		SET @created = GETDATE()
-		SET @modified = GETDATE()
-		IF NOT EXISTS(SELECT * FROM etl_target WHERE Id = @Id)
-		BEGIN
-		INSERT INTO [vehicle].[etl_target](RowId, container, id, name, diTransformRunId, created, modified) SELECT @RowId, @containerId, @id, @name, @transformRunId, @created, @modified
-		END
-		FETCH NEXT FROM C INTO @RowId, @name, @id
-	END
-	CLOSE C
-	DEALLOCATE C
-	IF(@desiredErrorOut > 10)
-	BEGIN
-	SET @returnMsg = 'error > 10, throwing exception'
-	RAISERROR(@returnMsg, @desiredErrorOut, 1)
-	END
-	ELSE
-	BEGIN
-	RETURN @returnVal
-	END
-END
-GO
-
-
-/****** Object:  StoredProcedure [vehicle].[etlTestRunBased]    Script Date: 10/31/2013 11:08:19 AM ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-
--- =============================================
--- Author:		Ryan Standley
--- Create date: 10/24/2013
--- Description:	sp for ETL testing ModifiedSince filter strategy
--- =============================================
-CREATE PROCEDURE [vehicle].[etlTestRunBased]
-	@containerId uniqueidentifier = NULL,
-	@rowsInserted int = 0 OUTPUT,
-	@rowsDeleted int = 0 OUTPUT,
-	@rowsModified int = 0 OUTPUT,
-	@returnMsg varchar(100) = 'default message' OUTPUT,
-	@debug varchar(1000) = '',
-	@desiredErrorOut int = 0,
-	@transformRunId int,
-	@created datetime,
-	@modified datetime,
-	@filterRunId int
-AS
-BEGIN
-    PRINT @filterRunId
-	SET NOCOUNT ON;
-	SET IDENTITY_INSERT [vehicle].[etl_target] ON
-	DECLARE @returnVal int = @desiredErrorOut
-	DECLARE @RowId int, @id varchar(9), @name varchar(100), @TransformRun int
-	DECLARE C CURSOR FOR SELECT Rowid, Name,Id FROM vehicle.etl_source WHERE TransformRun = @filterRunId ORDER BY ID
-	OPEN C
-	FETCH NEXT FROM C INTO @RowId, @name, @id
-	WHILE @@FETCH_STATUS = 0
-	BEGIN
-		SET @created = GETDATE()
-		SET @modified = GETDATE()
-		IF NOT EXISTS(SELECT * FROM etl_target WHERE id = @id)
-		BEGIN
-		SET @rowsInserted = @rowsInserted + 1
-		INSERT INTO [vehicle].[etl_target](RowId, container, id, name, diTransformRunId, created, modified) SELECT @RowId, @containerId, @id, @name, @transformRunId, @created, @modified
-		END
-		FETCH NEXT FROM C INTO @RowId, @name, @id
-	END
-	CLOSE C
-	DEALLOCATE C
-	IF(@desiredErrorOut > 10)
-	BEGIN
-	SET @returnMsg = 'error > 10, throwing exception'
-	RAISERROR(@returnMsg, @desiredErrorOut, 1)
-	END
-	ELSE
-	BEGIN
-	RETURN @returnVal
-	END
-END
-
-
-GO
-
 ALTER TABLE vehicle.[Transfer] Add [container] [dbo].[ENTITYID] NULL
 GO
 
@@ -141,3 +24,118 @@ GO
 ALTER TABLE [vehicle].[Transfer] CHECK CONSTRAINT [FK_etltransfer_container]
 GO
 
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+-- =============================================
+-- Author:		Tony Galuhn
+-- Create date: 11/22/2013
+-- Description:	sp for ETL testing
+-- =============================================
+CREATE PROCEDURE vehicle.etlTest
+	@transformRunId int,
+	@containerId entityId = NULL OUTPUT,
+	@rowsInserted int = 0 OUTPUT,
+	@rowsDeleted int = 0 OUTPUT,
+	@rowsModified int = 0 OUTPUT,
+	@returnMsg varchar(100) = 'default message' OUTPUT,
+	@debug varchar(1000) = '',
+	@filterRunId int = null,
+	@filterStartTimeStamp datetime = null,
+	@filterEndTimeStamp datetime = null,
+	@testMode int,
+	@testInOutParam varchar(10) = null OUTPUT,
+	@runCount int = 1 OUTPUT,
+	@previousFilterRunId int = null OUTPUT,
+	@previousFilterStartTimeStamp datetime = null OUTPUT,
+	@previousFilterEndTimeStamp datetime = null OUTPUT
+AS
+BEGIN
+
+/*
+	Test modes
+	1	normal operation
+	2	return code > 0
+	3	raise error
+	4	input/output parameter persistence
+	5	override of persisted input/output parameter
+	6	Run filter strategy, require @filterRunId. Test persistence.
+	7	Modified since filter strategy, require @filterStartTimeStamp & @filterEndTimeStamp. Test persistence.
+
+*/
+
+IF @testMode = 1
+BEGIN
+	print 'Test print statement logging'
+	SET @rowsInserted = 1
+	SET @rowsDeleted = 2
+	SET @rowsModified = 4
+	SET @returnMsg = 'Test returnMsg logging'
+	RETURN 0
+END
+
+IF @testMode = 2 RETURN 1
+
+IF @testMode = 3
+BEGIN
+	SET @returnMsg = 'Intentional SQL Exception From Inside Proc'
+	RAISERROR(@returnMsg, 11, 1)
+END
+
+IF @testMode = 4 AND @testInOutParam != 'after' AND @runCount > 1
+BEGIN
+	SET @returnMsg = 'Expected value "after" for @testInOutParam on run count = ' + convert(varchar, @runCount) + ', but was ' + @testInOutParam
+	RETURN 1
+END
+
+IF @testMode = 5 AND @testInOutParam != 'before' AND @runCount > 1
+BEGIN
+	SET @returnMsg = 'Expected value "before" for @testInOutParam on run count = ' + convert(varchar, @runCount) + ', but was ' + @testInOutParam
+	RETURN 1
+END
+
+IF @testMode = 6
+BEGIN
+	IF @filterRunId IS NULL
+	BEGIN
+		SET @returnMsg = 'Required @filterRunId value not supplied'
+		RETURN 1
+	END
+	IF @runCount > 1 AND (@previousFilterRunId IS NULL OR @previousFilterRunId <= @filterRunId)
+	BEGIN
+		SET @returnMsg = 'Required @filterRunId was not persisted from previous run.'
+		RETURN 1
+	END
+	SET @previousFilterRunId = @filterRunId
+END
+
+IF @testMode = 7
+BEGIN
+	IF @runCount > 1 AND (@previousFilterStartTimeStamp IS NULL OR @previousFilterEndTimeStamp IS NULL
+							OR @previousFilterStartTimeStamp <= @filterStartTimeStamp OR @previousFilterEndTimeStamp <= @filterEndTimeStamp)
+	BEGIN
+		SET @returnMsg = 'Required @filterStartTimeStamp or @filterEndTimeStamp were not persisted from previous run.'
+		RETURN 1
+	END
+	SET @previousFilterStartTimeStamp = @filterStartTimeStamp
+	SET @previousFilterEndTimeStamp = @filterEndTimeStamp
+END
+
+-- set value for persistence tests
+IF @testInOutParam IS NOT NULL SET @testInOutParam = 'after'
+
+RETURN 0
+
+END
+
+GO
+
+
+CREATE PROCEDURE vehicle.etlMissingTransformRunId
+AS
+BEGIN
+	SELECT 1
+END
