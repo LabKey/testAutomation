@@ -90,6 +90,15 @@ public class BasicTest extends BaseWebDriverTest
         waitAndClick(Locator.linkWithText("credits"));
         assertTextNotPresent("WARNING:");
 
+        // Check for unrecognized scripts on the orphaned scripts page (only available in dev mode)
+        if (TestProperties.isDevModeEnabled())
+        {
+            goToAdminConsole();
+            waitAndClick(Locator.linkWithText("sql scripts"));
+            waitAndClick(Locator.linkWithText("orphaned scripts"));
+            assertTextNotPresent("WARNING:");
+        }
+
         ensureAdminMode();
         clickProject(PROJECT_NAME);
         clickFolder(FOLDER_NAME);
