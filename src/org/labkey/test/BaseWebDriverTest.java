@@ -5133,7 +5133,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         WebElement el = l.findElement(getDriver());
 
-        if (text.length() < 1000)
+        if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
             try {el.clear();} catch(WebDriverException e) {/*Probably a file input*/}
             el.sendKeys(text);

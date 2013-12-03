@@ -30,7 +30,7 @@ import java.io.*;
  * Time: 4:39:49 PM
  */
 @Category({DailyA.class})
-public class ProgrammaticQCTest extends AbstractQCAssayTest
+public class ProgrammaticQCTest extends AbstractQCAssayTestWD
 {
     protected final static String TEST_PROGRAMMATIC_QC_PRJ = "Programmatic QC Test";
     protected final static String QC_ASSAY = "QC Assay";
@@ -91,12 +91,6 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         catch (Throwable t) {}
     }
 
-
-    public boolean isFileUploadTest()
-    {
-        return true;
-    }
-
     private void defineQCAssay()
     {
         log("Defining a QC test assay at the project level");
@@ -129,7 +123,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
-        selenium.type("//input[@id='AssayDesignerName']", assayName);
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), assayName);
 
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
         if (addQCScript)
@@ -158,15 +152,15 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        selenium.click("//input[@value='textAreaDataProvider']");
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA1);
         clickButton("Save and Finish");
 
         assertTextPresent("A duplicate PTID was discovered : b");
         assertTextPresent("A duplicate PTID was discovered : e");
 
-        selenium.click("//input[@value='textAreaDataProvider']");
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA2);
         clickButton("Save and Finish");
 
         // verify the log entry
@@ -187,15 +181,15 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        selenium.click("//input[@value='textAreaDataProvider']");
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA1);
         clickButton("Save and Finish");
 
         assertTextPresent("A duplicate PTID was discovered : b");
         assertTextPresent("A duplicate PTID was discovered : e");
 
-        selenium.click("//input[@value='textAreaDataProvider']");
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA2);
         clickButton("Save and Finish");
 
         clickAndWait(Locator.linkWithText("view results"));
@@ -221,14 +215,14 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        selenium.click("//input[@value='textAreaDataProvider']");
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA2);
         clickButton("Save and Finish");
 
         assertTextPresent("The animal column must contain a goat");
 
-        selenium.click("//input[@value='textAreaDataProvider']");
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA3);
         clickButton("Save and Finish");
 
         clickAndWait(Locator.linkWithText("view results"));
@@ -253,5 +247,11 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
     protected String getProjectName()
     {
         return TEST_PROGRAMMATIC_QC_PRJ;
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

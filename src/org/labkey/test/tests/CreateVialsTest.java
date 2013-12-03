@@ -17,14 +17,11 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.DataRegionTable;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -43,12 +40,6 @@ public class CreateVialsTest extends AbstractViabilityTest
     public String getAssociatedModuleDirectory()
     {
         return "customModules/letvin";
-    }
-
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
     }
 
     @Override
@@ -105,9 +96,9 @@ public class CreateVialsTest extends AbstractViabilityTest
         DataRegionTable table = new DataRegionTable("query", this, false);
         assertEquals(2, table.getDataRowCount());
         assertEquals("Alice Lab", table.getDataAsText(0, "Label"));
-        assertEquals("", table.getDataAsText(0, "External Id"));
+        assertEquals(" ", table.getDataAsText(0, "External Id"));
         assertEquals("Bob's Lab", table.getDataAsText(1, "Label"));
-        assertEquals("", table.getDataAsText(1, "External Id"));
+        assertEquals(" ", table.getDataAsText(1, "External Id"));
     }
 
     @Override
@@ -121,8 +112,9 @@ public class CreateVialsTest extends AbstractViabilityTest
         
         log("** Upload run without a TargetStudy set and try to create vials.");
         uploadViabilityRun("/sampledata/viability/122810.EP5.CSV", "run1", false);
-        clickButton("Save and Finish");
-        getConfirmationAndWait();
+        prepForPageLoad();
+        clickButton("Save and Finish", 0);
+        getAlert();
         clickAndWait(Locator.linkContainingText("run1"));
 
         DataRegionTable table = new DataRegionTable("Data", this);
@@ -140,10 +132,12 @@ public class CreateVialsTest extends AbstractViabilityTest
         log("** Upload run again but this time set a TargetStudy, visit ids, and a single specimen id on the first row");
         uploadViabilityRun("/sampledata/viability/122810.EP5.CSV", "run2", true);
         setFormElement(Locator.name("_pool_B01_0_VisitID"), "1.0");
-        clickCheckboxById("_pool_B01_0_VisitIDCheckBox");
+        click(Locator.checkboxById("_pool_B01_0_VisitIDCheckBox"));
         addSpecimenIds("_pool_B01_0_SpecimenIDs", "vial1");
-        clickButton("Save and Finish");
-        getConfirmationAndWait();
+        prepForPageLoad();
+        clickButton("Save and Finish", 0);
+        getAlert();
+        newWaitForPageToLoad();
 
         clickAndWait(Locator.linkContainingText("run2"));
         table = new DataRegionTable("Data", this);
@@ -186,22 +180,22 @@ public class CreateVialsTest extends AbstractViabilityTest
         setFormElement(Locator.name("siteLabel"), "Bob's Lab");
 
         setFormElement(Locator.name("usedCells"), "1");
-        fireEvent(Locator.name("usedCells"), BaseSeleniumWebTest.SeleniumEvent.change);
+        fireEvent(Locator.name("usedCells"), SeleniumEvent.change);
         assertEquals("20504211", getFormElement(Locator.name("viableCells")));
         assertEquals("3", table.getDataAsText(0, "Vial Count"));
 
         setFormElement(Locator.name("viableCells"), "10000000");
-        fireEvent(Locator.name("viableCells"), BaseSeleniumWebTest.SeleniumEvent.change);
+        fireEvent(Locator.name("viableCells"), SeleniumEvent.change);
         assertEquals("10504212", getFormElement(Locator.name("usedCells")));
         assertEquals("1", table.getDataAsText(0, "Vial Count"));
 
         setFormElement(Locator.name("viableCells"), "20000000");
-        fireEvent(Locator.name("viableCells"), BaseSeleniumWebTest.SeleniumEvent.change);
+        fireEvent(Locator.name("viableCells"), SeleniumEvent.change);
         assertEquals("504212", getFormElement(Locator.name("usedCells")));
         assertEquals("2", table.getDataAsText(0, "Vial Count"));
 
         setFormElement(Locator.name("viableCells"), "50000000");
-        fireEvent(Locator.name("viableCells"), BaseSeleniumWebTest.SeleniumEvent.change);
+        fireEvent(Locator.name("viableCells"), SeleniumEvent.change);
         assertEquals("-29495788", getFormElement(Locator.name("usedCells")));
         assertEquals("5", table.getDataAsText(0, "Vial Count"));
 
@@ -211,7 +205,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         assertAlert("All used cell fields must be greater than or equal to zero.");
 
         setFormElement(Locator.name("viableCells"), "20000001");
-        fireEvent(Locator.name("viableCells"), BaseSeleniumWebTest.SeleniumEvent.change);
+        fireEvent(Locator.name("viableCells"), SeleniumEvent.change);
         assertEquals("504211", getFormElement(Locator.name("usedCells")));
         assertEquals("3", table.getDataAsText(0, "Vial Count"));
 

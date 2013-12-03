@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
@@ -28,7 +29,7 @@ import static org.junit.Assert.*;
  * User: kevink
  * Date: Feb 23, 2011
  */
-public abstract class AbstractViabilityTest extends AbstractQCAssayTest
+public abstract class AbstractViabilityTest extends AbstractQCAssayTestWD
 {
     @Override
     public String getAssociatedModuleDirectory()
@@ -40,6 +41,12 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     protected boolean isFileUploadTest()
     {
         return true;
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     protected abstract String getProjectName();
@@ -58,8 +65,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     protected void initializeStudyFolder(String... tabs)
     {
         log("** Initialize Folder");
-        if (!isLinkPresentWithText(getProjectName()))
-            _containerHelper.createProject(getProjectName(), null);
+        _containerHelper.createProject(getProjectName(), null);
         createSubfolder(getProjectName(), getProjectName(), getFolderName(), "Study", tabs, true);
         
         log("** Create Study");
@@ -79,7 +85,8 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         log("** Import specimens");
         clickFolder(studyFolder);
         clickAndWait(Locator.linkWithText("Specimen Data"));
-        clickAndWait(Locator.linkWithText("Import Specimens"));
+        waitAndClickAndWait(Locator.linkWithText("Import Specimens"));
+        waitForElement(Locator.id("tsv"));
         setFormElement(Locator.id("tsv"), getFileContents(specimensPath));
         submit();
         assertTextPresent("Specimens uploaded successfully");
@@ -87,21 +94,22 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 
     protected void createViabilityAssay()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
         log("** Create viability assay");
         clickFolder(getFolderName());
-        addWebPart("Assay List");
+        portalHelper.addWebPart("Assay List");
         clickButton("Manage Assays");
         clickButton("New Assay Design");
-        checkRadioButton("providerName", "Viability");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "Viability"));
         clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
-        selenium.type("//input[@id='AssayDesignerName']", getAssayName());
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), getAssayName());
 
         // Add 'Unreliable' field to Results domain
-        addField("Result Fields", 11, "Unreliable", "Unreliable?", ListHelper.ListColumnType.Boolean);
-        addField("Result Fields", 12, "IntValue", "IntValue", ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Result Fields", 11, "Unreliable", "Unreliable?", ListHelper.ListColumnType.Boolean);
+        _listHelper.addField("Result Fields", 12, "IntValue", "IntValue", ListHelper.ListColumnType.Integer);
 
         sleep(1000);
         clickButton("Save", 0);
@@ -126,11 +134,11 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(getAssayName()));
         clickButton("Import Data");
         if (setBatchTargetStudy)
-            selectOptionByText("targetStudy", "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
+            selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
         clickButton("Next");
 
         if (runName != null)
-            setFormElement("name", runName);
+            setFormElement(Locator.name("name"), runName);
 
         uploadAssayFile(path);
     }
@@ -145,7 +153,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         clickButton("Next");
 
         if (runName != null)
-            setFormElement("name", runName);
+            setFormElement(Locator.name("name"), runName);
 
         uploadAssayFile(path);
     }
@@ -154,7 +162,7 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
     {
         File guavaFile = new File(getLabKeyRoot() + path);
         assertTrue("Upload file doesn't exist: " + guavaFile, guavaFile.exists());
-        setFormElement("__primaryFile__", guavaFile);
+        setFormElement(Locator.name("__primaryFile__"), guavaFile);
         clickButton("Next", 8000);
     }
 

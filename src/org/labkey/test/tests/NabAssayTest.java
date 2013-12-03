@@ -24,6 +24,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -35,7 +36,7 @@ import static org.junit.Assert.*;
  * Date: Nov 20, 2007
  */
 @Category({DailyA.class, Assays.class})
-public class NabAssayTest extends AbstractQCAssayTest
+public class NabAssayTest extends AbstractQCAssayTestWD
 {
     private final static String TEST_ASSAY_PRJ_NAB = "Nab Test Verify Project";            //project for nab test
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
@@ -88,7 +89,6 @@ public class NabAssayTest extends AbstractQCAssayTest
     private static final String CURVE_IC80_5PL_STUDY_COL_TITLE = "Curve IC80 5pl";
     private static final String CURVE_IC80_POLY_STUDY_COL_TITLE = "Curve IC80 Poly";
 
-    private static final boolean CONTINUE = false;
     private static final String PLATE_TEMPLATE_NAME = "NabAssayTest Template";
     private static final String STUDY_FOLDER = TEST_ASSAY_PRJ_NAB + "/Study 1";
     private static final String STUDY_FOLDER_ENCODED = "Nab%20Test%20Verify%20Project/Study%201";
@@ -148,8 +148,9 @@ public class NabAssayTest extends AbstractQCAssayTest
 
     protected String setSource(String srcFragment, boolean excludeTags)
     {
+        PortalHelper portalHelper = new PortalHelper(this);
         assertElementPresent(Locator.linkWithText(WIKIPAGE_NAME));
-        clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
+        portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
 
         String fullSource = srcFragment;
         if (!excludeTags)
@@ -168,7 +169,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             log("Waiting for " + TEST_DIV_NAME + " div to render...");
             if (isElementPresent(Locator.id(TEST_DIV_NAME)))
             {
-                String divHtml = selenium.getEval("this.browserbot.getCurrentWindow().document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
+                String divHtml = (String)executeScript("return document.getElementById('" + TEST_DIV_NAME + "').innerHTML;");
                 if (divHtml.length() > 0)
                     return divHtml;
             }
@@ -190,6 +191,12 @@ public class NabAssayTest extends AbstractQCAssayTest
         return TEST_ASSAY_PRJ_NAB;
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
     /**
      * Performs Luminex designer/upload/publish.
      */
@@ -201,298 +208,296 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         log("Testing NAb Assay Designer");
 
-        if (!CONTINUE)
-        {
-            // set up a scripting engine to run a java transform script
-            prepareProgrammaticQC();
+        // set up a scripting engine to run a java transform script
+        prepareProgrammaticQC();
 
-            //create a new test project
-            _containerHelper.createProject(TEST_ASSAY_PRJ_NAB, null);
+        //create a new test project
+        _containerHelper.createProject(TEST_ASSAY_PRJ_NAB, null);
 
-            //setup a pipeline for it
-            setupPipeline(TEST_ASSAY_PRJ_NAB);
+        //setup a pipeline for it
+        setupPipeline(TEST_ASSAY_PRJ_NAB);
 
-            // create a study so we can test copy-to-study later:
-            clickProject(TEST_ASSAY_PRJ_NAB);
-            _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, null);
-            addWebPart("Study Overview");
-            clickButton("Create Study");
-            clickButton("Create Study");
+        // create a study so we can test copy-to-study later:
+        clickProject(TEST_ASSAY_PRJ_NAB);
+        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, null);
 
-            //add the Assay List web part so we can create a new nab assay
-            _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
-            clickProject(TEST_ASSAY_PRJ_NAB);
-            addWebPart("Assay List");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Study Overview");
 
-            //create a new nab assay
-            clickButton("Manage Assays");
-            startCreateNabAssay(TEST_ASSAY_NAB);
-            selenium.type("//textarea[@id='AssayDesignerDescription']", TEST_ASSAY_NAB_DESC);
+        clickButton("Create Study");
+        clickButton("Create Study");
 
-            sleep(1000);
-            clickButton("Save", 0);
-            waitForText("Save successful.", 20000);
+        //add the Assay List web part so we can create a new nab assay
+        _containerHelper.createSubfolder(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_NAB, null);
 
-            clickAndWait(Locator.linkWithText("configure templates"));
+        clickProject(TEST_ASSAY_PRJ_NAB);
+        portalHelper.addWebPart("Assay List");
 
-            clickAndWait(Locator.linkWithText("new 96 well (8x12) NAb single-plate template"));
+        //create a new nab assay
+        clickButton("Manage Assays");
+        startCreateNabAssay(TEST_ASSAY_NAB);
+        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), TEST_ASSAY_NAB_DESC);
 
-            waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
+        sleep(1000);
+        clickButton("Save", 0);
+        waitForText("Save successful.", 20000);
 
-            setText("templateName", PLATE_TEMPLATE_NAME);
+        clickAndWait(Locator.linkWithText("configure templates"));
 
-            // select the specimen wellgroup tab
-            click(Locator.tagWithText("div", "SPECIMEN"));
+        clickAndWait(Locator.linkWithText("new 96 well (8x12) NAb single-plate template"));
 
-            // select the first specimen group
-            click(Locator.tagWithText("label", "Specimen 1"));
-            // set reversed dilution direction to true:
-            selenium.type("//input[@id='property-ReverseDilutionDirection']", "true");
+        waitForElement(Locator.xpath("//input[@id='templateName']"), WAIT_FOR_JAVASCRIPT);
 
-            // select the second specimen group
-            click(Locator.tagWithText("label", "Specimen 2"));
-            // set reversed dilution direction to false:
-            selenium.type("//input[@id='property-ReverseDilutionDirection']", "false");
+        setFormElement(Locator.id("templateName"), PLATE_TEMPLATE_NAME);
 
-            // select the third specimen group
-            click(Locator.tagWithText("label", "Specimen 3"));
-            // set reversed dilution direction to a nonsense value:
-            selenium.type("//input[@id='property-ReverseDilutionDirection']", "invalid boolean value");
+        // select the specimen wellgroup tab
+        click(Locator.tagWithText("div", "SPECIMEN"));
 
-            // note that we're intentionally leaving the fourth and fifth direction specifiers null, which should default to 'false'
+        // select the first specimen group
+        click(Locator.tagWithText("label", "Specimen 1"));
+        // set reversed dilution direction to true:
+        setFormElement(Locator.xpath("//input[@id='property-ReverseDilutionDirection']"), "true");
 
-            clickButton("Save & Close");
+        // select the second specimen group
+        click(Locator.tagWithText("label", "Specimen 2"));
+        // set reversed dilution direction to false:
+        setFormElement(Locator.xpath("//input[@id='property-ReverseDilutionDirection']"), "false");
 
-            assertTextPresent(PLATE_TEMPLATE_NAME);
-            assertTextPresent("NAb: 5 specimens in duplicate");
+        // select the third specimen group
+        click(Locator.tagWithText("label", "Specimen 3"));
+        // set reversed dilution direction to a nonsense value:
+        setFormElement(Locator.xpath("//input[@id='property-ReverseDilutionDirection']"), "invalid boolean value");
 
-            clickProject(TEST_ASSAY_PRJ_NAB);
-            clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        // note that we're intentionally leaving the fourth and fifth direction specifiers null, which should default to 'false'
 
-            clickEditAssayDesign(false);
-            waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_JAVASCRIPT);
+        clickButton("Save & Close");
 
-            selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
+        assertTextPresent(PLATE_TEMPLATE_NAME);
+        assertTextPresent("NAb: 5 specimens in duplicate");
 
-            clickButton("Save", 0);
-            waitForText("Save successful.", 20000);
+        clickProject(TEST_ASSAY_PRJ_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
-            clickAndWait(Locator.linkWithText("configure templates"));
+        clickEditAssayDesign(false);
+        waitForElement(Locator.xpath("//select[@id='plateTemplate']"), WAIT_FOR_JAVASCRIPT);
 
-            click(Locator.linkWithText("delete", 0));
+        selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
 
-            assertConfirmation("Permanently delete this plate template?");
+        clickButton("Save", 0);
+        waitForText("Save successful.", 20000);
 
-            waitForPageToLoad();
+        clickAndWait(Locator.linkWithText("configure templates"));
 
-            assertTextPresent(PLATE_TEMPLATE_NAME);
-            assertTextNotPresent("NAb: 5 specimens in duplicate");
-        }
+        prepForPageLoad();
+        click(Locator.linkWithText("delete"));
+
+        assertAlert("Permanently delete this plate template?");
+
+        newWaitForPageToLoad();
+
+        assertTextPresent(PLATE_TEMPLATE_NAME);
+        assertTextNotPresent("NAb: 5 specimens in duplicate");
 
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_NAB);
-        addWebPart("Assay List");
+        portalHelper.addWebPart("Assay List");
 
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
-        if (isFileUploadAvailable())
+        log("Uploading NAb Runs");
+        clickButton("Import Data");
+        clickButton("Next");
+
+        setFormElement(Locator.name("cutoff1"), "50");
+        setFormElement(Locator.name("cutoff2"), "70");
+        setFormElement(Locator.name("virusName"), "Nasty Virus");
+        setFormElement(Locator.name("virusID"), "5433211");
+        selectOptionByText(Locator.name("curveFitMethod"), "Polynomial");
+
+        for (int i = 0; i < 5; i++)
         {
-            log("Uploading NAb Runs");
-            clickButton("Import Data");
-            clickButton("Next");
-
-            setFormElement("cutoff1", "50");
-            setFormElement("cutoff2", "70");
-            setFormElement("virusName", "Nasty Virus");
-            setFormElement("virusID", "5433211");
-            selectOptionByText("curveFitMethod", "Polynomial");
-
-            for (int i = 0; i < 5; i++)
-            {
-                setFormElement("specimen" + (i + 1) + "_ParticipantID", "ptid " + (i + 1));
-                setFormElement("specimen" + (i + 1) + "_VisitID", "" + (i + 1));
-                setFormElement("specimen" + (i + 1) + "_InitialDilution", "20");
-                setFormElement("specimen" + (i + 1) + "_Factor", "3");
-                selectOptionByText("specimen" + (i + 1) + "_Method", "Dilution");
-            }
-
-            uploadFile(TEST_ASSAY_NAB_FILE1, "A", "Save and Import Another Run");
-            assertTextPresent("Upload successful.");
-
-            setFormElement("cutoff2", "80");
-            selectOptionByText("curveFitMethod", "Four Parameter");
-            uploadFile(TEST_ASSAY_NAB_FILE2, "B", "Save and Import Another Run");
-            assertTextPresent("Upload successful.");
-
-            selectOptionByText("curveFitMethod", "Five Parameter");
-            uploadFile(TEST_ASSAY_NAB_FILE3, "C", "Save and Finish");
-            //uploadFile(TEST_ASSAY_NAB_FILE4, "D");
-            //uploadFile(TEST_ASSAY_NAB_FILE5, "E");
-
-            assertTextPresent("Virus Name", "Nasty Virus", "ptid 1 C, Vst 1.0");
-            assertTextPresent("&lt; 20", 10);
-
-            // check for the first dilution for the second participant:
-            assertTextPresent(
-            "561",      // Five Parameter IC50
-            "0.077",    // Five PL AUC
-            "0.081");   // Five PL posAUC
-            assertTextNotPresent(
-            "503",      // Polynomial IC50
-            "461");     // Four parameter IC50
-
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Four Parameter");
-            assertTextPresent(
-            "461",      // Four parameter IC50
-            "0.043");   // 4PL AUC/PosAUC
-            assertTextNotPresent(
-            "561",      // Five Parameter IC50
-            "503",      // Polynomial IC50
-            "0.077");   // Five PL AUC
-
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Polynomial");
-            assertTextPresent(
-            "503",      // Polynomial IC50:
-            "0.054",    // Polynomial AUC:
-            "0.055");   // Polynomial posAUC:
-            assertTextNotPresent(
-            "561",      // Five Parameter IC50
-            "461",      // Four parameter IC50
-            "0.077",    // Five PL AUC
-            "0.043");   // 4PL AUC/PosAUC
-
-            log("Verify different graph sizes");
-            // Defaults to Small sized graphs
-            Number graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
-            assertEquals("Graphs aren't the correct size (Large)", 300, graphHeight);
-
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Large");
-            graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
-            assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
-
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Medium");
-            graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
-            assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
-
-            _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Small");
-            graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
-            assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
-
-            // Test editing runs
-            // Set the design to allow editing
-            clickAndWait(Locator.linkWithText("View Runs"));
-            assertLinkNotPresentWithText("edit");
-            click(Locator.linkWithText("manage assay design"));
-            selenium.chooseOkOnNextConfirmation();
-            clickAndWait(Locator.linkWithText("edit assay design"));
-            assertConfirmation("This assay is defined in the /Nab Test Verify Project folder. Would you still like to edit it?");
-
-            waitForElement(Locator.xpath("//span[@id='id_editable_run_properties']"), WAIT_FOR_JAVASCRIPT);
-            checkCheckbox(Locator.xpath("//span[@id='id_editable_run_properties']/input"));
-            clickButton("Save & Close");
-
-            // Edit the first run
-            clickFolder(TEST_ASSAY_FLDR_NAB);
-            clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-            clickAndWait(Locator.linkWithText("edit"));
-            // Make sure that the properties that affect calculations aren't shown
-            assertTextNotPresent("Cutoff");
-            assertTextNotPresent("Curve Fit Method");
-            setText("quf_Name", "NameEdited.xlsx");
-            setText("quf_HostCell", "EditedHostCell");
-            setText("quf_PlateNumber", "EditedPlateNumber");
-            clickButton("Submit");
-            assertLinkPresentWithText("NameEdited.xlsx");
-            assertTextPresent("EditedHostCell", "EditedPlateNumber");
-
-            // Verify that the edit was audited
-            goToModule("Query");
-            selectQuery("auditLog", "ExperimentAuditEvent");
-            waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
-            clickAndWait(Locator.linkWithText("view data"));
-            assertTextPresent("Run edited",
-                    "Plate Number changed from blank to 'EditedPlateNumber'",
-                    "Host Cell changed from blank to 'EditedHostCell'",
-                    "Name changed from 'm0902055;4001.xlsx' to 'NameEdited.xlsx'");
-
-            // Return to the run list
-            clickFolder(TEST_ASSAY_FLDR_NAB);
-            clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-
-            // test creating a custom details view via a "magic" named run-level view:
-            _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.removeCustomizeViewColumn("VirusName");
-            _customizeViewsHelper.saveCustomView("CustomDetailsView");
-
-            clickAndWait(Locator.linkContainingText("details", 1));
-            assertNabData(true);
-
-            clickAndWait(Locator.linkWithText("View Results"));
-
-            assertAUCColumnsHidden();
-            addAUCColumns();
-            assertAliasedAUCCellData();
-
-            setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
-            assertTextPresent("ptid 1 C");
-            String ptid1c_detailsURL = getAttribute(Locator.xpath("//a[contains(text(), 'details')]"), "href");
-            setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals One Of (e.g. \"a;b;c\")", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
-            assertTextPresent("ptid 1 A");
-            assertTextPresent("ptid 1 B");
-            assertTextNotPresent("ptid 1 C");
-            assertTextNotPresent("ptid 5");
-            checkAllOnPage("Data");
-            clickButton("Copy to Study");
-
-            selectOptionByText("targetStudy", "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
-            clickButton("Next");
-            clickButton("Copy to Study");
-            assertStudyData(4);
-
-            assertAliasedAUCStudyData();
-
-            clickAndWait(Locator.linkWithText("assay"));
-            assertNabData(true);
-
-            doSchemaBrowserTest();
-
-            doResolverTypeTest();
-
-            // create user with read permissions to study and dataset, but no permissions to source assay
-            clickProject(TEST_ASSAY_PRJ_NAB);
-            clickFolder(TEST_ASSAY_FLDR_STUDY1);
-            pushLocation();  // Save our location because impersonatied user won't have permission to project
-            createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
-            setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
-            setStudyPerms(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_STUDY_READALL);
-
-            // view dataset, click [assay] link, see assay details in nabassay container
-            impersonate(TEST_ASSAY_USR_NAB_READER);
-            popLocation();
-            assertTextPresent(TEST_ASSAY_PRJ_NAB);
-            assertTextNotPresent(TEST_ASSAY_FLDR_NAB); // assert no read permissions to nabassay container
-            clickFolder(TEST_ASSAY_FLDR_STUDY1);
-            clickAndWait(Locator.linkWithText("Study Navigator"));
-            clickAndWait(Locator.linkWithText("2"));
-            assertStudyData(1);
-            clickAndWait(Locator.linkWithText("assay"));
-            assertNabData(false); // CustomDetailsView not enabled for all users so "Virus Name" is present
-
-            // no permission to details page for "ptid 1 C"; it wasn't copied to the study
-            beginAt(ptid1c_detailsURL);
-            assertEquals(getResponseCode(), 401);
-
-            beginAt("/login/logout.view");  // stop impersonating
-
-            doNabApiTest();
-
-            runTransformTest();
-
-            moveAssayFolderTest();
-
-            directBrowserQueryTest();
+            setFormElement(Locator.name("specimen" + (i + 1) + "_ParticipantID"), "ptid " + (i + 1));
+            setFormElement(Locator.name("specimen" + (i + 1) + "_VisitID"), "" + (i + 1));
+            setFormElement(Locator.name("specimen" + (i + 1) + "_InitialDilution"), "20");
+            setFormElement(Locator.name("specimen" + (i + 1) + "_Factor"), "3");
+            selectOptionByText(Locator.name("specimen" + (i + 1) + "_Method"), "Dilution");
         }
+
+        uploadFile(TEST_ASSAY_NAB_FILE1, "A", "Save and Import Another Run");
+        assertTextPresent("Upload successful.");
+
+        setFormElement(Locator.name("cutoff2"), "80");
+        selectOptionByText(Locator.name("curveFitMethod"), "Four Parameter");
+        uploadFile(TEST_ASSAY_NAB_FILE2, "B", "Save and Import Another Run");
+        assertTextPresent("Upload successful.");
+
+        selectOptionByText(Locator.name("curveFitMethod"), "Five Parameter");
+        uploadFile(TEST_ASSAY_NAB_FILE3, "C", "Save and Finish");
+        //uploadFile(TEST_ASSAY_NAB_FILE4, "D");
+        //uploadFile(TEST_ASSAY_NAB_FILE5, "E");
+
+        assertTextPresent("Virus Name", "Nasty Virus", "ptid 1 C, Vst 1.0");
+        assertTextPresent("&lt; 20", 10);
+
+        // check for the first dilution for the second participant:
+        String nabData = getText(Locator.id("bodypanel"));
+        assertTrue(nabData.contains("561"));      // Five Parameter IC50
+        assertTrue(nabData.contains("0.077"));    // Five PL AUC
+        assertTrue(nabData.contains("0.081"));    // Five PL posAUC
+        assertFalse(nabData.contains("503"));      // Polynomial IC50
+        assertFalse(nabData.contains("461"));      // Four parameter IC50
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Four Parameter");
+        nabData = getText(Locator.id("bodypanel"));
+        assertTrue(nabData.contains("461"));      // Four parameter IC50
+        assertTrue(nabData.contains("0.043"));    // 4PL AUC/PosAUC
+        assertFalse(nabData.contains("561"));      // Five Parameter IC50
+        assertFalse(nabData.contains("503"));      // Polynomial IC50
+        assertFalse(nabData.contains("0.077"));    // Five PL AUC
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Polynomial");
+        nabData = getText(Locator.id("bodypanel"));
+        assertTrue(nabData.contains("503"));      // Polynomial IC50:
+        assertTrue(nabData.contains("0.054"));    // Polynomial AUC:
+        assertTrue(nabData.contains("0.055"));    // Polynomial posAUC:
+        assertFalse(nabData.contains("561"));      // Five Parameter IC50
+        assertFalse(nabData.contains("461"));      // Four parameter IC50
+        assertFalse(nabData.contains("0.077"));    // Five PL AUC
+        assertFalse(nabData.contains("0.043"));    // 4PL AUC/PosAUC
+
+        log("Verify different graph sizes");
+        Locator nabGraph = Locator.tagWithAttribute("img", "alt", "Neutralization Graph");
+        // Defaults to Small sized graphs
+        Number graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        assertEquals("Graphs aren't the correct size (Large)", 300, graphHeight);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Large");
+        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Medium");
+        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Small");
+        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
+
+        // Test editing runs
+        // Set the design to allow editing
+        clickAndWait(Locator.linkWithText("View Runs"));
+        assertElementNotPresent(Locator.linkWithText("edit"));
+        click(Locator.linkWithText("manage assay design"));
+        prepForPageLoad();
+        click(Locator.linkWithText("edit assay design"));
+        assertAlert("This assay is defined in the /Nab Test Verify Project folder. Would you still like to edit it?");
+        newWaitForPageToLoad();
+
+        waitForElement(Locator.xpath("//span[@id='id_editable_run_properties']"), WAIT_FOR_JAVASCRIPT);
+        checkCheckbox(Locator.xpath("//span[@id='id_editable_run_properties']/input"));
+        clickButton("Save & Close");
+
+        // Edit the first run
+        clickFolder(TEST_ASSAY_FLDR_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        clickAndWait(Locator.linkWithText("edit"));
+        // Make sure that the properties that affect calculations aren't shown
+        assertTextNotPresent("Cutoff");
+        assertTextNotPresent("Curve Fit Method");
+        setFormElement(Locator.name("quf_Name"), "NameEdited.xlsx");
+        setFormElement(Locator.name("quf_HostCell"), "EditedHostCell");
+        setFormElement(Locator.name("quf_PlateNumber"), "EditedPlateNumber");
+        clickButton("Submit");
+        assertElementPresent(Locator.linkWithText("NameEdited.xlsx"));
+        assertTextPresent("EditedHostCell", "EditedPlateNumber");
+
+        // Verify that the edit was audited
+        goToModule("Query");
+        selectQuery("auditLog", "ExperimentAuditEvent");
+        waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
+        clickAndWait(Locator.linkWithText("view data"));
+        assertTextPresent("Run edited",
+                "Plate Number changed from blank to 'EditedPlateNumber'",
+                "Host Cell changed from blank to 'EditedHostCell'",
+                "Name changed from 'm0902055;4001.xlsx' to 'NameEdited.xlsx'");
+
+        // Return to the run list
+        clickFolder(TEST_ASSAY_FLDR_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+
+        // test creating a custom details view via a "magic" named run-level view:
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.removeCustomizeViewColumn("VirusName");
+        _customizeViewsHelper.saveCustomView("CustomDetailsView");
+
+        clickAndWait(Locator.linkContainingText("details", 1));
+        assertNabData(true);
+
+        clickAndWait(Locator.linkWithText("View Results"));
+
+        assertAUCColumnsHidden();
+        addAUCColumns();
+        assertAliasedAUCCellData();
+
+        setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
+        assertTextPresent("ptid 1 C");
+        String ptid1c_detailsURL = getAttribute(Locator.xpath("//a[contains(text(), 'details')]"), "href");
+        setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals One Of (e.g. \"a;b;c\")", "ptid 1 A;ptid 1 B;ptid 2 A;ptid 2 B;ptid 3 A;ptid 3 B;ptid 4 A;ptid 4 B");
+        assertTextPresent("ptid 1 A");
+        assertTextPresent("ptid 1 B");
+        assertTextNotPresent("ptid 1 C");
+        assertTextNotPresent("ptid 5");
+        checkAllOnPage("Data");
+        clickButton("Copy to Study");
+
+        selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_NAB + "/" + TEST_ASSAY_FLDR_STUDY1 + " (" + TEST_ASSAY_FLDR_STUDY1 + " Study)");
+        clickButton("Next");
+        clickButton("Copy to Study");
+        assertStudyData(4);
+
+        assertAliasedAUCStudyData();
+
+        clickAndWait(Locator.linkWithText("assay"));
+        assertNabData(true);
+
+        doSchemaBrowserTest();
+
+        doResolverTypeTest();
+
+        // create user with read permissions to study and dataset, but no permissions to source assay
+        clickProject(TEST_ASSAY_PRJ_NAB);
+        clickFolder(TEST_ASSAY_FLDR_STUDY1);
+        pushLocation();  // Save our location because impersonatied user won't have permission to project
+        createPermissionsGroup(TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_USR_NAB_READER);
+        setSubfolderSecurity(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_READER);
+        setStudyPerms(TEST_ASSAY_PRJ_NAB, TEST_ASSAY_FLDR_STUDY1, TEST_ASSAY_GRP_NAB_READER, TEST_ASSAY_PERMS_STUDY_READALL);
+
+        // view dataset, click [assay] link, see assay details in nabassay container
+        impersonate(TEST_ASSAY_USR_NAB_READER);
+        popLocation();
+        assertTextPresent(TEST_ASSAY_PRJ_NAB);
+        assertTextNotPresent(TEST_ASSAY_FLDR_NAB); // assert no read permissions to nabassay container
+        clickFolder(TEST_ASSAY_FLDR_STUDY1);
+        clickAndWait(Locator.linkWithText("Study Navigator"));
+        clickAndWait(Locator.linkWithText("2"));
+        assertStudyData(1);
+        clickAndWait(Locator.linkWithText("assay"));
+        assertNabData(false); // CustomDetailsView not enabled for all users so "Virus Name" is present
+
+        // no permission to details page for "ptid 1 C"; it wasn't copied to the study
+        beginAt(ptid1c_detailsURL);
+        assertEquals(getResponseCode(), 401);
+
+        beginAt("/login/logout.view");  // stop impersonating
+
+        doNabApiTest();
+
+        runTransformTest();
+
+        moveAssayFolderTest();
+
+        directBrowserQueryTest();
     } //doTestSteps()
 
 
@@ -537,10 +542,9 @@ public class NabAssayTest extends AbstractQCAssayTest
                         QUERY_NAME + ".WellgroupName\n" +
                         "FROM " + QUERY_NAME + "\n"
         );
-        clickButton("Save & Finish", 0);
-        waitForText("Views", WAIT_FOR_JAVASCRIPT);
-        assertTextPresent("AUC", "Curve IC50 4pl", "Curve IC50 4pl OOR Indicator", "Participant ID", "Wellgroup Name");
-        assertTextPresent("<20.0", "ptid 1 C", "473.94");
+        clickButton("Save & Finish");
+        assertTextPresent("AUC", "Curve IC50 4pl", "Curve IC50 4pl OOR Indicator", "Participant ID", "Wellgroup Name",
+                          "<20.0", "ptid 1 C", "473.94");
     }
 
     private void doResolverTypeTest()
@@ -565,9 +569,11 @@ public class NabAssayTest extends AbstractQCAssayTest
     private static String WIKIPAGE_NAME = "Nab API Wiki";
     private void doNabApiTest()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_NAB);
-        addWebPart("Wiki");
+        portalHelper.addWebPart("Wiki");
         createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
@@ -581,16 +587,16 @@ public class NabAssayTest extends AbstractQCAssayTest
     {
         for (int i = 0; i < 5; i++)
         {
-            setFormElement("specimen" + (i + 1) + "_ParticipantID", "ptid " + (i + 1) + " " + uniqueifier);
-            setFormElement("specimen" + (i + 1) + "_VisitID", "" + (i + 1));
-            setFormElement("specimen" + (i + 1) + "_InitialDilution", "20");
-            setFormElement("specimen" + (i + 1) + "_Factor", "3");
-            selectOptionByText("specimen" + (i + 1) + "_Method", "Dilution");
+            setFormElement(Locator.name("specimen" + (i + 1) + "_ParticipantID"), "ptid " + (i + 1) + " " + uniqueifier);
+            setFormElement(Locator.name("specimen" + (i + 1) + "_VisitID"), "" + (i + 1));
+            setFormElement(Locator.name("specimen" + (i + 1) + "_InitialDilution"), "20");
+            setFormElement(Locator.name("specimen" + (i + 1) + "_Factor"), "3");
+            selectOptionByText(Locator.name("specimen" + (i + 1) + "_Method"), "Dilution");
         }
 
-        setFormElement("dataCollectorName", "File upload");
         File file1 = new File(filePath);
-        setFormElement("__primaryFile__", file1);
+        setFormElement(Locator.name("__primaryFile__"), file1);
+//        setFormElement(Locator.name("dataCollectorName"), "File upload");
         clickButton(finalButton, 60000);
     }
 
@@ -699,8 +705,8 @@ public class NabAssayTest extends AbstractQCAssayTest
         // Check that aliased AUC column show data from correct columns.  Any changes in the default location/quantity of columns will require adjustment of column indices.
         DataRegionTable table = new DataRegionTable("Data", this);
 
-        assertEquals("", table.getDataAsText(0, CURVE_IC80_COL_TITLE)); //ptid 1 A, Curve IC 80. Should be blank.
-        assertEquals("", table.getDataAsText(5, CURVE_IC70_COL_TITLE)); //ptid 1 B, Curve IC 70. Should be blank.
+        assertEquals(" ", table.getDataAsText(0, CURVE_IC80_COL_TITLE)); //ptid 1 A, Curve IC 80. Should be blank.
+        assertEquals(" ", table.getDataAsText(5, CURVE_IC70_COL_TITLE)); //ptid 1 B, Curve IC 70. Should be blank.
 
         for(int i = 0; i < 5; i++)
         {
@@ -745,8 +751,8 @@ public class NabAssayTest extends AbstractQCAssayTest
         assertEquals(table.getDataAsText(0, CURVE_IC70_STUDY_COL_TITLE), table.getDataAsText(0, CURVE_IC70_POLY_STUDY_COL_TITLE)); //CurveIC70 = CurveIC70_poly
         assertEquals(table.getDataAsText(1, CURVE_IC80_STUDY_COL_TITLE), table.getDataAsText(1, CURVE_IC80_4PL_STUDY_COL_TITLE));  //CurveIC80 = CurveIC80_4pl
 
-        assertEquals("", table.getDataAsText(0, CURVE_IC80_STUDY_COL_TITLE)); //IC80 = blank
-        assertEquals("", table.getDataAsText(1, CURVE_IC70_STUDY_COL_TITLE)); //IC70 = blank
+        assertEquals(" ", table.getDataAsText(0, CURVE_IC80_STUDY_COL_TITLE)); //IC80 = blank
+        assertEquals(" ", table.getDataAsText(1, CURVE_IC70_STUDY_COL_TITLE)); //IC70 = blank
     }
 
     /**
@@ -755,15 +761,12 @@ public class NabAssayTest extends AbstractQCAssayTest
      */
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        if (!CONTINUE)
-        {
-            revertToAdmin();
-            deleteProject(getProjectName(), afterTest);
-            try{deleteEngine();}
-            catch(Throwable T) {}
+        revertToAdmin();
+        deleteProject(getProjectName(), afterTest);
+        try{deleteEngine();}
+        catch(Throwable T) {}
 
-            deleteDir(getTestTempDir());
-        }
+        deleteDir(getTestTempDir());
     } //doCleanup()
 
     protected boolean isFileUploadTest()
@@ -787,10 +790,10 @@ public class NabAssayTest extends AbstractQCAssayTest
         clickButton("Import Data");
         clickButton("Next");
 
-        setFormElement("name", "transformed assayId");
-        setFormElement("cutoff1", "50");
-        setFormElement("cutoff2", "80");
-        selectOptionByText("curveFitMethod", "Polynomial");
+        setFormElement(Locator.name("name"), "transformed assayId");
+        setFormElement(Locator.name("cutoff1"), "50");
+        setFormElement(Locator.name("cutoff2"), "80");
+        selectOptionByText(Locator.name("curveFitMethod"), "Polynomial");
         uploadFile(TEST_ASSAY_NAB_FILE1, "E", "Save and Finish");
 
         // verify the run property FileID was generated by the transform script

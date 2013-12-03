@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
@@ -52,6 +53,8 @@ public abstract class AbstractAssayTestWD extends SimpleApiTestWD
     protected final static String TEST_ASSAY_FLDR_STUDY3 = "Study 3";                 //another sub of Studies
     protected final static String TEST_ASSAY_PERMS_STUDY_READALL = "READ";
 
+    private PortalHelper portalHelper = new PortalHelper(this);
+
     /**
      * Sets up the data pipeline for the specified project. This can be called from any page.
      * @param project name of project for which the pipeline should be setup
@@ -61,7 +64,7 @@ public abstract class AbstractAssayTestWD extends SimpleApiTestWD
     {
         log("Setting up data pipeline for project " + project);
         clickProject(project);
-        addWebPart("Data Pipeline");
+        portalHelper.addWebPart("Data Pipeline");
         clickButton("Setup");
         File dir = getTestTempDir();
         dir.mkdirs();
@@ -106,10 +109,10 @@ public abstract class AbstractAssayTestWD extends SimpleApiTestWD
         //we should now be sitting on the new project security page
         //create a group in the project for PIs and make them readers by default
         createPermissionsGroup(TEST_ASSAY_GRP_PIS);
-        setPermissions(TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_READER);
+        _securityHelper.setProjectPerm(TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_READER);
 
         //set Users group to be Readers by default
-        setPermissions(TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_READER);
+        _securityHelper.setProjectPerm(TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_READER);
 
         //add a PI user to that group
         addUserToProjGroup(TEST_ASSAY_USR_PI1, TEST_ASSAY_PRJ_SECURITY,TEST_ASSAY_GRP_PIS);
@@ -165,7 +168,7 @@ public abstract class AbstractAssayTestWD extends SimpleApiTestWD
         log("Adding assay list web part to lab1 folder");
         clickProject(TEST_ASSAY_PRJ_SECURITY);
         clickFolder(TEST_ASSAY_FLDR_LAB1);
-        addWebPart("Assay List");
+        portalHelper.addWebPart("Assay List");
     } //setupEnvironment()
 
     /**
@@ -187,6 +190,7 @@ public abstract class AbstractAssayTestWD extends SimpleApiTestWD
         enterPermissionsUI();
         uncheckInheritedPermissions();
         waitAndClickButton("Save", 0);
+        _ext4Helper.waitForMaskToDisappear();
         waitForElement(Locator.permissionRendered());
         if (TEST_ASSAY_PERMS_NONE.equals(perms))
         {
@@ -194,7 +198,7 @@ public abstract class AbstractAssayTestWD extends SimpleApiTestWD
             removePermission(group, "Reader");
         }
         else
-            setPermissions(group, perms);
+            _securityHelper.setProjectPerm(group, perms);
     } //setSubFolderSecurity()
 
     /**

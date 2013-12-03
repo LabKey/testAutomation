@@ -33,7 +33,7 @@ import static org.junit.Assert.*;
  * Date: 2/27/13
  */
 @Category({DailyA.class, Assays.class})
-public class NabHighThroughputAssayTest extends AbstractAssayTest
+public class NabHighThroughputAssayTest extends AbstractAssayTestWD
 {
     private final static String TEST_ASSAY_PRJ_NAB = "Nab High Throughput Test Verify Project";            //project for nab test
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";
@@ -111,8 +111,8 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
 
         log("Setting up NAb assay");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-        getWrapper().type("//input[@id='AssayDesignerName']", name);
-        getWrapper().type("//textarea[@id='AssayDesignerDescription']", description);
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), name);
+        setFormElement(Locator.xpath("//textarea[@id='AssayDesignerDescription']"), description);
         selectOptionByValue(Locator.xpath("//select[@id='plateTemplate']"), PLATE_TEMPLATE_NAME);
 
         if(singleFile)
@@ -230,20 +230,21 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.8 0.051 0.054"));
 
         log("Verify different graph sizes");
+        Locator nabGraph = Locator.tagWithAttribute("img", "alt", "Neutralization Graph");
         // Defaults to Medium sized graphs
-        Number graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+        Number graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Large)", 550, graphHeight);
 
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Large");
-        graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
 
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Medium");
-        graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
 
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Small");
-        graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
 
         log("Verify different samples per graph");
@@ -287,7 +288,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkContainingText("Print"));
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.8 0.051 0.054"));
-        graphHeight = selenium.getElementHeight(Locator.tagWithAttribute("img", "alt", "Neutralization Graph").toString());
+        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
         assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 12);
         assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 4); // Correct number of graphs in first row
@@ -304,15 +305,15 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
     }
 
     @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
-
-    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
         deleteDir(getTestTempDir());
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

@@ -89,7 +89,7 @@ public class ViabilityTest extends AbstractViabilityTest
         assertFormElementEquals("_pool_1604505335_0_TotalCells", "3.700E7");
         assertFormElementEquals("_pool_1604505335_0_ViableCells", "3.127E7");
         assertFormElementEquals("_pool_1604505335_0_Viability", "84.5%");
-        assertFormElementEquals("_pool_1604505335_0_Unreliable", "off");
+        assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
         assertFormElementEquals("_pool_1604505335_0_IntValue", "");
 
         log("** Insert specimen IDs");
@@ -100,16 +100,18 @@ public class ViabilityTest extends AbstractViabilityTest
         addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
 
         log("** Set Unreliable flag and IntValue");
-        checkCheckbox("_pool_1604505335_0_Unreliable", 0);
+        checkCheckbox(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
         setFormElement(Locator.xpath("//input[@name='_pool_1604505335_0_IntValue'][1]"), "300");
 
+        prepForPageLoad();
         clickButton("Save and Finish", 0);
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
                 "  Sample number 33: SpecimenIDs\n" +
                 "  Sample number 34: SpecimenIDs\n\n" +
                 "Save anyway?";
-        String actualConfirmation = getConfirmationAndWait();
+        String actualConfirmation = getAlert();
         log("** Got confirmation: " + actualConfirmation);
+        newWaitForPageToLoad();
 
         //This is a test for Issue 10054, which has been resolved as won't fix.
         //assertEquals(expectConfirmation, actualConfirmation);
@@ -135,7 +137,7 @@ public class ViabilityTest extends AbstractViabilityTest
         if (TestProperties.isGroupConcatSupported())
             assertEquals("vial1,vial2,vial3", table.getDataAsText(0, "SpecimenMatches"));
         else
-            assertEquals("", table.getDataAsText(0, "SpecimenMatches"));
+            assertEquals(" ", table.getDataAsText(0, "SpecimenMatches"));
         assertEquals("4", table.getDataAsText(0, "SpecimenCount"));
         assertEquals("3", table.getDataAsText(0, "SpecimenMatchCount"));
         assertEquals("52.11%", table.getDataAsText(0, "Recovery"));
@@ -162,12 +164,12 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals("xyzzy", table.getDataAsText(4, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(4, "SpecimenCount"));
         assertEquals("0", table.getDataAsText(4, "SpecimenMatchCount"));
-        assertEquals("", table.getDataAsText(4, "Recovery"));
+        assertEquals(" ", table.getDataAsText(4, "Recovery"));
 
-        assertEquals("", table.getDataAsText(5, "Specimen IDs"));
+        assertEquals(" ", table.getDataAsText(5, "Specimen IDs"));
         assertEquals("0", table.getDataAsText(5, "SpecimenCount"));
-        assertEquals("", table.getDataAsText(5, "SpecimenMatchCount"));
-        assertEquals("", table.getDataAsText(5, "Recovery"));
+        assertEquals(" ", table.getDataAsText(5, "SpecimenMatchCount"));
+        assertEquals(" ", table.getDataAsText(5, "Recovery"));
     }
 
     protected void runReRunTest()
@@ -187,9 +189,11 @@ public class ViabilityTest extends AbstractViabilityTest
         // Check the 'Unreliable' field isn't copied on re-run
         assertNotChecked(Locator.checkboxByName("_pool_1604505335_0_Unreliable"));
 
+        prepForPageLoad();
         clickButton("Save and Finish", 0);
-        String actualConfirmation = getConfirmationAndWait();
+        String actualConfirmation = getAlert();
         log("** Got confirmation: " + actualConfirmation);
+        newWaitForPageToLoad();
 
         log(".. checking re-runs are placed in the same Run Group");
         DataRegionTable runsTable = new DataRegionTable("Runs", this);
@@ -199,7 +203,7 @@ public class ViabilityTest extends AbstractViabilityTest
         runsTable.clickLink(0, "Run Groups");
 
         // Run Group name should be "Assay Name-XXX" where XXX is the run group rowid
-        String runGroupRowId = getUrlParam(selenium.getLocation(), "rowId", true);
+        String runGroupRowId = getUrlParam(getDriver().getCurrentUrl(), "rowId", true);
         assertEquals(getAssayName() + "-" + runGroupRowId, runGroupName);
         assertTextPresent("Re-importing any Viability run in this run group will place the new run in this same run group.");
         runsTable = new DataRegionTable("Runs", this);
@@ -209,7 +213,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickAndWait(Locator.linkWithText(runName));
 
         DataRegionTable dataTable = new DataRegionTable("Data", this);
-        assertEquals("", dataTable.getDataAsText(0, "Unreliable?"));
+        assertEquals(" ", dataTable.getDataAsText(0, "Unreliable?"));
         assertEquals("300", dataTable.getDataAsText(0, "IntValue"));
     }
 
@@ -255,13 +259,15 @@ public class ViabilityTest extends AbstractViabilityTest
         addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
         addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
 
+        prepForPageLoad();
         clickButton("Save and Finish", 0);
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
                 "  Sample number 33: SpecimenIDs\n" +
                 "  Sample number 34: SpecimenIDs\n\n" +
                 "Save anyway?";
-        String actualConfirmation = getConfirmationAndWait();
+        String actualConfirmation = getAlert();
         log("** Got confirmation: " + actualConfirmation);
+        newWaitForPageToLoad();
 
         // verify the description error was generated by the transform script
         clickAndWait(Locator.linkWithText("transformed assayId"));
@@ -294,8 +300,8 @@ public class ViabilityTest extends AbstractViabilityTest
         waitForElement(Locator.navButton("Add Script"));
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
-        deleteField("Batch Fields", 0);
-        addField("Result Fields", 13, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
+        _listHelper.deleteField("Batch Fields", 0);
+        _listHelper.addField("Result Fields", 13, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
         clickButton("Save & Close");
 
         clickProject(getProjectName());
@@ -308,17 +314,21 @@ public class ViabilityTest extends AbstractViabilityTest
 
         log("** Test 'same' checkbox for TargetStudy");
         String targetStudyOptionText = "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)";
-        selectOptionByText("_pool_1604505335_0_TargetStudy", targetStudyOptionText);
+        selectOptionByText(Locator.name("_pool_1604505335_0_TargetStudy"), targetStudyOptionText);
         assertEquals("[None]", getSelectedOptionText(Locator.name("_pool_1594020325_1_TargetStudy")));
-        clickCheckboxById("_pool_1604505335_0_TargetStudyCheckBox");
-        assertOptionEquals(Locator.name("_pool_1594020325_1_TargetStudy"), targetStudyOptionText);
-        assertOptionEquals(Locator.name("_pool_161400006115_3_TargetStudy"), targetStudyOptionText);
-        clickCheckboxById("_pool_1604505335_0_TargetStudyCheckBox");
+        checkCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
+        assertEquals("Target study didn't propogate with 'Same' checkbox.",
+                getSelectedOptionValue(Locator.name("_pool_1604505335_0_TargetStudy")),
+                getSelectedOptionValue(Locator.name("_pool_1594020325_1_TargetStudy")));
+        assertEquals("Target study didn't propogate with 'Same' checkbox.",
+                getSelectedOptionValue(Locator.name("_pool_1604505335_0_TargetStudy")),
+                getSelectedOptionValue(Locator.name("_pool_161400006115_3_TargetStudy")));
+        uncheckCheckbox(Locator.checkboxById("_pool_1604505335_0_TargetStudyCheckBox"));
         
         // clear TargetStudy for 'vial2' and set the TargetStudy for 'vial3' and 'xyzzy'
-        selectOptionByText("_pool_161400006105_2_TargetStudy", "[None]");
-        selectOptionByText("_pool_161400006115_3_TargetStudy", "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
-        selectOptionByText("_pool_1614016435_4_TargetStudy", "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
+        selectOptionByText(Locator.name("_pool_161400006105_2_TargetStudy"), "[None]");
+        selectOptionByText(Locator.name("_pool_161400006115_3_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
+        selectOptionByText(Locator.name("_pool_1614016435_4_TargetStudy"), "/" + getProjectName() + "/" + STUDY2_NAME + " (" + STUDY2_NAME + " Study)");
 
         log("** Insert specimen IDs");
         addSpecimenIds("_pool_1604505335_0_SpecimenIDs", "vial2", "vial3", "vial1", "foobar");
@@ -327,13 +337,15 @@ public class ViabilityTest extends AbstractViabilityTest
         addSpecimenIds("_pool_161400006115_3_SpecimenIDs", "vial3");
         addSpecimenIds("_pool_1614016435_4_SpecimenIDs", "xyzzy");
 
+        prepForPageLoad();
         clickButton("Save and Finish", 0);
         String expectConfirmation = "Some values are missing for the following pools:\n\n" +
                 "  Sample number 33: SpecimenIDs\n" +
                 "  Sample number 34: SpecimenIDs\n\n" +
                 "Save anyway?";
-        String actualConfirmation = getConfirmationAndWait();
+        String actualConfirmation = getAlert();
         log("** Got confirmation: " + actualConfirmation);
+        newWaitForPageToLoad();
 
         //TODO: uncomment once Issue 10054 is resolved.
         //assertEquals(expectConfirmation, actualConfirmation);
@@ -354,13 +366,13 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals("vial2", table.getDataAsText(2, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(2, "SpecimenCount"));
         assertEquals("0", table.getDataAsText(2, "SpecimenMatchCount"));
-        assertEquals("", table.getDataAsText(2, "Recovery"));
-        assertEquals("", table.getDataAsText(2, "TargetStudy"));
+        assertEquals(" ", table.getDataAsText(2, "Recovery"));
+        assertEquals(" ", table.getDataAsText(2, "TargetStudy"));
 
         assertEquals("vial3", table.getDataAsText(3, "Specimen IDs"));
         assertEquals("1", table.getDataAsText(3, "SpecimenCount"));
         assertEquals("0", table.getDataAsText(3, "SpecimenMatchCount"));
-        assertEquals("", table.getDataAsText(3, "Recovery"));
+        assertEquals(" ", table.getDataAsText(3, "Recovery"));
         assertEquals(STUDY2_NAME + " Study", table.getDataAsText(3, "TargetStudy"));
 
         assertEquals("xyzzy", table.getDataAsText(4, "Specimen IDs"));
