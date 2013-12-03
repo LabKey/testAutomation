@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
+-- It is intentional that there are no procedures in this script corresponding to the SQL Server version.
+-- Stored Proc ETL's are not yet supported in Postgres and the test is skipped.
+
 ALTER TABLE vehicle.Transfer Add COLUMN container ENTITYID NULL;
 
 ALTER TABLE vehicle.Transfer ADD CONSTRAINT FK_etltransfer_container FOREIGN KEY (container) REFERENCES core.Containers (EntityId);
 
--- It is intentional that there are no procedures in this script corresponding to the SQL Server version.
--- Stored Proc ETL's are not yet supported in Postgres and the test is skipped.
