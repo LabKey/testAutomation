@@ -1147,7 +1147,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (!isElementPresent(Locator.id("projectBar")))
         {
             goToHome();
-            waitForElement(Locator.id("projectBar"));
+            waitForElement(Locator.id("projectBar"), WAIT_FOR_PAGE);
         }
     }
 
@@ -3317,6 +3317,26 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return missingTexts;
     }
 
+    public List<String> getMissingTextsCaseInsensitive(String... texts)
+    {
+        List<String> missingTexts = new ArrayList<>();
+        if(texts==null || texts.length == 0)
+            return missingTexts;
+
+        String source = getHtmlSource().toLowerCase();
+
+        for (String text : texts)
+        {
+            String excapedText = text
+                    .replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;");
+            if (!source.contains(excapedText.toLowerCase()))
+                missingTexts.add(text);
+        }
+        return missingTexts;
+    }
+
     public String getText(Locator elementLocator)
     {
         WebElement el = elementLocator.findElement(getDriver());
@@ -3332,6 +3352,28 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             return;
 
         List<String> missingTexts = getMissingTexts(texts);
+
+        if (missingTexts.size() > 0)
+        {
+            String failMsg = (missingTexts.size() == 1 ? "Text '" : "Texts ['") + missingTexts.get(0) + "'";
+            for (int i = 1; i < missingTexts.size(); i++)
+            {
+                failMsg += ", '" + missingTexts.get(i) + "'";
+            }
+            failMsg += missingTexts.size() == 1 ? " was not present" : "] were not present";
+            fail(failMsg);
+        }
+    }
+
+    /**
+     * Verifies that all the strings are present in the page html source, disregards casing discrepancies
+     */
+    public void assertTextPresentCaseInsensitive(String... texts)
+    {
+        if(texts==null)
+            return;
+
+        List<String> missingTexts = getMissingTextsCaseInsensitive(texts);
 
         if (missingTexts.size() > 0)
         {
@@ -3380,6 +3422,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String[] textsArray = {};
         textsArray = texts.toArray(textsArray);
         assertTextPresent(textsArray);
+    }
+
+    public void assertTextPresentCaseInsensitive(List<String> texts)
+    {
+        String[] textsArray = {};
+        textsArray = texts.toArray(textsArray);
+        assertTextPresentCaseInsensitive(textsArray);
     }
 
     //takes the arguments used to set a filter and transforms them into the description in the grid view
