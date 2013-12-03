@@ -57,6 +57,12 @@ public class ModuleAssayTest extends AbstractAssayTestWD
         return PROJECT_NAME;
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteDir(getTestTempDir());
