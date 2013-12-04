@@ -139,7 +139,7 @@ public class FlowCBCTest extends BaseFlowTest
         // verify graph img is displayed (no error) and the src attribute goes to the flow container
         assertTextNotPresent("Error generating graph");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:SSC-H)']"), "src");
-        assertTrue("Expected graph img to go to flow container: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+        assertTrue("Expected graph img to go to flow container: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
         pushLocation();
         clickButton("View Source Assay");
