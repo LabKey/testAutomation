@@ -11,5 +11,6 @@
     </transforms>
     <incrementalFilter className="RunFilterStrategy" runTableSchema="vehicle" runTable="Transfer" pkColumnName="Rowid" fkColumnName= "TransformRun" />
     <schedule>
+        <poll interval="15s" />
     </schedule>
 </etl>

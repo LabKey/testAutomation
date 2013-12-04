@@ -10,5 +10,6 @@
         </transform>
     </transforms>
     <schedule>
+        <poll interval="15s" />
     </schedule>
 </etl>

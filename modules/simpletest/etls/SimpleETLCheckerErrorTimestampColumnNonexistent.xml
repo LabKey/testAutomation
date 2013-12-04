@@ -10,6 +10,7 @@
     </transform>
 </transforms>
 <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="monkeys" />
-<schedule>
-</schedule>
+    <schedule>
+        <poll interval="15s" />
+    </schedule>
 </etl>

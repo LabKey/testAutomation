@@ -127,6 +127,8 @@ modules/simpletest/etls/badCast.xml -text
 modules/simpletest/etls/badTableName.xml -text
 modules/simpletest/etls/merge.xml -text
 modules/simpletest/etls/remote.xml -text svneol=unset#application/xml
+modules/simpletest/etls/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
+modules/simpletest/etls/remote_noTruncate.xml -text svneol=unset#application/xml
 modules/simpletest/etls/truncate.xml -text
 modules/simpletest/folderTypes/Assay[!!-~]Test[!!-~]Workbook.folderType.xml -text
 modules/simpletest/folderTypes/File[!!-~]Test[!!-~]Workbook.folderType.xml -text

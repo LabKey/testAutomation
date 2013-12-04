@@ -11,5 +11,6 @@
     </transforms>
     <incrementalFilter className="ModifiedSinceFilterStrategy" timestampColumnName="modified" />
     <schedule>
+        <poll interval="15s" />
     </schedule>
 </etl>

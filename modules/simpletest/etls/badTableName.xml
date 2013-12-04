@@ -17,5 +17,6 @@
     <!--incorrect runTable name here is intentional and meant to test for a checker error-->
     <incrementalFilter className="RunFilterStrategy" runTableSchema="vehicle" runTable="TransfersAndStuff" pkColumnName="Rowid" fkColumnName= "TransformRun" />
     <schedule>
+        <poll interval="15s" />
     </schedule>
 </etl>

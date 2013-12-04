@@ -7,6 +7,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.RemoteConnectionHelperWD;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,6 +26,13 @@ public class ETLErrorTest extends ETLBaseTest
     private static final String TRANSFORM_QUERY_ERROR = "{simpletest}/SimpleETLqueryDoesNotExist";
     private static final String TRANSFORM_NOCOL_ERROR = "{simpletest}/SimpleETLCheckerErrorTimestampColumnNonexistent";
     private static final String TRANSFORM_BAD_XML = "{simpletest/SimpleETLbadConfigXML";
+    private static final String TRANSFORM_REMOTE = "{simpletest}/remote";
+    private static final String TRANSFORM_REMOTE_BAD_DEST = "{simpletest}/remoteInvalidDestinationSchemaName";
+    private static final String TRANSFORM_REMOTE_NOTRUNC = "{simpletest}/remote_noTruncate";
+    private static final String TRANSFORM_BADCAST = "{simpletest}/badCast";
+    private static final String TRANSFORM_BADTABLE = "{simpletest}/badTableName";
+    private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";
+
 
     @Nullable
     @Override
@@ -54,8 +62,38 @@ public class ETLErrorTest extends ETLBaseTest
         errors.add("Could not find table: vehicle.etl_source_cheeseburger");
         runETLandCheckErrors(TRANSFORM_QUERY_ERROR, false, true, errors);
         _runETL_NoNav(TRANSFORM_NOCOL_ERROR, false, true);
-        //TODO: update the expected error text once issue 19131 is addressed
-        assertTextPresent("Data truncation");
+        assertTextPresent("Column not found: etl_source.monkeys");
+        errors.clear();
+        //run remote etl without remote connection configured
+        errors.add("ERROR: The remote connection EtlTest_RemoteConnection has not yet been setup in the remote connection manager.  You may configure a new remote connection through the schema browser.");
+        errors.add("ERROR: Error running executeCopy");
+        runETLandCheckErrors(TRANSFORM_REMOTE, true, false, errors);
+        errors.clear();
+        // create our remote connection
+        RemoteConnectionHelperWD rconnHelper = new RemoteConnectionHelperWD(this);
+        rconnHelper.createConnection(TRANSFORM_REMOTE_CONNECTION, getBaseURL(), getProjectName());
+        errors.add("ERROR: Target schema not found: study_buddy");
+        errors.add("Error running executeCopy");
+        runETLandCheckErrors(TRANSFORM_REMOTE_BAD_DEST, true, false, errors);
+        errors.clear();
+        //remote etl constraint violation
+        insertSourceRow("12", "Patient 12", "");
+        runETL(TRANSFORM_REMOTE_NOTRUNC);
+        //since we just moved patient 12 to etl_target, running the etl a second time should give us a constraint violation
+        errors.add("Violation of UNIQUE KEY constraint 'AK_etltarget'. Cannot insert duplicate key in object 'vehicle.etl_target'. The duplicate key value is");
+        errors.add("ERROR: Error running executeCopy");
+        errors.add("org.labkey.api.pipeline.PipelineJobException: Error running executeCopy");
+        runETLandCheckErrors(TRANSFORM_REMOTE_NOTRUNC, true, false, errors);
+        errors.clear();
+        errors.add("contains value not castable to a date:");
+        runETLandCheckErrors(TRANSFORM_BADCAST, false, true, errors);
+        errors.clear();
+        errors.add("Table not found:");
+        waitForElement(Locator.xpath(".//*[@id='bodypanel']"));
+        runETLandCheckErrors(TRANSFORM_BADTABLE, false, true, errors);
+        errors.clear();
+        //TODO: add scheduled run of bad source schema and test logging
+        checkExpectedErrors(_expectedErrors);
     }
 
     protected void runETLandCheckErrors(String ETLName, boolean hasWork, boolean hasCheckerError, List<String> errors)
@@ -70,7 +108,17 @@ public class ETLErrorTest extends ETLBaseTest
         {
             goToProjectHome();
         }
-        assertTextPresent(errors);
+        assertTextPresentCaseInsensitive(errors);
+    }
+
+    protected void incrementExpectedErrors()
+    {
+        _expectedErrors++;
+    }
+
+    protected void incrementExpectedErrorsBy(Integer by)
+    {
+        _expectedErrors = _expectedErrors + by;
     }
 
     protected void runInitialSetup()
@@ -78,7 +126,7 @@ public class ETLErrorTest extends ETLBaseTest
         PortalHelper portalHelper = new PortalHelper(this);
         log("running setup");
         _containerHelper.createProject(getProjectName(), null);
-        _expectedErrors = 0;
+        _expectedErrors = 15;
         _jobsComplete = 0;
 
         enableModule("DataIntegration", true);
