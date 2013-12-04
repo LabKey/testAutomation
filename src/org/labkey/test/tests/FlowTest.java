@@ -426,11 +426,11 @@ public class FlowTest extends BaseFlowTest
         // check no graph errors are present and the graphs have labels
         assertTextNotPresent("Error generating graph");
         String href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
-        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
-        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
         // UNDONE: assert background values are correctly calculated
 
@@ -458,17 +458,18 @@ public class FlowTest extends BaseFlowTest
         // verify Issue 16304: query over flow.FCSFiles doesn't include URL for Name column
         DataRegionTable table = new DataRegionTable("query", this);
         String href = table.getHref(0, "Name");
-        assertTrue("Expected 'Name' href to go to showWell.view: " + href, href.contains("/" + getFolderName() + "/showWell.view"));
+        assertTrue("Expected 'Name' href to go to showWell.view: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showWell.view"));
         
         assertTextNotPresent("Error generating graph");
         assertTextPresent("No graph for:", "(<APC-A>)");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
-        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
 
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Thumbnail");
         href = getAttribute(Locator.xpath("//img[@title='(FSC-H:FSC-A)']"), "src");
-        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/showGraph.view"));
+        assertTrue("Expected graph img: " + href, href.contains("/" + getFolderName() + "/") && href.contains("showGraph.view"));
     }
+
 
     @LogMethod
     public void copyAnalysisScriptTest()

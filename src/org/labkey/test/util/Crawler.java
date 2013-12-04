@@ -545,16 +545,25 @@ public class Crawler
     private boolean underCreatedProject(String relativeURL)
     {
         relativeURL = BaseSeleniumWebTest.stripContextPath(relativeURL);
-        StringTokenizer st = new StringTokenizer(relativeURL, "/");
-        st.nextToken(); // controller
-        String currentProject = st.nextToken();
+        ControllerActionId cid = new ControllerActionId(relativeURL);
+        String folder = StringUtils.strip(cid.getFolder(),"/");
+        StringTokenizer st = new StringTokenizer(folder, "/");
+
+        if (!st.hasMoreElements())
+            return false;
+
+        String currentProject = EscapeUtil.decode(st.nextToken());
+        if (StringUtils.isEmpty(currentProject))
+            return false;
+
         for (String createdProject : _test.getContainerHelper().getCreatedProjects())
         {
-            if (currentProject.equals(EscapeUtil.encode(createdProject)))
+            if (currentProject.equals(createdProject))
                 return true;
         }
         return false;
     }
+
 
     @LogMethod
     public void crawlAllLinks(boolean inject)
