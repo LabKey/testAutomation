@@ -25,6 +25,7 @@ import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserExtendedProperty;
+import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.SearchHelper;
@@ -197,7 +198,7 @@ public class FileContentTest extends BaseWebDriverTest
         log("move file");
         String folderName = "Test folder";
         _fileBrowserHelper.createFolder(folderName);
-        click(Locator.css(".iconFolderTree"));
+        _fileBrowserHelper.clickFileBrowserButton(FileBrowserHelperWD.BrowserAction.FOLDER_TREE);
         shortWait().until(ExpectedConditions.visibilityOf(Locator.css("div.x4-splitter-vertical").findElement(getDriver())));
         _fileBrowserHelper.moveFile(filename, folderName);
 
@@ -231,10 +232,10 @@ public class FileContentTest extends BaseWebDriverTest
         // Delete file.
         clickProject(PROJECT_NAME);
         _fileBrowserHelper.waitForFileGridReady();
-        click(Locator.css(".iconFolderTree"));
+        _fileBrowserHelper.clickFileBrowserButton(FileBrowserHelperWD.BrowserAction.FOLDER_TREE);
         shortWait().until(ExpectedConditions.visibilityOf(Locator.css("div.x4-splitter-vertical").findElement(getDriver())));
         _fileBrowserHelper.selectFileBrowserItem(folderName + "/" + filename);
-        click(Locator.css(".iconDelete"));
+        _fileBrowserHelper.clickFileBrowserButton(FileBrowserHelperWD.BrowserAction.DELETE);
         clickButton("Yes", 0);
         waitForElementToDisappear(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(filename));
 

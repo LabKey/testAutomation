@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util;
 
+import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -26,6 +27,7 @@ import java.util.List;
 
 import static org.labkey.test.BaseSeleniumWebTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
+import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
 
 public class FileBrowserHelperWD implements FileBrowserHelperParams
 {
@@ -144,7 +146,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     public void renameFile(String currentName, String newName)
     {
         selectFileBrowserItem(currentName);
-        _test.click(Locator.css(".iconRename"));
+        clickFileBrowserButton(BrowserAction.RENAME);
         _test.waitForElement(Ext4HelperWD.Locators.window("Rename"));
         _test.setFormElement(Locator.name("renameText-inputEl"), newName);
         _test.clickButton("Rename", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
@@ -155,7 +157,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     public void moveFile(String fileName, String destinationPath)
     {
         selectFileBrowserItem(fileName);
-        _test.click(Locator.css(".iconMove"));
+        clickFileBrowserButton(BrowserAction.MOVE);
         _test.waitForElement(Ext4HelperWD.Locators.window("Choose Destination"));
         //NOTE:  this doesn't yet support nested folders
         Locator folder = Locator.xpath("//div[contains(@class, 'x4-window')]//div/span[contains(@class, 'x4-tree-node-text') and text() = '" + destinationPath + "']");
@@ -173,7 +175,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void createFolder(String folderName)
     {
-        clickFileBrowserButton("Create Folder");
+        clickFileBrowserButton(BrowserAction.NEW_FOLDER);
         _test.setFormElement(Locator.name("folderName"), folderName);
         _test.clickButton("Submit", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(folderName));
@@ -214,7 +216,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void goToAdminMenu()
     {
-        clickFileBrowserButton("Admin");
+        clickFileBrowserButton(BrowserAction.ADMIN);
         _test.waitForElement(Ext4HelperWD.Locators.window("Manage File Browser Configuration"));
     }
 
@@ -223,7 +225,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     {
         waitForFileGridReady();
         waitForImportDataEnabled();
-        clickFileBrowserButton("Import Data");
+        clickFileBrowserButton(BrowserAction.IMPORT_DATA);
         _test.waitAndClick(Locator.xpath("//input[@type='button' and not(@disabled)]/../label[contains(text(), " + Locator.xq(actionName) + ")]"));
         _test.clickAndWait(Locator.ext4Button("Import"));
     }
@@ -294,16 +296,83 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void clickFileBrowserButton(@LoggedParam String actionName)
     {
+        clickFileBrowserButton(BrowserAction.getEnum(actionName));
+    }
+
+    @LogMethod
+    public void clickFileBrowserButton(@LoggedParam BrowserAction action)
+    {
         waitForFileGridReady();
-        try
+        if (action._triggersPageLoad)
+            _test.clickAndWait(action.getButton(_test), WAIT_FOR_PAGE);
+        else
+            action.getButton(_test).click();
+    }
+
+    public static enum BrowserAction
+    {
+        FOLDER_TREE("FolderTree", "Toggle Folder Tree"),
+        UP("Up", "Parent Folder"),
+        RELOAD("Reload", "Refresh"),
+        NEW_FOLDER("FolderNew", "Create Folder"),
+        DOWNLOAD("Download", "Download"),
+        DELETE("Delete", "Delete"),
+        RENAME("Rename", "Rename"),
+        MOVE("Move", "Move"),
+        EDIT_PROPERTIES("EditFileProps", "Edit Properties"),
+        UPLOAD("Upload", "Upload Files"),
+        IMPORT_DATA("DBCommit", "Import Data"),
+        EMAIL_SETTINGS("EmailSettings", "Email Preferences"),
+        AUDIT_HISTORY("AuditLog", "Audit History", true),
+        ADMIN("Configure", "Admin");
+
+        private String _iconName;
+        private String _buttonText;
+        private boolean _triggersPageLoad;
+
+        private BrowserAction(String iconName, String buttonText, boolean triggersPageLoad)
         {
-            _test.assertElementVisible(Locator.ext4ButtonContainingText(actionName));
-            _test.click(Locator.ext4ButtonContainingText(actionName));
+            _iconName = iconName;
+            _buttonText = buttonText;
+            _triggersPageLoad = triggersPageLoad;
         }
-        catch(AssertionError e)
+
+        private BrowserAction(String iconName, String buttonText)
         {
-            _test.click(Locator.xpath("//span[contains(@class, 'x4-toolbar-more-icon')]"));
-            _test.click(Locator.xpath("//span[text()='"+actionName+"' and contains(@class, 'x4-menu-item-text')]"));
+            this(iconName, buttonText, false);
+        }
+
+        public String toString()
+        {
+            return _buttonText;
+        }
+
+        public static BrowserAction getEnum(String buttonText)
+        {
+            for (BrowserAction a : BrowserAction.values())
+            {
+                if (a.toString().equals(buttonText))
+                    return a;
+            }
+            throw new IllegalArgumentException("No such file browser action: " + buttonText);
+        }
+
+        public WebElement getButton(final BaseWebDriverTest test)
+        {
+            List<WebElement> possibleIcons = getButtonIconLocator().findElements(test.getDriver());
+            if (possibleIcons.size() > 0)
+                return possibleIcons.get(0);
+
+            Locator button = test.findButton(_buttonText);
+            if (button != null)
+                return button.findElement(test.getDriver());
+
+            throw new ElementNotFoundException("File browser button not present: " + _buttonText, "Button", _buttonText);
+        }
+
+        private Locator getButtonIconLocator()
+        {
+            return Locator.css(".icon" + _iconName);
         }
     }
 
@@ -326,7 +395,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
         if (_test.isElementPresent(collapsedTreePanel))
         {
             WebElement rootNode = Locator.css("#treeNav-body tr[data-recordindex = '0']").findElement(_test.getDriver());
-            _test.click(Locator.css("span.iconFolderTree"));
+            clickFileBrowserButton(BrowserAction.FOLDER_TREE);
             _test.waitForElementToDisappear(collapsedTreePanel);
             _test.shortWait().until(ExpectedConditions.stalenessOf(rootNode));
         }
@@ -344,6 +413,11 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
             return Locator.tag("tr")
                     .withClass("x4-grid-data-row")
                     .withPredicate("starts-with(@id, 'gridview')");
+        }
+
+        public static Locator.XPathLocator gridRow(String fileName)
+        {
+            return gridRowWithNodeId("/" + fileName);
         }
 
         public static Locator.XPathLocator gridRowWithNodeId(String nodeIdEndsWith)
