@@ -1130,30 +1130,6 @@
             </and>
         </condition>
 
-        <condition property="webdriver.chrome.driver" value="${test.dir}/bin/windows/chromedriver2a/chromedriver.exe">
-            <and>
-                <os family="windows"/>
-                <equals arg1="${chromedriver2.alpha}" arg2="true"/>
-            </and>
-        </condition>
-
-        <condition property="webdriver.chrome.driver" value="${test.dir}/bin/mac/chromedriver2a/chromedriver">
-            <and>
-                <os family="mac"/>
-                <equals arg1="${chromedriver2.alpha}" arg2="true"/>
-            </and>
-        </condition>
-
-        <condition property="webdriver.chrome.driver" value="${test.dir}/bin/linux/chromedriver2a/chromedriver">
-            <and>
-                <os family="unix"/>
-                <not>
-                    <os family="mac" />
-                </not>
-                <equals arg1="${chromedriver2.alpha}" arg2="true"/>
-            </and>
-        </condition>
-
         <condition property="webdriver.chrome.driver" value="${test.dir}/bin/windows/chromedriver.exe">
             <os family="windows"/>
         </condition>
