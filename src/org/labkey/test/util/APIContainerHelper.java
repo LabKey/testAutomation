@@ -128,7 +128,7 @@ public class APIContainerHelper extends AbstractContainerHelper
             }
             else
             {
-                fail(e.getMessage());
+                throw new RuntimeException("Failed to delete container", e);
             }
         }
         catch (SocketTimeoutException e)
@@ -137,7 +137,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
         catch (IOException e)
         {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to delete container", e);
         }
     }
 }
