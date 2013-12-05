@@ -271,6 +271,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return WebTestHelper.getLabKeyRoot();
     }
 
+    public static File getDefaultFileRoot(String containerPath)
+    {
+        return new File(getLabKeyRoot(), "build/deploy/files/" + containerPath + "/@files");
+    }
+
     public static String getSampledataPath()
     {
         File path = new File(getLabKeyRoot(), "sampledata");
@@ -338,11 +343,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
                     ChromeOptions options = new ChromeOptions();
 
-                    //TODO: Extensions broken in chromedriver 2.4
-                    //TODO: WebDriverException: unknown error: cannot process extension #1
-                    if (false)//isScriptCheckEnabled())
+                    if (isScriptCheckEnabled())
                     {
-                        options.addExtensions(new File(WebTestHelper.getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker.zip"));
+                        File jsErrorCheckerExtension = new File(getLabKeyRoot(), "server/test/chromeextensions/jsErrorChecker");
+                        options.addArguments("load-extension=" + jsErrorCheckerExtension.toString());
                     }
 
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
@@ -382,6 +386,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                             "application/octet-stream," +
                             "application/x-gzip," +
                             "application/x-zip-compressed," +
+                            "application/xml" +
+                            "text/xml" +
                             "text/x-script.perl");
                     profile.setPreference("browser.download.manager.showWhenStarting",false);
                     if (isScriptCheckEnabled())
@@ -1806,7 +1812,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         if (errorRef.get() instanceof UnhandledAlertException)    // Catch so we can record the alert's text
         {
-            errorRef.set(new RuntimeException("Unexpected Alert: " + ((UnhandledAlertException) errorRef.get()).getAlertText(), errorRef.get()));
+            errorRef.set(new RuntimeException("Unexpected Alert: " + getAlert(), errorRef.get()));
         }
         else if (errorRef.get() instanceof TestTimeoutException)
         {
@@ -6766,8 +6772,17 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return getFileContents(file);
     }
 
-    public String getFileContents(File file)
+    public String getFileContents(final File file)
     {
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return file.exists();
+            }
+        }, "File not found: " + file.getName(), WAIT_FOR_JAVASCRIPT);
+
         try
         {
             return new String(Files.readAllBytes(Paths.get(file.toURI())));
