@@ -43,7 +43,7 @@ public class ETLStoredProcedureTest extends ETLTest
 
     }
 
-    protected void verifyStoredProcTransform()
+    protected void verifyStoredProcTransform() throws Exception
     {
         /*
         Test modes as mapped in the proc etlTest

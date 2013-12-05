@@ -26,6 +26,7 @@ import org.labkey.remoteapi.query.ExecuteSqlCommand;
 import org.labkey.remoteapi.query.InsertRowsCommand;
 import org.labkey.remoteapi.query.SaveRowsResponse;
 import org.labkey.remoteapi.query.SelectRowsResponse;
+import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +39,7 @@ import java.util.Map;
  */
 public class DataIntegrationHelper
 {
-    private String _baseUrl = "http://localhost:8080/labkey";
+    private String _baseUrl = WebTestHelper.getBaseURL();
     private String _username = PasswordUtil.getUsername();
     private String _password = PasswordUtil.getPassword();
     private String _folderPath;
@@ -55,61 +56,38 @@ public class DataIntegrationHelper
         _baseUrl = baseUrl;
     }
 
-    public SelectRowsResponse executeQuery(String folderPath, String schemaName, String queryStatement)
+    public SelectRowsResponse executeQuery(String folderPath, String schemaName, String queryStatement) throws Exception
     {
         SelectRowsResponse exRsp = null;
         Connection cn = new Connection(_baseUrl, _username, _password);
         ExecuteSqlCommand exCmd = new ExecuteSqlCommand(schemaName, queryStatement);
-        try
-        {
-            exRsp = exCmd.execute(cn, folderPath);
-        }
-        catch(Exception e)
-        {
-            TestLogger.log(e.getMessage());
-        }
+        exRsp = exCmd.execute(cn, folderPath);
         return exRsp;
     }
 
-    public SaveRowsResponse executeInsert(String folderPath, String schemaName, String tableName, Map<String,Object> rows)
+    public SaveRowsResponse executeInsert(String folderPath, String schemaName, String tableName, Map<String,Object> rows) throws Exception
     {
         SaveRowsResponse response = null;
         Connection cn = new Connection(_baseUrl, _username, _password);
         InsertRowsCommand insCmd = new InsertRowsCommand(schemaName, tableName);
         insCmd.addRow(rows);
-        try
-        {
-            response = insCmd.execute(cn, folderPath);
-        }
-        catch(Exception e)
-        {
-            TestLogger.log(e.getMessage());
-        }
+        response = insCmd.execute(cn, folderPath);
         return response;
     }
 
-    public RunTransformResponse runTransform(String transformId)
+    public RunTransformResponse runTransform(String transformId) throws Exception
     {
-        RunTransformResponse response = null;
+        RunTransformResponse response;
         Connection cn = new Connection(_baseUrl, _username, _password);
         RunTransformCommand cmd = new RunTransformCommand(transformId);
-        try
-        {
-            response = cmd.execute(cn, _folderPath);
-        }
-        catch(Exception e)
-        {
-            TestLogger.log("Error running transform " + transformId + ":" + e.getMessage());
-        }
+        response = cmd.execute(cn, _folderPath);
         return response;
     }
 
-    public RunTransformResponse runTransformAndWait(String transformId, int msTimeout)
+    public RunTransformResponse runTransformAndWait(String transformId, int msTimeout) throws Exception
     {
-        RunTransformResponse response = null;
+        RunTransformResponse response ;
         response = runTransform(transformId);
-        if (response == null) // an error occured starting the job
-            return null;
         String jobId = response.getJobId();
         String status = response.getStatus();
         if (status.equalsIgnoreCase("Queued"))
@@ -124,7 +102,7 @@ public class DataIntegrationHelper
         return response;
     }
 
-    public String getTransformStatus(String jobId)
+    public String getTransformStatus(String jobId) throws Exception
     {
         // TODO: Proper handling of null jobId
         String query = "SELECT Status FROM dataintegration.TransformRun WHERE JobId = '" + jobId + "'";
@@ -132,7 +110,7 @@ public class DataIntegrationHelper
         return response.getRows().get(0).get("Status").toString();
     }
 
-    public String getTransformStatusByTransformId(String transformId)
+    public String getTransformStatusByTransformId(String transformId) throws Exception
     {
         // TODO: Proper handling of null transformId
         String query = "SELECT Status FROM dataintegration.TransformRun WHERE transformId = '" + transformId + "' ORDER BY Created DESC LIMIT 1";
@@ -174,7 +152,7 @@ public class DataIntegrationHelper
         return response;
     }
 
-    private String getContainerForFolder(String folderName)
+    private String getContainerForFolder(String folderName) throws Exception
     {
         String query = "select EntityID from Containers where Name = '" + folderName + "'";
         SelectRowsResponse response = executeQuery("/" + folderName, "core", query);
@@ -192,7 +170,7 @@ public class DataIntegrationHelper
         }
     }
 
-    public String getEtlLogFile(String jobId)
+    public String getEtlLogFile(String jobId) throws Exception
     {
         String query = "SELECT FilePath FROM pipeline.job WHERE RowId = '" + jobId + "'";
         SelectRowsResponse response = executeQuery("/" + _folderPath, _diSchema, query);

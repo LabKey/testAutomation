@@ -312,7 +312,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         }
     }
 
-    protected RunTransformResponse runETL_API(String projectName, String transformId, boolean hasWork, boolean hasCheckerError)
+    protected RunTransformResponse runETL_API(String projectName, String transformId, boolean hasWork, boolean hasCheckerError) throws Exception
     {
         log("running " + transformId + " job");
         if (!StringUtils.startsWith(transformId, "{"))
@@ -322,12 +322,12 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         return _diHelper.runTransformAndWait(transformId, 30000);
     }
 
-    protected RunTransformResponse runETL_API(String projectName, String transformId)
+    protected RunTransformResponse runETL_API(String projectName, String transformId) throws Exception
     {
         return runETL_API(projectName, transformId, true, false);
     }
 
-    protected RunTransformResponse runETL_API(String transformId)
+    protected RunTransformResponse runETL_API(String transformId) throws Exception
     {
         return runETL_API(PROJECT_NAME, transformId);
     }
@@ -414,7 +414,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         assertQueryWebPart("TransformRun", "TransformRun", true, targets);
     }
 
-    protected void assertInEtlLogFile(String jobId, String logString)
+    protected void assertInEtlLogFile(String jobId, String logString) throws Exception
     {
 
         final String etlLogFile = _diHelper.getEtlLogFile(jobId);
