@@ -94,8 +94,8 @@ public class BasicTest extends BaseWebDriverTest
         if (TestProperties.isDevModeEnabled())
         {
             goToAdminConsole();
-            waitAndClick(Locator.linkWithText("sql scripts"));
-            waitAndClick(Locator.linkWithText("orphaned scripts"));
+            clickAndWait(Locator.linkWithText("sql scripts"));
+            clickAndWait(Locator.linkWithText("orphaned scripts"));
             assertTextNotPresent("WARNING:");
         }
 
