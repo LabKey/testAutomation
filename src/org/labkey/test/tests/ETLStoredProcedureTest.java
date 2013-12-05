@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
  * Date: 11/26/13
  */
 @Category({DailyB.class})
-public class ETL_StoredProc_test extends ETLTest
+public class ETLStoredProcedureTest extends ETLTest
 {
     private static final String TRANSFORM_NORMAL_OPERATION_SP = "{simpletest}/SProcNormalOperation";
     private static final String TRANSFORM_BAD_NON_ZERO_RETURN_CODE_SP = "{simpletest}/SProcBadNonZeroReturnCode";
@@ -30,8 +30,8 @@ public class ETL_StoredProc_test extends ETLTest
     protected void doTestSteps() throws Exception
     {
 
-         // TODO: only need a subset of the initialSetup operations
-         runInitialSetup(false);
+        // TODO: only need a subset of the initialSetup operations
+        runInitialSetup(false);
 
         //stored proc based etl supported only on ms sql
         if(WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
@@ -45,7 +45,7 @@ public class ETL_StoredProc_test extends ETLTest
 
     protected void verifyStoredProcTransform()
     {
-      /*
+        /*
         Test modes as mapped in the proc etlTest
         1	normal operation
         2	return code > 0
@@ -54,7 +54,7 @@ public class ETL_StoredProc_test extends ETLTest
         5	override of persisted input/output parameter
         6	Run filter strategy, require @filterRunId
         7	Modified since filter strategy, require @filterStartTimeStamp & @filterEndTimeStamp
-      */
+        */
 
         // All tests use the API
         RunTransformResponse rtr;

@@ -351,8 +351,8 @@ src/org/labkey/test/tests/DrugSensitivityAssayTest.java -text
 src/org/labkey/test/tests/ELISPOT_AssayTest.java -text
 src/org/labkey/test/tests/ETLBaseTest.java -text
 src/org/labkey/test/tests/ETLErrorTest.java -text
+src/org/labkey/test/tests/ETLStoredProcedureTest.java -text
 src/org/labkey/test/tests/ETLTest.java -text
-src/org/labkey/test/tests/ETL_StoredProc_test.java -text
 src/org/labkey/test/tests/ElisaAssayTest.java -text
 src/org/labkey/test/tests/ElispotAssayTest.java -text
 src/org/labkey/test/tests/EmbeddedWebPartTest.java -text
