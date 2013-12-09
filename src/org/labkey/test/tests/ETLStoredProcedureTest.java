@@ -16,10 +16,12 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -152,7 +154,15 @@ public class ETLStoredProcedureTest extends ETLTest
         assertEquals("COMPLETE", _diHelper.getTransformStatus(rtr.getJobId()));
 
         // Bad source name
-        rtr = runETL_API(TRANSFORM_BAD_MODIFIED_FILTER_WITH_BAD_SOURCE_SP);
-        assertEquals("ERROR", _diHelper.getTransformStatusByTransformId(TRANSFORM_BAD_MODIFIED_FILTER_WITH_BAD_SOURCE_SP));
+        try
+        {
+            rtr = runETL_API(TRANSFORM_BAD_MODIFIED_FILTER_WITH_BAD_SOURCE_SP);
+        }
+        catch (CommandException e)
+        {
+            assertTrue("Incorrect exception message on bad source: ", e.getMessage().startsWith("Could not find table"));
+            assertEquals("ERROR", _diHelper.getTransformStatusByTransformId(TRANSFORM_BAD_MODIFIED_FILTER_WITH_BAD_SOURCE_SP));
+        }
+
     }
 }
