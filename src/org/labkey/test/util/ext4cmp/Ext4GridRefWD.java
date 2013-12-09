@@ -23,6 +23,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -79,9 +81,17 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
     //1-based rowIdx
     public Date getDateFieldValue(int rowIdx, String fieldName)
     {
-        rowIdx--;
-        Long val = (Long)getFnEval("return this.store.getAt('" + rowIdx+ "').get('" + fieldName + "') ? this.store.getAt('" + rowIdx + "').get('" + fieldName + "').getTime() : null");
-        return val == null ? null : new Date(val);
+        try
+        {
+            rowIdx--;
+            String val = (String)getFnEval("return this.store.getAt('" + rowIdx + "').get('" + fieldName + "') ? this.store.getAt('" + rowIdx + "').get('" + fieldName + "').format('c') : null");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+            return val == null ? null : dateFormat.parse(val);
+        }
+        catch (ParseException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Locator locateExt4GridCell(String contents)
@@ -252,12 +262,13 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
     public WebElement startEditing(int rowIdx, String colName)
     {
         int cellIdx = getIndexOfColumn(colName, true);  //NOTE: Ext 4.2.1 seems to not render hidden columns, unlike previous ext versions
-        Locator cell = Ext4GridRefWD.locateExt4GridCell(rowIdx, cellIdx, _id);
-        _test.assertElementPresent(cell);
 
         WebElement el = getActiveGridEditor();
         if (el == null)
         {
+            Locator cell = Ext4GridRefWD.locateExt4GridCell(rowIdx, cellIdx, _id);
+            _test.assertElementPresent(cell);
+
             if (_clicksToEdit > 1)
                 _test.doubleClick(cell);
             else

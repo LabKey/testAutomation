@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -880,6 +881,11 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         sleep(40); //wait for listener to act
         assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Antibodies").getValue());
 
+        //major events
+        Ext4FieldRefWD.getForBoxLabel(this, "Major Events").setValue(false);
+        sleep(40); //wait for listener to act
+        Assert.assertFalse("Radio was not toggled", (Boolean) Ext4FieldRefWD.getForBoxLabel(this, "View All Major Events").getValue());
+
         click(Locator.ext4Button("Submit"));
         waitForElement(Ext4HelperWD.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
@@ -939,6 +945,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Ext4FieldRefWD.getForBoxLabel(this, "DNA_Oligos").setValue(true);
         Ext4FieldRefWD.getForBoxLabel(this, "Peptides").setValue(true);
         Ext4FieldRefWD.getForBoxLabel(this, "Antibodies").setValue(true);
+        Ext4FieldRefWD.getForBoxLabel(this, "Major Events").setValue(true);
 
         sleep(100);
         assertTrue("Incorrect value for samples checkbox", (Boolean)_ext4Helper.queryOne(samplesSelector, Ext4FieldRefWD.class).getValue());
