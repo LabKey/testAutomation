@@ -169,6 +169,7 @@ public class ModuleAssayTest extends AbstractAssayTestWD
         popLocation();
         clickButton("Simple Assay Button", 0);
         assertAlert("button clicked");
+        waitForExtOnReady(); // Menu doesn't work immediately after alert is dismissed
 
         // Check that a query scoped to the assay type shows up for this assay design and has the right data
         goToSchemaBrowser();
