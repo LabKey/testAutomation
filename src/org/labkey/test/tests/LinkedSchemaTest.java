@@ -56,7 +56,6 @@ import static org.junit.Assert.*;
  *   (original title and URL for  P, Q, R, S, T, U, V, W, X, Y, Z)
  * - File metadata xml in linkedschematest/queries/lists/LinkedSchemaTestPeople.query.xml
  *   (overrides title and URL for P, Q, R, S, T, U, V, W, X, Y)
- *   (BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.)
  * - Database metadata xml
  *   (overrides title and URL for P, Q, R, S, T, U, V, W, X)
  *
@@ -87,7 +86,6 @@ import static org.junit.Assert.*;
  *   (overrides title and URL for P, Q)
  * - Database metadata xml
  *   (overrides title and URL for P)
- *   (BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.)
  */
 @Category({DailyA.class, Data.class})
 public class LinkedSchemaTest extends BaseWebDriverMultipleTest
@@ -464,7 +462,6 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         clickButton("Import Data");
         _listHelper.submitTsvData(LIST_DATA);
 
-        // Issue 17592: Query: inconsistent handling of query metadata xml -- database metadata overrides file metadata until we get clarification of expected behavior...
         log("** Applying metadata xml override to list...");
         beginAt("/query/" + PROJECT_NAME + "/" + SOURCE_FOLDER + "/sourceQuery.view?schemaName=lists&query.queryName=" + LIST_NAME + "#metadata");
         setCodeEditorValue("metadataText", LIST_METADATA_OVERRIDE);
@@ -491,22 +488,19 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
         _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, A_PEOPLE_SCHEMA_NAME, sourceContainerPath, null, "lists", LIST_NAME + "," + QUERY_NAME, A_PEOPLE_METADATA);
 
-        // UNDONE
-//        // Issue 17592: Query: inconsistent handling of query metadata xml -- skip applying metadata override until we get clarification of expected behavior...
-//        log("** Applying metadata to " + LIST_NAME + " in linked schema container");
-//        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + LIST_NAME + "#metadata");
-//        setQueryEditorValue("metadataText", A_PEOPLE_LIST_METADATA_OVERRIDE);
-//        clickButton("Save", 0);
-//        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-//        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        log("** Applying metadata to " + LIST_NAME + " in linked schema container");
+        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + LIST_NAME + "#metadata");
+        setCodeEditorValue("metadataText", A_PEOPLE_LIST_METADATA_OVERRIDE);
+        clickButton("Save", 0);
+        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
 
-//        // Issue 17592: Query: inconsistent handling of query metadata xml -- skip applying metadata override until we get clarification of expected behavior...
-//        log("** Applying metadata to " + QUERY_NAME + " in linked schema container");
-//        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + QUERY_NAME + "#metadata");
-//        setQueryEditorValue("metadataText", A_PEOPLE_QUERY_METADATA_OVERRIDE);
-//        clickButton("Save", 0);
-//        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
-//        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        log("** Applying metadata to " + QUERY_NAME + " in linked schema container");
+        beginAt("/query/" + PROJECT_NAME + "/" + TARGET_FOLDER + "/sourceQuery.view?schemaName=" + A_PEOPLE_SCHEMA_NAME + "&query.queryName=" + QUERY_NAME + "#metadata");
+        setCodeEditorValue("metadataText", A_PEOPLE_QUERY_METADATA_OVERRIDE);
+        clickButton("Save", 0);
+        waitForElement(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Locator.id("status").withText("Saved"), WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -523,57 +517,38 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         assertEquals("Expected to filter table to only Adam", "Adam", table.getDataAsText(0, A_PEOPLE_METADATA_TITLE));
 
         log("** Verify table metadata overrides when simplemodule is not active in TargetFolder");
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // So, if we set A_PEOPLE_LIST_METDATA_OVERRIDE and we allow database metadata xml
-        // to overlay over the queries/A_People/LinkedSchemaTestPeople.query.xml metadata,
-        // the metadata for columns P-S would have the title "A_People db_metadata List P".
-        //assertHrefContains(table, "A_People db_metadata List P", "a_template_file_metadata.view"); ...
-        assertHrefContains(table, "A_People template List P", "a_template_metadata.view");
-        assertHrefContains(table, "A_People template List Q", "a_template_metadata.view");
-        assertHrefContains(table, "A_People template List R", "a_template_metadata.view");
-        assertHrefContains(table, "A_People template List S", "a_template_metadata.view");
+        assertHrefContains(table, "A_People db_metadata List P", "a_db_metadata.view");
+        assertHrefContains(table, "A_People db_metadata List Q", "a_db_metadata.view");
+        assertHrefContains(table, "A_People db_metadata List R", "a_db_metadata.view");
+        assertHrefContains(table, "A_People db_metadata List S", "a_db_metadata.view");
         assertHrefContains(table, "A_People template List T", "a_template_metadata.view");
         assertHrefContains(table, "A_People template List U", "a_template_metadata.view");
         assertHrefContains(table, "A_People template List V", "a_template_metadata.view");
         assertHrefContains(table, "A_People template List W", "a_template_metadata.view");
         // Columns X, Y and Z have their URL removed by the linked schema.
         assertHrefNotPresent(table, "db_metadata List X");
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // In this case, we have applied the database xml (see column X), but that isn't
-        // merged with the /queries/lists/LInkedSchemaTestPeople.query.xml so we lose the
-        // customization for column Y.
-        //assertHrefNotPresent(table, "file_metadata List Y");
-        assertHrefNotPresent(table, "Original List Y");
+        assertHrefNotPresent(table, "file_metadata List Y");
         assertHrefNotPresent(table, "Original List Z");
 
         log("** Verify table metadata overrides when simplemodule is active in TargetFolder");
         pushLocation();
         enableModules(Arrays.asList("linkedschematest"), false);
         popLocation();
+
         waitForElement(Locator.id("dataregion_query"));
         table = new DataRegionTable("query", this);
 
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // So, if we set A_PEOPLE_LIST_METDATA_OVERRIDE and we allow database metadata xml
-        // to overlay over the queries/A_People/LinkedSchemaTestPeople.query.xml metadata,
-        // the metadata for columns P-S would have the title "A_People db_metadata List P".
-        //assertHrefContains(table, "A_People db_metadata List P", "a_template_file_metadata.view"); ...
-        assertHrefContains(table, "A_People file_metadata List P", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata List Q", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata List R", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata List S", "a_template_file_metadata.view");
+        assertHrefContains(table, "A_People db_metadata List P", "a_db_metadata.view");
+        assertHrefContains(table, "A_People db_metadata List Q", "a_db_metadata.view");
+        assertHrefContains(table, "A_People db_metadata List R", "a_db_metadata.view");
+        assertHrefContains(table, "A_People db_metadata List S", "a_db_metadata.view");
         assertHrefContains(table, "A_People file_metadata List T", "a_template_file_metadata.view");
         assertHrefContains(table, "A_People file_metadata List U", "a_template_file_metadata.view");
         assertHrefContains(table, "A_People file_metadata List V", "a_template_file_metadata.view");
         assertHrefContains(table, "A_People template List W",      "a_template_metadata.view");
         // Columns X, Y and Z have their URL removed by the linked schema.
         assertHrefNotPresent(table, "db_metadata List X");
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // In this case, we have applied the database xml (see column X), but that isn't
-        // merged with the /queries/lists/LInkedSchemaTestPeople.query.xml so we lose the
-        // customization for column Y.
-        //assertHrefNotPresent(table, "file_metadata List Y");
-        assertHrefNotPresent(table, "Original List Y");
+        assertHrefNotPresent(table, "file_metadata List Y");
         assertHrefNotPresent(table, "Original List Z");
 
         // Check the custom details url is used
@@ -588,27 +563,17 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         table = new DataRegionTable("query", this);
 
         log("** Verify query metadata overrides are correctly applied");
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // So, if we set A_PEOPLE_LIST_METDATA_OVERRIDE and we allow database metadata xml
-        // to overlay over the queries/A_People/LinkedSchemaTestPeople.query.xml metadata,
-        // the metadata for columns P-S would have the title "A_People db_metadata List P".
-        //assertHrefContains(table, "A_People db_metadata Query P", "a_template_file_metadata.view");
-        assertHrefContains(table, "A_People file_metadata Query P", "a_template_file_metadata.view");
+        assertHrefContains(table, "A_People db_metadata Query P", "a_db_metadata.view");
         assertHrefContains(table, "A_People file_metadata Query Q", "a_template_file_metadata.view");
         assertHrefContains(table, "A_People template Query R", "a_template_metadata.view");
-        // Columns X, Y and Z have their URL removed by the linked schema.
+        // Columns S-Z have their URL removed by the linked schema.
         assertHrefNotPresent(table, "file_metadata Query S");
         assertHrefNotPresent(table, "file_metadata Query T");
         assertHrefNotPresent(table, "db_metadata List U");
         assertHrefNotPresent(table, "db_metadata List V");
         assertHrefNotPresent(table, "db_metadata List W");
         assertHrefNotPresent(table, "db_metadata List X");
-        // BUGBUG? Issue 17592: if database metadata xml is present, it is applied INSTEAD of the file-based metadata xml and not merged.  I would have thought file-based metadata xml would be applied first, then database metadata xml.
-        // In this case, we have applied the database xml (see column X), but that isn't
-        // merged with the /queries/lists/LInkedSchemaTestPeople.query.xml so we lose the
-        // customization for column Y.
-        //assertHrefNotPresent(table, "db_metadata List Y");
-        assertHrefNotPresent(table, "Original List Y");
+        assertHrefNotPresent(table, "file_metadata List Y");
         assertHrefNotPresent(table, "Original List Z");
 
         // Disable the module in the TargetFolder container so query validation will pass at the end of the test
