@@ -16,11 +16,12 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.HidraPreRelease;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RemoteConnectionHelperWD;
 
@@ -32,7 +33,7 @@ import java.util.List;
  * User: RyanS
  * Date: 11/26/13
  */
-@Category(DailyA.class)
+@Category({DailyA.class, HidraPreRelease.class})
 public class ETLErrorTest extends ETLBaseTest
 {
     private static final String _projectName = "ETLErrorTestProject";
@@ -69,7 +70,8 @@ public class ETLErrorTest extends ETLBaseTest
         assertTextNotPresent("Should not have loaded invalid transform xml", TRANSFORM_BAD_XML);
         insertSourceRow("0", "Subject 0", null);
         List<String> errors = new ArrayList<String>();
-        errors.add("Violation of UNIQUE KEY constraint 'AK_etltarget'. Cannot insert duplicate key in object 'vehicle.etl_target'. The duplicate key value is");
+        errors.add("AK_etltarget");
+        errors.add("duplicate");
         errors.add("ERROR: Error running executeCopy");
         errors.add("org.labkey.api.pipeline.PipelineJobException: Error running executeCopy");
         runETLandCheckErrors(TRANSFORM_KEYCONSTRAINT_ERROR, true, false, errors);
@@ -95,7 +97,8 @@ public class ETLErrorTest extends ETLBaseTest
         insertSourceRow("12", "Patient 12", "");
         runETL(TRANSFORM_REMOTE_NOTRUNC);
         //since we just moved patient 12 to etl_target, running the etl a second time should give us a constraint violation
-        errors.add("Violation of UNIQUE KEY constraint 'AK_etltarget'. Cannot insert duplicate key in object 'vehicle.etl_target'. The duplicate key value is");
+        errors.add("AK_etltarget");
+        errors.add("constraint");
         errors.add("ERROR: Error running executeCopy");
         errors.add("org.labkey.api.pipeline.PipelineJobException: Error running executeCopy");
         runETLandCheckErrors(TRANSFORM_REMOTE_NOTRUNC, true, false, errors);
@@ -107,8 +110,17 @@ public class ETLErrorTest extends ETLBaseTest
         waitForElement(Locator.xpath(".//*[@id='bodypanel']"));
         runETLandCheckErrors(TRANSFORM_BADTABLE, false, true, errors);
         errors.clear();
-        //TODO: add scheduled run of bad source schema and test logging
-        checkExpectedErrors(_expectedErrors);
+        clickTab("DataIntegration");
+        enableScheduledRun("Error Bad Source Schema");
+        //schedule for job is 15 seconds
+        sleep(15000);
+        disableScheduledRun("Error Bad Source Schema");
+        clickTab("Portal");
+        Assert.assertTrue(countText("java.lang.IllegalArgumentException: Could not find table: vehicle.etl_source_cheeseburger") > 1);
+        //no way of knowing error count due to scheduled job running unkown number of times
+        pushLocation();
+        resetErrors();
+        popLocation();
     }
 
     protected void runETLandCheckErrors(String ETLName, boolean hasWork, boolean hasCheckerError, List<String> errors)
@@ -123,17 +135,10 @@ public class ETLErrorTest extends ETLBaseTest
         {
             goToProjectHome();
         }
-        assertTextPresentCaseInsensitive(errors);
-    }
-
-    protected void incrementExpectedErrors()
-    {
-        _expectedErrors++;
-    }
-
-    protected void incrementExpectedErrorsBy(Integer by)
-    {
-        _expectedErrors = _expectedErrors + by;
+        for(String error : errors)
+        {
+            assertTextPresentCaseInsensitive(errors);
+        }
     }
 
     protected void runInitialSetup()
@@ -141,7 +146,6 @@ public class ETLErrorTest extends ETLBaseTest
         PortalHelper portalHelper = new PortalHelper(this);
         log("running setup");
         _containerHelper.createProject(getProjectName(), null);
-        _expectedErrors = 15;
         _jobsComplete = 0;
 
         enableModule("DataIntegration", true);

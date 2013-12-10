@@ -26,7 +26,7 @@ import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RemoteConnectionHelperWD;
-
+import org.labkey.test.categories.HidraPreRelease;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -43,7 +43,7 @@ import static org.junit.Assert.fail;
  * Date: 3/26/13
  * Time: 11:32 AM
  */
-@Category({DailyB.class})
+@Category({DailyB.class, HidraPreRelease.class})
 public class ETLTest extends ETLBaseTest
 {
     //

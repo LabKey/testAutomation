@@ -95,6 +95,23 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         return (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL) ? (original+ 1) : original;
     }
 
+    //sets 'enabled' checkbox to checked state for given ETL on DataIntegration tab, assumes current tab selected is DataIntegration
+    protected void enableScheduledRun(String transformName)
+    {
+        checkCheckbox(Locator.xpath("//td[.='" + transformName + "']/../td/input[contains(@onchange, 'Enabled')]"));
+    }
+
+    protected void disableScheduledRun(String transformName)
+    {
+        uncheckCheckbox(Locator.xpath("//td[.='" + transformName + "']/../td/input[contains(@onchange, 'Enabled')]"));
+    }
+
+    //sets 'verbose' checbox to checked state for given ETL on DataIntegration tab, assumes current tab selected is DataIntegration
+    protected void enableVerbose(String transformName)
+    {
+        checkCheckbox(Locator.xpath("//td[.='" + transformName + "']/../td/input[contains(@onchange, 'Verbose')]"));
+    }
+
     //
     // verify the following:
     // contains expected number of rows (container filter and "no work" filter is there)

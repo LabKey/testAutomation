@@ -20,7 +20,7 @@ import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
-
+import org.labkey.test.categories.HidraPreRelease;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
  * User: tgaluhn
  * Date: 11/26/13
  */
-@Category({DailyB.class})
+@Category({DailyB.class, HidraPreRelease.class})
 public class ETLStoredProcedureTest extends ETLTest
 {
     private static final String TRANSFORM_NORMAL_OPERATION_SP = "{simpletest}/SProcNormalOperation";
