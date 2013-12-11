@@ -199,10 +199,13 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         log("Default Formats: set default formats for study");
         goToProjectHome();
         clickFolder(getFolderName());
-        goToManageDatasets();
-        setFormElement(Locator.name("dateFormat"), "MMM dd, yyyy");
-        setFormElement(Locator.name("numberFormat"), "#.000");
-        clickButton("Submit");
+
+        // Default date & number formats are now on the folder management "Formats" tab
+        goToFolderManagement();
+        clickAndWait(Locator.linkWithText("Formats"));
+        setFormElement(Locator.name("defaultDateFormat"), "MMM dd, yyyy");
+        setFormElement(Locator.name("defaultNumberFormat"), "#.000");
+        clickButton("Save");
 
         log("Default Formats: export study folder to the pipeline as indivisual files");
         exportStudyArchive(getFolderName(), "0");
@@ -215,12 +218,13 @@ public class StudySimpleExportTest extends StudyBaseTestWD
 
         log("Default Formats: verify imported settings");
         clickFolder("Default Dataset Formats");
-        goToManageDatasets();
-        waitForElement(Locator.name("dateFormat"));
-        assertFormElementEquals(Locator.name("dateFormat"), "MMM dd, yyyy");
-        assertFormElementEquals(Locator.name("numberFormat"), "#.000");
-        clickAndWait(Locator.linkWithText(TEST_DATASET_NAME));
-        clickButton("View Data");
+        goToFolderManagement();
+        clickAndWait(Locator.linkWithText("Formats"));
+        assertFormElementEquals(Locator.name("defaultDateFormat"), "MMM dd, yyyy");
+        assertFormElementEquals(Locator.name("defaultNumberFormat"), "#.000");
+
+        clickTab("Clinical and Assay Data");
+        waitAndClickAndWait(Locator.linkWithText(TEST_DATASET_NAME));
         assertTextPresentInThisOrder("999.000", "Oct 29, 2013");
     }
 

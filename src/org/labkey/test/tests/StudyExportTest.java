@@ -133,19 +133,24 @@ public class StudyExportTest extends StudyManualTest
     {
         super.verifyStudyAndDatasets();
 
-        // verify reordered, categorized, & hidden datasets.
         clickFolder(getFolderName());
+
+        // verify format strings
+        goToFolderManagement();
+        clickAndWait(Locator.linkWithText("Formats"));
+        assertFormElementEquals(Locator.name("defaultDateFormat"), DATE_FORMAT);
+        assertFormElementEquals(Locator.name("defaultNumberFormat"), NUMBER_FORMAT);
+
+        clickFolder(getFolderName());
+
+        // verify reordered, categorized, & hidden datasets.
         clickAndWait(Locator.linkWithText("47 datasets"));
         assertTextBefore(REORDERED_DATASET2, REORDERED_DATASET1);
         assertLinkNotPresentWithText(HIDDEN_DATASET);
         assertTextBefore(CATEGORY, MODIFIED_DATASET);
 
-        // verify format strings
-        clickAndWait(Locator.linkWithText("Manage Datasets"));
-        assertFormElementEquals(Locator.id("dateFormat"), DATE_FORMAT);
-        assertFormElementEquals(Locator.id("numberFormat"), NUMBER_FORMAT);
-
         // verify dataset category on dataset management page
+        clickAndWait(Locator.linkWithText("Manage Datasets"));
         assertTextPresent(CATEGORY, 1);
         assertElementContains(Locator.xpath("//tr[./td/a[text() = '" + MODIFIED_DATASET + "']]/td[4]"), CATEGORY);
 
@@ -563,11 +568,11 @@ public class StudyExportTest extends StudyManualTest
     private void setFormatStrings()
     {
         clickFolder(getFolderName());
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Datasets"));
-        setText("dateFormat", DATE_FORMAT);
-        setText("numberFormat", NUMBER_FORMAT);
-        clickButton("Submit");
+        goToFolderManagement();
+        clickAndWait(Locator.linkWithText("Formats"));
+        setFormElement(Locator.name("defaultDateFormat"), DATE_FORMAT);
+        setFormElement(Locator.name("defaultNumberFormat"), NUMBER_FORMAT);
+        clickButton("Save");
     }
 
     private void setManualCohorts()
