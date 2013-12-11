@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0: http://www.apache.org/licenses/LICENSE-2.0
  */
-// TODO: Query APIs added to this script should be matched by updates to test/modules/simpletest/scripts/validationTest/queryTest.js
+// TODO: Query APIs added to this script should be matched by updates to test/modules/simpletest/resources/scripts/validationTest/queryTest.js
 
 var schemaName = 'lists';
 var queryName = 'People';

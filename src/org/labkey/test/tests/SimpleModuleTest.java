@@ -789,7 +789,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         goToModule("Wiki");
         createNewWikiPage();
         setFormElement("wiki-input-name", "Parameterized QWP");
-        setWikiBody(getFileContents("/server/test/modules/simpletest/views/parameterizedQWP.html"));
+        setWikiBody(getFileContents("/server/test/modules/simpletest/resources/views/parameterizedQWP.html"));
         clickButton("Save & Close");
 
         log("Check that parameterized query doesn't cause page load.");
@@ -961,10 +961,17 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("Cleaned up SimpleModuleTest project.");
     }
 
+    @Override
     public String getAssociatedModuleDirectory()
     {
         //return "null" to skip verification of module directory
         //as it won't exist until after the test starts running the first time
         return null;
+    }
+
+    @Override
+    public BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
