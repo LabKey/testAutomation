@@ -461,7 +461,7 @@
         </condition>
     </target>
 
-    <target name="runsuite-selenium-tomcat" depends="stopSeleniumServer,compile,ensurePassword,deploy-test-modules,set-user-props,set-debug-props">
+    <target name="runsuite-selenium-tomcat" depends="stopSeleniumServer,compile,ensurePassword,deploy-test-modules,set-user-props,set-debug-props, install-rpackages">
         <fail unless="tomcat.home" />
         <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_teamcity" />
         <antcall target="waitfor-labkey-started"/>
@@ -1096,7 +1096,7 @@
       </waitfor>
     </target>
 
-    <target name="runsuite" depends="compile,package-chrome-extensions,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started">
+    <target name="runsuite" depends="compile,package-chrome-extensions,ensurePassword,deploy-test-modules,set-user-props,waitfor-labkey-started, install-rpackages">
         <junit fork="true" forkmode="once" maxmemory="512m" showoutput="true"
                 errorproperty="suite.failed" failureproperty="suite.failed"
                 haltonfailure="${sysprop.haltOnError}"
@@ -1152,7 +1152,7 @@
         </junit>
     </target>
 
-    <target name="runsuite-tomcat" depends="compile,ensurePassword,deploy-test-modules,set-user-props">
+    <target name="runsuite-tomcat" depends="compile,ensurePassword,deploy-test-modules,set-user-props, install-rpackages">
         <echo message="Deleting log files from ${tomcat.home}/logs"/>
         <delete failonerror="false" dir="${tomcat.home}/logs" />
         <mkdir dir="${tomcat.home}/logs" />
