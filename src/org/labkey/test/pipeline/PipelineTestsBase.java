@@ -19,8 +19,9 @@ import org.labkey.test.util.ExperimentRunTable;
 import org.labkey.test.util.PipelineStatusTable;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
+
+import static org.junit.Assert.assertFalse;
 
 /**
  * MS2TestsBase class
@@ -166,6 +167,8 @@ public class PipelineTestsBase
                 }
                 else
                 {
+                    assertFalse("Unexpected error in job: " + names[i], "ERROR".equals(getStatusTable().getJobStatus(names[i])));
+
                     String completeName = getExperimentTable(tableName).getRunName(names[i]);
                     if (completeName == null || getStatusTable().hasJob(names[i]))
                         return false;
