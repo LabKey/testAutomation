@@ -322,7 +322,7 @@ public abstract class Locator
 
     public static XPathLocator navButton(String text)
     {
-        return xpath("//a[" + NOT_HIDDEN + " and contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')]/span[text() = " + xq(text) + "]");
+        return tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')").withText(text);
     }
 
     public static XPathLocator navTreeExpander(String nodeText)

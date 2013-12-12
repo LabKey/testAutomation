@@ -87,6 +87,12 @@ modules/pipelinetest/resources/pipeline/pipelines/r-copy.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/tasks/r-copy-inline.task.xml -text
 modules/pipelinetest/resources/pipeline/tasks/r-copy.r -text
 modules/pipelinetest/resources/pipeline/tasks/r-copy.task.xml -text
+modules/pipelinetest2/module.properties -text
+modules/pipelinetest2/resources/pipeline/pipelines/r-copy-inline.pipeline.xml -text
+modules/pipelinetest2/resources/pipeline/pipelines/r-copy.pipeline.xml -text
+modules/pipelinetest2/resources/pipeline/tasks/r-copy-inline.task.xml -text
+modules/pipelinetest2/resources/pipeline/tasks/r-copy.r -text
+modules/pipelinetest2/resources/pipeline/tasks/r-copy.task.xml -text
 modules/restrictedModule/module.properties -text
 modules/restrictedModule/resources/module.xml -text
 modules/restrictedModule/resources/views/RestrictedWebPart.webpart.xml -text
@@ -367,6 +373,7 @@ src/org/labkey/test/tests/ExperimentalFeaturesTest.java -text
 src/org/labkey/test/tests/ExternalSchemaTest.java -text
 src/org/labkey/test/tests/ExtraKeyStudyTest.java -text
 src/org/labkey/test/tests/FieldValidatorTest.java -text
+src/org/labkey/test/tests/FileBasedPipelineTest.java -text
 src/org/labkey/test/tests/FileContentTest.java -text
 src/org/labkey/test/tests/FilterTest.java -text
 src/org/labkey/test/tests/FlowAnalysisResolverTest.java -text
