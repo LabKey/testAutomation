@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-ALTER TABLE vehicle.[Transfer] Add [container] [dbo].[ENTITYID] NULL
+ALTER TABLE vehicle.Transfer ADD container dbo.ENTITYID NULL
 GO
 
-ALTER TABLE [vehicle].[Transfer]  WITH CHECK ADD  CONSTRAINT [FK_etltransfer_container] FOREIGN KEY([container])
-REFERENCES [core].[Containers] ([EntityId])
+ALTER TABLE vehicle.Transfer  ADD CONSTRAINT FK_etltransfer_container FOREIGN KEY(container)
+REFERENCES core.Containers (EntityId)
 GO
-
-ALTER TABLE [vehicle].[Transfer] CHECK CONSTRAINT [FK_etltransfer_container]
-GO
-
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
 
 -- =============================================
 -- Author:		Tony Galuhn

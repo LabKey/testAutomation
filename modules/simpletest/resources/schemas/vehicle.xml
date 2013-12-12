@@ -27,7 +27,7 @@
       <column columnName="description"/>
       <column columnName="log"/>
       <column columnName="status"/>
-      <column columnName="Container"/>
+      <column columnName="container"/>
     </columns>
   </table>
 
