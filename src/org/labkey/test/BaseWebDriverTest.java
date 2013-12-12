@@ -395,7 +395,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                         try
                             {JavaScriptError.addExtension(profile);}
                         catch(IOException e)
-                            {fail("Failed to load JS error checker: " + e.getMessage());}
+                            {throw new RuntimeException("Failed to load JS error checker", e);}
                     }
                     if (isFirefoxExtensionsEnabled() && !isTestRunningOnTeamCity()) // Firebug just clutters up screenshots on TeamCity
                     {
@@ -416,7 +416,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                             }
                         }
                         catch(IOException e)
-                            {fail("Failed to load Firebug: " + e.getMessage());}
+                            {throw new RuntimeException("Failed to load Firebug", e);}
                     }
 
                     profile.setEnableNativeEvents(useNativeEvents());
@@ -441,7 +441,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 break;
             }
             default:
-                fail("Browser not yet implemented: " + BROWSER_TYPE);
+                throw new IllegalArgumentException("Browser not yet implemented: " + BROWSER_TYPE);
         }
 
         if (!reusingDriver)
@@ -872,7 +872,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (IOException e)
         {
-            fail("Unable to ensure credentials: " + e.getMessage());
+            throw new RuntimeException("Unable to ensure credentials", e);
         }
         waitForStartup();
         log("Signing in");
@@ -903,7 +903,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             clickButton("Sign In");
 
             if (isTextPresent("Type in your email address and password"))
-                fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+                throw new IllegalStateException("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
         }
 
         assertSignOutAndMyAccountPresent();
@@ -927,14 +927,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void signIn(String email, String password, boolean failOnError)
     {
         if ( !isElementPresent(Locator.linkWithText("Sign In")) )
-            fail("You need to be logged out to log in.  Please log out to log in.");
+            throw new IllegalStateException("You need to be logged out to log in.  Please log out to log in.");
 
         attemptSignIn(email, password);
 
         if ( failOnError )
         {
             if ( isTextPresent("Type in your email address and password") )
-                fail("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
+                throw new IllegalStateException("Could not log in with the saved credentials.  Please verify that the test user exists on this installation or reset the credentials using 'ant setPassword'");
 
             assertSignOutAndMyAccountPresent();
         }
@@ -1332,7 +1332,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         if (!hitFirstPage)
         {
-            fail("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
+            throw new RuntimeException("Webapp failed to start up after " + MAX_SERVER_STARTUP_WAIT_SECONDS + " seconds.");
         }
         log("Server is running.");
     }
@@ -1406,7 +1406,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                         Thread.sleep(2000);
                         waitMs -= 2000;
                         if (isTextPresent("error occurred") || isTextPresent("failure occurred"))
-                            fail("A startup failure occurred.");
+                            throw new RuntimeException("A startup failure occurred.");
                     }
                     catch (InterruptedException e)
                     {
@@ -1419,7 +1419,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 }
 
                 if (waitMs <= 0)
-                    fail("Script runner took more than 10 minutes to complete.");
+                    throw new TestTimeoutException("Script runner took more than 10 minutes to complete.");
 
                 if (isNavButtonPresent("Next"))
                 {
@@ -2109,7 +2109,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             }
             beginAt("/admin/memTracker.view?gc=1&clearCaches=1", 120000);
             if (!isTextPresent("In-Use Objects"))
-                fail("Asserts must be enabled to track memory leaks; please add -ea to your server VM params and restart.");
+                throw new IllegalStateException("Asserts must be enabled to track memory leaks; please add -ea to your server VM params and restart.");
             leakCount = getImageWithAltTextCount("expand/collapse");
         }
 
@@ -2820,13 +2820,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     @LogMethod
     public void startCreateGlobalPermissionsGroup(@LoggedParam String groupName, boolean failIfAlreadyExists)
     {
-
         goToHome();
         goToSiteGroups();
         if(isElementPresent(Locator.tagWithText("div", groupName)))
         {
             if(failIfAlreadyExists)
-                fail("Group already exists");
+                throw new IllegalArgumentException("Group already exists: " + groupName);
             else
                 return;
         }
@@ -2972,7 +2971,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         hoverFolderBar();
         if (isElementPresent(Locator.id("folderBar_menu").append(Locator.linkWithText(child))))
-            fail("Folder: " + child + " already exists in project: " + project);
+            throw new IllegalArgumentException("Folder: " + child + " already exists in project: " + project);
         log("Creating subfolder " + child + " under " + parent);
         clickAndWait(Locator.xpath("//a[@title='New Subfolder']"));
         waitForElement(Locator.name("name"), WAIT_FOR_JAVASCRIPT);
@@ -3654,7 +3653,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (TimeoutException to)
         {
-            fail("Page failed to load");
+            throw new RuntimeException("Page failed to load", to);
         }
     }
 
@@ -3922,7 +3921,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 sleep(500);
             refresh();
         }
-        fail("Element did not appear: " + loc.getLoggableDescription());
+        throw new NoSuchElementException("Element did not appear: " + loc.getLoggableDescription());
     }
 
     public void waitForElement(final Locator locator, int wait)
@@ -4650,7 +4649,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         int col = Locator.xpath("//table[@id='"+tableName+"']/tbody/tr[contains(@id, 'dataregion_column_header_row') and not(contains(@id, 'spacer'))]/td[./div/.='"+columnTitle+"']/preceding-sibling::*").findElements(getDriver()).size();
         if(col == 0)
-            fail("Column '" + columnTitle + "' not found in table '" + tableName + "'");
+            throw new IllegalArgumentException("Column '" + columnTitle + "' not found in table '" + tableName + "'");
 
         return col;
     }
@@ -4899,7 +4898,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (buttonLocator != null)
             clickAndWait(buttonLocator, wait);
         else
-            fail("No button found with text \"" + text + "\" at index " + index);
+            throw new NoSuchElementException("No button found with text \"" + text + "\" at index " + index);
     }
 
     public Locator.XPathLocator getButtonLocator(String text, int index)
@@ -5012,7 +5011,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (buttonLocator != null)
             clickAndWait(buttonLocator, waitMillis);
         else
-            fail("No button found with text \"" + text + "\"");
+            throw new NoSuchElementException("No button found with text \"" + text + "\"");
     }
 
     public void clickButtonContainingText(String text)
@@ -5026,7 +5025,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if (buttonLocator != null)
             clickAndWait(buttonLocator, waitMills);
         else
-            fail("No button found with text \"" + text + "\"");
+            throw new NoSuchElementException("No button found with text \"" + text + "\"");
     }
 
     public void clickButtonContainingText(String buttonText, String textShouldAppearAfterLoading)
@@ -5962,7 +5961,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         String role = toRole(permissionString);
         if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
         {
-            fail("call removePermission()");
+            throw new IllegalArgumentException("Can't set NoPermissionRole; call removePermission()");
         }
         else
         {
@@ -6166,8 +6165,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         else
         {
-            fail("cloneUserName support has been removed"); //not in use, so was not implemented in new user
-            //helpers
+            throw new IllegalArgumentException("cloneUserName support has been removed"); //not in use, so was not implemented in new user helpers
         }
     }
 
@@ -6279,7 +6277,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             return true;
         }
         else if (failIfNotFound)
-            fail("Group not found:" + groupName);
+            throw new NoSuchElementException("Group not found:" + groupName);
 
         return false;
     }
@@ -6469,7 +6467,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             portalHelper.clickWebpartMenuItem("Pages", "New");
         }
         else
-            fail("Could not find a link on the current page to create a new wiki page." +
+            throw new IllegalStateException("Could not find a link on the current page to create a new wiki page." +
                     " Ensure that you navigate to the wiki controller home page or an existing wiki page" +
                     " before calling this method.");
 
@@ -6790,8 +6788,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         catch (IOException fail)
         {
-            fail(fail.getMessage());
-            return null;
+            throw new RuntimeException(fail);
         }
     }
 
@@ -7165,7 +7162,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             for (File copiedArchive : _copiedArchives)
                 if (!copiedArchive.delete())
-                    fail("Couldn't delete copied specimen archive: " + copiedArchive.getAbsolutePath());
+                    throw new RuntimeException("Couldn't delete copied specimen archive: " + copiedArchive.getAbsolutePath());
         }
     }
 
@@ -7225,7 +7222,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 return;
 
         //else
-        fail("Running pipeline jobs were found.  Timeout:" + wait);
+        throw new TestTimeoutException("Running pipeline jobs were found.  Timeout:" + wait);
     }
 
     public void setCodeEditorValue(String id, String value)

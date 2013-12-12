@@ -21,10 +21,20 @@ package org.labkey.test;
  * User: jeckels
  * Date: 1/2/13
  */
-public class TestTimeoutException extends Exception
+public class TestTimeoutException extends RuntimeException
 {
-    public TestTimeoutException(Exception e)
+    public TestTimeoutException(Throwable t)
     {
-        super(e);
+        super(t);
+    }
+
+    public TestTimeoutException(String msg)
+    {
+        super(msg);
+    }
+
+    public TestTimeoutException(String msg, Throwable t)
+    {
+        super(msg, t);
     }
 }
