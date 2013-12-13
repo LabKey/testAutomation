@@ -238,7 +238,7 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         goToModule("FileContent");
         _fileBrowserHelper.selectFileBrowserItem("/unzip/");
         doubleClick(Locator.tag("div").startsWith("folder_load_"));
-        assertTextPresentInThisOrder("Loading folder type and active modules", " queries imported", "Skipping query validation.");
+        assertTextPresentInThisOrder("Loading folder properties (folder type, settings and active modules)", " queries imported", "Skipping query validation.");
     }
 
     @Test
