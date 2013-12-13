@@ -1152,68 +1152,6 @@
         </junit>
     </target>
 
-    <target name="runsuite-tomcat" depends="compile,ensurePassword,deploy-test-modules,set-user-props, install-rpackages">
-        <echo message="Deleting log files from ${tomcat.home}/logs"/>
-        <delete failonerror="false" dir="${tomcat.home}/logs" />
-        <mkdir dir="${tomcat.home}/logs" />
-        <ant inheritall="true" antfile="${project.root}/server/build.xml" target="start_tomcat_teamcity" />
-        <antcall target="waitfor-labkey-started"/>
-
-        <junit fork="true" forkmode="once" maxmemory="512m"
-                errorproperty="suite.failed" failureproperty="suite.failed"
-                haltonfailure="false" showoutput="true">
-            <jvmarg value="-Xmx512m"/>
-            <jvmarg value="-Duser.timezone=${sysprop.timezone}" />
-            <classpath refid="test.run.classpath"/>
-            <sysproperty key="suite" value="${sysprop.suite}"/>
-            <sysproperty key="cleanOnly" value="${sysprop.cleanOnly}"/>
-            <sysproperty key="test" value="${sysprop.test}"/>
-            <sysproperty key="clean" value="${sysprop.clean}"/>
-            <sysproperty key="loop" value="${sysprop.loop}"/>
-            <sysproperty key="linkCheck" value="${sysprop.linkCheck}"/>
-            <sysproperty key="injectCheck" value="${sysprop.injectCheck}"/>
-            <sysproperty key="memCheck" value="${sysprop.memCheck}"/>
-            <sysproperty key="scriptCheck" value="${sysprop.scriptCheck}"/>
-            <sysproperty key="queryCheck" value="${sysprop.queryCheck}"/>
-            <sysproperty key="viewCheck" value="${sysprop.viewCheck}"/>
-            <sysproperty key="disableAssertions" value="${sysprop.disableAssertions}"/>
-            <sysproperty key="devMode" value="${sysprop.devMode}"/>
-            <sysproperty key="failure.output.dir" value="${test.log.output.dir}"/>
-            <sysproperty key="labkey.root" value="${project.root}"/>
-            <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
-            <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
-            <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
-            <sysproperty key="testRecentlyFailed" value="${sysprop.testRecentlyFailed}" />
-            <sysproperty key="teamcity.tests.recentlyFailedTests.file" value="${sysprop.teamcity.tests.recentlyFailedTests.file}" />
-            <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />
-            <sysproperty key="teamcity.build.changedFiles.file" value="${sysprop.teamcity.build.changedFiles.file}" />
-            <sysproperty key="shuffleTests" value="${sysprop.shuffleTests}" />
-            <sysproperty key="maxTestFailures" value="${maxTestFailures}"/>
-            <sysproperty key="databaseType" value="${sysprop.databaseType}"/>
-            <sysproperty key="databaseVersion" value="${sysprop.databaseVersion}"/>
-            <sysproperty key="enableFirebugPanels" value="${sysprop.enableFirebugPanels}"/>
-            <sysproperty key="enableFirefoxExtensions" value="${sysprop.enableFirefoxExtensions}"/>
-            <sysproperty key="webdriver.ie.driver" value="${webdriver.ie.driver}"/>
-            <sysproperty key="webdriver.chrome.driver" value="${webdriver.chrome.driver}"/>
-
-            <formatter type="brief"/>
-            <formatter type="xml"/>
-
-            <test name="org.labkey.test.Runner"
-                todir="${test.log.output.dir}" outfile="${sysprop.suite}-results"/>
-        </junit>
-        <ant inheritall="true" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
-        <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${databaseType}/" />
-        <mkdir dir="${test.log.output.dir}/${databaseType}" />
-        <copy todir="${test.log.output.dir}/${databaseType}">
-            <fileset dir="${tomcat.home}/logs/">
-                <size value="0" units="k" when="more" />
-            </fileset>
-        </copy>
-
-        <ant target="fail_message" inheritall="true"/>
-    </target>
-
     <!-- for testing the TestHelper ui -->
     <target name="testhelper-test" depends="compile,set-user-props">
         <java classname="org.labkey.test.testpicker.TestHelper" fork="true">
