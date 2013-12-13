@@ -92,8 +92,8 @@ public class SecurityTest extends BaseWebDriverTest
         this.isQuickTest = isQuickTest;
         enableEmailRecorder();
 
-        displayNameTest();
         clonePermissionsTest();
+        displayNameTest();
         tokenAuthenticationTest();
         if(!isQuickTest)
         {
@@ -422,28 +422,16 @@ public class SecurityTest extends BaseWebDriverTest
 
     @LogMethod protected void displayNameTest()
     {
-        //set display name to user's email minus domain
-        String oldDisplayName = getDisplayName();
-        goToMyAccount();
-        clickButton("Edit");
+        String newDisplayName = "changeDisplayTest";
 
-        String email = PasswordUtil.getUsername();
-        String displayName;
-        if (email.contains("@"))
-        {
-            displayName = email.substring(0, email.indexOf("@"));
-        }
-        else
-        {
-            displayName = email;
-        }
-        setFormElement("quf_DisplayName", displayName);
-        clickButton("Submit");
+        setDisplayName(NORMAL_USER, newDisplayName);
+        assertTextPresent(newDisplayName);
 
-        //now set it back
-        clickButton("Edit");
-        setFormElement("quf_DisplayName", oldDisplayName);
-        clickButton("Submit");
+        String injectDisplayName = "displayNameInjection" + INJECT_CHARS_1;
+
+        setDisplayName(NORMAL_USER, injectDisplayName); // Link crawler will do more thorough check
+        assertTextPresent(injectDisplayName);
+        assertTextNotPresent(newDisplayName);
     }
 
     @LogMethod protected void clonePermissionsTest()

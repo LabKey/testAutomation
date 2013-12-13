@@ -43,7 +43,6 @@ public class SearchTest extends StudyWDTest
     private static final String FOLDER_C = "Folder Cherry"; // Folder rename name.
     private static final String GROUP_NAME = "Test Group";
     private static final String USER1 = "user1_searchtest@search.test";
-    private static final String USER1_DISPLAY_NAME = displayNameFromEmail(USER1);
 
     private static final String WIKI_NAME = "Brie";
     private static final String WIKI_TITLE = "Roquefort";
@@ -287,7 +286,7 @@ public class SearchTest extends StudyWDTest
         selectOptionByText("area", "Area51");
         selectOptionByText("priority", "1");
         setFormElement("comment", ISSUE_BODY);
-        selectOptionByText("assignedTo", USER1_DISPLAY_NAME);
+        selectOptionByText("assignedTo", displayNameFromEmail(USER1));
         click(Locator.linkWithText("Attach a file"));
         File file = new File(getLabKeyRoot() + "/common.properties");
         setFormElement("formFiles[00]", file);
@@ -295,7 +294,7 @@ public class SearchTest extends StudyWDTest
 
         _searchHelper.enqueueSearchItem(ISSUE_TITLE, Locator.linkContainingText(ISSUE_TITLE));
         _searchHelper.enqueueSearchItem(ISSUE_BODY, Locator.linkContainingText(ISSUE_TITLE));
-        _searchHelper.enqueueSearchItem(USER1_DISPLAY_NAME, Locator.linkContainingText(ISSUE_TITLE));
+        _searchHelper.enqueueSearchItem(displayNameFromEmail(USER1), Locator.linkContainingText(ISSUE_TITLE));
         _searchHelper.enqueueSearchItem("Area51", Locator.linkContainingText(ISSUE_TITLE));
         _searchHelper.enqueueSearchItem("UFO", Locator.linkContainingText(ISSUE_TITLE));
         //_searchHelper.enqueueSearchItem("Override", Locator.linkWithText("\"common.properties\" attached to issue \"" + ISSUE_TITLE + "\"")); // some text from attached file

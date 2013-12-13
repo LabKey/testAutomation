@@ -1244,23 +1244,31 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void goToSiteUsers()
     {
-        clickAdminMenuItem("Site", "Site Users");
+        if (!isElementPresent(Locator.id("labkey-nav-trail-current-page").withText("Site Users")))
+            clickAdminMenuItem("Site", "Site Users");
     }
 
     public void goToSiteGroups()
     {
-        clickAdminMenuItem("Site", "Site Groups");
+        if (!isElementPresent(Locator.tag("a").withClass("x4-tab-active").withText("Site Groups")))
+            clickAdminMenuItem("Site", "Site Groups");
     }
 
     public void goToSiteDevelopers()
     {
-        clickAdminMenuItem("Site", "Site Developers");
-        waitForElement(Locator.name("names"));
+        if (!isElementPresent(Locator.id("labkey-nav-trail-current-page").withText("Developers Group")))
+        {
+            clickAdminMenuItem("Site", "Site Developers");
+            waitForElement(Locator.name("names"));
+        }
     }
 
     public void goToSiteAdmins()
     {
-        clickAdminMenuItem("Site", "Site Admins");
+        if (!isElementPresent(Locator.id("labkey-nav-trail-current-page").withText("Administrators Group")))
+        {
+            clickAdminMenuItem("Site", "Site Admins");
+        }
     }
 
     public void goToManageViews()
@@ -6128,16 +6136,61 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _impersonationStack.push(fakeUser);
     }
 
+    private HashMap<String, String> usersAndDisplayNames = new HashMap<>();
+
+    protected void setDisplayName(String email, String newDisplayName)
+    {
+        String previousDisplayName = usersAndDisplayNames.get(email);
+        String defaultDisplayName = getDefaultDisplayName(email);
+        usersAndDisplayNames.remove(email);
+
+        if (previousDisplayName == null && newDisplayName.equals(defaultDisplayName))
+                return;
+        else
+        {
+            if (!newDisplayName.equals(previousDisplayName))
+            {
+                goToSiteUsers();
+
+                DataRegionTable users = new DataRegionTable("Users", this, true, true);
+                int userRow = users.getRow("Email", email);
+                assertFalse("No such user: " + email, userRow == -1);
+                clickAndWait(users.detailsLink(userRow));
+
+                clickButton("Edit");
+                setFormElement(Locator.name("quf_DisplayName"), newDisplayName);
+                clickButton("Submit");
+            }
+        }
+
+        if (!newDisplayName.equals(defaultDisplayName))
+            usersAndDisplayNames.put(email, newDisplayName);
+    }
+
+    protected void resetDisplayName(String email)
+    {
+        String defaultDisplayName = getDefaultDisplayName(email);
+
+        setDisplayName(email, defaultDisplayName);
+    }
 
     // assumes there are not collisions in the database causing unique numbers to be appended
-    public static String displayNameFromEmail(String email)
+    @Override
+    protected String displayNameFromEmail(String email)
+    {
+        if (usersAndDisplayNames.containsKey(email))
+            return usersAndDisplayNames.get(email);
+        else
+            return getDefaultDisplayName(email);
+    }
+
+    private String getDefaultDisplayName(String email)
     {
         String display = email.contains("@") ? email.substring(0,email.indexOf('@')) : email;
         display = display.replace('_', ' ');
         display = display.replace('.', ' ');
         return display.trim();
     }
-
 
     /**
      * Create a user with the specified permissions for the specified project
