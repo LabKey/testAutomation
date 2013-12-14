@@ -1344,32 +1344,11 @@
         <check-R-package-installed package="flowStats"/>
     </target>
 
-    <target name="install-flowStats-dependencies" if="flowStats.uninstalled" depends="check-flowStats-installed">
+    <target name="install-flowStats" if="flowStats.uninstalled" depends="check-flowStats-installed, install-flowWorkspace">
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true"
-              input="${project.root}/tools/Rpackages/install-flowStats-dependencies.R">
+              input="${project.root}/tools/Rpackages/install-flowStats.R">
             <arg line="--vanilla --quiet"/>
         </exec>
-    </target>
-
-    <target name="install-flowStats-source" if="flowStats.uninstalled" unless="windows" depends="install-flowStats-dependencies">
-        <copy tofile="${project.root}/sampledata/rlabkey/flowStats.tar.gz" overwrite="true">
-            <fileset dir="${project.root}/tools/Rpackages" includes="flowStats*.tar.gz"/>
-        </copy>
-        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
-            <arg line="CMD INSTALL --no-multiarch -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowStats.tar.gz" />
-        </exec>
-    </target>
-
-    <target name="install-flowStats-binary" if="flowStats.uninstalled" unless="unix" depends="install-flowStats-dependencies">
-        <copy tofile="${project.root}/sampledata/rlabkey/flowStats.zip" overwrite="true">
-            <fileset dir="${project.root}/tools/Rpackages" includes="flowStats*.zip"/>
-        </copy>
-        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
-            <arg line="CMD INSTALL --no-multiarch -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowStats.zip" />
-        </exec>
-    </target>
-
-    <target name="install-flowStats" depends="install-flowWorkspace, install-flowStats-binary, install-flowStats-source">
     </target>
 
     <target name="install-knitr" if="R.present" depends="check-rlabkey-installed">
@@ -1390,33 +1369,11 @@
         <check-R-package-installed package="flowWorkspace"/>
     </target>
 
-    <target name="install-flowWorkspace-dependencies" if="flowWorkspace.uninstalled" depends="check-flowWorkspace-installed">
-        <!-- flowWorkspace needs R 2.13 installed.  For now we won't fail the build if you don't have R 2.13 installed. -->
+    <target name="install-flowWorkspace" if="flowWorkspace.uninstalled" depends="check-flowWorkspace-installed">
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true"
-              input="${project.root}/tools/Rpackages/install-flowWorkspace-dependencies.R">
+              input="${project.root}/tools/Rpackages/install-flowWorkspace.R">
             <arg line="--vanilla --quiet"/>
         </exec>
-    </target>
-
-    <target name="install-flowWorkspace-source" if="flowWorkspace.uninstalled" unless="windows" depends="install-flowWorkspace-dependencies">
-        <copy tofile="${project.root}/sampledata/rlabkey/flowWorkspace.tar.gz" overwrite="true">
-            <fileset dir="${project.root}/tools/Rpackages" includes="flowWorkspace*.tar.gz"/>
-        </copy>
-        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
-            <arg line="CMD INSTALL --no-multiarch -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowWorkspace.tar.gz" />
-        </exec>
-    </target>
-
-    <target name="install-flowWorkspace-binary" if="flowWorkspace.uninstalled" unless="unix" depends="install-flowWorkspace-dependencies">
-        <copy tofile="${project.root}/sampledata/rlabkey/flowWorkspace.zip" overwrite="true">
-            <fileset dir="${project.root}/tools/Rpackages" includes="flowWorkspace*.zip"/>
-        </copy>
-        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true">
-            <arg line="CMD INSTALL --no-multiarch -l ${project.root}/sampledata/rlabkey ${project.root}/sampledata/rlabkey/flowWorkspace.zip" />
-        </exec>
-    </target>
-
-    <target name="install-flowWorkspace" depends="install-flowWorkspace-binary, install-flowWorkspace-source">
     </target>
 
     <target name="locate-R">
