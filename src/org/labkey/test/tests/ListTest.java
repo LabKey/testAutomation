@@ -32,6 +32,7 @@ import org.labkey.test.util.ListHelper.LookupInfo;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -607,7 +608,7 @@ public class ListTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         clickButton("Export", 0);
         _extHelper.clickSideTab("Text");
-        String exportButtonScript = getAttribute(Locator.xpath(Locator.navButton("Export to Text").getPath() + "/..") , "onclick");
+        String exportButtonScript = getAttribute(Locator.navButton("Export to Text"), "onclick");
         String exportUrl = exportButtonScript.substring(exportButtonScript.indexOf("window.location=") + 17, exportButtonScript.indexOf("document.getElementById") - 11);
         clickAndWait(Locator.linkWithText("View Design"));
 
