@@ -3321,11 +3321,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         for (String text : texts)
         {
-            String excapedText = text
+            String escapedText = text
                     .replace("&", "&amp;")
                     .replace("<", "&lt;")
                     .replace(">", "&gt;");
-            if (!source.contains(excapedText))
+            if (!source.contains(escapedText))
                 missingTexts.add(text);
         }
         return missingTexts;
@@ -3341,11 +3341,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
         for (String text : texts)
         {
-            String excapedText = text
+            String escapedText = text
                     .replace("&", "&amp;")
                     .replace("<", "&lt;")
                     .replace(">", "&gt;");
-            if (!source.contains(excapedText.toLowerCase()))
+            if (!source.contains(escapedText.toLowerCase()))
                 missingTexts.add(text);
         }
         return missingTexts;
