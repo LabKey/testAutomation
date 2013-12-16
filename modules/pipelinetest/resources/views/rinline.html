@@ -1,0 +1,107 @@
+<form id='analysis_form'>
+  <table>
+    <tr>
+      <td class='labkey-form-label'>Protocol Name:</td>
+      <td>
+        <input id='protocolNameInput' name='protocolNameInput' type='text' size=40>
+      </td>
+    </tr>
+
+    <tr>
+      <td class='labkey-form-label'>File(s):</td>
+      <td>
+        <div id='fileInfo'></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td class='labkey-form-label'>Skip Lines:</td>
+      <td>
+        <input id='skipLinesInput' name='skipLinesInput' type='number'>
+      </td>
+    </tr>
+
+    <tr>
+      <td>&nbsp;</td>
+      <td>
+        <a class='labkey-button' href='#' onclick='startAnalysis(); return false;'>
+          <span>Duplicate File(s)</span>
+        </a>
+      </td>
+    </tr>
+
+  </table>
+</form>
+
+
+<script>
+var path = null;
+var files = [];
+
+Ext.onReady(function () {
+
+  path = LABKEY.ActionURL.getParameter("path");
+  if (!path) {
+    alert("Path parameter required.");
+    window.location = LABKEY.ActionURL.buildURL("pipeline", "browse.view");
+    return;
+  }
+
+  files = LABKEY.ActionURL.getParameterArray("file");
+  if (!files || files.length == 0) {
+    alert("At least one file must be selected.");
+    window.location = LABKEY.ActionURL.buildURL("pipeline", "browse.view");
+    return;
+  }
+
+  fileInfo();
+
+});
+
+function fileInfo()
+{
+  var html = "<ul>";
+  for (var i = 0; i < files.length; i++)
+  {
+    var file = files[i];
+    html += "<li>" + Ext.util.Format.htmlEncode(file) + "</li>";
+  }
+  html += "</ul>";
+
+  var fileInfoEl = document.getElementById("fileInfo");
+  fileInfoEl.innerHTML = html;
+}
+
+function startAnalysis()
+{
+  var protocolName = document.getElementById("protocolNameInput").value;
+  if (!protocolName) {
+    alert("Protocol name is required");
+    return;
+  }
+
+  var skipLines = document.getElementById("skipLinesInput").value;
+  if (skipLines < 0) {
+    alert("Skip lines >= 0 required");
+    return;
+  }
+
+  LABKEY.Pipeline.startAnalysis({
+    taskId: "pipelinetest:pipeline:r-copy-inline",
+    path: path,
+    files: files,
+    //fileIds: fileIds,
+    protocolName: protocolName,
+    //protocolDescription: "",
+    jsonParameters: {
+      'skip-lines': skipLines
+    },
+    saveProtocol: false,
+    success: function() {
+      window.location = LABKEY.ActionURL.buildURL("pipeline-status", "showList.view")
+    }
+  });
+}
+
+</script>
+

@@ -13,19 +13,38 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 ##
-# echos the command line arguments
-args = commandArgs(trailingOnly=TRUE)
-print(args)
 
 # reads the input file and prints the contents to stdout
 lines = readLines(con="${input.txt}")
 
-# print to stdout
-cat("(stdout) contents of file: ${input.txt}\n")
-for (line in lines) cat(line, "\n")
-cat("\n")
+# skip-lines parameter. convert to integer if possible
+skipLines = as.integer("${skip-lines}")
+if (is.na(skipLines)) {
+    skipLines = 0
+}
 
-# print to ${output.xxx}
-cat(file="${output.xxx}", "(output) contents of file: ${input.txt}\n")
-for (line in lines) cat(file="${output.xxx}", line, "\n")
-cat(file="${output.xxx}", "\n")
+# lines in the file
+lineCount = NROW(lines)
+
+if (skipLines > lineCount) {
+    cat("start index larger than number of lines")
+} else {
+    # start index
+    start = skipLines + 1
+
+    # print to stdout
+    cat("(stdout) contents of file: ${input.txt}\n")
+    for (i in start:lineCount) {
+        cat(sep="", lines[i], "\n")
+    }
+
+    # print to ${output.xxx}
+    f = file(description="${output.xxx}", open="w")
+    cat(file=f, "(output) contents of file: ${input.txt}\n")
+    for (i in start:lineCount) {
+        cat(file=f, sep="", lines[i], "\n")
+    }
+    flush(con=f)
+    close(con=f)
+}
+

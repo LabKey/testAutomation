@@ -87,6 +87,8 @@ modules/pipelinetest/resources/pipeline/pipelines/r-copy.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/tasks/r-copy-inline.task.xml -text
 modules/pipelinetest/resources/pipeline/tasks/r-copy.r -text
 modules/pipelinetest/resources/pipeline/tasks/r-copy.task.xml -text
+modules/pipelinetest/resources/views/rinline.html -text
+modules/pipelinetest/resources/views/rinline.view.xml -text
 modules/pipelinetest2/module.properties -text
 modules/pipelinetest2/resources/pipeline/pipelines/r-copy-inline.pipeline.xml -text
 modules/pipelinetest2/resources/pipeline/pipelines/r-copy.pipeline.xml -text
