@@ -130,15 +130,13 @@ public class ETLErrorTest extends ETLBaseTest
         {
             waitForElement(Locator.xpath("//a[.='Show full log file']"));
             click(Locator.xpath("//a[.='Show full log file']"));
+            waitForElement(Locator.linkWithText("Show summary"));
         }
         else
         {
             goToProjectHome();
         }
-        for(String error : errors)
-        {
-            assertTextPresentCaseInsensitive(errors);
-        }
+        assertTextPresentCaseInsensitive(errors);
     }
 
     protected void runInitialSetup()
