@@ -46,6 +46,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 {
     public static final String STUDY_PIPELINE_ROOT = getLabKeyRoot() + "/sampledata/specimenprogressreport";
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
+    public PortalHelper _portalHelper = new PortalHelper(this);
     private static final String studyFolder = "study folder";
     private static final String assayFolder = "assay folder";
     int pipelineCount = 0;
@@ -96,7 +97,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         importFolderFromZip(new File(STUDY_PIPELINE_ROOT, "Study.folder.zip"));
 
         // set the label for the unscheduled visit
-        clickAndWait(Locator.linkWithText("Manage"));
+        goToManageStudy();
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.xpath("//td[contains(text(),'999.0-999.9999')]/../td/a[contains(text(), 'edit')]"));
         setFormElement(Locator.name("label"), "SR");
@@ -132,8 +133,8 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private void manageSpecimenConfiguration()
     {
         clickFolder(studyFolder);
-        PortalHelper portalHelper = new PortalHelper(this);
-        portalHelper.addQueryWebPart("rho");
+        _portalHelper.addQueryWebPart("rho");
+        _portalHelper.addQueryWebPart("study");
 
         // lookup the locationId for the Main site from the study.Locations table
         goToSchemaBrowser();
@@ -149,7 +150,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         int locationId = Integer.parseInt(drt.getDataAsText(drt.getRow("Label", "Main"), "RowId"));
 
         // add the specimen configurations to the manage page
-        goToModule("rho"); // for containers with a study, the rho beginAction will redirect to manageSpecimenConfiguration
+        goToModule("rho"); // for containers with a study, the rho beginAction will redirect to manageAssaySpecimen action
         addSpecimenConfiguration("PCR", "R", locationId, "CEF-R Cryovial", false);
         addSpecimenConfiguration("PCR", "R", locationId, "UPR Micro Tube", true);
         addSpecimenConfiguration("RNA", "R", locationId, "TGE Cryovial", true);
@@ -157,19 +158,19 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
         // lookup the config IDs to use in setting the visits
         clickFolder(studyFolder);
-        clickAndWait(Locator.linkWithText("SpecimenConfiguration"));
+        clickAndWait(Locator.linkWithText("AssaySpecimen"));
         drt = new DataRegionTable("query", this);
         String pcr1RowId = drt.getDataAsText(drt.getRow("TubeType", "CEF-R Cryovial"), "RowId");
         String pcr2RowId = drt.getDataAsText(drt.getRow("TubeType", "UPR Micro Tube"), "RowId");
         String rnaRowId = drt.getDataAsText(drt.getRow("TubeType", "TGE Cryovial"), "RowId");
         // set the specimen configuration visits (by checking the checkboxes on the manage page
-        goToModule("rho"); // for containers with a study, the rho beginAction will redirect to manageSpecimenConfiguration
-        waitForElement(Locator.css("#SpecimenVisitPanel table.x4-grid-table"));
+        goToModule("rho"); // for containers with a study, the rho beginAction will redirect to manageAssaySpecimen action
+        waitForElement(Locator.css("#AssaySpecimenVisitPanel table.x4-grid-table"));
         setSpecimenConfigurationVisit(pcr1RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
         setSpecimenConfigurationVisit(pcr2RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
         setSpecimenConfigurationVisit(rnaRowId, new String[]{"PT1", "0", "6", "20", "SR"});
         sleep(1000); // give the store a second to save the configurations
-        checkRhoQueryRowCount("SpecimenConfigurationVisit", 35);
+        checkRhoQueryRowCount("AssaySpecimenVisit", 35);
         checkRhoQueryRowCount("AssaySpecimenMap", 35);
         checkRhoQueryRowCount("MissingSpecimen", 2);
         checkRhoQueryRowCount("MissingVisit", 3);
@@ -186,13 +187,13 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
     private void addSpecimenConfiguration(String assayName, String source, int locationId, String tubeType, boolean expectRows)
     {
-        Locator.XPathLocator configGridRow = Locator.xpath("id('SpecimenConfigGrid')//table").withClass("x4-grid-table").append("/tbody/tr");
+        Locator.XPathLocator configGridRow = Locator.xpath("id('AssaySpecimenConfigGrid')//table").withClass("x4-grid-table").append("/tbody/tr");
         if (expectRows)
             waitForElement(configGridRow);
         else
-            waitForText("No specimen configurations");
+            waitForText("No assay/specimen configurations");
         int expectedRowIndex = getXpathCount(configGridRow);
-        clickButton("Add Specimen Configuration", 0);
+        clickButton("Insert New", 0);
         waitForElement(Locator.name("AssayName"));
         setFormElement(Locator.name("AssayName"), assayName);
         setFormElement(Locator.name("Description"), assayName + " " + tubeType);
@@ -300,7 +301,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         clickFolder(assayFolder);
         waitForElement(tableLoc);
         clickAndWait(Locator.linkWithText(assayName));
-        clickAndWait(Locator.linkWithText(runName));
+        clickAndWait(Locator.linkWithText("view results"));
 
         if (collectionDateFilterStr != null)
         {
@@ -331,8 +332,8 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
 
         clickFolder(assayFolder);
-        addWebPart("Assay Progress Dashboard");
-        addWebPart("Assay Progress Report");
+        _portalHelper.addWebPart("Assay Progress Dashboard");
+        _portalHelper.addWebPart("Assay Progress Report");
         assertTextPresent("You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report", 2);
 
         configureAssayProgressDashboard(assay1);
