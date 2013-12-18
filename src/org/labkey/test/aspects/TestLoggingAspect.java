@@ -17,6 +17,7 @@ package org.labkey.test.aspects;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.junit.Test;
 import org.labkey.test.util.TestLogger;
 
 import java.util.concurrent.TimeUnit;
@@ -50,8 +51,26 @@ public class TestLoggingAspect
         TestLogger.increaseIndent();
     }
 
-    @AfterReturning(value = "testCaseMethod()", argNames = "joinPoint")
-    public void afterTestCaseSuccess(JoinPoint joinPoint)
+    @AfterReturning(value = "testCaseMethod() && @annotation(test)", argNames = "joinPoint, test")
+    public void afterTestCaseSuccess(JoinPoint joinPoint, Test test)
+    {
+        if (!test.expected().equals(Test.None.class))
+            logTestFailure(); // Sometimes an exception is expected
+        else
+            logTestSuccess();
+
+    }
+
+    @AfterThrowing(value = "testCaseMethod() && @annotation(test)", throwing = "throwable", argNames = "joinPoint, test, throwable")
+    public void afterTestCaseFailure(JoinPoint joinPoint, Test test, Throwable throwable)
+    {
+        if (test.expected().equals(throwable.getClass()))
+            logTestSuccess(); // Sometimes an exception is expected
+        else
+            logTestFailure();
+    }
+
+    private void logTestSuccess()
     {
         Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
 
@@ -67,8 +86,7 @@ public class TestLoggingAspect
             TestLogger.log("\\\\ Test Case Complete //");
     }
 
-    @AfterThrowing(value = "testCaseMethod()", argNames = "joinPoint")
-    public void afterTestCaseFailure(JoinPoint joinPoint)
+    private void logTestFailure()
     {
         Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
 

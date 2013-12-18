@@ -14,6 +14,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.RReportHelperWD;
+import org.openqa.selenium.NoSuchElementException;
 
 import java.io.File;
 import java.util.Arrays;
@@ -107,7 +108,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
     }
 
-    @Test @Ignore("Currenly behaves the same whether module is enabled or not")
+    @Test (expected = NoSuchElementException.class)
     public void testRPipelineWithModuleDisabled()
     {
         final String folderName = "rPipelineDisabled";
