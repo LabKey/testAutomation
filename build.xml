@@ -526,6 +526,8 @@
             <sysproperty key="enableFirefoxExtensions" value="${sysprop.enableFirefoxExtensions}"/>
             <sysproperty key="webdriver.ie.driver" value="${webdriver.ie.driver}"/>
             <sysproperty key="webdriver.chrome.driver" value="${webdriver.chrome.driver}"/>
+            <sysproperty key="dump.svgs" value="${dump.svgs}"/>
+            <sysproperty key="user.home" value="${user.home}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -1145,6 +1147,7 @@
             <sysproperty key="webdriver.ie.driver" value="${webdriver.ie.driver}"/>
             <sysproperty key="webdriver.chrome.driver" value="${webdriver.chrome.driver}"/>
             <sysproperty key="dump.svgs" value="${dump.svgs}"/>
+            <sysproperty key="user.home" value="${user.home}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
