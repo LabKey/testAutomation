@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
@@ -239,6 +240,8 @@ public class TargetStudyTest extends AbstractAssayTestWD
 
         beginAt("/study/" + TEST_ASSAY_PRJ_SECURITY + "/" + TEST_ASSAY_FLDR_STUDIES + "/" + TEST_ASSAY_FLDR_STUDY1 + "/dataset.view?datasetId=5001");
         DataRegionTable dataset = new DataRegionTable("Dataset", this);
+        assertEquals(3, dataset.getDataRowCount());
+        dataset.setSort("ParticipantId", SortDirection.ASC);
         assertEquals(3, dataset.getDataRowCount());
         assertEquals("999320396", dataset.getDataAsText(0, "Participant ID"));
         assertEquals("999320396", dataset.getDataAsText(1, "Participant ID"));
