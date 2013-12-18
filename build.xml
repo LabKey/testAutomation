@@ -355,7 +355,9 @@
     <target name="deploy-test-modules">
         <ant antfile="${project.root}/server/build.xml" target="build_modules" inheritall="false">
             <property name="modulesFile" value="${test.dir}/test.modules"/>
+            <property name="skipDeployApp" value="true" />
         </ant>
+        <ant antfile="${project.root}/server/build.xml" target="deployApp" inheritall="false"/>
     </target>
 
     <target name="continue" description="Continue running a stopped or failed test suite">
