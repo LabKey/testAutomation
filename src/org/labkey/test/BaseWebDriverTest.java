@@ -7400,8 +7400,9 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         final boolean isFirefox = getBrowserType() == BrowserType.FIREFOX;
 
         // Remove raphael credits to make this function work with Raphael and d3 renderers.
-        final String ignoredRaphaelText = "Created with Rapha\u00ebl 2.1.0\n";
+        final String ignoredRaphaelText = "Created with Rapha\u00ebl 2.1.0";
         svgText = svgText.replace(ignoredRaphaelText, "");
+        svgText = svgText.trim();
 
         // Strip out all the whitespace on Firefox to deal with different return of getText from svgs
         return isFirefox ?
