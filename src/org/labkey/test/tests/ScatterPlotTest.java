@@ -21,6 +21,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -205,10 +208,15 @@ public class ScatterPlotTest extends GenericChartsTest
     private static final String SCATTER_PLOT_CUSTOMIZED_COLORS = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight\n0\nNormal\nNot Done";
     private static final String SCATTER_PLOT_CUSTOMIZED_SHAPES = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight\n0\nnormal\nabnormal/insignificant\nabnormal/significant";
     private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight\n0\nNormal\nNot Done\n0\nnormal\nabnormal/insignificant\nabnormal/significant";
+    private static final String CIRCLE_PATH_D = "M0,5A5,5 0 1,1 0,-5A5,5 0 1,1 0,5Z";
+    private static final String TRIANGLE_PATH_D = "M0,5L5,-5L-5,-5 Z";
+    private static final String SQUARE_PATH_D = "M-5,-5L5,-5 5,5 -5,5Z";
+    private static final String DIAMOND_PATH_D = "M0 6.123724356957945 L 6.123724356957945 0 L 0 -6.123724356957945 L -6.123724356957945 0 Z";
 
     @LogMethod
     private void doCustomizeScatterPlotTest()
     {
+        List<WebElement> points;
         clickReportGridLink(SCATTER_PLOT_NAME_DR);
         _ext4Helper.waitForMaskToDisappear();
 
@@ -222,8 +230,13 @@ public class ScatterPlotTest extends GenericChartsTest
         // Verify default styling for point at origin - blue circles
 
         waitForElement(Locator.css("svg > g > a > path"));
-        // TODO: We changed all shapes to be paths, even circles, so we need to find a new way to determine if the colors changed.
-//        assertEquals("Scatter points doin't have expected initial color", "#3366ff", getAttribute(Locator.css("svg > a > path"), "fill"));
+        points = Locator.css("svg g a path").findElements(getDriver());
+
+        for (WebElement el : points)
+        {
+            // All of the points should be blue.
+            assertEquals("The point was not the expected color.", "#3366FF", el.getAttribute("fill"));
+        }
 
         // Enable Grouping - Colors
         log("Group with colors");
@@ -234,15 +247,12 @@ public class ScatterPlotTest extends GenericChartsTest
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_COLORS);
-        // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
-//        assertEquals("Point at (70, 67) was an unexpected color", "#8da0cb", getAttribute(Locator.css("svg > g > a:nth-of-type(15) > *"), "fill"));
-        // TODO: We changed all shapes to be paths, even circles, so we need to find a new way to determine if the shape changed.
-//        assertTrue("Point at (70, 67) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(15) > circle")));
-        // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - teal circle
-//        assertEquals("Circle at (92, 89) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > g > a:nth-of-type(25) > *"), "fill"));
-        // TODO: We changed all shapes to be paths, even circles, so we cant use circle
-//        assertTrue("Circle at (92, 89) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(25) > circle")));
 
+        points = Locator.css("svg g a path").findElements(getDriver());
+        assertEquals("Point at (70, 67) was an unexpected color", "#8DA0CB", points.get(14).getAttribute("fill"));
+        assertEquals("Point at (70, 67) was not a circle.", CIRCLE_PATH_D, points.get(14).getAttribute("d"));
+        assertEquals("Point at (92, 89) was an unexpected color", "#FC8D62", points.get(24).getAttribute("fill"));
+        assertEquals("Point at (92, 89) was not a circle.", CIRCLE_PATH_D, points.get(24).getAttribute("d"));
 
         // Enable Grouping - Shapes
         log("Group with shapes");
@@ -253,15 +263,17 @@ public class ScatterPlotTest extends GenericChartsTest
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_SHAPES);
-        // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
-//        assertEquals("Point at (60, 48) was an unexpected color", "#3366ff", getAttribute(Locator.css("svg > g > a:nth-of-type(26) > *"), "fill"));
-//        assertEquals("Point at (60, 48) was an unexpected shape", "M-5,-5L5,-5L5,5L-5,5Z", getAttribute(Locator.css("svg > g > a:nth-of-type(26) > *"), "d"));
-        // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - teal square
-//        assertEquals("Diamond at (92, 89) was an unexpected color", "#3366ff", getAttribute(Locator.css("svg > g > a:nth-of-type(25) > *"), "fill"));
-        // TODO: We now use paths for all shapes, as a result width and height will never be available. Need to find another way to determine height/width.
-//        assertEquals("Square at (92, 89) was an unexpected width", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "width"));
-//        assertEquals("Square at (92, 89) was an unexpected height", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "height"));
+        points = Locator.css("svg g a path").findElements(getDriver());
 
+        for (WebElement el : points)
+        {
+            // All of the points should be blue.
+            assertEquals("The point was not the expected color.", "#3366FF", el.getAttribute("fill"));
+        }
+
+        assertEquals("Point at (70, 67) was not a triangle.", TRIANGLE_PATH_D, points.get(14).getAttribute("d"));
+        assertEquals("Point at (92,89) was not a diamond.", DIAMOND_PATH_D, points.get(24).getAttribute("d"));
+        assertEquals("Point at (60, 48) was not a square.", SQUARE_PATH_D, points.get(25).getAttribute("d"));
 
         // Enable Grouping - Shapes & Colors
         log("Group with both");
@@ -272,14 +284,14 @@ public class ScatterPlotTest extends GenericChartsTest
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_BOTH);
-        // Verify custom styling for point at origin (APXpulse: 70, APXwtkg: 67) - blue triangle
-//        assertEquals("Point at (70, 67) was an unexpected color", "#8da0cb", getAttribute(Locator.css("svg > g > a:nth-of-type(15) > *"), "fill"));
-//        assertEquals("Point at (70, 67) was an unexpected shape", "M0,5L5,-5L-5,-5Z", getAttribute(Locator.css("svg > g > a:nth-of-type(15) > *"), "d"));
-        // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - red diamond
-//        assertEquals("Square at (92, 89) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > g > a:nth-of-type(25) > *"), "fill"));
-        // TODO: We now use paths for all shapes, as a result width and height will never be available. Need to find another way to determine height/width.
-//        assertEquals("Square at (92, 89) was an unexpected width", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "width"));
-//        assertEquals("Square at (92, 89) was an unexpected height", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "height"));
+        points = Locator.css("svg g a path").findElements(getDriver());
+
+        assertEquals("Point at (70, 67) was not a triangle.", TRIANGLE_PATH_D, points.get(14).getAttribute("d"));
+        assertEquals("Point at (70, 67) was an unexpected color", "#8DA0CB", points.get(14).getAttribute("fill"));
+        assertEquals("Point at (92,89) was not a diamond.", DIAMOND_PATH_D, points.get(24).getAttribute("d"));
+        assertEquals("Point at (92,89) was an unexpected color", "#FC8D62", points.get(24).getAttribute("fill"));
+        assertEquals("Point at (60, 48) was not a square.", SQUARE_PATH_D, points.get(25).getAttribute("d"));
+        assertEquals("Point at (60, 48) was an unexpected color", "#FC8D62", points.get(25).getAttribute("fill"));
 
         savePlot(SCATTER_PLOT_NAME_DR + " Colored", SCATTER_PLOT_DESC_DR + " Colored");
     }
