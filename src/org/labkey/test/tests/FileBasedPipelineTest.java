@@ -19,6 +19,7 @@ import org.openqa.selenium.NoSuchElementException;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,8 +67,8 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         final String protocolName = "R Copy";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
         final Map<String, String> protocolProperties = Maps.of(
-            "Name", protocolName,
-            "Description", "");
+            "protocolName", protocolName,
+            "protocolDescription", "");
         final Map<String, Set<String>> outputFiles = Maps.of(
             "r-copy.r", Collections.<String>emptySet(),
             "r-copy.r.Rout", Collections.<String>emptySet(),
@@ -83,7 +84,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
     }
 
-    @Test @Ignore("Inline pipeline definition is broken")
+    @Test
     public void testRCopyInlinePipeline()
     {
         final String folderName = "rCopyInline";
@@ -94,17 +95,21 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         final String protocolName = "Inline R Copy";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
         final Map<String, String> protocolProperties = Maps.of(
-            "Name", protocolName,
-            "Description", "");
-        final Map<String, Set<String>> outputFiles = Maps.of(
-            "r-copy.xml", Collections.<String>emptySet(),
-            "sample.log", Collections.<String>emptySet());
+            "protocolName", protocolName,
+            "skipLines", "5");
+        final Map<String, Set<String>> outputFiles = new HashMap<>();
+        outputFiles.put("r-copy-inline.xml", Collections.<String>emptySet());
+        outputFiles.put("script.R", Collections.<String>emptySet());
+        outputFiles.put("script.Rout", Collections.<String>emptySet());
+        outputFiles.put("sample.pipe.xar.xml", Collections.<String>emptySet());
+        outputFiles.put("sample.log", Collections.<String>emptySet());
+        outputFiles.put("sample.xxx", Collections.<String>emptySet());
 
         _containerHelper.createSubfolder(getProjectName(), folderName, null);
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
-        runPipelineAnalysis(importAction, targetFiles, protocolProperties);
+        runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)");
         verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
     }
 
@@ -116,8 +121,8 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         final String protocolName = "Inline R Copy";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
         final Map<String, String> protocolProperties = Maps.of(
-                "Name", protocolName,
-                "Description", "");
+                "protocolName", protocolName,
+                "protocolDescription", "");
 
         _containerHelper.createSubfolder(getProjectName(), folderName, null);
         disableModules("pipelinetest");
@@ -130,6 +135,11 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
 
     @LogMethod
     private void runPipelineAnalysis(@LoggedParam String importAction, String[] files, Map<String, String> protocolProperties)
+    {
+        runPipelineAnalysis(importAction, files, protocolProperties, "Analyze");
+    }
+    @LogMethod
+    private void runPipelineAnalysis(@LoggedParam String importAction, String[] files, Map<String, String> protocolProperties, String analyzeButtonText)
     {
         StringBuilder fileString = new StringBuilder();
 
@@ -146,10 +156,10 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         assertEquals("Wrong file(s)", fileString.toString(), getText(Locator.id("fileStatus")));
         for (Map.Entry<String, String> property : protocolProperties.entrySet())
         {
-            setFormElement(Locator.id("protocol" + property.getKey() + "Input"), property.getValue());
+            setFormElement(Locator.id(property.getKey() + "Input"), property.getValue());
         }
 
-        clickButton("Analyze");
+        clickButton(analyzeButtonText);
     }
 
     @LogMethod

@@ -1,0 +1,7 @@
+<view xmlns="http://labkey.org/data/xml/view" title="Duplicate File Using R (Inline Script)" frame="none">
+    <dependencies>
+        <dependency path="clientapi"/>
+    </dependencies>
+</view>
+
+
