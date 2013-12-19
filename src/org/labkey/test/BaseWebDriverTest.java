@@ -2693,10 +2693,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 }
             }
             pauseJsErrorChecker();
+            prepForPageLoad();
 
             long startTime = System.currentTimeMillis();
             getDriver().navigate().to(getBaseURL() + relativeURL);
-            waitForExtOnReady();
+            newWaitForPageToLoad(millis);
             long elapsedTime = System.currentTimeMillis() - startTime;
             logMessage += " [" + elapsedTime + " ms]";
 
@@ -7382,6 +7383,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
+    public void waitForElements(Locator loc, int count)
+    {
+        waitForElementToDisappear(loc.index(count), WAIT_FOR_JAVASCRIPT);
+        if (count > 0)
+            waitForElement(loc.index(count - 1));
+    }
+
     public String getTextFromElement(Locator loc)
     {
         return getText(loc);
@@ -7391,12 +7399,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         final boolean isFirefox = getBrowserType() == BrowserType.FIREFOX;
 
-        // Firfox doesn't always include the Raphael credits in getText
-        final String ignoredSvgTestInFirefox = "Created with Rapha\u00ebl 2.1.0";
+        // Remove raphael credits to make this function work with Raphael and d3 renderers.
+        final String ignoredRaphaelText = "Created with Rapha\u00ebl 2.1.0\n";
+        svgText = svgText.replace(ignoredRaphaelText, "");
 
         // Strip out all the whitespace on Firefox to deal with different return of getText from svgs
         return isFirefox ?
-                svgText.replace(ignoredSvgTestInFirefox, "").replaceAll("[\n ]", "") :
+                svgText.replaceAll("[\n ]", "") :
                 svgText;
     }
 

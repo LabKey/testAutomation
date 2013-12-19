@@ -44,14 +44,15 @@ import java.util.ArrayList;
  * // TODO: add verification for plot line with and whether or not the data points are shown
  */
 @Category({DailyB.class, Reports.class})
-public class TimeChartImportTest extends TimeChartTest
+public class TimeChartImportTest extends StudyBaseTestWD
 {
     private static final String MULTI_FOLDER_ZIP = "/sampledata/study/TimeChartTesting.folder.zip";
     private static final String EXPORT_TEST_FOLDER = "exportTestFolder";
+    private static ArrayList<TimeChartInfo> EXPORTED_CHARTS;
     private static final String DATE_STUDY_FOLDER_NAME = "Date Based Study";
-    private static ArrayList<TimeChartInfo> DATE_CHARTS = new ArrayList<>();
+    private static ArrayList<TimeChartInfo> DATE_CHARTS;
     private static final String VISIT_STUDY_FOLDER_NAME = "Visit Based Study";
-    private static ArrayList<TimeChartInfo> VISIT_CHARTS = new ArrayList<>();
+    private static ArrayList<TimeChartInfo> VISIT_CHARTS;
 
     @BeforeClass
     public static void doSetup() throws Exception
@@ -78,95 +79,106 @@ public class TimeChartImportTest extends TimeChartTest
 
     private void populateChartConfigs()
     {
+        EXPORTED_CHARTS = new ArrayList<>();
+        VISIT_CHARTS = new ArrayList<>();
+        DATE_CHARTS = new ArrayList<>();
+
+        EXPORTED_CHARTS.add(new TimeChartInfo(
+                "One Measure: visit based plot per participant", 17, 47, false,
+                new String[]{
+                        "Created with Rapha\u00ebl 2.1.0\n1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n32.5\n33.0\n33.5\n34.0\n34.5\n35.0\n35.5\n36.0\n36.5\n37.0\nAbbr Phy Exam: 999320016\nVisit Label\nTemperature: body\n999320016"
+                }
+        ));
+
         VISIT_CHARTS.add(new TimeChartInfo(
                 "One Measure: visit based plot per participant", 17, 47, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n32.5\n33.0\n33.5\n34.0\n34.5\n35.0\n35.5\n36.0\n36.5\n37.0\nAbbr Phy Exam: 999320016\nVisit Label\nTemperature: body\n999320016",
-                        "Created with Rapha\u00ebl 2.1.0\n1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n37.5\n38.0\n38.5\n39.0\n39.5\nAbbr Phy Exam: 999320518\nVisit Label\nTemperature: body\n999320518"
+                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n32.0\n32.5\n33.0\n33.5\n34.0\n34.5\n35.0\n35.5\n36.0\n36.5\n37.0\nAbbr Phy Exam: 999320016\nVisit Label\nTemperature: body\n999320016",
+                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\nAbbr Phy Exam: 999320518\nVisit Label\nTemperature: body\n999320518"
                 }
         ));
 
         VISIT_CHARTS.add(new TimeChartInfo(
                 "Two Measure: group mean with one plot per dimension", 2, 38, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n80.0\n100.0\n120.0\n140.0\n160.0\n180.0\n200.0\nAPX-1: Abbreviated Physical Exam: 1. Weight\nVisit\n1. Weight\nGroup 1\nFemale\nMale",
-                        "Created with Rapha\u00ebl 2.1.0\n1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n33.0\n34.0\n35.0\n36.0\n37.0\n38.0\n39.0\n40.0\nAPX-1: Abbreviated Physical Exam: 2. Body Temp\nVisit\n2. Body Temp\nGroup 1\nFemale\nMale"
+                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n80.0\n100.0\n120.0\n140.0\n160.0\n180.0\n200.0\nAPX-1: Abbreviated Physical Exam: 1. Weight\nVisit\n1. Weight\nGroup 1\nFemale\nMale",
+                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n32.0\n33.0\n34.0\n35.0\n36.0\n37.0\n38.0\n39.0\n40.0\nAPX-1: Abbreviated Physical Exam: 2. Body Temp\nVisit\n2. Body Temp\nGroup 1\nFemale\nMale"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: filtered for pregnancy records", 1, 6, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n50\n100\n150\n200\n250\n58.0\n60.0\n62.0\n64.0\n66.0\n68.0\n70.0\n72.0\n74.0\n76.0\n78.0\nPhysical Exam\nDays Since Start Date\nPulse\n249320489\n249320897"
+                        "50\n100\n150\n200\n250\n56.0\n58.0\n60.0\n62.0\n64.0\n66.0\n68.0\n70.0\n72.0\n74.0\n76.0\n78.0\nPhysical Exam\nDays Since Start Date\nPulse\n249320489\n249320897"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "Four Measures: one axis with point click fn enabled", 1, 17, true,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n50\n100\n150\n200\n250\n300\n350\n200\n400\n600\n800\n1000\n1200\n1400\nLuminexAssay, Lab Results, GenericAssay, Physical Exam\nDays Since Start Date\nFI, CD4+ (cells/mm3), M1, Weight (kg)\n249318596 ABI-QSTAR\n249318596 CD4+(cells/mm3)\n249318596 TNF-alpha (40)\n249318596 Weight (kg)"
+                        "50\n100\n150\n200\n250\n300\n350\n200\n400\n600\n800\n1000\n1200\n1400\nLuminexAssay, Lab Results, GenericAssay, Physical Exam\nDays Since Start Date\nFI, CD4+ (cells/mm3), M1, Weight (kg)\n249318596 ABI-QSTAR\n249318596 CD4+ (cells/mm3)\n249318596 TNF-alpha (40)\n249318596 Weight (kg)"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "Four Measures: one axis with x-axis range and interval changed", 1, 17, true,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n0\n5\n10\n15\n20\n25\n30\n35\n200\n400\n600\n800\n1000\n1200\n1400\nLuminexAssay, Lab Results, GenericAssay, Physical Exam\nMonths\nFI, CD4+ (cells/mm3), M1, Weight (kg)\n249318596 ABI-QSTAR\n249318596 CD4+(cells/mm3)\n249318596 TNF-alpha (40)\n249318596 Weight (kg)"
+                        "0\n5\n10\n15\n20\n25\n30\n35\n200\n400\n600\n800\n1000\n1200\n1400\nLuminexAssay, Lab Results, GenericAssay, Physical Exam\nMonths\nFI, CD4+ (cells/mm3), M1, Weight (kg)\n249318596 ABI-QSTAR\n249318596 CD4+ (cells/mm3)\n249318596 TNF-alpha (40)\n249318596 Weight (kg)"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: FI luminex IL-10 and IL-2 data by Analyte dimension", 2, 30, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n80.0\n800.0\nLuminex: IL-10 (23)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717",
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n60.0\n600.0\nLuminex: IL-2 (3)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717"
+                        "0\n50\n100\n150\n200\n80.0\n800.0\nLuminex: IL-10 (23)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717",
+                        "0\n50\n100\n150\n200\n60.0\n600.0\nLuminex: IL-2 (3)\nDays Since Start Date\nFI\n249318596\n249320107\n249320127\n249320489\n249320897\n249325717"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: FI luminex with thin lines and no data points", 1, 5, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n50\n100\n150\n200\n70.0\n700.0\nLuminex\nDays Since Start Date\nFI\n249318596 TNF-alpha (40)\n249318596 IL-2 (3)\n249318596 IL-10 (23)"
+                        "50\n100\n150\n200\n70.0\n700.0\nLuminex\nDays Since Start Date\nFI\n249318596 TNF-alpha (40)\n249318596 IL-2 (3)\n249318596 IL-10 (23)"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: y-axis log scale and manual range on right side", 1, 33, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "One Measure: y-axis log scale and manual range", 1, 33, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "Two Measures: cd4 left axis and vl right axis by participant", 3, 23, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249318596\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249318596 CD4+(cells/mm3)\n249318596 Viral LoadQuantified (copies/ml)",
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249320127\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320127 CD4+(cells/mm3)\n249320127 Viral LoadQuantified (copies/ml)",
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249320897\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320897 CD4+(cells/mm3)\n249320897 Viral LoadQuantified (copies/ml)"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249318596\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249318596 CD4+(cells/mm3)\n249318596 Viral LoadQuantified (copies/ml)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249320127\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320127 CD4+(cells/mm3)\n249320127 Viral LoadQuantified (copies/ml)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249320897\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320897 CD4+(cells/mm3)\n249320897 Viral LoadQuantified (copies/ml)"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "Two Measure: all cohorts and groups", 8, 99, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nLab Results: Group 1: Accute HIV-1\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\nGroup 1: Accute HIV-1Hemoglobin\nGroup 1: Accute HIV-1Lymphs (cells/mm3)",
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nLab Results: Group 2: HIV-1 Negative\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\nGroup 2: HIV-1 NegativeHemoglobin\nGroup 2: HIV-1 NegativeLymphs (cells/mm3)"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nLab Results: Group 1: Accute HIV-1\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\nGroup 1: Accute HIV-1Hemoglobin\nGroup 1: Accute HIV-1Lymphs (cells/mm3)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n400.0\n600.0\n800.0\n1000.0\n1200.0\n1400.0\n1600.0\n1800.0\n2000.0\n2200.0\nLab Results: Group 2: HIV-1 Negative\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\nGroup 2: HIV-1 NegativeHemoglobin\nGroup 2: HIV-1 NegativeLymphs (cells/mm3)"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartInfo(
                 "Two Measure: showing both individual lines and aggregate", 3, 50, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n20.0\n200.0\nLab Results: Group 1: Accute HIV-1\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n249318596 Hemoglobin\n249318596 Lymphs(cells/mm3)\n249320107 Hemoglobin\n249320107 Lymphs(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)\nGroup 1: Accute HIV-1Hemoglobin\nGroup 1: Accute HIV-1Lymphs (cells/mm3)",
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n20.0\n200.0\nLab Results: First ptid\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n249318596 Hemoglobin\n249318596 Lymphs(cells/mm3)\nFirst ptid Hemoglobin\nFirst ptid Lymphs(cells/mm3)",
-                        "Created with Rapha\u00ebl 2.1.0\n0\n50\n100\n150\n200\n250\n300\n350\n20.0\n200.0\n2000.0\nLab Results: Female\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n249320107 Hemoglobin\n249320107 Lymphs(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)\n249320897 Hemoglobin\n249320897 Lymphs(cells/mm3)\nFemale Hemoglobin\nFemale Lymphs (cells/mm3)"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n20.0\n200.0\nLab Results: Group 1: Accute HIV-1\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n249318596 Hemoglobin\n249318596 Lymphs(cells/mm3)\n249320107 Hemoglobin\n249320107 Lymphs(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)\nGroup 1: Accute HIV-1Hemoglobin\nGroup 1: Accute HIV-1Lymphs (cells/mm3)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n20.0\n200.0\nLab Results: First ptid\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n249318596 Hemoglobin\n249318596 Lymphs(cells/mm3)\nFirst ptid Hemoglobin\nFirst ptid Lymphs (cells/mm3)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n20.0\n200.0\n2000.0\nLab Results: Female\nDays Since Start Date\nHemoglobin, Lymphs (cells/mm3)\n249320107 Hemoglobin\n249320107 Lymphs(cells/mm3)\n249320127 Hemoglobin\n249320127 Lymphs(cells/mm3)\n249320489 Hemoglobin\n249320489 Lymphs(cells/mm3)\n249320897 Hemoglobin\n249320897 Lymphs(cells/mm3)\nFemale Hemoglobin\nFemale Lymphs (cells/mm3)"
                 }
         ));
     }
@@ -203,7 +215,7 @@ public class TimeChartImportTest extends TimeChartTest
     {
         log("Verify chart information: " + info.getName());
 
-        waitForCharts(info.getCountSVGs());
+        waitForElements(Locator.css("div:not(.thumbnail) > svg"), info.getCountSVGs());
         for (int i = 0; i < info.getSvg().length; i++)
         {
             log("Verify SVG for chart index " + i);
@@ -238,6 +250,7 @@ public class TimeChartImportTest extends TimeChartTest
     @Test
     public void verifyExportToScript()
     {
+        // TODO: this test does not test the d3 renderer for exported charts. We should fix this.
         log("Export Time Chart as Script and paste into Wiki");
         goToProjectHome();
         clickFolder(VISIT_STUDY_FOLDER_NAME);
@@ -246,7 +259,7 @@ public class TimeChartImportTest extends TimeChartTest
         TimeChartInfo info = VISIT_CHARTS.get(0);
         waitForElement(Locator.linkWithText(info.getName()));
         clickAndWait(Locator.linkWithText(info.getName()));
-        waitForCharts(info.getCountSVGs());
+        waitForElements(Locator.css("div:not(.thumbnail) > svg"), info.getCountSVGs());
 
         _ext4Helper.clickExt4MenuButton(false, Locator.ext4Button("Export"), false, "Export as Script");
         _extHelper.waitForExtDialog("Export Script");
@@ -260,7 +273,7 @@ public class TimeChartImportTest extends TimeChartTest
         setWikiBody(exportScript);
         saveWikiPage();
 
-        verifyTimeChartInfo(info, false);
+        verifyTimeChartInfo(EXPORTED_CHARTS.get(0), false);
     }
 
     @Override
@@ -269,7 +282,7 @@ public class TimeChartImportTest extends TimeChartTest
         return BrowserType.CHROME;
     }
 
-    private class TimeChartInfo
+    public static class TimeChartInfo
     {
         private String _name;
         private int _countSVGs;

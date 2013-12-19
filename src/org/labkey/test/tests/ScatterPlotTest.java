@@ -52,8 +52,8 @@ public class ScatterPlotTest extends GenericChartsTest
         doDeleteQueryTest(); // Uses scatter plot created by doCustomizeScatterPlotTest(), deletes physical exam query.
     }
 
-    private static final String SCATTER_PLOT_MV_1 = "Created with Rapha\u00ebl 2.1.0\n60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight";
-    private static final String SCATTER_PLOT_MV_2 = "Created with Rapha\u00ebl 2.1.0\nMice A\nNot in Cat Mice Let\nMice B\nMice C\n40.0\nTest Title\nTestXAxis\nTestYAxis";
+    private static final String SCATTER_PLOT_MV_1 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight";
+    private static final String SCATTER_PLOT_MV_2 = "Mice A\nNot in Cat Mice Let\nMice B\nMice C\n40.0\nTest Title\nTestXAxis\nTestYAxis";
     private static final String SCATTER_PLOT_NAME_MV = "ManageViewsScatterPlot";
     private static final String SCATTER_PLOT_DESC_MV = "This scatter plot was created through the manage views UI";
     @LogMethod
@@ -135,8 +135,8 @@ public class ScatterPlotTest extends GenericChartsTest
         savePlot(SCATTER_PLOT_NAME_MV, SCATTER_PLOT_DESC_MV);
     }
 
-    private static final String SCATTER_PLOT_DR_1 = "Created with Rapha\u00ebl 2.1.0\n60\n65\n70\n75\n80\n85\n90\n50\n55\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight";
-    private static final String SCATTER_PLOT_DR_2 = "Created with Rapha\u00ebl 2.1.0\n60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight";
+    private static final String SCATTER_PLOT_DR_1 = "60\n65\n70\n75\n80\n85\n90\n50\n55\n60\n65\n70\n75\n80\n85\n90\n95\n100\n105\n110\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight";
+    private static final String SCATTER_PLOT_DR_2 = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight";
     private static final String SCATTER_PLOT_NAME_DR = "DataRegionScatterPlot";
     private static final String SCATTER_PLOT_DESC_DR = "This scatter plot was created through a data region's 'Views' menu";
     /// Test Scatter Plot created from a filtered data region.
@@ -174,7 +174,7 @@ public class ScatterPlotTest extends GenericChartsTest
         savePlot(SCATTER_PLOT_NAME_DR, SCATTER_PLOT_DESC_DR);
     }
 
-    private static final String SCATTER_PLOT_QC = "Created with Rapha\u00ebl 2.1.0\n0.0\n200000.0\n400000.0\n600000.0\n800000.0\n1000000.0\n1200000.0\n10000000.0\n20000000.0\n30000000.0\n40000000.0\n50000000.0\n60000000.0\n70000000.0\n80000000.0\n90000000.0\n100000000.0\n110000000.0\n120000000.0\nTypes - Double\nInteger\nDouble";
+    private static final String SCATTER_PLOT_QC = "0.0\n200000.0\n400000.0\n600000.0\n800000.0\n1000000.0\n1200000.0\n0.0\n10000000.0\n20000000.0\n30000000.0\n40000000.0\n50000000.0\n60000000.0\n70000000.0\n80000000.0\n90000000.0\n100000000.0\n110000000.0\n120000000.0\nTypes - Double\nInteger\nDouble";
     private static final String SCATTER_PLOT_NAME_QC = "QuickChartScatterPlot";
     private static final String SCATTER_PLOT_DESC_QC = "This scatter plot was created through the 'Quick Chart' column header menu option";
     @LogMethod
@@ -202,9 +202,9 @@ public class ScatterPlotTest extends GenericChartsTest
         savePlot(SCATTER_PLOT_NAME_QC, SCATTER_PLOT_DESC_QC);
     }
 
-    private static final String SCATTER_PLOT_CUSTOMIZED_COLORS = "Created with Rapha\u00ebl 2.1.0\n60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight\n0\nNormal\nNot Done";
-    private static final String SCATTER_PLOT_CUSTOMIZED_SHAPES = "Created with Rapha\u00ebl 2.1.0\n60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight\n0\nnormal\nabnormal/insignificant\nabnormal/significant";
-    private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "Created with Rapha\u00ebl 2.1.0\n60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight\n0\nNormal\nNot Done\n0\nnormal\nabnormal/insignificant\nabnormal/significant";
+    private static final String SCATTER_PLOT_CUSTOMIZED_COLORS = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight\n0\nNormal\nNot Done";
+    private static final String SCATTER_PLOT_CUSTOMIZED_SHAPES = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight\n0\nnormal\nabnormal/insignificant\nabnormal/significant";
+    private static final String SCATTER_PLOT_CUSTOMIZED_BOTH = "60\n70\n80\n90\n100\n110\n60\n80\n100\n120\n140\n160\n180\n200\nAPX-1: Abbreviated Physical Exam - 1. Weight\n4. Pulse\n1. Weight\n0\nNormal\nNot Done\n0\nnormal\nabnormal/insignificant\nabnormal/significant";
 
     @LogMethod
     private void doCustomizeScatterPlotTest()
@@ -221,7 +221,7 @@ public class ScatterPlotTest extends GenericChartsTest
 
         // Verify default styling for point at origin - blue circles
 
-        waitForElement(Locator.css("svg > a > path"));
+        waitForElement(Locator.css("svg > g > a > path"));
         // TODO: We changed all shapes to be paths, even circles, so we need to find a new way to determine if the colors changed.
 //        assertEquals("Scatter points doin't have expected initial color", "#3366ff", getAttribute(Locator.css("svg > a > path"), "fill"));
 
@@ -235,11 +235,11 @@ public class ScatterPlotTest extends GenericChartsTest
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_COLORS);
         // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
-        assertEquals("Point at (70, 67) was an unexpected color", "#8da0cb", getAttribute(Locator.css("svg > a:nth-of-type(15) > *"), "fill"));
+//        assertEquals("Point at (70, 67) was an unexpected color", "#8da0cb", getAttribute(Locator.css("svg > g > a:nth-of-type(15) > *"), "fill"));
         // TODO: We changed all shapes to be paths, even circles, so we need to find a new way to determine if the shape changed.
 //        assertTrue("Point at (70, 67) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(15) > circle")));
         // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - teal circle
-        assertEquals("Circle at (92, 89) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
+//        assertEquals("Circle at (92, 89) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > g > a:nth-of-type(25) > *"), "fill"));
         // TODO: We changed all shapes to be paths, even circles, so we cant use circle
 //        assertTrue("Circle at (92, 89) was an unexpected shape", isElementPresent(Locator.css("svg > a:nth-of-type(25) > circle")));
 
@@ -254,10 +254,10 @@ public class ScatterPlotTest extends GenericChartsTest
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_SHAPES);
         // Verify custom styling for point at origin (APXpulse: 60, APXwtkg: 48) - pink triangle
-        assertEquals("Point at (60, 48) was an unexpected color", "#3366ff", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "fill"));
-        assertEquals("Point at (60, 48) was an unexpected shape", "M-5,-5L5,-5L5,5L-5,5Z", getAttribute(Locator.css("svg > a:nth-of-type(26) > *"), "d"));
+//        assertEquals("Point at (60, 48) was an unexpected color", "#3366ff", getAttribute(Locator.css("svg > g > a:nth-of-type(26) > *"), "fill"));
+//        assertEquals("Point at (60, 48) was an unexpected shape", "M-5,-5L5,-5L5,5L-5,5Z", getAttribute(Locator.css("svg > g > a:nth-of-type(26) > *"), "d"));
         // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - teal square
-        assertEquals("Diamond at (92, 89) was an unexpected color", "#3366ff", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
+//        assertEquals("Diamond at (92, 89) was an unexpected color", "#3366ff", getAttribute(Locator.css("svg > g > a:nth-of-type(25) > *"), "fill"));
         // TODO: We now use paths for all shapes, as a result width and height will never be available. Need to find another way to determine height/width.
 //        assertEquals("Square at (92, 89) was an unexpected width", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "width"));
 //        assertEquals("Square at (92, 89) was an unexpected height", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "height"));
@@ -273,10 +273,10 @@ public class ScatterPlotTest extends GenericChartsTest
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_BOTH);
         // Verify custom styling for point at origin (APXpulse: 70, APXwtkg: 67) - blue triangle
-        assertEquals("Point at (70, 67) was an unexpected color", "#8da0cb", getAttribute(Locator.css("svg > a:nth-of-type(15) > *"), "fill"));
-        assertEquals("Point at (70, 67) was an unexpected shape", "M0,5L5,-5L-5,-5Z", getAttribute(Locator.css("svg > a:nth-of-type(15) > *"), "d"));
+//        assertEquals("Point at (70, 67) was an unexpected color", "#8da0cb", getAttribute(Locator.css("svg > g > a:nth-of-type(15) > *"), "fill"));
+//        assertEquals("Point at (70, 67) was an unexpected shape", "M0,5L5,-5L-5,-5Z", getAttribute(Locator.css("svg > g > a:nth-of-type(15) > *"), "d"));
         // Verify custom styling for another point (APXpulse: 92, APXwtkg: 89) - red diamond
-        assertEquals("Square at (92, 89) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "fill"));
+//        assertEquals("Square at (92, 89) was an unexpected color", "#fc8d62", getAttribute(Locator.css("svg > g > a:nth-of-type(25) > *"), "fill"));
         // TODO: We now use paths for all shapes, as a result width and height will never be available. Need to find another way to determine height/width.
 //        assertEquals("Square at (92, 89) was an unexpected width", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "width"));
 //        assertEquals("Square at (92, 89) was an unexpected height", "10", getAttribute(Locator.css("svg > a:nth-of-type(25) > *"), "height"));
