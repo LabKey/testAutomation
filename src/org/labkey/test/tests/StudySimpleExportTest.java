@@ -27,6 +27,8 @@ import org.labkey.test.categories.Study;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -275,13 +277,15 @@ public class StudySimpleExportTest extends StudyBaseTestWD
     }
 
     @Test
-    public void verifyVisitDescription()
+    public void verifyVisitProperties()
     {
         String visitLabel = "My visit label";
-        String visitSeqNumMin = "999";
+        String visitSeqNumMin = "999.0";
+        String visitSeqNumMax = "999.999";
+        String visitSeqNumTarget = "999.001";
         String visitDescription = "My visit description - " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + INJECT_CHARS_1 + INJECT_CHARS_2;
 
-        log("Visit Description: create visit with description");
+        log("Visit Properties: create visit with description");
         goToProjectHome();
         clickFolder(getFolderName());
         goToManageStudy();
@@ -290,19 +294,21 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         waitForElement(Locator.name("description"));
         setFormElement(Locator.name("label"), visitLabel);
         setFormElement(Locator.name("sequenceNumMin"), visitSeqNumMin);
+        setFormElement(Locator.name("sequenceNumMax"), visitSeqNumMax);
         setFormElement(Locator.name("description"), visitDescription);
         clickButton("Save");
 
-        log("Visit Description: edit visit description");
+        log("Visit Properties: edit visit description and set sequence num target");
         waitAndClickAndWait(Locator.xpath("//th[text()='" + visitLabel + "']/../td/a[text()='edit']"));
         waitForElement(Locator.name("description"));
         assertFormElementEquals(Locator.name("label"), visitLabel);
         assertFormElementEquals(Locator.name("description"), visitDescription);
         visitDescription += " <b>testing</b>";
         setFormElement(Locator.name("description"), visitDescription);
+        setFormElement(Locator.name("sequenceNumTarget"), visitSeqNumTarget);
         clickButton("Save");
 
-        log("Visit Description: add dataset record using new visit");
+        log("Visit Properties: add dataset record using new visit");
         clickTab("Clinical and Assay Data");
         waitAndClickAndWait(Locator.linkWithText(TEST_DATASET_NAME));
         clickButton("Import Data");
@@ -310,32 +316,35 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         setFormElement(Locator.name("text"), "ParticipantId\tSequenceNum\nPTID123\t" + visitSeqNumMin);
         clickButton("Submit");
 
-        log("Visit Description: export study folder to the pipeline as indivisual files");
+        log("Visit Properties: export study folder to the pipeline as indivisual files");
         exportStudyArchive(getFolderName(), "0");
 
-        log("Visit Description: verify xml file was created in export");
+        log("Visit Properties: verify xml file was created in export");
         _fileBrowserHelper.selectFileBrowserItem("export/study/visit_map.xml");
 
-        log("Visit Description: import study into subfolder");
-        createSubfolderAndImportStudyFromPipeline("Visit Description");
+        log("Visit Properties: import study into subfolder");
+        createSubfolderAndImportStudyFromPipeline("Visit Properties");
 
-        log("Visit Description: verify imported settings");
-        clickFolder("Visit Description");
+        log("Visit Properties: verify imported settings");
+        clickFolder("Visit Properties");
         goToManageStudy();
         waitAndClickAndWait(Locator.linkWithText("Manage Visits"));
         waitAndClickAndWait(Locator.xpath("//th[text()='" + visitLabel + "']/../td/a[text()='edit']"));
         waitForElement(Locator.name("description"));
         assertFormElementEquals(Locator.name("label"), visitLabel);
         assertFormElementEquals(Locator.name("description"), visitDescription);
+        assertFormElementEquals(Locator.name("sequenceNumMin"), visitSeqNumMin);
+        assertFormElementEquals(Locator.name("sequenceNumMax"), visitSeqNumMax);
+        assertFormElementEquals(Locator.name("sequenceNumTarget"), visitSeqNumTarget);
 
-        log("Visit Description: verify visit description in study navigator hover");
+        log("Visit Properties: verify visit description in study navigator hover");
         clickTab("Overview");
         waitAndClickAndWait(Locator.linkWithText("Study Navigator"));
         waitForText(visitLabel);
         click(Locator.css(".labkey-help-pop-up"));
         waitForElement(Locator.xpath("id('helpDivBody')").containing(visitDescription));
 
-        log("Visit Description: verify visit description in dataset visit column hover");
+        log("Visit Properties: verify visit description in dataset visit column hover");
         clickTab("Clinical and Assay Data");
         waitAndClickAndWait(Locator.linkWithText(TEST_DATASET_NAME));
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -344,7 +353,7 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         mouseOver(Locator.tagWithText("td", visitLabel));
         waitForElement(Locator.xpath("id('helpDivBody')").containing(visitDescription));
 
-        log("Visit Description: remove visit");
+        log("Visit Properties: remove visit");
         clickFolder(getFolderName());
         goToManageStudy();
         waitAndClickAndWait(Locator.linkWithText("Manage Visits"));
@@ -353,6 +362,155 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         waitForText("Do you want to delete Visit");
         clickButton("Delete");
         waitForText("Manage Visits");
+    }
+
+    @Test
+    public void verifyStudyProperties()
+    {
+        Map<String, String> origProps = new HashMap<>();
+        Map<String, String> newProps = new HashMap<>();
+        newProps.put("Investigator", "Investigator");
+        newProps.put("Grant", "Grant");
+        newProps.put("Species", "Species");
+        newProps.put("Description", "Description");
+        newProps.put("StartDate", "2013-01-01");
+        newProps.put("EndDate", "2013-12-31");
+        newProps.put("SubjectNounSingular", "Subject");
+        newProps.put("SubjectNounPlural", "Subjects");
+        newProps.put("SubjectColumnName", "SubjectId");
+        newProps.put("AssayPlan", "AssayPlan");
+
+        // add tricky chars and injection script, for non-dates
+        for (String key : newProps.keySet())
+        {
+            // subject noun fields have a length constraint, and leave the dates alone
+            if (key.equals("SubjectColumnName"))
+            {
+                // no op, this field gets truncated by the server using ColumnInfo.legalNameFromName
+            }
+            else if (key.startsWith("Subject"))
+                newProps.put(key, newProps.get(key) + TRICKY_CHARACTERS_FOR_PROJECT_NAMES);
+            else if (!key.contains("Date"))
+                newProps.put(key, newProps.get(key) + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + INJECT_CHARS_1 + INJECT_CHARS_2);
+        }
+
+        log("Study Properties: set study properties of interest");
+        goToProjectHome();
+        clickFolder(getFolderName());
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Change Study Properties"));
+        waitForElement(Locator.name("Investigator"));
+        for (String key : newProps.keySet())
+        {
+            origProps.put(key, getFormElement(Locator.name(key)));
+            setFormElement(Locator.name(key), newProps.get(key));
+        }
+        clickButton("Submit");
+
+        log("Study Properties: export study folder to the pipeline as indivisual files");
+        exportStudyArchive(getFolderName(), "0");
+
+        log("Study Properties: verify xml file was created in export");
+        _fileBrowserHelper.selectFileBrowserItem("export/study/study.xml");
+
+        log("Study Properties: import study into subfolder");
+        createSubfolderAndImportStudyFromPipeline("Study Properties");
+
+        log("Study Properties: verify imported settings");
+        clickFolder("Study Properties");
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Change Study Properties"));
+        waitForElement(Locator.name("Investigator"));
+        for (String key : newProps.keySet())
+        {
+            assertFormElementEquals(Locator.name(key), newProps.get(key));
+        }
+
+        log("Study Properties: verify display of some properties in overview webpart");
+        waitAndClickAndWait(Locator.linkWithText("Overview"));
+        waitForText(newProps.get("Investigator"));
+        assertTextPresent(newProps.get("Grant"));
+        assertTextPresent(newProps.get("Description"));
+        assertLinkPresentWithTextCount(newProps.get("SubjectNounPlural"), 1);
+
+        log("Study Properties: clean up study properties");
+        clickFolder(getFolderName());
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Change Study Properties"));
+        waitForElement(Locator.name("Investigator"));
+        for (String key : origProps.keySet())
+        {
+            setFormElement(Locator.name(key), origProps.get(key));
+        }
+        clickButton("Submit");
+    }
+
+    @Test
+    public void verifyCohortProperties()
+    {
+        String cohort1label = "Cohort1";
+        String cohort1count = "10";
+        String cohort1description = "First Description" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + INJECT_CHARS_1 + INJECT_CHARS_2;
+        String cohort2label = "Cohort2";
+        String cohort2count = "55";
+        String cohort2description = "Second Description" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + INJECT_CHARS_1 + INJECT_CHARS_2;
+
+        log("Cohort Properties: create new cohorts");
+        goToProjectHome();
+        clickFolder(getFolderName());
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Manage Cohorts"));
+        clickButton("Insert New");
+        waitForElement(Locator.name("quf_label"));
+        setFormElement(Locator.name("quf_label"), cohort1label);
+        setFormElement(Locator.name("quf_subjectCount"), cohort1count);
+        setFormElement(Locator.name("quf_description"), cohort1description);
+        clickButton("Submit");
+        clickButton("Insert New");
+        waitForElement(Locator.name("quf_label"));
+        setFormElement(Locator.name("quf_label"), cohort2label);
+        setFormElement(Locator.name("quf_subjectCount"), cohort2count);
+        setFormElement(Locator.name("quf_description"), cohort2description);
+        clickButton("Submit");
+
+        log("Cohort Properties: export study folder to the pipeline as indivisual files");
+        exportStudyArchive(getFolderName(), "0");
+
+        log("Cohort Properties: verify xml file was created in export");
+        _fileBrowserHelper.selectFileBrowserItem("export/study/cohorts.xml");
+
+        log("Cohort Properties: import study into subfolder");
+        createSubfolderAndImportStudyFromPipeline("Cohort Properties");
+
+        log("Cohort Properties: verify imported settings");
+        clickFolder("Cohort Properties");
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Manage Cohorts"));
+        waitForText(cohort1label);
+        clickAndWait(Locator.linkWithText("edit", 0));
+        waitForText("Update Cohort: " + cohort1label);
+        assertFormElementEquals(Locator.name("quf_subjectCount"), cohort1count);
+        assertFormElementEquals(Locator.name("quf_description"), cohort1description);
+        clickButton("Cancel");
+        waitForText(cohort2label);
+        clickAndWait(Locator.linkWithText("edit", 1));
+        waitForText("Update Cohort: " + cohort2label);
+        assertFormElementEquals(Locator.name("quf_subjectCount"), cohort2count);
+        assertFormElementEquals(Locator.name("quf_description"), cohort2description);
+        clickButton("Cancel");
+
+        log("Cohort Properties: verify display of cohorts in subjects webpart");
+        waitAndClickAndWait(Locator.linkWithText("Participants"));
+        waitForElement(Locator.tagWithClass("span", "lk-filter-panel-label").withText(cohort1label));
+        assertElementPresent(Locator.tagWithClass("span", "lk-filter-panel-label").withText(cohort2label));
+
+        log("Cohort Properties: clean up cohorts");
+        clickFolder(getFolderName());
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Manage Cohorts"));
+        clickAndWait(Locator.linkWithText("delete")); // first cohort
+        clickAndWait(Locator.linkWithText("delete")); // second cohort
+        waitForText("No data to show.");
     }
 
     private void exportStudyArchive(String folder, String location)

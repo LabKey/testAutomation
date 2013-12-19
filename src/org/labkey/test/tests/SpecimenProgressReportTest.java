@@ -133,6 +133,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private void manageSpecimenConfiguration()
     {
         clickFolder(studyFolder);
+        _portalHelper.addWebPart("Assay Schedule");
         _portalHelper.addQueryWebPart("rho");
         _portalHelper.addQueryWebPart("study");
 
@@ -150,7 +151,8 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         int locationId = Integer.parseInt(drt.getDataAsText(drt.getRow("Label", "Main"), "RowId"));
 
         // add the specimen configurations to the manage page
-        goToModule("rho"); // for containers with a study, the rho beginAction will redirect to manageAssaySpecimen action
+        clickAndWait(Locator.linkWithText("Overview"));
+        clickAndWait(Locator.linkWithText("Manage Assay Schedule"));
         addSpecimenConfiguration("PCR", "R", locationId, "CEF-R Cryovial", false);
         addSpecimenConfiguration("PCR", "R", locationId, "UPR Micro Tube", true);
         addSpecimenConfiguration("RNA", "R", locationId, "TGE Cryovial", true);
@@ -164,7 +166,8 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         String pcr2RowId = drt.getDataAsText(drt.getRow("TubeType", "UPR Micro Tube"), "RowId");
         String rnaRowId = drt.getDataAsText(drt.getRow("TubeType", "TGE Cryovial"), "RowId");
         // set the specimen configuration visits (by checking the checkboxes on the manage page
-        goToModule("rho"); // for containers with a study, the rho beginAction will redirect to manageAssaySpecimen action
+        goToManageStudy();
+        clickAndWait(Locator.linkWithText("Manage Assay Schedule"));
         waitForElement(Locator.css("#AssaySpecimenVisitPanel table.x4-grid-table"));
         setSpecimenConfigurationVisit(pcr1RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
         setSpecimenConfigurationVisit(pcr2RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
@@ -174,6 +177,11 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         checkRhoQueryRowCount("AssaySpecimenMap", 35);
         checkRhoQueryRowCount("MissingSpecimen", 2);
         checkRhoQueryRowCount("MissingVisit", 3);
+
+        // verify display of assay schedule webpart
+        clickAndWait(Locator.linkWithText("Overview"));
+        waitForElement(Locator.tagWithClass("table", "study-vaccine-design"));
+        assertTextPresent("[x]", 35);
     }
 
     private void checkRhoQueryRowCount(String name, int expectedCount)
