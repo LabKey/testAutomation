@@ -267,8 +267,6 @@ src/org/labkey/test/categories/EHR.java -text
 src/org/labkey/test/categories/External.java -text
 src/org/labkey/test/categories/FileBrowser.java -text
 src/org/labkey/test/categories/Flow.java -text
-src/org/labkey/test/categories/Hidra.java -text
-src/org/labkey/test/categories/HidraPreRelease.java -text
 src/org/labkey/test/categories/IDRI.java -text
 src/org/labkey/test/categories/InDevelopment.java -text
 src/org/labkey/test/categories/LabModule.java -text

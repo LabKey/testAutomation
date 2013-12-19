@@ -21,7 +21,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.categories.HidraPreRelease;
+import org.labkey.test.categories.Data;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RemoteConnectionHelperWD;
 
@@ -33,7 +33,7 @@ import java.util.List;
  * User: RyanS
  * Date: 11/26/13
  */
-@Category({DailyA.class, HidraPreRelease.class})
+@Category({DailyA.class, Data.class})
 public class ETLErrorTest extends ETLBaseTest
 {
     private static final String _projectName = "ETLErrorTestProject";
