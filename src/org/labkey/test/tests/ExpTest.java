@@ -88,7 +88,7 @@ public class ExpTest extends BaseSeleniumWebTest
 
         clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkWithText(EXPERIMENT_NAME));
-        assertTextPresent("Example 5 Run");
+        waitForText("Example 5 Run");
         clickAndWait(Locator.linkWithText(RUN_NAME));
         clickAndWait(Locator.linkWithText("Graph Summary View"));
         clickAndWait(Locator.imageMapLinkByTitle("graphmap", RUN_NAME_IMAGEMAP));
