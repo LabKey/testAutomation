@@ -3801,7 +3801,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         int complete = 0;
 
         for (String statusValue : statusValues)
-            if ("COMPLETE".equals(statusValue))
+            if ("COMPLETE".equals(statusValue) || "IMPORT FOLDER COMPLETE".equals(statusValue))
                 complete++;
 
         return complete;
@@ -3812,7 +3812,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     {
         int finsihed = 0;
         for (String statusValue : statusValues)
-            if ("COMPLETE".equals(statusValue) || "ERROR".equals(statusValue))
+            if ("COMPLETE".equals(statusValue) || "ERROR".equals(statusValue) || "IMPORT FOLDER COMPLETE".equals(statusValue))
                 finsihed++;
         return finsihed;
     }

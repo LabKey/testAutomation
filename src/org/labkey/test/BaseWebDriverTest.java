@@ -4810,7 +4810,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         int complete = 0;
 
         for (String statusValue : statusValues)
-            if ("COMPLETE".equals(statusValue))
+            if ("COMPLETE".equals(statusValue) || "IMPORT FOLDER COMPLETE".equals(statusValue))
                 complete++;
 
         return complete;
@@ -4821,7 +4821,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         int finsihed = 0;
         for (String statusValue : statusValues)
-            if ("COMPLETE".equals(statusValue) || "ERROR".equals(statusValue))
+            if ("COMPLETE".equals(statusValue) || "ERROR".equals(statusValue) || "IMPORT FOLDER COMPLETE".equals(statusValue))
                 finsihed++;
         return finsihed;
     }
