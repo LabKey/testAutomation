@@ -109,10 +109,13 @@ public class BasicTest extends BaseWebDriverTest
         popLocation();
         assertTextPresent(FOLDER_RENAME);
 
-        // Verify scheduled system maintenance is disabled.
-        goToAdminConsole();
-        waitAndClick(Locator.linkWithText("running threads"));
-        assertTextNotPresent("SystemMaintenance");
+        // Verify scheduled system maintenance is disabled (see above). Can disable this only in dev mode.
+        if (TestProperties.isDevModeEnabled())
+        {
+            goToAdminConsole();
+            waitAndClick(Locator.linkWithText("running threads"));
+            assertTextNotPresent("SystemMaintenance");
+        }
     }
 
     public String getAssociatedModuleDirectory()
