@@ -52,6 +52,8 @@ data/api/timechart-api.xml -text
 data/api/webPartTest.js -text
 data/api/webdavTest.html -text
 data/api/workbookAPITest.html -text
+modules/ETLtest/module.properties -text
+modules/ETLtest/resources/ETLs/merge.xml -text
 modules/linkedschematest/module.properties -text
 modules/linkedschematest/resources/queries/A_People/LinkedSchemaTestPeople.query.xml -text
 modules/linkedschematest/resources/queries/A_People/LinkedSchemaTestQuery.query.xml -text
@@ -139,7 +141,6 @@ modules/simpletest/resources/etls/append.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/appendIdByRun.xml -text
 modules/simpletest/resources/etls/badCast.xml -text
 modules/simpletest/resources/etls/badTableName.xml -text
-modules/simpletest/resources/etls/merge.xml -text
 modules/simpletest/resources/etls/remote.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remoteInvalidDestinationSchemaName.xml -text svneol=unset#application/xml
 modules/simpletest/resources/etls/remote_noTruncate.xml -text svneol=unset#application/xml

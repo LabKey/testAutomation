@@ -23,6 +23,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RemoteConnectionHelperWD;
 import org.labkey.test.categories.Data;
 import java.io.File;
+import java.nio.file.Files;
 
 /**
  * User: Rylan
@@ -37,10 +38,6 @@ public class ETLTest extends ETLBaseTest
     //
     protected static final String TRANSFORM_APPEND = "{simpletest}/append";
     private static final String TRANSFORM_APPEND_DESC = "Append Test";
-    private static final String TRANSFORM_BADCAST = "{simpletest}/badCast";
-    private static final String TRANSFORM_BADCAST_DESC = "Bad Cast";
-    private static final String TRANSFORM_BADTABLE = "{simpletest}/badTableName";
-    private static final String TRANSFORM_BADTABLE_DESC = "BadTableName";
     protected static final String TRANSFORM_TRUNCATE = "{simpletest}/truncate";
     private static final String TRANSFORM_TRUNCATE_DESC = "Truncate Test";
     private static final String TRANSFORM_BYRUNID = "{simpletest}/appendIdByRun";
@@ -48,12 +45,8 @@ public class ETLTest extends ETLBaseTest
     private static final String TRANSFORM_REMOTE_DESC = "Remote Test";
     private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";
     private static final String TRANSFORM_REMOTE_STUDY = "/sampledata/dataintegration/ETLTestStudy.zip";
-    private static final String TRANSFORM_BYRUNID_DESC = "ByRunId";
-    private static final String TRANSFORM_SP_MODIFIED = "{simpletest}/appendModifiedSinceSP";
-    private static final String TRANSFORM_SP_MODIFIED_DESC = "";
-    private static final String TRANSFORM_SP_RUNBASED = "{simpletest}/appendRunBasedSP";
-    private static final String TRANSFORM_SP_RUNBASED_DESC = "";
     private static final String TransformXMLdest = System.getenv("LABKEY_ROOT") + "\\build\\deploy\\modules\\simpletest\\etls";
+    private static final String TransformXMLsrc = System.getenv("LABKEY_ROOT") + "\\build\\deploy\\modules\\ETLtest\\etls";
     private static final String PROJECT_NAME = "ETLTestProject";
 
     @Override
@@ -149,7 +142,7 @@ UNDONE: need to fix the merge case
         checkExpectedErrors(_expectedErrors);
     }
 
-    protected void runInitialSetup(boolean remoteOnly)
+    protected void runInitialSetup(boolean remoteOnly) throws Exception
     {
         PortalHelper portalHelper = new PortalHelper(this);
         log("running setup");
@@ -158,6 +151,7 @@ UNDONE: need to fix the merge case
         _jobsComplete = 0;
 
         enableModule("DataIntegration", true);
+        //enableModule("simpletest", true);
         enableModule("simpletest", true);
 
         if(!remoteOnly)
@@ -187,6 +181,8 @@ UNDONE: need to fix the merge case
         importStudyFromZip(new File(getLabKeyRoot(), TRANSFORM_REMOTE_STUDY), true /*ignore query validation*/);
         // bump our pipeline job count since we used the pipeline to import the study
         _jobsComplete++;
+        //copy etl files from simpleTest module
+        copyETLfiles();
     }
 
     //
@@ -223,8 +219,14 @@ UNDONE: need to fix the merge case
         verifyTransformHistory(TRANSFORM_REMOTE, TRANSFORM_REMOTE_DESC);
     }
 
-    private void copyFile(String sourceDir, File file, String destDir)
+    public void copyETLfiles() throws Exception
     {
-
+        File srcDir = new File(TransformXMLsrc);
+            for (File xformXml: srcDir.listFiles())
+            {
+                String fileName = xformXml.getName();
+                copyFile(TransformXMLsrc + "\\" + fileName, TransformXMLdest + "\\" + fileName);
+            }
+            sleep(5000);
     }
 }
