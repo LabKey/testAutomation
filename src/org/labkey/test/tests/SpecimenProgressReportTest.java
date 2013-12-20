@@ -173,6 +173,11 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         setSpecimenConfigurationVisit(pcr2RowId, new String[]{"3", "5", "6", "8", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20", "SR"});
         setSpecimenConfigurationVisit(rnaRowId, new String[]{"PT1", "0", "6", "20", "SR"});
         sleep(1000); // give the store a second to save the configurations
+        // set the assay plan
+        String assayPlanTxt = "My assay plan " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + INJECT_CHARS_1 + INJECT_CHARS_2;
+        setFormElement(Locator.name("AssayPlan"), assayPlanTxt);
+        clickButton("Save");
+
         checkRhoQueryRowCount("AssaySpecimenVisit", 35);
         checkRhoQueryRowCount("AssaySpecimenMap", 35);
         checkRhoQueryRowCount("MissingSpecimen", 2);
@@ -181,6 +186,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         // verify display of assay schedule webpart
         clickAndWait(Locator.linkWithText("Overview"));
         waitForElement(Locator.tagWithClass("table", "study-vaccine-design"));
+        assertTextPresent(assayPlanTxt);
         assertTextPresent("[x]", 35);
     }
 

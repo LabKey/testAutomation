@@ -378,7 +378,6 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         newProps.put("SubjectNounSingular", "Subject");
         newProps.put("SubjectNounPlural", "Subjects");
         newProps.put("SubjectColumnName", "SubjectId");
-        newProps.put("AssayPlan", "AssayPlan");
 
         // add tricky chars and injection script, for non-dates
         for (String key : newProps.keySet())
