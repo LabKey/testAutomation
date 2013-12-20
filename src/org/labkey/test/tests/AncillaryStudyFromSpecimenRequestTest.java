@@ -27,7 +27,6 @@ import org.labkey.test.categories.DailyB;
 @Category({DailyB.class})
 public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 {
-
     public static final String DOV_DATASET = "DOV-1:";
     protected String ANCILLARY_STUDY_NAME = "Anc Study" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     protected String ANCILLARY_STUDY_DESC = "Study description";
@@ -52,8 +51,6 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         createRequest();
         createStudy();
         verifyAncillaryStudy();
-        
-
     }
 
     private void verifyAncillaryStudy()
@@ -65,17 +62,16 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         assertTextPresent(specimensToSelect);
 
         clickTab("Manage");
-        assertTextPresent("This study defines 7 Datasets", "This study defines " + visitCount + " Visits", "This study references 24 locations (labs/sites/repositories)");
+        assertTextPresent("This study defines 7 datasets", "This study defines " + visitCount + " visits", "This study references 24 locations (labs/sites/repositories)");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         assertTextPresent(DOV_DATASET, "APX-1", "DEM-1", "FPX-1", "TM-1", "IV-1", "EVC-1");
     }
 
-
     private void createStudy()
     {
         clickButton("Create Study", WAIT_FOR_EXT_MASK_TO_APPEAR);
-        setFormElement("studyName", ANCILLARY_STUDY_NAME);
-        setFormElement("studyDescription", ANCILLARY_STUDY_DESC);
+        setFormElement(Locator.name("studyName"), ANCILLARY_STUDY_NAME);
+        setFormElement(Locator.name("studyDescription"), ANCILLARY_STUDY_DESC);
         clickButton("Next", WAIT_FOR_EXT_MASK_TO_APPEAR);
 
         Locator datasetRow = Locator.tagContainingText("div", DOV_DATASET);
@@ -83,21 +79,18 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         clickAt(datasetRow, "1,1");
         clickButton("Finish");
         waitForPipelineJobsToFinish(3);
-
-
     }
 
     private void createRequest()
     {
         clickMenuButton("Request Options", "Create New Request");
 
-        selectOptionByText("destinationLocation", "Aurum Health KOSH Lab, Orkney, South Africa (Endpoint Lab, Repository)");
-        setFormElement("input0", "Assay Plan");
-        setFormElement("input2", "Comments");
-        setFormElement("input1", "Shipping");
+        selectOptionByText(Locator.name("destinationLocation"), "Aurum Health KOSH Lab, Orkney, South Africa (Endpoint Lab, Repository)");
+        setFormElement(Locator.id("input0"), "Assay Plan");
+        setFormElement(Locator.id("input2"), "Comments");
+        setFormElement(Locator.id("input1"), "Shipping");
         clickButton("Create and View Details");
     }
-
 
     protected String[] specimensToSelect = {"999320812", "999320396", "999320885", "999320746", "999320190", "999320466"};
     private void selectSpecimens()
