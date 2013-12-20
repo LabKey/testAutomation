@@ -106,22 +106,17 @@ public class WebTestHelper
 
     public static String getLabKeyRoot()
     {
-        synchronized (DEFAULT_LABKEY_ROOT)
+        if (_labkeyRoot == null)
         {
-            if (_labkeyRoot == null)
+            _labkeyRoot = canonicalizePath(System.getProperty("labkey.root"));
+            if (_labkeyRoot == null || _labkeyRoot.length() == 0)
             {
-                _labkeyRoot = canonicalizePath(System.getProperty("labkey.root"));
-                if (_labkeyRoot == null || _labkeyRoot.length() == 0)
-                {
-                    _labkeyRoot = canonicalizePath(DEFAULT_LABKEY_ROOT);
-                    log("Using default labkey root (" + _labkeyRoot +
-                            ").\nThis can be changed by passing VM arg '-Dlabkey.root=[yourroot]'.");
-                }
-                else
-                    log("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
+                throw new IllegalStateException("No LabKey root directory specified. Configure this by passing VM arg '-Dlabkey.root=[yourroot]'.");
             }
-            return _labkeyRoot;
+            else
+                log("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
         }
+        return _labkeyRoot;
     }
 
     public static DatabaseType getDatabaseType()
