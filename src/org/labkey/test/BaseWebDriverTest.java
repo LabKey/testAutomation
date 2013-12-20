@@ -1617,7 +1617,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         getDriver().switchTo().window((String)windows[1]);
         log("Waiting for system maintenance to complete");
 
-        int timeLeft = 1 * 60 * 1000 - ((Long)elapsed).intValue();
+        int timeLeft = 10 * 60 * 1000 - ((Long)elapsed).intValue();
         // Page updates automatically via AJAX... keep checking (up to 10 minutes from the start of the test) for system maintenance complete text
         waitFor(new Checker() {
             public boolean check()
