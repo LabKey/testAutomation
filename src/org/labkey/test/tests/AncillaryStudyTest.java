@@ -162,7 +162,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         assertTextPresent("Ancillary study created by AncillaryStudyTest");
         clickTab("Manage");
-        assertTextPresent((DATASETS.length + DEPENDENT_DATASETS.length) + " Datasets");
+        waitForText((DATASETS.length + DEPENDENT_DATASETS.length) + " datasets");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         for( String str : DATASETS )
         {
