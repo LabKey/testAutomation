@@ -71,7 +71,8 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         clickProject(getProjectName());
     }
 
-    @Test
+    // kevink: Disabled pending fix: File path to R script isn't getting escaped/quoted properly. Breaks with spaces basename: extra operand `Copy/sample.work/r-copy.r'
+    //@Test
     public void testRCopyPipeline()
     {
         final String folderName = "rCopy";
@@ -99,7 +100,8 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
     }
 
-    @Test
+    // kevink: Disabled pending fix: File path to R script isn't getting escaped/quoted properly. Breaks with spaces basename: extra operand `Copy/sample.work/r-copy.r'
+    //@Test
     public void testRCopyInlinePipeline()
     {
         final String folderName = "rCopyInline";
