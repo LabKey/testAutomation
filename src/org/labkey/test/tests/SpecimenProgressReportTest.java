@@ -206,7 +206,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
             waitForElement(configGridRow);
         else
             waitForText("No assay/specimen configurations");
-        int expectedRowIndex = getXpathCount(configGridRow);
+        int expectedRowIndex = getElementCount(configGridRow);
         clickButton("Insert New", 0);
         waitForElement(Locator.name("AssayName"));
         setFormElement(Locator.name("AssayName"), assayName);
@@ -231,17 +231,17 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     {
         clickFolder(assayFolder);
         waitForElement(tableLoc);
-        assertEquals(0, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
-        assertEquals(24, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
-        assertEquals(2, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
-        assertEquals(0, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
-        assertEquals(54, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
-        assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
+        assertEquals(0, getElementCount( Locator.xpath("//td[contains(@class, 'available')]")));
+        assertEquals(24, getElementCount( Locator.xpath("//td[contains(@class, 'query')]")));
+        assertEquals(2, getElementCount( Locator.xpath("//td[contains(@class, 'collected')]")));
+        assertEquals(0, getElementCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
+        assertEquals(54, getElementCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        assertEquals(3, getElementCount(Locator.xpath("//td[contains(@class, 'missing')]")));
 
-        flagSpecimenForReview(assayName, runName, null);
+        flagSpecimenForReview(assayName, null);
 
         waitForElement(tableLoc);
-        assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
+        assertEquals(1, getElementCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
 
         // verify legend text and ordering
         assertTextPresentInThisOrder("specimen expected", "specimen received by lab", "specimen not collected",
@@ -270,7 +270,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         configureAssayProgressDashboard(assay2);
         configureAssaySchema(assayName);
 
-        flagSpecimenForReview(assayName, assay2File, "2011-03-02");
+        flagSpecimenForReview(assayName, "2011-03-02");
 
         clickFolder(assayFolder);
         verifyProgressReport(assayName, false);
@@ -288,13 +288,13 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
         waitForElement(tableLoc);
         assertTextPresentInThisOrder("SR1", "SR2");
-        assertEquals(4, getXpathCount( Locator.xpath("//td[contains(@class, 'available')]")));
-        assertEquals(3, getXpathCount( Locator.xpath("//td[contains(@class, 'query')]")));
-        assertEquals(2 + ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'collected')]")));
-        assertEquals(2 - ignored, getXpathCount( Locator.xpath("//td[contains(@class, 'received')]")));
-        assertEquals(1, getXpathCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
-        assertEquals(10, getXpathCount(Locator.xpath("//td[contains(@class, 'expected')]")));
-        assertEquals(3, getXpathCount(Locator.xpath("//td[contains(@class, 'missing')]")));
+        assertEquals(4, getElementCount(Locator.xpath("//td[contains(@class, 'available')]")));
+        assertEquals(3, getElementCount(Locator.xpath("//td[contains(@class, 'query')]")));
+        assertEquals(2 + ignored, getElementCount(Locator.xpath("//td[contains(@class, 'collected')]")));
+        assertEquals(2 - ignored, getElementCount(Locator.xpath("//td[contains(@class, 'received')]")));
+        assertEquals(1, getElementCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
+        assertEquals(10, getElementCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        assertEquals(3, getElementCount(Locator.xpath("//td[contains(@class, 'missing')]")));
     }
 
     private void verifyUnassayedSpecimenQuery(String assayName)
@@ -310,7 +310,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void flagSpecimenForReview(String assayName, String runName, @Nullable String collectionDateFilterStr)
+    private void flagSpecimenForReview(String assayName, @Nullable String collectionDateFilterStr)
     {
         clickFolder(assayFolder);
         waitForElement(tableLoc);
@@ -373,7 +373,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
     private void configureAssayProgressDashboard(String assayName)
     {
-        clickWebpartMenuItem("Assay Progress Dashboard", true, "Customize");
+        _portalHelper.clickWebpartMenuItem("Assay Progress Dashboard", "Customize");
         _extHelper.checkCheckbox(assayName);
         click(Locator.tagContainingText("label", "Specimen Report Study Folder Study"));
         clickButton("Save");
@@ -381,14 +381,14 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
     private void configureGroupingColumn(String label, String name)
     {
-        clickWebpartMenuItem("Assay Progress Dashboard", true, "Customize");
+        _portalHelper.clickWebpartMenuItem("Assay Progress Dashboard", "Customize");
         setFormElement(Locator.xpath("//td/label[contains(text(),'" + label + "')]/../..//td/input[@name='groupingColumn']"), name);
         clickButton("Save");
     }
 
     private void ignoreSampleMindedData(String assayName)
     {
-        clickWebpartMenuItem("Assay Progress Report", true, "Customize");
+        _portalHelper.clickWebpartMenuItem("Assay Progress Report", "Customize");
         Locator ignoreSamplemindedCheckbox = Locator.css("table.ignoreSampleminded" + assayName + " input.x4-form-checkbox");
         Locator ignoreSamplemindedCheckboxChecked = Locator.css("table.x4-form-cb-checked.ignoreSampleminded" + assayName + " input.x4-form-checkbox");
         click(ignoreSamplemindedCheckbox);
