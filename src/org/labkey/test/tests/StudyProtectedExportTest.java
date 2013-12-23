@@ -235,16 +235,17 @@ public class StudyProtectedExportTest extends StudyExportTest
         for (int i = 2; i <= rowCount - 2; i++) // skip header row; Stop before Add Location row & Save/Cancel button row
         {
             Locator.XPathLocator rowLoc = Locator.xpath("id('manageLocationsTable')/tbody/tr["+i+"]");
+            String locId = getText(rowLoc.append("/td[2]"));
             String locName = getFormElement(rowLoc.append("/td/input[@name='labels']"));
-            String locTypes = getText(rowLoc.append("/td[4]"));
+            String locTypes = getText(rowLoc.append("/td[5]"));
             if (locTypes.contains("Clinic"))
             {
-                assertTrue("Clinic Location name not masked", locName.equals("Clinic"));
+                assertTrue("Clinic Location name not masked: " + locId, locName.equals("Clinic"));
                 foundClinics++;
             }
             else
             {
-                assertFalse("Clinic Location name not masked", locName.equals("Clinic"));
+                assertFalse("Non-Clinic Location name masked. Types: " + locId, locName.equals("Clinic"));
                 nonClinics.add(locName);
             }
         }
