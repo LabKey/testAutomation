@@ -19,6 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SearchHelper;
 import org.labkey.test.util.WikiHelper;
 
@@ -58,6 +59,8 @@ public class SearchTest extends StudyWDTest
     private static final String GRID_VIEW_NAME = "DRT Eligibility Query";
     private static final String REPORT_NAME = "TestReport";
 
+    private PortalHelper portalHelper = new PortalHelper(this);
+
     @Override
     public String getAssociatedModuleDirectory()
     {
@@ -82,10 +85,10 @@ public class SearchTest extends StudyWDTest
         addSearchableStudy(); // Must come first;  Creates project.
         addSearchableLists();
         addSearchableContainers();
-        //addSearchableReports(); // Reports not currently indexed.
+        addSearchableReports(); // Reports not currently indexed.
         addSearchableWiki();
         addSearchableIssues();
-        //addSearchableMessages();
+        addSearchableMessages();
         addSearchableFiles();
     }
 
@@ -99,7 +102,7 @@ public class SearchTest extends StudyWDTest
     private void addSearchableLists()
     {
         clickTab("Overview");
-        addWebPart("Lists");
+        portalHelper.addWebPart("Lists");
         _listHelper.importListArchive(FOLDER_A, new File(getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip"));
 
         clickAndWait(Locator.linkWithText(listToDelete));
@@ -201,45 +204,45 @@ public class SearchTest extends StudyWDTest
 
     private void addSearchableReports()
     {
-        clickFolder(getStudyLabel());
+        clickFolder(FOLDER_A);
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
-        clickMenuButton("Views", "Create", "Crosstab View");
-        selectOptionByValue("rowField",  "DEMsex");
-        selectOptionByValue("colField", "DEMsexor");
-        selectOptionByValue("statField", "MouseId");
+        _extHelper.clickMenuButton("Views", "Create", "Crosstab View");
+        selectOptionByValue(Locator.name("rowField"),  "DEMsex");
+        selectOptionByValue(Locator.name("colField"), "DEMsexor");
+        selectOptionByValue(Locator.name("statField"), "MouseId");
         clickButton("Submit");
 
         String[] row3 = new String[] {"Male", "2", "9", "3", "14"};
         assertTableRowsEqual("report", 3, new String[][] {row3});
 
-        setFormElement("label", REPORT_NAME);
+        setFormElement(Locator.name("label"), REPORT_NAME);
         clickButton("Save");
 
         // create new grid view report:
         goToManageViews();
         _extHelper.clickExtMenuButton(false, Locator.linkContainingText("Add Report"), "Grid View");
-        setFormElement("label", GRID_VIEW_NAME);
-        selectOptionByText("params", "ECI-1 (ECI-1: Eligibility Criteria)");
+        setFormElement(Locator.id("label"), GRID_VIEW_NAME);
+        selectOptionByText(Locator.name("params"), "ECI-1 (ECI-1: Eligibility Criteria)");
         clickButton("Create View");
 
         // create new external report
-        clickFolder(getStudyLabel());
+        clickFolder(FOLDER_A);
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
-        clickMenuButton("Views", "Create", "Advanced View");
-        selectOptionByText("queryName", "DEM-1 (DEM-1: Demographics)");
+        _extHelper.clickMenuButton("Views", "Create", "Advanced View");
+        selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
         String java = System.getProperty("java.home") + "/bin/java";
-        setFormElement("program", java);
-        setFormElement("arguments", "-cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
+        setFormElement(Locator.name("program"), java);
+        setFormElement(Locator.name("arguments"), "-cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE} ${REPORT_FILE}");
         clickButton("Submit");
         assertTextPresent("Female");
-        setFormElement("program", java);
-        setFormElement("arguments", "-cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
-        selectOptionByValue("fileExtension", "tsv");
+        setFormElement(Locator.name("program"), java);
+        setFormElement(Locator.name("arguments"), "-cp " + getLabKeyRoot() + "/server/test/build/classes org.labkey.test.util.Echo ${DATA_FILE}");
+        selectOptionByValue(Locator.name("fileExtension"), "tsv");
         clickButton("Submit");
         assertTextPresent("Female");
-        setFormElement("label", "tsv");
-        selectOptionByText("showWithDataset", "DEM-1: Demographics");
+        setFormElement(Locator.name("label"), "tsv");
+        selectOptionByText(Locator.name("showWithDataset"), "DEM-1: Demographics");
         clickButton("Save");
     }
 
@@ -248,9 +251,9 @@ public class SearchTest extends StudyWDTest
         WikiHelper _wikiHelper = new WikiHelper(this);
         
         clickFolder(getFolderName());
-        addWebPart("Wiki");
+        portalHelper.addWebPart("Wiki");
         _wikiHelper.createWikiPage(WIKI_NAME, "RADEOX", WIKI_TITLE, WIKI_CONTENT, new File(getLabKeyRoot() + "/server/module.template.properties"));
-        addWebPart("Wiki");
+        portalHelper.addWebPart("Wiki");
         //Issue 9454: Don't index option for wiki page
         _wikiHelper.createWikiPage(WIKI_NAME + "UNSEARCHABLE", "RADEOX", WIKI_TITLE, WIKI_CONTENT, false, null, true);
 
@@ -264,9 +267,10 @@ public class SearchTest extends StudyWDTest
     private void addSearchableIssues()
     {
         createPermissionsGroup(GROUP_NAME, USER1);
+        _securityHelper.setProjectPerm(GROUP_NAME, "Reader");
         clickButton("Save and Finish");
         clickFolder(getFolderName());
-        addWebPart("Issues Summary");
+        portalHelper.addWebPart("Issues Summary");
 
         // Setup issues options.
         clickAndWait(Locator.linkWithText("Issues Summary"));
@@ -281,15 +285,15 @@ public class SearchTest extends StudyWDTest
         // Create new issue.
         clickButton("Back to Issues");
         clickButton("New Issue");
-        setFormElement("title", ISSUE_TITLE);
-        selectOptionByText("type", "UFO");
-        selectOptionByText("area", "Area51");
-        selectOptionByText("priority", "1");
-        setFormElement("comment", ISSUE_BODY);
-        selectOptionByText("assignedTo", displayNameFromEmail(USER1));
+        setFormElement(Locator.id("title"), ISSUE_TITLE);
+        selectOptionByText(Locator.name("type"), "UFO");
+        selectOptionByText(Locator.name("area"), "Area51");
+        selectOptionByText(Locator.name("priority"), "1");
+        setFormElement(Locator.id("comment"), ISSUE_BODY);
+        selectOptionByText(Locator.name("assignedTo"), displayNameFromEmail(USER1));
         click(Locator.linkWithText("Attach a file"));
         File file = new File(getLabKeyRoot() + "/common.properties");
-        setFormElement("formFiles[00]", file);
+        setFormElement(Locator.name("formFiles[00]"), file);
         clickButton("Save");
 
         _searchHelper.enqueueSearchItem(ISSUE_TITLE, Locator.linkContainingText(ISSUE_TITLE));
@@ -303,13 +307,13 @@ public class SearchTest extends StudyWDTest
     private void addSearchableMessages()
     {
         clickFolder(getFolderName());
-        addWebPart("Messages");
-        clickWebpartMenuItem("Messages", "New");
-        setFormElement("title", MESSAGE_TITLE);
-        setFormElement("body", MESSAGE_BODY);
+        portalHelper.addWebPart("Messages");
+        portalHelper.clickWebpartMenuItem("Messages", "New");
+        setFormElement(Locator.id("title"), MESSAGE_TITLE);
+        setFormElement(Locator.id("body"), MESSAGE_BODY);
         click(Locator.linkWithText("Attach a file"));
         File file = new File(getLabKeyRoot() + "/sampledata/dataloading/excel/fruits.tsv");
-        setFormElement("formFiles[0]", file);
+        setFormElement(Locator.name("formFiles[0]"), file);
         clickButton("Submit");
 
         _searchHelper.enqueueSearchItem(MESSAGE_TITLE, Locator.linkContainingText(MESSAGE_TITLE));
