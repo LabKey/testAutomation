@@ -86,7 +86,7 @@ public class DataIntegrationHelper
 
     public RunTransformResponse runTransformAndWait(String transformId, int msTimeout) throws Exception
     {
-        RunTransformResponse response ;
+        RunTransformResponse response;
         response = runTransform(transformId);
         String jobId = response.getJobId();
         String status = response.getStatus();
