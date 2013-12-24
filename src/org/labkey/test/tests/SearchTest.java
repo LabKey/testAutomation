@@ -85,10 +85,10 @@ public class SearchTest extends StudyWDTest
         addSearchableStudy(); // Must come first;  Creates project.
         addSearchableLists();
         addSearchableContainers();
-        addSearchableReports(); // Reports not currently indexed.
+        //addSearchableReports(); // Reports not currently indexed.
         addSearchableWiki();
         addSearchableIssues();
-        addSearchableMessages();
+        //addSearchableMessages();
         addSearchableFiles();
     }
 
