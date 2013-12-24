@@ -492,8 +492,8 @@ public class ClientAPITest extends BaseWebDriverTest
 
         clickButton("Add Field", 0);
 
-        _listHelper.setColumnName(0, "species");
-        _listHelper.setColumnLabel(0, "Species");
+        _listHelper.setColumnName(0, "customfield1");
+        _listHelper.setColumnLabel(0, "Custom Field 1");
         
         clickButton("Add Field", 0);
 
@@ -501,7 +501,7 @@ public class ClientAPITest extends BaseWebDriverTest
         _listHelper.setColumnLabel(1, "Color");
 
         sleep(1000);
-        clickButton("Save", 10000);
+        clickButton("Save", WAIT_FOR_JAVASCRIPT);
 
         setSourceFromFile("domainTest.js");
         waitForElement(Locator.id(TEST_DIV_NAME).containing("Finished DomainTests."), 30000);
