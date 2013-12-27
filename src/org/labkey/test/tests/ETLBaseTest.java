@@ -27,6 +27,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.RemoteConnectionHelperWD;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -491,22 +492,19 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         assertTextPresent(errors);
     }
 
-    protected void copyETLfiles(String sourcePath, String destinationPath)
+    protected void copyETLfiles(File sourceDir, File destinationDir)
     {
-        File source = new File(sourcePath);
-        File dest = new File(destinationPath);
-
-        File[] files = source.listFiles();
+        File[] files = sourceDir.listFiles();
         try
         {
             for(File file : files)
             {
-                FileUtils.copyFileToDirectory(file, dest);
+                FileUtils.copyFileToDirectory(file, destinationDir);
             }
         }
-        catch(Exception e)
+        catch(IOException e)
         {
-            fail("Transform xml file copy failed: " + e.getMessage());
+            throw new RuntimeException("Transform xml file copy failed", e);
         }
     }
 

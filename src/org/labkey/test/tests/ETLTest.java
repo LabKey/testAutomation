@@ -44,9 +44,9 @@ public class ETLTest extends ETLBaseTest
     private static final String TRANSFORM_REMOTE = "{simpletest}/remote";
     private static final String TRANSFORM_REMOTE_DESC = "Remote Test";
     private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";
-    private static final String TRANSFORM_REMOTE_STUDY = "/sampledata/dataintegration/ETLTestStudy.zip";
-    private static final String TransformXMLdest = System.getenv("LABKEY_ROOT") + "\\build\\deploy\\modules\\simpletest\\etls";
-    private static final String TransformXMLsrc = System.getenv("LABKEY_ROOT") + "\\build\\deploy\\modules\\ETLtest\\etls";
+    private static final File TRANSFORM_REMOTE_STUDY = new File(getSampledataPath(), "dataintegration/ETLTestStudy.zip");
+    private static final File TransformXMLdest = new File(getLabKeyRoot(), "build/deploy/modules/simpletest/etls");
+    private static final File TransformXMLsrc = new File(getLabKeyRoot(), "build/deploy/modules/ETLtest/etls");
     private static final String PROJECT_NAME = "ETLTestProject";
 
     @Override
@@ -127,7 +127,6 @@ UNDONE: need to fix the merge case
         verifyTransformSummary();
         verifyTransformHistory(TRANSFORM_TRUNCATE, TRANSFORM_TRUNCATE_DESC);
 
-        //copyETLfiles(TransformXMLsource, TransformXMLdest);
         //identify by run into populated target
         insertSourceRow("3", "Subject 3", "42");
         insertTransferRow("42", getDate(), getDate(), "new transfer", "added by test automation", "pending");
@@ -151,7 +150,6 @@ UNDONE: need to fix the merge case
         _jobsComplete = 0;
 
         enableModule("DataIntegration", true);
-        //enableModule("simpletest", true);
         enableModule("simpletest", true);
 
         if(!remoteOnly)
@@ -178,11 +176,11 @@ UNDONE: need to fix the merge case
         // study to use the same type of ETL source and target that one of our customer uses.
         //
         clickTab("Study");
-        importStudyFromZip(new File(getLabKeyRoot(), TRANSFORM_REMOTE_STUDY), true /*ignore query validation*/);
+        importStudyFromZip(TRANSFORM_REMOTE_STUDY, true /*ignore query validation*/);
         // bump our pipeline job count since we used the pipeline to import the study
         _jobsComplete++;
         //copy etl files from simpleTest module
-        copyETLfiles();
+        copyETLfiles(TransformXMLsrc, TransformXMLdest);
     }
 
     //
@@ -217,16 +215,5 @@ UNDONE: need to fix the merge case
         assertInDatasetTarget1("Subject 1", "Subject 2", "Subject 3");
         verifyTransformSummary();
         verifyTransformHistory(TRANSFORM_REMOTE, TRANSFORM_REMOTE_DESC);
-    }
-
-    public void copyETLfiles() throws Exception
-    {
-        File srcDir = new File(TransformXMLsrc);
-            for (File xformXml: srcDir.listFiles())
-            {
-                String fileName = xformXml.getName();
-                copyFile(TransformXMLsrc + "\\" + fileName, TransformXMLdest + "\\" + fileName);
-            }
-            sleep(5000);
     }
 }
