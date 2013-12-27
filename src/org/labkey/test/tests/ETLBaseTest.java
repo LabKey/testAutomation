@@ -318,9 +318,26 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         if (hasWork && !hasCheckerError)
         {
             // pipeline job will run
-            prepForPageLoad();
-            waitAndClick(Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td/a"));
-            newWaitForPageToLoad();
+            waitAndClickAndWait(Locator.xpath("//tr[contains(@transformid,'" + transformId + "')]/td/a"));
+            waitFor(new Checker()
+            {
+                @Override
+                public boolean check()
+                {
+                    if (isElementPresent(Locator.tag("tr")
+                            .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
+                            .withPredicate(Locator.xpath("td").withText("ERROR"))))
+                        return true;
+                    else if (isElementPresent(Locator.tag("tr")
+                            .withPredicate(Locator.xpath("td").withClass("labkey-form-label").withText("Status"))
+                            .withPredicate(Locator.xpath("td").withText("COMPLETE"))))
+                        return true;
+                    else
+                        refresh();
+
+                    return false;
+                }
+            }, "ETL did not finish", WAIT_FOR_JAVASCRIPT);
         }
         else
         {
