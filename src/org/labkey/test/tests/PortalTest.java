@@ -18,7 +18,6 @@ package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverMultipleTest;
@@ -32,7 +31,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 /**
  * User: tchadick
@@ -199,7 +198,7 @@ public class PortalTest extends BaseWebDriverMultipleTest
             for (String title : webpartTitles)
             {
                 if (!allExpectedWebparts.contains(title))
-                    fail("Found unexpeted webpart: " + title);
+                    fail("Found unexpected webpart: " + title);
             }
 
             fail("Should be unreachable. Something went wrong in the test. Make sure you are looking for the correct webparts.");
