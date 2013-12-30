@@ -16,10 +16,9 @@
  */
 %>
 <%@ page import="com.dumbster.smtp.SmtpMessage" %>
-<%@ page import="org.labkey.api.util.DateUtil" %>
+<%@ page import="org.labkey.api.data.Container" %>
 <%@ page import="org.labkey.api.view.HttpView" %>
 <%@ page import="org.labkey.api.view.JspView" %>
-<%@ page import="org.labkey.api.view.ViewContext" %>
 <%@ page import="org.labkey.dumbster.DumbsterController" %>
 <%@ page import="org.labkey.dumbster.view.MailPage" %>
 <%@ page import="java.util.Iterator" %>
@@ -27,9 +26,8 @@
 <%@ taglib prefix="labkey" uri="http://www.labkey.org/taglib" %>
 <%
     JspView<MailPage> me = (JspView<MailPage>) HttpView.currentView();
-    ViewContext context = me.getViewContext();
-
     MailPage pageInfo = me.getModelBean();
+    Container c = getContainer();
     SmtpMessage[] messages = pageInfo.getMessages();
     boolean recorder = pageInfo.isEnableRecorder();
 
@@ -173,8 +171,8 @@ function toggleRecorder(checkbox)
             <td><a onclick="toggleBody('email_headers_<%=rowIndex%>'); return false;">View headers</a>
                 <div id="email_headers_<%=rowIndex%>" style="display: none;"><br><%=headers%></div></td>
             <td>
-                <a href="<%=h(DumbsterController.getViewMessageURL(context.getContainer(), rowIndex - 1, "html"))%>" target="_messageHtml">HTML</a>
-                <a href="<%=h(DumbsterController.getViewMessageURL(context.getContainer(), rowIndex - 1, "text"))%>" target="_messageText">Text</a>
+                <a href="<%=h(DumbsterController.getViewMessageURL(c, rowIndex - 1, "html"))%>" target="_messageHtml">HTML</a>
+                <a href="<%=h(DumbsterController.getViewMessageURL(c, rowIndex - 1, "text"))%>" target="_messageText">Text</a>
             </td>
         </tr>
 <%
@@ -184,7 +182,7 @@ function toggleRecorder(checkbox)
     <tr id="emailRecordEmpty" style="display: <%=text(messages.length > 0 ? "none" : "")%>;"><td colspan="3">No email recorded.</td></tr>
 </table>
 <%
-    if (context.getUser().isSiteAdmin())
+    if (getUser().isSiteAdmin())
     {
 %>
         <input name="emailRecordOn" type="checkbox" onclick="toggleRecorder(this);"<%=checked(recorder)%>> Record email messages sent
