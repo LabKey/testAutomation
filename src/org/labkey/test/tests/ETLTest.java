@@ -45,8 +45,8 @@ public class ETLTest extends ETLBaseTest
     private static final String TRANSFORM_REMOTE_DESC = "Remote Test";
     private static final String TRANSFORM_REMOTE_CONNECTION = "EtlTest_RemoteConnection";
     private static final File TRANSFORM_REMOTE_STUDY = new File(getSampledataPath(), "dataintegration/ETLTestStudy.zip");
-    private static final File TransformXMLdest = new File(getLabKeyRoot(), "build/deploy/modules/simpletest/etls");
-    private static final File TransformXMLsrc = new File(getLabKeyRoot(), "build/deploy/modules/ETLtest/etls");
+    private static final File TransformXMLdest = new File(getLabKeyRoot(), "build/deploy/modules/simpletest/ETLs");
+    private static final File TransformXMLsrc = new File(getLabKeyRoot(), "build/deploy/modules/ETLtest/ETLs");
     private static final String PROJECT_NAME = "ETLTestProject";
 
     @Override
