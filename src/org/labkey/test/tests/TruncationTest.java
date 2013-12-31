@@ -19,11 +19,12 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.categories.Study;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
 @Category({Study.class, Specimen.class})
-public class TruncationTest extends StudyBaseTest
+public class TruncationTest extends StudyBaseTestWD
 {
     private final File LIST_ARCHIVE =  new File(getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip");
     private final String STUDY_NAME = "Study 001";
@@ -34,7 +35,8 @@ public class TruncationTest extends StudyBaseTest
         importStudy();
         waitForPipelineJobsToComplete(1, "study import", false);
         goToProjectHome();
-        addWebPart("Lists");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Lists");
         _listHelper.importListArchive(getFolderName(), LIST_ARCHIVE);
         truncateList();
         truncateDataset();

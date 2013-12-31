@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  * Time: 2:06 PM
  */
 @Category({DailyA.class})
-public class AssayAPITest extends BaseSeleniumWebTest
+public class AssayAPITest extends BaseWebDriverTest
 {
     @Override
     protected String getProjectName()
@@ -51,13 +51,15 @@ public class AssayAPITest extends BaseSeleniumWebTest
         int pipelineCount = 0;
         String runName = "trial01.xls";
         importAssayAndRun(new File(getSampledataPath() + "/AssayAPI/XLS Assay.xar.xml"), ++pipelineCount, "XLS Assay",
-                new File(getSampledataPath() + "/GPAT/" + runName),  runName, new String[] {"1 - 100 of 201", "K770K3VY-19"});
+                new File(getSampledataPath() + "/GPAT/" + runName),  runName, new String[] {"K770K3VY-19"});
+        waitForElement(Locator.paginationText(1, 100, 201));
 //
         goToProjectHome();
 
         //Issue 16073
         importAssayAndRun(new File(getSampledataPath() + "/AssayAPI/BatchPropRequired.xar"), ++pipelineCount, "BatchPropRequired",
-                new File(getSampledataPath() + "/GPAT/" + runName),   "trial01-1.xls", new String[] {"1 - 100 of 201", "K770K3VY-19"});
+                new File(getSampledataPath() + "/GPAT/" + runName),   "trial01-1.xls", new String[] {"K770K3VY-19"});
+        waitForElement(Locator.paginationText(1, 100, 201));
 //        _assayHelper.getCurrentAssayNumber();
     }
 
