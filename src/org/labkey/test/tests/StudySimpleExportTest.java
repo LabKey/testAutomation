@@ -387,9 +387,6 @@ public class StudySimpleExportTest extends StudyBaseTestWD
             {
                 // no op, this field gets truncated by the server using ColumnInfo.legalNameFromName
             }
-            // TODO: Issue 19294 Study Description field doesn't support unicode chars in SQLServer
-            else if (key.equals("Description"))
-            {}
             else if (key.startsWith("Subject"))
                 newProps.put(key, newProps.get(key) + TRICKY_CHARACTERS_FOR_PROJECT_NAMES);
             else if (!key.contains("Date"))
