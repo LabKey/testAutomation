@@ -85,6 +85,7 @@ modules/miniassay/resources/queries/assay/simple/My[!!-~]Simple[!!-~]Assay/Data/
 modules/miniassay/resources/queries/assay/simple/My[!!-~]Simple[!!-~]Assay/Runs/AssayDesignChildSchemaRuns.qview.xml -text
 modules/pipelinetest/module.properties -text
 modules/pipelinetest/resources/pipeline/pipelines/r-copy-inline.pipeline.xml -text
+modules/pipelinetest/resources/pipeline/pipelines/r-copy-localtask.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/pipelines/r-copy.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/tasks/r-copy-inline.task.xml -text
 modules/pipelinetest/resources/pipeline/tasks/r-copy.r -text

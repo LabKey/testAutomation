@@ -40,7 +40,7 @@ if (skipLines > lineCount) {
 
     # print to ${output.xxx}
     f = file(description="${output.xxx}", open="w")
-    cat(file=f, "(output) contents of file: ${input.txt}\n")
+    cat(file=f, "# (output) contents of file: ${input.txt}\n")
     for (i in start:lineCount) {
         cat(file=f, sep="", lines[i], "\n")
     }

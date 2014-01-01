@@ -1,4 +1,7 @@
-<task xmlns="http://labkey.org/pipeline/xml" name="r-copy" version="0.0">
+<task xmlns="http://labkey.org/pipeline/xml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:type="ScriptTaskType"
+      name="r-copy" version="0.0">
     <description>Use R to duplicate a file</description>
     <script file="r-copy.r"/>
 </task>

@@ -1,6 +1,7 @@
-<pipeline xmlns="http://labkey.org/pipeline/xml" name="r-copy" version="0.0">
+<pipeline xmlns="http://labkey.org/pipeline/xml"
+          name="r-copy" version="0.0">
     <description>Use R to duplicate a file</description>
     <tasks>
-        <task ref="pipelinetest:task:r-copy"/>
+        <taskref ref="pipelinetest:task:r-copy"/>
     </tasks>
 </pipeline>

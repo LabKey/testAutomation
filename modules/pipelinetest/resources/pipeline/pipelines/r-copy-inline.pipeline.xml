@@ -2,11 +2,11 @@
     <description>Use R to duplicate a file (inline script)</description>
     <analyzeURL>/pipelinetest/rinline.view</analyzeURL>
     <tasks>
-        <task ref="pipelinetest:task:r-copy-inline"/>
+        <taskref ref="pipelinetest:task:r-copy-inline"/>
         <!--
         Reference a sub-pipeline
         <pipeline ref="pipelinetest:pipeline:r-copy"/>
         -->
-        <task ref="org.labkey.api.exp.pipeline.XarGeneratorId"/>
+        <taskref ref="org.labkey.api.exp.pipeline.XarGeneratorId"/>
     </tasks>
 </pipeline>
