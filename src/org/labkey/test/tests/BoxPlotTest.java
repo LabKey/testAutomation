@@ -20,6 +20,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 /**
  * User: tchadick
@@ -148,9 +151,12 @@ public class BoxPlotTest extends GenericChartsTest
         clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
         Locator svgPathLoc = Locator.css("svg a path");
         waitForElement(svgPathLoc);
-        fireEvent(svgPathLoc, SeleniumEvent.click);
+
+        // We need to specifically click the last element because those are the outliers.
+        List<WebElement> paths = svgPathLoc.findElements(getDriver());
+        fireEvent(paths.get(paths.size()-1), SeleniumEvent.click);
         _extHelper.waitForExtDialog("Data Point Information");
-        assertTextPresentInThisOrder("MouseId/Cohort: Group 1", "RCHtempc:");
+        assertTextPresentInThisOrder("MouseId/Cohort: Group 2", "RCHtempc:");
         clickButton("OK", 0);
 
         savePlot(BOX_PLOT_NAME_DR, BOX_PLOT_DESC_DR);
