@@ -45,7 +45,7 @@ public class SchemaHelper extends AbstractHelperWD
 
     public void _editLinkedSchema(boolean create, String projectName, String targetFolder, String name, String sourceContainerPath, String schemaTemplate, String sourceSchemaName, String tables, String metadata)
     {
-        _test.beginAt("/query/" + projectName + "/" + targetFolder + "/admin.view");
+        _test.beginAt("/query/" + projectName + (targetFolder == null ? "" : "/" + targetFolder) + "/admin.view");
 
         // Click the create new or edit existing link.
         Locator link;

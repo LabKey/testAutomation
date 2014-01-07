@@ -77,6 +77,29 @@ public class Ext4FieldRefWD extends Ext4CmpRefWD
         return getEval("getValue()");
     }
 
+    public Double getDoubleValue()
+    {
+        Object val = getEval("getValue()");
+        if (val == null)
+        {
+            return null;
+        }
+        else if (val instanceof Long)
+        {
+            return ((Long)val).doubleValue();
+        }
+        else if (val instanceof Integer)
+        {
+            return ((Integer)val).doubleValue();
+        }
+        else if (val instanceof Double)
+        {
+            return ((Double)val);
+        }
+
+        throw new IllegalArgumentException("Unknown type: " + val.getClass().getName());
+    }
+
     public boolean isVisible()
     {
         WebElement el = _test.getDriver().findElement(By.id(_id));

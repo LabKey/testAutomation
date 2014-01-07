@@ -1193,8 +1193,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitForText("Copy/Paste Data");
 
         //we only care that these items are present
-        _ext4Helper.selectComboBoxItem("Choose Template:", "Default Template");
         _ext4Helper.selectComboBoxItem("Choose Template:", "DNA Samples Template");
+        _ext4Helper.selectComboBoxItem("Choose Template:", "Default Template");
     }
 
     /**
@@ -1445,11 +1445,13 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.waitForCmp("#cancelBtn");
         Ext4CmpRefWD btn = _ext4Helper.queryOne("#cancelBtn", Ext4CmpRefWD.class);
         btn.waitForEnabled();
+        prepForPageLoad();
         waitAndClick(Locator.id(btn.getId() + "-btnEl"));
 
         Alert alert = getDriver().switchTo().alert();
         alert.accept();
-        waitForText(LabModuleHelper.LAB_HOME_TEXT);
+        newWaitForPageToLoad();
+        waitForText(LabModuleHelper.LAB_HOME_TEXT, WAIT_FOR_PAGE);
     }
 
     @Override

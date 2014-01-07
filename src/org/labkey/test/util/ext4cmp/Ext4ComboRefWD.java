@@ -15,6 +15,7 @@
  */
 package org.labkey.test.util.ext4cmp;
 
+import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
 import org.openqa.selenium.WebElement;
 
@@ -45,9 +46,40 @@ public class Ext4ComboRefWD extends Ext4FieldRefWD
         return getFnEval("return this.store.data.get(this.store.find(this.displayField, arguments[0])).get(this.valueField)", displayValue);
     }
 
+    public Object getDisplayValue()
+    {
+        waitForStoreLoad();
+        if (this.getValue() == null)
+            return null;
+
+        Long recordIdx = (Long)getFnEval("return this.store.find(this.valueField, this.getValue())");
+        assert recordIdx != -1 && recordIdx.intValue() != -1 : "Unable to find record with value: " + getValue();
+
+        return getFnEval("return this.store.getAt(arguments[0]).get(this.displayField)", recordIdx);
+    }
+
+    public void waitForStoreLoad()
+    {
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return (Boolean)getFnEval("return this.store && this.store.getCount() > 0;");
+            }
+        }, "No records loaded in store", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+    }
+
     public void setComboByDisplayValue(String displayValue)
     {
         Object value = getRawValueFromDisplayValue(displayValue);
         eval("setValue(arguments[0]);", value);
+    }
+
+    public static Ext4ComboRefWD getForLabel(BaseWebDriverTest test, String label)
+    {
+        Ext4ComboRefWD ref = test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4ComboRefWD.class);
+        Assert.assertNotNull("Unable to locate field with label: " + label, ref);
+        return ref;
     }
 }
