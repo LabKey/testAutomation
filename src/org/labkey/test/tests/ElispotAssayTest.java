@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
@@ -242,6 +243,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
 
         clickAndWait(Locator.linkWithText("view runs"));
         clickAndWait(Locator.linkContainingText("details"));
+        new DataRegionTable("AntigenStats", this).setSort("SpecimenLsid/Property/ParticipantID", SortDirection.ASC);
 
         assertTextPresent("Plate Summary Information");
         assertTextPresent("Antigen 7 Mean");
@@ -312,6 +314,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         return Locator.xpath(xpath);
     }
 
+    @LogMethod
     protected void createTemplate()
     {
         clickButton("Manage Assays");
@@ -348,6 +351,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         clickButton("Save & Close");
         waitForText(PLATE_TEMPLATE_NAME);
     }
+
 
     /**
      * Cleanup entry point.

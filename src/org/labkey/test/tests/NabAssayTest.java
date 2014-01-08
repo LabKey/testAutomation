@@ -24,6 +24,7 @@ import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -512,6 +513,8 @@ public class NabAssayTest extends AbstractQCAssayTestWD
      * previously, assays sometimes failed to find their source files after a folder move
      * this test verifies the fix
      */
+
+    @LogMethod
     private void moveAssayFolderTest()
     {
         log("rename assay folder and verify source file still findable");
@@ -567,6 +570,8 @@ public class NabAssayTest extends AbstractQCAssayTestWD
     }
 
     private static String WIKIPAGE_NAME = "Nab API Wiki";
+
+    @LogMethod
     private void doNabApiTest()
     {
         PortalHelper portalHelper = new PortalHelper(this);
@@ -582,6 +587,7 @@ public class NabAssayTest extends AbstractQCAssayTestWD
 
         setSource("runNabAssayTest({renderTo : 'testDiv'})", false);
     }
+
 
     private void uploadFile(String filePath, String uniqueifier, String finalButton)
     {
@@ -774,6 +780,7 @@ public class NabAssayTest extends AbstractQCAssayTestWD
         return true;
     }
 
+    @LogMethod
     protected void runTransformTest()
     {
         // add the transform script to the assay
