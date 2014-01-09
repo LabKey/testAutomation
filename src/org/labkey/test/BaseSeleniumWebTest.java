@@ -6462,6 +6462,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
         while (getCompleteCount(statusValues) < completeJobsExpected && elapsedSeconds() < MAX_WAIT_SECONDS)
         {
+            log("[" + StringUtils.join(statusValues,",") + "]");
             if (!expectError && hasError(statusValues))
                 break;
             log("Waiting for " + description);

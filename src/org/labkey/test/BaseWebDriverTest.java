@@ -7234,6 +7234,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             {
                 log("Waiting for " + description);
                 List<String> statusValues = getPipelineStatusValues();
+                log("[" + StringUtils.join(statusValues,",") + "]");
                 if (!expectError)
                 {
                     assertElementNotPresent(Locator.linkWithText("ERROR"));
