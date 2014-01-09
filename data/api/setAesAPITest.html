@@ -48,12 +48,8 @@
                 geom: new LABKEY.vis.Geom.Boxplot({})
             })],
             aes: {
-                x: function(d){
-                    return d.ParticipantId.value
-                },
-                yLeft: function(d){
-                    return d.CD4.value;
-                }
+                x: function(d){return d.ParticipantId.value;},
+                yLeft: function(d){return d.CD4.value;}
             },
             scales: {
                 x: {scaleType: 'discrete'},
@@ -112,9 +108,7 @@
                 x: function(d){return d.CD4.value;},
                 yLeft: function(d){return d.Lymphocytes.value;},
                 hoverText: function(d){return "HOVER TEXT"},
-                pointClickFn: function(d){
-                    Ext4.MessageBox.alert('Click Handler', 'Look a click handler!');
-                }
+                pointClickFn: function(d){Ext4.MessageBox.alert('Click Handler', 'Look a click handler!');}
             },
             scales: {
                 x: {scaleType: 'continuous', trans: 'linear'},
@@ -124,9 +118,7 @@
         charts.push(scatterPlotWithHoverAndClick);
         aesthetics.push({idx: -1, aes: {
             hoverText: null,
-            pointClickFn: function(d){
-                Ext4.MessageBox.alert('New Click Handler', 'The click handler has changed!');
-            }
+            pointClickFn: function(d){Ext4.MessageBox.alert('New Click Handler', 'The click handler has changed!');}
         }});
 
         var lpData = [];
@@ -190,6 +182,32 @@
             color: 'name',
             y: function(d) {return Math.log(d.value);}
         }});
+
+        // Removes the shape aes, which in turn removes the legend. Test case for Issue 19351.
+        var scatterPlotWithHoverAndClick = new LABKEY.vis.Plot({
+            renderTo: 'testDiv',
+            rendererType: 'd3',
+            width: 900,
+            height: 500,
+            labels: {
+                main: {value: 'Scatter remove legend'}
+            },
+            data: data.rows,
+            layers: [new LABKEY.vis.Layer({
+                geom: new LABKEY.vis.Geom.Point({})
+            })],
+            aes: {
+                x: function(d){return d.CD4.value;},
+                yLeft: function(d){return d.Lymphocytes.value;},
+                shape: function(d){return d.ParticipantId.value}
+            },
+            scales: {
+                x: {scaleType: 'continuous', trans: 'linear'},
+                yLeft: {scaleType: 'continuous', trans: 'linear'}
+            }
+        });
+        charts.push(scatterPlotWithHoverAndClick);
+        aesthetics.push({idx: -1, aes: {shape: null}});
 
         // Render the first chart.
         charts[chartIdx].render();

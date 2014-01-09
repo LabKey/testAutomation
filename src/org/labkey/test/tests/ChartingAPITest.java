@@ -270,6 +270,9 @@ public class ChartingAPITest extends ClientAPITest
     protected static final String SCATTER_HOVER_CLICK = "Scatter with hover and click";
     protected static final String LINE_ERROR_COLOR_Y = "Line/Error - Add color, change Y";
     protected static final String LINE_ERROR_COLOR_Y_SVG = "0\n5\n10\n15\n20\n0\n10\n20\n30\n40\n50\n60\n70\n80\n90\n100\nLine/Error - Add color, change Y\nAlan\nTrey\nNick";
+    protected static final String SCATTER_REMOVE_LEGEND = "Scatter remove legend";
+    protected static final String SCATTER_REMOVE_LEGEND_SVG_BEFORE = "0\n200\n400\n600\n800\n1000\n1200\n1400\n800\n1000\n1200\n1400\n1600\n1800\n2000\nScatter remove legend\n103866\n110349\n119180\n125478";
+    protected static final String SCATTER_REMOVE_LEGEND_SVG_AFTER = "0\n200\n400\n600\n800\n1000\n1200\n1400\n800\n1000\n1200\n1400\n1600\n1800\n2000\nScatter remove legend";
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void setAesAPITest()
@@ -306,6 +309,12 @@ public class ChartingAPITest extends ClientAPITest
         click(setAesBtn);
         waitForText("Alan");
         assertSVG(LINE_ERROR_COLOR_Y_SVG);
+
+        click(nextBtn);
+        waitForText(SCATTER_REMOVE_LEGEND);
+        assertSVG(SCATTER_REMOVE_LEGEND_SVG_BEFORE);
+        click(setAesBtn);
+        assertSVG(SCATTER_REMOVE_LEGEND_SVG_AFTER);
     }
 
     private void checkExportedChart(String title, String svgText)
