@@ -157,6 +157,27 @@ public class StudyWDTest extends StudyBaseTestWD
         }
     }
 
+    /*
+     * verifyAliasReplacement inserts a new entry into the Quality Control Report dataset
+     * and verifies that the inserted Id was changed by the alias to its new value.
+     */
+    @LogMethod
+    private void verifyAliasReplacement()
+    {
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
+        waitAndClickAndWait(Locator.linkWithText("Quality Control Report"));
+        waitAndClickAndWait(Locator.linkWithText("View Data"));
+        // Add a new row to the dataset
+        waitAndClickAndWait(Locator.linkWithText("Insert New"));
+        setFormElement(Locator.name("quf_MouseId"), "888208905");
+        setFormElement(Locator.name("quf_SequenceNum"), "1");
+        setFormElement(Locator.name("quf_QCREP_ID"), "42");
+        waitAndClickAndWait(Locator.linkWithText("Submit"));
+        // verify that the row was inserted and that the alias was converted
+        assertTextPresent("999320016");
+    }
+
     @LogMethod
     private void verifyPermissionsRestrictions()
     {
@@ -633,6 +654,8 @@ public class StudyWDTest extends StudyBaseTestWD
         setFormElement(Locator.input("quf_Bad Name"), "Updatable Value11");
         clickButton("Submit");
         assertTextPresent("Updatable Value11");
+
+        verifyAliasReplacement();
     }
 
     private void verifyAlternateIDs()
