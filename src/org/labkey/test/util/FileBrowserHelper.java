@@ -118,9 +118,10 @@ public class FileBrowserHelper implements FileBrowserHelperParams
     public void expandFileBrowserRootNode()
     {
         waitForFileGridReady();
-        _test.waitAndClick(Locator.css("#treeNav-body tr[data-recordindex = '0']"));
-        _test.waitForElement(Locator.css("#treeNav-body tr.x4-grid-row-selected[data-recordindex = '0']"), WAIT_FOR_JAVASCRIPT);
-    }
+
+        _test.waitAndClick(Locator.css("div.treenav-panel div.x4-panel-body tr[data-recordindex = '0']"));
+        _test.waitForElement(Locator.css("div.treenav-panel div.x4-panel-body tr.x4-grid-row-selected[data-recordindex = '0']"), WAIT_FOR_JAVASCRIPT);
+  }
 
     @Override
     public void clickFileBrowserFileCheckbox(@LoggedParam String fileName)
