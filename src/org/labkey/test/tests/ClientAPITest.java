@@ -336,15 +336,13 @@ public class ClientAPITest extends BaseWebDriverTest
         // enter a new last name
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
-        if (prevActiveCellId.equals(activeCellId))
-            fail("Failed to advance to next edit field");
+        assertNotEquals("Failed to advance to next edit field", prevActiveCellId, activeCellId);
         setFormElement(Locator.id(activeCellId), "Abeson\t");
 
         // enter a new age
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
-        if (prevActiveCellId.equals(activeCellId))
-            fail("Failed to advance to next edit field");
+        assertNotEquals("Failed to advance to next edit field", prevActiveCellId, activeCellId);
         setFormElement(Locator.id(activeCellId), "51\t");
 
         waitUntilGridUpdateComplete();
@@ -354,64 +352,40 @@ public class ClientAPITest extends BaseWebDriverTest
         sleep(500);
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
-        if (prevActiveCellId.equals(activeCellId))
-            fail("Failed to advance to next edit field");
+        assertNotEquals("Failed to advance to next edit field", prevActiveCellId, activeCellId);
         setFormElement(Locator.id(activeCellId), "Billy\t");
 
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
-        if (prevActiveCellId.equals(activeCellId))
-            fail("Failed to advance to next edit field");
+        assertNotEquals("Failed to advance to next edit field", prevActiveCellId, activeCellId);
         setFormElement(Locator.id(activeCellId), "Billyson\t");
 
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
-        if (prevActiveCellId.equals(activeCellId))
-            fail("Failed to advance to next edit field");
+        assertNotEquals("Failed to advance to next edit field", prevActiveCellId, activeCellId);
         pressTab(Locator.id(activeCellId));
         sleep(500);
 
         // delete the row below Billy (which should contain Jane)
         click(Locator.id("delete-records-button"));
         click(Locator.xpath("//div[contains(@class, 'x-window-dlg')]//button[text()='Delete']"));
-
-        int limit = 30;
-        while (isTextPresent("Jane") && limit-- > 0)
-            sleep(1000);
-
-        assertTextPresent("Abeson", 1);
-        assertTextPresent("Billy", 2);
-        assertTextNotPresent("Billson");
-        assertTextNotPresent("Jane");
+        waitForTextToDisappear("Jane");
+        assertTextPresent("Abeson", "Billyson");
+        assertTextNotPresent("Billson", "Jane");
 
         //test paging
         click(Locator.xpath("//button[contains(@class, 'x-tbar-page-next')]"));
-
-        limit = 30;
-        while (!isTextPresent("Norbert") && limit-- > 0)
-            sleep(1000);
-
-        assertTextPresent("Norbert");
-        assertTextPresent("Penny");
-        assertTextPresent("Yak");
+        waitForText("Norbert");
+        assertTextPresent("Norbert", "Penny", "Yak");
 
         click(Locator.xpath("//button[contains(@class, 'x-tbar-page-prev')]"));
-        limit = 30;
-        while (!isTextPresent("Abe") && limit-- > 0)
-            sleep(1000);
-
-        assertTextPresent("Abeson");
-        assertTextPresent("Billyson");
-        assertTextPresent("Johnson");
+        waitForText("Abe");
+        assertTextPresent("Abeson", "Billyson", "Johnson");
 
         //test sorting
         click(Locator.xpath("//div[contains(@class, 'x-grid3-hd-2')]"));
-        limit = 30;
-        while (!isTextPresent("Yak") && limit-- > 0)
-            sleep(1000);
-
-        assertTextBefore("Yakson", "Pennyson");
-        assertTextBefore("Pennyson", "Norbertson");
+        waitForText("Yak");
+        assertTextPresentInThisOrder("Yakson", "Pennyson", "Norbertson");
     }
 
     private String getActiveEditorId()
