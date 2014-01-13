@@ -153,7 +153,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTestWD
         _ext4Helper.selectComboBoxItem("Alias Column", ALIAS_COLUMN);
         _ext4Helper.selectComboBoxItem("Source Column", SOURCE_COLUMN);
         clickButton("Save Changes", 0);
-        assertTextPresent("alias settings saved successfully");
+        waitForText(SUBJECT_NOUN + " alias settings saved successfully");
         clickButton("OK", 0);
 
         clickButton("Done", "Manage Study");
