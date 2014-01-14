@@ -142,10 +142,10 @@
                 })],
             aes: {
                 x: function(d){
-                    return d.day
+                    return d.day;
                 },
                 group: function(d) {
-                    return d.name
+                    return d.name;
                 },
                 yLeft: function(d){
                     return d.value;
@@ -161,7 +161,7 @@
         });
         charts.push(lineErrorPlot);
         aesthetics.push({idx: 0, aes: {
-            color: 'name',
+            pathColor: 'name',
             y: function(d) {return Math.log(d.value);}
         }});
 
