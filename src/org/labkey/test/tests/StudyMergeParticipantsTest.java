@@ -28,6 +28,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTestWD
     private static final String PTID_WITH_ALIAS = "249318596";
     private static final String PTID_NO_ALIAS = "249320107";
     private static final String PTID_NEW_1 = "xyz987";
+    private static final String PTID_NEW_2 = "249325717";
 
     private static final String ALIAS_SOURCE_1 = "a";
     private static final String ALIAS_SOURCE_2 = "b";
@@ -104,7 +105,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTestWD
         goToMergeParticipants();
         click(CREATE_ALIAS_CB);
         setFormElement(OLD_ID_FIELD, PTID_NO_ALIAS);
-        setFormElement(NEW_ID_FIELD, PTID_NEW_1);
+        setFormElement(NEW_ID_FIELD, PTID_NEW_2);
         clickButton("Preview", 0);
         waitForElement(Locator.tag("span").containing("Preview Complete"));
         assertElementNotPresent(Locator.linkContainingText(PTID_NO_ALIAS + " has existing aliases"));
@@ -113,7 +114,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTestWD
         waitForElement(Locator.tag("span").containing("You must choose"));
 
         log("Check url's to are correctly constructed");
-        final String url = getContextPath() + "/study/" + EscapeUtil.encode(PROJECT_NAME) + "/" + EscapeUtil.encode(FOLDER_NAME) + "/dataset.view?datasetId=5018&Dataset.ParticipantId~in=" + PTID_NO_ALIAS + "%3B" + PTID_NEW_1;
+        final String url = getContextPath() + "/study/" + EscapeUtil.encode(PROJECT_NAME) + "/" + EscapeUtil.encode(FOLDER_NAME) + "/dataset.view?datasetId=5018&Dataset.ParticipantId~in=" + PTID_NO_ALIAS + "%3B" + PTID_NEW_2;
         assertElementPresent(Locator.linkWithHref(url));
 
         log("Resolve conflicts and check for correct row retention");
@@ -122,9 +123,9 @@ public class StudyMergeParticipantsTest extends StudyBaseTestWD
         clickButton("Merge", 0);
         waitForElement(Locator.tag("span").containing("Successfully merged"), MERGE_SUCCESS_TIMEOUT);
         clickTab(SUBJECT_NOUN_PLURAL);
-        waitAndClick(Locator.linkWithText(PTID_NEW_1));
+        waitAndClick(Locator.linkWithText(PTID_NEW_2));
         waitForElement(Locator.tag("th").containing("5008: Demographics"));
-        assertElementPresent(Locator.tag("td").containing("Start Date").append("/following-sibling::td['2008-05-17']")); //value from oldId demographic row
+        assertElementPresent(Locator.tag("td").containing("Start Date").append("/following-sibling::td['2008-04-27']")); //value from oldId demographic row
         assertElementPresent(Locator.tag("td").containing("Genetic Consent").append("/following-sibling::td['false']")); //value from newId consent row
     }
 
