@@ -2787,6 +2787,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         return text;
 	}
 
+    public String cancelAlert()
+    {
+        Alert alert = getDriver().switchTo().alert();
+        String text = alert.getText();
+        alert.dismiss();
+        return text;
+    }
+
     public void assertExtMsgBox(String title, String text)
     {
         String actual = _extHelper.getExtMsgBoxText(title);
@@ -3922,15 +3930,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void waitForElementWithRefresh(Locator loc, int wait)
     {
-        for(int i=0; i<wait; i+=1000)
+        long startTime = System.currentTimeMillis();
+
+        do
         {
-            if(isElementPresent(loc))
+            if(waitForElement(loc, 1000, false))
                 return;
-            else
-                sleep(500);
             refresh();
-        }
-        throw new NoSuchElementException("Element did not appear: " + loc.getLoggableDescription());
+        }while(System.currentTimeMillis() - startTime < wait);
+
+        waitForElement(loc, 1000);
     }
 
     public void waitForElement(final Locator locator, int wait)

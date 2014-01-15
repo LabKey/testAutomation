@@ -78,7 +78,7 @@ public class Ext4HelperWD extends AbstractHelperWD
 
         WebElement element = listItem.waitForElement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
-        if (!elementAlreadySelected)
+        if (!isOpenComboBoxMultiSelect() || !elementAlreadySelected)
         {
             _test.scrollIntoView(element); // Workaround: Auto-scrolling in chrome isn't working well
             _test.click(listItem);
@@ -90,11 +90,16 @@ public class Ext4HelperWD extends AbstractHelperWD
         Locator arrowTrigger = comboBox.append("//div[contains(@class,'arrow')]");
 
         // close combo manually if it is a multi-select combo-box
-        if (_test.isElementPresent(Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().append("/span").withClass("x4-combo-checker")))
+        if (isOpenComboBoxMultiSelect())
             _test.click(arrowTrigger);
 
         // menu should disappear
         _test.shortWait().until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".x4-boundlist-item")));
+    }
+
+    private boolean isOpenComboBoxMultiSelect()
+    {
+        return _test.isElementPresent(Locator.xpath("//*[contains(@class, 'x4-boundlist-item')]").notHidden().append("/span").withClass("x4-combo-checker"));
     }
 
     @LogMethod(quiet = true)
@@ -192,6 +197,11 @@ public class Ext4HelperWD extends AbstractHelperWD
     public boolean isChecked(String label)
     {
         Locator.XPathLocator checkbox = Locators.checkbox(_test, label);
+        return isChecked(checkbox);
+    }
+
+    public boolean isChecked(Locator.XPathLocator checkbox)
+    {
         _test.assertElementPresent(checkbox);
         Locator l = checkbox.append("[./ancestor-or-self::*[contains(@class, 'checked')]]");
         return _test.isElementPresent(l);
@@ -217,7 +227,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     public void checkGridRowCheckbox(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
-        if (!isChecked(rowLoc))
+        if (!isGridRowChecked(rowLoc))
             _test.click(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
     }
 
@@ -241,7 +251,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     public void uncheckGridRowCheckbox(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
-        if (isChecked(rowLoc))
+        if (isGridRowChecked(rowLoc))
             _test.click(rowLoc.append("//div[contains(@class, 'x4-grid-row-checker')]"));
     }
 
@@ -306,7 +316,7 @@ public class Ext4HelperWD extends AbstractHelperWD
      * @param rowLoc Locator provided by {@link #getGridRow(String, int)}
      * @return true if the specified row has a checked checkbox
      */
-    private boolean isChecked(Locator.XPathLocator rowLoc)
+    private boolean isGridRowChecked(Locator.XPathLocator rowLoc)
     {
         _test.assertElementPresent(rowLoc);
         return _test.isElementPresent(rowLoc.append("[contains(@class, 'x4-grid-row-selected')]"));
@@ -318,11 +328,10 @@ public class Ext4HelperWD extends AbstractHelperWD
      * @param index 0-based index of rows with matching cellText
      * @return true if the specified row has a checked checkbox
      */
-    public boolean isChecked(String cellText, int index)
+    public boolean isGridRowChecked(String cellText, int index)
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
-        _test.assertElementPresent(rowLoc);
-        return _test.isElementPresent(rowLoc.append("[contains(@class, 'x4-grid-row-selected')]"));
+        return isGridRowChecked(rowLoc);
     }
 
     public <Type extends Ext4CmpRefWD> List<Type> componentQuery(String componentSelector, Class<Type> clazz)

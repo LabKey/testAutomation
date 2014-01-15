@@ -2124,7 +2124,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     }
 
     public enum SeleniumEvent
-    {blur,change,mousedown,mouseup,click,reset,select,submit,abort,error,load,mouseout,mouseover,unload,keyup}
+    {blur,change,mousedown,mouseup,click,reset,select,submit,abort,error,load,mouseout,mouseover,unload,keyup,focus}
 
     public void fireEvent(Locator loc, SeleniumEvent event)
     {
