@@ -152,7 +152,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
 
         // add the specimen configurations to the manage page
         clickAndWait(Locator.linkWithText("Overview"));
-        clickAndWait(Locator.linkWithText("Manage Assay Schedule"));
+        clickAndWait(Locator.linkWithText("Edit"));
         addSpecimenConfiguration("PCR", "R", locationId, "CEF-R Cryovial", false);
         addSpecimenConfiguration("PCR", "R", locationId, "UPR Micro Tube", true);
         addSpecimenConfiguration("RNA", "R", locationId, "TGE Cryovial", true);
