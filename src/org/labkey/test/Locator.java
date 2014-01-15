@@ -25,6 +25,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -417,7 +418,7 @@ public abstract class Locator
 
     public static XPathLocator menuItem(String text)
     {
-        return xpath("//a/span["+ NOT_HIDDEN +" and text() = " + xq(text) + " and contains(@class, 'menu-item-text')]");
+        return xpath("//a/span[" + NOT_HIDDEN + " and text() = " + xq(text) + " and contains(@class, 'menu-item-text')]");
     }
 
     public static XPathLocator menuBarItem(String text)
@@ -536,30 +537,15 @@ public abstract class Locator
         return xpath("//span[contains(@class, 'labkey-link') and contains(text(), " + xq(linkText) + ")]");
     }
 
-    /**
-     *
-     * @param label
-     * @param labelColumn Column of label. NOTE: Use java-style 0-based indexes rather than xpath style 1-based
-     * @param elementType element to find. Usually, input, select
-     * @param elementColumn Column of element. NOTE: Use java-style 0-based indexes rather than xpath style 1-based
-     * @return
-     */
-    public static XPathLocator elementByLabel(String label, int labelColumn, String elementType, int elementColumn)
+    public static XPathLocator gwtTextBoxByLabel(String label)
     {
-        //TODO: Escape Label. What is XPATH escaping?
-        return xpath("//td[" + (labelColumn + 1) + " and contains(text(), " + xq(label) + ")]/../td[" + (elementColumn + 1) + "]/" + elementType);
+        return Locator.tagWithClass("input", "gwt-TextBox").withPredicate(Locator.xpath("../preceding-sibling::td").withText(label));
     }
 
-    public static XPathLocator inputByLabel(String label, int inputColumn)
+    public static XPathLocator gwtListBoxByLabel(String label)
     {
-        return elementByLabel(label, inputColumn - 1, "input", inputColumn);
+        return Locator.tagWithClass("select", "gwt-ListBox").withPredicate(Locator.xpath("../preceding-sibling::td").withText(label));
     }
-
-    public static XPathLocator permissionSelect(String group)
-    {
-        return elementByLabel(group, 0, "select", 1);
-    }
-
 
     public static XPathLocator permissionRendered()
     {
@@ -614,12 +600,25 @@ public abstract class Locator
 
     public static XPathLocator paginationText(int firstRow, int lastRow, int maxRows)
     {
-        return paginationText(
-                (firstRow > (lastRow - firstRow) ? "\u00AB First " : "") +
-                (firstRow > 1 ? "\u2039 Prev " : "") +
-                firstRow + " - " + lastRow + " of " + maxRows +
-                (maxRows > lastRow ? " Next \u203A" : "") +
-                (((maxRows - lastRow)) > (lastRow - firstRow) ? " Last \u00BB" : ""));
+        DecimalFormat numFormat = new DecimalFormat("#,###");
+
+        int rowsPerPage = lastRow - firstRow + 1;
+        int pageCount = (int)Math.ceil(maxRows / rowsPerPage);
+        int currentPage = (int)Math.ceil(lastRow / rowsPerPage);
+
+        boolean hasFirstLink = currentPage > 2;
+        boolean hasPrevLink = currentPage > 1;
+        boolean hasNextLink = currentPage < pageCount;
+        boolean hasLastLink = currentPage < pageCount - 1;
+
+        StringBuilder paginationText = new StringBuilder();
+        if (hasFirstLink) paginationText.append("\u00AB First ");
+        if (hasPrevLink) paginationText.append("\u2039 Prev ");
+        paginationText.append(String.format("%s - %s of %s", numFormat.format(firstRow), numFormat.format(lastRow), numFormat.format(maxRows)));
+        if (hasNextLink) paginationText.append(" Next \u203A");
+        if (hasLastLink) paginationText.append(" Last \u00BB");
+
+        return paginationText().withText(paginationText.toString());
     }
 
     /**
@@ -632,9 +631,9 @@ public abstract class Locator
         return paginationText(1, rowCount, rowCount);
     }
 
-    public static XPathLocator paginationText(String text)
+    public static XPathLocator paginationText()
     {
-        return Locator.xpath("//div[contains(@class, 'labkey-pagination')]").withText(text);
+        return Locator.xpath("//div[contains(@class, 'labkey-pagination')]");
     }
 
     public static XPathLocator pageHeader(String headerText)
@@ -726,6 +725,23 @@ public abstract class Locator
         public XPathLocator child(String str)
         {
             return new XPathLocator("(" + getPath() + ")/" + str);
+        }
+
+        public XPathLocator child(XPathLocator childLocator)
+        {
+            return this.child(stripLeadingSlashes(childLocator.getPath()));
+        }
+
+        private String stripLeadingSlashes(String xpath)
+        {
+            String strippedXPath = xpath;
+
+            while(strippedXPath.startsWith("/"))
+            {
+                strippedXPath = strippedXPath.substring(1);
+            }
+
+            return strippedXPath;
         }
 
         public XPathLocator append(String clause)

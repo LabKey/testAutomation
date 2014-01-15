@@ -55,11 +55,11 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
 
         waitForTextToDisappear("Loading", WAIT_FOR_JAVASCRIPT);        
 
-        waitForElement(Locator.inputByLabel("Protocol Name", 1), defaultWaitForPage);
-        setFormElement(Locator.inputByLabel("Protocol Name", 1), STUDY_FOLDER);
-        setFormElement(Locator.inputByLabel("Investigator", 3), "My Investigator");
-        setFormElement(Locator.inputByLabel("Grant", 1), "My Grant");
-        setFormElement(Locator.inputByLabel("Species", 3), "Rabbit");
+        waitForElement(Locator.gwtTextBoxByLabel("Protocol Name"), defaultWaitForPage);
+        setFormElement(Locator.gwtTextBoxByLabel("Protocol Name"), STUDY_FOLDER);
+        setFormElement(Locator.gwtTextBoxByLabel("Investigator"), "My Investigator");
+        setFormElement(Locator.gwtTextBoxByLabel("Grant"), "My Grant");
+        setFormElement(Locator.gwtTextBoxByLabel("Species"), "Rabbit");
         selenium.fireEvent(Locator.xpath("//div[contains(text(), 'Click to edit description')]/..").toString(), "focus");
         setFormElement("protocolDescription", "This is a very important protocol");
 
