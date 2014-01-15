@@ -23,6 +23,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.WebElement;
 
@@ -146,6 +147,7 @@ public class PortalTest extends BaseWebDriverMultipleTest
         assertWebparts(microarrayRequiredWebparts, currentPreferredWebparts);
     }
 
+    @LogMethod
     public void assertWebparts(List<String> requiredWebparts, List<String> preferredWebparts)
     {
         log(requiredWebparts.size() > 0 ? "Assert that required webparts can't be deleted" : "No required webparts");
@@ -164,7 +166,7 @@ public class PortalTest extends BaseWebDriverMultipleTest
                 assertElementPresent(Locator.xpath("//tr[th[@title='" + webpartTitle + "']]").withPredicate("not(.//a/img[@title='Remove From Page'])"));
         }
 
-        log(requiredWebparts.size() > 0 ? "Assert that preferred webparts can't be deleted" : "No preferred webparts");
+        log(preferredWebparts.size() > 0 ? "Assert that preferred webparts can't be deleted" : "No preferred webparts");
         for (String webpartTitle : preferredWebparts)
         {
             log("Check preferred webpart: " + webpartTitle);

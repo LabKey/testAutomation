@@ -204,6 +204,7 @@ public class PortalHelper extends AbstractHelper
             _test.click(removeButton);
         }
         _test.waitForElementToDisappear(Locators.webPartTitle(webPartTitle).index(startCount), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElementToDisappear(Locator.css("div.x4-form-display-field").withText("Saving..."));
     }
 
     public void addQueryWebPart(@LoggedParam String schemaName)
