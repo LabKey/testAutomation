@@ -17,14 +17,17 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Study;
+import org.labkey.test.pages.VaccineProtocolDesigner;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
+import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
@@ -34,13 +37,15 @@ import static org.junit.Assert.*;
  * Time: 5:40:36 PM
  */
 @Category({DailyA.class, Study.class})
-public class VaccineProtocolTest extends BaseSeleniumWebTest
+public class VaccineProtocolTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "ProtocolVerifyProject";
     protected static final String FOLDER_NAME = "My Folder";
     protected static final String TEST_RUN1 = "FirstRun";
     private static final String STUDY_FOLDER = "VaccineStudy";
     private static final String LIST_NAME = "List1";
+
+    private final PortalHelper portalHelper = new PortalHelper(this);
 
     protected void doTestSteps()
     {
@@ -50,114 +55,82 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         populateStudyDesignLookups();
 
         clickFolder(FOLDER_NAME);
-        addWebPart("Vaccine Study Protocols");
+        portalHelper.addWebPart("Vaccine Study Protocols");
         clickButton("New Protocol");
 
-        waitForTextToDisappear("Loading", WAIT_FOR_JAVASCRIPT);        
+        VaccineProtocolDesigner designer = new VaccineProtocolDesigner(this);
 
-        waitForElement(Locator.gwtTextBoxByLabel("Protocol Name"), defaultWaitForPage);
-        setFormElement(Locator.gwtTextBoxByLabel("Protocol Name"), STUDY_FOLDER);
-        setFormElement(Locator.gwtTextBoxByLabel("Investigator"), "My Investigator");
-        setFormElement(Locator.gwtTextBoxByLabel("Grant"), "My Grant");
-        setFormElement(Locator.gwtTextBoxByLabel("Species"), "Rabbit");
-        selenium.fireEvent(Locator.xpath("//div[contains(text(), 'Click to edit description')]/..").toString(), "focus");
-        setFormElement("protocolDescription", "This is a very important protocol");
+        designer.setName(STUDY_FOLDER);
+        designer.setInvestigator("My Investigator");
+        designer.setGrant("My Grant");
+        designer.setSpecies("Rabbit");
+        designer.setDescription("This is a very important protocol");
 
-        clickButton("Finished");
+        designer.finishEditing();
         waitForText("No assays have been scheduled.");
-        clickButton("Edit");
-        waitForText("Enter vaccine information in the grids below.");
+        designer.editDesign();
 
         // set the initial study design information to match the previous defaults, prior to 13.3 changes to remove all default values
-        setText("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[2]/input", "Cp1");
-        selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[3]/select", "label=Canarypox");
-        setText("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[4]/input", "1.5e10 Ad vg");
-        selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[5]/select", "label=Intramuscular (IM)");
-        setText("//table[@id='ImmunogenGrid']/tbody/tr[3]/td[2]/input", "gp120");
-        selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[3]/td[3]/select", "label=Subunit Protein");
-        setText("//table[@id='ImmunogenGrid']/tbody/tr[3]/td[4]/input", "1.6e8 Ad vg");
-        selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[3]/td[5]/select", "label=Intramuscular (IM)");
-        setText("//table[@id='AdjuvantGrid']/tbody/tr[2]/td[2]/input", "Adjuvant1");
-        setText("//table[@id='AdjuvantGrid']/tbody/tr[3]/td[2]/input", "Adjuvant2");
-        addGroup("Vaccine");
-        setText("//table[@id='ImmunizationGrid']/tbody/tr[3]/td[3]/input", "30");
-        addGroup("Placebo");
-        setText("//table[@id='ImmunizationGrid']/tbody/tr[4]/td[3]/input", "30");
-        selenium.click("//table[@id='ImmunizationGrid']//div[contains(text(), 'Add Timepoint')]");
-        selenium.type("timepointCount", "0");
-        click(Locator.tagWithText("button", "OK"));
-        selenium.click("//table[@id='ImmunizationGrid']//div[contains(text(), 'Add Timepoint')]");
-        selenium.type("timepointCount", "28");
-        click(Locator.tagWithText("button", "OK"));
-        selenium.click("//div[contains(text(), '(none)')]");
-        selenium.click("//label[text()='Cp1']/../input");
-        selenium.click("//label[text()='Adjuvant1']/../input");
-        click(Locator.tagWithText("button", "Done"));
-        selenium.click("//div[contains(text(), '(none)')]");
-        selenium.click("//label[text()='gp120']/../input");
-        selenium.click("//label[text()='Adjuvant1']/../input");
-        click(Locator.tagWithText("button", "Done"));
-        selenium.click("//div[contains(text(), '(none)')]");
-        selenium.click("//label[text()='Adjuvant1']/../input");
-        click(Locator.tagWithText("button", "Done"));
-        selenium.click("//div[contains(text(), '(none)')]");
-        selenium.click("//label[text()='Adjuvant1']/../input");
-        click(Locator.tagWithText("button", "Done"));
-        selenium.select("//table[@id='AssayGrid']/tbody/tr[3]/td[2]/select", "label=ELISPOT");
-        selenium.select("//table[@id='AssayGrid']/tbody/tr[3]/td[3]/select", "label=Schmitz");
-        selenium.select("//table[@id='AssayGrid']/tbody/tr[4]/td[2]/select", "label=Neutralizing Antibodies Panel 1");
-        selenium.select("//table[@id='AssayGrid']/tbody/tr[4]/td[3]/select", "label=Montefiori");
-        selenium.select("//table[@id='AssayGrid']/tbody/tr[5]/td[2]/select", "label=ICS");
-        selenium.select("//table[@id='AssayGrid']/tbody/tr[5]/td[3]/select", "label=McElrath");
-        selenium.select("//table[@id='AssayGrid']/tbody/tr[6]/td[2]/select", "label=ELISA");
-        selenium.select("//table[@id='AssayGrid']/tbody/tr[6]/td[3]/select", "label=Lab 1");
+        designer.addImmunogen("Cp1", "Canarypox", "1.5e10 Ad vg", "Intramuscular (IM)");
+        designer.addImmunogen("gp120", "Subunit Protein", "1.6e8 Ad vg", "Intramuscular (IM)");
+
+        designer.addAdjuvant("Adjuvant1", null, null);
+        designer.addAdjuvant("Adjuvant2", null, null);
+        designer.addImmunizationGroup("Vaccine", "30");
+        designer.addImmunizationGroup("Placebo", "30");
+
+        designer.addImmunizationTimepoint("0");
+        designer.addImmunizationTimepoint("28");
+
+        designer.defineFirstUndefinedImmunization(Arrays.asList("Cp1", "Adjuvant1"));
+        designer.defineFirstUndefinedImmunization(Arrays.asList("gp120", "Adjuvant1"));
+        designer.defineFirstUndefinedImmunization(Arrays.asList("Adjuvant1"));
+        designer.defineFirstUndefinedImmunization(Arrays.asList("Adjuvant1"));
+
+        designer.addAssay("ELISPOT", "Schmitz");
+        designer.addAssay("Neutralizing Antibodies Panel 1", "Montefiori");
+        designer.addAssay("ICS", "McElrath");
+        designer.addAssay("ELISA", "Lab 1");
 
         // change study design information to test GWT UI components
-        setText("//table[@id='ImmunogenGrid']/tbody/tr[2]/td[2]/input", "Immunogen1");
+        designer.setImmunogenName(1, "Immunogen1");
         assertTextPresent("Immunogen1|Adjuvant1"); //Make sure that Immunization schedule updated
-        setText("//table[@id='ImmunogenGrid']/tbody/tr[4]/td[2]/input", "Immunogen3");
-        selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[4]/td[3]/select", "label=Fowlpox");
-        setText("//table[@id='ImmunogenGrid']/tbody/tr[4]/td[4]/input", "1.9e8 Ad vg");
-        selenium.select("//table[@id='ImmunogenGrid']/tbody/tr[4]/td[5]/select", "label=Intramuscular (IM)");
 
-        selenium.select("//table[@id='AntigenGrid3']/tbody/tr[2]/td[3]/select", "label=Clade C");
-        selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[3]/td[3]/input", "1");
-        selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[4]/td[3]/input", "2");
-        addGroup("Vaccine2");
-        selenium.type("//table[@id='ImmunizationGrid']/tbody/tr[5]/td[3]/input", "3");
-        selenium.click("//div[contains(text(), '(none)')]");
-        selenium.click("//label[text()='Immunogen3']/../input");
-        selenium.click("//label[text()='Adjuvant1']/../input");
-        click(Locator.tagWithText("button", "Done"));
-        selenium.click("//div[contains(text(), '(none)')]");
-        selenium.click("//label[text()='Immunogen3']/../input");
-        click(Locator.tagWithText("button", "Done"));
-        selenium.click("//table[@id='AssayGrid']//div[contains(text(), 'Add Timepoint')]");
-        selenium.type("timepointName", "Pre-immunization");
-        click(Locator.tagWithText("button", "OK"));
-        selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/../..//input");
-        clickButton("Finished");
+        designer.addImmunogen("Immunogen3", "Fowlpox", "1.9e8 Ad vg", "Intramuscular (IM)");
 
-        waitForText("This is a very important protocol",WAIT_FOR_JAVASCRIPT);
+        selectOptionByText(Locator.xpath("//table[@id='AntigenGrid3']/tbody/tr[2]/td[3]/select"), "Clade C");
 
-        assertTextPresent("Immunogen3");
-        assertTextPresent("Fowlpox");
-        assertTextPresent("Immunogen3|Adjuvant1");
-        assertTextPresent("Pre-immunization");
+        designer.setImmunizationGroupCount(1, "1");
+        designer.setImmunizationGroupCount(2, "2");
 
-        clickButton("Edit");
-        waitForText("This is a very important protocol",WAIT_FOR_JAVASCRIPT);
+        designer.addImmunizationGroup("Vaccine2", "3");
 
-		selenium.click("//table[@id='AssayGrid']//div[contains(text(), 'Add Timepoint')]");
-		selenium.type("timepointCount", "8");
-        click(Locator.tagWithText("button", "OK"));
-        selenium.click("//td/div[text()='Neutralizing Antibodies Panel 1']/ancestor::tr/td[5]//input");
-        clickButton("Finished");
+        designer.defineFirstUndefinedImmunization(Arrays.asList("Immunogen3", "Adjuvant1"));
+        designer.defineFirstUndefinedImmunization(Arrays.asList("Immunogen3"));
 
-        waitForText("This is a very important protocol",WAIT_FOR_JAVASCRIPT);
+        designer.addAssayTimepoint("Pre-immunization", "0", null);
+
+        designer.setAssayRequiredForTimepoint("Neutralizing Antibodies Panel 1", "Pre-immunization");
+
+        designer.finishEditing();
+
+        waitForText("This is a very important protocol", WAIT_FOR_JAVASCRIPT);
+
+        assertTextPresent("Immunogen3", "Fowlpox", "Immunogen3|Adjuvant1", "Pre-immunization");
+
+        designer.editDesign();
+
+        waitForText("This is a very important protocol", WAIT_FOR_JAVASCRIPT);
+
+        designer.addAssayTimepoint(null, "8", null);
+        designer.setAssayRequiredForTimepoint("Neutralizing Antibodies Panel 1", "8 days");
+
+        designer.finishEditing();
+
+        waitForText("This is a very important protocol", WAIT_FOR_JAVASCRIPT);
 
         clickButton("Create Study Folder");
-        setFormElement("beginDate", "2007-01-01");
+        setFormElement(Locator.name("beginDate"), "2007-01-01");
         clickButton("Next");
         String cohorts = "SubjectId\tCohort\tStartDate\n" +
                 "V1\tVaccine\t2007-01-01\n" +
@@ -167,7 +140,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
                 "V3\tVaccine2\t2007-11-01\n" +
                 "V4\tVaccine2\t2007-11-01";
 
-        setFormElement("participantTSV", cohorts);
+        setFormElement(Locator.name("participantTSV"), cohorts);
         clickButton("Next");
         String specimens = "Vial Id\tSample Id\tDate\tTimepoint Number\tVolume\tUnits\tSpecimen Type\tderivative_type\tAdditive Type\tSubject Id\n" +
  "V1-0\tV1-0\t2007-01-01\t1.0000\t\t\tBlood\tSerum\t\tV1\n" +
@@ -182,8 +155,8 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
  "V2-8\tV2-8\t2007-11-09\t2.0000\t\t\tBlood\tSerum\t\tV2\n" +
  "V3-8\tV3-8\t2007-11-09\t2.0000\t\t\tBlood\tSerum\t\tV3\n" +
  "V4-8\tV4-8\t2007-11-09\t2.0000\t\t\tBlood\tSerum\t\tV4";
-        setFormElement("specimenTSV", specimens);
-		clickButton("Next");
+        setFormElement(Locator.name("specimenTSV"), specimens);
+        clickButton("Next");
         clickButton("Finish");
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
@@ -191,7 +164,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         checkCheckbox(Locator.checkboxByTitle("Query"));
         clickButton("Update Folder");
 
-        addWebPart("Lists");
+        portalHelper.addWebPart("Lists");
         clickAndWait(Locator.linkWithText("manage lists"));
 
         ListHelper.ListColumn valueColumn = new ListHelper.ListColumn("Value", "Value", ListHelper.ListColumnType.String, "Vaccine Value");
@@ -200,23 +173,23 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
 
         clickAndWait(Locator.linkWithText(LIST_NAME));
         clickButton("Insert New");
-		selenium.type("quf_Key", "1");
-		selenium.type("quf_Value", "One");
+        setFormElement(Locator.name("quf_Key"), "1");
+        setFormElement(Locator.name("quf_Value"), "One");
         submit();
 
-		clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
+        clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
         setupPipeline(PROJECT_NAME);
         defineAssay(PROJECT_NAME);
         uploadRun();
 
         clickAndWait(Locator.linkContainingText(TEST_RUN1));
-        selenium.click(".toggle");
+        click(Locator.name(".toggle"));
         clickButton("Copy to Study");
         clickButton("Next");
         clickButton("Copy to Study");
         clickAndWait(Locator.linkContainingText(STUDY_FOLDER + " Study"));
 
-        addWebPart("Datasets");
+        portalHelper.addWebPart("Datasets");
         clickAndWait(Locator.linkWithText("TestAssay1"));
         assertTextPresent("P1");
         assertTextPresent("V3");
@@ -251,7 +224,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("Create New Dataset"));
-        setFormElement("typeName", "Simple");
+        setFormElement(Locator.name("typeName"), "Simple");
         clickButton("Next");
         waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
         _listHelper.setColumnName(0, "Value");
@@ -271,7 +244,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         assertTextPresent("Day 320");
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Timepoints"));
-        setFormElement("startDate", "2007-11-01");
+        setFormElement(Locator.name("startDate"), "2007-11-01");
         submit();
         clickAndWait(Locator.linkWithText(STUDY_FOLDER + " Study"));
         clickAndWait(Locator.linkWithText("Study Navigator"));
@@ -285,15 +258,6 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText("Study Navigator"));
         //Make sure our guy picked up the his personal start date
         assertTextPresent("Day 10");
-    }
-
-    private void addGroup(String name)
-    {
-        click(Locator.xpath("//div[text() = 'Add New']"));
-        waitForElement(Locator.id("DefineGroupDialog"));
-        setFormElement("newName", name);
-        clickButton("OK", 0);
-        waitForElementToDisappear(Locator.id("DefineGroupDialog"), WAIT_FOR_JAVASCRIPT);
     }
 
     protected static final String TEST_ASSAY = "TestAssay1";
@@ -314,7 +278,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
     {
         log("Setting up data pipeline for project " + project);
         clickProject(project);
-        addWebPart("Data Pipeline");
+        portalHelper.addWebPart("Data Pipeline");
         clickButton("Setup");
         File dir = getTestTempDir();
         dir.mkdirs();
@@ -325,11 +289,6 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         assertTextPresent("The pipeline root was set to '" + dir.getAbsolutePath() + "'");
     } //setupPipeline
 
-
-    public boolean isFileUploadTest()
-    {
-        return true;
-    }
     /**
      * Defines an test assay at the project level for the security-related tests
      */
@@ -339,7 +298,7 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         //define a new assay at the project level
         //the pipeline must already be setup
         clickProject(projectName);
-        addWebPart("Assay List");
+        portalHelper.addWebPart("Assay List");
 
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/studyextra/TestAssay1.xar", 1, "TestAssay1.xar");
         goToProjectHome();
@@ -374,41 +333,25 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
 
         clickButton("Import Data");
-        selenium.select("//select[@name='targetStudy']", getTargetStudyOptionText(PROJECT_NAME, FOLDER_NAME, STUDY_FOLDER));
+        selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), getTargetStudyOptionText(PROJECT_NAME, FOLDER_NAME, STUDY_FOLDER));
         click(Locator.radioButtonByNameAndValue("participantVisitResolver", "SampleInfo"));
         clickButton("Next");
 
 
         log("Run properties and data");
-        selenium.type("name", TEST_RUN1);
-		selenium.type("comments", TEST_RUN1_COMMENTS);
-        selenium.click("//input[@value='textAreaDataProvider']");
-        selenium.type("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
+        setFormElement(Locator.name("name"), TEST_RUN1);
+        setFormElement(Locator.name("comments"), TEST_RUN1_COMMENTS);
+        click(Locator.xpath("//input[@value='textAreaDataProvider']"));
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA1);
         clickButton("Save and Finish");
         // reenable the following lines when we've moved to strict type checking of the incoming file.  For now, we're
         // flexible and only error if required columns are missing.
     }
 
-    protected void doCleanup(boolean afterTest) throws TestTimeoutException
-    {
-        deleteProject(getProjectName(), afterTest);
-    }
-
-    public String getAssociatedModuleDirectory()
-    {
-        return "server/modules/study";
-    }
-
-    @Override
-    protected String getProjectName()
-    {
-        return PROJECT_NAME;
-    }
-
     private void populateStudyDesignLookups()
     {
         goToProjectHome();
-        addWebPart("Vaccine Study Protocols");
+        portalHelper.addWebPart("Vaccine Study Protocols");
 
         goToAssayConfigureLookupValues(0); // index 0 = Immunogen Types
         for (String immunogenType : new String[]{"Canarypox", "Fowlpox", "Subunit Protein"})
@@ -452,11 +395,25 @@ public class VaccineProtocolTest extends BaseSeleniumWebTest
         clickButton("Submit");
     }
 
-    private void goToQuery(String queryName)
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        goToSchemaBrowser();
-        selectQuery("study", queryName);
-        waitForText("view data");
-        clickAndWait(Locator.linkContainingText("view data"));
+        deleteProject(getProjectName(), afterTest);
+    }
+
+    public String getAssociatedModuleDirectory()
+    {
+        return "server/modules/study";
+    }
+
+    @Override
+    protected String getProjectName()
+    {
+        return PROJECT_NAME;
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

@@ -5157,10 +5157,21 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         WebElement el = l.findElement(getDriver());
 
-        if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
+        boolean isFileInput = "file".equals(el.getAttribute("type"));
+        if (isFileInput)
         {
-            try {el.clear();} catch(WebDriverException e) {/*Probably a file input*/}
-            el.sendKeys(text);
+            log("DEPRECATED: Use File object to set file input");
+            setFormElement(el, new File(text));
+            return;
+        }
+
+        if (text.length() == 0)
+        {
+            el.clear();
+        }
+        else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
+        {
+            el.sendKeys(Keys.chord(Keys.CONTROL, "a"), text);
         }
         else
         {
@@ -5197,8 +5208,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void setFormElement(Locator loc, File file)
     {
         WebElement el = loc.findElement(getDriver());
-        String cssString = "";
+        setFormElement(el, file);
+    }
 
+    public void setFormElement(WebElement el, File file)
+    {
+        String cssString = "";
         if (!el.isDisplayed())
         {
             cssString = el.getAttribute("class");
@@ -5206,7 +5221,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             executeScript("arguments[0].setAttribute('class', '');", el);
         }
 
-        setFormElement(loc, file.getAbsolutePath());
+        el.sendKeys(file.getAbsolutePath());
 
         if (!cssString.isEmpty())
         {
