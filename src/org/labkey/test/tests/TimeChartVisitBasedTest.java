@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.DataRegionTable;
@@ -30,7 +31,7 @@ import static org.junit.Assert.*;
  * User: cnathe
  * Date: 11/2/12
  */
-@Category({DailyB.class, Reports.class})
+@Category({DailyB.class, Reports.class, Charting.class})
 public class TimeChartVisitBasedTest extends TimeChartTest
 {
     private static final String VISIT_REPORT_NAME = "TimeChartTest Visit Report";

@@ -628,6 +628,13 @@
         <antcall target="sub-selenium"/>
     </target>
 
+    <target name="charting" description="run visualization related regression tests">
+        <property name="debug.suspend.selenium" value="n"/>
+        <property name="suite" value="Charting"/>
+        <property name="selenium.browser" value="*best"/>
+        <antcall target="sub-selenium"/>
+    </target>
+
 
     <target name="unit-tests" description="run junit tests">
         <property name="debug.suspend.selenium" value="n"/>

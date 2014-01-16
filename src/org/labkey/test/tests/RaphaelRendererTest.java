@@ -22,13 +22,14 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
 
 import java.io.File;
 import java.util.ArrayList;
 
-@Category({DailyB.class, Reports.class})
+@Category({DailyB.class, Reports.class, Charting.class})
 public class RaphaelRendererTest extends BaseWebDriverMultipleTest
 {
     private static final String MULTI_FOLDER_ZIP = "/sampledata/vis/RaphaelRendererTest.folder.zip";
@@ -61,8 +62,8 @@ public class RaphaelRendererTest extends BaseWebDriverMultipleTest
         VISIT_CHARTS.add(new TimeChartImportTest.TimeChartInfo(
                 "One Measure: visit based plot per participant", 17, 47, false,
                 new String[]{
-                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n32.5\n33.0\n33.5\n34.0\n34.5\n35.0\n35.5\n36.0\n36.5\n37.0\nAbbr Phy Exam: 999320016\nVisit Label\nTemperature: body\n999320016",
-                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n37.5\n38.0\n38.5\n39.0\n39.5\nAbbr Phy Exam: 999320518\nVisit Label\nTemperature: body\n999320518"
+                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n32.0\n32.5\n33.0\n33.5\n34.0\n34.5\n35.0\n35.5\n36.0\n36.5\n37.0\nAbbr Phy Exam: 999320016\nVisit Label\nTemperature: body\n999320016",
+                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n37.0\n37.5\n38.0\n38.5\n39.0\n39.5\nAbbr Phy Exam: 999320518\nVisit Label\nTemperature: body\n999320518"
                 }
         ));
 
@@ -70,14 +71,14 @@ public class RaphaelRendererTest extends BaseWebDriverMultipleTest
                 "Two Measure: group mean with one plot per dimension", 2, 38, false,
                 new String[]{
                         "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n80.0\n100.0\n120.0\n140.0\n160.0\n180.0\n200.0\nAPX-1: Abbreviated Physical Exam: 1. Weight\nVisit\n1. Weight\nGroup 1\nFemale\nMale",
-                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n33.0\n34.0\n35.0\n36.0\n37.0\n38.0\n39.0\n40.0\nAPX-1: Abbreviated Physical Exam: 2. Body Temp\nVisit\n2. Body Temp\nGroup 1\nFemale\nMale"
+                        "1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\n1 wk Post-V#2/V#3\n2 wk Post-V#2/V#3\n4 wk Post-V#2/V#3\n32.0\n33.0\n34.0\n35.0\n36.0\n37.0\n38.0\n39.0\n40.0\nAPX-1: Abbreviated Physical Exam: 2. Body Temp\nVisit\n2. Body Temp\nGroup 1\nFemale\nMale"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartImportTest.TimeChartInfo(
                 "One Measure: filtered for pregnancy records", 1, 6, false,
                 new String[]{
-                        "50\n100\n150\n200\n250\n58.0\n60.0\n62.0\n64.0\n66.0\n68.0\n70.0\n72.0\n74.0\n76.0\n78.0\nPhysical Exam\nDays Since Start Date\nPulse\n249320489\n249320897"
+                        "50\n100\n150\n200\n250\n56.0\n58.0\n60.0\n62.0\n64.0\n66.0\n68.0\n70.0\n72.0\n74.0\n76.0\n78.0\nPhysical Exam\nDays Since Start Date\nPulse\n249320489\n249320897"
                 }
         ));
 
@@ -113,23 +114,23 @@ public class RaphaelRendererTest extends BaseWebDriverMultipleTest
         DATE_CHARTS.add(new TimeChartImportTest.TimeChartInfo(
                 "One Measure: y-axis log scale and manual range on right side", 1, 33, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartImportTest.TimeChartInfo(
                 "One Measure: y-axis log scale and manual range", 1, 33, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nHIV Test Results\nDays Since Start Date\nViral Load Quantified (copies/ml)\n249318596\n249320107\n249320127\n249320489\n249320897"
                 }
         ));
 
         DATE_CHARTS.add(new TimeChartImportTest.TimeChartInfo(
                 "Two Measures: cd4 left axis and vl right axis by participant", 3, 23, false,
                 new String[]{
-                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249318596\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249318596 CD4+(cells/mm3)\n249318596 Viral LoadQuantified (copies/ml)",
-                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249320127\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320127 CD4+(cells/mm3)\n249320127 Viral LoadQuantified (copies/ml)",
-                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249320897\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320897 CD4+(cells/mm3)\n249320897 Viral LoadQuantified (copies/ml)"
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249318596\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249318596 CD4+(cells/mm3)\n249318596 Viral LoadQuantified (copies/ml)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249320127\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320127 CD4+(cells/mm3)\n249320127 Viral LoadQuantified (copies/ml)",
+                        "0\n50\n100\n150\n200\n250\n300\n350\n200.0\n300.0\n400.0\n500.0\n600.0\n700.0\n800.0\n900.0\n1000.0\n1100.0\n1200.0\n1300.0\n10.0\n100.0\n1000.0\n10000.0\n100000.0\n1000000.0\n10000000.0\nPTID: 249320897\nDays Since Start Date\nCD4+ (cells/mm3)\nViral Load Quantified (copies/ml)\n249320897 CD4+(cells/mm3)\n249320897 Viral LoadQuantified (copies/ml)"
                 }
         ));
 

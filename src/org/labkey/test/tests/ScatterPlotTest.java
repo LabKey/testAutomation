@@ -19,6 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
+import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
@@ -31,7 +32,7 @@ import static org.junit.Assert.*;
  * User: tchadick
  * Date: 6/11/13
  */
-@Category({BVT.class, Reports.class})
+@Category({BVT.class, Reports.class, Charting.class})
 public class ScatterPlotTest extends GenericChartsTest
 {
     protected static final String DEVELOPER_USER = "developer_user1@report.test";

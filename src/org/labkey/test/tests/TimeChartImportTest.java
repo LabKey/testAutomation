@@ -20,6 +20,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.PortalHelper;
@@ -43,7 +44,7 @@ import java.util.ArrayList;
  * // TODO: add verification for plots with aggregate lines that have error bars
  * // TODO: add verification for plot line with and whether or not the data points are shown
  */
-@Category({DailyB.class, Reports.class})
+@Category({DailyB.class, Reports.class, Charting.class})
 public class TimeChartImportTest extends StudyBaseTestWD
 {
     private static final String MULTI_FOLDER_ZIP = "/sampledata/study/TimeChartTesting.folder.zip";
@@ -86,7 +87,7 @@ public class TimeChartImportTest extends StudyBaseTestWD
         EXPORTED_CHARTS.add(new TimeChartInfo(
                 "One Measure: visit based plot per participant", 17, 47, false,
                 new String[]{
-                        "Created with Rapha\u00ebl 2.1.0\n1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n32.5\n33.0\n33.5\n34.0\n34.5\n35.0\n35.5\n36.0\n36.5\n37.0\nAbbr Phy Exam: 999320016\nVisit Label\nTemperature: body\n999320016"
+                        "Created with Rapha\u00ebl 2.1.0\n1 week Post-V#1\nInt. Vis. %{S.1.1} .%{S.2.1}\nGrp1:F/U/Grp2:V#2\nG1: 6wk/G2: 2wk\n6 week Post-V#2\nG1: V#2/G2: V#3\nInt. Vis. %{S.1.1} .%{S.2.1}\nInt. Vis. %{S.1.1} .%{S.2.1}\n6 wk Post-V#2/V#3\n32.0\n32.5\n33.0\n33.5\n34.0\n34.5\n35.0\n35.5\n36.0\n36.5\n37.0\nAbbr Phy Exam: 999320016\nVisit Label\nTemperature: body\n999320016"
                 }
         ));
 
