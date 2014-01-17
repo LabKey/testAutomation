@@ -5165,12 +5165,14 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             return;
         }
 
-        if (text.length() == 0)
+        if (StringUtils.isEmpty(text))
         {
             el.clear();
         }
         else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
+            try {el.clear();} catch(WebDriverException e) {/*Probably a file input*/}
+            // CONTROL A DOESN'T WORK ON OSX
             el.sendKeys(Keys.chord(Keys.CONTROL, "a"), text);
         }
         else
