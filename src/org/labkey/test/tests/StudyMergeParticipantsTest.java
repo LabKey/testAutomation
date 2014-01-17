@@ -37,7 +37,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTestWD
     private static final Locator.NameLocator NEW_ID_FIELD = Locator.name("newIdField-inputEl");
     private static final Locator.NameLocator ALIAS_SOURCE_FIELD = Locator.name("aliasSourceField-inputEl");
 
-    private static final int MERGE_SUCCESS_TIMEOUT = 20000;
+    private static final int MERGE_SUCCESS_TIMEOUT = 60000;
 
 
     @Override
@@ -86,7 +86,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTestWD
         log("Check not reporting conflict when no conflict exists, and warning on existing alias");
         setFormElement(ALIAS_SOURCE_FIELD, ALIAS_SOURCE_2);
         clickButton("Preview", 0);
-        waitForElement(Locator.tag("span").containing("Preview Complete"));
+        waitForElement(Locator.tag("span").containing("Preview Complete"), MERGE_SUCCESS_TIMEOUT);
         assertElementPresent(Locator.tag("td").containing("Warning: Specimen data is not editable"));
         assertElementNotPresent(Locator.linkContainingText("Conflict!"));
         assertElementPresent(Locator.tag("td").containing("Aliases are not updated by this process"));
@@ -107,7 +107,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTestWD
         setFormElement(OLD_ID_FIELD, PTID_NO_ALIAS);
         setFormElement(NEW_ID_FIELD, PTID_NEW_2);
         clickButton("Preview", 0);
-        waitForElement(Locator.tag("span").containing("Preview Complete"));
+        waitForElement(Locator.tag("span").containing("Preview Complete"), MERGE_SUCCESS_TIMEOUT);
         assertElementNotPresent(Locator.linkContainingText(PTID_NO_ALIAS + " has existing aliases"));
         assertElementPresent(Locator.linkContainingText("Conflict!"));
         clickButton("Merge", 0);
