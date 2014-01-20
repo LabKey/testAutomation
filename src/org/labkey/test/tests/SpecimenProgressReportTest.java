@@ -151,8 +151,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         int locationId = Integer.parseInt(drt.getDataAsText(drt.getRow("Label", "Main"), "RowId"));
 
         // add the specimen configurations to the manage page
-        clickAndWait(Locator.linkWithText("Overview"));
-        clickAndWait(Locator.linkWithText("Edit"));
+        goToModule("rho");
         addSpecimenConfiguration("PCR", "R", locationId, "CEF-R Cryovial", false);
         addSpecimenConfiguration("PCR", "R", locationId, "UPR Micro Tube", true);
         addSpecimenConfiguration("RNA", "R", locationId, "TGE Cryovial", true);
