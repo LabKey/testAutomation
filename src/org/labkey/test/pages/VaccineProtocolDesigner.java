@@ -178,7 +178,7 @@ public class VaccineProtocolDesigner
     public void setImmunizationGroupCount(int groupRowNumber, String count)
     {
         Locator immunizationGroupCountField = Locators.immunizationGridRow().index(groupRowNumber - 1).append("/td[3]/input");
-        _test.setFormElement(immunizationGroupCountField, count);
+        _test.setFormElementJS(immunizationGroupCountField, count);
         _test.fireEvent(immunizationGroupCountField, BaseSeleniumWebTest.SeleniumEvent.change);
     }
 
