@@ -40,8 +40,19 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @LogMethod(quiet = true)
     public void expandFileBrowserRootNode()
     {
+        expandFileBrowserTree();
         _test.waitAndClick(Locator.css("div.treenav-panel div.x4-panel-body tr[data-recordindex = '0']"));
         _test.waitForElement(Locator.css("div.treenav-panel div.x4-panel-body tr.x4-grid-row-selected[data-recordindex = '0']"), WAIT_FOR_JAVASCRIPT);
+    }
+
+    public void expandFileBrowserTree()
+    {
+        Locator collapsedTreePanel = Locator.css("div.treenav-panel.x4-collapsed");
+        if (_test.isElementPresent(collapsedTreePanel))
+        {
+            _test.click(Locator.tagWithAttribute("a", "data-qtip", "Show or hide the folder tree"));
+            _test.waitForElementToDisappear(collapsedTreePanel);
+        }
     }
 
     @LogMethod(quiet = true)

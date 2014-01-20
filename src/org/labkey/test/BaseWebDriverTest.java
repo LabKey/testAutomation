@@ -1886,7 +1886,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     fixPipelineToolsDirectory();
             }
             catch(Throwable t){
-                log("Failed to fix pipeline tools directory after test failure");
+                // Assure that this failure is noticed
+                // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
+                log("**************************ERROR*******************************");
+                log("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
+                log("** Server remains in a bad state.                           **");
+                log("** Set tools directory manually or bootstrap to fix.        **");
+                log("**************************ERROR*******************************");
                 dumpPageSnapshot(testName, "fixPipelineToolsDir");
             }
 
@@ -5171,9 +5177,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         else if (text.length() < 1000 && !text.contains("\n") && !text.contains("\t"))
         {
-            try {el.clear();} catch(WebDriverException e) {/*Probably a file input*/}
-            // CONTROL A DOESN'T WORK ON OSX
-            el.sendKeys(Keys.chord(Keys.CONTROL, "a"), text);
+            el.clear();
+            el.sendKeys(text);
         }
         else
         {

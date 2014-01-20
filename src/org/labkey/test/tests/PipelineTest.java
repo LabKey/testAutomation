@@ -121,48 +121,23 @@ public class PipelineTest extends PipelineWebTestBase
 
         // Break the pipeline tools directory setting to cause errors.
         String oldToolsDirectory = setPipelineToolsDirectory(getLabKeyRoot() + "/external/noexist");
-        boolean testFailed = true;
-        try
+        runProcessing(_testSetMS1);
+        checkEmail(emailTable, 4);
+
+        // Make sure the expected errors have been logged.
+        checkExpectedErrors(4);
+
+        // Test pipeline error escalation email.
+        _testSetMS1.getParams()[0].validateEmailEscalation(0);
+        checkEmail(emailTable, 1);
+        // Fix the pipeline tools directory.
+        if (new File(oldToolsDirectory).exists())
         {
-            runProcessing(_testSetMS1);
-            checkEmail(emailTable, 4);
-
-            // Make sure the expected errors have been logged.
-            checkExpectedErrors(4);
-
-            // Test pipeline error escalation email.
-            _testSetMS1.getParams()[0].validateEmailEscalation(0);
-            checkEmail(emailTable, 1);
-            testFailed = false;
+            setPipelineToolsDirectory(oldToolsDirectory);
         }
-        finally
+        else
         {
-            try
-            {
-                // Fix the pipeline tools directory.
-                if (new File(oldToolsDirectory).exists())
-                {
-                    setPipelineToolsDirectory(oldToolsDirectory);
-                }
-                else
-                {
-                    setPipelineToolsDirectory(getLabKeyRoot() + File.separatorChar + "build" + File.separatorChar + "deploy" + File.separatorChar + "bin");
-                }
-            }
-            catch (AssertionError ae)
-            {
-                // Assure that this failure is noticed
-                // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
-                log("**************************ERROR*******************************");
-                log("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
-                log("** Server remains in a bad state.                           **");
-                log("** Set tools directory manually or bootstrap to fix.        **");
-                log("**************************ERROR*******************************");
-                if ( !testFailed )
-                    fail("Failed to reset pipeline tools directory.\n" + ae.getMessage());
-                else // Don't clobber an existing error.
-                    log("Error: " + ae.getMessage());
-            }
+            setPipelineToolsDirectory(getLabKeyRoot() + File.separatorChar + "build" + File.separatorChar + "deploy" + File.separatorChar + "bin");
         }
 
         PipelineTestParams tpRetry = _testSetMS1.getParams()[0];

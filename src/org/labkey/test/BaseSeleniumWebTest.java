@@ -1407,7 +1407,13 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                             fixPipelineToolsDirectory();
                     }
                     catch(Throwable t){
-                        log("Failed to fix pipeline tools directory after test failure");
+                        // Assure that this failure is noticed
+                        // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
+                        log("**************************ERROR*******************************");
+                        log("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
+                        log("** Server may be in a bad state.                            **");
+                        log("** Set tools directory manually or bootstrap to fix.        **");
+                        log("**************************ERROR*******************************");
                         dumpPageSnapshot("fixPipelineToolsDir");
                     }
                 }
