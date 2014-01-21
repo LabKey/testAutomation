@@ -584,7 +584,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
      * Set pipeline tools directory to the default location if the current location does not exist.
       */
     @LogMethod
-    private void fixPipelineToolsDirectory()
+    protected void fixPipelineToolsDirectory()
     {
         log("Ensuring pipeline tools directory points to the right place");
         goToHome();

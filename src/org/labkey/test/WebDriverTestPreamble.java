@@ -59,6 +59,9 @@ public class WebDriverTestPreamble extends BaseWebDriverTest
         {
             checkLeaksAndErrors();
         }
+
+        if (isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
+            fixPipelineToolsDirectory();
     }
 
     @Override

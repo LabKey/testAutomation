@@ -1318,15 +1318,18 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
                 }
             }
 
-            log("Pre-cleaning " + getClass().getSimpleName());
-            doCleanup(false);
-
             // Only do this as part of test startup if we haven't already checked. Since we do this as the last
             // step in the test, there's no reason to bother doing it again at the beginning of the next test
             if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
             {
                 checkLeaksAndErrors();
             }
+
+            if (isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
+                fixPipelineToolsDirectory();
+
+            log("Pre-cleaning " + getClass().getSimpleName());
+            doCleanup(false);
 
             doTestSteps();
 
