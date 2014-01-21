@@ -58,7 +58,7 @@ public class FlowAnalysisResolverTest extends FlowTest
         verifyCantChooseUnmatchedSample();
 
         //set no-resolve file to a file and proceed with import
-        setFormElement(Locator.name("selectedSamples.rows[no-resolve01].matchedFile"), "118795.fcs (microFCS)");
+        selectOptionByText(Locator.name("selectedSamples.rows[no-resolve01].matchedFile"), "118795.fcs (microFCS)");
 
 
         verifyImportedAllFiles();
