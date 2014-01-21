@@ -603,8 +603,8 @@ public abstract class Locator
         DecimalFormat numFormat = new DecimalFormat("#,###");
 
         int rowsPerPage = lastRow - firstRow + 1;
-        int pageCount = (int)Math.ceil(maxRows / rowsPerPage);
-        int currentPage = (int)Math.ceil(lastRow / rowsPerPage);
+        int pageCount = (int)Math.ceil((double)maxRows / (double)rowsPerPage);
+        int currentPage = (int)Math.ceil((double)lastRow / (double)rowsPerPage);
 
         boolean hasFirstLink = currentPage > 2;
         boolean hasPrevLink = currentPage > 1;
