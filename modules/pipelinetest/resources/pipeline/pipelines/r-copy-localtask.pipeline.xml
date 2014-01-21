@@ -1,19 +1,24 @@
 <pipeline xmlns="http://labkey.org/pipeline/xml"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           name="r-copy-localtask" version="0.0">
-    <description>Use R to duplicate a file (localtask)</description>
+    <description>Use R to create tsv file and import into 'myassay' (localtask)</description>
     <tasks>
         <task xsi:type="ScriptTaskType">
             <inputs>
                 <file name="input.txt"/>
-                <integer name="skip-lines" default="0"/>
             </inputs>
-            <script file="pipeline/tasks/r-copy.r"/>
+            <outputs>
+                <file name="output.tsv"/>
+            </outputs>
+            <script interpreter="r">
+              <![CDATA[
+# Generate a dummy tsv output file with two columns (Name, Age) and two rows.
+df <- data.frame(Name=c("Bob", "Sally"), Age=c(10, 20))
+write.table(df, file="${output.tsv}", sep="\t", qmethod="double", col.names=TRUE, row.names=FALSE)
+              ]]>
+            </script>
         </task>
         <task xsi:type="AssayImportRunTaskType" >
-            <inputs>
-                <file name="input.csv"/>
-            </inputs>
             <providerName>General</providerName>
             <!--<protocolName>${protocolName}</protocolName>-->
             <protocolName>myassay</protocolName>
