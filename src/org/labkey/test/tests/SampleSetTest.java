@@ -147,11 +147,11 @@ public class SampleSetTest extends BaseWebDriverTest
         clickButton("Next");
 
         setFormElement(Locator.name("outputSample1_KeyColFolder"), "SampleSetBVT15");
-		setFormElement(Locator.name("outputSample2_KeyColFolder"), "SampleSetBVT16");
-		checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
-		setFormElement(Locator.name("outputSample1_IntColFolder"), "500a");
-		setFormElement(Locator.name("outputSample1_StringColFolder"), "firstOutput");
-		setFormElement(Locator.name("outputSample2_StringColFolder"), "secondOutput");
+        setFormElement(Locator.name("outputSample2_KeyColFolder"), "SampleSetBVT16");
+        checkCheckbox(Locator.name("outputSample1_IntColFolderCheckBox"));
+        setFormElement(Locator.name("outputSample1_IntColFolder"), "500a");
+        setFormElement(Locator.name("outputSample1_StringColFolder"), "firstOutput");
+        setFormElement(Locator.name("outputSample2_StringColFolder"), "secondOutput");
         clickButton("Submit");
 
         assertTextPresent("must be of type Integer");
@@ -177,7 +177,7 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("outputSample1_IntCol"), "600");
         setFormElement(Locator.name("outputSample1_StringCol"), "String");
         setFormElement(Locator.name("outputSample1_DateCol"), "BadDate");
-        setFormElement(Locator.name("outputSample1_BoolCol"), "FALSE");
+        uncheckCheckbox(Locator.name("outputSample1_BoolCol"));
         clickButton("Submit");
 
         assertTextPresent("must be of type Date and Time");
@@ -218,7 +218,8 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("data"), AMBIGUOUS_CHILD_SAMPLE_SET_TSV);
         fireEvent(Locator.name("data"), SeleniumEvent.change);
         waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        setFormElement(Locator.id("parentCol"), "Parent"); // selectOptionByText helper breaks on this for some reason
+        selectOptionByText(Locator.id("parentCol"), "Parent");
+        selectOptionByText(Locator.id("parentCol"), "Parent"); // Not sure why first try fails
         clickButton("Submit");
         assertTextPresent("More than one match for parent material");
 
@@ -226,7 +227,8 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("data"), CHILD_SAMPLE_SET_TSV);
         fireEvent(Locator.name("data"), SeleniumEvent.change);
         waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        setFormElement(Locator.id("parentCol"), "Parent"); // selectOptionByText helper breaks on this for some reason
+        selectOptionByText(Locator.id("parentCol"), "Parent");
+        selectOptionByText(Locator.id("parentCol"), "Parent"); // Not sure why first try fails
         clickButton("Submit");
         assertTextPresent("SampleSetBVTChildA");
 
@@ -249,7 +251,8 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("data"), GRANDCHILD_SAMPLE_SET_TSV);
         fireEvent(Locator.name("data"), SeleniumEvent.change);
         waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        setFormElement(Locator.id("parentCol"), "Parent"); // selectOptionByText helper breaks on this for some reason
+        selectOptionByText(Locator.id("parentCol"), "Parent");
+        selectOptionByText(Locator.id("parentCol"), "Parent"); // Not sure why first try fails
         clickButton("Submit");
 
         assertTextPresent("A sample set with that name already exists");
