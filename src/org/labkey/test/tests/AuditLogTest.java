@@ -73,6 +73,7 @@ public class AuditLogTest extends BaseWebDriverTest
     {
         userAuditTest();
         groupAuditTest();
+        canSeeAuditLogTest();
     }
 
     protected void userAuditTest() throws Exception
@@ -123,6 +124,48 @@ public class AuditLogTest extends BaseWebDriverTest
         verifyAuditEvent(this, PROJECT_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_PROJECT + " was deleted", 5);
     }
 
+    protected void canSeeAuditLogTest()
+    {
+        log("testing CanSeeAuditLog permission");
+        simpleSignIn();
+        _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
+        createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, "Editor");
+
+        // signed in as an admin so we should see rows here
+        verifyAuditQueries(true);
+
+        // signed in as an editor should not show any rows for audit query links
+        impersonate(AUDIT_TEST_USER);
+        verifyAuditQueries(false);
+        stopImpersonating();
+
+        // now grant CanSeeAuditLog permission to our audit user and verify
+        // we see audit information
+        setSiteAdminRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
+        impersonate(AUDIT_TEST_USER);
+        verifyAuditQueries(true);
+
+        // cleanup
+        stopImpersonating();
+        deleteUser(AUDIT_TEST_USER);
+        deleteProject(AUDIT_TEST_PROJECT, true);
+    }
+
+    protected void verifyAuditQueries(boolean canSeeAuditLog)
+    {
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=auditLog&query.queryName=ContainerAuditEvent");
+        if (canSeeAuditLog)
+            verifyAuditQueryEvent(this, COMMENT_COLUMN, AUDIT_TEST_PROJECT + " was created", 1);
+        else
+            assertTextPresent("No data to show.");
+
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=auditLog&query.queryName=GroupAuditEvent");
+        if (canSeeAuditLog)
+            verifyAuditQueryEvent(this, COMMENT_COLUMN, "The user/group " + AUDIT_TEST_USER + " was assigned to the security role Editor.", 1);
+        else
+            assertTextPresent("No data to show.");
+    }
+
     public static void verifyAuditEvent(BaseWebDriverTest instance, String eventType, String column, String msg, int rowsToSearch)
     {
         if (!instance.isTextPresent("Audit Log"))
@@ -139,6 +182,12 @@ public class AuditLogTest extends BaseWebDriverTest
             instance.selectOptionByText(Locator.name("view"), eventType);
             instance.newWaitForPageToLoad();
         }
+
+        verifyAuditQueryEvent(instance, column, msg, rowsToSearch);
+    }
+
+    public static void verifyAuditQueryEvent(BaseWebDriverTest instance, String column, String msg, int rowsToSearch)
+    {
         instance.log("searching for audit entry: " + msg);
         DataRegionTable table = new DataRegionTable("query", instance, false);
         int i = table.getColumn(column);

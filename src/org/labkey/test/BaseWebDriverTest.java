@@ -5996,6 +5996,18 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         log(new Date().toString());
     }
 
+    @LogMethod
+    public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
+    {
+        log(new Date().toString());
+        goToSiteAdmins();
+        clickAndWait(Locator.linkContainingText("Permissions"));
+        _ext4Helper.clickTabContainingText("Permissions");
+        _selectPermission(userName, userName, permissionString);
+        log(new Date().toString());
+    }
+
+
     private void _setPermissions(String userOrGroupName, String permissionString, String className)
     {
         String role = toRole(permissionString);
@@ -6014,16 +6026,20 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             String group = userOrGroupName;
             if (className.equals("pSite"))
                 group = "Site: " + group;
-            _extHelper.selectExt4ComboBoxItem(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]"), group, true);
-            waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
-            String oldId = getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
-            savePermissions();
-            _ext4Helper.waitForMaskToDisappear();
-            waitForElementToDisappear(Locator.id(oldId), WAIT_FOR_JAVASCRIPT); // Elements get new ids after save
-            assertPermissionSetting(userOrGroupName, permissionString);
+            _selectPermission(userOrGroupName, group, permissionString);
         }
     }
 
+    private void _selectPermission(String userOrGroupName, String group, String permissionString)
+    {
+        _extHelper.selectExt4ComboBoxItem(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]"), group, true);
+        waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
+        String oldId = getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
+        savePermissions();
+        _ext4Helper.waitForMaskToDisappear();
+        waitForElementToDisappear(Locator.id(oldId), WAIT_FOR_JAVASCRIPT); // Elements get new ids after save
+        assertPermissionSetting(userOrGroupName, permissionString);
+    }
 
     public void removeSiteGroupPermission(String groupName, String permissionString)
     {
