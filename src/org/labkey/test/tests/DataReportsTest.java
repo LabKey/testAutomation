@@ -170,7 +170,6 @@ public class DataReportsTest extends ReportTest
         _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _ext4Helper.selectComboBoxItem("Query:", QUERY_REPORT_QUERY_NAME);
         _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.name("selectedQueryName"), QUERY_REPORT_QUERY_NAME);
 
         clickButton("Save");
         waitForText("Manage Views");
