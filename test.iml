@@ -14,6 +14,9 @@
     <content url="file://$MODULE_DIR$/../customModules/OConnorExperiments/test">
       <sourceFolder url="file://$MODULE_DIR$/../customModules/OConnorExperiments/test/src" isTestSource="false" />
     </content>
+    <content url="file://$MODULE_DIR$/../customModules/argos/test">
+      <sourceFolder url="file://$MODULE_DIR$/../customModules/argos/test/src" isTestSource="false" />
+    </content>
     <content url="file://$MODULE_DIR$/../customModules/biotrust/test">
       <sourceFolder url="file://$MODULE_DIR$/../customModules/biotrust/test/src" isTestSource="false" />
     </content>
