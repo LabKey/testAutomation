@@ -5182,9 +5182,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         else
         {
-            setFormElementJS(l, text.substring(0, text.length()-1));
-            //Retype the last character manually to trigger events
-            el.sendKeys(text.substring(text.length()-1));
+            setFormElementJS(l, text);
         }
 
         String elementClass = el.getAttribute("class");
@@ -5202,6 +5200,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         WebElement el = l.findElement(getDriver());
 
         executeScript("arguments[0].value = arguments[1]", el, text);
+        fireEvent(el, SeleniumEvent.change);
     }
 
     /**
