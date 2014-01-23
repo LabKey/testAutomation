@@ -198,8 +198,6 @@ public class FileContentTest extends BaseWebDriverTest
         log("move file");
         String folderName = "Test folder";
         _fileBrowserHelper.createFolder(folderName);
-        _fileBrowserHelper.clickFileBrowserButton(FileBrowserHelperWD.BrowserAction.FOLDER_TREE);
-        shortWait().until(ExpectedConditions.visibilityOf(Locator.css("div.x4-splitter-vertical").findElement(getDriver())));
         _fileBrowserHelper.moveFile(filename, folderName);
 
         // Check custom actions as non-administrator.
@@ -231,9 +229,6 @@ public class FileContentTest extends BaseWebDriverTest
 
         // Delete file.
         clickProject(PROJECT_NAME);
-        _fileBrowserHelper.waitForFileGridReady();
-        _fileBrowserHelper.clickFileBrowserButton(FileBrowserHelperWD.BrowserAction.FOLDER_TREE);
-        shortWait().until(ExpectedConditions.visibilityOf(Locator.css("div.x4-splitter-vertical").findElement(getDriver())));
         _fileBrowserHelper.selectFileBrowserItem(folderName + "/" + filename);
         _fileBrowserHelper.clickFileBrowserButton(FileBrowserHelperWD.BrowserAction.DELETE);
         clickButton("Yes", 0);
