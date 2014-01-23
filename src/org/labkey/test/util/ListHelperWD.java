@@ -45,39 +45,28 @@ public class ListHelperWD extends ListHelper
     {
         _test.clickButton("Import Data");
         _test.setFormElement(Locator.id("tsv3"), listData);
-        _submitImportTsv(null);
+        submitImportTsv_success();
     }
 
     public void submitTsvData(String listData)
     {
         _test.setFormElement(Locator.id("tsv3"), listData);
-        _submitImportTsv(null);
+        submitImportTsv_success();
     }
 
 
     public void submitImportTsv_success()
     {
-        _submitImportTsv(null);
+        _test.clickButton("Submit");
+        _test.waitForElement(Locator.css(".labkey-data-region"));
     }
 
     // null means any error
     public void submitImportTsv_error(String error)
     {
-        _submitImportTsv(null == error ? "" : error);
-    }
-
-    private void _submitImportTsv(@Nullable String error)
-    {
         _test.clickButton("Submit", 0);
-        if (null != error)
-        {
-            if (0<error.length())
-                _test.waitForElement(Locator.css(".labkey-error").containing(error));
-        }
-        else
-        {
-            _test.waitForElement(Locator.css(".labkey-data-region"));
-        }
+        if (error == null) error = "";
+        _test.waitForElement(Locator.css(".labkey-error").containing(error));
     }
 
     /**

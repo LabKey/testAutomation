@@ -40,43 +40,35 @@ public class ListHelper extends AbstractHelper
     {
         _test.clickButton("Import Data");
         _test.setLongTextField("text", listData);
-        _submitImportTsv(null);
+        submitImportTsv_success();
     }
 
     public void submitTsvData(String listData)
     {
         _test.setLongTextField("text", listData);
-        _submitImportTsv(null);
+        submitImportTsv_success();
     }
 
 
     public void submitImportTsv_success()
     {
-        _submitImportTsv(null);     
+        _test.clickButton("Submit", 0);
+        _test.sleep(500);
+        _test._extHelper.waitForExtDialog("Success");
+        _test.assertTextPresent(" inserted.");
+        _test.clickButton("OK");
     }
 
     // null means any error
     public void submitImportTsv_error(String error)
     {
-        _submitImportTsv(null == error ? "" : error);
-    }
-
-    private void _submitImportTsv(String error)
-    {
         _test.clickButton("Submit", 0);
         _test.sleep(500);
-        if (null != error)
-        {
-            _test.waitForExtMaskToDisappear();
-            if (0<error.length())
-                _test.waitForText(error, BaseSeleniumWebTest.WAIT_FOR_PAGE);
-        }
+        _test.waitForExtMaskToDisappear();
+        if (null != error && error.length() > 0)
+            _test.waitForElement(Locator.css(".labkey-error").containing(error));
         else
-        {
-            _test._extHelper.waitForExtDialog("Success");
-            _test.assertTextPresent(" inserted.");
-            _test.clickButton("OK");
-        }
+            _test.waitForElement(Locator.css(".labkey-error"));
     }
 
     /**
