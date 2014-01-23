@@ -86,10 +86,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         _test.clickButton("Alias Field", "Choose a field");
 
         Locator l = Locator.name("sourceColumn");
-        _test.setFormElement(l, aliasedColumn);
-        // may need to try all lower case for form element selection
-        if (!_test.getFormElement(l).equals(aliasedColumn))
-            _test.setFormElement(l, aliasedColumn.toLowerCase());
+        _test.selectOptionByText(l, aliasedColumn);
         _test.clickButton("OK", BaseSeleniumWebTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
         //set name
