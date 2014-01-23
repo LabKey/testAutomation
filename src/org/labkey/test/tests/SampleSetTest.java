@@ -218,8 +218,7 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("data"), AMBIGUOUS_CHILD_SAMPLE_SET_TSV);
         fireEvent(Locator.name("data"), SeleniumEvent.change);
         waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        selectOptionByText(Locator.id("parentCol"), "Parent");
-        selectOptionByText(Locator.id("parentCol"), "Parent"); // Not sure why first try fails
+        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
         clickButton("Submit");
         assertTextPresent("More than one match for parent material");
 
@@ -227,8 +226,7 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("data"), CHILD_SAMPLE_SET_TSV);
         fireEvent(Locator.name("data"), SeleniumEvent.change);
         waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        selectOptionByText(Locator.id("parentCol"), "Parent");
-        selectOptionByText(Locator.id("parentCol"), "Parent"); // Not sure why first try fails
+        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
         clickButton("Submit");
         assertTextPresent("SampleSetBVTChildA");
 
@@ -251,8 +249,7 @@ public class SampleSetTest extends BaseWebDriverTest
         setFormElement(Locator.name("data"), GRANDCHILD_SAMPLE_SET_TSV);
         fireEvent(Locator.name("data"), SeleniumEvent.change);
         waitForElement(Locator.css("select#parentCol > option").withText("Parent"));
-        selectOptionByText(Locator.id("parentCol"), "Parent");
-        selectOptionByText(Locator.id("parentCol"), "Parent"); // Not sure why first try fails
+        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
         clickButton("Submit");
 
         assertTextPresent("A sample set with that name already exists");
