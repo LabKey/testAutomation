@@ -301,14 +301,14 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "New");
-        setFormElement("emailList", USER2);
+        setFormElement("memberListInput", USER2);
         clickButtonContainingText("Submit", "Title must not be blank");
         clickButtonContainingText("OK", 0);
         waitForExtMaskToDisappear();
         setFormElement("title", MSG3_TITLE);
         submit();
         assertTextPresent("This user doesn't have permission");
-        setFormElement("emailList", USER1);
+        setFormElement("memberListInput", USER1);
         selectOptionByText("assignedTo", displayNameFromEmail(USER3));
         submit();
         clickAndWait(Locator.linkWithText("view message or respond"));
