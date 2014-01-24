@@ -204,7 +204,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         if (expectRows)
             waitForElement(configGridRow);
         else
-            waitForText("No assay/specimen configurations");
+            waitForText("No assay configurations");
         int expectedRowIndex = getElementCount(configGridRow);
         clickButton("Insert New", 0);
         waitForElement(Locator.name("AssayName"));
