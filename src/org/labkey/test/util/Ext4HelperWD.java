@@ -33,11 +33,13 @@ import java.util.List;
  */
 public class Ext4HelperWD extends AbstractHelperWD
 {
-    private static String _cssPrefix = "x4-";
+    private static final String DEFAULT_CSS_PREFIX = "x4-";
+    private static String _cssPrefix = DEFAULT_CSS_PREFIX;
 
     public Ext4HelperWD(BaseWebDriverTest test)
     {
         super(test);
+        _cssPrefix = DEFAULT_CSS_PREFIX;
     }
 
     public void setCssPrefix(String cssPrefix)
