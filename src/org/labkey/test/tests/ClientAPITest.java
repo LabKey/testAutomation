@@ -331,19 +331,22 @@ public class ClientAPITest extends BaseWebDriverTest
         // enter a new first name
 
         String activeCellId = getActiveEditorId();
-        setFormElement(Locator.id(activeCellId), "Abe\t");
+        setFormElementJS(Locator.id(activeCellId), "Abe");
+        pressTab(Locator.id(activeCellId));
 
         // enter a new last name
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         assertNotEquals("Failed to advance to next edit field", prevActiveCellId, activeCellId);
-        setFormElement(Locator.id(activeCellId), "Abeson\t");
+        setFormElementJS(Locator.id(activeCellId), "Abeson");
+        pressTab(Locator.id(activeCellId));
 
         // enter a new age
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         assertNotEquals("Failed to advance to next edit field", prevActiveCellId, activeCellId);
-        setFormElement(Locator.id(activeCellId), "51\t");
+        setFormElementJS(Locator.id(activeCellId), "51");
+        pressTab(Locator.id(activeCellId));
 
         waitUntilGridUpdateComplete();
 
@@ -353,12 +356,14 @@ public class ClientAPITest extends BaseWebDriverTest
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         assertNotEquals("Failed to advance to next edit field", prevActiveCellId, activeCellId);
-        setFormElement(Locator.id(activeCellId), "Billy\t");
+        setFormElementJS(Locator.id(activeCellId), "Billy");
+        pressTab(Locator.id(activeCellId));
 
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
         assertNotEquals("Failed to advance to next edit field", prevActiveCellId, activeCellId);
-        setFormElement(Locator.id(activeCellId), "Billyson\t");
+        setFormElementJS(Locator.id(activeCellId), "Billyson");
+        pressTab(Locator.id(activeCellId));
 
         prevActiveCellId = activeCellId;
         activeCellId = getActiveEditorId();
