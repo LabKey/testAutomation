@@ -39,15 +39,20 @@ public class Ext4HelperWD extends AbstractHelperWD
     public Ext4HelperWD(BaseWebDriverTest test)
     {
         super(test);
+        resetCssPrefix();
+    }
+
+    public static void resetCssPrefix()
+    {
         _cssPrefix = DEFAULT_CSS_PREFIX;
     }
 
-    public void setCssPrefix(String cssPrefix)
+    public static void setCssPrefix(String cssPrefix)
     {
         _cssPrefix = cssPrefix;
     }
 
-    public String getCssPrefix()
+    public static String getCssPrefix()
     {
         return _cssPrefix;
     }

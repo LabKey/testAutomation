@@ -36,16 +36,9 @@ import static org.junit.Assert.*;
  */
 public class ExtHelperWD extends AbstractHelperWD
 {
-    private String _cssPrefix = "x4-";
-
     public ExtHelperWD(BaseWebDriverTest test)
     {
         super(test);
-    }
-
-    public void setCssPrefix(String cssPrefix)
-    {
-        _cssPrefix = cssPrefix;
     }
 
     public void clickMenuButton(String menusLabel, String... subMenuLabels)
@@ -359,8 +352,8 @@ public class ExtHelperWD extends AbstractHelperWD
         if (windowTitle == null) return "";
         String ext3Dialog = "//div[contains(@class, 'x-window') and " + NOT_HIDDEN + " and "+
             "./div/div/div/div/span[contains(@class, 'x-window-header-text') and contains(string(), '" + windowTitle + "')]]";
-        String ext4Dialog = "//div[contains(@class, '" + _cssPrefix + "window') and " + NOT_HIDDEN + " and "+
-            "./div/div/div/div/div/span[contains(@class, '" + _cssPrefix + "window-header-text') and contains(string(), '" + windowTitle + "')]]";
+        String ext4Dialog = "//div[contains(@class, '" + Ext4HelperWD.getCssPrefix() + "window') and " + NOT_HIDDEN + " and "+
+            "./div/div/div/div/div/span[contains(@class, '" + Ext4HelperWD.getCssPrefix() + "window-header-text') and contains(string(), '" + windowTitle + "')]]";
         if( _test.isElementPresent(Locator.xpath(ext3Dialog)) )
             return ext3Dialog;
         else if( _test.isElementPresent(Locator.xpath(ext4Dialog)) )
@@ -494,7 +487,7 @@ public class ExtHelperWD extends AbstractHelperWD
 
     protected void clickX4GridPanelCheckbox(String colName, String colValue, int rowIndex, String markerCls, boolean keepExisting)
     {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, '" + _cssPrefix + "grid')]"), WAIT_FOR_PAGE);
+        _test.waitForElement(Locator.xpath("//div[contains(@class, '" + Ext4HelperWD.getCssPrefix() + "grid')]"), WAIT_FOR_PAGE);
         selectExt4GridItem(colName, colValue, rowIndex, markerCls, keepExisting);
     }
 
@@ -502,13 +495,13 @@ public class ExtHelperWD extends AbstractHelperWD
     public void pickMeasure(final String source, final String measure, boolean keepSelection)
     {
         //select source query
-        Locator queryLoc = Locator.css(".sourcepanel ." + _cssPrefix + "grid-row");
+        Locator queryLoc = Locator.css(".sourcepanel ." + Ext4HelperWD.getCssPrefix() + "grid-row");
         WebElement queryElement = queryLoc.waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
         _test.scrollIntoView(queryElement); // in case window is too short
         _test.shortWait().until(ExpectedConditions.elementToBeClickable(queryLoc.toBy())); // if one row is ready, all should be
         selectExt4GridItem("queryName", source, -1, "sourcegrid", keepSelection);
         //select measure
-        Locator measureLoc = Locator.css(".measuresgrid ." + _cssPrefix + "grid-row");
+        Locator measureLoc = Locator.css(".measuresgrid ." + Ext4HelperWD.getCssPrefix() + "grid-row");
         WebElement measureElement = measureLoc.waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
         _test.scrollIntoView(measureElement); // in case window is too short
         _test.shortWait().until(ExpectedConditions.elementToBeClickable(measureLoc.toBy())); // if one row is ready, all should be
@@ -523,10 +516,10 @@ public class ExtHelperWD extends AbstractHelperWD
     //Pick measure from one of multiple split panel measure pickers
     public void pickMeasure(String panelCls, String source, String measure, boolean keepSelection)
     {
-        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .sourcepanel ." + _cssPrefix + "grid-row"))); // if one row is ready, all should be
+        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .sourcepanel ." + Ext4HelperWD.getCssPrefix() + "grid-row"))); // if one row is ready, all should be
         selectExt4GridItem("queryName", source, -1, panelCls + " .sourcegrid", keepSelection);
         //select measure
-        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .measuresgrid ." + _cssPrefix + "grid-row"))); // if one row is ready, all should be
+        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .measuresgrid ." + Ext4HelperWD.getCssPrefix() + "grid-row"))); // if one row is ready, all should be
         selectExt4GridItem("label", measure, -1, panelCls + " .measuresgrid", keepSelection);
     }
 
@@ -565,11 +558,11 @@ public class ExtHelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection, boolean checkSelectionStartsWith)
     {
-        _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, '" + _cssPrefix + "form-arrow-trigger')]"));
+        _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, '" + Ext4HelperWD.getCssPrefix() + "form-arrow-trigger')]"));
         if (checkSelectionStartsWith)
-            _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, '" + _cssPrefix + "boundlist-item') and starts-with(text(), '" + selection + "')]"));
+            _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, '" + Ext4HelperWD.getCssPrefix() + "boundlist-item') and starts-with(text(), '" + selection + "')]"));
         else
-            _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, '" + _cssPrefix + "boundlist-item') and normalize-space()='" + selection + "']"));
+            _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, '" + Ext4HelperWD.getCssPrefix() + "boundlist-item') and normalize-space()='" + selection + "']"));
     }
 
     public void selectGWTComboBoxItem(Locator.XPathLocator parentLocator, String selection)
@@ -664,7 +657,7 @@ public class ExtHelperWD extends AbstractHelperWD
 
     public boolean isChecked(String label)
     {
-        Locator checked = Locator.xpath("//table[contains(@class, '" + _cssPrefix + "form-cb-checked')]//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
+        Locator checked = Locator.xpath("//table[contains(@class, '" + Ext4HelperWD.getCssPrefix() + "form-cb-checked')]//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
         return _test.isElementPresent(checked);
     }
 
