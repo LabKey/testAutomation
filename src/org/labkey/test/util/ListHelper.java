@@ -52,11 +52,8 @@ public class ListHelper extends AbstractHelper
 
     public void submitImportTsv_success()
     {
-        _test.clickButton("Submit", 0);
-        _test.sleep(500);
-        _test._extHelper.waitForExtDialog("Success");
-        _test.assertTextPresent(" inserted.");
-        _test.clickButton("OK");
+        _test.clickButton("Submit");
+        _test.assertElementNotPresent(Locator.css(".labkey-error"));
     }
 
     // null means any error
