@@ -535,7 +535,7 @@
             <test name="org.labkey.test.Runner"
                 todir="${test.log.output.dir}" outfile="${sysprop.suite}-results"/>
         </junit>
-        <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
+        <ant target="stop_tomcat" antfile="${project.root}/server/build.xml" inheritall="false"/>
         <antcall target="waitfor-tomcat-shutdown"/>
         <echo message="Copying log files from ${tomcat.home}/logs/ to ${test.log.output.dir}/${databaseType}/" />
         <mkdir dir="${test.log.output.dir}/${databaseType}" />
@@ -617,7 +617,6 @@
     </target>
 
     <target name="validateSeleniumStartup" if="noSeleniumServer">
-        <ant inheritall="true" antfile="${project.root}/server/build.xml" target="stop_tomcat"/>
         <fail message="Selenium server did not start." />
     </target>
 
@@ -1554,7 +1553,7 @@
         <ant target="start_tomcat_teamcity" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>
         <antcall target="waitfor-labkey-started"/>
         <antcall target="skipfish_scan"/>
-        <ant target="stop_tomcat" inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml"/>
+        <ant target="stop_tomcat" antfile="${project.root}/server/build.xml" inheritall="false"/>
 
         <delete file="${skipfish.report.dir}/skipfish.zip"/>
         <zip destfile="${skipfish.report.dir}/skipfish.zip" update="true" >
