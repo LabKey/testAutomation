@@ -180,6 +180,19 @@ public class StudyHelperWD extends AbstractHelperWD
     }
 
     @LogMethod
+    public String getParticipantIds(String groupName, String participantString)
+    {
+        selectParticipantCategoriesGridRow(groupName);
+        _test.clickButton("Edit Selected", 0);
+        _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
+
+        String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
+        _test.click(Locator.ext4Button("Cancel"));
+        _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        return currentIds;
+    }
+
+    @LogMethod
     public void deleteCustomParticipantGroup(String groupName, String participantString)
     {
         if( !_test.isElementPresent(Locator.xpath("id('labkey-nav-trail-current-page')[text() = 'Manage "+participantString+" Groups']")) )
