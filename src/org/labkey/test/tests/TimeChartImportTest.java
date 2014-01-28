@@ -23,10 +23,12 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * User: cnathe
@@ -275,6 +277,39 @@ public class TimeChartImportTest extends StudyBaseTestWD
         saveWikiPage();
 
         verifyTimeChartInfo(EXPORTED_CHARTS.get(0), false);
+    }
+
+    @Test
+    public void verifyMaskedPtidOnPublishStudy()
+    {
+        // Added for issue 18763
+        String publishFolderName = "MaskedPtidStudy";
+
+        log("Get the original mouse Ids from the imported study");
+        goToProjectHome();
+        clickFolder(VISIT_STUDY_FOLDER_NAME);
+        clickTab("Clinical and Assay Data");
+        waitAndClickAndWait(Locator.linkWithText("DEM-1: Demographics"));
+        DataRegionTable table = new DataRegionTable("Dataset", this);
+        List<String> origMouseIds = table.getColumnDataAsText("MouseId");
+
+        log("Created published study from Visit based study, with masked ptids");
+        _studyHelper.publishStudy(publishFolderName, 1, "Mice", "Visits", null);
+
+        log("Verify masked ptids in publish study reportInfo");
+        clickFolder(publishFolderName);
+        for (TimeChartInfo chartInfo : VISIT_CHARTS)
+        {
+            clickTab("Clinical and Assay Data");
+            waitAndClickAndWait(Locator.linkWithText(chartInfo.getName()));
+            beginAt("/reports/" + getProjectName() + "/" + VISIT_STUDY_FOLDER_NAME + "/" + publishFolderName + "/reportInfo.view?reportId="
+                    + getUrlParam(getURL().toString(), "reportId", false));
+            waitForText("Report Debug Information");
+            for (String origMouseId : origMouseIds)
+            {
+                assertTextNotPresent(origMouseId);
+            }
+        }
     }
 
     @Override

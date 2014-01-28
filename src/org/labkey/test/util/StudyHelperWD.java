@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 /**
@@ -234,4 +236,76 @@ public class StudyHelperWD extends AbstractHelperWD
         _test.clickButton("Export");
     }
 
+    @LogMethod
+    public void publishStudy(String studyName, int expectedPipelineJobs, String subjectNounPlural, String visitNounPlural, List<String> hiddenDatasetNames)
+    {
+        // This method does not include all options for selecting specific datasets, views, etc. but is
+        // meant to be a more general "publish study with all options selected"
+
+        //publish the study
+        _test.goToManageStudy();
+        _test.clickButton("Publish Study", 0);
+        _test._extHelper.waitForExtDialog("Publish Study");
+
+        // Wizard page 1 : General Setup
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'General Setup']"));
+        _test.setFormElement(Locator.name("studyName"), studyName);
+        _test.clickButton("Next", 0);
+
+        // Wizard page 2 : Participants
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = '" + subjectNounPlural + "']"));
+        _test.checkCheckbox(Locator.radioButtonByNameAndValue("renderType", "all"));
+        _test.clickButton("Next", 0);
+
+        // Wizard page 3 : Datasets
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Datasets']"));
+        _test.click(Locator.css(".studyWizardDatasetList .x-grid3-hd-checker  div"));
+        if (hiddenDatasetNames != null)
+        {
+            _test.assertTextPresent("Hidden Datasets");
+            _test.assertTextPresent(hiddenDatasetNames);
+            _test.click(Locator.css(".studyWizardHiddenDatasetList .x-grid3-hd-checker  div"));
+        }
+        _test.click(Locator.xpath("//input[@name='autoRefresh' and @value='false']"));
+        _test.clickButton("Next", 0);
+
+        // Wizard page 4 : Visits
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = '" + visitNounPlural + "']"));
+        _test.click(Locator.css(".studyWizardVisitList .x-grid3-hd-checker  div"));
+        _test.clickButton("Next", 0);
+
+        // Wizard page 5 : Specimens
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
+        _test.clickButton("Next", 0);
+
+        // Wizard Page 6 : Study Objects
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Objects']"));
+        _test.click(Locator.css(".studyObjects .x-grid3-hd-checker  div"));
+        _test.clickButton("Next", 0);
+
+        // Wizard page 7 : Lists
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Lists']"));
+        _test.click(Locator.css(".studyWizardListList .x-grid3-hd-checker  div"));
+        _test.clickButton("Next", 0);
+
+        // Wizard page 8 : Views
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Views']"));
+        _test.click(Locator.css(".studyWizardViewList .x-grid3-hd-checker  div"));
+        _test.clickButton("Next", 0);
+
+        // Wizard Page 9 : Reports
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports']"));
+        _test.click(Locator.css(".studyWizardReportList .x-grid3-hd-checker  div"));
+        _test.clickButton("Next", 0);
+
+        // Wizard page 10 : Folder Objects
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Objects']"));
+        _test.click(Locator.css(".folderObjects .x-grid3-hd-checker  div"));
+        _test.clickButton("Next", 0);
+
+        // Wizard page 11 : Publish Options
+        _test.waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
+        _test.clickButton("Finish");
+        _test.waitForPipelineJobsToComplete(expectedPipelineJobs, "Publish Study", false);
+    }
 }

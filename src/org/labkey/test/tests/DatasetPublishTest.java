@@ -24,6 +24,8 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @Category({DailyA.class})
 public class DatasetPublishTest extends BaseWebDriverTest
@@ -45,74 +47,16 @@ public class DatasetPublishTest extends BaseWebDriverTest
         importStudyFromZip(new File(getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
         goToProjectHome();
         hideDatasets();
-        publishStudy(SUBFOLDER_NAME);
+
+        List<String> hiddenDatasetNames = new ArrayList<>();
+        hiddenDatasetNames.add("ELISpotAssay");
+        _studyHelper.publishStudy(SUBFOLDER_NAME, 2, "Participants", "Timepoints", hiddenDatasetNames);
 
         modifySourceDataset();
         checkTargetDataset();
         addRowToSourceDataset();
         assertNewRowPresentInTarget();
         assertHiddenDatasetPresentInTarget();
-    }
-
-    @LogMethod
-    private void publishStudy(String studyName)
-    {
-        //publish the study
-        goToManageStudy();
-        clickButton("Publish Study", 0);
-        _extHelper.waitForExtDialog("Publish Study");
-
-        // Wizard page 1 : General Setup
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'General Setup']"));
-        setFormElement(Locator.name("studyName"), studyName);
-        clickButton("Next", 0);
-
-        // Wizard page 2 : Participants
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Participants']"));
-        clickButton("Next", 0);
-
-        // Wizard page 3 : Datasets
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Datasets']"));
-        click(Locator.css(".studyWizardDatasetList .x-grid3-hd-checker  div"));
-        click(Locator.xpath("//input[@name='autoRefresh' and @value='false']"));
-
-        assertTextPresent("Hidden Datasets", "ELISpotAssay");
-        click(Locator.css(".studyWizardHiddenDatasetList .x-grid3-hd-checker  div"));
-        clickButton("Next", 0);
-
-        // Wizard page 4 : Visits
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Timepoints']"));
-        click(Locator.css(".studyWizardVisitList .x-grid3-hd-checker  div"));
-        clickButton("Next", 0);
-
-        // Wizard page 5 : Specimens
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
-        clickButton("Next", 0);
-
-        // Wizard Page 6 : Study Objects
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Objects']"));
-        clickButton("Next", 0);
-
-        // Wizard page 7 : Lists
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Lists']"));
-        clickButton("Next", 0);
-
-        // Wizard page 8 : Views
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Views']"));
-        clickButton("Next", 0);
-
-        // Wizard Page 9 : Reports
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Reports']"));
-        clickButton("Next", 0);
-
-        // Wizard page 10 : Folder Objects
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Objects']"));
-        clickButton("Next", 0);
-
-        // Wizard page 11 : Publish Options
-        waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Publish Options']"));
-        clickButton("Finish");
-        waitForPipelineJobsToComplete(2, "Publish Study", false);
     }
 
     @LogMethod
