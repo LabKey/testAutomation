@@ -104,11 +104,6 @@ public class FileContentTest extends BaseWebDriverTest
         click(Locator.navButton("Update Settings"));
         shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css(".labkey-ribbon > div")));
         // Set folder default
-        // Attempt to reset digest timer so that all notifications appear in one email
-        _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "No Email");
-        click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Folder Default']"));
-        _extHelper.waitForExtDialog("Update complete", WAIT_FOR_JAVASCRIPT);
-        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "15 minute digest");
         click(Locator.xpath("//div[starts-with(@id, 'PanelButtonContent') and contains(@id, 'files')]//button[text()='Update Folder Default']"));
         _extHelper.waitForExtDialog("Update complete", WAIT_FOR_JAVASCRIPT);
@@ -243,10 +238,18 @@ public class FileContentTest extends BaseWebDriverTest
         goToModule("Dumbster");
         assertTextNotPresent(TEST_USER);  // User opted out of notifications
 
-        // Notifications should all be in a single digest as long as test runs in less than 15 minutes
-        click(Locator.linkWithText("File Management Notification"));
-        assertTextBefore("File uploaded", "annotations updated"); // All notifications in one email
-        assertTextBefore("annotations updated", "File deleted");
+        // All notifications might not appear in one digest
+        if (isElementPresent(Locator.linkWithText("File Management Notification").index(1)))
+        {
+            click(Locator.linkWithText("File Management Notification"));
+            click(Locator.linkWithText("File Management Notification").index(1));
+            assertTextPresentInThisOrder("File deleted", "File uploaded", "annotations updated"); // Deletion notification in most recent notification; Upload and update in the older notification
+        }
+        else // All notifications in one email
+        {
+            click(Locator.linkWithText("File Management Notification"));
+            assertTextPresentInThisOrder("File uploaded", "annotations updated", "File deleted");
+        }
     }
 
     @Override public BrowserType bestBrowser()
