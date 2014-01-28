@@ -6,7 +6,7 @@
         <transform id="step1" type="StoredProcedure">
             <source schemaName="vehicle" queryName="etl_source" />
             <procedure schemaName="vehicle" procedureName="etlTest">
-                <parameter name="@testMode" value="7"/>
+                <parameter name="@testMode" value="8"/>
             </procedure>
         </transform>
     </transforms>

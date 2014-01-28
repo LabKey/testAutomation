@@ -21,6 +21,7 @@ import org.labkey.remoteapi.di.RunTransformResponse;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
+
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -50,8 +51,9 @@ public class ETLStoredProcedureTest extends ETLTest
         // TODO: only need a subset of the initialSetup operations
         runInitialSetup(false);
 
-        //stored proc based etl supported only on ms sql
-        if(WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+        //stored proc based etl supported on MS SQL and Postgres
+        WebTestHelper.DatabaseType dbType = WebTestHelper.getDatabaseType();
+        if (dbType == WebTestHelper.DatabaseType.MicrosoftSQLServer || dbType == WebTestHelper.DatabaseType.PostgreSQL)
         {
             verifyStoredProcTransform();
         }
@@ -70,7 +72,10 @@ public class ETLStoredProcedureTest extends ETLTest
         4	input/output parameter persistence
         5	override of persisted input/output parameter
         6	Run filter strategy, require @filterRunId
-        7	Modified since filter strategy, require @filterStartTimeStamp & @filterEndTimeStamp
+        7   Modified since filter strategy, no source, require @filterStartTimeStamp & @filterEndTimeStamp,
+            populated from output of previous run
+        8	Modified since filter strategy with source, require @filterStartTimeStamp & @filterEndTimeStamp
+            populated from the filter strategy IncrementalStartTime & IncrementalEndTime
         */
 
         // All tests use the API
@@ -103,7 +108,12 @@ public class ETLStoredProcedureTest extends ETLTest
         // test mode 3, raise an error inside the sproc
         rtr = runETL_API(TRANSFORM_BAD_THROW_ERROR_SP);
         assertEquals("ERROR", _diHelper.getTransformStatus(rtr.getJobId()));
-        incrementExpectedErrorCount(false, false);
+        incrementExpectedErrorCount(true, false);
+        // Postgres throws even more errors in there than SQL Server for this case
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
+        {
+            incrementExpectedErrorCount(true, false);
+        }
 
         // test mode 4, parameter persistance. Run twice. First time, the value of the in/out parameter supplied in the xml file
         // is changed in the sproc, which should be persisted into the transformConfiguration.state variable map.
