@@ -153,7 +153,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     private Stack<String> _impersonationStack = new Stack<>();
     private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
     protected static boolean _testFailed = false;
-    protected static Boolean _anyTestFailed;
+    protected static Boolean _anyTestCaseFailed;
     protected static boolean _setupFailed;
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 30000;
@@ -208,7 +208,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _ext4Helper = new Ext4HelperWD(this);
         _listHelper = new ListHelperWD(this);
         _customizeViewsHelper = new CustomizeViewsHelperWD(this);
-        if (null == _anyTestFailed) _anyTestFailed = false;
+        _anyTestCaseFailed = false;
         _jsErrors = new ArrayList<>();
         _downloadDir = new File(ensureDumpDir(), "downloads");
 
@@ -1817,7 +1817,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void handleFailure(AtomicReference<Throwable> errorRef, String testName)
     {
         _testFailed = true;
-        _anyTestFailed = true;
+        _anyTestCaseFailed = true;
 
         if (errorRef.get() instanceof UnhandledAlertException)    // Catch so we can record the alert's text
         {

@@ -33,7 +33,7 @@ public class WebDriverTestPostamble extends BaseWebDriverTest
 {
     public void postamble() throws Exception
     {
-        if (!_anyTestFailed && currentTest != null)
+        if (!_anyTestCaseFailed && currentTest != null)
         {
             //make sure you're signed in as admin, because this won't work otherwise
             ensureSignedInAsAdmin();
@@ -69,7 +69,7 @@ public class WebDriverTestPostamble extends BaseWebDriverTest
             log("Skipping post-test checks because a test case failed.");
         }
 
-        if (!_anyTestFailed && getDownloadDir().exists())
+        if (!_anyTestCaseFailed && getDownloadDir().exists())
         {
             try{
                 FileUtils.deleteDirectory(getDownloadDir());
