@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.EscapeUtil;
 
@@ -135,6 +136,17 @@ public class StudyMergeParticipantsTest extends StudyBaseTestWD
         log("Resolve conflicts and check for correct row retention");
         click(Locator.radioButtonByNameAndValue("conflict_Demographics", "new"));
         click(Locator.radioButtonByNameAndValue("conflict_Participation and Genetic Consent", "old"));
+
+        // SQL Server reports additional conflicts
+        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.MicrosoftSQLServer)
+        {
+            click(Locator.radioButtonByNameAndValue("conflict_FileBasedAssay", "new"));
+            click(Locator.radioButtonByNameAndValue("conflict_HIV Test Results", "new"));
+            click(Locator.radioButtonByNameAndValue("conflict_Lab Results", "new"));
+            click(Locator.radioButtonByNameAndValue("conflict_Physical Exam", "new"));
+            click(Locator.radioButtonByNameAndValue("conflict_Status Assessment", "new"));
+        }
+
         clickButton("Merge", 0);
         waitForElement(Locator.tag("span").containing("Successfully merged"), MERGE_SUCCESS_TIMEOUT);
         clickTab(SUBJECT_NOUN_PLURAL);
