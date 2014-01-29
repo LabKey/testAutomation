@@ -137,6 +137,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return System.getProperty("selenium.server", DEFAULT_SELENIUM_SERVER);
     }
 
+    @Deprecated
     public DefaultSeleniumWrapper getWrapper()
     {
         return selenium;
