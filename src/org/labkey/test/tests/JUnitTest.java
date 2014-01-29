@@ -122,7 +122,7 @@ public class JUnitTest extends TestSuite
         }
         finally
         {
-            helper.tearDown();
+            helper.doTearDown();
         }
     }
 
