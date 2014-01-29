@@ -64,6 +64,10 @@ public class WebDriverTestPostamble extends BaseWebDriverTest
 
             checkJsErrors();
         }
+        else
+        {
+            log("Skipping post-test checks because a test case failed.");
+        }
 
         if (!_anyTestFailed && getDownloadDir().exists())
         {
