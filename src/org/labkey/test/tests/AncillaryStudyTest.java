@@ -219,8 +219,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("Import Data");
         setFormElement(Locator.name("text"), EXTRA_DATASET_ROWS);
-        clickButton("Submit", 0);
-        waitAndClickButton("OK");
+        clickButton("Submit");
 
         log("Verify changes in Ancillary Study. (insert)");
         clickFolder(STUDY_NAME);
