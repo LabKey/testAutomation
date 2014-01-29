@@ -43,6 +43,12 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         super.doCleanup(afterTest);
+
+        for (ExperimentalFeature feature : ExperimentalFeature.values())
+        {
+            if (_initialFeatureStates.containsKey(feature))
+                setExperimentalFeature(feature, _initialFeatureStates.get(feature));
+        }
     }
 
     @Override
@@ -75,15 +81,16 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
             else
             {
                 log("Experimental feature already enabled: " + feature);
+                return;
             }
         }
         if (!enable)
         {
-            if ("enable".equals(getText(toggleLink).toLowerCase()))
+            if ("disable".equals(getText(toggleLink).toLowerCase()))
             {
                 if(!_initialFeatureStates.containsKey(feature))
                 {
-                    _initialFeatureStates.put(feature, false);
+                    _initialFeatureStates.put(feature, true);
                 }
                 click(toggleLink);
                 waitForElement(toggleLink.append("[text()='Enable']"));
@@ -91,7 +98,13 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
             else
             {
                 log("Experimental feature already disabled: " + feature);
+                return;
             }
+        }
+
+        if(enable == _initialFeatureStates.get(feature))
+        {
+            _initialFeatureStates.remove(feature);
         }
     }
 
@@ -119,15 +132,5 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         {this.title = title;}
         public String toString()
         {return title;}
-    }
-
-    public void tearDown() throws Exception
-    {
-        for (ExperimentalFeature feature : ExperimentalFeature.values())
-        {
-            if (_initialFeatureStates.containsKey(feature))
-                setExperimentalFeature(feature, _initialFeatureStates.get(feature));
-        }
-        super.tearDown();
     }
 }
