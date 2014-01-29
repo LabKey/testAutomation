@@ -34,12 +34,15 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * User: tchadick
@@ -95,7 +98,7 @@ public class ChartingAPITest extends ClientAPITest
         chartAPITest();
         genericChartHelperTest();
         timeChartHelperTest();
-        setAesAPITest();
+        interactiveChartsTest();
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -274,13 +277,23 @@ public class ChartingAPITest extends ClientAPITest
     protected static final String SCATTER_REMOVE_LEGEND = "Scatter remove legend";
     protected static final String SCATTER_REMOVE_LEGEND_SVG_BEFORE = "0\n200\n400\n600\n800\n1000\n1200\n1400\n800\n1000\n1200\n1400\n1600\n1800\n2000\nScatter remove legend\n103866\n110349\n119180\n125478";
     protected static final String SCATTER_REMOVE_LEGEND_SVG_AFTER = "0\n200\n400\n600\n800\n1000\n1200\n1400\n800\n1000\n1200\n1400\n1600\n1800\n2000\nScatter remove legend";
+    protected static final String BRUSHED_SCATTER_W_CUSTOM_SCALES = "Scatter With Brushing and Custom Scales";
+    protected static final String BRUSHED_SCATTER_W_CUSTOM_SCALES_SVG = "0\n100\n200\n300\n400\n500\n600\n0\n100\n200\n300\n400\n500\n600\n700\n800\n900\nScatter With Brushing and Custom Scales\n0\n1\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n2\n3\n4\n5\n6\n7\n8\n9";
+    protected static final String CIRCLE_PATH = "M0-6.8c-3.7,0-6.8,3.1-6.8,6.8S-3.7,6.8,0,6.8S6.8,3.7,6.8,0S3.7-6.8,0-6.8z M0,4.9c-2.7,0-4.9-2.3-4.9-4.9S-2.7-4.9,0-4.9S4.9-2.8,4.9,0C4.9,2.7,2.7,4.9,0,4.9z";
+    protected static final String ARROW_PATH = "M5.5,1.1L5.5,1.1L0-6.2l-5.5,7.3l1.8,1.4l2.5-3.4v7.1h2.4v-7.1l2.5,3.4L5.5,1.1z";
+    protected static final String CIRCLE_COLOR = "#010101";
+    protected static final String ARROW_COLOR = "#FF33E5";
+    protected static final String MOUSEOVER_FILL = "#01BFC2";
+    protected static final String MOUSEOVER_STROKE = "#00EAFF";
+    protected static final String BRUSH_FILL = "#14C9CC";
+    protected static final String BRUSH_STROKE = "#00393A";
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void setAesAPITest()
+    private void interactiveChartsTest()
     {
         Locator nextBtn = Locator.input("next-btn");
         Locator setAesBtn = Locator.input("set-aes-btn");
-        File chartTestFile = new File(getApiFileRoot(), "setAesAPITest.html");
+        File chartTestFile = new File(getApiFileRoot(), "interactiveChartsTest.html");
         createAPITestWiki("setAesTestWiki", chartTestFile, false);
 
         waitForText(BOX_PLOT_COLOR_SHAPE);
@@ -316,6 +329,93 @@ public class ChartingAPITest extends ClientAPITest
         assertSVG(SCATTER_REMOVE_LEGEND_SVG_BEFORE);
         click(setAesBtn);
         assertSVG(SCATTER_REMOVE_LEGEND_SVG_AFTER);
+
+        click(nextBtn);
+        waitForText(BRUSHED_SCATTER_W_CUSTOM_SCALES);
+        assertSVG(BRUSHED_SCATTER_W_CUSTOM_SCALES_SVG);
+
+        List<WebElement> points;
+        points = Locator.css("svg g a path").findElements(getDriver());
+        assertEquals("Bottom left point was an unexpected color.", CIRCLE_COLOR, points.get(0).getAttribute("fill"));
+        assertEquals("Bottom left point was not a circle.", CIRCLE_PATH, points.get(0).getAttribute("d"));
+        assertEquals("Top right point was an unexpected color.", ARROW_COLOR, points.get(399).getAttribute("fill"));
+        assertEquals("Top right point was not an upward arrow.", ARROW_PATH, points.get(399).getAttribute("d"));
+
+        // Test mouseover/mouseout aesthetics.
+        fireEvent(points.get(0), SeleniumEvent.mouseover);
+        assertEquals("Related point had an unexpected fill color.", MOUSEOVER_FILL, points.get(1).getAttribute("fill"));
+        assertEquals("Related point had an unexpected stroke color.", MOUSEOVER_STROKE, points.get(1).getAttribute("stroke"));
+
+        fireEvent(points.get(0), SeleniumEvent.mouseout);
+        assertEquals("Related point had an unexpected fill color.", CIRCLE_COLOR, points.get(1).getAttribute("fill"));
+        assertEquals("Related point had an unexpected stroke color.", CIRCLE_COLOR, points.get(1).getAttribute("stroke"));
+
+        // Test removal of mouseover/mouseout aesthetics (Issue 19455).
+        click(setAesBtn);
+        points = Locator.css("svg g a path").findElements(getDriver());
+        fireEvent(points.get(0), SeleniumEvent.mouseover);
+        assertEquals("Related point had an unexpected fill color.", CIRCLE_COLOR, points.get(1).getAttribute("fill"));
+        assertEquals("Related point had an unexpected stroke color.", CIRCLE_COLOR, points.get(1).getAttribute("stroke"));
+
+        // Test chart brushing.
+        Actions builder = new Actions(getDriver());
+        builder.moveToElement(points.get(0)).moveByOffset(-10, 10).clickAndHold().moveByOffset(150, -190).release().perform();
+        verifyBrushedPoints();
+        verifyNonBrushedPoints();
+        // NOTE: have to use clickAndHold().release() here because Firefox does not like click().
+        builder.moveToElement(points.get(0)).moveByOffset(-20, 0).clickAndHold().release().perform();
+        verifyBrushCleared();
+    }
+
+    private void verifyBrushedPoints()
+    {
+        // Check the first, middle, and end point for each "row" in the selected area.
+        List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
+        for (int i = 0; i < 20; i++)
+        {
+            int baseIndex = i * 20;
+            verifyBrushedPoint(points.get(baseIndex));
+            verifyBrushedPoint(points.get(baseIndex + 4));
+            verifyBrushedPoint(points.get(baseIndex + 9));
+        }
+    }
+
+    private void verifyBrushCleared()
+    {
+        // Check the first, middle, and end point for each "row" in the selected area.
+        List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
+        for (int i = 0; i < 20; i++)
+        {
+            int baseIndex = i * 20;
+            verifyNonBrushedPoint(points.get(baseIndex));
+            verifyNonBrushedPoint(points.get(baseIndex + 4));
+            verifyNonBrushedPoint(points.get(baseIndex + 9));
+        }
+    }
+
+    private void verifyNonBrushedPoints()
+    {
+        // Check the first, middle, and end point for each "row" in the set of points in the top right of the plot.
+        List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
+        for (int i = 0; i < 20; i++)
+        {
+            int baseIndex = (i * 20) + 10;
+            verifyNonBrushedPoint(points.get(baseIndex));
+            verifyNonBrushedPoint(points.get(baseIndex + 4));
+            verifyNonBrushedPoint(points.get(baseIndex + 9));
+        }
+    }
+
+    private void verifyBrushedPoint(WebElement el)
+    {
+        assertEquals("Brushed point had an unexpected fill color.", BRUSH_FILL, el.getAttribute("fill"));
+        assertEquals("Brushed point had an unexpected stroke color.", BRUSH_STROKE, el.getAttribute("stroke"));
+    }
+
+    private void verifyNonBrushedPoint(WebElement el)
+    {
+        assertNotEquals("Non-brushed point had fill color of a brushed point.", BRUSH_FILL, el.getAttribute("fill"));
+        assertNotEquals("Non-brushed point had stroke color of a brushed point.", BRUSH_STROKE, el.getAttribute("stroke"));
     }
 
     private void checkExportedChart(String title, String svgText)
