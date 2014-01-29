@@ -20,7 +20,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.RReportHelperWD;
+import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.*;
 
@@ -30,7 +32,7 @@ import static org.junit.Assert.*;
  * Time: 3:22 PM
  */
 @Category({BVT.class})
-public class ParticipantListTest extends StudyBaseTest
+public class ParticipantListTest extends StudyBaseTestWD
 {
     protected static final String[] BITS = {"ABCD", "EFGH", "IJKL", "MNOP", "QRST", "UVWX"};
     protected static final String[] CATEGORIES = {BITS[0]+BITS[1]+TRICKY_CHARACTERS_NO_QUOTES, BITS[1]+BITS[2]+TRICKY_CHARACTERS_NO_QUOTES,
@@ -54,8 +56,8 @@ public class ParticipantListTest extends StudyBaseTest
     @Override @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doCreateSteps()
     {
-        RReportHelper _rReportHelper = new RReportHelper(this);
-        _rReportHelper.ensureRConfig();
+        RReportHelperWD _reportHelperWD = new RReportHelperWD(this);
+        _reportHelperWD.ensureRConfig();
         importStudy();
         startSpecimenImport(2);
 
@@ -80,7 +82,7 @@ public class ParticipantListTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("Change Properties"));
 
-        int dsCount = getXpathCount(Locator.xpath("//input[@name='extraData']"));
+        int dsCount = getElementCount(Locator.xpath("//input[@name='extraData']"));
         assertEquals("Unexpected number of Datasets.", datasetCount, dsCount);
 
         // create new categories, then assign them out
@@ -89,8 +91,9 @@ public class ParticipantListTest extends StudyBaseTest
             clickButton("Manage Categories", 0);
             _extHelper.waitForExtDialog("Manage Categories");
             clickButton("New Category", 0);
-            waitForElement(Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden());
-            setFormElement(Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden(), category);
+            WebElement formField = Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+            setFormElement(formField, category);
+            fireEvent(formField, SeleniumEvent.blur);
             waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//div").withText(category));
             clickButton("Done", 0);
             _extHelper.waitForExtDialogToDisappear("Manage Categories");
@@ -102,7 +105,7 @@ public class ParticipantListTest extends StudyBaseTest
             Locator.XPathLocator combo = Locator.xpath("//div[contains(@id, '-viewcategory')]//table").withClass("x4-form-item").index(i);
             _ext4Helper.selectComboBoxItem(combo, CATEGORIES[i / 10]);
         }
-        uncheckCheckbox("visible", dsCount - 1); // Set last dataset to not be visible.
+        uncheckCheckbox(Locator.name("visible").index(dsCount - 1)); // Set last dataset to not be visible.
         clickButton("Save");
     }
 
@@ -112,7 +115,8 @@ public class ParticipantListTest extends StudyBaseTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Overview"));
-        addWebPart("Mouse List");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Mouse List");
         waitForElement(Locator.css(".lk-filter-panel-label"));
         waitForText("Found 25 enrolled mice of 138."); // Wait for participant list to appear with Not in any cohort deselected by default
 
@@ -162,13 +166,19 @@ public class ParticipantListTest extends StudyBaseTest
 
         // compare the height of a non text-wrapped group grid cell to a wrapped one
         _ext4Helper.checkGridRowCheckbox(PARTICIPANT_GROUP_THREE);
-        int group2Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 8)"));
-        int group3Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 11)"));
+        int group2Height = _extHelper.getExtElementHeight("normalwrap-gridcell", 8);
+        int group3Height = _extHelper.getExtElementHeight("normalwrap-gridcell", 11);
         assertTrue("Expected " + PARTICIPANT_GROUP_THREE + " grid cell to wrap text (group3height="+group3Height+",group2Height="+group2Height, group3Height > group2Height);
         // drag the east handle to the right so that the group three doesn't wrap anymore
         dragAndDrop(Locator.xpath("//div[contains(@class, 'x4-resizable-handle-east')]"), 250, 0);
-        group2Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 8)"));
-        group3Height = Integer.parseInt(this.getWrapper().getEval("selenium.getExtElementHeight('normalwrap-gridcell', 11)"));
+        group2Height = _extHelper.getExtElementHeight("normalwrap-gridcell", 8);
+        group3Height = _extHelper.getExtElementHeight("normalwrap-gridcell", 11);
         assertTrue("Expected panel width to allow " + PARTICIPANT_GROUP_THREE + " grid cell on one line", group3Height == group2Height);
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

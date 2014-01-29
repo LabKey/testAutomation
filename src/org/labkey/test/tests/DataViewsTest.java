@@ -16,7 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.Ext4HelperWD;
@@ -24,6 +24,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.*;
 
@@ -47,6 +48,8 @@ public class DataViewsTest extends ParticipantListTest
             {"PT-1: Participant Transfer", "Locked"}
     };
 
+    private final PortalHelper _portalHelper = new PortalHelper(this);
+
     @Override @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doCreateSteps()
     {
@@ -67,7 +70,7 @@ public class DataViewsTest extends ParticipantListTest
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R View");
         clickButton("Save", "Please enter a view name:");
 
-        Locator locator = _ext4Helper.ext4Window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+        Locator locator = Ext4HelperWD.ext4Window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
         if (isElementPresent(locator))
         {
             setFormElement(locator, REPORT_NAME);
@@ -100,18 +103,15 @@ public class DataViewsTest extends ParticipantListTest
 
         log("Verify dataset category filtering.");
         setDataBrowseSearch(BITS[3]);
-        waitForTextToDisappear(BITS[1]);
-        assertTextNotPresent(CATEGORIES[0]);
-        assertTextNotPresent(CATEGORIES[1]);
-        assertTextNotPresent(CATEGORIES[4]);
-        assertEquals("Incorrect number of dataset categories visible.", 4, getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden())); // Two categories contain filter text.
-        assertEquals("Incorrect number of datasets after filter", 22, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        waitForElementToDisappear(Locator.tag("tr").withClass("x4-grid-row").containing(BITS[1]).notHidden());
+        assertEquals("Incorrect number of dataset categories visible.", 4, getElementCount(Locator.xpath("//td").withClass("dvcategory").notHidden())); // Two categories contain filter text.
+        assertEquals("Incorrect number of datasets after filter", 22, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
         collapseCategory("Subcategory1-" + CATEGORIES[2]);
-        assertEquals("Incorrect number of datasets after collapsing subcategory.", 21, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
-        assertEquals("Incorrect number of dataset categories visible after collapsing subcategory.", 4, getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
+        assertEquals("Incorrect number of datasets after collapsing subcategory.", 21, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        assertEquals("Incorrect number of dataset categories visible after collapsing subcategory.", 4, getElementCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
         collapseCategory(CATEGORIES[2]);
-        assertEquals("Incorrect number of datasets after collapsing category.", 10, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
-        assertEquals("Incorrect number of dataset categories visible after collapsing category.", 2, getXpathCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
+        assertEquals("Incorrect number of datasets after collapsing category.", 10, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        assertEquals("Incorrect number of dataset categories visible after collapsing category.", 2, getElementCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
         _extHelper.uncheckCheckbox("datasets");
         setFormElement(Locator.name("webpart.title"), RENAMED_WEBPART_TITLE);
@@ -119,9 +119,9 @@ public class DataViewsTest extends ParticipantListTest
         _ext4Helper.waitForMaskToDisappear();
         setDataBrowseSearch("");
         waitForElement(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden());
-        waitForElement(Locator.linkWithText(REPORT_NAME), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.linkWithText(REPORT_NAME), WAIT_FOR_JAVASCRIPT);
         assertElementPresent(PortalHelper.Locators.webPartTitle(RENAMED_WEBPART_TITLE));
-        assertEquals("Incorrect number of datasets after filter", 9, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        assertEquals("Incorrect number of datasets after filter", 9, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
         log("Verify cancel button");
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
@@ -134,7 +134,7 @@ public class DataViewsTest extends ParticipantListTest
         waitForText(REPORT_NAME); //TODO: /
         assertTextNotPresent("nothing");
         assertTextPresent(RENAMED_WEBPART_TITLE);
-        assertEquals("Incorrect number of datasets after filter", 9, getXpathCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        assertEquals("Incorrect number of datasets after filter", 9, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
 
         log("Verify category management: delete");
         openCustomizePanel(RENAMED_WEBPART_TITLE);
@@ -145,7 +145,7 @@ public class DataViewsTest extends ParticipantListTest
         _extHelper.waitForExtDialog("Delete Category");
         clickButton("OK", 0);
         _extHelper.waitForExtDialogToDisappear("Delete Category");
-        waitForElementToDisappear(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + CATEGORIES.length + "]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Locator.xpath("(//input[contains(@class, 'form-field') and @type='text'])[" + CATEGORIES.length + "]"), WAIT_FOR_JAVASCRIPT);
         clickButton("Done", 0);
         clickButton("Save", 0);
 
@@ -155,15 +155,16 @@ public class DataViewsTest extends ParticipantListTest
         clickButton("Manage Categories", 0);
         _extHelper.waitForExtDialog("Manage Categories");
         clickButton("New Category", 0);
-        waitForElement(Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden());
-        setFormElement(Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden(), NEW_CATEGORY);
+        WebElement newCategoryField = Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        setFormElement(newCategoryField, NEW_CATEGORY);
+        fireEvent(newCategoryField, SeleniumEvent.blur);
         waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//div").withText(NEW_CATEGORY));
         clickButton("Done", 0);
         _extHelper.waitForExtDialogToDisappear("Manage Categories");
         clickButton("Save", 0);
-        waitForText(CATEGORIES[1], BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForText(CATEGORIES[1], WAIT_FOR_JAVASCRIPT);
         refresh(); // Deleted category is still present, but hidden.  Refresh to clear page.
-        waitForText(CATEGORIES[1], BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForText(CATEGORIES[1], WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent(CATEGORIES[0]);
         assertTextPresentInThisOrder(CATEGORIES[2], CATEGORIES[3], "Uncategorized", REPORT_NAME, "APX-1");
 
@@ -214,36 +215,36 @@ public class DataViewsTest extends ParticipantListTest
             clickButton("Save", 0);
 
             Locator statusLink = Locator.xpath("//div[contains(@class, 'x4-grid-cell-inner')]//a[contains(text(), '" + entry[0] + "')]/../../../../..//div//img[@alt='" + entry[1] + "']");
-            waitForElement(statusLink, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            waitForElement(statusLink, WAIT_FOR_JAVASCRIPT);
 
             // visit the dataset page and make sure we inject the correct class onto the page
             log("Verify dataset view has the watermark class");
             click(Locator.xpath("//a[contains(text(), '" + entry[0] + "')]"));
 
-            waitForElement(Locator.xpath("//td[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+            waitForElement(Locator.xpath("//td[contains(@class, 'labkey-proj') and contains(@class, 'labkey-dataset-status-" + entry[1].toLowerCase() + "')]"), WAIT_FOR_JAVASCRIPT);
             clickAndWait(Locator.linkContainingText("Data & Reports"));
         }
     }
 
     private void openCustomizePanel(String title)
     {
-        clickWebpartMenuItem(title, false, "Customize");
-        waitForElement(Locator.ext4Button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _portalHelper.clickWebpartMenuItem(title, false, "Customize");
+        waitForElement(Locator.ext4Button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
     }
 
     private void closeCustomizePanel(String title)
     {
-        clickWebpartMenuItem(title, false, "Customize");
-        waitForElementToDisappear(Locator.ext4Button("Manage Categories"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _portalHelper.clickWebpartMenuItem(title, false, "Customize");
+        waitForElementToDisappear(Locator.ext4Button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
     }
 
     private void enableEditMode()
     {
         waitAndClick(Locator.css("a>img[title=Edit]"));
-        waitForElement(Locator.css("span[class~=edit-views-link]"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.css("span[class~=edit-views-link]"), WAIT_FOR_JAVASCRIPT);
     }
 
-    public static void clickCustomizeView(String viewName, BaseSeleniumWebTest test)
+    public static void clickCustomizeView(String viewName, BaseWebDriverTest test)
     {
         Locator editLink = Locators.editViewsLink(viewName);
         test.waitAndClick(editLink);
@@ -272,17 +273,17 @@ public class DataViewsTest extends ParticipantListTest
     private void collapseCategory(@LoggedParam String category)
     {
         Locator.XPathLocator dataViewRow = Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden();
-        int dataViewCount = getXpathCount(dataViewRow);
+        int dataViewCount = getElementCount(dataViewRow);
         assertElementPresent(Locator.xpath("//tr").withClass("x4-grid-tree-node-expanded").append("/td/div").withText(category));
         click(Locator.xpath("//div").withText(category).append("/img").withClass("x4-tree-expander"));
-        waitForElementToDisappear(dataViewRow.index(dataViewCount - 1), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(dataViewRow.index(dataViewCount - 1), WAIT_FOR_JAVASCRIPT);
     }
 
     @LogMethod
     private void expandCategory(@LoggedParam String category)
     {
         Locator.XPathLocator dataViewRow = Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden();
-        int dataViewCount = getXpathCount(dataViewRow);
+        int dataViewCount = getElementCount(dataViewRow);
         assertElementNotPresent(Locator.xpath("//tr").withClass("x4-grid-tree-node-expanded").append("/td/div").withText(category));
         click(Locator.xpath("//div").withText(category).append("/img").withClass("x4-tree-expander"));
         waitForElement(dataViewRow.index(dataViewCount));
@@ -299,22 +300,22 @@ public class DataViewsTest extends ParticipantListTest
         mouseOver(Locator.linkWithText(EDITED_DATASET));
         waitForText("Type:");
         assertTextNotPresent("Data Cut Date:");
-        mouseOut(Locator.linkWithText(EDITED_DATASET)); // Dismiss hover box
+//        mouseOut(Locator.linkWithText(EDITED_DATASET)); // Dismiss hover box
         waitForTextToDisappear("Type:");
         openCustomizePanel(RENAMED_WEBPART_TITLE);
         _extHelper.checkCheckbox("Modified");
         _extHelper.checkCheckbox("Data Cut Date");
         Locator manageButton = getButtonLocator("Manage Categories");
         clickButton("Save", 0);
-        waitForElementToDisappear(manageButton, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(manageButton, WAIT_FOR_JAVASCRIPT);
         waitForText("Data Cut Date");
         waitForText("Modified");
         enableEditMode();
         openEditPanel(EDITED_DATASET);
         _extHelper.waitForExtDialog(EDITED_DATASET);
-        setFormElement("refreshDate", refreshDate);
+        setFormElement(Locator.name("refreshDate"), refreshDate);
         clickButton("Save", 0);
-        waitForText(refreshDate, 1, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForText(refreshDate, 1, WAIT_FOR_JAVASCRIPT);
         // check hover box
         mouseOver(Locator.linkWithText(EDITED_DATASET));
         waitForText("Data Cut Date:");
@@ -324,14 +325,14 @@ public class DataViewsTest extends ParticipantListTest
     }
 
     private static final String CATEGORY_LIST =
-            CATEGORIES[0]+
-            CATEGORIES[1]+
-                "Subcategory1-"+CATEGORIES[1]+
-                "Subcategory2-"+CATEGORIES[1]+
-            CATEGORIES[2]+
-                "Subcategory1-"+CATEGORIES[2]+
-                "Subcategory2-"+CATEGORIES[2]+
-            CATEGORIES[3]+
+            CATEGORIES[0]+ "\n" +
+            CATEGORIES[1]+ "\n" +
+                "Subcategory1-"+CATEGORIES[1]+ "\n" +
+                "Subcategory2-"+CATEGORIES[1]+ "\n" +
+            CATEGORIES[2]+ "\n" +
+                "Subcategory1-"+CATEGORIES[2]+ "\n" +
+                "Subcategory2-"+CATEGORIES[2]+ "\n" +
+            CATEGORIES[3]+ "\n" +
             CATEGORIES[4];
 
     @LogMethod
@@ -343,7 +344,7 @@ public class DataViewsTest extends ParticipantListTest
         _extHelper.waitForExtDialog("Manage Categories");
 
         waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
-        mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
+        click(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
         _extHelper.waitForExtDialog("Subcategories");
         assertElementPresent(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[1]));
 
@@ -352,7 +353,7 @@ public class DataViewsTest extends ParticipantListTest
 
         click(Ext4HelperWD.Locators.window("Subcategories").append("//img").withClass("x4-tool-close").notHidden());
         waitForTextToDisappear("Subcategory1-" + CATEGORIES[1]);
-        mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
+        click(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
         waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[2]));
         assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1]);
 
@@ -361,7 +362,7 @@ public class DataViewsTest extends ParticipantListTest
 
         click(Ext4HelperWD.Locators.window("Subcategories").append("//img").withClass("x4-tool-close").notHidden());
         waitForTextToDisappear("Subcategory1-" + CATEGORIES[2]);
-        mouseDown(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[3])));
+        click(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[3])));
         waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[3]));
         assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1], "Subcategory1-" + CATEGORIES[2], "Subcategory2-" + CATEGORIES[2]);
 
@@ -411,7 +412,7 @@ public class DataViewsTest extends ParticipantListTest
     {
         log("Verify roundtripping of study redesign features");
         exportStudy(true, false);
-        deleteStudy(getStudyLabel());
+        deleteStudy();
 
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
@@ -438,9 +439,9 @@ public class DataViewsTest extends ParticipantListTest
     private void addSubCategory(String subCategoryName)
     {
         clickButton("New Subcategory", 0);
-        waitForElement(Locator.xpath("//input[@name='label']").notHidden());
-        setFormElement(Locator.name("label"), subCategoryName);
-        waitForElementToDisappear(Locator.xpath("//input[@name='label']").notHidden(), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        WebElement subCategoryField = Locator.xpath("//input[@name='label']").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        setFormElement(subCategoryField, subCategoryName);
+        fireEvent(subCategoryField, SeleniumEvent.blur);
         waitForElement(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(subCategoryName));
     }
 
@@ -460,7 +461,7 @@ public class DataViewsTest extends ParticipantListTest
     {
         clickButton("Save", 0);
         _extHelper.waitForExtDialogToDisappear(dataset);
-        _ext4Helper.waitForMaskToDisappear(BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.css(".x4-grid-row"));
     }
 
