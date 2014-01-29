@@ -18,6 +18,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -68,9 +69,19 @@ public class Ext4HelperWD extends AbstractHelperWD
     {
         openComboList(comboBox);
 
-        for (String selection : selections)
+        try
         {
-            selectItemFromOpenComboList(selection, containsText);
+            for (String selection : selections)
+            {
+                selectItemFromOpenComboList(selection, containsText);
+            }
+        }
+        catch (StaleElementReferenceException retry) // Combo-box might still be loading previous selection (no good way to detect)
+        {
+            for (String selection : selections)
+            {
+                selectItemFromOpenComboList(selection, containsText);
+            }
         }
 
         closeComboList(comboBox);
@@ -247,7 +258,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     {
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
         if (!isGridRowChecked(rowLoc))
-            _test.click(rowLoc.append("//div[contains(@class, '" + _cssPrefix + "grid-row-checker')]"));
+            _test.click(rowLoc.append("//div").withClass(_cssPrefix + "grid-row-checker"));
     }
 
     /**
@@ -338,7 +349,7 @@ public class Ext4HelperWD extends AbstractHelperWD
     private boolean isGridRowChecked(Locator.XPathLocator rowLoc)
     {
         _test.assertElementPresent(rowLoc);
-        return _test.isElementPresent(rowLoc.append("[contains(@class, '" + _cssPrefix + "grid-row-selected')]"));
+        return _test.isElementPresent(rowLoc.withClass(_cssPrefix + "grid-row-selected"));
     }
 
     /**
@@ -407,19 +418,7 @@ public class Ext4HelperWD extends AbstractHelperWD
             }
             return ret;
         }
-        catch (NoSuchMethodException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (InvocationTargetException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (InstantiationException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (IllegalAccessException e)
+        catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e)
         {
             throw new RuntimeException(e);
         }
@@ -467,12 +466,12 @@ public class Ext4HelperWD extends AbstractHelperWD
      */
     private Locator.XPathLocator getGridRow(String cellText, int index)
     {
-        return Locator.xpath("(//tr[contains(@class, '" + _cssPrefix + "grid-row')][(td|td/table/tbody/tr/td)[string() = '" + cellText + "']]["+Locator.NOT_HIDDEN+"])[" + (index + 1) + "]");
+        return Locator.tag("tr").withClass(_cssPrefix + "grid-row").withPredicate("(td|td/table/tbody/tr/td)[string() = " + Locator.xq(cellText) + "]").notHidden().index(index);
     }
 
     public static Locator.XPathLocator invalidField()
     {
-        return Locator.xpath("//input[contains(@class, '" + _cssPrefix + "form-field') and contains(@class, '" + _cssPrefix + "form-invalid-field')]");
+        return Locator.tag("input").withClass(_cssPrefix + "form-field").withClass(_cssPrefix + "form-invalid-field");
     }
 
     @LogMethod(quiet = true)
