@@ -5162,7 +5162,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void setFormElement(Locator l, String text, boolean suppressValueLogging)
     {
         WebElement el = l.findElement(getDriver());
+        setFormElement(el, text);
+    }
 
+    public void setFormElement(WebElement el, String text)
+    {
         boolean isFileInput = "file".equals(el.getAttribute("type"));
         if (isFileInput)
         {
@@ -5182,12 +5186,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
         else
         {
-            setFormElementJS(l, text);
+            setFormElementJS(el, text);
         }
 
         String elementClass = el.getAttribute("class");
         if (elementClass.contains("gwt-TextBox") || elementClass.contains("gwt-TextArea") || elementClass.contains("x-form-text"))
-            fireEvent(l, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
+            fireEvent(el, SeleniumEvent.blur); // Make GWT and ExtJS form elements behave better
     }
 
     /**
@@ -5198,7 +5202,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void setFormElementJS(Locator l, String text)
     {
         WebElement el = l.findElement(getDriver());
+        setFormElementJS(el, text);
+    }
 
+    public void setFormElementJS(WebElement el, String text)
+    {
         executeScript("arguments[0].value = arguments[1]", el, text);
         fireEvent(el, SeleniumEvent.change);
     }
