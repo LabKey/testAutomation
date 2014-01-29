@@ -218,7 +218,7 @@ public class ChartingAPITest extends ClientAPITest
     protected static final String TIME_CHART_4 = "Luminex Four";
     protected static final String TIME_CHART_4_TEXT_1 = "200\n400\n600\n800\n1000\n1200\n1400\nLuminex Four\nDays Since Start Date\nFi\n249318596";
     protected static final String TIME_CHART_5 = "Luminex Five";
-    protected static final String TIME_CHART_5_TEXT_1 = "0\n50\n100\n150\n200\n1000\n2000\n3000\n4000\n5000\n6000\n7000\nLuminex Five\nDays Since Start Date\nFi\n249318596 IL-10\n249318596 IL-2\n249318596 IL-6\n249318596 TNF-alpha\n249320107 IL-10\n249320107 IL-2\n249320107 IL-6\n249320107 TNF-alpha\n249320127 IL-10\n249320127 IL-2\n249320127 IL-6\n249320127 TNF-alpha";
+    protected static final String TIME_CHART_5_TEXT_1 = "0\n50\n100\n150\n200\n0\n1000\n2000\n3000\n4000\n5000\n6000\n7000\nLuminex Five\nDays Since Start Date\nFi\n249318596 IL-10\n249318596 IL-2\n249318596 IL-6\n249318596 TNF-alpha\n249320107 IL-10\n249320107 IL-2\n249320107 IL-6\n249320107 TNF-alpha\n249320127 IL-10\n249320127 IL-2\n249320127 IL-6\n249320127 TNF-alpha";
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void timeChartHelperTest()
