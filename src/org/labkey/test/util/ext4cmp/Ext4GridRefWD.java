@@ -141,6 +141,8 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
     @LogMethod
     public void setGridCell(@LoggedParam int rowIdx, @LoggedParam String colName, @LoggedParam String value)
     {
+        completeEdit();
+
         // NOTE: sometimes this editor is picky about appearing
         // for now, solve this by repeating.  however, it would be better to resolve this issue.
         // one theory is that we need to shift focus prior to the doubleclick
@@ -305,5 +307,13 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
     {
         getFnEval("this.editingPlugin.completeEdit();");
         waitForGridEditorToDisappear();
+    }
+
+    public Ext4FieldRefWD getActiveEditor(int rowIdx, String colName)
+    {
+        startEditing(rowIdx, colName);
+        String fieldId = (String)getFnEval("return this.editingPlugin.getActiveEditor().items.getAt(0).id;");
+
+        return new Ext4FieldRefWD(fieldId, _test);
     }
 }

@@ -79,6 +79,7 @@ public class EHRClientAPIHelper
     {
         return new Connection(_test.getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
+
     public boolean doesRowExist(String schema, String query, Map<String, Object> row, String pkCol) throws Exception
     {
         SelectRowsCommand select = new SelectRowsCommand(schema, query);
@@ -86,6 +87,14 @@ public class EHRClientAPIHelper
         SelectRowsResponse resp = select.execute(getConnection(), _containerPath);
 
         return resp.getRowCount().intValue() > 0;
+    }
+
+    public int getRowCount(String schema, String query) throws Exception
+    {
+        SelectRowsCommand select = new SelectRowsCommand(schema, query);
+        SelectRowsResponse resp = select.execute(getConnection(), _containerPath);
+
+        return resp.getRowCount().intValue();
     }
 
     public SaveRowsResponse insertRow(String schema, String query, Map<String, Object> row, boolean expectFailure) throws Exception
