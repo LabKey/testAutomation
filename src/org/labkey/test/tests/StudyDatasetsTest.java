@@ -91,13 +91,12 @@ public class StudyDatasetsTest extends StudyBaseTest
         verifyReportAndViewDatasetReferences();
 
         createDataset("B");
-        importDatasetData("B", DATASET_HEADER, DATASET_B_DATA);
+        importDatasetData("B", DATASET_HEADER, DATASET_B_DATA, "QC States: All data");
         checkDataElementsPresent("B",  DATASET_B_DATA.split("\t|\n"));
 
-        importDatasetData("B", DATASET_HEADER, DATASET_B_MERGE);
+        importDatasetData("B", DATASET_HEADER, DATASET_B_MERGE, "QC States: All data");
         checkDataElementsPresent("B", DATASET_B_MERGE.split("\t|\n"));
-        importDatasetData("B", DATASET_HEADER, DATASET_B_DUPE);
-        assertTextPresent("Only one row is allowed for each Mouse/Visit. Duplicates were found in the imported data.");
+        importDatasetData("B", DATASET_HEADER, DATASET_B_DUPE, "Only one row is allowed for each Mouse/Visit. Duplicates were found in the imported data.");
         clickButton("Cancel");
         waitForText("QC States: All data");
         checkDataElementsPresent("B", DATASET_B_MERGE.split("\t|\n"));
@@ -160,7 +159,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         }
     }
 
-    protected void importDatasetData(String dataSetName, String header, String tsv)
+    protected void importDatasetData(String dataSetName, String header, String tsv, String msg)
     {
         goToManageDatasets();
         waitForElement(Locator.xpath("//a[text()='" + dataSetName + "']"));
@@ -172,8 +171,8 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickButtonContainingText("Import Data");
         waitForText("Copy/paste text");
         setFormElement(Locator.xpath("//textarea"), header + tsv);
-        clickButtonContainingText("Submit");
-        waitForText("QC States: All data");
+        click(Locator.xpath(getButtonLocator("Submit").getLocatorString()));
+        waitForText(msg);
     }
 
     protected void deleteFields(String name)
