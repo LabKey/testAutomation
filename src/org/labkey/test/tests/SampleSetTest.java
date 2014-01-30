@@ -254,6 +254,7 @@ public class SampleSetTest extends BaseWebDriverTest
 
         assertTextPresent("A sample set with that name already exists");
         setFormElement(Locator.name("name"), FOLDER_GRANDCHILDREN_SAMPLE_SET_NAME);
+        Locator.id("parentCol").findElement(getDriver()).sendKeys("Parent"); // combo-box helper doesn't work
         clickButton("Submit");
 
         clickAndWait(Locator.linkWithText("SampleSetBVTGrandchildA"));
