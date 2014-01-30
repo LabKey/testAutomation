@@ -17,6 +17,9 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.query.ContainerFilter;
+import org.labkey.remoteapi.query.SelectRowsCommand;
+import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -25,9 +28,12 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.PasswordUtil;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * User: tamram
@@ -36,23 +42,30 @@ import static org.junit.Assert.*;
 @Category({DailyA.class})
 public class MessagesLongTest extends BaseWebDriverTest
 {
+    // TODO: This test and/or MessagesLongTest are misnamed
     private static final String PROJECT_NAME = "MessagesVerifyProject";
-    private static final String EXPIRES1 = "2107-07-19";
-    private static final String EXPIRES2 = "2108-07-19";
     private static final String MSG1_TITLE = "test message 1";
     private static final String MSG1_BODY = "this is a test message to Banana";
-    private static final String MSG2_TITLE = "test message 2";
-    private static final String MSG3_TITLE = "test message 3";
     private static final String RESP1_TITLE = "test response 1";
     private static final String RESP1_BODY = "this is another test, thanks";
+    private static final String EXPIRES1 = "2107-07-19";
+    private static final String EXPIRES2 = "2108-07-19";
+    private static final String MSG1_BODY_FIRST = "this is a test message";
+    private static final String MSG2_TITLE = "test message 2";
+    private static final String MSG3_TITLE = "test message 3";
     private static final String RESP2_BODY = "third test, thanks";
     private static final String USER1 = "messageslong_user1@messages.test";
     private static final String USER2 = "messageslong_user2@messages.test";
     private static final String USER3 = "messageslong_user3@messages.test";
+    private static final String NOT_A_USER = "Squirrel";
     private static final String RESPONDER = "responder@messages.test";
     private static final String HTML_BODY = "1 <b>x</b>\n" +
             "<b>${labkey.webPart(partName='Lists')}</b>\n";
     private static final String HTML_BODY_WEBPART_TEST = "manage lists";
+    private static final String MEMBER_LIST = "memberListInput";
+
+    String user = "message_user@gmail.com";
+    String group = "Message group";
 
     public String getAssociatedModuleDirectory()
     {
@@ -91,8 +104,8 @@ public class MessagesLongTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteUsers(afterTest, USER1, USER2, USER3, RESPONDER);
-        deleteProject(PROJECT_NAME, afterTest);
+        deleteUsers(afterTest, USER1, USER2, USER3, RESPONDER, user);
+        deleteProject(MessagesLongTest.PROJECT_NAME, afterTest);
     }
 
     @Override
@@ -111,23 +124,23 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertPermissionSetting("testers1", "No Permissions");
         exitPermissionsUI();
         enableModule(PROJECT_NAME, "Dumbster");
-        log("Add search to project");
-        addWebPart("Search");
 
         enableEmailRecorder();
-
+        basicMessageTests();
+        schemaTest();
+        
         doTestEmailPrefsMine();
 
         clickProject(PROJECT_NAME);
         log("Check email preferences");
         clickWebpartMenuItem("Messages", "Email", "Preferences");
-        checkRadioButton("emailPreference", "1");
+        checkCheckbox(Locator.radioButtonByName("emailPreference").index(2));
         clickButton("Update");
         clickButton("Done");
 
         log("Customize message board");
         clickWebpartMenuItem("Messages", "Customize");
-        checkCheckbox("expires");
+        checkCheckbox(Locator.checkboxByName("expires"));
         clickButton("Save");
 
         log("Check email admin works");
@@ -150,11 +163,11 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check message works in Wiki");
         clickWebpartMenuItem("Messages", "New");
-        setFormElement("title", MSG1_TITLE);
-        setFormElement("expires", EXPIRES1);
-        setFormElement("body", "1 <b>first message testing</b>");
-        selectOptionByText("rendererType", "Wiki Page");
-        submit();
+        setFormElement(Locator.name("title"), MSG1_TITLE);
+        setFormElement(Locator.name("expires"), EXPIRES1);
+        setFormElement(Locator.id("body"), "1 <b>first message testing</b>");
+        selectOptionByText(Locator.name("rendererType"), "Wiki Page");
+        clickButton("Submit");
         assertTextPresent(MSG1_TITLE);
         clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(EXPIRES1);
@@ -164,26 +177,26 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check that HTML message works");
         clickButton("New");
-        setFormElement("title", MSG1_TITLE);
-        setFormElement("body", HTML_BODY);
-        selectOptionByText("rendererType", "HTML");
-        submit();
+        setFormElement(Locator.name("title"), MSG1_TITLE);
+        setFormElement(Locator.id("body"), HTML_BODY);
+        selectOptionByText(Locator.name("rendererType"), "HTML");
+        clickButton("Submit");
         assertElementPresent(Locator.tag("div").withClass("message-text").withPredicate("starts-with(normalize-space(), '1 x')"));
-        assertLinkPresentWithText(HTML_BODY_WEBPART_TEST);
+        assertElementPresent(Locator.linkWithText(HTML_BODY_WEBPART_TEST));
 
         log("Check that edit works");
         clickAndWait(Locator.linkWithText("view message or respond"));
         clickAndWait(Locator.linkWithText("edit"));
-        setFormElement("body", MSG1_BODY);
-        submit();
+        setFormElement(Locator.id("body"), MSG1_BODY);
+        clickButton("Submit");
         assertTextPresent(MSG1_BODY);
 
         log("Add response");
         clickButton("Respond");
-        setFormElement("title", RESP1_TITLE);
-        setFormElement("expires", EXPIRES2);
-        setFormElement("body", RESP1_BODY);
-        submit();
+        setFormElement(Locator.name("title"), RESP1_TITLE);
+        setFormElement(Locator.name("expires"), EXPIRES2);
+        setFormElement(Locator.id("body"), RESP1_BODY);
+        clickButton("Submit");
 
         log("Make sure response was entered correctly");
         assertTextPresent(RESP1_TITLE);
@@ -192,8 +205,8 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Add second response, make sure it was entered and recognized");
         clickButton("Respond");
-        setFormElement("body", RESP2_BODY);
-        submit();
+        setFormElement(Locator.id("body"), RESP2_BODY);
+        clickButton("Submit");
         assertTextPresent(RESP2_BODY);
         clickAndWait(Locator.linkWithText("Messages"));
         assertElementPresent(Locator.css("#table1 td").withText(" (2 responses)")); // xpath doesn't work with nbsp
@@ -201,8 +214,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Create fake user for permissions check");
         enterPermissionsUI();
         clickManageGroup("Users");
-        setFormElement("names", USER1);
-        uncheckCheckbox("sendEmail");
+        setFormElement(Locator.name("names"), USER1);
+        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
 
         log("Check if permissions work without security");
@@ -212,7 +225,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Check with security");
         clickProject(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "Customize");
-        checkRadioButton("secure", 1);
+        checkCheckbox(Locator.radioButtonByName("secure").index(1));
         clickButton("Save");
         permissionCheck("Reader", false);
         permissionCheck("Editor", true);
@@ -220,30 +233,30 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Check if the customized names work");
         clickProject(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "Customize");
-        setFormElement("boardName", "Notes");
-        setFormElement("conversationName", "Thread");
+        setFormElement(Locator.name("boardName"), "Notes");
+        setFormElement(Locator.name("conversationName"), "Thread");
         clickButton("Save");
         assertTextPresent("Notes");
         assertTextPresent("thread");
         clickWebpartMenuItem("Notes", "Customize");
-        setFormElement("boardName", "Messages");
-        setFormElement("conversationName", "Message");
+        setFormElement(Locator.name("boardName"), "Messages");
+        setFormElement(Locator.name("conversationName"), "Message");
         clickButton("Save");
 
         log("Check if sorting works");
         clickWebpartMenuItem("Messages", "New");
-        setFormElement("title", MSG2_TITLE);
-        submit();
+        setFormElement(Locator.name("title"), MSG2_TITLE);
+        clickButton("Submit");
         clickAndWait(Locator.linkWithText("Messages"));
         clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(MSG2_TITLE);
         clickAndWait(Locator.linkWithText("Messages"));
         clickAndWait(Locator.linkWithText("view message or respond", 1));
         clickButton("Respond");
-        submit();
+        clickButton("Submit");
         clickAndWait(Locator.linkWithText("Messages"));
         clickAndWait(Locator.linkWithText("Customize"));
-        checkRadioButton("sortOrderIndex", 1);
+        checkCheckbox(Locator.radioButtonByName("sortOrderIndex").index(1));
         clickButton("Save");
         clickAndWait(Locator.linkWithText("view message or respond"));
         assertTextPresent(MSG1_TITLE);
@@ -251,13 +264,13 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Edit other customize options");
         clickAndWait(Locator.linkWithText("Messages"));
         clickAndWait(Locator.linkWithText("Customize"));
-        uncheckCheckbox("titleEditable");
-        checkCheckbox("memberList");
-        checkCheckbox("status");
-        uncheckCheckbox("expires");
-        checkCheckbox("assignedTo");
-        uncheckCheckbox("formatPicker");
-        selectOptionByText("defaultAssignedTo", displayNameFromEmail(USER1));
+        uncheckCheckbox(Locator.checkboxByName("titleEditable"));
+        checkCheckbox(Locator.checkboxByName("memberList"));
+        checkCheckbox(Locator.checkboxByName("status"));
+        uncheckCheckbox(Locator.checkboxByName("expires"));
+        checkCheckbox(Locator.checkboxByName("assignedTo"));
+        uncheckCheckbox(Locator.checkboxByName("formatPicker"));
+        selectOptionByText(Locator.name("defaultAssignedTo"), displayNameFromEmail(USER1));
         clickButton("Save");
 
         log("Check if status and expires work");
@@ -266,61 +279,21 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Cancel");
         clickAndWait(Locator.linkWithText(MSG2_TITLE));
         clickButton("Respond");
-        selectOptionByText("status", "Closed");
+        selectOptionByText(Locator.name("status"), "Closed");
         assertFormElementEquals("assignedTo", "");
-        submit();
+        clickButton("Submit");
         assertTextPresent("Status: Closed");
         assertTextNotPresent("Expires:");
         impersonate(USER1);
         clickProject(PROJECT_NAME);
         assertTextNotPresent(MSG2_TITLE);
         stopImpersonating();
-        clickProject(PROJECT_NAME);
 
-        // USER1 is now a reader
-        log("Test member list");
-        enterPermissionsUI();
-        removePermission("Users", "Editor");
-        setPermissions("Users", "Reader");
-        exitPermissionsUI();
+        testMemberLists();
 
-        // USER2 is a nobody
-        goToSiteUsers();
-        clickButton("Add Users");
-        setFormElement("newUsers", USER2);
-        uncheckCheckbox("sendMail");
-        clickButton("Add Users");
-        clickProject(PROJECT_NAME);
-
-        // USER3 is a Project Administrator
-        enterPermissionsUI();
-        clickManageGroup("Administrators");
-        setFormElement("names", USER3);
-        uncheckCheckbox("sendEmail");
-        clickButton("Update Group Membership");
-
-        clickProject(PROJECT_NAME);
-        clickWebpartMenuItem("Messages", "New");
-        setFormElement("memberListInput", USER2);
-        clickButtonContainingText("Submit", "Title must not be blank");
-        clickButtonContainingText("OK", 0);
-        waitForExtMaskToDisappear();
-        setFormElement("title", MSG3_TITLE);
-        submit();
-        assertTextPresent("This user doesn't have permission");
-        setFormElement("memberListInput", USER1);
-        selectOptionByText("assignedTo", displayNameFromEmail(USER3));
-        submit();
-        clickAndWait(Locator.linkWithText("view message or respond"));
-        assertTextPresent("Members: "+USER1);
-        assertElementPresent(Locator.css("#webpart_-1 td").withText("Assigned To: "+ displayNameFromEmail(USER3)));
-        impersonate(USER1);
-        clickProject(PROJECT_NAME);
-        assertTextPresent(MSG3_TITLE);
-        stopImpersonating();
         clickProject(PROJECT_NAME);
         clickWebpartMenuItem("Messages", "Customize");
-        checkRadioButton("secure", 0);
+        checkCheckbox(Locator.radioButtonByName("secure").index(0));
         clickButton("Save");
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
         clickButton("Delete Message");
@@ -346,14 +319,95 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check emailed messages");
         goToModule("Dumbster");
-        assertTextPresent("RE: " + MSG1_TITLE, 4); // TODO: switch to 3 when empty messages are emailed
+        assertTextPresent("RE: " + MSG1_TITLE, 6);
         click(Locator.linkWithText(MSG1_TITLE, 0));
         assertTextPresent("1 <b>x</b>");
         assertTextPresent("<a href=\"/labkey/list/MessagesVerifyProject/begin.view?\" class=\"labkey-text-link\">manage lists</a>");
         click(Locator.linkWithText(MSG1_TITLE, 1));
         assertTextPresent("first message testing");
-        assertLinkNotPresentWithText(MSG3_TITLE);
-        assertLinkNotPresentWithText(MSG2_TITLE);
+        assertElementNotPresent(Locator.linkWithText(MSG3_TITLE));
+        assertElementNotPresent(Locator.linkWithText(MSG2_TITLE));
+    }
+
+    private void testMemberLists()
+    {
+        clickProject(PROJECT_NAME);
+        // USER1 is now a reader
+        log("Test member list");
+        enterPermissionsUI();
+        removePermission("Users", "Editor");
+        setPermissions("Users", "Reader");
+        exitPermissionsUI();
+
+        // USER2 is a nobody
+        goToSiteUsers();
+        clickButton("Add Users");
+        setFormElement(Locator.id("newUsers"), USER2);
+        uncheckCheckbox(Locator.checkboxByName("sendMail"));
+        clickButton("Add Users");
+        clickProject(PROJECT_NAME);
+
+        // USER3 is a Project Administrator
+        enterPermissionsUI();
+        clickManageGroup("Administrators");
+        setFormElement(Locator.name("names"), USER3);
+        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
+        clickButton("Update Group Membership");
+
+        clickProject(PROJECT_NAME);
+        clickWebpartMenuItem("Messages", "New");
+        setFormElement(Locator.id(MEMBER_LIST), USER2);
+        clickButtonContainingText("Submit", "Title must not be blank");
+        clickButtonContainingText("OK", 0);
+        waitForExtMaskToDisappear();
+        setFormElement(Locator.name("title"), MSG3_TITLE);
+        clickButton("Submit");
+        assertTextPresent("This user doesn't have permission");
+        setFormElement(Locator.id(MEMBER_LIST), USER1);
+        selectOptionByText(Locator.name("assignedTo"), displayNameFromEmail(USER3));
+        clickButton("Submit");
+        clickAndWait(Locator.linkWithText("view message or respond"));
+        assertTextPresent("Members: "+USER1);
+        assertElementPresent(Locator.css("#webpart_-1 td").withText("Assigned To: "+ displayNameFromEmail(USER3)));
+        impersonate(USER1);
+        clickProject(PROJECT_NAME);
+
+        // Tests for changing email vs display name autocomplete / redisplay rules to follow site permissions
+        // Also verify bug fixes during that development: member list stays tied to parent of thread, and isn't
+        // wiped on a response.
+        log("Verify member list email vs display name rules for reader");
+        clickAndWait(Locator.linkWithText(MSG3_TITLE));
+        // should be display name only
+        assertTextNotPresent(USER3);
+        assertTextPresent(displayNameFromEmail(USER3));
+        stopImpersonating();
+
+        log("Verify member list failed user lookup reports error");
+        clickProject(PROJECT_NAME);
+        impersonateRole("Editor");
+        clickAndWait(Locator.linkWithText(MSG3_TITLE));
+        clickButton("Respond");
+        // enter invalid username, ensure error appears
+        setFormElement(Locator.id(MEMBER_LIST), NOT_A_USER);
+        clickButtonContainingText("Submit", NOT_A_USER + ": Invalid");
+
+        log("Verify member list autocomplete only shows display name, not email");
+        setFormElement(Locator.id(MEMBER_LIST), displayNameFromEmail(RESPONDER));
+        setFormElement(Locator.id("body"), "Another response again woo hoo");
+        assertTextPresent(displayNameFromEmail(RESPONDER));
+        assertTextNotPresent(RESPONDER);
+
+        log("Verify redisplay is display name only, even if email entered in member list.");
+        // Also tests persistence of member list changes.
+        setFormElement(Locator.id(MEMBER_LIST),USER1);
+        clickButton("Submit");
+        assertTextPresent(displayNameFromEmail("Members: " +USER1));
+        assertTextNotPresent(USER1);
+        stopImpersonatingRole();
+        log("Verify admin user still sees email address");
+        clickProject(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(MSG3_TITLE));
+        assertTextPresent("Members: " + USER1);
     }
 
     //Expects an empty email record
@@ -368,7 +422,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Save and Finish");
 
         clickWebpartMenuItem("Messages", "Email", "Preferences");
-        checkRadioButton("emailPreference", "2");
+        checkCheckbox(Locator.radioButtonByName("emailPreference").index(1));
         clickButton("Update");
         clickButton("Done");
 
@@ -379,8 +433,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(_messageTitle));
         clickButton("Respond");
-        setFormElement("title", _messageTitle + " response");
-        setFormElement("body", _messageBody + " response");
+        setFormElement(Locator.name("title"), _messageTitle + " response");
+        setFormElement(Locator.id("body"), _messageBody + " response");
         clickButton("Submit");
 
         stopImpersonating();
@@ -396,17 +450,142 @@ public class MessagesLongTest extends BaseWebDriverTest
                 to.get(0).equals(RESPONDER) && to.get(1).equals(PasswordUtil.getUsername()) ||
                 to.get(1).equals(RESPONDER) && to.get(0).equals(PasswordUtil.getUsername()));
 
-        assertLinkPresentWithText(_messageTitle);
-        assertLinkPresentWithText("RE: "+_messageTitle);
+        assertElementPresent(Locator.linkWithText(_messageTitle));
+        assertElementPresent(Locator.linkWithText("RE: "+_messageTitle));
         click(Locator.linkWithText("RE: "+_messageTitle, 1));
     }
 
     private void createNewMessage(String title, String body)
     {
         clickButton("New");
-        setFormElement("title", title);
-        setFormElement("body", body);
-        selectOptionByText("rendererType", "HTML");
+        setFormElement(Locator.name("title"), title);
+        setFormElement(Locator.id("body"), body);
+        selectOptionByText(Locator.name("rendererType"), "HTML");
         clickButton("Submit");
+    }
+
+    private void basicMessageTests()
+    {
+        log("Add search to project");
+        addWebPart("Search");
+
+        createUser(user, null);
+        goToHome();
+        goToProjectHome();
+        createPermissionsGroup(group);
+        setPermissions(group, "Editor");
+//        add
+        addUserToProjGroup(user, getProjectName(), group);
+        goToProjectHome();
+
+        log("Check that Plain Text message works and is added everywhere");
+        clickProject(PROJECT_NAME);
+        clickButton("New");
+
+        // Check defaults for uncustomized message board
+        assertTextNotPresent("Status");
+        assertTextNotPresent("Assigned To");
+        assertTextNotPresent("Members");
+        assertTextNotPresent("Expires");
+
+        setFormElement(Locator.name("title"), MSG1_TITLE);
+        setFormElement(Locator.id("body"), MSG1_BODY_FIRST);
+        selectOptionByText(Locator.name("rendererType"), "Plain Text");
+
+        log("test attachments too");
+        if (isFileUploadAvailable())
+        {
+            click(Locator.linkContainingText("Attach a file"));
+            File file = new File(getLabKeyRoot() + "/common.properties");
+            setFormElement(Locator.name("formFiles[00]"), file);
+        }
+        else
+            log("File upload skipped.");
+        clickButton("Submit");
+        if (isFileUploadAvailable())
+            assertTextPresent("common.properties");
+        assertTextPresent(MSG1_BODY_FIRST);
+        clickAndWait(Locator.linkWithText("view message or respond"));
+        clickAndWait(Locator.linkWithText("view list"));
+        assertTextPresent(MSG1_TITLE);
+        goToModule("Messages");
+        clickAndWait(Locator.linkWithText(MSG1_TITLE));
+
+        log("test edit messages");
+        clickAndWait(Locator.linkWithText("edit"));
+        setFormElement(Locator.id("body"), MSG1_BODY);
+        if (isFileUploadAvailable())
+        {
+            assertTextPresent("remove");
+            click(Locator.linkWithText("remove"));
+            waitForText("This cannot be undone");
+            clickButton("OK", 0);
+            waitForTextToDisappear("common.properties");
+            assertTextNotPresent("common.properties");
+        }
+        clickButton("Submit");
+        assertTextPresent(MSG1_BODY);
+
+
+        log("verify a user can subscribe to a thread");
+        impersonate(user);
+        goToProjectHome();
+        clickAndWait(Locator.linkContainingText("view message"));
+        Locator subscribeButton = Locator.tagWithText("span", "subscribe");
+        assertElementPresent(subscribeButton);
+        click(subscribeButton);
+        clickAndWait(Locator.tagWithText("span", "thread"));
+        clickAndWait(Locator.linkWithText("unsubscribe"));
+        assertElementPresent(subscribeButton);
+
+        click(subscribeButton);
+        clickAndWait(Locator.tagWithText("span", "forum"));
+        clickButton("Update");
+        clickButton("Done");
+
+
+        stopImpersonating();
+        goToProjectHome();
+
+        log("test add response");
+        clickAndWait(Locator.linkWithText("view message or respond"));
+        clickButton("Respond");
+        setFormElement(Locator.name("title"), RESP1_TITLE);
+        setFormElement(Locator.id("body"), RESP1_BODY);
+        clickButton("Submit");
+
+        log("Make sure response was entered correctly");
+        assertTextPresent(RESP1_TITLE);
+        assertTextPresent(RESP1_BODY);
+
+        log("test the search module on messages");
+        clickProject(PROJECT_NAME);
+        searchFor(PROJECT_NAME, "Banana", 1, MSG1_TITLE);
+
+        log("test filtering of messages grid");
+        clickAndWait(Locator.linkWithText("view list"));
+        setFilterAndWait("Announcements", "Title", "Equals", "foo", WAIT_FOR_PAGE);
+
+        assertTextNotPresent(RESP1_TITLE);
+    }
+
+    private void schemaTest()
+    {
+
+        SelectRowsCommand selectCmd = new SelectRowsCommand("announcement", "ForumSubscription");
+        selectCmd.setMaxRows(-1);
+        selectCmd.setContainerFilter(ContainerFilter.CurrentAndSubfolders);
+        selectCmd.setColumns(Arrays.asList("*"));
+        SelectRowsResponse selectResp = null;
+
+        String[] queries = {"Announcement", "AnnouncementSubscription", "EmailFormat", "EmailOption", "ForumSubscription"};
+        int[] counts = {2, 0, 2, 5, 1};
+
+        for(int i = 0; i<queries.length; i++)
+        {
+            selectResp = executeSelectRowCommand("announcement", queries[i]);
+            assertEquals("Count mismatch with query: " + queries[i], counts[i], selectResp.getRowCount().intValue());
+        }
+
     }
 }
