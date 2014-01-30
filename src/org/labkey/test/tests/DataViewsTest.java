@@ -23,7 +23,7 @@ import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.RReportHelperWD;
 import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.*;
@@ -53,7 +53,7 @@ public class DataViewsTest extends ParticipantListTest
     @Override @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doCreateSteps()
     {
-        RReportHelper reportHelper = new RReportHelper(this);
+        RReportHelperWD reportHelper = new RReportHelperWD(this);
         reportHelper.ensureRConfig();
 
         importStudy();
