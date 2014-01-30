@@ -208,7 +208,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         _ext4Helper = new Ext4HelperWD(this);
         _listHelper = new ListHelperWD(this);
         _customizeViewsHelper = new CustomizeViewsHelperWD(this);
-        _anyTestCaseFailed = false;
         _jsErrors = new ArrayList<>();
         _downloadDir = new File(ensureDumpDir(), "downloads");
 
@@ -1755,6 +1754,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public static void performInitialChecks() throws Throwable
     {
         _setupFailed = true;
+        _anyTestCaseFailed = false;
 
         _startTime = System.currentTimeMillis();
         WebDriverTestPreamble preamble = new WebDriverTestPreamble();
