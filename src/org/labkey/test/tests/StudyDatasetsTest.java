@@ -46,6 +46,19 @@ public class StudyDatasetsTest extends StudyBaseTest
     private static final String PTID_REPORT_NAME = "Mouse Report: 2 Dem Vars + 3 Other Vars";
     private static Map<String, String> EXPECTED_REPORTS = new HashMap<>();
     private static Map<String, String> EXPECTED_CUSTOM_VIEWS = new HashMap<>();
+    private static final String DATASET_HEADER = "mouseId\tsequenceNum\tXTest\tYTest\tZTest\n";
+    private static final String DATASET_B_DATA =
+            "a1\t1\tx1\ty1\tz1\n" +
+            "a2\t2\tx2\ty2\tz2\n" +
+            "a3\t3\tx3\ty3\tz3\n" +
+            "a4\t4\tx4\ty4\tz4\n" +
+            "a5\t5\tx5\ty5\tz5\n" +
+            "a6\t6\tx6\ty6\tz6\n";
+    private static final String DATASET_B_MERGE =
+            "a4\t4\tx4_merged\ty4_merged\tz4_merged\n";
+    private static final String DATASET_B_DUPE =
+            "a4\t4\tx4_merged\ty4_merged\tz4_merged\n" +
+            "a4\t4\tx4_merged2\ty4_merged2\tz4_merged2\n";
 
 
     @Override
@@ -76,6 +89,18 @@ public class StudyDatasetsTest extends StudyBaseTest
         verifySideFilter();
 
         verifyReportAndViewDatasetReferences();
+
+        createDataset("B");
+        importDatasetData("B", DATASET_HEADER, DATASET_B_DATA);
+        checkDataElementsPresent("B",  DATASET_B_DATA.split("\t|\n"));
+
+        importDatasetData("B", DATASET_HEADER, DATASET_B_MERGE);
+        checkDataElementsPresent("B", DATASET_B_MERGE.split("\t|\n"));
+        importDatasetData("B", DATASET_HEADER, DATASET_B_DUPE);
+        assertTextPresent("Only one row is allowed for each Mouse/Visit. Duplicates were found in the imported data.");
+        clickButton("Cancel");
+        waitForText("QC States: All data");
+        checkDataElementsPresent("B", DATASET_B_MERGE.split("\t|\n"));
     }
 
     protected void createDataset(String name)
@@ -100,7 +125,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         assertTextNotPresent("ZTest");
         setFormElement(Locator.xpath("//input[@id='name2-input']"), "ZTest");
         clickButton("Save");
- }
+    }
 
     protected void renameDataset(String orgName, String newName, String orgLabel, String newLabel, String... fieldNames)
     {
@@ -133,7 +158,23 @@ public class StudyDatasetsTest extends StudyBaseTest
             if (orgLabel.equals(entry.getValue()))
                 EXPECTED_CUSTOM_VIEWS.put(entry.getKey(), newLabel);
         }
-}
+    }
+
+    protected void importDatasetData(String dataSetName, String header, String tsv)
+    {
+        goToManageDatasets();
+        waitForElement(Locator.xpath("//a[text()='" + dataSetName + "']"));
+        click(Locator.xpath("//a[text()='" + dataSetName + "']"));
+        waitForText("Dataset Properties");
+        clickButtonContainingText("View Data");
+        //clickButton("View Data");
+        waitForText("QC States: All data");
+        clickButtonContainingText("Import Data");
+        waitForText("Copy/paste text");
+        setFormElement(Locator.xpath("//textarea"), header + tsv);
+        clickButtonContainingText("Submit");
+        waitForText("QC States: All data");
+    }
 
     protected void deleteFields(String name)
     {
@@ -154,7 +195,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         assertElementNotPresent(Locator.xpath("//input[@id='name1-input']"));
         assertElementNotPresent(Locator.xpath("//input[@id='name2-input']"));
         clickButton("Save");
-}
+    }
 
     protected void checkFieldsPresent(String name, String... items)
     {
@@ -165,6 +206,21 @@ public class StudyDatasetsTest extends StudyBaseTest
         waitForText("Edit Definition");
         clickButton("Edit Definition");
 
+        for(String item : items)
+        {
+            waitForText(item);
+        }
+    }
+
+    protected void checkDataElementsPresent(String name, String... items)
+    {
+        clickProject(getProjectName());
+        clickFolder(getFolderName());
+        goToManageDatasets();
+        waitForElement(Locator.xpath("//a[text()='" + name + "']"));
+        click(Locator.xpath("//a[text()='" + name + "']"));
+        waitForText("Dataset Properties");
+        clickButtonContainingText("View Data");
         for(String item : items)
         {
             waitForText(item);
