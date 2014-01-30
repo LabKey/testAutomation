@@ -365,6 +365,9 @@ public class ChartingAPITest extends ClientAPITest
         // NOTE: have to use clickAndHold().release() here because Firefox does not like click().
         builder.moveToElement(points.get(0)).moveByOffset(-20, 0).clickAndHold().release().perform();
         verifyBrushCleared();
+
+        builder.moveToElement(points.get(10)).moveByOffset(-10, 10).clickAndHold().moveByOffset(150, -190).release().perform();
+        verifyEdgePointsBrushed();
     }
 
     private void verifyBrushedPoints()
@@ -403,6 +406,24 @@ public class ChartingAPITest extends ClientAPITest
             verifyNonBrushedPoint(points.get(baseIndex));
             verifyNonBrushedPoint(points.get(baseIndex + 4));
             verifyNonBrushedPoint(points.get(baseIndex + 9));
+        }
+    }
+
+    private void verifyEdgePointsBrushed()
+    {
+        // Issue 19445: Can't select points on outer edge of plot with chart brushing area
+        // Check the points on the far right and top edges.
+        List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
+        // Right edge.
+        for (int i = 0; i < 19; i++)
+        {
+            int index = (i * 20) + 19;
+            verifyBrushedPoint(points.get(index));
+        }
+        // Top edge.
+        for (int index = 390; index < 400; index++)
+        {
+            verifyBrushedPoint(points.get(index));
         }
     }
 
