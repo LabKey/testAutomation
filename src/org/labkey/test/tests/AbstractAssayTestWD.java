@@ -116,6 +116,9 @@ public abstract class AbstractAssayTestWD extends SimpleApiTestWD
 
         //add a PI user to that group
         addUserToProjGroup(TEST_ASSAY_USR_PI1, TEST_ASSAY_PRJ_SECURITY,TEST_ASSAY_GRP_PIS);
+        // give the PI user "CanSeeAuditLog" permission
+        setSiteAdminRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
+
 
         //add a lab tech user to the Users group
         addUserToProjGroup(TEST_ASSAY_USR_TECH1, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_GRP_USERS);

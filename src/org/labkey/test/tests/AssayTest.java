@@ -632,7 +632,7 @@ public class AssayTest extends AbstractAssayTestWD
         setFormElement("label", "Preexisting Timepoint");
         setFormElement("sequenceNumMin", "50");
         setFormElement("sequenceNumMax", "89");
-        setFormElement("typeCode", "Screening");
+        selectOptionByText(Locator.name("typeCode"), "Screening");
 
         clickButton("Save");
 
