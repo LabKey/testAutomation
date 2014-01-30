@@ -607,11 +607,15 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("unknown QC");
         assertTextPresent("1234_B");
 
-        //Import duplicate data
+        // Test import alias for subject id
         clickButton("Import Data");
-        setFormElement("text", _tsv);
-        _listHelper.submitImportTsv_error("Duplicates were found");
+        _listHelper.submitTsvData(_tsv);
+        assertTextPresent("1234_A");
+        assertTextPresent("1234");
+        assertTextPresent("aliasedData");
+
         //Now explicitly replace, using 'mouseid' instead of 'participantid'
+        clickButton("Import Data");
         _tsv = "mouseid\tsequencenum\tvisitdate\tSampleId\tDateField\tNumberField\tTextField\treplace\n" +
                 "1234\t1\t1/1/2006\t1234_A\t2/1/2006\t5000\tnew text\tTRUE\n" +
                 "1234\t1\t1/1/2006\t1234_B\t2/1/2006\t5000\tnew text\tTRUE\n";
