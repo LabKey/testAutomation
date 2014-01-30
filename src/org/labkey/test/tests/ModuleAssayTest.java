@@ -18,11 +18,13 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -169,7 +171,6 @@ public class ModuleAssayTest extends AbstractAssayTestWD
         popLocation();
         clickButton("Simple Assay Button", 0);
         assertAlert("button clicked");
-        waitForExtOnReady(); // Menu doesn't work immediately after alert is dismissed
 
         // Check that a query scoped to the assay type shows up for this assay design and has the right data
         goToSchemaBrowser();

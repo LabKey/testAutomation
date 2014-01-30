@@ -1205,7 +1205,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     // Clicks admin menu items. Tests should use helpers to make admin menu changes less disruptive.
     protected void clickAdminMenuItem(String... items)
     {
-        waitForElement(Locators.ADMIN_MENU);
+        shortWait().until(ExpectedConditions.elementToBeClickable(Locators.ADMIN_MENU.toBy()));
         _ext4Helper.clickExt4MenuButton(true, Locators.ADMIN_MENU, false, items);
     }
 
