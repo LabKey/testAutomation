@@ -23,7 +23,7 @@
     <property environment="env"/>
     <property name="test.dir" value="${basedir}" />
     <property name="test.build.home" value="${test.dir}/build"/>
-    <property name="test.build.uptodate" value="${test.build.home}/uptodate"/>
+    <property name="test.build.uptodate" value="${test.build.home}/.uptodate"/>
     <property name="test.src.home" value="${test.dir}/src"/>
     <property name="project.root" value="${test.dir}/../.." />
     <property name="test.lib.home" value="${test.dir}/lib"/>
@@ -226,6 +226,17 @@
         </loadfile>
         <echo>${moduleDirectories}</echo>
 
+        <loadfile property="moduleSources" srcfile="${project.root}/server/${modulesFile}">
+            <filterchain>
+                <striplinecomments>
+                    <comment value="#"/>
+                </striplinecomments>
+                <expandproperties/>
+                <suffixlines suffix="/test/src/**/*,"/>
+                <striplinebreaks/>
+            </filterchain>
+        </loadfile>
+
         <!-- This selector detects all modules with tests -->
         <selector id="test.module.selector">
              <present targetdir="${project.root}">
@@ -250,20 +261,17 @@
             <path refid="module.test.src.dirs"/>
         </path>
 
-        <!--TODO: figure out how to set testClassesUpToDate properly based on module tests as well as core tests-->
-        <!--<pathtofileset dir="${project.root}"-->
-                       <!--pathrefid="module.test.src.dirs"-->
-                       <!--name="module.test.src.fileset"-->
-                       <!--id="module.test.src.fileset"/>-->
-
-        <!--<uptodate targetfile="${test.build.uptodate}" property="testClassesUpToDate">-->
-            <!--<srcfiles dir="${test.src.home}" />-->
-        <!--</uptodate>-->
+        <uptodate targetfile="${test.build.uptodate}" property="testClassesUpToDate">
+            <srcfiles dir="${project.root}" includes="${moduleSources}">
+                <include name="server/test/src/**/*"/>
+                <include name="server/test/lib/**/*"/>
+            </srcfiles>
+        </uptodate>
 
         <antcall target="compileIfDirty" inheritrefs="true"/>
     </target>
 
-    <target name="compileIfDirty">
+    <target name="compileIfDirty" unless="testClassesUpToDate">
         <taskdef
             resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties">
           <classpath>
