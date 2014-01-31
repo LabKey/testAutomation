@@ -291,6 +291,7 @@ public class ChartingAPITest extends ClientAPITest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void interactiveChartsTest()
     {
+        Actions builder = new Actions(getDriver());
         Locator nextBtn = Locator.input("next-btn");
         Locator setAesBtn = Locator.input("set-aes-btn");
         File chartTestFile = new File(getApiFileRoot(), "interactiveChartsTest.html");
@@ -342,13 +343,13 @@ public class ChartingAPITest extends ClientAPITest
         assertEquals("Top right point was not an upward arrow.", ARROW_PATH, points.get(399).getAttribute("d"));
 
         // Test mouseover/mouseout aesthetics.
-        fireEvent(points.get(0), SeleniumEvent.mouseover);
-        assertEquals("Related point had an unexpected fill color.", MOUSEOVER_FILL, points.get(1).getAttribute("fill"));
-        assertEquals("Related point had an unexpected stroke color.", MOUSEOVER_STROKE, points.get(1).getAttribute("stroke"));
+        builder.moveToElement(points.get(380)).perform();
+        assertEquals("Related point had an unexpected fill color.", MOUSEOVER_FILL, points.get(381).getAttribute("fill"));
+        assertEquals("Related point had an unexpected stroke color.", MOUSEOVER_STROKE, points.get(381).getAttribute("stroke"));
 
-        fireEvent(points.get(0), SeleniumEvent.mouseout);
-        assertEquals("Related point had an unexpected fill color.", CIRCLE_COLOR, points.get(1).getAttribute("fill"));
-        assertEquals("Related point had an unexpected stroke color.", CIRCLE_COLOR, points.get(1).getAttribute("stroke"));
+        builder.moveToElement(points.get(380)).moveByOffset(-20, -20).perform();
+        assertEquals("Related point had an unexpected fill color.", ARROW_COLOR, points.get(381).getAttribute("fill"));
+        assertEquals("Related point had an unexpected stroke color.", ARROW_COLOR, points.get(381).getAttribute("stroke"));
 
         // Test removal of mouseover/mouseout aesthetics (Issue 19455).
         click(setAesBtn);
@@ -358,7 +359,6 @@ public class ChartingAPITest extends ClientAPITest
         assertEquals("Related point had an unexpected stroke color.", CIRCLE_COLOR, points.get(1).getAttribute("stroke"));
 
         // Test chart brushing.
-        Actions builder = new Actions(getDriver());
         builder.moveToElement(points.get(0)).moveByOffset(-10, 10).clickAndHold().moveByOffset(150, -190).release().perform();
         verifyBrushedPoints();
         verifyNonBrushedPoints();
