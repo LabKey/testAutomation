@@ -113,7 +113,10 @@ public class ExperimentGraph
     {
         String[] sampleNames = tp.getSampleNames();
         if (sampleNames.length == 0)
+        {
+            // AbstractMS2SearchProtocol.getJoinedBaseName() is hard-coded to use "all"
             return "all";
+        }
         else
         {
             for (String sampleName : sampleNames)
