@@ -2717,6 +2717,28 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         }
     }
 
+    public long goToURL(URL url, int milliseconds)
+    {
+        String logMessage = "Navigating to " + url.toString();
+        try
+        {
+            pauseJsErrorChecker();
+            prepForPageLoad();
+            long startTime = System.currentTimeMillis();
+            getDriver().navigate().to(url);
+            newWaitForPageToLoad(milliseconds);
+            long elapsedTime = System.currentTimeMillis() - startTime;
+            logMessage += " [" + elapsedTime + " ms]";
+
+            resumeJsErrorChecker();
+            return elapsedTime;
+        }
+        finally
+        {
+            log(logMessage);
+        }
+    }
+
     // Get the container id of the current page
     public String getContainerId()
     {
@@ -6782,6 +6804,13 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         if(!isElementPresent(Locator.linkWithText(getProjectName())))
             goToHome();
         clickProject(getProjectName());
+    }
+
+    public void goToProjectHome(String projectName)
+    {
+        if(!isElementPresent(Locator.linkWithText(projectName)))
+            goToHome();
+        clickProject(projectName);
     }
 
     public void goToHome()
