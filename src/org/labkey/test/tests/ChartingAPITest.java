@@ -335,6 +335,13 @@ public class ChartingAPITest extends ClientAPITest
         waitForText(BRUSHED_SCATTER_W_CUSTOM_SCALES);
         assertSVG(BRUSHED_SCATTER_W_CUSTOM_SCALES_SVG);
 
+        /*
+        The points on the brushed scatter plot are split into two groups. Each 10 points wide and 20 points tall, for a
+        total of 400 points. Index wise, they go in order from bottom left to top right. Point 0 is the very bottom left
+        point on the left group. Point 19, is the bottom right point on the right group. Point 380 is the top left, point
+        399 is top right.
+         */
+
         List<WebElement> points;
         points = Locator.css("svg g a path").findElements(getDriver());
         assertEquals("Bottom left point was an unexpected color.", CIRCLE_COLOR, points.get(0).getAttribute("fill"));
@@ -359,13 +366,15 @@ public class ChartingAPITest extends ClientAPITest
         assertEquals("Related point had an unexpected stroke color.", CIRCLE_COLOR, points.get(1).getAttribute("stroke"));
 
         // Test chart brushing.
-        builder.moveToElement(points.get(0)).moveByOffset(-10, 10).clickAndHold().moveByOffset(150, -190).release().perform();
+        // Brush from the top left point of the left group, to the bottom right point of the left group.
+        builder.moveToElement(points.get(380)).moveByOffset(-10, -10).clickAndHold().moveByOffset(150, 190).release().perform();
         verifyBrushedPoints();
         verifyNonBrushedPoints();
         // NOTE: have to use clickAndHold().release() here because Firefox does not like click().
-        builder.moveToElement(points.get(0)).moveByOffset(-20, 0).clickAndHold().release().perform();
+        builder.moveToElement(points.get(380)).moveByOffset(-20, 0).clickAndHold().release().perform();
         verifyBrushCleared();
 
+        // Brush from the bottom left point of the left group, to the top right point of the left group.
         builder.moveToElement(points.get(10)).moveByOffset(-10, 10).clickAndHold().moveByOffset(150, -190).release().perform();
         verifyEdgePointsBrushed();
     }
