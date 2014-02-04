@@ -6917,7 +6917,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             {
                 return file.exists();
             }
-        }, "File not found: " + file.getName(), WAIT_FOR_JAVASCRIPT);
+        }, "File not found: " + file.getPath(), WAIT_FOR_JAVASCRIPT);
 
         try
         {
