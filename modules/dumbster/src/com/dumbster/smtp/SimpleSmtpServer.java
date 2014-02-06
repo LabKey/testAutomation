@@ -254,7 +254,8 @@ public class SimpleSmtpServer implements Runnable {
    */
   public static SimpleSmtpServer start(int port) {
     SimpleSmtpServer server = new SimpleSmtpServer(port);
-    Thread t = new Thread(server);
+    Thread t = new Thread(server, "Dumbster Server Thread");
+    t.setDaemon(true);
     
     // Block until the server socket is created
     synchronized (server) {

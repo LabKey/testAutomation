@@ -54,6 +54,12 @@ public class DumbsterManager implements ShutdownListener
 
     public boolean start()
     {
+        if (_server != null && !_server.isStopped())
+        {
+            // We're already running, no need to spin up another
+            return true;
+        }
+
         int port;
         ServerSocket socket = null;
         try
@@ -73,7 +79,7 @@ public class DumbsterManager implements ShutdownListener
                 if (socket != null)
                     socket.close();
             }
-            catch (IOException e) {}
+            catch (IOException ignored) {}
         }
         
         Properties props = new Properties();
@@ -108,6 +114,7 @@ public class DumbsterManager implements ShutdownListener
 
             _server.stop();
             ContextListener.removeShutdownListener(this);
+            _server = null;
         }
     }
     
