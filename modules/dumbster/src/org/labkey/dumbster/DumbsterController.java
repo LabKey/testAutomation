@@ -85,7 +85,6 @@ public class DumbsterController extends SpringActionController
         {
             if (form.isRecord())
             {
-
                 if (!DumbsterManager.get().start())
                     return new ApiSimpleResponse("error", "Error starting mail recorder.  Check log for more information.");
             }
