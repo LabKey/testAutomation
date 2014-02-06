@@ -327,15 +327,13 @@ public class ParticipantReportTest extends ReportTest
 
         clickButton("Select", 0);
 
-        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
-        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
-        waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 25 Results"), 3*WAIT_FOR_JAVASCRIPT);
-
         //Deselect All
         Locator filterExpander = Locator.xpath("(//img[contains(@class, 'x4-tool-expand-right')])[1]");
-        click(filterExpander);
+        waitAndClick(filterExpander);
         waitForElement(Locator.css(".initSelectionComplete"));
         _ext4Helper.deselectAllParticipantFilter();
+        click(Locator.xpath("//a[./img[@title = 'Edit']]"));
+        waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 0 Results"));
 
         //Mouse down on GROUP 1
