@@ -15,6 +15,7 @@
  */
 package org.labkey.test.pipeline;
 
+import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.Locator;
 
 import static org.junit.Assert.*;
@@ -106,7 +107,7 @@ public class ExperimentGraph
             }
         }
 
-        assertTrue("Unable to find experiment", false);
+        assertTrue("Unable to find experiment links: " + StringUtils.join(names, ", "), false);
     }
 
     private String getBaseName(PipelineTestParams tp)
