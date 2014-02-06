@@ -35,7 +35,7 @@ public class SimpleSmtpServer implements Runnable {
   /**
    * Stores all of the email received since this instance started up.
    */
-  private List receivedMail;
+  private List<String> receivedMail;
 
   /**
    * Default SMTP port is 25.
@@ -67,7 +67,7 @@ public class SimpleSmtpServer implements Runnable {
    * @param port port number
    */
   public SimpleSmtpServer(int port) {
-    receivedMail = new ArrayList();
+    receivedMail = new ArrayList<>();
     this.port = port;
   }
 
@@ -176,7 +176,7 @@ public class SimpleSmtpServer implements Runnable {
     sendResponse(out, smtpResponse);
     smtpState = smtpResponse.getNextState();
 
-    List msgList = new ArrayList();
+    List<SmtpMessage> msgList = new ArrayList<>();
     SmtpMessage msg = new SmtpMessage();
 
     while (smtpState != SmtpState.CONNECT) {
@@ -254,7 +254,8 @@ public class SimpleSmtpServer implements Runnable {
    */
   public static SimpleSmtpServer start(int port) {
     SimpleSmtpServer server = new SimpleSmtpServer(port);
-    Thread t = new Thread(server);
+    Thread t = new Thread(server, "Dumbster Server Thread");
+    t.setDaemon(true);
     
     // Block until the server socket is created
     synchronized (server) {
@@ -268,4 +269,8 @@ public class SimpleSmtpServer implements Runnable {
     return server;
   }
 
+    public void clearEmails()
+    {
+        receivedMail.clear();
+    }
 }
