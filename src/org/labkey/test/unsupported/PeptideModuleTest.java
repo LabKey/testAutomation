@@ -42,7 +42,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-@Category({External.class, ONPRC.class})
+@Category({External.class})
 public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnlyTest
 {
 
