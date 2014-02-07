@@ -214,7 +214,7 @@ public class StudyHelper extends AbstractHelper
                 return _test.isElementPresent(Locator.xpath("//div[contains(@class,'x4-grid-cell-inner') and contains(text(),'" + groupName + "')]"));
             }
         }, "could not group: " + groupName, BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
-        _test.getWrapper().getEval("selenium.selectExt4GridItem('label', '"+groupName+"', -1, 'participantCategoriesGrid', null, false)");
+        _test.getWrapper().getEval("selenium.selectExt4GridItem('label', '"+groupName+"', -1, 'ptid-group-grid', null, false)");
         _test.click(Locator.xpath("//*[text()='" + groupName + "']")); // Ext.select doesn't trigger click events
     }
 

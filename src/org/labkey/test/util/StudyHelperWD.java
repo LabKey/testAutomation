@@ -187,6 +187,8 @@ public class StudyHelperWD extends AbstractHelperWD
         selectParticipantCategoriesGridRow(groupName);
         _test.clickButton("Edit Selected", 0);
         _test._extHelper.waitForExtDialog("Define " + participantString + " Group");
+        _test.waitForElement(Locator.css(".doneLoadingTestMarker"));
+        _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
         _test.click(Locator.ext4Button("Cancel"));
@@ -212,7 +214,7 @@ public class StudyHelperWD extends AbstractHelperWD
 
     public void selectParticipantCategoriesGridRow(String groupName)
     {
-        _test._extHelper.selectExt4GridItem("label", groupName, -1, "participantCategoriesGrid", false);
+        _test._extHelper.selectExt4GridItem("label", groupName, -1, "ptid-group-grid", false);
         _test.click(Locator.xpath("//*[text()='" + groupName + "']")); // Ext.select doesn't trigger click events
     }
 
