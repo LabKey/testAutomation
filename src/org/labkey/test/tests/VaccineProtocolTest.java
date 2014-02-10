@@ -22,14 +22,12 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Study;
-import org.labkey.test.pages.VaccineProtocolDesigner;
+import org.labkey.test.pages.DesignerController.DesignerTester;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
-
-import static org.junit.Assert.*;
 
 /**
  * User: Mark Igra
@@ -58,7 +56,7 @@ public class VaccineProtocolTest extends BaseWebDriverTest
         portalHelper.addWebPart("Vaccine Study Protocols");
         clickButton("New Protocol");
 
-        VaccineProtocolDesigner designer = new VaccineProtocolDesigner(this);
+        DesignerTester designer = new DesignerTester(this);
 
         designer.setName(STUDY_FOLDER);
         designer.setInvestigator("My Investigator");
