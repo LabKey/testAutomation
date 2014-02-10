@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
 
@@ -108,7 +109,8 @@ public class NabOldTest extends AbstractQCAssayTestWD
         clickAndWait(Locator.linkWithText("Deprecated NAb Run"));
         clickAndWait(Locator.linkWithText("Previous Runs"));
         log("Delete run");
-        clickButton("Select All", 0);
+        DataRegionTable region = new DataRegionTable("Plate", this);
+        region.checkAllOnPage();
         clickButton("Delete");
         log("Verify deleted run");
         assertTextPresent("Incubation Time");
