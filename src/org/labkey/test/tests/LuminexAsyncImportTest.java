@@ -70,7 +70,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         waitForPipelineJobsToFinish(3);
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent("An error occurred when running the script 'tomaras_luminex_transform.R', exit code: 1).", 3);
-        assertTextPresent("Error: No value provided for 'Positivity Fold Change'.", 3);
+        assertTextPresent("No value provided for 'Positivity Fold Change'.", 3);
         checkExpectedErrors(2);
     }
 
@@ -146,7 +146,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         //Check for Analyte Properties
         assertTextPresentInThisOrder("----- Start Analyte Properties -----", "----- Stop Analyte Properties -----");
         assertTextPresent("Properties for GS Analyte (2)", "Properties for GS Analyte (1)");
-        assertTextPresent("*PositivityThreshold:", "*LotNumber:");
+        assertTextPresent("*LotNumber:", "*NegativeControl:", "*PositivityThreshold:");
 
         //Check for Well Role Properties
         assertTextPresentInThisOrder("----- Start Well Role Properties -----", "----- Stop Well Role Properties -----");

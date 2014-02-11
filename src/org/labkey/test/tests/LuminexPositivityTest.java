@@ -87,7 +87,7 @@ public class LuminexPositivityTest extends LuminexTest
         uploadPositivityFile(assayName + " No Fold Change", "1", "", false);
         // should result in error for having a base visit without a fold change
         waitForText("An error occurred when running the script 'tomaras_luminex_transform.R', exit code: 1).");
-        assertTextPresent("Error: No value provided for 'Positivity Fold Change'.");
+        assertTextPresent("No value provided for 'Positivity Fold Change'.");
         clickButton("Cancel");
         setPositivityThresholdParams(101, 100);
         uploadPositivityFile(assayName + " No Base Visit", "", "", false);

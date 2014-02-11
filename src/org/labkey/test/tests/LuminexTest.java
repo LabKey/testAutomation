@@ -234,6 +234,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
             // add analyte property for tracking lot number
             addField("Analyte Properties", 6, "LotNumber", "Lot Number", ListColumnType.String);
+            addField("Analyte Properties", 7, "NegativeControl", "Negative Control", ListColumnType.Boolean);
 
             // add the data properties for the calculated columns
             addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
