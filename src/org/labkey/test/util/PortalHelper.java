@@ -364,5 +364,10 @@ public class PortalHelper extends AbstractHelper
 
         public static Locator.CssLocator bodyWebpartTitle = Locator.css("#bodypanel .labkey-wp-title-text");
         public static Locator.CssLocator sideWebpartTitle = Locator.css(".labkey-side-panel .labkey-wp-title-text");
+
+        public static Locator.XPathLocator webPart(String title)
+        {
+            return Locator.tagWithName("table", "webpart").withPredicate(Locator.xpath("tbody/tr/th").withAttribute("title", title));
+        }
     }
 }

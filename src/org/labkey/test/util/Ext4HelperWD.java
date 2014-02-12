@@ -540,17 +540,27 @@ public class Ext4HelperWD extends AbstractHelperWD
 
         public static Locator.XPathLocator window(String title)
         {
-            return Locator.xpath("//div").withClass("" + _cssPrefix + "window").notHidden().withDescendant(Locator.xpath("//span").withClass("" + _cssPrefix + "window-header-text").withText(title));
+            return Locator.xpath("//div").withClass(_cssPrefix + "window").notHidden().withDescendant(Locator.xpath("//span").withClass("" + _cssPrefix + "window-header-text").withText(title));
         }
 
         public static Locator.XPathLocator formItemWithLabel(String label)
         {
-            return Locator.tag("*").withClass("" + _cssPrefix + "form-item").withDescendant(Locator.tag("label").withText(label)).notHidden();
+            return formItem().withDescendant(Locator.tag("label").withText(label));
         }
 
         public static Locator.XPathLocator formItemWithLabelContaining(String label)
         {
-            return Locator.tag("*").withClass("" + _cssPrefix + "form-item").withDescendant(Locator.tag("label").containing(label)).notHidden();
+            return formItem().withDescendant(Locator.tag("label").containing(label));
+        }
+
+        public static Locator.XPathLocator formItem()
+        {
+            return Locator.tag("*").withClass("" + _cssPrefix + "form-item").notHidden();
+        }
+
+        public static Locator.XPathLocator formItemWithInputNamed(String name)
+        {
+            return formItem().withDescendant(Locator.tag("input").withAttribute("name", name));
         }
 
         public static Locator.XPathLocator mask()
