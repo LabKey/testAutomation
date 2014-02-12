@@ -17,12 +17,6 @@ package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
@@ -32,12 +26,10 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
@@ -60,7 +52,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * User: bbimber
@@ -959,7 +953,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", filename2, sample1.get("fileName"));
         assertEquals("Unexpected value for param", "Readset2", sample1.get("readsetname"));
         assertEquals("Unexpected value for param", "Subject2", sample1.get("subjectid"));
-        assertTrue("Unexpected value for param", sample1.get("sampledate") instanceof Map); //this is a JS date object.  not worth trying to figure out the value.  it's either null or not
+        assertEquals("Unexpected value for param", "2010-10-20T07:00:00.000Z", sample1.get("sampledate"));
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("readset")));
         assertEquals("Unexpected value for param", "LS454", sample1.get("platform"));
         assertEquals("Unexpected value for param", null, StringUtils.trimToNull((String) sample1.get("fileId")));
