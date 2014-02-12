@@ -196,7 +196,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     public void addToolbarButton(String buttonId)
     {
         String checkboxXpath = "//*[contains(@class, 'x4-grid-checkcolumn')]";
-        String checkboxSelectedXpath = "//*[contains(@class, 'x4-grid-checkcolumn-checked')]";
+        String checkboxSelectedXpath = "/td[1]//*[contains(@class, 'x4-grid-checkcolumn-checked')]";
         Locator toolbarShownLocator = Locator.xpath("//tr[@data-recordid='" + buttonId + "']").append(checkboxSelectedXpath);
 
         _test.assertElementNotPresent(toolbarShownLocator);
@@ -207,7 +207,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     public void removeToolbarButton(String buttonId)
     {
         String checkboxXpath = "//*[contains(@class, 'x4-grid-checkcolumn')]";
-        String checkboxSelectedXpath = "//*[contains(@class, 'x4-grid-checkcolumn-checked')]";
+        String checkboxSelectedXpath = "/td[1]//*[contains(@class, 'x4-grid-checkcolumn-checked')]";
         Locator toolbarShownLocator = Locator.xpath("//tr[@data-recordid='" + buttonId + "']").append(checkboxSelectedXpath);
 
         _test.assertElementPresent(toolbarShownLocator);
