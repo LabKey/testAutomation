@@ -123,7 +123,7 @@ public class LabModuleHelper
     public void goToLabHome()
     {
         _test.goToProjectHome();
-        _test.waitForText(LAB_HOME_TEXT);
+        _test.waitForElement(Locator.tagWithText("span", LAB_HOME_TEXT));
     }
 
     public void verifyNavPanelRowItemPresent(String label)
