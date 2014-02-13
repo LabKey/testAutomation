@@ -31,7 +31,6 @@ import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
@@ -42,7 +41,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.UIContainerHelper;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
 import org.labkey.test.util.ext4cmp.Ext4ComboRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
@@ -60,7 +58,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * User: bbimber
@@ -147,10 +147,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     private static final String[][] PROJECT_ENROLLMENT = new String[][]{
             {"Participant0001","Project1","Controls","01/02/2004","08/31/2007"},
             {"Participant0002","Project1","Controls","01/02/2004",""},
-            {"Participant0003","Project1","Group A","01/02/2004","9/31/2007"},
+            {"Participant0003","Project1","Group A","01/02/2004","9/30/2007"},
             {"Participant0004","Project1","Group A","01/02/2004",""},
             {"Participant0005","Project1","Group A","01/02/2004",""},
-            {"Participant0006","Project1","Group B","01/16/2004","9/31/2007"},
+            {"Participant0006","Project1","Group B","01/16/2004","9/30/2007"},
             {"Participant0007","Project1","Group B","01/16/2004","12/14/2006"},
             {"Participant0008","Project2","Controls","01/16/2004","12/14/2006"},
             {"Participant0009","Project2","Controls","07/21/2002",""},
@@ -168,7 +168,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             {"Participant0001","Project3","","05/02/2002",""},
             {"Participant0002","Project3","","01/02/2003","08/31/2007"},
             {"Participant0003","Project3","","01/02/2003",""},
-            {"Participant0004","Project3","","01/02/2003","9/31/2007"}
+            {"Participant0004","Project3","","01/02/2003","9/30/2007"}
     };
 
     private static final String[][] MAJOR_EVENTS = new String[][]{
