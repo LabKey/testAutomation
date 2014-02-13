@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
@@ -38,9 +39,12 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexPositivityTest extends LuminexTest
 {
+    List<String> _analyteNames = new ArrayList<>();
     private int _expectedThresholdValue = 100;
     private int _newThresholdValue = 100;
-    private List<String> _thresholdInputNames = new ArrayList<>();
+    private Boolean _expectedNegativeControlValue = false;
+    private Boolean _newNegativeControlValue = false;
+    private String _negControlAnalyte = null;
 
     protected void ensureConfigured()
     {
@@ -56,46 +60,122 @@ public class LuminexPositivityTest extends LuminexTest
     protected void runUITests()
     {
         String assayName = "Positivity";
+        _analyteNames.add("MyAnalyte (1)");
+        _analyteNames.add("Blank (3)");
 
+        addTransformScriptsToAssayDesign();
+
+        test3xFoldChange(assayName);
+        test5xFoldChange(assayName);
+        testWithoutBaselineVisitOrFoldChange(assayName);
+        testWithNegativeControls(assayName);
+        testBaselineVisitDataFromPreviousRun(assayName);
+    }
+
+    private void addTransformScriptsToAssayDesign()
+    {
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + "/resources/transformscripts/description_parsing_example.pl"), 0);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 1);
         saveAssay();
+    }
 
-        _thresholdInputNames.add("_analyte_MyAnalyte (1)_PositivityThreshold");
-        _thresholdInputNames.add("_analyte_Blank (3)_PositivityThreshold");
-
-        // Test positivity data upload with 3x Fold Change
+    private void testBaselineVisitDataFromPreviousRun(String assayName)
+    {
         setPositivityThresholdParams(100, 100);
-        uploadPositivityFile(assayName + " 3x Fold Change", "1", "3", false);
-        String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A8", "B8", "A9", "B9"};
-        checkPositivityValues("positive", posWells.length, posWells);
-        String[] negWells = new String[] {"A3", "B3", "A5", "B5", "A10", "B10", "A13", "B13"};
-        checkPositivityValues("negative", negWells.length, negWells);
-        checkDescriptionParsingForPositivityXLS();
-
-        // Test positivity data upload with 5x Fold Change
-        setPositivityThresholdParams(100, 101);
-        uploadPositivityFile(assayName + " 5x Fold Change", "1", "5", false);
-        posWells = new String[] {"A8", "B8", "A9", "B9"};
-        checkPositivityValues("positive", posWells.length, posWells);
-        negWells = new String[] {"A2", "B2", "A3", "B3", "A5", "B5", "A6", "B6", "A10", "B10", "A13", "B13"};
-        checkPositivityValues("negative", negWells.length, negWells);
-        checkDescriptionParsingForPositivityXLS();
-
-        // Test positivity data upload w/out a baseline visit and/or fold change
-        setPositivityThresholdParams(101, 101);
-        uploadPositivityFile(assayName + " No Fold Change", "1", "", false);
-        // should result in error for having a base visit without a fold change
-        waitForText("An error occurred when running the script 'tomaras_luminex_transform.R', exit code: 1).");
-        assertTextPresent("No value provided for 'Positivity Fold Change'.");
+        setNegativeControlParams(true, false);
+        uploadPositivityFile(assayName + " Baseline Visit Previous Run Error", TEST_ASSAY_LUM_FILE12, "1", "3", false);
+        assertTextPresent("Error: Baseline visit data found in more than one prevoiusly uploaded run: Analyte=" + _analyteNames.get(0) + ", Participant=123400001, Visit=1.");
         clickButton("Cancel");
-        setPositivityThresholdParams(101, 100);
-        uploadPositivityFile(assayName + " No Base Visit", "", "", false);
-        posWells = new String[] {"A1", "B1", "A2", "B2", "A3", "B3", "A4", "B4", "A6", "B6", "A7", "B7", "A8", "B8", "A9", "B9"};
+
+        // delete all but one run of data so we have the expected number of previous baseline visits rows
+        checkAllOnPage("Runs");
+        uncheckDataRegionCheckbox("Runs", 4);
+        clickButton("Delete");
+        assertEquals(4, getXpathCount(Locator.linkContainingText("Positivity ")));
+        assertTextNotPresent("Positivity 3x Fold Change");
+        clickButton("Confirm Delete");
+
+        // now we exclude the analytes in the remaining run to test that version of the baseline visit query
+        waitAndClickAndWait(Locator.linkWithText("Positivity 3x Fold Change"));
+        excludeAnalyteForRun(_analyteNames.get(0), true, "");
+        uploadPositivityFile(assayName + " Baseline Visit Previous Run Error", TEST_ASSAY_LUM_FILE12, "1", "3", false);
+        assertTextPresent("Error: No baseline visit data found: Analyte=" + _analyteNames.get(0) + ", Participant=123400001, Visit=1, Column=fiBackground.");
+        clickButton("Cancel");
+        waitAndClickAndWait(Locator.linkWithText("Positivity 3x Fold Change"));
+        excludeAnalyteForRun(_analyteNames.get(0), false, "");
+
+        // now we actual test the case of getting baseline visit data from a previously uploaded run
+        _negControlAnalyte = _analyteNames.get(1);
+        uploadPositivityFile(assayName + " Baseline Visit Previous Run", TEST_ASSAY_LUM_FILE12, "1", "3", false);
+        String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A9", "B9"};
         checkPositivityValues("positive", posWells.length, posWells);
-        negWells = new String[] {"A5", "B5", "A10", "B10", "A13", "B13"};
+        String[] negWells = new String[] {"A3", "B3", "A5", "B5"};
         checkPositivityValues("negative", negWells.length, negWells);
-        checkDescriptionParsingForPositivityXLS();
+    }
+
+    private void testWithNegativeControls(String assayName)
+    {
+        setPositivityThresholdParams(100, 100);
+        setNegativeControlParams(false, true);
+        uploadPositivityFile(assayName + " Negative Control", TEST_ASSAY_LUM_FILE11, "1", "5", false);
+        checkPositivityValues("positive", 0, new String[0]);
+        checkPositivityValues("negative", 0, new String[0]);
+    }
+
+    private void testWithoutBaselineVisitOrFoldChange(String assayName)
+    {
+        setPositivityThresholdParams(101, 101);
+        uploadPositivityFile(assayName + " No Fold Change Error", TEST_ASSAY_LUM_FILE11, "1", "", false);
+        assertTextPresent("Error: No value provided for 'Positivity Fold Change'.");
+        clickButton("Cancel");
+
+        uploadPositivityFile(assayName + " No Base Visit Error", TEST_ASSAY_LUM_FILE13, "1", "3", false);
+        assertTextPresent("Error: No baseline visit data found: Analyte=" + _analyteNames.get(0) + ", Participant=123400004, Visit=1, Column=fiBackground.");
+        clickButton("Cancel");
+
+        // file contains the baseline visit data, which is not used in this case
+        setPositivityThresholdParams(101, 100);
+        uploadPositivityFile(assayName + " No Base Visit 1", TEST_ASSAY_LUM_FILE11, "", "", false);
+        String[] posWells = new String[] {"A1", "B1", "A2", "B2", "A3", "B3", "A4", "B4", "A6", "B6", "A7", "B7", "A9", "B9"};
+        checkPositivityValues("positive", posWells.length, posWells);
+        String[] negWells = new String[] {"A5", "B5"};
+        checkPositivityValues("negative", negWells.length, negWells);
+        checkDescriptionParsing("123400001 1 2012-10-01", "", "123400001", "1.0", "2012-10-01");
+        checkDescriptionParsing("123400002,2,1/15/2012", "", "123400002", "2.0", "2012-01-15");
+
+        // file contains data that is only checked against thresholds (i.e. no baseline visit data)
+        uploadPositivityFile(assayName + " No Base Visit 2", TEST_ASSAY_LUM_FILE13, "", "", false);
+        posWells = new String[] {"C1", "D1"};
+        checkPositivityValues("positive", posWells.length, posWells);
+        negWells = new String[] {"C2", "D2", "C3", "D3"};
+        checkPositivityValues("negative", negWells.length, negWells);
+        checkDescriptionParsing("P562, Wk 48, 7-27-2011", "", "P562", "48.0", "2011-07-27");
+    }
+
+    private void test5xFoldChange(String assayName)
+    {
+        // file contains the baseline visit data
+        setPositivityThresholdParams(100, 101);
+        uploadPositivityFile(assayName + " 5x Fold Change", TEST_ASSAY_LUM_FILE11, "1", "5", false);
+        String[] posWells = new String[] {"A9", "B9"};
+        checkPositivityValues("positive", posWells.length, posWells);
+        String[] negWells = new String[] {"A2", "B2", "A3", "B3", "A5", "B5", "A6", "B6"};
+        checkPositivityValues("negative", negWells.length, negWells);
+        checkDescriptionParsing("123400001 1 2012-10-01", "", "123400001", "1.0", "2012-10-01");
+        checkDescriptionParsing("123400002,2,1/15/2012", "", "123400002", "2.0", "2012-01-15");
+    }
+
+    private void test3xFoldChange(String assayName)
+    {
+        // file contains the baseline visit data
+        setPositivityThresholdParams(100, 100);
+        uploadPositivityFile(assayName + " 3x Fold Change", TEST_ASSAY_LUM_FILE11, "1", "3", false);
+        String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A9", "B9"};
+        checkPositivityValues("positive", posWells.length, posWells);
+        String[] negWells = new String[] {"A3", "B3", "A5", "B5"};
+        checkPositivityValues("negative", negWells.length, negWells);
+        checkDescriptionParsing("123400001 1 2012-10-01", "", "123400001", "1.0", "2012-10-01");
+        checkDescriptionParsing("123400002,2,1/15/2012", "", "123400002", "2.0", "2012-01-15");
     }
 
     private void setPositivityThresholdParams(int expectedValue, int newValue)
@@ -104,28 +184,42 @@ public class LuminexPositivityTest extends LuminexTest
         _newThresholdValue = newValue;
     }
 
-    @Override
-    protected void setPositivityThresholdValues()
+    private void setNegativeControlParams(boolean expectedValue, boolean newValue)
     {
-        for (String inputName : _thresholdInputNames)
+        _expectedNegativeControlValue = expectedValue;
+        _newNegativeControlValue = newValue;
+    }
+
+    @Override
+    protected void setAnalytePropertyValues()
+    {
+        for (String analyteName : _analyteNames)
         {
+            String inputName = "_analyte_" + analyteName + "_PositivityThreshold";
             Locator l = Locator.xpath("//input[@type='text' and @name='" + inputName + "'][1]");
             waitForElement(l);
             assertEquals(Integer.toString(_expectedThresholdValue), getFormElement(l));
             setFormElement(l, Integer.toString(_newThresholdValue));
+
+            inputName = "_analyte_" + analyteName + "_NegativeControl";
+            l = Locator.xpath("//input[@type='checkbox' and @name='" + inputName + "'][1]");
+            waitForElement(l);
+            assertEquals(_expectedNegativeControlValue ? "on" : "off", getFormElement(l));
+            if (!_expectedNegativeControlValue && _newNegativeControlValue)
+                checkCheckbox(l);
+            else if (_expectedNegativeControlValue && !_newNegativeControlValue)
+                uncheckCheckbox(l);
+
+            // special case for analyte that should always be considered negative control
+            if (analyteName.equals(_negControlAnalyte))
+                checkCheckbox(l);
         }
-    }
 
-    /**
-     * This function verify three specific descriptions present in positivity.xls are present in the
-     * data grid and that they have been correctly processed
-     */
-    private void checkDescriptionParsingForPositivityXLS()
-    {
-        checkDescriptionParsing("123400001 1 2012-10-01", "", "123400001", "1.0", "2012-10-01");
-        checkDescriptionParsing("123400002,2,1/15/2012", "", "123400002", "2.0", "2012-01-15");
-        checkDescriptionParsing("P562, Wk 48, 7-27-2011", "", "P562", "48.0", "2011-07-27");
+        if (_expectedThresholdValue != _newThresholdValue)
+            _expectedThresholdValue = _newThresholdValue;
 
+        if (!_expectedNegativeControlValue.equals(_newNegativeControlValue))
+            _expectedNegativeControlValue = _newNegativeControlValue;
     }
 
     private void checkDescriptionParsing(String description, String specimenID, String participantID, String visitID, String date)

@@ -74,6 +74,9 @@ public class LuminexTest extends AbstractQCAssayTest
     protected final File TEST_ASSAY_LUM_FILE8 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 4.xls");
     protected final File TEST_ASSAY_LUM_FILE9 = new File(getLabKeyRoot() + "/sampledata/Luminex/Guide Set plate 5.xls");
     protected final File TEST_ASSAY_LUM_FILE10 = new File(getLabKeyRoot() + "/sampledata/Luminex/RawAndSummary.xlsx");
+    protected final File TEST_ASSAY_LUM_FILE11 = new File(getLabKeyRoot() + "/sampledata/Luminex/PositivityWithBaseline.xls");
+    protected final File TEST_ASSAY_LUM_FILE12 = new File(getLabKeyRoot() + "/sampledata/Luminex/PositivityWithoutBaseline.xls");
+    protected final File TEST_ASSAY_LUM_FILE13 = new File(getLabKeyRoot() + "/sampledata/Luminex/PositivityThreshold.xls");
 
     protected final File TEST_ASSAY_MULTIPLE_STANDARDS_1 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (Standard2).xls");
     protected final File TEST_ASSAY_MULTIPLE_STANDARDS_2 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (Standard2).xls");
@@ -774,13 +777,8 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private void excludeAnalyteForAllWellsTest(String analyte)
     {
-        clickButtonContainingText("Exclude Analytes", 0);
-        _extHelper.waitForExtDialog("Exclude Analytes from Analysis");
-        clickExcludeAnalyteCheckBox(analyte);
-        String comment = "Changed for all analytes";
-        setFormElement(Locator.id(EXCLUDE_COMMENT_FIELD), comment);
-        waitForElement(Locator.xpath("//table[@id='saveBtn' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
-        clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
+        String comment ="Changed for all analytes";
+        excludeAnalyteForRun(analyte, true, comment);
 
         String exclusionPrefix = "Excluded for analyte: ";
         Map<String, Set<String>> analyteToExclusion = new HashMap<>();
@@ -791,6 +789,29 @@ public class LuminexTest extends AbstractQCAssayTest
         analyteToExclusion = createExclusionMap(set, analyte);
 
         compareColumnValuesAgainstExpected("Analyte", "Exclusion Comment", analyteToExclusion);
+    }
+
+    public void excludeAnalyteForRun(String analyte, boolean exclude, String comment)
+    {
+        clickButtonContainingText("Exclude Analytes", 0);
+        _extHelper.waitForExtDialog("Exclude Analytes from Analysis");
+        if (!exclude)
+            waitForText("Uncheck analytes to remove exclusions");
+
+        clickExcludeAnalyteCheckBox(analyte);
+        setFormElement(Locator.id(EXCLUDE_COMMENT_FIELD), comment);
+        waitForElement(Locator.xpath("//table[@id='saveBtn' and not(contains(@class, 'disabled'))]"), WAIT_FOR_JAVASCRIPT);
+
+        if (!exclude)
+        {
+            clickButton(SAVE_CHANGES_BUTTON, 0);
+            _extHelper.waitForExtDialog("Warning");
+            _extHelper.clickExtButton("Warning", "Yes", 2 * defaultWaitForPage);
+        }
+        else
+        {
+            clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
+        }
     }
 
     /**
@@ -1202,8 +1223,11 @@ public class LuminexTest extends AbstractQCAssayTest
     //helper function to go to test assay home from anywhere the project link is visible
     protected void goToTestAssayHome()
     {
-        clickProject(TEST_ASSAY_PRJ_LUMINEX);
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
+        if (!isTextPresent(TEST_ASSAY_LUM + " Runs"))
+        {
+            clickProject(TEST_ASSAY_PRJ_LUMINEX);
+            clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
+        }
     }
 
     protected boolean R_TRANSFORM_SET = false;
@@ -2301,7 +2325,7 @@ public class LuminexTest extends AbstractQCAssayTest
     }
 
     @LogMethod
-    public void uploadPositivityFile(String assayName, String baseVisit, String foldChange, boolean isBackgroundUpload)
+    public void uploadPositivityFile(String assayName, File file, String baseVisit, String foldChange, boolean isBackgroundUpload)
     {
         goToTestAssayHome();
         clickButton("Import Data");
@@ -2310,19 +2334,18 @@ public class LuminexTest extends AbstractQCAssayTest
         checkCheckbox(Locator.name("calculatePositivity"));
         setFormElement(Locator.name("baseVisit"), baseVisit);
         setFormElement(Locator.name("positivityFoldChange"), foldChange);
-        File positivityData = new File(getSampledataPath(), "Luminex/Positivity.xls");
-        assertTrue("Positivity Data absent: " + positivityData.toString(), positivityData.exists());
-        setFormElement(Locator.name("__primaryFile__"), positivityData);
+        assertTrue("Positivity Data absent: " + file.toString(), file.exists());
+        setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Next");
-        setPositivityThresholdValues();
+        setAnalytePropertyValues();
         clickButton("Save and Finish");
-        if (!isBackgroundUpload && !isTextPresent("Error"))
+        if (!isBackgroundUpload && !isTextPresent("Error: "))
             clickAndWait(Locator.linkWithText(assayName), 2 * WAIT_FOR_PAGE);
     }
 
-    protected void setPositivityThresholdValues()
+    protected void setAnalytePropertyValues()
     {
-        // no op
+        // no op, currently used by LuminexPositivityTest
     }
 
     @LogMethod
