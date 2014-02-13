@@ -341,6 +341,11 @@ public abstract class Locator
         return xpath("//a").notHidden().withClass("x4-btn").withText(text);
     }
 
+    public static XPathLocator ext4ButtonEnabled(String text)
+    {
+        return ext4Button(text).withoutClass("x4-disabled");
+    }
+
     public static XPathLocator extButtonEnabled(String text)
     {
         return xpath("//table").withClass("x-btn").withoutClass("x-item-disabled").append("//button").withClass("x-btn-text").withText(text);
