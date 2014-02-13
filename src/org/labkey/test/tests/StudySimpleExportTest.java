@@ -282,7 +282,7 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         String visitLabel = "My visit label";
         String visitSeqNumMin = "999.0";
         String visitSeqNumMax = "999.999";
-        String visitSeqNumTarget = "999.001";
+        String visitProtocolDay = "999.001";
         String visitDescription = "My visit description - " + TRICKY_CHARACTERS_FOR_PROJECT_NAMES + INJECT_CHARS_1 + INJECT_CHARS_2;
 
         log("Visit Properties: create visit with description");
@@ -305,7 +305,7 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         assertFormElementEquals(Locator.name("description"), visitDescription);
         visitDescription += " <b>testing</b>";
         setFormElement(Locator.name("description"), visitDescription);
-        setFormElement(Locator.name("sequenceNumTarget"), visitSeqNumTarget);
+        setFormElement(Locator.name("protocolDay"), visitProtocolDay);
         clickButton("Save");
 
         log("Visit Properties: add dataset record using new visit");
@@ -335,7 +335,7 @@ public class StudySimpleExportTest extends StudyBaseTestWD
         assertFormElementEquals(Locator.name("description"), visitDescription);
         assertFormElementEquals(Locator.name("sequenceNumMin"), visitSeqNumMin);
         assertFormElementEquals(Locator.name("sequenceNumMax"), visitSeqNumMax);
-        assertFormElementEquals(Locator.name("sequenceNumTarget"), visitSeqNumTarget);
+        assertFormElementEquals(Locator.name("protocolDay"), visitProtocolDay);
 
         log("Visit Properties: verify visit description in study navigator hover");
         clickTab("Overview");
