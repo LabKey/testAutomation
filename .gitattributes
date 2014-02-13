@@ -511,7 +511,6 @@ src/org/labkey/test/tests/TruncationTest.java -text
 src/org/labkey/test/tests/UniprotAnnotationTest.java -text
 src/org/labkey/test/tests/UserPermissionsTest.java -text
 src/org/labkey/test/tests/UserTest.java -text
-src/org/labkey/test/tests/VaccineProtocolTest.java -text
 src/org/labkey/test/tests/ViabilityTest.java -text
 src/org/labkey/test/tests/ViralLoadAssayTest.java -text
 src/org/labkey/test/tests/WebDavTest.java -text

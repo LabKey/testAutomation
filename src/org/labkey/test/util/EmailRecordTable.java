@@ -74,7 +74,7 @@ public class EmailRecordTable extends DataRegionTable
         
         _test.sleep(1000);
         String error = _test.getText(Locator.id("emailRecordError"));
-        assertTrue("Error setting email recorder", StringUtils.trimToNull(error) == null);
+        assertTrue("Error setting email recorder: " + error, StringUtils.trimToNull(error) == null);
     }
 
     public void clickMessage(EmailMessage message)
