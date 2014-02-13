@@ -214,8 +214,13 @@ public class StudyHelperWD extends AbstractHelperWD
 
     public void selectParticipantCategoriesGridRow(String groupName)
     {
-        _test._extHelper.selectExt4GridItem("label", groupName, -1, "ptid-group-grid", false);
-        _test.click(Locator.xpath("//*[text()='" + groupName + "']")); // Ext.select doesn't trigger click events
+        Locator.XPathLocator participantCategoriesGrid = Locator.id("participantCategoriesGrid");
+        Locator.XPathLocator categoryGridRow = participantCategoriesGrid
+                .append(Locator.tagWithClass("tr", "x4-grid-data-row")
+                        .withPredicate(Locator.tagWithClass("td", "x4-grid-cell-first").withText(groupName)));
+
+        _test.waitAndClick(categoryGridRow);
+        _test.waitForElement(categoryGridRow.withClass("x4-grid-row-selected"));
     }
 
     public void exportStudy(String folder)
