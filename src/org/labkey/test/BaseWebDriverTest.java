@@ -527,7 +527,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     "XULElement.selectedIndex", // Ignore known Firefox Issue
                     "Failed to decode base64 string!", // Firefox issue
                     "xulrunner-1.9.0.14/components/FeedProcessor.js", // Firefox problem
-                    "Image corrupt or truncated: <unknown>");
+                    "Image corrupt or truncated:");
         }
     }
 
