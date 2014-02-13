@@ -9,9 +9,9 @@ import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
-import org.labkey.test.pages.StudyDesignController.ManageAssayScheduleTester;
-import org.labkey.test.pages.StudyDesignController.ManageImmunizationsTester;
-import org.labkey.test.pages.StudyDesignController.ManageStudyProductsTester;
+import org.labkey.test.pages.xStudyDesignController.ManageAssayScheduleTester;
+import org.labkey.test.pages.xStudyDesignController.ManageImmunizationsTester;
+import org.labkey.test.pages.xStudyDesignController.ManageStudyProductsTester;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
