@@ -186,7 +186,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Overview"));
         waitForElement(Locator.tagWithClass("table", "study-vaccine-design"));
         assertTextPresent(assayPlanTxt);
-        assertTextPresent("[x]", 35);
+        assertTextPresent("\u2713", 35);
     }
 
     private void checkRhoQueryRowCount(String name, int expectedCount)
