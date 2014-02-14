@@ -92,6 +92,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -108,6 +109,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -336,11 +338,12 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 }
                 if(_driver == null)
                 {
-                    Map<String, String> prefs = new Hashtable<>();
+                    ChromeOptions options = new ChromeOptions();
+                    Dictionary<String, Object> prefs = new Hashtable<>();
+
                     prefs.put("download.prompt_for_download", "false");
                     prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
-
-                    ChromeOptions options = new ChromeOptions();
+                    options.setExperimentalOptions("prefs", prefs);
 
                     if (isScriptCheckEnabled())
                     {
@@ -349,7 +352,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     }
 
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-                    capabilities.setCapability("chrome.prefs", prefs);
                     capabilities.setCapability(ChromeOptions.CAPABILITY, options);
                     _jsErrorChecker = new ChromeJSErrorChecker();
                     _driver = new ChromeDriver(capabilities);
@@ -3863,7 +3865,38 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Export"));
         checkRadioButton(Locator.radioButtonByName("location").index(1));
+        clickButton("Export");
+    }
 
+    protected File exportFolderToBrowserAsZip()
+    {
+        goToFolderManagement();
+        clickAndWait(Locator.linkWithText("Export"));
+        checkRadioButton(Locator.radioButtonByName("location").index(2));
+
+        final long downloadTime = System.currentTimeMillis();
+        clickButton("Export", 0);
+
+        final File downloadDir = getDownloadDir();
+        final FileFilter fileFilter = new FileFilter()
+        {
+            @Override
+            public boolean accept(File file)
+            {
+                return file.lastModified() > downloadTime;
+            }
+        };
+
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return downloadDir.listFiles(fileFilter).length > 0;
+            }
+        }, "Folder archive did not appear in download dir", WAIT_FOR_PAGE);
+
+        return downloadDir.listFiles(fileFilter)[0];
     }
 
     @Override

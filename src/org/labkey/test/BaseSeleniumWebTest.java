@@ -2969,7 +2969,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Export"));
         checkRadioButton("location", 1);
-
+        clickButton("Export");
     }
 
     public void setModuleProperties(List<ModulePropertyValue> values)
