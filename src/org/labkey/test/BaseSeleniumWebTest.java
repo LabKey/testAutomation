@@ -6502,17 +6502,22 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertEquals("Did not find correct number of finished pipeline jobs.", jobsExpected, getFinishedCount(statusValues));
     }
 
-    // Note: unverified
+    @LogMethod
     protected void waitForRunningPipelineJobs(int wait)
     {
         log("Waiting for running pipeline jobs list to be empty.");
+        List<String> statusValues = getPipelineStatusValues();
         startTimer();
-        while (elapsedSeconds() < wait)
-            if ( getPipelineStatusValues().size() == 0 )
-                return;
+        while (statusValues.size() > 0 && elapsedSeconds() < wait)
+        {
+            log("[" + StringUtils.join(statusValues,",") + "]");
+            log("Waiting for " + statusValues.size() + " jobs to complete...");
+            sleep(1000);
+            refresh();
+            statusValues = getPipelineStatusValues();
+        }
 
-        //else
-        fail("Running pipeline jobs were found.  Timeout:" + wait);
+        assertTrue("Running pipeline jobs were found.  Timeout:" + wait, statusValues.size() == 0);
     }
 
     public void setCodeEditorValue(String id, String value)

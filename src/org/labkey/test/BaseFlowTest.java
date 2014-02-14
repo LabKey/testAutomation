@@ -119,16 +119,10 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     protected void waitForPipeline(String containerPath)
     {
         pushLocation();
-        beginAt("/Flow" + containerPath + "/showJobs.view");
 
-        long startTime = System.currentTimeMillis();
-        do
-        {
-            log("Waiting for flow pipeline jobs to complete...");
-            sleep(1500);
-            refresh();
-        }
-        while (!isTextPresent("There are no running or pending flow jobs") && System.currentTimeMillis() - startTime < 300000);
+        // Only show running jobs (not complete, cancelled, or error)
+        beginAt(containerPath + "/pipeline-status-showList.view?StatusFiles.Status~notin=COMPLETE%3BCANCELLED%3BERROR");
+        waitForRunningPipelineJobs(MAX_WAIT_SECONDS);
 
         popLocation(longWaitForPage);
     }

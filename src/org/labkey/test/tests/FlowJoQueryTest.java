@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
@@ -52,6 +53,18 @@ public class FlowJoQueryTest extends BaseFlowTest
         verifyFilterOnImport();
     }
 
+    @Override
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        super.doCleanup(afterTest);
+    }
+
+    @Override
+    protected void init()
+    {
+        super.init();
+    }
+
     protected void verifyQueryTest()
     {
         importAnalysis(getContainerPath(), "/flowjoquery/Workspaces/PV1-public.xml", SelectFCSFileOption.None, null, "FlowJoAnalysis", false, true);
@@ -65,19 +78,18 @@ public class FlowJoQueryTest extends BaseFlowTest
         _customizeViewsHelper.addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S4+:Count", "4+:Count");
         _customizeViewsHelper.addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
         _customizeViewsHelper.applyCustomView();
-        clickProject(PROJECT_NAME);
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Folder Type"));
-        toggleCheckboxByTitle("Query");
-        toggleCheckboxByTitle("Flow");
-        createQuery(PROJECT_NAME, "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
-        createQuery(PROJECT_NAME, "PassFailQuery", getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);
-        //createQuery(PROJECT_NAME, "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);
-        createQuery(PROJECT_NAME, "COMP", getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), getFileContents("/sampledata/flow/flowjoquery/query/COMP.xml"), true);
-        createQuery(PROJECT_NAME, "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), true);
+
+        // UNDONE: These queries used to be defined in the project container, but that no longer works after
+        createQuery(getContainerPath(), "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), false);
+        createQuery(getContainerPath(), "PassFail", getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), false);
+        //createQuery(getContainerPath(), "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), false);
+        createQuery(getContainerPath(), "COMP", getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), getFileContents("/sampledata/flow/flowjoquery/query/COMP.xml"), false);
+        createQuery(getContainerPath(), "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), false);
+
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 run"));
-        _extHelper.clickMenuButton("Query", "PassFailQuery");
+        _extHelper.clickMenuButton("Query", "PassFail");
+
         assertTextPresent("LO_CD8", 1);
         assertTextPresent("PASS", 4);
 //        The DeviationFromMean query does not work on SQL server.
