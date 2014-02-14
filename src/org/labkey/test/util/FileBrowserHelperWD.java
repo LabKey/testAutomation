@@ -129,6 +129,12 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
             _test.waitForElement(rowSelected);
     }
 
+    public void clickFileBrowserFileCheckboxWithPartialText(String partialFileName)
+    {
+        String firstMatch = _test.getText(Locator.tagWithAttribute("td", "role", "gridcell").append(Locator.tag("span").containing(partialFileName)));
+        clickFileBrowserFileCheckbox(firstMatch);
+    }
+
     //In case desired element is not present due to infinite scrolling
     private void scrollToGridRow(String nodeIdEndsWith)
     {
