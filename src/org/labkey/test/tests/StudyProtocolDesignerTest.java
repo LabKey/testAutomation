@@ -1,5 +1,6 @@
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -17,7 +18,10 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by tchadick on 1/29/14.
@@ -27,7 +31,7 @@ public class StudyProtocolDesignerTest extends BaseWebDriverMultipleTest
 {
     private static final File STUDY_ARCHIVE = new File(getSampledataPath(), "study/CohortStudy.zip");
     // Cohorts: defined in study archive
-    private static final String[] COHORTS = {"Positive", "Negative", "TestCohort", "OtherTestCohort"};
+    private static final String[] COHORTS = {"Positive", "Negative"};
 
     private static final File FOLDER_ARCHIVE = new File(getSampledataPath(), "FolderExport/ProtocolLookup.folder.zip");
     // lookups: defined in folder archive
@@ -47,7 +51,8 @@ public class StudyProtocolDesignerTest extends BaseWebDriverMultipleTest
     private static List<ManageImmunizationsTester.Visit> VISITS = new ArrayList<>();
     private static List<ManageImmunizationsTester.Visit> NEW_VISITS = new ArrayList<>();
     private static final String[] NEW_ASSAYS = {"Elispot", "Neutralizing Antibodies", "ICS"};
-
+    private static final String[] NEW_COHORTS = {"TestCohort", "OtherTestCohort"};
+    
     public StudyProtocolDesignerTest()
     {
         super();
@@ -96,7 +101,7 @@ public class StudyProtocolDesignerTest extends BaseWebDriverMultipleTest
         testImmunizationSchedule();
         preTest();
         testAssaySchedule();
-        //TODO: testImportExport();
+        testExportImport();
     }
 
     @LogMethod
@@ -137,11 +142,11 @@ public class StudyProtocolDesignerTest extends BaseWebDriverMultipleTest
                 new ManageImmunizationsTester.TreatmentComponent(IMMUNOGENS[2], DOSE_AND_UNITS[1], ROUTES[0]));
 
 
-        immunizations.insertNewCohort(COHORTS[2], 2,
+        immunizations.insertNewCohort(NEW_COHORTS[0], 2,
                 new ManageImmunizationsTester.TreatmentVisit(TREATMENTS[0], VISITS.get(0), false),
                 new ManageImmunizationsTester.TreatmentVisit(TREATMENTS[1], VISITS.get(2), false));
 
-        immunizations.insertNewCohort(COHORTS[3], 5,
+        immunizations.insertNewCohort(NEW_COHORTS[1], 5,
                 new ManageImmunizationsTester.TreatmentVisit(TREATMENTS[0], VISITS.get(0), false),
 //                new ManageImmunizationsTester.TreatmentVisit(TREATMENTS[1], NEW_VISITS.get(0), true), //TODO: Creating a second new visit triggers a page load
                 new ManageImmunizationsTester.TreatmentVisit(TREATMENTS[1], NEW_VISITS.get(1), true));
@@ -164,6 +169,7 @@ public class StudyProtocolDesignerTest extends BaseWebDriverMultipleTest
         schedule.insertNewAssayConfiguration(NEW_ASSAYS[0], null, LABS[0], null);
         schedule.insertNewAssayConfiguration(NEW_ASSAYS[1], null, LABS[1], null);
         schedule.insertNewAssayConfiguration(NEW_ASSAYS[2], null, LABS[2], null);
+        schedule.insertNewAssayConfiguration(NEW_ASSAYS[2], null, LABS[3], null);
 
         checkCheckbox(ManageAssayScheduleTester.Locators.assayScheduleGridCheckbox(NEW_ASSAYS[0], VISITS.get(0).getLabel()));
         checkCheckbox(ManageAssayScheduleTester.Locators.assayScheduleGridCheckbox(NEW_ASSAYS[1], VISITS.get(1).getLabel()));
@@ -172,6 +178,105 @@ public class StudyProtocolDesignerTest extends BaseWebDriverMultipleTest
         checkCheckbox(ManageAssayScheduleTester.Locators.assayScheduleGridCheckbox(NEW_ASSAYS[1], NEW_VISITS.get(1).getLabel()));
 
         schedule.setAssayPlan("Do some exciting science!");
+    }
+
+    @LogMethod
+    public void testExportImport()
+    {
+        final String importedFolder = "Imported " + getFolderName();
+        File downloadedFolder = exportFolderToBrowserAsZip();
+
+        _containerHelper.createSubfolder(getProjectName(), importedFolder, null);
+        importFolderFromZip(downloadedFolder);
+
+        verifyImportedProtocol();
+    }
+
+    private void verifyImportedProtocol()
+    {
+        clickFolder(getFolderName());
+
+        verifyImmunogenTable();
+        verifyHIVAntigenTable();
+        verifyAdjuvantTable();
+        verifyImmunizationSchedule();
+        verifyAssaySchedule();
+    }
+
+    private void verifyImmunogenTable()
+    {
+        Locator.XPathLocator immunogenGrid = Locators.studyProtocolWebpartGrid("Immunogens");
+        String gridText = getText(immunogenGrid);
+
+        List<String> expectedImmunogenTexts = new ArrayList<>();
+        expectedImmunogenTexts.addAll(Arrays.asList(IMMUNOGENS));
+        expectedImmunogenTexts.addAll(Arrays.asList(IMMUNOGEN_TYPES));
+
+        for (String expectedText : expectedImmunogenTexts)
+        {
+            assertTrue("Vaccine design immunogens did not contain: " + expectedText, gridText.contains(expectedText));
+        }
+    }
+
+    private void verifyHIVAntigenTable()
+    {
+        Locator.XPathLocator antigenGrid = Locator.tagWithClass("div", "immunogen-hiv-antigen").append("/table");
+        assertElementPresent(antigenGrid, 1);
+
+        String gridText = getText(antigenGrid);
+
+        List<String> expectedImmunogenTexts = new ArrayList<>();
+        expectedImmunogenTexts.addAll(Arrays.asList(GENES));
+        expectedImmunogenTexts.addAll(Arrays.asList(SUBTYPES));
+
+        for (String expectedText : expectedImmunogenTexts)
+        {
+            assertTrue("Vaccine design HIV Antigen grid did not contain: " + expectedText, gridText.contains(expectedText));
+        }
+    }
+
+    private void verifyAdjuvantTable()
+    {
+        Locator.XPathLocator adjuvantGrid = Locators.studyProtocolWebpartGrid("Adjuvants");
+        String gridText = getText(adjuvantGrid);
+
+        for (String expectedText : ADJUVANTS)
+        {
+            assertTrue("Vaccine design adjuvants did not contain: " + expectedText, gridText.contains(expectedText));
+        }
+    }
+
+    private void verifyImmunizationSchedule()
+    {
+        Locator.XPathLocator scheduleGrid = Locators.studyProtocolWebpartGrid("Immunization Schedule");
+        String gridText = getText(scheduleGrid);
+
+        List<String> expectedTexts = new ArrayList<>();
+        expectedTexts.addAll(Arrays.asList(COHORTS));
+        expectedTexts.addAll(Arrays.asList(NEW_COHORTS));
+        expectedTexts.addAll(Arrays.asList(TREATMENTS));
+
+        for (String expectedText : expectedTexts)
+        {
+            assertTrue("Vaccine design immunization schedule did not contain: " + expectedText, gridText.contains(expectedText));
+        }
+    }
+
+    private void verifyAssaySchedule()
+    {
+        Locator.XPathLocator scheduleGrid = Locators.studyProtocolWebpartGrid("Assay Schedule");
+        String gridText = getText(scheduleGrid);
+
+        List<String> expectedTexts = new ArrayList<>();
+        expectedTexts.addAll(Arrays.asList(NEW_ASSAYS));
+        expectedTexts.addAll(Arrays.asList(LABS));
+
+        for (String expectedText : expectedTexts)
+        {
+            assertTrue("Vaccine design assay schedule did not contain: " + expectedText, gridText.contains(expectedText));
+        }
+
+        assertEquals("Wrong number of scheduled assay/visits", 5, StringUtils.countMatches(gridText, "\u2713"));
     }
 
     @Nullable
@@ -190,5 +295,13 @@ public class StudyProtocolDesignerTest extends BaseWebDriverMultipleTest
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
+    }
+
+    public static class Locators
+    {
+        public static Locator.XPathLocator studyProtocolWebpartGrid(String title)
+        {
+            return Locator.tagWithClass("table", "labkey-data-region").withPredicate(Locator.tagWithClass("div", "study-vaccine-design-header").withText(title));
+        }
     }
 }
