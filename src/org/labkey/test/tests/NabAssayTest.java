@@ -435,8 +435,8 @@ public class NabAssayTest extends AbstractQCAssayTestWD
         clickAndWait(Locator.linkContainingText("details", 1));
         assertNabData(true);
 
+        clickAndWait(Locator.linkWithText("View Runs"));
         clickAndWait(Locator.linkWithText("View Results"));
-
         assertAUCColumnsHidden();
         addAUCColumns();
         assertAliasedAUCCellData();
