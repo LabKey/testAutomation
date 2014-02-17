@@ -192,25 +192,32 @@ public class StudyProtocolDesignerTest extends BaseWebDriverMultipleTest
         verifyImportedProtocol();
     }
 
+    @LogMethod
     private void verifyImportedProtocol()
     {
         clickFolder(getFolderName());
 
         verifyImmunogenTable();
-        verifyHIVAntigenTable();
         verifyAdjuvantTable();
         verifyImmunizationSchedule();
         verifyAssaySchedule();
     }
 
+    @LogMethod(quiet = true)
     private void verifyImmunogenTable()
     {
+        waitForElementToDisappear(Locator.css("div.immunogen-hiv-antigen").withText("...")); // HIV Antigen placeholder
+        Locator.XPathLocator antigenGrid = Locator.tagWithClass("div", "immunogen-hiv-antigen").append("/table");
+        assertElementPresent(antigenGrid, 1);
+
         Locator.XPathLocator immunogenGrid = Locators.studyProtocolWebpartGrid("Immunogens");
         String gridText = getText(immunogenGrid);
 
         List<String> expectedImmunogenTexts = new ArrayList<>();
         expectedImmunogenTexts.addAll(Arrays.asList(IMMUNOGENS));
         expectedImmunogenTexts.addAll(Arrays.asList(IMMUNOGEN_TYPES));
+        expectedImmunogenTexts.addAll(Arrays.asList(GENES));
+        expectedImmunogenTexts.addAll(Arrays.asList(SUBTYPES));
 
         for (String expectedText : expectedImmunogenTexts)
         {
@@ -218,23 +225,7 @@ public class StudyProtocolDesignerTest extends BaseWebDriverMultipleTest
         }
     }
 
-    private void verifyHIVAntigenTable()
-    {
-        Locator.XPathLocator antigenGrid = Locator.tagWithClass("div", "immunogen-hiv-antigen").append("/table");
-        assertElementPresent(antigenGrid, 1);
-
-        String gridText = getText(antigenGrid);
-
-        List<String> expectedImmunogenTexts = new ArrayList<>();
-        expectedImmunogenTexts.addAll(Arrays.asList(GENES));
-        expectedImmunogenTexts.addAll(Arrays.asList(SUBTYPES));
-
-        for (String expectedText : expectedImmunogenTexts)
-        {
-            assertTrue("Vaccine design HIV Antigen grid did not contain: " + expectedText, gridText.contains(expectedText));
-        }
-    }
-
+    @LogMethod(quiet = true)
     private void verifyAdjuvantTable()
     {
         Locator.XPathLocator adjuvantGrid = Locators.studyProtocolWebpartGrid("Adjuvants");
@@ -246,6 +237,7 @@ public class StudyProtocolDesignerTest extends BaseWebDriverMultipleTest
         }
     }
 
+    @LogMethod(quiet = true)
     private void verifyImmunizationSchedule()
     {
         Locator.XPathLocator scheduleGrid = Locators.studyProtocolWebpartGrid("Immunization Schedule");
@@ -262,6 +254,7 @@ public class StudyProtocolDesignerTest extends BaseWebDriverMultipleTest
         }
     }
 
+    @LogMethod(quiet = true)
     private void verifyAssaySchedule()
     {
         Locator.XPathLocator scheduleGrid = Locators.studyProtocolWebpartGrid("Assay Schedule");
