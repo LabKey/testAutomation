@@ -320,10 +320,20 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     public void clickFileBrowserButton(@LoggedParam BrowserAction action)
     {
         waitForFileGridReady();
-        if (action._triggersPageLoad)
-            _test.clickAndWait(action.getButton(_test), WAIT_FOR_PAGE);
+        WebElement button = action.getButton(_test);
+        if (button.isDisplayed())
+            _test.clickAndWait(action.getButton(_test), action._triggersPageLoad ? WAIT_FOR_PAGE : 0);
         else
-            action.getButton(_test).click();
+            clickFileBrowserButtonOverflow(action);
+    }
+
+    private void clickFileBrowserButtonOverflow(BrowserAction action)
+    {
+        Locator overflowMenuButton = Locator.css("div.fbrowser > div > a.x4-box-menu-after");
+        Locator menuItem = Locator.css("a.x4-menu-item-link").withText(action._buttonText);
+
+        _test.click(overflowMenuButton);
+        _test.waitAndClick(WAIT_FOR_JAVASCRIPT, menuItem, action._triggersPageLoad ? WAIT_FOR_PAGE : 0);
     }
 
     public static enum BrowserAction
