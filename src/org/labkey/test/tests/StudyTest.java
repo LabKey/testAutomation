@@ -26,6 +26,7 @@ import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.ChartHelper;
@@ -56,7 +57,7 @@ import static org.labkey.test.util.PasswordUtil.getUsername;
  * Date: Apr 3, 2009
  * Time: 9:18:32 AM
  */
-@Category({Study.class, Specimen.class})
+@Category({Study.class, Specimen.class, DailyB.class})
 public class StudyTest extends StudyBaseTest
 {
     public String datasetLink = datasetCount + " datasets";
