@@ -121,8 +121,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         }
         catch (CommandException e)
         {
-            if (e.getMessage().contains("Not Found") ||
-                e.getMessage().contains("The path / is not deletable.")) // TODO: 19217: DeleteContainerCommand: Container name gets incorrectly parsed if it matches a module name
+            if (e.getMessage().contains("Not Found"))
             {
                 if (failIfNotFound)
                     fail("Container not found: " + path);
