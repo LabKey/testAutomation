@@ -50,6 +50,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         importSecondRun(1, Calendar.getInstance(), TEST_ASSAY_LUM_FILE5);
         reimportFirstRun(0, Calendar.getInstance(), TEST_ASSAY_LUM_FILE5);
         importBackgroundFailure();
+        importBackgroundWarning();
     }
 
     protected void importFirstRun() {
@@ -68,13 +69,22 @@ public class LuminexAsyncImportTest extends LuminexTest
 
     private void importBackgroundFailure()
     {
-        // test background import failure
         uploadPositivityFile("No Fold Change", TEST_ASSAY_LUM_FILE11, "1", "", true);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(5);
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent("Error: No value provided for 'Positivity Fold Change'.", 3);
         checkExpectedErrors(2);
+    }
+
+    private void importBackgroundWarning()
+    {
+        uploadPositivityFile("No Baseline Data", TEST_ASSAY_LUM_FILE12, "1", "3", true);
+        assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
+        waitForPipelineJobsToFinish(6);
+        clickAndWait(Locator.linkWithText("COMPLETE", 0));
+        assertTextNotPresent("ERROR");
+        assertTextPresent("Warning: No baseline visit data found", 12);
     }
 
     protected void importSecondRun(int index, Calendar testDate, File file) {

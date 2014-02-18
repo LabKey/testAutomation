@@ -98,15 +98,16 @@ public class LuminexPositivityTest extends LuminexTest
         // now we exclude the analytes in the remaining run to test that version of the baseline visit query
         waitAndClickAndWait(Locator.linkWithText("Positivity 3x Fold Change"));
         excludeAnalyteForRun(_analyteNames.get(0), true, "");
-        uploadPositivityFile(assayName + " Baseline Visit Previous Run Error", TEST_ASSAY_LUM_FILE12, "1", "3", false);
-        assertTextPresent("Error: No baseline visit data found: Analyte=" + _analyteNames.get(0) + ", Participant=123400001, Visit=1, Column=fiBackground.");
-        clickButton("Cancel");
+        uploadPositivityFile(assayName + " Baseline Visit Previous Run 1", TEST_ASSAY_LUM_FILE12, "1", "3", false);
+        checkPositivityValues("positive", 0, new String[0]);
+        checkPositivityValues("negative", 0, new String[0]);
+        clickAndWait(Locator.linkWithText("view runs"));
         waitAndClickAndWait(Locator.linkWithText("Positivity 3x Fold Change"));
         excludeAnalyteForRun(_analyteNames.get(0), false, "");
 
         // now we actual test the case of getting baseline visit data from a previously uploaded run
         _negControlAnalyte = _analyteNames.get(1);
-        uploadPositivityFile(assayName + " Baseline Visit Previous Run", TEST_ASSAY_LUM_FILE12, "1", "3", false);
+        uploadPositivityFile(assayName + " Baseline Visit Previous Run 2", TEST_ASSAY_LUM_FILE12, "1", "3", false);
         String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A9", "B9"};
         checkPositivityValues("positive", posWells.length, posWells);
         String[] negWells = new String[] {"A3", "B3", "A5", "B5"};
@@ -129,11 +130,7 @@ public class LuminexPositivityTest extends LuminexTest
         assertTextPresent("Error: No value provided for 'Positivity Fold Change'.");
         clickButton("Cancel");
 
-        uploadPositivityFile(assayName + " No Base Visit Error", TEST_ASSAY_LUM_FILE13, "1", "3", false);
-        assertTextPresent("Error: No baseline visit data found: Analyte=" + _analyteNames.get(0) + ", Participant=123400004, Visit=1, Column=fiBackground.");
-        clickButton("Cancel");
-
-        // file contains the baseline visit data, which is not used in this case
+        // file contains the baseline visit data, which is not used in this case since we don't have a baseline visit prop set
         setPositivityThresholdParams(101, 100);
         uploadPositivityFile(assayName + " No Base Visit 1", TEST_ASSAY_LUM_FILE11, "", "", false);
         String[] posWells = new String[] {"A1", "B1", "A2", "B2", "A3", "B3", "A4", "B4", "A6", "B6", "A7", "B7", "A9", "B9"};
