@@ -383,7 +383,8 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                     profile.setPreference("browser.download.dir", getDownloadDir().getAbsolutePath());
                     profile.setPreference("browser.helperApps.alwaysAsk.force", false);
                     profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
-                            "application/vnd.ms-excel," +
+                            "application/vnd.ms-excel," + // .xls
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet," + // .xlsx
                             "application/octet-stream," +
                             "application/x-gzip," +
                             "application/x-zip-compressed," +
@@ -3874,11 +3875,21 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickAndWait(Locator.linkWithText("Export"));
         checkRadioButton(Locator.radioButtonByName("location").index(2));
 
+        return clickAndWaitForDownload(Locator.navButton("Export"));
+    }
+
+    public File clickAndWaitForDownload(Locator elementToClick)
+    {
+        return clickAndWaitForDownload(elementToClick, 1)[0];
+    }
+
+    public File[] clickAndWaitForDownload(Locator elementToClick, final int expectedFileCount)
+    {
         final long downloadTime = System.currentTimeMillis();
-        clickButton("Export", 0);
+        click(elementToClick);
 
         final File downloadDir = getDownloadDir();
-        final FileFilter fileFilter = new FileFilter()
+        final FileFilter newFiles = new FileFilter()
         {
             @Override
             public boolean accept(File file)
@@ -3892,11 +3903,11 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             @Override
             public boolean check()
             {
-                return downloadDir.listFiles(fileFilter).length > 0;
+                return downloadDir.listFiles(newFiles).length >= expectedFileCount;
             }
-        }, "Folder archive did not appear in download dir", WAIT_FOR_PAGE);
+        }, "File(s) did not appear in download dir", WAIT_FOR_PAGE);
 
-        return downloadDir.listFiles(fileFilter)[0];
+        return downloadDir.listFiles(newFiles);
     }
 
     @Override

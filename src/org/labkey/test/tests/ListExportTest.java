@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013 LabKey Corporation
+ * Copyright (c) 2012-2014 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,26 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.LabKeyExpectedConditions;
+import org.labkey.test.util.ListHelper;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 1/11/12
- * Time: 7:04 PM
- */
-public class ListExportTest extends ListTest
+@Category({DailyB.class})
+public class ListExportTest extends BaseWebDriverTest
 {
+    private static final String LIST_NAME = "DownloadList";
+    private static final String LIST_KEY = "TestKey";
+
     @Override
     protected String getProjectName()
     {
@@ -39,33 +44,31 @@ public class ListExportTest extends ListTest
     @Override
     protected void doTestSteps()
     {
+        _containerHelper.createProject(getProjectName(), null);
+        _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.AutoInteger, LIST_KEY);
+        clickButton("Done");
+        clickAndWait(Locator.linkWithText("View Data"));
 
-        setUpList(getProjectName());
-        String filter = ".*Colors.*\\.xlsx";
-        int fileCount = getNumFilesWithNameInDlDir(getDownloadDir(), filter);
-        exportList();
-        sleep(1000);
-        File[] fileAfterDownload =  getFilesWithNameInDlDir(getDownloadDir(), filter);
-        assertEquals(1, fileAfterDownload.length - fileCount);
+        File exportedList = exportList();
 
-        File exportedFile = fileAfterDownload[fileAfterDownload.length-1];
-        exportedFile.deleteOnExit();
+        assertTrue("Exported list does not exist: " + exportedList.getAbsolutePath(), exportedList.exists());
+
+        final String listExportRegex = LIST_NAME + "_[0-9_-]*\\.xlsx";
+        assertTrue("Exported list did not have expected name: " + exportedList.getName(), exportedList.getName().matches(listExportRegex));
+
+        assertTrue("Exported file is empty", exportedList.length() > 0);
     }
 
-    private File[] getFilesWithNameInDlDir(File dir, String fileRegEx)
-    {
-        return dir.listFiles(new FilterOnName((fileRegEx)));
-    }
-    private int getNumFilesWithNameInDlDir(File dir, String fileRegEx)
-    {
-        return getFilesWithNameInDlDir(dir, fileRegEx).length;
-    }
-
-    private void exportList()
+    private File exportList()
     {
         clickButton("Export", 0);
-        click(Locator.name("excelExportType").index(1));
-        clickButton("Export to Excel", 0);
+        shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(Locator.id("query")));
+        click(Locator.name("excelExportType").index(0));
+        File[] downloadedFiles = clickAndWaitForDownload(Locator.navButton("Export to Excel"), 1);
+
+        assertEquals("Too many files downloaded", 1, downloadedFiles.length);
+
+        return downloadedFiles[0];
     }
 
     @Override
@@ -80,19 +83,9 @@ public class ListExportTest extends ListTest
         return "server/modules/list";
     }
 
-    private class FilterOnName implements FilenameFilter
+    @Override
+    protected BrowserType bestBrowser()
     {
-        protected String regex = "";
-
-        public FilterOnName(String regex)
-        {
-            this.regex = regex;
-        }
-        @Override
-        public boolean accept(File dir, String name)
-        {
-            boolean b = name.matches(regex);
-            return b;
-        }
+        return BrowserType.CHROME;
     }
 }
