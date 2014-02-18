@@ -29,6 +29,6 @@ public class SecurityShortTest extends SecurityTest
 
     protected void doTestSteps()
     {
-        doTestStepsSetDetph(true);
+        doTestStepsSetDepth(true);
     }
 }

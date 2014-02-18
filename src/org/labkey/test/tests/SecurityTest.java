@@ -85,10 +85,10 @@ public class SecurityTest extends BaseWebDriverTest
 
     protected void doTestSteps()
     {
-        doTestStepsSetDetph(false);
+        doTestStepsSetDepth(false);
     }
 
-    @LogMethod protected void doTestStepsSetDetph(boolean isQuickTest)
+    @LogMethod protected void doTestStepsSetDepth(boolean isQuickTest)
     {
         this.isQuickTest = isQuickTest;
         enableEmailRecorder();

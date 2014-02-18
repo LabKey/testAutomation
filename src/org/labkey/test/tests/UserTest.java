@@ -55,7 +55,7 @@ public class UserTest extends SecurityTest
 
     protected void doTestSteps()
     {
-        super.doTestStepsSetDetph(true);
+        super.doTestStepsSetDepth(true);
 
         siteUsersTest();
         requiredFieldsTest();
