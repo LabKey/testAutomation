@@ -49,6 +49,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         importFirstRun();
         importSecondRun(1, Calendar.getInstance(), TEST_ASSAY_LUM_FILE5);
         reimportFirstRun(0, Calendar.getInstance(), TEST_ASSAY_LUM_FILE5);
+        importBackgroundFailure();
     }
 
     protected void importFirstRun() {
@@ -63,11 +64,14 @@ public class LuminexAsyncImportTest extends LuminexTest
         assertTextPresent("Starting assay upload", "Finished assay upload");
         clickButton("Data"); // data button links to the run results
         assertTextPresent(TEST_ASSAY_LUM + " Results");
+    }
 
+    private void importBackgroundFailure()
+    {
         // test background import failure
         uploadPositivityFile("No Fold Change", TEST_ASSAY_LUM_FILE11, "1", "", true);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
-        waitForPipelineJobsToFinish(3);
+        waitForPipelineJobsToFinish(5);
         clickAndWait(Locator.linkWithText("ERROR"));
         assertTextPresent("Error: No value provided for 'Positivity Fold Change'.", 3);
         checkExpectedErrors(2);
@@ -77,7 +81,6 @@ public class LuminexAsyncImportTest extends LuminexTest
         // add a second run with different run values
         int i = index;
         goToTestAssayHome();
-        checkCheckbox(".select");
         clickButton("Import Data");
         setFormElement("network", "NEWNET" + (i + 1));
         //assert(getFormElement(Locator.name("network")).equals("NETWORK1"));
@@ -88,6 +91,8 @@ public class LuminexAsyncImportTest extends LuminexTest
         uncheckCheckbox("_titrationRole_standard_Standard1");
         checkCheckbox("_titrationRole_qccontrol_Standard1");
         clickButton("Save and Finish");
+        waitForPipelineJobsToFinish(3);
+        assertTextNotPresent("ERROR");
     }
 
     protected void reimportFirstRun(int index, Calendar testDate, File file)
@@ -95,7 +100,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         // test Luminex re-run import, check for identical values
         int i = index;
         goToTestAssayHome();
-        // The 2nd run should already be selected, so we just need to click Re-import run
+        checkDataRegionCheckbox("Runs", 1);
         clickButton("Re-import run");
         // verify that all old values from the first imported run are present
         assert(getFormElement(Locator.name("network")).equals("NETWORK1"));
@@ -106,6 +111,8 @@ public class LuminexAsyncImportTest extends LuminexTest
         uncheckCheckbox("_titrationRole_standard_Standard1");
         checkCheckbox("_titrationRole_qccontrol_Standard1");
         clickButton("Save and Finish");
+        waitForPipelineJobsToFinish(4);
+        assertTextNotPresent("ERROR");
     }
 
     protected void reimportLuminexRunPageTwo(String name, String isotype, String conjugate, String stndCurveFitInput,
