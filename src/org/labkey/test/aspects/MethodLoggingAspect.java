@@ -26,6 +26,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.TestLogger;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Stack;
@@ -99,7 +100,20 @@ public class MethodLoggingAspect
     @AfterReturning(value = "loggedMethod() && @annotation(logMethod)", argNames = "joinPoint, logMethod")
     public void afterLoggedMethod(JoinPoint joinPoint, LogMethod logMethod)
     {
-        methodStack.pop(); // Discard current method
+        logMethodEnd(joinPoint, logMethod, "<<");
+    }
+
+    @AfterThrowing(value = "loggedMethod() && @annotation(logMethod)", throwing = "e", argNames = "joinPoint, logMethod, e")
+    public void afterLoggedMethodException(JoinPoint joinPoint, LogMethod logMethod, Throwable e)
+    {
+        TestLogger.resetLogger();
+        String thrown = e.getClass().getSimpleName();
+        logMethodEnd(joinPoint, logMethod, "** " + thrown + " **");
+    }
+
+    private void logMethodEnd(JoinPoint joinPoint, LogMethod logMethod, String logPrefix)
+    {
+        methodStack.pop(); // Discard current method, duplicated in joinPoint
         String caller = methodStack.isEmpty() ? "" : methodStack.peek();
         Long elapsed = System.currentTimeMillis()-startTimes.pop();
         String method = joinPoint.getStaticPart().getSignature().getName();
@@ -122,21 +136,8 @@ public class MethodLoggingAspect
                             TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
                     elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
             TestLogger.decreaseIndent();
-            TestLogger.log("<<" + method + argString + " [" + elapsedStr + "]"); // Only log on successful return
+            TestLogger.log(logPrefix + method + argString + " [" + elapsedStr + "]"); // Only log on successful return
         }
-    }
-
-    @AfterThrowing(value = "loggedMethod() && @annotation(logMethod)", argNames = "joinPoint, logMethod")
-    public void afterLoggedMethodException(JoinPoint joinPoint, LogMethod logMethod)
-    {
-        startTimes.pop();
-        methodStack.pop();
-        TestLogger.decreaseIndent();
-
-        if (logMethod.quiet())
-            quietMethods.pop();
-        if (quietMethods.empty())
-            TestLogger.suppressLogging(false);
     }
 
     private final int MAX_ARG_LENGTH = 30;
@@ -158,6 +159,10 @@ public class MethodLoggingAspect
                 argString += (argString.length() > 0 ? ", " : "") + getArgString(nestedArg);
             }
             argString = "[" + argString + "]";
+        }
+        else if (arg instanceof File)
+        {
+            argString = ((File) arg).getName();
         }
         else
         {

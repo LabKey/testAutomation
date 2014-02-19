@@ -254,7 +254,8 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     }
 
     @Override
-    public void uploadFile(File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties, boolean replace)
+    @LogMethod
+    public void uploadFile(@LoggedParam File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties, boolean replace)
     {
         _test.waitFor(new BaseWebDriverTest.Checker()
         {
@@ -311,12 +312,12 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     }
 
     @Override
-    public void clickFileBrowserButton(@LoggedParam String actionName)
+    public void clickFileBrowserButton(String actionName)
     {
         clickFileBrowserButton(BrowserAction.getEnum(actionName));
     }
 
-    @LogMethod
+    @LogMethod (quiet = true)
     public void clickFileBrowserButton(@LoggedParam BrowserAction action)
     {
         waitForFileGridReady();

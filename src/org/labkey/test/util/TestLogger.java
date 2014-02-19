@@ -31,9 +31,10 @@ public class TestLogger
 
     private static final int MAX_INDENT = 20;
 
-    public static void resetIndent()
+    public static void resetLogger()
     {
         currentIndent = 0;
+        suppressLogging = false;
     }
 
     public static void increaseIndent()

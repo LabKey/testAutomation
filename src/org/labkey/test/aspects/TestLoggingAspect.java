@@ -39,7 +39,7 @@ public class TestLoggingAspect
     @Before(value = "testCaseMethod()", argNames = "joinPoint")
     public void beforeTestCase(JoinPoint joinPoint)
     {
-        TestLogger.resetIndent();
+        TestLogger.resetLogger();
         testCaseStartTimeStamp = System.currentTimeMillis();
         testCaseName = joinPoint.getStaticPart().getSignature().getName();
 
@@ -74,14 +74,9 @@ public class TestLoggingAspect
     {
         Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
 
-        String elapsedStr = String.format("%dm %d.%ds",
-                TimeUnit.MILLISECONDS.toMinutes(elapsed),
-                TimeUnit.MILLISECONDS.toSeconds(elapsed) -
-                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
-                elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
-        TestLogger.resetIndent();
+        TestLogger.resetLogger();
         if (!"testSteps".equals(testCaseName))
-            TestLogger.log("\\\\ Test Case Complete - " + testCaseName + " [" + elapsedStr + "] //"); // Only log on successful return
+            TestLogger.log("\\\\ Test Case Complete - " + testCaseName + " [" + getElapsedString(elapsed) + "] //"); // Only log on successful return
         else
             TestLogger.log("\\\\ Test Case Complete //");
     }
@@ -90,16 +85,20 @@ public class TestLoggingAspect
     {
         Long elapsed = System.currentTimeMillis() - testCaseStartTimeStamp;
 
-        String elapsedStr = String.format("%dm %d.%ds",
+        TestLogger.resetLogger();
+        if (!"testSteps".equals(testCaseName))
+            TestLogger.log("\\\\ Failed Test Case - " + testCaseName + " [" + getElapsedString(elapsed) + "] //"); // Only log on successful return
+        else
+            TestLogger.log("\\\\ Failed Test Case //");
+    }
+
+    private String getElapsedString(Long elapsed)
+    {
+        return String.format("%dm %d.%ds",
                 TimeUnit.MILLISECONDS.toMinutes(elapsed),
                 TimeUnit.MILLISECONDS.toSeconds(elapsed) -
                         TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(elapsed)),
                 elapsed - TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(elapsed)));
-        TestLogger.resetIndent();
-        if (!"testSteps".equals(testCaseName))
-            TestLogger.log("\\\\ Failed Test Case - " + testCaseName + " [" + elapsedStr + "] //"); // Only log on successful return
-        else
-            TestLogger.log("\\\\ Failed Test Case //");
     }
 }
 
