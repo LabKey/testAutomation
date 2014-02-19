@@ -3595,7 +3595,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void assertTextAtPlaceInTable(String textToCheck, String dataRegion, int row, int column)
     {
-       assertTrue(textToCheck+" is not at that place in the table", textToCheck.compareTo(getTextInTable(dataRegion, row, column))==0);
+       assertEquals(textToCheck+" is not at that place in the table", textToCheck, getTextInTable(dataRegion, row, column));
     }
 
     /**
