@@ -21,6 +21,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
+import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
 import java.util.Calendar;
@@ -31,8 +32,8 @@ import java.util.Calendar;
  * Time: 1:02 PM
  */
 @Category({DailyA.class, MiniTest.class, Assays.class})
-public class LuminexAsyncImportTest extends LuminexTest
-{
+public class LuminexAsyncImportTest extends LuminexTest implements PostgresOnlyTest
+{                                                       // TODO: re-enable in SQLServer once Rlabkey issue is resolved
     @Override
     protected void ensureConfigured()
     {

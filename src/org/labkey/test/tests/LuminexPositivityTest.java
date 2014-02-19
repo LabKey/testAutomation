@@ -24,6 +24,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PerlHelper;
+import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,8 +38,8 @@ import static org.junit.Assert.*;
  * Time: 1:37 PM
  */
 @Category({DailyA.class, MiniTest.class, Assays.class})
-public class LuminexPositivityTest extends LuminexTest
-{
+public class LuminexPositivityTest extends LuminexTest implements PostgresOnlyTest
+{                                                      // TODO: re-enable in SQLServer once Rlabkey issue is resolved
     List<String> _analyteNames = new ArrayList<>();
     private int _expectedThresholdValue = 100;
     private int _newThresholdValue = 100;
