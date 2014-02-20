@@ -260,12 +260,12 @@ public class ClientAPITest extends BaseWebDriverTest
         _listHelper.submitImportTsv_success();
     }
 
-    private String waitForDivPopulation()
+    protected String waitForDivPopulation()
     {
         return waitForDivPopulation(30);
     }
 
-    private String waitForDivPopulation(int waitSeconds)
+    protected String waitForDivPopulation(int waitSeconds)
     {
         while (waitSeconds-- > 0)
         {

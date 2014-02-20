@@ -7104,7 +7104,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             separator = ".";
 
             log("Selecting schema " + schemaWithParents + " in the schema browser...");
-            Locator loc = Locator.schemaTreeNode(schemaPart);
+            Locator.XPathLocator loc = Locator.schemaTreeNode(schemaPart);
 
             //first load of schemas might a few seconds
             waitForElement(loc, 30000);
@@ -7112,8 +7112,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
                 click(loc);
             else
             {
-                doubleClick(loc);
-                sleep(1000);
+                click(loc.append("/../preceding-sibling::img").withClass("x-tree-elbow-plus"));
                 click(loc);
             }
             waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + schemaPart + "']"), 1000);

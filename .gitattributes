@@ -25,12 +25,10 @@ data/api/EmbeddedQueryWebPart.html -text
 data/api/LuminexGuideSet.html -text
 data/api/assayTest.js -text
 data/api/chartTest.js -text
-data/api/chartingAPITest.js -text
 data/api/domainTest.js -text
 data/api/extIntegrationTest.html -text
 data/api/filterTest.html -text
 data/api/folderTest.html -text
-data/api/genericChartHelperApiTest.html -text
 data/api/getDataAggregateTest.html -text
 data/api/getDataDateTest.html -text
 data/api/getDataErrorsTest.html -text
@@ -39,7 +37,6 @@ data/api/getDataVisitTest.html -text
 data/api/gridTest.js -text
 data/api/groupSecurityTest.html -text
 data/api/http-api.xml -text
-data/api/interactiveChartsTest.html -text
 data/api/jsReportTest.html -text
 data/api/queryRegressionTest.js -text
 data/api/queryTest.js -text
@@ -47,7 +44,6 @@ data/api/rlabkey-api.xml -text
 data/api/scatterPlotPointClickTestFn.js -text
 data/api/security-api.xml -text
 data/api/study-api.xml -text
-data/api/timeChartHelperApiTest.html -text
 data/api/timeChartPointClickTestFn.js -text
 data/api/timechart-api.xml -text
 data/api/webPartTest.js -text
@@ -55,6 +51,13 @@ data/api/webdavTest.html -text
 data/api/workbookAPITest.html -text
 modules/ETLtest/module.properties -text
 modules/ETLtest/resources/ETLs/merge.xml -text
+modules/chartingapi/module.properties -text
+modules/chartingapi/resources/views/begin.html -text
+modules/chartingapi/resources/views/chartTest.html -text
+modules/chartingapi/resources/views/chartTest2.html -text
+modules/chartingapi/resources/views/exportGenericChartTest.html -text
+modules/chartingapi/resources/views/exportTimeChartTest.html -text
+modules/chartingapi/resources/views/setAesTest.html -text
 modules/linkedschematest/module.properties -text
 modules/linkedschematest/resources/queries/A_People/LinkedSchemaTestPeople.query.xml -text
 modules/linkedschematest/resources/queries/A_People/LinkedSchemaTestQuery.query.xml -text

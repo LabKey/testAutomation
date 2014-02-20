@@ -26,6 +26,10 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -34,10 +38,10 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,42 +92,51 @@ public class ChartingAPITest extends ClientAPITest
         deleteProject(getProjectName(), afterTest);
     }
 
-
-    @Override
-    protected void doTestSteps() throws Exception
+    @BeforeClass
+    public static void doSetup() throws Exception
     {
-        initProject();
+        ChartingAPITest initTest = new ChartingAPITest();
+        initTest.doCleanup(false);
 
-        chartTest();
-        chartAPITest();
-        genericChartHelperTest();
-        timeChartHelperTest();
-        interactiveChartsTest();
+        initTest.initProject();
+
+        currentTest = initTest;
     }
 
-    @LogMethod(category = LogMethod.MethodType.SETUP)
-    private void initProject()
+    public void initProject()
     {
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), FOLDER_NAME, null);
         createPeopleList();
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void chartTest()
+    @Before
+    public void preTest()
     {
-        File chartTestFile = new File(getApiFileRoot(), "chartTest.js");
-        String chartHtml = createAPITestWiki("chartTestWiki", chartTestFile, true);
+        clickProject(getProjectName());
+        clickFolder(FOLDER_NAME);
+    }
+
+    private String goToChartingTestPage(String linkText)
+    {
+        goToModule("chartingapi");
+        clickAndWait(Locator.linkWithText(linkText));
+        return waitForDivPopulation();
+    }
+
+    @Test
+    public void chartTest()
+    {
+        String chartHtml = goToChartingTestPage("chartTest");
 
         if (!chartHtml.contains("<img") && !chartHtml.contains("<IMG"))
             fail("Test div does not contain an image:\n" + chartHtml);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void chartAPITest() throws Exception
+    @Test
+    public void chartAPITest() throws Exception
     {
-        File chartTestFile = new File(getApiFileRoot(), "chartingAPITest.js");
-        createAPITestWiki("chartTestWiki2", chartTestFile, true);
+        goToChartingTestPage("chartTest2");
 
         //Some things we know about test 0. After this we loop through some others and just test to see if they convert
         waitForText("Current Config");
@@ -141,9 +154,7 @@ public class ChartingAPITest extends ClientAPITest
     private void checkSVGConversion() throws Exception
     {
         //The server side svg converter is fairly strict and will fail with bad inputs
-        clickButton("Get SVG", 0);
-        waitForElement(Locator.id("svgtext"));
-        String svgText = getFormElement(Locator.id("svgtext"));
+        String svgText = (String)executeScript("return LABKEY.vis.SVGConverter.svgToStr(Ext4.query('svg')[0]);");
 
         String url = WebTestHelper.getBaseURL() + "/visualization/" + EscapeUtil.encode(getProjectName())+ "/exportPDF.view";
         HttpClient httpClient = WebTestHelper.getHttpClient();
@@ -183,11 +194,10 @@ public class ChartingAPITest extends ClientAPITest
     protected static final String BOX_ONE_TEXT = "Males\nFemales\n600\n800\n1000\n1200\n1400\n1600\n1800\n2000\n2200\nBox Plot One\nGender\nLymphs (cells/mm3)";
     protected static final String BOX_TWO_TEXT = "Males\nFemales\n0\n200\n400\n600\n800\n1000\n1200\n1400\n1600\nBox Plot Two (Custom)\nGender\nCD4\nFemales";
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void genericChartHelperTest()
+    @Test
+    public void genericChartHelperTest()
     {
-        File chartTestFile = new File(getApiFileRoot(), "genericChartHelperApiTest.html");
-        createAPITestWiki("exportGenericChartTestWiki", chartTestFile, false);
+        goToChartingTestPage("exportGenericChartTest");
 
         waitForText(SCATTER_ONE);
         checkExportedChart(SCATTER_ONE, SCATTER_ONE_TEXT);
@@ -223,11 +233,10 @@ public class ChartingAPITest extends ClientAPITest
     protected static final String TIME_CHART_5 = "Luminex Five";
     protected static final String TIME_CHART_5_TEXT_1 = "0\n50\n100\n150\n200\n0\n1000\n2000\n3000\n4000\n5000\n6000\n7000\nLuminex Five\nDays Since Start Date\nFi\n249318596 IL-10\n249318596 IL-2\n249318596 IL-6\n249318596 TNF-alpha\n249320107 IL-10\n249320107 IL-2\n249320107 IL-6\n249320107 TNF-alpha\n249320127 IL-10\n249320127 IL-2\n249320127 IL-6\n249320127 TNF-alpha";
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void timeChartHelperTest()
+    @Test
+    public void timeChartHelperTest()
     {
-        File chartTestFile = new File(getApiFileRoot(), "timeChartHelperApiTest.html");
-        createAPITestWiki("exportTimeChartTestWiki", chartTestFile, false);
+        goToChartingTestPage("exportTimeChartTest");
 
         waitForText(TIME_CHART_1);
         checkExportedChart(TIME_CHART_1, TIME_CHART_1_TEXT_1, false, 3, 0);
@@ -288,14 +297,13 @@ public class ChartingAPITest extends ClientAPITest
     protected static final String BRUSH_FILL = "#14C9CC";
     protected static final String BRUSH_STROKE = "#00393A";
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void interactiveChartsTest()
+    @Test
+    public void interactiveChartsTest()
     {
         Actions builder = new Actions(getDriver());
         Locator nextBtn = Locator.input("next-btn");
         Locator setAesBtn = Locator.input("set-aes-btn");
-        File chartTestFile = new File(getApiFileRoot(), "interactiveChartsTest.html");
-        createAPITestWiki("setAesTestWiki", chartTestFile, false);
+        goToChartingTestPage("setAesTest");
 
         waitForText(BOX_PLOT_COLOR_SHAPE);
         click(setAesBtn);
@@ -463,8 +471,8 @@ public class ChartingAPITest extends ClientAPITest
         checkExportedChart(title, svgText, hasError, svgCount, 0);
     }
 
-    @LogMethod(category = LogMethod.MethodType.VERIFICATION)
-    private void checkExportedChart(String title, @Nullable String svgText, boolean hasError, int svgCount, int svgIndex)
+    @LogMethod(quiet = true)
+    private void checkExportedChart(@LoggedParam String title, @Nullable String svgText, boolean hasError, int svgCount, int svgIndex)
     {
         if (hasError)
         {
@@ -489,5 +497,12 @@ public class ChartingAPITest extends ClientAPITest
         {
             assertSVG(svgText, svgIndex);
         }
+    }
+
+    @Override @Test @Ignore
+    public final void testSteps()
+    {
+        //Block Base @Test method
+        fail("Test executing incorrectly");
     }
 }
