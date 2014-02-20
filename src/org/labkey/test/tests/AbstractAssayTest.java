@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  * User: jeckels
  * Date: Nov 20, 2007
  */
-public abstract class AbstractAssayTest extends SimpleApiTest
+public abstract class AbstractAssayTest extends SimpleApiTestWD
 {
     // protected final static int WAIT_FOR_JAVASCRIPT = 5000;  uncomment to override base class
 
@@ -273,18 +273,15 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     protected void clickEditAssayDesign(boolean confirmEditInOtherContainer)
     {
         click(Locator.linkWithText("manage assay design"));
-        if (confirmEditInOtherContainer)
-        {
-            selenium.chooseOkOnNextConfirmation();
-        }
         click(Locator.linkWithText("edit assay design"));
         if (confirmEditInOtherContainer)
         {
-            String confirmation = selenium.getConfirmation();
+            String confirmation = getAlert();
             assertTrue(confirmation.contains("This assay is defined in the"));
             assertTrue(confirmation.contains("Would you still like to edit it?"));
         }
-        waitForPageToLoad(WAIT_FOR_PAGE);
+
+        waitForElement(Locator.name("AssayDesignerDescription"));
     }
 
     protected void enterStudySecurity()

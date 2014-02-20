@@ -22,7 +22,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.RReportHelperWD;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -45,7 +45,7 @@ import static org.junit.Assert.*;
  */
 public class LuminexTest extends AbstractQCAssayTest
 {
-    RReportHelper _rReportHelper = new RReportHelper(this);
+    RReportHelperWD _rReportHelper = new RReportHelperWD(this);
 
     private boolean _useXarImport = false;
 
@@ -124,6 +124,12 @@ public class LuminexTest extends AbstractQCAssayTest
     }
 
     @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    @Override
     protected String getProjectName()
     {
         return TEST_ASSAY_PRJ_LUMINEX;
@@ -155,14 +161,10 @@ public class LuminexTest extends AbstractQCAssayTest
     @LogMethod
     protected void configure()
     {
-        if(!isFileUploadAvailable())
-            fail("Test depends on file upload ability");
-
         // setup a scripting engine to run a java transform script
         prepareProgrammaticQC();
 
         // fail fast if R is not configured
-        RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();
 
         //revert to the admin user
@@ -205,7 +207,7 @@ public class LuminexTest extends AbstractQCAssayTest
             clickButton("Manage Assays");
             clickButton("New Assay Design");
 
-            checkRadioButton("providerName", "Luminex");
+            checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "Luminex"));
             clickButton("Next");
 
             waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
@@ -215,49 +217,49 @@ public class LuminexTest extends AbstractQCAssayTest
             setFormElement(Locator.id("AssayDesignerDescription"), TEST_ASSAY_LUM_DESC);
 
             // add batch properties for transform and Ruminex version numbers
-            addField("Batch Fields", 5, "Network", "Network", ListColumnType.String);
-            addField("Batch Fields", 6, "TransformVersion", "Transform Script Version", ListColumnType.String);
-            addField("Batch Fields", 7, "RuminexVersion", "Ruminex Version", ListColumnType.String);
+            _listHelper.addField("Batch Fields", 5, "Network", "Network", ListColumnType.String);
+            _listHelper.addField("Batch Fields", 6, "TransformVersion", "Transform Script Version", ListColumnType.String);
+            _listHelper.addField("Batch Fields", 7, "RuminexVersion", "Ruminex Version", ListColumnType.String);
 
             // add run properties for designation of which field to use for curve fit calc in transform
-            addField("Run Fields", 8, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
-            addField("Run Fields", 9, "StndCurveFitInput", "Input Var for Curve Fit Calc of Standards", ListColumnType.String);
-            addField("Run Fields", 10, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
-            addField("Run Fields", 11, "CurveFitLogTransform", "Curve Fit Log Transform", ListColumnType.Boolean);
+            _listHelper.addField("Run Fields", 8, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
+            _listHelper.addField("Run Fields", 9, "StndCurveFitInput", "Input Var for Curve Fit Calc of Standards", ListColumnType.String);
+            _listHelper.addField("Run Fields", 10, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
+            _listHelper.addField("Run Fields", 11, "CurveFitLogTransform", "Curve Fit Log Transform", ListColumnType.Boolean);
 
             // add run properties for use with the Guide Set test
-            addField("Run Fields", 12, "NotebookNo", "Notebook Number", ListColumnType.String);
-            addField("Run Fields", 13, "AssayType", "Assay Type", ListColumnType.String);
-            addField("Run Fields", 14, "ExpPerformer", "Experiment Performer", ListColumnType.String);
+            _listHelper.addField("Run Fields", 12, "NotebookNo", "Notebook Number", ListColumnType.String);
+            _listHelper.addField("Run Fields", 13, "AssayType", "Assay Type", ListColumnType.String);
+            _listHelper.addField("Run Fields", 14, "ExpPerformer", "Experiment Performer", ListColumnType.String);
 
             // add run properties for use with Calculating Positivity
-            addField("Run Fields", 15, "CalculatePositivity", "Calculate Positivity", ListColumnType.Boolean);
-            addField("Run Fields", 16, "BaseVisit", "Baseline Visit", ListColumnType.Double);
-            addField("Run Fields", 17, "PositivityFoldChange", "Positivity Fold Change", ListColumnType.Integer);
+            _listHelper.addField("Run Fields", 15, "CalculatePositivity", "Calculate Positivity", ListColumnType.Boolean);
+            _listHelper.addField("Run Fields", 16, "BaseVisit", "Baseline Visit", ListColumnType.Double);
+            _listHelper.addField("Run Fields", 17, "PositivityFoldChange", "Positivity Fold Change", ListColumnType.Integer);
 
             // add analyte property for tracking lot number
-            addField("Analyte Properties", 6, "LotNumber", "Lot Number", ListColumnType.String);
-            addField("Analyte Properties", 7, "NegativeControl", "Negative Control", ListColumnType.Boolean);
+            _listHelper.addField("Analyte Properties", 6, "LotNumber", "Lot Number", ListColumnType.String);
+            _listHelper.addField("Analyte Properties", 7, "NegativeControl", "Negative Control", ListColumnType.Boolean);
 
             // add the data properties for the calculated columns
-            addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
-            addField("Data Fields", 1, "Standard", "Stnd for Calc", ListColumnType.String);
-            addField("Data Fields", 2, "EstLogConc_5pl", "Est Log Conc Rumi 5 PL", ListColumnType.Double);
-            addField("Data Fields", 3, "EstConc_5pl", "Est Conc Rumi 5 PL", ListColumnType.Double);
-            addField("Data Fields", 4, "SE_5pl", "SE Rumi 5 PL", ListColumnType.Double);
-            addField("Data Fields", 5, "EstLogConc_4pl", "Est Log Conc Rumi 4 PL", ListColumnType.Double);
-            addField("Data Fields", 6, "EstConc_4pl", "Est Conc Rumi 4 PL", ListColumnType.Double);
-            addField("Data Fields", 7, "SE_4pl", "SE Rumi 4 PL", ListColumnType.Double);
-            addField("Data Fields", 8, "Slope_4pl", "Slope_4pl", ListColumnType.Double);
-            addField("Data Fields", 9, "Lower_4pl", "Lower_4pl", ListColumnType.Double);
-            addField("Data Fields", 10, "Upper_4pl", "Upper_4pl", ListColumnType.Double);
-            addField("Data Fields", 11, "Inflection_4pl", "Inflection_4pl", ListColumnType.Double);
-            addField("Data Fields", 12, "Slope_5pl", "Slope_5pl", ListColumnType.Double);
-            addField("Data Fields", 13, "Lower_5pl", "Lower_5pl", ListColumnType.Double);
-            addField("Data Fields", 14, "Upper_5pl", "Upper_5pl", ListColumnType.Double);
-            addField("Data Fields", 15, "Inflection_5pl", "Inflection_5pl", ListColumnType.Double);
-            addField("Data Fields", 16, "Asymmetry_5pl", "Asymmetry_5pl", ListColumnType.Double);
-            addField("Data Fields", 17, "Positivity", "Positivity", ListColumnType.String);
+            _listHelper.addField("Data Fields", 0, "fiBackgroundBlank", "FI-Bkgd-Blank", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 1, "Standard", "Stnd for Calc", ListColumnType.String);
+            _listHelper.addField("Data Fields", 2, "EstLogConc_5pl", "Est Log Conc Rumi 5 PL", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 3, "EstConc_5pl", "Est Conc Rumi 5 PL", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 4, "SE_5pl", "SE Rumi 5 PL", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 5, "EstLogConc_4pl", "Est Log Conc Rumi 4 PL", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 6, "EstConc_4pl", "Est Conc Rumi 4 PL", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 7, "SE_4pl", "SE Rumi 4 PL", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 8, "Slope_4pl", "Slope_4pl", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 9, "Lower_4pl", "Lower_4pl", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 10, "Upper_4pl", "Upper_4pl", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 11, "Inflection_4pl", "Inflection_4pl", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 12, "Slope_5pl", "Slope_5pl", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 13, "Lower_5pl", "Lower_5pl", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 14, "Upper_5pl", "Upper_5pl", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 15, "Inflection_5pl", "Inflection_5pl", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 16, "Asymmetry_5pl", "Asymmetry_5pl", ListColumnType.Double);
+            _listHelper.addField("Data Fields", 17, "Positivity", "Positivity", ListColumnType.String);
 
 
             // set format to two decimal place for easier testing later
@@ -281,12 +283,12 @@ public class LuminexTest extends AbstractQCAssayTest
             saveAssay();
 
             // remove the SpecimenID field from the results grid to speed up the test
-            clickAndWait(Locator.linkWithText("Assay List"));
-            clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
-            clickAndWait(Locator.linkWithText("view results"));
-            _customizeViewsHelper.openCustomizeViewPanel();
-            _customizeViewsHelper.removeCustomizeViewColumn("SpecimenID");
-            _customizeViewsHelper.saveDefaultView();
+//            clickAndWait(Locator.linkWithText("Assay List"));
+//            clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
+//            clickAndWait(Locator.linkWithText("view results"));
+//            _customizeViewsHelper.openCustomizeViewPanel();
+//            _customizeViewsHelper.removeCustomizeViewColumn("SpecimenID");
+//            _customizeViewsHelper.saveDefaultView();
         }
 
         // Clear the success message by reopening the designer, in case downstream the test wants to do further changes
@@ -314,30 +316,20 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         log("Starting Assay BVT Test");
 
-        if(isFileUploadAvailable())
-        {
-            runUploadAndCopyTest();
-            runJavaTransformTest();
-            runRTransformTest();
-            runMultipleCurveTest();
-            runWellExclusionTest();
-            runEC50Test();
-            runGuideSetTest();
-        }
+        runUploadAndCopyTest();
+        runJavaTransformTest();
+        runRTransformTest();
+        runMultipleCurveTest();
+        runWellExclusionTest();
+        runEC50Test();
+        runGuideSetTest();
     } //doTestSteps()
 
     @LogMethod
     protected void runUploadAndCopyTest()
     {
         _listHelper.importListArchive(getProjectName(), new File(getSampledataPath(), "/Luminex/UploadAndCopy.lists.zip"));
-//        ListHelper.ListColumn participantCol = new ListHelper.ListColumn("ParticipantID", "ParticipantID", ListColumnType.String, "Participant ID");
-//        ListHelper.ListColumn visitCol = new ListHelper.ListColumn("VisitID", "VisitID", ListColumnType.Double, "Visit id");
-//        ListHelper.createList(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, ListColumnType.String, "Index", participantCol, visitCol);
-//        ListHelper.uploadData(this, TEST_ASSAY_PRJ_LUMINEX, THAW_LIST_NAME, "Index\tParticipantID\tVisitID\n" +
-//                "1\tListParticipant1\t1001.1\n" +
-//                "2\tListParticipant2\t1001.2\n" +
-//                "3\tListParticipant3\t1001.3\n" +
-//                "4\tListParticipant4\t1001.4");
+
         clickProject(TEST_ASSAY_PRJ_LUMINEX);
 
         clickAndWait(Locator.linkWithText("Assay List"));
@@ -346,20 +338,20 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("No runs to show. To add new runs, use the Import Data button.");
         log("Uploading Luminex Runs");
         clickButton("Import Data");
-        setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
+        setFormElement(Locator.name("species"), TEST_ASSAY_LUM_SET_PROP_SPECIES);
         clickButton("Next");
-        setFormElement("name", TEST_ASSAY_LUM_RUN_NAME);
-        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE1);
+        setFormElement(Locator.name("name"), TEST_ASSAY_LUM_RUN_NAME);
+        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE1);
         clickButton("Next", 60000);
         clickButton("Save and Import Another Run");
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
         clickButton("Import Data");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES, selenium.getValue("species"));
-        setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES2);
+        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES, getFormElement(Locator.name("species")));
+        setFormElement(Locator.name("species"), TEST_ASSAY_LUM_SET_PROP_SPECIES2);
         clickButton("Next");
-        setFormElement("name", TEST_ASSAY_LUM_RUN_NAME2);
-        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE2);
+        setFormElement(Locator.name("name"), TEST_ASSAY_LUM_RUN_NAME2);
+        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE2);
         clickButton("Next", 60000);
         setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]"), "StandardName1b");
         setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text']"), "StandardName2");
@@ -368,40 +360,39 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // Upload another run using a thaw list pasted in as a TSV
         clickButton("Import Data");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
-        checkRadioButton("participantVisitResolver", "Lookup");
-        checkRadioButton("ThawListType", "Text");
+        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, getFormElement(Locator.name("species")));
+        checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", "Lookup"));
+        checkCheckbox(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
         setFormElement(Locator.id("ThawListTextArea"), "Index\tSpecimenID\tParticipantID\tVisitID\n" +
                 "1\tSpecimenID1\tParticipantID1\t1.1\n" +
                 "2\tSpecimenID2\tParticipantID2\t1.2\n" +
                 "3\tSpecimenID3\tParticipantID3\t1.3\n" +
                 "4\tSpecimenID4\tParticipantID4\t1.4");
         clickButton("Next");
-        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE3);
+        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE3);
         clickButton("Next", 60000);
-        assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
-        assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
+        assertEquals("StandardName1b", getFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]")));
+        assertEquals("StandardName4", getFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]")));
         clickButton("Save and Finish");
 
         // Upload another run using a thaw list that pointed at the list we uploaded earlier
         clickButton("Import Data");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, selenium.getValue("species"));
-        assertEquals("off", selenium.getValue("//input[@name='participantVisitResolver' and @value='SampleInfo']"));
-        assertEquals("on", selenium.getValue("//input[@name='participantVisitResolver' and @value='Lookup']"));
-        assertEquals("on", selenium.getValue("//input[@name='ThawListType' and @value='Text']"));
-        assertEquals("off", selenium.getValue("//input[@name='ThawListType' and @value='List']"));
-        checkRadioButton("ThawListType", "List");
+        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, getFormElement(Locator.name("species")));
+        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("participantVisitResolver", "Lookup"));
+        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
+        checkCheckbox(Locator.radioButtonByNameAndValue("ThawListType", "List"));
         waitForElement(Locator.id("button_Choose list..."), WAIT_FOR_JAVASCRIPT);
         clickButton("Choose list...", 0);
-        setFormElement("schema", "lists");
-        setFormElement("table", THAW_LIST_NAME);
+        setFormElement(Locator.id("schema"), "lists");
+        setFormElement(Locator.id("table"), THAW_LIST_NAME);
         clickButton("Close", 0);
         clickButton("Next");
-        setFormElement("name", TEST_ASSAY_LUM_RUN_NAME4);
-        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE3);
+        setFormElement(Locator.name("name"), TEST_ASSAY_LUM_RUN_NAME4);
+        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE3);
+        waitForText("A file with name '" + TEST_ASSAY_LUM_FILE3.getName() + "' already exists");
         clickButton("Next", 60000);
-        assertEquals("StandardName1b", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]"));
-        assertEquals("StandardName4", selenium.getValue("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]"));
+        assertEquals("StandardName1b", getFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]")));
+        assertEquals("StandardName4", getFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]")));
         clickButton("Save and Finish");
 
         log("Check that upload worked");
@@ -437,12 +428,12 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("9011-04");
 
         setFilter("Data", "FI", "Equals", "20");
-        selenium.click(".toggle");
+        click(Locator.name(".toggle"));
         clickButton("Copy to Study");
-        selectOptionByText("targetStudy", "/" + TEST_ASSAY_PRJ_LUMINEX + " (" + TEST_ASSAY_PRJ_LUMINEX + " Study)");
+        selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_LUMINEX + " (" + TEST_ASSAY_PRJ_LUMINEX + " Study)");
         clickButton("Next");
-        setFormElement("participantId", "ParticipantID");
-        setFormElement("visitId", "100.1");
+        setFormElement(Locator.name("participantId"), "ParticipantID");
+        setFormElement(Locator.name("visitId"), "100.1");
         clickButton("Copy to Study");
 
         log("Verify that the data was published");
@@ -456,8 +447,8 @@ public class LuminexTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement("name", "raw and summary");
-        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE10);
+        setFormElement(Locator.name("name"), "raw and summary");
+        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE10);
         clickButton("Next", 60000);
         clickButton("Save and Finish");
 
@@ -511,12 +502,10 @@ public class LuminexTest extends AbstractQCAssayTest
     @LogMethod
     protected void runEC50Test()
     {
-//        ensureConfigured();
         ensureRTransformPresent();
         createNewAssayRun(EC50_RUN_NAME);
-        checkCheckbox("curveFitLogTransform");
+        checkCheckbox(Locator.name("curveFitLogTransform"));
         uploadEC50Data();
-//        ensureMultipleCurveDataPresent();
         clickButton("Save and Finish", 2 * WAIT_FOR_PAGE);
 
         //add transform script
@@ -568,21 +557,21 @@ public class LuminexTest extends AbstractQCAssayTest
                 //ec50=populated=inflectionPoint
                 assertEquals(ec50.get(i), inflectionPoint.get(i));
                 //auc=unpopulated
-                assertEquals("", auc.get(i));
+                assertEquals(" ", auc.get(i));
             }
             else if(formula.get(i).equals(rum5))
             {
                 // ec50 will be populated for well formed curves (i.e. not expected for every row, so we'll keep a count and check at the end of the loop)
-                if (ec50.get(i).length() > 0)
+                if (!ec50.get(i).equals(" ") && ec50.get(i).length() > 0)
                     rum5ec50count++;
 
                 // auc should not be populated
-                assertEquals("", auc.get(i));
+                assertEquals(" ", auc.get(i));
             }
             else if(formula.get(i).equals(trapezoidal))
             {
                 //ec50 should not be populated
-                assertEquals("", ec50.get(i));
+                assertEquals(" ", ec50.get(i));
                 //auc=populated (for all non-blank analytes)
                 if (!analyte.get(i).startsWith("Blank"))
                     assertTrue( "AUC was unpopulated for row " + i, auc.get(i).length()>0);
@@ -693,14 +682,14 @@ public class LuminexTest extends AbstractQCAssayTest
         clickExclusionMenuIconForWell(wellName);
 
         String comment = "exclude all for single well";
-        setText(EXCLUDE_COMMENT_FIELD, comment);
+        setFormElement(Locator.name(EXCLUDE_COMMENT_FIELD), comment);
         clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
 
         excludeForSingleWellVerify("Excluded for replicate group: " + comment, new HashSet<>(Arrays.asList(getListOfAnalytesMultipleCurveData())));
 
         //remove exclusions to leave in clean state
         clickExclusionMenuIconForWell(wellName);
-        clickRadioButtonById("excludeselected");
+        click(Locator.radioButtonById("excludeselected"));
         clickButton(SAVE_CHANGES_BUTTON, 0);
         _extHelper.waitForExtDialog("Warning");
         clickButton("Yes", 2 * defaultWaitForPage);
@@ -715,41 +704,45 @@ public class LuminexTest extends AbstractQCAssayTest
      */
     private void excludeForSingleWellVerify(String expectedComment, Set<String> analytes)
     {
-        List<List<String>> vals = getColumnValues(DATA_TABLE_NAME, "Well", "Description", "Type", "Exclusion Comment", "Analyte");
-        List<String> wells = vals.get(0);
-        List<String> descriptions = vals.get(1);
-        List<String> types = vals.get(2);
-        List<String> comments = vals.get(3);
-        List<String> analytesPresent = vals.get(4);
-
-        String well;
-        String description;
-        String type;
-        String comment;
-        String analyte;
-
-        for(int i=0; i<wells.size(); i++)
+        for (String analyte : analytes)
         {
-            well = wells.get(i);
-            log("well: " + well);
-            description= descriptions.get(i);
-            log("description: " + description);
-            type = types.get(i);
-            log("type: " + type);
-            comment = comments.get(i);
-            log("Comment: "+ comment);
-            analyte= analytesPresent.get(i);
-            log("Analyte: " + analyte);
+            setFilter("Data", "Analyte", "Equals", analyte);
 
-            if(matchesWell(description, type, well) && analytes.contains(analyte))
-            {
-                assertEquals(expectedComment,comment);
-            }
+            List<List<String>> vals = getColumnValues(DATA_TABLE_NAME, "Well", "Description", "Type", "Exclusion Comment", "Analyte");
+            List<String> wells = vals.get(0);
+            List<String> descriptions = vals.get(1);
+            List<String> types = vals.get(2);
+            List<String> comments = vals.get(3);
+            List<String> analytesPresent = vals.get(4);
 
-            if(expectedComment.equals(comment))
+            String well;
+            String description;
+            String type;
+            String comment;
+
+            for(int i=0; i<wells.size(); i++)
             {
-                assertTrue(matchesWell(description, type, well));
-                assertTrue(analytes.contains(analyte));
+                well = wells.get(i);
+                log("well: " + well);
+                description= descriptions.get(i);
+                log("description: " + description);
+                type = types.get(i);
+                log("type: " + type);
+                comment = comments.get(i);
+                log("Comment: "+ comment);
+                String analyteVal = analytesPresent.get(i);
+                log("Analyte: " + analyteVal);
+
+                if(matchesWell(description, type, well) && analytes.contains(analyteVal))
+                {
+                    assertEquals(expectedComment,comment);
+                }
+
+                if(expectedComment.equals(comment))
+                {
+                    assertTrue(matchesWell(description, type, well));
+                    assertTrue(analytes.contains(analyteVal));
+                }
             }
         }
     }
@@ -856,8 +849,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void clickExcludeAnalyteCheckBox(String analyte)
     {
         Locator l = ExtHelper.locateGridRowCheckbox(analyte);
-        waitForElement(l);
-        clickAt(l, "1,1");
+        waitAndClick(l);
     }
 
     private String excludedWellDescription = "Sample 2";
@@ -1160,9 +1152,9 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         goToTestRunList();
         clickButtonContainingText("Import Data");
-        checkRadioButton("participantVisitResolver", "SampleInfo");
+        checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", "SampleInfo"));
         clickButtonContainingText("Next");
-        setFormElement(ASSAY_ID_FIELD, name);
+        setFormElement(Locator.name(ASSAY_ID_FIELD), name);
     }
 
 
@@ -1204,10 +1196,10 @@ public class LuminexTest extends AbstractQCAssayTest
 
         goToTestAssayHome();
         clickButton("Import Data");
-        setFormElement("species", TEST_ASSAY_LUM_SET_PROP_SPECIES);
+        setFormElement(Locator.name("species"), TEST_ASSAY_LUM_SET_PROP_SPECIES);
         clickButton("Next");
-        setFormElement("name", "transformed assayId");
-        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE1);
+        setFormElement(Locator.name("name"), "transformed assayId");
+        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE1);
         clickButton("Next", 60000);
         clickButton("Save and Finish");
 
@@ -1257,19 +1249,19 @@ public class LuminexTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         clickButton("Import Data");
         clickButton("Next");
-        setFormElement("name", "r script transformed assayId");
-        setFormElement("stndCurveFitInput", "FI");
-        setFormElement("unkCurveFitInput", "FI-Bkgd-Blank");
-        checkCheckbox("curveFitLogTransform");
-        setFormElement("__primaryFile__", TEST_ASSAY_LUM_FILE4);
+        setFormElement(Locator.name("name"), "r script transformed assayId");
+        setFormElement(Locator.name("stndCurveFitInput"), "FI");
+        setFormElement(Locator.name("unkCurveFitInput"), "FI-Bkgd-Blank");
+        checkCheckbox(Locator.name("curveFitLogTransform"));
+        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE4);
         clickButton("Next", 60000);
         // make sure the Standard checkboxes are checked
-        checkCheckbox("_titrationRole_standard_Standard1");
-        checkCheckbox("titration_MyAnalyte (1)_Standard1");
-        checkCheckbox("titration_MyAnalyte (2)_Standard1");
-        checkCheckbox("titration_Blank (3)_Standard1");
+        checkCheckbox(Locator.name("_titrationRole_standard_Standard1"));
+        checkCheckbox(Locator.name("titration_MyAnalyte (1)_Standard1"));
+        checkCheckbox(Locator.name("titration_MyAnalyte (2)_Standard1"));
+        checkCheckbox(Locator.name("titration_Blank (3)_Standard1"));
         // make sure that that QC Control checkbox is checked
-        checkCheckbox("_titrationRole_qccontrol_Standard1");
+        checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
         // set LotNumber for the first analyte
         setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_LotNumber')][1]"), TEST_ANALYTE_LOT_NUMBER);
         clickButton("Save and Finish");
@@ -1277,10 +1269,10 @@ public class LuminexTest extends AbstractQCAssayTest
         // verify that the PDF of curves was generated
         Locator l = Locator.tagWithAttribute("img", "src", "/labkey/_images/sigmoidal_curve.png");
         click(l);
-        assertLinkPresentWithText("WithBlankBead.Standard1_5PL.pdf");
-        assertLinkPresentWithText("WithBlankBead.Standard1_4PL.pdf");
-        assertLinkPresentWithText("WithBlankBead.Standard1_QC_Curves_4PL.pdf");
-        assertLinkPresentWithText("WithBlankBead.Standard1_QC_Curves_5PL.pdf");
+        assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_5PL.pdf"));
+        assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_4PL.pdf"));
+        assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_QC_Curves_4PL.pdf"));
+        assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_QC_Curves_5PL.pdf"));
 
         // verify that the transform script and ruminex versions are as expected
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
@@ -1294,15 +1286,15 @@ public class LuminexTest extends AbstractQCAssayTest
         _customizeViewsHelper.addCustomizeViewColumn("Analyte/Properties/LotNumber");
         _customizeViewsHelper.applyCustomView();
         setFilter("Data", "Analyte/Properties/LotNumber", "Equals", TEST_ANALYTE_LOT_NUMBER);
-        assertTextPresent("1 - 40 of 40");
+        waitForElement(Locator.paginationText(1, 40, 40));
         clearFilter("Data", "Analyte/Properties/LotNumber");
 
         // verfiy that the calculated values were generated by the transform script as expected
         table = new DataRegionTable("Data", this);
         setFilter("Data", "fiBackgroundBlank", "Is Not Blank");
-        assertTextPresent("1 - 40 of 40");
+        waitForElement(Locator.paginationText(1, 40, 40));
         setFilter("Data", "Type", "Starts With", "X"); // filter to just the unknowns
-        assertTextPresent("1 - 32 of 32");
+        waitForElement(Locator.paginationText(1, 32, 32));
         // check values in the fi-bkgd-blank column
         for(int i = 0; i < RTRANS_FIBKGDBLANK_VALUES.length; i++)
         {
@@ -1310,7 +1302,7 @@ public class LuminexTest extends AbstractQCAssayTest
         }
         clearFilter("Data", "fiBackgroundBlank");
         setFilter("Data", "EstLogConc_5pl", "Is Not Blank");
-        assertTextPresent("1 - 32 of 32");
+        waitForElement(Locator.paginationText(1, 32, 32));
         // check values in the est log conc 5pl column
         for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_5PL.length; i++)
         {
@@ -1318,7 +1310,7 @@ public class LuminexTest extends AbstractQCAssayTest
         }
         clearFilter("Data", "EstLogConc_5pl");
         setFilter("Data", "EstLogConc_4pl", "Is Not Blank");
-        assertTextPresent("1 - 32 of 32");
+        waitForElement(Locator.paginationText(1, 32, 32));
         // check values in the est log conc 4pl column
         for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_4PL.length; i++)
         {
@@ -1352,17 +1344,28 @@ public class LuminexTest extends AbstractQCAssayTest
                                            String unkCurveFitInput, String notebookNo, String assayType, String expPerformer,
                                            String testDate, File file, int i)
     {
-            setFormElement("name", name);
-            setFormElement("isotype", isotype);
-            setFormElement("conjugate", conjugate);
-            setFormElement("stndCurveFitInput", stndCurveFitInput);
-            setFormElement("unkCurveFitInput", unkCurveFitInput);
-            uncheckCheckbox("curveFitLogTransform"); 
-            setFormElement("notebookNo", notebookNo);
-            setFormElement("assayType", assayType);
-            setFormElement("expPerformer", expPerformer);
-            setFormElement("testDate", testDate);
-            setFormElement("__primaryFile__", file);
+        importLuminexRunPageTwo(name, isotype, conjugate, stndCurveFitInput, unkCurveFitInput, notebookNo, assayType, expPerformer, testDate, file, i, false);
+    }
+
+    protected void importLuminexRunPageTwo(String name, String isotype, String conjugate, String stndCurveFitInput,
+                                           String unkCurveFitInput, String notebookNo, String assayType, String expPerformer,
+                                           String testDate, File file, int i, boolean expectDuplicateFile)
+    {
+            setFormElement(Locator.name("name"), name);
+            setFormElement(Locator.name("isotype"), isotype);
+            setFormElement(Locator.name("conjugate"), conjugate);
+            setFormElement(Locator.name("stndCurveFitInput"), stndCurveFitInput);
+            setFormElement(Locator.name("unkCurveFitInput"), unkCurveFitInput);
+            uncheckCheckbox(Locator.name("curveFitLogTransform"));
+            setFormElement(Locator.name("notebookNo"), notebookNo);
+            setFormElement(Locator.name("assayType"), assayType);
+            setFormElement(Locator.name("expPerformer"), expPerformer);
+            setFormElement(Locator.name("testDate"), testDate);
+            setFormElement(Locator.name("__primaryFile__"), file);
+
+            if (expectDuplicateFile)
+                waitForText("A file with name '" + file.getName() + "' already exists");
+
             clickButton("Next", 60000);
     }
     //requires drc, Ruminex, rlabkey and xtable packages installed in R
@@ -1379,7 +1382,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToTestAssayHome();
         clickEditAssayDesign(false);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
-        addField("Batch Fields", 8, "CustomProtocol", "Protocol", ListColumnType.String);
+        _listHelper.addField("Batch Fields", 8, "CustomProtocol", "Protocol", ListColumnType.String);
         // save changes to assay design
         clickButton("Save & Close");
 
@@ -1392,15 +1395,15 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             goToTestAssayHome();
             clickButton("Import Data");
-            setFormElement("network", "NETWORK" + (i + 1));
-            setFormElement("customProtocol", "PROTOCOL" + (i + 1));
+            setFormElement(Locator.name("network"), "NETWORK" + (i + 1));
+            setFormElement(Locator.name("customProtocol"), "PROTOCOL" + (i + 1));
             clickButton("Next");
 
             testDate.add(Calendar.DATE, 1);
             importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
                         "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i], i);
-            uncheckCheckbox("_titrationRole_standard_Standard1");
-            checkCheckbox("_titrationRole_qccontrol_Standard1");
+            uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
+            checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
             clickButton("Save and Finish");
 
             verifyRunFileAssociations(i+1);
@@ -1418,7 +1421,7 @@ public class LuminexTest extends AbstractQCAssayTest
         verifyGuideSetsApplied(guideSetIds, analytes, 2);
 
         //nav trail check
-        assertTextPresent("assay.Luminex.&TestAssayLuminex></% 1 Schema >");
+        assertTextPresent("assay.Luminex.&TestAssayLuminex></% 1 Schema");
 
         // verify the guide set threshold values for the first set of runs
         int[] rowCounts = {2, 2};
@@ -1434,14 +1437,14 @@ public class LuminexTest extends AbstractQCAssayTest
         {
             goToTestAssayHome();
             clickButton("Import Data");
-            setFormElement("network", "NETWORK" + (i + 1));
-            setFormElement("customProtocol", "PROTOCOL" + (i + 1));
+            setFormElement(Locator.name("network"), "NETWORK" + (i + 1));
+            setFormElement(Locator.name("customProtocol"), "PROTOCOL" + (i + 1));
             clickButton("Next");
 
             importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
                         "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i], i);
-            uncheckCheckbox("_titrationRole_standard_Standard1");
-            checkCheckbox("_titrationRole_qccontrol_Standard1");
+            uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
+            checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
             clickButton("Save and Finish");
 
             verifyRunFileAssociations(i+1);
@@ -1479,14 +1482,14 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         goToTestAssayHome();
         clickButton("Import Data");
-        setFormElement("network", "NETWORK" + (i + 1));
+        setFormElement(Locator.name("network"), "NETWORK" + (i + 1));
         clickButton("Next");
 
         testDate.add(Calendar.DATE, 1);
         importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
                     "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), file, i);
-        uncheckCheckbox("_titrationRole_standard_Standard1");
-        checkCheckbox("_titrationRole_qccontrol_Standard1");
+        uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
+        checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
         clickButton("Save and Finish");
     }
 
@@ -1496,8 +1499,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToTestRunList();
         clickAndWait(Locator.linkWithText("Guide Set plate 4"));
         _customizeViewsHelper.openCustomizeViewPanel();
-        String expectedHMFI=  "9173.8";
-
+        _customizeViewsHelper.showHiddenItems();
         String[] newColumns = {"AnalyteTitration/MaxFIQCFlagsEnabled", "AnalyteTitration/MaxFI",
             "AnalyteTitration/Four ParameterCurveFit/EC50", "AnalyteTitration/Four ParameterCurveFit/AUC",
             "AnalyteTitration/Four ParameterCurveFit/EC50QCFlagsEnabled",
@@ -1511,9 +1513,10 @@ public class LuminexTest extends AbstractQCAssayTest
         }
         _customizeViewsHelper.saveCustomView();
 
-        assertElementPresent(Locator.xpath("//span[contains(@style, 'red') and text()=" + expectedHMFI + "]"));
+        String expectedHMFI=  "9173.8";
         String expectedEC50 = "36676.656";
-//        assertElementPresent(Locator.xpath("//span[contains(@style, 'red') and text()=" + expectedEC50 + "]"));
+
+        assertElementPresent(Locator.xpath("//span[contains(@style, 'red') and text()=" + expectedHMFI + "]"));
 
         clickAndWait(Locator.linkContainingText("view runs"));
         enableDisableQCFlags("Guide Set plate 4", "AUC", "HMFI");
@@ -1538,7 +1541,7 @@ public class LuminexTest extends AbstractQCAssayTest
         editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_2", "allRunsRow_3"}, "create new analyte 2 guide set with 3 runs", true);
 
         // apply the new guide set to a run
-        verifyGuideSetToRun("NETWORK5", 2, "create new analyte 2 guide set with 3 runs", 4);
+        verifyGuideSetToRun("NETWORK5", "create new analyte 2 guide set with 3 runs");
 
         // verify the threshold values for the new guide set
         guideSetIds = getGuideSetIdMap();
@@ -1555,8 +1558,8 @@ public class LuminexTest extends AbstractQCAssayTest
     private void verifyLeveyJenningsPermissions()
     {
         String ljUrl = getCurrentRelativeURL();
-        String editor = "editor@jennings.com";
-        String reader = "reader@jennings.com";
+        String editor = "editor1_luminex@luminex.test";
+        String reader = "reader1_luminex@luminex.test";
 
         createAndImpersonateUser(editor, "Editor");
 
@@ -1622,7 +1625,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setUpGuideSet("GS Analyte (2)");
         String newQcFlags = "AUC, EC50-4, EC50-5, HMFI";
         assertTextNotPresent(newQcFlags);
-        applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT,2 );
+        applyGuideSetToRun("NETWORK5", GUIDE_SET_5_COMMENT, 2);
         //assert ec50 and HMFI red text present
         assertElementPresent(Locator.xpath("//div[text()='28040.51' and contains(@style,'red')]"));
         assertElementPresent(Locator.xpath("//div[text()='27950.73' and contains(@style,'red')]"));
@@ -1638,16 +1641,16 @@ public class LuminexTest extends AbstractQCAssayTest
         //	- the EC50 and HMFI QC Flags that were added in step 4 are removed
         goToLeveyJenningsGraphPage("Standard1");
         setUpGuideSet("GS Analyte (2)");
-        applyGuideSetToRun("NETWORK5", 2, GUIDE_SET_5_COMMENT, -1);
+        applyGuideSetToRun("NETWORK5", GUIDE_SET_5_COMMENT, -1);
         assertTextNotPresent(newQcFlags);
 
         //6. Create new Guide Set for GS Analyte (2) that includes plate 5 (but not plate 5a)
         //	- the AUC QC Flag for plate 5 is removed
         Locator.XPathLocator aucLink =  Locator.xpath("//a[contains(text(),'AUC')]");
-        int aucCount = getXpathCount(aucLink);
+        int aucCount = getElementCount(aucLink);
         createGuideSet("GS Analyte (2)", false);
         editGuideSet(new String[]{"allRunsRow_1"}, "Guide set includes plate 5", true);
-        assertEquals("Wrong count for AUC flag links", aucCount-1, (getXpathCount(aucLink)));
+        assertEquals("Wrong count for AUC flag links", aucCount-1, (getElementCount(aucLink)));
 
         //7. Switch to GS Analyte (1), and edit the current guide set to include plate 3
         //	- the QC Flag for plate 3 (the run included) and the other plates (4, 5, and 5a) are all removed as all values are within the guide set ranges
@@ -1667,10 +1670,8 @@ public class LuminexTest extends AbstractQCAssayTest
     private void removePlate3FromGuideSet()
     {
         clickButtonContainingText("Edit", 0);
-        waitForExtMask();
-        Locator l = Locator.id("guideRunSetRow_0");
-        waitForElement(l, defaultWaitForPage);
-        click(l);
+        _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
+        waitAndClick(Locator.id("guideRunSetRow_0"));
         clickButton("Save",0);
         waitForGuideSetExtMaskToDisappear();
     }
@@ -1683,7 +1684,7 @@ public class LuminexTest extends AbstractQCAssayTest
     private void assertEC505PLQCFlagsPresent(int count)
     {
         assertEquals("Unexpected QC Flag Highlight Present", count,
-                    getXpathCount(Locator.xpath("//div[contains(@style,'red')]")));
+                getElementCount(Locator.xpath("//div[contains(@style,'red')]")));
         assertElementPresent(Locator.xpath("//a[contains(text(),'EC50-5')]"), count);
         for(String flag : new String[] {"AUC", "HMFI", "EC50-4", "PCV"})
         {
@@ -1698,13 +1699,13 @@ public class LuminexTest extends AbstractQCAssayTest
 
         goToTestAssayHome();
         clickButton("Import Data");
-        setFormElement("network", "NETWORK" + (10));
+        setFormElement(Locator.name("network"), "NETWORK" + (10));
         clickButton("Next");
 
         importLuminexRunPageTwo(newGuideSetPlate, isotype, conjugate, "", "", "Notebook" + 11,
-                    "Experimental", "TECH" + (11), "",  TEST_ASSAY_LUM_FILE9, 6);
-        uncheckCheckbox("_titrationRole_standard_Standard1");
-        checkCheckbox("_titrationRole_qccontrol_Standard1");
+                    "Experimental", "TECH" + (11), "",  TEST_ASSAY_LUM_FILE9, 6, true);
+        uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
+        checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
         clickButton("Save and Finish");
 
 
@@ -1746,12 +1747,9 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void enableDisableQCFlags(String runName, String... flags)
     {
-
-//        clickLinkWithText(expectedFlags,index, false);
-
         Locator l = Locator.xpath("//a[text()='" + runName + "']/../../td/a[contains(@onclick,'showQCFlag')]");
         click(l);
-        waitForExtMask();
+        _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
 
         sleep(1500);
         waitForText("Run QC Flags");
@@ -1759,20 +1757,17 @@ public class LuminexTest extends AbstractQCAssayTest
         for(String flag : flags)
         {
             Locator aucCheckBox = Locator.xpath("//div[text()='" + flag + "']/../../td/div/div[contains(@class, 'check')]");
-            clickAt(aucCheckBox,  "1,1");
+            click(aucCheckBox);
         }
 
-        clickButton("Save", 0);
-        waitForExtMaskToDisappear();
-        waitForPageToLoad();
-
+        clickButton("Save");
     }
 
     @LogMethod
     private void verifyQCFlagLink()
     {
         click(Locator.linkContainingText(expectedFlags[0], 0));
-        waitForExtMask();
+        _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
         sleep(1500);
         assertTextPresent("CV", 4); // 3 occurances of PCV and 1 of %CV
 
@@ -1781,25 +1776,21 @@ public class LuminexTest extends AbstractQCAssayTest
 
         //verify unchecking a box  removes the flag
         Locator aucCheckBox = Locator.xpath("//div[text()='AUC']/../../td/div/div[contains(@class, 'check')]");
-        clickAt(aucCheckBox,  "1,1");
+        click(aucCheckBox);
         clickButton("Save", 0);
-        waitForExtMaskToDisappear();
-        waitForPageToLoad();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         Locator strikeoutAUC = Locator.xpath("//span[contains(@style, 'line-through') and  text()='AUC']");
-        isElementPresent(strikeoutAUC);
+        waitForElement(strikeoutAUC);
 
         //verify rechecking a box adds the flag back
-        waitForText(expectedFlags[0]);
-        clickAt(strikeoutAUC, "1,1");
-        waitForExtMask();
-        waitForElement(aucCheckBox, defaultWaitForPage);
-        clickAt(aucCheckBox,  "1,1");
-
+        click(strikeoutAUC);
+        _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
+        waitAndClick(aucCheckBox);
         clickButton("Save", 0);
-        waitForExtMaskToDisappear();
-        waitForPageToLoad();
-        assertElementNotPresent(Locator.xpath("//span[contains(@style, 'line-through') and  text()='AUC']"));
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForText(expectedFlags[0]);
+        assertElementNotPresent(strikeoutAUC);
     }
 
     private void verifyQCAnalysis()
@@ -1810,7 +1801,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void goToQCAnalysisPage()
     {
-        clickProject(getProjectName());
+        goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
         clickAndWait(Locator.linkWithText("view results"));
@@ -1842,7 +1833,7 @@ public class LuminexTest extends AbstractQCAssayTest
         List<String> fourParamFlag = drt.getColumnDataAsText("Four Parameter Curve Fit Failure Flag");
         for(String flag: fourParamFlag)
         {
-            assertEquals("", flag);
+            assertEquals(" ", flag);
         }
 
         List<String> fiveParamFlag = drt.getColumnDataAsText("Five Parameter Curve Fit Failure Flag");
@@ -1850,7 +1841,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         for(int i=0; i<fiveParamData.size(); i++)
         {
-            assertTrue("Row " + i + " was flagged as 5PL failure but had EC50 data", ((fiveParamFlag.get(i).length() == 0) ^ (fiveParamData.get(i).length() == 0)));
+            assertTrue("Row " + i + " was flagged as 5PL failure but had EC50 data", ((fiveParamFlag.get(i).equals(" ")) ^ (fiveParamData.get(i).equals(" "))));
         }
 
 
@@ -1867,7 +1858,7 @@ public class LuminexTest extends AbstractQCAssayTest
         log("Exclude well from run");
         clickExclusionMenuIconForWell(well);
         clickButton("Save");
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
     //re-include an excluded well
@@ -1877,17 +1868,16 @@ public class LuminexTest extends AbstractQCAssayTest
 
         log("Exclude well from from run");
         clickExclusionMenuIconForWell(well);
-        clickRadioButtonById("excludeselected");
+        click(Locator.radioButtonById("excludeselected"));
         clickButton("Save", 0);
-//        sleep(1000);
         _extHelper.clickExtButton("Yes");
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
 
     private void excludableWellsWithTransformTest()
     {
-        clickProject(getProjectName());
+        goToProjectHome();
         clickAndWait(Locator.linkContainingText(TEST_ASSAY_LUM));
         excludeWellFromRun("Guide Set plate 5", "A6,B6");
         goToLeveyJenningsGraphPage("Standard1");
@@ -1899,7 +1889,7 @@ public class LuminexTest extends AbstractQCAssayTest
     @LogMethod
     private void guideSetApiTest()
     {
-        clickProject(getProjectName());
+        goToProjectHome();
         assertTextNotPresent("GS Analyte");
 
         String wikiName = "LuminexGuideSetTestWiki";
@@ -1910,27 +1900,26 @@ public class LuminexTest extends AbstractQCAssayTest
         saveWikiPage();
         setSourceFromFile("LuminexGuideSet.html", wikiName);
 
-        waitForElement(Locator.id("button_loadqwps"), defaultWaitForPage);
-        click(Locator.id("button_loadqwps"));
+        waitAndClick(Locator.id("button_loadqwps"));
         waitForText("Done loading QWPs");
-        assertTextNotPresent("Error:");
+        assertTextNotPresent("Unexpected Error:");
 
         click(Locator.id("button_testiud"));
         waitForText("Done testing inserts, updates, and deletes");
-        assertTextNotPresent("Error:");
+        assertTextNotPresent("Unexpected Error:");
 
         click(Locator.id("button_updateCurveFit"));
         waitForText("Done with CurveFit update");
-        assertTextNotPresent("Error:");
+        assertTextNotPresent("Unexpected Error:");
 
         click(Locator.id("button_updateGuideSetCurveFit"));
         waitForText("Done with GuideSetCurveFit update");
-        assertTextNotPresent("Error:");
+        assertTextNotPresent("Unexpected Error:");
 
         // check the QWPs again to make the inserts/updates/deletes didn't affected the expected row counts
         click(Locator.id("button_loadqwps"));
         waitForText("Done loading QWPs again");
-        assertTextNotPresent("Error:");        
+        assertTextNotPresent("Unexpected Error:");
     }
 
     @LogMethod
@@ -1941,26 +1930,22 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // check 4PL ec50 trending R plot
         click(Locator.tagWithText("span", "EC50 - 4PL"));
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        waitForLeveyJenningsTrendPlot();
         assertElementPresent( Locator.id("EC50 4PLTrendPlotDiv"));
 
         // check5PL  ec50 trending R plot
         click(Locator.tagWithText("span", "EC50 - 5PL Rumi"));
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        waitForLeveyJenningsTrendPlot();
         assertElementPresent( Locator.id("EC50 5PLTrendPlotDiv"));
 
         // check auc trending R plot
         click(Locator.tagWithText("span", "AUC"));
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        waitForLeveyJenningsTrendPlot();
         assertElementPresent( Locator.id("AUCTrendPlotDiv"));
 
         // check high mfi trending R plot
         click(Locator.tagWithText("span", "High MFI"));
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        waitForLeveyJenningsTrendPlot();
         assertElementPresent( Locator.id("High MFITrendPlotDiv"));
 
         //verify QC flags
@@ -1973,7 +1958,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // to the test
         for (int i = 1; i <= 5; i++)
         {
-            clickAt(ExtHelper.locateGridRowCheckbox("NETWORK" + i), "1,2");
+            click(ExtHelper.locateGridRowCheckbox("NETWORK" + i));
         }
         clickButton("View 4PL Curves", 0);
         waitForTextToDisappear("loading curves...", WAIT_FOR_JAVASCRIPT);
@@ -1986,6 +1971,8 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForTextToDisappear("loading curves...", WAIT_FOR_JAVASCRIPT);
         assertTextNotPresent("Error executing command");
         assertTextPresent("View Log Y-Axis");
+
+        clickButton("Close", 0);
     }
 
     @LogMethod
@@ -2012,6 +1999,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("view data");
         clickAndWait(Locator.linkContainingText("view data"));
         _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.showHiddenItems();
         _customizeViewsHelper.addCustomizeViewColumn("Analyte/RowId");
         _customizeViewsHelper.addCustomizeViewColumn("Titration/RowId");
         _customizeViewsHelper.addCustomizeViewColumn("GuideSet/RowId");
@@ -2034,6 +2022,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkContainingText("view data"));
         Map<String, Integer> guideSetIds = new HashMap<>();
         _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.showHiddenItems();
         _customizeViewsHelper.addCustomizeViewColumn("RowId");
         _customizeViewsHelper.applyCustomView();
         DataRegionTable table = new DataRegionTable("query", this);
@@ -2073,19 +2062,15 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         log("Setting Levey-Jennings Report graph parameters for Analyte " + analyte);
         waitForText(analyte);
-        Locator l = Locator.tagContainingText("span", analyte);
-        clickAt(l, "1,1");
+        click(Locator.tagContainingText("span", analyte));
 
         setIsoAndConjugate();
-
-        l = Locator.extButton("Apply", 0);
-        clickAt(l,  "1,1");
+        click(Locator.extButton("Apply", 0));
 
         // wait for the test headers in the guide set and tracking data regions
         waitForText(analyte + " - " + isotype + " " + conjugate);
         waitForText("Standard1 Tracking Data for " + analyte + " - " + isotype + " " + conjugate);
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        waitForLeveyJenningsTrendPlot();
         waitForElement(Locator.xpath("//img[starts-with(@id,'resultImage')]"));
     }
 
@@ -2093,8 +2078,7 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         for(String row: rows)
         {
-            Locator l = Locator.id(row);
-            waitForElement(l, defaultWaitForPage);
+            waitForElement(Locator.id(row));
             click(Locator.tagWithId("span", row));
         }
 
@@ -2128,7 +2112,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
 
         addRemoveGuideSetRuns(rows);
-        setText("commentTextField", comment);
+        setFormElement(Locator.name("commentTextField"), comment);
 
         if (creating)
         {
@@ -2150,10 +2134,8 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void waitForGuideSetExtMaskToDisappear()
     {
-
-        waitForExtMaskToDisappear();
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForLeveyJenningsTrendPlot();
     }
 
     private void goToLeveyJenningsGraphPage(String titrationName)
@@ -2179,6 +2161,7 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("view data");
         clickAndWait(Locator.linkContainingText("view data"));
         _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.showHiddenItems();
         _customizeViewsHelper.addCustomizeViewColumn("GuideSetId/RowId");
         _customizeViewsHelper.applyCustomView();
         DataRegionTable table = new DataRegionTable("query", this);
@@ -2196,43 +2179,41 @@ public class LuminexTest extends AbstractQCAssayTest
     }
 
     @LogMethod
-    private void applyGuideSetToRun(String network, int runRowIndex, String comment, int guideSetIndex)
+    private void applyGuideSetToRun(String network, String comment, int guideSetIndex)
     {
-        clickAt(ExtHelper.locateGridRowCheckbox(network), "1," + runRowIndex);
+        click(ExtHelper.locateGridRowCheckbox(network));
         clickButton("Apply Guide Set", 0);
         sleep(1000);//we need a little time even after all the elements have appeared, so waits won't work
 
         if(guideSetIndex!=-1) //not clicking anything will apply the current guide set
-            clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + guideSetIndex);
+            click(ExtHelper.locateGridRowCheckbox(comment));
 
         waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0);
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         // verify that the plot is reloaded
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        waitForLeveyJenningsTrendPlot();
 
     }
 
     @LogMethod
-    private void verifyGuideSetToRun(String network, int networkColIndex, String comment, int commentColIndex)
+    private void verifyGuideSetToRun(String network, String comment)
     {
-        clickAt(ExtHelper.locateGridRowCheckbox(network), "1," + networkColIndex);
+        click(ExtHelper.locateGridRowCheckbox(network));
         clickButton("Apply Guide Set", 0);
-        waitForElement(ExtHelper.locateGridRowCheckbox(network), defaultWaitForPage);
-        waitForElement(ExtHelper.locateGridRowCheckbox(comment), defaultWaitForPage);
+        waitForElement(ExtHelper.locateGridRowCheckbox(network));
+        waitForElement(ExtHelper.locateGridRowCheckbox(comment));
         sleep(1000);
         // deselect the current guide set to test error message
-        clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
+        click(ExtHelper.locateGridRowCheckbox(comment));
         clickButton("Apply Thresholds", 0);
         waitForText("Please select a guide set to be applied to the selected records.");
         clickButton("OK", 0);
         // reselect the current guide set and apply it
-        clickAt(ExtHelper.locateGridRowCheckbox(comment), "1," + commentColIndex);
-        waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0); 
-        waitForExtMaskToDisappear();
+        click(ExtHelper.locateGridRowCheckbox(comment));
+        clickButton("Apply Thresholds", 0);
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         // verify that the plot is reloaded
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        waitForLeveyJenningsTrendPlot();
     }
 
     @LogMethod
@@ -2250,8 +2231,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement(Locator.name("start-date-field"), "2011-03-26");
         setFormElement(Locator.name("end-date-field"), "2011-03-28");
         waitAndClick(Locator.extButtonEnabled("Apply").index(1));
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        waitForLeveyJenningsTrendPlot();
         // check that only 3 runs are now present
         waitForElementToDisappear(ExtHelper.locateGridRowCheckbox(colValuePrefix + "1"), WAIT_FOR_JAVASCRIPT);
         for (int i = 2; i <= 4; i++)
@@ -2278,8 +2258,7 @@ public class LuminexTest extends AbstractQCAssayTest
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@id='protocol-combo-box']/.."), colProtocolPrefix + "3");
 
         waitAndClick(Locator.extButtonEnabled("Apply").index(1));
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        waitForLeveyJenningsTrendPlot();
         // check that only 1 runs are now present
         waitForElementToDisappear(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "1"), WAIT_FOR_JAVASCRIPT);
         assertElementPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "3"));
@@ -2291,8 +2270,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         // Clear the filter and check that all rows reappear
         waitAndClick(Locator.extButtonEnabled("Clear"));
-        waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        waitForLeveyJenningsTrendPlot();
         for (int i = 1; i <= 5; i++)
         {
             assertElementPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + i));
@@ -2303,8 +2281,14 @@ public class LuminexTest extends AbstractQCAssayTest
     {
         setUpGuideSet("GS Analyte (2)");
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@id='scale-combo-box']/.."), "Log");
+        waitForLeveyJenningsTrendPlot();
+    }
+
+    private void waitForLeveyJenningsTrendPlot()
+    {
         waitForTextToDisappear("Loading");
-        assertTextNotPresent("Error");
+        assertTextNotPresent("ScriptException");
+        assertElementNotPresent(Locator.tagContainingText("pre", "Error"));
     }
 
     @LogMethod
@@ -2325,7 +2309,7 @@ public class LuminexTest extends AbstractQCAssayTest
     }
 
     @LogMethod
-    public void uploadPositivityFile(String assayName, File file, String baseVisit, String foldChange, boolean isBackgroundUpload)
+    public void uploadPositivityFile(String assayName, File file, String baseVisit, String foldChange, boolean isBackgroundUpload, boolean expectDuplicateFile)
     {
         goToTestAssayHome();
         clickButton("Import Data");
@@ -2336,6 +2320,8 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement(Locator.name("positivityFoldChange"), foldChange);
         assertTrue("Positivity Data absent: " + file.toString(), file.exists());
         setFormElement(Locator.name("__primaryFile__"), file);
+        if (expectDuplicateFile)
+            waitForText("A file with name '" + file.getName() + "' already exists");
         clickButton("Next");
         setAnalytePropertyValues();
         clickButton("Save and Finish");
@@ -2383,10 +2369,6 @@ public class LuminexTest extends AbstractQCAssayTest
         addFilesToAssayRun(TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3, TEST_ASSAY_MULTIPLE_STANDARDS_3);
         // verify that the error message for duplicate entries pops up, and that the first remove button is enabled (checks prior bug)
         waitForText("duplicate", WAIT_FOR_JAVASCRIPT);
-        clickButton("OK",0);
-        waitForTextToDisappear("duplicate", WAIT_FOR_JAVASCRIPT);
-
-        // verify no other error message, previous file usage was deleted & archived
-        assertTextNotPresent(ERROR_TEXT);
+        clickButton("OK", 0);
     }
 }

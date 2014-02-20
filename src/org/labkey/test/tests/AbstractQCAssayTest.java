@@ -142,16 +142,14 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
 
         if (isEngineConfigured())
         {
-            Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='jar']");
-            selenium.mouseDown(engine.toString());
+            click(Locator.xpath("//div[@id='enginesGrid']//td//div[.='jar']"));
 
             String id = _extHelper.getExtElementId("btn_deleteEngine");
             click(Locator.id(id));
 
             _extHelper.waitForExtDialog("Delete Engine Configuration", WAIT_FOR_JAVASCRIPT);
 
-            String btnId = selenium.getEval("this.browserbot.getCurrentWindow().Ext.MessageBox.getDialog().buttons[1].getId();");
-            click(Locator.id(btnId));
+            _extHelper.clickExtButton("Delete Engine Configuration", "Yes");
         }
     }
 
@@ -167,11 +165,12 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
     protected void startCreateNabAssay(String name)
     {
         clickButton("New Assay Design");
-        checkRadioButton("providerName", "TZM-bl Neutralization (NAb)");
+        checkRadioButton(Locator.radioButtonByNameAndValue("providerName", "TZM-bl Neutralization (NAb)"));
         clickButton("Next");
 
-        waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-        selenium.type("//input[@id='AssayDesignerName']", name);
+        Locator assayName = Locator.xpath("//input[@id='AssayDesignerName']");
+        waitForElement(assayName, WAIT_FOR_JAVASCRIPT);
+        setFormElement(assayName, name);
 
         log("Setting up NAb assay");
     }

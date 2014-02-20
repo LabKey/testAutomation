@@ -46,7 +46,7 @@
                    updateLog("Success: loaded " + record.table + " QWP with " + dataRegion.rowCount + ".", true);
                    if (record.expectedRows != undefined && record.expectedRows != dataRegion.rowCount)
                    {
-                       updateLog("<span class='labkey-error'>Error: unexpcted number of records in " + record.table + " QWP (expected " + record.expectedRows + ")</span>", true);
+                       updateLog("<span class='labkey-error'>" + "Unexpected " + "Error: unexpcted number of records in " + record.table + " QWP (expected " + record.expectedRows + ")</span>", true);
                    }
 
                    // store the rowCount for checking if the loadQWP is called again
@@ -58,7 +58,7 @@
                    }
                    else
                    {
-                       updateLog("Done loading QWPs" + (loadedQWPsOnce ? " again" : ""), true);
+                       updateLog("Done" + " loading QWPs" + (loadedQWPsOnce ? " again" : ""), true);
                        updateLog("", true); // add a blank line
                        Ext.get('qwp-div').update(""); // clear the QWP div
                        loadedQWPsOnce = true;
@@ -123,7 +123,7 @@
             return function(data) {
                 updateLog("Success: inserted record into " + record.table, true);
                 if (data.rowsAffected != 1)
-                    updateLog("<span class='labkey-error'>Error: unexpected number of rows affected by insert into " + record.table + "(" + data.rowsAffected + " rows affected)</span>", true);
+                    updateLog("<span class='labkey-error'>" + "Unexpected " + "Error: unexpected number of rows affected by insert into " + record.table + "(" + data.rowsAffected + " rows affected)</span>", true);
 
                 var keyVal = (data.rows[0][record.keyVar] ? data.rows[0][record.keyVar] : data.rows[0][record.keyVar.toLowerCase()]);
                 var updateRow = record.insertRow;
@@ -145,7 +145,7 @@
             return function(data) {
                 updateLog("Success: updated record in " + record.table, true);
                 if (data.rowsAffected != 1)
-                    updateLog("<span class='labkey-error'>Error: unexpected number of rows affected by update in " + record.table + "(" + data.rowsAffected + " rows affected)</span>", true);
+                    updateLog("<span class='labkey-error'>" + "Unexpected " + "Error: unexpected number of rows affected by update in " + record.table + "(" + data.rowsAffected + " rows affected)</span>", true);
 
                 var deleteRow = {};
                 deleteRow[record.keyVar] = (data.rows[0][record.keyVar] ? data.rows[0][record.keyVar] : data.rows[0][record.keyVar.toLowerCase()]);
@@ -179,7 +179,7 @@
                 if (failureExpected)
                     updateLog("Expected " + type + " failure for " + record.table + ": " + response.exception, true);
                 else
-                    updateLog("<span class='labkey-error'>Error: " + type + " failed for " + record.table + ": " + response.exception + "</span>", true);
+                    updateLog("<span class='labkey-error'>" + "Unexpected " + "Error: " + type + " failed for " + record.table + ": " + response.exception + "</span>", true);
 
                 checkForNextInsert(index);
             }
@@ -193,7 +193,7 @@
             }
             else
             {
-               updateLog("Done testing inserts, updates, and deletes", true);
+               updateLog("Done " + "testing inserts, updates, and deletes", true);
                updateLog("", true); // add a blank line
             }
         }
@@ -214,7 +214,7 @@
                         queryName: tablePrefix + ' ' + table,
                         rows: [updateRow],
                         success: function(){
-                            updateLog("Error: unexpected successful update of " + table, true);
+                            updateLog("Unexpected " + "Error: unexpected successful update of " + table, true);
                             updateLog("Done with " + table + " update", true);
                             updateLog("", true);
                         },

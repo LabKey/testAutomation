@@ -87,9 +87,9 @@ public class LuminexExcludedTitrationTest extends LuminexTest
     {
         clickButton("Exclude Titration","Analytes excluded for a replicate group or at the assay level will not be re-included by changes in titration exclusions" );
         waitForElement(Locator.xpath("//td/div").withText(Titration));
-        mouseDown(Locator.xpath("//td/div").withText(Titration));
+        click(Locator.xpath("//td/div").withText(Titration));
         waitForElement(Locator.xpath("//td/div[@class='x-grid3-cell-inner x-grid3-col-1 x-unselectable']").containing(Analyte));
-        mouseDown(Locator.xpath("//td/div[@class='x-grid3-cell-inner x-grid3-col-1 x-unselectable']").containing(Analyte));
+        click(Locator.xpath("//td/div[@class='x-grid3-cell-inner x-grid3-col-1 x-unselectable']").containing(Analyte));
         String exclusionMessage =  "excluding " + Analyte + " analyte for titration " + Titration;
         setFormElement(COMMENT_LOCATOR, exclusionMessage);
         sleep(10000) ;
@@ -101,6 +101,9 @@ public class LuminexExcludedTitrationTest extends LuminexTest
 
     protected void verifyTitrationAnalyteExclusion(String excludedTitration, String excludedAnalyte, String exclusionMessage)
     {
+        setFilter("Data", "Description", "Equals", excludedTitration);
+        setFilter("Data", "Analyte", "Contains", excludedAnalyte);
+        waitForElement(Locator.paginationText(1, 12, 12));
         List<List<String>> vals = getColumnValues(DATA_TABLE_NAME, "Well", "Description", "Type", "Exclusion Comment", "Analyte");
         List<String> wells = vals.get(0);
         List<String> descriptions = vals.get(1);
@@ -138,10 +141,20 @@ public class LuminexExcludedTitrationTest extends LuminexTest
                 assertTrue(analyte.contains(excludedAnalyte) && description.equals(excludedTitration));
             }
         }
+
+        setFilter("Data", "Analyte", "Does Not Contain", excludedAnalyte);
+        setFilter("Data", "ExclusionComment", "Is Not Blank");
+        waitForText("No data to show.");
+
+        clearFilter("Data", "ExclusionComment");
+        clearFilter("Data", "Analyte");
+        clearFilter("Data", "Description");
     }
 
     protected void verifyTitrationExclusion(String excludedTitration, String exclusionMessage)
     {
+        setFilter("Data", "Description", "Equals", excludedTitration);
+        waitForElement(Locator.paginationText(1, 60, 60));
         List<List<String>> vals = getColumnValues(DATA_TABLE_NAME, "Well", "Description", "Type", "Exclusion Comment", "Analyte");
         List<String> wells = vals.get(0);
         List<String> descriptions = vals.get(1);
@@ -174,6 +187,13 @@ public class LuminexExcludedTitrationTest extends LuminexTest
                 assertTrue(comment.contains(exclusionMessage));
             }
         }
+
+        setFilter("Data", "Description", "Does Not Equal", excludedTitration);
+        setFilter("Data", "ExclusionComment", "Is Not Blank");
+        waitForText("No data to show.");
+
+        clearFilter("Data", "ExclusionComment");
+        clearFilter("Data", "Description");
     }
 
 }

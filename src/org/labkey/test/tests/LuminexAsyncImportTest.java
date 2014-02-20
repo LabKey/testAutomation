@@ -62,7 +62,7 @@ public class LuminexAsyncImportTest extends LuminexTest implements PostgresOnlyT
         waitForPipelineJobsToFinish(2);
         clickAndWait(Locator.linkWithText("COMPLETE", 0));
         assertLuminexLogInfoPresent();
-        assertTextNotPresent("ERROR"); //Issue 14082
+        assertElementNotPresent(Locator.linkWithText("ERROR")); //Issue 14082
         assertTextPresent("Starting assay upload", "Finished assay upload");
         clickButton("Data"); // data button links to the run results
         assertTextPresent(TEST_ASSAY_LUM + " Results");
@@ -70,7 +70,7 @@ public class LuminexAsyncImportTest extends LuminexTest implements PostgresOnlyT
 
     private void importBackgroundFailure()
     {
-        uploadPositivityFile("No Fold Change", TEST_ASSAY_LUM_FILE11, "1", "", true);
+        uploadPositivityFile("No Fold Change", TEST_ASSAY_LUM_FILE11, "1", "", true, false);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(5);
         clickAndWait(Locator.linkWithText("ERROR"));
@@ -80,7 +80,7 @@ public class LuminexAsyncImportTest extends LuminexTest implements PostgresOnlyT
 
     private void importBackgroundWarning()
     {
-        uploadPositivityFile("No Baseline Data", TEST_ASSAY_LUM_FILE12, "1", "3", true);
+        uploadPositivityFile("No Baseline Data", TEST_ASSAY_LUM_FILE12, "1", "3", true, false);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(6);
         setFilter("StatusFiles", "Description", "Equals", "No Baseline Data");
@@ -93,17 +93,16 @@ public class LuminexAsyncImportTest extends LuminexTest implements PostgresOnlyT
         int i = index;
         goToTestAssayHome();
         clickButton("Import Data");
-        setFormElement("network", "NEWNET" + (i + 1));
-        //assert(getFormElement(Locator.name("network")).equals("NETWORK1"));
+        setFormElement(Locator.name("network"), "NEWNET" + (i + 1));
         clickButton("Next");
         testDate.add(Calendar.DATE, 1);
         importLuminexRunPageTwo("Guide Set plate " + (i+1), "new"+isotype, "new"+conjugate, "", "", "NewNote" + (i+1),
                 "new Experimental", "NewTECH" + (i+1), df.format(testDate.getTime()), file, i);
-        uncheckCheckbox("_titrationRole_standard_Standard1");
-        checkCheckbox("_titrationRole_qccontrol_Standard1");
+        uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
+        checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
         clickButton("Save and Finish");
         waitForPipelineJobsToFinish(3);
-        assertTextNotPresent("ERROR");
+        assertElementNotPresent(Locator.linkWithText("ERROR"));
     }
 
     protected void reimportFirstRun(int index, Calendar testDate, File file)
@@ -118,41 +117,41 @@ public class LuminexAsyncImportTest extends LuminexTest implements PostgresOnlyT
         clickButton("Next");
         testDate.add(Calendar.DATE, 1);
         reimportLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
-                "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), file.toString(), i);
-        uncheckCheckbox("_titrationRole_standard_Standard1");
-        checkCheckbox("_titrationRole_qccontrol_Standard1");
+                "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), file, i);
+        uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
+        checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
         clickButton("Save and Finish");
         waitForPipelineJobsToFinish(4);
-        assertTextNotPresent("ERROR");
+        assertElementNotPresent(Locator.linkWithText("ERROR"));
     }
 
     protected void reimportLuminexRunPageTwo(String name, String isotype, String conjugate, String stndCurveFitInput,
                                              String unkCurveFitInput, String notebookNo, String assayType, String expPerformer,
-                                             String testDate, String file, int i)
+                                             String testDate, File file, int i)
     {
         // verify that all old values from the first imported run are present
         assert(getFormElement(Locator.name("name")).equals(name));
-        setFormElement("name", name);
+        setFormElement(Locator.name("name"), name);
         assert(getFormElement(Locator.name("isotype")).equals(isotype));
-        setFormElement("isotype", isotype);
+        setFormElement(Locator.name("isotype"), isotype);
         assert(getFormElement(Locator.name("conjugate")).equals(conjugate));
-        setFormElement("conjugate", conjugate);
+        setFormElement(Locator.name("conjugate"), conjugate);
         assert(getFormElement(Locator.name("stndCurveFitInput")).equals(stndCurveFitInput));
-        setFormElement("stndCurveFitInput", stndCurveFitInput);
+        setFormElement(Locator.name("stndCurveFitInput"), stndCurveFitInput);
         assert(getFormElement(Locator.name("unkCurveFitInput")).equals(unkCurveFitInput));
-        setFormElement("unkCurveFitInput", unkCurveFitInput);
-        uncheckCheckbox("curveFitLogTransform");
+        setFormElement(Locator.name("unkCurveFitInput"), unkCurveFitInput);
+        uncheckCheckbox(Locator.name("curveFitLogTransform"));
         assert(getFormElement(Locator.name("notebookNo")).equals(notebookNo));
-        setFormElement("notebookNo", notebookNo);
+        setFormElement(Locator.name("notebookNo"), notebookNo);
         assert(getFormElement(Locator.name("assayType")).equals(assayType));
-        setFormElement("assayType", assayType);
+        setFormElement(Locator.name("assayType"), assayType);
         assert(getFormElement(Locator.name("expPerformer")).equals(expPerformer));
-        setFormElement("expPerformer", expPerformer);
+        setFormElement(Locator.name("expPerformer"), expPerformer);
         assert(getFormElement(Locator.name("testDate")).equals(testDate));
-        setFormElement("testDate", testDate);
-        //click(Locator.id("ext-gen4"));
+        setFormElement(Locator.name("testDate"), testDate);
         click(Locator.xpath("//a[contains(@class, 'labkey-file-add-icon-enabled')]"));
-        setFormElement("__primaryFile__", file);
+        setFormElement(Locator.name("__primaryFile__"), file);
+        waitForText("A file with name '" + file.getName() + "' already exists");
         clickButton("Next", 60000);
     }
 

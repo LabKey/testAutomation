@@ -7108,13 +7108,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
             //first load of schemas might a few seconds
             waitForElement(loc, 30000);
-            if (isExtTreeNodeExpanded(schemaPart))
-                click(loc);
-            else
-            {
-                click(loc.append("/../preceding-sibling::img").withClass("x-tree-elbow-plus"));
-                click(loc);
-            }
+            click(loc);
             waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + schemaPart + "']"), 1000);
             waitForElement(Locator.css(".lk-qd-name").withText(schemaWithParents + " Schema"));
         }

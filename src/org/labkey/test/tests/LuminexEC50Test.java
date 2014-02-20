@@ -35,7 +35,6 @@ public class LuminexEC50Test  extends LuminexTest
         super.ensureConfigured();
     }
 
-    //TODO:  set up and LuminexTest and everything
     protected void runUITests()
     {
         runEC50Test();
