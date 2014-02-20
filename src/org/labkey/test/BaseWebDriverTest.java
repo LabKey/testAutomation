@@ -195,7 +195,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     protected static boolean _checkedLeaksAndErrors = false;
-    private static final String ACTION_SUMMARY_TABLE_NAME = "springActions";
+    private static final String ACTION_SUMMARY_TABLE_NAME = "actions";
 
     private final BrowserType BROWSER_TYPE;
 

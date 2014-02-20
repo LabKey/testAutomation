@@ -115,7 +115,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     /** Have we already done a memory leak and error check in this test harness VM instance? */
     protected static boolean _checkedLeaksAndErrors = false;
-    private static final String ACTION_SUMMARY_TABLE_NAME = "springActions";
+    private static final String ACTION_SUMMARY_TABLE_NAME = "actions";
 
 
     protected static final String PERMISSION_ERROR = "User does not have permission to perform this operation";
