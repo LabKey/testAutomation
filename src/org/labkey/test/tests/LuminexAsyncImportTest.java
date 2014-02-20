@@ -83,8 +83,8 @@ public class LuminexAsyncImportTest extends LuminexTest implements PostgresOnlyT
         uploadPositivityFile("No Baseline Data", TEST_ASSAY_LUM_FILE12, "1", "3", true);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(6);
+        setFilter("StatusFiles", "Description", "Equals", "No Baseline Data");
         clickAndWait(Locator.linkWithText("COMPLETE", 0));
-        assertTextNotPresent("ERROR");
         assertTextPresent("Warning: No baseline visit data found", 12);
     }
 
