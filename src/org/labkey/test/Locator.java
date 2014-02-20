@@ -218,6 +218,28 @@ public abstract class Locator
         }
     }
 
+    public void waitForElementToHaveValue(final WebDriver driver, final int msTimeout, final String value)
+    {
+        long secTimeout = msTimeout / 1000;
+        secTimeout = secTimeout > 0 ? secTimeout : 1;
+        WebDriverWait wait = new WebDriverWait(driver, secTimeout);
+        try
+        {
+            wait.until(new ExpectedCondition<Boolean>()
+            {
+                @Override
+                public Boolean apply(WebDriver d)
+                {
+                    return findElement(driver).getText().contains(value);
+                }
+            });
+        }
+        catch (TimeoutException ex)
+        {
+            fail("Timeout waiting for element to disappear [" + secTimeout + "sec]: " + getLoggableDescription());
+        }
+    }
+
     public List<WebElement> waitForElements(final WebDriver driver, final int msTimeout)
     {
         waitForElement(driver, msTimeout);
@@ -486,6 +508,11 @@ public abstract class Locator
         return xpath("//input[@type='checkbox' and @name=" + xq(name) + "]");
     }
 
+    public static XPathLocator checkboxByIdContaining(String id)
+    {
+        return xpath("//input[@type='checkbox' and @id[contains(@id,'" + id + ";]");
+    }
+
     public static XPathLocator radioButtonById(String id)
     {
         return xpath("//input[@type='radio' and @id=" + xq(id) + "]");
@@ -593,6 +620,26 @@ public abstract class Locator
     public static XPathLocator currentProject()
     {
         return id("folderBar");
+    }
+
+    public static XPathLocator divByName(String name)
+    {
+        return xpath("//div[@name='" + name + "']");
+    }
+
+    public static XPathLocator divByNameContaining(String partialName)
+    {
+        return xpath("//div[contains(@name, '" + partialName + "')]");
+    }
+
+    public static XPathLocator divById(String id)
+    {
+        return xpath("//div[@name='" + id + "']");
+    }
+
+    public static XPathLocator divByIdContaining(String partialId)
+    {
+        return xpath("//div[contains(@id, '" + partialId + "')]");
     }
 
     public static IdLocator folderTab(String text)
