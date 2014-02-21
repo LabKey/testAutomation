@@ -139,7 +139,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Done");
 
         log("Customize message board");
-        clickWebpartMenuItem("Messages", "Customize");
+        clickWebpartMenuItem("Messages", "Admin");
         checkCheckbox(Locator.checkboxByName("expires"));
         clickButton("Save");
 
@@ -224,7 +224,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check with security");
         clickProject(PROJECT_NAME);
-        clickWebpartMenuItem("Messages", "Customize");
+        clickWebpartMenuItem("Messages", "Admin");
         checkCheckbox(Locator.radioButtonByName("secure").index(1));
         clickButton("Save");
         permissionCheck("Reader", false);
@@ -232,13 +232,13 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check if the customized names work");
         clickProject(PROJECT_NAME);
-        clickWebpartMenuItem("Messages", "Customize");
+        clickWebpartMenuItem("Messages", "Admin");
         setFormElement(Locator.name("boardName"), "Notes");
         setFormElement(Locator.name("conversationName"), "Thread");
         clickButton("Save");
         assertTextPresent("Notes");
         assertTextPresent("thread");
-        clickWebpartMenuItem("Notes", "Customize");
+        clickWebpartMenuItem("Notes", "Admin");
         setFormElement(Locator.name("boardName"), "Messages");
         setFormElement(Locator.name("conversationName"), "Message");
         clickButton("Save");
@@ -255,7 +255,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Respond");
         clickButton("Submit");
         clickAndWait(Locator.linkWithText("Messages"));
-        clickAndWait(Locator.linkWithText("Customize"));
+        clickAndWait(Locator.linkWithText("Admin"));
         checkCheckbox(Locator.radioButtonByName("sortOrderIndex").index(1));
         clickButton("Save");
         clickAndWait(Locator.linkWithText("view message or respond"));
@@ -263,7 +263,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Edit other customize options");
         clickAndWait(Locator.linkWithText("Messages"));
-        clickAndWait(Locator.linkWithText("Customize"));
+        clickAndWait(Locator.linkWithText("Admin"));
         uncheckCheckbox(Locator.checkboxByName("titleEditable"));
         checkCheckbox(Locator.checkboxByName("memberList"));
         checkCheckbox(Locator.checkboxByName("status"));
@@ -292,7 +292,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         testMemberLists();
 
         clickProject(PROJECT_NAME);
-        clickWebpartMenuItem("Messages", "Customize");
+        clickWebpartMenuItem("Messages", "Admin");
         checkCheckbox(Locator.radioButtonByName("secure").index(0));
         clickButton("Save");
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
