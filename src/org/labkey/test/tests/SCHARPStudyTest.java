@@ -20,6 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Study;
+import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
 
@@ -31,7 +32,7 @@ import static org.junit.Assert.*;
  * Time: 1:59:39 PM
  */
 @Category({DailyA.class, Study.class})
-public class SCHARPStudyTest extends BaseWebDriverTest
+public class SCHARPStudyTest extends BaseWebDriverTest implements PostgresOnlyTest
 {
     public static final String PROJECT_NAME="SCHARP Study Test";
 
@@ -65,14 +66,6 @@ public class SCHARPStudyTest extends BaseWebDriverTest
         log("creating project...");
         _containerHelper.createProject(PROJECT_NAME, "Study");
 
-        ensureAdminMode();
-        goToAdminConsole();
-        if (isTextPresent("Microsoft SQL Server"))
-        {
-            log("NOTE: Database type is SQL Server...skipping test...re-enable this on SQL Server once the following bugs are resolved: 8451, 8452, 8453, 8454, 8455.");
-            return;
-        }
-
         clickProject(PROJECT_NAME);
         log("importing study...");
         setupPipeline();
@@ -97,25 +90,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest
         clickButton("Import Study From Local Zip Archive");
         assertTextNotPresent("This file does not appear to be a valid .zip file");
 
-        if (isTextPresent("You must select a .zip file to import"))
-        {
-            setFormElement(Locator.name("folderZip"), _zipFilePath);
-            clickButton("Import Study");
-        }
-
-        assertTextPresent("Data Pipeline");
-
-        while(countLinksWithText("COMPLETE") < 1)
-        {
-            if (countLinksWithText("ERROR") > 0)
-            {
-                fail("Job in ERROR state found in the list");
-            }
-
-            log("Waiting for study to finish loading...");
-            sleep(3000);
-            refresh();
-        }
+        waitForPipelineJobsToComplete(1, "Study import", false);
 
         clickProject(PROJECT_NAME);
     }
@@ -135,5 +110,11 @@ public class SCHARPStudyTest extends BaseWebDriverTest
     protected boolean isFileUploadTest()
     {
         return true;
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
