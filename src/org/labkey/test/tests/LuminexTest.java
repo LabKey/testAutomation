@@ -1740,7 +1740,7 @@ public class LuminexTest extends AbstractQCAssayTest
         String[] flags = var.toArray(new String[var.size()]);
         for(int i=0; i<flags.length; i++)
         {
-            assertEquals(expectedFlags[i], flags[i]);
+            assertEquals(expectedFlags[i], flags[i].trim());
         }
         verifyQCFlagLink();
     }
