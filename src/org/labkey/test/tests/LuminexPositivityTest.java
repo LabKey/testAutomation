@@ -38,8 +38,8 @@ import static org.junit.Assert.*;
  * Time: 1:37 PM
  */
 @Category({DailyA.class, MiniTest.class, Assays.class})
-public class LuminexPositivityTest extends LuminexTest implements PostgresOnlyTest
-{                                                      // TODO: re-enable in SQLServer once Rlabkey issue is resolved
+public class LuminexPositivityTest extends LuminexTest
+{
     List<String> _analyteNames = new ArrayList<>();
     private int _expectedThresholdValue = 100;
     private int _newThresholdValue = 100;
@@ -89,10 +89,12 @@ public class LuminexPositivityTest extends LuminexTest implements PostgresOnlyTe
         clickButton("Cancel");
 
         // delete all but one run of data so we have the expected number of previous baseline visits rows
-        checkAllOnPage("Runs");
-        uncheckDataRegionCheckbox("Runs", 4);
+        checkDataRegionCheckbox("Runs", 0);
+        checkDataRegionCheckbox("Runs", 1);
+        checkDataRegionCheckbox("Runs", 2);
+        checkDataRegionCheckbox("Runs", 3);
         clickButton("Delete");
-        assertEquals(4, getXpathCount(Locator.linkContainingText("Positivity ")));
+        assertEquals(4, getElementCount(Locator.linkContainingText("Positivity ")));
         assertTextNotPresent("Positivity 3x Fold Change");
         clickButton("Confirm Delete");
 
@@ -131,7 +133,7 @@ public class LuminexPositivityTest extends LuminexTest implements PostgresOnlyTe
         assertTextPresent("Error: No value provided for 'Positivity Fold Change'.");
         clickButton("Cancel");
 
-        // file contains the baseline visit data, which is not used in this case since we don't have a baseline visit prop set
+        // file contains the baseline visit data, which is not used in this case since we don't have a baseline visit run property set
         setPositivityThresholdParams(101, 100);
         uploadPositivityFile(assayName + " No Base Visit 1", TEST_ASSAY_LUM_FILE11, "", "", false, true);
         String[] posWells = new String[] {"A1", "B1", "A2", "B2", "A3", "B3", "A4", "B4", "A6", "B6", "A7", "B7", "A9", "B9"};

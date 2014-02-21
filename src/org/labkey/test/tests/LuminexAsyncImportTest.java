@@ -32,8 +32,8 @@ import java.util.Calendar;
  * Time: 1:02 PM
  */
 @Category({DailyA.class, MiniTest.class, Assays.class})
-public class LuminexAsyncImportTest extends LuminexTest implements PostgresOnlyTest
-{                                                       // TODO: re-enable in SQLServer once Rlabkey issue is resolved
+public class LuminexAsyncImportTest extends LuminexTest
+{
     @Override
     protected void ensureConfigured()
     {
