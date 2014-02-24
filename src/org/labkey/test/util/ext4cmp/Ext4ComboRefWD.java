@@ -43,6 +43,7 @@ public class Ext4ComboRefWD extends Ext4FieldRefWD
 
     private Object getRawValueFromDisplayValue(String displayValue)
     {
+        waitForStoreLoad();
         return getFnEval("return this.store.data.get(this.store.find(this.displayField, arguments[0])).get(this.valueField)", displayValue);
     }
 
