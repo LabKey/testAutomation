@@ -15,13 +15,13 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Assert;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
-import org.labkey.test.util.PostgresOnlyTest;
 
 import java.io.File;
 import java.util.Calendar;
@@ -84,6 +84,11 @@ public class LuminexAsyncImportTest extends LuminexTest
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(6);
         setFilter("StatusFiles", "Description", "Equals", "No Baseline Data");
+        if (isElementPresent(Locator.linkWithText("ERROR")))
+        {
+            clickAndWait(Locator.linkWithText("ERROR"));
+            Assert.fail();
+        }
         clickAndWait(Locator.linkWithText("COMPLETE", 0));
         assertTextPresent("Warning: No baseline visit data found", 12);
     }
@@ -97,7 +102,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         clickButton("Next");
         testDate.add(Calendar.DATE, 1);
         importLuminexRunPageTwo("Guide Set plate " + (i+1), "new"+isotype, "new"+conjugate, "", "", "NewNote" + (i+1),
-                "new Experimental", "NewTECH" + (i+1), df.format(testDate.getTime()), file, i);
+                "new Experimental", "NewTECH" + (i+1), df.format(testDate.getTime()), file, i, true);
         uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
         checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
         clickButton("Save and Finish");

@@ -17,14 +17,12 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.PerlHelper;
-import org.labkey.test.util.PostgresOnlyTest;
+import org.labkey.test.util.PerlHelperWD;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,7 +47,7 @@ public class LuminexPositivityTest extends LuminexTest
 
     protected void ensureConfigured()
     {
-        PerlHelper perlHelper = new PerlHelper(this);
+        PerlHelperWD perlHelper = new PerlHelperWD(this);
         if(!perlHelper.ensurePerlConfig())
             fail("No Perl engine");
 
