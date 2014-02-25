@@ -3875,7 +3875,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         clickAndWait(Locator.linkWithText("Export"));
         checkRadioButton(Locator.radioButtonByName("location").index(2));
 
-        return clickAndWaitForDownload(Locator.navButton("Export"));
+        return clickAndWaitForDownload(Locator.extButton("Export"));
     }
 
     public File clickAndWaitForDownload(Locator elementToClick)
