@@ -358,6 +358,16 @@ public abstract class Locator
         return xpath("//button[" + NOT_HIDDEN + " and contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
     }
 
+    public static XPathLocator ext4Button(String cssPrefix, String text)
+    {
+        return xpath("//a").notHidden().withClass(cssPrefix + "btn").withText(text);
+    }
+
+    public static XPathLocator ext4ButtonEnabled(String cssPrefix, String text)
+    {
+        return ext4Button(cssPrefix, text).withoutClass(cssPrefix + "disabled");
+    }
+
     public static XPathLocator ext4Button(String text)
     {
         return xpath("//a").notHidden().withClass("x4-btn").withText(text);
