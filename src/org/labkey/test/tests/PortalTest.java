@@ -99,7 +99,7 @@ public class PortalTest extends BaseWebDriverMultipleTest
         portalHelper.addWebPart("MS2 Runs");
         assertElementPresent(Locator.linkWithText("MS2 Runs"));
 
-        portalHelper.clickWebpartMenuItem("Messages", "Customize");
+        portalHelper.clickWebpartMenuItem("Messages", "Admin");
         assertTextPresent("Customize");
         clickButton("Cancel");
     }
