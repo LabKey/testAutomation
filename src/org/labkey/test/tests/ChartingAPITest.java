@@ -435,30 +435,49 @@ public class ChartingAPITest extends ClientAPITest
         verifyBottomLeftGroupBrushed();
         verifyTopRightGroupNotBrushed();
         assertEquals("Brushed area was not the expected height", "385", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("height"));
+        // Make sure when making a 1D selection that the opposite axis handle isn't visible.
+        assertElementNotVisible(Locator.css(".y-axis-handle .resize.n"));
+        assertElementNotVisible(Locator.css(".y-axis-handle .resize.s"));
 
         // 1D selection on y axis (select top right)
         builder.moveToElement(Locator.css(".y-axis-handle .background").findElement(getDriver())).moveByOffset(0, -190).clickAndHold().moveByOffset(0, 190).release().perform();
         verifyTopRightGroupBrushed();
         verifyBottomLeftGroupNotBrushed();
         assertEquals("Brushed area was not the expected width", "619.9999999999999", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("width"));
+        // Make sure when making a 1D selection that the opposite axis handle isn't visible.
+        assertElementNotVisible(Locator.css(".x-axis-handle .resize.e"));
+        assertElementNotVisible(Locator.css(".x-axis-handle .resize.w"));
+
+        // Move 1D selection, make sure the opposite axis handle doesn't show up
+        builder.moveToElement(Locator.css(".brush .extent").findElement(getDriver())).clickAndHold().moveByOffset(0, 50).release().perform();
+        assertElementNotVisible(Locator.css(".x-axis-handle .resize.e"));
+        assertElementNotVisible(Locator.css(".x-axis-handle .resize.w"));
+
+        // Resize 1D selection via main brush, make sure opposite axis handle doesn't show up.
+        builder.moveToElement(Locator.css(".brush .resize.s").findElement(getDriver())).clickAndHold().moveByOffset(0, 50).release().perform();
+        assertElementNotVisible(Locator.css(".x-axis-handle .resize.e"));
+        assertElementNotVisible(Locator.css(".x-axis-handle .resize.w"));
+
+        // Resize 1D selection via main brush, make sure new axis handle does show up (because we're shrinking the x-axis part).
+        builder.moveToElement(Locator.css(".brush .resize.w").findElement(getDriver())).clickAndHold().moveByOffset(50, 0).release().perform();
+        assertElementVisible(Locator.css(".x-axis-handle .resize.e"));
+        assertElementVisible(Locator.css(".x-axis-handle .resize.w"));
+
+        // Verify that clicking in the margins clears the brush.
+        builder.moveToElement(Locator.css(".x-axis-handle .resize.w").findElement(getDriver())).moveByOffset(-5, 0).clickAndHold().release().perform();
+        verifyNoPointsBrushed();
     }
 
     private void verifyAllPointsBrushed()
     {
-        List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
-        for (WebElement point : points)
-        {
-            verifyBrushedPoint(point);
-        }
+        verifyBottomLeftGroupBrushed();
+        verifyTopRightGroupBrushed();
     }
 
     private void verifyNoPointsBrushed()
     {
-        List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
-        for (WebElement point : points)
-        {
-            verifyNonBrushedPoint(point);
-        }
+        verifyBottomLeftGroupNotBrushed();
+        verifyTopRightGroupNotBrushed();
     }
 
     private void verifyBottomLeftGroupBrushed()
