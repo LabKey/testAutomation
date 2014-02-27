@@ -586,7 +586,7 @@ public abstract class Locator
 
     public static XPathLocator gwtListBoxByLabel(String label)
     {
-        return Locator.tagWithClass("select", "gwt-ListBox").withPredicate(Locator.xpath("../preceding-sibling::td").withText(label));
+        return Locator.tagWithClass("select", "gwt-ListBox").withPredicate(Locator.xpath("../preceding-sibling::td/table/tbody/tr/td/div").withText(label));
     }
 
     public static XPathLocator permissionRendered()

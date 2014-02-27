@@ -582,6 +582,9 @@ public class StudyWDTest extends StudyBaseTestWD
         verifyVisitMapPage();
         verifyManageDatasetsPage();
 
+        if (quickTest)
+            verifyParticipantVisitDay();
+
         if(quickTest)
             return;
 
@@ -1103,5 +1106,40 @@ public class StudyWDTest extends StudyBaseTestWD
         assertTextNotPresent("Group 1");
         assertTextPresent("Group 2");
         clickAndWait(Locator.linkWithText("Next Mouse"));
+    }
+
+    @LogMethod
+    protected void verifyParticipantVisitDay()
+    {
+        clickFolder(getFolderName());
+        goToManageStudy();
+        waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
+        waitAndClickAndWait(Locator.linkWithText(DEMOGRAPHICS_TITLE));
+        clickButton("Edit Definition");
+        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.navButton("Add Field"), 0);
+        int newFieldIndex = getXpathCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
+        _listHelper.setColumnName(getPropertyXPath("Dataset Fields"), newFieldIndex, "VisitDay");
+        _listHelper.setColumnType(newFieldIndex, ListHelper.ListColumnType.Integer);
+        Locator element3 = Locator.gwtListBoxByLabel("Visit Date Column");
+        selectOptionByValue(element3, "DEMdt");
+        clickButton("Save");
+        clickButton("View Data");
+
+        // Edit 1 item changing sequence from 101; then edit again and change back and set VisitDay to something
+        clickAndWait(Locator.linkWithText("edit", 0));
+        setFormElement(Locator.input("quf_SequenceNum"), "100");
+        clickButton("Submit");
+        clickAndWait(Locator.linkWithText("edit", 0));
+        setFormElement(Locator.input("quf_SequenceNum"), "101");
+        setFormElement(Locator.input("quf_VisitDay"), "102");
+        clickButton("Submit");
+
+        // Then check that item in MouseVisit table
+        goToSchemaBrowser();
+        viewQueryData("study", "MouseVisit");
+        waitForElement(Locator.id("dataregion_query"));
+        DataRegionTable table = new DataRegionTable("query", this, false);
+        table.setFilter("Day", "Equals", "102");
+        assertTextPresent("999320016", "Screening", "101.0", "2005-01-01", "102", "Group 1");
     }
 }
