@@ -288,19 +288,11 @@ public class ChartingAPITest extends ClientAPITest
     protected static final String SCATTER_REMOVE_LEGEND_SVG_AFTER = "0\n200\n400\n600\n800\n1000\n1200\n1400\n800\n1000\n1200\n1400\n1600\n1800\n2000\nScatter remove legend";
     protected static final String BRUSHED_SCATTER_W_CUSTOM_SCALES = "Scatter With Brushing and Custom Scales";
     protected static final String BRUSHED_SCATTER_W_CUSTOM_SCALES_SVG = "0\n100\n200\n300\n400\n500\n600\n0\n100\n200\n300\n400\n500\n600\n700\n800\n900\nScatter With Brushing and Custom Scales\n0\n1\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n2\n3\n4\n5\n6\n7\n8\n9";
-    protected static final String CIRCLE_PATH = "M0-6.8c-3.7,0-6.8,3.1-6.8,6.8S-3.7,6.8,0,6.8S6.8,3.7,6.8,0S3.7-6.8,0-6.8z M0,4.9c-2.7,0-4.9-2.3-4.9-4.9S-2.7-4.9,0-4.9S4.9-2.8,4.9,0C4.9,2.7,2.7,4.9,0,4.9z";
-    protected static final String ARROW_PATH = "M5.5,1.1L5.5,1.1L0-6.2l-5.5,7.3l1.8,1.4l2.5-3.4v7.1h2.4v-7.1l2.5,3.4L5.5,1.1z";
     protected static final String CIRCLE_COLOR = "#010101";
-    protected static final String ARROW_COLOR = "#FF33E5";
-    protected static final String MOUSEOVER_FILL = "#01BFC2";
-    protected static final String MOUSEOVER_STROKE = "#00EAFF";
-    protected static final String BRUSH_FILL = "#14C9CC";
-    protected static final String BRUSH_STROKE = "#00393A";
 
     @Test
-    public void interactiveChartsTest()
+    public void setAesTest()
     {
-        Actions builder = new Actions(getDriver());
         Locator nextBtn = Locator.input("next-btn");
         Locator setAesBtn = Locator.input("set-aes-btn");
         goToChartingTestPage("setAesTest");
@@ -343,14 +335,38 @@ public class ChartingAPITest extends ClientAPITest
         waitForText(BRUSHED_SCATTER_W_CUSTOM_SCALES);
         assertSVG(BRUSHED_SCATTER_W_CUSTOM_SCALES_SVG);
 
+        List<WebElement> points;
+        // Test removal of mouseover/mouseout aesthetics (Issue 19455).
+        click(setAesBtn);
+        points = Locator.css("svg g a path").findElements(getDriver());
+        fireEvent(points.get(0), SeleniumEvent.mouseover);
+        assertEquals("Related point had an unexpected fill color.", CIRCLE_COLOR, points.get(1).getAttribute("fill"));
+        assertEquals("Related point had an unexpected stroke color.", CIRCLE_COLOR, points.get(1).getAttribute("stroke"));
+    }
+
+    protected static final String ARROW_COLOR = "#FF33E5";
+    protected static final String CIRCLE_PATH = "M0-6.8c-3.7,0-6.8,3.1-6.8,6.8S-3.7,6.8,0,6.8S6.8,3.7,6.8,0S3.7-6.8,0-6.8z M0,4.9c-2.7,0-4.9-2.3-4.9-4.9S-2.7-4.9,0-4.9S4.9-2.8,4.9,0C4.9,2.7,2.7,4.9,0,4.9z";
+    protected static final String ARROW_PATH = "M5.5,1.1L5.5,1.1L0-6.2l-5.5,7.3l1.8,1.4l2.5-3.4v7.1h2.4v-7.1l2.5,3.4L5.5,1.1z";
+    protected static final String MOUSEOVER_FILL = "#01BFC2";
+    protected static final String MOUSEOVER_STROKE = "#00EAFF";
+    protected static final String BRUSH_FILL = "#14C9CC";
+    protected static final String BRUSH_STROKE = "#00393A";
+
+    @Test
+    public void mouseEventsTest()
+    {
+        Actions builder = new Actions(getDriver());
+        List<WebElement> points;
+        goToChartingTestPage("interactivityTest");
+        waitForText("Interactive Plot");
+
         /*
-        The points on the brushed scatter plot are split into two groups. Each 10 points wide and 20 points tall, for a
+        The points on the scatter plot are split into two groups. Each 10 points wide and 20 points tall, for a
         total of 400 points. Index wise, they go in order from bottom left to top right. Point 0 is the very bottom left
         point on the left group. Point 19, is the bottom right point on the right group. Point 380 is the top left, point
         399 is top right.
          */
 
-        List<WebElement> points;
         points = Locator.css("svg g a path").findElements(getDriver());
         assertEquals("Bottom left point was an unexpected color.", CIRCLE_COLOR, points.get(0).getAttribute("fill"));
         assertEquals("Bottom left point was not a circle.", CIRCLE_PATH, points.get(0).getAttribute("d"));
@@ -365,29 +381,87 @@ public class ChartingAPITest extends ClientAPITest
         builder.moveToElement(points.get(380)).moveByOffset(-20, -20).perform();
         assertEquals("Related point had an unexpected fill color.", ARROW_COLOR, points.get(381).getAttribute("fill"));
         assertEquals("Related point had an unexpected stroke color.", ARROW_COLOR, points.get(381).getAttribute("stroke"));
-
-        // Test removal of mouseover/mouseout aesthetics (Issue 19455).
-        click(setAesBtn);
-        points = Locator.css("svg g a path").findElements(getDriver());
-        fireEvent(points.get(0), SeleniumEvent.mouseover);
-        assertEquals("Related point had an unexpected fill color.", CIRCLE_COLOR, points.get(1).getAttribute("fill"));
-        assertEquals("Related point had an unexpected stroke color.", CIRCLE_COLOR, points.get(1).getAttribute("stroke"));
-
-        // Test chart brushing.
-        // Brush from the top left point of the left group, to the bottom right point of the left group.
-        builder.moveToElement(points.get(380)).moveByOffset(-10, -10).clickAndHold().moveByOffset(150, 190).release().perform();
-        verifyBrushedPoints();
-        verifyNonBrushedPoints();
-        // NOTE: have to use clickAndHold().release() here because Firefox does not like click().
-        builder.moveToElement(points.get(380)).moveByOffset(-20, 0).clickAndHold().release().perform();
-        verifyBrushCleared();
-
-        // Brush from the bottom left point of the left group, to the top right point of the left group.
-        builder.moveToElement(points.get(10)).moveByOffset(-10, 10).clickAndHold().moveByOffset(150, -190).release().perform();
-        verifyEdgePointsBrushed();
     }
 
-    private void verifyBrushedPoints()
+    @Test
+    public void brushingTest()
+    {
+        Actions builder = new Actions(getDriver());
+        List<WebElement> points;
+        goToChartingTestPage("interactivityTest");
+        waitForText("Interactive Plot");
+
+        // Brush from the top left point of the left group, to the bottom right point of the left group.
+        points = Locator.css("svg g a path").findElements(getDriver());
+        builder.moveToElement(points.get(380)).moveByOffset(-10, -10).clickAndHold().moveByOffset(150, 190).release().perform();
+        verifyBottomLeftGroupBrushed();
+        verifyTopRightGroupNotBrushed();
+
+        // Move the brushed area to the top right and verify
+        builder.moveToElement(points.get(380)).moveByOffset(5, 5).clickAndHold().moveByOffset(480, -200).release().perform();
+        verifyTopRightGroupBrushed();
+        verifyBottomLeftGroupNotBrushed();
+
+        // NOTE: have to use clickAndHold().release() here because Firefox does not like click().
+        builder.moveToElement(points.get(380)).moveByOffset(-20, 0).clickAndHold().release().perform();
+        verifyNoPointsBrushed();
+
+        WebElement xRightHandle = Locator.css(".x-axis-handle .resize.e").findElement(getDriver());
+        WebElement yTopHandle = Locator.css(".y-axis-handle .resize.n").findElement(getDriver());
+
+        // Brush from the bottom left point of the right group, to the top right point of the right group.
+        builder.moveToElement(points.get(10)).moveByOffset(-10, 10).clickAndHold().moveByOffset(150, -190).release().perform();
+        verifyEdgePointsBrushed();
+        verifyTopRightGroupBrushed();
+        verifyBottomLeftGroupNotBrushed();
+
+        // Move the brushed area to the bottom left via brush handles and re-verify selected points.
+        builder.moveToElement(xRightHandle).moveByOffset(-5, 0).clickAndHold().moveByOffset(-420, 0).release().perform();
+        builder.moveToElement(yTopHandle).moveByOffset(0, 5).clickAndHold().moveByOffset(0, 190).release().perform();
+        verifyBottomLeftGroupBrushed();
+        verifyTopRightGroupNotBrushed();
+
+        // Stretch handles to select all points.
+        builder.moveToElement(xRightHandle).clickAndHold().moveByOffset(420, 0).release().perform();
+        builder.moveToElement(yTopHandle).clickAndHold().moveByOffset(0,-190).release().perform();
+        verifyAllPointsBrushed();
+
+        // Clear the brushed area
+        builder.moveToElement(Locator.css(".brush .resize.w").findElement(getDriver())).moveByOffset(-5, 0).clickAndHold().release().perform();
+        verifyNoPointsBrushed();
+
+        // 1D selection on x axis (select bottom left)
+        builder.moveToElement(Locator.css(".x-axis-handle .background").findElement(getDriver())).moveByOffset(-280, 0).clickAndHold().moveByOffset(180, 0).release().perform();
+        verifyBottomLeftGroupBrushed();
+        verifyTopRightGroupNotBrushed();
+        assertEquals("Brushed area was not the expected height", "385", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("height"));
+
+        // 1D selection on y axis (select top right)
+        builder.moveToElement(Locator.css(".y-axis-handle .background").findElement(getDriver())).moveByOffset(0, -190).clickAndHold().moveByOffset(0, 190).release().perform();
+        verifyTopRightGroupBrushed();
+        verifyBottomLeftGroupNotBrushed();
+        assertEquals("Brushed area was not the expected width", "619.9999999999999", Locator.css(".brush .extent").findElement(getDriver()).getAttribute("width"));
+    }
+
+    private void verifyAllPointsBrushed()
+    {
+        List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
+        for (WebElement point : points)
+        {
+            verifyBrushedPoint(point);
+        }
+    }
+
+    private void verifyNoPointsBrushed()
+    {
+        List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
+        for (WebElement point : points)
+        {
+            verifyNonBrushedPoint(point);
+        }
+    }
+
+    private void verifyBottomLeftGroupBrushed()
     {
         // Check the first, middle, and end point for each "row" in the selected area.
         List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
@@ -400,7 +474,7 @@ public class ChartingAPITest extends ClientAPITest
         }
     }
 
-    private void verifyBrushCleared()
+    private void verifyBottomLeftGroupNotBrushed()
     {
         // Check the first, middle, and end point for each "row" in the selected area.
         List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
@@ -413,7 +487,20 @@ public class ChartingAPITest extends ClientAPITest
         }
     }
 
-    private void verifyNonBrushedPoints()
+    private void verifyTopRightGroupBrushed()
+    {
+        // Check the first, middle, and end point for each "row" in the set of points in the top right of the plot.
+        List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
+        for (int i = 0; i < 20; i++)
+        {
+            int baseIndex = (i * 20) + 10;
+            verifyBrushedPoint(points.get(baseIndex));
+            verifyBrushedPoint(points.get(baseIndex + 4));
+            verifyBrushedPoint(points.get(baseIndex + 9));
+        }
+    }
+
+    private void verifyTopRightGroupNotBrushed()
     {
         // Check the first, middle, and end point for each "row" in the set of points in the top right of the plot.
         List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());

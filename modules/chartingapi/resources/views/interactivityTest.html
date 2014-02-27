@@ -1,0 +1,136 @@
+<div id="testDiv"></div>
+<script type="text/javascript">
+    LABKEY.requiresVisualization(function(){
+        var generateDataForPTID = function(id) {
+            var data = [];
+
+            // Step one: generate data for bottom left of chart.
+            for (var i = 0; i < 10; i++) {
+                data.push({
+                    ptid: id,
+                    x: (i * 15) + 50,
+                    y: (id * 22) + 25
+                });
+            }
+            // Step two: generate data for top right of chart.
+            for (var i = 0; i < 10; i++) {
+                data.push({
+                    ptid: id,
+                    x: (i * 15) + 500,
+                    y: (id * 22) + 500
+                });
+            }
+
+            return data;
+        };
+
+        var brushedData = [];
+
+        for (var i = 0; i < 20; i++) {
+            brushedData = brushedData.concat(generateDataForPTID(i));
+        }
+
+        // Tests brushing functionality and custom scales.
+        // Tests Issue 19455: JS error when mouseOutFn aes is removed via setAes call
+        var brushed = false;
+        var scatterPlotBrushing = new LABKEY.vis.Plot({
+            renderTo: 'testDiv',
+            rendererType: 'd3',
+            width: 900,
+            height: 500,
+            labels: {
+                main: {value: 'Interactive Plot'}
+            },
+            data: brushedData,
+            layers: [new LABKEY.vis.Layer({
+                geom: new LABKEY.vis.Geom.Point({})
+            })],
+            aes: {
+                x: 'x',
+                yLeft: 'y',
+                shape: 'ptid',
+                color: 'ptid',
+                mouseOverFn: function(event, data, layerSel) {
+                    if (brushed) {return;}
+                    var points = layerSel.selectAll('.point path');
+                    var colorScale = scatterPlotBrushing.scales.color.scale;
+                    var fillAcc = function(d) {
+                        if (d.ptid == data.ptid) {
+                            return '#01BFC2'
+                        }
+                        return colorScale(d.ptid);
+                    };
+                    var strokeAcc = function(d) {
+                        if (d.ptid == data.ptid) {
+                            return '#00EAFF';
+                        }
+                        return colorScale(d.ptid);
+                    };
+
+                    points.attr('fill', fillAcc).attr('stroke', strokeAcc);
+                },
+                mouseOutFn: function(event, data, layerSel) {
+                    if (brushed) {return;}
+                    var points = layerSel.selectAll('.point path');
+                    var colorScale = scatterPlotBrushing.scales.color.scale;
+                    var fillAcc = function(d) {
+                        return colorScale(d.ptid);
+                    };
+                    var strokeAcc = function(d) {
+                        return colorScale(d.ptid);
+                    };
+
+                    points.attr('fill', fillAcc).attr('stroke', strokeAcc);
+                }
+            },
+            scales: {
+                x: {scaleType: 'continuous', trans: 'linear', domain: [0, null]},
+                yLeft: {scaleType: 'continuous', trans: 'linear', domain: [0, null]},
+                color: {scaleType: 'discrete', range: LABKEY.vis.Scale.DataspaceColor()},
+                shape: {scaleType: 'discrete', range: LABKEY.vis.Scale.DataspaceShape()}
+            },
+            brushing: {
+                brushstart: function(event, data, extent, layerSelections) {
+                    brushed = true;
+                },
+                brush: function(event, data, extent, layerSelections) {
+                    var points = layerSelections[0].selectAll('.point path');
+                    var colorScale = scatterPlotBrushing.scales.color.scale;
+                    var colorAcc = function(d) {
+                        var x = d.x, y = d.y;
+                        d.isSelected = (x > extent[0][0] && x < extent[1][0] && y > extent[0][1] && y < extent[1][1])
+                        if (d.isSelected) {
+                            return '#14C9CC';
+                        }
+                        return colorScale(d.ptid);
+                    };
+                    var strokeAcc = function(d) {
+                        if (d.isSelected){
+                            return '#00393A';
+                        } else {
+                            return colorScale(d.ptid);
+                        }
+                    };
+                    var strokeWidthAcc = function(d) {
+                        if (d.isSelected){
+                            return .5;
+                        } else {
+                            return 1;
+                        }
+                    };
+                    points.attr('fill', colorAcc)
+                            .attr('stroke', strokeAcc)
+                            .attr('stroke-width', strokeWidthAcc);
+                },
+                brushend: function(){
+                    // TODO: pop up ext window with brush end message.
+                },
+                brushclear: function(event, data, layerSelections) {
+                    brushed = false;
+                    // TODO: pop up ext window with brush clear message.
+                }
+            }
+        });
+        scatterPlotBrushing.render();
+    });
+</script>
