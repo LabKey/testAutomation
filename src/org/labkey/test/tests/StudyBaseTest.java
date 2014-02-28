@@ -52,25 +52,6 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     abstract protected void doVerifySteps();
 
-
-    protected void setupSpecimenManagement()
-    {
-        clickFolder(getStudyLabel());
-        clickAndWait(Locator.linkWithText("Manage Study"));
-        clickAndWait(Locator.linkWithText("Manage Request Statuses"));
-        setFormElement("newLabel", "New Request");
-        clickButton("Save");
-        setFormElement("newLabel", "Processing");
-        clickButton("Save");
-        setFormElement("newLabel", "Completed");
-        checkCheckbox("newFinalState");
-        clickButton("Save");
-        setFormElement("newLabel", "Rejected");
-        checkCheckbox("newFinalState");
-        uncheckCheckbox("newSpecimensLocked");
-        clickButton("Done");
-    }
-
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/study";

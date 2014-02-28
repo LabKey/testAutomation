@@ -71,6 +71,23 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
         clickButton("Done");
     }
 
+    protected void setupSpecimenManagement()
+    {
+        goToManageStudy();
+        clickAndWait(Locator.linkWithText("Manage Request Statuses"));
+        setFormElement(Locator.name("newLabel"), "New Request");
+        clickButton("Save");
+        setFormElement(Locator.name("newLabel"), "Processing");
+        clickButton("Save");
+        setFormElement(Locator.name("newLabel"), "Completed");
+        checkCheckbox(Locator.name("newFinalState"));
+        clickButton("Save");
+        setFormElement(Locator.name("newLabel"), "Rejected");
+        checkCheckbox(Locator.name("newFinalState"));
+        uncheckCheckbox(Locator.name("newSpecimensLocked"));
+        clickButton("Done");
+    }
+
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/study";
@@ -340,5 +357,12 @@ public abstract class StudyBaseTestWD extends SimpleApiTestWD
     {
         goToManageStudy();
         waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
+    }
+
+    protected void goToAxisTab(String axisLabel)
+    {
+        // Workaround: (Selenium 2.33) Unable to click axis labels reliably for some reason. Use javascript
+        fireEvent(Locator.css("svg text").containing(axisLabel).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), SeleniumEvent.click);
+        waitForElement(Locator.ext4Button("Cancel")); // Axis label windows always have a cancel button. It should be the only one on the page
     }
 }

@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
@@ -29,7 +30,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 @Category({DailyA.class})
-public class StudyDatasetsTest extends StudyBaseTest
+public class StudyDatasetsTest extends StudyBaseTestWD
 {
     private static final String CATEGORY1 = "Category1";
     private static final String GROUP1A = "Group1A";
@@ -60,6 +61,11 @@ public class StudyDatasetsTest extends StudyBaseTest
             "a4\t4\tx4_merged\ty4_merged\tz4_merged\n" +
             "a4\t4\tx4_merged2\ty4_merged2\tz4_merged2\n";
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 
     @Override
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -91,14 +97,14 @@ public class StudyDatasetsTest extends StudyBaseTest
         verifyReportAndViewDatasetReferences();
 
         createDataset("B");
-        importDatasetData("B", DATASET_HEADER, DATASET_B_DATA, "QC States: All data");
+        importDatasetData("B", DATASET_HEADER, DATASET_B_DATA, "All data");
         checkDataElementsPresent("B",  DATASET_B_DATA.split("\t|\n"));
 
-        importDatasetData("B", DATASET_HEADER, DATASET_B_MERGE, "QC States: All data");
+        importDatasetData("B", DATASET_HEADER, DATASET_B_MERGE, "All data");
         checkDataElementsPresent("B", DATASET_B_MERGE.split("\t|\n"));
-        importDatasetData("B", DATASET_HEADER, DATASET_B_DUPE, "Only one row is allowed for each Mouse/Visit. Duplicates were found in the imported data.");
+        importDatasetData("B", DATASET_HEADER, DATASET_B_DUPE, "Only one row is allowed for each Mouse/Visit.  Duplicates were found in the imported data.");
         clickButton("Cancel");
-        waitForText("QC States: All data");
+        waitForText("All data");
         checkDataElementsPresent("B", DATASET_B_MERGE.split("\t|\n"));
     }
 
@@ -166,8 +172,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         click(Locator.xpath("//a[text()='" + dataSetName + "']"));
         waitForText("Dataset Properties");
         clickButtonContainingText("View Data");
-        //clickButton("View Data");
-        waitForText("QC States: All data");
+        waitForText("All data");
         clickButtonContainingText("Import Data");
         waitForText("Copy/paste text");
         setFormElement(Locator.xpath("//textarea"), header + tsv);
@@ -185,10 +190,10 @@ public class StudyDatasetsTest extends StudyBaseTest
         clickButton("Edit Definition");
 
         waitForElement(Locator.xpath("//div[@id='partdelete_2']"));
-        mouseClick(Locator.id("partdelete_2").toString());
+        click(Locator.id("partdelete_2"));
         clickButtonContainingText("OK", 0);
         waitForElement(Locator.xpath("//div[@id='partdelete_1']"));
-        mouseClick(Locator.id("partdelete_1").toString());
+        click(Locator.id("partdelete_1"));
 
         assertTextPresent("XTest");
         assertElementNotPresent(Locator.xpath("//input[@id='name1-input']"));
@@ -405,6 +410,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         }
         _customizeViewsHelper.openCustomizeViewPanel();
         assertTextNotPresent("not found", "Field not found");
+        _customizeViewsHelper.applyCustomView();
     }
 
     private void verifyTimeChart(String datasetName, String datasetLabel)
@@ -420,7 +426,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         assertTextPresent("Query Name:" + datasetName);
         assertTextNotPresent("Query Name:" + datasetLabel);
         clickButton("OK", 0);
-        waitAndClick(Locator.css("svg text:contains('APX Main Title')"));
+        goToAxisTab("APX Main Title");
         waitAndClick(Locator.xpath("//span[contains(@class, 'iconReload')]"));
         assertEquals(datasetLabel, getFormElement(Locator.name("chart-title-textfield")));
         clickButton("Cancel", 0);
@@ -435,7 +441,7 @@ public class StudyDatasetsTest extends StudyBaseTest
         _ext4Helper.waitForMaskToDisappear();
         assertTextNotPresent("An unexpected error occurred while retrieving data", "doesn't exist", "may have been deleted");
         // verify that the main title reset goes back to the dataset label - measue name
-        waitAndClick(Locator.css("svg text:contains('APX Main Title')"));
+        goToAxisTab("APX Main Title");
         setFormElement(Locator.name("chart-title-textfield"), "test");
         waitForElementToDisappear(Locator.xpath("//a[contains(@class, 'x4-btn-disabled')]//span[contains(@class, 'iconReload')]"));
         click(Locator.xpath("//span[contains(@class, 'iconReload')]"));

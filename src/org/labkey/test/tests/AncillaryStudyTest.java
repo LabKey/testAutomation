@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
@@ -35,7 +36,7 @@ import static org.junit.Assert.*;
  * Date: Sep 8, 2011
  */
 @Category({DailyB.class, Study.class})
-public class AncillaryStudyTest extends StudyBaseTest
+public class AncillaryStudyTest extends StudyBaseTestWD
 {
     private static final String PROJECT_NAME = "AncillaryStudyTest Project";
     private static final String STUDY_NAME = "Special Emphasis Study";
@@ -54,6 +55,12 @@ public class AncillaryStudyTest extends StudyBaseTest
                                                      PTIDS_BAD[0] + "\t" + SEQ_NUMBER;
     private final File PROTOCOL_DOC = new File( getLabKeyRoot() + getStudySampleDataPath() + "/Protocol.txt");
     private final File PROTOCOL_DOC2 = new File( getLabKeyRoot() + getStudySampleDataPath() + "/Protocol2.txt");
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -90,14 +97,16 @@ public class AncillaryStudyTest extends StudyBaseTest
         
         //Wizard page 1 - location
         _extHelper.waitForExtDialog("Create Ancillary Study");
-        clickAt(Locator.xpath("//label/span[text()='Protocol']"), "1,1");
+        click(Locator.xpath("//label/span[text()='Protocol']"));
         waitForElement(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and @class='g-tip-header']//span[text()='Protocol Document']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement("studyName", getFolderName());
-        setFormElement("studyDescription", STUDY_DESCRIPTION);
+        setFormElement(Locator.name("studyName"), getFolderName());
+        setFormElement(Locator.name("studyDescription"), STUDY_DESCRIPTION);
         assertTrue(PROTOCOL_DOC.exists());
-        setFormElement("protocolDoc", PROTOCOL_DOC);
+        setFormElement(Locator.name("protocolDoc"), PROTOCOL_DOC);
         clickButton("Change", 0);
-        selenium.doubleClick(Locator.xpath(_extHelper.getExtDialogXPath("Create Ancillary Study") + "//span[string() = '"+PROJECT_NAME+"']").toString());
+        Locator projectTreeNode = Locator.tagWithClass("a", "x-tree-node-anchor").withDescendant(Locator.tagWithText("span", PROJECT_NAME));
+        sleep(1000); // sleep while the tree expands
+        doubleClick(projectTreeNode);
         clickButton("Next", 0);
 
         //Wizard page 2 - participant group
@@ -109,14 +118,13 @@ public class AncillaryStudyTest extends StudyBaseTest
         log("Check participant group.");
         Locator.XPathLocator ptidLocator = Locator.xpath("//div[not(contains(@style, 'display: none;'))]/span[contains(@class, 'testParticipantGroups')]");
         waitForElement(ptidLocator, WAIT_FOR_JAVASCRIPT);
-        assertEquals("Did not find expected number of participants", PTIDS.length, getXpathCount(ptidLocator));
+        assertEquals("Did not find expected number of participants", PTIDS.length, getElementCount(ptidLocator));
         for (String ptid : PTIDS)
         {
             assertElementPresent(Locator.xpath("//div[not(contains(@style, 'display: none;'))]/span[@class='testParticipantGroups' and text() = '" + ptid + "']"));
         }
 
-//        _extHelper.selectExt4GridItem(null, null, 0, "studyWizardParticipantList", false); //WebDriver
-        selenium.getEval("selenium.selectExtGridItem(null, null, 0, 'studyWizardParticipantList', false)");
+        _extHelper.selectExtGridItem(null, null, 0, "studyWizardParticipantList", false);
 
         // kbl: commented out current wizard only allows existing participant groups or all participants (although this could change)
 /*
@@ -137,20 +145,20 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         //Wizard page 3 - select datasets
         waitForElement(Locator.xpath("//div[contains(@class, 'studyWizardDatasetList')]"), WAIT_FOR_JAVASCRIPT);
-        clickAt(Locator.xpath("//label/span[text()='Data Refresh:']"), "1,1");
+        click(Locator.xpath("//label/span[text()='Data Refresh:']"));
         waitForElement(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and @class='g-tip-header']//span[text()='Data Refresh']"), WAIT_FOR_JAVASCRIPT);
         for(int i = 0; i < DATASETS.length; i++)
         {
-            selenium.getEval("selenium.selectExtGridItem('Label', '"+DATASETS[i]+"', -1, 'studyWizardDatasetList', true)");
+            _extHelper.selectExtGridItem("Label", DATASETS[i], -1, "studyWizardDatasetList", true);
         }
-        assertWizardError("Finish", "An error occurred trying to create the study: A study already exists in the destination folder.");
+        assertWizardError("Finish", "A study already exists in the destination folder.");
 
         clickButton("Previous", 0);
         clickButton("Previous", 0);
-        setFormElement("studyName", STUDY_NAME);
+        setFormElement(Locator.name("studyName"), STUDY_NAME);
         clickButton("Next", 0);
         clickButton("Next", 0);
-        checkRadioButton("autoRefresh", "false");
+        checkCheckbox(Locator.radioButtonByNameAndValue("autoRefresh", "false"));
         clickButton("Finish");
 
         waitForPipelineJobsToFinish(3);
@@ -166,14 +174,14 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         for( String str : DATASETS )
         {
-            assertLinkPresentWithText(str);
+            assertElementPresent(Locator.linkWithText(str));
         }
 
         clickAndWait(Locator.linkWithText("Mice"));
         waitForText(PTIDS[0]);
         for( String str : PTIDS )
         {
-            assertLinkPresentWithText(str);
+            assertElementPresent(Locator.linkWithText(str));
         }
         assertTextPresent("10 mice");
 
@@ -223,14 +231,13 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify changes in Ancillary Study. (insert)");
         clickFolder(STUDY_NAME);
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        goToManageDatasets();
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Update Snapshot", 0);
-        assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
-        waitForPageToLoad();
+        assertAlert("Updating will replace all existing data with a new set of data. Continue?");
+        waitForElement(Locator.tagWithClass("table", "labkey-data-region"));
         DataRegionTable table = new DataRegionTable("Dataset", this, true, true);
         assertEquals("Dataset does not reflect changes in source study.", 21, table.getDataRowCount());
         assertTextPresent(SEQ_NUMBER + ".0");
@@ -246,14 +253,13 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify changes in Ancillary Study. (modify)");
         clickFolder(STUDY_NAME);
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        goToManageDatasets();
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Update Snapshot", 0);
-        assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
-        waitForPageToLoad();
+        assertAlert("Updating will replace all existing data with a new set of data. Continue?");
+        waitForElement(Locator.tagWithClass("table", "labkey-data-region"));
         table = new DataRegionTable("Dataset", this, true, true);
         assertEquals("Dataset does not reflect changes in source study.", 21, table.getDataRowCount());
         assertTextPresent(SEQ_NUMBER2 + ".0");
@@ -264,19 +270,19 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         checkCheckbox(".select", 1);
-        clickButton("Delete");
-        assertConfirmation("Delete selected row from this dataset?");
+        clickButton("Delete", 0);
+        assertAlert("Delete selected row from this dataset?");
+        waitForElement(Locator.paginationText(48));
 
         log("Verify changes in Ancillary Study. (delete)");
         clickFolder(STUDY_NAME);
-        clickTab("Manage");
-        clickAndWait(Locator.linkWithText("Manage Datasets"));
+        goToManageDatasets();
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
         clickMenuButton("Views", "Edit Snapshot");
         clickButton("Update Snapshot", 0);
-        assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
-        waitForPageToLoad();
+        assertAlert("Updating will replace all existing data with a new set of data. Continue?");
+        waitForElement(Locator.tagWithClass("table", "labkey-data-region"));
         table = new DataRegionTable("Dataset", this, true, true);
         assertEquals("Dataset does not reflect changes in source study.", 20, table.getDataRowCount());
         assertTextNotPresent(SEQ_NUMBER + ".0", SEQ_NUMBER2 + ".0");
@@ -291,14 +297,14 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickAndWait(Locator.xpath("//a[./img[@title='Edit']]"));
 
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
-        setFormElement("Label", "Extra " + STUDY_NAME);
-        setFormElement("Description", "Extra " + STUDY_DESCRIPTION);
-        click(Locator.linkWithText("Attach a file"));
+        setFormElement(Locator.name("Label"), "Extra " + STUDY_NAME);
+        setFormElement(Locator.name("Description"), "Extra " + STUDY_DESCRIPTION);
+        click(Locator.imageWithSrc("/labkey/_images/paperclip.gif", false)); //Attach a file
         waitForElement(Locator.xpath("//div[contains(@class, 'protocolPanel')]//input[@type='file']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//div[contains(@class, 'protocolPanel')]//input[@type='file']"), PROTOCOL_DOC2.toString());
         clickButton("Submit");
-        assertLinkPresentWithText(PROTOCOL_DOC.getName());
-        assertLinkPresentWithText(PROTOCOL_DOC2.getName());
+        assertElementPresent(Locator.linkWithText(PROTOCOL_DOC.getName()));
+        assertElementPresent(Locator.linkWithText(PROTOCOL_DOC2.getName()));
         assertTextPresent("Protocol documents:");
         assertTextPresent("Extra " + STUDY_NAME);
         assertTextPresent("Extra " + STUDY_DESCRIPTION);
@@ -321,13 +327,13 @@ public class AncillaryStudyTest extends StudyBaseTest
         }
         for(String dataset : DEPENDENT_DATASETS)
         {
-            assertLinkPresentWithText(dataset);
+            assertElementPresent(Locator.linkWithText(dataset));
         }
         clickAndWait(Locator.linkWithText(DEPENDENT_DATASETS[0]));
         assertTextNotPresent(UPDATED_DATASET_VAL);
         clickMenuButton("Views", "Edit Snapshot");
-        clickButton("Update Snapshot");
-        assertConfirmation("Updating will replace all existing data with a new set of data. Continue?");
+        clickButton("Update Snapshot", 0);
+        assertAlert("Updating will replace all existing data with a new set of data. Continue?");
         assertTextPresent(UPDATED_DATASET_VAL);
     }
 
@@ -335,13 +341,13 @@ public class AncillaryStudyTest extends StudyBaseTest
     {
         log("Verify copied specimens");
         clickFolder(STUDY_NAME);
-        clickAndWait(Locator.linkWithText("Specimen Data"));
-        clickAndWait(Locator.linkWithText("By Vial Group"));
+        waitAndClickAndWait(Locator.linkWithText("Specimen Data"));
+        waitAndClickAndWait(Locator.linkWithText("By Vial Group"));
         DataRegionTable table = new DataRegionTable("SpecimenSummary", this, false, true);
         assertEquals("Did not find expected number of specimens.", specimenCount, table.getDataRowCount() - 1); // n specimens + 1 total row
         assertEquals("Incorrect total vial count.", String.valueOf(vialCount), table.getDataAsText(specimenCount, "Vial Count"));
-        clickAndWait(Locator.linkWithText("Specimen Data"));
-        clickAndWait(Locator.linkWithText("By Individual Vial"));
+        waitAndClickAndWait(Locator.linkWithText("Specimen Data"));
+        waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
         table = new DataRegionTable("SpecimenDetail", this, false, true);
         assertEquals("Did not find expected number of vials.", vialCount, table.getDataRowCount() - 1); // m vials + 1 total row
 

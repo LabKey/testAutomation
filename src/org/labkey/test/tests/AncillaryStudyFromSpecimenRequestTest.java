@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 
@@ -25,7 +26,7 @@ import org.labkey.test.categories.DailyB;
  * Time: 12:52 PM
  */
 @Category({DailyB.class})
-public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
+public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTestWD
 {
     public static final String DOV_DATASET = "DOV-1:";
     protected String ANCILLARY_STUDY_NAME = "Anc Study" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
@@ -45,7 +46,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         log("here");
         setupSpecimenManagement();
         clickTab("Specimen Data");
-        clickAndWait(Locator.linkWithText("By Individual Vial"));
+        waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
         
         selectSpecimens();
         createRequest();
@@ -76,7 +77,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 
         Locator datasetRow = Locator.tagContainingText("div", DOV_DATASET);
         waitForElement(datasetRow);
-        clickAt(datasetRow, "1,1");
+        click(datasetRow);
         clickButton("Finish");
         waitForPipelineJobsToFinish(3);
     }
@@ -99,5 +100,11 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
         {
             checkCheckboxByNameInDataRegion(specimen);
         }
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

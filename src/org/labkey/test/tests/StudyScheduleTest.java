@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
@@ -31,7 +32,7 @@ import static org.junit.Assert.*;
  * Date: Feb 24, 2012
  */
 @Category({DailyA.class})
-public class StudyScheduleTest extends StudyBaseTest
+public class StudyScheduleTest extends StudyBaseTestWD
 {
     // dataset names
     private static final String IMPORT_DATASET = "ImportDataset";
@@ -63,6 +64,12 @@ public class StudyScheduleTest extends StudyBaseTest
 
     private String _folderName = getFolderName();
     private String _sampleDataPath = getStudySampleDataPath();
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 
     @Override @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doCreateSteps()
@@ -115,7 +122,7 @@ public class StudyScheduleTest extends StudyBaseTest
         // verify dataset 'data' link
         goToStudySchedule();
         click(Locator.xpath("//div[@data-qtip='" + dataset + "']//..//..//..//td[3]//a")); // go to dataset
-        waitForPageToLoad();
+        waitForElement(Locator.tagWithClass("table", "labkey-data-region"));
         waitForText(dataset);
 
         // test paging
@@ -148,7 +155,7 @@ public class StudyScheduleTest extends StudyBaseTest
 
         // click on the dataset link to verify it takes you to the dataset view
         click(Locator.xpath("//div[text() = '" + IMPORT_DATASET + "']/../../../td//a"));
-        waitForPageToLoad();
+        waitForElement(Locator.tagWithClass("table", "labkey-data-region"));
         assertTextPresent("Dataset:", IMPORT_DATASET);
         goToStudySchedule();
 
@@ -173,7 +180,7 @@ public class StudyScheduleTest extends StudyBaseTest
 
         // click on the dataset link to verify it takes you to the dataset view
         click(Locator.xpath("//div[text() = '" + GHOST_DATASET_1 + "']/../../../td//a"));
-        waitForPageToLoad();
+        waitForElement(Locator.tagWithClass("table", "labkey-data-region"));
         assertTextPresent("Dataset:", GHOST_DATASET_1);
         goToStudySchedule();
 
@@ -189,7 +196,7 @@ public class StudyScheduleTest extends StudyBaseTest
 
         // click on the dataset link to verify it takes you to the dataset view
         click(Locator.xpath("//div[text() = '" + GHOST_DATASET_3 + "']/../../../td//a"));
-        waitForPageToLoad();
+        waitForElement(Locator.tagWithClass("table", "labkey-data-region"));
         assertTextPresent("Dataset:", GHOST_DATASET_3);
     }
 
@@ -207,10 +214,14 @@ public class StudyScheduleTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
 
         linkDatasetFromDetails(GHOST_DATASET_4, DatasetType.linkeToExisting, "CPS-1: Screening Chemistry Panel");
+        waitForElement(Locator.navButton("Edit Definition"));
+        goToManageDatasets();
         assertElementPresent(Locator.linkWithText(GHOST_DATASET_4));
         assertElementNotPresent(Locator.linkWithText("CPS-1: Screening Chemistry Panel"));
         linkDatasetFromDetails(GHOST_DATASET_5, DatasetType.defineManually, null);
+        goToManageDatasets();
         linkDatasetFromDetails(GHOST_DATASET_6, DatasetType.importFromFile, null);
+        goToManageDatasets();
     }
 
     @LogMethod
@@ -297,7 +308,6 @@ public class StudyScheduleTest extends StudyBaseTest
         Locator link = Locator.xpath("//div[text() = '" + name + "']/../../../td//img[@alt='link data']/../..//div");
         assertElementPresent(link);
 
-        mouseClick(link.toString());
         click(link);
         log("show define dataset dialog");
         _extHelper.waitForExtDialog("Define Dataset");
@@ -316,9 +326,6 @@ public class StudyScheduleTest extends StudyBaseTest
         waitForElement(Locator.xpath("//div[contains(@class, 'x4-form-display-field')][text()='Define " + name + "']"), StudyBaseTest.WAIT_FOR_JAVASCRIPT);
 
         linkDataset(name, type, targetDataset);
-
-        clickTab("Manage");
-        clickAndWait(Locator.linkContainingText("Manage Datasets"));
     }
 
     @LogMethod
