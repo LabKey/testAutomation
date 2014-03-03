@@ -383,7 +383,7 @@ public class ChartingAPITest extends ClientAPITest
         assertEquals("Related point had an unexpected stroke color.", ARROW_COLOR, points.get(381).getAttribute("stroke"));
     }
 
-    @Test
+    @Test @Ignore
     public void brushingTest()
     {
         Actions builder = new Actions(getDriver());
