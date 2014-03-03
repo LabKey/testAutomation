@@ -272,6 +272,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     {
         _helper.goToLabHome();
         log("Validating client-side date parsing");
+        log("Client timezone: " + executeScript("return Ext4.Date.getTimezone(new Date());") + " / " + executeScript("return Ext4.Date.getGMTOffset(new Date());"));
+        log("Server timezone: " + Calendar.getInstance().getTimeZone().getDisplayName(false, TimeZone.SHORT) + " / " + (Calendar.getInstance().getTimeZone().getRawOffset() / (1000 * 60 * 60)));
 
         String dateFormat1 = "yyyy-MM-dd";
         checkDate("2011-03-04", dateFormat1);
