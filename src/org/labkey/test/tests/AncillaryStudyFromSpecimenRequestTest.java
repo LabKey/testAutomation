@@ -59,7 +59,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTestWD
         clickFolder(ANCILLARY_STUDY_NAME);
         assertTextPresent(ANCILLARY_STUDY_DESC);
         clickTab("Mice");
-        assertTextPresent("Showing all " + specimensToSelect.length + " mice");
+        waitForText("Found " + specimensToSelect.length + " mice of " + specimensToSelect.length);
         assertTextPresent(specimensToSelect);
 
         clickTab("Manage");
