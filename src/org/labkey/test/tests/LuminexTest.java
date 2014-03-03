@@ -85,7 +85,8 @@ public class LuminexTest extends AbstractQCAssayTest
     private static final String THAW_LIST_NAME = "LuminexThawList";
     private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
 
-    protected static final String RTRANSFORM_SCRIPT_FILE1 = "/resources/transformscripts/tomaras_luminex_transform.R";
+    protected static final String RTRANSFORM_SCRIPT_FILE_LABKEY = "/resources/transformscripts/labkey_luminex_transform.R";
+    protected static final String RTRANSFORM_SCRIPT_FILE_LAB = "/resources/transformscripts/tomaras_luminex_transform.R";
     private static final String[] RTRANS_FIBKGDBLANK_VALUES = {"-50.5", "-70.0", "25031.5", "25584.5", "391.5", "336.5", "263.8", "290.8",
             "35.2", "35.2", "63.0", "71.0", "-34.0", "-33.0", "-29.8", "-19.8", "-639.8", "-640.2", "26430.8", "26556.2", "-216.2", "-204.2", "-158.5",
             "-208.0", "-4.0", "-4.0", "194.2", "198.8", "-261.2", "-265.2", "-211.5", "-213.0"};
@@ -219,7 +220,8 @@ public class LuminexTest extends AbstractQCAssayTest
             // add batch properties for transform and Ruminex version numbers
             _listHelper.addField("Batch Fields", 5, "Network", "Network", ListColumnType.String);
             _listHelper.addField("Batch Fields", 6, "TransformVersion", "Transform Script Version", ListColumnType.String);
-            _listHelper.addField("Batch Fields", 7, "RuminexVersion", "Ruminex Version", ListColumnType.String);
+            _listHelper.addField("Batch Fields", 7, "LabTransformVersion", "Lab Transform Script Version", ListColumnType.String);
+            _listHelper.addField("Batch Fields", 8, "RuminexVersion", "Ruminex Version", ListColumnType.String);
 
             // add run properties for designation of which field to use for curve fit calc in transform
             _listHelper.addField("Run Fields", 8, "SubtBlankFromAll", "Subtract Blank Bead from All Wells", ListColumnType.Boolean);
@@ -1239,7 +1241,8 @@ public class LuminexTest extends AbstractQCAssayTest
         // add the R transform script to the assay
         goToTestAssayHome();
         clickEditAssayDesign(false);
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB), 1);
 
         // save changes to assay design
         clickButton("Save & Close");
@@ -1278,6 +1281,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
         DataRegionTable table = new DataRegionTable("Runs", this);
         assertEquals("Unexpected Transform Script Version number", "7.0.20140207", table.getDataAsText(0, "Transform Script Version"));
+        assertEquals("Unexpected Lab Transform Script Version number", "1.0.20140228", table.getDataAsText(0, "Lab Transform Script Version"));
         assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
 
         // verify that the lot number value are as expected
@@ -1381,7 +1385,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // add the R transform script to the assay
         goToTestAssayHome();
         clickEditAssayDesign(false);
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE1), 0);
+        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
         _listHelper.addField("Batch Fields", 8, "CustomProtocol", "Protocol", ListColumnType.String);
         // save changes to assay design
         clickButton("Save & Close");
