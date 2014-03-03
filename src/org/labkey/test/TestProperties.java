@@ -60,7 +60,7 @@ public abstract class TestProperties
 
     public static boolean isTestRunningOnTeamCity()
     {
-        return System.getProperty("teamcity.buildType.id") != null;
+        return !System.getProperty("teamcity.buildType.id").equals("${teamcity.buildType.id}");
     }
 
     public static boolean isLeakCheckSkipped()
