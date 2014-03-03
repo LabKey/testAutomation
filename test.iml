@@ -136,7 +136,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/selenium-server-standalone-2.39.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/selenium-server-standalone-2.40.0.jar!/" />
         </CLASSES>
         <JAVADOC>
           <root url="http://selenium.googlecode.com/svn/trunk/docs/api/java/index.html" />

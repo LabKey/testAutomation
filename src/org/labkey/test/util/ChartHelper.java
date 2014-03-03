@@ -17,7 +17,6 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
-import org.openqa.selenium.internal.seleniumemulation.WaitForPageToLoad;
 
 import java.util.Map;
 

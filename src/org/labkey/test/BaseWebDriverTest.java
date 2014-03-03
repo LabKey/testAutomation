@@ -66,7 +66,7 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverBackedSelenium;
+import com.thoughtworks.selenium.webdriven.WebDriverBackedSelenium;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -343,7 +343,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
                     prefs.put("download.prompt_for_download", "false");
                     prefs.put("download.default_directory", getDownloadDir().getCanonicalPath());
-                    options.setExperimentalOptions("prefs", prefs);
+                    options.setExperimentalOption("prefs", prefs);
 
                     if (isScriptCheckEnabled())
                     {
