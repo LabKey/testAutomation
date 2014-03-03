@@ -23,9 +23,11 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.NoSuchElementException;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -307,84 +309,81 @@ public class NabAssayTest extends AbstractQCAssayTestWD
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
 
         log("Uploading NAb Runs");
-        clickButton("Import Data");
-        clickButton("Next");
+        importData(
+                new AssayImportOptions.ImportOptionsBuilder().
+                        assayId("ptid + visit").
+                        visitResolver(AssayImportOptions.VisitResolverType.ParticipantVisit).
+                        cutoff1("50").
+                        cutoff2("70").
+                        virusName("Nasty Virus").
+                        virusId("5433211").
+                        curveFitMethod("Polynomial").
+                        ptids(new String[]{"ptid 1 A", "ptid 2 A", "ptid 3 A", "ptid 4 A", "ptid 5 A"}).
+                        visits(new String[]{"1", "2", "3", "4", "5"}).
+                        initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
+                        dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
+                        methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
+                        filePath(TEST_ASSAY_NAB_FILE1).
+                        build()
+        );
 
-        setFormElement(Locator.name("cutoff1"), "50");
-        setFormElement(Locator.name("cutoff2"), "70");
-        setFormElement(Locator.name("virusName"), "Nasty Virus");
-        setFormElement(Locator.name("virusID"), "5433211");
-        selectOptionByText(Locator.name("curveFitMethod"), "Polynomial");
+        importData(
+                new AssayImportOptions.ImportOptionsBuilder().
+                        assayId("ptid + date").
+                        visitResolver(AssayImportOptions.VisitResolverType.ParticipantDate).
+                        cutoff1("50").
+                        cutoff2("80").
+                        virusName("Nasty Virus").
+                        virusId("5433211").
+                        curveFitMethod("Five Parameter").
+                        ptids(new String[]{"ptid 1 C", "ptid 2 C", "ptid 3 C", "ptid 4 C", "ptid 5 C"}).
+                        dates(new String[]{"2014/2/28", "2014/2/28", "2014/2/28", "2014/2/28", "2014/2/28"}).
+                        initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
+                        dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
+                        methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
+                        filePath(TEST_ASSAY_NAB_FILE2).
+                        build()
+        );
 
-        for (int i = 0; i < 5; i++)
-        {
-            setFormElement(Locator.name("specimen" + (i + 1) + "_ParticipantID"), "ptid " + (i + 1));
-            setFormElement(Locator.name("specimen" + (i + 1) + "_VisitID"), "" + (i + 1));
-            setFormElement(Locator.name("specimen" + (i + 1) + "_InitialDilution"), "20");
-            setFormElement(Locator.name("specimen" + (i + 1) + "_Factor"), "3");
-            selectOptionByText(Locator.name("specimen" + (i + 1) + "_Method"), "Dilution");
-        }
+        importData(
+                new AssayImportOptions.ImportOptionsBuilder().
+                        assayId("ptid + visit + date").
+                        visitResolver(AssayImportOptions.VisitResolverType.ParticipantVisitDate).
+                        cutoff1("50").
+                        cutoff2("80").
+                        virusName("Nasty Virus").
+                        virusId("5433211").
+                        curveFitMethod("Four Parameter").
+                        ptids(new String[]{"ptid 1 B", "ptid 2 B", "ptid 3 B", "ptid 4 B", "ptid 5 B"}).
+                        visits(new String[]{"1", "2", "3", "4", "5"}).
+                        dates(new String[]{"2014/2/28", "2014/2/28", "2014/2/28", "2014/2/28", "2014/2/28"}).
+                        initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
+                        dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
+                        methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
+                        filePath(TEST_ASSAY_NAB_FILE3).
+                        build()
+        );
 
-        uploadFile(TEST_ASSAY_NAB_FILE1, "A", "Save and Import Another Run");
-        assertTextPresent("Upload successful.");
+        importData(
+                new AssayImportOptions.ImportOptionsBuilder().
+                        assayId("ptid + visit + specimenid").
+                        visitResolver(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit).
+                        cutoff1("50").
+                        cutoff2("80").
+                        virusName("Nasty Virus").
+                        virusId("5433211").
+                        curveFitMethod("Five Parameter").
+                        ptids(new String[]{"ptid 1 D", "ptid 2 D", "ptid 3 D", "ptid 4 D", "ptid 5 D"}).
+                        visits(new String[]{"1", "2", "3", "4", "5"}).
+                        sampleIds(new String[]{"sample1", "sample2", "sample3", "sample4", "sample5"}).
+                        initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
+                        dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
+                        methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
+                        filePath(TEST_ASSAY_NAB_FILE4).
+                        build()
+        );
 
-        setFormElement(Locator.name("cutoff2"), "80");
-        selectOptionByText(Locator.name("curveFitMethod"), "Four Parameter");
-        uploadFile(TEST_ASSAY_NAB_FILE2, "B", "Save and Import Another Run");
-        assertTextPresent("Upload successful.");
-
-        selectOptionByText(Locator.name("curveFitMethod"), "Five Parameter");
-        uploadFile(TEST_ASSAY_NAB_FILE3, "C", "Save and Finish");
-        //uploadFile(TEST_ASSAY_NAB_FILE4, "D");
-        //uploadFile(TEST_ASSAY_NAB_FILE5, "E");
-
-        assertTextPresent("Virus Name", "Nasty Virus", "ptid 1 C, Vst 1.0");
-        assertTextPresent("&lt; 20", 10);
-
-        // check for the first dilution for the second participant:
-        String nabData = getText(Locator.id("bodypanel"));
-        assertTrue(nabData.contains("561"));      // Five Parameter IC50
-        assertTrue(nabData.contains("0.077"));    // Five PL AUC
-        assertTrue(nabData.contains("0.081"));    // Five PL posAUC
-        assertFalse(nabData.contains("503"));      // Polynomial IC50
-        assertFalse(nabData.contains("461"));      // Four parameter IC50
-
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Four Parameter");
-        nabData = getText(Locator.id("bodypanel"));
-        assertTrue(nabData.contains("461"));      // Four parameter IC50
-        assertTrue(nabData.contains("0.043"));    // 4PL AUC/PosAUC
-        assertFalse(nabData.contains("561"));      // Five Parameter IC50
-        assertFalse(nabData.contains("503"));      // Polynomial IC50
-        assertFalse(nabData.contains("0.077"));    // Five PL AUC
-
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Polynomial");
-        nabData = getText(Locator.id("bodypanel"));
-        assertTrue(nabData.contains("503"));      // Polynomial IC50:
-        assertTrue(nabData.contains("0.054"));    // Polynomial AUC:
-        assertTrue(nabData.contains("0.055"));    // Polynomial posAUC:
-        assertFalse(nabData.contains("561"));      // Five Parameter IC50
-        assertFalse(nabData.contains("461"));      // Four parameter IC50
-        assertFalse(nabData.contains("0.077"));    // Five PL AUC
-        assertFalse(nabData.contains("0.043"));    // 4PL AUC/PosAUC
-
-        log("Verify different graph sizes");
-        Locator nabGraph = Locator.tagWithAttribute("img", "alt", "Neutralization Graph");
-        // Defaults to Small sized graphs
-        Number graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
-        assertEquals("Graphs aren't the correct size (Large)", 300, graphHeight);
-
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Large");
-        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
-        assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
-
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Medium");
-        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
-        assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
-
-        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Small");
-        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
-        assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
-
+        verifyRunDetails();
         // Test editing runs
         // Set the design to allow editing
         clickAndWait(Locator.linkWithText("View Runs"));
@@ -421,7 +420,7 @@ public class NabAssayTest extends AbstractQCAssayTestWD
         assertTextPresent("Run edited",
                 "Plate Number changed from blank to 'EditedPlateNumber'",
                 "Host Cell changed from blank to 'EditedHostCell'",
-                "Name changed from 'm0902055;4001.xlsx' to 'NameEdited.xlsx'");
+                "Name changed from 'ptid + visit + specimenid' to 'NameEdited.xlsx'");
 
         // Return to the run list
         clickFolder(TEST_ASSAY_FLDR_NAB);
@@ -439,6 +438,8 @@ public class NabAssayTest extends AbstractQCAssayTestWD
         clickAndWait(Locator.linkWithText("View Results"));
         assertAUCColumnsHidden();
         addAUCColumns();
+
+        executeScript("LABKEY.DataRegions['Data'].clearAllFilters();");
         assertAliasedAUCCellData();
 
         setFilter("Data", "SpecimenLsid/Property/ParticipantID", "Equals", "ptid 1 C");
@@ -588,22 +589,82 @@ public class NabAssayTest extends AbstractQCAssayTestWD
         setSource("runNabAssayTest({renderTo : 'testDiv'})", false);
     }
 
-
-    private void uploadFile(String filePath, String uniqueifier, String finalButton)
+    /**
+     * Import a new run into this assay
+     */
+    private void importData(AssayImportOptions options)
     {
-        for (int i = 0; i < 5; i++)
+        Locator.XPathLocator buttonLocator = getButtonLocator("Import Data");
+        Locator linkLocator = Locator.linkContainingText("Import Data");
+        if (buttonLocator != null && isElementPresent(buttonLocator))
+            clickAndWait(buttonLocator);
+        else if (isElementPresent(linkLocator))
+            clickAndWait(linkLocator);
+        else
+            fail("No Import Data button available");
+
+        if (options.getVisitResolver() == AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit)
         {
-            setFormElement(Locator.name("specimen" + (i + 1) + "_ParticipantID"), "ptid " + (i + 1) + " " + uniqueifier);
-            setFormElement(Locator.name("specimen" + (i + 1) + "_VisitID"), "" + (i + 1));
-            setFormElement(Locator.name("specimen" + (i + 1) + "_InitialDilution"), "20");
-            setFormElement(Locator.name("specimen" + (i + 1) + "_Factor"), "3");
-            selectOptionByText(Locator.name("specimen" + (i + 1) + "_Method"), "Dilution");
+            checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
+            Locator checkBox = Locator.checkboxByName("includeParticipantAndVisit");
+            waitForElement(checkBox);
+            checkCheckbox(checkBox);
+        }
+        else
+            checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", options.getVisitResolver().name()));
+        clickButton("Next");
+
+        if (options.getAssayId() != null)
+            setFormElement(Locator.name("name"), options.getAssayId());
+
+        setFormElement(Locator.name("cutoff1"), options.getCutoff1());
+        setFormElement(Locator.name("cutoff2"), options.getCutoff2());
+        if (options.getCutoff3() != null)
+            setFormElement(Locator.name("cutoff3"), options.getCutoff3());
+
+        setFormElement(Locator.name("virusName"), options.getVirusName());
+        setFormElement(Locator.name("virusID"), options.getVirusId());
+        selectOptionByText(Locator.name("curveFitMethod"), options.getCurveFitMethod());
+
+        // populate the sample well group information
+        for (int i=0; i < options.getPtids().length; i++)
+        {
+            setFormElement(Locator.name("specimen" + (i + 1) + "_ParticipantID"), options.getPtids()[i]);
         }
 
-        File file1 = new File(filePath);
+        for (int i=0; i < options.getVisits().length; i++)
+        {
+            setFormElement(Locator.name("specimen" + (i + 1) + "_VisitID"), options.getVisits()[i]);
+        }
+
+        for (int i=0; i < options.getInitialDilutions().length; i++)
+        {
+            setFormElement(Locator.name("specimen" + (i + 1) + "_InitialDilution"), options.getInitialDilutions()[i]);
+        }
+
+        for (int i=0; i < options.getDilutionFactors().length; i++)
+        {
+            setFormElement(Locator.name("specimen" + (i + 1) + "_Factor"), options.getDilutionFactors()[i]);
+        }
+
+        for (int i=0; i < options.getMethods().length; i++)
+        {
+            selectOptionByText(Locator.name("specimen" + (i + 1) + "_Method"), options.getMethods()[i]);
+        }
+
+        for (int i=0; i < options.getDates().length; i++)
+        {
+            setFormElement(Locator.name("specimen" + (i + 1) + "_Date"), options.getDates()[i]);
+        }
+
+        for (int i=0; i < options.getSampleIds().length; i++)
+        {
+            setFormElement(Locator.name("specimen" + (i + 1) + "_SpecimenID"), options.getSampleIds()[i]);
+        }
+
+        File file1 = new File(options.getFilePath());
         setFormElement(Locator.name("__primaryFile__"), file1);
-//        setFormElement(Locator.name("dataCollectorName"), "File upload");
-        clickButton(finalButton, 60000);
+        clickButton("Save and Finish", 60000);
     }
 
     private void assertStudyData(int ptidCount)
@@ -720,13 +781,13 @@ public class NabAssayTest extends AbstractQCAssayTestWD
             assertEquals(table.getDataAsText(i, CURVE_IC50_COL_TITLE), table.getDataAsText(i, CURVE_IC50_POLY_COL_TITLE)); //Curve IC50 = Curve_IC50_poly
             assertEquals(table.getDataAsText(i, CURVE_IC70_COL_TITLE), table.getDataAsText(i, CURVE_IC70_POLY_COL_TITLE)); //Curve IC70 = Curve_IC70_poly
         }
-        for(int i = 5; i < 10; i++)
+        for(int i = 10; i < 15; i++)
         {
             assertEquals(table.getDataAsText(i, AUC_COL_TITLE),        table.getDataAsText(i, AUC_4PL_COL_TITLE));        //AUC = AUC_4pl
             assertEquals(table.getDataAsText(i, CURVE_IC50_COL_TITLE), table.getDataAsText(i, CURVE_IC50_4PL_COL_TITLE)); //Curve IC50 = Curve_IC50_4pl
             assertEquals(table.getDataAsText(i, CURVE_IC80_COL_TITLE), table.getDataAsText(i, CURVE_IC80_4PL_COL_TITLE)); //Curve IC80 = Curve_IC80_4pl
         }
-        for(int i = 10; i < 15; i++)
+        for(int i = 5; i < 10; i++)
         {
             assertEquals(table.getDataAsText(i, AUC_COL_TITLE),        table.getDataAsText(i, AUC_5PL_COL_TITLE));        //AUC = AUC_5pl
             assertEquals(table.getDataAsText(i, CURVE_IC50_COL_TITLE), table.getDataAsText(i, CURVE_IC50_5PL_COL_TITLE)); //Curve IC50 = Curve_IC50_5pl
@@ -794,14 +855,21 @@ public class NabAssayTest extends AbstractQCAssayTestWD
 
         clickFolder(TEST_ASSAY_FLDR_NAB);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
-        clickButton("Import Data");
-        clickButton("Next");
-
-        setFormElement(Locator.name("name"), "transformed assayId");
-        setFormElement(Locator.name("cutoff1"), "50");
-        setFormElement(Locator.name("cutoff2"), "80");
-        selectOptionByText(Locator.name("curveFitMethod"), "Polynomial");
-        uploadFile(TEST_ASSAY_NAB_FILE1, "E", "Save and Finish");
+        importData(
+                new AssayImportOptions.ImportOptionsBuilder().
+                        assayId("transformed assayId").
+                        visitResolver(AssayImportOptions.VisitResolverType.ParticipantVisit).
+                        cutoff1("50").
+                        cutoff2("80").
+                        curveFitMethod("Polynomial").
+                        ptids(new String[]{"ptid 1 E", "ptid 2 E", "ptid 3 E", "ptid 4 E", "ptid 5 E"}).
+                        visits(new String[]{"1", "2", "3", "4", "5"}).
+                        initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
+                        dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
+                        methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
+                        filePath(TEST_ASSAY_NAB_FILE1).
+                        build()
+        );
 
         // verify the run property FileID was generated by the transform script
         clickAndWait(Locator.linkWithText("View Runs"));
@@ -838,5 +906,181 @@ public class NabAssayTest extends AbstractQCAssayTestWD
         return new File[] {
             new File(getLabKeyRoot() + "/server/test/data/api/nab-api.xml")
         };
+    }
+
+    protected void verifyRunDetails()
+    {
+        clickAndWait(Locator.linkWithText("View Runs"));
+
+        log("verify ptid + visit + date");
+        clickAndWait(Locator.linkWithText("ptid + visit + date"));
+        clickAndWait(Locator.linkWithText("run details"));
+
+        assertTextPresent("Virus Name", "Nasty Virus", "ptid 1 B, Vst 1.0");
+        assertTextPresent("&lt; 20", 10);
+
+        String nabData = getText(Locator.id("bodypanel"));
+        assertTrue(nabData.contains("461"));      // Four parameter IC50
+        assertTrue(nabData.contains("0.043"));    // 4PL AUC/PosAUC
+        assertFalse(nabData.contains("561"));      // Five Parameter IC50
+        assertFalse(nabData.contains("503"));      // Polynomial IC50
+        assertFalse(nabData.contains("0.077"));    // Five PL AUC
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Five Parameter");
+        nabData = getText(Locator.id("bodypanel"));
+        assertTrue(nabData.contains("561"));      // Five Parameter IC50
+        assertTrue(nabData.contains("0.077"));    // Five PL AUC
+        assertTrue(nabData.contains("0.081"));    // Five PL posAUC
+        assertFalse(nabData.contains("503"));      // Polynomial IC50
+        assertFalse(nabData.contains("461"));      // Four parameter IC50
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Polynomial");
+        nabData = getText(Locator.id("bodypanel"));
+        assertTrue(nabData.contains("503"));      // Polynomial IC50:
+        assertTrue(nabData.contains("0.054"));    // Polynomial AUC:
+        assertTrue(nabData.contains("0.055"));    // Polynomial posAUC:
+        assertFalse(nabData.contains("561"));      // Five Parameter IC50
+        assertFalse(nabData.contains("461"));      // Four parameter IC50
+        assertFalse(nabData.contains("0.077"));    // Five PL AUC
+        assertFalse(nabData.contains("0.043"));    // 4PL AUC/PosAUC
+
+        log("Verify different graph sizes");
+        Locator nabGraph = Locator.tagWithAttribute("img", "alt", "Neutralization Graph");
+        // Defaults to Small sized graphs
+        Number graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        assertEquals("Graphs aren't the correct size (Large)", 300, graphHeight);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Large");
+        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        assertEquals("Graphs aren't the correct size (Medium)", 600, graphHeight);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Medium");
+        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        assertEquals("Graphs aren't the correct size (Medium)", 550, graphHeight);
+
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Graph Size", "Small");
+        graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
+        assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
+
+        verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantVisitDate, "B");
+
+        log("verify ptid + visit");
+        clickAndWait(Locator.linkWithText("View Runs"));
+        clickAndWait(Locator.linkWithText("ptid + visit"));
+        clickAndWait(Locator.linkWithText("run details"));
+        verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantVisit, "A");
+
+        log("verify ptid + date");
+        clickAndWait(Locator.linkWithText("View Runs"));
+        clickAndWait(Locator.linkWithText("ptid + date"));
+        clickAndWait(Locator.linkWithText("run details"));
+        verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantDate, "C");
+
+        log("verify ptid + visit + specimenid");
+        clickAndWait(Locator.linkWithText("View Runs"));
+        clickAndWait(Locator.linkWithText("ptid + visit + specimenid"));
+        clickAndWait(Locator.linkWithText("run details"));
+        verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, "D");
+    }
+
+    protected void verifyDataIdentifiers(AssayImportOptions.VisitResolverType type, String ptidSuffix)
+    {
+        log("Verifying data identifiers");
+
+        // verify menu items
+        switch (type)
+        {
+            case ParticipantDate:
+                openDataIdentifierMenu();
+
+                waitForElement(Locator.extMenuItemDisabled("Specimen ID"));
+                waitForElement(Locator.extMenuItemDisabled("Participant ID / Visit"));
+                waitForElement(Locator.extMenuItemEnabled("Participant ID / Date"));
+                waitForElement(Locator.extMenuItemDisabled("Specimen ID / Participant ID / Visit"));
+                click(Locator.extMenuItemEnabled("Participant ID / Date"));
+                verifyDataIdentifierText(type, ptidSuffix);
+                break;
+            case ParticipantVisit:
+                openDataIdentifierMenu();
+
+                waitForElement(Locator.extMenuItemDisabled("Specimen ID"));
+                waitForElement(Locator.extMenuItemEnabled("Participant ID / Visit"));
+                waitForElement(Locator.extMenuItemDisabled("Participant ID / Date"));
+                waitForElement(Locator.extMenuItemDisabled("Specimen ID / Participant ID / Visit"));
+                click(Locator.extMenuItemEnabled("Participant ID / Visit"));
+                verifyDataIdentifierText(type, ptidSuffix);
+                break;
+            case ParticipantVisitDate:
+                openDataIdentifierMenu();
+
+                waitForElement(Locator.extMenuItemDisabled("Specimen ID"));
+                waitForElement(Locator.extMenuItemEnabled("Participant ID / Visit"));
+                waitForElement(Locator.extMenuItemEnabled("Participant ID / Date"));
+                waitForElement(Locator.extMenuItemDisabled("Specimen ID / Participant ID / Visit"));
+
+                // click and verify the identifiers on the page
+                click(Locator.extMenuItemEnabled("Participant ID / Date"));
+                verifyDataIdentifierText(AssayImportOptions.VisitResolverType.ParticipantDate, ptidSuffix);
+                break;
+            case SpecimenIDParticipantVisit:
+                openDataIdentifierMenu();
+
+                waitForElement(Locator.extMenuItemEnabled("Specimen ID"));
+                waitForElement(Locator.extMenuItemEnabled("Participant ID / Visit"));
+                waitForElement(Locator.extMenuItemDisabled("Participant ID / Date"));
+                waitForElement(Locator.extMenuItemEnabled("Specimen ID / Participant ID / Visit"));
+
+                // click and verify the identifiers on the page
+                click(Locator.extMenuItemEnabled("Specimen ID / Participant ID / Visit"));
+                verifyDataIdentifierText(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, ptidSuffix);
+                break;
+        }
+
+    }
+
+    /**
+     * Renders the data identifier menu, so we can validate the menu items
+     */
+    private void openDataIdentifierMenu()
+    {
+        Locator menu = Locator.linkContainingText("Change Graph Options");
+        mouseOver(menu);
+        click(menu);
+
+        Locator parentLocator = Locator.menuItem("Data Identifiers");
+        waitForElement(parentLocator, WAIT_FOR_JAVASCRIPT);
+        mouseOver(parentLocator);
+    }
+
+    private void verifyDataIdentifierText(AssayImportOptions.VisitResolverType type, String ptidSuffix)
+    {
+        String format = "";
+
+        switch (type)
+        {
+            case ParticipantDate:
+                format = "ptid %1$d %2$s, 2014-02-28";
+                break;
+            case ParticipantVisit:
+                format = "ptid %1$d %2$s, Vst %3$.1f";
+                break;
+            case ParticipantVisitDate:
+                format = "ptid %1$d %2$s, 2014-02-28";
+                break;
+            case SpecimenIDParticipantVisit:
+                format = "sample%1$d, ptid %1$d %2$s, Vst %3$.1f";
+                break;
+        }
+
+        for (int i=1; i < 6; i++)
+        {
+            String text = String.format(format, i, ptidSuffix, (double)i);
+
+            // cutoff
+            assertElementPresent(Locator.xpath("//table").withClass("cutoff-table").append("//td").withClass("sample-heading").withText(text));
+
+            // dilution
+            assertElementPresent(Locator.xpath("//table").withClass("labkey-data-region").append("//td").withClass("labkey-data-region-header-container").withText(text));
+        }
     }
 }

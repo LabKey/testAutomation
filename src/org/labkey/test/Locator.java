@@ -388,6 +388,16 @@ public abstract class Locator
         return xpath("(//button[contains(@class, 'x-btn-text') and text() = " + xq(text) + "])[" + (index + 1) + "]");
     }
 
+    public static XPathLocator extMenuItemEnabled(String text)
+    {
+        return xpath("//li").withClass("x-menu-list-item").withoutClass("x-item-disabled").append("//span").withClass("x-menu-item-text").withText(text);
+    }
+
+    public static XPathLocator extMenuItemDisabled(String text)
+    {
+        return xpath("//li").withClass("x-menu-list-item").withClass("x-item-disabled").append("//span").withClass("x-menu-item-text").withText(text);
+    }
+
     public static XPathLocator extButtonContainingText(String text)
     {
         return xpath("//button[@class='x-btn-text' and contains(text(), " + xq(text) + ")]");
