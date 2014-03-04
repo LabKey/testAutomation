@@ -383,8 +383,8 @@ public class ChartingAPITest extends ClientAPITest
         assertEquals("Related point had an unexpected stroke color.", ARROW_COLOR, points.get(381).getAttribute("stroke"));
     }
 
-    @Test @Ignore
-    public void brushingTest()
+    @Test
+    public void basicBrushTest()
     {
         Actions builder = new Actions(getDriver());
         List<WebElement> points;
@@ -406,18 +406,36 @@ public class ChartingAPITest extends ClientAPITest
         builder.moveToElement(points.get(380)).moveByOffset(-20, 0).clickAndHold().release().perform();
         verifyNoPointsBrushed();
 
-        WebElement xRightHandle = Locator.css(".x-axis-handle .resize.e").findElement(getDriver());
-        WebElement yTopHandle = Locator.css(".y-axis-handle .resize.n").findElement(getDriver());
-
         // Brush from the bottom left point of the right group, to the top right point of the right group.
         builder.moveToElement(points.get(10)).moveByOffset(-10, 10).clickAndHold().moveByOffset(150, -190).release().perform();
         verifyEdgePointsBrushed();
         verifyTopRightGroupBrushed();
         verifyBottomLeftGroupNotBrushed();
+    }
+
+    @Test @Ignore
+    public void advancedBrushTest()
+    {
+        // Only run this in Chrome. There is a bug in web driver for Firefox that prevents it from properly releasing
+        // the mouse. You can view the (very old) issue here:
+        // https://code.google.com/p/selenium/issues/detail?id=3356
+
+        Actions builder = new Actions(getDriver());
+        goToChartingTestPage("interactivityTest");
+        waitForText("Interactive Plot");
+
+        WebElement xRightHandle = Locator.css(".x-axis-handle .resize.e").findElement(getDriver());
+        WebElement yTopHandle = Locator.css(".y-axis-handle .resize.n").findElement(getDriver());
+        WebElement xExtent = Locator.css(".x-axis-handle .extent").findElement(getDriver());
+        WebElement yExtent = Locator.css(".y-axis-handle .extent").findElement(getDriver());
+        List<WebElement> points = Locator.css("svg g a path").findElements(getDriver());
+
+        // Brush from the bottom left point of the right group, to the top right point of the right group.
+        builder.moveToElement(points.get(10)).moveByOffset(-10, 10).clickAndHold().moveByOffset(150, -190).release().perform();
 
         // Move the brushed area to the bottom left via brush handles and re-verify selected points.
-        builder.moveToElement(xRightHandle).moveByOffset(-5, 0).clickAndHold().moveByOffset(-420, 0).release().perform();
-        builder.moveToElement(yTopHandle).moveByOffset(0, 5).clickAndHold().moveByOffset(0, 190).release().perform();
+        builder.moveToElement(xExtent).clickAndHold().moveByOffset(-420, 0).release().perform();
+        builder.moveToElement(yExtent).clickAndHold().moveByOffset(0, 190).release().perform();
         verifyBottomLeftGroupBrushed();
         verifyTopRightGroupNotBrushed();
 
@@ -427,7 +445,7 @@ public class ChartingAPITest extends ClientAPITest
         verifyAllPointsBrushed();
 
         // Clear the brushed area
-        builder.moveToElement(Locator.css(".brush .resize.w").findElement(getDriver())).moveByOffset(-5, 0).clickAndHold().release().perform();
+        builder.moveToElement(Locator.css(".brush .resize.w").findElement(getDriver())).moveByOffset(-5, 0).click().perform();
         verifyNoPointsBrushed();
 
         // 1D selection on x axis (select bottom left)
@@ -464,7 +482,7 @@ public class ChartingAPITest extends ClientAPITest
         assertElementVisible(Locator.css(".x-axis-handle .resize.w"));
 
         // Verify that clicking in the margins clears the brush.
-        builder.moveToElement(Locator.css(".x-axis-handle .resize.w").findElement(getDriver())).moveByOffset(-5, 0).clickAndHold().release().perform();
+        builder.moveToElement(Locator.css(".x-axis-handle .resize.w").findElement(getDriver())).moveByOffset(-5, 0).click().perform();
         verifyNoPointsBrushed();
     }
 
