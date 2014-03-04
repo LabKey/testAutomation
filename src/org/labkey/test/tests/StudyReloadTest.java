@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  * Time: 3:16 PM
  */
 @Category({DailyA.class})
-public class StudyReloadTest extends StudyBaseTest
+public class StudyReloadTest extends StudyBaseTestWD
 {
     public boolean isFileUploadTest()
     {
@@ -69,5 +69,11 @@ public class StudyReloadTest extends StudyBaseTest
         click(ff_name1);
         click(Locator.linkContainingText("Advanced"));
         assertEquals("on", getAttribute(Locator.name("protected"), "value"));
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

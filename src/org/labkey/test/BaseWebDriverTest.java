@@ -7422,7 +7422,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     {
         goToManageStudy();
         clickButton("Reload Study");
-        setFormElement(Locator.name("studyZip"), studyFile);
+        setFormElement(Locator.name("folderZip"), studyFile);
         clickButton("Reload Study From Local Zip Archive");
         waitForPipelineJobsToComplete(2, "Study Reload", false);
     }

@@ -19,7 +19,6 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
-import org.labkey.test.util.CustomizeViewsHelper;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +28,7 @@ import static org.junit.Assert.*;
  * Time: 1:17 PM
  */
 @Category({DailyB.class, Study.class})
-public class ExtraKeyStudyTest extends StudyBaseTest
+public class ExtraKeyStudyTest extends StudyBaseTestWD
 {
     static String studyFolder = "/ExtraKeyStudy/folder.xml";
 
@@ -142,4 +141,9 @@ public class ExtraKeyStudyTest extends StudyBaseTest
         return (bits & (1 << bit)) != 0;
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }

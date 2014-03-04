@@ -26,7 +26,7 @@ import org.labkey.test.categories.DailyA;
 * Time: 2:39:18 PM
 */
 @Category({DailyA.class})
-public class StudySecurityTest extends StudyBaseTest
+public class StudySecurityTest extends StudyBaseTestWD
 {
     protected static final String READER = "dsreader@studysecurity.test";
     protected static final String EDITOR = "dseditor@studysecurity.test";
@@ -157,7 +157,7 @@ public class StudySecurityTest extends StudyBaseTest
         {
             for (String dsName : datasets)
             {
-                selectOptionByText(getPerDatasetSelectId(dsName), perm.name());
+                selectOptionByText(getPerDatasetSelect(dsName), perm.name());
             }
             clickButton("Save");
         }
@@ -165,9 +165,9 @@ public class StudySecurityTest extends StudyBaseTest
         clickFolder(getFolderName());
     }
 
-    protected String getPerDatasetSelectId(String dsName)
+    protected Locator getPerDatasetSelect(String dsName)
     {
-        return selenium.getAttribute("//form[@id='datasetSecurityForm']/table/tbody/tr/td[text()='" + dsName + "']/../td/select/@name");
+        return Locator.xpath("//form[@id='datasetSecurityForm']/table/tbody/tr/td[text()='" + dsName + "']/../td/select");
     }
 
     protected void verifyPerms(String userName, String[] dsCanRead, String[] dsCannotRead, String[] dsCanEdit, String[] dsCannotEdit, boolean canSetupPipeline)
@@ -185,20 +185,20 @@ public class StudySecurityTest extends StudyBaseTest
 
         for (String dsName : dsCanRead)
         {
-            assertLinkPresentWithText(dsName);
+            assertElementPresent(Locator.linkWithText(dsName));
         }
 
         for (String dsName : dsCannotRead)
         {
-            assertLinkNotPresentWithText(dsName);
+            assertElementNotPresent(Locator.linkWithText(dsName));
         }
 
         for (String dsName : dsCanEdit)
         {
-            assertLinkPresentWithText(dsName);
+            assertElementPresent(Locator.linkWithText(dsName));
             clickAndWait(Locator.linkWithText(dsName));
             assertTextPresent(dsName);
-            assertLinkPresentWithText("edit");
+            assertElementPresent(Locator.linkWithText("edit"));
             assertNavButtonPresent("Insert New");
             assertNavButtonPresent("Import Data");
             clickFolder(getFolderName());
@@ -206,11 +206,11 @@ public class StudySecurityTest extends StudyBaseTest
 
         for (String dsName : dsCannotEdit)
         {
-            if (isLinkPresentWithText(dsName))
+            if (isElementPresent(Locator.linkWithText(dsName)))
             {
                 clickAndWait(Locator.linkWithText(dsName));
                 assertTextPresent(dsName);
-                assertLinkNotPresentWithText("edit");
+                assertElementNotPresent(Locator.linkWithText("edit"));
                 assertNavButtonNotPresent("Insert New");
                 assertNavButtonNotPresent("Import Data");
                 clickFolder(getFolderName());
@@ -228,7 +228,7 @@ public class StudySecurityTest extends StudyBaseTest
 
         waitForElement(Locator.name("securityString"));
         selectOptionByValue(Locator.name("securityString"), "ADVANCED_WRITE");
-        waitForPageToLoad();
+        waitForElements(Locator.tagWithName("table", "webpart"), 3);
 
         //the radio buttons are named "group.<id>" and since we don't know the
         //group ids, we need to find them by name
@@ -258,5 +258,11 @@ public class StudySecurityTest extends StudyBaseTest
     {
         super.doCleanup(afterTest);
         deleteUsers(afterTest, READER, EDITOR, LIMITED, NONE);
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
