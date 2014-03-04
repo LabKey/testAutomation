@@ -1077,7 +1077,7 @@ public class NabAssayTest extends AbstractQCAssayTestWD
             String text = String.format(format, i, ptidSuffix, (double)i);
 
             // cutoff
-            assertElementPresent(Locator.xpath("//table").withClass("cutoff-table").append("//td").withClass("sample-heading").withText(text));
+            waitForElement(Locator.xpath("//table").withClass("cutoff-table").append("//td").withClass("sample-heading").withText(text));
 
             // dilution
             assertElementPresent(Locator.xpath("//table").withClass("labkey-data-region").append("//td").withClass("labkey-data-region-header-container").withText(text));
