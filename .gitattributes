@@ -546,6 +546,7 @@ src/org/labkey/test/util/DataIntegrationHelper.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
 src/org/labkey/test/util/DevModeOnlyTest.java -text
 src/org/labkey/test/util/Diff.java -text
+src/org/labkey/test/util/DilutionAssayHelperWD.java -text
 src/org/labkey/test/util/EHRClientAPIHelper.java -text
 src/org/labkey/test/util/Echo.java -text
 src/org/labkey/test/util/EmailRecordTable.java -text

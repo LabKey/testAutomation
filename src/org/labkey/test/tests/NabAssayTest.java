@@ -25,6 +25,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DilutionAssayHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.NoSuchElementException;
@@ -148,7 +149,6 @@ public class NabAssayTest extends AbstractQCAssayTestWD
 
     // TODO: taken form ClientAPITest; when NabAssayTest is moved to WebDriver, this should be factored into a common place for both tests
     private static final String TEST_DIV_NAME = "testDiv";
-
     protected String setSource(String srcFragment, boolean excludeTags)
     {
         PortalHelper portalHelper = new PortalHelper(this);
@@ -375,7 +375,7 @@ public class NabAssayTest extends AbstractQCAssayTestWD
                         curveFitMethod("Five Parameter").
                         ptids(new String[]{"ptid 1 D", "ptid 2 D", "ptid 3 D", "ptid 4 D", "ptid 5 D"}).
                         visits(new String[]{"1", "2", "3", "4", "5"}).
-                        sampleIds(new String[]{"sample1", "sample2", "sample3", "sample4", "sample5"}).
+                        sampleIds(new String[]{"SPECIMEN-1", "SPECIMEN-2", "SPECIMEN-3", "SPECIMEN-4", "SPECIMEN-5"}).
                         initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
                         dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
                         methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
@@ -911,6 +911,7 @@ public class NabAssayTest extends AbstractQCAssayTestWD
     protected void verifyRunDetails()
     {
         clickAndWait(Locator.linkWithText("View Runs"));
+        DilutionAssayHelperWD assayHelper = new DilutionAssayHelperWD(this);
 
         log("verify ptid + visit + date");
         clickAndWait(Locator.linkWithText("ptid + visit + date"));
@@ -962,125 +963,24 @@ public class NabAssayTest extends AbstractQCAssayTestWD
         graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
 
-        verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantVisitDate, "B");
+        assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantVisitDate, "B");
 
         log("verify ptid + visit");
         clickAndWait(Locator.linkWithText("View Runs"));
         clickAndWait(Locator.linkWithText("ptid + visit"));
         clickAndWait(Locator.linkWithText("run details"));
-        verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantVisit, "A");
+        assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantVisit, "A");
 
         log("verify ptid + date");
         clickAndWait(Locator.linkWithText("View Runs"));
         clickAndWait(Locator.linkWithText("ptid + date"));
         clickAndWait(Locator.linkWithText("run details"));
-        verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantDate, "C");
+        assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantDate, "C");
 
         log("verify ptid + visit + specimenid");
         clickAndWait(Locator.linkWithText("View Runs"));
         clickAndWait(Locator.linkWithText("ptid + visit + specimenid"));
         clickAndWait(Locator.linkWithText("run details"));
-        verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, "D");
-    }
-
-    protected void verifyDataIdentifiers(AssayImportOptions.VisitResolverType type, String ptidSuffix)
-    {
-        log("Verifying data identifiers");
-
-        // verify menu items
-        switch (type)
-        {
-            case ParticipantDate:
-                openDataIdentifierMenu();
-
-                waitForElement(Locator.extMenuItemDisabled("Specimen ID"));
-                waitForElement(Locator.extMenuItemDisabled("Participant ID / Visit"));
-                waitForElement(Locator.extMenuItemEnabled("Participant ID / Date"));
-                waitForElement(Locator.extMenuItemDisabled("Specimen ID / Participant ID / Visit"));
-                click(Locator.extMenuItemEnabled("Participant ID / Date"));
-                verifyDataIdentifierText(type, ptidSuffix);
-                break;
-            case ParticipantVisit:
-                openDataIdentifierMenu();
-
-                waitForElement(Locator.extMenuItemDisabled("Specimen ID"));
-                waitForElement(Locator.extMenuItemEnabled("Participant ID / Visit"));
-                waitForElement(Locator.extMenuItemDisabled("Participant ID / Date"));
-                waitForElement(Locator.extMenuItemDisabled("Specimen ID / Participant ID / Visit"));
-                click(Locator.extMenuItemEnabled("Participant ID / Visit"));
-                verifyDataIdentifierText(type, ptidSuffix);
-                break;
-            case ParticipantVisitDate:
-                openDataIdentifierMenu();
-
-                waitForElement(Locator.extMenuItemDisabled("Specimen ID"));
-                waitForElement(Locator.extMenuItemEnabled("Participant ID / Visit"));
-                waitForElement(Locator.extMenuItemEnabled("Participant ID / Date"));
-                waitForElement(Locator.extMenuItemDisabled("Specimen ID / Participant ID / Visit"));
-
-                // click and verify the identifiers on the page
-                click(Locator.extMenuItemEnabled("Participant ID / Date"));
-                verifyDataIdentifierText(AssayImportOptions.VisitResolverType.ParticipantDate, ptidSuffix);
-                break;
-            case SpecimenIDParticipantVisit:
-                openDataIdentifierMenu();
-
-                waitForElement(Locator.extMenuItemEnabled("Specimen ID"));
-                waitForElement(Locator.extMenuItemEnabled("Participant ID / Visit"));
-                waitForElement(Locator.extMenuItemDisabled("Participant ID / Date"));
-                waitForElement(Locator.extMenuItemEnabled("Specimen ID / Participant ID / Visit"));
-
-                // click and verify the identifiers on the page
-                click(Locator.extMenuItemEnabled("Specimen ID / Participant ID / Visit"));
-                verifyDataIdentifierText(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, ptidSuffix);
-                break;
-        }
-
-    }
-
-    /**
-     * Renders the data identifier menu, so we can validate the menu items
-     */
-    private void openDataIdentifierMenu()
-    {
-        Locator menu = Locator.linkContainingText("Change Graph Options");
-        mouseOver(menu);
-        click(menu);
-
-        Locator parentLocator = Locator.menuItem("Data Identifiers");
-        waitForElement(parentLocator, WAIT_FOR_JAVASCRIPT);
-        mouseOver(parentLocator);
-    }
-
-    private void verifyDataIdentifierText(AssayImportOptions.VisitResolverType type, String ptidSuffix)
-    {
-        String format = "";
-
-        switch (type)
-        {
-            case ParticipantDate:
-                format = "ptid %1$d %2$s, 2014-02-28";
-                break;
-            case ParticipantVisit:
-                format = "ptid %1$d %2$s, Vst %3$.1f";
-                break;
-            case ParticipantVisitDate:
-                format = "ptid %1$d %2$s, 2014-02-28";
-                break;
-            case SpecimenIDParticipantVisit:
-                format = "sample%1$d, ptid %1$d %2$s, Vst %3$.1f";
-                break;
-        }
-
-        for (int i=1; i < 6; i++)
-        {
-            String text = String.format(format, i, ptidSuffix, (double)i);
-
-            // cutoff
-            waitForElement(Locator.xpath("//table").withClass("cutoff-table").append("//td").withClass("sample-heading").withText(text));
-
-            // dilution
-            assertElementPresent(Locator.xpath("//table").withClass("labkey-data-region").append("//td").withClass("labkey-data-region-header-container").withText(text));
-        }
+        assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, "D");
     }
 }

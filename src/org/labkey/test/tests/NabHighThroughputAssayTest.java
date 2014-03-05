@@ -21,7 +21,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.DilutionAssayHelperWD;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
@@ -215,19 +217,15 @@ public class NabHighThroughputAssayTest extends AbstractAssayTestWD
         log("Verify different curve types");
         // Imported with polynomial curve fit
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC PositiveAUC"));
-        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.6 0.050 0.057"));
 
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Polynomial");
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_poly PositiveAUC_poly"));
-        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.6 0.050 0.057"));
 
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Four Parameter");
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_4pl PositiveAUC_4pl"));
-        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.9 0.050 0.058"));
 
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Change Graph Options"), "Curve Type", "Five Parameter");
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
-        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.8 0.051 0.054"));
 
         log("Verify different graph sizes");
         Locator nabGraph = Locator.tagWithAttribute("img", "alt", "Neutralization Graph");
@@ -287,14 +285,16 @@ public class NabHighThroughputAssayTest extends AbstractAssayTestWD
         log("Verify customizations are applied to print page");
         clickAndWait(Locator.linkContainingText("Print"));
         assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").containing("AUC_5pl PositiveAUC_5pl"));
-        assertElementPresent(Locator.tag("table").withClass("labkey-data-region").append("//tr").withText("SPECIMEN-1 5.0 20.0 Concentration VIRUS-1 4.8 0.051 0.054"));
         graphHeight = nabGraph.findElement(getDriver()).getSize().getHeight();
         assertEquals("Graphs aren't the correct size (Small)", 300, graphHeight);
         assertElementPresent(Locator.tagWithAttribute("img", "alt", "Neutralization Graph"), 12);
         assertElementPresent(Locator.xpath("//tr[1]/td/a/img[@alt='Neutralization Graph']"), 4); // Correct number of graphs in first row
         assertElementNotPresent(Locator.xpath("//td[position()>4]/a/img[@alt='Neutralization Graph']")); // Too many graphs in a row
-
         goBack();
+
+        log("Verify data identifiers");
+        DilutionAssayHelperWD assayHelper = new DilutionAssayHelperWD(this);
+        assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, null);
     }
 
 
