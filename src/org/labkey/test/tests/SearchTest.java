@@ -326,9 +326,10 @@ public class SearchTest extends StudyWDTest
         clickFolder(getFolderName());
         goToModule("FileContent");
         File file = new File(getLabKeyRoot() + "/sampledata/security", "InlineFile.html");
-        File MLfile = new File(getLabKeyRoot() + "/sampledata/mzxml", "test_nocompression.mzXML");
-
         _fileBrowserHelper.uploadFile(file);
+
+        goToModule("FileContent");
+        File MLfile = new File(getLabKeyRoot() + "/sampledata/mzxml", "test_nocompression.mzXML");
         _fileBrowserHelper.uploadFile(MLfile);
 
         _searchHelper.enqueueSearchItem("antidisestablishmentarianism", true, Locator.linkWithText(file.getName()));

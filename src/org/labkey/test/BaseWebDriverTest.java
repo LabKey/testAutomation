@@ -3199,6 +3199,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             uncheckCheckbox(Locator.name("addAlias"));
         // Select Target
         waitForElement(Locator.permissionsTreeNode(newParent), 10000);
+        sleep(1000); // TODO: what is the right way to wait for the tree expanding animation to complete?
         selectFolderTreeItem(newParent);
         // move:
         clickButton("Confirm Move");
