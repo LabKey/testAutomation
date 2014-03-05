@@ -26,6 +26,11 @@ import junit.runner.BaseTestRunner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
+import org.junit.Ignore;
+import org.junit.runner.Description;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.Filterable;
+import org.junit.runner.manipulation.NoTestsRemainException;
 import org.labkey.test.categories.Continue;
 import org.labkey.test.testpicker.TestHelper;
 import org.labkey.test.tests.BasicTest;
@@ -318,7 +323,7 @@ public class Runner extends TestSuite
         }
     }
 
-
+    private static Map<Class, List<String>> specifiedTestMethods = new HashMap<>();
     // Set up only the requested tests
     private static List<Class> getTestClasses(TestSet testSet, List<String> testNames)
     {
@@ -343,10 +348,22 @@ public class Runner extends TestSuite
 
         for (String testName : testNames)
         {
-            Class testClass = nameMap.get(testName.toLowerCase());
+            String testClassName;
+            List<String> testMethods = null;
+
+            if (testName.contains("."))
+            {
+                String[] splitTestName = testName.split("\\.");
+                testClassName = splitTestName[0];
+                testMethods = Arrays.asList(Arrays.copyOfRange(splitTestName, 1, splitTestName.length));
+            }
+            else
+                testClassName = testName;
+
+            Class testClass = nameMap.get(testClassName.toLowerCase());
             if (testClass == null)
             {
-                System.err.println("Couldn't find test '" + testName + "' in suite '" + testSet.name() + "'.  Valid tests are:");
+                System.err.println("Couldn't find test '" + testClassName + "' in suite '" + testSet.name() + "'.  Valid tests are:");
 
                 List<String> sortedTests = testSet.getTestNames();
                 Collections.sort(sortedTests);
@@ -356,6 +373,8 @@ public class Runner extends TestSuite
                 System.exit(1);
             }
             testClasses.add(testClass);
+            if (testMethods != null)
+                specifiedTestMethods.put(testClass, testMethods);
         }
 
         return testClasses;
@@ -449,6 +468,73 @@ public class Runner extends TestSuite
                     }
                 }
                 test = new JUnit4TestAdapter(testClass);
+
+                if (specifiedTestMethods.containsKey(testClass))
+                {
+                    final List<String> testNames = specifiedTestMethods.get(testClass);
+                    final Set<String> unfoundTests = new HashSet<>(specifiedTestMethods.get(testClass));
+                    final Set<String> foundTests = new HashSet<>();
+                    final Set<String> ignoredTests = new HashSet<>();
+
+                    org.junit.runner.manipulation.Filter testNameFilter = new Filter()
+                    {
+                        @Override
+                        public boolean shouldRun(Description description)
+                        {
+                            String methodName = description.getMethodName();
+
+                            if (description.getAnnotation(Ignore.class) != null)
+                            {
+                                ignoredTests.add(methodName);
+                                return false;
+                            }
+
+                            foundTests.add(methodName);
+
+                            if (testNames.contains(methodName))
+                            {
+                                unfoundTests.remove(methodName);
+                                return true;
+                            }
+                            else
+                                return false;
+                        }
+
+                        @Override
+                        public String describe()
+                        {
+                            return "Tests specified on command line";
+                        }
+                    };
+
+                    try
+                    {
+                        ((Filterable)test).filter(testNameFilter);
+                    }
+                    catch (NoTestsRemainException ignore) {}
+
+                    if (unfoundTests.size() > 0)
+                    {
+                        System.err.println("Test(s) do not exist in class " + testClass.getSimpleName());
+                        System.err.println("Specified:");
+                        for (String unfoundTest : unfoundTests)
+                        {
+                            System.err.println("    " + unfoundTest);
+                        }
+                        System.err.println("Found:");
+                        for (String foundTest : foundTests)
+                        {
+                            System.err.println("    " + foundTest);
+                        }
+                        if (ignoredTests.size() > 0)
+                            System.err.println("Disabled:");
+                        for (String ignoredTest : ignoredTests)
+                        {
+                            System.err.println("    " + ignoredTest);
+                        }
+                        System.exit(1);
+                    }
+                }
             }
             else isServerSideTest = true;
 
