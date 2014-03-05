@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Study;
 import org.labkey.test.categories.Disabled;
@@ -34,7 +35,7 @@ import java.util.Set;
  * Time: 1:54:57 PM
  */
 @Category({Study.class, Disabled.class})
-public class StudyManualTest extends StudyTest
+public class StudyManualTest extends StudyWDTest
 {
 
     private final String CRF_SCHEMAS = getStudySampleDataPath() + "datasets/schema.tsv";
@@ -42,6 +43,12 @@ public class StudyManualTest extends StudyTest
     protected final String VISIT_MAP = getStudySampleDataPath() + "v068_visit_map.txt";
 
     protected final StudyHelper _studyHelper = new StudyHelper(this);
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 
     @Override
     protected boolean isFileUploadTest()
@@ -54,8 +61,6 @@ public class StudyManualTest extends StudyTest
         createStudyManually();
         startSpecimenImport(2);
 
-        // wait for datasets (but not specimens) to finish
-        waitForPipelineJobsToComplete(1, "study import", false);
         afterManualCreate();
     }
 
@@ -66,15 +71,15 @@ public class StudyManualTest extends StudyTest
 
         clickButton("Create Study");
         click(Locator.radioButtonByNameAndValue("simpleRepository", "false"));
-        setText("subjectNounSingular", "Mouse");
-        setText("subjectNounPlural", "Mice");
-        setText("subjectColumnName", "MouseId");
+        setFormElement(Locator.name("subjectNounSingular"), "Mouse");
+        setFormElement(Locator.name("subjectNounPlural"), "Mice");
+        setFormElement(Locator.name("subjectColumnName"), "MouseId");
         clickButton("Create Study");
 
         // change study label
         clickAndWait(Locator.linkWithText("Change Study Properties"));
         waitForElement(Locator.name("Label"), WAIT_FOR_JAVASCRIPT);
-        setFormElement("Label", getStudyLabel());
+        setFormElement(Locator.name("Label"), getStudyLabel());
         clickButton("Submit");
         assertTextPresent(getStudyLabel());
 
@@ -83,7 +88,7 @@ public class StudyManualTest extends StudyTest
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("Import Visit Map"));
         String visitMapData = getFileContents(VISIT_MAP);
-        setLongTextField("content", visitMapData);
+        setFormElement(Locator.name("content"), visitMapData);
         clickButton("Import");
 
         // import custom visit mapping
@@ -94,31 +99,28 @@ public class StudyManualTest extends StudyTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("Define Dataset Schemas"));
         clickAndWait(Locator.linkWithText("Bulk Import Schemas"));
-        setFormElement("typeNameColumn", "platename");
-        setFormElement("labelColumn", "platelabel");
-        setFormElement("typeIdColumn", "plateno");
+        setFormElement(Locator.name("typeNameColumn"), "platename");
+        setFormElement(Locator.name("labelColumn"), "platelabel");
+        setFormElement(Locator.name("typeIdColumn"), "plateno");
         setFormElement(Locator.name("tsv"), getFileContents(CRF_SCHEMAS));
         clickButton("Submit", 180000);
 
         // setup cohorts:
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
-        selectOptionByText("participantCohortDataSetId", "EVC-1: Enrollment Vaccination");
-        waitForPageToLoad();
-        selectOptionByText("participantCohortProperty", "2. Enrollment group");
+        selectOptionByText(Locator.name("participantCohortDataSetId"), "EVC-1: Enrollment Vaccination");
+        selectOptionByText(Locator.name("participantCohortProperty"), "2. Enrollment group");
         clickButton("Update Assignments");
 
         // configure QC state management so that all data is displayed by default (we'll test with hidden data later):
-        clickFolder(getStudyLabel());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
-        selectOptionByText("showPrivateDataByDefault", "All data");
+        selectOptionByText(Locator.name("showPrivateDataByDefault"), "All data");
         clickButton("Save");
 
         // upload datasets:
-        clickFolder(getStudyLabel());
         setPipelineRoot(getPipelinePath());
-        clickFolder(getStudyLabel());
+        clickTab("Overview");
         clickAndWait(Locator.linkWithText("Manage Files"));
         clickButton("Process and Import Data");
         _fileBrowserHelper.selectFileBrowserItem("datasets/Study001.dataset");
@@ -171,7 +173,7 @@ public class StudyManualTest extends StudyTest
 
     protected void importCustomVisitMapping()
     {
-        if (!isLinkPresentContainingText("Visit Import Mapping"))
+        if (!isElementPresent(Locator.linkContainingText("Visit Import Mapping")))
         {
             clickTab("Manage");
             clickAndWait(Locator.linkWithText("Manage Visits"));
@@ -194,7 +196,7 @@ public class StudyManualTest extends StudyTest
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButtonContainingText("Edit Definition");
         waitForElement(Locator.name("description"), WAIT_FOR_JAVASCRIPT);
-        setFormElement("description", DEMOGRAPHICS_DESCRIPTION);
+        setFormElement(Locator.name("description"), DEMOGRAPHICS_DESCRIPTION);
         clickButton("Save");
     }
 
@@ -222,7 +224,7 @@ public class StudyManualTest extends StudyTest
             if (labels.contains(currentLabel))
             {
                 clickAndWait(Locator.linkWithText("edit", row - 2));   // Zero-based, plus the header row doesn't have an edit link
-                uncheckCheckbox("showByDefault");
+                uncheckCheckbox(Locator.name("showByDefault"));
                 clickButton("Save");
                 labels.remove(currentLabel);
             }
@@ -236,7 +238,7 @@ public class StudyManualTest extends StudyTest
     {
         try
         {
-            return selenium.getText("//table[@id='visits']/tbody/tr[" + row + "]/th");
+            return getText(Locator.xpath("//table[@id='visits']/tbody/tr[" + row + "]/th"));
         }
         catch (SeleniumException e)
         {
@@ -250,7 +252,7 @@ public class StudyManualTest extends StudyTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("Create New Dataset"));
-        setFormElement("typeName", "verifyAssay");
+        setFormElement(Locator.name("typeName"), "verifyAssay");
         clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
@@ -260,7 +262,7 @@ public class StudyManualTest extends StudyTest
         clickButton("Import Fields", 0);
         waitForElement(Locator.xpath("//textarea[@id='schemaImportBox']"), WAIT_FOR_JAVASCRIPT);
 
-        setFormElement("schemaImportBox", "Property\tLabel\tRangeURI\tNotNull\tDescription\n" +
+        setFormElement(Locator.id("schemaImportBox"), "Property\tLabel\tRangeURI\tNotNull\tDescription\n" +
                 "SampleId\tSample Id\txsd:string\ttrue\tstring\n" +
                 "DateField\tDateField\txsd:dateTime\tfalse\tThis is a date field\n" +
                 "NumberField\tNumberField\txsd:double\ttrue\tThis is a number\n" +
@@ -271,7 +273,7 @@ public class StudyManualTest extends StudyTest
 
         clickRadioButtonById("button_dataField");
 
-        addField("Dataset Fields", 4, "otherData", "Other Data", ListHelper.ListColumnType.String);
+        _listHelper.addField("Dataset Fields", 4, "otherData", "Other Data", ListHelper.ListColumnType.String);
         click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
         waitForElement(Locator.id("importAliases"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("importAliases"), "aliasedColumn");
@@ -282,7 +284,7 @@ public class StudyManualTest extends StudyTest
         clickButton("Import Data");
 
         String errorRow = "\tbadvisitd\t1/1/2006\t\ttext\t";
-        setFormElement("text", _tsv + "\n" + errorRow);
+        setFormElement(Locator.name("text"), _tsv + "\n" + errorRow);
         _listHelper.submitImportTsv_error("Could not convert 'badvisitd'");
         assertTextPresent("Could not convert 'text'");
 

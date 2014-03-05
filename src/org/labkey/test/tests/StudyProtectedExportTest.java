@@ -36,7 +36,6 @@ import static org.junit.Assert.*;
 @Category({DailyB.class})
 public class StudyProtectedExportTest extends StudyExportTest
 {
-    int pipelineJobCount = 1;
     private String idPreface = "P!@#$%^&*(";
     private int idLength = 7;
     private Map<String,String> _originalFirstMouseStats;
@@ -61,9 +60,10 @@ public class StudyProtectedExportTest extends StudyExportTest
         setFormElement("numberOfDigits", "" + idLength);
         clickButton("Change Alternate IDs", 0);
         waitForText("Are you sure you want to change all Alternate IDs?");
-        clickButton("OK", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        clickButton("OK", 0);
+        sleep(1000);
         waitForText("Changing Alternate IDs is complete");
-        clickButton("OK", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        clickButton("OK", 0);
     }
 
     private void verifyParticipantGroups(String originalID, String newID)
@@ -127,7 +127,6 @@ public class StudyProtectedExportTest extends StudyExportTest
         click(fileRow);
 
         _fileBrowserHelper.selectImportDataAction("Import Study");
-        waitForPipelineJobsToComplete(++pipelineJobCount, "study import", false);
     }
 
     @Override
@@ -135,8 +134,10 @@ public class StudyProtectedExportTest extends StudyExportTest
     {
         verifyImportingAlternateIds();
 
-        deleteStudy(getStudyLabel());
+        clickFolder(getFolderName());
+        deleteStudy();
         importAlteredStudy();
+        waitForPipelineJobsToComplete(2, "study import", false);
         goToDatasetWithProtectedColum();
         assertTextNotPresent(protectedColumnLabel);
 
@@ -152,7 +153,8 @@ public class StudyProtectedExportTest extends StudyExportTest
         verifyStatsDoNotMatch(_originalFirstMouseStats, alteredFirstMouseStats);
         verifyParticipantGroups(_originalFirstMouseStats.get("Mouse Id"), alteredFirstMouseStats.get("Mouse Id"));
 
-        deleteStudy(getStudyLabel());
+        clickFolder(getFolderName());
+        deleteStudy();
         importAlteredStudy();
         waitForPipelineJobsToComplete(3, "Study reimport", false);
 
@@ -165,7 +167,8 @@ public class StudyProtectedExportTest extends StudyExportTest
         waitForPipelineJobsToComplete(4, "Specimen import", false);
         exportStudy(true, true, false, true, true, true, null);
 
-        deleteStudy(getStudyLabel());
+        clickFolder(getFolderName());
+        deleteStudy();
         importAlteredStudy();
         waitForPipelineJobsToComplete(5, "Study reimport with specimens", false);
 
@@ -219,7 +222,7 @@ public class StudyProtectedExportTest extends StudyExportTest
             {
                 foundClinics++;
                 assertTrue("Clinic Location name was not masked", query.getDataAsText(i, labelCol).equals("Clinic"));
-                assertTrue("Clinic Labware Lab Code was not masked", query.getDataAsText(i, labCodeCol).equals(""));
+                assertTrue("Clinic Labware Lab Code was not masked", query.getDataAsText(i, labCodeCol).equals(" "));
             }
             else // non-clinic
             {

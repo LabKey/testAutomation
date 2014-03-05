@@ -24,7 +24,7 @@ import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.RReportHelperWD;
 import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
@@ -69,7 +69,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private final String[] DATASETS = {"RCB-1: Reactogenicity-Baseline", "RCM-1: Reactogenicity-Early Assessment", "RCE-1: Reactogenicity-Day 0", "RCH-1: Reactogenicity-Day 1", "RCF-1: Reactogenicity-Day 2", "RCT-1: Reactogenicity-Day 3", "CPS-1: Screening Chemistry Panel", "DEM-1: Demographics"};
     private final String REPORT_DATASET = "RCB-1: Reactogenicity-Baseline";
     private final String UNPUBLISHED_REPORT_DATASET = "AE-1:(VTN) AE Log";
-    private final String DATE_SHIFT_DATASET = "CPS-1 (CPS-1: Screening Chemistry Panel)";
+    private final String DATE_SHIFT_DATASET_LABEL = "CPS-1: Screening Chemistry Panel";
+    private final String DATE_SHIFT_DATASET = "CPS-1 (" + DATE_SHIFT_DATASET_LABEL + ")";
     private final String DATE_SHIFT_REQUIRED_VISIT = "101";
     private final ImmutablePair<String, String> UNSHIFTED_DATE_FIELD = new ImmutablePair<>("CPSdt", "Initial Spec Collect Date");
     private final ImmutablePair<String, String> SHIFTED_DATE_FIELD = new ImmutablePair<>("CPScredt", "2a.Alt Creat Coll Date");
@@ -93,7 +94,6 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
     private final String PUB1_NAME = "PublishedStudy";
     private final String PUB1_DESCRIPTION = "";
-    private final String PUB1_CONTAINER = "/" + getProjectName() + "/" + getFolderName();
     private final String[] PUB1_GROUPS = {GROUP1_NAME};
     private final String[] PUB1_DATASETS = DATASETS;
     private final String[] PUB1_DEPENDENT_DATASETS = {"APX-1: Abbreviated Physical Exam"}; // Visit dates are defined here.
@@ -105,7 +105,6 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
     private final String PUB2_NAME = "PublishedToProject";
     private final String PUB2_DESCRIPTION = "Publish to new project";
-    private final String PUB2_CONTAINER = "/";
     private final String[] PUB2_GROUPS = {}; // all
     private final String[] PUB2_DATASETS = {}; // all
     private final String[] PUB2_DEPENDENT_DATASETS = {};
@@ -117,7 +116,6 @@ public class StudyPublishTest extends StudyProtectedExportTest
     
     private final String PUB3_NAME = "PublishedNonAnon";
     private final String PUB3_DESCRIPTION = "Non-anonymized published study";
-    private final String PUB3_CONTAINER = "/" + getProjectName();
     private final String[] PUB3_GROUPS = {GROUP2_NAME, GROUP3_NAME};
     private final String[] PUB3_DATASETS = {DATASETS[0], DATASETS[1], DATASETS[2], DATASETS[4], DATASETS[5], DATASETS[6]}; // DAY 1 omitted
     private final String[] PUB3_DEPENDENT_DATASETS = {"APX-1: Abbreviated Physical Exam", "EVC-1: Enrollment Vaccination", DATASETS[7]}; // Visit dates are defined here.
@@ -143,7 +141,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     protected void doCreateSteps()
     {
         // fail fast if R is not configured
-        RReportHelper _rReportHelper = new RReportHelper(this);
+        RReportHelperWD _rReportHelper = new RReportHelperWD(this);
         _rReportHelper.ensureRConfig();
 
         _pipelineJobs += 2;
@@ -187,9 +185,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         // Publish the study in a few different ways
-        publishStudy(PUB1_NAME, PUB1_DESCRIPTION, PUB1_CONTAINER, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true);
-        publishStudy(PUB2_NAME, PUB2_DESCRIPTION, PUB2_CONTAINER, PUB2_GROUPS, PUB2_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false);
-        publishStudy(PUB3_NAME, PUB3_DESCRIPTION, PUB3_CONTAINER, PUB3_GROUPS, PUB3_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, false, true, false, true);
+        publishStudy(PUB1_NAME, PUB1_DESCRIPTION, 2, PUB1_GROUPS, PUB1_DATASETS, PUB1_VISITS, PUB1_VIEWS, PUB1_REPORTS, PUB1_LISTS, true, true);
+        publishStudy(PUB2_NAME, PUB2_DESCRIPTION, 0, PUB2_GROUPS, PUB2_DATASETS, PUB2_VISITS, PUB2_VIEWS, PUB2_REPORTS, PUB2_LISTS, false, false);
+        publishStudy(PUB3_NAME, PUB3_DESCRIPTION, 1, PUB3_GROUPS, PUB3_DATASETS, PUB3_VISITS, PUB3_VIEWS, PUB3_REPORTS, PUB3_LISTS, true, false, false, true, false, true);
 
         // load specimen set B to test the specimen refresh for the published studies
         startSpecimenImport(++_pipelineJobs, SPECIMEN_ARCHIVE_B);
@@ -333,7 +331,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
             goToQueryView("study", DATE_SHIFT_DATASET, false);
             Set<String> unshiftedDates = new HashSet<>();
             Set<String> shiftedDates = new HashSet<>();
-            DataRegionTable datasetTable = new DataRegionTable("Dataset", this, true, true);
+            DataRegionTable datasetTable = new DataRegionTable("query", this, true, true);
             unshiftedDates.addAll(datasetTable.getColumnDataAsText(UNSHIFTED_DATE_FIELD.getValue()));
             shiftedDates.addAll(datasetTable.getColumnDataAsText(SHIFTED_DATE_FIELD.getValue()));
             assertTrue("Column '" + UNSHIFTED_DATE_FIELD.getValue() + "' should not be shifted", unshiftedDatesByStudy.get(name).containsAll(unshiftedDates));
@@ -396,11 +394,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
                     if (isTextPresent("Time Chart"))
                     {
-                        // Verify that time chart on click function is published with time chart
-                        waitAndClick(Locator.css("svg a>path"));
-                        _extHelper.waitForExtDialog("Data Point Information");
-                        clickButton("OK", 0);
-                        waitForExtMaskToDisappear();
+                        waitForText("RCH-1: Reactogenicity-Day 1, RCE-1: Reactogenicity-Day 0"); // chart title
+                        waitForElement(Locator.css("svg g a path"));
                     }
                 }
                 else
@@ -458,7 +453,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         {
             waitForText("By Vial Group");
             clickAndWait(Locator.linkWithText("By Individual Vial"));
-            waitForText("1 - " + expectedSpecimenCount + " of " + expectedSpecimenCount);
+            waitForElement(Locator.paginationText(expectedSpecimenCount));
 
             // verify that the alternate IDs are used
             if (alternateIDs)
@@ -493,7 +488,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
             // verify that the request related specimen reports are hidden
             clickAndWait(Locator.linkWithText("Specimen Data"));
-            clickAndWait(Locator.linkWithText("View Available Reports"));
+            waitAndClick(Locator.tagContainingText("span", "Specimen Reports")); // expand
+            waitAndClickAndWait(Locator.linkWithText("View Available Reports"));
             assertTextNotPresent("Requested Vials by Type and Timepoint");
             assertLinkPresentWithTextCount("show options", 6);
         }
@@ -508,11 +504,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // verify that the additive, derivative, etc. tables were populated correctly
         goToQueryView("study", "SpecimenAdditive", false);
         assertElementPresent(includeSpecimens ? Locator.paginationText(1, 42, 42) : Locator.xpath("//tr/td/em[text() = 'No data to show.']"));
-        goToQueryView("study", "SpecimenDerivative", false);
+        beginAt(getCurrentRelativeURL().replace("SpecimenAdditive", "SpecimenDerivative"));
         assertElementPresent(includeSpecimens ? Locator.paginationText(1, 99, 99) : Locator.xpath("//tr/td/em[text() = 'No data to show.']"));
-        goToQueryView("study", "SpecimenPrimaryType", false);
+        beginAt(getCurrentRelativeURL().replace("SpecimenDerivative", "SpecimenPrimaryType"));
         assertElementPresent(includeSpecimens ? Locator.paginationText(1, 59, 59) : Locator.xpath("//tr/td/em[text() = 'No data to show.']"));
-        goToQueryView("study", "Location", false);
+        beginAt(getCurrentRelativeURL().replace("SpecimenPrimaryType", "Location"));
         assertElementPresent(includeSpecimens ? Locator.paginationText(1, 24, 24) : Locator.xpath("//tr/td/em[text() = 'No data to show.']"));
 
         // verify masked clinic information
@@ -534,7 +530,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         clickFolder(PUB1_NAME);
         clickAndWait(Locator.linkWithText("Specimen Data"));
         clickAndWait(Locator.linkWithText("By Individual Vial"));
-        waitForText("1 - 37 of 37"); // updated number of total specimens
+        waitForElement(Locator.paginationText(37)); // updated number of total specimens
         assertTextNotPresent("BAQ00051-10"); // GUID removed via refresh
         assertTextPresent("PUBLISHED-", 2*37); // transformations still applied
         DataRegionTable table = new DataRegionTable("SpecimenDetail", this);
@@ -553,20 +549,20 @@ public class StudyPublishTest extends StudyProtectedExportTest
         table.clearFilter("Clinic");
     }
 
-    private void publishStudy(String name, String description, String parentContainer, String[] groups, String[] datasets,
+    private void publishStudy(String name, String description, int rootProjectOrFolder, String[] groups, String[] datasets,
                               String[] visits, String[] views, String[] reports, String[] lists, boolean includeSpecimens, boolean refreshSpecimens)
     {
-        publishStudy(name, description, parentContainer, groups, datasets, visits, views, reports, lists, includeSpecimens, refreshSpecimens, true, true, true, false);
+        publishStudy(name, description, rootProjectOrFolder, groups, datasets, visits, views, reports, lists, includeSpecimens, refreshSpecimens, true, true, true, false);
     }
 
     // Test should be in an existing study.
     @LogMethod
-    private void publishStudy(@LoggedParam String name, String description, String parentContainer, String[] groups, String[] datasets,
+    private void publishStudy(@LoggedParam String name, String description, int rootProjectOrFolder, String[] groups, String[] datasets,
                               String[] visits, String[] views, String[] reports, String[] lists, boolean includeSpecimens, boolean refreshSpecimens,
                               boolean removeProtected, boolean shiftDates, boolean alternateIDs, boolean maskClinicNames)
     {
         pushLocation();
-        goToQueryView("study", DATE_SHIFT_DATASET, false);
+        waitAndClickAndWait(Locator.linkWithText(DATE_SHIFT_DATASET_LABEL));
         Set<String> unshiftedDates = new HashSet<>();
         Set<String> preshiftedDates = new HashSet<>();
         if (groups != null && groups.length > 0)
@@ -602,7 +598,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         setFormElement(Locator.name("studyDescription"), description);
         assertTrue(PROTOCOL_DOC.exists());
         setFormElement(Locator.name("protocolDoc"), PROTOCOL_DOC);
-        selectLocation(parentContainer);
+        selectLocation(rootProjectOrFolder);
         clickButton("Next", 0);
 
         // Wizard page 2 : Mice
@@ -617,7 +613,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
             checkRadioButton("renderType", "existing");
             for (String group : groups)
             {
-                getWrapper().getEval("selenium.selectExtGridItem('label', '"+group+"', -1, 'studyWizardParticipantList', true)");
+                _extHelper.selectExtGridItem("label", group, -1, "studyWizardParticipantList", true);
             }
             assertTextNotPresent(GROUP0_NAME); // Unshared groups shouldn't show up here
         }
@@ -632,10 +628,10 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForElement(Locator.css(".studyWizardDatasetList"));
         for (String dataset : datasets)
         {
-            getWrapper().getEval("selenium.selectExtGridItem('Label', '"+dataset+"', -1, 'studyWizardDatasetList', true)");
+            _extHelper.selectExtGridItem("Label", dataset, -1, "studyWizardDatasetList", true);
         }
         if (datasets.length == 0) // select all
-            getWrapper().getEval("selenium.selectExtGridItem(null, null, -2, 'studyWizardDatasetList', true)");
+            click(Locator.css(".studyWizardDatasetList .x-grid3-hd-checker  div"));
         clickButton("Next", 0);
 
         // Wizard page 4 : Visits
@@ -647,10 +643,10 @@ public class StudyPublishTest extends StudyProtectedExportTest
         _extHelper.clickExtButton("Error", "OK", 0);
         for (String visit : visits)
         {
-            getWrapper().getEval("selenium.selectExtGridItem('SequenceNumMin', '" + visit + "', -1, 'studyWizardVisitList', true)");
+            _extHelper.selectExtGridItem("SequenceNumMin", visit, -1, "studyWizardVisitList", true);
         }
         if (visits.length == 0) // select all
-            getWrapper().getEval("selenium.selectExtGridItem(null, null, -2, 'studyWizardVisitList', true)");
+            click(Locator.css(".studyWizardVisitList .x-grid3-hd-checker  div"));
         clickButton("Next", 0);
 
         // Wizard page 5 : Specimens
@@ -661,7 +657,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Wizard Page 6 : Study Objects
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Study Objects']"));
-        mouseDown(Locator.css(".studyObjects .x-grid3-hd-checker  div"));
+        click(Locator.css(".studyObjects .x-grid3-hd-checker  div"));
         clickButton("Next", 0);
 
         // Wizard page 7 : Lists
@@ -669,7 +665,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForElement(Locator.css(".studyWizardListList"));
         for (String list : lists)
         {
-            getWrapper().getEval("selenium.selectExtGridItem('name', '" + list + "', -1, 'studyWizardListList', true)");
+            _extHelper.selectExtGridItem("name", list, -1, "studyWizardListList", true);
         }
         clickButton("Next", 0);
 
@@ -679,7 +675,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         assertTextNotPresent(R_VIEW_UNSHARED);
         for (String view : views)
         {
-            getWrapper().getEval("selenium.selectExtGridItem('name', '" + view + "', -1, 'studyWizardViewList', true)");
+            _extHelper.selectExtGridItem("name", view, -1, "studyWizardViewList", true);
         }
         clickButton("Next", 0);
 
@@ -689,13 +685,13 @@ public class StudyPublishTest extends StudyProtectedExportTest
         for (String report : reports)
         {
             waitForElement(Locator.css(".studyWizardReportList .x-grid3-col-1")); // Make sure grid is filled in
-            getWrapper().getEval("selenium.selectExtGridItem('name', '" + report + "', -1, 'studyWizardReportList', true)");
+            _extHelper.selectExtGridItem("name", report, -1, "studyWizardReportList", true);
         }
         clickButton("Next", 0);
 
         // Wizard page 10 : Folder Objects
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Folder Objects']"));
-        mouseDown(Locator.css(".folderObjects .x-grid3-hd-checker  div"));
+        click(Locator.css(".folderObjects .x-grid3-hd-checker  div"));
         clickButton("Next", 0);
 
         // Wizard page 11 : Publish Options
@@ -708,7 +704,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         _pipelineJobs++;
 
-        if (parentContainer.equals("/"))
+        if (rootProjectOrFolder == 0)
             _containerHelper.addCreatedProject(name); // Add to list so that it will be deleted during cleanup
 
         popLocation();
@@ -726,11 +722,12 @@ public class StudyPublishTest extends StudyProtectedExportTest
         _extHelper.waitForExtDialog("Add Measure...");
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
-        setFormElement(Locator.name("filterSearch"), datasetMeasurePairs[0][0]);
         String measureXpath = _extHelper.getExtDialogXPath("Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+datasetMeasurePairs[0][1]+"')]]";
+        waitForElement(Locator.xpath("(" + measureXpath + ")[2]"));
+        setFormElement(Locator.name("filterSearch"), datasetMeasurePairs[0][0]);
         waitForElementToDisappear(Locator.xpath("(" + measureXpath + ")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
         waitForElement(Locator.xpath(measureXpath));
-        mouseDown(Locator.xpath(measureXpath));
+        click(Locator.xpath(measureXpath));
         click(Locator.ext4Button("Select"));
         waitForText("No data found for the following measures/dimensions", WAIT_FOR_JAVASCRIPT);
 
@@ -745,11 +742,12 @@ public class StudyPublishTest extends StudyProtectedExportTest
                 _extHelper.waitForExtDialog("Add Measure...");
                 _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
-                setFormElement(Locator.name("filterSearch", i), datasetMeasurePairs[i][0]);
                 measureXpath = _extHelper.getExtDialogXPath("Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+datasetMeasurePairs[i][1]+"')]]";
+                waitForElement(Locator.xpath("("+measureXpath+")[2]"));
+                setFormElement(Locator.name("filterSearch", i), datasetMeasurePairs[i][0]);
                 waitForElementToDisappear(Locator.xpath("("+measureXpath+")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
                 waitForElement(Locator.xpath(measureXpath));
-                mouseDown(Locator.xpath(measureXpath));
+                click(Locator.xpath(measureXpath));
                 click(Locator.ext4Button("Select"));
 
                 waitForText(datasetMeasurePairs[i][1] + " from " + datasetMeasurePairs[i][0]);
@@ -759,13 +757,14 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         _ext4Helper.checkGridRowCheckbox("All");
         _ext4Helper.uncheckGridRowCheckbox("All");
+        waitForText("No mouse selected. Please select at least one mouse.");
         for (String mouseId : GROUP1_PTIDS)
         {
             // Select all of the Mice in GROUP1
             _ext4Helper.checkGridRowCheckbox(mouseId);
         }
-        sleep(1000);
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT); // Make sure charts are rendered
+        waitForText("No calculated interval values");
 
         // Add point click function
         clickButton("Developer", 0);
@@ -776,12 +775,12 @@ public class StudyPublishTest extends StudyProtectedExportTest
         _ext4Helper.waitForMaskToDisappear();
 
         // Visit-based chart
-        waitAndClick(Locator.css("svg text:contains('Days Since Contact Date')"));
-        waitForElement(Locator.ext4Button("Cancel"));
+        waitForElement(Locator.css("svg text").containing("Days Since Contact Date"));
+        fireEvent(Locator.css("svg text").containing("Days Since Contact Date").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), SeleniumEvent.click);
+        waitForElement(Locator.ext4Button("Cancel")); // Axis label windows always have a cancel button. It should be the only one on the page
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
         waitAndClick(Locator.ext4Button("OK"));
-        _ext4Helper.waitForMaskToDisappear();
-        waitForTextToDisappear("Days Since Contact Date");
+        waitForElement(Locator.css("svg text").containing("Visit"));
 
         clickButton("Save", 0);
         waitForText("Viewable By");
@@ -867,35 +866,26 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
     /**
      * Selects the destination for study publication
-     * @param containerPath path to the published study's parent. NULL or blank to select the default location.
+     * @param rootProjectOrFolder => 0 - root, 1 - project, 2 - folder
      */
-    private void selectLocation(String containerPath)
+    private void selectLocation(int rootProjectOrFolder)
     {
-        if (containerPath!=null && !containerPath.equals(""))
-        {
-            clickButton("Change", 0);
-            waitForElement(Locator.css(".folder-management-tree:not(.x-panel-collapsed)"));
+        clickButton("Change", 0);
+        sleep(1000); // sleep while the tree expands
 
-            String nodeXpath = "//div[contains(@class, 'folder-management-tree')]//ul[contains(@class, 'x-tree-root-ct')]/li/div[contains(@class, 'x-tree-node-el') and string()='LabKey Server Projects']";
-            if (containerPath.equals("/"))
-            {
-                selenium.doubleClick(Locator.xpath(nodeXpath).toString());
-            }
-            else
-            {
-                String[] splitPath = containerPath.split("/");
-                for (int i = 1; i < splitPath.length; i++)
-                {
-                    if (getAttribute(Locator.xpath(nodeXpath), "class").contains("x-tree-node-collapsed"))
-                    {
-                        click(Locator.xpath(nodeXpath + "/img[contains(@class, 'x-tree-ec-icon')]"));
-                    }
-                    nodeXpath += "/../ul/li/div[contains(@class, 'x-tree-node-el') and string()='"+splitPath[i]+"']";
-                    if (!isElementPresent(Locator.xpath(nodeXpath)))
-                        fail("Unable to find folder: " + containerPath);
-                }
-                selenium.doubleClick(Locator.xpath(nodeXpath).toString());
-            }
+        if (rootProjectOrFolder == 0)
+        {
+            Locator rootTreeNode = Locator.tagWithClass("a", "x-tree-node-anchor").withDescendant(Locator.tagWithText("span", "LabKey Server Projects"));
+            doubleClick(rootTreeNode);
+        }
+        else if (rootProjectOrFolder == 1)
+        {
+            Locator projectTreeNode = Locator.tagWithClass("a", "x-tree-node-anchor").withDescendant(Locator.tagWithText("span", getProjectName()));
+            doubleClick(projectTreeNode);
+        }
+        else
+        {
+            // noop : subfolder already selected by default
         }
     }
 
@@ -945,15 +935,15 @@ public class StudyPublishTest extends StudyProtectedExportTest
     private void goToQueryView(String schema, String query, boolean viewMetadata)
     {
         goToSchemaBrowser();
-        selectQuery(schema, query);
+        sleep(1000); // TODO: why is it having issues selecting the schema from the tree?
         if (!viewMetadata)
         {
-            waitForText("view data");
-            clickAndWait(Locator.linkContainingText("view data"));
+            viewQueryData(schema, query);
             waitForElement(Locator.css(".labkey-data-region"));
         }
         else
         {
+            selectQuery(schema, query);
             waitForText("edit metadata");
             clickAndWait(Locator.linkContainingText("edit metadata"));
             waitForElement(Locator.xpath("id('org.labkey.query.metadata.MetadataEditor-Root')//td[contains(@class, 'labkey-wp-title-left')]").withText("Metadata Properties"));

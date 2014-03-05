@@ -68,7 +68,8 @@ public class StudyExportTest extends StudyManualTest
         exportStudy(false, false);
 
         // delete manually created study
-        deleteStudy(getStudyLabel());
+        clickFolder(getFolderName());
+        deleteStudy();
 
         log("Importing exported study (legacy formats)");
         clickButton("Import Study");
@@ -98,7 +99,8 @@ public class StudyExportTest extends StudyManualTest
         exportStudy(true, true);
 
         // delete the study
-        deleteStudy(getStudyLabel());
+        clickFolder(getFolderName());
+        deleteStudy();
 
         log("Importing exported study (xml formats)");
         clickButton("Import Study");
@@ -166,7 +168,7 @@ public class StudyExportTest extends StudyManualTest
         clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
-        assertFormElementEquals(Locator.id("manualCohortAssignmentEnabled"), "on");
+        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("manualCohortAssignment", "true"));
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("47 datasets"));
         clickAndWait(Locator.linkWithText(DEMOGRAPHICS_DATASET));
@@ -192,7 +194,7 @@ public class StudyExportTest extends StudyManualTest
         super.verifySpecimens();
 
         // configure specimen tracking
-        clickFolder(getStudyLabel());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Request Statuses"));
         setFormElement("newLabel", "New Request");
@@ -232,14 +234,13 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
 
         // create specimen request
-        clickFolder(getStudyLabel());
+        clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Study Navigator"));
 
         assertLinkNotPresentWithText("24");
         selectOptionByText("QCState", "All data");
-        waitForPageToLoad();
 
-        clickAndWait(Locator.linkWithText("24"));
+        waitAndClickAndWait(Locator.linkWithText("24"));
         checkCheckbox(Locator.checkboxByName(".toggle"));
         clickButton("View Specimens");
         assertLinkPresentWithText("999320016");
@@ -265,19 +266,17 @@ public class StudyExportTest extends StudyManualTest
         assertNavButtonPresent("Details");
         assertTextPresent("Not Yet Submitted");
         clickButton("Submit", 0);
-        getConfirmationAndWait();
-        clickAndWait(Locator.linkWithText("Specimen Requests"));
+        getAlert(); // TODO: add check for expected alert text
+        waitAndClickAndWait(Locator.linkWithText("Specimen Requests"));
         assertNavButtonNotPresent("Submit");
         assertNavButtonPresent("Details");
         assertTextPresent("New Request");
 
         // test auto-fill:
         clickButton("Create New Request");
-        String inputs = selenium.getValue("inputs");
-        System.out.println(inputs);
-        assertNotEquals(selenium.getEval("selenium.browserbot.getCurrentWindow().document.forms[1].inputs[1].value;"), "Duke University, NC");
+        assertNotEquals(getFormElement(Locator.id("input1")), "Duke University, NC");
         selectOptionByText("destinationLocation", "Duke University (Repository, Site Affiliated Lab, Clinic)");
-        assertEquals(selenium.getEval("selenium.browserbot.getCurrentWindow().document.forms[1].inputs[1].value;"), "Duke University, NC");
+        assertEquals(getFormElement(Locator.id("input1")), "Duke University, NC");
         clickButton("Cancel");
 
         // manage new request
@@ -326,7 +325,7 @@ public class StudyExportTest extends StudyManualTest
 
         // enable advanced study security
         selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
-        waitForPageToLoad(30000);
+        waitForElements(Locator.tagWithName("table", "webpart"), 3);
 
         click(Locator.xpath("//td[.='Users']/..//input[@value='READ']"));
         clickAndWait(Locator.id("groupUpdateButton"));
@@ -344,7 +343,7 @@ public class StudyExportTest extends StudyManualTest
         clickMenuButton("QC State", "clean");
 
         // test specimen comments
-        clickFolder(getStudyLabel());
+        clickFolder(getFolderName());
         waitAndClick(Locator.linkWithText("Vials by Derivative Type"));
         waitForText("Plasma, Unknown Processing");
         clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
@@ -357,25 +356,25 @@ public class StudyExportTest extends StudyManualTest
         setFilter("SpecimenDetail", "MouseId", "Equals", "999320824");
         checkAllOnPage("SpecimenDetail");
         clickMenuButtonAndContinue("Comments and QC", "Clear Vial Comments for Selected");
-        getConfirmationAndWait();
+        getAlert(); // TODO: add check for expected alert text
         assertTextNotPresent("These vials are very important.");
         clearFilter("SpecimenDetail", "MouseId");
         assertTextPresent("These vials are very important.", 23);
         clickMenuButton("Comments and QC", "Exit Comments and QC mode");
 
         // import second archive, verify that that data is merged:
-        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getStudyLabel(), 5);
+        SpecimenImporter importer = new SpecimenImporter(new File(getPipelinePath()), new File(getLabKeyRoot(), SPECIMEN_ARCHIVE_B), new File(getLabKeyRoot(), ARCHIVE_TEMP_DIR), getFolderName(), 5);
         importer.importAndWaitForComplete();
 
         // verify that comments remain after second specimen load
-        clickFolder(getStudyLabel());
+        clickFolder(getFolderName());
         waitAndClick(Locator.linkWithText("Vials by Derivative Type"));
         waitForText("Plasma, Unknown Processing");
         clickAndWait(Locator.linkWithText("Plasma, Unknown Processing"));
         assertTextPresent("These vials are very important.", 2);
 
         // check to see that data in the specimen archive was merged correctly:
-        clickFolder(getStudyLabel());
+        clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("By Individual Vial"));
         clickMenuButton("Page Size", "Show All");
         assertTextPresent("DRT000XX-01");
@@ -394,8 +393,8 @@ public class StudyExportTest extends StudyManualTest
 //        setFormElement(globalUniqueIDValueElems[0], "1416");
 //        setFormElement(participantIDFormElems[2], "999320528");
 
-        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Mouse:"), "999320528", true);
-        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Visit:"), "Enroll/Vacc #1 (201)", true);
+        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Mouse:"), true, "999320528");
+        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Visit:"), true, "Enroll/Vacc #1 (201)");
 
         clickButton("Search");
         assertTextPresent("999320528");
@@ -407,17 +406,17 @@ public class StudyExportTest extends StudyManualTest
         clickAndWait(Locator.linkWithText("[history]"));
         assertTextPresent("GAA082NH-01");
         assertTextPresent("BAD");
-        assertTextPresent("1.0&nbsp;ML");
+        //assertTextPresent("1.0&nbsp;ML");
         assertTextPresent("Added Comments");
         assertTextPresent("Johannesburg, South Africa");
 
-        clickFolder(getStudyLabel());
+        clickFolder(getFolderName());
         click(Locator.linkWithText("Specimen Requests"));
         clickAndWait(Locator.linkWithText("View Current Requests"));
         clickButton("Details");
         assertTextPresent("WARNING: Missing Specimens");
         clickButton("Delete missing specimens", 0);
-        getConfirmationAndWait();
+        getAlert(); // TODO: add check for expected alert text
         assertTextNotPresent("WARNING: Missing Specimens");
         assertTextPresent("Duke University");
         assertTextPresent("An Assay Plan");
@@ -433,8 +432,9 @@ public class StudyExportTest extends StudyManualTest
 
         enterStudySecurity();
 
+        prepForPageLoad();
         selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
-        waitForPageToLoad(30000);
+        newWaitForPageToLoad();
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("47 datasets"));
@@ -466,11 +466,11 @@ public class StudyExportTest extends StudyManualTest
         log("Test deleting rows in a dataset");
         checkCheckbox(Locator.xpath("//input[contains(@value, '999320529')]"));
         clickButton("Delete", 0);
-        getConfirmationAndWait();
+        getAlert(); // TODO: add check for expected alert text
         assertTextNotPresent("999320529");
 
         // configure QC state management to show all data by default so the next steps don't have to keep changing the state:
-        clickFolder(getStudyLabel());
+        clickFolder(getFolderName());
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
         selectOptionByText("showPrivateDataByDefault", "All data");
@@ -560,6 +560,7 @@ public class StudyExportTest extends StudyManualTest
         click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
         waitForElement(Locator.name("mvEnabled"), WAIT_FOR_JAVASCRIPT);
         checkCheckbox("mvEnabled");
+        click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Display']"));
         setFormElement(Locator.id("propertyDescription"), COLUMN_DESC);
         // TODO: add lookups for current & other folders
         clickButton("Save");
@@ -581,7 +582,7 @@ public class StudyExportTest extends StudyManualTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Cohorts"));
         clickRadioButtonById("manualCohortAssignmentEnabled");
-        waitForPageToLoad();
+        waitForText("Mouse-Cohort Assignments");
         setParticipantCohort(MODIFIED_PARTICIPANT, GROUP_2);
         clickButton("Save");
     }
@@ -623,8 +624,7 @@ public class StudyExportTest extends StudyManualTest
         _extHelper.selectGWTComboBoxItem(sequenceNum, "visit number");
 
         waitAndClickButton("Import");
-        waitForPageToLoad();
-
+        waitForElement(Locator.paginationText(9));
         assertTextPresent("kevin");
         assertTextPresent("chimpanzee");
     }
