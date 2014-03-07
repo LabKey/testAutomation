@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
  * Date: Jan 6, 2011
  */
 @Category({DailyB.class, Study.class, Assays.class})
-public class TargetStudyTest extends AbstractAssayTestWD
+public class TargetStudyTest extends AbstractAssayTest
 {
     private static final String ASSAY_NAME = "Assay";
     private static final String STUDY1_LABEL = "AwesomeStudy1";

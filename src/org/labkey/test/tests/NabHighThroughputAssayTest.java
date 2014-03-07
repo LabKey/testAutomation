@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
  * Date: 2/27/13
  */
 @Category({DailyA.class, Assays.class})
-public class NabHighThroughputAssayTest extends AbstractAssayTestWD
+public class NabHighThroughputAssayTest extends AbstractAssayTest
 {
     private final static String TEST_ASSAY_PRJ_NAB = "Nab High Throughput Test Verify Project";            //project for nab test
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";

@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
  * User: kevink
  * Date: Feb 23, 2011
  */
-public abstract class AbstractViabilityTest extends AbstractQCAssayTestWD
+public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 {
     @Override
     public String getAssociatedModuleDirectory()

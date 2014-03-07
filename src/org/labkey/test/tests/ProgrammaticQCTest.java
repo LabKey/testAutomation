@@ -30,7 +30,7 @@ import java.io.*;
  * Time: 4:39:49 PM
  */
 @Category({DailyA.class})
-public class ProgrammaticQCTest extends AbstractQCAssayTestWD
+public class ProgrammaticQCTest extends AbstractQCAssayTest
 {
     protected final static String TEST_PROGRAMMATIC_QC_PRJ = "Programmatic QC Test";
     protected final static String QC_ASSAY = "QC Assay";

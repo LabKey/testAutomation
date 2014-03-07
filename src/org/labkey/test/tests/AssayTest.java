@@ -38,7 +38,7 @@ import static org.junit.Assert.*;
  * Date: Aug 10, 2007
  */
 @Category({BVT.class, Study.class, Assays.class})
-public class AssayTest extends AbstractAssayTestWD
+public class AssayTest extends AbstractAssayTest
 {
     private final PortalHelper portalHelper = new PortalHelper(this);
 

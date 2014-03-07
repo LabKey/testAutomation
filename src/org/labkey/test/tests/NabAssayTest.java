@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
  * Date: Nov 20, 2007
  */
 @Category({DailyA.class, Assays.class})
-public class NabAssayTest extends AbstractQCAssayTestWD
+public class NabAssayTest extends AbstractQCAssayTest
 {
     private final static String TEST_ASSAY_PRJ_NAB = "Nab Test Verify Project";            //project for nab test
     private final static String TEST_ASSAY_FLDR_NAB = "nabassay";

@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
  * Date: Dec 28, 2008
  */
 @Category({DailyA.class, Assays.class})
-public class ModuleAssayTest extends AbstractAssayTestWD
+public class ModuleAssayTest extends AbstractAssayTest
 {
     private final static String PROJECT_NAME = "ModuleAssayTest";
     private static final String MODULE_NAME = "miniassay";

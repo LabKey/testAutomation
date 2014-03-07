@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2014 LabKey Corporation
+ * Copyright (c) 2012-2014 LabKey Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,14 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: jeckels
- * Date: Nov 20, 2007
- */
 public abstract class AbstractAssayTest extends SimpleApiTestWD
 {
-    // protected final static int WAIT_FOR_JAVASCRIPT = 5000;  uncomment to override base class
-
     //constants added for security tests
     protected final static String TEST_ASSAY_PERMS_READER = "Reader";                 //name of built-in reader role
     private final static String TEST_ASSAY_PERMS_EDITOR = "Editor";                 //name of built-in editor role
@@ -51,16 +46,18 @@ public abstract class AbstractAssayTest extends SimpleApiTestWD
     protected final static String TEST_ASSAY_FLDR_STUDY3 = "Study 3";                 //another sub of Studies
     protected final static String TEST_ASSAY_PERMS_STUDY_READALL = "READ";
 
+    private PortalHelper portalHelper = new PortalHelper(this);
+
     /**
      * Sets up the data pipeline for the specified project. This can be called from any page.
      * @param project name of project for which the pipeline should be setup
      */
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void setupPipeline(String project)
     {
         log("Setting up data pipeline for project " + project);
         clickProject(project);
-        addWebPart("Data Pipeline");
+        portalHelper.addWebPart("Data Pipeline");
         clickButton("Setup");
         File dir = getTestTempDir();
         dir.mkdirs();
@@ -93,7 +90,7 @@ public abstract class AbstractAssayTest extends SimpleApiTestWD
      *  - if the target study was set to a folder where the PI does not have editor perms, the system will
      *     warn the PI of this when publishing and force the PI to select one in which the PI does have editor perms.
      */
-    @LogMethod(category = LogMethod.MethodType.SETUP)
+    @LogMethod
     protected void setupEnvironment()
     {
         //create a new project for the security tests
@@ -105,13 +102,15 @@ public abstract class AbstractAssayTest extends SimpleApiTestWD
         //we should now be sitting on the new project security page
         //create a group in the project for PIs and make them readers by default
         createPermissionsGroup(TEST_ASSAY_GRP_PIS);
-        setPermissions(TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_READER);
+        _securityHelper.setProjectPerm(TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_READER);
 
         //set Users group to be Readers by default
-        setPermissions(TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_READER);
+        _securityHelper.setProjectPerm(TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_READER);
 
         //add a PI user to that group
         addUserToProjGroup(TEST_ASSAY_USR_PI1, TEST_ASSAY_PRJ_SECURITY,TEST_ASSAY_GRP_PIS);
+        // give the PI user "CanSeeAuditLog" permission
+        setSiteAdminRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
 
         //add a lab tech user to the Users group
         addUserToProjGroup(TEST_ASSAY_USR_TECH1, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_GRP_USERS);
@@ -156,7 +155,7 @@ public abstract class AbstractAssayTest extends SimpleApiTestWD
         // ends up testing the study-level security anyway.
         log("Setting study-level permissions");
         setStudyPerms(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY1,
-                        TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_STUDY_READALL);
+                TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_STUDY_READALL);
 
         setStudyQCStates(TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_FLDR_STUDY1);
 
@@ -164,7 +163,7 @@ public abstract class AbstractAssayTest extends SimpleApiTestWD
         log("Adding assay list web part to lab1 folder");
         clickProject(TEST_ASSAY_PRJ_SECURITY);
         clickFolder(TEST_ASSAY_FLDR_LAB1);
-        addWebPart("Assay List");
+        portalHelper.addWebPart("Assay List");
     } //setupEnvironment()
 
     /**
@@ -186,6 +185,7 @@ public abstract class AbstractAssayTest extends SimpleApiTestWD
         enterPermissionsUI();
         uncheckInheritedPermissions();
         waitAndClickButton("Save", 0);
+        _ext4Helper.waitForMaskToDisappear();
         waitForElement(Locator.permissionRendered());
         if (TEST_ASSAY_PERMS_NONE.equals(perms))
         {
@@ -193,7 +193,7 @@ public abstract class AbstractAssayTest extends SimpleApiTestWD
             removePermission(group, "Reader");
         }
         else
-            setPermissions(group, perms);
+            _securityHelper.setProjectPerm(group, perms);
     } //setSubFolderSecurity()
 
     /**
@@ -214,8 +214,9 @@ public abstract class AbstractAssayTest extends SimpleApiTestWD
         clickFolder(folder);
         enterStudySecurity();
 
+        prepForPageLoad();
         selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
-        waitForPageToLoad(30000);
+        newWaitForPageToLoad(30000);
 
         click(Locator.xpath("//td[.='" + group + "']/..//input[@value='" + perms + "']"));
 
@@ -246,7 +247,6 @@ public abstract class AbstractAssayTest extends SimpleApiTestWD
      * though it will go through a sign out and sign in, requiring re-selection
      * of the project
      */
-    @LogMethod
     protected void revertToAdmin()
     {
         log("reverting to admin");
@@ -267,21 +267,20 @@ public abstract class AbstractAssayTest extends SimpleApiTestWD
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.xpath(prefix + "//span/input[@name='required']"), 0);
     }
 
-    /** @param confirmEditInOtherContainer true if the assay design is stored in another container and we should
-     *                                     expect a confirmation dialog before navigating to the designer
-     */
-    protected void clickEditAssayDesign(boolean confirmEditInOtherContainer)
+    protected void clickEditAssayDesign(Boolean confirmEditInOtherContainer)
     {
+        prepForPageLoad();
         click(Locator.linkWithText("manage assay design"));
-        click(Locator.linkWithText("edit assay design"));
+        waitAndClick(Locator.linkWithText("edit assay design"));
         if (confirmEditInOtherContainer)
         {
-            String confirmation = getAlert();
-            assertTrue(confirmation.contains("This assay is defined in the"));
-            assertTrue(confirmation.contains("Would you still like to edit it?"));
+            String alertText = getAlert();
+            assertTrue("Alert did not contain expected text\nExpected: This assay is defined in the\nActual: " + alertText,
+                    alertText.contains("This assay is defined in the"));
+            assertTrue("Alert did not contain expected text\nExpected: Would you still like to edit it?\nActual: " + alertText,
+                    alertText.contains("Would you still like to edit it?"));
         }
-
-        waitForElement(Locator.name("AssayDesignerDescription"));
+        newWaitForPageToLoad(WAIT_FOR_PAGE);
     }
 
     protected void enterStudySecurity()
