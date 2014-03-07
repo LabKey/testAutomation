@@ -599,6 +599,16 @@ public abstract class Locator
         return Locator.tagWithClass("select", "gwt-ListBox").withPredicate(Locator.xpath("../preceding-sibling::td/table/tbody/tr/td/div").withText(label));
     }
 
+    public static XPathLocator gwtCheckBoxOnImportGridByColLabel(String label)
+    {
+        return Locator.tagWithAttribute("input", "type", "checkbox").withPredicate(Locator.xpath("../../following-sibling::td/span").containing(label));
+    }
+
+    public static XPathLocator gwtNextButtonOnImportGridByColLabel(String label)
+    {
+        return Locator.tagWithClass("div", "x-tbar-page-next").withPredicate(Locator.xpath("../preceding-sibling::td/span").containing(label));
+    }
+
     public static XPathLocator permissionRendered()
     {
         return xpath("//input[@id='policyRendered']");

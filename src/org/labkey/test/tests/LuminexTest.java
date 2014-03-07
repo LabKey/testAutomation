@@ -1386,7 +1386,7 @@ public class LuminexTest extends AbstractQCAssayTest
         goToTestAssayHome();
         clickEditAssayDesign(false);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
-        _listHelper.addField("Batch Fields", 8, "CustomProtocol", "Protocol", ListColumnType.String);
+        _listHelper.addField("Batch Fields", 9, "CustomProtocol", "Protocol", ListColumnType.String);
         // save changes to assay design
         clickButton("Save & Close");
 
@@ -2307,7 +2307,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_4PL.pdf", 3);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_5PL.pdf", 3);
         assertLinkPresentWithTextCount("Guide Set plate " + index + ".xls", 4);
-        assertLinkPresentWithTextCount("Guide Set plate " + index + ".tomaras_luminex_transform.Rout", 3);
+        assertLinkPresentWithTextCount("Guide Set plate " + index + ".labkey_luminex_transform.Rout", 3);
 
         return true;
     }
