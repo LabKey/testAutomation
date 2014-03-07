@@ -19,6 +19,7 @@ import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 
 import java.io.File;
@@ -160,7 +161,7 @@ public class RReportHelperWD extends AbstractHelperWD
         try
         {
             if (_test.isREngineConfigured())
-                if(System.getProperty("teamcity.buildType.id") == null)
+                if(TestProperties.isTestRunningOnTeamCity())
                 {
                     _test.doubleClick(Locator.css("div.x-grid3-col-0").containing("R Scripting Engine"));
                     return getRVersion(new File(_test.getFormElement(Locator.id("editEngine_exePath"))));

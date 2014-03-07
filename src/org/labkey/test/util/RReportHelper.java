@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 
 import java.io.File;
@@ -159,7 +160,7 @@ public class RReportHelper extends AbstractHelper
         try
         {
             if (_test.isREngineConfigured())
-                if(System.getProperty("teamcity.buildType.id") == null)
+                if(TestProperties.isTestRunningOnTeamCity())
                     return true;
                 else // Reset R scripting engine on TeamCity
                     deleteEngine();
