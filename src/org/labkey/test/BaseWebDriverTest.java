@@ -3256,7 +3256,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             @Override
             public boolean check()
             {
-                return (Boolean)executeScript("if (HoverNavigation) return true; else return false;");
+                return (Boolean)executeScript("if (HoverNavigation && HoverNavigation._folder && HoverNavigation._project) return true; else return false;");
             }
         }, "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
     }
@@ -6223,15 +6223,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void impersonate(String fakeUser)
     {
-        if (isElementPresent(Locator.id("userMenuPopupLink")))
-        {
-            click(Locator.id("userMenuPopupLink"));
-        }
-        assertTextNotPresent("Stop Impersonating");
-        goToAdminConsole();
-        selectOptionByText(Locator.id("email"), fakeUser);
-        clickButton("Impersonate");
+        _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "User");
+        waitForElement(Ext4HelperWD.Locators.window("Impersonate User"));
+        _ext4Helper.selectComboBoxItem("User:", fakeUser + " (", true);
+        clickAndWait(Ext4HelperWD.ext4WindowButton("Impersonate User", "Impersonate"));
         _impersonationStack.push(fakeUser);
+
+        if (isElementPresent(Locator.navButton("Home")))
+        {
+            clickAndWait(Locator.navButton("Home"));
+        }
     }
 
 
@@ -6243,21 +6244,6 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertSignOutAndMyAccountPresent();
         goToHome();
         assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
-    }
-
-    public void impersonateAtProjectLevel(String fakeUser)
-    {
-        if (isElementPresent(Locator.id("userMenuPopupLink")))
-        {
-            click(Locator.id("userMenuPopupLink"));
-        }
-        assertTextNotPresent("Stop Impersonating");
-        ensureAdminMode();
-        enterPermissionsUI();
-        _ext4Helper.clickTabContainingText("Impersonate");
-        selectOptionByText(Locator.id("email"), fakeUser);
-        clickButton("Impersonate");
-        _impersonationStack.push(fakeUser);
     }
 
     private HashMap<String, String> usersAndDisplayNames = new HashMap<>();

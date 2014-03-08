@@ -5054,15 +5054,16 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
 
     public void impersonate(String fakeUser)
     {
-        if (isElementPresent(Locator.id("userMenuPopupLink")))
-        {
-            click(Locator.id("userMenuPopupLink"));
-        }
-        assertTextNotPresent("Stop Impersonating");
-        goToAdminConsole();
-        selectOptionByText(Locator.id("email").toString(), fakeUser);
-        clickButton("Impersonate");
+        _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "User");
+        waitForElement(Ext4HelperWD.Locators.window("Impersonate User"));
+        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("User:"), fakeUser + " (", true);
+        clickAndWait(Ext4HelperWD.ext4WindowButton("Impersonate User", "Impersonate"));
         _impersonationStack.push(fakeUser);
+
+        if (isElementPresent(Locator.navButton("Home")))
+        {
+            clickAndWait(Locator.navButton("Home"));
+        }
     }
 
 
@@ -5075,22 +5076,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         goToHome();
         assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
     }
-
-    public void impersonateAtProjectLevel(String fakeUser)
-    {
-        if (isElementPresent(Locator.id("userMenuPopupLink")))
-        {
-            click(Locator.id("userMenuPopupLink"));
-        }
-        assertTextNotPresent("Stop Impersonating");
-        ensureAdminMode();
-        enterPermissionsUI();
-        _ext4Helper.clickTabContainingText("Impersonate");
-        selectOptionByText(Locator.id("email"), fakeUser);
-        clickAndWait(Locator.linkWithText("Impersonate"));
-        _impersonationStack.push(fakeUser);
-    }
-
 
     // assumes there are not collisions in the database causing unique numbers to be appended
     protected String displayNameFromEmail(String email)

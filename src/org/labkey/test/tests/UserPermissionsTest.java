@@ -64,6 +64,12 @@ public class UserPermissionsTest extends BaseWebDriverTest
         return PERM_PROJECT_NAME;
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         log(this.getClass().getName() + " Cleaning Up");
@@ -217,7 +223,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         signOut();
         signIn(GAMMA_PROJECT_ADMIN_USER, PasswordUtil.getPassword(), true);
         clickProject(PERM_PROJECT_NAME);
-        impersonateAtProjectLevel(GAMMA_READER_USER);
+        impersonate(GAMMA_READER_USER);
         clickProject(PERM_PROJECT_NAME);
         hoverFolderBar();
         expandFolderTree(GAMMA_SUB_FOLDER_NAME);
