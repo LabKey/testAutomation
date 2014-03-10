@@ -3256,7 +3256,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             @Override
             public boolean check()
             {
-                return (Boolean)executeScript("if (HoverNavigation && HoverNavigation._folder && HoverNavigation._project) return true; else return false;");
+                return (Boolean)executeScript("if (HoverNavigation) return true; else return false;");
             }
         }, "HoverNavigation not ready", WAIT_FOR_JAVASCRIPT);
     }
