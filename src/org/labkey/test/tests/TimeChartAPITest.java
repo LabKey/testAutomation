@@ -219,7 +219,7 @@ public class TimeChartAPITest extends TimeChartTest
         "Only time charts are currently supported: expected 'time' property on each measure.",
         "Unknown time value: test",
         "Multiple intervals with different start dates or units are not supported",
-        "No enum constant org.labkey.visualization.sql.VisualizationIntervalColumn.Interval.MINUTE",
+        "No enum constant org.labkey.api.visualization.VisualizationIntervalColumn.Interval.MINUTE",
         "SchemaName, queryName, and name are all required for each measure, dimension, or sort.",
         "Unable to find field ObcConcNA in study.LuminexAssay.",
         "The 'dateCol' and 'zeroDateCol' properties are requried for each measure.",
