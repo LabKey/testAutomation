@@ -2830,7 +2830,7 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
      */
     @Deprecated public void waitForExtMaskToDisappear()
     {
-        waitForExtMaskToDisappear( WAIT_FOR_JAVASCRIPT );
+        waitForExtMaskToDisappear(WAIT_FOR_JAVASCRIPT);
     }
 
     /**
@@ -2906,6 +2906,10 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         return isElementPresent(Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']"));
     }
 
+    @Deprecated
+    /**
+     * @deprecated Migrate to {@link org.labkey.test.BaseWebDriverTest} and use {@link org.labkey.test.BaseWebDriverTest#click(Locator)}
+     */
     public void mouseClick(String locator)
     {
         selenium.mouseClick(locator);

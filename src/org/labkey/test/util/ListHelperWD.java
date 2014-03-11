@@ -594,7 +594,7 @@ public class ListHelperWD extends ListHelper
 
     public void clickRow(@Nullable String prefix, int index)
     {
-        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_name" + index + "']");
+        Locator l = Locator.xpath((null==prefix?"":prefix) + "//input[@name='ff_label" + index + "']");
         _test.click(l);
     }
 

@@ -17,13 +17,13 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
-import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.PortalHelper;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,13 +31,8 @@ import java.util.Date;
 
 import static org.junit.Assert.*;
 
-/**
- * User: brittp
- * Date: Nov 22, 2005
- * Time: 1:31:42 PM
- */
 @Category({BVT.class, FileBrowser.class})
-public class ExpTest extends BaseSeleniumWebTest
+public class ExpTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "ExpVerifyProject";
     private static final String FOLDER_NAME = "verifyfldr";
@@ -57,6 +52,12 @@ public class ExpTest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         deleteProject(getProjectName(), afterTest);
@@ -66,8 +67,9 @@ public class ExpTest extends BaseSeleniumWebTest
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Experiment", "Query" });
-        addWebPart("Data Pipeline");
-        addWebPart("Run Groups");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Data Pipeline");
+        portalHelper.addWebPart("Run Groups");
         clickButton("Setup");
         setPipelineRoot(getLabKeyRoot() + "/sampledata/xarfiles/expVerify");
         clickFolder(FOLDER_NAME);
@@ -75,15 +77,15 @@ public class ExpTest extends BaseSeleniumWebTest
 
         _fileBrowserHelper.importFile("experiment.xar.xml", "Import Experiment");
         clickAndWait(Locator.linkWithText("Data Pipeline"));
-        assertLinkNotPresentWithText("ERROR");
+        assertElementNotPresent(Locator.linkWithText("ERROR"));
         int seconds = 0;
-        while (!isLinkPresentWithText("COMPLETE") && seconds++ < MAX_WAIT_SECONDS)
+        while (!isElementPresent(Locator.linkWithText("COMPLETE")) && seconds++ < MAX_WAIT_SECONDS)
         {
             sleep(1000);
             clickTab("Pipeline");
         }
 
-        if (!isLinkPresentWithText("COMPLETE"))
+        if (!isElementPresent(Locator.linkWithText("COMPLETE")))
             fail("Import did not complete.");
 
         clickFolder(FOLDER_NAME);
@@ -109,7 +111,7 @@ public class ExpTest extends BaseSeleniumWebTest
                 "substring(Datas.DataFileUrl, 0, 7) AS DataFileUrlPrefix,\n" +
                 "Datas.Created AS Created\n" +
                 "FROM Datas");
-        clickButton("Execute Query", 0);        
+        _extHelper.clickExtTab("Data");
 
         // Check that it contains the date format we expect
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -121,8 +123,10 @@ public class ExpTest extends BaseSeleniumWebTest
         clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
         clickButton("Edit Metadata");
-        waitForElement(Locator.name("ff_label5"), WAIT_FOR_JAVASCRIPT);
-        _listHelper.setColumnLabel(5, "editedCreated");
+        int created_RowIndex = 5;
+        waitForElement(Locator.name("ff_label" + created_RowIndex), WAIT_FOR_JAVASCRIPT);
+        _listHelper.clickRow(created_RowIndex);
+        _listHelper.setColumnLabel(created_RowIndex, "editedCreated");
         _extHelper.clickExtTab("Format");
         setFormElement(Locator.id("propertyFormat"), "ddd MMM dd yyyy");
         clickButton("Save", 0);
@@ -152,10 +156,10 @@ public class ExpTest extends BaseSeleniumWebTest
         click(Locator.xpath("//span").append(Locator.navButton("OK")));
 
         // Make it a lookup into our custom query
-        int fieldCount = getXpathCount(Locator.xpath("//input[contains(@name, 'ff_type')]"));
+        int fieldCount = getElementCount(Locator.xpath("//input[contains(@name, 'ff_type')]"));
         assertTrue(fieldCount > 0);
         _listHelper.setColumnType(fieldCount - 1, new ListHelper.LookupInfo(null, "exp", "dataCustomQuery"));
-        mouseClick(Locator.name("ff_type" + (fieldCount - 1)).toString());
+        click(Locator.name("ff_type" + (fieldCount - 1)));
 
         // Save it
         clickButton("Save", 0);
