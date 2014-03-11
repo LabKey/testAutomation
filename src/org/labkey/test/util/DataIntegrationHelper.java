@@ -91,14 +91,17 @@ public class DataIntegrationHelper
         String jobId = response.getJobId();
         String status = response.getStatus();
         if (status.equalsIgnoreCase("Queued"))
-            for(int i=0; i<msTimeout; i+=1000)
+        {
+            long startTime = System.currentTimeMillis();
+            do
             {
                 status = getTransformStatus(jobId);
                 if(status.equalsIgnoreCase("COMPLETE") || status.equalsIgnoreCase("ERROR"))
                     return response;
                 else
                     sleep(500);
-            }
+            }while(System.currentTimeMillis() - startTime < msTimeout);
+        }
         return response;
     }
 
