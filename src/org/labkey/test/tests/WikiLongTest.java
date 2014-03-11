@@ -427,7 +427,7 @@ public class WikiLongTest extends BaseWebDriverTest
         removePermission(USERS_GROUP, "Reader");
         clickButton("Save and Finish");
         impersonate(USER1);
-        assertTextNotPresent(PROJECT2_NAME);     // Project should not be visible
+        assertElementNotPresent(Locator.linkWithText(PROJECT2_NAME));     // Project should not be visible
         popLocation();
         assertTextPresent("User does not have permission to perform this operation");  // Not authorized
         goToHome();
@@ -651,9 +651,9 @@ public class WikiLongTest extends BaseWebDriverTest
         clickButton("Agree");
 
         log("Check terms with impersonated user");
+        clickProject(PROJECT_NAME, false);
         impersonate(USER2);
 
-        clickProject(PROJECT_NAME, false);
         assertTextPresent("fight club");
         checkCheckbox(Locator.id("approvedTermsOfUse"));
         clickButton("Agree");
