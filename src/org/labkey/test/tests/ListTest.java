@@ -603,16 +603,10 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(LIST2_KEY3);
         assertTextNotPresent(LIST2_KEY4);
 
-        log("Get URL to test exporting deleted list.");
+        log("Test deleting data (should any list custom views)");
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
-        clickButton("Export", 0);
-        _extHelper.clickSideTab("Text");
-        String exportButtonScript = getAttribute(Locator.navButton("Export to Text"), "onclick");
-        String exportUrl = exportButtonScript.substring(exportButtonScript.indexOf("window.location=") + 17, exportButtonScript.indexOf("document.getElementById") - 11);
         clickAndWait(Locator.linkWithText("View Design"));
-
-        log("Test deleting data (should any list custom views)");
         clickDeleteList();
         assertTextPresent("The following depend upon this list:", "Custom view '" + TEST_VIEW + "'");
         clickButton("OK");
@@ -629,7 +623,8 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("query not found");
 
         log("Test exporting a nonexistent list returns a 404");
-        beginAt(exportUrl.substring(WebTestHelper.getContextPath().length()));
+        String exportUrl = "/" + EscapeUtil.encode(PROJECT_VERIFY) + "/query-exportRowsTsv.view?schemaName=lists&query.queryName=" + EscapeUtil.encode(LIST_NAME_COLORS);
+        beginAt(exportUrl);
         assertEquals("Incorrect response code", 404, getResponseCode());
         assertTextPresent("Query '" + LIST_NAME_COLORS + "' in schema 'lists' doesn't exist.");
 
