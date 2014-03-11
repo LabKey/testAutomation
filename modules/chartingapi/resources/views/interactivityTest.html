@@ -90,10 +90,10 @@
                 shape: {scaleType: 'discrete', range: LABKEY.vis.Scale.DataspaceShape()}
             },
             brushing: {
-                brushstart: function(event, data, extent, layerSelections) {
+                brushstart: function(event, data, extent, plot, layerSelections) {
                     brushed = true;
                 },
-                brush: function(event, data, extent, layerSelections) {
+                brush: function(event, data, extent, plot, layerSelections) {
                     var points = layerSelections[0].selectAll('.point path');
                     var colorScale = scatterPlotBrushing.scales.color.scale;
                     var colorAcc = function(d) {
@@ -125,7 +125,7 @@
                 brushend: function(){
                     // TODO: pop up ext window with brush end message.
                 },
-                brushclear: function(event, data, layerSelections) {
+                brushclear: function(event, data, plot, layerSelections) {
                     brushed = false;
                     // TODO: pop up ext window with brush clear message.
                 }
