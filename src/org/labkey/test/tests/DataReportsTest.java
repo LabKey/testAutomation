@@ -113,7 +113,7 @@ public class DataReportsTest extends ReportTest
 
     private final static String R_SCRIPT2_TEXT2 = "999320672";
 
-    protected final static String R_USER = "r_user@report.test";
+    protected final static String R_USER = "r_editor@report.test";
     protected final static String AUTHOR_USER = "author_user@report.test";
 
     @Override
