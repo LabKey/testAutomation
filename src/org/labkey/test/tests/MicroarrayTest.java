@@ -213,7 +213,7 @@ public class MicroarrayTest extends BaseWebDriverTest
         _customizeViewsHelper.openCustomizeViewPanel();
         String name = "unneeded view";
         _customizeViewsHelper.saveCustomView(name);
-        assertTextNotPresent("Error");
+        assertElementNotPresent(Locator.tagWithClass("*", "labkey-error").withPredicate("string-length() > 0"));
         assertElementPresent(Locator.css(".labkey-dataregion-msg").withText("View: " + name));
 
         //Issue 16936: Microarray, Viability, Elispot, and other assays fail to find custom run view
