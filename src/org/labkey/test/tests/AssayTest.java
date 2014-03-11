@@ -336,9 +336,9 @@ public class AssayTest extends AbstractAssayTest
     private void uploadRuns(String folder, String asUser)
     {
         log("Uploading runs into folder " + folder + " as user " + asUser);
-        impersonate(asUser);
         clickProject(TEST_ASSAY_PRJ_SECURITY);
         clickFolder(folder);
+        impersonate(asUser);
 
         clickAndWait(Locator.linkWithText("Assay List"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
