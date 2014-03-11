@@ -4054,15 +4054,16 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
 
     public void waitForTextWithRefresh(String text, int wait)
     {
-        for(int i=0; i<wait; i+=1000)
+        startTimer();
+        do
         {
             if(isTextPresent(text))
                 return;
             else
                 sleep(1000);
             refresh();
-        }
-        fail(text + " did not appear [" + wait + "ms]");
+        }while(elapsedMilliseconds() < wait);
+        assertTrue(text + " did not appear [" + wait + "ms]", isTextPresent(text));
     }
     public void waitForText(final String text, int wait)
     {

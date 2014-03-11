@@ -17,7 +17,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
@@ -27,7 +27,7 @@ import org.labkey.test.categories.DailyA;
  * Date: Dec 4, 2007
  */
 @Category({DailyA.class})
-public class UniprotAnnotationTest extends BaseSeleniumWebTest
+public class UniprotAnnotationTest extends BaseWebDriverTest
 {
     private static final String UNIPROT_FILENAME = "tinyuniprot.xml";
     private static final String PROJECT_NAME = "ProteinAnnotationVerifier";
@@ -42,6 +42,12 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         return PROJECT_NAME;
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
     protected void doTestSteps() throws Exception
     {
         log("Starting UniprotAnnotationTest");
@@ -52,65 +58,57 @@ public class UniprotAnnotationTest extends BaseSeleniumWebTest
         assertTextNotPresent(UNIPROT_FILENAME);
 
         clickButton("Load New Annot File");
-        setFormElement("fname", getLabKeyRoot() + "/sampledata/proteinAnnotations/" + UNIPROT_FILENAME);
-        setFormElement("fileType", "uniprot");
+        setFormElement(Locator.id("fname"), getLabKeyRoot() + "/sampledata/proteinAnnotations/" + UNIPROT_FILENAME);
+        selectOptionByText(Locator.name("fileType"), "uniprot");
         clickButton("Load Annotations");
 
         setFilter("AnnotInsertions", "FileName", "Contains", UNIPROT_FILENAME);
         setFilter("AnnotInsertions", "CompletionDate", "Is Not Blank");
 
-        int seconds = 0;
-        while (!isTextPresent(UNIPROT_FILENAME) && seconds++ < 60)
-        {
-            Thread.sleep(1000);
-            refresh();
-        }
-
-        assertTextPresent(UNIPROT_FILENAME);
+        waitForTextWithRefresh(UNIPROT_FILENAME, 60000);
 
         _containerHelper.createProject(PROJECT_NAME, "MS2");
         clickProject(PROJECT_NAME);
-        setFormElement("identifier", "Ppia");
-        uncheckCheckbox("restrictProteins");
+        setFormElement(Locator.name("identifier"), "Ppia");
+        uncheckCheckbox(Locator.checkboxByName("restrictProteins"));
         clickButton("Search");
 
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"),0); // Search results are hidden by default.
         assertTextPresent("Peptidyl-prolyl cis-trans isomerase A");
 
-        selenium.openWindow("", "prot");
         click(Locator.linkWithText("PPIA_MOUSE"));
         //opens in separate window
-        selenium.waitForPopUp("prot", "10000");
-        selenium.selectWindow("prot");
+        Object[] windows = getDriver().getWindowHandles().toArray();
+        getDriver().switchTo().window((String) windows[1]);
         assertTextPresent("PPIA_MOUSE");
         click(Locator.id("expandCollapse-ProteinAnnotationsView"));
         waitForText("Q9CWJ5", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Q9R137");
         assertTextPresent("Mus musculus");
-        selenium.close();
-        selenium.selectWindow(null);
+
+        getDriver().close();
+        getDriver().switchTo().window((String) windows[0]);
 
         clickProject(PROJECT_NAME);
-        setFormElement("identifier", "Defa1");
-        uncheckCheckbox("restrictProteins");
+        setFormElement(Locator.name("identifier"), "Defa1");
+        uncheckCheckbox(Locator.checkboxByName("restrictProteins"));
         clickButton("Search");
 
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"),0); // Search results are hidden by default.
         assertTextPresent("Defensin-1 precursor");
 
-        selenium.openWindow("", "prot");
         click(Locator.linkWithText("DEF1_MOUSE"));
         //opens in separate window
-        selenium.waitForPopUp("prot", "10000");
-        selenium.selectWindow("prot");
+        windows = getDriver().getWindowHandles().toArray();
+        getDriver().switchTo().window((String) windows[1]);
         click(Locator.id("expandCollapse-ProteinAnnotationsView"));
         waitForText("P11477", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Q61448");
         assertTextPresent("DEF1_MOUSE");
         assertTextPresent("ENSMUSG00000074440");
         assertTextPresent("Mus musculus");
-        selenium.close();
-        selenium.selectWindow(null);
+        getDriver().close();
+        getDriver().switchTo().window((String) windows[0]);
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
