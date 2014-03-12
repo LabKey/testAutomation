@@ -3238,7 +3238,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
     public void hoverFolderBar()
     {
         waitForElement(Locator.id("folderBar"));
-        waitForHoverNavigationReady();
+        waitForFolderNavigationReady();
         executeScript("HoverNavigation._folder.show();"); // mouseOver doesn't work on old Firefox
         waitForElement(Locator.css("#folderBar_menu .folder-nav"));
     }
@@ -3248,6 +3248,18 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         hoverFolderBar();
         expandFolderTree(folder);
         waitAndClickAndWait(Locator.linkWithText(folder));
+    }
+
+    public void waitForFolderNavigationReady()
+    {
+        waitForHoverNavigationReady();
+        waitFor(new Checker(){
+            @Override
+            public boolean check()
+            {
+                return (Boolean)executeScript("if (HoverNavigation._folder != HoverNavigation._project) return true; else return false;");
+            }
+        }, "HoverNavigation._folder not ready", WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForHoverNavigationReady()
@@ -3729,11 +3741,15 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             catch (Exception ignore) {} // Checker exceptions count as a false check
             sleep(100);
         } while ((System.currentTimeMillis() - startTime) < wait);
-        if (!checker.check())
+        try
         {
-            _testTimeout = true;
-            return false;
+            if (!checker.check())
+            {
+                _testTimeout = true;
+                return false;
+            }
         }
+        catch (Exception ignore){}
         return false;
     }
 
