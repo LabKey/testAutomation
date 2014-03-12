@@ -784,6 +784,11 @@ public abstract class Locator
             return this.withPredicate("normalize-space()="+xq(text));
         }
 
+        public XPathLocator withText()
+        {
+            return this.withPredicate("string-length() > 0");
+        }
+
         public XPathLocator startsWith(String text)
         {
             return this.withPredicate("starts-with(normalize-space(), "+xq(text)+")");
