@@ -80,8 +80,8 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         //opens in separate window
         Object[] windows = getDriver().getWindowHandles().toArray();
         getDriver().switchTo().window((String) windows[1]);
+        waitAndClick(Locator.id("expandCollapse-ProteinAnnotationsView"));
         assertTextPresent("PPIA_MOUSE");
-        click(Locator.id("expandCollapse-ProteinAnnotationsView"));
         waitForText("Q9CWJ5", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Q9R137");
         assertTextPresent("Mus musculus");
@@ -101,7 +101,7 @@ public class UniprotAnnotationTest extends BaseWebDriverTest
         //opens in separate window
         windows = getDriver().getWindowHandles().toArray();
         getDriver().switchTo().window((String) windows[1]);
-        click(Locator.id("expandCollapse-ProteinAnnotationsView"));
+        waitAndClick(Locator.id("expandCollapse-ProteinAnnotationsView"));
         waitForText("P11477", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Q61448");
         assertTextPresent("DEF1_MOUSE");
