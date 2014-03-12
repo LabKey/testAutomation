@@ -7322,7 +7322,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             clickFolder(_studyFolderName);
             clickAndWait(Locator.linkWithText("Manage Files"));
 
-            waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import", _expectError);
+            if (_expectError)
+                waitForPipelineJobsToFinish(_completeJobsExpected);
+            else
+                waitForPipelineJobsToComplete(_completeJobsExpected, "specimen import", _expectError);
 
             for (File copiedArchive : _copiedArchives)
                 if (!copiedArchive.delete())

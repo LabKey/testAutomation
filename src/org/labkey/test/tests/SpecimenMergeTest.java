@@ -16,7 +16,7 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
@@ -32,18 +32,17 @@ import java.io.File;
  * CreateVialsTest also uses the specimen merge feature.
  */
 @Category({DailyB.class, Study.class, Specimen.class})
-public class SpecimenMergeTest extends BaseSeleniumWebTest
+public class SpecimenMergeTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "SpecimenMergeTest";
     protected static final String FOLDER_NAME = "My Study";
-    protected static final String STUDY_NAME = "My Study Study";
 
     protected static final String LAB19_SPECIMENS = "/sampledata/study/specimens/lab19.specimens";
     protected static final String LAB20_SPECIMENS = "/sampledata/study/specimens/lab20.specimens";
     protected static final String LAB21_SPECIMENS = "/sampledata/study/specimens/lab21.specimens";
 
     protected static final String SPECIMEN_TEMP_DIR = "/sampledata/study/drt_temp";
-    protected int pipelineJobCount = 2;
+    protected int pipelineJobCount = 3;
 
     protected String _studyDataRoot = null;
 
@@ -51,6 +50,12 @@ public class SpecimenMergeTest extends BaseSeleniumWebTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/study";
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     @Override
