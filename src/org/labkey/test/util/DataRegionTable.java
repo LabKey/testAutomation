@@ -266,35 +266,37 @@ public class DataRegionTable
     public int getColumn(String name)
     {
         name = name.replaceAll(" ", "");
-        Integer colIndex = _mapColumns.get(name);
-        if (colIndex != null)
-            return colIndex.intValue();
 
-        try
-        {
-            for (int col = 0; col < _columnCount; col++)
-            {
-                String header = getDataAsText(-(_headerRows/2), col);
-                if( header != null )
-                {
-                    String headerName = header.split("\n")[0];
-                    headerName = headerName.replaceAll(" ", "");
-                    if (!StringUtils.isEmpty(headerName))
-                        _mapColumns.put(headerName, col);
-                    if (headerName.equals(name))
-                    {
-                        return col;
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            // _test.log("Failed to get column named " + name);
-        }
+        if (_mapColumns.containsKey(name))
+            return _mapColumns.get(name);
+
+        getColumnHeaders();
+
+        if (_mapColumns.containsKey(name))
+            return _mapColumns.get(name);
 
         _test.log("Column '" + name + "' not found");
         return -1;
+    }
+
+    public List<String> getColumnHeaders()
+    {
+        List<String> columnHeaders = new ArrayList<>();
+
+        for (int col = 0; col < _columnCount; col++)
+        {
+            String header = getDataAsText(-(_headerRows/2), col);
+            columnHeaders.add(header);
+            if( header != null )
+            {
+                String headerName = header.split("\n")[0];
+                headerName = headerName.replaceAll(" ", "");
+                if (!StringUtils.isEmpty(headerName))
+                    _mapColumns.put(headerName, col);
+            }
+        }
+
+        return columnHeaders;
     }
 
     public List<String> getColumnDataAsText(int col)
