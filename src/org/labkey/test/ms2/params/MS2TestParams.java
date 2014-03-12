@@ -20,13 +20,6 @@ import org.labkey.test.ms2.MS2ClusterTest;
 import org.labkey.test.pipeline.AbstractPipelineTestParams;
 import org.labkey.test.pipeline.PipelineWebTestBase;
 
-/**
- * MS2TestParams class
-* <p/>
-* Created: Aug 15, 2007
-*
-* @author bmaclean
-*/
 public class MS2TestParams extends AbstractPipelineTestParams
 {
     public MS2TestParams(PipelineWebTestBase test, String dataPath, String protocolName, String... sampleNames)
@@ -60,13 +53,13 @@ public class MS2TestParams extends AbstractPipelineTestParams
     protected void setGrouping(String grouping)
     {
         _test.log("Set grouping to " + grouping);
-        _test.selectOptionByText("grouping", grouping);
+        _test.selectOptionByText(Locator.name("grouping"), grouping);
         _test.clickAndWait(Locator.id("viewTypeSubmitButton"));
     }
 
     @Override
     protected void clickSubmitButton()
     {
-        _test.submit();
+        _test.clickAndWait(Locator.id("button_Search"));
     }
 }

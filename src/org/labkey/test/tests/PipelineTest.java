@@ -35,9 +35,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * <code>PipelineTest</code>
- */
 @Category({BVT.class, FileBrowser.class})
 public class PipelineTest extends PipelineWebTestBase
 {
@@ -90,6 +87,12 @@ public class PipelineTest extends PipelineWebTestBase
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/pipeline";  // + ms2 and ms1
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException

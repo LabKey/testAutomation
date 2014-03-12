@@ -16,12 +16,13 @@
 package org.labkey.test.pipeline;
 
 import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 
 /**
  * @author brendanx
  */
-abstract public class PipelineWebTestBase extends BaseSeleniumWebTest
+abstract public class PipelineWebTestBase extends BaseWebDriverTest
 {
     private String _projectName;
 

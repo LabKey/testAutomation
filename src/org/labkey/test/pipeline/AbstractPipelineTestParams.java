@@ -385,8 +385,8 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         _test.pushLocation();
         statusTable.clickStatusLink(sampleExp);
         _test.clickButton("Escalate Job Failure");
-        _test.setFormElement("escalateUser", escalateEmail);
-        _test.setFormElement("escalationMessage", messageText);
+        _test.selectOptionByText(Locator.id("escalateUser"), escalateEmail);
+        _test.setFormElement(Locator.id("escalationMessage"), messageText);
         // DetailsView adds a useless form.
         //_test.submit();
         _test.clickButton("Send");
