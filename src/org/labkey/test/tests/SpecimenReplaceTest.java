@@ -76,7 +76,7 @@ public class SpecimenReplaceTest extends SpecimenMergeTest
 
     private void verifyReplaceWithIdenticalFiles()
     {
-        pipelineJobCount  = 4;
+        pipelineJobCount += 3;
         importFirstFileSet();
         goToIndividualvialsDRT();
 
