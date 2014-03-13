@@ -115,8 +115,8 @@ public class Crawler
             new ControllerActionId("genotyping", "analyze"),    // Crawler doesn't like NotFoundException that the test generates
             new ControllerActionId("issues", "download"),
             new ControllerActionId("login", "logout"),
-            new ControllerActionId("login", "enable"),
-            new ControllerActionId("login", "disable"),
+            new ControllerActionId("login", "enable"),      // TODO: These should be post actions (product issue)
+            new ControllerActionId("login", "disable"),      // TODO: These should be post actions (product issue)
             new ControllerActionId("login", "setPassword"),
             new ControllerActionId("ms2", "showParamsFile"),
             // Tested directly in XTandemTest
@@ -149,7 +149,7 @@ public class Crawler
             new ControllerActionId("study-samples", "download"),
             new ControllerActionId("targetedms", "downloadChromLibrary"),
             new ControllerActionId("nabassay", "downloadDatafile"),
-            new ControllerActionId("NAb", "download"),
+            new ControllerActionId("NAb", "download"),           // TODO: I think this controller is gone
             new ControllerActionId("wiki", "download"),
 
             // Actions from external modules
