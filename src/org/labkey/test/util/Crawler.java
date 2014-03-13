@@ -150,7 +150,6 @@ public class Crawler
             new ControllerActionId("targetedms", "downloadChromLibrary"),
             new ControllerActionId("nabassay", "downloadDatafile"),
             new ControllerActionId("NAb", "download"),
-            new ControllerActionId("user", "impersonate"),
             new ControllerActionId("wiki", "download"),
 
             // Actions from external modules

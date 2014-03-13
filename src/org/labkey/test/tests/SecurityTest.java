@@ -660,10 +660,9 @@ public class SecurityTest extends BaseWebDriverTest
         stopImpersonating();
 
         impersonate(SITE_ADMIN_USER);
-        String siteAdminDisplayName = getDisplayName();
+        String siteAdminDisplayName = getDisplayName(); // Use when checking audit log, below
         ensureAdminMode();
-        goToAdminConsole();
-        assertTextPresent("Already impersonating; click ", " to change back to " + testUserDisplayName);
+        goToAdminConsole();  // Site admin should be able to get to the admin console
         deleteUsers(true, TO_BE_DELETED_USER);
         stopImpersonating();
 
@@ -692,8 +691,6 @@ public class SecurityTest extends BaseWebDriverTest
         impersonate(PROJECT_ADMIN_USER);
         clickProject(PROJECT_NAME);
         enterPermissionsUI();
-        _ext4Helper.clickTabContainingText("Impersonate");
-        assertTextPresent("Already impersonating; click");
         _ext4Helper.clickTabContainingText("Project Groups");
         assertTextPresent("Total Users");
         stopImpersonating();
