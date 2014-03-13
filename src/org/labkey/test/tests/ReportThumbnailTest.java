@@ -23,7 +23,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
 
@@ -46,7 +46,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
     private String THUMBNAIL_DATA;
     private String ICON_DATA;
 
-    private final RReportHelperWD _rReportHelper = new RReportHelperWD(this);
+    private final RReportHelper _rReportHelper = new RReportHelper(this);
 
     //
     // expected values for roundtrip test

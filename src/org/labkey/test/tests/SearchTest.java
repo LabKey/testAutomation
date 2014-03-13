@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
  */
 
 @Category({DailyB.class})
-public class SearchTest extends StudyWDTest
+public class SearchTest extends StudyTest
 {
     private final SearchHelper _searchHelper = new SearchHelper(this);
     

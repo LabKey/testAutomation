@@ -26,7 +26,7 @@ import org.labkey.test.categories.DailyA;
 * Time: 2:39:18 PM
 */
 @Category({DailyA.class})
-public class StudySecurityTest extends StudyBaseTestWD
+public class StudySecurityTest extends StudyBaseTest
 {
     protected static final String READER = "dsreader@studysecurity.test";
     protected static final String EDITOR = "dseditor@studysecurity.test";

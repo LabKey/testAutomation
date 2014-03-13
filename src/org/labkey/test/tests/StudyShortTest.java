@@ -24,7 +24,7 @@ import org.labkey.test.categories.DRT;
  * Time: 12:48 PM
  */
 @Category(DRT.class)
-public class StudyShortTest extends StudyWDTest
+public class StudyShortTest extends StudyTest
 {
     @Override
     protected void doVerifySteps()

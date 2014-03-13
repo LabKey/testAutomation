@@ -21,7 +21,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.*;
@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
  * Time: 3:22 PM
  */
 @Category({BVT.class})
-public class ParticipantListTest extends StudyBaseTestWD
+public class ParticipantListTest extends StudyBaseTest
 {
     protected static final String[] BITS = {"ABCD", "EFGH", "IJKL", "MNOP", "QRST", "UVWX"};
     protected static final String[] CATEGORIES = {BITS[0]+BITS[1]+TRICKY_CHARACTERS_NO_QUOTES, BITS[1]+BITS[2]+TRICKY_CHARACTERS_NO_QUOTES,
@@ -56,7 +56,7 @@ public class ParticipantListTest extends StudyBaseTestWD
     @Override @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void doCreateSteps()
     {
-        RReportHelperWD _reportHelperWD = new RReportHelperWD(this);
+        RReportHelper _reportHelperWD = new RReportHelper(this);
         _reportHelperWD.ensureRConfig();
         importStudy();
         startSpecimenImport(2);

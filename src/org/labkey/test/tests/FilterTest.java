@@ -35,7 +35,7 @@ import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.Arrays;
@@ -88,8 +88,8 @@ public class FilterTest extends ListTest
     @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupProject()
     {
-        RReportHelperWD _RReportHelperWD = new RReportHelperWD(this);
-        _RReportHelperWD.ensureRConfig();
+        RReportHelper _RReportHelper = new RReportHelper(this);
+        _RReportHelper.ensureRConfig();
 
         _containerHelper.createProject(PROJECT_NAME, null);
     }

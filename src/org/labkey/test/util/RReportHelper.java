@@ -30,12 +30,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 
-/**
- * User: klum
- * Date: Mar 9, 2010
- * Time: 2:54:08 PM
- */
-public class RReportHelperWD extends AbstractHelperWD
+public class RReportHelper extends AbstractHelperWD
 {
     public enum ReportOption {
         shareReport("Make this view available to all users", null, true),
@@ -57,7 +52,7 @@ public class RReportHelperWD extends AbstractHelperWD
         }
     }
 
-    public RReportHelperWD(BaseWebDriverTest test)
+    public RReportHelper(BaseWebDriverTest test)
     {
         super(test);
     }

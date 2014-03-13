@@ -30,7 +30,7 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 @Category({DailyA.class})
-public class StudyDatasetsTest extends StudyBaseTestWD
+public class StudyDatasetsTest extends StudyBaseTest
 {
     private static final String CATEGORY1 = "Category1";
     private static final String GROUP1A = "Group1A";

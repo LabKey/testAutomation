@@ -22,7 +22,7 @@ import org.labkey.test.categories.InDevelopment;
 import java.io.File;
 
 @Category({InDevelopment.class})
-public class SecurityApiTest extends SimpleApiTestWD
+public class SecurityApiTest extends SimpleApiTest
 {
     protected static final String PROJECT_NAME = "Security API Test Project";
     private static final String USER_1 = "testuser1@securityapi.test";

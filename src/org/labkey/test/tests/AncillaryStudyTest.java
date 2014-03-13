@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
  * Date: Sep 8, 2011
  */
 @Category({DailyB.class, Study.class})
-public class AncillaryStudyTest extends StudyBaseTestWD
+public class AncillaryStudyTest extends StudyBaseTest
 {
     private static final String PROJECT_NAME = "AncillaryStudyTest Project";
     private static final String STUDY_NAME = "Special Emphasis Study";

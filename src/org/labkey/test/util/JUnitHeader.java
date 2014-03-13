@@ -44,7 +44,7 @@ public class JUnitHeader extends BaseWebDriverTest
         log("** This should precede JUnitTest.");
         log("** It will enable the dumbster and clean up any errors caused by the previous test");
 
-        RReportHelperWD reportHelper = new RReportHelperWD(this);
+        RReportHelper reportHelper = new RReportHelper(this);
         reportHelper.ensureRConfig(); // reportTest.js (via RhinoService) executes an R script
 
         try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}

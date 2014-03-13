@@ -39,7 +39,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.SecurityHelperWD;
 
 import java.io.File;
@@ -647,7 +647,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestReports()
     {
-        RReportHelperWD _rReportHelper = new RReportHelperWD(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();
 
         log("Testing module-based JS reports...");

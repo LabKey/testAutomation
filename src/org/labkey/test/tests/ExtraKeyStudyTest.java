@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
  * Time: 1:17 PM
  */
 @Category({DailyB.class, Study.class})
-public class ExtraKeyStudyTest extends StudyBaseTestWD
+public class ExtraKeyStudyTest extends StudyBaseTest
 {
     static String studyFolder = "/ExtraKeyStudy/folder.xml";
 

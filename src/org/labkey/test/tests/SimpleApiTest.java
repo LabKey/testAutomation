@@ -47,8 +47,7 @@ import static org.junit.Assert.*;
  * The class would also implement getTestFiles which returns an array of recorded test files, the schema is
  * apiTest.xsd and a test can be recorded using the API test page: query/apiTest.view
  */
-// TODO : TEMPORARY CLASS FOR INCREMENTAL WEBDRIVER UPGRADE : MERGE BACK TO NON-WD CLASS WHEN COMPLETE//
-public abstract class SimpleApiTestWD extends BaseWebDriverTest
+public abstract class SimpleApiTest extends BaseWebDriverTest
 {
     JSONHelper _helper = null;
 

@@ -32,7 +32,7 @@ import static org.junit.Assert.*;
  * Date: Feb 24, 2012
  */
 @Category({DailyA.class})
-public class StudyScheduleTest extends StudyBaseTestWD
+public class StudyScheduleTest extends StudyBaseTest
 {
     // dataset names
     private static final String IMPORT_DATASET = "ImportDataset";

@@ -47,7 +47,7 @@ import java.util.List;
  * // TODO: add verification for plot line with and whether or not the data points are shown
  */
 @Category({DailyB.class, Reports.class, Charting.class})
-public class TimeChartImportTest extends StudyBaseTestWD
+public class TimeChartImportTest extends StudyBaseTest
 {
     private static final String MULTI_FOLDER_ZIP = "/sampledata/study/TimeChartTesting.folder.zip";
     private static final String EXPORT_TEST_FOLDER = "exportTestFolder";

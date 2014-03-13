@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  * Date: Jul 31, 2009
  */
 @Category({DailyA.class, Study.class})
-public class QuerySnapshotTest extends StudyBaseTestWD
+public class QuerySnapshotTest extends StudyBaseTest
 {
     private final String DEMOGRAPHICS_SNAPSHOT = "Demographics Snapshot";
     private final String APX_SNAPSHOT = "APX Joined Snapshot";

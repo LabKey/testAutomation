@@ -17,7 +17,7 @@ package org.labkey.test;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.labkey.test.tests.SimpleApiTestWD;
+import org.labkey.test.tests.SimpleApiTest;
 
 import java.io.File;
 
@@ -49,7 +49,7 @@ import static org.junit.Assert.*;
  * might be a good solution for cleaning up the class structure we are using to shoehorn our existing tests into
  * allowing multiple test cases.
  */
-public abstract class BaseWebDriverMultipleTest extends SimpleApiTestWD
+public abstract class BaseWebDriverMultipleTest extends SimpleApiTest
 {
 /*
     @BeforeClass

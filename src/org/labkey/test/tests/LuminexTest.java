@@ -22,7 +22,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelperWD;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -45,7 +45,7 @@ import static org.junit.Assert.*;
  */
 public class LuminexTest extends AbstractQCAssayTest
 {
-    RReportHelperWD _rReportHelper = new RReportHelperWD(this);
+    RReportHelper _rReportHelper = new RReportHelper(this);
 
     private boolean _useXarImport = false;
 

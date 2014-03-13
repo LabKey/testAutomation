@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.UIContainerHelper;
 import org.openqa.selenium.WebElement;
 
@@ -89,7 +89,7 @@ public class FolderExportTest extends BaseWebDriverTest
         goToAdminConsole();
         assertTextPresent("simpletest");
 
-        RReportHelperWD _rReportHelper = new RReportHelperWD(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();
         _containerHelper.createProject(getProjectName(), null);
         

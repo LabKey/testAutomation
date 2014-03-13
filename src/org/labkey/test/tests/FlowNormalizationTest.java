@@ -22,7 +22,7 @@ import org.labkey.test.BaseFlowTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +41,7 @@ public class FlowNormalizationTest extends BaseFlowTest
     {
         // fail fast if R is not configured
         // R is needed for the positivity report
-        RReportHelperWD _rReportHelper = new RReportHelperWD(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
         String rVersion = _rReportHelper.ensureRConfig();
 
         Assume.assumeTrue("Wrong version of R: flowNormalization package require 2.15.x", rVersion.startsWith("2.15"));

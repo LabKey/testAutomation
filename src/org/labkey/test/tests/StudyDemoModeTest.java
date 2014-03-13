@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 */
 
 @Category({DailyB.class})
-public class StudyDemoModeTest extends StudyBaseTestWD
+public class StudyDemoModeTest extends StudyBaseTest
 {
     @Override
     protected BrowserType bestBrowser()

@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  * Time: 3:16 PM
  */
 @Category({DailyA.class})
-public class StudyReloadTest extends StudyBaseTestWD
+public class StudyReloadTest extends StudyBaseTest
 {
     public boolean isFileUploadTest()
     {

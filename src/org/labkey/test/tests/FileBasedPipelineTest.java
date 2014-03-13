@@ -32,7 +32,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.NoSuchElementException;
 
 import java.io.File;
@@ -64,7 +64,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest.enableModules(Arrays.asList(PIPELINETEST_MODULE, "Pipeline"), true);
 
-        RReportHelperWD rReportHelper = new RReportHelperWD(initTest);
+        RReportHelper rReportHelper = new RReportHelper(initTest);
         rReportHelper.ensureRConfig();
 
         currentTest = initTest;

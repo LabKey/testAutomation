@@ -59,7 +59,7 @@ import static org.junit.Assert.*;
  * Time: 9:18:32 AM
  */
 @Category({Study.class, Specimen.class, DailyB.class})
-public class StudyWDTest extends StudyBaseTestWD
+public class StudyTest extends StudyBaseTest
 {
     public String datasetLink = datasetCount + " datasets";
     protected boolean quickTest = true;

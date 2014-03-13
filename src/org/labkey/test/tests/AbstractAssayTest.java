@@ -24,7 +24,7 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-public abstract class AbstractAssayTest extends SimpleApiTestWD
+public abstract class AbstractAssayTest extends SimpleApiTest
 {
     //constants added for security tests
     protected final static String TEST_ASSAY_PERMS_READER = "Reader";                 //name of built-in reader role

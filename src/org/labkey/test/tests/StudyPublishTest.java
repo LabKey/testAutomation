@@ -24,7 +24,7 @@ import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
@@ -141,7 +141,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     protected void doCreateSteps()
     {
         // fail fast if R is not configured
-        RReportHelperWD _rReportHelper = new RReportHelperWD(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();
 
         _pipelineJobs += 2;

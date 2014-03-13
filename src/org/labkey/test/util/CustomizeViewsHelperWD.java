@@ -40,13 +40,13 @@ import static org.junit.Assert.*;
 public class CustomizeViewsHelperWD extends AbstractHelperWD
 {
     private final Locator.IdLocator _dataRegion;
-    private RReportHelperWD _reportHelper;
+    private RReportHelper _reportHelper;
 
     public CustomizeViewsHelperWD(BaseWebDriverTest test)
     {
         super(test);
         _dataRegion = Locator.id("");
-        _reportHelper = new RReportHelperWD(test);
+        _reportHelper = new RReportHelper(test);
     }
 
     public CustomizeViewsHelperWD(BaseWebDriverTest test, Locator.IdLocator dataRegion)
@@ -697,7 +697,7 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
             fail("Unimplemented");
 
         if (shareView)
-            _reportHelper.selectOption(RReportHelperWD.ReportOption.shareReport);
+            _reportHelper.selectOption(RReportHelper.ReportOption.shareReport);
 
         _reportHelper.saveReport(name);
     }

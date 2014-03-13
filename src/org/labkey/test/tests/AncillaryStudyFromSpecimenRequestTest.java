@@ -26,7 +26,7 @@ import org.labkey.test.categories.DailyB;
  * Time: 12:52 PM
  */
 @Category({DailyB.class})
-public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTestWD
+public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 {
     public static final String DOV_DATASET = "DOV-1:";
     protected String ANCILLARY_STUDY_NAME = "Anc Study" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;

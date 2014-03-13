@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
  * Each @Test then sets a property in that study, exports the study, and reimports it into a subfolder
  */
 @Category({DailyB.class, Study.class, FileBrowser.class})
-public class StudySimpleExportTest extends StudyBaseTestWD
+public class StudySimpleExportTest extends StudyBaseTest
 {
     private static final String TEST_DATASET_NAME = "TestDataset";
 

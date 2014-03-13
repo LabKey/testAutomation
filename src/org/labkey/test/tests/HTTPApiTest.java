@@ -30,7 +30,7 @@ import java.io.File;
  * Time: 2:03:39 PM
  */
 @Category({DailyA.class})
-public class HTTPApiTest extends SimpleApiTestWD
+public class HTTPApiTest extends SimpleApiTest
 {
     private static final String PROJECT_NAME = "HTTPApiVerifyProject";
     private static final String LIST_NAME = "Test List";

@@ -27,7 +27,7 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
@@ -74,7 +74,7 @@ public class FlowTest extends BaseFlowTest
     {
         // fail fast if R is not configured
         // R is needed for the positivity report
-        RReportHelperWD _rReportHelper = new RReportHelperWD(this);
+        RReportHelper _rReportHelper = new RReportHelper(this);
         _rReportHelper.ensureRConfig();
 
         super.init();

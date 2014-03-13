@@ -21,7 +21,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 
 import java.io.File;
 import java.util.List;
@@ -34,9 +34,9 @@ import static org.junit.Assert.*;
  * Time: 3:44:04 PM
  */
 @Category({DailyB.class})
-public class RlabkeyTest extends SimpleApiTestWD
+public class RlabkeyTest extends SimpleApiTest
 {
-    RReportHelperWD _rReportHelper = new RReportHelperWD(this);
+    RReportHelper _rReportHelper = new RReportHelper(this);
     private static final String PROJECT_NAME = "RlabkeyVerifyProject";
     private static final String PROJECT_NAME_2 = PROJECT_NAME + "2";
     private static final String LIST_NAME = "AllTypes";

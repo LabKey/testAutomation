@@ -27,7 +27,7 @@ import java.io.File;
  * Date: 12/30/13
  */
 @Category(DailyB.class)
-public class StudyMergeParticipantsTest extends StudyBaseTestWD
+public class StudyMergeParticipantsTest extends StudyBaseTest
 {
     private static final String PROJECT_NAME =  "Merge Participants Test Project";
     private static final String STUDY_NAME = "Merge Participants Test Study";

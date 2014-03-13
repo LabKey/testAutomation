@@ -22,7 +22,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ext4cmp.Ext4FileFieldRefWD;
 
 import java.io.File;
@@ -69,7 +69,7 @@ public class NonStudyReportsTest extends ReportTest
 
         _containerHelper.createProject(getProjectName(), "Study");
 
-        RReportHelperWD rReportHelper = new RReportHelperWD(this);
+        RReportHelper rReportHelper = new RReportHelper(this);
         rReportHelper.ensureRConfig();
     }
 
@@ -258,10 +258,10 @@ public class NonStudyReportsTest extends ReportTest
 
         goToManageViews();
         clickAddReport("R View");
-        RReportHelperWD RReportHelperWD = new RReportHelperWD(this);
-        RReportHelperWD.executeScript("# Placeholder script for discussion", "");
+        RReportHelper RReportHelper = new RReportHelper(this);
+        RReportHelper.executeScript("# Placeholder script for discussion", "");
         click(Locator.linkWithText("Source"));
-        RReportHelperWD.saveReport(DISCUSSED_REPORT);
+        RReportHelper.saveReport(DISCUSSED_REPORT);
         clickReportGridLink(DISCUSSED_REPORT);
 
         _extHelper.clickExtMenuButton(true, Locator.id("discussionMenuToggle"), "Start new discussion");

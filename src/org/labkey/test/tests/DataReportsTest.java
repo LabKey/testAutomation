@@ -26,7 +26,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
 @Category({BVT.class, Reports.class})
 public class DataReportsTest extends ReportTest
 {
-    protected final RReportHelperWD _rReportHelper = new RReportHelperWD(this);
+    protected final RReportHelper _rReportHelper = new RReportHelper(this);
 
     protected static final String AUTHOR_REPORT = "Author report";
 
@@ -396,8 +396,8 @@ public class DataReportsTest extends ReportTest
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
         clickSourceTab();
-        _rReportHelper.selectOption(RReportHelperWD.ReportOption.shareReport);
-        _rReportHelper.selectOption(RReportHelperWD.ReportOption.runInPipeline);
+        _rReportHelper.selectOption(RReportHelper.ReportOption.shareReport);
+        _rReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
         clickViewTab();
 
         log("Check that R script worked");
@@ -504,9 +504,9 @@ public class DataReportsTest extends ReportTest
 
         if(share)
         {
-            _rReportHelper.selectOption(RReportHelperWD.ReportOption.shareReport);
+            _rReportHelper.selectOption(RReportHelper.ReportOption.shareReport);
             if(shareSource)
-                _rReportHelper.selectOption(RReportHelperWD.ReportOption.showSourceTab);
+                _rReportHelper.selectOption(RReportHelper.ReportOption.showSourceTab);
         }
         saveReport(name);
 

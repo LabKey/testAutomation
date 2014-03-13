@@ -22,7 +22,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,7 +42,7 @@ public class KnitrReportTest extends ReportTest
     private static final Path scriptpadReports = Paths.get(getLabKeyRoot(), "server/test/modules/scriptpad/resources/reports/schemas");
     private static final Path rhtmlReport = scriptpadReports.resolve("script_rhtml.rhtml");
     private static final Path rmdReport = scriptpadReports.resolve("script_rmd.rmd");
-    private final RReportHelperWD _rReportHelper = new RReportHelperWD(this);
+    private final RReportHelper _rReportHelper = new RReportHelper(this);
 
     @Nullable
     @Override
@@ -67,7 +67,7 @@ public class KnitrReportTest extends ReportTest
     @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupProject()
     {
-        RReportHelperWD rReportHelper = new RReportHelperWD(this);
+        RReportHelper rReportHelper = new RReportHelper(this);
         rReportHelper.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), "Collaboration");
@@ -95,7 +95,7 @@ public class KnitrReportTest extends ReportTest
                                       "begin.rcode",                     // knitr commands shouldn't be visible
                                       "opts_chunk"};                     // Un-echoed R code
 
-        createAndVerifyKnitrReport(rhtmlReport, RReportHelperWD.ReportOption.knitrHtml, reportContains, reportNotContains);
+        createAndVerifyKnitrReport(rhtmlReport, RReportHelper.ReportOption.knitrHtml, reportContains, reportNotContains);
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -112,10 +112,10 @@ public class KnitrReportTest extends ReportTest
                                       "{r",               // Markdown for R code chunks
                                       "data_means"};      // Non-echoed R code
 
-        createAndVerifyKnitrReport(rmdReport, RReportHelperWD.ReportOption.knitrMarkdown, reportContains, reportNotContains);
+        createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains);
     }
 
-    private void createAndVerifyKnitrReport(Path reportSourcePath, RReportHelperWD.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains)
+    private void createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains)
     {
         final String reportSource = readReport(reportSourcePath);
         final String reportName = reportSourcePath.getFileName() + " Report";

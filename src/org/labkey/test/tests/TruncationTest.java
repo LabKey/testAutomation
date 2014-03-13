@@ -24,7 +24,7 @@ import org.labkey.test.util.PortalHelper;
 import java.io.File;
 
 @Category({Study.class, Specimen.class})
-public class TruncationTest extends StudyBaseTestWD
+public class TruncationTest extends StudyBaseTest
 {
     private final File LIST_ARCHIVE =  new File(getLabKeyRoot() + getStudySampleDataPath() + "/searchTest.lists.zip");
     private final String STUDY_NAME = "Study 001";

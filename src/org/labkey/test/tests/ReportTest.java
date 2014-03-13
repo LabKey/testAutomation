@@ -23,7 +23,7 @@ import org.labkey.test.util.LogMethod;
  * User: klum
  * Date: Jul 31, 2009
  */
-public abstract class ReportTest extends StudyBaseTestWD
+public abstract class ReportTest extends StudyBaseTest
 {
     @Override
     protected BrowserType bestBrowser()

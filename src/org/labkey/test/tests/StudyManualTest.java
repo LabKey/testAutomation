@@ -35,7 +35,7 @@ import java.util.Set;
  * Time: 1:54:57 PM
  */
 @Category({Study.class, Disabled.class})
-public class StudyManualTest extends StudyWDTest
+public class StudyManualTest extends StudyTest
 {
 
     private final String CRF_SCHEMAS = getStudySampleDataPath() + "datasets/schema.tsv";

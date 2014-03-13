@@ -36,7 +36,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.RReportHelperWD;
+import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.WorkbookHelper;
 
 import java.io.IOException;
@@ -59,7 +59,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     private static final String COLOR = "Red";
     private static final String MANUFACTURER = "Toyota";
     private static final String MODEL = "Prius C";
-    private RReportHelperWD _rReportHelperWD = new RReportHelperWD(this);
+    private RReportHelper _RReportHelper = new RReportHelper(this);
 
     @Override
     protected boolean isFileUploadTest()
@@ -110,7 +110,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
     protected void doSetup() throws Exception
     {
-        _rReportHelperWD.ensureRConfig();
+        _RReportHelper.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), null);
         enableModules(Arrays.asList("simpletest", "ViscStudies"), true);
@@ -278,8 +278,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         clickFolder(folder);
         clickAndWait(Locator.linkWithText(listName));
         clickMenuButton("Views", "Create", "R View");
-        _rReportHelperWD.selectOption(RReportHelperWD.ReportOption.runInPipeline);
-        _rReportHelperWD.saveReport(folder + "-BackgroundReport");
+        _RReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
+        _RReportHelper.saveReport(folder + "-BackgroundReport");
         waitForElement(Locator.id("query"));
 
         log("** Executing background R script");

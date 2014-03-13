@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
 
 // Provides some helpful utilities used in study-related tests.  Subclasses provide all study creation and
 // verification steps.
-public abstract class StudyBaseTestWD extends SimpleApiTestWD
+public abstract class StudyBaseTest extends SimpleApiTest
 {
     protected static final String ARCHIVE_TEMP_DIR = getStudySampleDataPath() + "drt_temp";
     protected static final String SPECIMEN_ARCHIVE_A = getStudySampleDataPath() + "specimens/sample_a.specimens";
