@@ -470,7 +470,6 @@ src/org/labkey/test/tests/SecurityShortTest.java -text
 src/org/labkey/test/tests/SecurityTest.java -text
 src/org/labkey/test/tests/SecurityTestExtended.java -text
 src/org/labkey/test/tests/SequenceTest.java -text
-src/org/labkey/test/tests/SimpleApiTest.java -text
 src/org/labkey/test/tests/SimpleApiTestWD.java -text
 src/org/labkey/test/tests/SimpleModuleTest.java -text
 src/org/labkey/test/tests/SpecimenBaseTest.java -text
@@ -482,7 +481,6 @@ src/org/labkey/test/tests/SpecimenMultipleImportTest.java -text
 src/org/labkey/test/tests/SpecimenProgressReportTest.java -text
 src/org/labkey/test/tests/SpecimenReplaceTest.java -text
 src/org/labkey/test/tests/SpecimenTest.java -text
-src/org/labkey/test/tests/StudyBaseTest.java -text
 src/org/labkey/test/tests/StudyBaseTestWD.java -text
 src/org/labkey/test/tests/StudyCohortExportTest.java -text
 src/org/labkey/test/tests/StudyDatasetsTest.java -text
@@ -497,7 +495,6 @@ src/org/labkey/test/tests/StudyScheduleTest.java -text
 src/org/labkey/test/tests/StudySecurityTest.java -text
 src/org/labkey/test/tests/StudyShortTest.java -text
 src/org/labkey/test/tests/StudySimpleExportTest.java -text
-src/org/labkey/test/tests/StudyTest.java -text
 src/org/labkey/test/tests/StudyWDTest.java -text
 src/org/labkey/test/tests/SurveyTest.java -text
 src/org/labkey/test/tests/SystemMaintenanceTest.java -text
@@ -578,7 +575,6 @@ src/org/labkey/test/util/PipelineStatusTable.java -text
 src/org/labkey/test/util/PortalHelper.java -text
 src/org/labkey/test/util/PostgresOnlyTest.java -text
 src/org/labkey/test/util/ProteinRegionTable.java -text
-src/org/labkey/test/util/RReportHelper.java -text
 src/org/labkey/test/util/RReportHelperWD.java -text
 src/org/labkey/test/util/RemoteConnectionHelperWD.java -text
 src/org/labkey/test/util/ResetTracker.java -text

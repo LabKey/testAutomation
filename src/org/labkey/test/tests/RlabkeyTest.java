@@ -20,7 +20,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.RReportHelperWD;
 
 import java.io.File;
 import java.util.List;
@@ -33,9 +34,9 @@ import static org.junit.Assert.*;
  * Time: 3:44:04 PM
  */
 @Category({DailyB.class})
-public class RlabkeyTest extends SimpleApiTest
+public class RlabkeyTest extends SimpleApiTestWD
 {
-    RReportHelper _rReportHelper = new RReportHelper(this);
+    RReportHelperWD _rReportHelper = new RReportHelperWD(this);
     private static final String PROJECT_NAME = "RlabkeyVerifyProject";
     private static final String PROJECT_NAME_2 = PROJECT_NAME + "2";
     private static final String LIST_NAME = "AllTypes";
@@ -52,7 +53,8 @@ public class RlabkeyTest extends SimpleApiTest
         _containerHelper.createProject(PROJECT_NAME, null);
         _containerHelper.createProject(PROJECT_NAME_2, null);
         clickProject(PROJECT_NAME);
-        addWebPart("Lists");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Lists");
        
         log("Import Lists");
         File listArchive = new File(WebTestHelper.getLabKeyRoot(), "/sampledata/rlabkey/listArchive.zip");
@@ -64,7 +66,7 @@ public class RlabkeyTest extends SimpleApiTest
         // create an issues list in a project and subfolder to test ContainerFilters.
 
         clickProject(PROJECT_NAME);
-        addWebPart("Issues List");
+        portalHelper.addWebPart("Issues List");
         clickButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
         clickButton("Update");
@@ -75,7 +77,7 @@ public class RlabkeyTest extends SimpleApiTest
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[0]);
 
         clickFolder(FOLDER_NAME);
-        addWebPart("Issues List");
+        portalHelper.addWebPart("Issues List");
         clickButton("Admin");
         uncheckCheckbox("requiredFields", "AssignedTo");
         clickButton("Update");
@@ -150,6 +152,12 @@ public class RlabkeyTest extends SimpleApiTest
     public String getAssociatedModuleDirectory()
     {
         return null;
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     @Override

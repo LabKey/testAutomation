@@ -7043,15 +7043,10 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
         assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to not contain '" + value + "', but was '" + actual + "' instead.", actual != null && !actual.contains(value));
     }
 
-    public void assertSetsEqual(String firstSet, String secondSet, String delimiterRegEx)
+    public void assertSetsEqual(List<String> firstSet, List<String> secondSet)
     {
-        String[] firstArray = firstSet.split(delimiterRegEx);
-        String[] secondArray = secondSet.split(delimiterRegEx);
-        assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstArray.length == secondArray.length);
-        Set<String> firstHash= new HashSet<>();
-        Collections.addAll(firstHash, firstArray);
-        Set<String> secondHash= new HashSet<>();
-        Collections.addAll(secondHash, secondArray);
+        Set<String> firstHash= new HashSet<>(firstSet);
+        Set<String> secondHash= new HashSet<>(secondSet);
         assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
     }
 

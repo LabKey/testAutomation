@@ -93,7 +93,7 @@ public class RReportHelperWD extends AbstractHelperWD
 
         Locator l = Locator.xpath("//div[@class='reportView']//pre");
         _test.waitForElement(l);
-        String html = _test.getText(l);
+        String html = _test.getText(l).replaceAll(" +", " ");
 
         if (failOnError)
         {

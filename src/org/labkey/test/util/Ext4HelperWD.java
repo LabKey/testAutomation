@@ -565,7 +565,7 @@ public class Ext4HelperWD extends AbstractHelperWD
 
         public static Locator.XPathLocator mask()
         {
-            return Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, '" + _cssPrefix + "mask')]");
+            return Locator.tag("div").withClass(_cssPrefix + "mask").notHidden();
         }
 
         public static Locator.XPathLocator folderManagementTreeNode(String nodeText)

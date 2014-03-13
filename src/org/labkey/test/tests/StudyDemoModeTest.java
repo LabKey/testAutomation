@@ -25,6 +25,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 /*
 * User: adam
 * Date: Jun 10, 2011
@@ -32,8 +34,14 @@ import java.util.List;
 */
 
 @Category({DailyB.class})
-public class StudyDemoModeTest extends StudyBaseTest
+public class StudyDemoModeTest extends StudyBaseTestWD
 {
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
     @Override
     protected String getProjectName()
     {
@@ -130,6 +138,7 @@ public class StudyDemoModeTest extends StudyBaseTest
             List<ControllerActionId> list = super.getExcludedActions();
             list.add(new ControllerActionId("search", "search"));    // Search results page displays PTIDs
             list.add(new ControllerActionId("study", "datasetReport")); // Reports aren't expected to hide ptids
+            list.add(new ControllerActionId("reports", "runReport")); // Reports aren't expected to hide ptids
             return list;
         }
 
@@ -140,9 +149,10 @@ public class StudyDemoModeTest extends StudyBaseTest
             // Check the standard forbidden words and fail if they're found
             super.checkForForbiddenWords(relativeURL);
 
+            String bodyText = getBodyText();
             // Now look for PTIDs in the visible text of the page and fail if we find one
             for (String ptid : Arrays.asList("999320", "999321", "618005775"))
-                assertTextNotPresent(ptid);
+                assertFalse("Found visible ptid during demo mode", bodyText.contains(ptid));
         }
     }
 }

@@ -30,7 +30,7 @@ import java.io.File;
  * Time: 2:03:39 PM
  */
 @Category({DailyA.class})
-public class HTTPApiTest extends SimpleApiTest
+public class HTTPApiTest extends SimpleApiTestWD
 {
     private static final String PROJECT_NAME = "HTTPApiVerifyProject";
     private static final String LIST_NAME = "Test List";
@@ -60,6 +60,12 @@ public class HTTPApiTest extends SimpleApiTest
         return new File[]{new File(getLabKeyRoot() + "/server/test/data/api/http-api.xml")};
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/query";
@@ -75,12 +81,13 @@ public class HTTPApiTest extends SimpleApiTest
         log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
         clickProject(PROJECT_NAME);
-        addWebPart("Lists");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Lists");
 
         log("Create List");
         _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
         clickButton("Edit Design", 0);
-        selectOptionByText("ff_titleColumn", "Like");    // Explicitly set to the PK (auto title will pick wealth column)
+        selectOptionByText(Locator.id("ff_titleColumn"), "Like");    // Explicitly set to the PK (auto title will pick wealth column)
         clickButton("Save", 0);
         waitForElement(Locator.id("button_Import Data"), WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Like");
@@ -90,7 +97,6 @@ public class HTTPApiTest extends SimpleApiTest
         _listHelper.submitTsvData(LIST_DATA);
         
         clickProject(PROJECT_NAME);
-        PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addQueryWebPart("lists");
     }
 }

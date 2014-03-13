@@ -33,12 +33,9 @@ import static org.junit.Assert.*;
 
 public class CustomizeViewsHelper extends AbstractHelper
 {
-    private RReportHelper _reportHelper;
-
     public CustomizeViewsHelper(BaseSeleniumWebTest test)
     {
         super(test);
-        _reportHelper = new RReportHelper(test);
     }
 
     public void openCustomizeViewPanel()
@@ -593,40 +590,6 @@ public class CustomizeViewsHelper extends AbstractHelper
             }
         }
         _test.clickButton("OK", 0);
-    }
-
-    /**
-     * pre-conditions:  at page with grid for which you would like an R view (grid should be only
-     *      or at least first element on page)
-     * post-conditions:  grid has R view of name name
-     * @param view   string to enter in view box (null for default) - Unimplemented
-     * @param name name to give new R view
-     */
-    public void createRView(String view, String name)
-    {
-        createRView(view, name, false);
-    }
-
-    /**
-     * pre-conditions:  at page with grid for which you would like an R view (grid should be only
-     *      or at least first element on page)
-     * post-conditions:  grid has R view of name name
-     * @param view   string to enter in view box (null for default) - Unimplemented
-     * @param name name to give new R view
-     * @param shareView should this view be available to all users
-     */
-    public void createRView(String view, String name, boolean shareView)
-    {
-        _test.waitForText(("Views"));
-        _test.clickMenuButton("Views", "Create", "R View");
-
-        if(view!=null)
-            fail("Unimplemented");
-
-        if (shareView)
-            _reportHelper.selectOption(RReportHelper.ReportOption.shareReport);
-
-        _reportHelper.saveReport(name);
     }
 
     /** Check that a column is present. */

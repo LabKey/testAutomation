@@ -56,9 +56,15 @@
             "effectivePermissions": [
                 "org.labkey.api.security.permissions.InsertPermission",
                 "org.labkey.api.security.permissions.DeletePermission",
-                "org.labkey.api.security.permissions.UpdatePermission",
+                "org.labkey.api.security.permissions.EditSharedViewPermission",
+                "org.labkey.api.reports.permissions.EditSharedReportPermission",
                 "org.labkey.api.security.permissions.ReadPermission",
-                "org.labkey.api.security.permissions.ReadSomePermission"
+                "org.labkey.api.reports.permissions.ShareReportPermission",
+                "org.labkey.api.study.permissions.SharedParticipantGroupPermission",
+                "org.labkey.announcements.model.SecureMessageBoardRespondPermission",
+                "org.labkey.api.security.permissions.ReadSomePermission",
+                "org.labkey.api.security.permissions.UpdatePermission",
+                "org.labkey.announcements.model.SecureMessageBoardReadPermission"
             ]
         },
         {

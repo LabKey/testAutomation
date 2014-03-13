@@ -26,12 +26,16 @@ import org.labkey.remoteapi.query.Sort;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Specimen;
+import org.labkey.test.categories.Study;
 import org.labkey.test.util.ChartHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4HelperWD;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
@@ -44,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
 import static org.junit.Assert.*;
@@ -53,7 +58,7 @@ import static org.junit.Assert.*;
  * Date: Apr 3, 2009
  * Time: 9:18:32 AM
  */
-@Category(InDevelopment.class)
+@Category({Study.class, Specimen.class, DailyB.class})
 public class StudyWDTest extends StudyBaseTestWD
 {
     public String datasetLink = datasetCount + " datasets";
@@ -85,9 +90,10 @@ public class StudyWDTest extends StudyBaseTestWD
 
     //lists created in participant picker tests must be cleaned up afterwards
     LinkedList<String> persistingLists  = new LinkedList<>();
-    private String Study001 = "Study 001";
     private String authorUser = "author1_study@study.test";
     private String specimenUrl = null;
+
+    private final PortalHelper portalHelper = new PortalHelper(this);
 
     protected void setDatasetLink(int datasetCount)
     {
@@ -195,16 +201,17 @@ public class StudyWDTest extends StudyBaseTestWD
     private void verifyParticipantReports()
     {
         clickFolder(getFolderName());
-        addWebPart("Study Data Tools");
+        portalHelper.addWebPart("Study Data Tools");
         clickAndWait(Locator.linkWithImage("/labkey/study/tools/participant_report.png"));
         clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog("Add Measure");
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         String textToFilter = "AE-1:(VTN) AE Log";
-        waitForText(textToFilter);
-        assertTextPresent(textToFilter, 27);
-        assertTextPresent("Abbrevi", 79);
+        Locator measureRow = Locator.tagWithText("div", textToFilter);
+        waitForElement(measureRow, WAIT_FOR_JAVASCRIPT * 2);
+        assertElementPresent(measureRow, 27);
+        assertElementPresent(Locator.tagContainingText("div", "Abbrevi"), 79);
 
         log("filter participant results down");
         Locator filterSearchText = Locator.xpath("//input[@name='filterSearch']");
@@ -221,7 +228,7 @@ public class StudyWDTest extends StudyBaseTestWD
         _extHelper.clickX4GridPanelCheckbox(40, "measuresGridPanel", true);
         _extHelper.clickX4GridPanelCheckbox(20, "measuresGridPanel", true);
         clickButton("Select", 0);
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         log("Verify report page looks as expected");
         String reportName = "MouseFooReport";
@@ -265,7 +272,7 @@ public class StudyWDTest extends StudyBaseTestWD
 
             cancelCreateClassificationList();
 
-            String pIDs = createListWithAddAll(allList, false);
+            List<String> pIDs = createListWithAddAll(allList, false);
             persistingLists.add(allList);
 
             refresh();
@@ -282,7 +289,7 @@ public class StudyWDTest extends StudyBaseTestWD
             persistingLists.remove(allList);
 
             attemptCreateExpectError("1", "does not exist in this study.", "bad List ");
-            String id = pIDs.substring(0, pIDs.indexOf(","));
+            String id = pIDs.get(0);
             attemptCreateExpectError(id + ", " + id, "Duplicates are not allowed in a group", "Bad List 2");
         }
 
@@ -303,7 +310,7 @@ public class StudyWDTest extends StudyBaseTestWD
             _extHelper.waitForExtDialog("Selection Error");
             assertTextPresent("At least one " + SUBJECT_NOUN + " must be selected");
             clickButtonContainingText("OK", 0);
-            waitForExtMaskToDisappear();
+            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         }
 
@@ -320,7 +327,7 @@ public class StudyWDTest extends StudyBaseTestWD
         // save the new group and use it
         setFormElement(Locator.name(LABEL_FIELD), "Participant Group from Grid");
         clickButtonContainingText("Save", 0);
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
         if(!quickTest)
         {
@@ -360,13 +367,12 @@ public class StudyWDTest extends StudyBaseTestWD
 
         // validate...
         if (!identifiers.containsAll(Arrays.asList(ids)))
-            fail("The Participant Group wizard did not contain the subject IDs : " + ids);
+            fail("The Participant Group wizard did not contain the subject IDs : [" + StringUtils.join(ids, ", ") + "]");
     }
 
     /** verify that we can change a list's name
      * pre-conditions: list with name listName exists
      * post-conditions: list now named lCHANGEstName
-     * @param listName
      * @return new name of list
      */
     @LogMethod
@@ -403,14 +409,14 @@ public class StudyWDTest extends StudyBaseTestWD
 
         _extHelper.waitForExtDialog("Delete Group");
         clickButtonContainingText("No", 0);
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         assertTextPresent(listName);
 
 
         clickButtonContainingText("Delete Selected", 0);
         _extHelper.waitForExtDialog("Delete Group");
         clickButtonContainingText("Yes", 0);
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         refresh();
         assertTextNotPresent(listName);
 
@@ -431,9 +437,12 @@ public class StudyWDTest extends StudyBaseTestWD
         setFormElement(Locator.name(LABEL_FIELD), listName);
         setFormElement(Locator.name(ID_FIELD), ids);
         clickButton("Save", 0);
-        waitForText(expectedError, 5*defaultWaitForPage);
+        waitForElement(Ext4HelperWD.Locators.window("Error"));
+        assertTextPresent(expectedError);
         clickButton("OK", 0);
+        waitForElementToDisappear(Ext4HelperWD.Locators.mask().index(1));
         clickButton("Cancel", 0);
+        waitForElementToDisappear(Ext4HelperWD.Locators.mask());
         assertTextNotPresent(listName);
     }
 
@@ -441,32 +450,29 @@ public class StudyWDTest extends StudyBaseTestWD
      * verify that an already created list contains the pIDs we expect it to and can be changed.
      * pre-conditions:  listName exists with the specified IDs
      * post-conditions:  listName exists, with the same IDs, minus the first one
-     *
-     * @param listName
-     * @param pIDs
      */
     @LogMethod
-    private void editClassificationList(String listName, String pIDs)
+    private void editClassificationList(String listName, List<String> pIDs)
     {
         sleep(1000);
         selectListName(listName);
 
         clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
-        String newPids = getFormElement(Locator.name(ID_FIELD));
-        assertSetsEqual(pIDs, newPids, ", *");
+        List<String> newPids = Arrays.asList(getFormElement(Locator.name(ID_FIELD)).replaceAll(" +", "").split(","));
+        assertSetsEqual(pIDs, newPids);
         log("IDs present after opening list: " + newPids);
 
         //remove first element
         sleep(1000);
         waitForElement(Locator.xpath("//input[contains(@name, 'infoCombo')]"));
-        newPids = pIDs.substring(pIDs.indexOf(",")+2);
-        setFormElement(Locator.name(ID_FIELD), newPids);
+        newPids = pIDs.subList(1, pIDs.size());
+        setFormElement(Locator.name(ID_FIELD), StringUtils.join(newPids, ","));
         log("edit list of IDs to: " + newPids);
 
         //save, close, reopen, verify change
         _extHelper.waitForExtDialog("Define Mouse Group");
         clickButtonContainingText("Save", 0);
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         sleep(1000);
         waitForElement(Locator.ext4Button("Delete Selected"));
         selectListName(listName);
@@ -474,12 +480,13 @@ public class StudyWDTest extends StudyBaseTestWD
 
         sleep(1000);
         waitForElement(Locator.xpath("//input[contains(@name, 'infoCombo')]"));
-        String pidsAfterEdit =   getFormElement(Locator.name(ID_FIELD));
+        String pidsAfterEdit = getFormElement(Locator.name(ID_FIELD)).replaceAll(" +", "");
         log("pids after edit: " + pidsAfterEdit);
 
-        String[] arrPids = newPids.replace(" ","").split(","); Arrays.sort(arrPids);
-        String[] arrAfter = pidsAfterEdit.replace(" ","").split(","); Arrays.sort(arrAfter);
-        assertTrue(Arrays.deepEquals(arrPids, arrAfter));
+        Collections.sort(newPids);
+        List<String> editedPids = Arrays.asList(pidsAfterEdit.split(","));
+        Collections.sort(editedPids);
+        assertEquals(newPids, editedPids);
 
         clickButtonContainingText("Cancel", 0);
     }
@@ -527,7 +534,7 @@ public class StudyWDTest extends StudyBaseTestWD
      * @return ids in new list
      */
     @LogMethod
-    private String createListWithAddAll(String listName, boolean filtered)
+    private List<String> createListWithAddAll(String listName, boolean filtered)
     {
         startCreateParticipantGroup();
         setFormElement(Locator.name(LABEL_FIELD), listName);
@@ -542,7 +549,7 @@ public class StudyWDTest extends StudyBaseTestWD
         clickButtonContainingText("Add All", 0);
 
         List<String> idsInColumn = table.getColumnDataAsText("Mouse Id");
-        String idsInForm = getFormElement(Locator.name(ID_FIELD));
+        List<String> idsInForm = Arrays.asList(getFormElement(Locator.name(ID_FIELD)).replaceAll(" +", "").split(","));
         assertIDListsMatch(idsInColumn, idsInForm);
 
         clickButtonContainingText("Save", 0);
@@ -555,15 +562,11 @@ public class StudyWDTest extends StudyBaseTestWD
     /**
      * Compare list of IDs extracted from a column to those entered in
      * the form.  They should be identical.
-     * @param idsInColumn
-     * @param idsInForm
      */
-    private void assertIDListsMatch(List<String> idsInColumn, String idsInForm)
+    private void assertIDListsMatch(List<String> idsInColumn, List<String> idsInForm)
     {
         //assert same size
-        int columnCount = idsInColumn.size()-2; //the first entry in column count is the name
-        int formCount = idsInForm.length() - idsInForm.replace(",", "").length() - 1; //number of commas + 1 = number of entries
-        assertEquals("Wrong number of participants selected", columnCount, formCount);
+        assertEquals("Wrong number of participants selected", idsInColumn, idsInForm);
     }
 
     private void goToManageParticipantClassificationPage(String projectName, String studyName, String subjectNoun)
@@ -600,13 +603,13 @@ public class StudyWDTest extends StudyBaseTestWD
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Manage Study"));
         clickAndWait(Locator.linkWithText("Manage Dataset QC States"));
-        setFormElement("newLabel", "unknown QC");
-        setFormElement("newDescription", "Unknown data is neither clean nor dirty.");
-        clickCheckboxById("dirty_public");
-        clickCheckbox("newPublicData");
+        setFormElement(Locator.name("newLabel"), "unknown QC");
+        setFormElement(Locator.name("newDescription"), "Unknown data is neither clean nor dirty.");
+        click(Locator.checkboxById("dirty_public"));
+        click(Locator.checkboxByName("newPublicData"));
         clickButton("Save");
-        selectOptionByText("defaultDirectEntryQCState", "unknown QC");
-        selectOptionByText("showPrivateDataByDefault", "Public data");
+        selectOptionByText(Locator.name("defaultDirectEntryQCState"), "unknown QC");
+        selectOptionByText(Locator.name("showPrivateDataByDefault"), "Public data");
         clickButton("Save");
 
         // return to dataset import page
@@ -615,7 +618,7 @@ public class StudyWDTest extends StudyBaseTestWD
         clickAndWait(Locator.linkWithText("verifyAssay"));
         assertTextPresent("QC State");
         assertTextNotPresent("1234_B");
-        clickMenuButton("QC State", "All data");
+        _extHelper.clickMenuButton("QC State", "All data");
         clickButton("QC State", 0);
         assertTextPresent("unknown QC");
         assertTextPresent("1234_B");
@@ -638,14 +641,14 @@ public class StudyWDTest extends StudyBaseTestWD
         clickButton("Manage Dataset");
         clickButton("Edit Definition");
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.navButton("Add Field"), 0);
-        int newFieldIndex = getXpathCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
+        int newFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
         _listHelper.setColumnName(getPropertyXPath("Dataset Fields"), newFieldIndex, "Bad Name");
         clickButton("Save");
         clickButton("View Data");
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("Bad Name", "Bad Name");
         _customizeViewsHelper.applyCustomView();
-        clickMenuButton("QC State", "All data");
+        _extHelper.clickMenuButton("QC State", "All data");
         clickAndWait(Locator.linkWithText("edit", 0));
         setFormElement(Locator.input("quf_Bad Name"), "Updatable Value");
         clickButton("Submit");
@@ -687,7 +690,7 @@ public class StudyWDTest extends StudyBaseTestWD
     protected void verifySpecimens()
     {
         clickFolder(getFolderName());
-        addWebPart("Specimens");
+        portalHelper.addWebPart("Specimens");
         waitForText("Blood (Whole)");
         clickAndWait(Locator.linkWithText("Blood (Whole)"));
         specimenUrl = getCurrentRelativeURL();
@@ -707,7 +710,7 @@ public class StudyWDTest extends StudyBaseTestWD
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("Create New Dataset"));
 
-        setFormElement("typeName", PARTICIPANT_CMT_DATASET);
+        setFormElement(Locator.name("typeName"), PARTICIPANT_CMT_DATASET);
         clickButton("Next");
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -724,7 +727,7 @@ public class StudyWDTest extends StudyBaseTestWD
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText("Create New Dataset"));
 
-        setFormElement("typeName", PARTICIPANT_VISIT_CMT_DATASET);
+        setFormElement(Locator.name("typeName"), PARTICIPANT_VISIT_CMT_DATASET);
         clickButton("Next");
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -752,14 +755,14 @@ public class StudyWDTest extends StudyBaseTestWD
             clickAndWait(Locator.linkWithText("Manage Comments"));
         }
         prepForPageLoad();
-        selectOptionByText("participantCommentDataSetId", PARTICIPANT_CMT_DATASET);
+        selectOptionByText(Locator.name("participantCommentDataSetId"), PARTICIPANT_CMT_DATASET);
         newWaitForPageToLoad();
-        selectOptionByText("participantCommentProperty", PARTICIPANT_COMMENT_LABEL);
+        selectOptionByText(Locator.name("participantCommentProperty"), PARTICIPANT_COMMENT_LABEL);
 
         prepForPageLoad();
-        selectOptionByText("participantVisitCommentDataSetId", PARTICIPANT_VISIT_CMT_DATASET);
+        selectOptionByText(Locator.name("participantVisitCommentDataSetId"), PARTICIPANT_VISIT_CMT_DATASET);
         newWaitForPageToLoad();
-        selectOptionByText("participantVisitCommentProperty", PARTICIPANT_VISIT_COMMENT_LABEL);
+        selectOptionByText(Locator.name("participantVisitCommentProperty"), PARTICIPANT_VISIT_COMMENT_LABEL);
         clickButton("Save");
 
         clickFolder(getFolderName());
@@ -767,12 +770,12 @@ public class StudyWDTest extends StudyBaseTestWD
         clickAndWait(Locator.linkWithText("Blood (Whole)"));
         clickButton("Enable Comments/QC");
         log("manage participant comments directly");
-        clickMenuButton("Comments and QC", "Manage Mouse Comments");
+        _extHelper.clickMenuButton("Comments and QC", "Manage Mouse Comments");
 
         int datasetAuditEventCount = getDatasetAuditEventCount(); //inserting a new event should increase this by 1;
         clickButton("Insert New");
-        setFormElement("quf_MouseId", "999320812");
-        setFormElement("quf_" + COMMENT_FIELD_NAME, "Mouse Comment");
+        setFormElement(Locator.name("quf_MouseId"), "999320812");
+        setFormElement(Locator.name("quf_" + COMMENT_FIELD_NAME), "Mouse Comment");
         clickButton("Submit");
         //Issue 14894: Datasets no longer audit row insertion
         verifyAuditEventAdded(datasetAuditEventCount);
@@ -789,24 +792,24 @@ public class StudyWDTest extends StudyBaseTestWD
         setFilter("SpecimenDetail", "GlobalUniqueId", "Equals", "AAA07XK5-01");
         checkCheckbox(Locator.name(".toggle"));
         clickButton("Enable Comments/QC");
-        clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
-        setFormElement("comments", "Vial Comment");
+        _extHelper.clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
+        setFormElement(Locator.name("comments"), "Vial Comment");
         clickButton("Save Changes");
 
         checkCheckbox(Locator.name(".toggle"));
-        clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
-        clickMenuButton("Copy or Move Comment(s)", "Copy", "To Mouse", "999320812");
-        setFormElement("quf_" + COMMENT_FIELD_NAME, "Copied PTID Comment");
+        _extHelper.clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
+        _extHelper.clickMenuButton("Copy or Move Comment(s)", "Copy", "To Mouse", "999320812");
+        setFormElement(Locator.name("quf_" + COMMENT_FIELD_NAME), "Copied PTID Comment");
         clickButton("Submit");
         assertTextPresent("Copied PTID Comment");
 
         checkCheckbox(Locator.name(".toggle"));
-        clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
+        _extHelper.clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
         prepForPageLoad();
-        clickMenuButtonAndContinue("Copy or Move Comment(s)", "Move", "To Mouse", "999320812");
+        _extHelper.clickMenuButton(false, "Copy or Move Comment(s)", "Move", "To Mouse", "999320812");
         getAlert();
         newWaitForPageToLoad();
-        setFormElement("quf_" + COMMENT_FIELD_NAME, "Moved PTID Comment");
+        setFormElement(Locator.name("quf_" + COMMENT_FIELD_NAME), "Moved PTID Comment");
         clickButton("Submit");
         assertElementPresent(Locator.tagContainingText("td", "Moved PTID Comment"));
         assertElementNotPresent(Locator.tagContainingText("td", "Mouse Comment"));
@@ -875,7 +878,7 @@ public class StudyWDTest extends StudyBaseTestWD
         exportDataRegion("Script", "R");
         goToAuditLog();
         prepForPageLoad();
-        selectOptionByText("view", "Query export events");
+        selectOptionByText(Locator.name("view"), "Query export events");
         newWaitForPageToLoad();
 
         DataRegionTable auditTable =  new DataRegionTable("query", this);
@@ -974,13 +977,13 @@ public class StudyWDTest extends StudyBaseTestWD
     {
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Study Navigator"));
-        assertTextNotPresent("Screening Cycle");
-        assertTextNotPresent("Cycle 1");
-        assertTextPresent("Pre-exist Cond");
+        assertElementPresent(Locator.tag("td").withClass("labkey-column-header").withText("Pre-exist Cond"));
+        assertElementNotPresent(Locator.tag("td").withClass("labkey-column-header").withText("Screening Cycle"));
+        assertElementNotPresent(Locator.tag("td").withClass("labkey-column-header").withText("Cycle 1"));
         clickAndWait(Locator.linkWithText("Show All Datasets"));
-        assertTextPresent("Screening Cycle");
-        assertTextPresent("Cycle 1");
-        assertTextPresent("Pre-exist Cond");
+        assertElementPresent(Locator.tag("td").withClass("labkey-column-header").withText("Screening Cycle"));
+        assertElementPresent(Locator.tag("td").withClass("labkey-column-header").withText("Cycle 1"));
+        assertElementPresent(Locator.tag("td").withClass("labkey-column-header").withText("Pre-exist Cond"));
     }
 
     @LogMethod
@@ -1060,7 +1063,7 @@ public class StudyWDTest extends StudyBaseTestWD
         }
 
         String path = "//td[" + StringUtils.join(parts, " and ") + "]";
-        return getXpathCount(Locator.xpath(path));
+        return getElementCount(Locator.xpath(path));
     }
 
     protected void verifyCohorts()
@@ -1079,11 +1082,11 @@ public class StudyWDTest extends StudyBaseTestWD
         assertTextPresent("999320016");
         assertTextPresent("999320518");
 
-        clickMenuButton("Mouse Groups", "Cohorts", "Group 1");
+        _extHelper.clickMenuButton("Mouse Groups", "Cohorts", "Group 1");
         assertTextPresent("999320016");
         assertTextNotPresent("999320518");
 
-        clickMenuButton("Mouse Groups", "Cohorts", "Group 2");
+        _extHelper.clickMenuButton("Mouse Groups", "Cohorts", "Group 2");
         assertTextNotPresent("999320016");
         assertTextPresent("999320518");
 
@@ -1113,7 +1116,7 @@ public class StudyWDTest extends StudyBaseTestWD
         waitAndClickAndWait(Locator.linkWithText(DEMOGRAPHICS_TITLE));
         clickButton("Edit Definition");
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.navButton("Add Field"), 0);
-        int newFieldIndex = getXpathCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
+        int newFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
         _listHelper.setColumnName(getPropertyXPath("Dataset Fields"), newFieldIndex, "VisitDay");
         _listHelper.setColumnType(newFieldIndex, ListHelper.ListColumnType.Integer);
         Locator element3 = Locator.gwtListBoxByLabel("Visit Date Column");
@@ -1137,5 +1140,11 @@ public class StudyWDTest extends StudyBaseTestWD
         DataRegionTable table = new DataRegionTable("query", this, false);
         table.setFilter("Day", "Equals", "102");
         assertTextPresent("999320016", "Screening", "101.0", "2005-01-01", "102", "Group 1");
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }

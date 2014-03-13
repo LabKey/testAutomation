@@ -15,16 +15,14 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.experimental.categories.Category;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.InDevelopment;
 
 import java.io.File;
 
-/*
-* User: dave
-* Date: Sep 30, 2009
-* Time: 10:57:41 AM
-*/
-public class SecurityApiTest extends SimpleApiTest
+@Category({InDevelopment.class})
+public class SecurityApiTest extends SimpleApiTestWD
 {
     protected static final String PROJECT_NAME = "Security API Test Project";
     private static final String USER_1 = "testuser1@securityapi.test";
@@ -41,6 +39,12 @@ public class SecurityApiTest extends SimpleApiTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     @Override

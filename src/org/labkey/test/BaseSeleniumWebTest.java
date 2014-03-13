@@ -5807,18 +5807,6 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
         assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to not contain '" + value + "', but was '" + actual + "' instead.", actual != null && !actual.contains(value));
     }
 
-    public void assertSetsEqual(String firstSet, String secondSet, String delimiterRegEx)
-    {
-        String[] firstArray = firstSet.split(delimiterRegEx);
-        String[] secondArray = secondSet.split(delimiterRegEx);
-        assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstArray.length == secondArray.length);
-        Set<String> firstHash= new HashSet<>();
-        Collections.addAll(firstHash, firstArray);
-        Set<String> secondHash= new HashSet<>();
-        Collections.addAll(secondHash, secondArray);
-        assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
-    }
-
     public String getAttribute(Locator locator, String attributeName)
     {
         return selenium.getAttribute(locator.toString() + "@" + attributeName);
