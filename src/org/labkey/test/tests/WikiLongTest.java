@@ -476,7 +476,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Also check copying permission");
         clickTab("Wiki");
         clickWebpartMenuItem("Pages", "Copy");
-        assertTextNotPresent(PROJECT_NAME);
+        assertElementNotPresent(Locator.linkWithText(PROJECT_NAME));
         stopImpersonating();
         clickProject(PROJECT_NAME);
         enterPermissionsUI();
@@ -488,7 +488,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickProject(PROJECT2_NAME);
         clickTab("Wiki");
         clickWebpartMenuItem("Pages", "Copy");
-        assertTextPresent(PROJECT_NAME);
+        assertElementPresent(Locator.linkWithText(PROJECT_NAME));
         stopImpersonating();
 
         log("delete wiki web part");
