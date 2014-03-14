@@ -135,9 +135,8 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
         {
             _test.log("Saving current custom view");
         }
-        _test.clickButtonByIndex("Save", 1, 0);
+        _test.clickButtonByIndex("Save", 1);
 
-        _test.waitForElementToDisappear(_dataRegion.toCssLocator().append(".customizeViewPanel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT); // Panel will be gone after a page load
         _test.waitForElement(_dataRegion.toCssLocator().append(".labkey-data-region"));
     }
 
