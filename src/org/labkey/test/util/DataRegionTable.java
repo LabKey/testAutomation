@@ -282,6 +282,7 @@ public class DataRegionTable
     public List<String> getColumnHeaders()
     {
         List<String> columnHeaders = new ArrayList<>();
+        _mapColumns.clear(); // Start fresh
 
         for (int col = 0; col < _columnCount; col++)
         {
@@ -291,7 +292,8 @@ public class DataRegionTable
             {
                 String headerName = header.split("\n")[0];
                 headerName = headerName.replaceAll(" ", "");
-                if (!StringUtils.isEmpty(headerName))
+                if (!StringUtils.isEmpty(headerName)
+                        && !_mapColumns.containsKey(headerName)) // Remember only the first occurrence of each column label
                     _mapColumns.put(headerName, col);
             }
         }
