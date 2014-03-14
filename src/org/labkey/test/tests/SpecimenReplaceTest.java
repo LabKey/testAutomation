@@ -86,6 +86,6 @@ public class SpecimenReplaceTest extends SpecimenMergeTest
     private void goToIndividualvialsDRT()
     {
         clickTab("Specimen Data");
-        clickAndWait(Locator.linkWithText("By Individual Vial"));
+        waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
     }
 }
