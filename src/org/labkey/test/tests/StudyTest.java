@@ -566,7 +566,7 @@ public class StudyTest extends StudyBaseTest
     private void assertIDListsMatch(List<String> idsInColumn, List<String> idsInForm)
     {
         //assert same size
-        assertEquals("Wrong number of participants selected", idsInColumn, idsInForm);
+        assertEquals("Wrong participants selected", new HashSet<>(idsInColumn), new HashSet<>(idsInForm));
     }
 
     private void goToManageParticipantClassificationPage(String projectName, String studyName, String subjectNoun)
