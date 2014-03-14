@@ -165,7 +165,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         //click(Locator.id(btnId));
         _extHelper.clickExtButton("Create Vials");
         assertTextPresent("Each vial will have no more than 1.00e+07 cells.");
-        assertTextNotPresent("B01");
+        assertElementNotPresent(Locator.tagWithText("td", "B01"));
 
 
         log("** test changing cell counts updates used/remaining columns and vial count column");
