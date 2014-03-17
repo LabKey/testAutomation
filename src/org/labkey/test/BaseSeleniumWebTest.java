@@ -98,9 +98,9 @@ public abstract class BaseSeleniumWebTest implements Cleanable, WebTest
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
     protected static final int MAX_WAIT_SECONDS = 10 * 60;
 
-    public static final String TRICKY_CHARACTERS = "><&/%\\' \"1";
-    public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1";
-    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#";
+    public static final String TRICKY_CHARACTERS = "><&/%\\' \"1äöü";
+    public static final String TRICKY_CHARACTERS_NO_QUOTES = "></% 1äöü";
+    public static final String TRICKY_CHARACTERS_FOR_PROJECT_NAMES = "\u2603~!@$&()_+{}-=[],.#äöü";
 
     public static final String INJECT_CHARS_1 = "\"'>--><script>alert('8(');</script>;P";
     public static final String INJECT_CHARS_2 = "\"'>--><img src=xss onerror=alert(\"8(\")>\u2639";
