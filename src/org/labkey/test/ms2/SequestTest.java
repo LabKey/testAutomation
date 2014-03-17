@@ -159,22 +159,22 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         assertLinkPresentWithText(PROTOCOL);
 
         log("Test Protein Search");
-        selenium.type("identifier", SEARCH);
-        selenium.click("exactMatch");
+        setFormElement("identifier", SEARCH);
+        click(Locator.name("exactMatch"));
         clickButton("Search");
         assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
         assertTextPresent(SEARCH_FIND);
 
-        selenium.type("minimumProbability", "2.0");
+        setFormElement("minimumProbability", "2.0");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTextPresent(SEARCH_FIND);
         assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
 
-        selenium.type("identifier", "GarbageProteinName");
-        selenium.type("minimumProbability", "");
+        setFormElement("identifier", "GarbageProteinName");
+        setFormElement("minimumProbability", "");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTextNotPresent(SEARCH_FIND);

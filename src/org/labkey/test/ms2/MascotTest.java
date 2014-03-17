@@ -20,6 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.categories.MS2;
 import org.labkey.test.categories.Mascot;
 
@@ -47,7 +48,7 @@ import static org.junit.Assert.*;
  *          Rule 5 ">[^ ]* \(.*\)"   (the rule number can be different, but regex must be the same or equivalent)
  *
  */
-@Category({MS2.class, Mascot.class})
+@Category({/*MS2.class, */Mascot.class, InDevelopment.class})
 public class MascotTest extends AbstractMS2SearchEngineTest
 {
     protected static final String PEPTIDE = "R.RLPVGADR.G";
@@ -331,21 +332,21 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         assertLinkPresentWithText(PROTOCOL);
 
         log("Test Protein Search");
-        selenium.type("identifier", SEARCH);
-        selenium.click("exactMatch");
+        setFormElement("identifier", SEARCH);
+        click(Locator.name("exactMatch"));
         clickButton("Search");
         assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
-        selenium.type("minimumProbability", "2.0");
+        setFormElement("minimumProbability", "2.0");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
         assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
 
-        selenium.type("identifier", "GarbageProteinName");
-        selenium.type("minimumProbability", "");
+        setFormElement("identifier", "GarbageProteinName");
+        setFormElement("minimumProbability", "");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTextNotPresent(SEARCH_FIND);

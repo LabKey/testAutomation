@@ -61,9 +61,6 @@ import static org.labkey.test.TestProperties.*;
 import static org.junit.Assert.*;
 
 /**
- * User: Mark Igra
- * Date: Feb 7, 2007
- * Time: 5:31:38 PM
  * @deprecated Use {@link BaseWebDriverTest}
  */
 @Deprecated

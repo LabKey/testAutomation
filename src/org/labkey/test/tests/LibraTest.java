@@ -75,7 +75,7 @@ public class LibraTest extends MS2TestBase
     {
         configure();
         waitForText("Grouping");
-        selenium.select("viewTypeGrouping", "Standard");
+        selectOptionByText(Locator.id("viewTypeGrouping"), "Standard");
         clickButton("Go");
         _customizeViewsHelper.openCustomizeViewPanel();
         addNormalizationCount();
@@ -136,7 +136,7 @@ public class LibraTest extends MS2TestBase
         assertRadioButtonSelected("spectraConfig", "SpectraCountPeptide");
         _customizeViewsHelper.saveCustomView("HyperFilter");
         clickRadioButtonById("SpectraCountPeptideCharge");
-        setFormElement(Locator.id("PeptidesFilter.viewName"), "HyperFilter");
+        selectOptionByText(Locator.id("PeptidesFilter.viewName"), "HyperFilter");
         setFormElement("targetProtein", "");
         clickButton("Compare");
         assertLinkPresentWithTextCount("itraq/iTRAQ (Libra)", 12);
@@ -158,18 +158,17 @@ public class LibraTest extends MS2TestBase
 
     protected void newWindowTest(String linkToClick, String verificationString, String... additionalChecks)
     {
-        selenium.openWindow("", "prot");
         click(Locator.linkContainingText(linkToClick));
-        selenium.selectWindow("prot");
-        waitForPageToLoad();
+        Object[] windows = getDriver().getWindowHandles().toArray();
+        getDriver().switchTo().window((String)windows[1]);
         waitForText(verificationString);
 
         checkForITRAQNormalization();
         checkForITRAQQuantitation();
 
         assertTextPresent(additionalChecks);
-        selenium.close();
-        selenium.selectWindow(null);
+        getDriver().close();
+        getDriver().switchTo().window((String)windows[0]);
 
     }
     private void specificProteinTest()

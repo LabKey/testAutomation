@@ -73,7 +73,7 @@ public class XTandemTest extends AbstractXTandemTest
         clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
 
         // Make sure we're not using a custom default view for the current user
-        selectOptionByText("viewParams", "<Standard View>");
+        selectOptionByText(Locator.name("viewParams"), "<Standard View>");
         clickButton("Go");
 
         log("Test filtering and sorting");
@@ -86,10 +86,10 @@ public class XTandemTest extends AbstractXTandemTest
         clickButton("Save View");
         setFormElement("name", VIEW);
         clickButton("Save View");
-        selectOptionByText("viewParams", "<Standard View>");
+        selectOptionByText(Locator.name("viewParams"), "<Standard View>");
         clickButton("Go");
         assertTextPresent(PEPTIDE);
-        selectOptionByText("viewParams", VIEW);
+        selectOptionByText(Locator.name("viewParams"), VIEW);
         clickButton("Go");
         assertTextNotPresent("K.VFHFVR.Q");
         assertTextBefore(PEPTIDE2, PEPTIDE3);
@@ -113,7 +113,7 @@ public class XTandemTest extends AbstractXTandemTest
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Peptide (Legacy)"));
-        selectOptionByText("viewParams", VIEW);
+        selectOptionByText(Locator.name("viewParams"), VIEW);
         clickButton("Compare");
         assertTextPresent("(Mass > 1000.0)");
 
@@ -133,7 +133,7 @@ public class XTandemTest extends AbstractXTandemTest
     private void verifyComparePeptides()
     {
         clickAndWait(Locator.linkWithText("Setup Compare Peptides"));
-        clickRadioButtonById(PEPTIDE_CROSSTAB_RADIO_PROBABILITY_ID);
+        checkRadioButton(Locator.radioButtonById(PEPTIDE_CROSSTAB_RADIO_PROBABILITY_ID));
         setFormElement(PEPTIDE_CROSSTAB__PROBABILITY_TEXTBOX_NAME, "0.25");
         clickButton("Compare");
         assertTextPresent(PEPTIDE4);
@@ -143,24 +143,24 @@ public class XTandemTest extends AbstractXTandemTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         log("Verify experiment information in MS2 runs.");
-        assertLinkPresentWithText(PROTOCOL);
+        assertElementPresent(Locator.linkWithText(PROTOCOL));
 
         log("Test Protein Search");
-        selenium.type("identifier", SEARCH);
-        selenium.click("exactMatch");
+        setFormElement("identifier", SEARCH);
+        click(Locator.name("exactMatch"));
         clickButton("Search");
-        assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
+        assertElementPresent(Locator.linkContainingText(SAMPLE_BASE_NAME + " (test2)"));
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
-        selenium.type("minimumProbability", "2.0");
+        setFormElement("minimumProbability", "2.0");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
-        assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
+        assertElementNotPresent(Locator.linkContainingText(SAMPLE_BASE_NAME + " (test2)"));
 
-        selenium.type("identifier", "GarbageProteinName");
-        selenium.type("minimumProbability", "");
+        setFormElement("identifier", "GarbageProteinName");
+        setFormElement("minimumProbability", "");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(!(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT)));
@@ -170,19 +170,17 @@ public class XTandemTest extends AbstractXTandemTest
 
     private void verifyPeptideDetailsPage()
     {
-
         log("Test peptide details page");
-        selenium.openWindow("", "pep");
         click(Locator.linkWithText(PEPTIDE2));
-        selenium.waitForPopUp("pep", "10000");
-        selenium.selectWindow("pep");
+        Object[] windows = getDriver().getWindowHandles().toArray();
+        getDriver().switchTo().window((String)windows[1]);
         assertTextPresent("gi|4689022|ribosomal_protein_");  // Check for protein
         assertTextPresent("CAexample_mini.pep.xml - bov_sample/CAexample_mini (test2)"); // Check for run name
         assertTextPresent("1373.4690"); // Check for mass
         waitForText("44.0215"); // Look for b3+ ions, populated bu JavaScript
         assertTextPresent("87.0357", "130.0499");
-        selenium.close();
-        selenium.selectWindow(null);
+        getDriver().close();
+        getDriver().switchTo().window((String)windows[0]);
     }
 
     private void verifyPeptideCrosstab()
@@ -193,7 +191,7 @@ public class XTandemTest extends AbstractXTandemTest
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Peptide"));
 
-        checkRadioButton(PEPTIDE_CROSSTAB_RADIO_NAME, PEPTIDE_CROSSTAB_RADIO_VALUE_NONE);
+        checkRadioButton(Locator.radioButtonByNameAndValue(PEPTIDE_CROSSTAB_RADIO_NAME, PEPTIDE_CROSSTAB_RADIO_VALUE_NONE));
         clickButton("Compare");
         assertTextPresent(PEPTIDE3);
         assertTextPresent(PEPTIDE4);

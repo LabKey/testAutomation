@@ -28,7 +28,7 @@ import java.io.File;
  * Date: Nov 28, 2005
  * Time: 2:47:27 PM
  */
-abstract public class MS2TestBase extends BaseSeleniumWebTest
+abstract public class MS2TestBase extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "MS2VerifyProject";
     protected static final String FOLDER_NAME = "ms2folder";
@@ -61,6 +61,12 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -117,8 +123,9 @@ abstract public class MS2TestBase extends BaseSeleniumWebTest
         clickFolder(FOLDER_NAME);
 
         clickAndWait(Locator.linkWithText("MS2 Runs"));
+        prepForPageLoad();
         selectOptionByText("experimentRunFilter", "All Runs");
-        waitForPageToLoad();
+        newWaitForPageToLoad();
         if (!isTextPresent("No data to show"))
         {
             checkCheckbox(".toggle");

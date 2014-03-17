@@ -49,7 +49,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         log("Create a new MS2 sample prep assay definition.");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
-        selenium.type("//input[@id='AssayDesignerName']", TEST_ASSAY_NAME);
+        setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), TEST_ASSAY_NAME);
 
         addField("Run Fields", 0, "IntegerField", "IntegerField", ListHelper.ListColumnType.Integer);
         addField("Run Fields", 1, "TextField", "TextField", ListHelper.ListColumnType.String);
@@ -76,8 +76,8 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
             seconds++;
             sleep(1000);
         }
-        selectOptionByText("sampleSetListBox0", "<None>");
-        setFormElement("sampleTextBox0", "verify:001");
+        selectOptionByText(Locator.id("sampleSetListBox0"), "<None>");
+        setFormElement(Locator.id("sampleTextBox0"), "verify:001");
 
         clickButton("Save and Finish");
 
@@ -106,7 +106,6 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setFormElement("minPeptideProphetProb", "0");
         clickButton("Search");
         // Search is submitted as AJAX, and upon success the browser is redirected to a new page. Wait for it to load
-        waitForPageToLoad();
         waitForElement(Locator.linkWithText("Data Pipeline"), WAIT_FOR_JAVASCRIPT);
         sleep(5000); // without this sleep, some machines try to redirect back to the begin.view page after the Data Pipeline link is clicked
         log("View the analysis log.");
@@ -148,16 +147,18 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         log("View full status.");
         clickFolder(FOLDER_NAME);
 
-        assertTextPresent(SAMPLE_BASE_NAME + " (test2)");
+        assertElementPresent(Locator.linkContainingText(SAMPLE_BASE_NAME + " (test2)"));
 
-        clickAndWait(Locator.linkWithText("Data Pipeline"));
+        clickAndWait(Locator.tagWithAttribute("a", "title", "Experiment run graph"));
+
+//        clickAndWait(Locator.linkWithText("Data Pipeline"));
 
         // Since the list of jobs is sorted by creation time in descending
         // order and we know that the job we want to click on is the one
         // that was submitted last, and that all the jobs have completed,
         // we can safely click on the first link
-        clickAndWait(Locator.linkWithText("COMPLETE"));
-        clickButton("Data");
+//        clickAndWait(Locator.linkWithText("COMPLETE"));
+//        clickButton("Data");
 
         log("Verify msPicture");
         assertElementPresent(Locator.imageMapLinkByTitle("graphmap", ANNOTATION_RUN_NAME));
@@ -208,9 +209,10 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
     protected  void searchMS2LibraCheck()
     {
-        selenium.select("//tr[td/table/tbody/tr/td/div[contains(text(),'Quantitation engine')]]/td/select","Libra");
+        selectOptionByText(Locator.xpath("//tr[td/table/tbody/tr/td/div[contains(text(),'Quantitation engine')]]/td/select"),"Libra");
         assertTextPresent("Libra config name", "Libra normalization channel");
         setFormElement(Locator.xpath("//tr[td/table/tbody/tr/td/div[text()='Libra config name']]/td/input"), "foo");
+        fireEvent(Locator.xpath("//tr[td/table/tbody/tr/td/div[text()='Libra config name']]/td/input"), SeleniumEvent.change);
         String text = getFormElement("configureXml");
         assertTrue(text.contains("foo"));
     }

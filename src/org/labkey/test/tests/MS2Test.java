@@ -77,12 +77,13 @@ public class MS2Test extends AbstractMS2ImportTest
         selectOptionByText("viewParams", "<Standard View>");
         clickButton("Go");
 
-        assertTextPresent(SEARCH_NAME3);
-        assertTextPresent("databases");
+        assertTextPresent(
+                SEARCH_NAME3,
+                "databases",
+                MASS_SPEC);
         //Different cases used with different search engines.
         if( !isTextPresent(ENZYME))
             assertTextPresent(ENZYME);
-        assertTextPresent(MASS_SPEC);
         assertLinkPresentWithText(PEPTIDE1);
 
         log("Test Navigation Bar for Run");
@@ -90,15 +91,17 @@ public class MS2Test extends AbstractMS2ImportTest
         click(Locator.linkWithText("Show Modifications"));
         // Wait for tooltip to show up
         waitForText("Variable", 2000);
-        assertTextPresent("E^");
-        assertTextPresent("Q^");
+        assertTextPresent(
+                "E^",
+                "Q^");
 
         log("Test Show Peptide Prophet Details");
         pushLocation();
         beginAt(getLinkHref("Show Peptide Prophet Details", "MS2", "/" + PROJECT_NAME + "/" + FOLDER_NAME));
-        assertTextPresent("Minimum probability");
-        assertTextPresent("Error rate");
-        assertTextPresent("Sensitivity");
+        assertTextPresent(
+                "Minimum probability",
+                "Error rate",
+                "Sensitivity");
         assertElementPresent(Locator.tagWithAttribute("img", "alt", "Charge 1+ Distribution"));
         assertElementPresent(Locator.tagWithAttribute("img", "alt", "Sensitivity Plot"));
         assertElementPresent(Locator.tagWithAttribute("img", "alt", "Charge 1+ Cumulative Distribution"));
@@ -109,9 +112,10 @@ public class MS2Test extends AbstractMS2ImportTest
         log("Test Show Protein Prophet Details");
         pushLocation();
         beginAt(getLinkHref("Show Protein Prophet Details", "MS2", "/" + PROJECT_NAME + "/" + FOLDER_NAME));
-        assertTextPresent("Minimum probability");
-        assertTextPresent("Error rate");
-        assertTextPresent("Sensitivity");
+        assertTextPresent(
+                "Minimum probability",
+                "Error rate",
+                "Sensitivity");
         assertElementPresent(Locator.tagWithAttribute("img", "alt", "Sensitivity Plot"));
         popLocation();
 
@@ -129,22 +133,23 @@ public class MS2Test extends AbstractMS2ImportTest
         clickMenuButton("Export Selected", "TSV");
         assertTextPresent("K.LLASMLAK.A");
         assertTextNotPresent("R.Q^YALHVDGVGTK.A");
-        assertTextPresent("\n", 2, true);
+        assertTextPresent("\n", 2);
         popLocation();
         pushLocation();
         peptidesTable.checkAllOnPage();
         clickMenuButton("Export Selected", "AMT");
         assertTextPresent("\n", 60, true);
-        assertTextPresent("Run");
-        assertTextPresent("CalcMHPlus");
-        assertTextPresent("RetTime");
-        assertTextPresent("Fraction");
-        assertTextPresent("PepProphet");
-        assertTextPresent("Peptide");
-        assertTextPresent("1373.4690");
-        assertTextPresent("846.5120");
-        assertTextPresent("K.LLASMLAK.A");
-        assertTextPresent("K.EEEESDEDMGFG.-");
+        assertTextPresent(
+                "Run",
+                "CalcMHPlus",
+                "RetTime",
+                "Fraction",
+                "PepProphet",
+                "Peptide",
+                "1373.4690",
+                "846.5120",
+                "K.LLASMLAK.A",
+                "K.EEEESDEDMGFG.-");
         popLocation();
 
         log("Test sort");
@@ -399,7 +404,7 @@ public class MS2Test extends AbstractMS2ImportTest
         clearSort("MS2Peptides", "Scan");
 
         log("Test customize view");
-        clickButton("Clear All");
+        fireEvent(Locator.navButton("Clear All"), SeleniumEvent.click);
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewSort("Charge", "Z", "Descending");
         _customizeViewsHelper.addCustomizeViewSort("Mass", "CalcMH+", "Descending");
@@ -425,7 +430,7 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test changing order of sorts and columns");
         _customizeViewsHelper.openCustomizeViewPanel();
-        selenium.windowMaximize();
+        windowMaximize();
         sleep(500);
         _customizeViewsHelper.moveCustomizeViewSort("Charge", false);
         // XXX: selenium test can't move columns that require scrolling the column list
@@ -436,9 +441,8 @@ public class MS2Test extends AbstractMS2ImportTest
         //assertTextBefore("gi|30519530|A38R_protein", "K.ISNFIANNDCRYYIDAEHQKIISDEINR.Q");
 
         _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.moveCustomizeViewSort("Charge", true);
+        _customizeViewsHelper.moveCustomizeViewSort("Mass", false);
         // XXX: selenium test can't move columns that require scrolling the column list
-        //_customizeViewsHelper.moveCustomizeViewColumn(this, "Peptide", true);
         _customizeViewsHelper.applyCustomView();
 
         log("Test Ignore View Filter");
@@ -755,8 +759,9 @@ public class MS2Test extends AbstractMS2ImportTest
         {
             // User last viewed all peptides, regardless of search engine assignment, so flip to the other option
             // before checking that the values match our expectations
+            prepForPageLoad();
             selectOptionByValue(Locator.name("allPeps"), "false");
-            waitForPageToLoad();
+            newWaitForPageToLoad();
         }
         assertTextPresent("27% (18 / 66)");
         assertTextPresent("27% (2,050 / 7,683)");
@@ -764,8 +769,9 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
         assertTextNotPresent("K.YTELK.D");
 
+        prepForPageLoad();
         selectOptionByValue(Locator.name("allPeps"), "true");
-        waitForPageToLoad();
+        newWaitForPageToLoad();
 
         assertTextPresent("35% (23 / 66)");
         assertTextPresent("35% (2,685 / 7,683)");
@@ -793,8 +799,9 @@ public class MS2Test extends AbstractMS2ImportTest
         if (userPref)
         {
             // User last only peptides assigned by the search engine, so flip back to restore their preference
+            prepForPageLoad();
             selectOptionByValue(Locator.name("allPeps"), "false");
-            waitForPageToLoad();
+            newWaitForPageToLoad();
         }
 
         popLocation();
@@ -836,11 +843,12 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test editing run group info");
         clickAndWait(Locator.linkWithText(RUN_GROUP1_NAME1));
-        assertTextPresent(RUN_GROUP1_NAME1);
-        assertTextPresent(RUN_GROUP1_CONTACT);
-        assertTextPresent(RUN_GROUP1_DESCRIPTION);
-        assertTextPresent(RUN_GROUP1_HYPOTHESIS);
-        assertTextPresent(RUN_GROUP1_COMMENTS);
+        assertTextPresent(
+                RUN_GROUP1_NAME1,
+                RUN_GROUP1_CONTACT,
+                RUN_GROUP1_DESCRIPTION,
+                RUN_GROUP1_HYPOTHESIS,
+                RUN_GROUP1_COMMENTS);
         clickButton("Edit");
         setFormElement("name", RUN_GROUP1_NAME2);
         clickButton("Submit");
@@ -854,9 +862,10 @@ public class MS2Test extends AbstractMS2ImportTest
         _customizeViewsHelper.addCustomizeViewColumn(new String[] { "RunGroupToggle", "Default Experiment" }, "Run Groups Default Experiment");
         _customizeViewsHelper.applyCustomView();
 
-        assertTextPresent(RUN_GROUP1_NAME2);
-        assertTextPresent(RUN_GROUP2_NAME);
-        assertTextPresent(DEFAULT_EXPERIMENT);
+        assertTextPresent(
+                RUN_GROUP1_NAME2,
+                RUN_GROUP2_NAME,
+                DEFAULT_EXPERIMENT);
 
         for (int i = 0; i <= 5; i++)
         {
@@ -892,7 +901,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextPresent(RUN_GROUP1_NAME2);
         assertTextPresent(RUN_GROUP2_NAME);
         assertTextPresent(DEFAULT_EXPERIMENT);
-        selectOptionByValue("//div[text() = 'A']/../../../td/select", "group1");
+        selectOptionByValue(Locator.xpath("//div[text() = 'A']/../../../td/select"), "group1");
 
         log("Test Customize View");
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -1002,20 +1011,22 @@ public class MS2Test extends AbstractMS2ImportTest
         click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
         setFormElement(Locator.input("targetProtein"), "");
         clickButton("Compare");
-        assertTextPresent("K.EEEESDEDMGFG.-");
-        assertTextPresent("R.Q^YALHVDGVGTK.A");
-        assertTextPresent("K.GSDSLSDGPACKR.S");
-        assertTextPresent("K.EYYLLHKPPKTISSTK.D");
+        assertTextPresent(
+                "K.EEEESDEDMGFG.-",
+                "R.Q^YALHVDGVGTK.A",
+                "K.GSDSLSDGPACKR.S",
+                "K.EYYLLHKPPKTISSTK.D");
 
         // verify the bulk protein coverage map export
         pushLocation();
         addUrlParameter("exportAsWebPage=true");
         clickButton("Export Protein Coverage");
-        assertTextPresentInThisOrder("22001886", "Q963B6");
-        assertTextPresentInThisOrder("29827410", "NP_822044.1");
-        assertTextPresentInThisOrder("17508693", "NP_492384.1");
-        assertTextPresentInThisOrder("27716987", "XP_233992.1");
-        assertTextPresent("(search engine matches)");
+        assertTextPresent(
+                "22001886|sp|Q963B6",
+                "29827410|ref|NP_822044.1",
+                "17508693|ref|NP_492384.1",
+                "27716987|ref|XP_233992.1",
+                "(search engine matches)");
         assertTextNotPresent("(all matching peptides)");
         assertTextPresent("57 Total qualifying peptides in run", 56); // two peptides have the same search engine protein
         assertTextPresent("57 Distinct qualifying peptides in run", 56); // two peptides have the same search engine protein
@@ -1028,22 +1039,25 @@ public class MS2Test extends AbstractMS2ImportTest
         click(Locator.radioButtonByNameAndValue("peptideFilterType", "probability"));
         setFormElement(Locator.input("peptideProphetProbability"), "0.9");
         clickButton("Compare");
-        assertTextPresent("K.EEEESDEDMGFG.-");
-        assertTextPresent("R.Q^YALHVDGVGTK.A");
+        assertTextPresent(
+                "K.EEEESDEDMGFG.-",
+                "R.Q^YALHVDGVGTK.A",
+                "K.EYYLLHKPPKTISSTK.D");
         assertTextNotPresent("K.GSDSLSDGPACKR.S");
-        assertTextPresent("K.EYYLLHKPPKTISSTK.D");
 
         // verify the bulk protein coverage map export for the peptideProphet probability filter
         pushLocation();
         addUrlParameter("exportAsWebPage=true");
         clickButton("Export Protein Coverage");
-        assertTextPresentInThisOrder("4689022", "CAA80880.2");
-        assertTextPresentInThisOrder("18311790", "NP_558457.1");
-        assertTextPresentInThisOrder("15828808", "NP_326168.1");
-        assertTextPresentInThisOrder("34849400", "AAP58899.1");
-        assertTextNotPresent("BAB39767.1"); // for peptide K.GSDSLSDGPACKR.S
-        assertTextPresent("(search engine matches)");
-        assertTextNotPresent("(all matching peptides)");
+        assertTextPresent(
+                "4689022|emb|CAA80880.2",
+                "18311790|ref|NP_558457.1",
+                "15828808|ref|NP_326168.1",
+                "34849400|gb|AAP58899.1",
+                "(search engine matches)");
+        assertTextNotPresent(
+                "BAB39767.1", // for peptide K.GSDSLSDGPACKR.S
+                "(all matching peptides)");
         assertTextPresent("2 Total qualifying peptides in run", 4);
         assertTextPresent("2 Distinct qualifying peptides in run", 4);
         assertTextPresent("peptide-marker", 4);
@@ -1054,18 +1068,21 @@ public class MS2Test extends AbstractMS2ImportTest
         setFormElement(Locator.input("targetProtein"), "gi|18311790|phosphoribosylfor");
         clickButton("Compare");
         assertTextPresent("R.Q^YALHVDGVGTK.A");
-        assertTextNotPresent("K.EEEESDEDMGFG.-");
-        assertTextNotPresent("K.GSDSLSDGPACKR.S");
-        assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
+        assertTextNotPresent(
+                "K.EEEESDEDMGFG.-",
+                "K.GSDSLSDGPACKR.S",
+                "K.EYYLLHKPPKTISSTK.D");
 
         // verify the bulk protein coverage map export for peptideProphet filter with target protein
         pushLocation();
         addUrlParameter("exportAsWebPage=true");
         clickButton("Export Protein Coverage");
-        assertTextPresentInThisOrder("18311790", "NP_558457.1");
-        assertTextNotPresent("CAA80880.2"); // for peptide K.EEEESDEDMGFG.-
-        assertTextPresent("(all matching peptides)");
-        assertTextNotPresent("(search engine matches)");
+        assertTextPresent(
+                "18311790|ref|NP_558457.1",
+                "(all matching peptides)");
+        assertTextNotPresent(
+                "CAA80880.2", // for peptide K.EEEESDEDMGFG.-
+                "(search engine matches)");
         assertTextPresent("(PeptideProphet &gt;= 0.9) AND (Matches sequence of ", 2);
         assertTextPresent("Peptide Counts:", 2);
         assertTextPresent("1 Total peptide matching sequence", 1);
@@ -1082,22 +1099,27 @@ public class MS2Test extends AbstractMS2ImportTest
         setFormElement(Locator.input("targetProtein"), "gi|15645924|ribosomal_protein");
         click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
         clickButton("Compare");
-        assertTextPresent("K.YTELK.D");
-        assertTextPresent("R.VKLKAMQLSNPNEIKKAR.N");
-        assertTextNotPresent("R.Q^YALHVDGVGTK.A");
-        assertTextNotPresent("K.EEEESDEDMGFG.-");
-        assertTextNotPresent("K.GSDSLSDGPACKR.S");
-        assertTextNotPresent("K.EYYLLHKPPKTISSTK.D");
+        assertTextPresent(
+                "K.YTELK.D",
+                "R.VKLKAMQLSNPNEIKKAR.N");
+        assertTextNotPresent(
+                "R.Q^YALHVDGVGTK.A",
+                "K.EEEESDEDMGFG.-",
+                "K.GSDSLSDGPACKR.S",
+                "K.EYYLLHKPPKTISSTK.D");
 
         // verify the bulk protein coverage map export for target protein
         pushLocation();
         addUrlParameter("exportAsWebPage=true");
         clickButton("Export Protein Coverage");
-        assertTextPresentInThisOrder("15645924", "NP_208103.1");
+        assertTextPresent(
+                "15645924|ref|NP_208103.1",
+                "(all matching peptides)");
+        assertTextNotPresent(
+                "15612296",
+                "NP_223949.1",
+                "(search engine matches)");
         assertTextPresent("NP_208103.1", 4);
-        assertTextNotPresent("15612296", "NP_223949.1");
-        assertTextPresent("(all matching peptides)");
-        assertTextNotPresent("(search engine matches)");
         assertTextPresent("Peptide Counts:", 2);
         assertTextPresent("0 Total peptides matching sequence", 1);
         assertTextPresent("0 Distinct peptides matching sequence", 1);
@@ -1117,9 +1139,10 @@ public class MS2Test extends AbstractMS2ImportTest
         checkRadioButton(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
         setFormElement(Locator.name("targetProtein"), "");
         clickButton("Compare");
-        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
-        assertTextPresent("R.TQMPAASICVNYK.G");
-        assertTextPresent("Avg PepProphet");
+        assertTextPresent(
+                "K.EIRQRQGDDLDGLSFAELR.G",
+                "R.TQMPAASICVNYK.G",
+                "Avg PepProphet");
 
         log("Test Customize View in Query Peptides");
         _customizeViewsHelper.openCustomizeViewPanel();
@@ -1129,29 +1152,38 @@ public class MS2Test extends AbstractMS2ImportTest
         _customizeViewsHelper.saveCustomView();
 
         log("Check filtering and columns were added correctly");
-        assertTextPresent("Avg XCorr");
-        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
-        assertTextNotPresent("R.TQMPAASICVNYK.G");
-        assertTextPresent("11.200", "13.800");
+        assertTextPresent(
+                "Avg XCorr",
+                "K.EIRQRQGDDLDGLSFAELR.G",
+                "11.200",
+                "13.800");
+        assertTextNotPresent(
+                "R.TQMPAASICVNYK.G");
 
         log("Check Ignore/Apply View Filter");
         clickMenuButton("Views", "Apply View Filter");
-        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
-        assertTextPresent("R.TQMPAASICVNYK.G");
-        assertTextPresent("Avg XCorr");
+        assertTextPresent(
+                "K.EIRQRQGDDLDGLSFAELR.G",
+                "R.TQMPAASICVNYK.G",
+                "Avg XCorr");
 
         clickMenuButton("Views", "Apply View Filter");
-        assertTextPresent("Avg XCorr");
-        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
-        assertTextNotPresent("R.TQMPAASICVNYK.G");
+        assertTextPresent(
+                "Avg XCorr",
+                "K.EIRQRQGDDLDGLSFAELR.G");
+        assertTextNotPresent(
+                "R.TQMPAASICVNYK.G");
 
         log("Test exporting in Query Peptides Comparision");
         addUrlParameter("exportAsWebPage=true");
         clickExportToText();
-        assertTextPresent("AVG_XCorr");
-        assertTextPresent("K.EIRQRQGDDLDGLSFAELR.G");
-        assertTextNotPresent("R.TQMPAASICVNYK.G");
-        assertTextPresent("11.200", "13.800");
+        assertTextPresent(
+                "AVG_XCorr",
+                "K.EIRQRQGDDLDGLSFAELR.G",
+                "11.200",
+                "13.800");
+        assertTextNotPresent(
+                "R.TQMPAASICVNYK.G");
         goBack();
     }
 
@@ -1162,17 +1194,15 @@ public class MS2Test extends AbstractMS2ImportTest
         String ms2Run = "ms2pipe/truncated (pepXML)";
         waitForTextWithRefresh(ms2Run, defaultWaitForPage);
         clickAndWait(Locator.linkWithText(ms2Run));
-        String windowName = "peptideProphetSummary";
-        selenium.openWindow("", windowName);
+
         click(Locator.linkWithText("Show Peptide Prophet Details"));
-        selenium.waitForPopUp(windowName, "10000");
-        selenium.selectWindow(windowName);
+        Object[] windows = getDriver().getWindowHandles().toArray();
+        getDriver().switchTo().window((String) windows[1]);
         assertElementPresent(Locator.imageWithAltText("Charge 3+ Cumulative Observed vs. Model", false));
         assertEquals("Incorrect number of graphs", 13, getXpathCount(Locator.imageWithSrc("labkey/ms2/MS2VerifyProject/ms2folder", true)));
         assertTextPresent("PeptideProphet Details: ms2pipe/truncated (pepXML)");
-        selenium.close();
-        selenium.selectWindow(null);
-
+        getDriver().close();
+        getDriver().switchTo().window((String) windows[0]);
     }
 
     //issue 12342

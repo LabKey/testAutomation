@@ -132,11 +132,6 @@ import static org.labkey.test.WebTestHelper.getTargetServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
 import static org.labkey.test.TestProperties.*;
 
-/**
- * User: Mark Igra
- * Date: Feb 7, 2007
- * Time: 5:31:38 PM
- */
 public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements Cleanable, WebTest
 {
     /**
@@ -3257,7 +3252,7 @@ public abstract class BaseWebDriverTest extends BaseSeleniumWebTest implements C
             @Override
             public boolean check()
             {
-                return (Boolean)executeScript("if (HoverNavigation._folder != HoverNavigation._project) return true; else return false;");
+                return (Boolean)executeScript("if (HoverNavigation._folder.webPartName = 'foldernav') return true; else return false;");
             }
         }, "HoverNavigation._folder not ready", WAIT_FOR_JAVASCRIPT);
     }
