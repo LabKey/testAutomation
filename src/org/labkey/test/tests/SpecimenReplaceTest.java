@@ -80,7 +80,7 @@ public class SpecimenReplaceTest extends SpecimenMergeTest
         importFirstFileSet();
         goToIndividualvialsDRT();
 
-        assertTextPresent("1 - 100 of 667");
+        assertElementPresent(Locator.paginationText(1, 100, 667));
     }
 
     private void goToIndividualvialsDRT()
