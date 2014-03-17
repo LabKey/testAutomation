@@ -82,9 +82,6 @@ public class QuantitationTest extends AbstractXTandemTest
         clickFolder(FOLDER_NAME);
 
         // Jump to the flow chart view
-//        clickAndWait(Locator.linkWithText("Data Pipeline"));
-//        clickAndWait(Locator.linkWithText("COMPLETE"));
-//        clickButton("Data");
         clickAndWait(Locator.tagWithAttribute("a", "title", "Experiment run graph"));
         
         pushLocation();

@@ -151,15 +151,6 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         clickAndWait(Locator.tagWithAttribute("a", "title", "Experiment run graph"));
 
-//        clickAndWait(Locator.linkWithText("Data Pipeline"));
-
-        // Since the list of jobs is sorted by creation time in descending
-        // order and we know that the job we want to click on is the one
-        // that was submitted last, and that all the jobs have completed,
-        // we can safely click on the first link
-//        clickAndWait(Locator.linkWithText("COMPLETE"));
-//        clickButton("Data");
-
         log("Verify msPicture");
         assertElementPresent(Locator.imageMapLinkByTitle("graphmap", ANNOTATION_RUN_NAME));
         pushLocation();
