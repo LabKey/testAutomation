@@ -3218,7 +3218,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void hoverFolderBar()
     {
-        waitForElement(Locator.id("folderBar"));
+        waitForElement(Locator.id("folderBar").withText());
         waitForFolderNavigationReady();
         executeScript("HoverNavigation._folder.show();"); // mouseOver doesn't work on old Firefox
         waitForElement(Locator.css("#folderBar_menu .folder-nav"));
@@ -3238,7 +3238,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean check()
             {
-                return (Boolean)executeScript("if (HoverNavigation._folder.webPartName = 'foldernav') return true; else return false;");
+                return (Boolean)executeScript("if (HoverNavigation._folder.webPartName == 'foldernav') return true; else return false;");
             }
         }, "HoverNavigation._folder not ready", WAIT_FOR_JAVASCRIPT);
     }
@@ -3873,6 +3873,24 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 return downloadDir.listFiles(newFiles).length >= expectedFileCount;
             }
         }, "File(s) did not appear in download dir", WAIT_FOR_PAGE);
+
+        final FileFilter tempFiles = new FileFilter()
+        {
+            @Override
+            public boolean accept(File file)
+            {
+                return file.getName().contains(".part") || file.getName().contains(".tmp");
+            }
+        };
+
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return downloadDir.listFiles(tempFiles).length == 0;
+            }
+        }, "Temp files remain after download", WAIT_FOR_JAVASCRIPT);
 
         return downloadDir.listFiles(newFiles);
     }
