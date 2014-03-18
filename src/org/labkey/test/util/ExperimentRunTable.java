@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class ExperimentRunTable extends DataRegionTable
     private int _rows = -1;
     private List<String> _listNames;
 
-    public ExperimentRunTable(String tableName, BaseSeleniumWebTest test, boolean cache)
+    public ExperimentRunTable(String tableName, BaseWebDriverTest test, boolean cache)
     {
         super(tableName, test, true);
 

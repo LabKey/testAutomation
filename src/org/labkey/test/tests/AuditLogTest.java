@@ -86,7 +86,7 @@ public class AuditLogTest extends BaseWebDriverTest
         signIn(AUDIT_TEST_USER, "asdf", false); // Bad login.  Existing User
         signIn(AUDIT_TEST_USER + "fail", "asdf", false); // Bad login.  Non-existent User
         simpleSignIn();
-        deleteUser(AUDIT_TEST_USER);
+        deleteUsers(true, AUDIT_TEST_USER);
 
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was added to the system", 10);
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was impersonated by", 10);
@@ -111,7 +111,7 @@ public class AuditLogTest extends BaseWebDriverTest
         setFormElement(Locator.name("names"), AUDIT_TEST_USER);
         uncheckCheckbox("sendEmail");
         clickButton("Update Group Membership");
-        deleteUser(AUDIT_TEST_USER);
+        deleteUsers(true, AUDIT_TEST_USER);
         deleteProject(AUDIT_TEST_PROJECT, true);
 
         verifyAuditEvent(this, GROUP_AUDIT_EVENT, COMMENT_COLUMN, "A new security group named Testers was created", 10);
@@ -147,7 +147,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         // cleanup
         stopImpersonating();
-        deleteUser(AUDIT_TEST_USER);
+        deleteUsers(true, AUDIT_TEST_USER);
         deleteProject(AUDIT_TEST_PROJECT, true);
     }
 

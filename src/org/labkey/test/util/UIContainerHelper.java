@@ -15,18 +15,14 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import static org.junit.Assert.*;
 
-/**
- * User: jeckels
- * Date: Jul 20, 2012
- */
 public class UIContainerHelper extends AbstractContainerHelper
 {
-    public UIContainerHelper(BaseSeleniumWebTest test)
+    public UIContainerHelper(BaseWebDriverTest test)
     {
         super(test);
     }
@@ -49,7 +45,7 @@ public class UIContainerHelper extends AbstractContainerHelper
             fail("Cannot create project; A link with text " + projectName + " already exists.  " +
                     "This project may already exist, or its name appears elsewhere in the UI.");
         _test.goToCreateProject();
-        _test.waitForElement(Locator.name("name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.name("name"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(Locator.name("name"), projectName);
 
         if (null != folderType && !folderType.equals("None"))
@@ -120,7 +116,7 @@ public class UIContainerHelper extends AbstractContainerHelper
         if (_test.isElementPresent(Locator.linkWithText(project)))
         {
             _test.log("Wait extra long for folder to finish deleting.");
-            while (_test.isLinkPresentWithText(project) && System.currentTimeMillis() - startTime < wait)
+            while (_test.isElementPresent(Locator.linkWithText(project)) && System.currentTimeMillis() - startTime < wait)
             {
                 _test.sleep(5000);
                 _test.refresh();

@@ -67,12 +67,6 @@ public class WikiTest extends BaseWebDriverTest
           return "Subfolder";
     }
 
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
-
     protected void doTestSteps()
     {
         log("Create Project");

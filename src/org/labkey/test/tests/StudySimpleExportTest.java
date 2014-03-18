@@ -24,7 +24,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.Study;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 
 import java.io.File;
 import java.util.HashMap;
@@ -103,8 +103,8 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickButton("Next");
         waitForElement(Locator.name("ff_name0"));
         _listHelper.deleteField("Dataset Fields", 0);
-        _listHelper.addField("Dataset Fields", 0, "TestInt", "TestInt", ListHelper.ListColumnType.Integer);
-        _listHelper.addField("Dataset Fields", 1, "TestDate", "TestDate", ListHelper.ListColumnType.DateTime);
+        _listHelper.addField("Dataset Fields", 0, "TestInt", "TestInt", ListHelperWD.ListColumnType.Integer);
+        _listHelper.addField("Dataset Fields", 1, "TestDate", "TestDate", ListHelperWD.ListColumnType.DateTime);
         clickButton("Save");
         clickButton("View Data");
         clickButton("Import Data");
@@ -430,7 +430,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         waitForText(newProps.get("Investigator"));
         assertTextPresent(newProps.get("Grant"));
         assertTextPresent(newProps.get("Description"));
-        assertLinkPresentWithTextCount(newProps.get("SubjectNounPlural"), 1);
+        assertElementPresent(Locator.linkWithText(newProps.get("SubjectNounPlural")), 1);
 
         log("Study Properties: clean up study properties");
         clickFolder(getFolderName());

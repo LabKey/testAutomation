@@ -78,7 +78,7 @@ public class SequestImportTest extends BaseWebDriverTest
 
         // Do a peptide comparison, making sure that the target protein filter works
         setFormElement(Locator.name("targetProtein"), "IPI00176617");
-        toggleCheckboxByTitle("Select/unselect all on current page");
+        click(Locator.checkboxByTitle("Select/unselect all on current page"));
         clickButton("Compare Peptides");
         assertTextPresent("S.GDPEEEEEEEEELVDPLTTVR.E", "raftflow10");
         // Make sure that other peptides have been filtered our correctly based on the target protein

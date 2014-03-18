@@ -109,7 +109,7 @@ public class WorkbookHelper extends AbstractHelperWD
         _test.waitForElement(Locator.linkWithText("Files"));
         assertEquals(title, _test.getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
         assertEquals(description, _test.getText(Locator.xpath("//div[@id='wb-description']")));
-        _test.assertLinkNotPresentWithText(title); // Should not appear in folder tree.
+        _test.assertElementNotPresent(Locator.linkWithText(title)); // Should not appear in folder tree.
         return id;
     }
 

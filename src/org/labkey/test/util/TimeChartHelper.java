@@ -15,20 +15,15 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
-/**
- * User: elvan
- * Date: 12/3/12
- * Time: 1:07 PM
- */
 public class TimeChartHelper
 {
-    ExtHelper _extHelper = null;
-    BaseSeleniumWebTest _test = null;
+    ExtHelperWD _extHelper = null;
+    BaseWebDriverTest _test = null;
 
-    public TimeChartHelper(BaseSeleniumWebTest test)
+    public TimeChartHelper(BaseWebDriverTest test)
     {
         _test = test;
         _extHelper = _test._extHelper;
@@ -44,7 +39,7 @@ public class TimeChartHelper
         String measureXpath = _extHelper.getExtDialogXPath("Add Measure...") + "//table/tbody/tr/td[div[starts-with(text(), '"+ measure +"')]]";
         _test.waitForElement(Locator.css("a.x4-btn span.iconDelete"));
         _test.mouseDown(Locator.xpath(measureXpath));
-        _test.clickButton("Select", BaseSeleniumWebTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        _test.clickButton("Select", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         _test.assertTextPresent(measure);
     }
 

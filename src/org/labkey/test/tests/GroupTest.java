@@ -23,8 +23,11 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.StringHelper;
 import org.openqa.selenium.NoSuchElementException;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -144,10 +147,11 @@ public class GroupTest extends BaseWebDriverTest
         int accessColumn = 2;
 
         int rowIndex = drt.getRow(userColumn, displayNameFromEmail(TEST_USERS_FOR_GROUP[0]));
+        List<String> expectedGroups = Arrays.asList("Author", "Reader", "Editor");
+        List<String> groupsForUser = Arrays.asList(drt.getDataAsText(rowIndex, accessColumn).replace(" ", "").split(","));
 
         //confirm correct perms
-        assertTrue("Unexpected groups", StringHelper.stringArraysAreEquivalentTrimmed(new String[]{"Author", "Reader", "Editor"},
-                drt.getDataAsText(rowIndex, accessColumn).replace(" ", "").split(",")));
+        assertEquals("Unexpected groups", new HashSet<>(expectedGroups), new HashSet<>(groupsForUser));
 
 
         //exapnd plus  to check specific groups

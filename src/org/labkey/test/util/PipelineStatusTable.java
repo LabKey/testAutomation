@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 
 import java.util.*;
 
@@ -30,7 +30,7 @@ public class PipelineStatusTable extends DataRegionTable
     private int _rows = -1;
     private Map<String, String> _mapDescriptionStatus;
 
-    public PipelineStatusTable(BaseSeleniumWebTest test, boolean selectors, boolean cache)
+    public PipelineStatusTable(BaseWebDriverTest test, boolean selectors, boolean cache)
     {
         // 13760: PipelineTest fails because status table no longer has floating headers
         super("StatusFiles", test, selectors, false);

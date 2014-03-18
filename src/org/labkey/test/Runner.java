@@ -895,16 +895,9 @@ public class Runner extends TestSuite
                     Constructor<WebTest> c = testClass.getConstructor();
                     WebTest test = null;
                     String directory = null;
-                    try
-                    {
-                        test = c.newInstance();
-                        directory = test.getAssociatedModuleDirectory();
-                    }
-                    finally
-                    {
-                        if (test != null)
-                            ((BaseSeleniumWebTest)test).tearDown(); // Kill firefox window created by test
-                    }
+
+                    test = c.newInstance();
+                    directory = test.getAssociatedModuleDirectory();
 
                     if (directory == null || directory.length() == 0)
                         continue;

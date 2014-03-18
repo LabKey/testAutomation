@@ -16,7 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.http.HttpStatus;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 
@@ -25,16 +25,11 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: Trey Chadick
- * Date: Apr 30, 2010
- * Time: 7:53:50 AM
- */
-public class SearchHelper extends AbstractHelper
+public class SearchHelper extends AbstractHelperWD
 {
     private static LinkedList<SearchItem> _searchQueue = new LinkedList<>();
 
-    public SearchHelper(BaseSeleniumWebTest test)
+    public SearchHelper(BaseWebDriverTest test)
     {
         super(test);
     }

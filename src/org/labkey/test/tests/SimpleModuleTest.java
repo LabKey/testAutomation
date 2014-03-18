@@ -146,7 +146,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Sample Sets", "Assay List");
         assertTextPresent("Run Groups");
-        assertLinkNotPresentWithText("Create Run Group"); // Not in small Run Groups web-part.
+        assertElementNotPresent(Locator.linkWithText("Create Run Group")); // Not in small Run Groups web-part.
         securityHelper.checkWebpartPermission("A customized web part", "Read", null);
         securityHelper.checkWebpartPermission("Data Pipeline", "Read", null);
     }
@@ -408,7 +408,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         selectSchema(VEHICLE_SCHEMA);
         selectQuery(VEHICLE_SCHEMA, "Manufacturers");
 
-        assertLinkPresentWithText("view history");
+        assertElementPresent(Locator.linkWithText("view history"));
         clickAndWait(Locator.linkContainingText("view history"));
 
         DataRegionTable table = new DataRegionTable("query", this, false, true);
@@ -420,7 +420,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         selectQuery(VEHICLE_SCHEMA, "Models");
         pushLocation();
 
-        assertLinkPresentWithText("view history");
+        assertElementPresent(Locator.linkWithText("view history"));
         clickAndWait(Locator.linkContainingText("view history"));
 
         table = new DataRegionTable("query", this, false, true);
@@ -442,7 +442,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         popLocation();
         selectSchema(VEHICLE_SCHEMA);
         selectQuery(VEHICLE_SCHEMA, "Models");
-        assertLinkPresentWithText("view data");
+        assertElementPresent(Locator.linkWithText("view data"));
         clickAndWait(Locator.linkContainingText("view data"));
 
         table = new DataRegionTable("query", this, true, true);

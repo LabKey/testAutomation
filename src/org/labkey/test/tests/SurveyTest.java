@@ -72,12 +72,6 @@ public class SurveyTest extends BaseWebDriverTest
         verifySurveyContainerPermissions();
     }
 
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true; // for list archive import
-    }
-
     @LogMethod(category = LogMethod.MethodType.SETUP)
     private void setupProjectFolder()
     {

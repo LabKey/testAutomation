@@ -19,7 +19,7 @@ package org.labkey.test.util;
 import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.UnhandledAlertException;
@@ -70,14 +70,14 @@ public class Crawler
     private static final int DEFAULT_CRAWL_TIME = 90000;
 
     private static Map<String, CrawlStats> _crawlStats = new LinkedHashMap<>();
-    private BaseSeleniumWebTest _test;
+    private BaseWebDriverTest _test;
 
-    public Crawler(BaseSeleniumWebTest test)
+    public Crawler(BaseWebDriverTest test)
     {
         this(test, DEFAULT_CRAWL_TIME);
     }
 
-    public Crawler(BaseSeleniumWebTest test, int crawlTime)
+    public Crawler(BaseWebDriverTest test, int crawlTime)
     {
         _test = test;
         _maxCrawlTime = crawlTime;
@@ -177,7 +177,7 @@ public class Crawler
         return _maxDepth = maxDepth;
     }
 
-    private void saveCrawlStats(BaseSeleniumWebTest test, int maxDepth, int newPages, int uniqueActions, int crawlTestLength)
+    private void saveCrawlStats(BaseWebDriverTest test, int maxDepth, int newPages, int uniqueActions, int crawlTestLength)
     {
         String testName = test.getClass().getSimpleName();
         _crawlStats.put(testName, new CrawlStats(maxDepth, newPages, uniqueActions, crawlTestLength));
@@ -295,7 +295,7 @@ public class Crawler
         public ControllerActionId(String rootRelativeURL)
         {
             rootRelativeURL = stripQueryParams(rootRelativeURL);
-            rootRelativeURL = BaseSeleniumWebTest.stripContextPath(rootRelativeURL);
+            rootRelativeURL = BaseWebDriverTest.stripContextPath(rootRelativeURL);
 
             if (rootRelativeURL.startsWith("_webdav/"))
             {
@@ -543,7 +543,7 @@ public class Crawler
 
     private boolean underCreatedProject(String relativeURL)
     {
-        relativeURL = BaseSeleniumWebTest.stripContextPath(relativeURL);
+        relativeURL = BaseWebDriverTest.stripContextPath(relativeURL);
         ControllerActionId cid = new ControllerActionId(relativeURL);
         String folder = StringUtils.strip(cid.getFolder(),"/");
         StringTokenizer st = new StringTokenizer(folder, "/");
@@ -731,7 +731,7 @@ public class Crawler
 	public static final String maliciousScript = "<script>alert(\"" + alertText + "\");</script>";
 	public static final String injectString = "\"'>--></script>" + maliciousScript;
 
-    public static <F, T> T tryInject(BaseSeleniumWebTest test, Function<F, T> f, F arg)
+    public static <F, T> T tryInject(BaseWebDriverTest test, Function<F, T> f, F arg)
     {
         try
         {

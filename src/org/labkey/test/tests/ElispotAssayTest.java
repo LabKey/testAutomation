@@ -162,7 +162,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         }
 
         File file1 = new File(filePath);
-        setFormElement("__primaryFile__", file1);
+        setFormElement(Locator.name("__primaryFile__"), file1);
         clickButton("Next");
 
         for (int i = 0; i < 6; i++)
@@ -180,12 +180,6 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         }
 
         clickButton(finalButton);
-    }
-
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
     }
 
     @LogMethod

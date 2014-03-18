@@ -46,12 +46,6 @@ public class PivotQueryTest extends BaseWebDriverTest
         return getClass().getSimpleName() + "Project";
     }
 
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
-
     protected void setupProject()
     {
         _containerHelper.createProject(getProjectName(), "Study");

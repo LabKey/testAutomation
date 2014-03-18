@@ -159,7 +159,7 @@ public class ElisaAssayTest extends ElispotAssayTest
         }
 
         File file1 = new File(filePath);
-        setFormElement("__primaryFile__", file1);
+        setFormElement(Locator.name("__primaryFile__"), file1);
         clickButton("Next");
 
         String allErrors = "";

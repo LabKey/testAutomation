@@ -17,6 +17,7 @@ package org.labkey.test.ms2;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Cluster;
 import org.labkey.test.pipeline.PipelineWebTestBase;
@@ -72,12 +73,6 @@ public class MS2ClusterTest extends PipelineWebTestBase
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/ms2";
-    }
-
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return USE_GLOBUS;
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -137,8 +132,7 @@ public class MS2ClusterTest extends PipelineWebTestBase
             refresh();
         }
 
-        // Count uses case sensitive match.
-        assertLinkPresentWithTextCount("ERROR", 0);
+        assertElementNotPresent(Locator.linkWithText("ERROR"));
 
         for (PipelineTestParams tp : listValidated)
         {

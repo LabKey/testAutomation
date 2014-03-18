@@ -156,22 +156,22 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         log("Verify experiment information in MS2 runs.");
-        assertLinkPresentWithText(PROTOCOL);
+        assertElementPresent(Locator.linkWithText(PROTOCOL));
 
         log("Test Protein Search");
         setFormElement("identifier", SEARCH);
         click(Locator.name("exactMatch"));
         clickButton("Search");
-        assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
+        assertElementPresent(Locator.linkContainingText(SAMPLE_BASE_NAME + " (test2)"));
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
-        assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
+        assertElementPresent(Locator.linkContainingText(SAMPLE_BASE_NAME + " (test2)"));
         assertTextPresent(SEARCH_FIND);
 
         setFormElement("minimumProbability", "2.0");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTextPresent(SEARCH_FIND);
-        assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
+        assertElementNotPresent(Locator.linkWithText(SAMPLE_BASE_NAME + " (test2)"));
 
         setFormElement("identifier", "GarbageProteinName");
         setFormElement("minimumProbability", "");

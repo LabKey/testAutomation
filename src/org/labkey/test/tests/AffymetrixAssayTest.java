@@ -24,7 +24,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.FileBrowserHelperWD;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -92,7 +92,7 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
         Locator nameLocator = Locator.xpath("//input[@id='AssayDesignerName']");
         waitForElement(nameLocator);
         setFormElement(nameLocator, ASSAY_NAME);
-        _listHelper.addField("Data Fields", 3, EXTRA_RUN_DATA_FIELD_NAME, EXTRA_RUN_DATA_FIELD_LABEL, ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Data Fields", 3, EXTRA_RUN_DATA_FIELD_NAME, EXTRA_RUN_DATA_FIELD_LABEL, ListHelperWD.ListColumnType.Integer);
         clickButton("Save & Close");
 
         PortalHelper portalHelper = new PortalHelper(this);

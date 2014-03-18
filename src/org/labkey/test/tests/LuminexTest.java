@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.labkey.test.util.ListHelper.ListColumnType;
+import static org.labkey.test.util.ListHelperWD.ListColumnType;
 
 import static org.junit.Assert.*;
 
@@ -663,7 +663,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickExclusionMenuIconForWell(wellName);
 
         String exclusionComment = "exclude single analyte for single well";
-        setText(EXCLUDE_COMMENT_FIELD, exclusionComment);
+        setFormElement(EXCLUDE_COMMENT_FIELD, exclusionComment);
         clickRadioButtonById(EXCLUDE_SELECTED_BUTTON);
         clickExcludeAnalyteCheckBox(excludedAnalyte);
         clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
@@ -1176,11 +1176,6 @@ public class LuminexTest extends AbstractQCAssayTest
         deleteDir(getTestTempDir());
     } //doCleanup()
 
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
-
     @LogMethod
     protected void runJavaTransformTest()
     {
@@ -1571,7 +1566,7 @@ public class LuminexTest extends AbstractQCAssayTest
         setUpGuideSet("GS Analyte (2)");
         assertTextPresent("Apply Guide Set");
         stopImpersonating();
-        deleteUser(editor);
+        deleteUsers(true, editor);
 
         createAndImpersonateUser(reader, "Reader");
 
@@ -1580,7 +1575,7 @@ public class LuminexTest extends AbstractQCAssayTest
         assertTextPresent("Levey-Jennings Reports", "Standard1");
         assertTextNotPresent("Apply Guide Set");
         stopImpersonating();
-        deleteUser(reader);
+        deleteUsers(true, reader);
     }
 
     @LogMethod
@@ -2304,10 +2299,10 @@ public class LuminexTest extends AbstractQCAssayTest
         clickAndWait(Locator.tagWithAttribute("img", "src", "/labkey/Experiment/images/graphIcon.gif"));
         clickAndWait(Locator.linkWithText("Text View"));
         waitForText("Protocol Applications"); // bottom section of the "Text View" tab for the run details page
-        assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_4PL.pdf", 3);
-        assertLinkPresentWithTextCount("Guide Set plate " + index + ".Standard1_QC_Curves_5PL.pdf", 3);
-        assertLinkPresentWithTextCount("Guide Set plate " + index + ".xls", 4);
-        assertLinkPresentWithTextCount("Guide Set plate " + index + ".labkey_luminex_transform.Rout", 3);
+        assertElementPresent(Locator.linkWithText("Guide Set plate " + index + ".Standard1_QC_Curves_4PL.pdf"), 3);
+        assertElementPresent(Locator.linkWithText("Guide Set plate " + index + ".Standard1_QC_Curves_5PL.pdf"), 3);
+        assertElementPresent(Locator.linkWithText("Guide Set plate " + index + ".xls"), 4);
+        assertElementPresent(Locator.linkWithText("Guide Set plate " + index + ".labkey_luminex_transform.Rout"), 3);
 
         return true;
     }

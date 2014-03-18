@@ -20,7 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.InDevelopment;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.By;
@@ -96,8 +96,8 @@ public class ListPublishTest extends BaseWebDriverTest
     {
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Lists");
-        ListHelper.ListColumn column = new ListHelper.ListColumn("ParticipantId", "ParticipantId", ListHelper.ListColumnType.Subject, "A list of Ptids");
-        _listHelper.createList("ListPublishTestProject", "List4", ListHelper.ListColumnType.AutoInteger, "Key", column);
+        ListHelperWD.ListColumn column = new ListHelperWD.ListColumn("ParticipantId", "ParticipantId", ListHelperWD.ListColumnType.Subject, "A list of Ptids");
+        _listHelper.createList("ListPublishTestProject", "List4", ListHelperWD.ListColumnType.AutoInteger, "Key", column);
         goToProjectHome();
         goToList("List4");
         insertPtids();

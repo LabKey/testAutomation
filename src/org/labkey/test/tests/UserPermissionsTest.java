@@ -101,10 +101,10 @@ public class UserPermissionsTest extends BaseWebDriverTest
         createSubfolder(PERM_PROJECT_NAME, PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
         createSubfolder(PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, GAMMA_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
         addWebPart("Messages");
-        assertLinkPresentWithText("Messages");
+        assertElementPresent(Locator.linkWithText("Messages"));
         addWebPart("Wiki");
         assertTextPresent("Wiki");
-        assertLinkPresentWithText("Create a new wiki page");
+        assertElementPresent(Locator.linkWithText("Create a new wiki page"));
         addWebPart("Wiki Table of Contents");
 
         //Create Reader User
@@ -167,7 +167,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         clickFolder(GAMMA_SUB_FOLDER_NAME);
         clickAndWait(Locator.linkContainingText("view message", 1));
         assertTextPresent(GAMMA_EDITOR_PAGE_TITLE);
-        assertLinkNotPresentWithText("Edit");
+        assertElementNotPresent(Locator.linkWithText("Edit"));
         stopImpersonating();
 
         //Make sure that the Reader can read but not edit
@@ -177,12 +177,12 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         clickAndWait(Locator.linkContainingText("view message", 0));
         assertTextPresent(GAMMA_AUTHOR_PAGE_TITLE);
-        assertLinkNotPresentWithText("Edit");
+        assertElementNotPresent(Locator.linkWithText("Edit"));
 
         clickFolder(GAMMA_SUB_FOLDER_NAME);
         clickAndWait(Locator.linkContainingText("view message", 1));
         assertTextPresent(GAMMA_EDITOR_PAGE_TITLE);
-        assertLinkNotPresentWithText("Edit");
+        assertElementNotPresent(Locator.linkWithText("Edit"));
         stopImpersonating();
 
         //switch back to Editor and edit

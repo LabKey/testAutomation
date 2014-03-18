@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import java.util.Map;
@@ -25,10 +25,10 @@ import java.util.Map;
  * Date: 2/11/13
  * Time: 3:06 PM
  */
-public class ChartHelper  extends AbstractHelper
+public class ChartHelper  extends AbstractHelperWD
 {
 
-    public ChartHelper(BaseSeleniumWebTest test)
+    public ChartHelper(BaseWebDriverTest test)
     {
         super(test);
     }

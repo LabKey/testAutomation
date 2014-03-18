@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 
-import static org.labkey.test.BaseSeleniumWebTest.WAIT_FOR_PAGE;
+import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
 
 import static org.junit.Assert.*;
 
@@ -148,7 +148,7 @@ public class LabModuleHelper
             _test.clickTab("Workbooks");
 
         _test.waitAndClickButton("Create New Workbook", 0);
-        _test.waitForElement(Ext4Helper.ext4Window("Create Workbook"));
+        _test.waitForElement(Ext4HelperWD.Locators.window("Create Workbook"));
         _test.setFormElement(Locator.name("title"), workbookTitle);
         _test.setFormElement(Locator.name("description"), workbookDescription);
         _test.clickButton("Submit");
@@ -251,7 +251,7 @@ public class LabModuleHelper
 
         _test.waitForText("Sample Information");
         _test.waitAndClick(Locator.ext4Button("Add From Spreadsheet"));
-        _test.waitForElement(Ext4Helper.ext4Window("Spreadsheet Import"));
+        _test.waitForElement(Ext4HelperWD.Locators.window("Spreadsheet Import"));
 
         if (expectedColumns != null)
         {
@@ -308,7 +308,7 @@ public class LabModuleHelper
         if (supportsTemplates)
             _test._ext4Helper.clickExt4MenuItem(UPLOAD_RESULTS_TEXT);
 
-        _test.waitForElement(Ext4Helper.ext4Window(supportsTemplates ? UPLOAD_RESULTS_TEXT : IMPORT_DATA_TEXT));
+        _test.waitForElement(Ext4HelperWD.Locators.window(supportsTemplates ? UPLOAD_RESULTS_TEXT : IMPORT_DATA_TEXT));
         _test.waitAndClickAndWait(Locator.ext4Button("Submit"));
         _test.waitForText("Data Import");
     }

@@ -124,12 +124,6 @@ public class WikiLongTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
-
     protected void doTestSteps()
     {
         enableEmailRecorder();
@@ -175,7 +169,7 @@ public class WikiLongTest extends BaseWebDriverTest
         searchFor(PROJECT_NAME, "normal normal normal", 1, WIKI_PAGE1_TITLE);
 
         log("Test add content to link page");
-        assertLinkPresentWithText(WIKI_PAGE2_NAME);
+        assertElementPresent(Locator.linkWithText(WIKI_PAGE2_NAME));
         clickAndWait(Locator.linkWithText(WIKI_PAGE2_NAME));
         assertTextPresent("page has no content");
         clickAndWait(Locator.linkWithText("add content"));
@@ -186,7 +180,7 @@ public class WikiLongTest extends BaseWebDriverTest
         saveWikiPage();
 
         clickAndWait(Locator.linkWithText("Welcome"));
-        assertLinkNotPresentWithText(WIKI_PAGE2_NAME);
+        assertElementNotPresent(Locator.linkWithText(WIKI_PAGE2_NAME));
 
         searchFor(PROJECT_NAME, "Page AAA", 1, WIKI_PAGE2_TITLE);
 
@@ -204,19 +198,13 @@ public class WikiLongTest extends BaseWebDriverTest
         setFormElement("name", WIKI_PAGE3_NAME_TITLE);
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
         selectOptionByText("parent", WIKI_PAGE2_TITLE + " (" + WIKI_PAGE2_NAME + ")");
-        setWikiBody(WIKI_PAGE3_CONTENT);        
-        if (isFileUploadAvailable())
-        {
-            log("test attachments in wiki");
-            click(Locator.linkWithText("Attach a file"));
-            File file = new File(getLabKeyRoot() + "/common.properties");
-            setFormElement("formFiles[0]", file);
-        }
-        else
-            log("File upload skipped.");
+        setWikiBody(WIKI_PAGE3_CONTENT);
+        log("test attachments in wiki");
+        click(Locator.linkWithText("Attach a file"));
+        File file = new File(getLabKeyRoot() + "/common.properties");
+        setFormElement(Locator.name("formFiles[0]"), file);
         saveWikiPage();
-        if (isFileUploadAvailable())
-            assertTextPresent("common.properties");
+        assertTextPresent("common.properties");
         assertTextPresent(WIKI_PAGE3_WEBPART_TEST);
         assertTextPresent("Some HTML content");
 
@@ -251,7 +239,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Check Start Page series works");
         searchFor(PROJECT_NAME, "Some HTML", 1, WIKI_PAGE3_NAME_TITLE);
-        assertLinkPresentWithTextCount(WIKI_PAGE2_TITLE, 2);
+        assertElementPresent(Locator.linkWithText(WIKI_PAGE2_TITLE), 2);
 
         log("Check Pages menu works");
         clickAndWait(Locator.linkWithText(WIKI_PAGE2_TITLE));
@@ -323,14 +311,14 @@ public class WikiLongTest extends BaseWebDriverTest
         saveWikiPage();
 
         assertElementNotPresent(Locator.linkWithText("Home"));
-        assertLinkPresentWithText(PROJECT_NAME);
+        assertElementPresent(Locator.linkWithText(PROJECT_NAME));
 
         clickAndWait(Locator.linkWithText("Edit"));
         setWikiBody(NAVBAR2_CONTENT);
         saveWikiPage();
-        assertLinkPresentWithText("Projects");
-        assertLinkPresentWithText("Manage Project");
-        assertLinkPresentWithText("Manage Site");
+        assertElementPresent(Locator.linkWithText("Projects"));
+        assertElementPresent(Locator.linkWithText("Manage Project"));
+        assertElementPresent(Locator.linkWithText("Manage Site"));
 
         //test deleting via edit page
         clickAndWait(Locator.linkWithText("Edit"));
@@ -496,7 +484,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickTab("Portal");
         click(Locator.linkWithImage(getContextPath() + "/_images/partdelete.png"));
         waitForElementToDisappear(Locator.linkWithImage(getContextPath() + "/_images/partdelete.png"), WAIT_FOR_JAVASCRIPT);
-        assertLinkNotPresentWithText("Welcome");
+        assertElementNotPresent(Locator.linkWithText("Welcome"));
 
         log("test wiki TOC customize link");
         _portalHelper.addWebPart("Wiki Table of Contents");
@@ -536,7 +524,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Edit"));
         deleteWikiPage();
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
-        assertLinkPresentWithTextCount(WIKI_PAGE2_TITLE, 1);
+        assertElementPresent(Locator.linkWithText(WIKI_PAGE2_TITLE), 1);
 
         indexTest();
 

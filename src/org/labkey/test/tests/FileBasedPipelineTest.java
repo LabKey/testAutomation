@@ -18,16 +18,14 @@ package org.labkey.test.tests;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.FileBrowserHelperWD;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -264,19 +262,19 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         checkRadioButton(Locator.radioButtonByNameAndValue("providerName", providerName));
         clickButton("Next", 0);
 
-        waitForElement(Locator.id("AssayDesignerName"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("AssayDesignerName"), protocolName);
-        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseSeleniumWebTest.SeleniumEvent.change); // GWT compensation
+        fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.change); // GWT compensation
 
         _listHelper.deleteField("Data Fields", 0); // SpecimenID
         _listHelper.deleteField("Data Fields", 0); // ParticipantID
         _listHelper.deleteField("Data Fields", 0); // VisitID
         _listHelper.deleteField("Data Fields", 0); // Date
-        _listHelper.addField("Data Fields", 0, "Name", "Name", ListHelper.ListColumnType.String);
-        _listHelper.addField("Data Fields", 1, "Age", "Age", ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Data Fields", 0, "Name", "Name", ListHelperWD.ListColumnType.String);
+        _listHelper.addField("Data Fields", 1, "Age", "Age", ListHelperWD.ListColumnType.Integer);
 
         clickButton("Save", 0);
-        waitForText("Save successful.", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);
         waitForText("Save successful.", 20000);
     }
 

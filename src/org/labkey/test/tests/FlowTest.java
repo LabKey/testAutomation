@@ -224,8 +224,8 @@ public class FlowTest extends BaseFlowTest
         submit();
         popLocation();
         assertElementPresent(Locator.linkWithImage("/flagFCSFile.gif"));
-        assertLinkNotPresentWithText("91761.fcs");
-        assertLinkPresentWithText("FlowTest New Name");
+        assertElementNotPresent(Locator.linkWithText("91761.fcs"));
+        assertElementPresent(Locator.linkWithText("FlowTest New Name"));
         assertTextPresent("FlowTest Keyword Plate Name");
 
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
@@ -252,7 +252,7 @@ public class FlowTest extends BaseFlowTest
         setFormElement("ff_name", "QUV analysis");
         submit();
         clickAndWait(Locator.linkWithText("View Source"));
-        setLongTextField("script", this.getFileContents(QUV_ANALYSIS_SCRIPT));
+        setFormElement("script", this.getFileContents(QUV_ANALYSIS_SCRIPT));
         submit();
     }
 
@@ -290,8 +290,8 @@ public class FlowTest extends BaseFlowTest
 
         setSelectedFields(getContainerPath(), "flow", "CompensationControls", null, new String[] {"Name","Flag","Created","Run","FCSFile","RowId"});
 
-        assertLinkPresentWithText("PE Green laser-A+");
-        assertLinkNotPresentWithText("91918.fcs");
+        assertElementPresent(Locator.linkWithText("PE Green laser-A+"));
+        assertElementNotPresent(Locator.linkWithText("91918.fcs"));
         clickAndWait(Locator.linkWithText("PE Green laser-A+"));
         pushLocation();
         clickAndWait(Locator.linkWithText("Keywords from the FCS file"));
@@ -437,7 +437,7 @@ public class FlowTest extends BaseFlowTest
         // check well details page for FCSFile has link to the sample
         clickAndWait(Locator.linkWithText("91779.fcs-" + FCS_FILE_1));
         clickAndWait(Locator.linkWithText("91779.fcs"));
-        assertLinkPresentWithText(FCS_FILE_1 + "-C01");
+        assertElementPresent(Locator.linkWithText(FCS_FILE_1 + "-C01"));
     }
 
     //Issue 16304: query over flow.FCSFiles doesn't copy include URL for Name column

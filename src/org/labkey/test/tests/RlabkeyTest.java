@@ -166,9 +166,4 @@ public class RlabkeyTest extends SimpleApiTest
         return PROJECT_NAME;
     }
 
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
 }

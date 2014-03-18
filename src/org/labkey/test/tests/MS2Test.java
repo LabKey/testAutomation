@@ -84,7 +84,7 @@ public class MS2Test extends AbstractMS2ImportTest
         //Different cases used with different search engines.
         if( !isTextPresent(ENZYME))
             assertTextPresent(ENZYME);
-        assertLinkPresentWithText(PEPTIDE1);
+        assertElementPresent(Locator.linkWithText(PEPTIDE1));
 
         log("Test Navigation Bar for Run");
         log("Test Show Modifications");
@@ -218,7 +218,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextPresent("(Scan > 6) AND (Scan <= 100) AND (Charge = 2) AND (Hyper >= 14.6) AND (Next <> 9.5) AND (B < 11.6) AND (Y < 11.3) AND (Expect > 1.2)");
 
         log("Test spectrum page");
-        assertLinkPresentWithText("R.LSSMRDSR.S");
+        assertElementPresent(Locator.linkWithText("R.LSSMRDSR.S"));
         String address = getAttribute(Locator.linkWithText("R.LSSMRDSR.S"), "href");
         beginAt(address);
 
@@ -301,7 +301,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextPresent("(SequenceMass > 17000) AND (SequenceMass < 50000) AND (Description DOES NOT CONTAIN Uncharacterized conserved protein)");
 
         log("Test Single Protein View");
-        assertLinkPresentContainingText("gi|13541159|30S_ribosomal_pro");
+        assertElementPresent(Locator.linkContainingText("gi|13541159|30S_ribosomal_pro"));
         String href = getAttribute(Locator.linkContainingText("gi|13541159|30S_ribosomal_pro"), "href");
         pushLocation();
         beginAt(href);
@@ -745,7 +745,7 @@ public class MS2Test extends AbstractMS2ImportTest
         clickButton("Go");
 
         log("Test peptide filtering on protein page");
-        assertLinkPresentWithText("gi|15645924|ribosomal_protein");
+        assertElementPresent(Locator.linkWithText("gi|15645924|ribosomal_protein"));
         String address = getAttribute(Locator.linkWithText("gi|15645924|ribosomal_protein"), "href");
         pushLocation();
         beginAt(address);

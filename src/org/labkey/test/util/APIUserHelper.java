@@ -18,7 +18,7 @@ package org.labkey.test.util;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateUserCommand;
 import org.labkey.remoteapi.security.CreateUserResponse;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 
 import static org.junit.Assert.*;
 
@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
  */
 public class APIUserHelper extends AbstractUserHelper
 {
-    public APIUserHelper(BaseSeleniumWebTest test)
+    public APIUserHelper(BaseWebDriverTest test)
     {
         super(test);
     }

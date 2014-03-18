@@ -21,13 +21,12 @@ import org.labkey.test.BaseWebDriverTest;
  * User: jeckels
  * Date: Jul 20, 2012
  */
-public abstract class AbstractHelperWD extends AbstractHelper
+public abstract class AbstractHelperWD
 {
     protected final BaseWebDriverTest _test;
 
     public AbstractHelperWD(BaseWebDriverTest test)
     {
-        super(test);
         _test = test;
     }
 }

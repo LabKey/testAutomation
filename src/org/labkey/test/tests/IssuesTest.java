@@ -234,7 +234,7 @@ public class IssuesTest extends BaseWebDriverTest
         assertTextPresent("Issue " + issueId + ": " + ISSUE_TITLE_0);
         assertTextPresent("Milestone", "MyInteger", "MySecondInteger", "MyFirstString", "MyThirdString", "MyFourthString", "MyFifthString");
         assertTextNotPresent("MySecondString");
-        assertLinkPresentWithText("http://www.issues.test");
+        assertElementPresent(Locator.linkWithText("http://www.issues.test"));
 
         // ListAction
         clickAndWait(Locator.linkWithText("return to grid"));

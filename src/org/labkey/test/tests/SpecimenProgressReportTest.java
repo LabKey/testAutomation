@@ -25,7 +25,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIAssayHelper;
@@ -75,11 +75,6 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     {
         //Issue 16247: tricky characters in project name cause alert when trying to add a lookup to a rho query in the folder
         return "Specimen Progress Report Test" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
-    }
-
-    public boolean isFileUploadTest()
-    {
-        return true;
     }
 
     @Override
@@ -358,7 +353,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     @LogMethod
     private void configureAssaySchema(String assayName)
     {
-        ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo("", "rho", assayName + " Query");
+        ListHelperWD.LookupInfo lookupInfo = new ListHelperWD.LookupInfo("", "rho", assayName + " Query");
         _assayHelper.addAliasedFieldToMetadata("assay.General." + assayName, "Data", "RowId", "qcmessage", lookupInfo);
         clickButton("Save", 0);
         waitForText("Save successful.");

@@ -16,15 +16,13 @@
 package org.labkey.test.pipeline;
 
 import org.apache.commons.lang3.StringUtils;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
 
 import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * <code>PipelineFolder</code>
-*/
 public class PipelineFolder
 {
     // These files are not checked in, since that would be a security issue.
@@ -131,11 +129,10 @@ public class PipelineFolder
 
         if (getPipelineType() == Type.enterprise)
         {
-            assertTrue("Globus test requires file upload.", _test.isFileUploadAvailable());
-            String pathLabKey = BaseSeleniumWebTest.getLabKeyRoot();
-            _test.setFormElement("keyFile", new File(pathLabKey + USER_KEY));
+            String pathLabKey = BaseWebDriverTest.getLabKeyRoot();
+            _test.setFormElement(Locator.name("keyFile"), new File(pathLabKey + USER_KEY));
             _test.setFormElement("keyPassword", USER_KEY_PASSWORD);
-            _test.setFormElement("certFile", new File(pathLabKey + USER_CERT));
+            _test.setFormElement(Locator.name("certFile"), new File(pathLabKey + USER_CERT));
         }
         _test.submit();
 

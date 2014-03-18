@@ -107,12 +107,6 @@ public class SCHARPStudyTest extends BaseWebDriverTest implements PostgresOnlyTe
     }
 
     @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
-
-    @Override
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;

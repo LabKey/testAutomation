@@ -24,12 +24,6 @@ import java.io.FilenameFilter;
 
 import static org.junit.Assert.*;
 
-/**
- * User: tchadick
- * Date: 10/22/12
- * Time: 4:51 PM
- */
-// TODO : TEMPORARY CLASS FOR INCREMENTAL WEBDRIVER UPGRADE : MERGE BACK TO NON-WD CLASS WHEN COMPLETE//
 public class PerlHelperWD extends AbstractHelperWD
 {
     public PerlHelperWD(BaseWebDriverTest test)

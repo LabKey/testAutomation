@@ -28,7 +28,6 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.NoSuchElementException;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -835,11 +834,6 @@ public class NabAssayTest extends AbstractQCAssayTest
 
         deleteDir(getTestTempDir());
     } //doCleanup()
-
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
 
     @LogMethod
     protected void runTransformTest()

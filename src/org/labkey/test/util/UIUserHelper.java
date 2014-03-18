@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import static org.junit.Assert.*;
@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  */
 public class UIUserHelper extends AbstractUserHelper
 {
-    public UIUserHelper(BaseSeleniumWebTest test)
+    public UIUserHelper(BaseWebDriverTest test)
     {
         super(test);
     }

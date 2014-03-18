@@ -16,7 +16,6 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
@@ -55,7 +54,7 @@ public class LibraTest extends MS2TestBase
         for (int i = 0; i < 10; i++)
         {
             refresh();
-            if (isLinkPresentContainingText(runName))
+            if (isElementPresent(Locator.linkContainingText(runName)))
             {
                 break;
             }
@@ -101,13 +100,13 @@ public class LibraTest extends MS2TestBase
         clickRadioButtonById("SpectraCountPeptide");
         clickButton("Compare");
         assertTextPresent("-.MM'EILRGSPALSAFR.I");
-        assertLinkPresentWithTextCount("itraq/iTRAQ (Libra)", 27);
+        assertElementPresent(Locator.linkWithText("itraq/iTRAQ (Libra)"), 27);
 
         // Try setting a target protein
         clickAndWait(Locator.linkWithText("Spectra Count Options"));
         setFormElement("targetProtein", "gi|34392343");
         clickButton("Compare");
-        assertLinkPresentWithTextCount("itraq/iTRAQ (Libra)", 1);
+        assertElementPresent(Locator.linkWithText("itraq/iTRAQ (Libra)"), 1);
         assertTextPresent("R.TDTGEPM'GR.G");
         clickAndWait(Locator.linkContainingText("gi|34392343"));
         assertTextPresent("84,731");
@@ -131,15 +130,15 @@ public class LibraTest extends MS2TestBase
         goBack();
         clickAndWait(Locator.linkWithText("Spectra Count Options"));
         click(Locator.linkWithText("Create or Edit View"));
-        waitForElement(Locator.xpath("//button[text()='Save']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//button[text()='Save']"), WAIT_FOR_JAVASCRIPT);
         _customizeViewsHelper.addCustomizeViewFilter("Hyper", "Hyper", "Is Greater Than", "250");
-        assertRadioButtonSelected("spectraConfig", "SpectraCountPeptide");
+        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("spectraConfig", "SpectraCountPeptide"));
         _customizeViewsHelper.saveCustomView("HyperFilter");
         clickRadioButtonById("SpectraCountPeptideCharge");
         selectOptionByText(Locator.id("PeptidesFilter.viewName"), "HyperFilter");
         setFormElement("targetProtein", "");
         clickButton("Compare");
-        assertLinkPresentWithTextCount("itraq/iTRAQ (Libra)", 12);
+        assertElementPresent(Locator.linkWithText("itraq/iTRAQ (Libra)"), 12);
         assertTextPresent("-.MM'EILRGSPALSAFR.I", "R.TDTGEPM'GR.G");
         assertTextNotPresent("R.AEGTFPGK.I", "R.ILEKSGSPER.I");
 
@@ -152,7 +151,7 @@ public class LibraTest extends MS2TestBase
         // Validate that it remembers our options
         goBack();
         clickAndWait(Locator.linkWithText("Spectra Count Options"));
-        assertRadioButtonSelected("spectraConfig", "SpectraCountPeptideCharge");
+        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("spectraConfig", "SpectraCountPeptideCharge"));
         assertFormElementEquals(Locator.id("PeptidesFilter.viewName"), "HyperFilter");
     }
 

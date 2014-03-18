@@ -65,12 +65,6 @@ public class SpecimenMergeTest extends BaseWebDriverTest
     }
 
     @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
-
-    @Override
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         _studyDataRoot = getLabKeyRoot() + "/sampledata/study";

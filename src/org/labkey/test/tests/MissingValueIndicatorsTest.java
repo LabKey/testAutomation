@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 
 import java.io.File;
 
@@ -148,7 +148,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Missing Values"));
-        clickCheckboxById("inherit");
+        click(Locator.checkboxById("inherit"));
 
         // Delete all site-level settings
         while(isElementPresent(Locator.tagWithAttribute("img", "alt", "delete")))
@@ -188,20 +188,20 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     {
         log("Create list");
 
-        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[3];
+        ListHelperWD.ListColumn[] columns = new ListHelperWD.ListColumn[3];
 
-        ListHelper.ListColumn listColumn = new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, "");
+        ListHelperWD.ListColumn listColumn = new ListHelperWD.ListColumn("name", "Name", ListHelperWD.ListColumnType.String, "");
         columns[0] = listColumn;
 
-        listColumn = new ListHelper.ListColumn("age", "Age", ListHelper.ListColumnType.Integer, "");
+        listColumn = new ListHelperWD.ListColumn("age", "Age", ListHelperWD.ListColumnType.Integer, "");
         listColumn.setMvEnabled(true);
         columns[1] = listColumn;
 
-        listColumn = new ListHelper.ListColumn("sex", "Sex", ListHelper.ListColumnType.String, "");
+        listColumn = new ListHelperWD.ListColumn("sex", "Sex", ListHelperWD.ListColumnType.String, "");
         listColumn.setMvEnabled(true);
         columns[2] = listColumn;
 
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelperWD.ListColumnType.AutoInteger, "Key", columns);
 
         log("Test upload list data with a combined data and MVI column");
         _listHelper.clickImportData();
@@ -404,65 +404,56 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         clickButton("Copy to Study");
         validateSingleColumnData();
 
-        if (isFileUploadAvailable())
-        {
-            log("Import from Excel in single-column format");
-            clickProject(PROJECT_NAME);
-            clickAndWait(Locator.linkWithText(ASSAY_NAME));
-            clickButton("Import Data");
-            selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
+        log("Import from Excel in single-column format");
+        clickProject(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        clickButton("Import Data");
+        selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
 
-            clickButton("Next");
-            setFormElement(Locator.name("name"), ASSAY_EXCEL_RUN_SINGLE_COLUMN);
-            checkRadioButton("dataCollectorName", "File upload");
+        clickButton("Next");
+        setFormElement(Locator.name("name"), ASSAY_EXCEL_RUN_SINGLE_COLUMN);
+        checkRadioButton("dataCollectorName", "File upload");
 
-            File file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
-            setFormElement(Locator.name("__primaryFile__"), file);
-            clickButton("Save and Finish");
-            assertLabkeyErrorPresent();
+        File file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
+        setFormElement(Locator.name("__primaryFile__"), file);
+        clickButton("Save and Finish");
+        assertLabkeyErrorPresent();
 
-            checkRadioButton("dataCollectorName", "File upload");
-            file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE);
-            setFormElement(Locator.name("__primaryFile__"), file);
-            clickButton("Save and Finish");
-            assertNoLabkeyErrors();
-            clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_SINGLE_COLUMN));
-            validateSingleColumnData();
+        checkRadioButton("dataCollectorName", "File upload");
+        file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE);
+        setFormElement(Locator.name("__primaryFile__"), file);
+        clickButton("Save and Finish");
+        assertNoLabkeyErrors();
+        clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_SINGLE_COLUMN));
+        validateSingleColumnData();
 
-            log("Import from Excel in two-column format");
-            clickProject(PROJECT_NAME);
-            clickAndWait(Locator.linkWithText(ASSAY_NAME));
-            clickButton("Import Data");
-            selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
+        log("Import from Excel in two-column format");
+        clickProject(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText(ASSAY_NAME));
+        clickButton("Import Data");
+        selectOptionByText(Locator.xpath("//select[@name='targetStudy']"), targetStudyValue);
 
-            clickButton("Next");
-            setFormElement(Locator.name("name"), ASSAY_EXCEL_RUN_TWO_COLUMN);
-            checkRadioButton("dataCollectorName", "File upload");
-            file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
-            setFormElement(Locator.name("__primaryFile__"), file);
-            clickButton("Save and Finish");
-            assertLabkeyErrorPresent();
+        clickButton("Next");
+        setFormElement(Locator.name("name"), ASSAY_EXCEL_RUN_TWO_COLUMN);
+        checkRadioButton("dataCollectorName", "File upload");
+        file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
+        setFormElement(Locator.name("__primaryFile__"), file);
+        clickButton("Save and Finish");
+        assertLabkeyErrorPresent();
 
-            checkRadioButton("dataCollectorName", "File upload");
-            file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE);
-            setFormElement(Locator.name("__primaryFile__"), file);
-            clickButton("Save and Finish");
-            assertNoLabkeyErrors();
-            clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN));
-            validateTwoColumnData("Data", "ParticipantID");
-        }
+        checkRadioButton("dataCollectorName", "File upload");
+        file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE);
+        setFormElement(Locator.name("__primaryFile__"), file);
+        clickButton("Save and Finish");
+        assertNoLabkeyErrors();
+        clickAndWait(Locator.linkWithText(ASSAY_EXCEL_RUN_TWO_COLUMN));
+        validateTwoColumnData("Data", "ParticipantID");
     }
 
     private void assertMvIndicatorPresent()
     {
         // We'd better have some 
         assertElementPresent(Locator.xpath("//img[@class='labkey-mv-indicator']"));
-    }
-
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
     }
 
     /**
@@ -488,8 +479,8 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         setFormElement(Locator.id("AssayDesignerName"), ASSAY_NAME);
 
         int index = AssayTest.TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT;
-        _listHelper.addField("Data Fields", index++, "age", "Age", ListHelper.ListColumnType.Integer);
-        _listHelper.addField("Data Fields", index++, "sex", "Sex", ListHelper.ListColumnType.String);
+        _listHelper.addField("Data Fields", index++, "age", "Age", ListHelperWD.ListColumnType.Integer);
+        _listHelper.addField("Data Fields", index++, "sex", "Sex", ListHelperWD.ListColumnType.String);
         sleep(1000);
 
         log("setting fields to enable missing values");

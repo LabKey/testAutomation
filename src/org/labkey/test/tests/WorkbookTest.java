@@ -94,9 +94,9 @@ public class WorkbookTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
 
         // Check for all workbooks in list.
-        assertLinkPresentWithText("Renamed"+DEFAULT_WORKBOOK_NAME);
-        assertLinkPresentWithText(ASSAY_WORKBOOK_NAME);
-        assertLinkPresentWithText(FILE_WORKBOOK_NAME);
+        assertElementPresent(Locator.linkWithText("Renamed"+DEFAULT_WORKBOOK_NAME));
+        assertElementPresent(Locator.linkWithText(ASSAY_WORKBOOK_NAME));
+        assertElementPresent(Locator.linkWithText(FILE_WORKBOOK_NAME));
         assertTextPresentInThisOrder(FILE_WORKBOOK_NAME, ASSAY_WORKBOOK_NAME, "Renamed"+DEFAULT_WORKBOOK_NAME);
 
         // Delete a workbook
@@ -143,18 +143,18 @@ public class WorkbookTest extends BaseWebDriverTest
 
         // Create Assay Workbook
         names[1] = (workbookHelper.createWorkbook(projectName, assayWorkbookName, assayWorkbookDescription, WorkbookHelper.WorkbookFolderType.ASSAY_WORKBOOK));
-        assertLinkPresentWithText("Experiment Runs");
+        assertElementPresent(Locator.linkWithText("Experiment Runs"));
         assertEquals(assayWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
         assertEquals(assayWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
-        assertLinkNotPresentWithText(assayWorkbookName); // Should not appear in folder tree.
+        assertElementNotPresent(Locator.linkWithText(assayWorkbookName)); // Should not appear in folder tree.
 
         // Create Default Workbook
         names[2] = (workbookHelper.createWorkbook(projectName, defaultWorkbookName, defaultWorkbookDescription, WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK));
-        assertLinkPresentWithText("Files");
-        assertLinkPresentWithText("Experiment Runs");
+        assertElementPresent(Locator.linkWithText("Files"));
+        assertElementPresent(Locator.linkWithText("Experiment Runs"));
         assertEquals(defaultWorkbookName, getText(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]")));
         assertEquals(defaultWorkbookDescription, getText(Locator.xpath("//div[@id='wb-description']")));
-        assertLinkNotPresentWithText(defaultWorkbookName); // Should not appear in folder tree.
+        assertElementNotPresent(Locator.linkWithText(defaultWorkbookName)); // Should not appear in folder tree.
         return names;
     }
 

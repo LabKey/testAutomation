@@ -18,7 +18,7 @@ package org.labkey.test.util;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
  * User: kevink
  * Date: Mar 9, 2011
  */
-public class JSONHelper extends AbstractHelper
+public class JSONHelper extends AbstractHelperWD
 {
     // json key elements to ignore during the comparison phase, these can be regular expressions
     static final Pattern[] GLOBALLY_IGNORED = {
@@ -55,14 +55,14 @@ public class JSONHelper extends AbstractHelper
 
     private ArrayList<Pattern> _ignoredElements;
 
-    public JSONHelper(BaseSeleniumWebTest test)
+    public JSONHelper(BaseWebDriverTest test)
     {
         super(test);
         _ignoredElements = new ArrayList<>();
         _ignoredElements.addAll(Arrays.asList(GLOBALLY_IGNORED));
     }
 
-    public JSONHelper(BaseSeleniumWebTest test, Pattern[] ignored)
+    public JSONHelper(BaseWebDriverTest test, Pattern[] ignored)
     {
         super(test);
 

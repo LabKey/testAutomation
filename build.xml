@@ -412,57 +412,12 @@
         <antcall target="sub-selenium"/>
     </target>
 
-    <target name="init-selenium">
-        <condition property="sysprop.selenium.server" value="localhost">
-            <not>
-                <isset property="selenium.server"/>
-            </not>
-        </condition>
-        <condition property="sysprop.selenium.server" value="${selenium.server}">
-             <isset property="selenium.server"/>
-        </condition>
-
-        <condition property="sysprop.selenium.server.port" value="4444">
-            <not>
-                <isset property="selenium.server.port"/>
-            </not>
-        </condition>
-        <condition property="sysprop.selenium.server.port" value="${selenium.server.port}">
-             <isset property="selenium.server.port"/>
-        </condition>
-
-        <condition property="local.selenium.server">
-            <equals arg1="localhost" arg2="${sysprop.selenium.server}" />
-        </condition>
-        <echo message="Checking if Selenium server needs to be started..." />
-        <condition property="selenium.server.needs.starting">
-            <and>
-                <not>
-                    <socket server="${sysprop.selenium.server}" port="${sysprop.selenium.server.port}"/>
-                </not>
-                <isset property="local.selenium.server"/>
-            </and>
-        </condition>
-        <echo message="Selenium Server Properties" />
-        <echo message=" selenium.server: ${sysprop.selenium.server}"/>
-        <echo message=" selenium.server.port: ${sysprop.selenium.server.port}" />
-        <echo message=" selenium.server.needs.starting: ${selenium.server.needs.starting}" />
-    </target>
-
-    <target name="sub-selenium" depends="build-java-client,init-selenium" >
-        <antcall target="startSeleniumServer" />
-        <condition property="no.selenium.server">
-            <not >
-                <socket server="${sysprop.selenium.server}" port="${sysprop.selenium.server.port}"/>
-            </not>
-        </condition>
-        <fail if="no.selenium.server" message="Could not find selenium server ${sysprop.selenium.server} port ${sysprop.selenium.server.port}"/>
-
+    <target name="sub-selenium" depends="build-java-client" >
         <antcall inheritall="true" target="runsuite">
             <param name="debug.suspend" value="${debug.suspend.selenium}" />
         </antcall>
 
-        <antcall target="stopSeleniumServer" />
+        <antcall target="kill_chromedriver" />
     </target>
 
     <target name="set-debug-props">
@@ -471,19 +426,10 @@
         </condition>
     </target>
 
-    <target name="runsuite-selenium-tomcat" depends="stopSeleniumServer,compile,ensurePassword,deploy-test-modules,set-user-props,set-debug-props, install-rpackages">
+    <target name="runsuite-selenium-tomcat" depends="kill_chromedriver,compile,ensurePassword,deploy-test-modules,set-user-props,set-debug-props, install-rpackages">
         <fail unless="tomcat.home" />
         <ant inheritall="true" dir="${project.root}/server" antfile="${project.root}/server/build.xml" target="start_tomcat_teamcity" />
         <antcall target="waitfor-labkey-started"/>
-
-        <antcall target="startSeleniumServer" />
-
-        <condition property="no.selenium.server">
-            <not >
-                <socket server="${sysprop.selenium.server}" port="${sysprop.selenium.server.port}"/>
-            </not>
-        </condition>
-        <fail if="no.selenium.server" message="Could not find selenium server ${sysprop.selenium.server} port ${sysprop.selenium.server.port}"/>
 
         <condition property="sysprop.suiteToUse" value="${sysprop.moduleSuite}">
             <isset property="sysprop.moduleSuite"/>
@@ -516,8 +462,6 @@
             <sysproperty key="labkey.port" value="${sysprop.labkey.port}"/>
             <sysproperty key="labkey.server" value="${sysprop.labkey.server}"/>
             <sysproperty key="labkey.contextpath" value="${sysprop.labkey.contextpath}"/>
-            <sysproperty key="selenium.server.port" value="${sysprop.selenium.server.port}" />
-            <sysproperty key="selenium.server" value="${sysprop.selenium.server}" />
             <sysproperty key="selenium.browser" value="${sysprop.selenium.browser}"/>
             <sysproperty key="selenium.browser.path" value="${sysprop.selenium.browser.path}"/>
             <sysproperty key="testRecentlyFailed" value="${sysprop.testRecentlyFailed}" />
@@ -554,7 +498,7 @@
             </fileset>
         </copy>
 
-        <antcall target="stopSeleniumServer" />
+        <antcall target="kill_chromedriver" />
 
         <antcall target="fail_message"/>
     </target>
@@ -600,35 +544,6 @@
         <echo message="${sysprop.suiteToUse} FAILED"/>
     </target>
 
-    <target name="startSeleniumServer" description="start selenium server" if="selenium.server.needs.starting" depends="init-selenium">
-        <echo message="Starting selenium server on local server, port ${sysprop.selenium.server.port}."/>
-        <echo message="Server will stop after successful tests."/>
-        <echo message="Or use ant stopSeleniumServer to stop manually."/>
-        <echo message="Setting selenium server's PATH to: ${env.FIREFOX_HOME}:${env.PATH}" level="verbose"/>
-        <delete file="selenium.log"/>
-        <java spawn="true" fork="true" classname="org.openqa.selenium.server.SeleniumServer">
-            <classpath refid="test.lib.selenium.classpath" />
-            <env key="PATH" path="${env.FIREFOX_HOME}:${env.PATH}"/>
-            <arg value="-port" />
-            <arg value="${sysprop.selenium.server.port}" />
-            <arg value="-Dcaching=true"/>
-            <arg value="-log"/>
-            <arg value="selenium.log"/>
-        </java>
-        <echo message="Checking for Selenium Server on port ${sysprop.selenium.server.port}" />
-        <waitfor maxwait="60" maxwaitunit="second" checkevery="2" checkeveryunit="second" timeoutproperty="noSeleniumServer">
-            <socket server="localhost" port="${sysprop.selenium.server.port}"/>
-        </waitfor>
-
-        <antcall target="validateSeleniumStartup" />
-
-        <echo message="Selenium Server started successfully" />
-    </target>
-
-    <target name="validateSeleniumStartup" if="noSeleniumServer">
-        <fail message="Selenium server did not start." />
-    </target>
-
     <target name="drt" description="run developer regression tests">
         <property name="debug.suspend.selenium" value="n"/>
         <property name="suite" value="DRT"/>
@@ -656,11 +571,7 @@
         <antcall target="sub-selenium"/>
     </target>
 
-    <target name="stopSeleniumServer" description="stop selenium server" depends="init-selenium">
-        <echo message="Stopping selenium server." />
-        <condition property="selenium.server.shut.down">
-            <http url="http://localhost:${sysprop.selenium.server.port}/selenium-server/driver/?cmd=shutDownSeleniumServer"/>
-        </condition>
+    <target name="kill_chromedriver" description="kill chromedriver processes">
         <exec osfamily="windows" executable="taskkill">
             <arg line="/F /IM chromedriver.exe"/>
         </exec>
@@ -1147,8 +1058,6 @@
             <sysproperty key="close.on.fail" value="${sysprop.close.on.fail}"/>
             <sysproperty key="selenium.browser" value="${sysprop.selenium.browser}"/>
             <sysproperty key="selenium.browser.path" value="${sysprop.selenium.browser.path}"/>
-            <sysproperty key="selenium.server.port" value="${sysprop.selenium.server.port}" />
-            <sysproperty key="selenium.server" value="${sysprop.selenium.server}" />
             <sysproperty key="testRecentlyFailed" value="${sysprop.testRecentlyFailed}" />
             <sysproperty key="teamcity.tests.recentlyFailedTests.file" value="${sysprop.teamcity.tests.recentlyFailedTests.file}" />
             <sysproperty key="testNewAndModified" value="${sysprop.testNewAndModified}" />

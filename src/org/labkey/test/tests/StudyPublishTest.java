@@ -353,7 +353,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         if (reports.length > 0 || views.length > 0)
         {
             goToManageViews();
-            waitForExtMaskToDisappear();
+            _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
             if(reports.length > 0)
             {
                 waitForText(reports[0]);
@@ -407,7 +407,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
                 }
 
                 popLocation();
-                waitForExtMaskToDisappear();
+                _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
                 waitForText(reports[0]);
             }
 
@@ -427,7 +427,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
                 assertTextPresent(view);
 
                 popLocation();
-                waitForExtMaskToDisappear();
+                _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
                 waitForText(views[0]);
             }
         }
@@ -491,7 +491,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
             waitAndClick(Locator.tagContainingText("span", "Specimen Reports")); // expand
             waitAndClickAndWait(Locator.linkWithText("View Available Reports"));
             assertTextNotPresent("Requested Vials by Type and Timepoint");
-            assertLinkPresentWithTextCount("show options", 6);
+            assertElementPresent(Locator.linkWithText("show options"), 6);
         }
         else
         {

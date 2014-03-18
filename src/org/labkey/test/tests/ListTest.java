@@ -21,18 +21,16 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.ListHelper.ListColumn;
-import org.labkey.test.util.ListHelper.LookupInfo;
+import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelperWD.ListColumn;
+import org.labkey.test.util.ListHelperWD.LookupInfo;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -42,8 +40,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.labkey.test.util.ListHelper.ListColumnType.Integer;
-import static org.labkey.test.util.ListHelper.ListColumnType.String;
+import static org.labkey.test.util.ListHelperWD.ListColumnType.Integer;
+import static org.labkey.test.util.ListHelperWD.ListColumnType.String;
 
 import static org.junit.Assert.*;
 
@@ -57,7 +55,7 @@ public class ListTest extends BaseWebDriverTest
     protected final static String PROJECT_VERIFY = "ListVerifyProject" ;//+ TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     private final static String PROJECT_OTHER = "OtherListVerifyProject";
     protected final static String LIST_NAME_COLORS = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
-    protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
+    protected final static ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.String;
     protected final static String LIST_KEY_NAME = "Key";
     protected final static String LIST_KEY_NAME2 = "Color";
     protected final static String LIST_DESCRIPTION = "A list of colors and what they are like";
@@ -66,13 +64,13 @@ public class ListTest extends BaseWebDriverTest
     protected final static String HIDDEN_TEXT = "CantSeeMe";
     protected final static String DETAILS_BUTTON_NAME = "Show Grid";
 
-    protected final ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelper.ListColumnType.String, "What the color is like");
-    protected final ListColumn _listCol1 = new ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
-    protected final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
-    protected final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
-    protected final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
-    protected final ListColumn _listCol5 = new ListColumn("HiddenColumn", HIDDEN_TEXT, ListHelper.ListColumnType.String, "I should be hidden!");
-    protected final ListColumn _listCol6 = new ListColumn("Aliased,Column", "Element", ListHelper.ListColumnType.String, "I show aliased data.");
+    protected final ListColumn _listCol1Fake = new ListColumn(FAKE_COL1_NAME, FAKE_COL1_NAME, ListHelperWD.ListColumnType.String, "What the color is like");
+    protected final ListColumn _listCol1 = new ListColumn("Desc", "Description", ListHelperWD.ListColumnType.String, "What the color is like");
+    protected final ListColumn _listCol2 = new ListColumn("Month", "Month to Wear", ListHelperWD.ListColumnType.DateTime, "When to wear the color", "M");
+    protected final ListColumn _listCol3 = new ListColumn("JewelTone", "Jewel Tone", ListHelperWD.ListColumnType.Boolean, "Am I a jewel tone?");
+    protected final ListColumn _listCol4 = new ListColumn("Good", "Quality", ListHelperWD.ListColumnType.Integer, "How nice the color is");
+    protected final ListColumn _listCol5 = new ListColumn("HiddenColumn", HIDDEN_TEXT, ListHelperWD.ListColumnType.String, "I should be hidden!");
+    protected final ListColumn _listCol6 = new ListColumn("Aliased,Column", "Element", ListHelperWD.ListColumnType.String, "I show aliased data.");
     protected final static String[][] TEST_DATA = {
             { "Blue", "Green", "Red", "Yellow" },
             { "Light", "Mellow", "Robust", "ZanzibarMasinginiTanzaniaAfrica" },
@@ -100,7 +98,7 @@ public class ListTest extends BaseWebDriverTest
             LIST_ROW1 + "\t" + "String";
     private final static String TEST_VIEW = "list_view";
     private final static String LIST2_NAME_CARS = TRICKY_CHARACTERS_NO_QUOTES + "Cars";
-    protected final static ListHelper.ListColumnType LIST2_KEY_TYPE = ListHelper.ListColumnType.String;
+    protected final static ListHelperWD.ListColumnType LIST2_KEY_TYPE = ListHelperWD.ListColumnType.String;
     protected final static String LIST2_KEY_NAME = "Car";
 
     protected final ListColumn _list2Col1 = new ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new LookupInfo(null, "lists", LIST_NAME_COLORS));
@@ -114,9 +112,9 @@ public class ListTest extends BaseWebDriverTest
     private final static String LIST2_KEY4 = "Car4";
     private final static String LIST2_FOREIGN_KEY4 = "Brown";
     private final static String LIST3_NAME_OWNERS = "Owners";
-    private final static ListHelper.ListColumnType LIST3_KEY_TYPE = ListHelper.ListColumnType.String;
+    private final static ListHelperWD.ListColumnType LIST3_KEY_TYPE = ListHelperWD.ListColumnType.String;
     private final static String LIST3_KEY_NAME = "Owner";
-    private final ListColumn _list3Col2 = new ListColumn("Wealth", "Wealth", ListHelper.ListColumnType.String, "");
+    private final ListColumn _list3Col2 = new ListColumn("Wealth", "Wealth", ListHelperWD.ListColumnType.String, "");
     protected final ListColumn _list3Col1 = new ListColumn(LIST3_KEY_NAME, LIST3_KEY_NAME, LIST3_KEY_TYPE, "Who owns the car", new LookupInfo("/" + PROJECT_OTHER, "lists", LIST3_NAME_OWNERS));
     private final static String LIST3_COL2 = "Rich";
     private final String LIST2_DATA =
@@ -150,12 +148,6 @@ public class ListTest extends BaseWebDriverTest
     {
         deleteProject(getProjectName(), afterTest);
         deleteProject(PROJECT_OTHER, afterTest);
-    }
-
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
     }
 
     @Override
@@ -503,9 +495,9 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("Bulk inserted", 2);
         assertTextPresent("A new list record was inserted", 1);
         assertTextPresent("created", 1);
-        assertEquals("details Links", 8, countLinksWithText("DETAILS"));
-        assertEquals("Project Links", 17 + 1, countLinksWithText(PROJECT_VERIFY)); // Table links + header link
-        assertEquals("List Links", 17 + 1, countLinksWithText(LIST_NAME_COLORS)); // Table links + header link
+        assertEquals("details Links", 8, getElementCount(Locator.linkWithText("DETAILS")));
+        assertEquals("Project Links", 17 + 1, getElementCount(Locator.linkWithText(PROJECT_VERIFY))); // Table links + header link
+        assertEquals("List Links", 17 + 1, getElementCount(Locator.linkWithText(LIST_NAME_COLORS))); // Table links + header link
         clickAndWait(Locator.linkWithText("DETAILS"));
         assertTextPresent("List Item Details");
         assertTextNotPresent("No details available for this event.");
@@ -663,11 +655,11 @@ public class ListTest extends BaseWebDriverTest
 
         log("Issue 6883: test list self join");
 
-        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
-                new ListHelper.ListColumn(dummyCol, dummyCol, ListHelper.ListColumnType.String, ""),
-                new ListHelper.ListColumn(lookupField, lookupField, ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(null, lookupSchema, lookupTable))
+        ListHelperWD.ListColumn[] columns = new ListHelperWD.ListColumn[] {
+                new ListHelperWD.ListColumn(dummyCol, dummyCol, ListHelperWD.ListColumnType.String, ""),
+                new ListHelperWD.ListColumn(lookupField, lookupField, ListHelperWD.ListColumnType.String, "", new ListHelperWD.LookupInfo(null, lookupSchema, lookupTable))
         };
-        _listHelper.createList(PROJECT_VERIFY, listName, ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(PROJECT_VERIFY, listName, ListHelperWD.ListColumnType.AutoInteger, "Key", columns);
         clickButton("Done");
         clickAndWait(Locator.linkWithText(listName));
         assertTextPresent(dummyBase);
@@ -680,7 +672,7 @@ public class ListTest extends BaseWebDriverTest
     {
         //create list with look up A
         String lookupColumn = "lookup";
-        _listHelper.createList(PROJECT_OTHER, crossContainerLookupList, ListHelper.ListColumnType.AutoInteger, "Key",  col(PROJECT_VERIFY, lookupColumn, Integer, "A" ));
+        _listHelper.createList(PROJECT_OTHER, crossContainerLookupList, ListHelperWD.ListColumnType.AutoInteger, "Key",  col(PROJECT_VERIFY, lookupColumn, Integer, "A" ));
         clickImportData();
         setListImportAsTestDataField(lookupColumn + "\n1");
 
@@ -754,9 +746,6 @@ public class ListTest extends BaseWebDriverTest
     @LogMethod
     private void doUploadTest()
     {
-        if (!isFileUploadAvailable())
-            return;
-
         log("Infer from excel file, then import data");
         File excelFile = new File(EXCEL_DATA_FILE);
         _listHelper.createListFromFile(PROJECT_VERIFY, "Fruits from Excel", excelFile);
@@ -769,13 +758,13 @@ public class ListTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("manage lists"));
         clickButton("Create New List");
-        waitForElement(Locator.id("ff_name"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.id("ff_name"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("ff_name"),  TSV_LIST_NAME);
         checkCheckbox(Locator.xpath("//span[@id='fileImport']/input[@type='checkbox']"));
         clickButton("Create List", 0);
-        waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), WAIT_FOR_JAVASCRIPT);
         setFormElement("uploadFormElement", tsvFile);
-        waitForElement(Locator.xpath("//span[@id='button_Import']"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.xpath("//span[@id='button_Import']"), WAIT_FOR_JAVASCRIPT);
         clickButton("Import", 0);
         waitForElement(Locator.xpath("//div[text()='Creating columns...']"), WAIT_FOR_JAVASCRIPT);
         clickButton("Cancel");
@@ -887,7 +876,7 @@ public class ListTest extends BaseWebDriverTest
     private void doRenameFieldsTest()
     {
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
-        _listHelper.createList(PROJECT_VERIFY, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
+        _listHelper.createList(PROJECT_VERIFY, "new", ListHelperWD.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelperWD.ListColumnType.String, "Some new column"));
         assertTextPresent("BarBar");
         clickEditDesign();
         setColumnName(1,"FooFoo");
@@ -910,24 +899,24 @@ public class ListTest extends BaseWebDriverTest
     // CUSTOMIZE URL tests
     //
 
-    ListHelper.ListColumn col(String name, ListHelper.ListColumnType type)
+    ListHelperWD.ListColumn col(String name, ListHelperWD.ListColumnType type)
     {
-        return new ListHelper.ListColumn(name, "", type, "");
+        return new ListHelperWD.ListColumn(name, "", type, "");
     }
 
-    ListHelper.ListColumn col(String name, ListHelper.ListColumnType type, String table)
+    ListHelperWD.ListColumn col(String name, ListHelperWD.ListColumnType type, String table)
     {
         return col(null, name, type, table);
     }
 
-    ListHelper.ListColumn col(String folder, String name, ListHelper.ListColumnType type, String table)
+    ListHelperWD.ListColumn col(String folder, String name, ListHelperWD.ListColumnType type, String table)
     {
-        return new ListHelper.ListColumn(name, "", type, "", new ListHelper.LookupInfo(folder, "lists", table));
+        return new ListHelperWD.ListColumn(name, "", type, "", new ListHelperWD.LookupInfo(folder, "lists", table));
     }
 
-    ListHelper.ListColumn colURL(String name, ListHelper.ListColumnType type, String url)
+    ListHelperWD.ListColumn colURL(String name, ListHelperWD.ListColumnType type, String url)
     {
-        ListColumn c  = new ListHelper.ListColumn(name, "", type, "");
+        ListColumn c  = new ListHelperWD.ListColumn(name, "", type, "");
         c.setURL(url);
         return c;
     }
@@ -942,7 +931,7 @@ public class ListTest extends BaseWebDriverTest
         {"1", "one A", "1"},
     };
 
-    List<ListHelper.ListColumn> Bcolumns = Arrays.asList(
+    List<ListHelperWD.ListColumn> Bcolumns = Arrays.asList(
             col("B", Integer),
             colURL("title", String, "org.labkey.core.junit.JunitController$EchoFormAction.class?key=${B}&title=${title}&table=B"),
             col("Cfk", Integer, "C")
@@ -952,7 +941,7 @@ public class ListTest extends BaseWebDriverTest
         {"1", "one B", "1"},
     };
 
-    List<ListHelper.ListColumn> Ccolumns = Arrays.asList(
+    List<ListHelperWD.ListColumn> Ccolumns = Arrays.asList(
             col("C", Integer),
             colURL("title", String, "/junit/echoForm.view?key=${C}&title=${title}&table=C")
     );
@@ -962,11 +951,11 @@ public class ListTest extends BaseWebDriverTest
     };
 
 
-    String toTSV(List<ListHelper.ListColumn> cols, String[][] data)
+    String toTSV(List<ListHelperWD.ListColumn> cols, String[][] data)
     {
         StringBuilder sb = new StringBuilder();
         String tab = "";
-        for (ListHelper.ListColumn c : cols)
+        for (ListHelperWD.ListColumn c : cols)
         {
             sb.append(tab);
             sb.append(c.getName());
@@ -999,11 +988,11 @@ public class ListTest extends BaseWebDriverTest
     }
 
 
-    void createList(String name, List<ListHelper.ListColumn> cols, String[][] data)
+    void createList(String name, List<ListHelperWD.ListColumn> cols, String[][] data)
     {
         log("Add List -- " + name);
         _listHelper.createList(PROJECT_VERIFY, name, cols.get(0).getType(), cols.get(0).getName(),
-                cols.subList(1, cols.size()).toArray(new ListHelper.ListColumn[cols.size() - 1]));
+                cols.subList(1, cols.size()).toArray(new ListHelperWD.ListColumn[cols.size() - 1]));
         clickEditDesign();
         selectOptionByText(Locator.id("ff_titleColumn"), cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
         clickSave();
@@ -1046,8 +1035,8 @@ public class ListTest extends BaseWebDriverTest
             pushLocation();
             {
                 clickAndWait(Locator.linkWithText("one B"));
-                assertLinkPresentWithText("one B");
-                assertLinkPresentWithText("one C");
+                assertElementPresent(Locator.linkWithText("one B"));
+                assertElementPresent(Locator.linkWithText("one C"));
             }
             popLocation();
 
@@ -1123,7 +1112,7 @@ public class ListTest extends BaseWebDriverTest
         setFormElement(labelLoc, label);
         pressTab(labelLoc);
     }
-    void setColumnType(int index, ListHelper.ListColumnType type)
+    void setColumnType(int index, ListHelperWD.ListColumnType type)
     {
         Locator typeLoc = Locator.name("ff_type"+index);
         click(typeLoc);

@@ -16,7 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 
@@ -40,24 +40,24 @@ import static org.junit.Assert.*;
 public class DataRegionTable
 {
     protected final String _tableName;
-    protected BaseSeleniumWebTest _test;
+    protected BaseWebDriverTest _test;
     protected final boolean _selectors;
     protected final Map<String, Integer> _mapColumns = new HashMap<>();
     protected final Map<String, Integer> _mapRows = new HashMap<>();
     protected final int _columnCount;
     protected final int _headerRows;
 
-    public DataRegionTable(String tableName, BaseSeleniumWebTest test)
+    public DataRegionTable(String tableName, BaseWebDriverTest test)
     {
         this(tableName, test, true, true);
     }
 
-    public DataRegionTable(String tableName, BaseSeleniumWebTest test, boolean selectors)
+    public DataRegionTable(String tableName, BaseWebDriverTest test, boolean selectors)
     {
         this(tableName, test, selectors, true);
     }
 
-    public DataRegionTable(String tableName, BaseSeleniumWebTest test, boolean selectors, boolean floatingHeaders)
+    public DataRegionTable(String tableName, BaseWebDriverTest test, boolean selectors, boolean floatingHeaders)
     {
         _tableName = tableName;
         _selectors = selectors;
@@ -82,7 +82,7 @@ public class DataRegionTable
         return _columnCount;
     }
 
-    public void reload(BaseSeleniumWebTest test)
+    public void reload(BaseWebDriverTest test)
     {
         _test = test;
     }
@@ -469,7 +469,7 @@ public class DataRegionTable
 
     public void setFilter(String columnName, String filterType, String filter)
     {
-        setFilter(columnName, filterType, filter, BaseSeleniumWebTest.WAIT_FOR_PAGE);
+        setFilter(columnName, filterType, filter, BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
     public void setFilter(String columnName, String filterType, String filter, int waitMillis)

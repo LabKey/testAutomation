@@ -18,7 +18,7 @@ package org.labkey.test.ms2;
 
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 
 import static org.junit.Assert.*;
 
@@ -51,9 +51,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), TEST_ASSAY_NAME);
 
-        addField("Run Fields", 0, "IntegerField", "IntegerField", ListHelper.ListColumnType.Integer);
-        addField("Run Fields", 1, "TextField", "TextField", ListHelper.ListColumnType.String);
-        addField("Run Fields", 2, "BooleanField", "BooleanField", ListHelper.ListColumnType.Boolean);
+        _listHelper.addField("Run Fields", 0, "IntegerField", "IntegerField", ListHelperWD.ListColumnType.Integer);
+        _listHelper.addField("Run Fields", 1, "TextField", "TextField", ListHelperWD.ListColumnType.String);
+        _listHelper.addField("Run Fields", 2, "BooleanField", "BooleanField", ListHelperWD.ListColumnType.Boolean);
 
         sleep(1000);
         clickButton("Save", 0);
@@ -84,7 +84,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         log("Return to search page");
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
-        assertLinkPresentWithText(ANNOTATION_RUN_NAME);
+        assertElementPresent(Locator.linkWithText(ANNOTATION_RUN_NAME));
 
         clickButton("Process and Import Data");
         _fileBrowserHelper.selectFileBrowserItem("bov_sample/");
@@ -138,7 +138,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         waitForElement(Locator.xpath("//select[@name='protocol']/option[.='test2']"), WAIT_FOR_JAVASCRIPT);
         assertEquals("test2", getSelectedOptionText(Locator.name("protocol")));
 
-        if (!isLinkPresentWithText("running") && isLinkPresentWithText("completed"))
+        if (!isElementPresent(Locator.linkWithText("running")) && isElementPresent(Locator.linkWithText("completed")))
             assertTextPresent("running");
 
         log("Verify no work for protocol.");
@@ -155,12 +155,12 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertElementPresent(Locator.imageMapLinkByTitle("graphmap", ANNOTATION_RUN_NAME));
         pushLocation();
         clickAndWait(Locator.imageMapLinkByTitle("graphmap", "Data: " + SAMPLE_BASE_NAME + ".mzXML.image..itms.png (Run Output)"));
-        assertLinkPresentWithTextCount("msPicture", 2);
+        assertElementPresent(Locator.linkWithText("msPicture"), 2);
         beginAt(getAttribute(Locator.xpath("//img[contains(@src, 'showFile.view')]"), "src"));
         // Firefox sets the title of the page when we view an image separately from an HTML page, so use that to verify
         // that we got something that matches what we expect. IE doesn't do this, so assume that we're good if we don't
         // get a 404, error message, etc
-        if(getBrowser().startsWith(FIREFOX_BROWSER))
+        if(getBrowserType() == BrowserType.FIREFOX)
             assertTitleContains("showFile.view (PNG Image");
         popLocation();
 

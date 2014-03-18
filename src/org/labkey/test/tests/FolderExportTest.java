@@ -63,12 +63,6 @@ public class FolderExportTest extends BaseWebDriverTest
     }
 
     @Override
-    protected boolean isFileUploadTest()
-    {
-        return true; // for importFolderFromZip
-    }
-
-    @Override
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;

@@ -15,7 +15,7 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import static org.junit.Assert.*;
@@ -31,11 +31,11 @@ import static org.junit.Assert.*;
  */
 public class ResetTracker
 {
-    BaseSeleniumWebTest test = null;
+    BaseWebDriverTest test = null;
     protected String searchBoxId = "query";
     protected String searchBoxEntry =  null;
 
-    public ResetTracker(BaseSeleniumWebTest test)
+    public ResetTracker(BaseWebDriverTest test)
     {
         this.test=test;
         test.addWebPart("Search");
@@ -45,7 +45,7 @@ public class ResetTracker
 
     public void startTrackingRefresh()
     {
-        searchBoxEntry = BaseSeleniumWebTest.TRICKY_CHARACTERS + "this should not change" + resetTrackingCounter++;
+        searchBoxEntry = BaseWebDriverTest.TRICKY_CHARACTERS + "this should not change" + resetTrackingCounter++;
         test.setFormElement(Locator.id(searchBoxId), searchBoxEntry);
     }
 

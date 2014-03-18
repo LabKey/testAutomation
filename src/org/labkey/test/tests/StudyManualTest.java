@@ -18,12 +18,11 @@ package org.labkey.test.tests;
 
 import com.thoughtworks.selenium.SeleniumException;
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Study;
 import org.labkey.test.categories.Disabled;
-import org.labkey.test.util.ListHelper;
-import org.labkey.test.util.StudyHelper;
+import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.StudyHelperWD;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -42,18 +41,12 @@ public class StudyManualTest extends StudyTest
 
     protected final String VISIT_MAP = getStudySampleDataPath() + "v068_visit_map.txt";
 
-    protected final StudyHelper _studyHelper = new StudyHelper(this);
+    protected final StudyHelperWD _studyHelper = new StudyHelperWD(this);
 
     @Override
     protected BrowserType bestBrowser()
     {
         return BrowserType.CHROME;
-    }
-
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
     }
 
     protected void doCreateSteps()
@@ -257,7 +250,7 @@ public class StudyManualTest extends StudyTest
 
         waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
-        checkRadioButton("additionalKey", 1);
+        checkRadioButton(Locator.radioButtonByName("additionalKey").index(1));
 
         clickButton("Import Fields", 0);
         waitForElement(Locator.xpath("//textarea[@id='schemaImportBox']"), WAIT_FOR_JAVASCRIPT);
@@ -273,7 +266,7 @@ public class StudyManualTest extends StudyTest
 
         clickRadioButtonById("button_dataField");
 
-        _listHelper.addField("Dataset Fields", 4, "otherData", "Other Data", ListHelper.ListColumnType.String);
+        _listHelper.addField("Dataset Fields", 4, "otherData", "Other Data", ListHelperWD.ListColumnType.String);
         click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
         waitForElement(Locator.id("importAliases"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("importAliases"), "aliasedColumn");

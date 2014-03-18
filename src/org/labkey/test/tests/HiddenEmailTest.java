@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DevModeOnlyTest;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -111,8 +111,8 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
     {
         // Create list
         impersonate(ADMIN_USER);
-        ListHelper.ListColumn userColumn = new ListHelper.ListColumn("user", "user", ListHelper.ListColumnType.String, "", new ListHelper.LookupInfo(getProjectName(), "core", "Users"));
-        _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelper.ListColumnType.AutoInteger, "Key", userColumn);
+        ListHelperWD.ListColumn userColumn = new ListHelperWD.ListColumn("user", "user", ListHelperWD.ListColumnType.String, "", new ListHelperWD.LookupInfo(getProjectName(), "core", "Users"));
+        _listHelper.createList(getProjectName(), EMAIL_TEST_LIST, ListHelperWD.ListColumnType.AutoInteger, "Key", userColumn);
         clickButton("Done");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
         clickButton("Insert New");

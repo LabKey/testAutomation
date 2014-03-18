@@ -15,7 +15,6 @@
  */
 package org.labkey.test.pipeline;
 
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 

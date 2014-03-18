@@ -273,14 +273,14 @@ public class CohortTest extends BaseWebDriverTest
 
         setCohortFilter("Positive", AdvancedCohortType.DATA_COLLECTION);
         clickAndWait(Locator.linkWithText("Infected1"));
-        assertLinkNotPresentWithText("Previous Participant");
+        assertElementNotPresent(Locator.linkWithText("Previous Participant"));
         clickAndWait(Locator.linkWithText("Next Participant"));
         assertTextPresent("Infected2");
-        assertLinkPresentWithText("Previous Participant");
+        assertElementPresent(Locator.linkWithText("Previous Participant"));
         clickAndWait(Locator.linkWithText("Next Participant"));
         assertTextPresent("Infected3");
-        assertLinkPresentWithText("Previous Participant");
-        assertLinkNotPresentWithText("Next Participant"); // Participant 4 should be filtered out
+        assertElementPresent(Locator.linkWithText("Previous Participant"));
+        assertElementNotPresent(Locator.linkWithText("Next Participant")); // Participant 4 should be filtered out
 
         // Check basic cohorts
         log("Check basic cohort features.");

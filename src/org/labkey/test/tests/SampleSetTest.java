@@ -68,11 +68,6 @@ public class SampleSetTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
-
     @Override
     protected String getProjectName()
     {

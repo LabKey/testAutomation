@@ -221,7 +221,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
         log("Verify upload started.");
         String mascotDatLabel = SAMPLE_BASE_NAME + ".dat (none)";
-        assertLinkPresentWithText(mascotDatLabel);
+        assertElementPresent(Locator.linkWithText(mascotDatLabel));
 
         pushLocation();
 
@@ -230,10 +230,10 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 /*
         Commented out because .dat is not loaded as part of an experiment, so it won't appear in the dashboard
 
-        assertLinkPresentWithText(mascotDatLabel);
+        assertElementPresent(Locator.linkWithText(mascotDatLabel));
 */
 
-        assertLinkPresentWithText("MS2 Runs");
+        assertElementPresent(Locator.linkWithText("MS2 Runs"));
         log("Navigate to MS2 runs.");
         clickAndWait(Locator.linkWithText("MS2 Runs"));
 
@@ -242,13 +242,13 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         clickFolder(FOLDER_NAME);
         clickAndWait(Locator.linkWithText("All"));
         int sec = 300;
-        while (!isLinkPresentWithText("COMPLETE", 1) && sec-- > 0)
+        while (!isElementPresent(Locator.linkWithText("COMPLETE").index(1)) && sec-- > 0)
         {
             log("Waiting for load to complete");
             sleep(1000);
             refresh();
         }
-        if (!isLinkPresentWithText("COMPLETE", 1))
+        if (!isElementPresent(Locator.linkWithText("COMPLETE").index(1)))
             fail("Mascot .dat import did not complete.");
 
         popLocation();
@@ -329,13 +329,13 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         log("Verify experiment information in MS2 runs.");
-        assertLinkPresentWithText(PROTOCOL);
+        assertElementPresent(Locator.linkWithText(PROTOCOL));
 
         log("Test Protein Search");
         setFormElement("identifier", SEARCH);
         click(Locator.name("exactMatch"));
         clickButton("Search");
-        assertLinkPresentContainingText(SAMPLE_BASE_NAME + " (test2)");
+        assertElementPresent(Locator.linkContainingText(SAMPLE_BASE_NAME + " (test2)"));
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
@@ -343,7 +343,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
-        assertLinkNotPresentWithText(SAMPLE_BASE_NAME + " (test2)");
+        assertElementNotPresent(Locator.linkWithText(SAMPLE_BASE_NAME + " (test2)"));
 
         setFormElement("identifier", "GarbageProteinName");
         setFormElement("minimumProbability", "");

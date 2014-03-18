@@ -16,7 +16,7 @@
 package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import static org.junit.Assert.*;
@@ -30,7 +30,7 @@ public class EmailRecordTable extends DataRegionTable
 
     private boolean _recordOn;
 
-    public EmailRecordTable(BaseSeleniumWebTest test)
+    public EmailRecordTable(BaseWebDriverTest test)
     {
         super("EmailRecord", test, false, false);
     }

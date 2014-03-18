@@ -268,7 +268,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
-        toggleCheckboxByTitle("Pipeline");
+        click(Locator.checkboxByTitle("Pipeline"));
         submit();
         addWebPart("Data Pipeline");
         addWebPart("Datasets");

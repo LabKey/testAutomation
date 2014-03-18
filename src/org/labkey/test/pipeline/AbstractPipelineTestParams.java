@@ -16,7 +16,7 @@
 package org.labkey.test.pipeline;
 
 import org.apache.commons.lang3.StringUtils;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.EmailRecordTable;
 import org.labkey.test.util.ExperimentRunTable;
@@ -246,7 +246,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
 
         clickActionButton();
 
-        int wait = BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT;
+        int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
         _test.log("Choose existing protocol " + getProtocolName());
         _test.waitForElement(Locator.xpath("//select[@name='protocol']/option[.='" + getProtocolName() + "']" ), wait*12); // seems very long
         _test.selectOptionByText("protocol", getProtocolName());
@@ -305,7 +305,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         else
         {
             int split = 1;
-            while (_test.isLinkPresentWithText("COMPLETE", split))
+            while (_test.isElementPresent(Locator.linkWithText("COMPLETE").index(split)))
             {
                 _test.pushLocation();
                 _test.clickAndWait(Locator.linkWithText("COMPLETE", split++));

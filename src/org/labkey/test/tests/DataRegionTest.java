@@ -24,7 +24,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -49,13 +49,13 @@ public class DataRegionTest extends BaseWebDriverTest
 
     private static final String PROJECT_NAME = "DataRegionProject";
     private static final String LIST_NAME = "WebColors" + INJECT_CHARS_1;
-    private static final ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.Integer;
+    private static final ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.Integer;
     private static final String LIST_KEY_NAME = "Key";
 
-    private static final ListHelper.ListColumn NAME_COLUMN =
-            new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Color Name");
-    private static final ListHelper.ListColumn HEX_COLUMN =
-            new ListHelper.ListColumn("Hex", "Hex", ListHelper.ListColumnType.String, "Hexadecimal");
+    private static final ListHelperWD.ListColumn NAME_COLUMN =
+            new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Color Name");
+    private static final ListHelperWD.ListColumn HEX_COLUMN =
+            new ListHelperWD.ListColumn("Hex", "Hex", ListHelperWD.ListColumnType.String, "Hexadecimal");
 
     private static final String LIST_DATA;
     private static final int TOTAL_ROWS;
@@ -178,20 +178,20 @@ public class DataRegionTest extends BaseWebDriverTest
         assertEquals("#FFFF00", table.getDataAsText(15, 4));
 
         assertMenuButtonPresent("Page Size");
-        assertLinkNotPresentWithTitle(PREV_LINK);
-        assertLinkNotPresentWithTitle(NEXT_LINK);
+        assertElementNotPresent(Locator.linkWithText(PREV_LINK));
+        assertElementNotPresent(Locator.linkWithText(NEXT_LINK));
 
         log("Test 3 per page");
         table.setMaxRows(3);
         clickButton("Page Size", 0);
-        assertLinkPresentWithText("3 per page");
-        assertLinkPresentWithText("40 per page");
-        assertLinkPresentWithText("100 per page");
-        assertLinkPresentWithText("250 per page");
-        assertLinkPresentWithText("1000 per page");
-        assertLinkPresentWithText("Show Selected");
-        assertLinkPresentWithText("Show Unselected");
-        assertLinkPresentWithText("Show All");
+        assertElementPresent(Locator.linkWithText("3 per page"));
+        assertElementPresent(Locator.linkWithText("40 per page"));
+        assertElementPresent(Locator.linkWithText("100 per page"));
+        assertElementPresent(Locator.linkWithText("250 per page"));
+        assertElementPresent(Locator.linkWithText("1000 per page"));
+        assertElementPresent(Locator.linkWithText("Show Selected"));
+        assertElementPresent(Locator.linkWithText("Show Unselected"));
+        assertElementPresent(Locator.linkWithText("Show All"));
         assertPaginationText(1, 3, 16);
         assertEquals(3, table.getDataRowCount());
 
@@ -200,40 +200,40 @@ public class DataRegionTest extends BaseWebDriverTest
         assertPaginationText(1, 5, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("aqua", table.getDataAsText(0, 3));
-        assertLinkNotPresentWithTitle(FIRST_LINK);
-        assertLinkNotPresentWithTitle(PREV_LINK);
-        assertLinkPresentWithTitle(NEXT_LINK);
-        assertLinkPresentWithTitle(LAST_LINK);
+        assertElementNotPresent(Locator.linkWithText(FIRST_LINK));
+        assertElementNotPresent(Locator.linkWithText(PREV_LINK));
+        assertElementPresent(Locator.linkWithText(NEXT_LINK));
+        assertElementPresent(Locator.linkWithText(LAST_LINK));
 
         log("Next Page");
         table.pageNext();
         assertPaginationText(6, 10, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("grey", table.getDataAsText(0, 3));
-        assertLinkNotPresentWithTitle(FIRST_LINK);
-        assertLinkPresentWithTitle(PREV_LINK);
-        assertLinkPresentWithTitle(NEXT_LINK);
-        assertLinkPresentWithTitle(LAST_LINK);
+        assertElementNotPresent(Locator.linkWithText(FIRST_LINK));
+        assertElementPresent(Locator.linkWithText(PREV_LINK));
+        assertElementPresent(Locator.linkWithText(NEXT_LINK));
+        assertElementPresent(Locator.linkWithText(LAST_LINK));
 
         log("Last Page");
         table.pageLast();
         assertPaginationText(16, 16, 16);
         assertEquals(1, table.getDataRowCount());
         assertEquals("yellow", table.getDataAsText(0, 3));
-        assertLinkPresentWithTitle(FIRST_LINK);
-        assertLinkPresentWithTitle(PREV_LINK);
-        assertLinkNotPresentWithTitle(NEXT_LINK);
-        assertLinkNotPresentWithTitle(LAST_LINK);
+        assertElementPresent(Locator.linkWithText(FIRST_LINK));
+        assertElementPresent(Locator.linkWithText(PREV_LINK));
+        assertElementNotPresent(Locator.linkWithText(NEXT_LINK));
+        assertElementNotPresent(Locator.linkWithText(LAST_LINK));
 
         log("Previous Page");
         table.pagePrev();
         assertPaginationText(11, 15, 16);
         assertEquals(5, table.getDataRowCount());
         assertEquals("purple", table.getDataAsText(0, 3));
-        assertLinkPresentWithTitle(FIRST_LINK);
-        assertLinkPresentWithTitle(PREV_LINK);
-        assertLinkPresentWithTitle(NEXT_LINK);
-        assertLinkNotPresentWithTitle(LAST_LINK);
+        assertElementPresent(Locator.linkWithText(FIRST_LINK));
+        assertElementPresent(Locator.linkWithText(PREV_LINK));
+        assertElementPresent(Locator.linkWithText(NEXT_LINK));
+        assertElementNotPresent(Locator.linkWithText(LAST_LINK));
 
         log("Setting a filter should go back to first page");
         table.setFilter(NAME_COLUMN.getName(), "Does Not Equal", "aqua");
@@ -248,27 +248,27 @@ public class DataRegionTest extends BaseWebDriverTest
         clickButton("Page Size", 0);
         clickAndWait(Locator.linkWithText("Show Selected"));
         assertEquals(5, table.getDataRowCount());
-        assertLinkNotPresentWithTitle(FIRST_LINK);
-        assertLinkNotPresentWithTitle(PREV_LINK);
-        assertLinkNotPresentWithTitle(NEXT_LINK);
-        assertLinkNotPresentWithTitle(LAST_LINK);
+        assertElementNotPresent(Locator.linkWithText(FIRST_LINK));
+        assertElementNotPresent(Locator.linkWithText(PREV_LINK));
+        assertElementNotPresent(Locator.linkWithText(NEXT_LINK));
+        assertElementNotPresent(Locator.linkWithText(LAST_LINK));
 
         log("Show All");
         clickButton("Page Size", 0);
         clickAndWait(Locator.linkWithText("Show All"));
         assertEquals(15, table.getDataRowCount());
-        assertLinkNotPresentWithTitle(FIRST_LINK);
-        assertLinkNotPresentWithTitle(PREV_LINK);
-        assertLinkNotPresentWithTitle(NEXT_LINK);
-        assertLinkNotPresentWithTitle(LAST_LINK);
+        assertElementNotPresent(Locator.linkWithText(FIRST_LINK));
+        assertElementNotPresent(Locator.linkWithText(PREV_LINK));
+        assertElementNotPresent(Locator.linkWithText(NEXT_LINK));
+        assertElementNotPresent(Locator.linkWithText(LAST_LINK));
 
         log("Test 1000 per page");
         clickButton("Page Size", 0);
         clickAndWait(Locator.linkWithText("1000 per page"));
-        assertLinkNotPresentWithTitle(FIRST_LINK);
-        assertLinkNotPresentWithTitle(PREV_LINK);
-        assertLinkNotPresentWithTitle(NEXT_LINK);
-        assertLinkNotPresentWithTitle(LAST_LINK);
+        assertElementNotPresent(Locator.linkWithText(FIRST_LINK));
+        assertElementNotPresent(Locator.linkWithText(PREV_LINK));
+        assertElementNotPresent(Locator.linkWithText(NEXT_LINK));
+        assertElementNotPresent(Locator.linkWithText(LAST_LINK));
 
     }
 

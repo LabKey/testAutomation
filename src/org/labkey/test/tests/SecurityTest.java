@@ -481,7 +481,7 @@ public class SecurityTest extends BaseWebDriverTest
         boolean isPresent = isElementPresent(userAccessLink);
 
         // If user is not found but paging indicators are, then show all 
-        if (!isPresent && isLinkPresentContainingText("Next") && isLinkPresentContainingText("Last"))
+        if (!isPresent && isElementPresent(Locator.linkContainingText("Next")) && isElementPresent(Locator.linkContainingText("Last")))
         {
             clickButton("Page Size", 0);
             clickAndWait(Locator.linkWithText("Show All"));
@@ -494,7 +494,7 @@ public class SecurityTest extends BaseWebDriverTest
             
             // check for the expected number of group membership links (note: they may be hidden by expandos)
             click(Locator.xpath("//tr[td/a[text()='" + getProjectName() + "']]//img" ));
-            assertLinkPresentWithTextCount(groupName, expectedCount);
+            assertElementPresent(Locator.linkWithText(groupName), expectedCount);
             return;
         }
         fail("Unable to verify group membership of cloned user privileges");

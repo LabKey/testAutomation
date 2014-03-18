@@ -196,13 +196,13 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     //Issue 12597: Need to delete exp.data objects when deleting a flow run
     protected void deleteAllRuns() throws Exception
     {
-        if (!isLinkPresentWithText(getProjectName()))
+        if (!isElementPresent(Locator.linkWithText(getProjectName())))
             goToHome();
-        if (!isLinkPresentWithText(getProjectName()))
+        if (!isElementPresent(Locator.linkWithText(getProjectName())))
             return;
 
         clickProject(getProjectName());
-        if (!isLinkPresentWithText(getFolderName()))
+        if (!isElementPresent(Locator.linkWithText(getFolderName())))
             return;
 
         clickFolder(getFolderName());
@@ -236,7 +236,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         if (!title.startsWith("Flow Dashboard: "))
         {
             // All flow pages have a link back to the Flow Dashboard
-            if (isLinkPresentWithText("Flow Dashboard"))
+            if (isElementPresent(Locator.linkWithText("Flow Dashboard")))
             {
                 clickAndWait(Locator.linkWithText("Flow Dashboard"));
             }

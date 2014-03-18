@@ -17,11 +17,10 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
 import org.labkey.remoteapi.CommandException;
-import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.assay.AssayListCommand;
 import org.labkey.remoteapi.assay.AssayListResponse;
 import org.labkey.remoteapi.assay.ImportRunCommand;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,16 +29,10 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 9/14/12
- * Time: 2:45 PM
- */
-
 public class APIAssayHelper extends AbstractAssayHelper
 {
 
-    public APIAssayHelper(BaseSeleniumWebTest test)
+    public APIAssayHelper(BaseWebDriverTest test)
     {
         super(test);
     }

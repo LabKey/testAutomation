@@ -22,7 +22,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.categories.Study;
-import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 
 import java.io.File;
@@ -52,12 +51,6 @@ public class SampleMindedImportTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
-    }
-
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
     }
 
     @Override
@@ -109,12 +102,12 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         waitForPipelineJobsToComplete(1, "Import specimens: SampleMindedExport.xlsx", false);
         clickTab("Specimen Data");
         waitForElement(Locator.linkWithText("BAL"));
-        assertLinkPresentWithText("BAL");
-        assertLinkPresentWithText("Blood");
+        assertElementPresent(Locator.linkWithText("BAL"));
+        assertElementPresent(Locator.linkWithText("Blood"));
         clickAndWait(Locator.linkWithText("By Individual Vial"));
-        assertLinkPresentWithTextCount("P1000001", 6);
-        assertLinkPresentWithTextCount("P2000001", 3);
-        assertLinkPresentWithTextCount("P20043001", 5);
+        assertElementPresent(Locator.linkWithText("P1000001"), 6);
+        assertElementPresent(Locator.linkWithText("P2000001"), 3);
+        assertElementPresent(Locator.linkWithText("P20043001"), 5);
         assertTextPresent("20045467");
         assertTextPresent("45627879");
         assertTextPresent("1000001-21");
@@ -134,14 +127,14 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         assertEquals("Incorrect number of vials.", "Count:  5", specimenTable.getTotal("Global Unique Id"));
 
         clickAndWait(Locator.linkWithText("Group vials"));
-        assertLinkPresentWithTextCount("P20043001", 2);
+        assertElementPresent(Locator.linkWithText("P20043001"), 2);
         assertTextPresent("Visit SE");
 
         // add column sequencenum
-        new CustomizeViewsHelper(this).openCustomizeViewPanel();
-        new CustomizeViewsHelper(this).showHiddenItems();
-        new CustomizeViewsHelper(this).addCustomizeViewColumn("SequenceNum");
-        new CustomizeViewsHelper(this).applyCustomView();
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.showHiddenItems();
+        _customizeViewsHelper.addCustomizeViewColumn("SequenceNum");
+        _customizeViewsHelper.applyCustomView();
         assertTextPresent("999.0138");
     }
 }

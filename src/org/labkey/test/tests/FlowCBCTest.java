@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.TimeChartHelper;
 
@@ -66,7 +66,7 @@ public class FlowCBCTest extends BaseFlowTest
         createSubfolder(getProjectName(), getProjectName(), CBC_FOLDER, "Assay", null);
 
         clickFolder(CBC_FOLDER);
-        if (!isLinkPresentWithText("Assay List"))
+        if (!isElementPresent(Locator.linkWithText("Assay List")))
             addWebPart("Assay List");
         clickButton("New Assay Design");
         checkRadioButton("providerName", "CBC");
@@ -77,16 +77,14 @@ public class FlowCBCTest extends BaseFlowTest
         sleep(1000);
 
         // Remove TargetStudy field from the Batch domain
-        deleteField("Batch Fields", 0);
+        _listHelper.deleteField("Batch Fields", 0);
 
         // Add TargetStudy to the end of the default list of Results domain
-        addField("Result Fields", 25, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
+        _listHelper.addField("Result Fields", 25, "TargetStudy", "Target Study", ListHelperWD.ListColumnType.String);
 
         clickButton("Save", 0);
         waitForText("Save successful.", 20000);
     }
-
-    public boolean isFileUploadTest(){return true;}
 
     @LogMethod
     private void initializeStudyFolder()

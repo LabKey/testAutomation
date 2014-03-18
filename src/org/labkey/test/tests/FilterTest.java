@@ -32,7 +32,7 @@ import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.IssuesHelper;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelper;
@@ -131,7 +131,7 @@ public class FilterTest extends ListTest
     @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void createList2()
     {
-        ListHelper.ListColumn yearColumn = new ListHelper.ListColumn("year", "year", ListHelper.ListColumnType.Integer, "");
+        ListHelperWD.ListColumn yearColumn = new ListHelperWD.ListColumn("year", "year", ListHelperWD.ListColumnType.Integer, "");
         _listHelper.createList(PROJECT_NAME, FACET_TEST_LIST, LIST2_KEY_TYPE, LIST2_KEY_NAME, _list2Col1, yearColumn);
         clickButton("Import Data");
         setFormElement(Locator.name("text"), "Car\tColor\tyear\n" +

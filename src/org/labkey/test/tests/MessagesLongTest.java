@@ -108,12 +108,6 @@ public class MessagesLongTest extends BaseWebDriverTest
         deleteProject(MessagesLongTest.PROJECT_NAME, afterTest);
     }
 
-    @Override
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
-
     protected void doTestSteps()
     {
         log("Open new project, add group, alter permissions");
@@ -155,10 +149,10 @@ public class MessagesLongTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//input[@name='defaultEmailOption']"), WAIT_FOR_JAVASCRIPT);
         clickButton("Update Folder Default", 0);
 
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         assertTextPresent("All conversations");
 
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         clickProject(PROJECT_NAME);
 
         log("Check message works in Wiki");
@@ -359,7 +353,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         setFormElement(Locator.id(MEMBER_LIST), USER2);
         clickButtonContainingText("Submit", "Title must not be blank");
         clickButtonContainingText("OK", 0);
-        waitForExtMaskToDisappear();
+        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("title"), MSG3_TITLE);
         clickButton("Submit");
         assertTextPresent("This user doesn't have permission");
@@ -493,17 +487,11 @@ public class MessagesLongTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("rendererType"), "Plain Text");
 
         log("test attachments too");
-        if (isFileUploadAvailable())
-        {
-            click(Locator.linkContainingText("Attach a file"));
-            File file = new File(getLabKeyRoot() + "/common.properties");
-            setFormElement(Locator.name("formFiles[00]"), file);
-        }
-        else
-            log("File upload skipped.");
+        click(Locator.linkContainingText("Attach a file"));
+        File file = new File(getLabKeyRoot() + "/common.properties");
+        setFormElement(Locator.name("formFiles[00]"), file);
         clickButton("Submit");
-        if (isFileUploadAvailable())
-            assertTextPresent("common.properties");
+        assertTextPresent("common.properties");
         assertTextPresent(MSG1_BODY_FIRST);
         clickAndWait(Locator.linkWithText("view message or respond"));
         clickAndWait(Locator.linkWithText("view list"));
@@ -514,15 +502,12 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("test edit messages");
         clickAndWait(Locator.linkWithText("edit"));
         setFormElement(Locator.id("body"), MSG1_BODY);
-        if (isFileUploadAvailable())
-        {
-            assertTextPresent("remove");
-            click(Locator.linkWithText("remove"));
-            waitForText("This cannot be undone");
-            clickButton("OK", 0);
-            waitForTextToDisappear("common.properties");
-            assertTextNotPresent("common.properties");
-        }
+        assertTextPresent("remove");
+        click(Locator.linkWithText("remove"));
+        waitForText("This cannot be undone");
+        clickButton("OK", 0);
+        waitForTextToDisappear("common.properties");
+        assertTextNotPresent("common.properties");
         clickButton("Submit");
         assertTextPresent(MSG1_BODY);
 

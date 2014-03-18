@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.PortalHelper;
 
 /**
@@ -150,11 +150,11 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, null);
 
-        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
-                new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, "")
+        ListHelperWD.ListColumn[] columns = new ListHelperWD.ListColumn[] {
+                new ListHelperWD.ListColumn("name", "Name", ListHelperWD.ListColumnType.String, "")
         };
 
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelperWD.ListColumnType.AutoInteger, "Key", columns);
 
         clickButton("Done");
         clickAndWait(Locator.linkWithText(LIST_NAME));

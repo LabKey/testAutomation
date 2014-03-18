@@ -148,7 +148,7 @@ public class StudyExportTest extends StudyManualTest
         // verify reordered, categorized, & hidden datasets.
         clickAndWait(Locator.linkWithText("47 datasets"));
         assertTextBefore(REORDERED_DATASET2, REORDERED_DATASET1);
-        assertLinkNotPresentWithText(HIDDEN_DATASET);
+        assertElementNotPresent(Locator.linkWithText(HIDDEN_DATASET));
         assertTextBefore(CATEGORY, MODIFIED_DATASET);
 
         // verify dataset category on dataset management page
@@ -237,16 +237,16 @@ public class StudyExportTest extends StudyManualTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Study Navigator"));
 
-        assertLinkNotPresentWithText("24");
+        assertElementNotPresent(Locator.linkWithText("24"));
         selectOptionByText("QCState", "All data");
 
         waitAndClickAndWait(Locator.linkWithText("24"));
         checkCheckbox(Locator.checkboxByName(".toggle"));
         clickButton("View Specimens");
-        assertLinkPresentWithText("999320016");
-        assertLinkPresentWithText("999320518");
+        assertElementPresent(Locator.linkWithText("999320016"));
+        assertElementPresent(Locator.linkWithText("999320518"));
         clickAndWait(Locator.linkWithText("Show individual vials"));
-        assertLinkPresentWithText("999320016");
+        assertElementPresent(Locator.linkWithText("999320016"));
         checkCheckbox(Locator.checkboxByName(".toggle"));
         clickMenuButton("Request Options", "Create New Request");
         assertTextPresent("HAQ0003Y-09");
@@ -296,9 +296,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("Providing lab approval");
         checkCheckbox("complete");
         setFormElement("comment", "Approval granted.");
-        if (isFileUploadAvailable())
-            setFormElement("formFiles[0]", new File(getLabKeyRoot() + VISIT_MAP).getPath());
-        else
+        setFormElement("formFiles[0]", new File(getLabKeyRoot() + VISIT_MAP).getPath());
             log("File upload skipped.");
         clickButton("Save Changes and Send Notifications");
         assertTextPresent("Complete");
@@ -316,8 +314,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("Request is now pending.");
         assertTextPresent("Approval granted.");
         assertTextPresent("Institutional Review Board (Duke University), Receiving lab approval");
-        if (isFileUploadAvailable())
-            assertTextPresent(VISIT_MAP.substring(VISIT_MAP.lastIndexOf("/") + 1));
+        assertTextPresent(VISIT_MAP.substring(VISIT_MAP.lastIndexOf("/") + 1));
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
@@ -401,7 +398,7 @@ public class StudyExportTest extends StudyManualTest
         clickAndWait(Locator.linkWithText("Show individual vials"));
         // if our search worked, we'll only have six vials:
         assertTextPresent("[history]", 6);
-        assertLinkPresentWithTextCount("999320528", 6);
+        assertElementPresent(Locator.linkWithText("999320528"), 6);
         assertTextNotPresent("DRT000XX-01");
         clickAndWait(Locator.linkWithText("[history]"));
         assertTextPresent("GAA082NH-01");
@@ -599,9 +596,6 @@ public class StudyExportTest extends StudyManualTest
 
     protected void doTestDatasetImport()
     {
-        if (!isFileUploadAvailable())
-            return;
-
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickTab("Manage");
@@ -614,7 +608,7 @@ public class StudyExportTest extends StudyManualTest
         waitForElement(Locator.xpath("//input[@name='uploadFormElement']"), WAIT_FOR_JAVASCRIPT);
 
         File datasetFile = new File(DATASET_DATA_FILE);
-        setFormElement("uploadFormElement", datasetFile);
+        setFormElement(Locator.name("uploadFormElement"), datasetFile);
 
         waitForElement(Locator.xpath("//span[@id='button_Import']"), WAIT_FOR_JAVASCRIPT);
 

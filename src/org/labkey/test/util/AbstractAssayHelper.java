@@ -16,7 +16,7 @@
 package org.labkey.test.util;
 
 import org.labkey.remoteapi.CommandException;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import java.io.File;
@@ -30,9 +30,9 @@ import static org.junit.Assert.*;
  * Date: 9/14/12
  * Time: 2:41 PM
  */
-public abstract class AbstractAssayHelper extends AbstractHelper
+public abstract class AbstractAssayHelper extends AbstractHelperWD
 {
-    public AbstractAssayHelper(BaseSeleniumWebTest test)
+    public AbstractAssayHelper(BaseWebDriverTest test)
     {
         super(test);
     }
@@ -71,7 +71,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     }
 
     @LogMethod
-    public void addAliasedFieldToMetadata(String schemaName, String tableName, String aliasedColumn, String columnName, ListHelper.LookupInfo lookupInfo)
+    public void addAliasedFieldToMetadata(String schemaName, String tableName, String aliasedColumn, String columnName, ListHelperWD.LookupInfo lookupInfo)
     {
         //go to schema browser
         _test.goToSchemaBrowser();
@@ -87,7 +87,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
         Locator l = Locator.name("sourceColumn");
         _test.selectOptionByText(l, aliasedColumn);
-        _test.clickButton("OK", BaseSeleniumWebTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        _test.clickButton("OK", BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
 
         //set name
         //TODO:  better locator
@@ -118,11 +118,11 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         _test.checkRadioButton(Locator.radioButtonByNameAndValue("providerName", type));
         _test.clickButton("Next", 0);
 
-        _test.waitForElement(Locator.id("AssayDesignerName"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.id("AssayDesignerName"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(Locator.id("AssayDesignerName"), name);
-        _test.fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseSeleniumWebTest.SeleniumEvent.change); // GWT compensation
+        _test.fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseWebDriverTest.SeleniumEvent.change); // GWT compensation
         _test.clickButton("Save", 0); // GWT compensation
-        _test.waitForText("Save successful.", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForText("Save successful.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.clickButton("Save & Close");
 
         _test.waitForElement(Locator.id("AssayList"));
@@ -137,11 +137,11 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
         _test.waitForElement(Locator.xpath("//input[@type='checkbox' and @name='editableRunProperties']"));
         _test.checkCheckbox(Locator.xpath("//input[@type='checkbox' and @name='editableRunProperties']"));
-        _test.waitForElement(Locator.id("AssayDesignerName"), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.id("AssayDesignerName"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.setFormElement(Locator.id("AssayDesignerName"), name);
-        _test.fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseSeleniumWebTest.SeleniumEvent.change); // GWT compensation
+        _test.fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), BaseWebDriverTest.SeleniumEvent.change); // GWT compensation
         _test.clickButton("Save", 0); // GWT compensation
-        _test.waitForText("Save successful.", BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForText("Save successful.", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.clickButton("Save & Close");
 
         _test.waitForElement(Locator.id("AssayList"));

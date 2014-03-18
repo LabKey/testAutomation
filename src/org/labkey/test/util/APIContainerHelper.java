@@ -21,7 +21,7 @@ import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.CreateContainerCommand;
 import org.labkey.remoteapi.security.CreateContainerResponse;
 import org.labkey.remoteapi.security.DeleteContainerCommand;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 
 import java.io.IOException;
@@ -29,13 +29,9 @@ import java.net.SocketTimeoutException;
 
 import static org.junit.Assert.*;
 
-/**
- * User: jeckels
- * Date: Jul 20, 2012
- */
 public class APIContainerHelper extends AbstractContainerHelper
 {
-    public APIContainerHelper(BaseSeleniumWebTest test)
+    public APIContainerHelper(BaseWebDriverTest test)
     {
         super(test);
     }

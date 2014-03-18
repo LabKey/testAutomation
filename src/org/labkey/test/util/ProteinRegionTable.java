@@ -15,25 +15,18 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.SortDirection;
 
-/**
- * ProteinRegionTable class
-* <p/>
-* Created: Aug 15, 2007
-*
-* @author bmaclean
-*/
 public class ProteinRegionTable extends DataRegionTable
 {
-    protected BaseSeleniumWebTest _test;
+    protected BaseWebDriverTest _test;
     protected double _maxProbability;
     protected int _pages;
     protected int _maxGroup;
     protected int _maxSubGroup;
 
-    public ProteinRegionTable(double maxProbability, BaseSeleniumWebTest test)
+    public ProteinRegionTable(double maxProbability, BaseWebDriverTest test)
     {
         super("ProteinGroupsWithQuantitation", test);
 

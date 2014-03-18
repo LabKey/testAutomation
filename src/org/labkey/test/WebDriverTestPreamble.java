@@ -43,16 +43,6 @@ public class WebDriverTestPreamble extends BaseWebDriverTest
             disableMaintenance();
         }
 
-        if ( !isGuestModeTest() )
-        {
-            if (!isConfigurationSupported()) // skip this check if it returns true with no database info.
-            {
-                log("** Skipping " + Runner.getCurrentTestName() + " test for unsupported configurarion");
-                _testFailed = false;
-                return;
-            }
-        }
-
         // Only do this as part of test startup if we haven't already checked. Since we do this as the last
         // step in the test, there's no reason to bother doing it again at the beginning of the next test
         if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))

@@ -20,7 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 
 /**
  * User: Trey Chadick
@@ -101,7 +101,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         // Unable to check fail state: Selenium can't handle GWT alert.
         // clickButton("Begin import", 0);
         // assertAlert("Could not convert the value 'text' from line #202 in column #6 (Primary) to Integer");
-        _listHelper.setColumnType(5, ListHelper.ListColumnType.String); // Row 201 is a string
+        _listHelper.setColumnType(5, ListHelperWD.ListColumnType.String); // Row 201 is a string
         clickButton("Begin import");
         waitAndClickButton("Next");
         waitAndClickButton("Save and Finish");
@@ -130,7 +130,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "VisitID");
         assertFormElementEquals("Date", "DrawDt");
-        _listHelper.setColumnType(5, ListHelper.ListColumnType.String); // Row 201 is a string
+        _listHelper.setColumnType(5, ListHelperWD.ListColumnType.String); // Row 201 is a string
         clickButton("Begin import");
         waitAndClickButton("Next");
         waitAndClickButton("Save and Finish");
@@ -159,7 +159,7 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertFormElementEquals("ParticipantID", "ptid");
         assertFormElementEquals("VisitID", "VisitID");
         assertFormElementEquals("Date", "DrawDt");
-        _listHelper.setColumnType(5, ListHelper.ListColumnType.String);
+        _listHelper.setColumnType(5, ListHelperWD.ListColumnType.String);
         clickButton("Show Assay Designer");
 
         waitForElement(Locator.xpath( getPropertyXPath(ASSAY_NAME_TSV + " Data Fields")), WAIT_FOR_JAVASCRIPT);

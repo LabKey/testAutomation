@@ -24,6 +24,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.CustomizeViewsHelperWD;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -48,17 +49,17 @@ public class AssayTest extends AbstractAssayTest
     protected static final String TEST_ASSAY_SET_PROP_EDIT = "NewTargetStudy";
     protected static final String TEST_ASSAY_SET_PROP_NAME = "testAssaySetProp";
     protected static final int TEST_ASSAY_SET_PREDEFINED_PROP_COUNT = 2;
-    protected static final ListColumnType[] TEST_ASSAY_SET_PROP_TYPES = { ListColumnType.Boolean, ListColumnType.Double, ListColumnType.Integer, ListColumnType.DateTime };
+    protected static final ListColumnType[] TEST_ASSAY_SET_PROP_TYPES = { ListHelperWD.ListColumnType.Boolean, ListHelperWD.ListColumnType.Double, ListHelperWD.ListColumnType.Integer, ListHelperWD.ListColumnType.DateTime };
     protected static final String[] TEST_ASSAY_SET_PROPERTIES = { "false", "100.0", "200", "2001-10-10" };
     protected static final String TEST_ASSAY_RUN_PROP_NAME = "testAssayRunProp";
     protected static final int TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT = 0;
-    protected static final ListColumnType[] TEST_ASSAY_RUN_PROP_TYPES = { ListColumnType.String, ListColumnType.Boolean, ListColumnType.Double, ListColumnType.Integer, ListColumnType.DateTime };
+    protected static final ListColumnType[] TEST_ASSAY_RUN_PROP_TYPES = { ListHelperWD.ListColumnType.String, ListHelperWD.ListColumnType.Boolean, ListHelperWD.ListColumnType.Double, ListHelperWD.ListColumnType.Integer, ListHelperWD.ListColumnType.DateTime };
     protected static final String TEST_ASSAY_RUN_PROP1 = "TestRunProp";
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
     protected static final String TEST_ASSAY_DATA_ALIASED_PROP_NAME = "testAssayAliasedData";
     protected static final String ALIASED_DATA = "aliasedData";
     public static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
-    protected static final ListColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { ListColumnType.Boolean, ListColumnType.Integer, ListColumnType.DateTime, ListColumnType.String };
+    protected static final ListColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { ListHelperWD.ListColumnType.Boolean, ListHelperWD.ListColumnType.Integer, ListHelperWD.ListColumnType.DateTime, ListHelperWD.ListColumnType.String };
     protected static final String TEST_RUN1 = "FirstRun";
     protected static final String TEST_RUN1_COMMENTS = "First comments";
     protected static final String TEST_RUN1_DATA1 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "20\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
@@ -293,7 +294,7 @@ public class AssayTest extends AbstractAssayTest
             _listHelper.addField("Data Fields", i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
         }
 
-        _listHelper.addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Flags", "Flags", ListColumnType.Flag);
+        _listHelper.addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Flags", "Flags", ListHelperWD.ListColumnType.Flag);
 
         // Set some to required
         setRequired("Batch Fields", TEST_ASSAY_SET_PREDEFINED_PROP_COUNT);
@@ -577,8 +578,8 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("301.0");
         assertTextPresent("9.0");
         assertTextPresent("8.0");
-        assertLinkPresentWithTextCount("999320396", 2);
-        assertLinkPresentWithTextCount("999320885", 1);
+        assertElementPresent(Locator.linkWithText("999320885"), 1);
+        assertElementPresent(Locator.linkWithText("999320885"), 1);
         assertTextPresent(TEST_RUN1_COMMENTS);
         assertTextPresent(TEST_RUN2_COMMENTS);
         assertTextPresent(TEST_RUN1);
@@ -967,8 +968,4 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("BAQ00051", baq00051Count);
     }
 
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
 }

@@ -15,16 +15,16 @@
  */
 package org.labkey.test.util;
 
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 
 /**
  * User: elvan
  * Date: 9/12/12
  * Time: 11:45 AM
  */
-public abstract class AbstractUserHelper extends AbstractHelper
+public abstract class AbstractUserHelper extends AbstractHelperWD
 {
-    public AbstractUserHelper(BaseSeleniumWebTest test)
+    public AbstractUserHelper(BaseWebDriverTest test)
     {
         super(test);
     }

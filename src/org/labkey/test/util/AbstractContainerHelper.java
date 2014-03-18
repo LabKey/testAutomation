@@ -16,7 +16,7 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
@@ -27,11 +27,11 @@ import java.util.List;
  * User: jeckels
  * Date: Jul 20, 2012
  */
-public abstract class AbstractContainerHelper extends AbstractHelper
+public abstract class AbstractContainerHelper extends AbstractHelperWD
 {
     private List<String> _createdProjects = new ArrayList<>();
 
-    public AbstractContainerHelper(BaseSeleniumWebTest test)
+    public AbstractContainerHelper(BaseWebDriverTest test)
     {
         super(test);
     }

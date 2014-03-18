@@ -20,7 +20,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
@@ -126,7 +126,7 @@ public class UserTest extends SecurityTest
 
         simpleSignIn();
 
-        deleteUser(newUserEmail);
+        deleteUsers(true, newUserEmail);
     }
 
     @LogMethod
@@ -388,8 +388,8 @@ public class UserTest extends SecurityTest
 
         waitForText("Add Field");
         int firstIdx = findLastUserCustomField();
-        addField("Field Properties", firstIdx++, PROP_NAME1, PROP_NAME1, ListHelper.ListColumnType.String);
-        addField("Field Properties", firstIdx, PROP_NAME2, PROP_NAME2, ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Field Properties", firstIdx++, PROP_NAME1, PROP_NAME1, ListHelperWD.ListColumnType.String);
+        _listHelper.addField("Field Properties", firstIdx, PROP_NAME2, PROP_NAME2, ListHelperWD.ListColumnType.Integer);
 
         try {
             clickButton("Save");
@@ -410,8 +410,8 @@ public class UserTest extends SecurityTest
 
             waitForText("Add Field");
 
-            deleteField("Field Properties", firstIdx--);
-            deleteField("Field Properties", firstIdx);
+            _listHelper.deleteField("Field Properties", firstIdx--);
+            _listHelper.deleteField("Field Properties", firstIdx);
 
             clickButton("Save");
         }

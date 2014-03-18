@@ -22,7 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.PortalHelper;
 
 import java.text.DateFormat;
@@ -158,7 +158,7 @@ public class ExpTest extends BaseWebDriverTest
         // Make it a lookup into our custom query
         int fieldCount = getElementCount(Locator.xpath("//input[contains(@name, 'ff_type')]"));
         assertTrue(fieldCount > 0);
-        _listHelper.setColumnType(fieldCount - 1, new ListHelper.LookupInfo(null, "exp", "dataCustomQuery"));
+        _listHelper.setColumnType(fieldCount - 1, new ListHelperWD.LookupInfo(null, "exp", "dataCustomQuery"));
         click(Locator.name("ff_type" + (fieldCount - 1)));
 
         // Save it

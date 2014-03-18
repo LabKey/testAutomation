@@ -32,10 +32,6 @@ import static org.junit.Assert.*;
 @Category({DailyA.class})
 public class StudyReloadTest extends StudyBaseTest
 {
-    public boolean isFileUploadTest()
-    {
-        return true;
-    }
     @Override
     //disabled for 14569
     @LogMethod(category = LogMethod.MethodType.SETUP)

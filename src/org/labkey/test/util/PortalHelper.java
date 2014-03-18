@@ -17,7 +17,6 @@ package org.labkey.test.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.BaseSeleniumWebTest;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
@@ -28,9 +27,9 @@ import static org.junit.Assert.*;
  * Date: 1/11/13
  * Time: 2:38 PM
  */
-public class PortalHelper extends AbstractHelper
+public class PortalHelper extends AbstractHelperWD
 {
-    public PortalHelper(BaseSeleniumWebTest test)
+    public PortalHelper(BaseWebDriverTest test)
     {
         super(test);
     }
@@ -108,7 +107,7 @@ public class PortalHelper extends AbstractHelper
 //        ((BaseWebDriverTest)_test).prepForPageLoad(); // using prepForPageLoad and newWaitForPageLoad does not work. I feel like it should.
         clickTabMenuItem(tabText, true, "Delete");
         _test.waitForElementToDisappear(tabLocator);
-//        ((BaseWebDriverTest)_test).newWaitForPageToLoad(BaseSeleniumWebTest.WAIT_FOR_PAGE);
+//        ((BaseWebDriverTest)_test).newWaitForPageToLoad(BaseWebDriverTest.WAIT_FOR_PAGE);
         _test.assertElementNotPresent(tabLocator);
     }
 
@@ -203,7 +202,7 @@ public class PortalHelper extends AbstractHelper
             Locator.XPathLocator removeButton = Locator.xpath("//tr[th[@title='"+webPartTitle+"']]//a[img[@title='Remove From Page']]");
             _test.click(removeButton);
         }
-        _test.waitForElementToDisappear(Locators.webPartTitle(webPartTitle).index(startCount), BaseSeleniumWebTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElementToDisappear(Locators.webPartTitle(webPartTitle).index(startCount), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.waitForElementToDisappear(Locator.css("div.x4-form-display-field").withText("Saving..."));
     }
 

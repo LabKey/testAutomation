@@ -38,11 +38,6 @@ public class AssayAPITest extends BaseWebDriverTest
         return "Assay API TEST";
     }
 
-    protected boolean isFileUploadTest()
-    {
-        return true;
-    }
-
     @Override
     protected void doTestSteps() throws Exception
     {

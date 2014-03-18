@@ -19,7 +19,7 @@ package org.labkey.test.testpicker;
 import org.labkey.test.SuiteBuilder;
 import org.labkey.test.TestConfig;
 import org.labkey.test.TestSet;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Continue;
 import org.labkey.test.categories.SuiteComparator;
 import org.labkey.test.categories.Test;
@@ -32,12 +32,6 @@ import java.util.List;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-
-/**
- * User: ulberge
- * Date: Aug 23, 2007
- * Time: 3:51:11 PM
- */
 
 public class TestHelper
 {
@@ -809,11 +803,11 @@ public class TestHelper
             }
             if (_firefoxButton.isSelected())
             {
-                System.setProperty("selenium.browser", BaseSeleniumWebTest.FIREFOX_BROWSER);
+                System.setProperty("selenium.browser", "*firefox");
             }
             else if (_ieButton.isSelected())
             {
-                System.setProperty("selenium.browser", BaseSeleniumWebTest.IE_BROWSER);
+                System.setProperty("selenium.browser", "*ie");
             }
             saveTestConfig(_prevTestConfig);
 

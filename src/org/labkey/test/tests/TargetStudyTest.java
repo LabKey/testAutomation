@@ -137,11 +137,6 @@ public class TargetStudyTest extends AbstractAssayTest
         waitForText("General Study Settings");
     }
 
-    public boolean isFileUploadTest()
-    {
-        return true;
-    }
-
     @LogMethod(category = LogMethod.MethodType.SETUP)
     protected void setupAssay()
     {

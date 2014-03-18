@@ -23,8 +23,9 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -115,30 +116,31 @@ public class JavaClientApiTest extends BaseWebDriverTest
         assertGroupDoesNotExist(GROUP_NAME, PROJECT_NAME);
 
         //delete the user
-        deleteUser(USER_NAME);
+        deleteUsers(true, USER_NAME);
     }
 
     protected void doQueryTest() throws Exception
     {
         log("Starting query portion of test...");
         clickProject(PROJECT_NAME);
-        addWebPart("Lists");
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Lists");
 
         log("Creating list for Query test...");
 
         _listHelper.createList(PROJECT_NAME, LIST_NAME,
-                ListHelper.ListColumnType.AutoInteger, "Key",
-                new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "First Name"),
-                new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "Last Name"),
-                new ListHelper.ListColumn("Birthdate", "Birthdate", ListHelper.ListColumnType.DateTime, "Birthdate"),
-                new ListHelper.ListColumn("GooAmount", "Goo Amount", ListHelper.ListColumnType.Double, "Amount of Goo"),
-                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"),
-                new ListHelper.ListColumn("Notes", "Notes", ListHelper.ListColumnType.String, "Notes"));
+                ListHelperWD.ListColumnType.AutoInteger, "Key",
+                new ListHelperWD.ListColumn("FirstName", "First Name", ListHelperWD.ListColumnType.String, "First Name"),
+                new ListHelperWD.ListColumn("LastName", "Last Name", ListHelperWD.ListColumnType.String, "Last Name"),
+                new ListHelperWD.ListColumn("Birthdate", "Birthdate", ListHelperWD.ListColumnType.DateTime, "Birthdate"),
+                new ListHelperWD.ListColumn("GooAmount", "Goo Amount", ListHelperWD.ListColumnType.Double, "Amount of Goo"),
+                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"),
+                new ListHelperWD.ListColumn("Notes", "Notes", ListHelperWD.ListColumnType.String, "Notes"));
 
         log("Setting permissions...");
         clickProject(PROJECT_NAME);
         enterPermissionsUI();
-        setSiteGroupPermissions("Guests", "Editor");
+        _securityHelper.setSiteGroupPermissions("Guests", "Editor");
         exitPermissionsUI();
 
         clickProject(PROJECT_NAME);

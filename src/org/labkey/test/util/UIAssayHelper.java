@@ -16,21 +16,16 @@
 package org.labkey.test.util;
 
 import org.labkey.remoteapi.CommandException;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * User: elvan
- * Date: 9/18/12
- * Time: 1:36 PM
- */
 public class UIAssayHelper extends AbstractAssayHelper
 {
-    public UIAssayHelper(BaseSeleniumWebTest test)
+    public UIAssayHelper(BaseWebDriverTest test)
     {
         super(test);
     }

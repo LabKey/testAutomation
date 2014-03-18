@@ -27,9 +27,8 @@ import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserExtendedProperty;
 import org.labkey.test.util.FileBrowserHelperWD;
 import org.labkey.test.util.LabKeyExpectedConditions;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.SearchHelper;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -66,11 +65,6 @@ public class FileContentTest extends BaseWebDriverTest
     protected String getProjectName()
     {
         return PROJECT_NAME;
-    }
-
-    public boolean isFileUploadTest()
-    {
-        return true;
     }
 
 
@@ -120,7 +114,7 @@ public class FileContentTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//a/span[text() = 'Admin']"), WAIT_FOR_JAVASCRIPT);
         enableEmailRecorder();
         // Create list for lookup custom file property
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, COLUMN_NAME);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelperWD.ListColumnType.String, COLUMN_NAME);
         _listHelper.uploadData(PROJECT_NAME, LIST_NAME, COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
         clickProject(PROJECT_NAME);
         // Setup custom file properties
@@ -137,7 +131,7 @@ public class FileContentTest extends BaseWebDriverTest
         waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("ff_name0"), CUSTOM_PROPERTY);
         setFormElement(Locator.id("url"), "http://labkey.test/?a=${"+CUSTOM_PROPERTY+"}&b=${"+COLUMN_NAME+"}");
-        _listHelper.addLookupField(null, 1, COLUMN_NAME, COLUMN_NAME, new ListHelper.LookupInfo(PROJECT_NAME, "lists", LIST_NAME));
+        _listHelper.addLookupField(null, 1, COLUMN_NAME, COLUMN_NAME, new ListHelperWD.LookupInfo(PROJECT_NAME, "lists", LIST_NAME));
         clickButton("Save & Close");
 
         waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);

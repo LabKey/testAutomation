@@ -21,11 +21,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.LabKeyExpectedConditions;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
 
 import static org.junit.Assert.*;
 
@@ -45,7 +43,7 @@ public class ListExportTest extends BaseWebDriverTest
     protected void doTestSteps()
     {
         _containerHelper.createProject(getProjectName(), null);
-        _listHelper.createList(getProjectName(), LIST_NAME, ListHelper.ListColumnType.AutoInteger, LIST_KEY);
+        _listHelper.createList(getProjectName(), LIST_NAME, ListHelperWD.ListColumnType.AutoInteger, LIST_KEY);
         clickButton("Done");
         clickAndWait(Locator.linkWithText("View Data"));
 

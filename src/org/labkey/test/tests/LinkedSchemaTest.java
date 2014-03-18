@@ -28,7 +28,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
-import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.ListHelperWD;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.SchemaHelper;
@@ -395,7 +395,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
 
         // Linked schemas disallow lookups to other folders outside of the current folder.
         //Change the Mother column lookup to point to the other folder, then ensure that the mother lookup is no longer propogating
-        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics"));
+        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelperWD.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics"));
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", false, "Mother");
 
@@ -408,7 +408,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", false, "Mother");
 
         //Change the Mother column lookup to point to the query, and then make sure that the table has lookups appropriately.
-        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup"));
+        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelperWD.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup"));
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
     }
 
@@ -722,7 +722,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         }
     }
 
-    protected void changelistLookup(String sourceFolder, String tableName, int index, ListHelper.LookupInfo info)
+    protected void changelistLookup(String sourceFolder, String tableName, int index, ListHelperWD.LookupInfo info)
     {
         clickFolder(sourceFolder);
 

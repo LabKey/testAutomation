@@ -16,19 +16,14 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.BaseSeleniumWebTest;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
 import java.io.File;
 
-/**
- * User: elvan
- * Date: 7/26/12
- * Time: 12:44 PM
- */
-public class WikiHelper extends AbstractHelper
+public class WikiHelper extends AbstractHelperWD
 {
-    public WikiHelper(BaseSeleniumWebTest test)
+    public WikiHelper(BaseWebDriverTest test)
     {
         super(test);
     }
@@ -71,7 +66,7 @@ public class WikiHelper extends AbstractHelper
         if (null != attachment)
         {
             _test.click(Locator.linkWithText("Attach a file"));
-            _test.setFormElement("formFiles[0]", attachment);
+            _test.setFormElement(Locator.name("formFiles[0]"), attachment);
         }
         _test.saveWikiPage();
     }

@@ -223,7 +223,7 @@ public class MS1Test extends BaseWebDriverTest
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewFilter("CTAGG_COUNT_FeatureId", "Num Features", "Is Greater Than", "1");
         _customizeViewsHelper.applyCustomView();
-        assertLinkNotPresentWithText("1");
+        assertElementNotPresent(Locator.linkWithText("1"));
 
         pushLocation();
         addUrlParameter("exportAsWebPage=true");
