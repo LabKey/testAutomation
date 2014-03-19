@@ -55,6 +55,7 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
+import org.labkey.test.util.ext4cmp.Ext4ComboRefWD;
 import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -5975,6 +5976,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "User");
         waitForElement(Ext4HelperWD.Locators.window("Impersonate User"));
+        Ext4ComboRefWD userCombo = Ext4ComboRefWD.getForLabel(this, "User");
+        userCombo.waitForStoreLoad();
         _ext4Helper.selectComboBoxItem("User:", fakeUser + " (", true);
         clickAndWait(Ext4HelperWD.ext4WindowButton("Impersonate User", "Impersonate"));
         _impersonationStack.push(fakeUser);
