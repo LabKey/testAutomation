@@ -2878,13 +2878,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         startCreateGlobalPermissionsGroup(groupName, failIfAlreadyExists);
         StringBuilder namesList = new StringBuilder();
-        for(String member : users)
+
+        for (String member : users)
         {
             namesList.append(member).append("\n");
         }
 
-        log("Adding\n" + namesList.toString() + " to group " + groupName + "...");
-        waitAndClickAndWait(Locator.tagContainingText("a","manage group"));
+        log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
+        waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
         waitForElement(Locator.name("names"));
         setFormElement(Locator.name("names"), namesList.toString());
         uncheckCheckbox(Locator.name("sendEmail"));
@@ -2916,7 +2917,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             namesList.append(member).append("\n");
         }
 
-        log("Adding\n" + namesList.toString() + " to group " + groupName + "...");
+        log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
         addUserToGroupFromGroupScreen(namesList.toString());
 
         enterPermissionsUI();
@@ -5948,9 +5949,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void impersonateGroup(String group, boolean isSiteGroup)
     {
-        if (isSiteGroup)
-            goToHome();
-        clickUserMenuItem("Impersonate", "Group", (isSiteGroup ? "Site: " : "") + group);
+        _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "Group");
+        waitForElement(Ext4HelperWD.Locators.window("Impersonate Group"));
+        Ext4ComboRefWD groupCombo = Ext4ComboRefWD.getForLabel(this, "Group");
+        groupCombo.waitForStoreLoad();
+        _ext4Helper.selectComboBoxItem("Group:", (isSiteGroup ? "Site: " : "") + group, true);
+        clickAndWait(Ext4HelperWD.ext4WindowButton("Impersonate Group", "Impersonate"));
     }
 
     public void impersonateRole(String role)

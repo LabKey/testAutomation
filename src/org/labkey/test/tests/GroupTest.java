@@ -214,7 +214,6 @@ public class GroupTest extends BaseWebDriverTest
         verifyAuthorPermission(nameTitleBody);
         stopImpersonatingGroup();
 
-
         Locator unavailableEditorChoice = Locator.xpath("//li[contains(@class, 'x-item-disabled')]/a/span[text()='Editor']");
         impersonateRole("Author");
         assertElementNotPresent(unavailableEditorChoice);
@@ -229,8 +228,8 @@ public class GroupTest extends BaseWebDriverTest
         //Issue 13802: add child group to SIMPLE_GROUP, child group should also have access to pages
         createGlobalPermissionsGroup(CHILD_GROUP, "");
         addUserToSiteGroup(CHILD_GROUP, SIMPLE_GROUP);
-        impersonateGroup(CHILD_GROUP, true);
         clickProject(getProjectName());
+        impersonateGroup(CHILD_GROUP, true);
         verifyEditorPermission(nameTitleBody);
         stopImpersonatingGroup();
     }
