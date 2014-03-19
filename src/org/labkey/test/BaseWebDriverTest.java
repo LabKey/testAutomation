@@ -1746,8 +1746,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @Before
-    public void preClean() throws TestTimeoutException
+    public void preClean() throws Exception
     {
+        setUp(); // Instantiate new WebDriver if needed
         simpleSignIn();
 
         // Perform initial cleanup for tests using doTestSteps.
@@ -3858,7 +3859,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         click(elementToClick);
 
         final File downloadDir = getDownloadDir();
-        final FileFilter newFiles = new FileFilter()
+        final FileFilter newFileFilter = new FileFilter()
         {
             @Override
             public boolean accept(File file)
@@ -3872,7 +3873,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean check()
             {
-                return downloadDir.listFiles(newFiles).length >= expectedFileCount;
+                return downloadDir.listFiles(newFileFilter).length >= expectedFileCount;
             }
         }, "File(s) did not appear in download dir", WAIT_FOR_PAGE);
 
@@ -3881,7 +3882,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean accept(File file)
             {
-                return file.getName().contains(".part") || file.getName().contains(".tmp");
+                return file.getName().contains(".part") || file.getName().contains(".tmp") || file.getName().contains(".crdownload");
             }
         };
 
@@ -3894,7 +3895,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
         }, "Temp files remain after download", WAIT_FOR_JAVASCRIPT);
 
-        return downloadDir.listFiles(newFiles);
+        File[] newFiles = downloadDir.listFiles(newFileFilter);
+        assertEquals("Wrong number of files downloaded to " + downloadDir.toString(), expectedFileCount, newFiles.length);
+
+        return newFiles;
     }
 
     public void setModuleProperties(List<ModulePropertyValue> values)
@@ -5615,15 +5619,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void checkCheckbox(Locator checkBoxLocator)
     {
-        log("Checking checkbox " + checkBoxLocator);
-        if (!isChecked(checkBoxLocator))
-            click(checkBoxLocator);
-        assertTrue("Checking checkbox failed", isChecked(checkBoxLocator));
+        WebElement checkbox = checkBoxLocator.findElement(getDriver());
+        checkCheckbox(checkbox);
     }
 
     public void checkCheckbox(WebElement el)
     {
-        if (!(Boolean)executeScript("return arguments[0].checked", el))
+        if (!el.isSelected())
         {
             el.click();
         }
@@ -5631,7 +5633,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void uncheckCheckbox(WebElement el)
     {
-        if ((Boolean)executeScript("return arguments[0].checked", el))
+        if (el.isSelected())
         {
             el.click();
         }
@@ -5668,9 +5670,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void uncheckCheckbox(Locator checkBoxLocator)
     {
-        log("Unchecking checkbox " + checkBoxLocator);
-        if (isChecked(checkBoxLocator))
-            click(checkBoxLocator);
+        WebElement checkbox = checkBoxLocator.findElement(getDriver());
+        uncheckCheckbox(checkbox);
     }
 
     public void assertChecked(Locator checkBoxLocator)
