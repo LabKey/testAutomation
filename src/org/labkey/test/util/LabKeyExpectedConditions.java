@@ -20,6 +20,7 @@ import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -62,6 +63,41 @@ public class LabKeyExpectedConditions
             public String toString()
             {
                 return "animation of element: " + loc.getLoggableDescription();
+            }
+        };
+    }
+
+    /**
+     * Another expectation for checking that an element has stopped moving
+     *
+     * @param el the element who's position changes
+     * @return true when animation is complete
+     */
+    public static ExpectedCondition<Boolean> animationIsDone(final WebElement el) {
+        return new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                Point firstPosition;
+                Point secondPosition;
+                try
+                {
+                    firstPosition = el.getLocation();
+                    Thread.sleep(100);
+                    secondPosition = el.getLocation();
+                }
+                catch (InterruptedException recheck)
+                {
+                    return false;
+                }
+
+                return secondPosition.equals(firstPosition);
+            }
+
+            @Override
+            public String toString()
+            {
+                return "movement of element";
             }
         };
     }

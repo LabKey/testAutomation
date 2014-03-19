@@ -535,6 +535,7 @@ src/org/labkey/test/util/ComponentQuery.java -text
 src/org/labkey/test/util/Crawler.java -text
 src/org/labkey/test/util/CustomizeViewsHelperWD.java -text
 src/org/labkey/test/util/DataIntegrationHelper.java -text
+src/org/labkey/test/util/DataRegionExportHelper.java -text
 src/org/labkey/test/util/DataRegionTable.java -text
 src/org/labkey/test/util/DevModeOnlyTest.java -text
 src/org/labkey/test/util/Diff.java -text

@@ -35,6 +35,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,7 +44,7 @@ import java.util.Map;
  * Date: May 2, 2011
  * Time: 6:24:37 PM
  */
-public class ExcelHelper
+public abstract class ExcelHelper
 {
     public static final String SUB_TYPE_XSSF = "vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public static final String SUB_TYPE_BIFF5 = "x-tika-msoffice";
@@ -194,5 +196,16 @@ public class ExcelHelper
     public static String getCellContentsAt(Sheet sheet, int colIdx, int rowIdx)
     {
         return getCellStringValue(getCell(sheet, colIdx, rowIdx));
+    }
+
+    public static List<String> getColumnData(Sheet sheet, int colIdx)
+    {
+        List<String> columnData = new ArrayList<>();
+        int lastRowNum = sheet.getLastRowNum();
+        for (int i = 0; i <= lastRowNum; i++)
+        {
+            columnData.add(getCellContentsAt(sheet, colIdx, i));
+        }
+        return columnData;
     }
 }

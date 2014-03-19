@@ -381,15 +381,19 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     profile.setPreference("browser.download.downloadDir", getDownloadDir().getAbsolutePath());
                     profile.setPreference("browser.download.dir", getDownloadDir().getAbsolutePath());
                     profile.setPreference("browser.helperApps.alwaysAsk.force", false);
+                    profile.setPreference("browser.download.manager.showAlertOnComplete", false);
+                    profile.setPreference("browser.download.manager.showWhenStarting",false);
                     profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
                             "application/vnd.ms-excel," + // .xls
                             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet," + // .xlsx
                             "application/octet-stream," +
                             "application/x-gzip," +
                             "application/x-zip-compressed," +
-                            "application/xml" +
-                            "text/xml" +
-                            "text/x-script.perl");
+                            "application/xml," +
+                            "text/xml," +
+                            "text/x-script.perl," +
+                            "text/tab-separated-values," +
+                            "text/csv");
                     profile.setPreference("browser.download.manager.showWhenStarting",false);
                     if (isScriptCheckEnabled())
                     {

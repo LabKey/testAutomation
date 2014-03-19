@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -504,12 +505,32 @@ public class DataRegionTable
 
     public void checkAll()
     {
-        throw new UnsupportedOperationException("Not Yet Implemented");
+        WebElement toggleAll = Locator.id(getTableName()).append(Locator.tagWithName("input", ".toggle")).findElement(_test.getDriver());
+        _test.uncheckCheckbox(toggleAll);
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
+        _test.checkCheckbox(toggleAll);
+//        waitForAllChecked();
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
     }
 
     public void uncheckAll()
     {
-        throw new UnsupportedOperationException("Not Yet Implemented");
+        WebElement toggleAll = Locator.id(getTableName()).append(Locator.tagWithName("input", ".toggle")).findElement(_test.getDriver());
+        _test.checkCheckbox(toggleAll);
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
+        _test.uncheckCheckbox(toggleAll);
+//        waitForAllUnchecked();
+        _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
+    }
+
+    private void waitForAllChecked()
+    {
+        _test.waitForElementToDisappear(Locator.css("#" + getHtmlName() + " input:not(:checked)[name='.select']"));
+    }
+
+    private void waitForAllUnchecked()
+    {
+        _test.waitForElementToDisappear(Locator.css("#" + getHtmlName() + " input:checked[name='.select']"));
     }
 
     public void checkCheckbox(String value)
