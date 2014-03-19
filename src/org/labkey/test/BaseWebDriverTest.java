@@ -3398,6 +3398,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return el.getText();
     }
 
+    public WebElement getElement(Locator locator)
+    {
+        return locator.findElement(getDriver());
+    }
+
     /**
      * Verifies that all the strings are present in the page html source
      */
@@ -6861,6 +6866,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             //first load of schemas might a few seconds
             waitForElement(loc, 30000);
+            shortWait().until(ExpectedConditions.elementToBeClickable(By.xpath(loc.toXpath())));
             click(loc);
             waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + schemaPart + "']"), 1000);
             waitForElement(Locator.css(".lk-qd-name").withText(schemaWithParents + " Schema"));
