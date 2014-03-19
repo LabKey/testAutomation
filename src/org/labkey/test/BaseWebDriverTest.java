@@ -804,6 +804,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _savedLocation = getCurrentRelativeURL();
     }
 
+    public String getSavedLocation()
+    {
+        return _savedLocation;
+    }
+
     public void recallLocation()
     {
         recallLocation(defaultWaitForPage);

@@ -344,6 +344,7 @@ src/org/labkey/test/testpicker/CheckNode.java -text
 src/org/labkey/test/testpicker/CheckRenderer.java -text
 src/org/labkey/test/testpicker/TestHelper.java -text
 src/org/labkey/test/tests/AbstractAssayTest.java -text
+src/org/labkey/test/tests/AbstractExportTest.java -text
 src/org/labkey/test/tests/AbstractLabModuleAssayTest.java -text
 src/org/labkey/test/tests/AbstractMS2ImportTest.java -text
 src/org/labkey/test/tests/AbstractPlateBasedAssayTest.java -text
@@ -354,6 +355,7 @@ src/org/labkey/test/tests/AffymetrixAssayTest.java -text
 src/org/labkey/test/tests/AliquotTest.java -text
 src/org/labkey/test/tests/AncillaryStudyFromSpecimenRequestTest.java -text
 src/org/labkey/test/tests/AncillaryStudyTest.java -text
+src/org/labkey/test/tests/AssayResultsExportTest.java -text
 src/org/labkey/test/tests/AssayTest.java -text
 src/org/labkey/test/tests/AuditLogTest.java -text
 src/org/labkey/test/tests/BasicTest.java -text
@@ -370,6 +372,7 @@ src/org/labkey/test/tests/DataRegionTest.java -text
 src/org/labkey/test/tests/DataReportsTest.java -text
 src/org/labkey/test/tests/DataViewsTest.java -text
 src/org/labkey/test/tests/DatabaseDiagnosticsTest.java -text
+src/org/labkey/test/tests/DatasetExportTest.java -text
 src/org/labkey/test/tests/DatasetPublishTest.java -text
 src/org/labkey/test/tests/DrugSensitivityAssayTest.java -text
 src/org/labkey/test/tests/ELISPOT_AssayTest.java -text

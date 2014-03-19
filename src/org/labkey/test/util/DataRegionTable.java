@@ -509,7 +509,6 @@ public class DataRegionTable
         _test.uncheckCheckbox(toggleAll);
         _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
         _test.checkCheckbox(toggleAll);
-//        waitForAllChecked();
         _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
     }
 
@@ -519,7 +518,6 @@ public class DataRegionTable
         _test.checkCheckbox(toggleAll);
         _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
         _test.uncheckCheckbox(toggleAll);
-//        waitForAllUnchecked();
         _test.shortWait().until(LabKeyExpectedConditions.animationIsDone(toggleAll));
     }
 

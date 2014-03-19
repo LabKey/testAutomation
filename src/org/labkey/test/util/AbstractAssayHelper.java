@@ -42,9 +42,9 @@ public abstract class AbstractAssayHelper extends AbstractHelperWD
 
 
 
-    public void uploadXarFileAsAssayDesign(String path, int pipelineCount, String name)
+    public void uploadXarFileAsAssayDesign(String path, int pipelineCount)
     {
-        uploadXarFileAsAssayDesign(new File(path), pipelineCount, name);
+        uploadXarFileAsAssayDesign(new File(path), pipelineCount);
     }
 
     /**
@@ -54,10 +54,9 @@ public abstract class AbstractAssayHelper extends AbstractHelperWD
      * Preconditions:  on a page with an assay web part
      * @param file   file to upload
      * @param pipelineCount  expected count of succesful pipeline jobs including thise one
-     * @param name  name of assay file (rest of path removed)
      */
     @LogMethod
-    public void uploadXarFileAsAssayDesign(File file, int pipelineCount, String name)
+    public void uploadXarFileAsAssayDesign(File file, int pipelineCount)
     {
         assertTrue("XAR file does not exist: " + file.toString(), file.exists());
         //create a new luminex assay
@@ -67,7 +66,7 @@ public abstract class AbstractAssayHelper extends AbstractHelperWD
         _test.clickAndWait(Locator.linkWithText("upload"));
         _test.setFormElement(Locator.name("uploadFile"), file);
         _test.clickAndWait(Locator.navButton("Upload"));
-        _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + name, false);
+        _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
     }
 
     @LogMethod

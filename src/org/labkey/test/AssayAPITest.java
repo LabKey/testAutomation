@@ -62,7 +62,7 @@ public class AssayAPITest extends BaseWebDriverTest
                                       String runName, String[] textToCheck)
     {
         APIAssayHelper assayHelper = new APIAssayHelper(this);
-        assayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount, assayName);
+        assayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount);
         try
         {
             assayHelper.importAssay(assayName, runPath, getProjectName(), Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo"));

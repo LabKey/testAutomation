@@ -191,7 +191,7 @@ public class LuminexTest extends AbstractQCAssayTest
         if (_useXarImport)
         {
             // import the assay design from the XAR file
-            _assayHelper.uploadXarFileAsAssayDesign(TEST_ASSAY_XAR_FILE, 1, "foo");
+            _assayHelper.uploadXarFileAsAssayDesign(TEST_ASSAY_XAR_FILE, 1);
             // since we want to test special characters in the assay name, copy the assay design to rename
             goToManageAssays();
             clickAndWait(Locator.linkWithText(TEST_ASSAY_XAR_NAME));
