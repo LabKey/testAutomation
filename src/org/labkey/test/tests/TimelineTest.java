@@ -22,7 +22,7 @@ import org.labkey.test.TestProperties;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import static org.junit.Assert.*;
@@ -39,15 +39,15 @@ public class TimelineTest extends BaseWebDriverTest
     private static final String PROJECT_NAME = "TimelineTestProject";
     private static final String FOLDER_NAME = "timeline folder";
     private final static String LIST_NAME = "People";
-    private final static ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.AutoInteger;
+    private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
 
-    private final static ListHelperWD.ListColumn[] LIST_COLUMNS = new ListHelperWD.ListColumn[]
+    private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
     {
-        new ListHelperWD.ListColumn("FirstName", "First Name", ListHelperWD.ListColumnType.String, "The first name"),
-        new ListHelperWD.ListColumn("LastName", "Last Name", ListHelperWD.ListColumnType.String, "The last name"),
-        new ListHelperWD.ListColumn("DOB", "DOB", ListHelperWD.ListColumnType.DateTime, "Date of Birth"),
-        new ListHelperWD.ListColumn("DOD", "DOD", ListHelperWD.ListColumnType.DateTime, "Date of Death"),
+        new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "The first name"),
+        new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "The last name"),
+        new ListHelper.ListColumn("DOB", "DOB", ListHelper.ListColumnType.DateTime, "Date of Birth"),
+        new ListHelper.ListColumn("DOD", "DOD", ListHelper.ListColumnType.DateTime, "Date of Death"),
     };
 
     private final static String[][] TEST_DATA =

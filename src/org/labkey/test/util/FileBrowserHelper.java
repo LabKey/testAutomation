@@ -29,10 +29,10 @@ import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
 
-public class FileBrowserHelperWD implements FileBrowserHelperParams
+public class FileBrowserHelper implements FileBrowserHelperParams
 {
     BaseWebDriverTest _test;
-    public FileBrowserHelperWD(BaseWebDriverTest test)
+    public FileBrowserHelper(BaseWebDriverTest test)
     {
         _test = test;
     }
@@ -164,7 +164,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     {
         selectFileBrowserItem(currentName);
         clickFileBrowserButton(BrowserAction.RENAME);
-        _test.waitForElement(Ext4HelperWD.Locators.window("Rename"));
+        _test.waitForElement(Ext4Helper.Locators.window("Rename"));
         _test.setFormElement(Locator.name("renameText-inputEl"), newName);
         _test.clickButton("Rename", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
         _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(newName));
@@ -175,7 +175,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     {
         selectFileBrowserItem(fileName);
         clickFileBrowserButton(BrowserAction.MOVE);
-        _test.waitForElement(Ext4HelperWD.Locators.window("Choose Destination"));
+        _test.waitForElement(Ext4Helper.Locators.window("Choose Destination"));
         //NOTE:  this doesn't yet support nested folders
         Locator folder = Locator.xpath("//div[contains(@class, 'x4-window')]//div/span[contains(@class, 'x4-tree-node-text') and text() = '" + destinationPath + "']");
         _test.waitForElement(folder);
@@ -223,7 +223,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     @Override
     public void goToConfigureButtonsTab()
     {
-        if (!_test.isElementPresent(Ext4HelperWD.Locators.window("Manage File Browser Configuration")))
+        if (!_test.isElementPresent(Ext4Helper.Locators.window("Manage File Browser Configuration")))
             goToAdminMenu();
 
         _test._ext4Helper.clickExt4Tab("Toolbar and Grid Settings");
@@ -234,7 +234,7 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
     public void goToAdminMenu()
     {
         clickFileBrowserButton(BrowserAction.ADMIN);
-        _test.waitForElement(Ext4HelperWD.Locators.window("Manage File Browser Configuration"));
+        _test.waitForElement(Ext4Helper.Locators.window("Manage File Browser Configuration"));
     }
 
     @Override
@@ -273,14 +273,14 @@ public class FileBrowserHelperWD implements FileBrowserHelperParams
 
         if (replace)
         {
-            _test.waitForElement(Ext4HelperWD.ext4Window("File Conflict:"));
+            _test.waitForElement(Ext4Helper.ext4Window("File Conflict:"));
             _test.assertTextPresent("Would you like to replace it?");
             _test.clickButton("Yes", 0);
         }
 
         if (fileProperties != null && fileProperties.size() > 0)
         {
-            _test.waitForElement(Ext4HelperWD.ext4Window("Extended File Properties"));
+            _test.waitForElement(Ext4Helper.ext4Window("Extended File Properties"));
             _test.waitForText("File (1 of ");
             for (FileBrowserExtendedProperty prop : fileProperties)
             {

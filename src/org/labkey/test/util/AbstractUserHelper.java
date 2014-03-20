@@ -22,7 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
  * Date: 9/12/12
  * Time: 11:45 AM
  */
-public abstract class AbstractUserHelper extends AbstractHelperWD
+public abstract class AbstractUserHelper extends AbstractHelper
 {
     public AbstractUserHelper(BaseWebDriverTest test)
     {

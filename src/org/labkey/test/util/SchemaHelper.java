@@ -17,13 +17,12 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.openqa.selenium.WebElement;
 
 /**
  * User: RyanS
  * Date: 9/9/13
  */
-public class SchemaHelper extends AbstractHelperWD
+public class SchemaHelper extends AbstractHelper
 {
 
     public SchemaHelper(BaseWebDriverTest test)
@@ -93,7 +92,7 @@ public class SchemaHelper extends AbstractHelperWD
             }
             _test.shortWait().until(LabKeyExpectedConditions.elementIsEnabled(Locator.xpath("//input[@name='tables']")));
 
-            _test._ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Published Tables:?"), true, tables.split(","));
+            _test._ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel("Published Tables:?"), true, tables.split(","));
         }
 
         if (metadata != null)

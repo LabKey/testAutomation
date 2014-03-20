@@ -19,7 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.Ext4HelperWD;
+import org.labkey.test.util.Ext4Helper;
 
 /**
  * User: Nick
@@ -86,7 +86,7 @@ public class FolderTest extends BaseWebDriverTest
         log("Moving Folders");
         clickProject(PROJECT_NAME);
         goToFolderManagement();
-        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(PROJECT_NAME));
+        waitForElement(Ext4Helper.Locators.folderManagementTreeNode(PROJECT_NAME));
 
         log("Ensure folders will be visible");
         getDriver().manage().window().maximize();

@@ -26,22 +26,22 @@ import java.io.File;
  * Date: 6/28/12
  * Time: 6:20 PM
  */
-public class Ext4FileFieldRefWD extends Ext4CmpRefWD
+public class Ext4FileFieldRef extends Ext4CmpRef
 {
-    public Ext4FileFieldRefWD(String id, BaseWebDriverTest test)
+    public Ext4FileFieldRef(String id, BaseWebDriverTest test)
     {
         super(id, test);
     }
 
-    public Ext4FileFieldRefWD(WebElement el, BaseWebDriverTest test)
+    public Ext4FileFieldRef(WebElement el, BaseWebDriverTest test)
     {
         super(el, test);
     }
 
     //often there is only one file field on screen, so we'll just grab that
-    public static Ext4FileFieldRefWD create(BaseWebDriverTest test)
+    public static Ext4FileFieldRef create(BaseWebDriverTest test)
     {
-        return test._ext4Helper.queryOne("filefield", Ext4FileFieldRefWD.class);
+        return test._ext4Helper.queryOne("filefield", Ext4FileFieldRef.class);
     }
 
     public void setToFile(File file)

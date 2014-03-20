@@ -22,10 +22,9 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.External;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4HelperWD;
-import org.labkey.test.util.UIContainerHelper;
-import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
-import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
+import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,12 +103,12 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         //a proxy for page loading
         _helper.waitForField("Sample Type");
 
-        Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
-        Ext4FieldRefWD.getForLabel(this, "Assay Type").setValue(3);
+        Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
+        Ext4FieldRef.getForLabel(this, "Assay Type").setValue(3);
 
-        assertEquals("Incorrect value for field", "PBMC", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
+        assertEquals("Incorrect value for field", "PBMC", Ext4FieldRef.getForLabel(this, "Sample Type").getValue());
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         StringBuilder sb = new StringBuilder();
         for (String[] row : PHENOTYPE_TEST_DATA1)
         {
@@ -120,10 +119,10 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Trying to save invalid data");
         String errorText = text.replaceAll("CD14 Mono", "NotRealPopulation");
         textarea.setValue(errorText);
-        Ext4CmpRefWD btn = _ext4Helper.queryOne("#upload", Ext4CmpRefWD.class);
+        Ext4CmpRef btn = _ext4Helper.queryOne("#upload", Ext4CmpRef.class);
         btn.waitForEnabled();
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for population: NotRealPopulation");
@@ -131,7 +130,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -158,16 +157,16 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         //a proxy for page loading
         _helper.waitForField("Sample Type");
 
-        Ext4FieldRefWD field = Ext4FieldRefWD.getForBoxLabel(this, "Pivoted By Population");
+        Ext4FieldRef field = Ext4FieldRef.getForBoxLabel(this, "Pivoted By Population");
         field.setChecked(true);
         _helper.waitForField("Sample Type");
 
-        Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
-        Ext4FieldRefWD.getForLabel(this, "Assay Type").setValue(3);
+        Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
+        Ext4FieldRef.getForLabel(this, "Assay Type").setValue(3);
 
-        assertEquals("Incorrect value for field", "PBMC", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
+        assertEquals("Incorrect value for field", "PBMC", Ext4FieldRef.getForLabel(this, "Sample Type").getValue());
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         StringBuilder sb = new StringBuilder();
         for (String[] row : PHENOTYPE_PIVOT_DATA)
         {
@@ -179,11 +178,11 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("CD4 T-Cells", "NotRealPopulation");
         textarea.setValue(errorText);
 
-        Ext4CmpRefWD uploadBtn = _ext4Helper.queryOne("#upload", Ext4CmpRefWD.class);
+        Ext4CmpRef uploadBtn = _ext4Helper.queryOne("#upload", Ext4CmpRef.class);
         _helper.waitForDisabled(uploadBtn, false);
 
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
+        waitForElement(Ext4Helper.ext4Window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: NotRealPopulation");
@@ -191,7 +190,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -236,12 +235,12 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         //a proxy for page loading
         _helper.waitForField("Sample Type");
 
-        Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
-        Ext4FieldRefWD.getForLabel(this, "Assay Type").setValue(3);
+        Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
+        Ext4FieldRef.getForLabel(this, "Assay Type").setValue(3);
 
-        assertEquals("Incorrect value for field", "PBMC", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
+        assertEquals("Incorrect value for field", "PBMC", Ext4FieldRef.getForLabel(this, "Sample Type").getValue());
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         StringBuilder sb = new StringBuilder();
         for (String[] row : ICS_DATA)
         {
@@ -253,7 +252,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("CD14 Mono", "NotRealPopulation");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for population: NotRealPopulation");
@@ -261,7 +260,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 

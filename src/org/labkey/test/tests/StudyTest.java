@@ -31,8 +31,8 @@ import org.labkey.test.categories.Specimen;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.ChartHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4HelperWD;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -437,12 +437,12 @@ public class StudyTest extends StudyBaseTest
         setFormElement(Locator.name(LABEL_FIELD), listName);
         setFormElement(Locator.name(ID_FIELD), ids);
         clickButton("Save", 0);
-        waitForElement(Ext4HelperWD.Locators.window("Error"));
+        waitForElement(Ext4Helper.Locators.window("Error"));
         assertTextPresent(expectedError);
         clickButton("OK", 0);
-        waitForElementToDisappear(Ext4HelperWD.Locators.mask().index(1));
+        waitForElementToDisappear(Ext4Helper.Locators.mask().index(1));
         clickButton("Cancel", 0);
-        waitForElementToDisappear(Ext4HelperWD.Locators.mask());
+        waitForElementToDisappear(Ext4Helper.Locators.mask());
         assertTextNotPresent(listName);
     }
 
@@ -720,7 +720,7 @@ public class StudyTest extends StudyBaseTest
         // add a comment field
         _listHelper.setColumnName(0, COMMENT_FIELD_NAME);
         _listHelper.setColumnLabel(0, PARTICIPANT_COMMENT_LABEL);
-        _listHelper.setColumnType(0, ListHelperWD.ListColumnType.MutliLine);
+        _listHelper.setColumnType(0, ListHelper.ListColumnType.MutliLine);
         clickButton("Save");
 
         log("creating the participant/visit comment dataset");
@@ -734,7 +734,7 @@ public class StudyTest extends StudyBaseTest
         // add a comment field
         _listHelper.setColumnName(0, COMMENT_FIELD_NAME);
         _listHelper.setColumnLabel(0, PARTICIPANT_VISIT_COMMENT_LABEL);
-        _listHelper.setColumnType(0, ListHelperWD.ListColumnType.MutliLine);
+        _listHelper.setColumnType(0, ListHelper.ListColumnType.MutliLine);
         clickButton("Save");
 
         log("configure comments");
@@ -1118,7 +1118,7 @@ public class StudyTest extends StudyBaseTest
         waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.navButton("Add Field"), 0);
         int newFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
         _listHelper.setColumnName(getPropertyXPath("Dataset Fields"), newFieldIndex, "VisitDay");
-        _listHelper.setColumnType(newFieldIndex, ListHelperWD.ListColumnType.Integer);
+        _listHelper.setColumnType(newFieldIndex, ListHelper.ListColumnType.Integer);
         Locator element3 = Locator.gwtListBoxByLabel("Visit Date Column");
         selectOptionByValue(element3, "DEMdt");
         clickButton("Save");

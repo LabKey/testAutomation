@@ -25,7 +25,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.DilutionAssayHelperWD;
+import org.labkey.test.util.DilutionAssayHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -905,7 +905,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     protected void verifyRunDetails()
     {
         clickAndWait(Locator.linkWithText("View Runs"));
-        DilutionAssayHelperWD assayHelper = new DilutionAssayHelperWD(this);
+        DilutionAssayHelper assayHelper = new DilutionAssayHelper(this);
 
         log("verify ptid + visit + date");
         clickAndWait(Locator.linkWithText("ptid + visit + date"));

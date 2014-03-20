@@ -36,14 +36,14 @@ import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AdvancedSqlTest;
-import org.labkey.test.util.CustomizeViewsHelperWD;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4HelperWD;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
-import org.labkey.test.util.ext4cmp.Ext4ComboRefWD;
-import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4ComboRef;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.Alert;
 
 import java.io.UnsupportedEncodingException;
@@ -622,11 +622,11 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("Sequence:", IMPORT_DATA_TEXT);
-        assertElementPresent(Ext4HelperWD.ext4MenuItem("Create Readsets"));
-        assertElementPresent(Ext4HelperWD.ext4MenuItem("Upload Raw Data"));
+        assertElementPresent(Ext4Helper.ext4MenuItem("Create Readsets"));
+        assertElementPresent(Ext4Helper.ext4MenuItem("Upload Raw Data"));
 
         _ext4Helper.clickExt4MenuItem("Create Readsets");
-        waitForElement(Ext4HelperWD.ext4Window("Create Readsets"));
+        waitForElement(Ext4Helper.ext4Window("Create Readsets"));
         waitAndClick(Locator.ext4Button("Close"));
 
     }
@@ -640,26 +640,26 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         clickTab("Data Browser");
         waitForText("Type of Search");
 
-        waitForElement(Ext4HelperWD.ext4Tab("Samples"));
+        waitForElement(Ext4Helper.ext4Tab("Samples"));
 
-        Ext4FieldRefWD ref = _ext4Helper.queryOne("textfield[itemId='subjArea']", Ext4FieldRefWD.class);
+        Ext4FieldRef ref = _ext4Helper.queryOne("textfield[itemId='subjArea']", Ext4FieldRef.class);
         ref.setValue("12345,23456");
 
         waitAndClick(Locator.ext4Button("Refresh"));
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("You must select a report to display by clicking the one of the 2nd tier tabs below");
         waitAndClick(Locator.ext4Button("OK"));
 
-        waitAndClick(Ext4HelperWD.ext4Tab("Sequence Data"));
-        waitForElement(Ext4HelperWD.ext4Tab("Sequence Readsets"));
-        waitAndClick(Ext4HelperWD.ext4Tab("Sequence Readsets"));
+        waitAndClick(Ext4Helper.ext4Tab("Sequence Data"));
+        waitForElement(Ext4Helper.ext4Tab("Sequence Readsets"));
+        waitAndClick(Ext4Helper.ext4Tab("Sequence Readsets"));
         waitForText("Sequence Readsets - 12345, 23456");
 
         //now walk assay tabs
         for (Pair<String, String> pair : getAssaysToCreate())
         {
-            waitAndClick(Ext4HelperWD.ext4Tab(pair.getKey()));
-            waitForElement(Ext4HelperWD.ext4Tab(pair.getValue() + ": Raw Data"));
+            waitAndClick(Ext4Helper.ext4Tab(pair.getKey()));
+            waitForElement(Ext4Helper.ext4Tab(pair.getValue() + ": Raw Data"));
         }
     }
 
@@ -680,7 +680,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         cleanupDataSources();
 
         //data sources first
-        List<Ext4CmpRefWD> btns = getRemoveBtns(manageDataSources);
+        List<Ext4CmpRef> btns = getRemoveBtns(manageDataSources);
         int initialDataBtns = btns == null ? 0 : btns.size();
 
         _helper.addDataSource("misc", GROUP_SOURCE, "New Data Sources", null, "core", "Groups");
@@ -715,26 +715,26 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         cleanupDataSources();
 
         //add data source
-        Ext4CmpRefWD addDataSourceBtn = _ext4Helper.queryOne("#" + manageDataSources + " button[text='Add Default Sources']", Ext4CmpRefWD.class);
+        Ext4CmpRef addDataSourceBtn = _ext4Helper.queryOne("#" + manageDataSources + " button[text='Add Default Sources']", Ext4CmpRef.class);
         waitAndClick(Locator.id(addDataSourceBtn.getId()));
-        waitAndClick(Ext4HelperWD.ext4MenuItem(DATA_SOURCE + " (\"/home\".core.Users)"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitAndClick(Ext4Helper.ext4MenuItem(DATA_SOURCE + " (\"/home\".core.Users)"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
 
-        addDataSourceBtn = _ext4Helper.queryOne("#" + manageDataSources + " button[text='Add Default Sources']", Ext4CmpRefWD.class);
+        addDataSourceBtn = _ext4Helper.queryOne("#" + manageDataSources + " button[text='Add Default Sources']", Ext4CmpRef.class);
         waitAndClick(Locator.id(addDataSourceBtn.getId()));
-        waitAndClick(Ext4HelperWD.ext4MenuItem(GROUP_SOURCE+ " (core.Groups)"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitAndClick(Ext4Helper.ext4MenuItem(GROUP_SOURCE + " (core.Groups)"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
 
         waitForText("Item Type");
         assertEquals("Incorrect number of remove buttons", 2, getRemoveBtns(manageDataSources).size());
 
         //add demographics source
-        Ext4CmpRefWD addDemographicsSourceBtn = _ext4Helper.queryOne("#" + manageDemographicsSources + " button[text='Add Default Sources']", Ext4CmpRefWD.class);
+        Ext4CmpRef addDemographicsSourceBtn = _ext4Helper.queryOne("#" + manageDemographicsSources + " button[text='Add Default Sources']", Ext4CmpRef.class);
         waitAndClick(Locator.id(addDemographicsSourceBtn.getId()));
-        waitAndClick(Ext4HelperWD.ext4MenuItem(SUBJECT_LIST + " (laboratory.subjects)"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitAndClick(Ext4Helper.ext4MenuItem(SUBJECT_LIST + " (laboratory.subjects)"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
 
         waitForText("Table Name");
@@ -798,9 +798,9 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         deleteSourceByLabel(SUBJECT_LIST, manageDemographicsSources);
     }
 
-    private List<Ext4CmpRefWD> getRemoveBtns(String parentItemId)
+    private List<Ext4CmpRef> getRemoveBtns(String parentItemId)
     {
-        return _ext4Helper.componentQuery("#" + parentItemId + " button[text='Remove']", Ext4CmpRefWD.class);
+        return _ext4Helper.componentQuery("#" + parentItemId + " button[text='Remove']", Ext4CmpRef.class);
     }
 
     private String replaceNonVisibleChars(String value)
@@ -813,14 +813,14 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
     private void deleteSourceByLabel(String label, String parentItemId)
     {
-        Ext4CmpRefWD panel = _ext4Helper.queryOne("#" + parentItemId, Ext4CmpRefWD.class);
+        Ext4CmpRef panel = _ext4Helper.queryOne("#" + parentItemId, Ext4CmpRef.class);
         Long idx = (Long)panel.getFnEval("return this.getSourceIdx(arguments[0])", label);
         if (idx == null)
             return;
 
-        List<Ext4CmpRefWD> removeBtns = _ext4Helper.componentQuery("#" + parentItemId + " button[text='Remove']", Ext4CmpRefWD.class);
+        List<Ext4CmpRef> removeBtns = _ext4Helper.componentQuery("#" + parentItemId + " button[text='Remove']", Ext4CmpRef.class);
         click(Locator.id(removeBtns.get(idx.intValue()).getId()));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
 
         waitForText("Loading...");
@@ -846,50 +846,50 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         int i = 1;
         for (Pair<String, String> pair : getAssaysToCreate())
         {
-            Ext4FieldRefWD.getForBoxLabel(this, pair.getValue()).setValue(false);
+            Ext4FieldRef.getForBoxLabel(this, pair.getValue()).setValue(false);
             sleep(40); //wait for listener to act
-            assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, pair.getValue() + ": Raw Data").getValue());
+            assertFalse("Radio was not toggled", (Boolean) Ext4FieldRef.getForBoxLabel(this, pair.getValue() + ": Raw Data").getValue());
 
             if (i == 1)
-                Ext4FieldRefWD.getForBoxLabel(this, pair.getValue()).setValue(true);
+                Ext4FieldRef.getForBoxLabel(this, pair.getValue()).setValue(true);
 
             i++;
         }
 
         //sequence
-        Ext4FieldRefWD.getForBoxLabel(this, "Sequence").setValue(false);
+        Ext4FieldRef.getForBoxLabel(this, "Sequence").setValue(false);
         sleep(40); //wait for listener to act
-        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "Browse Sequence Data").getValue());
+        assertFalse("Radio was not toggled", (Boolean) Ext4FieldRef.getForBoxLabel(this, "Browse Sequence Data").getValue());
 
 
         //samples
-        Ext4FieldRefWD.getForBoxLabel(this, "Samples").setValue(false);
+        Ext4FieldRef.getForBoxLabel(this, "Samples").setValue(false);
         sleep(40); //wait for listener to act
-        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "Freezer Summary").getValue());
-        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Samples").getValue());
+        assertFalse("Radio was not toggled", (Boolean) Ext4FieldRef.getForBoxLabel(this, "Freezer Summary").getValue());
+        assertFalse("Radio was not toggled", (Boolean) Ext4FieldRef.getForBoxLabel(this, "View All Samples").getValue());
 
         //oligos
-        Ext4FieldRefWD.getForBoxLabel(this, "DNA_Oligos").setValue(false);
+        Ext4FieldRef.getForBoxLabel(this, "DNA_Oligos").setValue(false);
         sleep(40); //wait for listener to act
-        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All DNA Oligos").getValue());
+        assertFalse("Radio was not toggled", (Boolean) Ext4FieldRef.getForBoxLabel(this, "View All DNA Oligos").getValue());
 
         //peptides
-        Ext4FieldRefWD.getForBoxLabel(this, "Peptides").setValue(false);
+        Ext4FieldRef.getForBoxLabel(this, "Peptides").setValue(false);
         sleep(40); //wait for listener to act
-        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Peptides").getValue());
+        assertFalse("Radio was not toggled", (Boolean) Ext4FieldRef.getForBoxLabel(this, "View All Peptides").getValue());
 
         //antibodies
-        Ext4FieldRefWD.getForBoxLabel(this, "Antibodies").setValue(false);
+        Ext4FieldRef.getForBoxLabel(this, "Antibodies").setValue(false);
         sleep(40); //wait for listener to act
-        assertFalse("Radio was not toggled", (Boolean)Ext4FieldRefWD.getForBoxLabel(this, "View All Antibodies").getValue());
+        assertFalse("Radio was not toggled", (Boolean) Ext4FieldRef.getForBoxLabel(this, "View All Antibodies").getValue());
 
         //major events
-        Ext4FieldRefWD.getForBoxLabel(this, "Major Events").setValue(false);
+        Ext4FieldRef.getForBoxLabel(this, "Major Events").setValue(false);
         sleep(40); //wait for listener to act
-        Assert.assertFalse("Radio was not toggled", (Boolean) Ext4FieldRefWD.getForBoxLabel(this, "View All Major Events").getValue());
+        Assert.assertFalse("Radio was not toggled", (Boolean) Ext4FieldRef.getForBoxLabel(this, "View All Major Events").getValue());
 
         click(Locator.ext4Button("Submit"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
 
         //should redirect to lab home
@@ -939,21 +939,21 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         for (Pair<String, String> pair : getAssaysToCreate())
         {
-            Ext4FieldRefWD.getForBoxLabel(this, pair.getValue()).setValue(true);
+            Ext4FieldRef.getForBoxLabel(this, pair.getValue()).setValue(true);
         }
-        Ext4FieldRefWD.getForBoxLabel(this, "Sequence").setValue(true);
+        Ext4FieldRef.getForBoxLabel(this, "Sequence").setValue(true);
         String samplesSelector = "container[itemCategory='samples'] > checkbox[boxLabel='Samples']";
-        _ext4Helper.queryOne(samplesSelector, Ext4FieldRefWD.class).setValue(true);
-        Ext4FieldRefWD.getForBoxLabel(this, "DNA_Oligos").setValue(true);
-        Ext4FieldRefWD.getForBoxLabel(this, "Peptides").setValue(true);
-        Ext4FieldRefWD.getForBoxLabel(this, "Antibodies").setValue(true);
-        Ext4FieldRefWD.getForBoxLabel(this, "Major Events").setValue(true);
+        _ext4Helper.queryOne(samplesSelector, Ext4FieldRef.class).setValue(true);
+        Ext4FieldRef.getForBoxLabel(this, "DNA_Oligos").setValue(true);
+        Ext4FieldRef.getForBoxLabel(this, "Peptides").setValue(true);
+        Ext4FieldRef.getForBoxLabel(this, "Antibodies").setValue(true);
+        Ext4FieldRef.getForBoxLabel(this, "Major Events").setValue(true);
 
         sleep(100);
-        assertTrue("Incorrect value for samples checkbox", (Boolean)_ext4Helper.queryOne(samplesSelector, Ext4FieldRefWD.class).getValue());
+        assertTrue("Incorrect value for samples checkbox", (Boolean)_ext4Helper.queryOne(samplesSelector, Ext4FieldRef.class).getValue());
 
         click(Locator.ext4Button("Submit"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
     }
 
@@ -1025,16 +1025,16 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         waitAndClick(_helper.toolIcon("Import Data"));
-        assertElementPresent(Ext4HelperWD.ext4MenuItem("Sequence"));
+        assertElementPresent(Ext4Helper.ext4MenuItem("Sequence"));
         for(Pair<String, String> pair : getAssaysToCreate())
         {
-            assertElementPresent(Ext4HelperWD.ext4MenuItem(pair.getValue()));
+            assertElementPresent(Ext4Helper.ext4MenuItem(pair.getValue()));
         }
 
         waitAndClick(_helper.toolIcon("Import Samples"));
         for (String s : getSampleItems())
         {
-            assertElementPresent(Ext4HelperWD.ext4MenuItem(s));
+            assertElementPresent(Ext4Helper.ext4MenuItem(s));
         }
 
         assertElementPresent(_helper.toolIcon("Data Browser"));
@@ -1054,11 +1054,11 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("View and Edit Workbooks:", "Create New Workbook");
-        waitForElement(Ext4HelperWD.ext4Window("Create Workbook"));
+        waitForElement(Ext4Helper.ext4Window("Create Workbook"));
         assertElementNotPresent(Locator.ext4Radio("Add To Existing Workbook"));
         waitForElement(Locator.ext4Button("Close"));
         click(Locator.ext4Button("Close"));
-        assertElementNotPresent(Ext4HelperWD.ext4Window("Create Workbook"));
+        assertElementNotPresent(Ext4Helper.ext4Window("Create Workbook"));
 
         String workbookTitle = "NewWorkbook_" + INJECT_CHARS_1;
         String workbookDescription = "I am a workbook.  I am trying to inject javascript into your page.  " + INJECT_CHARS_1 + INJECT_CHARS_2;
@@ -1073,7 +1073,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitAndClick(_helper.toolIcon("Import Samples"));
         for (String s : getSampleItems())
         {
-            assertElementPresent(Ext4HelperWD.ext4MenuItem(s));
+            assertElementPresent(Ext4Helper.ext4MenuItem(s));
         }
         //NOTE: we are in a workbook here
         _ext4Helper.clickExt4MenuItem("DNA_Oligos");
@@ -1085,7 +1085,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
 
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         assertTextPresent("Your upload was successful");
         _oligosTotal++;
         clickButton("OK", 0);
@@ -1099,7 +1099,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("DNA_Oligos:", IMPORT_DATA_TEXT);
-        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
         waitAndClickAndWait(Locator.ext4Button("Submit"));
 
         waitForElement(Locator.name("purification"));
@@ -1111,7 +1111,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         clickButton("Submit", 0);
 
         String errorMsg = "Sequence can only contain valid bases: ATGCN or IUPAC bases: RYSWKMBDHV";
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent(errorMsg);
         clickButton("OK", 0);
 
@@ -1120,7 +1120,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         setFormElementJS(Locator.name("text"), "Name\tSequence\nTestPrimer1\tatg\nTestPrimer2\tABCDEFG");
         click(Locator.ext4Button("Upload"));
 
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         waitForText(errorMsg);
         clickButton("OK", 0);
 
@@ -1134,7 +1134,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         clickButton("Upload", 0);
         _oligosTotal += 2;
 
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         assertTextPresent("Success! 2 rows inserted.");
         clickButton("OK");
 
@@ -1157,7 +1157,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("Samples:", IMPORT_DATA_TEXT);
-        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
         waitAndClickAndWait(Locator.ext4Button("Submit"));
 
         waitForElement(Locator.name("samplename"));
@@ -1168,25 +1168,25 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //verify drop down menus show correct text by spot checking several drop-downs
         //NOTE: trailing spaces are added by ext template
-        Ext4ComboRefWD.getForLabel(this, "Sample Type").setValue("Cell Line");
-        Ext4ComboRefWD.getForLabel(this, "Sample Source").setValue("DNA");
-        Ext4ComboRefWD.getForLabel(this, "Additive").setValue("EDTA");
-        Ext4ComboRefWD.getForLabel(this, "Molecule Type").setValue("vRNA");
+        Ext4ComboRef.getForLabel(this, "Sample Type").setValue("Cell Line");
+        Ext4ComboRef.getForLabel(this, "Sample Source").setValue("DNA");
+        Ext4ComboRef.getForLabel(this, "Additive").setValue("EDTA");
+        Ext4ComboRef.getForLabel(this, "Molecule Type").setValue("vRNA");
 
-        assertElementNotPresent(Ext4HelperWD.invalidField());
+        assertElementNotPresent(Ext4Helper.invalidField());
         clickButton("Submit", 0);
 
         //test error conditions in trigger script
-        waitForElement(Ext4HelperWD.ext4Window("Error"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        waitForElement(Ext4Helper.ext4Window("Error"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         assertTextPresent("Must enter either a location or freezer");
         clickButton("OK", 0);
-        waitForElement(Ext4HelperWD.invalidField());
+        waitForElement(Ext4Helper.invalidField());
 
         _helper.setFormField("box_row", "-100");
         _helper.setFormField("location", "Location1");
         clickButton("Submit", 0);
 
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         waitForText("Cannot have a negative value for box_row");
         clickButton("OK", 0);
 
@@ -1225,7 +1225,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.waitForDataRegion("query");
         DataRegionTable dr = new DataRegionTable("query", this);
 
-        CustomizeViewsHelperWD cv = new CustomizeViewsHelperWD(this);
+        CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
         cv.openCustomizeViewPanel();
         cv.showHiddenItems();
         cv.addCustomizeViewColumn("container");
@@ -1300,13 +1300,13 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.setFormField("samplename", "Sample" + suffix);
         _helper.setFormField("location", "location_" + _helper.getRandomInt());
 
-        Ext4ComboRefWD.getForLabel(this, "Sample Type").setValue("DNA");
-        Ext4ComboRefWD.getForLabel(this, "Sample Source").setValue("Whole Blood");
+        Ext4ComboRef.getForLabel(this, "Sample Type").setValue("DNA");
+        Ext4ComboRef.getForLabel(this, "Sample Source").setValue("Whole Blood");
 
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
 
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         assertTextPresent("Your upload was successful");
         _samplesTotal++;
         clickButton("OK", 0);
@@ -1320,7 +1320,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
 
         _helper.clickNavPanelItem("Peptides:", IMPORT_DATA_TEXT);
-        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
         waitAndClickAndWait(Locator.ext4Button("Submit"));
 
         waitForElement(Locator.name("sequence"));
@@ -1335,7 +1335,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         //test error conditions in trigger script
         String errorMsg = "Sequence can only contain valid amino acid characters: ARNDCQEGHILKMFPSTWYV*";
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent(errorMsg);
         clickButton("OK", 0);
 
@@ -1343,7 +1343,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         sleep(150); //there's a buffer when committing changes
         clickButton("Submit", 0);
 
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         assertTextPresent("Your upload was successful");
         _peptideTotal = 1;
         clickButton("OK", 0);
@@ -1433,19 +1433,19 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitAndClickAndWait(Locator.linkContainingText("Set Assay Defaults"));
         String defaultVal = "LC480";
         _helper.waitForField(VIRAL_LOAD_ASSAYNAME);
-        Ext4FieldRefWD.getForLabel(this, VIRAL_LOAD_ASSAYNAME).setValue(defaultVal);
+        Ext4FieldRef.getForLabel(this, VIRAL_LOAD_ASSAYNAME).setValue(defaultVal);
         waitAndClick(Locator.ext4Button("Submit"));
 
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         waitAndClickAndWait(Locator.ext4Button("OK"));
         waitForText("Types of Data");
         _helper.goToAssayResultImport(VIRAL_LOAD_ASSAYNAME);
         _helper.waitForField("Source Material");
-        Boolean state = (Boolean)Ext4FieldRefWD.getForBoxLabel(this, defaultVal).getValue();
+        Boolean state = (Boolean) Ext4FieldRef.getForBoxLabel(this, defaultVal).getValue();
         assertTrue("Default method not correct", state);
 
         _helper.waitForCmp("#cancelBtn");
-        Ext4CmpRefWD btn = _ext4Helper.queryOne("#cancelBtn", Ext4CmpRefWD.class);
+        Ext4CmpRef btn = _ext4Helper.queryOne("#cancelBtn", Ext4CmpRef.class);
         btn.waitForEnabled();
         prepForPageLoad();
         waitAndClick(Locator.id(btn.getId() + "-btnEl"));

@@ -22,8 +22,8 @@ import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.MS2;
-import org.labkey.test.util.CustomizeViewsHelperWD;
-import org.labkey.test.util.FileBrowserHelperWD;
+import org.labkey.test.util.CustomizeViewsHelper;
+import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class SequestImportTest extends BaseWebDriverTest
 
         // Customize the view to show the distinct and total peptide counts based on the criteria established
         // by the custom query
-        CustomizeViewsHelperWD viewsHelper = new CustomizeViewsHelperWD(this, Locator.id("MS2ExtensionsRunGrid"));
+        CustomizeViewsHelper viewsHelper = new CustomizeViewsHelper(this, Locator.id("MS2ExtensionsRunGrid"));
         viewsHelper.openCustomizeViewPanel();
         viewsHelper.addCustomizeViewColumn(TOTAL_PEPTIDES_FIELD_KEY);
         viewsHelper.addCustomizeViewColumn(UNIQUE_PEPTIDES_FIELD_KEY);
@@ -102,7 +102,7 @@ public class SequestImportTest extends BaseWebDriverTest
         _fileBrowserHelper.waitForFileGridReady();
         for (String file : runFiles)
         {
-            waitForElement(FileBrowserHelperWD.Locators.gridRowWithNodeId(file).append(runLink));
+            waitForElement(FileBrowserHelper.Locators.gridRowWithNodeId(file).append(runLink));
         }
 
         clickAndWait(runLink);

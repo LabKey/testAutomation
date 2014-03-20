@@ -20,7 +20,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
 import java.text.ParseException;
@@ -36,11 +35,11 @@ import static org.junit.Assert.*;
  * Date: 11/7/12
  * Time: 8:48 PM
  */
-public class Ext4GridRefWD extends Ext4CmpRefWD
+public class Ext4GridRef extends Ext4CmpRef
 {
     private int _clicksToEdit = 2;
 
-    public Ext4GridRefWD(String id, BaseWebDriverTest test)
+    public Ext4GridRef(String id, BaseWebDriverTest test)
     {
         super(id, test);
     }
@@ -62,12 +61,12 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
 
     public Locator getRow(int rowIndex)
     {
-        return Ext4GridRefWD.locateExt4GridRow(rowIndex, _id);
+        return Ext4GridRef.locateExt4GridRow(rowIndex, _id);
     }
 
     public static Locator locateExt4GridCell(int rowIdx, int cellIndex, String parentId)
     {
-        Locator row = Ext4GridRefWD.locateExt4GridRow(rowIdx, parentId);
+        Locator row = Ext4GridRef.locateExt4GridRow(rowIdx, parentId);
         return Locator.xpath("(" + ((Locator.XPathLocator) row).getPath() + "//td[contains(@class, 'x4-grid-cell')])[" + cellIndex + "]").append(Locator.tag("div")).notHidden();
     }
 
@@ -268,7 +267,7 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         WebElement el = getActiveGridEditor();
         if (el == null)
         {
-            Locator cell = Ext4GridRefWD.locateExt4GridCell(rowIdx, cellIdx, _id);
+            Locator cell = Ext4GridRef.locateExt4GridCell(rowIdx, cellIdx, _id);
             _test.assertElementPresent(cell);
 
             if (_clicksToEdit > 1)
@@ -309,11 +308,11 @@ public class Ext4GridRefWD extends Ext4CmpRefWD
         waitForGridEditorToDisappear();
     }
 
-    public Ext4FieldRefWD getActiveEditor(int rowIdx, String colName)
+    public Ext4FieldRef getActiveEditor(int rowIdx, String colName)
     {
         startEditing(rowIdx, colName);
         String fieldId = (String)getFnEval("return this.editingPlugin.getActiveEditor().items.getAt(0).id;");
 
-        return new Ext4FieldRefWD(fieldId, _test);
+        return new Ext4FieldRef(fieldId, _test);
     }
 }

@@ -16,23 +16,18 @@
 package org.labkey.test.tests;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverMultipleTest;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.LabKeyExpectedConditions;
-import org.labkey.test.util.ListHelperWD;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.SchemaHelper;
-import org.openqa.selenium.WebElement;
 
 import java.io.File;
 import java.util.Arrays;
@@ -395,7 +390,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
 
         // Linked schemas disallow lookups to other folders outside of the current folder.
         //Change the Mother column lookup to point to the other folder, then ensure that the mother lookup is no longer propogating
-        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelperWD.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics"));
+        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + OTHER_FOLDER, "lists", "NIMHDemographics"));
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", true, "Father");
         assertLookupsWorking(TARGET_FOLDER, "BasicLinkedSchema", "NIMHDemographics", false, "Mother");
 
@@ -408,7 +403,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "QueryOverLookup", false, "Mother");
 
         //Change the Mother column lookup to point to the query, and then make sure that the table has lookups appropriately.
-        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelperWD.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup"));
+        changelistLookup(SOURCE_FOLDER, "NIMHDemographics", MOTHER_ID, new ListHelper.LookupInfo("/" + PROJECT_NAME + "/" + SOURCE_FOLDER, "lists", "QueryOverLookup"));
         assertLookupsWorking(TARGET_FOLDER, "QueryLinkedSchema", "NIMHDemographics", true, "Mother", "Father");
     }
 
@@ -442,21 +437,21 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
     {
         log("** Importing some data...");
         _listHelper.createList(SOURCE_FOLDER, LIST_NAME,
-                ListHelperWD.ListColumnType.AutoInteger, "Key",
-                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
-                new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
-                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"),
-                new ListHelperWD.ListColumn("P", LIST_DEF_TITLE + " P", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("Q", LIST_DEF_TITLE + " Q", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("R", LIST_DEF_TITLE + " R", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("S", LIST_DEF_TITLE + " S", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("T", LIST_DEF_TITLE + " T", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("U", LIST_DEF_TITLE + " U", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("V", LIST_DEF_TITLE + " V", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("W", LIST_DEF_TITLE + " W", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("X", LIST_DEF_TITLE + " X", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("Y", LIST_DEF_TITLE + " Y", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
-                new ListHelperWD.ListColumn("Z", LIST_DEF_TITLE + " Z", ListHelperWD.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL));
+                ListHelper.ListColumnType.AutoInteger, "Key",
+                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
+                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
+                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"),
+                new ListHelper.ListColumn("P", LIST_DEF_TITLE + " P", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
+                new ListHelper.ListColumn("Q", LIST_DEF_TITLE + " Q", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
+                new ListHelper.ListColumn("R", LIST_DEF_TITLE + " R", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
+                new ListHelper.ListColumn("S", LIST_DEF_TITLE + " S", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
+                new ListHelper.ListColumn("T", LIST_DEF_TITLE + " T", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
+                new ListHelper.ListColumn("U", LIST_DEF_TITLE + " U", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
+                new ListHelper.ListColumn("V", LIST_DEF_TITLE + " V", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
+                new ListHelper.ListColumn("W", LIST_DEF_TITLE + " W", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
+                new ListHelper.ListColumn("X", LIST_DEF_TITLE + " X", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
+                new ListHelper.ListColumn("Y", LIST_DEF_TITLE + " Y", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL),
+                new ListHelper.ListColumn("Z", LIST_DEF_TITLE + " Z", ListHelper.ListColumnType.String, null, null, null, null, "fake/" + LIST_DEF_URL));
 
         log("** Importing some data...");
         clickButton("Import Data");
@@ -722,7 +717,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         }
     }
 
-    protected void changelistLookup(String sourceFolder, String tableName, int index, ListHelperWD.LookupInfo info)
+    protected void changelistLookup(String sourceFolder, String tableName, int index, ListHelper.LookupInfo info)
     {
         clickFolder(sourceFolder);
 

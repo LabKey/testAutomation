@@ -22,7 +22,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.Study;
-import org.labkey.test.util.Ext4HelperWD;
+import org.labkey.test.util.Ext4Helper;
 
 import java.io.File;
 
@@ -390,8 +390,8 @@ public class StudyExportTest extends StudyManualTest
 //        setFormElement(globalUniqueIDValueElems[0], "1416");
 //        setFormElement(participantIDFormElems[2], "999320528");
 
-        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Mouse:"), true, "999320528");
-        _ext4Helper.selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel("Visit:"), true, "Enroll/Vacc #1 (201)");
+        _ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel("Mouse:"), true, "999320528");
+        _ext4Helper.selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel("Visit:"), true, "Enroll/Vacc #1 (201)");
 
         clickButton("Search");
         assertTextPresent("999320528");

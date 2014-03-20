@@ -34,13 +34,13 @@ import org.labkey.test.ModulePropertyValue;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.SecurityHelperWD;
+import org.labkey.test.util.SecurityHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -142,7 +142,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestCustomFolder()
     {
         clickProject(getProjectName());
-        SecurityHelperWD securityHelper = new SecurityHelperWD(this);
+        SecurityHelper securityHelper = new SecurityHelper(this);
 
         assertTextPresentInThisOrder("A customized web part", "Data Pipeline", "Experiment Runs", "Sample Sets", "Assay List");
         assertTextPresent("Run Groups");
@@ -586,19 +586,19 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void createPeopleListInFolder(String folderName)
     {
         _listHelper.createList(folderName, LIST_NAME,
-                ListHelperWD.ListColumnType.AutoInteger, "Key",
-                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
-                new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
-                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
+                ListHelper.ListColumnType.AutoInteger, "Key",
+                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
+                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
+                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
     }
 
     private void createPeopleListInTab(String tabLabel)
     {
         _listHelper.createListFromTab(tabLabel, LIST_NAME,
-                ListHelperWD.ListColumnType.AutoInteger, "Key",
-                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
-                new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
-                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
+                ListHelper.ListColumnType.AutoInteger, "Key",
+                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
+                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
+                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
     }
 
     @LogMethod

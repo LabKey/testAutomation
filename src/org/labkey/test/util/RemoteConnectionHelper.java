@@ -22,19 +22,19 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public class RemoteConnectionHelperWD extends AbstractHelperWD
+public class RemoteConnectionHelper extends AbstractHelper
 {
-    private ExtHelperWD _extHelper;
+    private ExtHelper _extHelper;
 
     // If true then this helper won't navigate back and forth between the
     // remote connection management page and the project folder.  Right now
     // only used for the RemoteConnectionTest
     private boolean _navToProjectFolder = true;
 
-    public RemoteConnectionHelperWD(BaseWebDriverTest test)
+    public RemoteConnectionHelper(BaseWebDriverTest test)
     {
         super(test);
-        _extHelper = new ExtHelperWD(test);
+        _extHelper = new ExtHelper(test);
         if (test instanceof RemoteConnectionTest)
             _navToProjectFolder = false;
     }

@@ -31,9 +31,9 @@ import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4HelperWD;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -171,11 +171,11 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         //a proxy for page loading
         _helper.waitForField("Sample Type");
 
-        Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
+        Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
 
-        assertEquals("Incorrect value for field", "gDNA", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
+        assertEquals("Incorrect value for field", "gDNA", Ext4FieldRef.getForLabel(this, "Sample Type").getValue());
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         StringBuilder sb = new StringBuilder();
         for (String[] row : SSP_TEST_DATA1)
         {
@@ -187,7 +187,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("Positive", "NotRealResult");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
         waitAndClick(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for result: NotRealResult for primer: TestPrimer2");
@@ -195,7 +195,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         waitAndClick(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -256,15 +256,15 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         _helper.waitForField("Sample Type");
 
         //switch import method
-        Ext4FieldRefWD field = Ext4FieldRefWD.getForBoxLabel(this, "Pivoted By Allele Name");
+        Ext4FieldRef field = Ext4FieldRef.getForBoxLabel(this, "Pivoted By Allele Name");
         field.setChecked(true);
 
         _helper.waitForField("Sample Type"); //form is re-rendered when import method changed
-        Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
+        Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
 
-        assertEquals("Incorrect value for field", "gDNA", Ext4FieldRefWD.getForLabel(this, "Sample Type").getValue());
+        assertEquals("Incorrect value for field", "gDNA", Ext4FieldRef.getForLabel(this, "Sample Type").getValue());
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         StringBuilder sb = new StringBuilder();
         for (String[] row : SSP_PIVOT_DATA)
         {
@@ -278,7 +278,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("Positive", "NotRealResult");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
         waitAndClick(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for result: NotRealResult for primer: TestPrimer1");
@@ -288,7 +288,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         errorText = text.replaceAll(originalPrimer, fakePrimer);
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
         waitAndClick(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: " + fakePrimer);
@@ -296,7 +296,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         waitAndClick(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -339,24 +339,24 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         _helper.waitForField("Instrument");
 
         //switch import method
-        Ext4FieldRefWD field = Ext4FieldRefWD.getForBoxLabel(this, "UC Davis STR");
+        Ext4FieldRef field = Ext4FieldRef.getForBoxLabel(this, "UC Davis STR");
         field.setChecked(true);
         Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
-        Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
+        Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
 
-        //assertEquals("Incorrect value for field", "LC480", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
+        //assertEquals("Incorrect value for field", "LC480", Ext4FieldRef.getForLabel(this, "Instrument").getValue());
         waitAndClick(btn);
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         String text = _helper.getExampleData();
 
         log("Trying to save invalid data");
         String errorText = text.replaceAll("13294", ",");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing subject Id");
@@ -364,7 +364,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 

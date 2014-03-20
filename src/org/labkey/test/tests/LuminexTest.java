@@ -20,7 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ExtHelperWD;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 
@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.labkey.test.util.ListHelperWD.ListColumnType;
+import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import static org.junit.Assert.*;
 
@@ -850,7 +850,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private void clickExcludeAnalyteCheckBox(String analyte)
     {
-        Locator l = ExtHelperWD.locateGridRowCheckbox(analyte);
+        Locator l = ExtHelper.locateGridRowCheckbox(analyte);
         waitAndClick(l);
     }
 
@@ -1957,7 +1957,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // to the test
         for (int i = 1; i <= 5; i++)
         {
-            click(ExtHelperWD.locateGridRowCheckbox("NETWORK" + i));
+            click(ExtHelper.locateGridRowCheckbox("NETWORK" + i));
         }
         clickButton("View 4PL Curves", 0);
         waitForTextToDisappear("loading curves...", WAIT_FOR_JAVASCRIPT);
@@ -2180,12 +2180,12 @@ public class LuminexTest extends AbstractQCAssayTest
     @LogMethod
     private void applyGuideSetToRun(String network, String comment, int guideSetIndex)
     {
-        click(ExtHelperWD.locateGridRowCheckbox(network));
+        click(ExtHelper.locateGridRowCheckbox(network));
         clickButton("Apply Guide Set", 0);
         sleep(1000);//we need a little time even after all the elements have appeared, so waits won't work
 
         if(guideSetIndex!=-1) //not clicking anything will apply the current guide set
-            click(ExtHelperWD.locateGridRowCheckbox(comment));
+            click(ExtHelper.locateGridRowCheckbox(comment));
 
         waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0);
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
@@ -2197,18 +2197,18 @@ public class LuminexTest extends AbstractQCAssayTest
     @LogMethod
     private void verifyGuideSetToRun(String network, String comment)
     {
-        click(ExtHelperWD.locateGridRowCheckbox(network));
+        click(ExtHelper.locateGridRowCheckbox(network));
         clickButton("Apply Guide Set", 0);
-        waitForElement(ExtHelperWD.locateGridRowCheckbox(network));
-        waitForElement(ExtHelperWD.locateGridRowCheckbox(comment));
+        waitForElement(ExtHelper.locateGridRowCheckbox(network));
+        waitForElement(ExtHelper.locateGridRowCheckbox(comment));
         sleep(1000);
         // deselect the current guide set to test error message
-        click(ExtHelperWD.locateGridRowCheckbox(comment));
+        click(ExtHelper.locateGridRowCheckbox(comment));
         clickButton("Apply Thresholds", 0);
         waitForText("Please select a guide set to be applied to the selected records.");
         clickButton("OK", 0);
         // reselect the current guide set and apply it
-        click(ExtHelperWD.locateGridRowCheckbox(comment));
+        click(ExtHelper.locateGridRowCheckbox(comment));
         clickButton("Apply Thresholds", 0);
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         // verify that the plot is reloaded
@@ -2224,7 +2224,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // check that all 5 runs are present in the grid by clicking on them
         for (int i = 1; i <= 5; i++)
         {
-            assertElementPresent(ExtHelperWD.locateGridRowCheckbox(colValuePrefix + i));
+            assertElementPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + i));
         }
         // set start and end date filter
         setFormElement(Locator.name("start-date-field"), "2011-03-26");
@@ -2232,12 +2232,12 @@ public class LuminexTest extends AbstractQCAssayTest
         waitAndClick(Locator.extButtonEnabled("Apply").index(1));
         waitForLeveyJenningsTrendPlot();
         // check that only 3 runs are now present
-        waitForElementToDisappear(ExtHelperWD.locateGridRowCheckbox(colValuePrefix + "1"), WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(ExtHelper.locateGridRowCheckbox(colValuePrefix + "1"), WAIT_FOR_JAVASCRIPT);
         for (int i = 2; i <= 4; i++)
         {
-            assertElementPresent(ExtHelperWD.locateGridRowCheckbox(colValuePrefix + i));
+            assertElementPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + i));
         }
-        assertElementNotPresent(ExtHelperWD.locateGridRowCheckbox(colValuePrefix + "5"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colValuePrefix + "5"));
     }
 
     @LogMethod
@@ -2250,7 +2250,7 @@ public class LuminexTest extends AbstractQCAssayTest
         // check that all 5 runs are present in the grid by clicking on them
         for (int i = 1; i <= 5; i++)
         {
-            assertElementPresent(ExtHelperWD.locateGridRowCheckbox(colNetworkPrefix + i));
+            assertElementPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + i));
         }
         // set network and protocol filter
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@id='network-combo-box']/.."), colNetworkPrefix + "3");
@@ -2259,20 +2259,20 @@ public class LuminexTest extends AbstractQCAssayTest
         waitAndClick(Locator.extButtonEnabled("Apply").index(1));
         waitForLeveyJenningsTrendPlot();
         // check that only 1 runs are now present
-        waitForElementToDisappear(ExtHelperWD.locateGridRowCheckbox(colNetworkPrefix + "1"), WAIT_FOR_JAVASCRIPT);
-        assertElementPresent(ExtHelperWD.locateGridRowCheckbox(colNetworkPrefix + "3"));
+        waitForElementToDisappear(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "1"), WAIT_FOR_JAVASCRIPT);
+        assertElementPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "3"));
 
-        assertElementNotPresent(ExtHelperWD.locateGridRowCheckbox(colNetworkPrefix + "1"));
-        assertElementNotPresent(ExtHelperWD.locateGridRowCheckbox(colNetworkPrefix + "2"));
-        assertElementNotPresent(ExtHelperWD.locateGridRowCheckbox(colNetworkPrefix + "4"));
-        assertElementNotPresent(ExtHelperWD.locateGridRowCheckbox(colNetworkPrefix + "5"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "1"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "2"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "4"));
+        assertElementNotPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + "5"));
 
         // Clear the filter and check that all rows reappear
         waitAndClick(Locator.extButtonEnabled("Clear"));
         waitForLeveyJenningsTrendPlot();
         for (int i = 1; i <= 5; i++)
         {
-            assertElementPresent(ExtHelperWD.locateGridRowCheckbox(colNetworkPrefix + i));
+            assertElementPresent(ExtHelper.locateGridRowCheckbox(colNetworkPrefix + i));
         }
     }
 

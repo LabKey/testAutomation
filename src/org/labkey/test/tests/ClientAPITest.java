@@ -23,7 +23,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
@@ -48,15 +48,15 @@ public class ClientAPITest extends BaseWebDriverTest
     private final static String TEST_XLS_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/ClientAPITestList.xls";
     private final static String SUBFOLDER_LIST = "subfolderList"; // for cross-folder query test
     private static final String OTHER_PROJECT_LIST = "otherProjectList"; // for cross-project query test
-    protected final static ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.AutoInteger;
+    protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     protected final static String LIST_KEY_NAME = "Key";
     protected static final String TEST_ASSAY = "TestAssay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
-    protected final static ListHelperWD.ListColumn[] LIST_COLUMNS = new ListHelperWD.ListColumn[]
+    protected final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
     {
-        new ListHelperWD.ListColumn("FirstName", "First Name", ListHelperWD.ListColumnType.String, "The first name"),
-        new ListHelperWD.ListColumn("LastName", "Last Name", ListHelperWD.ListColumnType.String, "The last name"),
-        new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "The age")
+        new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, "The first name"),
+        new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "The last name"),
+        new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age")
     };
     static
     {
@@ -196,7 +196,7 @@ public class ClientAPITest extends BaseWebDriverTest
         saveWikiPage();
     }
 
-    protected String getListData(String listKeyName, ListHelperWD.ListColumn[] listColumns, String[][] listData)
+    protected String getListData(String listKeyName, ListHelper.ListColumn[] listColumns, String[][] listData)
     {
         StringBuilder data = new StringBuilder();
         data.append(listKeyName).append("\t");
@@ -300,7 +300,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         waitForDivPopulation();
         assertTextPresent("Webpart Title");
-        for (ListHelperWD.ListColumn column : LIST_COLUMNS)
+        for (ListHelper.ListColumn column : LIST_COLUMNS)
             assertTextPresent(column.getLabel());
     }
 
@@ -314,7 +314,7 @@ public class ClientAPITest extends BaseWebDriverTest
 
         assertTextPresent(GRIDTEST_GRIDTITLE);
 
-        for (ListHelperWD.ListColumn col : LIST_COLUMNS)
+        for (ListHelper.ListColumn col : LIST_COLUMNS)
             waitForText(col.getLabel());
 
         for (int row = 0; row < PAGE_SIZE; ++row)
@@ -441,7 +441,7 @@ public class ClientAPITest extends BaseWebDriverTest
         click(Locator.xpath(getPropertyXPath("Run Fields") + Locator.navButton("Add Field").getPath()));
         _listHelper.setColumnName(getPropertyXPath("Run Fields"), 0, "RunDate");
         _listHelper.setColumnLabel(getPropertyXPath("Run Fields"), 0, "Run Date");
-        _listHelper.setColumnType(getPropertyXPath("Run Fields"), 0, ListHelperWD.ListColumnType.DateTime);
+        _listHelper.setColumnType(getPropertyXPath("Run Fields"), 0, ListHelper.ListColumnType.DateTime);
 
         sleep(1000);
         clickButton("Save", 0);

@@ -22,10 +22,10 @@ import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4HelperWD;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
-import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
-import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4GridRef;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -159,7 +159,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("Prepare Run");
-        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<>();
@@ -188,16 +188,16 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 
         //the data are missing an ID
         click(Locator.ext4Button("Save"));
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("One or more required fields are missing from the sample records");
         waitAndClick(Locator.ext4Button("OK"));
 
         //save data using a fake ID
-        Ext4GridRefWD grid = _ext4Helper.queryOne("grid", Ext4GridRefWD.class);
+        Ext4GridRef grid = _ext4Helper.queryOne("grid", Ext4GridRef.class);
         grid.setGridCell(1, "subjectId", "FakeId");
 
         click(Locator.ext4Button("Save"));
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("Must provide at least 2 negative controls for each subjectId/date.");
         assertTextPresent("Missing for: FakeId / 2012-02-09");
         waitAndClick(Locator.ext4Button("OK"));
@@ -225,17 +225,17 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
-        assertEquals("Incorrect value for field", "AID Plate Reader", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
-        assertEquals("Incorrect value for field", new Double(0.05), Ext4FieldRefWD.getForLabel(this, "Positivity Threshold").getValue());
+        assertEquals("Incorrect value for field", "AID Plate Reader", Ext4FieldRef.getForLabel(this, "Instrument").getValue());
+        assertEquals("Incorrect value for field", new Double(0.05), Ext4FieldRef.getForLabel(this, "Positivity Threshold").getValue());
         waitAndClick(btn);
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         String text = _helper.getExampleData();
 
         log("Trying to save data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 

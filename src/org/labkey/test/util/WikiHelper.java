@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 
 import java.io.File;
 
-public class WikiHelper extends AbstractHelperWD
+public class WikiHelper extends AbstractHelper
 {
     public WikiHelper(BaseWebDriverTest test)
     {

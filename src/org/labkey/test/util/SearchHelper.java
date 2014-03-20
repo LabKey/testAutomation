@@ -25,7 +25,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class SearchHelper extends AbstractHelperWD
+public class SearchHelper extends AbstractHelper
 {
     private static LinkedList<SearchItem> _searchQueue = new LinkedList<>();
 

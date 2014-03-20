@@ -25,7 +25,7 @@ import java.util.Map;
  * Date: 2/11/13
  * Time: 3:06 PM
  */
-public class ChartHelper  extends AbstractHelperWD
+public class ChartHelper  extends AbstractHelper
 {
 
     public ChartHelper(BaseWebDriverTest test)

@@ -27,7 +27,7 @@ import static org.junit.Assert.*;
  * Date: 1/11/13
  * Time: 2:38 PM
  */
-public class PortalHelper extends AbstractHelperWD
+public class PortalHelper extends AbstractHelper
 {
     public PortalHelper(BaseWebDriverTest test)
     {

@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 
@@ -188,20 +188,20 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
     {
         log("Create list");
 
-        ListHelperWD.ListColumn[] columns = new ListHelperWD.ListColumn[3];
+        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[3];
 
-        ListHelperWD.ListColumn listColumn = new ListHelperWD.ListColumn("name", "Name", ListHelperWD.ListColumnType.String, "");
+        ListHelper.ListColumn listColumn = new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, "");
         columns[0] = listColumn;
 
-        listColumn = new ListHelperWD.ListColumn("age", "Age", ListHelperWD.ListColumnType.Integer, "");
+        listColumn = new ListHelper.ListColumn("age", "Age", ListHelper.ListColumnType.Integer, "");
         listColumn.setMvEnabled(true);
         columns[1] = listColumn;
 
-        listColumn = new ListHelperWD.ListColumn("sex", "Sex", ListHelperWD.ListColumnType.String, "");
+        listColumn = new ListHelper.ListColumn("sex", "Sex", ListHelper.ListColumnType.String, "");
         listColumn.setMvEnabled(true);
         columns[2] = listColumn;
 
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelperWD.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
         log("Test upload list data with a combined data and MVI column");
         _listHelper.clickImportData();
@@ -479,8 +479,8 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         setFormElement(Locator.id("AssayDesignerName"), ASSAY_NAME);
 
         int index = AssayTest.TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT;
-        _listHelper.addField("Data Fields", index++, "age", "Age", ListHelperWD.ListColumnType.Integer);
-        _listHelper.addField("Data Fields", index++, "sex", "Sex", ListHelperWD.ListColumnType.String);
+        _listHelper.addField("Data Fields", index++, "age", "Age", ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Data Fields", index++, "sex", "Sex", ListHelper.ListColumnType.String);
         sleep(1000);
 
         log("setting fields to enable missing values");

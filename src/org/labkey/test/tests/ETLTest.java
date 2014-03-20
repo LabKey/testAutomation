@@ -15,15 +15,13 @@
  */
 package org.labkey.test.tests;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RemoteConnectionHelperWD;
+import org.labkey.test.util.RemoteConnectionHelper;
 import org.labkey.test.categories.Data;
 import java.io.File;
-import java.nio.file.Files;
 
 /**
  * User: Rylan
@@ -201,7 +199,7 @@ UNDONE: need to fix the merge case
         //
         // create our remote connection
         //
-        RemoteConnectionHelperWD rconnHelper = new RemoteConnectionHelperWD(this);
+        RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
         rconnHelper.createConnection(TRANSFORM_REMOTE_CONNECTION, getBaseURL(), getProjectName());
 
         //

@@ -23,7 +23,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.ext4cmp.Ext4FileFieldRefWD;
+import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 
 import java.io.File;
 
@@ -95,7 +95,7 @@ public class NonStudyReportsTest extends ReportTest
         setFormElement("description", ATTACHMENT_REPORT_DESCRIPTION);
         setFormElement(Locator.id("uploadFile-button-fileInputEl"), ATTACHMENT_REPORT_FILE);
 
-        Ext4FileFieldRefWD ref = Ext4FileFieldRefWD.create(this);
+        Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
         ref.setToFile(ATTACHMENT_REPORT_FILE);
         clickButton("Save");
         // save should return back to manage views page
@@ -193,7 +193,7 @@ public class NonStudyReportsTest extends ReportTest
         clickAndWait(Locator.linkContainingText("Edit Report"));
         // change this from a server attachment report to a local attachment report
         click(Locator.xpath("//input[../label[string()='Upload file to server']]"));
-        Ext4FileFieldRefWD ref = Ext4FileFieldRefWD.create(this);
+        Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
         ref.setToFile(ATTACHMENT_REPORT2_FILE);
         clickButton("Save");
         // save should return back to the details page
@@ -244,7 +244,7 @@ public class NonStudyReportsTest extends ReportTest
 //        setFormElement(Locator.xpath("//input[contains(@id, 'customThumbnail')]"), ATTACHMENT_REPORT2_FILE.toString(), false);
 
         _ext4Helper.clickExt4Tab("Images");
-        Ext4FileFieldRefWD ref = Ext4FileFieldRefWD.create(this);
+        Ext4FileFieldRef ref = Ext4FileFieldRef.create(this);
         ref.setToFile(ATTACHMENT_REPORT2_FILE);
         clickButton("Save", 0);
 

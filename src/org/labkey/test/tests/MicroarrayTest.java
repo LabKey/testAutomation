@@ -21,7 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 /**
@@ -80,11 +80,11 @@ public class MicroarrayTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//td[contains(text(), 'Name')]/..//td/input"), defaultWaitForPage);
         setFormElement(Locator.xpath("//td[contains(text(), 'Name')]/..//td/input"), ASSAY_NAME);
         setFormElement(Locator.xpath("//td[contains(text(), 'Description')]/..//td/textarea"), ASSAY_DESCRIPTION);
-        _listHelper.addField("Batch Fields", 0, BATCH_STRING_FIELD, BATCH_STRING_FIELD, ListHelperWD.ListColumnType.String);
-        _listHelper.addField("Run Fields", 0, RUN_STRING_FIELD, RUN_STRING_FIELD, ListHelperWD.ListColumnType.String);
+        _listHelper.addField("Batch Fields", 0, BATCH_STRING_FIELD, BATCH_STRING_FIELD, ListHelper.ListColumnType.String);
+        _listHelper.addField("Run Fields", 0, RUN_STRING_FIELD, RUN_STRING_FIELD, ListHelper.ListColumnType.String);
         setFormElement(Locator.xpath("//td[contains(text(), 'Run Fields')]/../..//td/textarea[@id='propertyDescription']"), XPATH_TEST);
-        _listHelper.addField("Run Fields", 1, RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, ListHelperWD.ListColumnType.Integer);
-        _listHelper.addField("Data Properties", 0, DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, ListHelperWD.ListColumnType.String);
+        _listHelper.addField("Run Fields", 1, RUN_INTEGER_FIELD, RUN_INTEGER_FIELD, ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Data Properties", 0, DATA_FIELD_TEST_NAME, DATA_FIELD_TEST_NAME, ListHelper.ListColumnType.String);
         clickButton("Save", 0);
         waitForText("Save successful.", 20000);
         clickButton("Save & Close");

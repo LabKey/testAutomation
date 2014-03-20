@@ -31,11 +31,11 @@ import static org.junit.Assert.*;
  * User: jeckels
  * Date: Nov 21, 2007
  */
-public class ListHelperWD extends AbstractHelperWD
+public class ListHelper extends AbstractHelper
 {
     BaseWebDriverTest _test;
 
-    public ListHelperWD(BaseWebDriverTest test)
+    public ListHelper(BaseWebDriverTest test)
     {
         super(test);
         _test = test;
@@ -733,7 +733,7 @@ public class ListHelperWD extends AbstractHelperWD
         _test.checkCheckbox(l);
     }
 
-    public void addField(String areaTitle, int index, String name, String label, ListHelperWD.ListColumnType type)
+    public void addField(String areaTitle, int index, String name, String label, ListHelper.ListColumnType type)
     {
         String prefix = _test.getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
@@ -744,7 +744,7 @@ public class ListHelperWD extends AbstractHelperWD
         setColumnType(prefix, index, type);
     }
 
-    public void addLookupField(String areaTitle, int index, String name, String label, ListHelperWD.LookupInfo type)
+    public void addLookupField(String areaTitle, int index, String name, String label, ListHelper.LookupInfo type)
     {
         String prefix = areaTitle==null ? "" : _test.getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();

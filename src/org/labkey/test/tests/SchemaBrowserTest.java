@@ -20,7 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 
 /*
 * User: dave
@@ -111,22 +111,22 @@ public class SchemaBrowserTest extends BaseWebDriverTest
     public void createLists()
     {
         _listHelper.createList(PROJECT_NAME, AUTHORS_LIST,
-                ListHelperWD.ListColumnType.AutoInteger, "AuthorId",
-                new ListHelperWD.ListColumn("FirstName", "First Name", ListHelperWD.ListColumnType.String, TEST_DESC_AUTHORS),
-                new ListHelperWD.ListColumn("LastName", "Last Name", ListHelperWD.ListColumnType.String, "")
+                ListHelper.ListColumnType.AutoInteger, "AuthorId",
+                new ListHelper.ListColumn("FirstName", "First Name", ListHelper.ListColumnType.String, TEST_DESC_AUTHORS),
+                new ListHelper.ListColumn("LastName", "Last Name", ListHelper.ListColumnType.String, "")
         );
 
         _listHelper.createList(PROJECT_NAME, PUBLISHERS_LIST,
-                ListHelperWD.ListColumnType.AutoInteger, "PublisherId",
-                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, TEST_DESC_PUBLISHERS)
+                ListHelper.ListColumnType.AutoInteger, "PublisherId",
+                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, TEST_DESC_PUBLISHERS)
         );
 
         _listHelper.createList(PROJECT_NAME, BOOKS_LIST,
-                ListHelperWD.ListColumnType.AutoInteger, "TitleId",
-                new ListHelperWD.ListColumn("Title", "Title", ListHelperWD.ListColumnType.String, TEST_DESC_BOOKS),
-                new ListHelperWD.ListColumn("Subtitle", "Subtitle", ListHelperWD.ListColumnType.String, ""),
-                new ListHelperWD.ListColumn("AuthorId", "AuthorId", ListHelperWD.ListColumnType.Integer, "", new ListHelperWD.LookupInfo("", "lists", AUTHORS_LIST)),
-                new ListHelperWD.ListColumn("PublisherId", "PublisherId", ListHelperWD.ListColumnType.Integer, "", new ListHelperWD.LookupInfo("", "lists", PUBLISHERS_LIST))
+                ListHelper.ListColumnType.AutoInteger, "TitleId",
+                new ListHelper.ListColumn("Title", "Title", ListHelper.ListColumnType.String, TEST_DESC_BOOKS),
+                new ListHelper.ListColumn("Subtitle", "Subtitle", ListHelper.ListColumnType.String, ""),
+                new ListHelper.ListColumn("AuthorId", "AuthorId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", AUTHORS_LIST)),
+                new ListHelper.ListColumn("PublisherId", "PublisherId", ListHelper.ListColumnType.Integer, "", new ListHelper.LookupInfo("", "lists", PUBLISHERS_LIST))
         );
     }
 }

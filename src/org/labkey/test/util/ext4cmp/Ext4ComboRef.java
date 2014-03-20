@@ -24,19 +24,19 @@ import org.openqa.selenium.WebElement;
  * Date: 1/23/13
  * Time: 5:31 PM
  */
-public class Ext4ComboRefWD extends Ext4FieldRefWD
+public class Ext4ComboRef extends Ext4FieldRef
 {
-    public Ext4ComboRefWD(String id, BaseWebDriverTest test)
+    public Ext4ComboRef(String id, BaseWebDriverTest test)
     {
         super(id, test);
     }
 
-    public Ext4ComboRefWD(WebElement el, BaseWebDriverTest test)
+    public Ext4ComboRef(WebElement el, BaseWebDriverTest test)
     {
         super(el, test);
     }
 
-    public Ext4ComboRefWD(Ext4CmpRefWD cmp, BaseWebDriverTest test)
+    public Ext4ComboRef(Ext4CmpRef cmp, BaseWebDriverTest test)
     {
         super(cmp.getId(), test);
     }
@@ -77,9 +77,9 @@ public class Ext4ComboRefWD extends Ext4FieldRefWD
         eval("setValue(arguments[0]);", value);
     }
 
-    public static Ext4ComboRefWD getForLabel(BaseWebDriverTest test, String label)
+    public static Ext4ComboRef getForLabel(BaseWebDriverTest test, String label)
     {
-        Ext4ComboRefWD ref = test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4ComboRefWD.class);
+        Ext4ComboRef ref = test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4ComboRef.class);
         Assert.assertNotNull("Unable to locate field with label: " + label, ref);
         return ref;
     }

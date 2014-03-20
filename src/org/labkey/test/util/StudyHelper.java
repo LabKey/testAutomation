@@ -27,9 +27,9 @@ import static org.junit.Assert.*;
  * User: t.chadick
  * Date: Aug 16, 2011
  */
-public class StudyHelperWD extends AbstractHelperWD
+public class StudyHelper extends AbstractHelper
 {
-    public StudyHelperWD(BaseWebDriverTest test)
+    public StudyHelper(BaseWebDriverTest test)
     {
         super(test);
     }

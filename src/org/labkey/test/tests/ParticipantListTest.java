@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
-import org.labkey.test.util.Ext4HelperWD;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
@@ -94,7 +94,7 @@ public class ParticipantListTest extends StudyBaseTest
             WebElement formField = Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
             setFormElement(formField, category);
             fireEvent(formField, SeleniumEvent.blur);
-            waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//div").withText(category));
+            waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//div").withText(category));
             clickButton("Done", 0);
             _extHelper.waitForExtDialogToDisappear("Manage Categories");
         }

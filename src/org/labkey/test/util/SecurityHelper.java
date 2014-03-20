@@ -17,20 +17,17 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.openqa.selenium.WebElement;
-
-import static org.junit.Assert.*;
 
 /**
  * User: elvan
  * Date: 1/17/13
  * Time: 11:21 AM
  */
-public class SecurityHelperWD extends AbstractHelperWD
+public class SecurityHelper extends AbstractHelper
 {
     private PortalHelper _portalHelper;
 
-    public SecurityHelperWD(BaseWebDriverTest test)
+    public SecurityHelper(BaseWebDriverTest test)
     {
         super(test);
         _portalHelper = new PortalHelper(test);

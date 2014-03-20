@@ -25,9 +25,9 @@ import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
 import org.labkey.test.util.FileBrowserExtendedProperty;
-import org.labkey.test.util.FileBrowserHelperWD;
+import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.SearchHelper;
 
 import java.io.File;
@@ -114,7 +114,7 @@ public class FileContentTest extends BaseWebDriverTest
         waitForElement(Locator.xpath("//a/span[text() = 'Admin']"), WAIT_FOR_JAVASCRIPT);
         enableEmailRecorder();
         // Create list for lookup custom file property
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelperWD.ListColumnType.String, COLUMN_NAME);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, COLUMN_NAME);
         _listHelper.uploadData(PROJECT_NAME, LIST_NAME, COLUMN_NAME+"\n"+LOOKUP_VALUE_1+"\n"+LOOKUP_VALUE_2);
         clickProject(PROJECT_NAME);
         // Setup custom file properties
@@ -131,7 +131,7 @@ public class FileContentTest extends BaseWebDriverTest
         waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.name("ff_name0"), CUSTOM_PROPERTY);
         setFormElement(Locator.id("url"), "http://labkey.test/?a=${"+CUSTOM_PROPERTY+"}&b=${"+COLUMN_NAME+"}");
-        _listHelper.addLookupField(null, 1, COLUMN_NAME, COLUMN_NAME, new ListHelperWD.LookupInfo(PROJECT_NAME, "lists", LIST_NAME));
+        _listHelper.addLookupField(null, 1, COLUMN_NAME, COLUMN_NAME, new ListHelper.LookupInfo(PROJECT_NAME, "lists", LIST_NAME));
         clickButton("Save & Close");
 
         waitForText("Last Modified", WAIT_FOR_JAVASCRIPT);
@@ -219,7 +219,7 @@ public class FileContentTest extends BaseWebDriverTest
         // Delete file.
         clickProject(PROJECT_NAME);
         _fileBrowserHelper.selectFileBrowserItem(folderName + "/" + filename);
-        _fileBrowserHelper.clickFileBrowserButton(FileBrowserHelperWD.BrowserAction.DELETE);
+        _fileBrowserHelper.clickFileBrowserButton(FileBrowserHelper.BrowserAction.DELETE);
         clickButton("Yes", 0);
         waitForElementToDisappear(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(filename));
 

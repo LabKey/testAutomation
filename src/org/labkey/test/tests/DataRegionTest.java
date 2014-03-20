@@ -24,7 +24,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -49,13 +49,13 @@ public class DataRegionTest extends BaseWebDriverTest
 
     private static final String PROJECT_NAME = "DataRegionProject";
     private static final String LIST_NAME = "WebColors" + INJECT_CHARS_1;
-    private static final ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.Integer;
+    private static final ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.Integer;
     private static final String LIST_KEY_NAME = "Key";
 
-    private static final ListHelperWD.ListColumn NAME_COLUMN =
-            new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Color Name");
-    private static final ListHelperWD.ListColumn HEX_COLUMN =
-            new ListHelperWD.ListColumn("Hex", "Hex", ListHelperWD.ListColumnType.String, "Hexadecimal");
+    private static final ListHelper.ListColumn NAME_COLUMN =
+            new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Color Name");
+    private static final ListHelper.ListColumn HEX_COLUMN =
+            new ListHelper.ListColumn("Hex", "Hex", ListHelper.ListColumnType.String, "Hexadecimal");
 
     private static final String LIST_DATA;
     private static final int TOTAL_ROWS;

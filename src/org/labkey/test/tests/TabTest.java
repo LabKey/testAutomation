@@ -19,8 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
-import org.labkey.test.util.Ext4HelperWD;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
@@ -258,10 +258,10 @@ public class TabTest extends SimpleModuleTest
         // Create the list again so we can pass query validation.
         log("Create list in subfolder to prevent query validation failure");
         _listHelper.createList(STUDY_FOLDER_TAB_LABEL, LIST_NAME,
-                ListHelperWD.ListColumnType.AutoInteger, "Key",
-                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
-                new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
-                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
+                ListHelper.ListColumnType.AutoInteger, "Key",
+                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
+                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
+                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
     }
 
     @LogMethod
@@ -354,11 +354,11 @@ public class TabTest extends SimpleModuleTest
 
 //        _ext4Helper.clickExt4MenuButton(true, tabMenuXPath, false, "Folder", "Management");       // Tab menu hidden so this doesn't work; do it inline with fireEvent instead
         fireEvent(tabMenuXPath, SeleniumEvent.click);
-        Locator parentLocator = Ext4HelperWD.ext4MenuItem("Folder");
+        Locator parentLocator = Ext4Helper.ext4MenuItem("Folder");
         waitForElement(parentLocator, 1000);
         mouseOver(parentLocator);
 
-        Locator itemLocator = Ext4HelperWD.ext4MenuItem("Management");
+        Locator itemLocator = Ext4Helper.ext4MenuItem("Management");
         waitAndClickAndWait(itemLocator);
     }
 }

@@ -30,7 +30,7 @@ import static org.junit.Assert.*;
  * Date: 9/14/12
  * Time: 2:41 PM
  */
-public abstract class AbstractAssayHelper extends AbstractHelperWD
+public abstract class AbstractAssayHelper extends AbstractHelper
 {
     public AbstractAssayHelper(BaseWebDriverTest test)
     {
@@ -70,7 +70,7 @@ public abstract class AbstractAssayHelper extends AbstractHelperWD
     }
 
     @LogMethod
-    public void addAliasedFieldToMetadata(String schemaName, String tableName, String aliasedColumn, String columnName, ListHelperWD.LookupInfo lookupInfo)
+    public void addAliasedFieldToMetadata(String schemaName, String tableName, String aliasedColumn, String columnName, ListHelper.LookupInfo lookupInfo)
     {
         //go to schema browser
         _test.goToSchemaBrowser();

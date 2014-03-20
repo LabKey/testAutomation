@@ -16,7 +16,7 @@
 package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -32,12 +32,12 @@ import java.util.List;
  * Date: Jan 3, 2012
  * Time: 3:34:16 PM
  */
-public class Ext4HelperWD extends AbstractHelperWD
+public class Ext4Helper extends AbstractHelper
 {
     private static final String DEFAULT_CSS_PREFIX = "x4-";
     private static String _cssPrefix = DEFAULT_CSS_PREFIX;
 
-    public Ext4HelperWD(BaseWebDriverTest test)
+    public Ext4Helper(BaseWebDriverTest test)
     {
         super(test);
         resetCssPrefix();
@@ -135,13 +135,13 @@ public class Ext4HelperWD extends AbstractHelperWD
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
-        selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(label), false, selection);
+        selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), false, selection);
     }
 
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection, boolean containsText)
     {
-        selectComboBoxItem(Ext4HelperWD.Locators.formItemWithLabel(label), containsText, selection);
+        selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), containsText, selection);
     }
 
     @LogMethod(quiet = true)
@@ -364,12 +364,12 @@ public class Ext4HelperWD extends AbstractHelperWD
         return isGridRowChecked(rowLoc);
     }
 
-    public <Type extends Ext4CmpRefWD> List<Type> componentQuery(String componentSelector, Class<Type> clazz)
+    public <Type extends Ext4CmpRef> List<Type> componentQuery(String componentSelector, Class<Type> clazz)
     {
         return componentQuery(componentSelector, null, clazz);
     }
 
-    public <Type extends Ext4CmpRefWD> List<Type> componentQuery(String componentSelector, String parentId, Class<Type> clazz)
+    public <Type extends Ext4CmpRef> List<Type> componentQuery(String componentSelector, String parentId, Class<Type> clazz)
     {
         componentSelector = componentSelector.replaceAll("'", "\"");  //escape single quotes
         String script =
@@ -394,7 +394,7 @@ public class Ext4HelperWD extends AbstractHelperWD
         return _test._ext4Helper.componentsFromIds(ids, clazz);
     }
 
-    public <Type extends Ext4CmpRefWD> Type queryOne(String componentSelector, Class<Type> clazz)
+    public <Type extends Ext4CmpRef> Type queryOne(String componentSelector, Class<Type> clazz)
     {
         List<Type> cmpRefs = componentQuery(componentSelector, clazz);
         if (null == cmpRefs || cmpRefs.size() == 0)
@@ -403,7 +403,7 @@ public class Ext4HelperWD extends AbstractHelperWD
         return cmpRefs.get(0);
     }
 
-    public <Type extends Ext4CmpRefWD> List<Type> componentsFromIds(List<String> ids, Class<Type> clazz)
+    public <Type extends Ext4CmpRef> List<Type> componentsFromIds(List<String> ids, Class<Type> clazz)
     {
         if (null == ids || ids.isEmpty())
             return null;
@@ -429,7 +429,7 @@ public class Ext4HelperWD extends AbstractHelperWD
         return new BaseWebDriverTest.Checker(){
             public boolean check()
             {
-                return queryOne(selector, Ext4CmpRefWD.class) != null;
+                return queryOne(selector, Ext4CmpRef.class) != null;
             }
         };
     }

@@ -19,7 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.util.Ext4HelperWD;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
@@ -70,7 +70,7 @@ public class DataViewsTest extends ParticipantListTest
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "R View");
         clickButton("Save", "Please enter a view name:");
 
-        Locator locator = Ext4HelperWD.ext4Window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+        Locator locator = Ext4Helper.ext4Window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
         if (isElementPresent(locator))
         {
             setFormElement(locator, REPORT_NAME);
@@ -158,7 +158,7 @@ public class DataViewsTest extends ParticipantListTest
         WebElement newCategoryField = Locator.xpath("//input[contains(@id, 'textfield') and @name='label']").notHidden().waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
         setFormElement(newCategoryField, NEW_CATEGORY);
         fireEvent(newCategoryField, SeleniumEvent.blur);
-        waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//div").withText(NEW_CATEGORY));
+        waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//div").withText(NEW_CATEGORY));
         clickButton("Done", 0);
         _extHelper.waitForExtDialogToDisappear("Manage Categories");
         clickButton("Save", 0);
@@ -343,27 +343,27 @@ public class DataViewsTest extends ParticipantListTest
         clickButton("Manage Categories", 0);
         _extHelper.waitForExtDialog("Manage Categories");
 
-        waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
-        click(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
+        waitForElement(Ext4Helper.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
+        click(Ext4Helper.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[1])));
         _extHelper.waitForExtDialog("Subcategories");
-        assertElementPresent(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[1]));
+        assertElementPresent(Ext4Helper.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[1]));
 
         addSubCategory("Subcategory1-" + CATEGORIES[1]);
         addSubCategory("Subcategory2-" + CATEGORIES[1]);
 
-        click(Ext4HelperWD.Locators.window("Subcategories").append("//img").withClass("x4-tool-close").notHidden());
+        click(Ext4Helper.Locators.window("Subcategories").append("//img").withClass("x4-tool-close").notHidden());
         waitForTextToDisappear("Subcategory1-" + CATEGORIES[1]);
-        click(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
-        waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[2]));
+        click(Ext4Helper.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[2])));
+        waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[2]));
         assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1]);
 
         addSubCategory("Subcategory1-" + CATEGORIES[2]);
         addSubCategory("Subcategory2-" + CATEGORIES[2]);
 
-        click(Ext4HelperWD.Locators.window("Subcategories").append("//img").withClass("x4-tool-close").notHidden());
+        click(Ext4Helper.Locators.window("Subcategories").append("//img").withClass("x4-tool-close").notHidden());
         waitForTextToDisappear("Subcategory1-" + CATEGORIES[2]);
-        click(Ext4HelperWD.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[3])));
-        waitForElement(Ext4HelperWD.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[3]));
+        click(Ext4Helper.Locators.window("Manage Categories").append(Locator.xpath("//div").withClass("x4-grid-cell-inner").withText(CATEGORIES[3])));
+        waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[3]));
         assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1], "Subcategory1-" + CATEGORIES[2], "Subcategory2-" + CATEGORIES[2]);
 
         click(Locator.ext4Button("Done"));

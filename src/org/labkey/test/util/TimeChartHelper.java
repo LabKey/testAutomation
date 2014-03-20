@@ -20,7 +20,7 @@ import org.labkey.test.Locator;
 
 public class TimeChartHelper
 {
-    ExtHelperWD _extHelper = null;
+    ExtHelper _extHelper = null;
     BaseWebDriverTest _test = null;
 
     public TimeChartHelper(BaseWebDriverTest test)

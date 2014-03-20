@@ -24,7 +24,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.RemoteConnectionHelperWD;
+import org.labkey.test.util.RemoteConnectionHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -500,7 +500,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         // no connection was created
         if (afterTest)
         {
-            RemoteConnectionHelperWD rconnHelper = new RemoteConnectionHelperWD(this);
+            RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
             rconnHelper.deleteConnection(connectionName);
         }
         super.doCleanup(afterTest);

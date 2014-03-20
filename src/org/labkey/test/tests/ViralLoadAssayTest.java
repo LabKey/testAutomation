@@ -30,11 +30,11 @@ import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4HelperWD;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
-import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4GridRef;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -214,7 +214,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("Prepare Run");
-        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
         waitAndClickAndWait(Locator.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<>();
@@ -230,11 +230,11 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.addRecordsToAssayTemplate(TEMPLATE_DATA, expectedCols);
 
         waitAndClick(Locator.ext4Button("Plate Layout"));
-        waitForElement(Ext4HelperWD.ext4Window("Configure Plate"));
+        waitForElement(Ext4Helper.ext4Window("Configure Plate"));
         waitForText("Group By Category");
-        Ext4FieldRefWD.getForLabel(this, "Group By Category").setChecked(true);
+        Ext4FieldRef.getForLabel(this, "Group By Category").setChecked(true);
         waitForText("Below are the sample categories");
-        Ext4FieldRefWD ctlField = Ext4FieldRefWD.getForLabel(this, "Neg Control (2)");
+        Ext4FieldRef ctlField = Ext4FieldRef.getForLabel(this, "Neg Control (2)");
         ctlField.setValue(8); //A8
         waitAndClick(Locator.ext4Button("Submit"));
         assertAlert("Error: Neg Control conflicts with an existing sample in well: A8");
@@ -249,7 +249,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         assertElementPresent(_helper.getAssayWell("G3", LabModuleHelper.STD_COLOR));
         assertElementPresent(_helper.getAssayWell("H12", LabModuleHelper.STD_COLOR));
 
-        Ext4FieldRefWD.getForLabel(this, "Run Name").setValue("TestRun");
+        Ext4FieldRef.getForLabel(this, "Run Name").setValue("TestRun");
 
         waitAndClick(Locator.ext4Button("Save and Close"));
         waitForText("Save Complete");
@@ -272,10 +272,10 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         assertElementPresent(_helper.getAssayWell("H12", LabModuleHelper.STD_COLOR));
 
         //no duplicate wells allowed
-        Ext4GridRefWD grid = _ext4Helper.queryOne("grid", Ext4GridRefWD.class);
+        Ext4GridRef grid = _ext4Helper.queryOne("grid", Ext4GridRef.class);
         grid.setGridCell(1, "well", "H11");
         click(Locator.ext4Button("Save"));
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("another sample is already present in well: H11");
         grid.setGridCell(1, "well", "A5");  //restore original contents
@@ -283,7 +283,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         //verify neg controls enforced
         grid.setGridCell(70, "category", "Unknown");
         click(Locator.ext4Button("Download"));
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("Must provide at least 2 negative controls per run");
         grid.setGridCell(70, "category", "Neg Control");  //restore original contents
@@ -367,12 +367,12 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
-        assertEquals("Incorrect value for field", "ABI 7500", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
-        assertEquals("Incorrect value for field", new Long(60), Ext4FieldRefWD.getForLabel(this, "Eluate Volume").getValue());
-        assertEquals("Incorrect value for field", new Long(20), Ext4FieldRefWD.getForLabel(this, "Sample Vol Per Rxn").getValue());
+        assertEquals("Incorrect value for field", "ABI 7500", Ext4FieldRef.getForLabel(this, "Instrument").getValue());
+        assertEquals("Incorrect value for field", new Long(60), Ext4FieldRef.getForLabel(this, "Eluate Volume").getValue());
+        assertEquals("Incorrect value for field", new Long(20), Ext4FieldRef.getForLabel(this, "Sample Vol Per Rxn").getValue());
         waitAndClick(btn);
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         String text = _helper.getExampleData();
 
         log("Trying to save invalid data");
@@ -380,7 +380,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         errorText = errorText.replaceAll("Subject2\tDETECTOR1", "Subject2\tDETECTOR2");
         textarea.setValue(errorText);
         waitAndClick(WAIT_FOR_PAGE, Locator.ext4Button("Upload"), 0);
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 9");
@@ -390,7 +390,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         clickAndWait(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -527,19 +527,19 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.waitForField("Source Material");
 
         //switch import method
-        Ext4FieldRefWD field = Ext4FieldRefWD.getForBoxLabel(this, "LC480");
+        Ext4FieldRef field = Ext4FieldRef.getForBoxLabel(this, "LC480");
         field.setChecked(true);
         Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
-        Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
+        Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
 
-        assertEquals("Incorrect value for field", "LC480", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
-        assertEquals("Incorrect value for field", new Long(50), Ext4FieldRefWD.getForLabel(this, "Eluate Volume").getValue());
-        assertEquals("Incorrect value for field", new Long(5), Ext4FieldRefWD.getForLabel(this, "Sample Vol Per Rxn").getValue());
+        assertEquals("Incorrect value for field", "LC480", Ext4FieldRef.getForLabel(this, "Instrument").getValue());
+        assertEquals("Incorrect value for field", new Long(50), Ext4FieldRef.getForLabel(this, "Eluate Volume").getValue());
+        assertEquals("Incorrect value for field", new Long(5), Ext4FieldRef.getForLabel(this, "Sample Vol Per Rxn").getValue());
         waitAndClick(btn);
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         String text = _helper.getExampleData();
 
         log("Trying to save invalid data");
@@ -547,7 +547,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         errorText = errorText.replaceAll("d56053_2010.04.21_1_JBS", "");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 17");
@@ -555,7 +555,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         waitAndClickAndWait(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -618,26 +618,26 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.waitForField("Source Material");
 
         //switch import method
-        Ext4FieldRefWD field = Ext4FieldRefWD.getForBoxLabel(this, "Light Cycler");
+        Ext4FieldRef field = Ext4FieldRef.getForBoxLabel(this, "Light Cycler");
         field.setChecked(true);
         Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
         //set other field values
-        Ext4FieldRefWD.getForLabel(this, "Sample Type").setValue("Serum");
-        assertEquals("Incorrect value for field", "Light Cycler", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
-        assertEquals("Incorrect value for field", new Long(50), Ext4FieldRefWD.getForLabel(this, "Eluate Volume").getValue());
-        assertEquals("Incorrect value for field", new Long(5), Ext4FieldRefWD.getForLabel(this, "Sample Vol Per Rxn").getValue());
+        Ext4FieldRef.getForLabel(this, "Sample Type").setValue("Serum");
+        assertEquals("Incorrect value for field", "Light Cycler", Ext4FieldRef.getForLabel(this, "Instrument").getValue());
+        assertEquals("Incorrect value for field", new Long(50), Ext4FieldRef.getForLabel(this, "Eluate Volume").getValue());
+        assertEquals("Incorrect value for field", new Long(5), Ext4FieldRef.getForLabel(this, "Sample Vol Per Rxn").getValue());
         waitAndClick(btn);
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         String text = _helper.getExampleData();
 
         String errorText = text.replaceAll("CTL_negative", "");
         errorText = errorText.replaceAll("de0115_2008.09.08_1_JG\t\t\t0", "");
         textarea.setValue(errorText);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"));
+        waitForElement(Ext4Helper.ext4Window("Upload Failed"));
         click(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 23");
@@ -646,7 +646,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         waitAndClickAndWait(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 

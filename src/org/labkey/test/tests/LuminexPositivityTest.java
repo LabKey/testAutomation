@@ -22,7 +22,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.PerlHelperWD;
+import org.labkey.test.util.PerlHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ public class LuminexPositivityTest extends LuminexTest
 
     protected void ensureConfigured()
     {
-        PerlHelperWD perlHelper = new PerlHelperWD(this);
+        PerlHelper perlHelper = new PerlHelper(this);
         if(!perlHelper.ensurePerlConfig())
             fail("No Perl engine");
 

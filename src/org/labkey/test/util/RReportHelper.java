@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 
-public class RReportHelper extends AbstractHelperWD
+public class RReportHelper extends AbstractHelper
 {
     public enum ReportOption {
         shareReport("Make this view available to all users", null, true),
@@ -301,7 +301,7 @@ public class RReportHelper extends AbstractHelperWD
 
         if (null != name)
         {
-            Locator locator = Ext4HelperWD.Locators.window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
+            Locator locator = Ext4Helper.Locators.window("Save View").append(Locator.xpath("//input[contains(@class, 'x4-form-field')]"));
             if (_test.isElementPresent(locator))
             {
                 _test.setFormElement(locator, name);
@@ -315,13 +315,13 @@ public class RReportHelper extends AbstractHelperWD
         ensureFieldSetExpanded(option._fieldSet);
         if (option._isCheckbox)
         {
-            Locator checkbox = Ext4HelperWD.Locators.checkbox(_test, option._label);
+            Locator checkbox = Ext4Helper.Locators.checkbox(_test, option._label);
             _test.waitForElement(checkbox);
             _test._ext4Helper.checkCheckbox(option._label);
         }
         else
         {
-            Locator checkbox = Ext4HelperWD.Locators.radiobutton(_test, option._label);
+            Locator checkbox = Ext4Helper.Locators.radiobutton(_test, option._label);
             _test.waitForElement(checkbox);
             _test._ext4Helper.selectRadioButton(option._label);
         }

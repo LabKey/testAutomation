@@ -23,7 +23,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RemoteConnectionHelperWD;
+import org.labkey.test.util.RemoteConnectionHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public class ETLErrorTest extends ETLBaseTest
         runETLandCheckErrors(TRANSFORM_REMOTE, true, false, errors);
         errors.clear();
         // create our remote connection
-        RemoteConnectionHelperWD rconnHelper = new RemoteConnectionHelperWD(this);
+        RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
         rconnHelper.createConnection(TRANSFORM_REMOTE_CONNECTION, getBaseURL(), getProjectName());
         errors.add("ERROR: Target schema not found: study_buddy");
         errors.add("Error running executeCopy");

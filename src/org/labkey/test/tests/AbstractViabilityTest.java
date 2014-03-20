@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -102,8 +102,8 @@ public abstract class AbstractViabilityTest extends AbstractQCAssayTest
         setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), getAssayName());
 
         // Add 'Unreliable' field to Results domain
-        _listHelper.addField("Result Fields", 11, "Unreliable", "Unreliable?", ListHelperWD.ListColumnType.Boolean);
-        _listHelper.addField("Result Fields", 12, "IntValue", "IntValue", ListHelperWD.ListColumnType.Integer);
+        _listHelper.addField("Result Fields", 11, "Unreliable", "Unreliable?", ListHelper.ListColumnType.Boolean);
+        _listHelper.addField("Result Fields", 12, "IntValue", "IntValue", ListHelper.ListColumnType.Integer);
 
         sleep(1000);
         clickButton("Save", 0);

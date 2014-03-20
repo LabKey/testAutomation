@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.TimeChartHelper;
 
@@ -80,7 +80,7 @@ public class FlowCBCTest extends BaseFlowTest
         _listHelper.deleteField("Batch Fields", 0);
 
         // Add TargetStudy to the end of the default list of Results domain
-        _listHelper.addField("Result Fields", 25, "TargetStudy", "Target Study", ListHelperWD.ListColumnType.String);
+        _listHelper.addField("Result Fields", 25, "TargetStudy", "Target Study", ListHelper.ListColumnType.String);
 
         clickButton("Save", 0);
         waitForText("Save successful.", 20000);

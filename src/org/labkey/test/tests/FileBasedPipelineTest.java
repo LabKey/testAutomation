@@ -24,8 +24,8 @@ import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.FileBrowserHelperWD;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.FileBrowserHelper;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
@@ -229,7 +229,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         goToModule("FileContent");
 
         _fileBrowserHelper.selectFileBrowserItem(analysisPath);
-        assertElementNotPresent(FileBrowserHelperWD.Locators.gridRowWithNodeId(".work"));
+        assertElementNotPresent(FileBrowserHelper.Locators.gridRowWithNodeId(".work"));
 
         for (Map.Entry fileAndContents : expectedFilesAndContents.entrySet())
         {
@@ -270,8 +270,8 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         _listHelper.deleteField("Data Fields", 0); // ParticipantID
         _listHelper.deleteField("Data Fields", 0); // VisitID
         _listHelper.deleteField("Data Fields", 0); // Date
-        _listHelper.addField("Data Fields", 0, "Name", "Name", ListHelperWD.ListColumnType.String);
-        _listHelper.addField("Data Fields", 1, "Age", "Age", ListHelperWD.ListColumnType.Integer);
+        _listHelper.addField("Data Fields", 0, "Name", "Name", ListHelper.ListColumnType.String);
+        _listHelper.addField("Data Fields", 1, "Age", "Age", ListHelper.ListColumnType.Integer);
 
         clickButton("Save", 0);
         waitForText("Save successful.", WAIT_FOR_JAVASCRIPT);

@@ -28,20 +28,20 @@ import java.util.List;
 * Date: 5/31/12
 * Time: 10:43 PM
 */
-public class Ext4CmpRefWD
+public class Ext4CmpRef
 {
     protected String _id;
     protected BaseWebDriverTest _test;
     protected WebElement _el;
 
-    public Ext4CmpRefWD(String id, BaseWebDriverTest test)
+    public Ext4CmpRef(String id, BaseWebDriverTest test)
     {
         this._id = id;
         this._test = test;
         this._el = test.getDriver().findElement(By.id(id));
     }
 
-    public Ext4CmpRefWD(WebElement el, BaseWebDriverTest test)
+    public Ext4CmpRef(WebElement el, BaseWebDriverTest test)
     {
         this._id = el.getAttribute("id");
         this._test = test;
@@ -53,9 +53,9 @@ public class Ext4CmpRefWD
         return _id;
     }
 
-    public List<Ext4CmpRefWD> query(String selector)
+    public List<Ext4CmpRef> query(String selector)
     {
-        return _test._ext4Helper.componentQuery(selector, _id, Ext4CmpRefWD.class);
+        return _test._ext4Helper.componentQuery(selector, _id, Ext4CmpRef.class);
     }
 
     public void eval(String expr, Object... args)

@@ -21,7 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Study;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 
 import static org.junit.Assert.*;
 
@@ -296,7 +296,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
             click(Locator.xpath(getPropertyXPath("Dataset Fields")).append("//span").append(Locator.navButton("Add Field").getPath()));
             _listHelper.setColumnName(index, keyField);
-            _listHelper.setColumnType(index, ListHelperWD.ListColumnType.Integer);
+            _listHelper.setColumnType(index, ListHelper.ListColumnType.Integer);
 
             click(Locator.name("ff_name0"));
             clickRadioButtonById("button_managedField");

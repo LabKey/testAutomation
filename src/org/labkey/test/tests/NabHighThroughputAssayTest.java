@@ -23,7 +23,7 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.AssayImportOptions;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.DilutionAssayHelperWD;
+import org.labkey.test.util.DilutionAssayHelper;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
@@ -293,7 +293,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
         goBack();
 
         log("Verify data identifiers");
-        DilutionAssayHelperWD assayHelper = new DilutionAssayHelperWD(this);
+        DilutionAssayHelper assayHelper = new DilutionAssayHelper(this);
         assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, null);
     }
 

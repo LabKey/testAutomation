@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
  * Date: 12/18/12
  * Time: 11:56 AM
  */
-public class WorkbookHelper extends AbstractHelperWD
+public class WorkbookHelper extends AbstractHelper
 {
     public WorkbookHelper(BaseWebDriverTest test)
     {

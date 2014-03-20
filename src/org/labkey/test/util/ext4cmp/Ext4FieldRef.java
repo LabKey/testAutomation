@@ -26,35 +26,35 @@ import static org.junit.Assert.*;
  * Date: 6/20/12
  * Time: 12:40 PM
  */
-public class Ext4FieldRefWD extends Ext4CmpRefWD
+public class Ext4FieldRef extends Ext4CmpRef
 {
-    public Ext4FieldRefWD(String id, BaseWebDriverTest test)
+    public Ext4FieldRef(String id, BaseWebDriverTest test)
     {
         super(id, test);
     }
 
-    public Ext4FieldRefWD(WebElement el, BaseWebDriverTest test)
+    public Ext4FieldRef(WebElement el, BaseWebDriverTest test)
     {
         super(el, test);
     }
 
-    public static Ext4FieldRefWD getForLabel(BaseWebDriverTest test, String label)
+    public static Ext4FieldRef getForLabel(BaseWebDriverTest test, String label)
     {
-        Ext4FieldRefWD ref = test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRefWD.class);
+        Ext4FieldRef ref = test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRef.class);
         assertNotNull("Unable to locate field with label: " + label, ref);
         return ref;
     }
 
-    public static Ext4FieldRefWD getForBoxLabel(BaseWebDriverTest test, String boxLabel)
+    public static Ext4FieldRef getForBoxLabel(BaseWebDriverTest test, String boxLabel)
     {
-        Ext4FieldRefWD ref = test._ext4Helper.queryOne("field[boxLabel^=\"" + boxLabel + "\"]", Ext4FieldRefWD.class);
+        Ext4FieldRef ref = test._ext4Helper.queryOne("field[boxLabel^=\"" + boxLabel + "\"]", Ext4FieldRef.class);
         assertNotNull("Unable to locate field with boxLabel: " + boxLabel, ref);
         return ref;
     }
 
     public static boolean isFieldPresent(BaseWebDriverTest test, String label)
     {
-        return null != test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRefWD.class);
+        return null != test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRef.class);
     }
 
     public void setValue(Object val)

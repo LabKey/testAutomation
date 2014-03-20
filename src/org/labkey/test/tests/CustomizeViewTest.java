@@ -21,7 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Crawler;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,18 +38,18 @@ public class CustomizeViewTest extends BaseWebDriverTest
 {
     public static final String PROJECT_NAME = "CustomizeViewTest";
     public static final String LIST_NAME = "People" + INJECT_CHARS_1;
-    private final static ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.AutoInteger;
+    private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
     protected static final String TEST_ASSAY = "TestAssay1";
     protected static final String TEST_ASSAY_DESC = "Description for assay 1";
 
     private final static String LAST_NAME_COLUMN = "LastName" + INJECT_CHARS_2;
     private final static String FIRST_NAME = "FirstName";
-    private final static ListHelperWD.ListColumn[] LIST_COLUMNS = new ListHelperWD.ListColumn[]
+    private final static ListHelper.ListColumn[] LIST_COLUMNS = new ListHelper.ListColumn[]
             {
-                    new ListHelperWD.ListColumn(FIRST_NAME, FIRST_NAME + INJECT_CHARS_1, ListHelperWD.ListColumnType.String, "The first name"),
-                    new ListHelperWD.ListColumn(LAST_NAME_COLUMN, "Last Name", ListHelperWD.ListColumnType.String, "The last name"),
-                    new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "The age" + INJECT_CHARS_1)
+                    new ListHelper.ListColumn(FIRST_NAME, FIRST_NAME + INJECT_CHARS_1, ListHelper.ListColumnType.String, "The first name"),
+                    new ListHelper.ListColumn(LAST_NAME_COLUMN, "Last Name", ListHelper.ListColumnType.String, "The last name"),
+                    new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "The age" + INJECT_CHARS_1)
             };
     static
     {

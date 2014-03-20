@@ -18,7 +18,7 @@ package org.labkey.test.ms2;
 
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 
 import static org.junit.Assert.*;
 
@@ -51,9 +51,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//input[@id='AssayDesignerName']"), TEST_ASSAY_NAME);
 
-        _listHelper.addField("Run Fields", 0, "IntegerField", "IntegerField", ListHelperWD.ListColumnType.Integer);
-        _listHelper.addField("Run Fields", 1, "TextField", "TextField", ListHelperWD.ListColumnType.String);
-        _listHelper.addField("Run Fields", 2, "BooleanField", "BooleanField", ListHelperWD.ListColumnType.Boolean);
+        _listHelper.addField("Run Fields", 0, "IntegerField", "IntegerField", ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Run Fields", 1, "TextField", "TextField", ListHelper.ListColumnType.String);
+        _listHelper.addField("Run Fields", 2, "BooleanField", "BooleanField", ListHelper.ListColumnType.Boolean);
 
         sleep(1000);
         clickButton("Save", 0);

@@ -29,11 +29,10 @@ import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4HelperWD;
-import org.labkey.test.util.UIContainerHelper;
-import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
-import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
-import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
+import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4GridRef;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -193,15 +192,15 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         _helper.waitForField("Sample Type");
 
         //switch import method
-        Ext4FieldRefWD field = Ext4FieldRefWD.getForBoxLabel(this, "Pivoted By Test");
+        Ext4FieldRef field = Ext4FieldRef.getForBoxLabel(this, "Pivoted By Test");
         field.setChecked(true);
 
         _helper.waitForField("Sample Type"); //form is re-rendered when import method changed
-        Ext4FieldRefWD.getForLabel(this, "Run Description").setValue("Description");
+        Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
 
-        Ext4FieldRefWD.getForLabel(this, "Sample Type").setValue("Serum");
+        Ext4FieldRef.getForLabel(this, "Sample Type").setValue("Serum");
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         StringBuilder sb = new StringBuilder();
         for (String[] row : PIVOT_DATA)
         {
@@ -214,11 +213,11 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll(originalTest, "FakeTest");
         textarea.setValue(errorText);
 
-        Ext4CmpRefWD button = _ext4Helper.queryOne("button[text=\"Upload\"]", Ext4CmpRefWD.class);
+        Ext4CmpRef button = _ext4Helper.queryOne("button[text=\"Upload\"]", Ext4CmpRef.class);
         button.waitForEnabled();
 
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
+        waitForElement(Ext4Helper.ext4Window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
         waitAndClick(Locator.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: FakeTest (ng/ml)");
@@ -226,7 +225,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         log("Saving valid data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         waitAndClick(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 
@@ -265,7 +264,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("Prepare Run");
-        waitForElement(Ext4HelperWD.ext4Window(IMPORT_DATA_TEXT));
+        waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
         waitAndClick(Locator.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<>();
@@ -291,11 +290,11 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
 
         waitAndClick(Locator.ext4Button("Save and Close"));
 
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         assertElementPresent(Locator.xpath("//div[contains(text(), 'Unknown value for field category: " + category + "')]"));
         click(Locator.ext4Button("OK"));
 
-        Ext4GridRefWD grid = _ext4Helper.queryOne("grid", Ext4GridRefWD.class);
+        Ext4GridRef grid = _ext4Helper.queryOne("grid", Ext4GridRef.class);
         grid.setGridCellJS(1, "category", "Blank");
         templateData[1][1] = "Blank"; //restore original value to array
 
@@ -353,17 +352,17 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         Locator btn = Locator.linkContainingText("Download Example Data");
         waitForElement(btn);
 
-        assertEquals("Incorrect value for field", "Roche E411", Ext4FieldRefWD.getForLabel(this, "Instrument").getValue());
-        assertEquals("Incorrect value for field", "Electrochemiluminescence", Ext4FieldRefWD.getForLabel(this, "Method").getValue());
+        assertEquals("Incorrect value for field", "Roche E411", Ext4FieldRef.getForLabel(this, "Instrument").getValue());
+        assertEquals("Incorrect value for field", "Electrochemiluminescence", Ext4FieldRef.getForLabel(this, "Method").getValue());
         waitAndClick(btn);
 
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("#fileContent", Ext4FieldRef.class);
         String text = _helper.getExampleData();
 
         log("Trying to save data");
         textarea.setValue(text);
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         click(Locator.ext4Button("OK"));
         waitForText("Import Samples");
 

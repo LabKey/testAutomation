@@ -30,12 +30,12 @@ import org.labkey.test.categories.External;
 import org.labkey.test.categories.LabModule;
 import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.Ext4HelperWD;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LabModuleHelper;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
-import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
-import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4GridRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
@@ -120,7 +120,7 @@ public class SequenceTest extends BaseWebDriverTest
         setFormElementJS(Locator.name("text"), getIlluminaNames());
 
         waitAndClick(Locator.ext4Button("Upload"));
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         _readsetCt += 14;
         assertTextPresent("Success!");
         clickButton("OK");
@@ -155,7 +155,7 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("You have chosen to export " + _readsetCt + " samples");
         _helper.waitForField("Investigator Name");
 
-        Ext4FieldRefWD.getForLabel(this, "Reagent Cassette Id").setValue("FlowCell");
+        Ext4FieldRef.getForLabel(this, "Reagent Cassette Id").setValue("FlowCell");
 
         String[][] fieldPairs = {
                 {"Investigator Name", "Investigator"},
@@ -168,7 +168,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         for (String[] a : fieldPairs)
         {
-            Ext4FieldRefWD.getForLabel(this, a[0]).setValue(a[1]);
+            Ext4FieldRef.getForLabel(this, a[0]).setValue(a[1]);
         }
 
         _ext4Helper.clickTabContainingText("Preview Header");
@@ -176,7 +176,7 @@ public class SequenceTest extends BaseWebDriverTest
         for (String[] a : fieldPairs)
         {
             String propName = a.length == 3 ? a[2] : a[0];
-            assertEquals(a[1], Ext4FieldRefWD.getForLabel(this, propName).getValue());
+            assertEquals(a[1], Ext4FieldRef.getForLabel(this, propName).getValue());
         }
 
         clickButton("Edit Sheet", 0);
@@ -190,7 +190,7 @@ public class SequenceTest extends BaseWebDriverTest
         //add new values
         String prop_name = "NewProperty";
         String prop_value = "NewValue";
-        Ext4FieldRefWD textarea = _ext4Helper.queryOne("textarea[itemId='sourceField']", Ext4FieldRefWD.class);
+        Ext4FieldRef textarea = _ext4Helper.queryOne("textarea[itemId='sourceField']", Ext4FieldRef.class);
         String newValue = prop_name + "," + prop_value;
         String val = (String)textarea.getValue();
         val += "\n" + newValue;
@@ -199,7 +199,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         //verify template has changed
         _ext4Helper.clickTabContainingText("General Info");
-        assertEquals("Custom", Ext4FieldRefWD.getForLabel(this, "Application").getValue());
+        assertEquals("Custom", Ext4FieldRef.getForLabel(this, "Application").getValue());
 
         //verify samples present
         _ext4Helper.clickTabContainingText("Preview Samples");
@@ -210,7 +210,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         //NOTE: hitting download will display the text in the browser; however, this replaces newlines w/ spaces.  therefore we use selenium
         //to directly get the output
-        Ext4CmpRefWD panel = _ext4Helper.queryOne("#illuminaPanel", Ext4CmpRefWD.class);
+        Ext4CmpRef panel = _ext4Helper.queryOne("#illuminaPanel", Ext4CmpRef.class);
         String outputTable = panel.getEval("getTableOutput().join(\"<>\")").toString();
         outputTable = outputTable.replaceAll("<>", System.getProperty("line.separator"));
 
@@ -346,18 +346,18 @@ public class SequenceTest extends BaseWebDriverTest
         dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "Download Sequence Files");
-        waitForElement(Ext4HelperWD.ext4Window("Export Files"));
+        waitForElement(Ext4Helper.ext4Window("Export Files"));
         waitForText("Export Files As");
-        Ext4CmpRefWD window = _ext4Helper.queryOne("#exportFilesWin", Ext4CmpRefWD.class);
+        Ext4CmpRef window = _ext4Helper.queryOne("#exportFilesWin", Ext4CmpRef.class);
         String fileName = "MyFile";
-        Ext4FieldRefWD.getForLabel(this, "File Prefix").setValue(fileName);
+        Ext4FieldRef.getForLabel(this, "File Prefix").setValue(fileName);
         String url = window.getEval("getURL()").toString();
         assertTrue("Improper URL to download sequences", url.contains("zipFileName=" + fileName));
         assertTrue("Improper URL to download sequences", url.contains("exportFiles.view?"));
         assertEquals("Wrong number of files selected", 28, StringUtils.countMatches(url, "dataIds="));
 
-        _ext4Helper.queryOne("field[boxLabel='Forward Reads']", Ext4FieldRefWD.class).setValue("false");
-        _ext4Helper.queryOne("field[boxLabel='Merge into Single FASTQ File']", Ext4FieldRefWD.class).setChecked(true);
+        _ext4Helper.queryOne("field[boxLabel='Forward Reads']", Ext4FieldRef.class).setValue("false");
+        _ext4Helper.queryOne("field[boxLabel='Merge into Single FASTQ File']", Ext4FieldRef.class).setChecked(true);
 
         url = window.getEval("getURL()").toString();
         assertEquals("Wrong number of files selected", 14, StringUtils.countMatches(url, "dataIds="));
@@ -406,10 +406,10 @@ public class SequenceTest extends BaseWebDriverTest
         waitForText("3-Barcode:");
         waitForText("Run:");
         String newName = "ChangedSample";
-        Ext4FieldRefWD.getForLabel(this, "Name").setValue(newName);
+        Ext4FieldRef.getForLabel(this, "Name").setValue(newName);
         sleep(250); //wait for value to save
         clickButton("Submit", 0);
-        waitForElement(Ext4HelperWD.ext4Window("Success"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
         assertTextPresent("Your upload was successful!");
         clickButton("OK");
 
@@ -440,7 +440,7 @@ public class SequenceTest extends BaseWebDriverTest
         rowIds.add(dr.getDataAsText(6, "Readset Id"));
 
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "Analyze Selected");
-        waitForElement(Ext4HelperWD.ext4Window("Import Data"));
+        waitForElement(Ext4Helper.ext4Window("Import Data"));
         waitForText("Description");
         waitAndClickAndWait(Locator.ext4Button("Submit"));
 
@@ -476,25 +476,25 @@ public class SequenceTest extends BaseWebDriverTest
             assertTextPresent("Illumina-R2-" + rowId + ".fastq.gz");
         }
 
-        Ext4FieldRefWD.getForLabel(this, "Job Name").setValue(jobName);
-        Ext4FieldRefWD.getForLabel(this, "Description").setValue(analysisDescription);
+        Ext4FieldRef.getForLabel(this, "Job Name").setValue(jobName);
+        Ext4FieldRef.getForLabel(this, "Description").setValue(analysisDescription);
 
         log("Verifying Pre-processing section");
-        WebElement el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Total Reads").getId()));
+        WebElement el = getDriver().findElement(By.id(Ext4FieldRef.getForLabel(this, "Total Reads").getId()));
         assertFalse("Reads field should be hidden", el.isDisplayed());
-        Ext4FieldRefWD.getForLabel(this, "Downsample Reads").setChecked(true);
-        el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Total Reads").getId()));
+        Ext4FieldRef.getForLabel(this, "Downsample Reads").setChecked(true);
+        el = getDriver().findElement(By.id(Ext4FieldRef.getForLabel(this, "Total Reads").getId()));
         assertTrue("Reads field should be visible", el.isDisplayed());
 
-        Ext4FieldRefWD.getForLabel(this, "Total Reads").setValue(totalReads);
+        Ext4FieldRef.getForLabel(this, "Total Reads").setValue(totalReads);
 
-        Ext4FieldRefWD.getForLabel(this, "Minimum Read Length").setValue(minReadLength);
-        Ext4FieldRefWD.getForLabel(this, "Adapter Trimming").setChecked(true);
+        Ext4FieldRef.getForLabel(this, "Minimum Read Length").setValue(minReadLength);
+        Ext4FieldRef.getForLabel(this, "Adapter Trimming").setChecked(true);
         waitForText("Adapters");
         clickButton("Common Adapters", 0);
-        waitForElement(Ext4HelperWD.ext4Window("Choose Adapters"));
+        waitForElement(Ext4Helper.ext4Window("Choose Adapters"));
         waitForText("Choose Adapter Group");
-        Ext4FieldRefWD.getForLabel(this, "Choose Adapter Group").setValue("Roche-454 FLX Amplicon");
+        Ext4FieldRef.getForLabel(this, "Choose Adapter Group").setValue("Roche-454 FLX Amplicon");
         waitAndClick(Locator.ext4Button("Submit"));
 
         waitForText(rocheAdapters[0][0]);
@@ -503,12 +503,12 @@ public class SequenceTest extends BaseWebDriverTest
         assertTextPresent(rocheAdapters[0][1]);
         assertTextPresent(rocheAdapters[1][1]);
 
-        _ext4Helper.queryOne("#adapterGrid", Ext4CmpRefWD.class).eval("getSelectionModel().select(0)");
+        _ext4Helper.queryOne("#adapterGrid", Ext4CmpRef.class).eval("getSelectionModel().select(0)");
         clickButton("Move Down", 0);
         sleep(500);
         assertTextBefore(rocheAdapters[1][0], rocheAdapters[0][0]);
 
-        _ext4Helper.queryOne("#adapterGrid", Ext4CmpRefWD.class).eval("getSelectionModel().select(1)");
+        _ext4Helper.queryOne("#adapterGrid", Ext4CmpRef.class).eval("getSelectionModel().select(1)");
         clickButton("Move Up", 0);
         sleep(500);
         assertTextBefore(rocheAdapters[0][0], rocheAdapters[1][0]);
@@ -517,38 +517,38 @@ public class SequenceTest extends BaseWebDriverTest
         sleep(500);
         assertTextNotPresent(rocheAdapters[0][0]);
 
-        Ext4FieldRefWD.getForLabel(this, "Seed Mismatches").setValue(seedMismatches);
-        Ext4FieldRefWD.getForLabel(this, "Simple Clip Threshold").setValue(simpleClipThreshold);
+        Ext4FieldRef.getForLabel(this, "Seed Mismatches").setValue(seedMismatches);
+        Ext4FieldRef.getForLabel(this, "Simple Clip Threshold").setValue(simpleClipThreshold);
 
-        el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Window Size").getId()));
+        el = getDriver().findElement(By.id(Ext4FieldRef.getForLabel(this, "Window Size").getId()));
         assertFalse("Window Size field should be hidden", el.isDisplayed());
-        Ext4FieldRefWD.getForLabel(this, "Quality Trimming (by sliding window)").setChecked(true);
+        Ext4FieldRef.getForLabel(this, "Quality Trimming (by sliding window)").setChecked(true);
 
-        el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Window Size").getId()));
+        el = getDriver().findElement(By.id(Ext4FieldRef.getForLabel(this, "Window Size").getId()));
         assertTrue("Window Size field should be visible", el.isDisplayed());
 
-        Ext4FieldRefWD.getForLabel(this, "Window Size").setValue(qualWindowSize);
-        Ext4FieldRefWD.getForLabel(this, "Avg Qual").setValue(qualAvgQual);
+        Ext4FieldRef.getForLabel(this, "Window Size").setValue(qualWindowSize);
+        Ext4FieldRef.getForLabel(this, "Avg Qual").setValue(qualAvgQual);
 
-        el = getDriver().findElement(By.id(Ext4FieldRefWD.getForLabel(this, "Min Qual").getId()));
+        el = getDriver().findElement(By.id(Ext4FieldRef.getForLabel(this, "Min Qual").getId()));
         assertFalse("Min Qual field should be hidden", el.isDisplayed());
 
         log("Testing Alignment Section");
 
         log("Testing whether sections are disabled when alignment unchecked");
-        Ext4FieldRefWD.getForLabel(this, "Perform Alignment").setChecked(false);
-        assertEquals("Field should be hidden", false, Ext4FieldRefWD.isFieldPresent(this, "Reference Library Type"));
-        assertEquals("Field should be hidden", false, Ext4FieldRefWD.isFieldPresent(this, "Aligner"));
+        Ext4FieldRef.getForLabel(this, "Perform Alignment").setChecked(false);
+        assertEquals("Field should be hidden", false, Ext4FieldRef.isFieldPresent(this, "Reference Library Type"));
+        assertEquals("Field should be hidden", false, Ext4FieldRef.isFieldPresent(this, "Aligner"));
 
-        assertEquals("Field should be disabled", true, Ext4FieldRefWD.getForLabel(this, "Sequence Based Genotyping").getEval("isDisabled()"));
-        assertEquals("Field should be disabled", true, Ext4FieldRefWD.getForLabel(this, "Min SNP Quality").getEval("isDisabled()"));
+        assertEquals("Field should be disabled", true, Ext4FieldRef.getForLabel(this, "Sequence Based Genotyping").getEval("isDisabled()"));
+        assertEquals("Field should be disabled", true, Ext4FieldRef.getForLabel(this, "Min SNP Quality").getEval("isDisabled()"));
 
-        Ext4FieldRefWD.getForLabel(this, "Perform Alignment").setChecked(true);
+        Ext4FieldRef.getForLabel(this, "Perform Alignment").setChecked(true);
         waitForText("Reference Library Type");
         sleep(500);
 
         log("Testing aligner field and descriptions");
-        Ext4FieldRefWD alignerField = Ext4FieldRefWD.getForLabel(this, "Aligner");
+        Ext4FieldRef alignerField = Ext4FieldRef.getForLabel(this, "Aligner");
 
         alignerField.setValue("bwa");
         alignerField.eval("fireEvent(\"select\", Ext4.getCmp('" + alignerField.getId() + "'), 'bwa')");
@@ -577,26 +577,26 @@ public class SequenceTest extends BaseWebDriverTest
             @Override
             public boolean check()
             {
-                return !(Boolean)Ext4FieldRefWD.getForLabel(test, "Virus Strain").getEval("store.isLoading()");
+                return !(Boolean) Ext4FieldRef.getForLabel(test, "Virus Strain").getEval("store.isLoading()");
             }
         }, "Combo store did not load", WAIT_FOR_JAVASCRIPT);
 
         sleep(100);
-        Ext4FieldRefWD.getForLabel(this, "Virus Strain").setValue(strain);
+        Ext4FieldRef.getForLabel(this, "Virus Strain").setValue(strain);
 
-        Ext4FieldRefWD.getForLabel(this, "Min SNP Quality").setValue(minSnpQual);
-        Ext4FieldRefWD.getForLabel(this, "Min Avg SNP Quality").setValue(minAvgSnpQual);
-        Ext4FieldRefWD.getForLabel(this, "Min DIP Quality").setValue(minDipQual);
-        Ext4FieldRefWD.getForLabel(this, "Min Avg DIP Quality").setValue(minAvgDipQual);
+        Ext4FieldRef.getForLabel(this, "Min SNP Quality").setValue(minSnpQual);
+        Ext4FieldRef.getForLabel(this, "Min Avg SNP Quality").setValue(minAvgSnpQual);
+        Ext4FieldRef.getForLabel(this, "Min DIP Quality").setValue(minDipQual);
+        Ext4FieldRef.getForLabel(this, "Min Avg DIP Quality").setValue(minAvgDipQual);
 
-        Ext4FieldRefWD.getForLabel(this, "Sequence Based Genotyping").setChecked(true);
+        Ext4FieldRef.getForLabel(this, "Sequence Based Genotyping").setChecked(true);
 
-//        Ext4FieldRefWD.getForLabel(this, "Max Alignment Mismatches").setValue(maxAlignMismatch);
-//        Ext4FieldRefWD.getForLabel(this, "Assemble Unaligned Reads").setChecked(true);
-//        Ext4FieldRefWD.getForLabel(this, "Assembly Percent Identity").setValue(assembleUnalignedPct);
-//        Ext4FieldRefWD.getForLabel(this, "Min Sequences Per Contig").setValue(minContigsForNovel);
+//        Ext4FieldRef.getForLabel(this, "Max Alignment Mismatches").setValue(maxAlignMismatch);
+//        Ext4FieldRef.getForLabel(this, "Assemble Unaligned Reads").setChecked(true);
+//        Ext4FieldRef.getForLabel(this, "Assembly Percent Identity").setValue(assembleUnalignedPct);
+//        Ext4FieldRef.getForLabel(this, "Min Sequences Per Contig").setValue(minContigsForNovel);
 
-        Ext4CmpRefWD panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRefWD.class);
+        Ext4CmpRef panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRef.class);
         Map<String, Object> params = (Map)panel.getEval("getJsonParams()");
 
         String container = (String)executeScript("return LABKEY.Security.currentContainer.id");
@@ -696,25 +696,25 @@ public class SequenceTest extends BaseWebDriverTest
         beginAt(url);
         waitForText("Specialized Analysis");
 
-        Ext4FieldRefWD analysisField = Ext4FieldRefWD.getForLabel(this, "Specialized Analysis");
+        Ext4FieldRef analysisField = Ext4FieldRef.getForLabel(this, "Specialized Analysis");
         analysisField.setValue("SBT");
 
-        assertEquals("Incorrect field value", "DNA", Ext4FieldRefWD.getForLabel(this, "Reference Library Type").getValue());
+        assertEquals("Incorrect field value", "DNA", Ext4FieldRef.getForLabel(this, "Reference Library Type").getValue());
         String species = "Human";
         String molType = "gDNA";
 
         String jobName2 = "Job2";
-        Ext4FieldRefWD.getForLabel(this, "Job Name").setValue(jobName2);
-        waitForElementToDisappear(Ext4HelperWD.invalidField(), WAIT_FOR_JAVASCRIPT);
+        Ext4FieldRef.getForLabel(this, "Job Name").setValue(jobName2);
+        waitForElementToDisappear(Ext4Helper.invalidField(), WAIT_FOR_JAVASCRIPT);
 
-        Ext4FieldRefWD.getForLabel(this, "Species").setValue(species);
-        Ext4FieldRefWD.getForLabel(this, "Subset").eval("setValue([\"KIR\",\"MHC\"])");
-        Ext4FieldRefWD.getForLabel(this, "Molecule Type").setValue(molType);
-        Ext4FieldRefWD.getForLabel(this, "Loci").eval("setValue([\"KIR1D\",\"HLA-A\"])");
+        Ext4FieldRef.getForLabel(this, "Species").setValue(species);
+        Ext4FieldRef.getForLabel(this, "Subset").eval("setValue([\"KIR\",\"MHC\"])");
+        Ext4FieldRef.getForLabel(this, "Molecule Type").setValue(molType);
+        Ext4FieldRef.getForLabel(this, "Loci").eval("setValue([\"KIR1D\",\"HLA-A\"])");
 
-        Ext4FieldRefWD.getForLabel(this, "Calculate and Save NT SNPs").setValue("false");
-        Ext4FieldRefWD.getForLabel(this, "Calculate and Save Coverage Depth").setValue("false");
-        Ext4FieldRefWD.getForLabel(this, "Calculate and Save AA SNPs").setValue("false");
+        Ext4FieldRef.getForLabel(this, "Calculate and Save NT SNPs").setValue("false");
+        Ext4FieldRef.getForLabel(this, "Calculate and Save Coverage Depth").setValue("false");
+        Ext4FieldRef.getForLabel(this, "Calculate and Save AA SNPs").setValue("false");
 
         params = (Map)panel.getEval("getJsonParams()");
 
@@ -809,16 +809,16 @@ public class SequenceTest extends BaseWebDriverTest
         initiatePipelineJob(_readsetPipelineName, filename1, filename2);
         waitForText("Job Name");
 
-        Ext4FieldRefWD.getForLabel(this, "Job Name").setValue("SequenceTest_" + System.currentTimeMillis());
+        Ext4FieldRef.getForLabel(this, "Job Name").setValue("SequenceTest_" + System.currentTimeMillis());
 
         waitForElement(Locator.linkContainingText(filename1));
         waitForElement(Locator.linkContainingText(filename2));
 
-        Ext4FieldRefWD barcodeField = Ext4FieldRefWD.getForLabel(this, "Use Barcodes");
-        Ext4FieldRefWD treatmentField = Ext4FieldRefWD.getForLabel(this, "Treatment of Input Files");
-        Ext4FieldRefWD mergeField = Ext4FieldRefWD.getForLabel(this, "Merge Files");
-        Ext4FieldRefWD pairedField = Ext4FieldRefWD.getForLabel(this, "Data Is Paired End");
-        Ext4GridRefWD grid = getSampleGrid();
+        Ext4FieldRef barcodeField = Ext4FieldRef.getForLabel(this, "Use Barcodes");
+        Ext4FieldRef treatmentField = Ext4FieldRef.getForLabel(this, "Treatment of Input Files");
+        Ext4FieldRef mergeField = Ext4FieldRef.getForLabel(this, "Merge Files");
+        Ext4FieldRef pairedField = Ext4FieldRef.getForLabel(this, "Data Is Paired End");
+        Ext4GridRef grid = getSampleGrid();
 
         assertEquals("Incorrect starting value for input file-handling field", "delete", treatmentField.getValue());
 
@@ -839,7 +839,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Incorrect value for input file-handling field after merge toggle", "compress", treatmentField.getValue());
         assertTrue("Paired end field should be disabled when merge is checked", pairedField.isDisabled());
 
-        Ext4FieldRefWD mergenameField = Ext4FieldRefWD.getForLabel(this, "Name For Merged File");
+        Ext4FieldRef mergenameField = Ext4FieldRef.getForLabel(this, "Name For Merged File");
 
         assertTrue("Merge name field should be visible", mergenameField.isVisible());
         assertEquals("Merged file name not set in grid correctly", "MergedFile", grid.getFieldValue(1, "fileName"));
@@ -861,7 +861,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         //now set real values
         click(Locator.ext4Button("Add"));
-        waitForElement(Ext4GridRefWD.locateExt4GridRow(2, grid.getId()));
+        waitForElement(Ext4GridRef.locateExt4GridRow(2, grid.getId()));
 
         //the first field is pre-selected
         grid.cancelEdit();
@@ -869,7 +869,7 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCell(1, "fileName", filename1);
         grid.setGridCell(2, "fileName", filename1);
         waitAndClick(Locator.ext4Button("Import Data"));
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("For each file, you must provide either the Id of an existing, unused readset or a name/platform to create a new one");
         click(Locator.ext4Button("OK"));
 
@@ -885,14 +885,14 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCell(2, "sampledate", "2010-10-20");
 
         waitAndClick(Locator.ext4Button("Import Data"));
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         waitForElement(Locator.tagContainingText("div", "Duplicate Sample: " + filename1 + ". Please remove or edit rows"));
         waitAndClick(Locator.ext4Button("OK"));
 
         //verify paired end
         pairedField.setChecked(true);
         waitAndClick(Locator.ext4Button("Import Data"));
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("Either choose a file or unchecked paired-end.");
         waitAndClick(Locator.ext4Button("OK"));
         pairedField.setChecked(false);
@@ -903,13 +903,13 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCellJS(1, "mid5", barcode);
         grid.setGridCellJS(2, "mid3", barcode);
         waitAndClick(Locator.ext4Button("Import Data"));
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("All samples must either use no barcodes, 5' only, 3' only or both ends");
         click(Locator.ext4Button("OK"));
         barcodeField.setChecked(false);
         grid.setGridCell(2, "fileName", filename2);
 
-        Ext4CmpRefWD panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRefWD.class);
+        Ext4CmpRef panel = _ext4Helper.queryOne("#sequenceAnalysisPanel", Ext4CmpRef.class);
         Map<String, Object> params = (Map)panel.getEval("getJsonParams()");
         Map<String, Object> fieldsJson = (Map)params.get("json");
         //List<Long> fileIds = (List)params.get("distinctIds");
@@ -962,12 +962,12 @@ public class SequenceTest extends BaseWebDriverTest
         assertFalse("param shold not be present", sample1.containsKey("mid3"));
 
         barcodeField.setValue(true);
-        Ext4FieldRefWD.getForLabel(this, "Additional Barcodes").setValue("GSMIDs");
-        Ext4FieldRefWD.getForLabel(this, "Mismatches Tolerated").setValue(9);
-        Ext4FieldRefWD.getForLabel(this, "Deletions Tolerated").setValue(9);
-        Ext4FieldRefWD.getForLabel(this, "Allowed Distance From Read End").setValue(9);
+        Ext4FieldRef.getForLabel(this, "Additional Barcodes").setValue("GSMIDs");
+        Ext4FieldRef.getForLabel(this, "Mismatches Tolerated").setValue(9);
+        Ext4FieldRef.getForLabel(this, "Deletions Tolerated").setValue(9);
+        Ext4FieldRef.getForLabel(this, "Allowed Distance From Read End").setValue(9);
 
-        Ext4FieldRefWD.getForLabel(this, "Delete Intermediate Files").setValue(false);
+        Ext4FieldRef.getForLabel(this, "Delete Intermediate Files").setValue(false);
         treatmentField.setValue("compress");
 
         mergeField.setValue(true);
@@ -1015,7 +1015,7 @@ public class SequenceTest extends BaseWebDriverTest
         pairedField.setValue(false);
         barcodeField.setValue(true);
         waitAndClick(Locator.ext4Button("Add"));
-        waitForElement(Ext4GridRefWD.locateExt4GridRow(2, grid.getId()));
+        waitForElement(Ext4GridRef.locateExt4GridRow(2, grid.getId()));
         getDriver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
         sleep(100);
 
@@ -1058,13 +1058,13 @@ public class SequenceTest extends BaseWebDriverTest
         initiatePipelineJob(_readsetPipelineName, filename1, filename2);
         waitForText("Job Name");
 
-        Ext4FieldRefWD.getForLabel(this, "Job Name").setValue("SequenceTest_" + System.currentTimeMillis());
+        Ext4FieldRef.getForLabel(this, "Job Name").setValue("SequenceTest_" + System.currentTimeMillis());
 
         waitForElement(Locator.linkContainingText(filename1));
         waitForElement(Locator.linkContainingText(filename2));
 
-        Ext4FieldRefWD.getForLabel(this, "Treatment of Input Files").setValue("none");
-        Ext4GridRefWD grid = getSampleGrid();
+        Ext4FieldRef.getForLabel(this, "Treatment of Input Files").setValue("none");
+        Ext4GridRef grid = getSampleGrid();
 
         String readset1 = "ReadsetTest1";
         String readset2 = "ReadsetTest2";
@@ -1100,7 +1100,7 @@ public class SequenceTest extends BaseWebDriverTest
         goToProjectHome();
         initiatePipelineJob(_readsetPipelineName, filename1, filename2);
         waitForText("Job Name");
-        waitForElement(Ext4HelperWD.ext4Window("Error"));
+        waitForElement(Ext4Helper.ext4Window("Error"));
         waitForElement(Locator.tagContainingText("div", "There are errors with the input files"));
         isTextPresent("File is already used in existing readsets')]");
         assertElementPresent(Locator.xpath("//td[contains(@style, 'background: red')]"));
@@ -1116,9 +1116,9 @@ public class SequenceTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    protected Ext4GridRefWD getSampleGrid()
+    protected Ext4GridRef getSampleGrid()
     {
-        return _ext4Helper.queryOne("#sampleGrid", Ext4GridRefWD.class);
+        return _ext4Helper.queryOne("#sampleGrid", Ext4GridRef.class);
     }
 
     protected void cleanupDirectory(String path)

@@ -7,11 +7,11 @@ import org.labkey.test.Locator;
 /**
  * Created by klum on 3/3/14.
  */
-public class DilutionAssayHelperWD
+public class DilutionAssayHelper
 {
     private BaseWebDriverTest _test;
 
-    public DilutionAssayHelperWD(BaseWebDriverTest test)
+    public DilutionAssayHelper(BaseWebDriverTest test)
     {
         _test = test;
     }

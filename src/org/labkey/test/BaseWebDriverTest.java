@@ -54,9 +54,9 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.*;
-import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
-import org.labkey.test.util.ext4cmp.Ext4ComboRefWD;
-import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4ComboRef;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
@@ -163,15 +163,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private static JSErrorChecker _jsErrorChecker = null;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
-    public ExtHelperWD _extHelper = new ExtHelperWD(this);
-    public Ext4HelperWD _ext4Helper = new Ext4HelperWD(this);
-    public CustomizeViewsHelperWD _customizeViewsHelper = new CustomizeViewsHelperWD(this);
-    public StudyHelperWD _studyHelper = new StudyHelperWD(this);
-    public ListHelperWD _listHelper = new ListHelperWD(this);
+    public ExtHelper _extHelper = new ExtHelper(this);
+    public Ext4Helper _ext4Helper = new Ext4Helper(this);
+    public CustomizeViewsHelper _customizeViewsHelper = new CustomizeViewsHelper(this);
+    public StudyHelper _studyHelper = new StudyHelper(this);
+    public ListHelper _listHelper = new ListHelper(this);
     public AbstractUserHelper _userHelper = new APIUserHelper(this);
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
-    public SecurityHelperWD _securityHelper = new SecurityHelperWD(this);
-    public FileBrowserHelperWD _fileBrowserHelper = new FileBrowserHelperWD(this);
+    public SecurityHelper _securityHelper = new SecurityHelper(this);
+    public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
     private static File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
@@ -200,10 +200,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public BaseWebDriverTest()
     {
-        _extHelper = new ExtHelperWD(this);
-        _ext4Helper = new Ext4HelperWD(this);
-        _listHelper = new ListHelperWD(this);
-        _customizeViewsHelper = new CustomizeViewsHelperWD(this);
+        _extHelper = new ExtHelper(this);
+        _ext4Helper = new Ext4Helper(this);
+        _listHelper = new ListHelper(this);
+        _customizeViewsHelper = new CustomizeViewsHelper(this);
         _jsErrors = new ArrayList<>();
         _downloadDir = new File(ensureDumpDir(), "downloads");
 
@@ -2937,8 +2937,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         _ext4Helper.clickTabContainingText("Project Groups");
         // warning Adminstrators can apper multiple times
-        List<Ext4CmpRefWD> refs = _ext4Helper.componentQuery("grid", Ext4CmpRefWD.class);
-        Ext4CmpRefWD ref = refs.get(0);
+        List<Ext4CmpRef> refs = _ext4Helper.componentQuery("grid", Ext4CmpRef.class);
+        Ext4CmpRef ref = refs.get(0);
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
         ref.eval("getSelectionModel().select(" + idx + ")");
@@ -2955,8 +2955,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         _ext4Helper.clickTabContainingText("Site Groups");
         // warning Adminstrators can apper multiple times
-        List<Ext4CmpRefWD> refs = _ext4Helper.componentQuery("grid", Ext4CmpRefWD.class);
-        Ext4CmpRefWD ref = refs.get(0);
+        List<Ext4CmpRef> refs = _ext4Helper.componentQuery("grid", Ext4CmpRef.class);
+        Ext4CmpRef ref = refs.get(0);
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
         ref.eval("getSelectionModel().select(" + idx + ")");
@@ -3138,7 +3138,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickFolder(folderName);
         ensureAdminMode();
         goToFolderManagement();
-        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName));
+        waitForElement(Ext4Helper.Locators.folderManagementTreeNode(folderName));
         clickButton("Delete");
         // confirm delete subfolders if present
         if(isTextPresent("This folder has subfolders."))
@@ -3159,7 +3159,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickFolder(folderName);
         ensureAdminMode();
         goToFolderManagement();
-        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName).notHidden());
+        waitForElement(Ext4Helper.Locators.folderManagementTreeNode(folderName).notHidden());
         clickButton("Rename");
         setFormElement(Locator.name("name"), newFolderName);
         if (createAlias)
@@ -3184,7 +3184,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickFolder(folderName);
         ensureAdminMode();
         goToFolderManagement();
-        waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(folderName));
+        waitForElement(Ext4Helper.Locators.folderManagementTreeNode(folderName));
         clickButton("Move");
         if (createAlias)
             checkCheckbox(Locator.name("addAlias"));
@@ -3933,7 +3933,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             map.put("propName", value.getPropertyName());
             waitForText(value.getPropertyName()); //wait for the property name to appear
             String query = ComponentQuery.fromAttributes("field", map);
-            Ext4FieldRefWD ref = _ext4Helper.queryOne(query, Ext4FieldRefWD.class);
+            Ext4FieldRef ref = _ext4Helper.queryOne(query, Ext4FieldRef.class);
             String val = (String)ref.getValue();
             if((StringUtils.isEmpty(val) != StringUtils.isEmpty(value.getValue())) || !val.equals(value.getValue()))
             {
@@ -5420,7 +5420,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     /**
      * From the assay design page, add a field with the given name, label, and type
      */
-    public void addRunField(String name, String label, ListHelperWD.ListColumnType type)
+    public void addRunField(String name, String label, ListHelper.ListColumnType type)
     {
         String xpath = ("//input[starts-with(@name, 'ff_name");
         int newFieldIndex = getElementCount(Locator.xpath(xpath + "')]"));
@@ -5475,7 +5475,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     /**
      * Executes an Ext.menu.Item's handler.
-     * @deprecated Use {@link ExtHelperWD#clickExtComponent(String)}
+     * @deprecated Use {@link org.labkey.test.util.ExtHelper#clickExtComponent(String)}
      */
     @Deprecated public boolean runMenuItemHandler(String id)
     {
@@ -5485,7 +5485,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     /**
      * Clicks the labkey menu item and optional submenu labels (for cascading menus)
-     * @deprecated Use {@link ExtHelperWD#clickMenuButton(boolean, String, String...)}
+     * @deprecated Use {@link org.labkey.test.util.ExtHelper#clickMenuButton(boolean, String, String...)}
      */
     @Deprecated public void clickMenuButton(String menusLabel, String ... subMenusLabels)
     {
@@ -5495,7 +5495,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     /**
      * Clicks the ext menu item and optional submenu labels's (for cascading menus)
      * Does not wait for page load.
-     * @deprecated Use {@link ExtHelperWD#clickMenuButton(boolean, String, String...)}
+     * @deprecated Use {@link org.labkey.test.util.ExtHelper#clickMenuButton(boolean, String, String...)}
      */
     @Deprecated public void clickMenuButtonAndContinue(String menusLabel, String ... subMenusLabels)
     {
@@ -5965,11 +5965,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void impersonateGroup(String group, boolean isSiteGroup)
     {
         _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "Group");
-        waitForElement(Ext4HelperWD.Locators.window("Impersonate Group"));
-        Ext4ComboRefWD groupCombo = Ext4ComboRefWD.getForLabel(this, "Group");
+        waitForElement(Ext4Helper.Locators.window("Impersonate Group"));
+        Ext4ComboRef groupCombo = Ext4ComboRef.getForLabel(this, "Group");
         groupCombo.waitForStoreLoad();
         _ext4Helper.selectComboBoxItem("Group:", (isSiteGroup ? "Site: " : "") + group, true);
-        clickAndWait(Ext4HelperWD.ext4WindowButton("Impersonate Group", "Impersonate"));
+        clickAndWait(Ext4Helper.ext4WindowButton("Impersonate Group", "Impersonate"));
     }
 
     public void impersonateRole(String role)
@@ -5994,11 +5994,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void impersonate(String fakeUser)
     {
         _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "User");
-        waitForElement(Ext4HelperWD.Locators.window("Impersonate User"));
-        Ext4ComboRefWD userCombo = Ext4ComboRefWD.getForLabel(this, "User");
+        waitForElement(Ext4Helper.Locators.window("Impersonate User"));
+        Ext4ComboRef userCombo = Ext4ComboRef.getForLabel(this, "User");
         userCombo.waitForStoreLoad();
         _ext4Helper.selectComboBoxItem("User:", fakeUser + " (", true);
-        clickAndWait(Ext4HelperWD.ext4WindowButton("Impersonate User", "Impersonate"));
+        clickAndWait(Ext4Helper.ext4WindowButton("Impersonate User", "Impersonate"));
         _impersonationStack.push(fakeUser);
 
         if (isElementPresent(Locator.navButton("Home")))
@@ -6281,8 +6281,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Project Groups");
         waitForText("Member Groups");
-        List<Ext4CmpRefWD> refs = _ext4Helper.componentQuery("grid", Ext4CmpRefWD.class);
-        Ext4CmpRefWD ref = refs.get(0);
+        List<Ext4CmpRef> refs = _ext4Helper.componentQuery("grid", Ext4CmpRef.class);
+        Ext4CmpRef ref = refs.get(0);
         Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
         exitPermissionsUI();
         return (idx >= 0);

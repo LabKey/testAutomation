@@ -24,9 +24,9 @@ import java.io.FilenameFilter;
 
 import static org.junit.Assert.*;
 
-public class PerlHelperWD extends AbstractHelperWD
+public class PerlHelper extends AbstractHelper
 {
-    public PerlHelperWD(BaseWebDriverTest test)
+    public PerlHelper(BaseWebDriverTest test)
     {
         super(test);
     }

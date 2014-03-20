@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
  * User: kevink
  * Date: Mar 9, 2011
  */
-public class JSONHelper extends AbstractHelperWD
+public class JSONHelper extends AbstractHelper
 {
     // json key elements to ignore during the comparison phase, these can be regular expressions
     static final Pattern[] GLOBALLY_IGNORED = {

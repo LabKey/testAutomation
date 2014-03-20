@@ -19,7 +19,7 @@ package org.labkey.test;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.FileBrowserHelperWD;
+import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
@@ -38,7 +38,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "Flow Verify Project";
     protected static final String PIPELINE_PATH = "/sampledata/flow";
-    private final FileBrowserHelperWD flowFileBrowserHelper = new FileBrowserHelperWD(this);
+    private final FileBrowserHelper flowFileBrowserHelper = new FileBrowserHelper(this);
 
     public String getAssociatedModuleDirectory()
     {

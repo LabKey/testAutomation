@@ -25,7 +25,7 @@ import org.labkey.remoteapi.query.*;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
 import org.labkey.test.util.JSONHelper;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 
@@ -77,10 +77,10 @@ public class ScriptValidationTest extends SimpleModuleTest
 
         log("Create list in subfolder to prevent query validation failure");
         _listHelper.createList(getProjectName(), LIST_NAME,
-                ListHelperWD.ListColumnType.AutoInteger, "Key",
-                new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name"),
-                new ListHelperWD.ListColumn("Age", "Age", ListHelperWD.ListColumnType.Integer, "Age"),
-                new ListHelperWD.ListColumn("Crazy", "Crazy", ListHelperWD.ListColumnType.Boolean, "Crazy?"));
+                ListHelper.ListColumnType.AutoInteger, "Key",
+                new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name"),
+                new ListHelper.ListColumn("Age", "Age", ListHelper.ListColumnType.Integer, "Age"),
+                new ListHelper.ListColumn("Crazy", "Crazy", ListHelper.ListColumnType.Boolean, "Crazy?"));
     }
 
     private void doTestTransformation() throws Exception

@@ -20,7 +20,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 
 /*
 * User: Karl Lum
@@ -52,18 +52,18 @@ public class FieldValidatorTest extends BaseWebDriverTest
         log("Setup project and list module");
         _containerHelper.createProject(PROJECT_NAME, null);
 
-        ListHelperWD.ListColumn[] columns = new ListHelperWD.ListColumn[] {
+        ListHelper.ListColumn[] columns = new ListHelper.ListColumn[] {
 
-                new ListHelperWD.ListColumn("name", "Name", ListHelperWD.ListColumnType.String, ""),
-                new ListHelperWD.ListColumn("id", "ID", ListHelperWD.ListColumnType.String, "",
-                        new ListHelperWD.RegExValidator("idValidator", "idValidator", ID_ERROR_MSG, "ID:.*:001")),
-                new ListHelperWD.ListColumn("age", "Age", ListHelperWD.ListColumnType.Integer, "",
-                        new ListHelperWD.RangeValidator("ageValidator", "ageValidator", AGE_ERROR_MSG, ListHelperWD.RangeType.Equals, "25")),
-                new ListHelperWD.ListColumn("sex", "Sex", ListHelperWD.ListColumnType.String, "",
-                        new ListHelperWD.RegExValidator("sexValidator", "sexValidator", SEX_ERROR_MSG, "male|female")),
+                new ListHelper.ListColumn("name", "Name", ListHelper.ListColumnType.String, ""),
+                new ListHelper.ListColumn("id", "ID", ListHelper.ListColumnType.String, "",
+                        new ListHelper.RegExValidator("idValidator", "idValidator", ID_ERROR_MSG, "ID:.*:001")),
+                new ListHelper.ListColumn("age", "Age", ListHelper.ListColumnType.Integer, "",
+                        new ListHelper.RangeValidator("ageValidator", "ageValidator", AGE_ERROR_MSG, ListHelper.RangeType.Equals, "25")),
+                new ListHelper.ListColumn("sex", "Sex", ListHelper.ListColumnType.String, "",
+                        new ListHelper.RegExValidator("sexValidator", "sexValidator", SEX_ERROR_MSG, "male|female")),
         };
 
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelperWD.ListColumnType.AutoInteger, "Key", columns);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.AutoInteger, "Key", columns);
 
         log("Test upload data");
         clickButton("Import Data");

@@ -24,7 +24,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.Study;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 import java.util.HashMap;
@@ -103,8 +103,8 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickButton("Next");
         waitForElement(Locator.name("ff_name0"));
         _listHelper.deleteField("Dataset Fields", 0);
-        _listHelper.addField("Dataset Fields", 0, "TestInt", "TestInt", ListHelperWD.ListColumnType.Integer);
-        _listHelper.addField("Dataset Fields", 1, "TestDate", "TestDate", ListHelperWD.ListColumnType.DateTime);
+        _listHelper.addField("Dataset Fields", 0, "TestInt", "TestInt", ListHelper.ListColumnType.Integer);
+        _listHelper.addField("Dataset Fields", 1, "TestDate", "TestDate", ListHelper.ListColumnType.DateTime);
         clickButton("Save");
         clickButton("View Data");
         clickButton("Import Data");

@@ -25,7 +25,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIContainerHelper;
 import org.labkey.test.util.AbstractContainerHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIAssayHelper;
@@ -353,7 +353,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     @LogMethod
     private void configureAssaySchema(String assayName)
     {
-        ListHelperWD.LookupInfo lookupInfo = new ListHelperWD.LookupInfo("", "rho", assayName + " Query");
+        ListHelper.LookupInfo lookupInfo = new ListHelper.LookupInfo("", "rho", assayName + " Query");
         _assayHelper.addAliasedFieldToMetadata("assay.General." + assayName, "Data", "RowId", "qcmessage", lookupInfo);
         clickButton("Save", 0);
         waitForText("Save successful.");

@@ -20,7 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 
 import java.io.*;
 
@@ -39,7 +39,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
 
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
     public static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
-    protected static final ListHelperWD.ListColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { ListHelperWD.ListColumnType.Boolean, ListHelperWD.ListColumnType.Integer, ListHelperWD.ListColumnType.DateTime };
+    protected static final ListHelper.ListColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { ListHelper.ListColumnType.Boolean, ListHelper.ListColumnType.Integer, ListHelper.ListColumnType.DateTime };
 
     protected static final String TEST_RUN1_DATA1 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "20\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
             "s1\ta\t1\ttrue\t20\t2000-01-01\n" +
@@ -135,7 +135,7 @@ public class ProgrammaticQCTest extends AbstractQCAssayTest
         }
 
         // add an 'animal' field which will be populated by the transform script
-        _listHelper.addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Animal", "Animal", ListHelperWD.ListColumnType.String);
+        _listHelper.addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Animal", "Animal", ListHelper.ListColumnType.String);
 
         sleep(1000);
         clickButton("Save", 0);

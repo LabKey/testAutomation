@@ -19,11 +19,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.util.ext4cmp.Ext4CmpRefWD;
-import org.labkey.test.util.ext4cmp.Ext4ComboRefWD;
-import org.labkey.test.util.ext4cmp.Ext4FieldRefWD;
-import org.labkey.test.util.ext4cmp.Ext4GridRefWD;
-import org.openqa.selenium.Alert;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4ComboRef;
+import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4GridRef;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -148,7 +147,7 @@ public class LabModuleHelper
             _test.clickTab("Workbooks");
 
         _test.waitAndClickButton("Create New Workbook", 0);
-        _test.waitForElement(Ext4HelperWD.Locators.window("Create Workbook"));
+        _test.waitForElement(Ext4Helper.Locators.window("Create Workbook"));
         _test.setFormElement(Locator.name("title"), workbookTitle);
         _test.setFormElement(Locator.name("description"), workbookDescription);
         _test.clickButton("Submit");
@@ -204,7 +203,7 @@ public class LabModuleHelper
             @Override
             public boolean check()
             {
-                return Ext4FieldRefWD.isFieldPresent(_test, label);
+                return Ext4FieldRef.isFieldPresent(_test, label);
             }
         }, "Field did not appear: " + label, wait);
     }
@@ -216,12 +215,12 @@ public class LabModuleHelper
             @Override
             public boolean check()
             {
-                return _test._ext4Helper.queryOne(query, Ext4CmpRefWD.class) != null;
+                return _test._ext4Helper.queryOne(query, Ext4CmpRef.class) != null;
             }
         }, "Ext4 component did not appear for query: " + query, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
-    public void waitForDisabled(final Ext4CmpRefWD cmp, final boolean state)
+    public void waitForDisabled(final Ext4CmpRef cmp, final boolean state)
     {
         _test.waitFor(new BaseWebDriverTest.Checker()
         {
@@ -251,11 +250,11 @@ public class LabModuleHelper
 
         _test.waitForText("Sample Information");
         _test.waitAndClick(Locator.ext4Button("Add From Spreadsheet"));
-        _test.waitForElement(Ext4HelperWD.Locators.window("Spreadsheet Import"));
+        _test.waitForElement(Ext4Helper.Locators.window("Spreadsheet Import"));
 
         if (expectedColumns != null)
         {
-            Ext4CmpRefWD win = _test._ext4Helper.queryOne("window", Ext4CmpRefWD.class);
+            Ext4CmpRef win = _test._ext4Helper.queryOne("window", Ext4CmpRef.class);
             _test.sleep(1000);
             String fields = (String)win.getEval("getFieldsInTemplateTest()");
             String[] fieldArray = fields.split(";");
@@ -267,13 +266,13 @@ public class LabModuleHelper
             }
         }
 
-        Ext4FieldRefWD textArea = _test._ext4Helper.queryOne("#textField", Ext4FieldRefWD.class);
+        Ext4FieldRef textArea = _test._ext4Helper.queryOne("#textField", Ext4FieldRef.class);
         textArea.setValue(sb.toString());
         _test.waitAndClick(Locator.ext4Button("Submit"));
 
         String[] lastRow = data[data.length - 1];
         String cell = lastRow[0];
-        _test.waitForElement(Ext4GridRefWD.locateExt4GridCell(cell));
+        _test.waitForElement(Ext4GridRef.locateExt4GridCell(cell));
     }
 
     public Locator getAssayWell(String text, String color)
@@ -308,7 +307,7 @@ public class LabModuleHelper
         if (supportsTemplates)
             _test._ext4Helper.clickExt4MenuItem(UPLOAD_RESULTS_TEXT);
 
-        _test.waitForElement(Ext4HelperWD.Locators.window(supportsTemplates ? UPLOAD_RESULTS_TEXT : IMPORT_DATA_TEXT));
+        _test.waitForElement(Ext4Helper.Locators.window(supportsTemplates ? UPLOAD_RESULTS_TEXT : IMPORT_DATA_TEXT));
         _test.waitAndClickAndWait(Locator.ext4Button("Submit"));
         _test.waitForText("Data Import");
     }
@@ -342,33 +341,33 @@ public class LabModuleHelper
 
     public void addDataSource(String type, String label, String category, String containerPath, String schema, String query)
     {
-        Ext4CmpRefWD addBtn = _test._ext4Helper.queryOne("#manageDataSources button[text='Add New']", Ext4CmpRefWD.class);
+        Ext4CmpRef addBtn = _test._ext4Helper.queryOne("#manageDataSources button[text='Add New']", Ext4CmpRef.class);
         _test.waitAndClick(Locator.id(addBtn.getId()));
-        _test.waitForElement(Ext4HelperWD.ext4Window("Add Data Source"));
+        _test.waitForElement(Ext4Helper.ext4Window("Add Data Source"));
 
         _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForField("Item Type");
-        Ext4FieldRefWD.getForLabel(_test, "Item Type").setValue(type);
-        Ext4FieldRefWD.getForLabel(_test, "Label").setValue(label);
-        Ext4FieldRefWD.getForLabel(_test, "Category").setValue(category);
+        Ext4FieldRef.getForLabel(_test, "Item Type").setValue(type);
+        Ext4FieldRef.getForLabel(_test, "Label").setValue(label);
+        Ext4FieldRef.getForLabel(_test, "Category").setValue(category);
         if (containerPath != null)
         {
-            Ext4ComboRefWD combo = new Ext4ComboRefWD(Ext4FieldRefWD.getForLabel(_test, "Container (optional)"), _test);
+            Ext4ComboRef combo = new Ext4ComboRef(Ext4FieldRef.getForLabel(_test, "Container (optional)"), _test);
             combo.setComboByDisplayValue(containerPath);
             _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
 
-        Ext4FieldRefWD schemaField = Ext4FieldRefWD.getForLabel(_test, "Schema");
+        Ext4FieldRef schemaField = Ext4FieldRef.getForLabel(_test, "Schema");
         schemaField.waitForEnabled();
         schemaField.setValue(schema);
         _test.waitForElementToDisappear(Locator.tagWithText("div", "Loading..."), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 3);
 
-        Ext4FieldRefWD queryField = Ext4FieldRefWD.getForLabel(_test, "Query");
+        Ext4FieldRef queryField = Ext4FieldRef.getForLabel(_test, "Query");
         queryField.waitForEnabled();
         queryField.setValue(query);
 
         _test.waitAndClick(Locator.ext4Button("Save"));
-        _test.waitForElement(Ext4HelperWD.ext4Window("Success"));
+        _test.waitForElement(Ext4Helper.ext4Window("Success"));
         _test.click(Locator.ext4Button("OK"));
 
         if (containerPath == null)
@@ -379,35 +378,35 @@ public class LabModuleHelper
 
     public void addDemographicsSource(String label, String containerPath, String schema, String query, String targetColumn, boolean expectSuccess, boolean isDuplicate)
     {
-        Ext4CmpRefWD addBtn = _test._ext4Helper.queryOne("#manageDemographicsSources button[text='Add New']", Ext4CmpRefWD.class);
+        Ext4CmpRef addBtn = _test._ext4Helper.queryOne("#manageDemographicsSources button[text='Add New']", Ext4CmpRef.class);
         _test.waitAndClick(Locator.id(addBtn.getId()));
-        _test.waitForElement(Ext4HelperWD.ext4Window("Add Demographics Source"));
+        _test.waitForElement(Ext4Helper.ext4Window("Add Demographics Source"));
 
         _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         waitForField("Label");
-        Ext4FieldRefWD.getForLabel(_test, "Label").setValue(label);
+        Ext4FieldRef.getForLabel(_test, "Label").setValue(label);
 
         if (containerPath != null)
         {
-            Ext4ComboRefWD combo = new Ext4ComboRefWD(Ext4FieldRefWD.getForLabel(_test, "Container (optional)"), _test);
+            Ext4ComboRef combo = new Ext4ComboRef(Ext4FieldRef.getForLabel(_test, "Container (optional)"), _test);
             combo.setComboByDisplayValue(containerPath);
             _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
 
-        Ext4FieldRefWD.getForLabel(_test, "Schema").setValue(schema);
+        Ext4FieldRef.getForLabel(_test, "Schema").setValue(schema);
         _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT * 3);
 
-        Ext4FieldRefWD.getForLabel(_test, "Query").setValue(query);
+        Ext4FieldRef.getForLabel(_test, "Query").setValue(query);
         _test.waitForElementToDisappear(Locator.xpath("//div[contains(text(), 'Loading...')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         if (targetColumn != null)
-            Ext4FieldRefWD.getForLabel(_test, "Target Column").setValue(targetColumn);
+            Ext4FieldRef.getForLabel(_test, "Target Column").setValue(targetColumn);
 
         _test.waitAndClick(Locator.ext4Button("Save"));
 
         if (expectSuccess)
         {
-            _test.waitForElement(Ext4HelperWD.ext4Window("Success"));
+            _test.waitForElement(Ext4Helper.ext4Window("Success"));
             _test.click(Locator.ext4Button("OK"));
 
             if (containerPath == null)
@@ -420,13 +419,13 @@ public class LabModuleHelper
             if (!isDuplicate)
             {
                 //this indicates we did not expect this to be successful, so we make sure the right errors are shown
-                _test.waitForElement(Ext4HelperWD.ext4Window("Error"));
+                _test.waitForElement(Ext4Helper.ext4Window("Error"));
                 _test.click(Locator.ext4Button("OK"));
                 _test.click(Locator.ext4Button("Cancel"));
             }
             else
             {
-                _test.waitForElement(Ext4HelperWD.ext4Window("Error"));
+                _test.waitForElement(Ext4Helper.ext4Window("Error"));
                 _test.click(Locator.ext4Button("OK"));
                 _test.click(Locator.ext4Button("Cancel"));
             }

@@ -98,7 +98,7 @@ public class UIContainerHelper extends AbstractContainerHelper
         }
         _test.clickProject(project);
         _test.goToFolderManagement();
-        _test.waitForElement(Ext4HelperWD.Locators.folderManagementTreeNode(project));
+        _test.waitForElement(Ext4Helper.Locators.folderManagementTreeNode(project));
 
         _test.clickButton("Delete");
 

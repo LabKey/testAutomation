@@ -17,22 +17,9 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Locator;
-import org.labkey.test.TestTimeoutException;
-import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.PasswordUtil;
-import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RemoteConnectionHelperWD;
-
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
+import org.labkey.test.util.RemoteConnectionHelper;
 
 import static org.junit.Assert.*;
 
@@ -77,7 +64,7 @@ public class RemoteConnectionTest extends BaseWebDriverTest
     protected void doTestSteps() throws Exception
     {
         doSetup();
-        RemoteConnectionHelperWD rconnHelper = new RemoteConnectionHelperWD(this);
+        RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
 
         //
         // no remote connections should exist for this new container

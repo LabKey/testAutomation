@@ -37,19 +37,19 @@ import static org.junit.Assert.*;
  * Time: 2:32:05 PM
  */
 
-public class CustomizeViewsHelperWD extends AbstractHelperWD
+public class CustomizeViewsHelper extends AbstractHelper
 {
     private final Locator.IdLocator _dataRegion;
     private RReportHelper _reportHelper;
 
-    public CustomizeViewsHelperWD(BaseWebDriverTest test)
+    public CustomizeViewsHelper(BaseWebDriverTest test)
     {
         super(test);
         _dataRegion = Locator.id("");
         _reportHelper = new RReportHelper(test);
     }
 
-    public CustomizeViewsHelperWD(BaseWebDriverTest test, Locator.IdLocator dataRegion)
+    public CustomizeViewsHelper(BaseWebDriverTest test, Locator.IdLocator dataRegion)
     {
         super(test);
         _dataRegion = dataRegion;
@@ -645,14 +645,14 @@ public class CustomizeViewsHelperWD extends AbstractHelperWD
                     continue;
 
                 _test.clickButton("Add Aggregate", 0);
-                Locator row = ExtHelperWD.locateExt3GridRow(idx, parent);
+                Locator row = ExtHelper.locateExt3GridRow(idx, parent);
 
-                Locator comboCell = ExtHelperWD.locateExt3GridCell(row, 1);
+                Locator comboCell = ExtHelper.locateExt3GridCell(row, 1);
                 _test.doubleClick(comboCell);
                 _test._extHelper.selectComboBoxItem((Locator.XPathLocator)grid, aggregate.get("type"));
 
                 if(aggregate.get("label") != null){
-                    Locator labelCell = ExtHelperWD.locateExt3GridCell(row, 2);
+                    Locator labelCell = ExtHelper.locateExt3GridCell(row, 2);
                     _test.doubleClick(labelCell);
 
                     Locator fieldPath = ((Locator.XPathLocator) grid).child("/input[contains(@class, 'x-form-text') and not(../img)]");

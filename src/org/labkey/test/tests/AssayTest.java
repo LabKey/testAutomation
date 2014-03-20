@@ -22,15 +22,15 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Study;
-import org.labkey.test.util.CustomizeViewsHelperWD;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
-import static org.labkey.test.util.ListHelperWD.ListColumnType;
+import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import static org.junit.Assert.*;
 
@@ -49,17 +49,17 @@ public class AssayTest extends AbstractAssayTest
     protected static final String TEST_ASSAY_SET_PROP_EDIT = "NewTargetStudy";
     protected static final String TEST_ASSAY_SET_PROP_NAME = "testAssaySetProp";
     protected static final int TEST_ASSAY_SET_PREDEFINED_PROP_COUNT = 2;
-    protected static final ListColumnType[] TEST_ASSAY_SET_PROP_TYPES = { ListHelperWD.ListColumnType.Boolean, ListHelperWD.ListColumnType.Double, ListHelperWD.ListColumnType.Integer, ListHelperWD.ListColumnType.DateTime };
+    protected static final ListColumnType[] TEST_ASSAY_SET_PROP_TYPES = { ListHelper.ListColumnType.Boolean, ListHelper.ListColumnType.Double, ListHelper.ListColumnType.Integer, ListHelper.ListColumnType.DateTime };
     protected static final String[] TEST_ASSAY_SET_PROPERTIES = { "false", "100.0", "200", "2001-10-10" };
     protected static final String TEST_ASSAY_RUN_PROP_NAME = "testAssayRunProp";
     protected static final int TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT = 0;
-    protected static final ListColumnType[] TEST_ASSAY_RUN_PROP_TYPES = { ListHelperWD.ListColumnType.String, ListHelperWD.ListColumnType.Boolean, ListHelperWD.ListColumnType.Double, ListHelperWD.ListColumnType.Integer, ListHelperWD.ListColumnType.DateTime };
+    protected static final ListColumnType[] TEST_ASSAY_RUN_PROP_TYPES = { ListHelper.ListColumnType.String, ListHelper.ListColumnType.Boolean, ListHelper.ListColumnType.Double, ListHelper.ListColumnType.Integer, ListHelper.ListColumnType.DateTime };
     protected static final String TEST_ASSAY_RUN_PROP1 = "TestRunProp";
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
     protected static final String TEST_ASSAY_DATA_ALIASED_PROP_NAME = "testAssayAliasedData";
     protected static final String ALIASED_DATA = "aliasedData";
     public static final int TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT = 4;
-    protected static final ListColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { ListHelperWD.ListColumnType.Boolean, ListHelperWD.ListColumnType.Integer, ListHelperWD.ListColumnType.DateTime, ListHelperWD.ListColumnType.String };
+    protected static final ListColumnType[] TEST_ASSAY_DATA_PROP_TYPES = { ListHelper.ListColumnType.Boolean, ListHelper.ListColumnType.Integer, ListHelper.ListColumnType.DateTime, ListHelper.ListColumnType.String };
     protected static final String TEST_RUN1 = "FirstRun";
     protected static final String TEST_RUN1_COMMENTS = "First comments";
     protected static final String TEST_RUN1_DATA1 = "specimenID\tparticipantID\tvisitID\t" + TEST_ASSAY_DATA_PROP_NAME + "20\t" + TEST_ASSAY_DATA_PROP_NAME + "5\t" + TEST_ASSAY_DATA_PROP_NAME + "6\n" +
@@ -294,7 +294,7 @@ public class AssayTest extends AbstractAssayTest
             _listHelper.addField("Data Fields", i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_NAME + i, TEST_ASSAY_DATA_PROP_TYPES[i - TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT]);
         }
 
-        _listHelper.addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Flags", "Flags", ListHelperWD.ListColumnType.Flag);
+        _listHelper.addField("Data Fields", TEST_ASSAY_DATA_PREDEFINED_PROP_COUNT + TEST_ASSAY_DATA_PROP_TYPES.length, "Flags", "Flags", ListHelper.ListColumnType.Flag);
 
         // Set some to required
         setRequired("Batch Fields", TEST_ASSAY_SET_PREDEFINED_PROP_COUNT);
@@ -861,7 +861,7 @@ public class AssayTest extends AbstractAssayTest
         log("Setting the customized view to include subfolders");
         Locator dataregionLoc = Locator.xpath("//form[starts-with(@id, 'Runs')]");
         String dataregionId = dataregionLoc.findElement(getDriver()).getAttribute("id");
-        CustomizeViewsHelperWD customizeViewsHelper = new CustomizeViewsHelperWD(this, Locator.id(dataregionId));
+        CustomizeViewsHelper customizeViewsHelper = new CustomizeViewsHelper(this, Locator.id(dataregionId));
         customizeViewsHelper.openCustomizeViewPanel();
 
         customizeViewsHelper.clipFolderFilter();

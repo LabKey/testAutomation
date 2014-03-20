@@ -21,8 +21,8 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Study;
 import org.labkey.test.categories.Disabled;
-import org.labkey.test.util.ListHelperWD;
-import org.labkey.test.util.StudyHelperWD;
+import org.labkey.test.util.ListHelper;
+import org.labkey.test.util.StudyHelper;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -41,7 +41,7 @@ public class StudyManualTest extends StudyTest
 
     protected final String VISIT_MAP = getStudySampleDataPath() + "v068_visit_map.txt";
 
-    protected final StudyHelperWD _studyHelper = new StudyHelperWD(this);
+    protected final StudyHelper _studyHelper = new StudyHelper(this);
 
     @Override
     protected BrowserType bestBrowser()
@@ -266,7 +266,7 @@ public class StudyManualTest extends StudyTest
 
         clickRadioButtonById("button_dataField");
 
-        _listHelper.addField("Dataset Fields", 4, "otherData", "Other Data", ListHelperWD.ListColumnType.String);
+        _listHelper.addField("Dataset Fields", 4, "otherData", "Other Data", ListHelper.ListColumnType.String);
         click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
         waitForElement(Locator.id("importAliases"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("importAliases"), "aliasedColumn");

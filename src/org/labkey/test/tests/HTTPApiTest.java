@@ -19,7 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -35,9 +35,9 @@ public class HTTPApiTest extends SimpleApiTest
     private static final String PROJECT_NAME = "HTTPApiVerifyProject";
     private static final String LIST_NAME = "Test List";
 
-    private static final ListHelperWD.ListColumn COL1 = new ListHelperWD.ListColumn("Like", "Like", ListHelperWD.ListColumnType.String, "What the color is like");
-    private static final ListHelperWD.ListColumn COL2 = new ListHelperWD.ListColumn("Month", "Month to Wear", ListHelperWD.ListColumnType.DateTime, "When to wear the color", "M");
-    private static final ListHelperWD.ListColumn COL3 = new ListHelperWD.ListColumn("Good", "Quality", ListHelperWD.ListColumnType.Integer, "How nice the color is");
+    private static final ListHelper.ListColumn COL1 = new ListHelper.ListColumn("Like", "Like", ListHelper.ListColumnType.String, "What the color is like");
+    private static final ListHelper.ListColumn COL2 = new ListHelper.ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
+    private static final ListHelper.ListColumn COL3 = new ListHelper.ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
     private final static String[][] TEST_DATA = { { "Blue", "Green", "Red", "Yellow" },
             { "Zany", "Robust", "Mellow", "Light"},
             { "1", "4", "3", "2" },
@@ -85,7 +85,7 @@ public class HTTPApiTest extends SimpleApiTest
         portalHelper.addWebPart("Lists");
 
         log("Create List");
-        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelperWD.ListColumnType.String, "Color", COL1, COL2, COL3);
+        _listHelper.createList(PROJECT_NAME, LIST_NAME, ListHelper.ListColumnType.String, "Color", COL1, COL2, COL3);
         clickButton("Edit Design", 0);
         selectOptionByText(Locator.id("ff_titleColumn"), "Like");    // Explicitly set to the PK (auto title will pick wealth column)
         clickButton("Save", 0);

@@ -29,10 +29,10 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Data;
-import org.labkey.test.util.CustomizeViewsHelperWD;
+import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
-import org.labkey.test.util.ListHelperWD;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
@@ -53,7 +53,7 @@ public class ContainerContextTest extends BaseWebDriverTest
     private static final String SUB_FOLDER_A = "A";
     private static final String SUB_FOLDER_B = "B";
 
-    private final static ListHelperWD.ListColumnType LIST_KEY_TYPE = ListHelperWD.ListColumnType.AutoInteger;
+    private final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.AutoInteger;
     private final static String LIST_KEY_NAME = "Key";
 
     private static final String COLOR = "Red";
@@ -119,9 +119,9 @@ public class ContainerContextTest extends BaseWebDriverTest
     {
         log("** Creating lookup target list in sub-folder");
         goToProjectHome();
-        ListHelperWD.ListColumn[] lookupTargetCols = {
-            new ListHelperWD.ListColumn("LookupName", "LookupName", ListHelperWD.ListColumnType.String, "Lookup Name"),
-            new ListHelperWD.ListColumn("LookupAge", "LookupAge", ListHelperWD.ListColumnType.Integer, "Lookup Age", null, null, null, "fake/action.view?key=${Key}")
+        ListHelper.ListColumn[] lookupTargetCols = {
+            new ListHelper.ListColumn("LookupName", "LookupName", ListHelper.ListColumnType.String, "Lookup Name"),
+            new ListHelper.ListColumn("LookupAge", "LookupAge", ListHelper.ListColumnType.Integer, "Lookup Age", null, null, null, "fake/action.view?key=${Key}")
         };
         String lookupTargetListName = SUB_FOLDER_A + "-LookupTarget-List";
         _listHelper.createList(SUB_FOLDER_A, lookupTargetListName, LIST_KEY_TYPE, LIST_KEY_NAME, lookupTargetCols);
@@ -141,9 +141,9 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Creating list with lookup to list in sub-folder");
         goToProjectHome();
-        ListHelperWD.ListColumn[] cols = {
-            new ListHelperWD.ListColumn("MyName", "MyName", ListHelperWD.ListColumnType.String, "My Name"),
-            new ListHelperWD.ListColumn("ListLookup", "ListLookup", ListHelperWD.ListColumnType.String, "List Lookup", new ListHelperWD.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName)),
+        ListHelper.ListColumn[] cols = {
+            new ListHelper.ListColumn("MyName", "MyName", ListHelper.ListColumnType.String, "My Name"),
+            new ListHelper.ListColumn("ListLookup", "ListLookup", ListHelper.ListColumnType.String, "List Lookup", new ListHelper.LookupInfo(getProjectName() + "/" + SUB_FOLDER_A, "lists", lookupTargetListName)),
         };
         String lookupSourceListName = "Project-LookupSource-List";
         _listHelper.createList(getProjectName(), lookupSourceListName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
@@ -206,8 +206,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         clickButton("Create Study");
 
         log("** Creating list with lookup to viscstudies.studies");
-        ListHelperWD.ListColumn[] cols = {
-            new ListHelperWD.ListColumn("StudyLookup", "StudyLookup", ListHelperWD.ListColumnType.String, "Study Lookup", new ListHelperWD.LookupInfo(null, "viscstudies", "studies")),
+        ListHelper.ListColumn[] cols = {
+            new ListHelper.ListColumn("StudyLookup", "StudyLookup", ListHelper.ListColumnType.String, "Study Lookup", new ListHelper.LookupInfo(null, "viscstudies", "studies")),
         };
         _listHelper.createList(getProjectName(), "Issue15610-List", LIST_KEY_TYPE, LIST_KEY_NAME, cols);
         clickButton("Done");
@@ -260,8 +260,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         goToProjectHome();
 
         log("** Creating list in folder '" + folder + "'");
-        ListHelperWD.ListColumn[] cols = {
-            new ListHelperWD.ListColumn("Name", "Name", ListHelperWD.ListColumnType.String, "Name")
+        ListHelper.ListColumn[] cols = {
+            new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name")
         };
         String listName = folder + "-Issue15751-List";
         _listHelper.createList(folder, listName, LIST_KEY_TYPE, LIST_KEY_NAME, cols);
@@ -315,7 +315,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         // Verify Issue 16243: Details URL creating URLs with null container unless the container column is actually added to current view
         log("** Removing container column and rehecking lookup URLs...");
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=vehicle&query.queryName=EmissionTest&query.sort=RowId");
-        CustomizeViewsHelperWD cv = new CustomizeViewsHelperWD(this);
+        CustomizeViewsHelper cv = new CustomizeViewsHelper(this);
         cv.openCustomizeViewPanel();
         cv.showHiddenItems();
         cv.removeCustomizeViewColumn("Container");
