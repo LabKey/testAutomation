@@ -53,7 +53,7 @@ public class SpecimenReplaceTest extends SpecimenMergeTest
         importer.importAndWaitForComplete();
         //go to individual vial list
         goToIndividualvialsDRT();
-        assertTextPresent("1 - 12 of 12");
+        assertElementPresent(Locator.paginationText(12));
 
         //entry for participant 999320812 have been replaced with 123123123
         assertTextPresent("999320812");
