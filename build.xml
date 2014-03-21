@@ -413,6 +413,8 @@
     </target>
 
     <target name="sub-selenium" depends="build-java-client" >
+        <antcall target="kill_chromedriver" />
+
         <antcall inheritall="true" target="runsuite">
             <param name="debug.suspend" value="${debug.suspend.selenium}" />
         </antcall>
