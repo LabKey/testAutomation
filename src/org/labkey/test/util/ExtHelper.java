@@ -491,41 +491,27 @@ public class ExtHelper extends AbstractHelper
         selectExt4GridItem(colName, colValue, rowIndex, markerCls, keepExisting);
     }
 
-    //Pick measure from split panel measure picker
-    public void pickMeasure(final String source, final String measure, boolean keepSelection)
-    {
-        //select source query
-        Locator queryLoc = Locator.css(".sourcepanel ." + Ext4Helper.getCssPrefix() + "grid-row");
-        WebElement queryElement = queryLoc.waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
-        _test.scrollIntoView(queryElement); // in case window is too short
-        _test.shortWait().until(ExpectedConditions.elementToBeClickable(queryLoc.toBy())); // if one row is ready, all should be
-        selectExt4GridItem("queryName", source, -1, "sourcegrid", keepSelection);
-        //select measure
-        Locator measureLoc = Locator.css(".measuresgrid ." + Ext4Helper.getCssPrefix() + "grid-row");
-        WebElement measureElement = measureLoc.waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
-        _test.scrollIntoView(measureElement); // in case window is too short
-        _test.shortWait().until(ExpectedConditions.elementToBeClickable(measureLoc.toBy())); // if one row is ready, all should be
-        selectExt4GridItem("label", measure, -1, "measuresgrid", keepSelection);
-    }
-
-    public void pickMeasure(String source, String measure)
-    {
-        pickMeasure(source, measure, false);
-    }
-
     //Pick measure from one of multiple split panel measure pickers
-    public void pickMeasure(String panelCls, String source, String measure, boolean keepSelection)
+    public void pickMeasure(String panelCls, String source, String measure, boolean isMultiSelect, boolean keepSelection)
     {
-        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .sourcepanel ." + Ext4Helper.getCssPrefix() + "grid-row"))); // if one row is ready, all should be
-        selectExt4GridItem("queryName", source, -1, panelCls + " .sourcegrid", keepSelection);
+        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .sourcepanel div.itemrow"))); // if one row is ready, all should be
+        _test.click(Locator.css("." + panelCls + " .sourcepanel div.itemrow span.val").withText(source));
         //select measure
-        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .measuresgrid ." + Ext4Helper.getCssPrefix() + "grid-row"))); // if one row is ready, all should be
-        selectExt4GridItem("label", measure, -1, panelCls + " .measuresgrid", keepSelection);
+        if (isMultiSelect)
+        {
+            _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .measuresgrid ." + Ext4Helper.getCssPrefix() + "grid-row"))); // if one row is ready, all should be
+            selectExt4GridItem("label", measure, -1, panelCls + " .measuresgrid", keepSelection);
+        }
+        else
+        {
+            _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .measuresgrid div.itemrow"))); // if one row is ready, all should be
+            _test.click(Locator.css("." + panelCls + " .measuresgrid div.itemrow").withText(measure));
+        }
     }
 
     public void pickMeasure(String panelCls, String source, String measure)
     {
-        pickMeasure(panelCls, source, measure, false);
+        pickMeasure(panelCls, source, measure, false, false);
     }
 
     @LogMethod(quiet = true)
