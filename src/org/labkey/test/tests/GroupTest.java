@@ -93,7 +93,7 @@ public class GroupTest extends BaseWebDriverTest
         stopImpersonating();
         //create users
 
-        createGlobalPermissionsGroup(SIMPLE_GROUP,  TEST_USERS_FOR_GROUP[0], TEST_USERS_FOR_GROUP[1]);
+        createGlobalPermissionsGroup(SIMPLE_GROUP, TEST_USERS_FOR_GROUP[0], TEST_USERS_FOR_GROUP[1]);
         createGlobalPermissionsGroup(COMPOUND_GROUP, SIMPLE_GROUP,  TEST_USERS_FOR_GROUP[2]);
 
         verifyExportFunction();
@@ -126,7 +126,7 @@ public class GroupTest extends BaseWebDriverTest
 
         createProjectCopyPerms();
 
-        verifyImpersonateGroup();
+        verifyImpersonate();
 
         verifyCantAddSystemGroupToUserGroup();
 
@@ -187,7 +187,7 @@ public class GroupTest extends BaseWebDriverTest
     }
 
     @LogMethod
-    private void verifyImpersonateGroup()
+    private void verifyImpersonate()
     {
         //set simple group as editor
         _securityHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
@@ -214,14 +214,16 @@ public class GroupTest extends BaseWebDriverTest
         verifyAuthorPermission(nameTitleBody);
         stopImpersonatingGroup();
 
-        Locator unavailableEditorChoice = Locator.xpath("//li[contains(@class, 'x-item-disabled')]/a/span[text()='Editor']");
-        impersonateRole("Author");
-        assertElementNotPresent(unavailableEditorChoice);
+//        Locator unavailableEditorChoice = Locator.xpath("//li[contains(@class, 'x-item-disabled')]/a/span[text()='Editor']");
+        impersonateRoles("Author");
+//        assertElementNotPresent(unavailableEditorChoice);
         verifyAuthorPermission(nameTitleBody);
-        impersonateRole("Editor");
-        clickUserMenuItem(false, true, "Impersonate", "Role", "Editor");
-        waitForElement(unavailableEditorChoice);
-        assertElementPresent(Locator.xpath("//li[contains(@class, 'x-item-disabled')]/a/span[text()='Author']"));
+        stopImpersonatingRole();
+
+        impersonateRoles("Editor");
+//        clickUserMenuItem(false, true, "Impersonate", "Role", "Editor");
+//        waitForElement(unavailableEditorChoice);
+//        assertElementPresent(Locator.xpath("//li[contains(@class, 'x-item-disabled')]/a/span[text()='Author']"));
         verifyEditorPermission(nameTitleBody);
         stopImpersonatingRole();
 

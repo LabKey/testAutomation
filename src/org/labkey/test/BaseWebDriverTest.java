@@ -5977,6 +5977,26 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickUserMenuItem("Impersonate", "Role", role);
     }
 
+    public void impersonateRoles(String... roles)
+    {
+        _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "Roles");
+        waitForElement(Ext4Helper.Locators.window("Impersonate Roles"));
+        Ext4ComboRef rolesCombo = Ext4ComboRef.getForLabel(this, "Roles");
+        rolesCombo.waitForStoreLoad();
+        Locator comboLoc = Locator.id("ImpersonateRolesCombo");
+
+        // Open the drop-down
+        click(comboLoc);
+        sleep(1000);
+
+        for (String role : roles)
+            click(Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains(text(), '" + role + "')]"));
+
+        // Close the drop-down
+        click(comboLoc);
+        clickAndWait(Ext4Helper.ext4WindowButton("Impersonate Roles", "Impersonate"));
+    }
+
     public void stopImpersonatingRole()
     {
         clickUserMenuItem("Stop Impersonating");
