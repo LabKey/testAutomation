@@ -132,14 +132,21 @@ public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
         return rowIds;
     }
 
-    protected final void assertExportExists(File exportedFile, String expectedExtension)
+    protected final void assertExportExists(final File exportedFile, String expectedExtension)
     {
-        assertTrue("Exported list does not exist: " + exportedFile.getAbsolutePath(), exportedFile.exists());
+        assertTrue("Exported file does not exist: " + exportedFile.getAbsolutePath(), exportedFile.exists());
 
         final String fileExportRegex = getExportedFilePrefixRegex() + "_[0-9_-]*\\." + expectedExtension;
-        assertTrue("Exported list did not have expected name: " + exportedFile.getName(), exportedFile.getName().matches(fileExportRegex));
+        assertTrue("Exported file has wrong name:\n expected: " + fileExportRegex + "\n actual: " + exportedFile.getName(), exportedFile.getName().matches(fileExportRegex));
 
-        assertTrue("Exported file is empty", exportedFile.length() > 0);
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return exportedFile.length() > 0;
+            }
+        }, "Exported file is empty",  WAIT_FOR_JAVASCRIPT);
     }
 
     protected final void assertTextExportContents(File exportedFile, int expectedDataRowCount)

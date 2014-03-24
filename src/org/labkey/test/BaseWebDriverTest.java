@@ -371,6 +371,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 if (_driver == null)
                 {
                     final FirefoxProfile profile = new FirefoxProfile();
+                    profile.setPreference("webdriver.load.strategy", "unstable");
                     profile.setPreference("app.update.auto", false);
                     profile.setPreference("extensions.update.autoUpdate", false);
                     profile.setPreference("extensions.update.enabled", false);
@@ -380,9 +381,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     profile.setPreference("browser.download.folderList", 2);
                     profile.setPreference("browser.download.downloadDir", getDownloadDir().getAbsolutePath());
                     profile.setPreference("browser.download.dir", getDownloadDir().getAbsolutePath());
-                    profile.setPreference("browser.helperApps.alwaysAsk.force", false);
                     profile.setPreference("browser.download.manager.showAlertOnComplete", false);
                     profile.setPreference("browser.download.manager.showWhenStarting",false);
+                    profile.setPreference("browser.helperApps.alwaysAsk.force", false);
                     profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
                             "application/vnd.ms-excel," + // .xls
                             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet," + // .xlsx
@@ -3891,7 +3892,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
         }, "File(s) did not appear in download dir", WAIT_FOR_PAGE);
 
-        final FileFilter tempFiles = new FileFilter()
+        final FileFilter tempFilesFilter = new FileFilter()
         {
             @Override
             public boolean accept(File file)
@@ -3905,12 +3906,17 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean check()
             {
-                return downloadDir.listFiles(tempFiles).length == 0;
+                return downloadDir.listFiles(tempFilesFilter).length == 0;
             }
         }, "Temp files remain after download", WAIT_FOR_JAVASCRIPT);
 
         File[] newFiles = downloadDir.listFiles(newFileFilter);
         assertEquals("Wrong number of files downloaded to " + downloadDir.toString(), expectedFileCount, newFiles.length);
+
+        for (File newFile : newFiles)
+        {
+            log("File downloaded: " + newFile.getName());
+        }
 
         return newFiles;
     }
