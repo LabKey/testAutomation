@@ -7,7 +7,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.DataRegionTable;
 
-@Category({InDevelopment.class}) // Add to DailyB when copy-to-study is fixed
+@Category({DailyB.class})
 public class DatasetExportTest extends AssayResultsExportTest
 {
     @Override
@@ -22,9 +22,15 @@ public class DatasetExportTest extends AssayResultsExportTest
     }
 
     @Override
+    protected int getTestColumnIndex()
+    {
+        return 0;
+    }
+
+    @Override
     protected String getExportedTsvTestColumnHeader()
     {
-        return getTestColumnTitle();
+        return "participantId";
     }
 
     @Override
@@ -68,7 +74,6 @@ public class DatasetExportTest extends AssayResultsExportTest
         selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + getFolderName() + " (" + getFolderName() + " Study)");
         clickButton("Next");
         clickButton("Copy to Study");
-        clickAndWait(Locator.linkWithText(ASSAY_NAME));
     }
 
     @Override
