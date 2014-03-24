@@ -59,9 +59,9 @@ public class Ext4Helper extends AbstractHelper
     }
 
     @LogMethod(quiet = true)
-    public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String selection)
+    public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String... selections)
     {
-        selectComboBoxItem(comboBox, false, selection);
+        selectComboBoxItem(comboBox, false, selections);
     }
 
     @LogMethod(quiet = true)
@@ -133,15 +133,15 @@ public class Ext4Helper extends AbstractHelper
     }
 
     @LogMethod(quiet = true)
-    public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
+    public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String... selections)
     {
-        selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), false, selection);
+        selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), false, selections);
     }
 
     @LogMethod(quiet = true)
-    public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection, boolean containsText)
+    public void selectComboBoxItem(@LoggedParam String label, boolean containsText, @LoggedParam String... selections)
     {
-        selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), containsText, selection);
+        selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), containsText, selections);
     }
 
     @LogMethod(quiet = true)

@@ -5968,7 +5968,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForElement(Ext4Helper.Locators.window("Impersonate Group"));
         Ext4ComboRef groupCombo = Ext4ComboRef.getForLabel(this, "Group");
         groupCombo.waitForStoreLoad();
-        _ext4Helper.selectComboBoxItem("Group:", (isSiteGroup ? "Site: " : "") + group, true);
+        _ext4Helper.selectComboBoxItem("Group:", true, (isSiteGroup ? "Site: " : "") + group);
         clickAndWait(Ext4Helper.ext4WindowButton("Impersonate Group", "Impersonate"));
     }
 
@@ -5983,17 +5983,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForElement(Ext4Helper.Locators.window("Impersonate Roles"));
         Ext4ComboRef rolesCombo = Ext4ComboRef.getForLabel(this, "Roles");
         rolesCombo.waitForStoreLoad();
-        Locator comboLoc = Locator.id("ImpersonateRolesCombo");
 
-        // Open the drop-down
-        click(comboLoc);
-        sleep(1000);
+        _ext4Helper.selectComboBoxItem("Roles:", true, roles);
 
-        for (String role : roles)
-            click(Locator.xpath("//li[contains(@class, 'x4-boundlist-item') and contains(text(), '" + role + "')]"));
-
-        // Close the drop-down
-        click(comboLoc);
         clickAndWait(Ext4Helper.ext4WindowButton("Impersonate Roles", "Impersonate"));
     }
 
@@ -6017,7 +6009,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForElement(Ext4Helper.Locators.window("Impersonate User"));
         Ext4ComboRef userCombo = Ext4ComboRef.getForLabel(this, "User");
         userCombo.waitForStoreLoad();
-        _ext4Helper.selectComboBoxItem("User:", fakeUser + " (", true);
+        _ext4Helper.selectComboBoxItem("User:", true, fakeUser + " (");
         clickAndWait(Ext4Helper.ext4WindowButton("Impersonate User", "Impersonate"));
         _impersonationStack.push(fakeUser);
 
