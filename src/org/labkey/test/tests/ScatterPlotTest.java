@@ -131,8 +131,8 @@ public class ScatterPlotTest extends GenericChartsTest
         _extHelper.waitForExtDialogToDisappear("Error");
 
         //Test cancel button
-        setFormElement("reportName", "TestReportName");
-        setFormElement("reportDescription", "TestReportDescription");
+        setFormElement(Locator.name("reportName"), "TestReportName");
+        setFormElement(Locator.name("reportDescription"), "TestReportDescription");
         _ext4Helper.clickWindowButton("Save", "Cancel", 0, 0);
         assertTextNotPresent("TestReportName");
 
