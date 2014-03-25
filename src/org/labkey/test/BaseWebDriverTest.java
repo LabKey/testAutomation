@@ -2375,7 +2375,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName)
     {
-        return executeSelectRowCommand(schemaName, queryName, ContainerFilter.CurrentAndSubfolders, "/" + getProjectName(), null);
+        return executeSelectRowCommand(schemaName, queryName, null);
+    }
+
+    protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName,  @Nullable List<Filter> filters)
+    {
+        return executeSelectRowCommand(schemaName, queryName, ContainerFilter.CurrentAndSubfolders, "/" + getProjectName(), filters);
     }
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName, ContainerFilter containerFilter, String path, @Nullable List<Filter> filters)
