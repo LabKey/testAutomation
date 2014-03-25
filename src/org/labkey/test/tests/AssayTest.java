@@ -225,7 +225,7 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("edit"));
         setFormElement(Locator.name("quf_SpecimenID"), "EditedSpecimenID");
         setFormElement(Locator.name("quf_VisitID"), "601.5");
-        setFormElement(Locator.name("quf_testAssayDataProp5"), "a");
+        setFormElement(Locator.name("quf_testAssayDataProp5"), "prop5Value");
         clickButton("Submit");
         assertTextPresent("Could not convert value: a");
         setFormElement(Locator.name("quf_testAssayDataProp5"), "514801");
@@ -246,11 +246,13 @@ public class AssayTest extends AbstractAssayTest
         selectQuery("auditLog", "ExperimentAuditEvent");
         waitForElement(Locator.linkWithText("view data"), WAIT_FOR_JAVASCRIPT);
         clickAndWait(Locator.linkWithText("view data"));
-        assertTextPresent("Data row, id ", ", edited in " + TEST_ASSAY + ".",
+        assertTextPresent(
+                "Data row, id ",
+                ", edited in " + TEST_ASSAY + ".",
                 "Specimen ID changed from 'AAA07XK5-05' to 'EditedSpecimenID'",
                 "Visit ID changed from '601.0' to '601.5",
-                "testAssayDataProp5 changed from blank to '514801'");
-        assertTextPresent("Deleted data row.");
+                "testAssayDataProp5 changed from blank to '514801'",
+                "Deleted data row.");
 
         clickProject(TEST_ASSAY_PRJ_SECURITY);
     }
@@ -357,9 +359,10 @@ public class AssayTest extends AbstractAssayTest
         setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 2), "Bad Test");
         setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 3), "Bad Test");
         clickButton("Next");
-        assertTextPresent(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + " must be of type Number (Double).");
-        assertTextPresent(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 2) + " must be of type Integer.");
-        assertTextPresent(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 3) + " must be of type Date and Time.");
+        assertTextPresent(
+                TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + " must be of type Number (Double).",
+                TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 2) + " must be of type Integer.",
+                TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 3) + " must be of type Date and Time.");
         setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1), TEST_ASSAY_SET_PROPERTIES[1]);
         setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 2), TEST_ASSAY_SET_PROPERTIES[2]);
         setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 3), TEST_ASSAY_SET_PROPERTIES[3]);
@@ -376,10 +379,11 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Next");
 
         log("Check properties set.");
-        assertTextPresent(TEST_ASSAY_SET_PROPERTIES[1]);
-        assertTextPresent(TEST_ASSAY_SET_PROPERTIES[2]);
-        assertTextPresent(TEST_ASSAY_SET_PROPERTIES[3]);
-        assertTextPresent(TEST_ASSAY_SET_PROPERTIES[0]);
+        assertTextPresent(
+                TEST_ASSAY_SET_PROPERTIES[1],
+                TEST_ASSAY_SET_PROPERTIES[2],
+                TEST_ASSAY_SET_PROPERTIES[3],
+                TEST_ASSAY_SET_PROPERTIES[0]);
 
         log("Run properties and data");
         clickButton("Save and Finish");
@@ -417,27 +421,29 @@ public class AssayTest extends AbstractAssayTest
 
         log("Check out the data for one of the runs");
         assertNoLabkeyErrors();
-        assertTextPresent(TEST_ASSAY + " Runs");
-        assertTextPresent(TEST_ASSAY_RUN_PROP1);
-        assertTextPresent(TEST_ASSAY_SET_PROPERTIES[0]);
-        assertTextPresent(TEST_ASSAY_SET_PROPERTIES[3]);
+        assertTextPresent(
+                TEST_ASSAY + " Runs",
+                TEST_ASSAY_RUN_PROP1,
+                TEST_ASSAY_SET_PROPERTIES[0],
+                TEST_ASSAY_SET_PROPERTIES[3]);
         clickAndWait(Locator.linkWithText(TEST_RUN1));
-        isTextPresent("2.0");
-        assertTextNotPresent("7.0");
+        assertElementNotPresent(Locator.tagWithText("td", "7.0"));
         // Make sure that our specimen IDs resolved correctly
-        assertTextPresent("AAA07XSF-02");
-        assertTextPresent("999320885");
-        assertTextPresent("301");
-        assertTextPresent("AAA07XK5-05");
-        assertTextPresent("999320812");
-        assertTextPresent("601");
-        assertTextPresent(TEST_ASSAY_DATA_PROP_NAME + "4");
-        assertTextPresent(TEST_ASSAY_DATA_PROP_NAME + "5");
-        assertTextPresent(TEST_ASSAY_DATA_PROP_NAME + "6");
-        assertTextPresent("2000-06-06");
-        assertTextPresent("0.0");
-        assertTextPresent("f");
-        assertTextPresent(ALIASED_DATA);
+        assertTextPresent(
+                "2.0",
+                "AAA07XSF-02",
+                "999320885",
+                "301",
+                "AAA07XK5-05",
+                "999320812",
+                "601",
+                TEST_ASSAY_DATA_PROP_NAME + "4",
+                TEST_ASSAY_DATA_PROP_NAME + "5",
+                TEST_ASSAY_DATA_PROP_NAME + "6",
+                "2000-06-06",
+                "0.0",
+                "f",
+                ALIASED_DATA);
 
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("SpecimenID/GlobalUniqueId", "Specimen Global Unique Id");
@@ -463,8 +469,8 @@ public class AssayTest extends AbstractAssayTest
         log("Check out the data for all of the runs");
         clickAndWait(Locator.linkWithText("view results"));
         clearAllFilters("Data", "SpecimenID");
-        assertTextPresent("7.0");
-        assertTextPresent("18");
+        assertElementPresent(Locator.tagWithText("td", "7.0"));
+        assertElementPresent(Locator.tagWithText("td", "18"));
 
         assertTextPresent("Blood (Whole)", 7);
 
@@ -553,10 +559,11 @@ public class AssayTest extends AbstractAssayTest
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("QCState", "QC State");
         _customizeViewsHelper.applyCustomView();
-        assertTextPresent("Pending Review");
-        assertTextPresent("a");
-        assertTextPresent(TEST_RUN1_COMMENTS);
-        assertTextPresent("2000-01-01");
+        assertTextPresent(
+                "Pending Review",
+                "prop5Value",
+                TEST_RUN1_COMMENTS,
+                "2000-01-01");
         clickTab("Overview");
         clickAndWait(Locator.linkWithText("Study Navigator"));
 
@@ -683,7 +690,7 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Copy to Study");
 
         log("Verifying that the data was published");
-        assertTextPresent("a");
+        assertTextPresent("prop5Value");
         assertTextPresent(TEST_RUN1_COMMENTS);
         assertTextPresent("2000-01-01");
         clickTab("Overview");
@@ -781,9 +788,10 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Copy to Study");
 
         log("Verifying that the data was published");
-        assertTextPresent("a");
-        assertTextPresent(TEST_RUN1_COMMENTS);
-        assertTextPresent("2000-01-01");
+        assertTextPresent(
+                "prop5Value",
+                TEST_RUN1_COMMENTS,
+                "2000-01-01");
         clickTab("Overview");
         clickAndWait(Locator.linkWithText("Study Navigator"));
 
@@ -855,8 +863,7 @@ public class AssayTest extends AbstractAssayTest
         // Set the container filter to include subfolders
         _extHelper.clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
 
-        assertTextPresent("FirstRun");
-        assertTextPresent("SecondRun");
+        assertTextPresent("FirstRun", "SecondRun");
 
         log("Setting the customized view to include subfolders");
         Locator dataregionLoc = Locator.xpath("//form[starts-with(@id, 'Runs')]");
@@ -867,8 +874,7 @@ public class AssayTest extends AbstractAssayTest
         customizeViewsHelper.clipFolderFilter();
         customizeViewsHelper.saveCustomView("");
 
-        assertTextPresent("FirstRun");
-        assertTextPresent("SecondRun");
+        assertTextPresent("FirstRun", "SecondRun");
 
         log("Testing select all data and view");
         checkAllOnPage("Runs2");
@@ -890,8 +896,7 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
         clickButton("View Source Assay", defaultWaitForPage);
 
-        assertTextPresent("FirstRun");
-        assertTextPresent("SecondRun");
+        assertTextPresent("FirstRun", "SecondRun");
 
         clickAndWait(Locator.linkWithText("FirstRun"));
         verifySpecimensPresent(3, 2, 0);
