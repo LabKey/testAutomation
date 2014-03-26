@@ -739,6 +739,7 @@ public class Runner extends TestSuite
                     System.out.println("Couldn't find suite '" + suiteName + "'.  Valid suites are:");
                     for (Class suite : _suites.getSuites())
                         System.out.println("   " + suite.getSimpleName());
+                    System.exit(1);
                 }
             }
             return tests;
