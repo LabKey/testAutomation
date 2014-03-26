@@ -55,6 +55,7 @@ public class AssayTest extends AbstractAssayTest
     protected static final int TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT = 0;
     protected static final ListColumnType[] TEST_ASSAY_RUN_PROP_TYPES = { ListHelper.ListColumnType.String, ListHelper.ListColumnType.Boolean, ListHelper.ListColumnType.Double, ListHelper.ListColumnType.Integer, ListHelper.ListColumnType.DateTime };
     protected static final String TEST_ASSAY_RUN_PROP1 = "TestRunProp";
+    protected static final String PROP_5_VALUE = "prop5Value";
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
     protected static final String TEST_ASSAY_DATA_ALIASED_PROP_NAME = "testAssayAliasedData";
     protected static final String ALIASED_DATA = "aliasedData";
@@ -225,9 +226,9 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("edit"));
         setFormElement(Locator.name("quf_SpecimenID"), "EditedSpecimenID");
         setFormElement(Locator.name("quf_VisitID"), "601.5");
-        setFormElement(Locator.name("quf_testAssayDataProp5"), "prop5Value");
+        setFormElement(Locator.name("quf_testAssayDataProp5"), PROP_5_VALUE);
         clickButton("Submit");
-        assertTextPresent("Could not convert value: a");
+        assertTextPresent("Could not convert value: " + PROP_5_VALUE);
         setFormElement(Locator.name("quf_testAssayDataProp5"), "514801");
         setFormElement(Locator.name("quf_Flags"), "This Flag Has Been Edited");
         clickButton("Submit");
@@ -560,7 +561,7 @@ public class AssayTest extends AbstractAssayTest
         _customizeViewsHelper.applyCustomView();
         assertTextPresent(
                 "Pending Review",
-                "prop5Value",
+                PROP_5_VALUE,
                 TEST_RUN1_COMMENTS,
                 "2000-01-01");
         clickTab("Overview");
@@ -581,18 +582,19 @@ public class AssayTest extends AbstractAssayTest
 
         clickAndWait(Locator.linkWithText("8"));
 
-        assertTextPresent("301.0");
-        assertTextPresent("9.0");
-        assertTextPresent("8.0");
         assertElementPresent(Locator.linkWithText("999320885"), 1);
         assertElementPresent(Locator.linkWithText("999320885"), 1);
-        assertTextPresent(TEST_RUN1_COMMENTS);
-        assertTextPresent(TEST_RUN2_COMMENTS);
-        assertTextPresent(TEST_RUN1);
-        assertTextPresent(TEST_RUN2);
-        assertTextPresent("2000-06-06");
-        assertTextPresent(TEST_ASSAY_RUN_PROP1);
-        assertTextPresent("18");
+        assertTextPresent(
+                "301.0",
+                "9.0",
+                "8.0",
+                TEST_RUN1_COMMENTS,
+                TEST_RUN2_COMMENTS,
+                TEST_RUN1,
+                TEST_RUN2,
+                "2000-06-06",
+                TEST_ASSAY_RUN_PROP1,
+                "18");
 
         // test recall
         clickFolder(TEST_ASSAY_FLDR_LAB1);
@@ -689,9 +691,10 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Copy to Study");
 
         log("Verifying that the data was published");
-        assertTextPresent("prop5Value");
-        assertTextPresent(TEST_RUN1_COMMENTS);
-        assertTextPresent("2000-01-01");
+        assertTextPresent(
+                PROP_5_VALUE,
+                TEST_RUN1_COMMENTS,
+                "2000-01-01");
         clickTab("Overview");
         clickAndWait(Locator.linkWithText("Study Navigator"));
 
@@ -788,7 +791,7 @@ public class AssayTest extends AbstractAssayTest
 
         log("Verifying that the data was published");
         assertTextPresent(
-                "prop5Value",
+                PROP_5_VALUE,
                 TEST_RUN1_COMMENTS,
                 "2000-01-01");
         clickTab("Overview");
