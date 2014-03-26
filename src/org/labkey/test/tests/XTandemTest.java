@@ -174,11 +174,13 @@ public class XTandemTest extends AbstractXTandemTest
         click(Locator.linkWithText(PEPTIDE2));
         Object[] windows = getDriver().getWindowHandles().toArray();
         getDriver().switchTo().window((String)windows[1]);
-        assertTextPresent("gi|4689022|ribosomal_protein_");  // Check for protein
-        assertTextPresent("CAexample_mini.pep.xml - bov_sample/CAexample_mini (test2)"); // Check for run name
-        assertTextPresent("1373.4690"); // Check for mass
         waitForText("44.0215"); // Look for b3+ ions, populated bu JavaScript
-        assertTextPresent("87.0357", "130.0499");
+        assertTextPresent(
+                "gi|4689022|ribosomal_protein_",  // Check for protein
+                "CAexample_mini.pep.xml - bov_sample/CAexample_mini (test2)", // Check for run name
+                "1373.4690", // Check for mass
+                "87.0357",
+                "130.0499");
         getDriver().close();
         getDriver().switchTo().window((String)windows[0]);
     }
