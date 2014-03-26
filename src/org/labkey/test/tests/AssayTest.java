@@ -430,7 +430,6 @@ public class AssayTest extends AbstractAssayTest
         assertElementNotPresent(Locator.tagWithText("td", "7.0"));
         // Make sure that our specimen IDs resolved correctly
         assertTextPresent(
-                "2.0",
                 "AAA07XSF-02",
                 "999320885",
                 "301",
