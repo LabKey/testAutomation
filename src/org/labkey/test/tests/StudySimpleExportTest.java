@@ -15,6 +15,8 @@
  */
 package org.labkey.test.tests;
 
+import org.apache.commons.collections.MapUtils;
+import org.jetbrains.annotations.Nullable;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -27,8 +29,14 @@ import org.labkey.test.categories.Study;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ListResourceBundle;
 import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -44,6 +52,8 @@ import static org.junit.Assert.*;
 public class StudySimpleExportTest extends StudyBaseTest
 {
     private static final String TEST_DATASET_NAME = "TestDataset";
+    private final String FOLDER_SCOPE = "folder";
+    private final String PROJECT_SCOPE = "project";
 
     @Override
     protected BrowserType bestBrowser()
@@ -89,6 +99,25 @@ public class StudySimpleExportTest extends StudyBaseTest
         initTest.assertTextPresentInThisOrder("Study tracks data in", "over 1 visit. Data is present for 1 Participant");
 
         currentTest = initTest;
+    }
+
+    @Override
+    protected void initializeFolder()
+    {
+        super.initializeFolder();
+
+        clickProject(getProjectName());
+        goToFolderManagement();
+        clickAndWait(Locator.linkWithText("Folder Type"));
+        checkCheckbox(Locator.radioButtonByNameAndValue("folderType", "Study"));
+        clickButton("Update Folder");
+
+        // click button to create manual study
+        clickTab("Overview");
+        clickButton("Create Study");
+        // use all of the default study settings
+        clickButton("Create Study");
+        clickFolder(getFolderName());
     }
 
     private void createSimpleDataset()
@@ -510,6 +539,369 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("delete")); // first cohort
         clickAndWait(Locator.linkWithText("delete")); // second cohort
         waitForText("No data to show.");
+    }
+
+    /**
+     * Study design tables are exported from either the assay schedule or treatment data export categories, they
+     * are non-extensible but can have data at both the folder and project level.
+     */
+    @Test
+    public void verifyStudyDesignTables()
+    {
+        final String FOLDER_NAME = "Study Design Data";
+        final String FOLDER_NAME_2 = "Study Design Data2";
+
+        log("StudyDesign Tables");
+        goToProjectHome();
+        clickFolder(getFolderName());
+
+        Map<String, List<Map>> tableData = new HashMap<>();
+
+        List<Map> assayData = new ArrayList<>();
+        assayData.add(toMap(new Object[][]{
+                {"scope", PROJECT_SCOPE},
+                {"Name", "proj-elispot assay"},
+                {"Label", "proj-elispot assay label"},
+                {"Target", "proj-Antibody"},
+                {"Methodology", "proj-Elispot"},
+                {"Category", "proj-Cell Engineering"},
+                {"TargetFunction", "proj-Neutralization"},
+                {"LeadContributor", "Dr. Toop"},
+                {"Contact", "dtoop@elispot.org"},
+                {"Summary", "Cell Engineering"},
+                {"Keywords", "elispot, cell, toop"}
+        }));
+        assayData.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"Name", "elisa assay"},
+                {"Label", "elisa assay label"},
+                {"Target", "Humoral"},
+                {"Methodology", "Elisa"},
+                {"Category", "Epidemiology"},
+                {"TargetFunction", "Neutralization"},
+                {"Summary", "in construction"},
+                {"Keywords", "elisa, epidemiology"}
+        }));
+        tableData.put("StudyDesignAssays", assayData);
+
+        List<Map> geneData = new ArrayList<>();
+        geneData.add(toMap(new Object[][]{
+                {"scope", PROJECT_SCOPE},
+                {"Name", "env"},
+                {"Label", "env label"}
+        }));
+        geneData.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"Name", "gag"},
+                {"Label", "gag label"}
+        }));
+        tableData.put("StudyDesignGenes", geneData);
+
+        List<Map> immunogenData = new ArrayList<>();
+        immunogenData.add(toMap(new Object[][]{
+                {"scope", PROJECT_SCOPE},
+                {"Name", "Cp1"},
+                {"Label", "Cp1 label"}
+        }));
+        immunogenData.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"Name", "Immunogen2"},
+                {"Label", "Immunogen2 label"}
+        }));
+        tableData.put("StudyDesignImmunogenTypes", immunogenData);
+
+        List<Map> labData = new ArrayList<>();
+        labData.add(toMap(new Object[][]{
+                {"scope", PROJECT_SCOPE},
+                {"Name", "Anderson Lab"},
+                {"Label", "blank"},
+                {"PI", "Dr. Anderson"},
+                {"Description", "proj-the PI"},
+                {"Summary", "blah blah blah, science"},
+                {"Institution", "Medowville"},
+        }));
+        labData.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"Name", "Lab2"},
+                {"Label", "Lab2 label"},
+                {"PI", "Dr. Miller"},
+                {"Description", "the PI"},
+        }));
+        tableData.put("StudyDesignLabs", labData);
+
+        List<Map> routesData = new ArrayList<>();
+        routesData.add(toMap(new Object[][]{
+                {"scope", PROJECT_SCOPE},
+                {"Name", "Intramuscular"},
+                {"Label", "Intramuscular label"}
+        }));
+        routesData.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"Name", "Epidural"},
+                {"Label", "Epidural label"}
+        }));
+        tableData.put("StudyDesignRoutes", routesData);
+
+        List<Map> sampleTypes = new ArrayList<>();
+        sampleTypes.add(toMap(new Object[][]{
+                {"scope", PROJECT_SCOPE},
+                {"Name", "proj-Type2"},
+                {"PrimaryType", "proj-Diabetes"},
+                {"ShortSampleCode", "T2"}
+        }));
+        sampleTypes.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"Name", "Epidural"},
+                {"Name", "Type2"},
+                {"PrimaryType", "Diabetes"},
+                {"ShortSampleCode", "DB"}
+        }));
+        tableData.put("StudyDesignSampleTypes", sampleTypes);
+
+        List<Map> subTypeData = new ArrayList<>();
+        subTypeData.add(toMap(new Object[][]{
+                {"scope", PROJECT_SCOPE},
+                {"Name", "ST1"},
+                {"Label", "ST1 label"}
+        }));
+        subTypeData.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"Name", "ST2"},
+                {"Label", "ST2 label"}
+        }));
+        tableData.put("StudyDesignSubTypes", subTypeData);
+
+        List<Map> unitsData = new ArrayList<>();
+        unitsData.add(toMap(new Object[][]{
+                {"scope", PROJECT_SCOPE},
+                {"Name", "IN"},
+                {"Label", "Inches label"}
+        }));
+        unitsData.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"Name", "LTR"},
+                {"Label", "liters label"}
+        }));
+        tableData.put("StudyDesignUnits", unitsData);
+
+        log("StudyDesign Tables: populate project level table data");
+        populateTableData(tableData, null, PROJECT_SCOPE);
+
+        log("StudyDesign Tables: populate folder level table data");
+        populateTableData(tableData, getFolderName(), FOLDER_SCOPE);
+
+        log("StudyDesign Tables: export study folder to the pipeline as indivisual files");
+        exportStudyArchive(getFolderName(), "0");
+
+        log("StudyDesign Tables: import study into subfolder");
+        createSubfolderAndImportStudyFromPipeline(FOLDER_NAME);
+
+        log("StudyDesign Tables: verify imported settings preserve existing project level data");
+        verifyTableData(tableData, FOLDER_NAME, FOLDER_SCOPE);
+
+        clickFolder(getFolderName());
+        exportStudyArchive(getFolderName(), "0");
+
+        // delete all of the project level data, and import into a new folder, both project and
+        // folder data should appear
+        clickProject(getProjectName());
+        for (Map.Entry<String, List<Map>> entry : tableData.entrySet())
+        {
+            beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=study&query.queryName=" + entry.getKey());
+            checkCheckbox(Locator.checkboxByName(".select"));
+            clickButton("Delete", 0);
+            assertAlert("Are you sure you want to delete the selected row?");
+        }
+
+        log("StudyDesign Tables: import study into subfolder");
+        createSubfolderAndImportStudyFromPipeline(FOLDER_NAME_2);
+
+        log("StudyDesign Tables: verify imported settings insert both project and folder level data");
+        verifyTableData(tableData, FOLDER_NAME_2, null);
+    }
+
+    private Map toMap(final Object[][] data)
+    {
+        ResourceBundle bundle = new ListResourceBundle()
+        {
+            @Override
+            protected Object[][] getContents()
+            {
+                return data;
+            }
+        };
+        return MapUtils.toMap(bundle);
+    }
+
+    private void populateTableData(Map<String, List<Map>> tableData, @Nullable String folderName, String level)
+    {
+        for (Map.Entry<String, List<Map>> entry : tableData.entrySet())
+        {
+            if (folderName != null)
+                beginAt("/query/" + getProjectName() + "/" + folderName + "/executeQuery.view?schemaName=study&query.queryName=" + entry.getKey());
+            else
+                beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=study&query.queryName=" + entry.getKey());
+
+            for (Map row : entry.getValue())
+            {
+                Object levelProp = row.get("scope");
+                if (levelProp != null && !level.equalsIgnoreCase(levelProp.toString()))
+                    continue;
+                
+                waitForText("Insert New");
+                clickButton("Insert New");
+
+                for (Object key : row.keySet())
+                {
+                    String name = "quf_" + key.toString();
+                    Locator option = Locator.tagWithName("select", name);
+                    Locator field = Locator.name(name);
+                    if (isElementPresent(option))
+                    {
+                        selectOptionByText(option, (String) row.get(key));
+                    }
+                    else if (isElementPresent(field))
+                    {
+                        setFormElement(field, (String)row.get(key));
+                    }
+                }
+                clickButton("Submit");
+            }
+        }
+    }
+
+    private void verifyTableData(Map<String, List<Map>> tableData, @Nullable String folderName, @Nullable String level)
+    {
+        for (Map.Entry<String, List<Map>> entry : tableData.entrySet())
+        {
+            if (folderName != null)
+                beginAt("/query/" + getProjectName() + "/" + folderName + "/executeQuery.view?schemaName=study&query.queryName=" + entry.getKey());
+            else
+                beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=study&query.queryName=" + entry.getKey());
+
+            for (Map row : entry.getValue())
+            {
+                Object levelProp = row.get("scope");
+                boolean checkPresent = true;
+                if (level != null && levelProp != null && !level.equalsIgnoreCase(levelProp.toString()))
+                    checkPresent = false;
+
+                for (Map.Entry fieldEntry : ((Set<Map.Entry>)row.entrySet()))
+                {
+                    String columnName = fieldEntry.getKey().toString();
+
+                    if ("scope".equalsIgnoreCase(columnName))
+                        continue;
+
+                    Locator cell = Locator.tagWithClass("table", "labkey-data-region").append(Locator.tag("td")).withText(fieldEntry.getValue().toString());
+                    if (checkPresent)
+                        assertElementPresent(cell);
+                    else
+                        assertElementNotPresent(cell);
+                }
+            }
+        }
+    }
+
+    /**
+     * Verify the study design extensible tables can round trip their custom properties (and data)
+     */
+    @Test
+    public void verifyStudyDesignExtensibleTables()
+    {
+        final String FOLDER_NAME = "Study Design ExData";
+
+        log("StudyDesign Extensible Tables");
+        goToProjectHome();
+        clickFolder(getFolderName());
+
+        log("StudyDesign Extensible Tables: adding custom fields");
+        // add custom fields to all the extensible tables
+        addCustomField("Treatment", "cust_treatment", ListHelper.ListColumnType.String);
+        addCustomField("TreatmentProductMap", "cust_map", ListHelper.ListColumnType.Integer);
+        addCustomField("Product", "cust_product", ListHelper.ListColumnType.DateTime);
+        addCustomField("ProductAntigen", "cust_antigen", ListHelper.ListColumnType.Double);
+        addCustomField("Personnel", "cust_personnel", ListHelper.ListColumnType.MutliLine);
+
+        // add data and export
+        Map<String, List<Map>> tableData = new LinkedHashMap<>();
+
+        List<Map> treatmentData = new ArrayList<>();
+        treatmentData.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"Label", "Treatment label"},
+                {"Description", "Treatment description"},
+                {"DescriptionRendererType", "HTML"},
+                {"cust_treatment", "custom treatment field"}
+        }));
+        tableData.put("Treatment", treatmentData);
+
+        List<Map> productData = new ArrayList<>();
+        productData.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"Label", "Product label"},
+                {"Role", "Product role"},
+                {"cust_product", "2014-03-26"}
+        }));
+        tableData.put("Product", productData);
+
+        List<Map> treatmentMap = new ArrayList<>();
+        treatmentMap.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"TreatmentId", "Treatment label"},
+                {"ProductId", "Product label"},
+                {"cust_map", "100"}
+        }));
+        tableData.put("TreatmentProductMap", treatmentMap);
+
+        List<Map> productAntigen = new ArrayList<>();
+        productAntigen.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"ProductId", "Product label"},
+                {"cust_antigen", "100.0"}
+        }));
+        tableData.put("ProductAntigen", productAntigen);
+
+        List<Map> personnel = new ArrayList<>();
+        personnel.add(toMap(new Object[][]{
+                {"scope", FOLDER_SCOPE},
+                {"Label", "Personnel label"},
+                {"Role", "personnel role"},
+                {"cust_personnel", "custom personnel"}
+        }));
+        tableData.put("Personnel", personnel);
+
+        log("StudyDesign Extensible Tables: populate folder level table data");
+        populateTableData(tableData, getFolderName(), FOLDER_SCOPE);
+
+        log("StudyDesign Extensible Tables: export study folder to the pipeline as indivisual files");
+        exportStudyArchive(getFolderName(), "0");
+
+        log("StudyDesign Extensible Tables: import study into subfolder");
+        createSubfolderAndImportStudyFromPipeline(FOLDER_NAME);
+
+        log("StudyDesign Extensible Tables: verify imported settings");
+        verifyTableData(tableData, FOLDER_NAME, null);
+    }
+
+    private void addCustomField(String tableName, String fieldName, ListHelper.ListColumnType type)
+    {
+        goToSchemaBrowser();
+        selectQuery("study", tableName);
+        waitForText("edit definition");
+        clickAndWait(Locator.linkWithText("Edit Definition"));
+        waitForText("No fields have been defined.");
+
+        clickButton("Add Field", 0);
+
+        _listHelper.setColumnName(0, fieldName);
+        _listHelper.setColumnType(0, type);
+        clickButton("Save", WAIT_FOR_JAVASCRIPT);
+
+        // update the default view to contain the custom column
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn(fieldName);
+        _customizeViewsHelper.saveCustomView("", true);
     }
 
     private void exportStudyArchive(String folder, String location)
