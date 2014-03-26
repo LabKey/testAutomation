@@ -593,5 +593,4 @@ src/org/labkey/test/util/ext4cmp/Ext4ComboRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FieldRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FileFieldRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4GridRef.java -text
-/test.modules -text
 /upgrade_stress_test.cmd -text

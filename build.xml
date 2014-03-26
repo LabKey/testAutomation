@@ -251,15 +251,12 @@
             </dirset>
         </path>
 
-        <pathconvert property="srcdir.list" refid="module.test.src.dirs" pathsep="," dirsep="/">
-            <map from="/" to=""/>
-        </pathconvert>
-        <echo>${srcdir.list}</echo>
-
         <path id="full.test.build.classpath">
             <path refid="test.build.classpath"/>
             <path refid="module.test.src.dirs"/>
         </path>
+
+        <antcall target="force_compile"/>
 
         <uptodate targetfile="${test.build.uptodate}" property="testClassesUpToDate">
             <srcfiles dir="${project.root}" includes="${moduleSources}">
@@ -269,6 +266,18 @@
         </uptodate>
 
         <antcall target="compileIfDirty" inheritrefs="true"/>
+    </target>
+
+    <target name="force_compile">
+        <loadfile property="previous.modulesFile" srcfile="${test.build.uptodate}" failonerror="false"/>
+        <if>
+            <not>
+                <equals arg1="${previous.modulesFile}" arg2="${modulesFile}"/>
+            </not>
+            <then>
+                <delete file="${test.build.uptodate}"/>
+            </then>
+        </if>
     </target>
 
     <target name="compileIfDirty" unless="testClassesUpToDate">
@@ -296,7 +305,7 @@
                 <include name="**/*.js"/>
             </fileset>
         </copy>
-        <touch file="${test.build.uptodate}" />
+        <echo file="${test.build.uptodate}" message="${modulesFile}"/>
     </target>
 
     <path id="ant.contrib.classpath">
@@ -361,8 +370,19 @@
     </target>
 
     <target name="deploy-test-modules">
+        <property name="coreTestModules" value="server/test/modules/*"/>
+        <loadfile property="testModuleSources" srcfile="${project.root}/server/${modulesFile}">
+            <filterchain>
+                <striplinecomments>
+                    <comment value="#"/>
+                </striplinecomments>
+                <suffixlines suffix="/test/modules/*,"/>
+                <striplinebreaks/>
+            </filterchain>
+        </loadfile>
+
         <ant antfile="${project.root}/server/build.xml" target="build_modules" inheritall="false">
-            <property name="modulesFile" value="${test.dir}/test.modules"/>
+            <property name="moduleDirectories" value="${coreTestModules},${testModuleSources}"/>
             <property name="skipDeployApp" value="true" />
         </ant>
         <ant antfile="${project.root}/server/build.xml" target="deployApp" inheritall="false"/>

@@ -1,2 +1,0 @@
-# All module directories listed here will be built by "ant test"
-server/test/modules/*
