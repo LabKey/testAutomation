@@ -3884,7 +3884,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean accept(File file)
             {
-                return file.lastModified() > downloadTime;
+                return file.lastModified() >= downloadTime;
             }
         };
 
