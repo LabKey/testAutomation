@@ -16,12 +16,14 @@
 
 package org.labkey.test.tests;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ListHelper;
 
 import static org.junit.Assert.*;
 
@@ -38,7 +40,10 @@ public class AuditLogTest extends BaseWebDriverTest
     public static final String ASSAY_AUDIT_EVENT = "Copy-to-Study Assay events";
 
     private static final String AUDIT_TEST_USER = "audit_user1@auditlog.test";
+    private static final String AUDIT_TEST_USER2 = "audit_user2@auditlog.test";
+
     private static final String AUDIT_TEST_PROJECT = "AuditVerifyTest";
+    private static final String AUDIT_TEST_SUBFOLDER = "AuditVerifyTest_Subfolder";
 
     public static final String COMMENT_COLUMN = "Comment";
 
@@ -129,7 +134,14 @@ public class AuditLogTest extends BaseWebDriverTest
         log("testing CanSeeAuditLog permission");
         simpleSignIn();
         _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
+        _containerHelper.createSubfolder(AUDIT_TEST_PROJECT, AUDIT_TEST_SUBFOLDER, null);
+        createList(AUDIT_TEST_PROJECT, "Parent List");
+        createList(AUDIT_TEST_SUBFOLDER, "Child List");
+
         createUserWithPermissions(AUDIT_TEST_USER, AUDIT_TEST_PROJECT, "Editor");
+        clickButton("Save and Finish");
+        createUserWithPermissions(AUDIT_TEST_USER2, AUDIT_TEST_PROJECT, "Project Administrator");
+        clickButton("Save and Finish");
 
         // signed in as an admin so we should see rows here
         verifyAuditQueries(true);
@@ -147,8 +159,43 @@ public class AuditLogTest extends BaseWebDriverTest
 
         // cleanup
         stopImpersonating();
+
+        // verify issue 19515 - ensure that container filters are respected (i.e., a project admin without sub-folder admin access
+        // should not see audit log events for that sub folder
+        // verify our audit log only shows the row for the parent list since our user does not have project admin
+        // permissions on the sub-folder
+        impersonate(AUDIT_TEST_USER2);
+        verifyListAuditLogQueries(false);
+        stopImpersonating();
+        // now give access to the sub-folder
+        clickProject(AUDIT_TEST_PROJECT);
+        clickFolder(AUDIT_TEST_SUBFOLDER);
+        _securityHelper.setProjectPerm(AUDIT_TEST_USER2, "Folder Administrator");
+        impersonate(AUDIT_TEST_USER2);
+        verifyListAuditLogQueries(true);
+        stopImpersonating();
+
         deleteUsers(true, AUDIT_TEST_USER);
+        deleteUsers(true, AUDIT_TEST_USER2);
         deleteProject(AUDIT_TEST_PROJECT, true);
+    }
+
+    private void createList(String folderName, String listName)
+    {
+        ListHelper.ListColumn  lc = new ListHelper.ListColumn("Name", "Name", ListHelper.ListColumnType.String, "Name");
+        _listHelper.createList(folderName, listName, ListHelper.ListColumnType.AutoInteger, "Key", lc);
+        clickAndWait(Locator.linkWithText(folderName));
+        clickAndWait(Locator.linkWithText(listName));
+        clickButton("Insert New");
+        setFormElement(Locator.name("quf_Name"), "Data");
+        submit();
+    }
+
+    protected void verifyListAuditLogQueries(boolean canSeeSubFolders)
+    {
+        beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=auditLog&query.queryName=ListAuditEvent&query.containerFilterName=CurrentAndSubfolders");
+        verifyAuditQueryEvent(this, "List", "Parent List", 1);
+        verifyAuditQueryEvent(this, "List", "Child List", 1, canSeeSubFolders);
     }
 
     protected void verifyAuditQueries(boolean canSeeAuditLog)
@@ -188,10 +235,18 @@ public class AuditLogTest extends BaseWebDriverTest
 
     public static void verifyAuditQueryEvent(BaseWebDriverTest instance, String column, String msg, int rowsToSearch)
     {
+        verifyAuditQueryEvent(instance, column, msg, rowsToSearch, true);
+    }
+
+    public static void verifyAuditQueryEvent(BaseWebDriverTest instance, String column, String msg, int rowsToSearch, boolean shouldFindText)
+    {
         instance.log("searching for audit entry: " + msg);
         DataRegionTable table = new DataRegionTable("query", instance, false);
         int i = table.getColumn(column);
-        assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
+        if (shouldFindText)
+            assertTrue("Text '" + msg + "' was not present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
+        else
+            assertFalse("Text '" + msg + "' was present", findTextInDataRegion(table, i, msg, rowsToSearch + 2));
     }
 
     public static boolean findTextInDataRegion(DataRegionTable table, int column, String txt, int rowsToSearch)
@@ -199,7 +254,7 @@ public class AuditLogTest extends BaseWebDriverTest
         for (int row = 0; row < rowsToSearch; row++)
         {
             String value = table.getDataAsText(row, column);
-            if (value.contains(txt))
+            if (StringUtils.isNotEmpty(value) && value.contains(txt))
                 return true;
         }
         return false;
