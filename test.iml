@@ -15,45 +15,6 @@
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../intellijBuild/test/build/classes" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../customModules/OConnorExperiments/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/OConnorExperiments/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/argos/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/argos/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/biotrust/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/biotrust/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/cds/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/cds/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/ehr/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/ehr/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/genotyping/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/genotyping/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/icemr/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/icemr/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/idri/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/idri/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/kiem/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/kiem/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/npod/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/npod/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/reagent/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/reagent/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/targetedms/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/targetedms/test/src" isTestSource="false" />
-    </content>
-    <content url="file://$MODULE_DIR$/../customModules/viscstudies/test">
-      <sourceFolder url="file://$MODULE_DIR$/../customModules/viscstudies/test/src" isTestSource="false" />
-    </content>
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
