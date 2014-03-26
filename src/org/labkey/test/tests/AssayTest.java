@@ -55,7 +55,6 @@ public class AssayTest extends AbstractAssayTest
     protected static final int TEST_ASSAY_RUN_PREDEFINED_PROP_COUNT = 0;
     protected static final ListColumnType[] TEST_ASSAY_RUN_PROP_TYPES = { ListHelper.ListColumnType.String, ListHelper.ListColumnType.Boolean, ListHelper.ListColumnType.Double, ListHelper.ListColumnType.Integer, ListHelper.ListColumnType.DateTime };
     protected static final String TEST_ASSAY_RUN_PROP1 = "TestRunProp";
-    protected static final String PROP_5_VALUE = "prop5Value";
     protected static final String TEST_ASSAY_DATA_PROP_NAME = "testAssayDataProp";
     protected static final String TEST_ASSAY_DATA_ALIASED_PROP_NAME = "testAssayAliasedData";
     protected static final String ALIASED_DATA = "aliasedData";
@@ -226,9 +225,9 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("edit"));
         setFormElement(Locator.name("quf_SpecimenID"), "EditedSpecimenID");
         setFormElement(Locator.name("quf_VisitID"), "601.5");
-        setFormElement(Locator.name("quf_testAssayDataProp5"), PROP_5_VALUE);
+        setFormElement(Locator.name("quf_testAssayDataProp5"), "notAnumber");
         clickButton("Submit");
-        assertTextPresent("Could not convert value: " + PROP_5_VALUE);
+        assertTextPresent("Could not convert value: " + "notAnumber");
         setFormElement(Locator.name("quf_testAssayDataProp5"), "514801");
         setFormElement(Locator.name("quf_Flags"), "This Flag Has Been Edited");
         clickButton("Submit");
@@ -561,7 +560,6 @@ public class AssayTest extends AbstractAssayTest
         _customizeViewsHelper.applyCustomView();
         assertTextPresent(
                 "Pending Review",
-                PROP_5_VALUE,
                 TEST_RUN1_COMMENTS,
                 "2000-01-01");
         clickTab("Overview");
@@ -692,7 +690,6 @@ public class AssayTest extends AbstractAssayTest
 
         log("Verifying that the data was published");
         assertTextPresent(
-                PROP_5_VALUE,
                 TEST_RUN1_COMMENTS,
                 "2000-01-01");
         clickTab("Overview");
@@ -791,7 +788,6 @@ public class AssayTest extends AbstractAssayTest
 
         log("Verifying that the data was published");
         assertTextPresent(
-                PROP_5_VALUE,
                 TEST_RUN1_COMMENTS,
                 "2000-01-01");
         clickTab("Overview");
