@@ -29,8 +29,10 @@ import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -500,11 +502,17 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         //assertEquals("Incorrect spot counts after background subtraction.", FILE5_PLATE_SUMMARY_POST_SUBTRACTION, getText(Locator.css("#plate-summary-div-1 table")));
 
         DataRegionTable detailsTable = new DataRegionTable("AntigenStats", this, true, true);
-        column = detailsTable.getColumnDataAsText("BackgroundMedian");
-        String[] expectedColumn = {"0.0","0.0","9.5","0.0"};
-        for(int i = 0; i < 4; i++)
+        Map<String, String> expectedBackgroundMedians = new HashMap<>();
+        expectedBackgroundMedians.put("ptid 1 E", "0.0");
+        expectedBackgroundMedians.put("ptid 2 E", "0.0");
+        expectedBackgroundMedians.put("ptid 3 E", "9.5");
+        expectedBackgroundMedians.put("ptid 4 E", "0.0");
+        for(Map.Entry<String, String> ptidMedian : expectedBackgroundMedians.entrySet())
         {
-            assertEquals("Incorrect background value for " + detailsTable.getDataAsText(i, "Participant ID"), expectedColumn[i], column.get(i));
+            String ptid = ptidMedian.getKey();
+            String expectedBackgroundMedian = ptidMedian.getValue();
+            int row = detailsTable.getRow("Participant ID", ptid);
+            assertEquals("Incorrect background value for " + ptid, expectedBackgroundMedian, detailsTable.getDataAsText(row, "Background Median"));
         }
     }
 
