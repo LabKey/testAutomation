@@ -208,7 +208,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _downloadDir = new File(ensureDumpDir(), "downloads");
 
         String seleniumBrowser = System.getProperty("selenium.browser");
-        if (seleniumBrowser == null || "".equals(seleniumBrowser) || "*best".equals(seleniumBrowser.toLowerCase()))
+        if (seleniumBrowser == null || seleniumBrowser.length() == 0 || seleniumBrowser.toLowerCase().contains("best"))
         {
             if (isTestRunningOnTeamCity())
                 BROWSER_TYPE = BrowserType.FIREFOX;
@@ -217,19 +217,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         else
         {
-            if (seleniumBrowser.toLowerCase().startsWith("*firefox"))
-                BROWSER_TYPE = BrowserType.FIREFOX;
-            else if (seleniumBrowser.toLowerCase().startsWith("*ie"))
-                BROWSER_TYPE = BrowserType.IE;
-            else if (seleniumBrowser.toLowerCase().startsWith("*google"))
-                BROWSER_TYPE = BrowserType.CHROME;
-            else if (seleniumBrowser.toLowerCase().startsWith("*html"))
-                BROWSER_TYPE = BrowserType.HTML;
-            else
+            for (BrowserType bt : BrowserType.values())
             {
-                BROWSER_TYPE = bestBrowser();
-                log("Unknown browser [" + seleniumBrowser + "]; Using best compatible browser [" + BROWSER_TYPE + "]");
+                if (seleniumBrowser.toLowerCase().contains(bt.name().toLowerCase()))
+                {
+                    BROWSER_TYPE = bt;
+                    return;
+                }
             }
+            BROWSER_TYPE = bestBrowser();
+            log("Unknown browser [" + seleniumBrowser + "]; Using best compatible browser [" + BROWSER_TYPE + "]");
         }
     }
 
@@ -588,22 +585,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public enum BrowserType
     {
-        FIREFOX("*firefox"),
-        IE("*iexplore"),
-        CHROME("*googlechrome"),
-        HTML("*html");
-
-        private String _seleniumBrowserString;
-
-        private BrowserType(String seleniumBrowserString)
-        {
-            _seleniumBrowserString = seleniumBrowserString;
-        }
-
-        public String toString()
-        {
-            return _seleniumBrowserString;
-        }
+        FIREFOX,
+        IE,
+        CHROME,
+        HTML
     }
 
     /**
