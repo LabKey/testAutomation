@@ -121,7 +121,7 @@ public class ExpTest extends BaseWebDriverTest
         // Edit the metadata to use a special date format
         _extHelper.clickExtTab("Source");
         clickButton("Save", 0);
-        waitForText("Saved", WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.css(".labkey-status-info").withText("Saved"));
         clickButton("Edit Metadata");
         int created_RowIndex = 5;
         waitForElement(Locator.name("ff_label" + created_RowIndex), WAIT_FOR_JAVASCRIPT);
