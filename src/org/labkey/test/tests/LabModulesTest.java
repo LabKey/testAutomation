@@ -57,6 +57,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -273,7 +274,9 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _helper.goToLabHome();
         log("Validating client-side date parsing");
         log("Client timezone: " + executeScript("return Ext4.Date.getTimezone(new Date());") + " / " + executeScript("return Ext4.Date.getGMTOffset(new Date());"));
-        log("Server timezone: " + Calendar.getInstance().getTimeZone().getDisplayName(false, TimeZone.SHORT) + " / " + (Calendar.getInstance().getTimeZone().getRawOffset() / (1000 * 60 * 60)));
+        TimeZone tz = Calendar.getInstance().getTimeZone();
+        long now = System.currentTimeMillis();
+        log("Server timezone: " + tz.getDisplayName(tz.inDaylightTime(new Date(now)), TimeZone.SHORT) + " / " + TimeUnit.MILLISECONDS.toHours(tz.getOffset(now)));
 
         String dateFormat1 = "yyyy-MM-dd";
         checkDate("2011-03-04", dateFormat1);
