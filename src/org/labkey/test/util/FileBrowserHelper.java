@@ -289,6 +289,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
                 else
                     _test.setFormElement(Locator.name(prop.getName()), prop.getValue());
             }
+            waitForImportDataEnabled();
             _test.clickButton("Save", 0);
             _test._ext4Helper.waitForMaskToDisappear();
 
