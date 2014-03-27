@@ -465,7 +465,6 @@
                 haltonfailure="false" haltonerror="false" showoutput="true">
             <jvmarg value="-Xmx512m"/>
             <jvmarg value="-Xdebug" />
-            <jvmarg value="-Duser.timezone=${sysprop.timezone}" />
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend.selenium},address=${sysprop.selenium.debug.port}" />
             <classpath refid="test.run.classpath"/>
             <sysproperty key="suite" value="${sysprop.suiteToUse}"/>
@@ -569,14 +568,14 @@
     <target name="drt" description="run developer regression tests">
         <property name="debug.suspend.selenium" value="n"/>
         <property name="suite" value="DRT"/>
-        <property name="selenium.browser" value="*best"/>
+        <property name="selenium.browser" value="best"/>
         <antcall target="sub-selenium"/>
     </target>
 
     <target name="charting" description="run visualization related regression tests">
         <property name="debug.suspend.selenium" value="n"/>
         <property name="suite" value="Charting"/>
-        <property name="selenium.browser" value="*best"/>
+        <property name="selenium.browser" value="best"/>
         <antcall target="sub-selenium"/>
     </target>
 
@@ -589,7 +588,7 @@
 
     <target name="drt-debug" description="run drt, suspend until debugger attaches">
         <property name="debug.suspend.selenium" value="y"/>
-        <property name="selenium.browser" value="*best"/>
+        <property name="selenium.browser" value="best"/>
         <antcall target="sub-selenium"/>
     </target>
 
@@ -660,7 +659,7 @@
     <target name="drt-clean">
         <property name="suite" value="DRT"/>
         <property name="cleanOnly" value="true"/>
-        <property name="selenium.browser" value="*best"/>
+        <property name="selenium.browser" value="best"/>
         <antcall target="sub-selenium"/>
     </target>
 
@@ -877,7 +876,7 @@
         </condition>
 
         <!-- Set property sysprop.selenium.browser -->
-        <condition property="sysprop.selenium.browser" value="*best">
+        <condition property="sysprop.selenium.browser" value="best">
             <not>
                 <isset property="selenium.browser"/>
             </not>
@@ -966,11 +965,6 @@
             <isset property="suite"/>
         </condition>
 
-        <!-- Set property sysprop.timezone. Normalizes timezone for tests running on TeamCity -->
-        <condition property="sysprop.timezone" value="America/Los_Angeles" else="${user.timezone}">
-            <isset property="teamcity.buildType.id"/>
-        </condition>
-
         <condition property="webdriver.ie.driver" value="${test.dir}/bin/windows/amd64/IEDriverServer.exe">
             <and>
                 <os family="windows"/>
@@ -1017,7 +1011,6 @@
         <echo message="User property overrides:" />
         <echo message="    suite: ${sysprop.suite}"/>
         <echo message="    tests: ${sysprop.test}"/>
-        <echo message="    time zone: ${sysprop.timezone}"/>
         <echo message="    clean up after test: ${sysprop.clean}"/>
         <echo message="    clean up only: ${sysprop.cleanOnly}"/>
         <echo message="    halt on error: ${sysprop.haltOnError}"/>
@@ -1055,7 +1048,6 @@
                 haltonerror="${sysprop.haltOnError}">
             <jvmarg value="-Xdebug" />
             <jvmarg value="-Xmx512m"/>
-            <jvmarg value="-Duser.timezone=${sysprop.timezone}" />
             <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=${debug.suspend},address=${sysprop.selenium.debug.port}" />
             <jvmarg value="-Djava.compiler=NONE" />
             <classpath refid="test.run.classpath" />
