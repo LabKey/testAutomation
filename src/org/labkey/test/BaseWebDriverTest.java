@@ -56,7 +56,6 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
-import org.labkey.test.util.ext4cmp.Ext4ComboRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -128,14 +127,30 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.labkey.test.TestProperties.getDatabaseType;
+import static org.labkey.test.TestProperties.getDatabaseVersion;
+import static org.labkey.test.TestProperties.isDevModeEnabled;
+import static org.labkey.test.TestProperties.isFirebugPanelsEnabled;
+import static org.labkey.test.TestProperties.isFirefoxExtensionsEnabled;
+import static org.labkey.test.TestProperties.isInjectCheckEnabled;
+import static org.labkey.test.TestProperties.isLeakCheckSkipped;
+import static org.labkey.test.TestProperties.isLinkCheckEnabled;
+import static org.labkey.test.TestProperties.isQueryCheckSkipped;
+import static org.labkey.test.TestProperties.isScriptCheckEnabled;
+import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
+import static org.labkey.test.TestProperties.isViewCheckSkipped;
 import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
 import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
 import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
 import static org.labkey.test.WebTestHelper.getHttpGetResponse;
 import static org.labkey.test.WebTestHelper.getTargetServer;
 import static org.labkey.test.WebTestHelper.leakCRC;
-import static org.labkey.test.TestProperties.*;
 
 public abstract class BaseWebDriverTest implements Cleanable, WebTest
 {
@@ -6024,7 +6039,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         assertFalse(displayNameFromEmail(fakeUser).equals(getDisplayName()));
     }
 
-    private HashMap<String, String> usersAndDisplayNames = new HashMap<>();
+    private final HashMap<String, String> usersAndDisplayNames = new HashMap<>();
 
     protected void setDisplayName(String email, String newDisplayName)
     {
