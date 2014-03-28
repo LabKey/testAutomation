@@ -262,6 +262,7 @@
             <srcfiles dir="${project.root}" includes="${moduleSources}">
                 <include name="server/test/src/**/*"/>
                 <include name="server/test/lib/**/*"/>
+                <include name="server/${modulesFile}"/>
             </srcfiles>
         </uptodate>
 
