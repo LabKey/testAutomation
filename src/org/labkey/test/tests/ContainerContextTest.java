@@ -165,23 +165,28 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText("EDIT"), "href");
         assertTrue("Expected [edit] link to go to " + getProjectName() + " container, href=" + href,
-                href.contains("/query/" + getProjectName() + "/updateQueryRow.view?"));
+                href.contains("/query/" + getProjectName() + "/updateQueryRow.view?") ||
+                href.contains("/" + getProjectName() + "/query-updateQueryRow.view?"));
 
         href = getAttribute(Locator.linkWithText("DETAILS"), "href");
         assertTrue("Expected [details] link to go to " + getProjectName() + " container, href=" + href,
-                href.contains("/list/" + getProjectName() + "/details.view?"));
+                href.contains("/list/" + getProjectName() + "/details.view?") ||
+                href.contains("/" + getProjectName() + "/list-details.view?"));
 
         href = getAttribute(Locator.linkWithText("MyName"), "href");
         assertTrue("Expected MyName link to go to " + getProjectName() + " container, href=" + href,
-                href.contains("/list/" + getProjectName() + "/details.view?"));
+                href.contains("/list/" + getProjectName() + "/details.view?") ||
+                href.contains("/" + getProjectName() + "/list-details.view?"));
 
         href = getAttribute(Locator.linkWithText("MyLookupItem2"), "href");
         assertTrue("Expected ListLookup link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
-                href.contains("/list/" + getProjectName() + "/" + SUB_FOLDER_A + "/details.view?"));
+                href.contains("/list/" + getProjectName() + "/" + SUB_FOLDER_A + "/details.view?") ||
+                href.contains("/" + getProjectName() + "/" + SUB_FOLDER_A + "/list-details.view?"));
 
         href = getAttribute(Locator.linkWithText("200"), "href");
         assertTrue("Expected ListLookup/LookupAge link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container, href=" + href,
-                href.contains("/fake/" + getProjectName() + "/" + SUB_FOLDER_A + "/action.view?key=2"));
+                href.contains("/fake/" + getProjectName() + "/" + SUB_FOLDER_A + "/action.view?key=2") ||
+                href.contains("/" + getProjectName() + "/" + SUB_FOLDER_A + "/fake-action.view?key=2"));
 
     }
 
@@ -226,11 +231,13 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText(SUB_FOLDER_A + "-Study"), "href");
         assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_A + " container: " + href,
-                href.contains("/study/" + getProjectName() + "/" + SUB_FOLDER_A + "/studySchedule.view"));
+                href.contains("/study/" + getProjectName() + "/" + SUB_FOLDER_A + "/studySchedule.view") ||
+                href.contains("/" + getProjectName() + "/" + SUB_FOLDER_A + "/study-studySchedule.view"));
 
         href = getAttribute(Locator.linkWithText(SUB_FOLDER_B + "-Study"), "href");
         assertTrue("Expected 'MyStudy' link to go to " + getProjectName() + "/" + SUB_FOLDER_B + " container: " + href,
-                href.contains("/study/" + getProjectName() + "/" + SUB_FOLDER_B + "/studySchedule.view"));
+                href.contains("/study/" + getProjectName() + "/" + SUB_FOLDER_B + "/studySchedule.view") ||
+                href.contains("/" + getProjectName() + "/" + SUB_FOLDER_B + "/study-studySchedule.view"));
     }
 
     // Issue 15751: Pipeline job list generates URLs without correct container
@@ -247,11 +254,13 @@ public class ContainerContextTest extends BaseWebDriverTest
         log("** Checking URLs go to correct container...");
         String href = getAttribute(Locator.linkWithText("COMPLETE", 0), "href");
         assertTrue("Expected 'COMPLETE' link 0 to go to current A container: " + href,
-                href.contains("/pipeline-status/" + getProjectName() + "/" + SUB_FOLDER_A + "/details.view"));
+                href.contains("/pipeline-status/" + getProjectName() + "/" + SUB_FOLDER_A + "/details.view") ||
+                href.contains("/" + getProjectName() + "/" + SUB_FOLDER_A + "/pipeline-status-details.view"));
 
         href = getAttribute(Locator.linkWithText("COMPLETE", 1), "href");
         assertTrue("Expected 'COMPLETE' link 1 to go to current B container: " + href,
-                href.contains("/pipeline-status/" + getProjectName() + "/" + SUB_FOLDER_B + "/details.view"));
+                href.contains("/pipeline-status/" + getProjectName() + "/" + SUB_FOLDER_B + "/details.view") ||
+                href.contains("/" + getProjectName() + "/" + SUB_FOLDER_B + "/pipeline-status-details.view"));
     }
 
     @LogMethod
@@ -448,17 +457,22 @@ public class ContainerContextTest extends BaseWebDriverTest
             String workbookContainer = EscapeUtil.encode(getProjectName()) + "/" + workbookIds[i];
             String href;
             String expectedHref;
+            String expectedContainerRelativeHref;
 
             // update link
             if (hasUpdate)
             {
                 href = dr.getUpdateHref(i);
                 log("  [edit] column href = " + href);
-                expectedHref = "/query/" + workbookContainer + "/updateQueryRow.view?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
+
+                String rest = "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
+                expectedHref = "/query/" + workbookContainer + "/updateQueryRow.view" + rest;
+                expectedContainerRelativeHref = "/" + workbookContainer + "/query-updateQueryRow.view" + rest;
+
                 assertTrue("Expected and actual [edit] links differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual  : " + href,
-                        href != null && href.contains(expectedHref));
+                        href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
             }
 
             // details link
@@ -466,28 +480,37 @@ public class ContainerContextTest extends BaseWebDriverTest
             {
                 href = dr.getDetailsHref(i);
                 log("  [details] column href = " + href);
-                expectedHref = "/query/" + workbookContainer + "/" + detailsAction + "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
+
+                String rest = "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + emissionIds[i];
+                expectedHref = "/query/" + workbookContainer + "/" + detailsAction + rest;
+                expectedContainerRelativeHref = "/" + workbookContainer + "/query-" + detailsAction + rest;
+
                 assertTrue("Expected and actual [details] links differ:\n" +
                         "Expected: " + expectedHref + "\n" +
                         "Actual:   " + href,
-                        href != null && href.contains(expectedHref));
+                        href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
             }
 
             // vehicle link
             href = dr.getHref(i, "Vehicle Id");
             log("  Vehicle column href = " + href);
+
             expectedHref = "/simpletest/" + getProjectName() + "/vehicle.view?rowid=" + vehicleId;
+            expectedContainerRelativeHref = "/" + getProjectName() + "/simpletest-vehicle.view?rowid=" + vehicleId;
+
             assertTrue("Expected and actual Vehicle column URL differ:\n" +
                     "Expected: " + expectedHref + "\n" +
                     "Actual:   " + href,
-                    href != null && href.contains(expectedHref));
+                    href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
 
             // parent sample ID link (table has a container so URL should go to lookup's container)
             if (parentRowIds[i] != null && !parentRowIds[i].equals("") && parentDetailsAction != null)
             {
                 String parentTestWorkbookId = rowIdToWorkbookId.get(parentRowIds[i]);
                 String parentTestContainer = EscapeUtil.encode(getProjectName()) + "/" + parentTestWorkbookId;
-                expectedHref = "/query/" + parentTestContainer + "/" + parentDetailsAction + "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + parentRowIds[i];
+                String rest = "?schemaName=vehicle&query.queryName=EmissionTest&RowId=" + parentRowIds[i];
+                expectedHref = "/query/" + parentTestContainer + "/" + parentDetailsAction + rest;
+                expectedContainerRelativeHref = "/" + parentTestContainer + "/query-" + parentDetailsAction + rest;
 
                 href = dr.getHref(i, "Parent Test");
                 if (href != null)
@@ -496,7 +519,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                     assertTrue("Expected and actual parent test column URL differ:\n" +
                             "Expected: " + expectedHref + "\n" +
                             "Actual:   " + href,
-                            href.contains(expectedHref));
+                            (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
                 }
             }
 
@@ -507,10 +530,12 @@ public class ContainerContextTest extends BaseWebDriverTest
 
                 log("  Folder column href = " + href);
                 expectedHref = "/project/" + workbookContainer + "/begin.view?";
+                expectedContainerRelativeHref = "/" + workbookContainer + "/project-begin.view?";
+
                 assertTrue("Expected and actual container column URL differ:\n" +
                         "Expected container: " + workbookContainer + "\n" +
                         "Actual URL        : " + href,
-                        href != null && href.contains(expectedHref));
+                        href != null && (href.contains(expectedHref) || href.contains(expectedContainerRelativeHref)));
             }
 
             log("");
