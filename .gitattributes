@@ -114,6 +114,8 @@ modules/scriptpad/module.properties -text
 modules/scriptpad/resources/reports/schemas/consoleOnly.r -text
 modules/scriptpad/resources/reports/schemas/err.r -text
 modules/scriptpad/resources/reports/schemas/errOnly.r -text
+modules/scriptpad/resources/reports/schemas/kable.report.xml -text
+modules/scriptpad/resources/reports/schemas/kable.rmd -text
 modules/scriptpad/resources/reports/schemas/script2.r -text
 modules/scriptpad/resources/reports/schemas/script3.r -text
 modules/scriptpad/resources/reports/schemas/script_r.r -text

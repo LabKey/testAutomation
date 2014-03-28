@@ -23,6 +23,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.openqa.selenium.UnhandledAlertException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,6 +43,7 @@ public class KnitrReportTest extends ReportTest
     private static final Path scriptpadReports = Paths.get(getLabKeyRoot(), "server/test/modules/scriptpad/resources/reports/schemas");
     private static final Path rhtmlReport = scriptpadReports.resolve("script_rhtml.rhtml");
     private static final Path rmdReport = scriptpadReports.resolve("script_rmd.rmd");
+    private static final Path rmdDependenciesReport = scriptpadReports.resolve("kable.rmd");
     private final RReportHelper _rReportHelper = new RReportHelper(this);
 
     @Nullable
@@ -62,6 +64,9 @@ public class KnitrReportTest extends ReportTest
     {
         verifyKnitrHTMLFormat();
         verifyKnitrMarkupFormat();
+        verifyModuleReportDependencies();
+        verifyAdhocReportDependenciesString();
+        verifyAdhocReportDependenciesLib();
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)
@@ -77,6 +82,7 @@ public class KnitrReportTest extends ReportTest
         //portalHelper.addWebPart("Scriptpad");
 
         portalHelper.addReportWebPart("script_rmd");
+        portalHelper.addWebPart("Data Views");
     }
 
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
@@ -115,6 +121,77 @@ public class KnitrReportTest extends ReportTest
         createAndVerifyKnitrReport(rmdReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains);
     }
 
+    private void verifyModuleReportDependencies()
+    {
+        //
+        // Checks that the dependencies can be loaded from the included kable report's metadata file.
+        // If the dependencies did not load correctly then the test will fail with an
+        // UnhandledAlertException when trying to view this report in the report designer
+        //
+        clickProject(getProjectName());
+        Locator link = getReportGridLink("kable", false);
+        waitForElement(link);
+        scrollIntoView(link);
+        clickAndWait(link);
+        _ext4Helper.waitForMaskToDisappear();
+    }
+
+    private void verifyAdhocReportDependenciesString()
+    {
+        verifyAdhocReportDependencies("Strings",
+                "http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js;" +
+                "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js;\r\n" +
+                "http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css"
+        );
+    }
+
+    private void verifyAdhocReportDependenciesLib()
+    {
+        //
+        // copy over a lib to the webapp path that includes the required dependencies and ensure
+        // the report loads by referencing those dependencies
+        //
+        Path source = Paths.get(getSampledataPath(), "knitr/knitr.lib.xml");
+        Path destDir = Paths.get(getDefaultWebAppRoot());
+
+        try
+        {
+            Files.copy(source, destDir.resolve(source.getFileName()));
+        }
+        catch (IOException e)
+        {
+            fail("Failed to copy knitr.lib.xml to [" + destDir.toString() + "]: " + e.getMessage());
+        }
+
+        verifyAdhocReportDependencies("ClientLib", "knitr");
+    }
+    private void verifyAdhocReportDependencies(String viewName, String dependencies)
+    {
+        // just do a sanity check of the report's contents.  If the dependencies aren't loaded then we'll throw an alert
+        Locator[] reportContains = {Locator.css("h1").withText("jQuery DataTables")};
+        String[] reportNotContains = {"```", "{r",};
+
+        // without the dependencies, this report should fail to render
+        try
+        {
+            createAndVerifyKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains);
+        }
+        catch(UnhandledAlertException e)
+        {
+            dismissAlerts();
+        }
+
+        // now set the dependencies
+        _rReportHelper.clickSourceTab();
+        _rReportHelper.ensureFieldSetExpanded("knitr");
+        setFormElement(Locator.name("scriptDependencies"), dependencies);
+
+        _rReportHelper.clickViewTab();
+        assertReportContents(reportContains, reportNotContains);
+        _rReportHelper.clickSourceTab();
+        saveAndVerifyKnitrReport(rmdDependenciesReport.getFileName() + " " + viewName, reportContains, reportNotContains);
+    }
+
     private void createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains)
     {
         final String reportSource = readReport(reportSourcePath);
@@ -133,10 +210,14 @@ public class KnitrReportTest extends ReportTest
 
         _rReportHelper.clickSourceTab();
         assertEquals("Incorrect number of lines present in code editor.", reportSource.split("\n").length, getElementCount(Locator.css(".CodeMirror-gutter-text pre")));
+
+        saveAndVerifyKnitrReport(reportName, reportContains, reportNotContains);
+    }
+
+    private void saveAndVerifyKnitrReport(String reportName, Locator[] reportContains, String[] reportNotContains)
+    {
         _rReportHelper.saveReport(reportName);
-
         openView(reportName);
-
         assertReportContents(reportContains, reportNotContains);
     }
 

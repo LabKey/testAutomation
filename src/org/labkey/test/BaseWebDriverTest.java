@@ -269,6 +269,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return new File(getLabKeyRoot(), "build/deploy/files/" + containerPath + "/@files");
     }
 
+    public static String getDefaultWebAppRoot()
+    {
+        File path = new File(getLabKeyRoot(), "build/deploy/labkeyWebapp");
+        return path.toString();
+    }
+
     public static String getSampledataPath()
     {
         File path = new File(getLabKeyRoot(), "sampledata");

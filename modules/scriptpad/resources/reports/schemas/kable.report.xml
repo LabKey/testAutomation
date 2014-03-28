@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ReportDescriptor xmlns="http://labkey.org/query/xml">
+    <label>kable</label>
+    <description>The uncool query</description>
+    <hidden>false</hidden>
+    <reportType>
+        <R>
+            <dependencies>
+                <dependency path="http://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js"/>
+                <dependency path="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.min.js"/>
+                <dependency path="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css"/>
+            </dependencies>
+        </R>
+    </reportType>
+</ReportDescriptor>
