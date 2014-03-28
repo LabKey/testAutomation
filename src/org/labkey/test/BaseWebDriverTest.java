@@ -19,7 +19,6 @@ package org.labkey.test;
 import com.thoughtworks.selenium.SeleniumException;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.http.HttpException;
@@ -127,30 +126,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.labkey.test.TestProperties.getDatabaseType;
-import static org.labkey.test.TestProperties.getDatabaseVersion;
-import static org.labkey.test.TestProperties.isDevModeEnabled;
-import static org.labkey.test.TestProperties.isFirebugPanelsEnabled;
-import static org.labkey.test.TestProperties.isFirefoxExtensionsEnabled;
-import static org.labkey.test.TestProperties.isInjectCheckEnabled;
-import static org.labkey.test.TestProperties.isLeakCheckSkipped;
-import static org.labkey.test.TestProperties.isLinkCheckEnabled;
-import static org.labkey.test.TestProperties.isQueryCheckSkipped;
-import static org.labkey.test.TestProperties.isScriptCheckEnabled;
-import static org.labkey.test.TestProperties.isTestRunningOnTeamCity;
-import static org.labkey.test.TestProperties.isViewCheckSkipped;
-import static org.labkey.test.WebTestHelper.DEFAULT_TARGET_SERVER;
-import static org.labkey.test.WebTestHelper.GC_ATTEMPT_LIMIT;
-import static org.labkey.test.WebTestHelper.MAX_LEAK_LIMIT;
-import static org.labkey.test.WebTestHelper.getHttpGetResponse;
-import static org.labkey.test.WebTestHelper.getTargetServer;
-import static org.labkey.test.WebTestHelper.leakCRC;
+import static org.junit.Assert.*;
+import static org.labkey.test.TestProperties.*;
+import static org.labkey.test.WebTestHelper.*;
 
 public abstract class BaseWebDriverTest implements Cleanable, WebTest
 {
@@ -2051,12 +2029,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 throw new RuntimeException(ex);
             }
         }
-    }
-
-    public boolean isGroupConcatSupported()
-    {
-        return "pg".equals(getDatabaseType()) ||
-               "mssql".equals(getDatabaseType()) && !"2005".equals(getDatabaseVersion());
     }
 
     public boolean isGuestModeTest()

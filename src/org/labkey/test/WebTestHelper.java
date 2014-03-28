@@ -44,25 +44,16 @@ import java.net.URISyntaxException;
 
 import static org.junit.Assert.*;
 
-/**
- * User: Mark Igra
- * Date: Feb 7, 2007
- * Time: 11:16:41 PM
- */
 public class WebTestHelper
 {
     public static final String DEFAULT_CONTEXT_PATH = "/labkey";
     public static final String DEFAULT_WEB_PORT = "8080";
-    public static final String DEFAULT_LABKEY_ROOT = "C:/cpas";
     public static final String DEFAULT_TARGET_SERVER = "http://localhost";
     private static String _webPort = null;
     private static String _contextPath = null;
     public static final int MAX_LEAK_LIMIT = 0;
     public static final int GC_ATTEMPT_LIMIT = 6;
-    public static final int DEFAULT_BUTTON_FONT_SIZE = 11;
     public static long leakCRC = 0;
-
-    public enum DatabaseType {PostgreSQL, MicrosoftSQLServer}
 
     public static String getWebPort()
     {
@@ -108,16 +99,35 @@ public class WebTestHelper
     {
         if (_labkeyRoot == null)
         {
-            _labkeyRoot = canonicalizePath(System.getProperty("labkey.root"));
-            if (_labkeyRoot == null || _labkeyRoot.length() == 0)
+            _labkeyRoot = System.getProperty("labkey.root");
+
+            if (_labkeyRoot.length() == 0)
             {
                 throw new IllegalStateException("No LabKey root directory specified. Configure this by passing VM arg '-Dlabkey.root=[yourroot]'.");
             }
-            else
-                log("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
+
+            File labkeyRoot = new File(_labkeyRoot);
+
+            if (!labkeyRoot.exists())
+            {
+                throw new IllegalStateException("Specified LabKey root does not exist [" + _labkeyRoot + "]. Configure this by passing VM arg '-Dlabkey.root=[yourroot]'.");
+            }
+
+            try
+            {
+                _labkeyRoot = labkeyRoot.getCanonicalPath();
+            }
+            catch (IOException badPath)
+            {
+                throw new IllegalStateException("Unable to canonicalize specified LabKey root [" + _labkeyRoot + "]. Configure this by passing VM arg '-Dlabkey.root=[yourroot]'.");
+            }
+
+            log("Using labkey root '" + _labkeyRoot + "', as provided by system property 'labkey.root'.");
         }
         return _labkeyRoot;
     }
+
+    public enum DatabaseType {PostgreSQL, MicrosoftSQLServer}
 
     public static DatabaseType getDatabaseType()
     {
@@ -135,30 +145,16 @@ public class WebTestHelper
         throw new IllegalStateException("Unknown database type: " + databaseType);
     }
 
-    public static String canonicalizePath(String path)
+    public static String getDatabaseVersion()
     {
-        if (path == null)
-            return null;
-        File f = new File(path);
-        if (f.exists())
-        {
-            try
-            {
-                return  f.getCanonicalPath();
-            }
-            catch (IOException e)
-            {
-                log("WARNING: '" + path + "' may not exist.");
-                return null;
-            }
-        }
-        else
-        {
-            log("WARNING: '" + path + "' may not exist.");
-            return null;
-        }
+        return System.getProperty("databaseVersion");
     }
 
+    public static boolean isGroupConcatSupported()
+    {
+        return  getDatabaseType() == DatabaseType.PostgreSQL ||
+                getDatabaseType() == DatabaseType.MicrosoftSQLServer && !"2005".equals(getDatabaseVersion());
+    }
 
     private static String _labkeyRoot = null;
     private static String _targetServer = null;

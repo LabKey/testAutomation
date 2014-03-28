@@ -44,10 +44,6 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-/**
- * User: kevink
- * Date: Oct 29, 2008 3:52:53 PM
- */
 @Category({DailyA.class, Data.class})
 public class ExternalSchemaTest extends BaseWebDriverTest
 {
@@ -211,7 +207,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 //        data casing, which will differ between PostgreSQL and SQL Server. Use code like the below to distinguish.
 //
 //        // External schemas report JDBC names, so we expect different casing on PostgreSQL vs. Microsoft SQL Server
-//        switch (TestProperties.getDatabaseType())
+//        switch (WebTestHelper.getDatabaseType())
 //        {
 //            case PostgreSQL:
 //                TABLE_NAME = "testtable";

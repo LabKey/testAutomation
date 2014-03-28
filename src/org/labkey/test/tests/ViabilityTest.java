@@ -30,10 +30,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: kevink
- * Date: Sep 30, 2009
- */
 @Category({DailyB.class, Assays.class})
 public class ViabilityTest extends AbstractViabilityTest
 {
@@ -134,7 +130,7 @@ public class ViabilityTest extends AbstractViabilityTest
         assertEquals("6.000E7", table.getDataAsText(0, "Original Cells"));
 
         assertEquals("foobar,vial1,vial2,vial3", table.getDataAsText(0, "Specimen IDs"));
-        if (TestProperties.isGroupConcatSupported())
+        if (WebTestHelper.isGroupConcatSupported())
             assertEquals("vial1,vial2,vial3", table.getDataAsText(0, "SpecimenMatches"));
         else
             assertEquals(" ", table.getDataAsText(0, "SpecimenMatches"));

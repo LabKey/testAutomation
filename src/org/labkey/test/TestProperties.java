@@ -17,10 +17,6 @@ package org.labkey.test;
 
 import java.io.File;
 
-/**
- * User: tchadick
- * Date: 9/26/13
- */
 public abstract class TestProperties
 {
     public static boolean isTestCleanupSkipped()
@@ -81,22 +77,6 @@ public abstract class TestProperties
     public static boolean isSystemMaintenanceDisabled()
     {
         return "never".equals(System.getProperty("systemMaintenance"));
-    }
-
-    public static String getDatabaseType()
-    {
-        return System.getProperty("databaseType");
-    }
-
-    public static String getDatabaseVersion()
-    {
-        return System.getProperty("databaseVersion");
-    }
-
-    public static boolean isGroupConcatSupported()
-    {
-        return  "pg".equals(getDatabaseType()) ||
-                "mssql".equals(getDatabaseType()) && !"2005".equals(getDatabaseVersion());
     }
 
     public static File getDumpDir()
