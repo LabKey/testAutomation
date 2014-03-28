@@ -19,6 +19,7 @@ package org.labkey.test;
 import com.thoughtworks.selenium.SeleniumException;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.http.HttpException;
@@ -3864,6 +3865,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         click(elementToClick);
 
         final File downloadDir = getDownloadDir();
+        final FileFilter tempFilesFilter = new FileFilter()
+        {
+            @Override
+            public boolean accept(File file)
+            {
+                return file.getName().contains(".part") || file.getName().contains(".tmp") || file.getName().contains(".crdownload");
+            }
+        };
         final FileFilter newFileFilter = new FileFilter()
         {
             @Override
@@ -3878,18 +3887,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean check()
             {
-                return downloadDir.listFiles(newFileFilter).length >= expectedFileCount;
+                return downloadDir.listFiles(newFileFilter).length >= expectedFileCount && downloadDir.listFiles(tempFilesFilter).length == 0;
             }
         }, "File(s) did not appear in download dir", WAIT_FOR_PAGE);
-
-        final FileFilter tempFilesFilter = new FileFilter()
-        {
-            @Override
-            public boolean accept(File file)
-            {
-                return file.getName().contains(".part") || file.getName().contains(".tmp") || file.getName().contains(".crdownload");
-            }
-        };
 
         waitFor(new Checker()
         {
