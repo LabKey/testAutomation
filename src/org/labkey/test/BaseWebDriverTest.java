@@ -56,6 +56,7 @@ import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.*;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4GridRef;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
@@ -5968,7 +5969,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "Roles");
         waitForElement(Ext4Helper.Locators.window("Impersonate Roles"));
-        _ext4Helper.selectComboBoxItem("Roles:", true, roles);
+
+        for (String role : roles)
+            waitAndClick(Ext4GridRef.locateExt4GridCell(role));
+
         clickAndWait(Ext4Helper.ext4WindowButton("Impersonate Roles", "Impersonate"));
     }
 
