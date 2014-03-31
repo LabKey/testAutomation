@@ -1420,7 +1420,7 @@ public class LuminexTest extends AbstractQCAssayTest
         verifyGuideSetsApplied(guideSetIds, analytes, 2);
 
         //nav trail check
-        assertElementPresent(Locator.id("navTrailAncestors").withText("assay.Luminex." + TEST_ASSAY_LUM + " Schema"));
+        assertElementPresent(Locator.id("navTrailAncestors").append("/a").withText("assay.Luminex." + TEST_ASSAY_LUM + " Schema"));
 
         // verify the guide set threshold values for the first set of runs
         int[] rowCounts = {2, 2};
