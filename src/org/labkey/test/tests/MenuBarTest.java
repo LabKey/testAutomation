@@ -134,7 +134,7 @@ public class MenuBarTest extends BaseWebDriverTest
         waitForElementToDisappear(Locator.css(".ext-el-mask"));
         _extHelper.selectComboBoxItem("Schema", "wiki");
         waitForElementToDisappear(Locator.css(".ext-el-mask"));
-        _extHelper.selectComboBoxItem("Query", "renderertype");
+        _extHelper.selectComboBoxItem("Query", "RendererType");
         waitForElementToDisappear(Locator.css(".ext-el-mask"));
         _extHelper.selectComboBoxItem("Title Column", "Value");
         _extHelper.clickExtButton("Submit");
