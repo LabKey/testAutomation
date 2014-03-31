@@ -268,7 +268,7 @@ public class Ext4GridRef extends Ext4CmpRef
         if (el == null)
         {
             Locator cell = Ext4GridRef.locateExt4GridCell(rowIdx, cellIdx, _id);
-            _test.assertElementPresent(cell);
+            _test.waitForElement(cell);
 
             if (_clicksToEdit > 1)
                 _test.doubleClick(cell);
