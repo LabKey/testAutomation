@@ -15,20 +15,25 @@
  */
 package org.labkey.test.tests;
 
+import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.jetbrains.annotations.Nullable;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.TestProperties;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.UnhandledAlertException;
+import org.openqa.selenium.WebDriverException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -79,7 +84,6 @@ public class KnitrReportTest extends ReportTest
         enableModule(getProjectName(), "scriptpad");
 
         PortalHelper portalHelper = new PortalHelper(this);
-        //portalHelper.addWebPart("Scriptpad");
 
         portalHelper.addReportWebPart("script_rmd");
         portalHelper.addWebPart("Data Views");
@@ -156,7 +160,7 @@ public class KnitrReportTest extends ReportTest
 
         try
         {
-            Files.copy(source, destDir.resolve(source.getFileName()));
+            Files.copy(source, destDir.resolve(source.getFileName()), StandardCopyOption.REPLACE_EXISTING);
         }
         catch (IOException e)
         {
@@ -171,14 +175,27 @@ public class KnitrReportTest extends ReportTest
         Locator[] reportContains = {Locator.css("h1").withText("jQuery DataTables")};
         String[] reportNotContains = {"```", "{r",};
 
-        // without the dependencies, this report should fail to render
-        try
+        createKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown);
+
+        // Without dependencies, we expect a javascript error.  Behavior is browser dependent
+        if (getBrowserType() == BrowserType.FIREFOX)
         {
-            createAndVerifyKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown, reportContains, reportNotContains);
+            // no exception thrown, so look into the JS errors collection
+            _rReportHelper.clickViewTab();
+            verifyJsErrors("ReferenceError: $ is not defined");
         }
-        catch(UnhandledAlertException e)
+        else
         {
-            dismissAlerts();
+            // exception thrown, so knock down the alert
+            try
+            {
+                _rReportHelper.clickViewTab();
+                _rReportHelper.clickSourceTab();
+            }
+            catch(UnhandledAlertException e)
+            {
+                dismissAlerts();
+            }
         }
 
         // now set the dependencies
@@ -187,15 +204,47 @@ public class KnitrReportTest extends ReportTest
         setFormElement(Locator.name("scriptDependencies"), dependencies);
 
         _rReportHelper.clickViewTab();
+        if (getBrowserType() == BrowserType.FIREFOX)
+        {
+            // verify no errors now on FF.  Chrome would have thrown again and we would fail
+            // if there were errors on the page
+            verifyJsErrors(null);
+        }
+
         assertReportContents(reportContains, reportNotContains);
         _rReportHelper.clickSourceTab();
         saveAndVerifyKnitrReport(rmdDependenciesReport.getFileName() + " " + viewName, reportContains, reportNotContains);
     }
 
-    private void createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains)
+    private void verifyJsErrors(String expectedError)
     {
-        final String reportSource = readReport(reportSourcePath);
-        final String reportName = reportSourcePath.getFileName() + " Report";
+        if (TestProperties.isScriptCheckEnabled())
+        {
+            try
+            {
+                boolean foundError = false;
+                List<JavaScriptError> jsErrors = JavaScriptError.readErrors(getDriver());
+                for (JavaScriptError j : jsErrors)
+                {
+                    if (j.getErrorMessage().contains(expectedError))
+                        foundError = true;
+                }
+
+                if (expectedError == null)
+                    assertTrue("unexpected JS errors found!", jsErrors.size() == 0);
+                else
+                    assertTrue("expected JS jquery reference error not found!", foundError);
+            }
+            catch(WebDriverException ex)
+            {
+                fail("error checker not enabled!");
+            }
+        }
+    }
+
+    private String createKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption)
+    {
+        String reportSource = readReport(reportSourcePath);
 
         clickProject(getProjectName());
         goToManageViews();
@@ -203,6 +252,14 @@ public class KnitrReportTest extends ReportTest
         clickAddReport("R View");
         _rReportHelper.selectOption(knitrOption);
         setCodeEditorValue("script-report-editor", reportSource);
+        return reportSource;
+    }
+
+
+    private void createAndVerifyKnitrReport(Path reportSourcePath, RReportHelper.ReportOption knitrOption, Locator[] reportContains, String[] reportNotContains)
+    {
+        final String reportName = reportSourcePath.getFileName() + " Report";
+        String reportSource = createKnitrReport(reportSourcePath, knitrOption);
 
         // Regression test: Issue #18602
         _rReportHelper.clickViewTab();
