@@ -96,7 +96,7 @@ public class Ext4CmpRef
             @Override
             public boolean check()
             {
-                return (Boolean)test.executeScript("return !!Ext4.ComponentQuery.query(\"" + query + "\");");
+                return (Boolean)test.executeScript("return !!Ext4.ComponentQuery.query(\"" + query + "\").length;");
             }
         }, "Component did not appear: " + query, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
