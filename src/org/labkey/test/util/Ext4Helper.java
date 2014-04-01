@@ -17,6 +17,7 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
+import org.labkey.test.util.ext4cmp.Ext4ComboRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -27,11 +28,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * User: klum
- * Date: Jan 3, 2012
- * Time: 3:34:16 PM
- */
 public class Ext4Helper extends AbstractHelper
 {
     private static final String DEFAULT_CSS_PREFIX = "x4-";
@@ -92,7 +88,7 @@ public class Ext4Helper extends AbstractHelper
         Locator arrowTrigger = comboBox.append("//div[contains(@class,'arrow')]");
         _test.click(arrowTrigger);
 
-        if (!_test.waitForElement(comboBox.withDescendant(Locator.tag("td").withClass("" + _cssPrefix + "pickerfield-open")), 1000, false))
+        if (!_test.waitForElement(comboBox.withDescendant(Locator.tag("td").withClass(_cssPrefix + "pickerfield-open")), 1000, false))
             _test.click(arrowTrigger); // try again if combo-box doesn't open
 
         _test.waitForElement(Locator.css("." + _cssPrefix + "boundlist-item"));
@@ -129,25 +125,32 @@ public class Ext4Helper extends AbstractHelper
 
     private boolean isOpenComboBoxMultiSelect()
     {
-        return _test.isElementPresent(Locator.xpath("//*[contains(@class, '" + _cssPrefix + "boundlist-item')]").notHidden().append("/span").withClass("" + _cssPrefix + "combo-checker"));
+        return _test.isElementPresent(Locator.xpath("//*[contains(@class, '" + _cssPrefix + "boundlist-item')]").notHidden().append("/span").withClass(_cssPrefix + "combo-checker"));
     }
 
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String... selections)
     {
-        selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), false, selections);
+        selectComboBoxItem(label, false, selections);
     }
 
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, boolean containsText, @LoggedParam String... selections)
     {
+        String componentQueryLabel = label.replaceAll(":", "");
+        Ext4ComboRef userCombo = Ext4ComboRef.getForLabel(_test, componentQueryLabel);
+        userCombo.waitForStoreLoad();
+
         selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), containsText, selections);
     }
 
     @LogMethod(quiet = true)
     public void selectComboBoxItemById(@LoggedParam String labelId, @LoggedParam String selection)
     {
-        Locator.XPathLocator loc = Locator.xpath("//tbody[./tr/td/label[@id='" + labelId + "-labelEl']]");
+        Ext4ComboRef userCombo = queryOne("#" + labelId, Ext4ComboRef.class);
+        userCombo.waitForStoreLoad();
+
+        Locator.XPathLocator loc = Locator.tagWithId("table", labelId);
         selectComboBoxItem(loc, selection);
     }
 
@@ -307,7 +310,7 @@ public class Ext4Helper extends AbstractHelper
      */
     public void clickParticipantFilterGridRowText(String cellText, int index)
     {
-        _test.waitForElementToDisappear(Locator.tag("div").withClass("" + _cssPrefix + "tip").notHidden()); // tooltip breaks test in Chrome
+        _test.waitForElementToDisappear(Locator.tag("div").withClass(_cssPrefix + "tip").notHidden()); // tooltip breaks test in Chrome
         Locator.XPathLocator rowLoc = getGridRow(cellText, index);
         _test.waitForElement(rowLoc);
         _test.click(rowLoc.append("//span[contains(@class, 'lk-filter-panel-label')][normalize-space() = '"+cellText+"']"));
@@ -540,7 +543,7 @@ public class Ext4Helper extends AbstractHelper
 
         public static Locator.XPathLocator window(String title)
         {
-            return Locator.xpath("//div").withClass(_cssPrefix + "window").notHidden().withDescendant(Locator.xpath("//span").withClass("" + _cssPrefix + "window-header-text").withText(title));
+            return Locator.xpath("//div").withClass(_cssPrefix + "window").notHidden().withDescendant(Locator.xpath("//span").withClass(_cssPrefix + "window-header-text").withText(title));
         }
 
         public static Locator.XPathLocator formItemWithLabel(String label)
@@ -555,7 +558,7 @@ public class Ext4Helper extends AbstractHelper
 
         public static Locator.XPathLocator formItem()
         {
-            return Locator.tag("*").withClass("" + _cssPrefix + "form-item").notHidden();
+            return Locator.tag("*").withClass(_cssPrefix + "form-item").notHidden();
         }
 
         public static Locator.XPathLocator formItemWithInputNamed(String name)
@@ -570,7 +573,7 @@ public class Ext4Helper extends AbstractHelper
 
         public static Locator.XPathLocator folderManagementTreeNode(String nodeText)
         {
-            return Locator.xpath("//tr").withClass("" + _cssPrefix + "grid-row").append("/td/div").withText(nodeText);
+            return Locator.xpath("//tr").withClass(_cssPrefix + "grid-row").append("/td/div").withText(nodeText);
         }
 
         public static Locator.XPathLocator tab(String tabName)
@@ -581,7 +584,7 @@ public class Ext4Helper extends AbstractHelper
 
     public static Locator.XPathLocator ext4Tab(String label)
     {
-        return Locator.tagWithText("span", label).withClass("" + _cssPrefix + "tab-inner").notHidden();
+        return Locator.tagWithText("span", label).withClass(_cssPrefix + "tab-inner").notHidden();
     }
 
     public void clickExtTab(String tabname)
