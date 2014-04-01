@@ -241,6 +241,8 @@ modules/simpletest/resources/web/simpletest/testfile.js -text
 modules/simpletest/resources/web/simpletest/testfile2.js -text
 /resetDRT.cmd -text
 /resetDRT.sh -text
+src/org/labkey/remoteapi/olap/MdxCommand.java -text
+src/org/labkey/remoteapi/olap/MdxResponse.java -text
 src/org/labkey/test/AssayAPITest.java -text
 src/org/labkey/test/BaseFlowTest.java -text
 src/org/labkey/test/BaseWebDriverMultipleTest.java -text
@@ -566,6 +568,7 @@ src/org/labkey/test/util/ListHelper.java -text
 src/org/labkey/test/util/LogMethod.java -text
 src/org/labkey/test/util/LoggedParam.java -text
 src/org/labkey/test/util/Maps.java -text
+src/org/labkey/test/util/OlapHelper.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PerlHelper.java -text
 src/org/labkey/test/util/PipelineHelper.java -text

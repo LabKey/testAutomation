@@ -1,0 +1,116 @@
+package org.labkey.remoteapi.olap;
+
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.labkey.remoteapi.CommandException;
+import org.labkey.remoteapi.Connection;
+import org.labkey.remoteapi.PostCommand;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.zip.GZIPInputStream;
+
+/**
+ * User: tgaluhn
+ * Date: 3/31/14
+ */
+public class MdxCommand extends PostCommand<MdxResponse>
+{
+    private String _configId;
+    private String _schemaName;
+    private String _cubeName;
+    private String _query;
+
+    public MdxCommand(MdxCommand source)
+    {
+        super(source);
+        _configId = source.getConfigId();
+        _schemaName = source.getSchemaName();
+        _cubeName = source.getCubeName();
+        _query = source.getQuery();
+    }
+
+    public MdxCommand(String configId, String schema, String query)
+    {
+        super("olap", "executeMdx");
+        _configId = configId;
+        _schemaName = schema;
+        _query = query;
+    }
+
+    public String getConfigId()
+    {
+        return _configId;
+    }
+
+    public void setConfigId(String configId)
+    {
+        this._configId = configId;
+    }
+
+    public String getSchemaName()
+    {
+        return _schemaName;
+    }
+
+    public void setSchemaName(String schemaName)
+    {
+        this._schemaName = schemaName;
+    }
+
+    public String getCubeName()
+    {
+        return _cubeName;
+    }
+
+    public void setCubeName(String cubeName)
+    {
+        this._cubeName = cubeName;
+    }
+
+    public String getQuery()
+    {
+        return _query;
+    }
+
+    public void setQuery(String query)
+    {
+        _query = query;
+    }
+
+    @Override
+    protected MdxResponse createResponse(String text, int status, String contentType, JSONObject json)
+    {
+        return new MdxResponse(text, status, contentType, json, this);
+    }
+
+    @Override
+    public JSONObject getJsonObject()
+    {
+        JSONObject result = super.getJsonObject();
+        if (result == null)
+        {
+            result = new JSONObject();
+        }
+        result.put("configId", _configId);
+        result.put("schemaName", _schemaName);
+        if (_cubeName != null)
+            result.put("cubeName", _cubeName);
+        result.put("query", _query);
+        setJsonObject(result);
+        return result;
+    }
+
+    @Override
+    public MdxResponse execute(Connection connection, String folderPath) throws IOException, CommandException
+    {
+        // Hack override to decode the gzip response, as that's not yet supported in the java client api
+        try (Response response = _execute(connection, folderPath))
+        {
+            JSONObject json;
+            json = (JSONObject) JSONValue.parse(new BufferedReader(new InputStreamReader(new GZIPInputStream(response.getInputStream()))));
+            return createResponse(null, response.statusCode, response.contentType, json);
+        }
+    }
+}
