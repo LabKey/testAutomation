@@ -138,8 +138,8 @@ public class Ext4Helper extends AbstractHelper
     public void selectComboBoxItem(@LoggedParam String label, boolean containsText, @LoggedParam String... selections)
     {
         String componentQueryLabel = label.replaceAll(":", "");
-        Ext4ComboRef userCombo = Ext4ComboRef.getForLabel(_test, componentQueryLabel);
-        userCombo.waitForStoreLoad();
+        Ext4ComboRef comboRef = Ext4ComboRef.getForLabel(_test, componentQueryLabel);
+        comboRef.waitForStoreLoad();
 
         selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), containsText, selections);
     }
@@ -147,8 +147,8 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void selectComboBoxItemById(@LoggedParam String labelId, @LoggedParam String selection)
     {
-        Ext4ComboRef userCombo = queryOne("#" + labelId, Ext4ComboRef.class);
-        userCombo.waitForStoreLoad();
+        Ext4ComboRef comboRef = queryOne("#" + labelId, Ext4ComboRef.class);
+        comboRef.waitForStoreLoad();
 
         Locator.XPathLocator loc = Locator.tagWithId("table", labelId);
         selectComboBoxItem(loc, selection);
