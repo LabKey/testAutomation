@@ -288,7 +288,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
 
         waitForText("904");  //this is the last sample
 
-        waitAndClick(Locator.ext4Button("Save and Close"));
+        waitAndClick(Locator.ext4ButtonEnabled("Save and Close"));
 
         waitForElement(Ext4Helper.ext4Window("Error"));
         assertElementPresent(Locator.xpath("//div[contains(text(), 'Unknown value for field category: " + category + "')]"));

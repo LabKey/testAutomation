@@ -251,7 +251,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
         Ext4FieldRef.getForLabel(this, "Run Name").setValue("TestRun");
 
-        waitAndClick(Locator.ext4Button("Save and Close"));
+        waitAndClick(Locator.ext4ButtonEnabled("Save and Close"));
         waitForText("Save Complete");
         waitAndClick(Locator.ext4Button("OK"));
 
