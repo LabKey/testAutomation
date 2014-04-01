@@ -751,21 +751,27 @@ public class StudySimpleExportTest extends StudyBaseTest
                 waitForText("Insert New");
                 clickButton("Insert New");
 
-                for (Object key : row.keySet())
-                {
-                    String name = "quf_" + key.toString();
-                    Locator option = Locator.tagWithName("select", name);
-                    Locator field = Locator.name(name);
-                    if (isElementPresent(option))
-                    {
-                        selectOptionByText(option, (String) row.get(key));
-                    }
-                    else if (isElementPresent(field))
-                    {
-                        setFormElement(field, (String)row.get(key));
-                    }
-                }
+                populateFormData(row, "quf_");
                 clickButton("Submit");
+            }
+        }
+    }
+
+    private void populateFormData(Map formData, @Nullable String formFieldPrefix)
+    {
+        for (Object key : formData.keySet())
+        {
+            String name = (formFieldPrefix != null ? formFieldPrefix : "") + key.toString();
+            Locator option = Locator.tagWithName("select", name);
+            Locator field = Locator.name(name);
+            log("setting form element: " + name);
+            if (isElementPresent(option))
+            {
+                selectOptionByText(option, (String) formData.get(key));
+            }
+            else if (isElementPresent(field))
+            {
+                setFormElement(field, (String)formData.get(key));
             }
         }
     }
@@ -919,5 +925,222 @@ public class StudySimpleExportTest extends StudyBaseTest
         clickFolder(subfolderName);
         setPipelineRoot(getPipelinePath());
         importFolderFromPipeline("/export/folder.xml");
+    }
+
+    /**
+     * Test for simple roundtripping of some of the specimen categories (14.2 sprint 1) :
+     *      - manage display and behavior
+     *      - request forms
+     *      - notifications
+     *      - requestability rules
+     */
+    @Test
+    public void verifySpecimenSettings()
+    {
+        final String FOLDER_NAME = "Specimen Settings";
+
+        log("Export specimen request settings");
+        goToProjectHome();
+        clickFolder(getFolderName());
+        goToManageStudy();
+
+        log("Configure advanced specimen settings and requests");
+        waitAndClickAndWait(Locator.linkWithText("Change Repository Type"));
+        click(Locator.radioButtonByNameAndValue("simple", "false"));
+        click(Locator.radioButtonByNameAndValue("enableRequests", "true"));
+        clickButton("Submit");
+
+        waitAndClickAndWait(Locator.linkWithText("Manage Display and Behavior"));
+        log("Export Display and Behavior");
+        selectOptionByText(Locator.tagWithName("select", "defaultToCommentsMode"), "Comments Mode");
+        selectOptionByText(Locator.tagWithName("select", "enableManualQCFlagging"), "Disabled");
+        clickButton("Save");
+
+        waitAndClickAndWait(Locator.linkWithText("Manage New Request Form"));
+        log("Export Request forms");
+        setFormElement(Locator.tagWithAttribute("input", "value", "Assay Plan"), "Assay Plan-1");
+        click(Locator.imageWithSrc("downarrow.gif", true, 1));
+        clickButton("Add New Input", 0);
+
+        Locator input1 = Locator.xpath("(//input[@type='text' and @name='title'])[4]");
+        waitForElement(input1);
+        setFormElement(input1, "Request #4");
+        setFormElement(Locator.xpath("(//input[@type='text' and @name='helpText'])[4]"), "Request help text #4");
+        checkCheckbox(Locator.checkboxByNameAndValue("required", "3"));
+        clickButton("Add New Input", 0);
+        Locator input2 = Locator.xpath("(//input[@type='text' and @name='title'])[5]");
+        waitForElement(input2);
+        setFormElement(input2, "Request #5");
+        setFormElement(Locator.xpath("(//input[@type='text' and @name='helpText'])[5]"), "Request help text #5");
+        checkCheckbox(Locator.checkboxByNameAndValue("required", "4"));
+
+        clickButton("Save");
+
+        waitAndClickAndWait(Locator.linkWithText("Manage Notifications"));
+        log("Export Notifications");
+        click(Locator.radioButtonByNameAndValue("replyToCurrentUser", "false"));
+        setFormElement(Locator.tagWithName("input", "replyTo"), "specimen-test@labkey.com");
+
+        click(Locator.checkboxByName("ccCheckbox"));
+        waitForElement(Locator.xpath("//tr[@id='ccArea']").notHidden());
+        setFormElement(Locator.xpath("//textarea[@id='cc']"), "specimen-test@labkey.com");
+        click(Locator.radioButtonByNameAndValue("defaultEmailNotify", "None"));
+        click(Locator.radioButtonByNameAndValue("specimensAttachment", "ExcelAttachment"));
+        clickButton("Save");
+
+        waitAndClickAndWait(Locator.linkWithText("Manage Requestability rules"));
+        log("Export Requestability Rules");
+        _extHelper.clickMenuButton(false, "Add Rule", "Custom Query");
+        _extHelper.waitForExtDialog("Add Custom Query Rule");
+        _extHelper.selectComboBoxItem("Schema:", "auditLog");
+        _extHelper.selectComboBoxItem("Query:", "FileSystem");
+        _extHelper.selectComboBoxItem("Mark vials:", "Unavailable");
+        clickButton("Submit", 0);
+        _extHelper.waitForExtDialogToDisappear("Add Custom Query Rule");
+        _extHelper.selectExtGridItem("Rule", "At Repository Check", 0, "x-grid-panel", false);
+        clickButton("Move Down", 0);
+        clickButton("Save");
+
+         log("StudyDesign Extensible Tables: export study folder to the pipeline as individual files");
+        exportStudyArchive(getFolderName(), "0");
+
+        log("StudyDesign Extensible Tables: import study into subfolder");
+        createSubfolderAndImportStudyFromPipeline(FOLDER_NAME);
+
+        log("Verify specimen request settings");
+        goToProjectHome();
+        clickFolder(FOLDER_NAME);
+        goToManageStudy();
+
+        waitAndClickAndWait(Locator.linkWithText("Manage Display and Behavior"));
+        log("Verify Display and Behavior");
+        assertOptionEquals(Locator.tagWithName("select", "defaultToCommentsMode"), "Comments Mode");
+        assertOptionEquals(Locator.tagWithName("select", "enableManualQCFlagging"), "Disabled");
+        clickButton("Cancel");
+
+        waitAndClickAndWait(Locator.linkWithText("Manage New Request Form"));
+        log("Verify Request forms");
+        assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[1][@value='Shipping Information']"));
+        assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[2][@value='Assay Plan-1']"));
+        assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[3][@value='Comments']"));
+        assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[4][@value='Request #4']"));
+        assertElementPresent(Locator.xpath("(//input[@type='text' and @name='title'])[5][@value='Request #5']"));
+        clickButton("Cancel");
+
+        waitAndClickAndWait(Locator.linkWithText("Manage Notifications"));
+        log("Verify Notifications");
+        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("replyToCurrentUser", "false"));
+        assertFormElementEquals(Locator.tagWithName("input", "replyTo"), "specimen-test@labkey.com");
+
+        assertChecked(Locator.checkboxByName("ccCheckbox"));
+        assertFormElementEquals(Locator.xpath("//textarea[@id='cc']"), "specimen-test@labkey.com");
+        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("defaultEmailNotify", "None"));
+        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("specimensAttachment", "ExcelAttachment"));
+        clickButton("Cancel");
+
+        waitAndClickAndWait(Locator.linkWithText("Manage Requestability rules"));
+        log("Verify Requestability Rules");
+
+        //Locator row = _extHelper.locateExt3GridRow(0, "//div[@id='rulesGrid'");
+        assertElementPresent(_extHelper.locateExt3GridRow(1, "//div[@id='rulesGrid']").append(Locator.xpath("//div[contains(text(), 'Administrator Override')]")));
+        assertElementPresent(_extHelper.locateExt3GridRow(2, "//div[@id='rulesGrid']").append(Locator.xpath("//div[contains(text(), 'At Repository Check')]")));
+        assertElementPresent(_extHelper.locateExt3GridRow(3, "//div[@id='rulesGrid']").append(Locator.xpath("//div[contains(text(), 'Locked In Request Check')]")));
+        assertElementPresent(_extHelper.locateExt3GridRow(4, "//div[@id='rulesGrid']").append(Locator.xpath("//div[contains(text(), 'Custom Query: auditLog.FileSystem')]")));
+
+        clickButton("Cancel");
+    }
+
+    /**
+     * Verify study pproperties can round trip custom properties (and data)
+     */
+    @Test
+    public void verifyExtensibleStudyProperties()
+    {
+        final String FOLDER_NAME = "Study Properties ExData";
+
+        log("Study Custom Properties");
+        goToProjectHome();
+        clickFolder(getFolderName());
+
+        log("Study Properties: adding custom fields");
+        goToManageStudy();
+        waitForText("Edit Definition");
+        clickAndWait(Locator.linkWithText("Edit Definition"));
+        waitForText("No fields have been defined.");
+
+        clickButton("Add Field", 0);
+        _listHelper.setColumnName(0, "cust_string");
+        _listHelper.setColumnType(0, ListHelper.ListColumnType.String);
+        clickButton("Add Field", 0);
+        _listHelper.setColumnName(1, "cust_integer");
+        _listHelper.setColumnType(1, ListHelper.ListColumnType.Integer);
+        clickButton("Add Field", 0);
+        _listHelper.setColumnName(2, "cust_dateTime");
+        _listHelper.setColumnType(2, ListHelper.ListColumnType.DateTime);
+        clickButton("Add Field", 0);
+        _listHelper.setColumnName(3, "cust_double");
+        _listHelper.setColumnType(3, ListHelper.ListColumnType.Double);
+        clickButton("Add Field", 0);
+        _listHelper.setColumnName(4, "cust_multiline");
+        _listHelper.setColumnType(4, ListHelper.ListColumnType.MutliLine);
+
+        clickButton("Save", WAIT_FOR_JAVASCRIPT);
+
+        // add data and export
+        Map studyProperties = toMap(new Object[][]{
+                {"Label", "Study Properties"},
+                {"Investigator", "Dr. Strangelove"},
+                {"Grant", "Grantland"},
+                {"Species", "Human"},
+                {"Description", "study description"},
+                {"cust_string", "custom string"},
+                {"cust_integer", "2"},
+                {"cust_dateTime", "2014-03-26"},
+                {"cust_double", "3.14"},
+                {"cust_multiline", "custom multiline\ncustom multiline"}
+        });
+
+        goToManageStudy();
+        waitForText("Change Study Properties");
+        clickAndWait(Locator.linkWithText("Change Study Properties"));
+        waitForText("Study Properties");
+        waitForElement(Locator.ext4Button("Submit"));
+
+        populateFormData(studyProperties, null);
+        clickButton("Submit");
+
+        log("Study Properties: export study folder to the pipeline as indivisual files");
+        exportStudyArchive(getFolderName(), "0");
+
+        log("Study Properties: import study into subfolder");
+        createSubfolderAndImportStudyFromPipeline(FOLDER_NAME);
+
+        log("Study Properties: verify imported settings");
+        goToProjectHome();
+        clickFolder(FOLDER_NAME);
+
+        goToManageStudy();
+        waitForText("Change Study Properties");
+        clickAndWait(Locator.linkWithText("Change Study Properties"));
+        waitForText("Study Properties");
+        waitForElement(Locator.ext4Button("Submit"));
+
+        verifyFormData(studyProperties);
+    }
+
+    private void verifyFormData(Map formData)
+    {
+        for (Object key : formData.keySet())
+        {
+            String name = key.toString();
+            log("verifying form element: " + name);
+
+            if (isElementPresent(Locator.tagWithName("input", name)))
+                assertFormElementEquals(Locator.tagWithName("input", name), (String)formData.get(key));
+            else if (isElementPresent(Locator.tagWithName("textarea", name)))
+                assertFormElementEquals(Locator.tagWithName("textarea", name), (String)formData.get(key));
+            else
+                fail("Unable to locate form element: " + name);
+        }
     }
 }
