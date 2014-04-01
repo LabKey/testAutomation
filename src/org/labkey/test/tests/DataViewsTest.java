@@ -28,10 +28,6 @@ import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.*;
 
-/**
- * User: klum
- * Date: Feb 29, 2012
- */
 @Category({DailyA.class})
 public class DataViewsTest extends ParticipantListTest
 {
@@ -455,14 +451,14 @@ public class DataViewsTest extends ParticipantListTest
     private void openEditPanel(String itemName)
     {
         waitAndClick(Locators.editViewsLink(itemName));
-        _extHelper.waitForExtDialog(itemName);
+        waitForElement(Ext4Helper.Locators.window(itemName));
     }
 
     public void saveDatasetProperties(String dataset)
     {
         clickButton("Save", 0);
-        _extHelper.waitForExtDialogToDisappear(dataset);
         _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Locator.css(".x4-grid-row-selected"));
         waitForElement(Locator.css(".x4-grid-row"));
     }
 

@@ -23,11 +23,6 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-/**
-* User: markigra
-* Date: 5/31/12
-* Time: 10:43 PM
-*/
 public class Ext4CmpRef
 {
     protected String _id;
@@ -60,19 +55,25 @@ public class Ext4CmpRef
 
     public void eval(String expr, Object... args)
     {
-        String script = "Ext4.getCmp('"+_id+"')." + expr + ";";
+        String script = "var cmp = Ext4.getCmp('" + _id + "');" +
+                        "if (!cmp) cmp = Ext4.ComponentQuery.query('#" + _id + "')[0];" +
+                        "cmp." + expr + ";";
         _test.executeScript(script, args);
     }
 
     public Object getEval(String expr, Object... args)
     {
-        String script = "return Ext4.getCmp('"+_id+"')." + expr + ";";
+        String script = "var cmp = Ext4.getCmp('" + _id + "');" +
+                "if (!cmp) cmp = Ext4.ComponentQuery.query('#" + _id + "')[0];" +
+                "return cmp." + expr + ";";
         return _test.executeScript(script, args);
     }
 
     public Object getFnEval(String expr, Object... args)
     {
-        String script = "var cmp = Ext4.getCmp('" + _id + "'); return (function(){" + expr + "}).apply(cmp, arguments);";
+        String script = "var cmp = Ext4.getCmp('"+_id+"');" +
+                        "if (!cmp) cmp = Ext4.ComponentQuery.query('#" + _id + "')[0];" +
+                        "return (function(){" + expr + "}).apply(cmp, arguments);";
         return _test.executeScript(script, args);
     }
 

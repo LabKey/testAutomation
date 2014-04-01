@@ -17,15 +17,9 @@ package org.labkey.test.util.ext4cmp;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
-import static org.junit.Assert.*;
-
-/**
- * User: bbimber
- * Date: 6/20/12
- * Time: 12:40 PM
- */
 public class Ext4FieldRef extends Ext4CmpRef
 {
     public Ext4FieldRef(String id, BaseWebDriverTest test)
@@ -41,14 +35,16 @@ public class Ext4FieldRef extends Ext4CmpRef
     public static Ext4FieldRef getForLabel(BaseWebDriverTest test, String label)
     {
         Ext4FieldRef ref = test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRef.class);
-        assertNotNull("Unable to locate field with label: " + label, ref);
+        if (ref == null)
+            throw new NoSuchElementException("Unable to locate field with label: " + label);
         return ref;
     }
 
     public static Ext4FieldRef getForBoxLabel(BaseWebDriverTest test, String boxLabel)
     {
         Ext4FieldRef ref = test._ext4Helper.queryOne("field[boxLabel^=\"" + boxLabel + "\"]", Ext4FieldRef.class);
-        assertNotNull("Unable to locate field with boxLabel: " + boxLabel, ref);
+        if (ref == null)
+            throw new NoSuchElementException("Unable to locate field with boxLabel: " + boxLabel);
         return ref;
     }
 

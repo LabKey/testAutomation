@@ -29,11 +29,6 @@ import static org.labkey.test.Locator.NOT_HIDDEN;
 
 import static org.junit.Assert.*;
 
-/**
- * User: klum
- * Date: Apr 6, 2009
- * Time: 5:21:53 PM
- */
 public class ExtHelper extends AbstractHelper
 {
     public ExtHelper(BaseWebDriverTest test)

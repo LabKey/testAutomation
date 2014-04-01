@@ -15,15 +15,10 @@
  */
 package org.labkey.test.util.ext4cmp;
 
-import org.junit.Assert;
 import org.labkey.test.BaseWebDriverTest;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
-/**
- * User: bimber
- * Date: 1/23/13
- * Time: 5:31 PM
- */
 public class Ext4ComboRef extends Ext4FieldRef
 {
     public Ext4ComboRef(String id, BaseWebDriverTest test)
@@ -80,7 +75,8 @@ public class Ext4ComboRef extends Ext4FieldRef
     public static Ext4ComboRef getForLabel(BaseWebDriverTest test, String label)
     {
         Ext4ComboRef ref = test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4ComboRef.class);
-        Assert.assertNotNull("Unable to locate field with label: " + label, ref);
+        if (ref == null)
+            throw new NoSuchElementException("Unable to locate combo with label: " + label);
         return ref;
     }
 }
