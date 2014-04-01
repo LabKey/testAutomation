@@ -15,6 +15,7 @@
  */
 package org.labkey.test.ms2;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -29,10 +30,6 @@ import org.labkey.test.util.LogMethod;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * User: jeckels
- * Date: 2/8/13
- */
 @Category({DailyB.class, MS2.class, FileBrowser.class})
 public class SequestImportTest extends BaseWebDriverTest
 {
@@ -47,8 +44,8 @@ public class SequestImportTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         setupProject();
         importSequestRun();

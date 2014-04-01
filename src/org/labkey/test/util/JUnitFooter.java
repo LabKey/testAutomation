@@ -16,16 +16,8 @@
 
 package org.labkey.test.util;
 
+import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Runner;
-
-import static org.labkey.test.WebTestHelper.logToServer;
-
-/**
- * User: tchad
- * Date: March 3, 2011
- * Time: 3:49:59 PM
- */
 
 public class JUnitFooter extends BaseWebDriverTest
 {
@@ -41,8 +33,8 @@ public class JUnitFooter extends BaseWebDriverTest
         return null;
     }
 
-    @Override
-    public void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         log("** This should follow JUnitTest.");
         log("** It will check for any errors or memory leaks caused by server-side tests");

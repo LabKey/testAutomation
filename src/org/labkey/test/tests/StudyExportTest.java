@@ -28,11 +28,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: brittp
- * Date: Dec 8, 2006
- * Time: 4:30:24 PM
- */
 @Category({DailyB.class, Study.class, FileBrowser.class})
 public class StudyExportTest extends StudyManualTest
 {

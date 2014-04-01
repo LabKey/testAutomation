@@ -18,10 +18,6 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
-/**
- * User: RyanS
- * Date: 9/9/13
- */
 public class SchemaHelper extends AbstractHelper
 {
 

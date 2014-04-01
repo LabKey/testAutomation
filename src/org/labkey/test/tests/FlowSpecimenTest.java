@@ -24,9 +24,6 @@ import org.labkey.test.categories.Flow;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import static org.junit.Assert.*;
 
 /**

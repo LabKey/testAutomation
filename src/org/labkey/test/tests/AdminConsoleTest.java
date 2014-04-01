@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -24,11 +25,6 @@ import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.*;
 
-/**
- * User: bimber
- * Date: 2/21/13
- * Time: 4:10 PM
- */
 @Category({DailyA.class})
 public class AdminConsoleTest extends BaseWebDriverTest
 {
@@ -37,12 +33,13 @@ public class AdminConsoleTest extends BaseWebDriverTest
         return null;
     }
 
-    public void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         testRibbonBar();
     }
 
-    public void testRibbonBar() throws Exception
+    public void testRibbonBar()
     {
         goToAdminConsole();
         waitAndClick(Locator.linkContainingText("site settings"));

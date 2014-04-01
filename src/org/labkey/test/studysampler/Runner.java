@@ -38,10 +38,6 @@ import org.apache.commons.io.IOUtils;
 
 
 /**
- * User: newton
- * Date: Oct 27, 2010
- * Time: 11:09:34 AM
- *
  * Given a study export, create a new study export
  * where data for only a subset of participants and retained
  * and values of certain fields are replaced with new values

@@ -15,16 +15,13 @@
  */
 package org.labkey.test.ms2;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 
 import java.io.File;
 
-/**
- * User: jeckels
- * Date: May 27, 2011
- */
 @Category({DailyA.class})
 public class QuantitationTest extends AbstractXTandemTest
 {
@@ -42,8 +39,8 @@ public class QuantitationTest extends AbstractXTandemTest
             "  <note label=\"pipeline quantitation, libra config name\" type=\"input\">LibraConfig1</note> \n" +
         "</bioml>";
 
-    @Override
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         createProjectAndFolder();
 

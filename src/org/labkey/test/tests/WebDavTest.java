@@ -19,6 +19,7 @@ package org.labkey.test.tests;
 import com.googlecode.sardine.DavResource;
 import com.googlecode.sardine.Sardine;
 import com.googlecode.sardine.SardineFactory;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
@@ -45,9 +46,8 @@ public class WebDavTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         _containerHelper.createProject(getProjectName(), null);
 

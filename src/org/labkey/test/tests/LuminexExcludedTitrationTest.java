@@ -26,10 +26,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: RyanS
- * Date: 5/31/13
- */
 @Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexExcludedTitrationTest extends LuminexTest
 {

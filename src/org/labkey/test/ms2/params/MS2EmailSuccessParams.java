@@ -16,7 +16,6 @@
 package org.labkey.test.ms2.params;
 
 import org.labkey.test.pipeline.PipelineWebTestBase;
-import org.labkey.test.pipeline.PipelineFolder;
 
 /**
  * <code>MS2EmailSuccessParams</code>

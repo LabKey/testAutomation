@@ -15,6 +15,7 @@
  */
 package org.labkey.test.unsupported;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -26,7 +27,6 @@ import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.External;
-import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -94,7 +94,8 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
         clickButton("Update Folder");
     }
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         setupProject();
         assertModuleEnabled("Issues");

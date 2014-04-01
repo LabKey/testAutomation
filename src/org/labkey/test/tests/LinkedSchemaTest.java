@@ -35,9 +35,6 @@ import java.util.Arrays;
 import static org.junit.Assert.*;
 
 /**
- * User: kevink
- * Date: 1/28/13
- *
  * This test created linked schemas from a source container in a target container.
  *
  * To check the metadata is applied correctly, each letter column has metadata applied

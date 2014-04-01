@@ -25,10 +25,6 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-/**
- * User: tchadick
- * Date: 6/11/13
- */
 @Category({DailyA.class, Reports.class, Charting.class})
 public class BoxPlotTest extends GenericChartsTest
 {

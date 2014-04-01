@@ -21,17 +21,10 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.labkey.test.util.LogMethod;
 
 import java.util.HashMap;
 import java.util.Stack;
-
-/**
- * User: tchadick
- * Date: 2/15/13
- * Time: 8:47 PM
- */
 
 @Aspect
 public class MethodPerfAspect

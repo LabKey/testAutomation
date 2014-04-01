@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.apache.poi.hssf.OldExcelFormatException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.format.CellGeneralFormatter;
 import org.apache.poi.ss.formula.FormulaParseException;
@@ -39,11 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * User: klum
- * Date: May 2, 2011
- * Time: 6:24:37 PM
- */
 public abstract class ExcelHelper
 {
     public static final String SUB_TYPE_XSSF = "vnd.openxmlformats-officedocument.spreadsheetml.sheet";

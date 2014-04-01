@@ -72,11 +72,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-/**
- * User: brittp
- * Date: Nov 15, 2005
- * Time: 5:18:46 PM
- */
 public class Runner extends TestSuite
 {
     private static final int DEFAULT_MAX_TEST_FAILURES = 10;

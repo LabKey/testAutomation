@@ -26,11 +26,6 @@ import org.labkey.test.categories.MiniTest;
 import java.io.File;
 import java.util.Calendar;
 
-/**
- * User: elvan
- * Date: 2/20/12
- * Time: 1:02 PM
- */
 @Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexAsyncImportTest extends LuminexTest
 {

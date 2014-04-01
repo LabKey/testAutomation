@@ -27,10 +27,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: jeckels
- * Date: Nov 21, 2007
- */
 public class ListHelper extends AbstractHelper
 {
     BaseWebDriverTest _test;

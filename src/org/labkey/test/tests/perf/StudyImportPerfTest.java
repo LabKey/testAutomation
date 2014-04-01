@@ -15,16 +15,11 @@
  */
 package org.labkey.test.tests.perf;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.Perf;
 
 import java.io.File;
-
-/**
- * User: elvan
- * Date: 12/5/12
- * Time: 11:52 AM
- */
 
 @Category(Perf.class)
 public class StudyImportPerfTest extends PerformanceTest
@@ -35,8 +30,8 @@ public class StudyImportPerfTest extends PerformanceTest
         return "Study Perf Project";
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         setIsPerfTest(true);
         _containerHelper.createProject(getProjectName(), "Study");

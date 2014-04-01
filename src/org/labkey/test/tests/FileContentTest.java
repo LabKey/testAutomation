@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -75,7 +76,8 @@ public class FileContentTest extends BaseWebDriverTest
         deleteDir(getTestTempDir());
     }
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         log("Create a new web part, upload file, log out and navigate to it");
         log("Note that we use a space and a non-ascii character in the project name, "+

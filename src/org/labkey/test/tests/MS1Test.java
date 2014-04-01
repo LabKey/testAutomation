@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -28,12 +29,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * MS1 BVT
- * User: Dave
- * Date: Nov 7, 2007
- * Time: 9:33:52 AM
- */
 @Category({DailyA.class})
 public class MS1Test extends BaseWebDriverTest
 {
@@ -76,7 +71,8 @@ public class MS1Test extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         log("Starting MS1 BVT");
         setupEnvironment();

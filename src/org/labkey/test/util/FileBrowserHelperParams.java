@@ -16,7 +16,6 @@
 package org.labkey.test.util;
 
 import org.jetbrains.annotations.Nullable;
-import org.labkey.test.Locator;
 
 import java.io.File;
 import java.util.List;

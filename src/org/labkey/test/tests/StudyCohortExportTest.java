@@ -20,10 +20,6 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
 
-/**
- * User: daxh
- * Date: Aug 29, 2012
- */
 @Category({DailyB.class, Study.class})
 public class StudyCohortExportTest extends StudyExportTest
 {

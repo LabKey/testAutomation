@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -25,10 +26,6 @@ import org.labkey.test.util.ListHelper;
 
 import java.io.File;
 
-/*
-* User: Jess Garms
-* Date: Jan 16, 2009
-*/
 @Category({DailyB.class, Assays.class})
 public class MissingValueIndicatorsTest extends BaseWebDriverTest
 {
@@ -124,7 +121,8 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         return getLabKeyRoot() + "/sampledata/mvIndicators/";
     }
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         log("Create MV project");
         _containerHelper.createProject(PROJECT_NAME, "Study");
@@ -142,7 +140,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         checkAssay();
     }
 
-    private void setupIndicators() throws InterruptedException
+    private void setupIndicators()
     {
         log("Setting MV indicators");
         
@@ -154,13 +152,13 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         while(isElementPresent(Locator.tagWithAttribute("img", "alt", "delete")))
         {
             click(Locator.tagWithAttribute("img", "alt", "delete"));
-            Thread.sleep(500);
+            sleep(500);
         }
 
         click(getButtonLocator("Add"));
         click(getButtonLocator("Add"));
         click(getButtonLocator("Add"));
-        Thread.sleep(500);
+        sleep(500);
 
         // This is disgusting. For some reason a simple XPath doesn't seem to work: we have to get the id right,
         // and unfortunately the id is dependent on how many inherited indicators we had, which can vary by server.
@@ -184,7 +182,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         log("Set MV indicators.");
     }
 
-    private void checkList() throws Exception
+    private void checkList()
     {
         log("Create list");
 
@@ -248,7 +246,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         newWaitForPageToLoad();
     }
 
-    private void checkDataset() throws Exception
+    private void checkDataset()
     {
         log("Create dataset");
         clickProject(PROJECT_NAME);

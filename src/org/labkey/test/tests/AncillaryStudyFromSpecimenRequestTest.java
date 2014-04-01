@@ -16,15 +16,9 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 
-/**
- * User: elvan
- * Date: 11/21/12
- * Time: 12:52 PM
- */
 @Category({DailyB.class})
 public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 {

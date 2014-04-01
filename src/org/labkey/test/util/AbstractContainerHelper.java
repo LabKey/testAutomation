@@ -23,10 +23,6 @@ import org.labkey.test.TestTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * User: jeckels
- * Date: Jul 20, 2012
- */
 public abstract class AbstractContainerHelper extends AbstractHelper
 {
     private List<String> _createdProjects = new ArrayList<>();

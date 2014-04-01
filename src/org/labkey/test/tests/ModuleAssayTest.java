@@ -18,22 +18,16 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
-import org.labkey.test.Locators;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PortalHelper;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: kevink
- * Date: Dec 28, 2008
- */
 @Category({DailyA.class, Assays.class})
 public class ModuleAssayTest extends AbstractAssayTest
 {

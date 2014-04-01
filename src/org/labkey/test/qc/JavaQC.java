@@ -19,11 +19,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-* User: Karl Lum
-* Date: Mar 4, 2009
-* Time: 9:17:41 AM
-*/
 public class JavaQC
 {
     private static File _errorFile;

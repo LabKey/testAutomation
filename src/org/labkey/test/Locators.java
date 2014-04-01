@@ -15,10 +15,6 @@
  */
 package org.labkey.test;
 
-/**
- * User: tchadick
- * Date: 9/24/13
- */
 public class Locators
 {
     public static final Locator.XPathLocator ADMIN_MENU = Locator.xpath("id('adminMenuPopupLink')[@onclick]");

@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -26,11 +27,6 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIContainerHelper;
 
-/**
- * User: marki
- * Date: March 23, 2007
- * Time: 1:57:05 PM
- */
 @Category({DRT.class, BVT.class, DailyA.class})
 public class BasicTest extends BaseWebDriverTest
 {
@@ -55,7 +51,8 @@ public class BasicTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         // Disable scheduled system maintenance
         setSystemMaintenance(false);

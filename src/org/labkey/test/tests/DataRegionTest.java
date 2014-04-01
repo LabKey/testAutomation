@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -35,10 +36,6 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 
-/**
- * User: kevink
- * Date: Mar 4, 2008 1:05:38 PM
- */
 @Category({DailyA.class, Data.class})
 public class DataRegionTest extends BaseWebDriverTest
 {
@@ -113,7 +110,8 @@ public class DataRegionTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         createList();
 
@@ -156,7 +154,7 @@ public class DataRegionTest extends BaseWebDriverTest
         _listHelper.uploadData(PROJECT_NAME, LIST_NAME, LIST_DATA);
     }
 
-    private void dataRegionTest(URL url, String dataRegionName) throws Exception
+    private void dataRegionTest(URL url, String dataRegionName)
     {
         log("** Beginning test for dataRegionName: " + dataRegionName);
 
@@ -242,9 +240,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
         log("Show Selected");
         table.checkAllOnPage();
-        for (int i = 0; i < 10 && !isTextPresent("Selected 5 of 15 rows."); i++)
-            Thread.sleep(1000);
-        assertTextPresent("Selected 5 of 15 rows.");
+        waitForText("Selected 5 of 15 rows.");
         clickButton("Page Size", 0);
         clickAndWait(Locator.linkWithText("Show Selected"));
         assertEquals(5, table.getDataRowCount());

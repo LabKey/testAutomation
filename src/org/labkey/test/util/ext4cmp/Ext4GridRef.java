@@ -30,11 +30,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: bimber
- * Date: 11/7/12
- * Time: 8:48 PM
- */
 public class Ext4GridRef extends Ext4CmpRef
 {
     private int _clicksToEdit = 2;

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -25,10 +26,6 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
-/**
- * User: klum
- * Date: 11/14/12
- */
 @Category({DailyB.class})
 public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTest
 {
@@ -61,8 +58,8 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         return null;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         setupHiddenEmailTest();
         verifyHiddenEmailTest();

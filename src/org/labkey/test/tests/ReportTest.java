@@ -19,10 +19,6 @@ package org.labkey.test.tests;
 import org.labkey.test.Locator;
 import org.labkey.test.util.LogMethod;
 
-/**
- * User: klum
- * Date: Jul 31, 2009
- */
 public abstract class ReportTest extends StudyBaseTest
 {
     @Override

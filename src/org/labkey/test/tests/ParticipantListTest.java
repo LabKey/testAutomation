@@ -26,11 +26,6 @@ import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 8/16/11
- * Time: 3:22 PM
- */
 @Category({BVT.class})
 public class ParticipantListTest extends StudyBaseTest
 {

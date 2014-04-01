@@ -48,16 +48,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
 import static org.labkey.test.util.PasswordUtil.getUsername;
 
 import static org.junit.Assert.*;
 
-/**
- * User: adam
- * Date: Apr 3, 2009
- * Time: 9:18:32 AM
- */
 @Category({Study.class, Specimen.class, DailyB.class})
 public class StudyTest extends StudyBaseTest
 {

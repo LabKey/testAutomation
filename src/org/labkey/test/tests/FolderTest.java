@@ -15,16 +15,13 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Ext4Helper;
 
-/**
- * User: Nick
- * Date: May 5, 2011
- */
 @Category({DailyB.class})
 public class FolderTest extends BaseWebDriverTest
 {
@@ -53,8 +50,8 @@ public class FolderTest extends BaseWebDriverTest
     public boolean enableLinkCheck()
     {return false;} // too many folders
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         createFolders();

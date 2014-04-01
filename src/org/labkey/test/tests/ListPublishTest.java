@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -45,8 +46,8 @@ public class ListPublishTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         initializePtids("249318596", "249320107", "249320127", "249320489", "249320897", "249325717");
         _containerHelper.createProject(PROJECT_NAME, "Study");

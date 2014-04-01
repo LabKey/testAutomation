@@ -20,10 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Collections;
 
-/**
- * User: kevink
- * Date: Aug 31, 2009
- */
 public class Maps
 {
     public static <K, V> Map<K, V> of()

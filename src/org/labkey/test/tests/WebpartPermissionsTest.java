@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
@@ -25,11 +26,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 1/16/13
- * Time: 2:37 PM
- */
 @Category({DailyB.class})
 public class WebpartPermissionsTest extends BaseWebDriverTest
 {
@@ -42,8 +38,8 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
         return "Webpart Perms project";
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         setUpDummyFolder();
 

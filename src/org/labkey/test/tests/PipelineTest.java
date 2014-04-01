@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -102,7 +103,8 @@ public class PipelineTest extends PipelineWebTestBase
         super.doCleanup(afterTest);
     }
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         _testSetMS2.verifyClean();
         _testSetMS1.verifyClean();

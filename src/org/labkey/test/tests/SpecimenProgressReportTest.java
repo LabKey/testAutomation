@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.test.BaseWebDriverTest;
@@ -36,11 +37,6 @@ import java.util.Collections;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 9/11/12
- * Time: 2:42 PM
- */
 @Category({DailyA.class})
 public class SpecimenProgressReportTest extends BaseWebDriverTest
 {
@@ -83,8 +79,8 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         _assayHelper = new UIAssayHelper(this);
         _containerHelper.createProject(getProjectName(), null);

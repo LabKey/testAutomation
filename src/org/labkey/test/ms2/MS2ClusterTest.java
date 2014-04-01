@@ -16,6 +16,7 @@
 package org.labkey.test.ms2;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -32,9 +33,6 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-/**
- * @author brendanx
- */
 @Category({Cluster.class})
 public class MS2ClusterTest extends PipelineWebTestBase
 {
@@ -84,7 +82,8 @@ public class MS2ClusterTest extends PipelineWebTestBase
         }
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         if (CLEAN_DATA)
         {

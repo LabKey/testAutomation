@@ -18,11 +18,6 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.DRT;
 
-/**
- * User: elvan
- * Date: 7/20/12
- * Time: 10:09 AM
- */
 @Category(DRT.class)
 public class FlowShortTest extends FlowTest
 {

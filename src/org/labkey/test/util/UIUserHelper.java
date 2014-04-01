@@ -20,11 +20,6 @@ import org.labkey.test.Locator;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 9/12/12
- * Time: 12:09 PM
- */
 public class UIUserHelper extends AbstractUserHelper
 {
     public UIUserHelper(BaseWebDriverTest test)

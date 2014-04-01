@@ -23,10 +23,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: t.chadick
- * Date: Aug 16, 2011
- */
 public class StudyHelper extends AbstractHelper
 {
     public StudyHelper(BaseWebDriverTest test)

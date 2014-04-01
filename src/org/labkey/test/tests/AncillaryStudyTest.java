@@ -30,10 +30,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: t.chadick
- * Date: Sep 8, 2011
- */
 @Category({DailyB.class, Study.class})
 public class AncillaryStudyTest extends StudyBaseTest
 {

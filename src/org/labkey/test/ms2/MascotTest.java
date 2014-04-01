@@ -16,12 +16,12 @@
 
 package org.labkey.test.ms2;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.InDevelopment;
-import org.labkey.test.categories.MS2;
 import org.labkey.test.categories.Mascot;
 
 import java.io.File;
@@ -31,10 +31,6 @@ import java.net.MalformedURLException;
 import static org.junit.Assert.*;
 
 /**
- * User: billnelson@uky.edu
- * Date: Aug 7, 2006
- * Time: 1:04:36 PM
- *
  * Tests the fields added to the Customize Site form for the MS2 modules.
  *
  * WCH: Please take note on how you should set up the sequence database
@@ -74,7 +70,8 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         log("Verifying that pipeline files were cleaned up properly");
         File test2 = new File(PIPELINE_PATH + "/bov_sample/" + SEARCH_TYPE + "/test2");
@@ -211,7 +208,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         popLocation();
 
         // Do normal MS2 test
-        super.doTestSteps();
+        super.testSteps();
 
         // test import of .dat file
         log("Upload existing Mascot .dat result file.");

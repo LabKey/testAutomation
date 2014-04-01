@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -27,11 +28,6 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
-/**
- * User: brittp
- * Date: Nov 15, 2005
- * Time: 1:55:56 PM
- */
 @Category({BVT.class, Wiki.class})
 public class WikiTest extends BaseWebDriverTest
 {
@@ -67,7 +63,8 @@ public class WikiTest extends BaseWebDriverTest
           return "Subfolder";
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);

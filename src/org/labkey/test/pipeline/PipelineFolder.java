@@ -21,8 +21,6 @@ import org.labkey.test.Locator;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
-
 public class PipelineFolder
 {
     // These files are not checked in, since that would be a security issue.

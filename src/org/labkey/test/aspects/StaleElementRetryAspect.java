@@ -23,11 +23,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.labkey.test.util.TestLogger;
 import org.openqa.selenium.StaleElementReferenceException;
 
-/**
- * User: tchadick
- * Date: 11/22/13
- */
-
 @Aspect
 public class StaleElementRetryAspect
 {

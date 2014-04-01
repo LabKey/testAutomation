@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -63,7 +64,8 @@ public class ExpTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    protected void doTestSteps() throws InterruptedException
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[] { "Experiment", "Query" });

@@ -31,10 +31,6 @@ import java.util.Random;
 
 import static org.junit.Assert.*;
 
-/**
- * User: kevink
- * Date: Jan 6, 2011
- */
 @Category({DailyB.class, Study.class, Assays.class})
 public class TargetStudyTest extends AbstractAssayTest
 {

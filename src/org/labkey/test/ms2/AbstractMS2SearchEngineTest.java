@@ -16,17 +16,13 @@
 
 package org.labkey.test.ms2;
 
+import org.junit.Test;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
 
 import static org.junit.Assert.*;
 
-/**
- * User: ulberge
- * Date: Jul 6, 2007
- * Time: 1:08:37 PM
- */
 public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 {
     protected static final String TEST_ASSAY_NAME = "AutomatedTestAssay";
@@ -38,9 +34,10 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
     abstract protected void basicChecks();
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
-        super.doTestSteps();
+        super.testSteps();
 
         log("Start analysis running.");
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));

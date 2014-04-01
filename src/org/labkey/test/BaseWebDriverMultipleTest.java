@@ -24,9 +24,6 @@ import java.io.File;
 import static org.junit.Assert.*;
 
 /**
- * User: tchadick
- * Date: 10/7/13
- *
  * This class should be used to create tests containing multiple individual test cases (specified by @Test)
  * rather than the single @Test defined in BaseWebDriverTest
  * Test cases should be non-destructive and should not depend on a particular execution order

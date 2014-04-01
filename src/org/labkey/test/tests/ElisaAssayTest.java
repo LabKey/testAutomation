@@ -25,11 +25,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: tchadick
- * Date: 10/17/12
- * Time: 3:44 PM
- */
 @Category({DailyB.class, Assays.class})
 public class ElisaAssayTest extends ElispotAssayTest
 {

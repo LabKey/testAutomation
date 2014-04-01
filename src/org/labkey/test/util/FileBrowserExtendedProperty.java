@@ -15,10 +15,6 @@
  */
 package org.labkey.test.util;
 
-/**
- * User: cnathe
- * Date: 10/24/13
- */
 public class FileBrowserExtendedProperty
 {
     private String _name;

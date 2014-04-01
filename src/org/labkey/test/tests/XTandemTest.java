@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -41,10 +42,12 @@ public class XTandemTest extends AbstractXTandemTest
     protected static final String PEPTIDE_CROSSTAB_RADIO_NAME = "peptideFilterType";
     protected static final String PEPTIDE_CROSSTAB_RADIO_VALUE_NONE = "none";
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         doTestStepsSetDepth(false);
     }
+
     protected void doTestStepsSetDepth(boolean isQuickTest)
     {
         setIsQuickTest(isQuickTest);
@@ -54,7 +57,7 @@ public class XTandemTest extends AbstractXTandemTest
         if (test2.exists())
             fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
-        super.doTestSteps();
+        super.testSteps();
     }
 
     protected void basicChecks()

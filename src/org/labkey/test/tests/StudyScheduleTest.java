@@ -27,10 +27,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: klum
- * Date: Feb 24, 2012
- */
 @Category({DailyA.class})
 public class StudyScheduleTest extends StudyBaseTest
 {

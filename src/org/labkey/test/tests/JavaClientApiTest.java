@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.security.*;
@@ -33,12 +34,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/*
-* User: Dave
-* Date: Mar 30, 2009
-* Time: 1:53:45 PM
-*/
-
 /**
  * Test for the Java Client API library. This test is written in
  * Selenium because we don't yet have a way to create a list via
@@ -53,7 +48,8 @@ public class JavaClientApiTest extends BaseWebDriverTest
     public static final String USER_NAME = "user1@javaclientapi.test";
     public static final String GROUP_NAME = "TEST GROUP";
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         log("Starting Java client api library test...");
         _containerHelper.createProject(PROJECT_NAME, null);

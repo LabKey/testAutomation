@@ -20,11 +20,6 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
 
-/**
- * User: cnathe
- * Date: Sep 12, 2011
- * Time: 10:33:36 AM
- */
 @Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexUploadAndCopyTest extends LuminexTest
 {

@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -24,10 +25,6 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 
-/**
- * User: Mark Griffith
- * Date: Jan 18, 2006
- */
 @Category({DailyA.class})
 public class UserPermissionsTest extends BaseWebDriverTest
 {
@@ -78,7 +75,8 @@ public class UserPermissionsTest extends BaseWebDriverTest
         deleteUsers(afterTest, GAMMA_EDITOR_USER, GAMMA_AUTHOR_USER, GAMMA_READER_USER, GAMMA_PROJECT_ADMIN_USER);
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         enableEmailRecorder();
         userPermissionRightsTest();

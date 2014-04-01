@@ -15,15 +15,13 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
-import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.WorkbookHelper;
-
-import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -61,8 +59,8 @@ public class WorkbookTest extends BaseWebDriverTest
         deleteProject(PROJECT_NAME2, afterTest);
     }
 
-    @Override @LogMethod
-    public void doTestSteps()
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         addWebPart("Workbooks");

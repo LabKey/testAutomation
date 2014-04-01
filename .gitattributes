@@ -583,7 +583,6 @@ src/org/labkey/test/util/SchemaHelper.java -text
 src/org/labkey/test/util/SearchHelper.java -text
 src/org/labkey/test/util/SecurityHelper.java -text
 src/org/labkey/test/util/SqlserverOnlyTest.java -text
-src/org/labkey/test/util/StopSelenium.java -text
 src/org/labkey/test/util/StudyHelper.java -text
 src/org/labkey/test/util/TestLogger.java -text
 src/org/labkey/test/util/TimeChartHelper.java -text

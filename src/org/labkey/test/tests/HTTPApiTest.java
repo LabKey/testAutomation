@@ -24,11 +24,6 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
-/**
- * User: Erik
- * Date: Jul 2, 2008
- * Time: 2:03:39 PM
- */
 @Category({DailyA.class})
 public class HTTPApiTest extends SimpleApiTest
 {

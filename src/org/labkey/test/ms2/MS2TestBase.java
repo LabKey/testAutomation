@@ -16,17 +16,13 @@
 
 package org.labkey.test.ms2;
 
+import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
 import java.io.File;
 
-/**
- * User: brittp
- * Date: Nov 28, 2005
- * Time: 2:47:27 PM
- */
 abstract public class MS2TestBase extends BaseWebDriverTest
 {
     protected static final String PROJECT_NAME = "MS2VerifyProject";
@@ -74,7 +70,8 @@ abstract public class MS2TestBase extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         createProjectAndFolder();
     }

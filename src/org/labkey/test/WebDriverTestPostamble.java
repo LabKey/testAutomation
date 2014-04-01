@@ -24,8 +24,6 @@ import static org.labkey.test.TestProperties.isTestCleanupSkipped;
 import static org.labkey.test.WebTestHelper.logToServer;
 
 /**
- * User: tchadick
- * Date: 10/4/13
  * This "test" performs the post-test checks and logging for all of
  * It exists so that BaseWebDriverTest can instantiate it in order to
  */
@@ -93,12 +91,6 @@ public class WebDriverTestPostamble extends BaseWebDriverTest
     protected String getProjectName()
     {
         return null;
-    }
-
-    @Override
-    protected void doTestSteps() throws Exception
-    {
-        throw new RuntimeException("This is not a test.");
     }
 
     @Override

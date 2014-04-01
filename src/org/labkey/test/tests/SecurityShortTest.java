@@ -15,19 +15,15 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.DRT;
 
-/**
- * User: elvan
- * Date: 7/20/12
- * Time: 12:08 PM
- */
 @Category(DRT.class)
 public class SecurityShortTest extends SecurityTest
 {
-
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         doTestStepsSetDepth(true);
     }

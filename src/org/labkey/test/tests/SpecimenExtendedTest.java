@@ -23,10 +23,6 @@ import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 
-/**
- * User: Nick Arnold
- * Date: 7/25/13
- */
 @Category({Specimen.class})
 public class SpecimenExtendedTest extends SpecimenBaseTest
 {

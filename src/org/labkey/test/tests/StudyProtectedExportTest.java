@@ -28,11 +28,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 8/14/12
- * Time: 9:55 AM
- */
 @Category({DailyB.class})
 public class StudyProtectedExportTest extends StudyExportTest
 {

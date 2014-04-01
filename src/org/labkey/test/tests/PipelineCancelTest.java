@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -22,11 +23,6 @@ import org.labkey.test.categories.DailyB;
 
 import java.io.File;
 
-/**
- * User: elvan
- * Date: 2/29/12
- * Time: 6:48 PM
- */
 @Category({DailyB.class})
 public class PipelineCancelTest  extends BaseWebDriverTest
 {
@@ -37,7 +33,8 @@ public class PipelineCancelTest  extends BaseWebDriverTest
         return "Pipeline Cancel Test";
     }
 
-    public void doTestSteps()
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(getProjectName(), "Study");
         startImportStudyFromZip(new File(getLabKeyRoot(), STUDY_ZIP));

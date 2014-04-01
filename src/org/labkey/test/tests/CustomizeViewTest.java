@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import com.google.common.base.Function;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -28,11 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * User: kevink
- * Date: Oct 14, 2010
- * Time: 11:37:20 AM
- */
 @Category({DailyB.class})
 public class CustomizeViewTest extends BaseWebDriverTest
 {
@@ -75,8 +71,8 @@ public class CustomizeViewTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         createList();

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -90,9 +91,8 @@ public class ContainerContextTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         doSetup();
 
@@ -314,7 +314,11 @@ public class ContainerContextTest extends BaseWebDriverTest
             String id = String.valueOf(workbookHelper.createWorkbook(getProjectName(), workbookName, "Description", WorkbookHelper.WorkbookFolderType.DEFAULT_WORKBOOK));
             workbookIds[i] = id;
             parentRowIds[i] = i > 0 ? emissionIds[i-1] : null;
-            emissionIds[i] = insertEmissionTest(workbookIds[i], String.valueOf(i), vehicleId, parentRowIds[i]);
+            try
+            {
+                emissionIds[i] = insertEmissionTest(workbookIds[i], String.valueOf(i), vehicleId, parentRowIds[i]);
+            }
+            catch (IOException | CommandException fail) {throw new RuntimeException(fail);}
             rowIdToWorkbookId.put(emissionIds[i], workbookIds[i]);
         }
 

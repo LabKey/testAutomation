@@ -25,10 +25,6 @@ import org.labkey.test.util.ListHelper;
 
 import static org.junit.Assert.*;
 
-/**
- * User: klum
- * Date: Jul 31, 2009
- */
 @Category({DailyA.class, Study.class})
 public class QuerySnapshotTest extends StudyBaseTest
 {

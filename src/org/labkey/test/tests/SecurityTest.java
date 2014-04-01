@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -40,10 +41,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-/**
- * User: Mark Igra
- * Date: March 23, 2007
- */
 @Category(BVT.class)
 public class SecurityTest extends BaseWebDriverTest
 {
@@ -83,7 +80,8 @@ public class SecurityTest extends BaseWebDriverTest
             deleteUsers(false, TO_BE_DELETED_USER); // Only needed for pre-clean. Should be deleted during test
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         doTestStepsSetDepth(false);
     }

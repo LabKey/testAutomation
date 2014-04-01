@@ -17,10 +17,6 @@ package org.labkey.test.categories;
 
 import java.util.Comparator;
 
-/**
- * User: tchadick
- * Date: 7/30/13
- */
 public class SuiteComparator implements Comparator
 {
     @Override

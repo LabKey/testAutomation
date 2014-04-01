@@ -46,13 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
-/**
- * User: tchadick
- * Date: 3/11/13
- * Time: 1:55 PM
- */
 @Category({BVT.class, Charting.class})
 public class ChartingAPITest extends ClientAPITest
 {

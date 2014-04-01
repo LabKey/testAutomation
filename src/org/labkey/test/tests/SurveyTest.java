@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -28,10 +29,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: cnathe
- * Date: 1/4/13
- */
 @Category({DailyB.class})
 public class SurveyTest extends BaseWebDriverTest
 {
@@ -59,8 +56,8 @@ public class SurveyTest extends BaseWebDriverTest
         return BrowserType.CHROME;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         setupProjectFolder();
         setupSubfolder();

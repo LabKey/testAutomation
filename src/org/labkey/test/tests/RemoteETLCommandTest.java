@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.json.simple.JSONObject;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandResponse;
 import org.labkey.remoteapi.Connection;
@@ -34,11 +35,6 @@ import java.util.Date;
 
 import static org.junit.Assert.*;
 
-/**
- * User: dax
- * Date: 11/3/13
- * Time: 11:32 AM
- */
 @Category({DailyB.class})
 public class RemoteETLCommandTest extends ETLTest
 {
@@ -50,8 +46,8 @@ public class RemoteETLCommandTest extends ETLTest
         return "RemoteETLCommandTestProject";
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         super.runInitialSetup(true);
         verifyRemoteApi();

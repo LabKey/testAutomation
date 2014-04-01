@@ -16,12 +16,6 @@
 package org.labkey.test.util;
 
 /**
- * User: tchadick
- * Date: 9/10/12
- * Time: 2:59 PM
- */
-
-/**
  * Tests that exercise modules using the LabKey SQL group_concat aggregate should implement this
  */
 public interface AdvancedSqlTest

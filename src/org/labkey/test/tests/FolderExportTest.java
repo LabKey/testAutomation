@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -33,11 +34,6 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 1/24/12
- * Time: 1:26 PM
- */
 @Category({DailyB.class})
 public class FolderExportTest extends BaseWebDriverTest
 {
@@ -76,8 +72,8 @@ public class FolderExportTest extends BaseWebDriverTest
         return folders;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         // we are using the simpletest module to test Container Tab import/export
         goToAdminConsole();

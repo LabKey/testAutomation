@@ -32,12 +32,6 @@ import java.util.Collection;
 import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 
-/**
- * User: tchadick
- * Date: 10/1/12
- * Time: 3:17 PM
- */
-
 @Aspect
 public class MethodLoggingAspect
 {

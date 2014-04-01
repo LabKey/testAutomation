@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.External;
@@ -34,11 +35,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: bimber
- * Date: 11/19/12
- * Time: 5:06 PM
- */
 @Category({External.class, ONPRC.class, LabModule.class})
 public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 {
@@ -143,8 +139,8 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         PROJECT_NAME = "ELISPOT_AssayVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         setUpTest();
         createPlateTemplate();

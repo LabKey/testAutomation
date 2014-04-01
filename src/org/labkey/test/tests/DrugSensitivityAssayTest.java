@@ -24,10 +24,6 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
-/**
- * User: klum
- * Date: 5/18/13
- */
 @Category({DailyB.class})
 public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
 {

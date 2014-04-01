@@ -18,11 +18,6 @@ package org.labkey.test.util;
 
 import java.io.*;
 
-/**
- * User: brittp
- * Date: Nov 16, 2005
- * Time: 9:47:28 AM
- */
 public class PasswordUtil
 {
     private static final String PASSWORD_FILE_NAME = ".cpasDRTPassword";

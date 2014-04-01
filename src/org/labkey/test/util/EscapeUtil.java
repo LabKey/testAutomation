@@ -24,9 +24,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * User: kevink
- * Date: 8/3/11
- *
  * UNDONE: Refactor useful methods from PageFlowUtil into util.jar that can be used by the test harness then delete this class.
  */
 public class EscapeUtil

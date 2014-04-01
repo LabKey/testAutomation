@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -26,11 +27,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: dave
- * Date: Aug 4, 2009
- * Time: 1:59:39 PM
- */
 @Category({DailyA.class, Study.class})
 public class SCHARPStudyTest extends BaseWebDriverTest implements PostgresOnlyTest
 {
@@ -61,7 +57,8 @@ public class SCHARPStudyTest extends BaseWebDriverTest implements PostgresOnlyTe
         }
     }
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         log("creating project...");
         _containerHelper.createProject(PROJECT_NAME, "Study");

@@ -18,11 +18,6 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 
-/**
- * User: elvan
- * Date: 1/17/13
- * Time: 11:21 AM
- */
 public class SecurityHelper extends AbstractHelper
 {
     private PortalHelper _portalHelper;

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyB;
@@ -23,11 +24,6 @@ import org.labkey.test.util.RemoteConnectionHelper;
 import org.labkey.test.categories.Data;
 import java.io.File;
 
-/**
- * User: Rylan
- * Date: 3/26/13
- * Time: 11:32 AM
- */
 @Category({DailyB.class, Data.class})
 public class ETLTest extends ETLBaseTest
 {
@@ -58,8 +54,8 @@ public class ETLTest extends ETLBaseTest
         super.doCleanup(true);
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         runInitialSetup(false);
 
@@ -139,7 +135,7 @@ UNDONE: need to fix the merge case
         checkExpectedErrors(_expectedErrors);
     }
 
-    protected void runInitialSetup(boolean remoteOnly) throws Exception
+    protected void runInitialSetup(boolean remoteOnly)
     {
         PortalHelper portalHelper = new PortalHelper(this);
         log("running setup");

@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -28,11 +29,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: brittp
- * Date: Nov 15, 2005
- * Time: 1:55:56 PM
- */
 @Category({DailyA.class, Wiki.class})
 public class WikiLongTest extends BaseWebDriverTest
 {
@@ -124,7 +120,8 @@ public class WikiLongTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         enableEmailRecorder();
         _containerHelper.createProject(PROJECT2_NAME, null);

@@ -20,11 +20,6 @@ import org.labkey.test.Locator;
 
 import java.util.Map;
 
-/**
- * User: elvan
- * Date: 2/11/13
- * Time: 3:06 PM
- */
 public class ChartHelper  extends AbstractHelper
 {
 

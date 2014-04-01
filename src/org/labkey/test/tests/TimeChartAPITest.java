@@ -30,10 +30,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: cnathe
- * Date: 11/5/12
- */
 @Category({DailyB.class, Reports.class, Charting.class})
 public class TimeChartAPITest extends TimeChartTest
 {

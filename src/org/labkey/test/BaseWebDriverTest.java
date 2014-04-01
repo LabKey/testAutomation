@@ -44,7 +44,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
@@ -1758,12 +1757,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _setupFailed = false;
     }
 
-    @Test
-    public void testSteps() throws Exception
-    {
-        doTestSteps();
-    }
-
     @Rule
     public Timeout globalTimeout = new Timeout(1800000); // 30 minutes max per method tested
 
@@ -1938,9 +1931,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         if(!isElementPresent(Locator.id("adminMenuPopupText")))
             signIn();
     }
-
-    @LogMethod
-    protected abstract void doTestSteps() throws Exception;
 
     // Standard cleanup: delete the project
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
@@ -2543,7 +2533,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             String labkeyRoot = WebTestHelper.getLabKeyRoot();
             labkeyRoot = new File(labkeyRoot).getAbsolutePath();
             String strFile = file.getAbsolutePath();
-            if (labkeyRoot != null && strFile.toLowerCase().startsWith(labkeyRoot.toLowerCase()))
+            if (strFile.toLowerCase().startsWith(labkeyRoot.toLowerCase()))
             {
                 String path = strFile.substring(labkeyRoot.length());
                 if (path.startsWith(File.separator))
@@ -3063,11 +3053,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         //second page of the wizard
         waitForElement(Locator.css(".labkey-nav-page-header").withText("Users / Permissions"));
-        if (inheritPermissions)
+        if (!inheritPermissions)
         {
-            //nothing needed, this is the default
-        }
-        else {
             waitAndClick(Locator.xpath("//td[./label[text()='My User Only']]/input"));
         }
 
@@ -3451,7 +3438,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         for (String text : texts)
         {
-            targets.concat(text + ", ");
             String escapedText = text
                     .replace("&", "&amp;")
                     .replace("<", "&lt;")
@@ -4236,7 +4222,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         Select select = new Select(loc.findElement(getDriver()));
         List<WebElement> selectedOptions =  select.getAllSelectedOptions();
-        List<String> values = new ArrayList(selectedOptions.size());
+        List<String> values = new ArrayList<>();
         for (WebElement selectedOption : selectedOptions)
             values.add(selectedOption.getAttribute("value"));
         return values;
@@ -5358,8 +5344,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _extHelper.clickExtComponent(EscapeUtil.filter(id));
         clickButton("CLEAR ALL FILTERS");
     }
-
-    final static int MAX_TEXT_LENGTH = 2000;
 
     public String getPropertyXPath(String propertyHeading)
     {

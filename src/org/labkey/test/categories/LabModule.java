@@ -15,11 +15,6 @@
  */
 package org.labkey.test.categories;
 
-/**
- * User: bimber
- * Date: 9/2/13
- * Time: 7:01 PM
- */
 public class LabModule extends Test
 {
 }

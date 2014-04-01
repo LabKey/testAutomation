@@ -17,8 +17,9 @@ package org.labkey.test.tests;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -43,6 +44,7 @@ import org.openqa.selenium.WebElement;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -56,11 +58,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * User: bbimber
- * Date: 5/28/12
- * Time: 7:12 PM
- */
 @Category({External.class, ONPRC.class, LabModule.class})
 public class SequenceTest extends BaseWebDriverTest
 {
@@ -81,8 +78,8 @@ public class SequenceTest extends BaseWebDriverTest
         return "SequenceVerifyProject";// + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         setUpTest();
 
@@ -95,7 +92,7 @@ public class SequenceTest extends BaseWebDriverTest
         readsetImportTest();
     }
 
-    protected void setUpTest() throws Exception
+    protected void setUpTest()
     {
         _containerHelper.createProject(getProjectName(), "Sequence Analysis");
         goToProjectHome();
@@ -284,7 +281,7 @@ public class SequenceTest extends BaseWebDriverTest
      * the FASTQC report and downloading of results
      * @throws Exception
      */
-    private void readsetFeaturesTest() throws Exception
+    private void readsetFeaturesTest() throws IOException
     {
         //verify import and instrument run creation
         goToProjectHome();
@@ -424,7 +421,7 @@ public class SequenceTest extends BaseWebDriverTest
      * with the goal of exercising all UI options.  It directly calls getJsonParams() on the panel,
      * in order to inspect the JSON it would send to the server, but does not initiate a pipeline job.
      */
-    private void analysisPanelTest() throws JSONException
+    private void analysisPanelTest()
     {
         log("Verifying Analysis Panel UI");
 
@@ -741,7 +738,7 @@ public class SequenceTest extends BaseWebDriverTest
      * @param filename
      * @throws Exception
      */
-    private void validateFastqDownload(String filename) throws Exception
+    private void validateFastqDownload(String filename) throws IOException
     {
         log("Verifying merged FASTQ export");
 
@@ -797,7 +794,7 @@ public class SequenceTest extends BaseWebDriverTest
      * The intent of this method is to perform additional tests of this Readset Import Panel,
      * with the goal of exercising all UI options
      */
-    private void readsetPanelTest() throws JSONException
+    private void readsetPanelTest()
     {
         log("Verifying Readset Import Panel UI");
 
@@ -1046,7 +1043,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Unexpected value for param", barcode, sample1.get("mid3"));
     }
 
-    private void readsetImportTest() throws Exception
+    private void readsetImportTest()
     {
         log("Verifying Readset Import");
 
@@ -1093,7 +1090,15 @@ public class SequenceTest extends BaseWebDriverTest
         Connection cn = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
         SelectRowsCommand sr = new SelectRowsCommand("sequenceanalysis", "sequence_readsets");
         sr.addFilter(new Filter("name", readset1 + ";" + readset2, Filter.Operator.IN));
-        SelectRowsResponse resp = sr.execute(cn, getProjectName());
+        SelectRowsResponse resp;
+        try
+        {
+            resp = sr.execute(cn, getProjectName());
+        }
+        catch (IOException | CommandException fail)
+        {
+            throw new RuntimeException(fail);
+        }
         assertEquals("Incorrect readset number", 2, resp.getRowCount().intValue());
 
         log("attempting to re-import same files");

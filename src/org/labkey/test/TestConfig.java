@@ -22,11 +22,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.Serializable;
 
-/**
- * User: ulberge
- * Date: Aug 27, 2007
- * Time: 4:41:27 PM
- */
 public class TestConfig implements Serializable
 {
     static final long serialVersionUID = -1490695783905269342L;

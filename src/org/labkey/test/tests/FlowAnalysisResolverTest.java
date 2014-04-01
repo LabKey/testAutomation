@@ -22,11 +22,6 @@ import org.labkey.test.categories.Flow;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 1/10/13
- * Time: 4:40 PM
- */
 @Category({DailyB.class, Flow.class})
 public class FlowAnalysisResolverTest extends FlowTest
 {

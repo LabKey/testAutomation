@@ -24,7 +24,6 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PipelineStatusTable;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

@@ -34,10 +34,6 @@ import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
 
-/**
- * User: jeckels
- * Date: Nov 20, 2007
- */
 @Category({DailyA.class, Assays.class})
 public class NabAssayTest extends AbstractQCAssayTest
 {

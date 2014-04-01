@@ -31,9 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * User: cnathe
- * Date: 10/4/13
- *
  * This test imports a folder archive that has 2 subfolders (a date based study and a visit based study) which have been
  * trimmed down to contain just the datasets/queries/etc. that are needed for the Time Chart reports in the study folders
  * that are imported (2 in the visit based study and 10 in the date based study).

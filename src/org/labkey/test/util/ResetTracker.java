@@ -21,9 +21,6 @@ import org.labkey.test.Locator;
 import static org.junit.Assert.*;
 
 /**
- * User: elvan
- * Date: 8/5/11
- *
  * This class tracks whether or not a page has been updated.
  * currently, it does so by populating the search bar and verifying
  * that it is unchanged at a specified point.  If this proves unsatisfactory

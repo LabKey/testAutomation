@@ -31,12 +31,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: Trey Chadick
- * Date: Oct 6, 2010
- * Time: 2:32:05 PM
- */
-
 public class CustomizeViewsHelper extends AbstractHelper
 {
     private final Locator.IdLocator _dataRegion;

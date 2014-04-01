@@ -33,11 +33,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
-/**
- * User: Mark Igra
- * Date: Feb 8, 2007
- * Time: 10:59:37 AM
- */
 public abstract class Locator
 {
     protected String _loc;

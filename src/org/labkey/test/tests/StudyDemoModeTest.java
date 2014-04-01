@@ -27,12 +27,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/*
-* User: adam
-* Date: Jun 10, 2011
-* Time: 7:06:56 AM
-*/
-
 @Category({DailyB.class})
 public class StudyDemoModeTest extends StudyBaseTest
 {

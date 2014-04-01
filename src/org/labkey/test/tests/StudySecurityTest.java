@@ -20,11 +20,6 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 
-/*
-* User: dave
-* Date: Oct 12, 2009
-* Time: 2:39:18 PM
-*/
 @Category({DailyA.class})
 public class StudySecurityTest extends StudyBaseTest
 {

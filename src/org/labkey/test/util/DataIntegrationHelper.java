@@ -33,10 +33,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
-/**
- * User: RyanS
- * Date: 10/22/13
- */
 public class DataIntegrationHelper
 {
     private String _baseUrl = WebTestHelper.getBaseURL();

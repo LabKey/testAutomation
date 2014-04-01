@@ -20,10 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import static org.labkey.test.TestProperties.isSystemMaintenanceDisabled;
 import static org.labkey.test.WebTestHelper.logToServer;
 
-/**
- * User: tchadick
- * Date: 10/4/13
- */
 public class WebDriverTestPreamble extends BaseWebDriverTest
 {
     public void preamble() throws Exception
@@ -65,12 +61,6 @@ public class WebDriverTestPreamble extends BaseWebDriverTest
     protected String getProjectName()
     {
         return null;
-    }
-
-    @Override
-    protected void doTestSteps() throws Exception
-    {
-        throw new RuntimeException("This is not a test.");
     }
 
     @Override

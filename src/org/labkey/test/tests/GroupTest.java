@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -31,11 +32,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 11/4/11
- * Time: 2:08 PM
- */
 @Category(BVT.class)
 public class GroupTest extends BaseWebDriverTest
 {
@@ -80,8 +76,8 @@ public class GroupTest extends BaseWebDriverTest
         _containerHelper.createProject(getProjectName(), "Collaboration");
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         init();
 

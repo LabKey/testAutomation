@@ -17,11 +17,6 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 
-/**
- * User: elvan
- * Date: 9/12/12
- * Time: 11:45 AM
- */
 public abstract class AbstractUserHelper extends AbstractHelper
 {
     public AbstractUserHelper(BaseWebDriverTest test)

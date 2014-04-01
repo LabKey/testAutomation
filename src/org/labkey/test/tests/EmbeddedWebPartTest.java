@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -27,11 +28,6 @@ import org.labkey.test.util.UIContainerHelper;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 8/4/11
- * Time: 3:23 PM
- */
 @Category({DailyA.class, Wiki.class})
 public class EmbeddedWebPartTest extends BaseWebDriverTest
 {
@@ -59,8 +55,8 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
         resetTracker = new ResetTracker(this);
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         configure();
         embeddedQueryWebPartDoesNotRefreshOnChange();

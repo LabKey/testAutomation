@@ -15,15 +15,11 @@
  */
 package org.labkey.test.util;
 
+import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
-import org.labkey.test.Runner;
 
 import static org.labkey.test.WebTestHelper.logToServer;
 
-/**
- * User: t.chadick
- * Date: May 3, 2011
- */
 public class JUnitHeader extends BaseWebDriverTest
 {
     @Override
@@ -38,8 +34,8 @@ public class JUnitHeader extends BaseWebDriverTest
         return null;
     }
 
-    @Override
-    public void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         log("** This should precede JUnitTest.");
         log("** It will enable the dumbster and clean up any errors caused by the previous test");

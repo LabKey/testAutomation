@@ -22,11 +22,6 @@ import org.labkey.test.categories.Study;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 4/29/12
- * Time: 1:17 PM
- */
 @Category({DailyB.class, Study.class})
 public class ExtraKeyStudyTest extends StudyBaseTest
 {

@@ -18,13 +18,7 @@ package org.labkey.test;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
-/**
- * User: Mark Igra
- * Date: Feb 8, 2007
- * Time: 4:26:59 PM
- */
 public interface WebTest
 {
     String getResponseText();

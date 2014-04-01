@@ -22,10 +22,6 @@ import org.labkey.test.util.EscapeUtil;
 
 import java.io.File;
 
-/**
- * User: tgaluhn
- * Date: 12/30/13
- */
 @Category(DailyB.class)
 public class StudyMergeParticipantsTest extends StudyBaseTest
 {

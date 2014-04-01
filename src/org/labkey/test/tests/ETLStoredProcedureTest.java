@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.di.RunTransformResponse;
@@ -25,10 +26,6 @@ import org.labkey.test.categories.Data;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
-/**
- * User: tgaluhn
- * Date: 11/26/13
- */
 @Category({DailyB.class, Data.class})
 public class ETLStoredProcedureTest extends ETLTest
 {
@@ -44,8 +41,8 @@ public class ETLStoredProcedureTest extends ETLTest
     private static final String TRANSFORM_MODIFIED_FILTER_WITH_SOURCE_SP = "{simpletest}/SProcModifiedSinceWithSource";
     private static final String TRANSFORM_BAD_MODIFIED_FILTER_WITH_BAD_SOURCE_SP = "{simpletest}/SProcBadModifiedSinceWithBadSource";
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
 
         // TODO: only need a subset of the initialSetup operations

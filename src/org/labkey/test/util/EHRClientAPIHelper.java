@@ -41,7 +41,6 @@ import org.labkey.test.WebTestHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,11 +49,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: bimber
- * Date: 9/25/13
- * Time: 2:26 PM
- */
 public class EHRClientAPIHelper
 {
     private BaseWebDriverTest _test;

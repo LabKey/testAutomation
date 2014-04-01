@@ -17,7 +17,9 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -34,6 +36,8 @@ import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,11 +48,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: bimber
- * Date: 11/19/12
- * Time: 5:08 PM
- */
 @Category({External.class, ONPRC.class, LabModule.class})
 public class HormoneAssayTest extends AbstractLabModuleAssayTest
 {
@@ -173,8 +172,8 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         PROJECT_NAME = "EC_AssayVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         setUpTest();
         createPlateTemplate();
@@ -183,7 +182,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         pivotedImportTest();
     }
 
-    private void pivotedImportTest() throws Exception
+    private void pivotedImportTest()
     {
         log("Verifying Hormone Assay Import Using Pivoted Input");
         _helper.goToAssayResultImport(ASSAY_NAME, true);
@@ -259,7 +258,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         verifyResults(24, expected);
     }
 
-    private void createPlateTemplate() throws Exception
+    private void createPlateTemplate() throws ParseException
     {
         _helper.goToLabHome();
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
@@ -548,7 +547,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
 
     }
 
-    private void ensureTestRecords() throws Exception
+    private void ensureTestRecords() throws CommandException, IOException
     {
         log("Inserting testname records");
 

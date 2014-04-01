@@ -33,10 +33,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: tchadick
- * Date: 6/10/13
- */
 @Category({BVT.class, Reports.class})
 public class DataReportsTest extends ReportTest
 {

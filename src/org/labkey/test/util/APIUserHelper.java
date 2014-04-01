@@ -22,11 +22,6 @@ import org.labkey.test.BaseWebDriverTest;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 9/12/12
- * Time: 11:52 AM
- */
 public class APIUserHelper extends AbstractUserHelper
 {
     public APIUserHelper(BaseWebDriverTest test)

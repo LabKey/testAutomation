@@ -28,11 +28,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: klum
- * Date: Mar 9, 2010
- * Time: 3:44:04 PM
- */
 @Category({DailyB.class})
 public class RlabkeyTest extends SimpleApiTest
 {

@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.json.simple.JSONObject;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -54,11 +55,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/*
-* User: Dave
-* Date: Mar 25, 2009
-* Time: 10:50:18 AM
-*
+/**
 * Tests the simple module and file-based resources introduced in version 9.1
 */
 @Category({DailyA.class})
@@ -111,7 +108,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         createList();
     }
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         doSetup();
         doVerifySteps();

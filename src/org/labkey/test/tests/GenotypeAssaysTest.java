@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -44,11 +45,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: bimber
- * Date: 12/9/12
- * Time: 11:15 PM
- */
 @Category({External.class, ONPRC.class, LabModule.class})
 public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
 {
@@ -107,8 +103,8 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         }
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         setUpTest();
         sspImportTest();

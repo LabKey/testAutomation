@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
@@ -35,10 +36,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * User: tamram
- * Date: May 15, 2006
- */
 @Category({DailyA.class})
 public class MessagesLongTest extends BaseWebDriverTest
 {
@@ -108,7 +105,8 @@ public class MessagesLongTest extends BaseWebDriverTest
         deleteProject(MessagesLongTest.PROJECT_NAME, afterTest);
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         log("Open new project, add group, alter permissions");
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");

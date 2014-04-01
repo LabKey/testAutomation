@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -22,11 +23,6 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.MS2;
 import org.labkey.test.ms2.MS2TestBase;
 
-/**
- * User: elvan
- * Date: 8/19/11
- * Time: 3:32 PM
- */
 @Category({DailyB.class, MS2.class})
 public class LibraTest extends MS2TestBase
 {
@@ -69,8 +65,8 @@ public class LibraTest extends MS2TestBase
     String runName = "itraq/iTRAQ (Libra)";
     int normalizationCount = 8;
 
-    @Override
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         configure();
         waitForText("Grouping");

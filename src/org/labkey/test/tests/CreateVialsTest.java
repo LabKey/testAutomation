@@ -25,10 +25,6 @@ import org.labkey.test.util.DataRegionTable;
 
 import static org.junit.Assert.*;
 
-/**
- * User: kevink
- * Date: Feb 23, 2011
- */
 @Category({DailyB.class, Specimen.class})
 public class CreateVialsTest extends AbstractViabilityTest
 {

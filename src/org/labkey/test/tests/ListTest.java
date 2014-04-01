@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -45,10 +46,6 @@ import static org.labkey.test.util.ListHelper.ListColumnType.String;
 
 import static org.junit.Assert.*;
 
-/**
- * User: ulberge
- * Date: Jul 13, 2007
- */
 @Category({DailyA.class, Data.class})
 public class ListTest extends BaseWebDriverTest
 {
@@ -425,7 +422,8 @@ public class ListTest extends BaseWebDriverTest
         clickButton("Cancel");
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         setUpList(PROJECT_VERIFY);
 

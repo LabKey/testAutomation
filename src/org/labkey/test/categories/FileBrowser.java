@@ -15,10 +15,6 @@
  */
 package org.labkey.test.categories;
 
-/**
- * User: tchadick
- * Date: 11/7/13
- */
 public abstract class FileBrowser extends Test
 {
 }

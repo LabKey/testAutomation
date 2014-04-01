@@ -22,11 +22,6 @@ import org.labkey.test.Locator;
 import java.io.File;
 import java.util.Map;
 
-/**
- * User: tchadick
- * Date: 7/23/13
- * Time: 3:27 PM
- */
 public class IssuesHelper extends AbstractHelper
 {
     public IssuesHelper(BaseWebDriverTest test)

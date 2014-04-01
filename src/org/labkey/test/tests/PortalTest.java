@@ -34,10 +34,6 @@ import java.util.List;
 
 import static org.junit.Assert.fail;
 
-/**
- * User: tchadick
- * Date: 10/8/13
- */
 @Category({BVT.class})
 public class PortalTest extends BaseWebDriverMultipleTest
 {

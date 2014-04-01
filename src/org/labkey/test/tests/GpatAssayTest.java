@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -22,11 +23,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.ListHelper;
 
-/**
- * User: Trey Chadick
- * Date: Apr 6, 2011
- * Time: 2:19:10 PM
- */
 @Category({DailyB.class})
 public class GpatAssayTest extends BaseWebDriverTest
 {
@@ -70,8 +66,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    @Override
-    public void doTestSteps()
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, "Assay");
         addWebPart("Pipeline Files");

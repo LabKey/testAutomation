@@ -30,9 +30,6 @@ import static org.junit.Assert.*;
 
 /**
  * Utilities to compare JSON blobs.
- *
- * User: kevink
- * Date: Mar 9, 2011
  */
 public class JSONHelper extends AbstractHelper
 {

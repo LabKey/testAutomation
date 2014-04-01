@@ -24,11 +24,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 4/5/12
- * Time: 3:16 PM
- */
 @Category({DailyA.class})
 public class StudyReloadTest extends StudyBaseTest
 {

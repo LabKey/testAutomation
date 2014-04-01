@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
 import org.junit.Assert;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -48,6 +49,7 @@ import org.openqa.selenium.Alert;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,13 +64,6 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-/**
- * User: bbimber
- * Date: 5/27/12
- * Time: 8:33 PM
- */
-
 
 /**
  * Contains a series of tests designed to test the UI in the laboratory module.
@@ -208,8 +203,8 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 //        super.doCleanup(afterTest);
 //    }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         setUpTest();
 
@@ -269,7 +264,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         return assays;
     }
 
-    private void dateParseTest() throws Exception
+    private void dateParseTest() throws ParseException
     {
         _helper.goToLabHome();
         log("Validating client-side date parsing");
@@ -291,7 +286,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         checkDate("3/5/99", dateFormat3);
     }
 
-    private void checkDate(String dateStr, String javaFormatStr) throws Exception
+    private void checkDate(String dateStr, String javaFormatStr) throws ParseException
     {
         SimpleDateFormat stdFormat = new SimpleDateFormat("yyyy-MM-dd");
 

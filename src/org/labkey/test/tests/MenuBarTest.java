@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -24,11 +25,6 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
-/**
- * User: marki
- * Date: May 18, 2009
- * Time: 12:44:03 PM
- */
 @Category({DailyA.class})
 public class MenuBarTest extends BaseWebDriverTest
 {
@@ -52,13 +48,8 @@ public class MenuBarTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-//    @Override
-//    protected BrowserType bestBrowser()
-//    {
-//        return BrowserType.CHROME;
-//    }
-
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         PortalHelper portalHelper = new PortalHelper(this);
 

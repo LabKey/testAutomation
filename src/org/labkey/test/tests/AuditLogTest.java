@@ -17,6 +17,7 @@
 package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -27,10 +28,6 @@ import org.labkey.test.util.ListHelper;
 
 import static org.junit.Assert.*;
 
-/**
- * User: Karl Lum
- * Date: Mar 13, 2008
- */
 @Category({DailyA.class})
 public class AuditLogTest extends BaseWebDriverTest
 {
@@ -74,14 +71,15 @@ public class AuditLogTest extends BaseWebDriverTest
         }
     }
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         userAuditTest();
         groupAuditTest();
         canSeeAuditLogTest();
     }
 
-    protected void userAuditTest() throws Exception
+    protected void userAuditTest()
     {
         log("testing user audit events");
         createUser(AUDIT_TEST_USER, null);
@@ -103,7 +101,7 @@ public class AuditLogTest extends BaseWebDriverTest
         verifyAuditEvent(this, USER_AUDIT_EVENT, COMMENT_COLUMN, AUDIT_TEST_USER + " was deleted from the system", 10);
     }
 
-    protected void groupAuditTest() throws Exception
+    protected void groupAuditTest()
     {
         log("testing group audit events");
 

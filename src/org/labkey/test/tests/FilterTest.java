@@ -16,14 +16,9 @@
 
 package org.labkey.test.tests;
 
-/**
- * User: elvan
- * Date: 8/7/11
- * Time: 3:58 PM
- */
-
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -71,8 +66,8 @@ public class FilterTest extends ListTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    @LogMethod
-    public void doTestSteps()
+    @Test
+    public void testSteps()
     {
         setupProject();
 

@@ -16,7 +16,7 @@
 
 package org.labkey.test.ms2;
 
-import org.junit.Assert;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -34,7 +34,8 @@ public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnl
     protected static final String SEARCH_BUTTON = "Comet";
     protected static final String SEARCH_TYPE = "comet";
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         doTestStepsSetDepth(false);
     }
@@ -62,7 +63,7 @@ public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnl
         if (test2.exists())
             fail("Pipeline files were not cleaned up; test2(" + test2.toString() + ") directory still exists");
 
-        super.doTestSteps();
+        super.testSteps();
     }
 
     protected void basicChecks()

@@ -17,11 +17,6 @@ package org.labkey.test.tests;
 
 import org.labkey.test.TestProperties;
 
-/**
- * User: bimber
- * Date: 12/12/12
- * Time: 12:17 PM
- */
 abstract public class AbstractLabModuleAssayTest extends LabModulesTest
 {
     @Override

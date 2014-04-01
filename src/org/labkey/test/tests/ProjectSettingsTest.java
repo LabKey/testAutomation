@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -24,11 +25,6 @@ import org.labkey.test.categories.DailyB;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 3/14/12
- * Time: 12:03 PM
- */
 @Category({DailyB.class})
 public class ProjectSettingsTest extends BaseWebDriverTest
 {
@@ -82,8 +78,8 @@ public class ProjectSettingsTest extends BaseWebDriverTest
 //        assertElementNotPresent("Support link still present after removing link from settings", supportLink);
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         setUpTest();
 

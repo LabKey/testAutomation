@@ -37,11 +37,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: tchadick
- * Date: 5/30/13
- * Time: 12:34 PM
- */
 @Category({DailyA.class, Reports.class})
 public class KnitrReportTest extends ReportTest
 {

@@ -22,11 +22,6 @@ import org.labkey.test.util.TestLogger;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * User: tchadick
- * Date: 2/15/13
- * Time: 8:27 PM
- */
 @Aspect
 public class TestLoggingAspect
 {

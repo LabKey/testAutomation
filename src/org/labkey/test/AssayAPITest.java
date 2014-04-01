@@ -15,6 +15,7 @@
  */
 package org.labkey.test;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIAssayHelper;
@@ -24,11 +25,6 @@ import java.util.Collections;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 9/14/12
- * Time: 2:06 PM
- */
 @Category({DailyA.class})
 public class AssayAPITest extends BaseWebDriverTest
 {
@@ -38,8 +34,8 @@ public class AssayAPITest extends BaseWebDriverTest
         return "Assay API TEST";
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(getProjectName(), "Assay");
         goToProjectHome();

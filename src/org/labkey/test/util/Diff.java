@@ -17,11 +17,6 @@ package org.labkey.test.util;
 
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * User: matthewb
- * Date: Oct 22, 2009
- * Time: 11:01:23 AM
- */
 public class Diff
 {
 

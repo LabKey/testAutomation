@@ -22,10 +22,6 @@ import org.labkey.test.categories.MS2;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
-/**
- * User: jeckels
- * Date: 8/28/13
- */
 @Category({MS2.class, DailyA.class})
 public class MS2ExportTest extends AbstractMS2ImportTest
 {

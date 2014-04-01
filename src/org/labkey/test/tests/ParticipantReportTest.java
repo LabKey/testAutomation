@@ -27,10 +27,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: tchadick
- * Date: 6/10/13
- */
 @Category({DailyA.class, Reports.class})
 public class ParticipantReportTest extends ReportTest
 {

@@ -32,12 +32,6 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-/**
- * User: tchadick
- * Date: 12/19/12
- * Time: 1:40 PM
- */
-
 // Provides some helpful utilities used in study-related tests.  Subclasses provide all study creation and
 // verification steps.
 public abstract class StudyBaseTest extends SimpleApiTest

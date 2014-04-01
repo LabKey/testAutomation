@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -23,12 +24,6 @@ import org.labkey.test.categories.NoSuite;
 import org.labkey.test.util.DevModeOnlyTest;
 
 import java.util.HashMap;
-
-/**
- * User: tchadick
- * Date: 9/26/12
- * Time: 1:37 PM
- */
 
 @Category(NoSuite.class)
 public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevModeOnlyTest
@@ -57,8 +52,8 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         return null;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
     }
 

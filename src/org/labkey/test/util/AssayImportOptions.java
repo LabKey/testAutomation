@@ -1,7 +1,5 @@
 package org.labkey.test.util;
 
-import org.labkey.test.Locator;
-
 /**
  * Created by klum on 2/28/14.
  */

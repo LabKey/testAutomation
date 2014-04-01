@@ -30,9 +30,6 @@ import java.io.File;
 import static org.junit.Assert.*;
 
 /**
- * User: kevink
- * Date: 6/6/12
- *
  * This test is an end-to-end scenario for the Letvin lab.
  * - date-based study set up with default timepoint length of 7 days.
  * - import Flow and CBC data into different containers.

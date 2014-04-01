@@ -15,19 +15,15 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.MS2;
 
-/**
- * User: elvan
- * Date: 7/20/12
- * Time: 12:40 PM
- */
 @Category(MS2.class)
 public class XTandemShortTest extends XTandemTest
 {
-
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         doTestStepsSetDepth(true);
     }

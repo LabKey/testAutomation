@@ -23,11 +23,6 @@ import java.net.URL;
 
 import static org.junit.Assert.*;
 
-/**
- * User: tchadick
- * Date: 12/18/12
- * Time: 11:56 AM
- */
 public class WorkbookHelper extends AbstractHelper
 {
     public WorkbookHelper(BaseWebDriverTest test)

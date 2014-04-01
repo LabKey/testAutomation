@@ -23,6 +23,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -201,7 +202,8 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
 //        TODO: Test an external schema without applying metadata; verify that table and column names match JDBC meta
 //        data casing, which will differ between PostgreSQL and SQL Server. Use code like the below to distinguish.
@@ -235,7 +237,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         doTestViaJavaApi();
     }
 
-    void doTestUneditable() throws Exception
+    void doTestUneditable()
     {
         log("** Trying to insert via form on uneditable external schema");
         insertViaFormNoPerms(PROJECT_NAME, "Haha!", 3);
@@ -256,6 +258,10 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         {
             assertEquals(401,ex.getStatusCode());
         }
+        catch (IOException fail)
+        {
+            throw new RuntimeException(fail);
+        }
 
     }
 
@@ -266,7 +272,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         assertTitleEquals("404: Error Page -- Could not find schema: Test");
     }
     
-    void doTestViaForm() throws Exception
+    void doTestViaForm()
     {
         String containerPath = StringUtils.join(Arrays.asList(PROJECT_NAME, FOLDER_NAME), "/");
 
@@ -296,7 +302,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
 
         Row[] inserted = new Row[] {new Row("A", 3), new Row("B", 4) };
         int[] pks = insertViaJavaApi(containerPath, cn, inserted);
-        
+
         Row[] selected = selectViaJavaApi(containerPath, cn, pks);
         for (int i = 0; i < inserted.length; i++)
             assertEquals(inserted[i], selected[i]);
@@ -334,7 +340,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         deleteViaJavaApi(containerPath, cn, pks);
     }
     
-    int[] insertViaJavaApi(String containerPath, Connection cn, Row... rows) throws Exception
+    int[] insertViaJavaApi(String containerPath, Connection cn, Row... rows) throws IOException, CommandException
     {
         log("** Inserting via api...");
         InsertRowsCommand cmd = new InsertRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
@@ -355,7 +361,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         return pks;
     }
     
-    Row[] selectViaJavaApi(String containerPath, Connection cn, int... pks) throws Exception
+    Row[] selectViaJavaApi(String containerPath, Connection cn, int... pks) throws IOException, CommandException
     {
         log("** Select via api: " + join(",", pks) + "...");
         SelectRowsCommand cmd = new SelectRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
@@ -379,7 +385,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         return rows.toArray(new Row[rows.size()]);
     }
     
-    Row[] updateViaJavaApi(String containerPath, Connection cn, Row... rows) throws Exception
+    Row[] updateViaJavaApi(String containerPath, Connection cn, Row... rows) throws ParseException, IOException, CommandException
     {
         log("** Updating via api...");
         UpdateRowsCommand cmd = new UpdateRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);
@@ -398,7 +404,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         return updated;
     }
     
-    void deleteViaJavaApi(String containerPath, Connection cn, int... pks) throws Exception
+    void deleteViaJavaApi(String containerPath, Connection cn, int... pks) throws IOException, CommandException
     {
         log("** Deleting via api: pks=" + join(",", pks) + "...");
         DeleteRowsCommand cmd = new DeleteRowsCommand(USER_SCHEMA_NAME, TABLE_NAME);

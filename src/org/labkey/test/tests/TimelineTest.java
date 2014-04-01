@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -27,10 +28,6 @@ import org.labkey.test.util.PortalHelper;
 
 import static org.junit.Assert.*;
 
-/**
- * User: brittp
- * Created: Mar 12, 2008 9:36:47 AM
- */
 @Category({DailyA.class, Wiki.class})
 public class TimelineTest extends BaseWebDriverTest
 {
@@ -113,7 +110,8 @@ public class TimelineTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         createSubfolder(PROJECT_NAME, FOLDER_NAME, new String[]{"Timeline"});

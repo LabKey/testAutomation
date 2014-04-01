@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
@@ -63,8 +64,8 @@ public class ScriptValidationTest extends SimpleModuleTest
         }
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         assertModuleDeployed(MODULE_NAME);
         _containerHelper.createProject(getProjectName(), null);

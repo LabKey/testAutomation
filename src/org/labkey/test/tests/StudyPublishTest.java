@@ -37,11 +37,6 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-/**
- * User: tchadick
- * Date: 8/24/12
- * Time: 11:00 AM
- */
 @Category({DailyB.class, Study.class})
 public class StudyPublishTest extends StudyProtectedExportTest
 {

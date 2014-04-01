@@ -16,7 +16,7 @@
 package org.labkey.test.categories;
 
 /**
- * User: tchadick
+  User: tchadick
  * Date: 7/30/13
  */
 public abstract class Continue extends Test

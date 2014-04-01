@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LogMethod;
@@ -141,8 +142,8 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         deletePipelineWorkDirectory();
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         init();
         _doTestSteps();

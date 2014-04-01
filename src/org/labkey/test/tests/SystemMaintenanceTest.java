@@ -15,15 +15,11 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
-/**
- * User: elvan
- * Date: 8/25/12
- * Time: 6:23 PM
- */
 public class SystemMaintenanceTest extends BaseWebDriverTest
 {
     @Override
@@ -44,8 +40,8 @@ public class SystemMaintenanceTest extends BaseWebDriverTest
 
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
 
         // Disable scheduled system maintenance

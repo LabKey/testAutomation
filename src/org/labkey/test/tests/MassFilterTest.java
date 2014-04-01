@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.InDevelopment;
@@ -23,10 +24,6 @@ import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
-/**
- * User: elvan
- * Date: 3/13/13
- */
 @Category(InDevelopment.class)
 public class MassFilterTest extends  FilterTest
 {
@@ -36,8 +33,8 @@ public class MassFilterTest extends  FilterTest
         return "Mass Filter Test";
     }
 
-    @Override
-    public void doTestSteps()
+    @Test
+    public void testSteps()
     {
         doSetUp();
         doVerify();

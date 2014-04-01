@@ -16,6 +16,7 @@
 
 package org.labkey.test.ms2;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
@@ -27,12 +28,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: billnelson@uky.edu
- * Date: Aug 7, 2006
- * Time: 1:04:36 PM
- *
- */
 @Category({MS2.class, Sequest.class})
 public class SequestTest extends AbstractMS2SearchEngineTest
 {
@@ -58,7 +53,8 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
 
         beginAt("/admin/showCustomizeSite.view");
@@ -90,7 +86,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         if (test2.exists())
             fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
-        super.doTestSteps();
+        super.testSteps();
     }
 
     protected void setupEngine()

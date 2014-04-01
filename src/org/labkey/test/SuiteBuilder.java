@@ -27,10 +27,6 @@ import java.util.Set;
 import java.util.HashMap;
 import java.util.HashSet;
 
-/**
- * User: tchadick
- * Date: 7/29/13
- */
 public class SuiteBuilder
 {
     private static SuiteBuilder _instance = null;

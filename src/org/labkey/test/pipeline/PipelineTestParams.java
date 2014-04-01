@@ -15,9 +15,7 @@
  */
 package org.labkey.test.pipeline;
 
-import java.util.Map;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * <code>PipelineTestParams</code>

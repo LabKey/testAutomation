@@ -34,10 +34,6 @@ import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import static org.junit.Assert.*;
 
-/**
- * User: jeckels
- * Date: Aug 10, 2007
- */
 @Category({BVT.class, Study.class, Assays.class})
 public class AssayTest extends AbstractAssayTest
 {

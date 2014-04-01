@@ -18,11 +18,6 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.DRT;
 
-/**
- * User: elvan
- * Date: 7/19/12
- * Time: 12:48 PM
- */
 @Category(DRT.class)
 public class StudyShortTest extends StudyTest
 {

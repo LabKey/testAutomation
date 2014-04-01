@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -31,10 +32,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: tamram
- * Date: May 15, 2006
- */
 @Category({DailyA.class, Data.class})
 public class IssuesTest extends BaseWebDriverTest
 {
@@ -113,7 +110,8 @@ public class IssuesTest extends BaseWebDriverTest
         enableEmailRecorder();
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         initProject();
 

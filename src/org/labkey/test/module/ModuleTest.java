@@ -16,16 +16,13 @@
 
 package org.labkey.test.module;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.NoSuite;
 
-/**
- * User: ulberge
- * Date: Aug 7, 2007
- */
 @Category({NoSuite.class})
 public class ModuleTest extends BaseWebDriverTest
 {
@@ -37,7 +34,8 @@ public class ModuleTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
         log("Test module created from moduleTemplate");

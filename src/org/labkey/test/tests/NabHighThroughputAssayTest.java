@@ -30,10 +30,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: klum
- * Date: 2/27/13
- */
 @Category({DailyA.class, Assays.class})
 public class NabHighThroughputAssayTest extends AbstractAssayTest
 {

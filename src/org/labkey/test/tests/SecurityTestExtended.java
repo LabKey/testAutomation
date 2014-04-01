@@ -15,12 +15,7 @@
  */
 package org.labkey.test.tests;
 
-/**
- * User: elvan
- * Date: 6/22/11
- * Time: 11:40 AM
- */
-
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.categories.Weekly;
 
@@ -30,8 +25,8 @@ import org.labkey.test.categories.Weekly;
 @Category({Weekly.class})
 public class SecurityTestExtended extends SecurityTest
 {
-
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         enableEmailRecorder();
 

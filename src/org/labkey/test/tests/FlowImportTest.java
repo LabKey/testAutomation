@@ -31,10 +31,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: kevink
- * Date: Mar 31, 2009
- */
 @Category({DailyA.class, Flow.class, FileBrowser.class})
 public class FlowImportTest extends BaseFlowTest
 {

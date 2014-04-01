@@ -28,12 +28,6 @@ import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
-/**
- * User: Trey Chadick
- * Date: Apr 27, 2010
- * Time: 9:10:47 AM
- */
-
 @Category({DailyB.class})
 public class SearchTest extends StudyTest
 {

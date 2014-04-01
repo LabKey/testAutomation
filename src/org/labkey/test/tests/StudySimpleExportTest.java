@@ -41,9 +41,6 @@ import java.util.Set;
 import static org.junit.Assert.*;
 
 /**
- * User: cnathe
- * Date: 10/28/13
- *
  * This test is designed to test individual parts/properties of the study import/export archive.
  * The @BeforeClass creates a new study manuall using the default settings.
  * Each @Test then sets a property in that study, exports the study, and reimports it into a subfolder

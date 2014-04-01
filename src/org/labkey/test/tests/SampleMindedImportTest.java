@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -29,9 +30,6 @@ import java.io.File;
 import static org.junit.Assert.*;
 
 /**
- * User: jeckels
- * Date: June 25, 2012
- *
  * Imports a SampleMinded data export (.xlsx) into the specimen repository.
  */
 @Category({DailyB.class, Study.class, Specimen.class})
@@ -72,8 +70,8 @@ public class SampleMindedImportTest extends BaseWebDriverTest
         super.doCleanup(afterTest);
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, "Study");
         clickButton("Create Study");

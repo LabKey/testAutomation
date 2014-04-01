@@ -28,10 +28,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: tchadick
- * Date: 6/11/13
- */
 @Category({BVT.class, Reports.class, Charting.class})
 public class ScatterPlotTest extends GenericChartsTest
 {

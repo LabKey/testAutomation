@@ -26,6 +26,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
+import org.junit.Test;
 import org.labkey.query.xml.ApiTestsDocument;
 import org.labkey.query.xml.TestCaseType;
 import org.labkey.test.BaseWebDriverTest;
@@ -43,7 +44,7 @@ import static org.junit.Assert.*;
 
 /**
  * An abstract class that can be used to test recorded API request/response interactions. A typical usage
- * would be for an extending class to perform whatever project setup was required and call super.doTestSteps.
+ * would be for an extending class to perform whatever project setup was required and call super.testSteps.
  * The class would also implement getTestFiles which returns an array of recorded test files, the schema is
  * apiTest.xsd and a test can be recorded using the API test page: query/apiTest.view
  */
@@ -77,7 +78,8 @@ public abstract class SimpleApiTest extends BaseWebDriverTest
 
     }
 
-    protected final void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         ensureConfigured();
         runUITests();

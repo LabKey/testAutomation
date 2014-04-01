@@ -17,10 +17,6 @@ package org.labkey.test.ms2;
 
 import org.labkey.test.TestTimeoutException;
 
-/**
- * User: jeckels
- * Date: May 27, 2011
- */
 public abstract class AbstractXTandemTest extends AbstractMS2SearchEngineTest
 {
     protected static final String SEARCH_BUTTON = "X!Tandem";

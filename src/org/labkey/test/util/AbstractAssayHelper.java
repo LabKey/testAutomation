@@ -25,11 +25,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 9/14/12
- * Time: 2:41 PM
- */
 public abstract class AbstractAssayHelper extends AbstractHelper
 {
     public AbstractAssayHelper(BaseWebDriverTest test)

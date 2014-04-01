@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.External;
@@ -31,11 +32,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: bimber
- * Date: 12/9/12
- * Time: 11:24 PM
- */
 @Category({External.class, ONPRC.class})
 public class FlowAssaysTest extends AbstractLabModuleAssayTest
 {
@@ -78,8 +74,8 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         PROJECT_NAME = "FlowAssaysVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         setUpTest();
 

@@ -19,7 +19,6 @@ package org.labkey.test.testpicker;
 import org.labkey.test.SuiteBuilder;
 import org.labkey.test.TestConfig;
 import org.labkey.test.TestSet;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.Continue;
 import org.labkey.test.categories.SuiteComparator;
 import org.labkey.test.categories.Test;

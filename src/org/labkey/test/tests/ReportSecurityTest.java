@@ -22,10 +22,6 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
 
-/**
- * User: tchadick
- * Date: 6/10/13
- */
 @Category({DailyA.class, Reports.class})
 public class ReportSecurityTest extends ReportTest
 {

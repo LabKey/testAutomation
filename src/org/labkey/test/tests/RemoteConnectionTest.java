@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.categories.DailyB;
@@ -23,10 +24,6 @@ import org.labkey.test.util.RemoteConnectionHelper;
 
 import static org.junit.Assert.*;
 
-/**
- * User: scary dax
- * Date: 10/31/13
-  */
 @Category({DailyB.class})
 public class RemoteConnectionTest extends BaseWebDriverTest
 {
@@ -60,8 +57,8 @@ public class RemoteConnectionTest extends BaseWebDriverTest
     * for this test to work
     */
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         doSetup();
         RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);

@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -26,10 +27,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: kevink
- * Date: 6/27/12
- */
 @Category({DailyB.class, Data.class})
 public class PivotQueryTest extends BaseWebDriverTest
 {
@@ -52,8 +49,8 @@ public class PivotQueryTest extends BaseWebDriverTest
         importStudyFromZip(new File(getLabKeyRoot(), STUDY_ZIP));
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         setupProject();
         verifyPivotQuery();

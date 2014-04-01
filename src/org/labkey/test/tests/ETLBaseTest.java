@@ -37,12 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-/**
- * User: RyanS
- * Date: 11/22/13
- */
 public abstract class ETLBaseTest extends BaseWebDriverTest
 {
     protected static String PROJECT_NAME = "ETLTestProject";

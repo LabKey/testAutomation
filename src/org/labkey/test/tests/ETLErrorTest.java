@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
@@ -29,10 +30,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * User: RyanS
- * Date: 11/26/13
- */
 @Category({DailyA.class, Data.class})
 public class ETLErrorTest extends ETLBaseTest
 {
@@ -62,8 +59,8 @@ public class ETLErrorTest extends ETLBaseTest
         super.doCleanup(true);
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         runInitialSetup();
         verifyTransformSummary();

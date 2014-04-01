@@ -29,10 +29,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: tchadick
- * Date: 6/11/13
- */
 @Category({DailyA.class, Reports.class})
 public class NonStudyReportsTest extends ReportTest
 {

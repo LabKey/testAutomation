@@ -25,10 +25,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: kevink
- * Date: Feb 23, 2011
- */
 public abstract class AbstractViabilityTest extends AbstractQCAssayTest
 {
     @Override

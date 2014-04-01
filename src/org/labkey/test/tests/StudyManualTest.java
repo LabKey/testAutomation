@@ -28,11 +28,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * User: brittp
- * Date: Mar 9, 2006
- * Time: 1:54:57 PM
- */
 @Category({Study.class, Disabled.class})
 public class StudyManualTest extends StudyTest
 {

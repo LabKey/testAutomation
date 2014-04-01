@@ -21,14 +21,7 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.labkey.test.util.TestLogger;
 
-import java.util.Stack;
 import java.util.concurrent.TimeUnit;
-
-/**
- * User: tchadick
- * Date: 11/6/12
- * Time: 2:55 PM
- */
 
 @Aspect
 public class ImpersonationLoggingAspect

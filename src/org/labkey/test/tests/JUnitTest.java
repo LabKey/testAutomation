@@ -48,11 +48,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: brittp
- * Date: Nov 30, 2005
- * Time: 10:53:59 PM
- */
 @Category({DRT.class, BVT.class, UnitTests.class, External.class})
 public class JUnitTest extends TestSuite
 {
@@ -90,7 +85,6 @@ public class JUnitTest extends TestSuite
         }
 
         protected String getProjectName() {return null;}
-        protected void doTestSteps() throws Exception { }
         protected void doCleanup(boolean afterTest) throws TestTimeoutException
         { }
         public String getAssociatedModuleDirectory() { return null; }

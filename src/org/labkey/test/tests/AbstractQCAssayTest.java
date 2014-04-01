@@ -28,10 +28,6 @@ import java.io.PrintWriter;
 
 import static org.junit.Assert.*;
 
-/**
- * User: klum
- * Date: Oct 27, 2009
- */
 public abstract class AbstractQCAssayTest extends AbstractAssayTest
 {
     public void prepareProgrammaticQC()

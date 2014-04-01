@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -22,11 +23,6 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.ListHelper;
 
-/*
-* User: dave
-* Date: Sep 23, 2009
-* Time: 1:19:40 PM
-*/
 @Category({DailyA.class})
 public class SchemaBrowserTest extends BaseWebDriverTest
 {
@@ -60,7 +56,8 @@ public class SchemaBrowserTest extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");
         createLists();

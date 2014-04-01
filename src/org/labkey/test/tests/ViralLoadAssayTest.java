@@ -18,7 +18,9 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.InsertRowsCommand;
@@ -36,6 +38,7 @@ import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,11 +48,6 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-/**
- * User: bimber
- * Date: 11/6/12
- * Time: 5:43 PM
- */
 @Category({External.class, ONPRC.class, LabModule.class})
 public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 {
@@ -157,8 +155,8 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         PROJECT_NAME = "VL_AssayVerifyProject" + TRICKY_CHARACTERS_FOR_PROJECT_NAMES;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps() throws Exception
     {
         setUpTest();
         createPlateTemplate();
@@ -175,7 +173,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         ensureABI7500Records();
     }
 
-    private void ensureABI7500Records() throws Exception
+    private void ensureABI7500Records() throws CommandException, IOException
     {
         String query = "abi7500_detectors";
         String schema = "viral_load_assay";

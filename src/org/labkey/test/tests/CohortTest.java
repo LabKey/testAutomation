@@ -16,6 +16,7 @@
 package org.labkey.test.tests;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -30,11 +31,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: Trey Chadick
- * Date: Jan 13, 2010
- * Time: 4:50:24 PM
- */
 @Category({DailyB.class, Study.class})
 public class CohortTest extends BaseWebDriverTest
 {
@@ -63,8 +59,8 @@ public class CohortTest extends BaseWebDriverTest
     private static final String[] PTIDS_POSITIVE_NEGATIVE = {INFECTED_1, INFECTED_2, INFECTED_3, INFECTED_4};
     private static final String[] PTIDS_POSITIVE_NOCOHORT = {INFECTED_1, INFECTED_2, INFECTED_3, UNASSIGNED_1};
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         doSetup();
         cohortTest();

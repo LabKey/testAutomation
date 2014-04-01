@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.Locator;
@@ -28,11 +27,6 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import java.util.List;
 
-/**
- * User: tchadick
- * Date: 11/30/12
- * Time: 4:28 PM
- */
 public class LabKeyExpectedConditions
 {
     private LabKeyExpectedConditions(){}

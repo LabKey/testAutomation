@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -28,10 +29,6 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-/**
- * User: jeckels
- * Date: Nov 19, 2007
- */
 @Category({DailyA.class})
 public class SampleSetTest extends BaseWebDriverTest
 {
@@ -74,7 +71,8 @@ public class SampleSetTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         PortalHelper portalHelper = new PortalHelper(this);
 

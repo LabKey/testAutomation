@@ -30,11 +30,6 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-/**
- * User: elvan
- * Date: 2/21/12
- * Time: 1:37 PM
- */
 @Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexPositivityTest extends LuminexTest
 {

@@ -21,11 +21,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-/**
- * User: elvan
- * Date: 12/5/12
- * Time: 11:48 AM
- */
 public abstract class PerformanceTest extends BaseWebDriverTest
 {
     long elapsedTime = -1;

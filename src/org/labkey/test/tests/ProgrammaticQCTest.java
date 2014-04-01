@@ -24,11 +24,6 @@ import org.labkey.test.util.ListHelper;
 
 import java.io.*;
 
-/**
- * User: klum
- * Date: Apr 6, 2009
- * Time: 4:39:49 PM
- */
 @Category({DailyA.class})
 public class ProgrammaticQCTest extends AbstractQCAssayTest
 {

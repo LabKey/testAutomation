@@ -39,10 +39,6 @@ import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import static org.junit.Assert.*;
 
-/**
- * User: jeckels
- * Date: Nov 20, 2007
- */
 public class LuminexTest extends AbstractQCAssayTest
 {
     RReportHelper _rReportHelper = new RReportHelper(this);

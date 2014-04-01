@@ -21,11 +21,6 @@ import org.openqa.selenium.WebElement;
 
 import java.io.File;
 
-/**
- * User: elvan
- * Date: 6/28/12
- * Time: 6:20 PM
- */
 public class Ext4FileFieldRef extends Ext4CmpRef
 {
     public Ext4FileFieldRef(String id, BaseWebDriverTest test)

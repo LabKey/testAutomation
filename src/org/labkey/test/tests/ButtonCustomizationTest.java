@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -24,10 +25,6 @@ import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
-/**
- * User: brittp
- * Date: Apr 28, 2010 2:38:02 PM
- */
 @Category({BVT.class, Wiki.class})
 public class ButtonCustomizationTest extends BaseWebDriverTest
 {
@@ -145,8 +142,8 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         return PROJECT_NAME;
     }
 
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
 

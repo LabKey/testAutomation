@@ -20,11 +20,6 @@ import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
 
-/**
- * User: elvan
- * Date: 9/2/11
- * Time: 1:48 PM
- */
 @Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexEC50Test  extends LuminexTest
 {

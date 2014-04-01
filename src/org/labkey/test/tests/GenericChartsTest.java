@@ -22,12 +22,6 @@ import org.labkey.test.util.LogMethod;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
-/**
- * User: tchadick
- * Date: 6/10/13
- */
 public abstract class GenericChartsTest extends ReportTest
 {
     protected static final String MICE_A = "Mice A";

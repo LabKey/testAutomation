@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -75,15 +76,14 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         deleteProject(PROJECT_NAME_ROUNDTRIP, afterTest);
     }
 
-
-    @Override
-    protected void doTestSteps() throws Exception
+    @Test
+    public void testSteps()
     {
         doSetup();
         doVerifySteps();
     }
 
-    protected void doVerifySteps() throws Exception
+    protected void doVerifySteps()
     {
         testGenericChartThumbnails();
         testCustomIcon();
@@ -91,7 +91,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         testThumbnailRoundtrip();
     }
 
-    private void testGenericChartThumbnails() throws Exception
+    private void testGenericChartThumbnails()
     {
         goToDataViews();
         setThumbnailSRC(BOX_PLOT);
@@ -109,7 +109,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         THUMBNAIL_CUSTOM_DATA = THUMBNAIL_DATA;
     }
 
-    private void testRThumbnails() throws Exception
+    private void testRThumbnails()
     {
         goToDataViews();
         setThumbnailSRC(R_REGRESSION_BP_ALL);
@@ -140,7 +140,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         verifyIcon(R_REGRESSION_BP_MEANS, ICON_CUSTOM_DATA);
     }
 
-    private void testCustomIcon() throws Exception
+    private void testCustomIcon()
     {
         goToDataViews();
         setIconSRC(BOX_PLOT);

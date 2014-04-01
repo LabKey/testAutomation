@@ -17,15 +17,7 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.openqa.selenium.WebElement;
 
-import java.io.File;
-
-/**
- * User: elvan
- * Date: 8/16/12
- * Time: 11:44 AM
- */
 public class PipelineHelper
 {
     BaseWebDriverTest _test = null;

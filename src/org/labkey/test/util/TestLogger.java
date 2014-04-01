@@ -18,11 +18,6 @@ package org.labkey.test.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * User: tchadick
- * Date: 11/6/12
- * Time: 2:49 PM
- */
 public class TestLogger
 {
     private static final int indentStep = 2;

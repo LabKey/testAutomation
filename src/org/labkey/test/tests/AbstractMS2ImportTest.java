@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
 import org.labkey.test.TestTimeoutException;
@@ -35,7 +36,8 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
     public static final String QUERY_PROTEIN_GROUP_VIEW_NAME = "queryProteinGroupViewView";
     public static final String QUERY_PROTEINPROPHET_VIEW_NAME = "queryProteinProphetView";
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         setupMS2();
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
@@ -86,7 +88,7 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         if (test2.exists())
             fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
-        super.doTestSteps();
+        super.testSteps();
 
         importMS2Run("DRT1", 1);
 

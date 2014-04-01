@@ -35,11 +35,6 @@ import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
 
 import static org.junit.Assert.*;
 
-/**
- * User: bbimber
- * Date: 5/28/12
- * Time: 8:56 PM
- */
 public class LabModuleHelper
 {
     private BaseWebDriverTest _test;

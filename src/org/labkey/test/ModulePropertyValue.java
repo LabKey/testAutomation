@@ -15,10 +15,6 @@
  */
 package org.labkey.test;
 
-/**
- * User: jeckels
- * Date: 2/8/13
- */
 public class ModulePropertyValue
 {
     private String _moduleName;

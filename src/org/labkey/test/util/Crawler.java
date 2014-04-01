@@ -39,11 +39,6 @@ import java.util.StringTokenizer;
 
 import static org.junit.Assert.*;
 
-/**
- * User: brittp
- * Date: Jan 13, 2007
- * Time: 5:11:16 PM
- */
 public class Crawler
 {
     private final List<ControllerActionId> _excludedActions;

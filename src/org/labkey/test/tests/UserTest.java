@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -27,10 +28,6 @@ import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.*;
 
-/**
- * User: Karl Lum
- * Date: Jan 11, 2007
- */
 @Category({DailyA.class})
 public class UserTest extends SecurityTest
 {
@@ -53,7 +50,8 @@ public class UserTest extends SecurityTest
     protected static final String NORMAL_USER2_ALTERNATE = "not-user2@security.test";
 
 
-    protected void doTestSteps()
+    @Test
+    public void testSteps()
     {
         super.doTestStepsSetDepth(true);
 
