@@ -240,7 +240,7 @@ public class LuminexPositivityTest extends LuminexTest
     private void checkPositivityValues(String type, int numExpected, String[] positivityWells)
     {
         // verify that we are already on the Data results view
-        assertTextPresent(TEST_ASSAY_LUM+ " Results");
+        assertElementPresent(Locator.tagWithText("span", "Exclude Analytes"));
 
         assertTextPresent(type, numExpected);
 

@@ -2324,7 +2324,7 @@ public class LuminexTest extends AbstractQCAssayTest
         clickButton("Next");
         setAnalytePropertyValues();
         clickButton("Save and Finish");
-        if (!isBackgroundUpload && !isTextPresent("Error: "))
+        if (!isBackgroundUpload && !isElementPresent(Locator.css(".labkey-error").containing("Error: ")))
             clickAndWait(Locator.linkWithText(assayName), 2 * WAIT_FOR_PAGE);
     }
 
