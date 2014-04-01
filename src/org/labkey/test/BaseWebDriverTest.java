@@ -6871,7 +6871,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             shortWait().until(ExpectedConditions.elementToBeClickable(By.xpath(loc.toXpath())));
             click(loc);
             waitForElement(Locator.xpath("//div[contains(./@class,'x-tree-selected')]/a/span[text()='" + schemaPart + "']"), 1000);
-            waitForElement(Locator.css(".lk-qd-name").withText(schemaWithParents + " Schema"));
+            waitForElement(Locator.css(".lk-qd-name").withText(schemaWithParents + " Schema"), 30000);
         }
     }
 
