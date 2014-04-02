@@ -16,6 +16,8 @@
 package org.labkey.test.util.ext4cmp;
 
 import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
@@ -51,6 +53,19 @@ public class Ext4FieldRef extends Ext4CmpRef
     public static boolean isFieldPresent(BaseWebDriverTest test, String label)
     {
         return null != test._ext4Helper.queryOne("field[fieldLabel^=\"" + label + "\"]", Ext4FieldRef.class);
+    }
+
+    @LogMethod(quiet = true)
+    public static void waitForField(final BaseWebDriverTest test, @LoggedParam final String label)
+    {
+        test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                return isFieldPresent(test, label);
+            }
+        }, "Field did not appear: " + label, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void setValue(Object val)
