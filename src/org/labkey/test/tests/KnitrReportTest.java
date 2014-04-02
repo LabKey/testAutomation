@@ -221,7 +221,8 @@ public class KnitrReportTest extends ReportTest
                 List<JavaScriptError> jsErrors = JavaScriptError.readErrors(getDriver());
                 for (JavaScriptError j : jsErrors)
                 {
-                    if (j.getErrorMessage().contains(expectedError))
+                    String msg = j.getErrorMessage();
+                    if ((null != msg) && msg.contains(expectedError))
                         foundError = true;
                 }
 
