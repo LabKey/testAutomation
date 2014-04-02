@@ -34,10 +34,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
     abstract protected void basicChecks();
 
-    @Test
-    public void testSteps()
+    public void basicMS2Check()
     {
-        super.testSteps();
+        createProjectAndFolder();
 
         log("Start analysis running.");
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));

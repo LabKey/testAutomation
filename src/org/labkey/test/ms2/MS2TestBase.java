@@ -70,12 +70,6 @@ abstract public class MS2TestBase extends BaseWebDriverTest
         deleteProject(getProjectName(), afterTest);
     }
 
-    @Test
-    public void testSteps()
-    {
-        createProjectAndFolder();
-    }
-
     protected void createProjectAndFolder()
     {
         _containerHelper.createProject(PROJECT_NAME, null);

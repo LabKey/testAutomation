@@ -88,7 +88,7 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         if (test2.exists())
             fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
-        super.testSteps();
+        createProjectAndFolder();
 
         importMS2Run("DRT1", 1);
 

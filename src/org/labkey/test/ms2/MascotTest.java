@@ -208,7 +208,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         popLocation();
 
         // Do normal MS2 test
-        super.testSteps();
+        basicMS2Check();
 
         // test import of .dat file
         log("Upload existing Mascot .dat result file.");

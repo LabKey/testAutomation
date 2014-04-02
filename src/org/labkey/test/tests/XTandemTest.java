@@ -57,7 +57,7 @@ public class XTandemTest extends AbstractXTandemTest
         if (test2.exists())
             fail("Pipeline files were not cleaned up; test2("+test2.toString()+") directory still exists");
 
-        super.testSteps();
+        basicMS2Check();
     }
 
     protected void basicChecks()
