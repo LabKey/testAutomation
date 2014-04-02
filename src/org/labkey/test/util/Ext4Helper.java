@@ -17,7 +17,6 @@ package org.labkey.test.util;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
-import org.labkey.test.util.ext4cmp.Ext4ComboRef;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
@@ -137,19 +136,12 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, boolean containsText, @LoggedParam String... selections)
     {
-        String componentQueryLabel = label.replaceAll(":", "");
-        Ext4ComboRef comboRef = Ext4ComboRef.getForLabel(_test, componentQueryLabel);
-        comboRef.waitForStoreLoad();
-
         selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), containsText, selections);
     }
 
     @LogMethod(quiet = true)
     public void selectComboBoxItemById(@LoggedParam String labelId, @LoggedParam String selection)
     {
-        Ext4ComboRef comboRef = queryOne("#" + labelId, Ext4ComboRef.class);
-        comboRef.waitForStoreLoad();
-
         Locator.XPathLocator loc = Locator.tagWithId("table", labelId);
         selectComboBoxItem(loc, selection);
     }
