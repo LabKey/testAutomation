@@ -3841,16 +3841,25 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public File[] clickAndWaitForDownload(Locator elementToClick, final int expectedFileCount)
     {
-        final long downloadTime = System.currentTimeMillis();
+        final File downloadDir = getDownloadDir();
+        File[] existingFilesArray = downloadDir.listFiles();
+        final List<File> existingFiles;
+
+        if (existingFilesArray != null)
+            existingFiles = Arrays.asList(existingFilesArray);
+        else
+            existingFiles = new ArrayList<>();
+
         click(elementToClick);
 
-        final File downloadDir = getDownloadDir();
         final FileFilter tempFilesFilter = new FileFilter()
         {
             @Override
             public boolean accept(File file)
             {
-                return file.getName().contains(".part") || file.getName().contains(".tmp") || file.getName().contains(".crdownload");
+                return file.getName().contains(".part") ||
+                       file.getName().contains(".tmp") ||
+                       file.getName().contains(".crdownload");
             }
         };
         final FileFilter newFileFilter = new FileFilter()
@@ -3858,7 +3867,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean accept(File file)
             {
-                return file.lastModified() >= downloadTime;
+                return !existingFiles.contains(file) && !tempFilesFilter.accept(file);
             }
         };
 
@@ -3867,7 +3876,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean check()
             {
-                return downloadDir.listFiles(newFileFilter).length >= expectedFileCount && downloadDir.listFiles(tempFilesFilter).length == 0;
+                return downloadDir.listFiles(newFileFilter).length >= expectedFileCount;
             }
         }, "File(s) did not appear in download dir", WAIT_FOR_PAGE);
 
