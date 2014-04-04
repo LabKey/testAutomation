@@ -184,9 +184,10 @@ public abstract class StudyBaseTest extends SimpleApiTest
                 return name.endsWith(".log");
             }
         });
-        for (File f : logFiles)
-            if (!f.delete())
-                log("WARNING: couldn't delete log file " + f.getAbsolutePath());
+        if (null != logFiles)
+            for (File f : logFiles)
+                if (!f.delete())
+                    log("WARNING: couldn't delete log file " + f.getAbsolutePath());
     }
 
     protected void importStudy(){importStudy(null);}

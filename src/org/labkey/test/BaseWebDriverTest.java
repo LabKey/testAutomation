@@ -6633,12 +6633,27 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected void startImportStudyFromZip(File studyFile, boolean ignoreQueryValidation)
     {
+        startImportStudyFromZip(studyFile, ignoreQueryValidation, false);
+    }
+
+    protected void startImportStudyFromZip(File studyFile, boolean ignoreQueryValidation, boolean createSharedDatasets)
+    {
         clickButton("Import Study");
         setFormElement(Locator.name("folderZip"), studyFile);
         if (ignoreQueryValidation)
         {
             click(Locator.checkboxByName("validateQueries"));
         }
+        Locator createSharedDatasetsCheckbox = Locator.name("createSharedDatasets");
+        List<WebElement> webElements = createSharedDatasetsCheckbox.findElements(getDriver());
+        if (!webElements.isEmpty())
+        {
+            if (createSharedDatasets)
+                checkCheckbox(createSharedDatasetsCheckbox);
+            else
+                uncheckCheckbox(createSharedDatasetsCheckbox);
+        }
+
         clickButton("Import Study From Local Zip Archive");
         if (isElementPresent(Locator.css(".labkey-error")))
         {
