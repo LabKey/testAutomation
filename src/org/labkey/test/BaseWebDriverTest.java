@@ -6687,6 +6687,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForPipelineJobsToComplete(1, "Study import", false);
     }
 
+    protected void importStudyFromZip(File studyFile, boolean ignoreQueryValidation, boolean createSharedDataset)
+    {
+        startImportStudyFromZip(studyFile, ignoreQueryValidation, createSharedDataset);
+        waitForPipelineJobsToComplete(1, "Study import", false);
+    }
+
     protected void importFolderFromZip(File folderFile, boolean validateQueries, int completedJobs)
     {
         importFolderFromZip(folderFile, validateQueries, completedJobs, false);
