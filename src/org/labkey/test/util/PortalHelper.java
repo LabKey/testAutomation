@@ -99,10 +99,8 @@ public class PortalHelper extends AbstractHelper
     public void deleteTab(@LoggedParam String tabText)
     {
         Locator tabLocator = Locator.xpath("//div[@class='labkey-app-bar']//ul//li//a[text()='" + tabText +"']");
-//        ((BaseWebDriverTest)_test).prepForPageLoad(); // using prepForPageLoad and newWaitForPageLoad does not work. I feel like it should.
         clickTabMenuItem(tabText, true, "Delete");
         _test.waitForElementToDisappear(tabLocator);
-//        ((BaseWebDriverTest)_test).newWaitForPageToLoad(BaseWebDriverTest.WAIT_FOR_PAGE);
         _test.assertElementNotPresent(tabLocator);
     }
 
@@ -174,9 +172,6 @@ public class PortalHelper extends AbstractHelper
         _test._extHelper.clickExtMenuButton(wait, Locator.xpath("//img[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
     }
 
-    /**
-     * Works with {@link BaseWebDriverTest} only
-     */
     @LogMethod(quiet = true)public void addWebPart(@LoggedParam String webPartName)
     {
         _test.waitForElement(Locator.xpath("//option").withText(webPartName));
@@ -274,9 +269,6 @@ public class PortalHelper extends AbstractHelper
         _test.waitForElement(Locator.xpath("//span").withClass("labkey-wp-title-text").withText(title != null ? title : "Reports"));
     }
 
-    /**
-     * Works with {@link BaseWebDriverTest} only
-     */
     @LogMethod(quiet = true)public void moveWebPart(@LoggedParam String webPartTitle, @LoggedParam Direction direction)
     {
         if (direction.isHorizontal())
