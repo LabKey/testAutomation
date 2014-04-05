@@ -15,7 +15,7 @@
  */
 package org.labkey.test.tests;
 
-import com.sun.istack.internal.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;

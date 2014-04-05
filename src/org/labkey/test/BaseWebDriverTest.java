@@ -3613,6 +3613,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         return null;
     }
+
     // Searches only the displayed text in the body of the page, not the HTML source.
     public void assertTextPresentInThisOrder(Object... text)
     {
