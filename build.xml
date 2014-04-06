@@ -292,15 +292,34 @@
         <antcall target="test_with_clover" />
         <antcall target="clean" />
         <antcall target="prepare" />
-        <iajc
-            destdir="${test.build.home}/classes"
-            debug="${test.compile.debug}"
-            deprecation="${test.compile.deprecation}"
-            source="1.7"
-            classpathref="full.test.build.classpath">
-            <src path="${test.src.home}"/>
-            <src refid="module.test.src.dirs"/>
-        </iajc>
+
+        <!-- Temporary hack to work around the fact that our AspectJ build doesn't seem to suport Java 8.
+             TODO: Upgrade AspectJ library, #20054, and remove <if>, using iajc in all cases -->
+        <if>
+            <equals arg1="${ant.java.version}" arg2="1.8"/>
+            <then>
+                <javac
+                    destdir="${test.build.home}/classes"
+                    debug="${test.compile.debug}"
+                    deprecation="${test.compile.deprecation}"
+                    source="1.7"
+                    classpathref="full.test.build.classpath">
+                    <src path="${test.src.home}"/>
+                    <src refid="module.test.src.dirs"/>
+                </javac>
+            </then>
+            <else>
+                <iajc
+                    destdir="${test.build.home}/classes"
+                    debug="${test.compile.debug}"
+                    deprecation="${test.compile.deprecation}"
+                    source="1.7"
+                    classpathref="full.test.build.classpath">
+                    <src path="${test.src.home}"/>
+                    <src refid="module.test.src.dirs"/>
+                </iajc>
+            </else>
+        </if>
         <copy todir="${test.build.home}/classes" >
             <fileset dir="${test.src.home}">
                 <include name="**/*.js"/>
