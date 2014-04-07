@@ -2728,6 +2728,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
+    public void navigateToQuery(String schemaName, String queryName)
+    {
+        RelativeUrl queryURL = new RelativeUrl("query", "executequery");
+        queryURL.setContainerPath(getCurrentContainerPath());
+        queryURL.addParameter("schemaName", schemaName);
+        queryURL.addParameter("query.queryName", queryName);
+
+        queryURL.navigate(this);
+    }
+
     // Get the container id of the current page
     public String getContainerId()
     {
@@ -2741,6 +2751,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         String containerId = getContainerId();
         popLocation();
         return containerId;
+    }
+
+    public String getCurrentContainerPath()
+    {
+        return (String)executeScript("return LABKEY.container.path;");
     }
 
     public void assertAlert(String msg)
