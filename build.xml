@@ -38,6 +38,9 @@
     <property name="deploy.dir" value="${project.root}/build/deploy" />
     <property name="deploy.webapp.dir" value="${deploy.dir}/labkeyWebapp" />
 
+    <property name="modulesFile" value="standard.modules" />
+    <property name="modulesFile.fullpath" value="${project.root}/server/${modulesFile}" />
+
     <property name="staging.modules.dir" value="${project.root}/build/staging/modules"/>
     <property name="deploy.modules.dir" value="${project.root}/build/deploy/modules"/>
 
@@ -213,8 +216,7 @@
     </path>
 
     <target name="compile" depends="build-java-client,prepare,build-qc-validator" description="Compile Java sources">
-        <property name="modulesFile" value="standard.modules" />
-        <loadfile property="moduleDirectories" srcfile="${project.root}/server/${modulesFile}">
+        <loadfile property="moduleDirectories" srcfile="${modulesFile.fullpath}">
             <filterchain>
                 <striplinecomments>
                     <comment value="#"/>
@@ -226,7 +228,7 @@
         </loadfile>
         <echo>${moduleDirectories}</echo>
 
-        <loadfile property="moduleSources" srcfile="${project.root}/server/${modulesFile}">
+        <loadfile property="moduleSources" srcfile="${modulesFile.fullpath}">
             <filterchain>
                 <striplinecomments>
                     <comment value="#"/>
@@ -244,10 +246,20 @@
              </present>
         </selector>
 
+        <!-- This selector detects all modules with tests -->
+        <selector id="skip.module.selector">
+            <not>
+                <present targetdir="${project.root}">
+                    <mapper type="glob" from="*" to="*/../skipBuild.txt"/>
+                </present>
+            </not>
+        </selector>
+
         <!-- Create a path that includes all individual module test directories -->
         <path id="module.test.src.dirs">
             <dirset dir="${project.root}" includes="${moduleDirectories}">
                 <selector refid="test.module.selector"/>
+                <selector refid="skip.module.selector"/>
             </dirset>
         </path>
 
@@ -267,6 +279,8 @@
         </uptodate>
 
         <antcall target="compileIfDirty" inheritrefs="true"/>
+
+        <antcall target="write_sampledata_path" inheritrefs="true" />
     </target>
 
     <target name="force_compile">
@@ -326,6 +340,32 @@
             </fileset>
         </copy>
         <echo file="${test.build.uptodate}" message="${modulesFile}"/>
+    </target>
+
+    <target name="write_sampledata_path">
+        <!-- This selector detects all modules with tests -->
+        <selector id="sampledata.selector">
+            <present targetdir="${project.root}">
+                <mapper type="glob" from="*" to="*/sampledata"/>
+            </present>
+        </selector>
+
+        <!-- Create a path that includes all sampledata directories -->
+        <path id="sampledata.roots">
+            <path location="../../"/>
+            <path>
+                <dirset dir="${project.root}" includes="${moduleDirectories}">
+                    <selector refid="sampledata.selector"/>
+                    <selector refid="skip.module.selector"/>
+                </dirset>
+            </path>
+        </path>
+
+        <pathconvert property="sampledata.dirs" refid="sampledata.roots">
+            <globmapper from="*" to="*${file.separator}sampledata"/>
+        </pathconvert>
+
+        <echo message="${sampledata.dirs}" file="${test.build.home}/sampledata.dirs"/>
     </target>
 
     <path id="ant.contrib.classpath">
@@ -391,7 +431,7 @@
 
     <target name="deploy-test-modules">
         <property name="coreTestModules" value="server/test/modules/*"/>
-        <loadfile property="testModuleSources" srcfile="${project.root}/server/${modulesFile}">
+        <loadfile property="testModuleSources" srcfile="${modulesFile.fullpath}">
             <filterchain>
                 <striplinecomments>
                     <comment value="#"/>
