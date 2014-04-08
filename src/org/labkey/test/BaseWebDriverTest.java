@@ -268,11 +268,53 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return path.toString();
     }
 
+    public static File getSampleData(String relativePath)
+    {
+        List<String> splitPath = new ArrayList<>();
+        File sampledataPathFile = new File("build", "sampledata.dirs");
+
+        if (sampledataPathFile.exists())
+        {
+            try
+            {
+                splitPath = Arrays.asList((new String(Files.readAllBytes(Paths.get(sampledataPathFile.toURI())))).split(File.pathSeparator));
+            }
+            catch (IOException io)
+            {
+                throw new RuntimeException(io);
+            }
+        }
+        else
+        {
+            splitPath.add(getSampledataPath());
+        }
+
+        File foundFile = null;
+        for (String sampledataDir : splitPath)
+        {
+            File checkFile = new File(sampledataDir, relativePath);
+            if (checkFile.exists())
+            {
+                if (foundFile != null)
+                    throw new IllegalArgumentException("Ambiguous file specified: " + relativePath + "\n" +
+                                                       "Found:\n" +
+                                                        foundFile + "\n" +
+                                                        checkFile);
+                else
+                    foundFile = checkFile;
+            }
+        }
+
+        assertNotNull("Sample data not found: " + relativePath);
+        return foundFile;
+    }
+
     public static String getSampledataPath()
     {
         File path = new File(getLabKeyRoot(), "sampledata");
         return path.toString();
     }
+
     public static String getContextPath()
     {
         return WebTestHelper.getContextPath();
@@ -6750,17 +6792,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return getFileContents(file);
     }
 
-    public String getFileContents(final File file)
+    public static String getFileContents(final File file)
     {
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return file.exists();
-            }
-        }, "File not found: " + file.getPath(), WAIT_FOR_JAVASCRIPT);
-
         try
         {
             return new String(Files.readAllBytes(Paths.get(file.toURI())));
