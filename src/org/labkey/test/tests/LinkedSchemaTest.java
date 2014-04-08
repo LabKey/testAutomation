@@ -31,6 +31,9 @@ import org.labkey.test.util.SchemaHelper;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -405,6 +408,42 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
     }
 
     @Test
+    public void customFilters()
+    {
+        log("** Creating linked schema filtered by 'Frisby' family");
+        String customFilterMetadata = getCustomFilterMetadata("Frisby");
+        String sourceContainerPath = "/" + getProjectName() + "/" + SOURCE_FOLDER;
+        _schemaHelper.createLinkedSchema(getProjectName(), TARGET_FOLDER, "CustomFilterLinkedSchema", sourceContainerPath, null, "lists", "NIMHDemographics,NIMHPortions", customFilterMetadata);
+
+        log("** Verifying linked schema tables are filtered");
+        navigateToQuery("CustomFilterLinkedSchema", "NIMHDemographics");
+        DataRegionTable table = new DataRegionTable("query", this);
+        assertEquals("Expected 7 Frisby members", table.getDataRowCount(), 7);
+
+        Set<String> families = new HashSet<>(table.getColumnDataAsText("Family"));
+        assertTrue("Expected only 'Frisby' in family collection: " + families, families.contains("Frisby") && families.size() == 1);
+
+        List<String> names = table.getColumnDataAsText("Name");
+        assertTrue("Expected 'Mrs. Frisby' in names: " + names, names.contains("Mrs. Frisby"));
+        assertFalse("Unexpected 'Nicodemus' in names: " + names, names.contains("Nicodemus"));
+
+        navigateToQuery("CustomFilterLinkedSchema", "NIMHPortions");
+        table = new DataRegionTable("query", this);
+        Set<String> subjectNames = new HashSet<>(table.getColumnDataAsText("SubjectID"));
+        assertTrue("Expected 'Mrs. Frisby' in names: " + subjectNames, subjectNames.contains("Mrs. Frisby"));
+        assertFalse("Unexpected 'Nicodemus' in names: " + subjectNames, subjectNames.contains("Nicodemus"));
+    }
+
+    private String getCustomFilterMetadata(String familyName)
+    {
+        return "<tables xmlns=\"http://labkey.org/data/xml\">\n" +
+                "     <schemaCustomizer class = \"org.labkey.linkedschematest.TestLinkedSchemaCustomizer\">\n" +
+                "          <family xmlns=\"\">" + familyName + "</family>\n" +
+                "     </schemaCustomizer>\n" +
+                "</tables>";
+    }
+
+    @Test
     public void schemaTemplateTest()
     {
         createLinkedSchemaUsingTemplate();
@@ -468,7 +507,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         File lists = new File(getLabKeyRoot() + "/sampledata/lists/ListDemo.lists.zip");
         _listHelper.importListArchive(SOURCE_FOLDER, lists);
 
-        //Create second folder that should be not visible to linked schemas
+        //Create second folder that should be not visible to linked schemas and import lists again
         _containerHelper.createSubfolder(getProjectName(), OTHER_FOLDER, null);
         _listHelper.importListArchive(OTHER_FOLDER, lists);
     }
