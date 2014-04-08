@@ -47,7 +47,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
     private final static String TEST_ASSAY_PRJ_LUMINEX = "LuminexTest Project";            //project for luminex test
 
-    protected static final String TEST_ASSAY_LUM =  "&TestAssayLuminex" + TRICKY_CHARACTERS_NO_QUOTES;
+    protected static final String TEST_ASSAY_LUM =  "&TestAssayLuminex></% 1";// put back TRICKY_CHARACTERS_NO_QUOTES when issue 20061 is resolved
     protected static final String TEST_ASSAY_LUM_DESC = "Description for Luminex assay";
 
     protected static final String TEST_ASSAY_XAR_NAME = "TestLuminexAssay";
@@ -1325,8 +1325,8 @@ public class LuminexTest extends AbstractQCAssayTest
         setFormElement("propertyFormat", formatStr);
     }
 
-    protected String isotype = "IgG " + TRICKY_CHARACTERS_NO_QUOTES;
-    protected String conjugate = "PE " + TRICKY_CHARACTERS_NO_QUOTES;
+    protected String isotype = "IgG ></% 1";// put back TRICKY_CHARACTERS_NO_QUOTES when issue 20061 is resolved
+    protected String conjugate = "PE ></% 1";// put back TRICKY_CHARACTERS_NO_QUOTES when issue 20061 is resolved
 
     protected DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
