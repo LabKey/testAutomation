@@ -489,8 +489,8 @@ public class ExtHelper extends AbstractHelper
     //Pick measure from one of multiple split panel measure pickers
     public void pickMeasure(String panelCls, String source, String measure, boolean isMultiSelect, boolean keepSelection)
     {
-        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .sourcepanel div.itemrow"))); // if one row is ready, all should be
-        _test.click(Locator.css("." + panelCls + " .sourcepanel div.itemrow span.val").withText(source));
+        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .sourcepanel div.itemrow span.val"))); // if one row is ready, all should be
+        _test.waitAndClick(Locator.css("." + panelCls + " .sourcepanel div.itemrow span.val").withText(source));
         //select measure
         if (isMultiSelect)
         {

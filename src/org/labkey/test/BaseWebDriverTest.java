@@ -5160,6 +5160,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void setFormElement(WebElement el, File file)
     {
+        assertTrue("File not found: " + file.toString(), file.exists());
         String cssString = "";
         if (!el.isDisplayed())
         {
