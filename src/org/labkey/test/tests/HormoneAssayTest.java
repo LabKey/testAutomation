@@ -34,8 +34,10 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -176,10 +178,51 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
     public void testSteps() throws Exception
     {
         setUpTest();
+        pivotedImportTestFromExcel();
+
         createPlateTemplate();
         importResults();
 
         pivotedImportTest();
+    }
+
+    private void pivotedImportTestFromExcel()
+    {
+        log("Verifying Hormone Assay Import Using Pivoted Input");
+        _helper.goToAssayResultImport(ASSAY_NAME, true);
+
+        //a proxy for page loading
+        _helper.waitForField("Sample Type");
+
+        //switch import method
+        Ext4FieldRef field = Ext4FieldRef.getForBoxLabel(this, "Pivoted By Test");
+        field.setChecked(true);
+
+        _helper.waitForField("Sample Type"); //form is re-rendered when import method changed
+        Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
+
+        Ext4FieldRef.getForLabel(this, "Sample Type").setValue("Serum");
+
+        waitAndClick(Ext4Helper.Locators.radiobutton(this, "File Upload"));
+        Ext4CmpRef.waitForComponent(this, "filefield");
+        Ext4FileFieldRef ff = Ext4FileFieldRef.create(this);
+        File sampleExcel = new File(getSampledataPath(), "HormoneAssay/HormoneAssayPivotData.xlsx");
+        assert sampleExcel.exists();
+        ff.setToFile(sampleExcel);
+
+        Ext4CmpRef button = _ext4Helper.queryOne("button[text=\"Upload\"]", Ext4CmpRef.class);
+        button.waitForEnabled();
+
+        waitAndClick(Locator.ext4Button("Upload"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitAndClick(Locator.ext4Button("OK"));
+        waitForText("Import Samples");
+
+        Map<String, String[]> expected = new LinkedHashMap<>();
+        expected.put("TestId_Estradiol_37.6", new String[]{"TestId", "2014-03-18", "Estradiol", "37.6", "", "Unknown", "", "", ""});
+        expected.put("TestId_Progesterone_<0.03", new String[]{"TestId", "2014-03-18", "Progesterone", "<0.03", "", "Unknown", "", "", ""});
+
+        verifyResults(2, expected);
     }
 
     private void pivotedImportTest()
@@ -487,7 +530,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         DataRegionTable results = new DataRegionTable("Data", this);
 
         assertEquals("Incorrect row count", totalRows, results.getDataRowCount());
-        waitForText("48.51");
+        waitForText("Estradiol");
 
         //recreate the DR to see if this removes intermittent test failures
         results = new DataRegionTable(results.getTableName(), this);

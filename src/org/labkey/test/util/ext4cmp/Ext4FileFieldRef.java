@@ -42,6 +42,6 @@ public class Ext4FileFieldRef extends Ext4CmpRef
     public void setToFile(File file)
     {
         _test.setFormElement(Locator.id((String)getEval("fileInputEl.dom.id")), file);
-        this.eval("onFileChange()");
+        this.getFnEval("this.onFileChange(this.button, null, this.fileInputEl.dom.value)"); //pass name of the file so the field sets the correct display value
     }
 }

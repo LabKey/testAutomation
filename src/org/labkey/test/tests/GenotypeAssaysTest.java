@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.CommandException;
@@ -34,8 +35,11 @@ import org.labkey.test.categories.ONPRC;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
+import org.labkey.test.util.ext4cmp.Ext4FileFieldRef;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -50,6 +54,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
 {
     private static final String ASSAY_NAME = "Genotype Test";
     private static final String SSP_ASSAY_NAME = "SSP Assay Test";
+    private static final String SNP_ASSAY_NAME = "SNP Assay Test";
     private static final String REF_NT_NAME = "GenotypeAssaysTest";
     private static final String[][] SSP_TEST_DATA1 = new String[][]{
         {"Subject Id", "Sample Type", "Freezer Id", "Lane Number", "Method", "Sample Date", "Primer Pair", "Result", "Comment", "Sequence"},
@@ -107,6 +112,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
     public void testSteps() throws Exception
     {
         setUpTest();
+        beadStudioImportTest();
         sspImportTest();
         sspPivotedImportTest();
         UCDavisTest();
@@ -157,6 +163,85 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         }
 
         super.doCleanup(afterTest);
+    }
+
+    private void beadStudioImportTest()
+    {
+        log("Verifying Bead Studio Import");
+        _helper.goToAssayResultImport(SNP_ASSAY_NAME, false);
+
+        //a proxy for page loading
+        _helper.waitForField("Sample Type");
+
+        //switch import method
+        Ext4FieldRef field = Ext4FieldRef.getForBoxLabel(this, "Illumina Bead Studio");
+        field.setChecked(true);
+
+        _helper.waitForField("Sample Type"); //form is re-rendered when import method changed
+
+        Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
+
+        File exampleData = clickAndWaitForDownload(Locator.ext4Button("Download Example Data"));
+        assert exampleData.exists();
+
+        waitAndClick(Ext4Helper.Locators.radiobutton(this, "File Upload"));
+        Ext4CmpRef.waitForComponent(this, "filefield");
+        Ext4FileFieldRef ff = Ext4FileFieldRef.create(this);
+        ff.setToFile(exampleData);
+
+        Ext4CmpRef button = _ext4Helper.queryOne("button[text=\"Upload\"]", Ext4CmpRef.class);
+        button.waitForEnabled();
+
+        waitAndClick(Locator.ext4Button("Upload"));
+        waitForElement(Ext4Helper.ext4Window("Success"));
+        waitAndClick(Locator.ext4Button("OK"));
+        waitForText("Import Samples");
+
+        log("Verifying results");
+        _helper.clickNavPanelItemAndWait(SNP_ASSAY_NAME + " Runs:", 1);
+        waitAndClickAndWait(Locator.linkContainingText("view results"));
+
+        List<String[]> expected = new ArrayList<>();
+        expected.add(new String[]{"TestId", "TNF:82", "4", "-", "148192", "T/C"});
+        expected.add(new String[]{"TestId", "SLC6A22495", "20", "+", "668875", "T/G"});
+        expected.add(new String[]{"TestId", "X1225328.1.D8YOWMI02J2VK2", "1", "-", "1225328", "A/G"});
+        expected.add(new String[]{"TestId", "X3511786.5.D8YOWMI02IQTPD", "5", "-", "3511786", "T/C"});
+        expected.add(new String[]{"TestId", "X5541516.3.D8YOWMI01CIYVH", "3", "-", "5541516", "A/G"});
+        expected.add(new String[]{"TestId", "HTR2A1425", "17", "-", "10472114", "C/G"});
+        expected.add(new String[]{"TestId", "AGTR11303", "2", "-", "12105004", "C/G"});
+        expected.add(new String[]{"TestId", "AK53266", "1", "+", "13439580", "A/G"});
+        expected.add(new String[]{"TestId", "X16659718.6.D8YOWMI01ASB4C", "6", "-", "16659718", "A/C"});
+        expected.add(new String[]{"TestId", "X18315239.9.D8YOWMI02F8M1S", "9", "+", "18315239", "A/G"});
+        expected.add(new String[]{"TestId", "X18461747.18.D8YOWMI02IB8XJ", "18", "+", "18461747", "C/G"});
+        expected.add(new String[]{"TestId", "X21413256.17.D8YOWMI02G62LU", "17", "-", "21413256", "T/A"});
+        expected.add(new String[]{"TestId", "X27827510.2.D8YOWMI01BI0G3", "2", "+", "27827510", "A/G"});
+        expected.add(new String[]{"TestId", "X28916342.11.D8YOWMI02IBGV5", "11", "-", "28916342", "T/C"});
+        expected.add(new String[]{"TestId", "X30014284.12.D8YOWMI02G7314", "12", "-", "30014284", "T/C"});
+        expected.add(new String[]{"TestId", "X42043589.5.D8YOWMI02GU1AY", "5", "-", "42043589", "T/C"});
+        expected.add(new String[]{"TestId", "X49505747.2.D8YOWMI02IRAP3", "2", "-", "49505747", "T/C"});
+        expected.add(new String[]{"TestId", "X54965041.4.D8YOWMI02GMI1H", "4", "+", "54965041", "A/G"});
+        expected.add(new String[]{"TestId", "X59111711.18.D8YOWMI01CKKVH", "18", "-", "59111711", "A/G"});
+        expected.add(new String[]{"TestId", "X64513090.17.D8YOWMI01DSVH1", "17", "+", "64513090", "A/G"});
+        expected.add(new String[]{"TestId", "X65705967.14.D8YOWMI01DDMKZ", "14", "+", "65705967", "A/G"});
+        expected.add(new String[]{"TestId", "X68169940.11.D8YOWMI01CRCMT", "11", "-", "68169940", "A/C"});
+        expected.add(new String[]{"TestId", "X69150843.5.D8YOWMI02FLEJ3", "5", "+", "69150843", "G/C"});
+        expected.add(new String[]{"TestId", "X76648545.16.D8YOWMI01E4IMG", "16", "+", "76648545", "T/C"});
+        expected.add(new String[]{"TestId", "X91637310.11.D8YOWMI01A9H8U", "11", "-", "91637310", "A/G"});
+        expected.add(new String[]{"TestId", "X91812668.4.D8YOWMI02I4GKW", "4", "+", "91812668", "T/C"});
+        expected.add(new String[]{"TestId", "X92524888.8.D8YOWMI01A9N5I", "8", "+", "92524888", "T/C"});
+        expected.add(new String[]{"TestId", "X103423156.3.D8YOWMI02IAD6W", "3", "+", "103423156", "A/G"});
+        expected.add(new String[]{"TestId", "X104259837.5.D8YOWMI01BRLN6", "5", "+", "104259837", "A/C"});
+        expected.add(new String[]{"TestId", "X105505591.2.D8YOWMI02JSIZX", "2", "+", "105505591", "A/C"});
+        expected.add(new String[]{"TestId", "X125266859.8.D8YOWMI02IOS4V", "8", "+", "125266859", "A/C"});
+        expected.add(new String[]{"TestId", "X133206513.7.D8YOWMI02FLAP8", "7", "+", "133206513", "A/G"});
+        expected.add(new String[]{"TestId", "X137720099.1.D8YOWMI02F9MU6", "1", "-", "137720099", "T/G"});
+        expected.add(new String[]{"TestId", "X151730139.2.D8YOWMI01C6KF2", "2", "+", "151730139", "T/C"});
+        expected.add(new String[]{"TestId", "X154196413.3.D8YOWMI01DQGLP", "3", "+", "154196413", "A/C"});
+        expected.add(new String[]{"TestId", "X158120260.1.D8YOWMI01CQO73", "1", "+", "158120260", "A/G"});
+        expected.add(new String[]{"TestId", "X161109270.7.D8YOWMI01E6VH2", "7", "+", "161109270", "A/G"});
+        expected.add(new String[]{"TestId", "X164415957.2.D8YOWMI01CGPRC", "2", "+", "164415957", "C/G"});
+        expected.add(new String[]{"TestId", "X167559647.3.D8YOWMI02H5ZKN", "3", "+", "167559647", "A/G"});
+        verifySNPResults(expected);
     }
 
     private void sspImportTest()
@@ -243,6 +328,38 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         }
     }
 
+    private void verifySNPResults(List<String[]> expected)
+    {
+        DataRegionTable results = new DataRegionTable("Data", this);
+        Assert.assertEquals("Incorrect row count", expected.size(), results.getDataRowCount());
+        waitForText("TestId"); //proxy for DR load
+        log("DataRegion column count was: " + results.getColumnCount());
+
+        //recreate the DR to see if this removes intermittent test failures
+        results = new DataRegionTable(results.getTableName(), this);
+
+        int i = 0;
+        while (i < expected.size())
+        {
+            String[] expectedVals = expected.get(i);
+            String subjectId = results.getDataAsText(i, "Subject Id");
+            String marker = results.getDataAsText(i, "Marker");
+            String refNt = results.getDataAsText(i, "Reference Sequence");
+            String strand = results.getDataAsText(i, "Strand");
+            String position = results.getDataAsText(i, "Position");
+            String nt = results.getDataAsText(i, "NT");
+
+            Assert.assertEquals("Incorrect subjectId on row: " + i, expectedVals[0], subjectId);
+            Assert.assertEquals("Incorrect marker on row: " + i, expectedVals[1], marker);
+            Assert.assertEquals("Incorrect ref sequence on row: " + i, expectedVals[2], refNt);
+            Assert.assertEquals("Incorrect strand on row: " + i, expectedVals[3], strand);
+            Assert.assertEquals("Incorrect position on row: " + i, expectedVals[4], position);
+            Assert.assertEquals("Incorrect NT on row: " + i, expectedVals[5], nt);
+
+            i++;
+        }
+    }
+
     private void sspPivotedImportTest()
     {
         log("Verifying SSP Import Using Pivoted Input");
@@ -322,6 +439,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         List<Pair<String, String>> assays = new ArrayList<>();
         assays.add(Pair.of("SSP Typing", SSP_ASSAY_NAME));
         assays.add(Pair.of("Genotype Assay", ASSAY_NAME));
+        assays.add(Pair.of("SNP Assay", SNP_ASSAY_NAME));
 
         return assays;
     }
