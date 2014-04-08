@@ -222,8 +222,11 @@ public class KnitrReportTest extends ReportTest
                 for (JavaScriptError j : jsErrors)
                 {
                     String msg = j.getErrorMessage();
-                    if ((null != msg) && msg.contains(expectedError))
+                    if ((null != msg) && (null != expectedError) && msg.contains(expectedError))
+                    {
                         foundError = true;
+                        break;
+                    }
                 }
 
                 if (expectedError == null)
