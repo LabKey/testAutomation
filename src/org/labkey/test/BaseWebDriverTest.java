@@ -270,17 +270,19 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public static File getSampleData(String relativePath)
     {
-        List<String> splitPath = new ArrayList<>();
+        String path;
         File sampledataDirsFile = new File("build", "sampledata.dirs");
 
         if (sampledataDirsFile.exists())
         {
-            splitPath = Arrays.asList(getFileContents(sampledataDirsFile).split(File.pathSeparator));
+            path = getFileContents(sampledataDirsFile);
         }
         else
         {
-            splitPath.add(getSampledataPath());
+            path = getSampledataPath();
         }
+
+        List<String> splitPath = Arrays.asList(path.split(File.pathSeparator));
 
         File foundFile = null;
         for (String sampledataDir : splitPath)
@@ -298,7 +300,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
         }
 
-        assertNotNull("Sample data not found: " + relativePath);
+        assertNotNull("Sample data not found: " + relativePath + "\n" +
+                      "In: " + path, foundFile);
         return foundFile;
     }
 
