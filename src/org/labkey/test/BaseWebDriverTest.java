@@ -4999,15 +4999,17 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
 
-    // waits for page to load after button is clicked
-    // use clickButton(text, 0) to click a button and continue immediately
+    /**
+     * Wait for a button to appear, click it, then waits for the page to load.
+     * Use clickButton(text, 0) to click a button and continue immediately.
+     */
     public void clickButton(String text)
     {
         clickButton(text, defaultWaitForPage);
     }
 
     /**
-     * click a button with text text and wait for text waitForText to appear
+     * Wait for a button to appear, click it, then waits for the text to appear.
      */
     public void clickButton(String text, String waitForText)
         {
@@ -5015,9 +5017,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             waitForText(waitForText);
         }
 
-
-    public void clickButton(String text, int waitMillis)
+    /**
+     * Wait for a button to appear, click it, then wait for <code>waitMillis</code> for the page to load.
+     */
+    public void clickButton(final String text, int waitMillis)
     {
+        // Wait for button to appear
+        String failMessage = "Button with text '" + text + "' did not appear";
+        waitFor(new Checker()
+        {
+            public boolean check()
+            {
+                return null != getButtonLocator(text);
+            }
+        }, failMessage, WAIT_FOR_JAVASCRIPT);
+
+        // Click and wait for page to load
         Locator.XPathLocator buttonLocator = getButtonLocator(text);
         if (buttonLocator != null)
             clickAndWait(buttonLocator, waitMillis);
@@ -5046,23 +5061,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     /**
-     *  wait for button to appear, click it, wait for page to load
+     * Wait for button to appear, click it, wait for page to load.
+     * @deprecated clickButton() will now wait for the button to appear before clicking.
      */
+    @Deprecated
     public void waitAndClickButton(final String text)
     {
-        waitAndClickButton(text, defaultWaitForPage);
+        clickButton(text, defaultWaitForPage);
     }
 
+    /**
+     * Wait for button to appear, click it, then wait.
+     * @deprecated clickButton() will now wait for the button to appear before clicking.
+     */
+    @Deprecated
     public void waitAndClickButton(final String text, final int wait)
     {
-        String failMessage = "Button with text '" + text + "' did not appear";
-        waitFor(new Checker()
-        {
-            public boolean check()
-            {
-                return null != getButtonLocator(text);
-            }
-        }, failMessage, WAIT_FOR_JAVASCRIPT);
         clickButton(text, wait);
     }
 

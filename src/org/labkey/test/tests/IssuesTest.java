@@ -623,11 +623,13 @@ public class IssuesTest extends BaseWebDriverTest
 
         // Verify the URL of ISSUE_TITLE_0 goes to PROJECT_NAME
         String href = getAttribute(Locator.linkContainingText(ISSUE_TITLE_0), "href");
-        assertTrue("Expected issue details URL to link to project container", href.contains("/issues/" + PROJECT_NAME + "/details.view"));
+        assertTrue("Expected issue details URL to link to project container",
+                href.contains("/issues/" + PROJECT_NAME + "/details.view") || href.contains("/" + PROJECT_NAME + "/issues-details.view"));
 
         // Verify the URL of ISSUE_TITLE_3 goes to PROJECT_NAME/SUB_FOLDER_NAME
         href = getAttribute(Locator.linkContainingText(ISSUE_TITLE_3), "href");
-        assertTrue("Expected issue details URL to link to sub-folder container", href.contains("/issues/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/details.view"));
+        assertTrue("Expected issue details URL to link to sub-folder container",
+            href.contains("/issues/" + PROJECT_NAME + "/details.view") || href.contains("/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/issues-details.view"));
     }
 
 }
