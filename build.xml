@@ -361,7 +361,7 @@
             </path>
         </path>
 
-        <pathconvert property="sampledata.dirs" refid="sampledata.roots">
+        <pathconvert property="sampledata.dirs" refid="sampledata.roots" pathsep=";">
             <globmapper from="*" to="*${file.separator}sampledata"/>
         </pathconvert>
 
