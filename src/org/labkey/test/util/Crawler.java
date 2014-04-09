@@ -691,7 +691,7 @@ public class Crawler
                     String originUrl = origin.toString();
                     int relativeURLStart = originUrl.lastIndexOf(WebTestHelper.getBaseURL()) + WebTestHelper.getBaseURL().length();
                     _test.beginAt(originUrl.substring(relativeURLStart));
-                    _test.dumpPageSnapshot("crawlOrigin");
+                    _test.getArtifactCollector().dumpPageSnapshot("crawler", "crawlOrigin");
                     _test.popLocation();
                 }
             }

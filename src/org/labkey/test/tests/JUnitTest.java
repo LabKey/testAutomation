@@ -45,8 +45,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Category({DRT.class, BVT.class, UnitTests.class, External.class})
 public class JUnitTest extends TestSuite
@@ -104,19 +103,10 @@ public class JUnitTest extends TestSuite
             helper.signIn();
             helper.unfail();
         }
-        catch (Exception e)
+        catch (Exception | AssertionError e)
         {
-            helper.dumpPageSnapshot();
+            helper.handleFailure(new AtomicReference<>((Throwable)e), "fetchJUnitTestList");
             throw e;
-        }
-        catch (AssertionError a)
-        {
-            helper.dumpPageSnapshot();
-            throw a;
-        }
-        finally
-        {
-            helper.doTearDown();
         }
     }
 

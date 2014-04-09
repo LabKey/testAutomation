@@ -16,6 +16,7 @@
 package org.labkey.test;
 
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 
 import static org.labkey.test.TestProperties.isSystemMaintenanceDisabled;
 import static org.labkey.test.WebTestHelper.logToServer;
@@ -25,8 +26,6 @@ public class WebDriverTestPreamble extends BaseWebDriverTest
     public void preamble() throws Exception
     {
         log("\n\n=============== Starting " + Runner.getCurrentTestName() + Runner.getProgress() + " =================");
-
-        _startTime = System.currentTimeMillis();
 
         logToServer("=== Starting " + Runner.getCurrentTestName() + Runner.getProgress() + " ===");
         signIn();

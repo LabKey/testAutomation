@@ -47,6 +47,7 @@ import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
+import org.junit.runner.RunWith;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -64,9 +65,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -85,19 +84,11 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
-import org.tmatesoft.svn.core.wc.SVNStatusClient;
-import org.tmatesoft.svn.core.wc.SVNStatusType;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -150,11 +141,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public int defaultWaitForPage = WAIT_FOR_PAGE;
     public final static int WAIT_FOR_JAVASCRIPT = 10000;
     public int longWaitForPage = defaultWaitForPage * 5;
-    protected static long _startTime;
+    private static long _startTime;
     private List<JavaScriptError> _jsErrors;
     private static WebDriverWait _shortWait;
     private static WebDriverWait _longWait;
     private static JSErrorChecker _jsErrorChecker = null;
+    private final ArtifactCollector _artifactCollector;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public ExtHelper _extHelper = new ExtHelper(this);
@@ -194,12 +186,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public BaseWebDriverTest()
     {
+        _artifactCollector = new ArtifactCollector(this);
         _extHelper = new ExtHelper(this);
         _ext4Helper = new Ext4Helper(this);
         _listHelper = new ListHelper(this);
         _customizeViewsHelper = new CustomizeViewsHelper(this);
         _jsErrors = new ArrayList<>();
-        _downloadDir = new File(ensureDumpDir(), "downloads");
+        _downloadDir = new File(getArtifactCollector().ensureDumpDir(), "downloads");
 
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || seleniumBrowser.length() == 0 || seleniumBrowser.toLowerCase().contains("best"))
@@ -224,6 +217,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
+    public static long getStartTime()
+    {
+        return _startTime;
+    }
 
     public void pauseSearchCrawler()
     {
@@ -292,16 +289,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 if (foundFile != null)
                     throw new IllegalArgumentException("Ambiguous file specified: " + relativePath + "\n" +
-                                                       "Found:\n" +
-                                                        foundFile + "\n" +
-                                                        checkFile);
+                            "Found:\n" +
+                            foundFile + "\n" +
+                            checkFile);
                 else
                     foundFile = checkFile;
             }
         }
 
         assertNotNull("Sample data not found: " + relativePath + "\n" +
-                      "In: " + path, foundFile);
+                "In: " + path, foundFile);
         return foundFile;
     }
 
@@ -421,22 +418,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     profile.setPreference("browser.helperApps.alwaysAsk.force", false);
                     profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
                             "application/vnd.ms-excel," + // .xls
-                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet," + // .xlsx
-                            "application/octet-stream," +
-                            "application/x-gzip," +
-                            "application/x-zip-compressed," +
-                            "application/xml," +
-                            "text/xml," +
-                            "text/x-script.perl," +
-                            "text/tab-separated-values," +
-                            "text/csv");
+                                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet," + // .xlsx
+                                    "application/octet-stream," +
+                                    "application/x-gzip," +
+                                    "application/x-zip-compressed," +
+                                    "application/xml," +
+                                    "text/xml," +
+                                    "text/x-script.perl," +
+                                    "text/tab-separated-values," +
+                                    "text/csv");
                     profile.setPreference("browser.download.manager.showWhenStarting",false);
                     if (isScriptCheckEnabled())
                     {
                         try
-                            {JavaScriptError.addExtension(profile);}
+                        {JavaScriptError.addExtension(profile);}
                         catch(IOException e)
-                            {throw new RuntimeException("Failed to load JS error checker", e);}
+                        {throw new RuntimeException("Failed to load JS error checker", e);}
                     }
                     if (isFirefoxExtensionsEnabled() && !isTestRunningOnTeamCity()) // Firebug just clutters up screenshots on TeamCity
                     {
@@ -457,7 +454,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                             }
                         }
                         catch(IOException e)
-                            {throw new RuntimeException("Failed to load Firebug", e);}
+                        {throw new RuntimeException("Failed to load Firebug", e);}
                     }
 
                     profile.setEnableNativeEvents(useNativeEvents());
@@ -521,6 +518,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
+    public ArtifactCollector getArtifactCollector()
+    {
+        return _artifactCollector;
+    }
+
     private interface JSErrorChecker
     {
         public void pause();
@@ -579,14 +581,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         public void pause()
         {
             executeScript(
-                "window.dispatchEvent(new Event('pauseJsErrorChecker'))");
+                    "window.dispatchEvent(new Event('pauseJsErrorChecker'))");
         }
 
         @Override
         public void resume()
         {
             executeScript(
-                "window.dispatchEvent(new Event('resumeJsErrorChecker'))");
+                    "window.dispatchEvent(new Event('resumeJsErrorChecker'))");
         }
 
         @Override @NotNull
@@ -603,7 +605,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     /**
      * Set pipeline tools directory to the default location if the current location does not exist.
-      */
+     */
     @LogMethod
     protected void fixPipelineToolsDirectory()
     {
@@ -1122,7 +1124,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 click(Locator.id("userMenuPopupLink"));
                 if (isTextPresent("Stop Impersonating"))
                 {
-                     stopImpersonating();
+                    stopImpersonating();
                 }
             }
 
@@ -1752,8 +1754,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         if ( isGuestModeTest() )
             return;
-		if (getTargetServer().equals(DEFAULT_TARGET_SERVER))
-        	beginAt("/admin/resetErrorMark.view");
+        if (getTargetServer().equals(DEFAULT_TARGET_SERVER))
+            beginAt("/admin/resetErrorMark.view");
     }
 
     @LogMethod @BeforeClass
@@ -1761,8 +1763,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         _setupFailed = true;
         _anyTestCaseFailed = false;
-
         _startTime = System.currentTimeMillis();
+        ArtifactCollector.forgetArtifactDirs();
+
         WebDriverTestPreamble preamble = new WebDriverTestPreamble();
 
         try
@@ -1856,14 +1859,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         try
         {
-            dumpPageSnapshot(testName, null);
+            getArtifactCollector().dumpPageSnapshot(testName, null);
             if (isTestRunningOnTeamCity())
             {
-                dumpPipelineFiles(getLabKeyRoot() + "/sampledata");
-                dumpPipelineLogFiles(getLabKeyRoot() + "/build/deploy/files");
+                getArtifactCollector().addArtifactLocation(new File(getLabKeyRoot(), "sampledata"));
+                getArtifactCollector().addArtifactLocation(new File(getLabKeyRoot(), "build/deploy/files"), new FileFilter()
+                {
+                    @Override
+                    public boolean accept(File pathname)
+                    {
+                        return pathname.getName().endsWith(".log");
+                    }
+                });
+                getArtifactCollector().dumpPipelineFiles();
             }
             if (_testTimeout)
-                dumpThreads();
+                getArtifactCollector().dumpThreads(this);
         }
         catch (Exception t)
         {
@@ -1878,7 +1889,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
             catch(Throwable t){
                 log("Failed to reset DB login config after test failure");
-                dumpPageSnapshot(testName, "resetDbLogin");
+                getArtifactCollector().dumpPageSnapshot(testName, "resetDbLogin");
             }
 
             try
@@ -1894,7 +1905,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 log("** Server remains in a bad state.                           **");
                 log("** Set tools directory manually or bootstrap to fix.        **");
                 log("**************************ERROR*******************************");
-                dumpPageSnapshot(testName, "fixPipelineToolsDir");
+                getArtifactCollector().dumpPageSnapshot(testName, "fixPipelineToolsDir");
             }
 
             checkJsErrors();
@@ -2082,15 +2093,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         if ( isGuestModeTest() )
             return;
-		checkErrors();
-		checkLeaks();
+        checkErrors();
+        checkLeaks();
         _checkedLeaksAndErrors = true;
     }
 
     public void checkLeaks()
     {
-		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
-			return;
+        if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
+            return;
         if (isLeakCheckSkipped())
             return;
         if (isGuestModeTest())
@@ -2128,7 +2139,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             if (leakCRC != crc.getValue())
             {
                 leakCRC = crc.getValue();
-                dumpHeap();
+                getArtifactCollector().dumpHeap();
                 fail(leakCount + " in-use objects exceeds allowed limit of " + MAX_LEAK_LIMIT + ".");
             }
 
@@ -2140,16 +2151,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void checkErrors()
     {
-		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
-			return;
+        if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
+            return;
         if ( isGuestModeTest() )
             return;
         beginAt("/admin/showErrorsSinceMark.view");
 
-       assertTrue("There were errors during the test run", isPageEmpty());
-       log("No new errors found.");
-       goToHome();         // Don't leave on an empty page
-   }
+        assertTrue("There were errors during the test run", isPageEmpty());
+        log("No new errors found.");
+        goToHome();         // Don't leave on an empty page
+    }
 
     public void checkExpectedErrors(int count)
     {
@@ -2440,7 +2451,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         // Download full action coverage table and add to TeamCity artifacts.
         beginAt("/admin/exportActions.view?asWebPage=true");
-        publishArtifact(saveTsv(TestProperties.getDumpDir(), "ActionCoverage"));
+        getArtifactCollector().publishArtifact(saveTsv(TestProperties.getDumpDir(), "ActionCoverage"));
         popLocation();
     }
 
@@ -2473,186 +2484,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         catch (IOException ignore){}
     }
 
-    protected File ensureDumpDir()
-    {
-        File dumpDir = new File(TestProperties.getDumpDir(), Runner.getCurrentTestName());
-        if ( !dumpDir.exists() )
-            dumpDir.mkdirs();
-
-        return dumpDir;
-    }
-
-    private static final String DEFAULT_TEST_NAME = "testSteps";
-
-    public void dumpPageSnapshot()
-    {
-        dumpPageSnapshot(null);
-    }
-
-    public void dumpPageSnapshot(@Nullable String subdir)
-    {
-        dumpPageSnapshot(DEFAULT_TEST_NAME, subdir);
-    }
-
-    public void dumpPageSnapshot(String testName, @Nullable String subdir)
-    {
-        File dumpDir = ensureDumpDir();
-        if (subdir != null && subdir.length() > 0)
-        {
-            dumpDir = new File(dumpDir, subdir);
-            if ( !dumpDir.exists() )
-                dumpDir.mkdirs();
-        }
-
-        FastDateFormat dateFormat = FastDateFormat.getInstance("yyyyMMddHHmm");
-        String baseName = dateFormat.format(new Date()) + getClass().getSimpleName();
-        if (!DEFAULT_TEST_NAME.equals(testName))
-            baseName += "#" + testName;
-
-        publishArtifact(dumpFullScreen(dumpDir, baseName));
-        publishArtifact(dumpScreen(dumpDir, baseName));
-        publishArtifact(dumpHtml(dumpDir, baseName));
-    }
-
-    public void dumpHeap()
-    {
-		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
-			return;
-        if ( isGuestModeTest() )
-            return;
-        pushLocation();
-        try
-        {
-            // Use dumpHeapAction rather that touching file so that we can get file name and publish artifact.
-            beginAt("/admin/dumpHeap.view");
-            File destDir = ensureDumpDir();
-            String dumpMsg = Locator.css("#bodypanel > div").findElement(getDriver()).getText();
-            String filename = dumpMsg.substring(dumpMsg.indexOf("HeapDump_"));
-            File heapDump = new File(getLabKeyRoot() + "/build/deploy", filename);
-            File destFile = new File(destDir, filename);
-
-            if ( heapDump.renameTo(destFile) )
-                publishArtifact(destFile);
-            else
-                log("Unable to move HeapDump file to test logs directory.");
-        }
-        catch (Exception e)
-        {
-            log("Error dumping heap: " + e.getMessage());
-        }
-        popLocation(); // go back to get screenshot if needed.
-    }
-
-    public void dumpThreads()
-    {
-		if (!getTargetServer().equals(DEFAULT_TARGET_SERVER))
-			return;
-
-        try
-        {
-            File threadDumpRequest = new File(getLabKeyRoot() + "/build/deploy", "threadDumpRequest");
-            threadDumpRequest.setLastModified(System.currentTimeMillis()); // Touch file to trigger automatic thread dump.
-        }
-        catch (Exception e)
-        {
-            log("Error dumping threads: " + e.getMessage());
-        }
-
-        log("Threads dumped to standard labkey log file");
-    }
-
-    // Publish artifacts while the build is still in progress:
-    // http://www.jetbrains.net/confluence/display/TCD4/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-PublishingArtifactswhiletheBuildisStillinProgress
-    public void publishArtifact(File file)
-    {
-        if (file != null && isTestRunningOnTeamCity())
-        {
-            // relativize path to labkey project root
-            String labkeyRoot = WebTestHelper.getLabKeyRoot();
-            labkeyRoot = new File(labkeyRoot).getAbsolutePath();
-            String strFile = file.getAbsolutePath();
-            if (strFile.toLowerCase().startsWith(labkeyRoot.toLowerCase()))
-            {
-                String path = strFile.substring(labkeyRoot.length());
-                if (path.startsWith(File.separator))
-                    path = path.substring(1);
-                System.out.println("##teamcity[publishArtifacts '" + path + "']");
-            }
-        }
-    }
-
-    public File dumpScreen(File dir, String baseName)
-    {
-        File screenFile = new File(dir, baseName + ".png");
-        try
-        {
-            File tempScreen = ((TakesScreenshot) getDriver()).getScreenshotAs(OutputType.FILE);
-            FileUtils.copyFile(tempScreen, screenFile);
-            return screenFile;
-        }
-        catch (IOException ioe)
-        {
-            log("Failed to copy screenshot file: " + ioe.getMessage());
-        }
-        catch (Exception ignore)
-        {
-            try
-            {
-                // Use alternate method for screen grab. Page might be too tall for TakesScreenshot.getScreenshotAs()
-                windowMaximize();
-                return dumpFullScreen(dir, baseName);
-            }
-            catch (Exception ex) { log("Failed to take screenshot: " + ex.getMessage()); }
-        }
-
-        return null;
-    }
-
     public void windowMaximize()
     {
         getDriver().manage().window().maximize();
-    }
-
-    public File dumpFullScreen(File dir, String baseName)
-    {
-        File screenFile = new File(dir, baseName + "Fullscreen.png");
-
-        // Windows doesn't support OS level screenshots for headless environment
-        if (!isTestRunningOnTeamCity() || !System.getProperty("os.name").toLowerCase().contains("win"))
-        {
-            try
-            {
-                // capture entire screen
-                BufferedImage fullscreen = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-                ImageIO.write(fullscreen, "png", screenFile);
-
-                return screenFile;
-            }
-            catch (Exception e)
-            {
-                log("Failed to take full screenshot: " + e.getMessage());
-            }
-        }
-
-        return null;
-    }
-
-    public File dumpHtml(File dir, String baseName)
-    {
-        if (getLastPageText() == null)
-            return null;
-
-        File htmlFile = new File(dir, baseName + ".html");
-        try(FileWriter writer = new FileWriter(htmlFile))
-        {
-            writer.write(getLastPageText());
-            return htmlFile;
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     public File saveTsv(File dir, String baseName)
@@ -2819,8 +2653,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-	public boolean isAlertPresent()
-	{
+    public boolean isAlertPresent()
+    {
         try {
             getDriver().switchTo().alert();
             switchToMainWindow();
@@ -2830,15 +2664,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             return false;
         }
-	}
+    }
 
-	public String getAlert()
-	{
+    public String getAlert()
+    {
         Alert alert = getDriver().switchTo().alert();
         String text = alert.getText();
         alert.accept();
         return text;
-	}
+    }
 
     public String cancelAlert()
     {
@@ -2998,10 +2832,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         Actions builder = new Actions(getDriver());
         builder
-            .clickAndHold(Locator.permissionButton(group, srcRole).findElement(getDriver()))
-            .moveToElement(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + destRole + "']]/div/div").findElement(getDriver()))
-            .release()
-            .build().perform();
+                .clickAndHold(Locator.permissionButton(group, srcRole).findElement(getDriver()))
+                .moveToElement(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + destRole + "']]/div/div").findElement(getDriver()))
+                .release()
+                .build().perform();
 
         waitForElementToDisappear(Locator.permissionButton(group, srcRole), WAIT_FOR_JAVASCRIPT);
         waitForElement(Locator.permissionButton(group, destRole));
@@ -3361,7 +3195,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void assertLabkeyErrorPresent()
     {
         assertTrue("No errors found", isElementPresent(Locator.xpath("//div[@class='labkey-error']")) ||
-            isElementPresent(Locator.xpath("//font[@class='labkey-error']")));
+                isElementPresent(Locator.xpath("//font[@class='labkey-error']")));
 
     }
 
@@ -3630,7 +3464,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void assertTextAtPlaceInTable(String textToCheck, String dataRegion, int row, int column)
     {
-       assertEquals(textToCheck+" is not at that place in the table", textToCheck, getTextInTable(dataRegion, row, column));
+        assertEquals(textToCheck+" is not at that place in the table", textToCheck, getTextInTable(dataRegion, row, column));
     }
 
     /**
@@ -3697,7 +3531,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 // Wait for marker to disappear
                 return (Boolean)executeScript("try {if(window.preppedForPageLoadMarker) return false; else return true;}" +
-                                              "catch(e) {return false;}");
+                        "catch(e) {return false;}");
             }
         }, "Page failed to load", millis);
         _testTimeout = false;
@@ -3710,13 +3544,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         try
         {
             ((JavascriptExecutor) getDriver()).executeAsyncScript(
-                "var callback = arguments[arguments.length - 1];" +
-                "if(window['Ext4'])" +
-                "   Ext4.onReady(callback);" +
-                "else if(window['Ext'])" +
-                "   Ext.onReady(callback);" +
-                "else" +
-                "   callback();");
+                    "var callback = arguments[arguments.length - 1];" +
+                            "if(window['Ext4'])" +
+                            "   Ext4.onReady(callback);" +
+                            "else if(window['Ext'])" +
+                            "   Ext.onReady(callback);" +
+                            "else" +
+                            "   callback();");
         }
         catch (TimeoutException to)
         {
@@ -3912,8 +3746,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             public boolean accept(File file)
             {
                 return file.getName().contains(".part") ||
-                       file.getName().contains(".tmp") ||
-                       file.getName().contains(".crdownload");
+                        file.getName().contains(".tmp") ||
+                        file.getName().contains(".crdownload");
             }
         };
         final FileFilter newFileFilter = new FileFilter()
@@ -4091,7 +3925,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void waitForText(final String text)
     {
-         waitForText(text, WAIT_FOR_JAVASCRIPT);
+        waitForText(text, WAIT_FOR_JAVASCRIPT);
     }
 
     public void waitForTextWithRefresh(String text, int wait)
@@ -4500,15 +4334,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public int getImageWithAltTextCount(String altText)
     {
         String js = "function countImagesWithAlt(txt) {" +
-                        "var doc=document;" +
-                        "var count = 0;" +
-                        "for (var i = 0; i < doc.images.length; i++) {" +
-                            "if (doc.images[i].alt == txt) " +
-                                "count++;" +
-                            "}" +
-                        "return count;" +
-                    "};" +
-                    "return countImagesWithAlt('" + altText + "');";
+                "var doc=document;" +
+                "var count = 0;" +
+                "for (var i = 0; i < doc.images.length; i++) {" +
+                "if (doc.images[i].alt == txt) " +
+                "count++;" +
+                "}" +
+                "return count;" +
+                "};" +
+                "return countImagesWithAlt('" + altText + "');";
         return Integer.parseInt(executeScript(js).toString());
     }
 
@@ -4696,80 +4530,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         setPipelineRoot(rootPath, false);
     }
 
-    private void dumpPipelineFiles(String path)
-    {
-        File dumpDir = ensureDumpDir();
-
-        // moves all files under @path, created by the test, to the TeamCity publish directory
-        ArrayList<File> files = listFilesRecursive(new File(path), new NonSVNFilter());
-        for (File file : files)
-        {
-            if ( file.isFile() )
-            {
-                File dest = new File(dumpDir, file.getParent().substring(path.length()));
-                if (!dest.exists())
-                    dest.mkdirs();
-                file.renameTo(new File(dest, file.getName()));
-            }
-        }
-    }
-
-    private void dumpPipelineLogFiles(String path)
-    {
-        File dumpDir = ensureDumpDir();
-
-        // moves all .log files under @path, created by the test, to the TeamCity publish directory
-        ArrayList<File> files = listFilesRecursive(new File(path), new NonSVNFilter());
-        for (File file : files)
-        {
-            if ( file.isFile() && file.getName().endsWith(".log") )
-            {
-                File dest = new File(dumpDir, file.getParent().substring(path.length()));
-                if (!dest.exists())
-                    dest.mkdirs();
-                file.renameTo(new File(dest, file.getName()));
-            }
-        }
-    }
-
-    private ArrayList<File> listFilesRecursive(File path, FilenameFilter filter)
-    {
-        File[] files = path.listFiles(filter);
-        ArrayList<File> allFiles = new ArrayList<>();
-        if (files != null)
-        {
-            for (File file : files)
-            {
-                if ( file.isDirectory() )
-                    allFiles.addAll(listFilesRecursive(file, filter));
-                else // file.isFile()
-                    allFiles.add(file);
-            }
-        }
-        return allFiles;
-    }
-
-    private class NonSVNFilter implements FilenameFilter
-    {
-        SVNStatusClient svn = new SVNStatusClient((ISVNAuthenticationManager)null, null);
-
-        public NonSVNFilter() { }
-
-        public boolean accept(File directory, String filename)
-        {
-            File file = new File(directory, filename);
-            try
-            {
-                return (!file.isHidden() && file.isDirectory() ||
-                        _startTime < file.lastModified() && svn.doStatus(file, false).getContentsStatus().equals(SVNStatusType.STATUS_UNVERSIONED));
-            }
-            catch (SVNException e)
-            {
-                return e.getMessage().contains("is not a working copy");
-            }
-        }
-    }
-
     public void setPipelineRoot(String rootPath, boolean inherit)
     {
         log("Set pipeline to: " + rootPath);
@@ -4885,7 +4645,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public int getTableRowCount(String tableName)
     {
         return Locator.xpath("//table[@id=" + Locator.xq(tableName) + "]/thead/tr").findElements(getDriver()).size() +
-               Locator.xpath("//table[@id=" + Locator.xq(tableName) + "]/tbody/tr").findElements(getDriver()).size();
+                Locator.xpath("//table[@id=" + Locator.xq(tableName) + "]/tbody/tr").findElements(getDriver()).size();
     }
 
     public int getTableColumnCount(String tableId)
@@ -5012,10 +4772,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      * Wait for a button to appear, click it, then waits for the text to appear.
      */
     public void clickButton(String text, String waitForText)
-        {
-            clickButton(text, 0);
-            waitForText(waitForText);
-        }
+    {
+        clickButton(text, 0);
+        waitForText(waitForText);
+    }
 
     /**
      * Wait for a button to appear, click it, then wait for <code>waitMillis</code> for the page to load.
@@ -6086,7 +5846,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         usersAndDisplayNames.remove(email);
 
         if (previousDisplayName == null && newDisplayName.equals(defaultDisplayName))
-                return;
+            return;
         else
         {
             if (!newDisplayName.equals(previousDisplayName))
@@ -6231,8 +5991,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void removeUserFromGroup(String groupName, String userName)
     {
-         if(!isTextPresent("Group " + groupName))
-             selectGroup(groupName);
+        if(!isTextPresent("Group " + groupName))
+            selectGroup(groupName);
 
         Locator l = Locator.xpath("//td[text()='" + userName +  "']/..//td/a/span[text()='remove']");
         click(l);
@@ -6240,8 +6000,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void addUserToGroup(String groupName, String userName)
     {
-         if(!isTextPresent("Group " + groupName))
-             selectGroup(groupName);
+        if(!isTextPresent("Group " + groupName))
+            selectGroup(groupName);
         String dialogTitle = groupName + " Information";
 
         _ext4Helper.selectComboBoxItem(Locator.xpath(_extHelper.getExtDialogXPath(dialogTitle) + "//table[contains(@id, 'labkey-principalcombo')]"), userName);
@@ -6836,7 +6596,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         while (wait < 5*defaultWaitForPage)
         {
             if ((titleName == null && isTextPresent("Found " + expectedResults + " result")) ||
-                (titleName != null && isElementPresent(Locator.linkContainingText(titleName))))
+                    (titleName != null && isElementPresent(Locator.linkContainingText(titleName))))
                 break;
             sleep(500);
             wait += 500;
@@ -6906,10 +6666,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return getText(Locator.id("userMenuPopupText"));
     }
 
-	public String getHtmlSource()
-	{
-		return getDriver().getPageSource();
-	}
+    public String getHtmlSource()
+    {
+        return getDriver().getPageSource();
+    }
 
     public boolean isExtTreeNodeSelected(String nodeCaption)
     {
@@ -7322,7 +7082,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             scrollIntoView(svgLoc);
             String svgText = getText(svgLoc);
 
-            File svgDir = new File(ensureDumpDir(), "svgs");
+            File svgDir = new File(getArtifactCollector().ensureDumpDir(), "svgs");
             String baseName;
             File svgFile;
 
@@ -7334,7 +7094,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 svgFile = new File(svgDir, baseName + ".txt");
             }while (svgFile.exists());
 
-            dumpScreen(svgDir, baseName);
+            getArtifactCollector().dumpScreen(svgDir, baseName);
 
             try(FileWriter writer = new FileWriter(svgFile))
             {
