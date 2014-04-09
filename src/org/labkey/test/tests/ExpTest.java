@@ -153,6 +153,9 @@ public class ExpTest extends BaseWebDriverTest
         waitForElement(Locator.linkWithText("edit metadata"), WAIT_FOR_JAVASCRIPT); //on Ext panel
         clickAndWait(Locator.linkWithText("edit metadata"));
         waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
+        int lastFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]")) - 1;
+        Locator lastField = Locator.xpath("//input[@name='ff_label" + lastFieldIndex + "']");
+        click(lastField);
         click(Locator.xpath("//span").append(Locator.navButton("Alias Field")));
         selectOptionByText(Locator.name("sourceColumn"), "RowId");
         click(Locator.xpath("//span").append(Locator.navButton("OK")));

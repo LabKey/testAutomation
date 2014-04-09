@@ -733,6 +733,13 @@ public class ListHelper extends AbstractHelper
     {
         String prefix = _test.getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
+        // click the last field in the list first, if it exists
+        int lastFieldIndex = _test.getElementCount(Locator.xpath(prefix + "//input[starts-with(@name, 'ff_name')]")) - 1;
+        if (lastFieldIndex > 0)
+        {
+            Locator lastField = Locator.xpath(prefix + "//input[@name='ff_name" + lastFieldIndex + "']");
+            _test.click(lastField);
+        }
         _test.click(Locator.xpath(addField));
         _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         setColumnName(prefix, index, name);
