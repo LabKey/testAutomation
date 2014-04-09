@@ -271,18 +271,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public static File getSampleData(String relativePath)
     {
         List<String> splitPath = new ArrayList<>();
-        File sampledataPathFile = new File("build", "sampledata.dirs");
+        File sampledataDirsFile = new File("build", "sampledata.dirs");
 
-        if (sampledataPathFile.exists())
+        if (sampledataDirsFile.exists())
         {
-            try
-            {
-                splitPath = Arrays.asList((new String(Files.readAllBytes(Paths.get(sampledataPathFile.toURI())))).split(File.pathSeparator));
-            }
-            catch (IOException io)
-            {
-                throw new RuntimeException(io);
-            }
+            splitPath = Arrays.asList(getFileContents(sampledataDirsFile).split(File.pathSeparator));
         }
         else
         {
