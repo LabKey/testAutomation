@@ -79,12 +79,14 @@ public class FlowJoQueryTest extends BaseFlowTest
         _customizeViewsHelper.addCustomizeViewColumn("Statistic/S$SLv$SL$S3+$S8+:Count", "8+:Count");
         _customizeViewsHelper.applyCustomView();
 
-        // UNDONE: These queries used to be defined in the project container, but that no longer works after
-        createQuery(getContainerPath(), "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), false);
-        createQuery(getContainerPath(), "PassFail", getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), false);
-        //createQuery(getContainerPath(), "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), false);
-        createQuery(getContainerPath(), "COMP", getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), getFileContents("/sampledata/flow/flowjoquery/query/COMP.xml"), false);
-        createQuery(getContainerPath(), "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), false);
+        clickProject(PROJECT_NAME);
+        enableModules(Arrays.asList("Query", "Flow"), true);
+
+        createQuery(PROJECT_NAME, "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
+        createQuery(PROJECT_NAME, "PassFail", getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);
+        //createQuery(PROJECT_NAME, "DeviationFromMean", getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.sql"), getFileContents("/sampledata/flow/flowjoquery/query/DeviationFromMean.xml"), true);
+        createQuery(PROJECT_NAME, "COMP", getFileContents("sampledata/flow/flowjoquery/query/COMP.sql"), getFileContents("/sampledata/flow/flowjoquery/query/COMP.xml"), true);
+        createQuery(PROJECT_NAME, "Comparison", getFileContents("sampledata/flow/flowjoquery/query/Comparison.sql"), getFileContents("/sampledata/flow/flowjoquery/query/Comparison.xml"), true);
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("1 run"));
