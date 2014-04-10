@@ -268,7 +268,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public static File getSampleData(String relativePath)
     {
         String path;
-        File sampledataDirsFile = new File("build", "sampledata.dirs");
+        File sampledataDirsFile = new File(getLabKeyRoot(), "server/test/build/sampledata.dirs");
 
         if (sampledataDirsFile.exists())
         {
