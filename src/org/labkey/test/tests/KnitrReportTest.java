@@ -222,15 +222,19 @@ public class KnitrReportTest extends ReportTest
                 for (JavaScriptError j : jsErrors)
                 {
                     String msg = j.getErrorMessage();
-                    if ((null != msg) && (null != expectedError) && msg.contains(expectedError))
+                    if (null != msg)
                     {
-                        foundError = true;
-                        break;
+                        log("found JS error: " + msg);
+                        if ((null != expectedError) && msg.contains(expectedError))
+                        {
+                            foundError = true;
+                            break;
+                        }
                     }
                 }
 
                 if (expectedError == null)
-                    assertTrue("unexpected JS errors found!", jsErrors.size() == 0);
+                    assertTrue("unexpected JS errors found, see log above!", jsErrors.size() == 0);
                 else
                     assertTrue("expected JS jquery reference error not found!", foundError);
             }
