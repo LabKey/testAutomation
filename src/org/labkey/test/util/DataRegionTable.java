@@ -643,7 +643,7 @@ public class DataRegionTable
 
     public void clickHeaderButtonByText(String buttonText)
     {
-        _test.click(Locators.headerButton(_tableName, buttonText));
+        _test.waitAndClick(Locators.headerButton(_tableName, buttonText));
     }
 
     public static class Locators
