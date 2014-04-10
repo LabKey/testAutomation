@@ -6961,7 +6961,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 }
                 if (statusValues.size() < completeJobsExpected || statusValues.size() != getFinishedCount(statusValues))
                 {
-                    refresh();
+                    prepForPageLoad();
+                    executeScript("window.location = window.location;");
+                    newWaitForPageToLoad();
                     return false;
                 }
                 return true;
