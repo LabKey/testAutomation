@@ -241,29 +241,19 @@ public class ListTest extends BaseWebDriverTest
         clickTab("List");
         clickAndWait(Locator.linkWithText("view design"));
         clickEditDesign();
-        setColumnName(1,_listCol1.getName());
+        setColumnName(1, _listCol1.getName());
         setColumnLabel(1, _listCol1.getLabel());
-        clickButton("Add Field", 0);
-        setColumnName(4,_listCol4.getName());
-        setColumnLabel(4, _listCol4.getLabel());
-        setColumnType(4, _listCol4.getType());
-        setFormElement(Locator.id("propertyDescription"), _listCol4.getDescription());
-
+        ListHelper listHelper = new ListHelper(this);
+        listHelper.addField(_listCol4);
 
         // Create "Hidden Field" and remove from all views.
-        clickButton("Add Field", 0);
-        setColumnName(5, _listCol5.getName());
-        setColumnLabel(5,_listCol5.getLabel());
-        setColumnType(5,_listCol5.getType());
+        listHelper.addField(_listCol5);
         uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInGrid']/input"));
         uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInInsert']/input"));
         uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInUpdate']/input"));
         uncheckCheckbox(Locator.xpath("//span[@id='propertyShownInDetail']/input"));
 
-        clickButton("Add Field", 0);
-        setColumnName(6, _listCol6.getName());
-        setColumnLabel(6,_listCol6.getLabel());
-        setColumnType(6,_listCol6.getType());
+        listHelper.addField(_listCol6);
         selectPropertyTab("Advanced");
         waitForElement(Locator.id("importAliases"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("importAliases"), ALIASED_KEY_NAME);
@@ -883,8 +873,9 @@ public class ListTest extends BaseWebDriverTest
         assertTextPresent("FooFoo");
         assertTextNotPresent("BarBar");
         clickEditDesign();
-        clickButton("Add Field", 0);
-        setColumnName(2,"BarBar");
+        ListHelper listHelper = new ListHelper(this);
+        ListColumn newCol = new ListColumn("BarBar","BarBar", ListHelper.ListColumnType.String, "None");
+        listHelper.addField(newCol);
         clickSave();
         assertTextPresent("FooFoo");
         assertTextPresent("BarBar");

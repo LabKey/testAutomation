@@ -23,11 +23,13 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class})
 public class SampleSetTest extends BaseWebDriverTest
@@ -338,11 +340,8 @@ public class SampleSetTest extends BaseWebDriverTest
         String fileField = "FileAttachment";
         clickButton("Edit Fields");
         waitForElement(Locator.navButton("Add Field"), defaultWaitForPage);
-        clickButton("Add Field", 0);
-        waitForElement(Locator.id(inputFormID), defaultWaitForPage);
-        setFormElement(Locator.id(inputFormID), fileField);
-        Locator l = Locator.xpath("//input[@id='" + inputFormID + "']/../../../td[8]/div/input");
-        setFormElement(l,  "File");
+        ListHelper listHelper = new ListHelper(this);
+        listHelper.addField(new ListHelper.ListColumn(fileField, fileField, ListHelper.ListColumnType.File, fileField));
         clickButton("Save");
     }
 

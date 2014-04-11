@@ -417,12 +417,18 @@ public class ListHelper extends AbstractHelper
     public void addField(ListColumn col)
     {
         _test.waitForElement(Locator.id("button_Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        int i = _test.getElementCount(Locator.css(".labkey-pad-cells > tbody > tr")) - 1;
+        int lastFieldIndex = _test.getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]")) - 1;
+        if (lastFieldIndex > 0)
+        {
+            Locator lastField = Locator.xpath("//input[@name='ff_label" + lastFieldIndex + "']");
+            _test.click(lastField);
+        }
         _test.clickButton("Add Field", 0);
-        _test.setFormElement(Locator.name("ff_name" + i),  col.getName());
-        _test.setFormElement(Locator.name("ff_label" + i), col.getLabel());
+        lastFieldIndex++;
+        _test.setFormElement(Locator.name("ff_name" + lastFieldIndex),  col.getName());
+        _test.setFormElement(Locator.name("ff_label" + lastFieldIndex), col.getLabel());
 
-        setColumnType(null, col.getLookup(), col.getType(), i);
+        setColumnType(null, col.getLookup(), col.getType(), lastFieldIndex);
 
         _test._extHelper.clickExtTab("Display");
         if (col.getDescription() != null)
@@ -734,10 +740,10 @@ public class ListHelper extends AbstractHelper
         String prefix = _test.getPropertyXPath(areaTitle);
         String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
         // click the last field in the list first, if it exists
-        int lastFieldIndex = _test.getElementCount(Locator.xpath(prefix + "//input[starts-with(@name, 'ff_name')]")) - 1;
+        int lastFieldIndex = _test.getElementCount(Locator.xpath(prefix + "//input[starts-with(@name, 'ff_label')]")) - 1;
         if (lastFieldIndex > 0)
         {
-            Locator lastField = Locator.xpath(prefix + "//input[@name='ff_name" + lastFieldIndex + "']");
+            Locator lastField = Locator.xpath(prefix + "//input[@name='ff_label" + lastFieldIndex + "']");
             _test.click(lastField);
         }
         _test.click(Locator.xpath(addField));

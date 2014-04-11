@@ -48,9 +48,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.labkey.test.util.PasswordUtil.getUsername;
-
-import static org.junit.Assert.*;
 
 @Category({Study.class, Specimen.class, DailyB.class})
 public class StudyTest extends StudyBaseTest
@@ -634,9 +636,8 @@ public class StudyTest extends StudyBaseTest
         // Test Bad Field Names -- #13607
         clickButton("Manage Dataset");
         clickButton("Edit Definition");
-        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.navButton("Add Field"), 0);
-        int newFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
-        _listHelper.setColumnName(getPropertyXPath("Dataset Fields"), newFieldIndex, "Bad Name");
+        int newFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]"));
+        _listHelper.addField("Dataset", newFieldIndex, "Bad Name", "Bad Name", ListHelper.ListColumnType.String);
         clickButton("Save");
         clickButton("View Data");
         _customizeViewsHelper.openCustomizeViewPanel();
