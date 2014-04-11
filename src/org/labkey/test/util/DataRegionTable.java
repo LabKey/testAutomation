@@ -95,7 +95,7 @@ public class DataRegionTable
 
     public boolean hasAggregateRow()
     {
-        return _test.isElementPresent(Locator.css("#" + getHtmlName() + " tr.labkey-col-total"));
+        return _test.isElementPresent(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]//tr[contains(@class, 'labkey-col-total')]"));
     }
 
     private String getJSParam(String func, int i, boolean bStr)
