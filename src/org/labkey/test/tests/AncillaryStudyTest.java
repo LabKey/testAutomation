@@ -42,7 +42,7 @@ public class AncillaryStudyTest extends StudyBaseTest
     private static final String[] PTIDS = {"999320016", "999320518", "999320529", "999320533", "999320541", "999320557", "999320565", "999320576", "999320582", "999320590"};
     private static final String PARTICIPANT_GROUP_BAD = "Bad Ancillary Group";
     private static final String[] PTIDS_BAD = {"999320004", "999320007", "999320010", "999320016", "999320018", "999320021", "999320029", "999320033", "999320036","999320038"};
-    private static final String SEQ_NUMBER = "1001"; //These should alphabetically precede all exesting sequence numbers.
+    private static final String SEQ_NUMBER = "1001"; //These should alphabetically precede all existing sequence numbers.
     private static final String SEQ_NUMBER2 = "1002";
     private static final String UPDATED_DATASET_VAL = "Esperanto";
     private static final String EXTRA_DATASET_ROWS = "mouseId\tsequenceNum\n" + // Rows for APX-1: Abbreviated Physical Exam
@@ -350,7 +350,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage"));
         assertTextNotPresent("Specimen Repository Settings");
         assertTextNotPresent("Specimen Request Settings");
-        assertTextPresent("NOTE: specimen repository and request settings are not available for ancillary or published studies.");
+        assertTextPresent("Note: specimen repository and request settings are not available for ancillary studies.");
         assertElementNotPresent(Locator.linkWithText("Change Repository Type"));
         assertElementNotPresent(Locator.linkWithText("Manage Display and Behavior"));
         assertElementNotPresent(Locator.linkWithText("Manage Request Statuses"));

@@ -495,7 +495,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // verify that the specimen request options are hidden from the manage study page
         goToManageStudy();
         assertTextNotPresent("Specimen Repository Settings", "Repository Type", "Display and Behavior", "Specimen Request Settings");
-        assertTextPresent("NOTE: specimen repository and request settings are not available for ancillary or published studies.");
+        assertTextPresent("Note: specimen repository and request settings are not available for published studies.");
         // verify that the additive, derivative, etc. tables were populated correctly
         goToQueryView("study", "SpecimenAdditive", false);
         assertElementPresent(includeSpecimens ? Locator.paginationText(1, 42, 42) : Locator.xpath("//tr/td/em[text() = 'No data to show.']"));
