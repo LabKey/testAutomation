@@ -197,7 +197,8 @@ public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
             expectedExportColumn.add(getTestColumnTitle());
             expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()).subList(0, expectedDataRowCount));
 
-            assertEquals("Wrong rows exported", expectedExportColumn, ExcelHelper.getColumnData(sheet, getTestColumnIndex()));
+            List<String> exportedColumn = ExcelHelper.getColumnData(sheet, getTestColumnIndex());
+            assertEquals("Wrong rows exported", expectedExportColumn, exportedColumn);
         }
         catch (IOException | InvalidFormatException e)
         {

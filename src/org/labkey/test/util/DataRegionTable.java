@@ -93,6 +93,11 @@ public class DataRegionTable
         return _test.isElementPresent(Locator.xpath("//table[starts-with(@id, 'dataregion_footer_')]"));
     }
 
+    public boolean hasAggregateRow()
+    {
+        return _test.isElementPresent(Locator.css("#" + getHtmlName() + " tr.labkey-col-total"));
+    }
+
     private String getJSParam(String func, int i, boolean bStr)
     {
         int lParen = func.indexOf("(");
@@ -116,6 +121,8 @@ public class DataRegionTable
     {
         int rows = 0;
         rows = _test.getTableRowCount(getHtmlName()) - (_headerRows + (bottomBarPresent()?1:0));
+        if (hasAggregateRow())
+            rows -= 1;
 
         if (rows == 1 && hasNoDataToShow())
             rows = 0;
