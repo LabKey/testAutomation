@@ -25,6 +25,8 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 
@@ -465,7 +467,12 @@ public class DataReportsTest extends ReportTest
         clickViewTab();
         waitForElement(Locator.navButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickButton("Start Job", 0);
-        waitForText("COMPLETE", WAIT_FOR_PAGE);
+        waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
+        goToModule("Pipeline");
+        waitForPipelineJobsToFinish(2);
+        // go back to the report and confirm it is visible
+        clickReportGridLink(R_SCRIPTS[1]);
+        waitForText(R_SCRIPT2_TEXT2);
         assertTextPresent(R_SCRIPT2_TEXT2);
         assertTextNotPresent(R_SCRIPT2_TEXT1);
         prepForPageLoad();
