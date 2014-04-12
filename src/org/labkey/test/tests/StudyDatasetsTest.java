@@ -400,7 +400,8 @@ public class StudyDatasetsTest extends StudyBaseTest
         if (checkAggregates)
         {
             DataRegionTable drt = new DataRegionTable("Dataset", this); // verify joined fields in filter
-            assertEquals("Unexpected number of rows, filter was not applied correctly", 4, drt.getDataRowCount()); // 3 data rows + aggregates
+            assertEquals("Unexpected number of rows, filter was not applied correctly", 3, drt.getDataRowCount()); // 3 data rows + aggregates
+            assertTrue("Expected aggregate row", drt.hasAggregateRow());
             assertTextPresentInThisOrder("Avg Cre:", "Agg Count:"); // verify joined fields in aggregates
         }
         for (String colFieldKey : colFieldKeys) // verify joined fields in column select
