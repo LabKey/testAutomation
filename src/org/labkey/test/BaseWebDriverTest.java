@@ -47,7 +47,6 @@ import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
 import org.junit.runner.Description;
-import org.junit.runner.RunWith;
 import org.labkey.remoteapi.Connection;
 import org.labkey.remoteapi.query.ContainerFilter;
 import org.labkey.remoteapi.query.Filter;
@@ -147,6 +146,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private static WebDriverWait _longWait;
     private static JSErrorChecker _jsErrorChecker = null;
     private final ArtifactCollector _artifactCollector;
+    protected PipelineToolsHelper _pipelineToolsHelper;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public ExtHelper _extHelper = new ExtHelper(this);
@@ -595,31 +595,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         public List<String> ignored()
         {
             return Collections.emptyList(); // Add ignored chromedriver errors to jserrors.js
-        }
-    }
-
-    protected boolean isPipelineToolsTest()
-    {
-        return false;
-    }
-
-    /**
-     * Set pipeline tools directory to the default location if the current location does not exist.
-     */
-    @LogMethod
-    protected void fixPipelineToolsDirectory()
-    {
-        log("Ensuring pipeline tools directory points to the right place");
-        goToHome();
-        goToSiteSettings();
-        File currentToolsDirectory = new File(getFormElement(Locator.name("pipelineToolsDirectory")));
-        if(!currentToolsDirectory.exists())
-        {
-            log("Pipeline tools directory does not exist: " + currentToolsDirectory);
-            File defaultToolsDirectory = new File(getLabKeyRoot() + "/build/deploy/bin");
-            log("Setting to default tools directory" + defaultToolsDirectory.toString());
-            setFormElement(Locator.name("pipelineToolsDirectory"), defaultToolsDirectory.toString());
-            clickButton("Save");
         }
     }
 
@@ -1894,8 +1869,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             try
             {
-                if (isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
-                    fixPipelineToolsDirectory();
+                // Get DB back in a good state after failed pipeline tools test.
+                _pipelineToolsHelper.fixPipelineToolsDirectory();
             }
             catch(Throwable t){
                 // Assure that this failure is noticed

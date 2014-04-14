@@ -202,10 +202,4 @@ public class XTandemTest extends AbstractXTandemTest
         assertTextPresent(PEPTIDE4);
         assertTextPresent(PEPTIDE);
     }
-
-    @Override
-    protected boolean isPipelineToolsTest()
-    {
-        return true;
-    }
 }

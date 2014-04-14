@@ -31,8 +31,7 @@ import org.labkey.test.util.EmailRecordTable;
 import org.labkey.test.util.PipelineStatusTable;
 import org.labkey.test.ms1.params.PepMatchTestParams;
 import org.labkey.test.ms1.params.FeaturesTestParams;
-
-import java.io.File;
+import org.labkey.test.util.PipelineToolsHelper;
 
 import static org.junit.Assert.*;
 
@@ -43,6 +42,7 @@ public class PipelineTest extends PipelineWebTestBase
 
     protected PipelineTestsBase _testSetMS2 = new PipelineTestsBase(this);
     protected PipelineTestsBase _testSetMS1 = new PipelineTestsBase(this);
+    private final PipelineToolsHelper _pipelineToolsHelper = new PipelineToolsHelper(this);
 
     public PipelineTest()
     {
@@ -101,6 +101,7 @@ public class PipelineTest extends PipelineWebTestBase
         _testSetMS2.clean();
         _testSetMS1.clean();
         super.doCleanup(afterTest);
+        _pipelineToolsHelper.fixPipelineToolsDirectory();
     }
 
     @Test
@@ -125,7 +126,7 @@ public class PipelineTest extends PipelineWebTestBase
         checkErrors();
 
         // Break the pipeline tools directory setting to cause errors.
-        String oldToolsDirectory = setPipelineToolsDirectory(getLabKeyRoot() + "/external/noexist");
+        _pipelineToolsHelper.setPipelineToolsDirectory(getLabKeyRoot() + "/external/noexist");
         runProcessing(_testSetMS1);
         checkEmail(emailTable, 4);
 
@@ -136,14 +137,7 @@ public class PipelineTest extends PipelineWebTestBase
         _testSetMS1.getParams()[0].validateEmailEscalation(0);
         checkEmail(emailTable, 1);
         // Fix the pipeline tools directory.
-        if (new File(oldToolsDirectory).exists())
-        {
-            setPipelineToolsDirectory(oldToolsDirectory);
-        }
-        else
-        {
-            setPipelineToolsDirectory(getLabKeyRoot() + File.separatorChar + "build" + File.separatorChar + "deploy" + File.separatorChar + "bin");
-        }
+        _pipelineToolsHelper.resetPipelineToolsDirectory();
 
         PipelineTestParams tpRetry = _testSetMS1.getParams()[0];
         tpRetry.setExpectError(false);
@@ -221,24 +215,5 @@ public class PipelineTest extends PipelineWebTestBase
         }
         while (testSet.getCompleteParams().length != testSet.getParams().length &&
                 seconds < MAX_WAIT_SECONDS);
-    }
-
-    private String setPipelineToolsDirectory(String path)
-    {
-        log("Set tools bin directory to " + path);
-        pushLocation();
-        goToHome();
-        goToSiteSettings();
-        String existingValue = getFormElement(Locator.name("pipelineToolsDirectory"));
-        setFormElement(Locator.name("pipelineToolsDirectory"), path);
-        clickButton("Save");
-        popLocation();
-        return existingValue;
-    }
-
-    @Override
-    protected boolean isPipelineToolsTest()
-    {
-        return true;
     }
 }

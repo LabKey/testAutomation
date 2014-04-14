@@ -79,6 +79,11 @@ public abstract class TestProperties
         return "never".equals(System.getProperty("systemMaintenance"));
     }
 
+    public static String getExtraPipelineToolsDirs()
+    {
+        return "C:\\temp";
+    }
+
     public static File getDumpDir()
     {
         File dumpDir = null;

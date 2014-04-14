@@ -16,7 +16,6 @@
 package org.labkey.test;
 
 import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 
 import static org.labkey.test.TestProperties.isSystemMaintenanceDisabled;
 import static org.labkey.test.WebTestHelper.logToServer;
@@ -44,9 +43,6 @@ public class WebDriverTestPreamble extends BaseWebDriverTest
         {
             checkLeaksAndErrors();
         }
-
-        if (isPipelineToolsTest()) // Get DB back in a good state after failed pipeline tools test.
-            fixPipelineToolsDirectory();
     }
 
     @Override

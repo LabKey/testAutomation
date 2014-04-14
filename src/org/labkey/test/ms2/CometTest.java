@@ -82,16 +82,10 @@ public class CometTest extends AbstractMS2SearchEngineTest implements WindowsOnl
         clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
 
         // Make sure we're not using a custom default view for the current user
-        selectOptionByText("viewParams", "<Standard View>");
+        selectOptionByText(Locator.name("viewParams"), "<Standard View>");
         clickButton("Go");
 
         // Check for a few high-scoring peptides
         assertTextPresent("K.MSKIRQVIAAR.L", "K.LRRPDPYK.G", "K.KSGRSSDLTSVR.L");
-    }
-
-    @Override
-    protected boolean isPipelineToolsTest()
-    {
-        return true;
     }
 }
