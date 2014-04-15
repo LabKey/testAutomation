@@ -17,8 +17,8 @@ public class PipelineToolsHelper
     private BaseWebDriverTest _test;
     private static String _originalToolsDir = null;
     private static String _currentToolsDir = null;
-    private static final File _defaultToolsDirectory = new File(getLabKeyRoot() + "/build/deploy/bin");
-    private static final String _defaultToolsPath = TestProperties.getExtraPipelineToolsDirs() + File.pathSeparator + _defaultToolsDirectory.toString();
+    private static final String _defaultToolsDirectory = (new File(getLabKeyRoot() + "/build/deploy/bin")).getAbsoluteFile().toString();
+    private static final String _defaultToolsPath = TestProperties.getExtraPipelineToolsDirs() + File.pathSeparator + _defaultToolsDirectory;
     private String _pathSeparator = File.pathSeparator;
 
     public PipelineToolsHelper(BaseWebDriverTest test)
@@ -103,16 +103,18 @@ public class PipelineToolsHelper
         {
             resetPipelineToolsDirectory();
         }
-
-        _test.log("Ensuring pipeline tools directory points to a real directory");
-        goToSiteSettings();
-        String currentToolsDirectory = _test.getFormElement(Locator.name("pipelineToolsDirectory"));
-        if (!goodPath(currentToolsDirectory))
+        else
         {
-            _test.log("Pipeline tools directory does not exist: " + currentToolsDirectory);
-            _test.log("Setting to default tools directory" + _defaultToolsDirectory);
-            _test.setFormElement(Locators.pipelineToolsDirectoryField(), _defaultToolsDirectory);
-            _test.clickButton("Save");
+            _test.log("Ensuring pipeline tools directory points to a real directory");
+            goToSiteSettings();
+            String currentToolsDirectory = _test.getFormElement(Locator.name("pipelineToolsDirectory"));
+            if (!goodPath(currentToolsDirectory))
+            {
+                _test.log("Pipeline tools directory does not exist: " + currentToolsDirectory);
+                _test.log("Setting to default tools directory" + _defaultToolsDirectory);
+                _test.setFormElement(Locators.pipelineToolsDirectoryField(), _defaultToolsDirectory);
+                _test.clickButton("Save");
+            }
         }
     }
 

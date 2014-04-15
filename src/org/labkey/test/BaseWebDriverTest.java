@@ -146,7 +146,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private static WebDriverWait _longWait;
     private static JSErrorChecker _jsErrorChecker = null;
     private final ArtifactCollector _artifactCollector;
-    protected PipelineToolsHelper _pipelineToolsHelper;
 
     public AbstractContainerHelper _containerHelper = new APIContainerHelper(this);
     public ExtHelper _extHelper = new ExtHelper(this);
@@ -1870,14 +1869,15 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             try
             {
                 // Get DB back in a good state after failed pipeline tools test.
-                _pipelineToolsHelper.fixPipelineToolsDirectory();
+                PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
+                pipelineToolsHelper.fixPipelineToolsDirectory();
             }
             catch(Throwable t){
                 // Assure that this failure is noticed
                 // Regression check: https://www.labkey.org/issues/home/Developer/issues/details.view?issueId=10732
                 log("**************************ERROR*******************************");
                 log("** SERIOUS ERROR: Failed to reset pipeline tools directory. **");
-                log("** Server remains in a bad state.                           **");
+                log("** Server may be in a bad state.                            **");
                 log("** Set tools directory manually or bootstrap to fix.        **");
                 log("**************************ERROR*******************************");
                 getArtifactCollector().dumpPageSnapshot(testName, "fixPipelineToolsDir");
