@@ -339,7 +339,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         waitAndClickAndWait(Locator.linkWithText("Specimen Data"));
         waitAndClickAndWait(Locator.linkWithText("By Vial Group"));
         DataRegionTable table = new DataRegionTable("SpecimenSummary", this, false, true);
-        assertEquals("Did not find expected number of specimens.", specimenCount, table.getDataRowCount() - 1); // n specimens + 1 total row
+        assertEquals("Did not find expected number of specimens.", specimenCount, table.getDataRowCount());
         assertEquals("Incorrect total vial count.", String.valueOf(vialCount), table.getDataAsText(specimenCount, "Vial Count"));
         waitAndClickAndWait(Locator.linkWithText("Specimen Data"));
         waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
