@@ -344,7 +344,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         waitAndClickAndWait(Locator.linkWithText("Specimen Data"));
         waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
         table = new DataRegionTable("SpecimenDetail", this, false, true);
-        assertEquals("Did not find expected number of vials.", vialCount, table.getDataRowCount() - 1); // m vials + 1 total row
+        assertEquals("Did not find expected number of vials.", vialCount, table.getDataRowCount());
 
         log("Verify that Ancillary study doesn't support requests.");
         clickAndWait(Locator.linkWithText("Manage"));
