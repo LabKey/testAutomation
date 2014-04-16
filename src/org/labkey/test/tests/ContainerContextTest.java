@@ -33,6 +33,7 @@ import org.labkey.test.categories.Data;
 import org.labkey.test.util.CustomizeViewsHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
@@ -289,7 +290,9 @@ public class ContainerContextTest extends BaseWebDriverTest
         clickMenuButton("Views", folder + "-BackgroundReport");
         waitForElement(Locator.navButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickButton("Start Job", 0);
-        waitForText("COMPLETE", WAIT_FOR_PAGE);
+        waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
+        goToModule("Pipeline");
+        waitForPipelineJobsToFinish(1);
     }
 
     @LogMethod
