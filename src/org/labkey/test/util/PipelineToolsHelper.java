@@ -17,18 +17,23 @@ public class PipelineToolsHelper
     private BaseWebDriverTest _test;
     private static String _originalToolsDir = null;
     private static String _currentToolsDir = null;
+    private static String _pathSeparator = File.pathSeparator;
     private static final String _defaultToolsDirectory = (new File(getLabKeyRoot() + "/build/deploy/bin")).getAbsoluteFile().toString();
-    private static final String _defaultToolsPath = TestProperties.getExtraPipelineToolsDirs() + File.pathSeparator + _defaultToolsDirectory;
-    private String _pathSeparator = File.pathSeparator;
+    private static final String _extraPipelineTools = TestProperties.getAdditionalPipelineTools();
 
     public PipelineToolsHelper(BaseWebDriverTest test)
     {
         _test = test;
     }
 
-    public void setPathSeparator(String pathSeparator)
+    public static void setPathSeparator(String pathSeparator)
     {
         _pathSeparator = pathSeparator;
+    }
+
+    private static String getDefaultToolsPath()
+    {
+        return (_extraPipelineTools != null ? _extraPipelineTools + _pathSeparator : "") + _defaultToolsDirectory;
     }
 
     @LogMethod
@@ -53,7 +58,7 @@ public class PipelineToolsHelper
 
     //TODO: enable or remove when we figure out if we can change pipelineToolsDirectory can use a path
     @LogMethod
-    private void addPipelineToolsDirectories(@LoggedParam String... directories)
+    private void addToPipelineToolsPath(@LoggedParam String... directories)
     {
         List<String> directoriesToAppend = Arrays.asList(directories);
 
@@ -78,11 +83,14 @@ public class PipelineToolsHelper
         }
         else
         {
-            log("All directories are already present in pipelin tools config");
+            log("All directories are already present in pipeline tools config");
         }
         _test.popLocation();
     }
 
+    /**
+     * Reset pipeline tools directory to pre-test state
+     */
     @LogMethod
     public void resetPipelineToolsDirectory()
     {
@@ -94,39 +102,12 @@ public class PipelineToolsHelper
     }
 
     /**
-     * Set pipeline tools directory to the default location if the current location does not exist.
+     * Set pipeline tools directory to the default location for testing.
      */
     @LogMethod
-    public void fixPipelineToolsDirectory()
+    public void setToolsDirToTestDefault()
     {
-        if (_originalToolsDir != null && goodPath(_originalToolsDir))
-        {
-            resetPipelineToolsDirectory();
-        }
-        else
-        {
-            _test.log("Ensuring pipeline tools directory points to a real directory");
-            goToSiteSettings();
-            String currentToolsDirectory = _test.getFormElement(Locator.name("pipelineToolsDirectory"));
-            if (!goodPath(currentToolsDirectory))
-            {
-                _test.log("Pipeline tools directory does not exist: " + currentToolsDirectory);
-                _test.log("Setting to default tools directory" + _defaultToolsDirectory);
-                _test.setFormElement(Locators.pipelineToolsDirectoryField(), _defaultToolsDirectory);
-                _test.clickButton("Save");
-            }
-        }
-    }
-
-    private boolean goodPath(String path)
-    {
-        String[] splitPath = path.split(_pathSeparator);
-        for (String directory : splitPath)
-        {
-            if (!(new File (directory)).exists())
-                return false;
-        }
-        return true;
+        setPipelineToolsDirectory(getDefaultToolsPath());
     }
 
     private void goToSiteSettings()

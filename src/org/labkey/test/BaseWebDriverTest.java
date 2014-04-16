@@ -1870,7 +1870,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 // Get DB back in a good state after failed pipeline tools test.
                 PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
-                pipelineToolsHelper.fixPipelineToolsDirectory();
+                pipelineToolsHelper.resetPipelineToolsDirectory();
             }
             catch(Throwable t){
                 // Assure that this failure is noticed

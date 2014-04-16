@@ -15,6 +15,7 @@
  */
 package org.labkey.test.tests;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
@@ -101,7 +102,12 @@ public class PipelineTest extends PipelineWebTestBase
         _testSetMS2.clean();
         _testSetMS1.clean();
         super.doCleanup(afterTest);
-        _pipelineToolsHelper.fixPipelineToolsDirectory();
+    }
+
+    @Before
+    public void preTest()
+    {
+        _pipelineToolsHelper.setToolsDirToTestDefault();
     }
 
     @Test
