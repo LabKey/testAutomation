@@ -169,6 +169,7 @@ public class KnitrReportTest extends ReportTest
         // just do a sanity check of the report's contents.  If the dependencies aren't loaded then we'll throw an alert
         Locator[] reportContains = {Locator.css("h1").withText("jQuery DataTables")};
         String[] reportNotContains = {"```", "{r",};
+        String expectedError = "ReferenceError: $ is not defined";
 
         createKnitrReport(rmdDependenciesReport, RReportHelper.ReportOption.knitrMarkdown);
 
@@ -177,7 +178,7 @@ public class KnitrReportTest extends ReportTest
         {
             // no exception thrown, so look into the JS errors collection
             _rReportHelper.clickViewTab();
-            verifyJsErrors("ReferenceError: $ is not defined");
+            verifyJsErrors(expectedError, true);
         }
         else
         {
@@ -203,7 +204,7 @@ public class KnitrReportTest extends ReportTest
         {
             // verify no errors now on FF.  Chrome would have thrown again and we would fail
             // if there were errors on the page
-            verifyJsErrors(null);
+            verifyJsErrors(expectedError, false);
         }
 
         assertReportContents(reportContains, reportNotContains);
@@ -211,7 +212,7 @@ public class KnitrReportTest extends ReportTest
         saveAndVerifyKnitrReport(rmdDependenciesReport.getFileName() + " " + viewName, reportContains, reportNotContains);
     }
 
-    private void verifyJsErrors(String expectedError)
+    private void verifyJsErrors(String expectedError, boolean shouldBePresent)
     {
         if (TestProperties.isScriptCheckEnabled())
         {
@@ -225,7 +226,7 @@ public class KnitrReportTest extends ReportTest
                     if (null != msg)
                     {
                         log("found JS error: " + msg);
-                        if ((null != expectedError) && msg.contains(expectedError))
+                        if (msg.contains(expectedError))
                         {
                             foundError = true;
                             break;
@@ -233,10 +234,10 @@ public class KnitrReportTest extends ReportTest
                     }
                 }
 
-                if (expectedError == null)
-                    assertTrue("unexpected JS errors found, see log above!", jsErrors.size() == 0);
-                else
+                if (shouldBePresent)
                     assertTrue("expected JS jquery reference error not found!", foundError);
+                else
+                    assertFalse("unexpected JS jquery reference error found!", foundError);
             }
             catch(WebDriverException ex)
             {
