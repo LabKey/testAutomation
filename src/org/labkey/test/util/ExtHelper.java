@@ -469,7 +469,6 @@ public class ExtHelper extends AbstractHelper
         _test.executeScript(script, columnName, columnVal, idx, markerCls, keepExisting);
     }
 
-    //TODO:  comment this
     public void clickX4GridPanelCheckbox(int index, String markerCls, boolean keepExisting)
     {
         clickX4GridPanelCheckbox(null, null, index, markerCls, keepExisting);
@@ -525,17 +524,29 @@ public class ExtHelper extends AbstractHelper
         selectComboBoxItem(Locator.xpath("//div["+NOT_HIDDEN+" and ./label/span[text()='"+label+"']]/div/div"), selection);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#selectComboBoxItem(org.labkey.test.Locator.XPathLocator, String...)}
+     */
+    @Deprecated
     @LogMethod(quiet = true)
     public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
         selectExt4ComboBoxItem(parentLocator, selection, false);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#selectComboBoxItem(String, String...)}
+     */
+    @Deprecated
     public void selectExt4ComboBoxItem(String label, String selection)
     {
         selectExt4ComboBoxItem(Locator.xpath("//tr["+NOT_HIDDEN+" and ./td/label[text()='"+label+"']]"), selection);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#selectComboBoxItem(org.labkey.test.Locator.XPathLocator, boolean, String...)}
+     */
+    @Deprecated
     @LogMethod(quiet = true)
     public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection, boolean checkSelectionStartsWith)
     {
@@ -618,6 +629,10 @@ public class ExtHelper extends AbstractHelper
         _test.clickAndWait(loc, wait);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#checkCheckbox(String)}
+     */
+    @Deprecated
     public void checkCheckbox(String label)
     {
         Locator checkbox = Locator.ext4Checkbox(label);
@@ -627,6 +642,10 @@ public class ExtHelper extends AbstractHelper
             fail("Failed to check checkbox '" + label + "'.");
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#uncheckCheckbox(String)}
+     */
+    @Deprecated
     public void uncheckCheckbox(String label)
     {
         Locator checkbox = Locator.ext4Checkbox(label);
@@ -636,6 +655,10 @@ public class ExtHelper extends AbstractHelper
             fail("Failed to uncheck checkbox '" + label + "'.");
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#isChecked(String)}
+     */
+    @Deprecated
     public boolean isChecked(String label)
     {
         Locator checked = Locator.xpath("//table[contains(@class, '" + Ext4Helper.getCssPrefix() + "form-cb-checked')]//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
