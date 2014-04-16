@@ -219,7 +219,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         waitForText("Import Samples");
 
         Map<String, String[]> expected = new LinkedHashMap<>();
-        expected.put("TestId_Estradiol_37.6", new String[]{"TestId", "2014-03-18", "Estradiol", "37.6", "", "Unknown", "", "", ""});
+        expected.put("TestId_Estradiol_38", new String[]{"TestId", "2014-03-18", "Estradiol", "38", "", "Unknown", "", "", ""});
         expected.put("TestId_Progesterone_<0.03", new String[]{"TestId", "2014-03-18", "Progesterone", "<0.03", "", "Unknown", "", "", ""});
 
         verifyResults(2, expected);
