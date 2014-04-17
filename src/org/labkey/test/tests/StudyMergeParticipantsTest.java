@@ -147,7 +147,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTest
 
         // Create alias dataset and insert some data
         goToManageDatasets();
-        click(Locator.linkContainingText("Create New Dataset"));
+        clickAndWait(Locator.linkContainingText("Create New Dataset"));
         setFormElement(Locator.name("typeName"), ALIAS_DATASET);
         clickButton("Next", "Import Fields");
         clickButton("Import Fields", "Paste tab-delimited");
