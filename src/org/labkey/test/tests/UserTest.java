@@ -231,7 +231,7 @@ public class UserTest extends SecurityTest
         prepForPageLoad();
         clickButtonContainingText("Reset Password", 0);
         assertAlertContains("You are about to clear the user's current password");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         clickAndWait(Locator.linkWithText("Done"));
         // View reset password email.
 //        clickProject(PROJECT_NAME);

@@ -373,7 +373,7 @@ public class ScatterPlotTest extends GenericChartsTest
         prepForPageLoad();
         clickButton("Delete Dataset", 0);
         assertAlertContains("Are you sure you want to delete this dataset?");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         waitForText("The study schedule defines"); // text on the Manage Datasets page
 
         click(Locator.linkContainingText("Clinical and Assay Data"));
@@ -446,7 +446,7 @@ public class ScatterPlotTest extends GenericChartsTest
         savePlot(SCATTER_PLOT_NAME_MV + " PointClickFn", SCATTER_PLOT_DESC_MV + " PointClickFn");
         prepForPageLoad();
         fireEvent(svgCircleLoc, SeleniumEvent.click);
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         waitForText("Query Schema Browser");
         assertTextPresent("APX-1: Abbreviated Physical Exam");
         // verify that only developers can see the button to add point click function
@@ -464,7 +464,7 @@ public class ScatterPlotTest extends GenericChartsTest
         assertElementNotPresent(Locator.ext4Button("Developer"));
         prepForPageLoad();
         fireEvent(svgCircleLoc, SeleniumEvent.click);
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         waitForText("APX-1: Abbreviated Physical Exam");
         stopImpersonating();
         // give DEVELOPER_USER developer perms and try again

@@ -742,7 +742,7 @@ public class StudyTest extends StudyBaseTest
             clickAndWait(Locator.linkWithText("Manage Security"));
             prepForPageLoad();
             selectOptionByText(Locator.name("securityString"), "Basic security with editable datasets");
-            newWaitForPageToLoad();
+            waitForPageToLoad();
 
             log("configure comments");
             clickFolder(getFolderName());
@@ -751,12 +751,12 @@ public class StudyTest extends StudyBaseTest
         }
         prepForPageLoad();
         selectOptionByText(Locator.name("participantCommentDataSetId"), PARTICIPANT_CMT_DATASET);
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         selectOptionByText(Locator.name("participantCommentProperty"), PARTICIPANT_COMMENT_LABEL);
 
         prepForPageLoad();
         selectOptionByText(Locator.name("participantVisitCommentDataSetId"), PARTICIPANT_VISIT_CMT_DATASET);
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         selectOptionByText(Locator.name("participantVisitCommentProperty"), PARTICIPANT_VISIT_COMMENT_LABEL);
         clickButton("Save");
 
@@ -803,7 +803,7 @@ public class StudyTest extends StudyBaseTest
         prepForPageLoad();
         _extHelper.clickMenuButton(false, "Copy or Move Comment(s)", "Move", "To Mouse", "999320812");
         getAlert();
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         setFormElement(Locator.name("quf_" + COMMENT_FIELD_NAME), "Moved PTID Comment");
         clickButton("Submit");
         assertElementPresent(Locator.tagContainingText("td", "Moved PTID Comment"));
@@ -874,7 +874,7 @@ public class StudyTest extends StudyBaseTest
         goToAuditLog();
         prepForPageLoad();
         selectOptionByText(Locator.name("view"), "Query export events");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
 
         DataRegionTable auditTable =  new DataRegionTable("query", this);
         String[][] columnAndValues = new String[][] {{"Created By", getDisplayName()},

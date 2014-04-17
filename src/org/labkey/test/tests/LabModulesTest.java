@@ -1450,7 +1450,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         Alert alert = getDriver().switchTo().alert();
         alert.accept();
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         waitForText(LabModuleHelper.LAB_HOME_TEXT, WAIT_FOR_PAGE);
     }
 

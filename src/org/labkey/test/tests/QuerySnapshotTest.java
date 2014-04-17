@@ -89,7 +89,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         enterStudySecurity();
         prepForPageLoad();
         selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
     }
 
     @Override
@@ -208,7 +208,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         prepForPageLoad();
         clickButton("Update Snapshot", 0);
         getAlert();
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         waitForText("Dataset: Custom Query Snapshot", 10000);
 
         log("delete the snapshot");
@@ -339,6 +339,6 @@ public class QuerySnapshotTest extends StudyBaseTest
         prepForPageLoad();
         clickButton("Delete Snapshot", 0);
         getAlert();
-        newWaitForPageToLoad();
+        waitForPageToLoad();
     }
 }

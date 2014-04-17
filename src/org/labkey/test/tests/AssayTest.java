@@ -570,7 +570,7 @@ public class AssayTest extends AbstractAssayTest
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
         prepForPageLoad();
         uncheckCheckbox(Locator.checkboxByNameAndValue("visitStatistic", "ParticipantCount"));
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         row2 = new String[]{TEST_ASSAY, "8", "1", "1", "1", "1", "1", "3"};
         assertTableRowsEqual("studyOverview", 1, new String[][]{row2});
 
@@ -602,7 +602,7 @@ public class AssayTest extends AbstractAssayTest
         prepForPageLoad();
         clickButton("Recall Rows", 0);
         getAlert();
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         assertTextPresent("row(s) were recalled to the assay: " + TEST_ASSAY);
 
         // Set a filter so that we know we're looking at the copy event for SecondRun again

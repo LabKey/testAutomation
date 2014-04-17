@@ -216,7 +216,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
 
         prepForPageLoad();
         selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
-        newWaitForPageToLoad(30000);
+        waitForPageToLoad(30000);
 
         click(Locator.xpath("//td[.='" + group + "']/..//input[@value='" + perms + "']"));
 
@@ -280,7 +280,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
             assertTrue("Alert did not contain expected text\nExpected: Would you still like to edit it?\nActual: " + alertText,
                     alertText.contains("Would you still like to edit it?"));
         }
-        newWaitForPageToLoad(WAIT_FOR_PAGE);
+        waitForPageToLoad(WAIT_FOR_PAGE);
     }
 
     protected void enterStudySecurity()

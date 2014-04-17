@@ -164,7 +164,7 @@ public class ListTest extends BaseWebDriverTest
         prepForPageLoad();
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected rows?");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         // load test data
         clickImportData();
         setFormElement(Locator.name("text"), LIST_DATA2);

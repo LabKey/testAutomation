@@ -206,7 +206,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         _rReportHelper.clickSourceTab();
         prepForPageLoad();
         _rReportHelper.saveReport(null);
-        newWaitForPageToLoad();
+        waitForPageToLoad();
     }
 
 

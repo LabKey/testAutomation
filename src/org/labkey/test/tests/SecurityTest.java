@@ -356,7 +356,7 @@ public class SecurityTest extends BaseWebDriverTest
         prepForPageLoad();
         clickButtonContainingText("Reset Password", 0);
         getAlert();
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         clickButton("Done");
 
         String url = getPasswordResetUrl(username);
@@ -670,7 +670,7 @@ public class SecurityTest extends BaseWebDriverTest
 
         prepForPageLoad();
         selectOptionByText("view", "User events");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
 
         DataRegionTable table = new DataRegionTable("query", this, false);
 

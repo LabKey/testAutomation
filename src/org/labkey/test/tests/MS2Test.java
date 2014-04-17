@@ -761,7 +761,7 @@ public class MS2Test extends AbstractMS2ImportTest
             // before checking that the values match our expectations
             prepForPageLoad();
             selectOptionByValue(Locator.name("allPeps"), "false");
-            newWaitForPageToLoad();
+            waitForPageToLoad();
         }
         assertTextPresent("27% (18 / 66)");
         assertTextPresent("27% (2,050 / 7,683)");
@@ -771,7 +771,7 @@ public class MS2Test extends AbstractMS2ImportTest
 
         prepForPageLoad();
         selectOptionByValue(Locator.name("allPeps"), "true");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
 
         assertTextPresent("35% (23 / 66)");
         assertTextPresent("35% (2,685 / 7,683)");
@@ -801,7 +801,7 @@ public class MS2Test extends AbstractMS2ImportTest
             // User last only peptides assigned by the search engine, so flip back to restore their preference
             prepForPageLoad();
             selectOptionByValue(Locator.name("allPeps"), "false");
-            newWaitForPageToLoad();
+            waitForPageToLoad();
         }
 
         popLocation();

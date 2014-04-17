@@ -267,7 +267,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Manage"));
         prepForPageLoad();
         selectOptionByText("parent", WIKI_PAGE1_TITLE + " (" + WIKI_PAGE1_NAME + ")");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         clickButton("Save");
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
         clickAndWait(Locator.linkWithText("next"));

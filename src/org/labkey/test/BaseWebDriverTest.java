@@ -831,14 +831,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         prepForPageLoad();
         getDriver().navigate().refresh();
-        newWaitForPageToLoad(millis);
+        waitForPageToLoad(millis);
     }
 
     public void goBack(int millis)
     {
         prepForPageLoad();
         getDriver().navigate().back();
-        newWaitForPageToLoad(millis);
+        waitForPageToLoad(millis);
     }
 
     public void goBack()
@@ -2563,7 +2563,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             long startTime = System.currentTimeMillis();
             getDriver().navigate().to(getBaseURL() + relativeURL);
-            newWaitForPageToLoad(millis);
+            waitForPageToLoad(millis);
             long elapsedTime = System.currentTimeMillis() - startTime;
             logMessage += " [" + elapsedTime + " ms]";
 
@@ -2586,7 +2586,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             prepForPageLoad();
             long startTime = System.currentTimeMillis();
             getDriver().navigate().to(url);
-            newWaitForPageToLoad(milliseconds);
+            waitForPageToLoad(milliseconds);
             long elapsedTime = System.currentTimeMillis() - startTime;
             logMessage += " [" + elapsedTime + " ms]";
 
@@ -3519,7 +3519,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _preppedForPageLoad = true;
     }
 
-    public void newWaitForPageToLoad(int millis)
+    public void waitForPageToLoad(int millis)
     {
         if (!_preppedForPageLoad) throw new IllegalStateException("Please call prepForPageLoad() before performing the action that would trigger the expected page load.");
         _testTimeout = true;
@@ -3529,7 +3529,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             public boolean check()
             {
                 // Wait for marker to disappear
-                return (Boolean)executeScript("try {if(window.preppedForPageLoadMarker) return false; else return true;}" +
+                return (Boolean) executeScript("try {if(window.preppedForPageLoadMarker) return false; else return true;}" +
                         "catch(e) {return false;}");
             }
         }, "Page failed to load", millis);
@@ -3557,9 +3557,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public void newWaitForPageToLoad()
+    public void waitForPageToLoad()
     {
-        newWaitForPageToLoad(defaultWaitForPage);
+        waitForPageToLoad(defaultWaitForPage);
     }
 
     public void waitForExtReady()
@@ -3989,7 +3989,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         prepForPageLoad();
         executeScript("arguments[0].submit()", form);
-        newWaitForPageToLoad();
+        waitForPageToLoad();
     }
 
     /**
@@ -4194,7 +4194,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 .perform();
 
         if (pageTimeout > 0)
-            newWaitForPageToLoad(pageTimeout);
+            waitForPageToLoad(pageTimeout);
     }
 
     public void clickAndWait(Locator l)
@@ -4248,7 +4248,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
 
         if (pageTimeoutMs > 0)
-            newWaitForPageToLoad(pageTimeoutMs);
+            waitForPageToLoad(pageTimeoutMs);
         else if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_APPEAR)
             _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
         else if(pageTimeoutMs==WAIT_FOR_EXT_MASK_TO_DISSAPEAR)
@@ -4267,7 +4267,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         Actions action = new Actions(getDriver());
         action.doubleClick(l.findElement(getDriver())).perform();
         if (millis > 0)
-            newWaitForPageToLoad(millis);
+            waitForPageToLoad(millis);
 
     }
 
@@ -5036,7 +5036,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":clear");
         prepForPageLoad();
         _extHelper.clickExtComponent(EscapeUtil.filter(id));
-        newWaitForPageToLoad(wait);
+        waitForPageToLoad(wait);
     }
 
     public void setSort(String regionName, String columnName, SortDirection direction, int wait)
@@ -5047,7 +5047,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         String id = EscapeUtil.filter(regionName + ":" + columnName + ":" + direction.toString().toLowerCase());
         prepForPageLoad();
         _extHelper.clickExtComponent(EscapeUtil.filter(id));
-        newWaitForPageToLoad(wait);
+        waitForPageToLoad(wait);
     }
 
     public void setFilter(String regionName, String columnName, String filterType)
@@ -5185,7 +5185,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             prepForPageLoad();
         _extHelper.clickExtComponent(EscapeUtil.filter(id));
         if(waitForPageLoad > 0)
-            newWaitForPageToLoad(waitForPageLoad);
+            waitForPageToLoad(waitForPageLoad);
     }
 
     /**
@@ -6979,9 +6979,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 }
                 if (statusValues.size() < completeJobsExpected || statusValues.size() != getFinishedCount(statusValues))
                 {
-                    prepForPageLoad();
-                    executeScript("window.location = window.location;");
-                    newWaitForPageToLoad();
+                    refresh();
                     return false;
                 }
                 return true;

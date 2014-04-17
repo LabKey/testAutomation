@@ -136,7 +136,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("Analyze some runs"));
         prepForPageLoad();
         selectOptionByValue(Locator.name("ff_targetExperimentId"), "");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         // select mini-fcs.xml Analysis run
         checkCheckbox(Locator.checkboxByNameAndValue(".select", String.valueOf(runId)));
         clickButton("Analyze selected runs");

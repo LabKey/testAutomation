@@ -343,16 +343,16 @@ public class FlowTest extends BaseFlowTest
         waitForElement(ff_targetExperimentId);
         prepForPageLoad();
         selectOptionByText(ff_targetExperimentId, "<create new>");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         assertEquals(2, countEnabledInputs(SELECT_CHECKBOX_NAME));
         prepForPageLoad();
         selectOptionByText(ff_targetExperimentId, "FlowExperiment2");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
 
         assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
         prepForPageLoad();
         selectOptionByText("ff_compensationMatrixOption", "Matrix: " + FCS_FILE_1 + " comp matrix");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
 
         checkCheckbox(".toggle");
         clickButton("Analyze selected runs");

@@ -392,7 +392,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
         click(Locator.xpath("//span[text()='Delete']"));
         // eat the alert without spewing to the log file
         getAlert();
-        newWaitForPageToLoad();
+        waitForPageToLoad();
         log("returning to project home");
         //goToProjectHome();
         clickTab("Portal");

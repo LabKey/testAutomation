@@ -128,7 +128,7 @@ public class DatasetPublishTest extends BaseWebDriverTest
         prepForPageLoad();
         clickButton("Update Snapshot", 0);
         assertAlertContains("Updating will replace all existing data with a new set of data. Continue?");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
     }
 
     @LogMethod

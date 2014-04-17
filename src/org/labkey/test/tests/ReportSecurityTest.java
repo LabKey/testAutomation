@@ -88,7 +88,7 @@ public class ReportSecurityTest extends ReportTest
         // enable advanced study security
         prepForPageLoad();
         selectOptionByValue(Locator.name("securityString"), "ADVANCED_READ");
-        newWaitForPageToLoad(30000);
+        waitForPageToLoad(30000);
 
         click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));
         clickAndWait(Locator.id("groupUpdateButton"));

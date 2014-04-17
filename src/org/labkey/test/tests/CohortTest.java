@@ -439,7 +439,7 @@ public class CohortTest extends BaseWebDriverTest
         prepForPageLoad();
         click(Locator.radioButtonById("advancedCohorts"));
         assertAlert("Changing between simple and advanced modes requires updating cohort assignments for all participants.  Update cohort assignments now?");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
 
         verifyDatasetEnrolledCohortFilterAdvanced("Test Results", 16, 0, 12, 6);
         verifySpecimenEnrolledCohortFilterAdvanced("By Individual Vial", 20, 4, 16, 10);

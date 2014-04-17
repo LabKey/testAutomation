@@ -457,7 +457,7 @@ public class DataReportsTest extends ReportTest
         assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT1(R_SCRIPT1_EDIT_FUNC, DATA_BASE_PREFIX), R_SCRIPT1_TEXT1));
         prepForPageLoad();
         resaveReport();
-        newWaitForPageToLoad();
+        waitForPageToLoad();
 
         log("Check that edit worked");
         clickProject(getProjectName());
@@ -477,7 +477,7 @@ public class DataReportsTest extends ReportTest
         assertTextNotPresent(R_SCRIPT2_TEXT1);
         prepForPageLoad();
         resaveReport();
-        newWaitForPageToLoad();
+        waitForPageToLoad();
 
         log("Clean up R pipeline jobs");
         cleanPipelineItem(R_SCRIPTS[1]);

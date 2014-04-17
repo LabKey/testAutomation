@@ -512,7 +512,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         prepForPageLoad();
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected row" + (pk.length == 1 ? "?" : "s?"));
-        newWaitForPageToLoad();
+        waitForPageToLoad();
     }
 
     public void deleteViaFormNoPerms(String containerPath, int[] pk)

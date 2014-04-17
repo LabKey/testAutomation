@@ -243,7 +243,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         prepForPageLoad();
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected row" + (rowCount == 1 ? "?" : "s?"));
-        newWaitForPageToLoad();
+        waitForPageToLoad();
     }
 
     private void checkDataset()
@@ -499,7 +499,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         prepForPageLoad();
         clickButton("Delete", 0);
         assertAlert("Delete selected row" + (1 == rowCount ? "" : "s") + " from this dataset?");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException

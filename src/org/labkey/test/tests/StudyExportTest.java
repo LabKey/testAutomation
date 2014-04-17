@@ -426,7 +426,7 @@ public class StudyExportTest extends StudyManualTest
 
         prepForPageLoad();
         selectOptionByValue(Locator.name("securityString"), "BASIC_WRITE");
-        newWaitForPageToLoad();
+        waitForPageToLoad();
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("47 datasets"));

@@ -225,7 +225,7 @@ public class AuditLogTest extends BaseWebDriverTest
         {
             instance.prepForPageLoad();
             instance.selectOptionByText(Locator.name("view"), eventType);
-            instance.newWaitForPageToLoad();
+            instance.waitForPageToLoad();
         }
 
         verifyAuditQueryEvent(instance, column, msg, rowsToSearch);
