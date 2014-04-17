@@ -113,7 +113,7 @@ public class APIContainerHelper extends AbstractContainerHelper
         dcc.setTimeout(wait*10);
         try
         {
-            dcc.execute(_test.getDefaultConnection(), path);
+            dcc.execute(_test.createDefaultConnection(false), path);
         }
         catch (CommandException e)
         {

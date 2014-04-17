@@ -18,6 +18,7 @@ package org.labkey.test;
 
 import com.thoughtworks.selenium.SeleniumException;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
+import org.apache.commons.httpclient.URIException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
@@ -59,6 +60,7 @@ import org.labkey.test.util.ext4cmp.Ext4GridRef;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -2362,9 +2364,31 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public Connection getDefaultConnection()
+    /**
+     * @param reuseSession true to have the Java API connection "hijack" the session from the Selenium browser window
+     */
+    public Connection createDefaultConnection(boolean reuseSession)
     {
-        return new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        Connection result = new Connection(getBaseURL(), PasswordUtil.getUsername(), PasswordUtil.getPassword());
+        if (reuseSession)
+        {
+            Cookie cookie = getDriver().manage().getCookieNamed("JSESSIONID");
+            if (cookie == null)
+            {
+                throw new IllegalStateException("No session cookie available to resuse.");
+            }
+
+            try
+            {
+                result.getHttpClient().getState().addCookie(new org.apache.commons.httpclient.Cookie(cookie.getDomain(), cookie.getName(), cookie.getValue(), cookie.getPath(), cookie.getExpiry(), cookie.isSecure()));
+            }
+            catch (URIException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return result;
     }
 
     protected SelectRowsResponse executeSelectRowCommand(String schemaName, String queryName)
@@ -4196,12 +4220,31 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         try
         {
-            el.click();
+            try
+            {
+                el.click();
+            }
+            catch (ElementNotVisibleException tryAgain)
+            {
+                scrollIntoView(el); // TODO: WebDriver 2.33 sometimes fails to do this automatically in Firefox
+                el.click();
+            }
         }
-        catch (ElementNotVisibleException tryAgain)
+        catch (WebDriverException tryAgain)
         {
-            scrollIntoView(el); // TODO: WebDriver 2.33 sometimes fails to do this automatically in Firefox
-            el.click();
+            if (tryAgain.getMessage() != null && tryAgain.getMessage().contains("Other element would receive the click"))
+            {
+                try
+                {
+                    Thread.sleep(2500);
+                }
+                catch (InterruptedException ignored) {}
+                el.click();
+            }
+            else
+            {
+                throw tryAgain;
+            }
         }
 
         if (pageTimeoutMs > 0)

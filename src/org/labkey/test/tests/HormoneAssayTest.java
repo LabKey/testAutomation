@@ -594,7 +594,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
     {
         log("Inserting testname records");
 
-        Connection cn = getDefaultConnection();
+        Connection cn = createDefaultConnection(false);
         Map<String, String[]> tests = new HashMap<>();
 
         tests.put("Estradiol", new String[]{"E2", "pg/ml"});

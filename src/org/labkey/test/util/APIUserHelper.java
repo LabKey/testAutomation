@@ -34,7 +34,7 @@ public class APIUserHelper extends AbstractUserHelper
     {
 
             CreateUserCommand command = new CreateUserCommand(userName);
-            Connection connection = _test.getDefaultConnection();
+            Connection connection = _test.createDefaultConnection(false);
             try
             {
                 CreateUserResponse response = command.execute(connection, "");

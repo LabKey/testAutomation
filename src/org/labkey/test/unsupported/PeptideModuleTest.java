@@ -151,7 +151,7 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
     {
         if (cn == null)
         {
-            cn = getDefaultConnection();
+            cn = createDefaultConnection(false);
         }
         cleanupTable(cn, "peptide", "source");
         cleanupTable(cn, "peptide", "peptides");
@@ -201,7 +201,7 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
     // Identify the index at which our peptide IDs start.
     private void findPeptideStartIndex() throws IOException
     {
-        Connection cn = getDefaultConnection();
+        Connection cn = createDefaultConnection(false);
         try
         {
             ensureExternalSchema(getProjectName());

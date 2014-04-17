@@ -43,7 +43,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         ImportRunCommand  irc = new ImportRunCommand(assayID, file);
         irc.setBatchProperties(batchProperties);
         irc.setTimeout(180000); // Wait 3 minutes for assay import
-        irc.execute(_test.getDefaultConnection(), "/" + projectPath);
+        irc.execute(_test.createDefaultConnection(false), "/" + projectPath);
 
     }
     public void importAssay(int assayID, File file, String projectPath) throws CommandException, IOException
@@ -67,7 +67,7 @@ public class APIAssayHelper extends AbstractAssayHelper
         AssayListResponse alr = null;
         try
         {
-            alr = alc.execute(_test.getDefaultConnection(), "/" + projectPath);
+            alr = alc.execute(_test.createDefaultConnection(false), "/" + projectPath);
         }
         catch (Exception e)
         {

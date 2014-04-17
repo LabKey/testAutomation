@@ -152,7 +152,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
     {
         log("Starting CRUD test...");
         log("Inserting a new record into that list...");
-        Connection cn = getDefaultConnection();
+        Connection cn = createDefaultConnection(false);
 
         //insert a row
         Date now = new Date();
