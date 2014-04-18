@@ -1781,9 +1781,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         @Override @LogMethod
         protected void failed(Throwable e, Description description)
         {
-            handleFailure(new AtomicReference<>(e), description.getMethodName());
+            AtomicReference<Throwable> errorRef = new AtomicReference<>(e);
+            handleFailure(errorRef, description.getMethodName());
 
-            super.failed(e, description);
+            super.failed(errorRef.get(), description);
         }
     };
 
