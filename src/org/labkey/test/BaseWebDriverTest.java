@@ -3570,7 +3570,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 return executeScript("return document.readyState;").equals("complete");
             }
         }, "Page failed to load", msWaitForPageLoad);
-        waitForExtReady();
+        waitForExtOnReady();
     }
 
     public void waitForExtReady()
