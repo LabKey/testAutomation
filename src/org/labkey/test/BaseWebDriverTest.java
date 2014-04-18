@@ -44,6 +44,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestWatcher;
 import org.junit.rules.Timeout;
@@ -1772,8 +1773,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _setupFailed = false;
     }
 
-    @Rule
-    public Timeout globalTimeout = new Timeout(1800000); // 30 minutes max per method tested
+    @ClassRule
+    public Timeout globalTimeout = new Timeout(1800000); // 30 minutes
 
     @Rule
     public TestWatcher _watcher = new TestWatcher()
