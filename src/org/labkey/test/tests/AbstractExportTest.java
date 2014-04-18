@@ -64,7 +64,7 @@ public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
         }
 
         dataRegion = new DataRegionTable(getDataRegionId(), this);
-        exportHelper = new DataRegionExportHelper(this, dataRegion);
+        exportHelper = new DataRegionExportHelper(dataRegion);
 
         dataRegion.uncheckAll();
     }

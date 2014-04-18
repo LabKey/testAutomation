@@ -123,7 +123,7 @@ public class DataRegionTest extends BaseWebDriverTest
 
     private void exportLoggingTest()
     {
-        exportDataRegion("Script", "R");
+        exportDataRegion("Text", null);
         goToAuditLog();
         prepForPageLoad();
         selectOptionByText(Locator.name("view"), "Query export events");
@@ -132,7 +132,7 @@ public class DataRegionTest extends BaseWebDriverTest
         DataRegionTable auditTable =  new DataRegionTable("query", this);
         String[][] columnAndValues = new String[][] {{"Created By", getDisplayName()},
                 {"Project", PROJECT_NAME}, {"Container", PROJECT_NAME}, {"SchemaName", "lists"},
-                {"QueryName", LIST_NAME}, {"Comment", "Exported to script type r"}};
+                {"QueryName", LIST_NAME}, {"Comment", "Exported to TSV"}};
         for(String[] columnAndValue : columnAndValues)
         {
             log("Checking column: "+ columnAndValue[0]);

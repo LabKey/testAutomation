@@ -28,9 +28,9 @@ public class DataRegionExportHelper
     private DataRegionTable _drt;
     private int _expectedFileCount;
 
-    public DataRegionExportHelper(BaseWebDriverTest test, DataRegionTable drt)
+    public DataRegionExportHelper(DataRegionTable drt)
     {
-        _test = test;
+        _test = drt._test;
         _drt = drt;
         _expectedFileCount = 1;
     }

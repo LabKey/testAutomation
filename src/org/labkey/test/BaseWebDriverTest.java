@@ -829,16 +829,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void refresh(int millis)
     {
-        prepForPageLoad();
         getDriver().navigate().refresh();
-        waitForPageToLoad(millis);
+        simpleWaitForPageToLoad(millis);
     }
 
     public void goBack(int millis)
     {
-        prepForPageLoad();
         getDriver().navigate().back();
-        waitForPageToLoad(millis);
+        simpleWaitForPageToLoad(millis);
     }
 
     public void goBack()
@@ -2559,11 +2557,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 }
             }
             pauseJsErrorChecker();
-            prepForPageLoad();
 
             long startTime = System.currentTimeMillis();
             getDriver().navigate().to(getBaseURL() + relativeURL);
-            waitForPageToLoad(millis);
+            simpleWaitForPageToLoad(millis);
             long elapsedTime = System.currentTimeMillis() - startTime;
             logMessage += " [" + elapsedTime + " ms]";
 
@@ -2583,10 +2580,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         try
         {
             pauseJsErrorChecker();
-            prepForPageLoad();
             long startTime = System.currentTimeMillis();
             getDriver().navigate().to(url);
-            waitForPageToLoad(milliseconds);
+            simpleWaitForPageToLoad(milliseconds);
             long elapsedTime = System.currentTimeMillis() - startTime;
             logMessage += " [" + elapsedTime + " ms]";
 
@@ -3553,13 +3549,26 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         catch (TimeoutException to)
         {
-            throw new RuntimeException("Page failed to load", to);
+            throw new TestTimeoutException("Page failed to load", to);
         }
     }
 
     public void waitForPageToLoad()
     {
         waitForPageToLoad(defaultWaitForPage);
+    }
+
+    public void simpleWaitForPageToLoad(int msWaitForPageLoad)
+    {
+        waitFor(new Checker()
+        {
+            @Override
+            public boolean check()
+            {
+                // Wait for marker to disappear
+                return executeScript("return document.readyState;").equals("complete");
+            }
+        }, "Page failed to load", msWaitForPageLoad);
     }
 
     public void waitForExtReady()
@@ -3670,6 +3679,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         popLocation();
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionExportHelper}
+     */
+    @Deprecated
     protected void clickExportToText()
     {
         clickButton("Export", 0);
@@ -3679,11 +3692,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionExportHelper}
      * Use UI to export data region
      * note that Selenium/Firefox currently can't handle the dialogue that will pop up if you choose anything but script
      * @param tab   Excel, Text, or Script
      * @param type the specific radiobutton to choose
      */
+    @Deprecated
     protected void exportDataRegion(String tab, String type)
     {
         clickButton("Export", 0);
@@ -3700,7 +3715,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         else
         {
-            clickButtonContainingText("Export To " + tab, 0);
+            clickButtonContainingText("Export to " + tab, 0);
         }
     }
 

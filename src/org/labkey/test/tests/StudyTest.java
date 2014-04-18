@@ -870,7 +870,7 @@ public class StudyTest extends StudyBaseTest
     private void verifyDatasetExport()
     {
         pushLocation();
-        exportDataRegion("Script", "R");
+        exportDataRegion("Text", null);
         goToAuditLog();
         prepForPageLoad();
         selectOptionByText(Locator.name("view"), "Query export events");
@@ -879,7 +879,7 @@ public class StudyTest extends StudyBaseTest
         DataRegionTable auditTable =  new DataRegionTable("query", this);
         String[][] columnAndValues = new String[][] {{"Created By", getDisplayName()},
                 {"Project", PROJECT_NAME}, {"Container", STUDY_NAME}, {"SchemaName", "study"},
-                {"QueryName", "DEM-1"}, {"Comment", "Exported to script type r"}};
+                {"QueryName", "DEM-1"}, {"Comment", "Exported to TSV"}};
         for(String[] columnAndValue : columnAndValues)
         {
             log("Checking column: "+ columnAndValue[0]);
