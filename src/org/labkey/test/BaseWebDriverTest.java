@@ -1774,7 +1774,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @ClassRule
-    public Timeout globalTimeout = new Timeout(1800000); // 30 minutes
+    public static Timeout globalTimeout = new Timeout(1800000); // 30 minutes
 
     @Rule
     public TestWatcher _watcher = new TestWatcher()
