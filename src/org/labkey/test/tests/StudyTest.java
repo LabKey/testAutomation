@@ -1110,13 +1110,9 @@ public class StudyTest extends StudyBaseTest
         waitAndClickAndWait(Locator.linkWithText("Manage Datasets"));
         waitAndClickAndWait(Locator.linkWithText(DEMOGRAPHICS_TITLE));
         clickButton("Edit Definition");
-        int lastFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
-        Locator lastField = Locator.xpath("//input[@name='ff_name" + lastFieldIndex + "']");
-        click(lastField);
-        waitAndClick(WAIT_FOR_JAVASCRIPT, Locator.navButton("Add Field"), 0);
-        int newFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]")) - 1;
-        _listHelper.setColumnName(getPropertyXPath("Dataset Fields"), newFieldIndex, "VisitDay");
-        _listHelper.setColumnType(newFieldIndex, ListHelper.ListColumnType.Integer);
+        waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
+        int lastFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]"));
+        _listHelper.addField("Dataset Fields", lastFieldIndex, "VisitDay", "VisitDay", ListHelper.ListColumnType.Integer);
         Locator element3 = Locator.gwtListBoxByLabel("Visit Date Column");
         selectOptionByValue(element3, "DEMdt");
         clickButton("Save");

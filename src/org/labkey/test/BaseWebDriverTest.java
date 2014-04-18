@@ -1197,7 +1197,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     // Clicks admin menu items. Tests should use helpers to make admin menu changes less disruptive.
     protected void clickAdminMenuItem(String... items)
     {
-        shortWait().until(ExpectedConditions.elementToBeClickable(Locators.ADMIN_MENU.toBy()));
+        longWait().until(ExpectedConditions.elementToBeClickable(Locators.ADMIN_MENU.toBy()));
         _ext4Helper.clickExt4MenuButton(true, Locators.ADMIN_MENU, false, items);
     }
 
