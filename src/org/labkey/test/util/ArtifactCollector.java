@@ -152,16 +152,6 @@ public class ArtifactCollector
         {
             _test.log("Failed to copy screenshot file: " + ioe.getMessage());
         }
-        catch (Exception ignore)
-        {
-            try
-            {
-                // Use alternate method for screen grab. Page might be too tall for TakesScreenshot.getScreenshotAs()
-                _test.windowMaximize();
-                return dumpFullScreen(dir, baseName);
-            }
-            catch (Exception ex) { _test.log("Failed to take screenshot: " + ex.getMessage()); }
-        }
 
         return null;
     }
