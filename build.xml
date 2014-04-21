@@ -560,6 +560,7 @@
             <sysproperty key="dump.svgs" value="${dump.svgs}"/>
             <sysproperty key="user.home" value="${user.home}"/>
             <sysproperty key="teamcity.buildType.id" value="${teamcity.buildType.id}"/>
+            <sysproperty key="additional.pipeline.tools" value="${additional.pipeline.tools}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>
@@ -1023,6 +1024,8 @@
             <isset property="suite"/>
         </condition>
 
+        <property name="additional.pipeline.tools" value="" />
+
         <condition property="webdriver.ie.driver" value="${test.dir}/bin/windows/amd64/IEDriverServer.exe">
             <and>
                 <os family="windows"/>
@@ -1145,6 +1148,7 @@
             <sysproperty key="dump.svgs" value="${dump.svgs}"/>
             <sysproperty key="user.home" value="${user.home}"/>
             <sysproperty key="teamcity.buildType.id" value="${teamcity.buildType.id}"/>
+            <sysproperty key="additional.pipeline.tools" value="${additional.pipeline.tools}"/>
 
             <formatter type="brief"/>
             <formatter type="xml"/>

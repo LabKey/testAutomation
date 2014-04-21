@@ -39,6 +39,9 @@ public class JUnitFooter extends BaseWebDriverTest
         log("** This should follow JUnitTest.");
         log("** It will check for any errors or memory leaks caused by server-side tests");
 
+        PipelineToolsHelper pipelineToolsHelper = new PipelineToolsHelper(this);
+        pipelineToolsHelper.resetPipelineToolsDirectory();
+
         try{deleteFolder("Shared", "_junit");}catch(Throwable e){/*ignore*/}
     }
 
