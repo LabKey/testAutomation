@@ -573,7 +573,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                     "XULElement.selectedIndex", // Ignore known Firefox Issue
                     "Failed to decode base64 string!", // Firefox issue
                     "xulrunner-1.9.0.14/components/FeedProcessor.js", // Firefox problem
-                    "Image corrupt or truncated:");
+                    "Image corrupt or truncated:",
+                    "SyntaxError: Using //@ to indicate source map URL pragmas");
         }
     }
 
