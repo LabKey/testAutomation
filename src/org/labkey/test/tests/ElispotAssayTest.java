@@ -449,6 +449,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         waitForElement(Locator.css("#plate-summary-div-1 table"));
 
         DataRegionTable table = new DataRegionTable("AntigenStats", this, true, true);
+        table.setSort("SpecimenLsid/Property/ParticipantID", SortDirection.ASC);
 
         Iterator<String> means = Arrays.asList("0.0", "2271111.1", "1111.1", "4444.4").iterator();
         for (String mean : table.getColumnDataAsText("Atg1AMean"))
