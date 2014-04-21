@@ -5035,6 +5035,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#setSort(String, SortDirection)}
+     */
+    @Deprecated
     public void setSort(String regionName, String columnName, SortDirection direction)
     {
         setSort(regionName, columnName, direction, defaultWaitForPage);
@@ -5057,6 +5061,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForPageToLoad(wait);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#setSort(String, SortDirection)}
+     */
+    @Deprecated
     public void setSort(String regionName, String columnName, SortDirection direction, int wait)
     {
         log("Setting sort in " + regionName + " for " + columnName + " to " + direction.toString());
@@ -5068,17 +5076,29 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForPageToLoad(wait);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#setFilter(String, String, String)}
+     */
+    @Deprecated
     public void setFilter(String regionName, String columnName, String filterType)
     {
         setUpFilter(regionName, columnName, filterType, null);
         clickButton("OK");
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#setFilter(String, String, String)}
+     */
+    @Deprecated
     public void setFilter(String regionName, String columnName, String filterType, String filter)
     {
         setFilter(regionName, columnName, filterType, filter, WAIT_FOR_PAGE);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#setFilter(String, String, String, int)}
+     */
+    @Deprecated
     public void setFilter(String regionName, String columnName, String filterType, String filter, int waitMillis)
     {
         setUpFilter(regionName, columnName, filterType, filter);
@@ -5090,6 +5110,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         setUpFilter(regionName, columnName, filterType, filter, null, null);
     }
 
+    /**
+     * @deprecated Use {@link org.labkey.test.util.DataRegionTable#setFilter(String, String, String, int)}
+     */
+    @Deprecated
     public void setFilterAndWait(String regionName, String columnName, String filterType, String filter, int milliSeconds)
     {
         setUpFilter(regionName, columnName, filterType, filter);
