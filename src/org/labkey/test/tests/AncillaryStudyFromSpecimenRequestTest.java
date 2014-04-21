@@ -29,7 +29,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
     @Override
     public void doCreateSteps()
     {
-        enableExperimentalFeature("CreateSpecimenStudy");
+        enableExperimentalFeature("Create Specimen Study");
         importStudy();
         startSpecimenImport(2);
         waitForPipelineJobsToComplete(2, "study import", false);

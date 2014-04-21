@@ -5247,8 +5247,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("experimental features"));
 
-        String xpath = "//div[div[text()='Create Specimen Study']]/a";
-        if(!isElementPresent(Locator.xpath(xpath)))
+        String xpath = "//div[div[text()='" + feature + "']]/a";
+        if (!isElementPresent(Locator.xpath(xpath)))
             fail("No such feature found");
         else
         {
