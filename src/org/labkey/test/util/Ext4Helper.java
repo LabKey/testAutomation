@@ -234,7 +234,6 @@ public class Ext4Helper extends AbstractHelper
 
     /**
      * Check the checkbox for an Ext4 grid row
-     * Currently used only for participant filter panel.
      * @param cellText Exact text from any cell in the desired row
      */
     public void checkGridRowCheckbox(String cellText)
@@ -244,7 +243,6 @@ public class Ext4Helper extends AbstractHelper
 
     /**
      * Check the checkbox for an Ext4 grid row
-     * Currently used only for participant filter panel
      * @param cellText Exact text from any cell in the desired row
      * @param index 0-based index of rows with matching cellText
      */
@@ -258,7 +256,6 @@ public class Ext4Helper extends AbstractHelper
 
     /**
      * Uncheck the checkbox for an Ext4 grid row
-     * Currently used only for participant filter panel.
      * @param cellText Exact text from any cell in the desired row
      */
     public void uncheckGridRowCheckbox(String cellText)
@@ -268,7 +265,6 @@ public class Ext4Helper extends AbstractHelper
 
     /**
      * Uncheck the checkbox for an Ext4 grid row
-     * Currently used only for participant filter panel
      * @param cellText Exact text from any cell in the desired row
      * @param index 0-based index of rows with matching cellText
      */
@@ -282,7 +278,6 @@ public class Ext4Helper extends AbstractHelper
 
     /**
      * Click the text of an Ext4 grid row
-     * Currently used only for time chart measure picker
      * @param cellText Exact text from any cell in the desired row
      * @param index 0-based index of rows with matching cellText
      */
@@ -296,7 +291,6 @@ public class Ext4Helper extends AbstractHelper
 
     /**
      * Click the text of an Participant filter panel grid row
-     * Currently used only for participant filter panel
      * @param cellText Exact text from any cell in the desired row
      * @param index 0-based index of rows with matching cellText
      */
@@ -310,7 +304,6 @@ public class Ext4Helper extends AbstractHelper
 
     /**
      * Click the text of an Participant filter panel category grouping header
-     * Currently used only for participant filter panel
      * @param categoryLabel Exact text from any category label (i.e. Cohorts, Group 1)
      */
     public void clickParticipantFilterCategory(String categoryLabel)

@@ -485,29 +485,6 @@ public class ExtHelper extends AbstractHelper
         selectExt4GridItem(colName, colValue, rowIndex, markerCls, keepExisting);
     }
 
-    //Pick measure from one of multiple split panel measure pickers
-    public void pickMeasure(String panelCls, String source, String measure, boolean isMultiSelect, boolean keepSelection)
-    {
-        _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .sourcepanel div.itemrow span.val"))); // if one row is ready, all should be
-        _test.waitAndClick(Locator.css("." + panelCls + " .sourcepanel div.itemrow span.val").withText(source));
-        //select measure
-        if (isMultiSelect)
-        {
-            _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .measuresgrid ." + Ext4Helper.getCssPrefix() + "grid-row"))); // if one row is ready, all should be
-            selectExt4GridItem("label", measure, -1, panelCls + " .measuresgrid", keepSelection);
-        }
-        else
-        {
-            _test.shortWait().until(ExpectedConditions.elementToBeClickable(By.cssSelector("." + panelCls + " .measuresgrid div.itemrow"))); // if one row is ready, all should be
-            _test.click(Locator.css("." + panelCls + " .measuresgrid div.itemrow").withText(measure));
-        }
-    }
-
-    public void pickMeasure(String panelCls, String source, String measure)
-    {
-        pickMeasure(panelCls, source, measure, false, false);
-    }
-
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
