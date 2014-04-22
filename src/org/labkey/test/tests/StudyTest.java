@@ -636,7 +636,9 @@ public class StudyTest extends StudyBaseTest
         // Test Bad Field Names -- #13607
         clickButton("Manage Dataset");
         clickButton("Edit Definition");
-        int newFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_name')]"));
+        Locator.XPathLocator nameField = Locator.xpath("//input[starts-with(@name, 'ff_name')]");
+        waitForElement(nameField);
+        int newFieldIndex = getElementCount(nameField);
         _listHelper.addField("Dataset", newFieldIndex, "Bad Name", "Bad Name", ListHelper.ListColumnType.String);
         clickButton("Save");
         clickButton("View Data");
