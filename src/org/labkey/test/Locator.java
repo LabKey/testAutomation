@@ -981,6 +981,40 @@ public abstract class Locator
             super(loc, index, contains, text);
         }
 
+        public static CssLocator union(CssLocator... locators)
+        {
+            if (locators.length == 0)
+                return null;
+
+            for (Locator loc : locators)
+            {
+                if (loc._contains != null || loc._text != null || loc._index != null)
+                    throw new IllegalArgumentException("Only able to union raw CSS selectors");
+            }
+
+            StringBuilder unionedLocators = new StringBuilder();
+            unionedLocators.append(locators[0]._loc);
+            for (int i = 1; i < locators.length; i++)
+            {
+                unionedLocators.append(",");
+                unionedLocators.append(locators[i]._loc);
+            }
+
+            return new CssLocator(unionedLocators.toString()){
+                @Override
+                public CssLocator append(CssLocator loc)
+                {
+                    throw new UnsupportedOperationException("Don't append to unioned CSS selectors.");
+                }
+
+                @Override
+                public Locator index(Integer index)
+                {
+                    throw new UnsupportedOperationException("Don't index into unioned CSS selectors.");
+                }
+            };
+        }
+
         public Locator containing(String contains)
         {
             if (_text != null && _text.length() > 0 || _contains != null && _contains.length() > 0)
