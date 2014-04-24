@@ -51,7 +51,7 @@ public class LuminexExcludedTitrationTest extends LuminexTest
      * postconditions:  multiple curve data will be present, wells for the given titration will be marked excluded
      */
     @LogMethod
-    protected void runTitrationExclusionTest()
+    private void runTitrationExclusionTest()
     {
         ensureMultipleCurveDataPresent();
 
@@ -63,7 +63,7 @@ public class LuminexExcludedTitrationTest extends LuminexTest
         excludeAnalyteWithinTitration("Sample 2", "ENV6");
     }
 
-    protected void excludeTitration(String Titration)
+    private void excludeTitration(String Titration)
     {
         clickButton("Exclude Titration","Analytes excluded for a replicate group or at the assay level will not be re-included by changes in titration exclusions" );
         waitForElement(Locator.xpath("//td/div").withText(Titration));
@@ -79,7 +79,7 @@ public class LuminexExcludedTitrationTest extends LuminexTest
         verifyTitrationExclusion(Titration, exclusionMessage);
     }
 
-    protected void excludeAnalyteWithinTitration(String Titration, String Analyte)
+    private void excludeAnalyteWithinTitration(String Titration, String Analyte)
     {
         clickButton("Exclude Titration","Analytes excluded for a replicate group or at the assay level will not be re-included by changes in titration exclusions" );
         waitForElement(Locator.xpath("//td/div").withText(Titration));
@@ -95,7 +95,7 @@ public class LuminexExcludedTitrationTest extends LuminexTest
         verifyTitrationAnalyteExclusion(Titration, Analyte, exclusionMessage);
     }
 
-    protected void verifyTitrationAnalyteExclusion(String excludedTitration, String excludedAnalyte, String exclusionMessage)
+    private void verifyTitrationAnalyteExclusion(String excludedTitration, String excludedAnalyte, String exclusionMessage)
     {
         setFilter("Data", "Description", "Equals", excludedTitration);
         setFilter("Data", "Analyte", "Contains", excludedAnalyte);
@@ -147,7 +147,7 @@ public class LuminexExcludedTitrationTest extends LuminexTest
         clearFilter("Data", "Description");
     }
 
-    protected void verifyTitrationExclusion(String excludedTitration, String exclusionMessage)
+    private void verifyTitrationExclusion(String excludedTitration, String exclusionMessage)
     {
         setFilter("Data", "Description", "Equals", excludedTitration);
         waitForElement(Locator.paginationText(1, 60, 60));

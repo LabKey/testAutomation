@@ -17,9 +17,12 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
+import org.labkey.test.util.DataRegionTable;
+import org.testng.Assert;
 
 import java.io.File;
 import java.util.Calendar;
@@ -57,7 +60,13 @@ public class LuminexSinglePointTest  extends LuminexTest
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'view qc report']"), "view single point control qc report");
         waitForText("Average Fi Bkgd");
 
-        assertTableCellTextEquals("dataregion_AnalyteSinglePointControl", 4, "Average Fi Bkgd", "27.0");
+        DataRegionTable tbl = new DataRegionTable("AnalyteSinglePointControl", this);
+        tbl.setFilter("Analyte", "Equals", "ENV1 (31)");
+        tbl.setSort("SinglePointControl/Run/Name", SortDirection.ASC);
+        Assert.assertEquals(tbl.getDataAsText(0, "Average Fi Bkgd"), "27.0");
+        Assert.assertEquals(tbl.getDataAsText(1, "Average Fi Bkgd"), "30.0");
+        tbl.clearFilter("Analyte");
+
         clickAndWait(Locator.linkContainingText("graph"));
         assertTextNotPresent("ERROR");
 

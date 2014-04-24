@@ -39,13 +39,13 @@ import static org.labkey.test.util.ListHelper.ListColumnType;
 
 import static org.junit.Assert.*;
 
-public class LuminexTest extends AbstractQCAssayTest
+public abstract class LuminexTest extends AbstractQCAssayTest
 {
     RReportHelper _rReportHelper = new RReportHelper(this);
 
     private boolean _useXarImport = false;
 
-    private final static String TEST_ASSAY_PRJ_LUMINEX = "LuminexTest Project";            //project for luminex test
+    protected final static String TEST_ASSAY_PRJ_LUMINEX = "LuminexTest Project";            //project for luminex test
 
     protected static final String TEST_ASSAY_LUM =  "&TestAssayLuminex></% 1";// put back TRICKY_CHARACTERS_NO_QUOTES when issue 20061 is resolved
     protected static final String TEST_ASSAY_LUM_DESC = "Description for Luminex assay";
@@ -77,9 +77,6 @@ public class LuminexTest extends AbstractQCAssayTest
     protected final File TEST_ASSAY_MULTIPLE_STANDARDS_1 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 1_IgA-Biot (Standard2).xls");
     protected final File TEST_ASSAY_MULTIPLE_STANDARDS_2 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 2_IgA-Biot (Standard2).xls");
     protected final File TEST_ASSAY_MULTIPLE_STANDARDS_3 = new File(getLabKeyRoot() + "/sampledata/Luminex/plate 3_IgA-Biot (Standard1).xls");
-
-    private static final String THAW_LIST_NAME = "LuminexThawList";
-    private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
 
     protected static final String RTRANSFORM_SCRIPT_FILE_LABKEY = "/resources/transformscripts/labkey_luminex_transform.R";
     protected static final String RTRANSFORM_SCRIPT_FILE_LAB = "/resources/transformscripts/tomaras_luminex_transform.R";
@@ -305,197 +302,6 @@ public class LuminexTest extends AbstractQCAssayTest
         waitForText("Save successful.", 20000);
     }
 
-
-    /**
-     * Performs Luminex designer/upload/publish.
-     */
-    @LogMethod
-    protected void runUITests()
-    {
-        log("Starting Assay BVT Test");
-
-        runUploadAndCopyTest();
-        runJavaTransformTest();
-        runRTransformTest();
-        runMultipleCurveTest();
-        runWellExclusionTest();
-        runEC50Test();
-        runGuideSetTest();
-    } //doTestSteps()
-
-    @LogMethod
-    protected void runUploadAndCopyTest()
-    {
-        _listHelper.importListArchive(getProjectName(), new File(getSampledataPath(), "/Luminex/UploadAndCopy.lists.zip"));
-
-        clickProject(TEST_ASSAY_PRJ_LUMINEX);
-
-        clickAndWait(Locator.linkWithText("Assay List"));
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
-        // Make sure we have the expected help text
-        assertTextPresent("No runs to show. To add new runs, use the Import Data button.");
-        log("Uploading Luminex Runs");
-        clickButton("Import Data");
-        setFormElement(Locator.name("species"), TEST_ASSAY_LUM_SET_PROP_SPECIES);
-        clickButton("Next");
-        setFormElement(Locator.name("name"), TEST_ASSAY_LUM_RUN_NAME);
-        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE1);
-        clickButton("Next", 60000);
-        clickButton("Save and Import Another Run");
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
-
-        clickButton("Import Data");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES, getFormElement(Locator.name("species")));
-        setFormElement(Locator.name("species"), TEST_ASSAY_LUM_SET_PROP_SPECIES2);
-        clickButton("Next");
-        setFormElement(Locator.name("name"), TEST_ASSAY_LUM_RUN_NAME2);
-        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE2);
-        clickButton("Next", 60000);
-        setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]"), "StandardName1b");
-        setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text']"), "StandardName2");
-        setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[5]//input[@type='text']"), "StandardName4");
-        clickButton("Save and Finish");
-
-        // Upload another run using a thaw list pasted in as a TSV
-        clickButton("Import Data");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, getFormElement(Locator.name("species")));
-        checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", "Lookup"));
-        checkCheckbox(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
-        setFormElement(Locator.id("ThawListTextArea"), "Index\tSpecimenID\tParticipantID\tVisitID\n" +
-                "1\tSpecimenID1\tParticipantID1\t1.1\n" +
-                "2\tSpecimenID2\tParticipantID2\t1.2\n" +
-                "3\tSpecimenID3\tParticipantID3\t1.3\n" +
-                "4\tSpecimenID4\tParticipantID4\t1.4");
-        clickButton("Next");
-        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE3);
-        clickButton("Next", 60000);
-        assertEquals("StandardName1b", getFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]")));
-        assertEquals("StandardName4", getFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]")));
-        clickButton("Save and Finish");
-
-        // Upload another run using a thaw list that pointed at the list we uploaded earlier
-        clickButton("Import Data");
-        assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, getFormElement(Locator.name("species")));
-        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("participantVisitResolver", "Lookup"));
-        assertRadioButtonSelected(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
-        checkCheckbox(Locator.radioButtonByNameAndValue("ThawListType", "List"));
-        waitForElement(Locator.id("button_Choose list..."), WAIT_FOR_JAVASCRIPT);
-        clickButton("Choose list...", 0);
-        setFormElement(Locator.id("schema"), "lists");
-        setFormElement(Locator.id("table"), THAW_LIST_NAME);
-        clickButton("Close", 0);
-        clickButton("Next");
-        setFormElement(Locator.name("name"), TEST_ASSAY_LUM_RUN_NAME4);
-        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE3);
-        waitForText("A file with name '" + TEST_ASSAY_LUM_FILE3.getName() + "' already exists");
-        clickButton("Next", 60000);
-        assertEquals("StandardName1b", getFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]")));
-        assertEquals("StandardName4", getFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]/../../../tr[4]//input[@type='text'][1]")));
-        clickButton("Save and Finish");
-
-        log("Check that upload worked");
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM_RUN_NAME), 2 * WAIT_FOR_PAGE);
-        assertTextPresent("Hu IL-1b (32)");
-
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM + " Runs"));
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM_RUN_NAME3));
-        assertTextPresent("IL-1b (1)");
-        assertTextPresent("ParticipantID1");
-        assertTextPresent("ParticipantID2");
-        assertTextPresent("ParticipantID3");
-        setFilter("Data", "ParticipantID", "Equals", "ParticipantID1");
-        assertTextPresent("1.1");
-        setFilter("Data", "ParticipantID", "Equals", "ParticipantID2");
-        assertTextPresent("1.2");
-
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM + " Runs"));
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM_RUN_NAME4));
-        assertTextPresent("IL-1b (1)");
-        assertTextPresent("ListParticipant1");
-        assertTextPresent("ListParticipant2");
-        assertTextPresent("ListParticipant3");
-        assertTextPresent("ListParticipant4");
-        setFilter("Data", "ParticipantID", "Equals", "ListParticipant1");
-        assertTextPresent("1001.1");
-        setFilter("Data", "ParticipantID", "Equals", "ListParticipant2");
-        assertTextPresent("1001.2");
-
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM + " Runs"));
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM_RUN_NAME2));
-        assertTextPresent("IL-1b (1)");
-        assertTextPresent("9011-04");
-
-        setFilter("Data", "FI", "Equals", "20");
-        click(Locator.name(".toggle"));
-        clickButton("Copy to Study");
-        selectOptionByText(Locator.name("targetStudy"), "/" + TEST_ASSAY_PRJ_LUMINEX + " (" + TEST_ASSAY_PRJ_LUMINEX + " Study)");
-        clickButton("Next");
-        setFormElement(Locator.name("participantId"), "ParticipantID");
-        setFormElement(Locator.name("visitId"), "100.1");
-        clickButton("Copy to Study");
-
-        log("Verify that the data was published");
-        assertTextPresent("ParticipantID");
-        assertTextPresent("100.1");
-        assertTextPresent(TEST_ASSAY_LUM_RUN_NAME2);
-        assertTextPresent("LX10005314302");
-
-        // Upload another run that has both Raw and Summary data in the same excel file
-        clickProject(TEST_ASSAY_PRJ_LUMINEX);
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
-        clickButton("Import Data");
-        clickButton("Next");
-        setFormElement(Locator.name("name"), "raw and summary");
-        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE10);
-        clickButton("Next", 60000);
-        clickButton("Save and Finish");
-
-        clickAndWait(Locator.linkWithText("raw and summary"), 2 * WAIT_FOR_PAGE);
-        // make sure the Summary, StdDev, and DV columns are visible
-        _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("Summary");
-        _customizeViewsHelper.addCustomizeViewColumn("StdDev");
-        _customizeViewsHelper.addCustomizeViewColumn("CV");
-        _customizeViewsHelper.applyCustomView();
-        // show all rows (> 100 in full data file)
-        clickButton("Page Size", 0);
-        clickAndWait(Locator.linkWithText("Show All"));
-
-        // check that both the raw and summary data were uploaded together
-        DataRegionTable table = new DataRegionTable("Data", this);
-        assertEquals("Unexpected number of data rows for both raw and summary data", 108, table.getDataRowCount());
-        // check the number of rows of summary data
-        table.setFilter("Summary", "Equals", "true");
-        assertEquals("Unexpected number of data rows for summary data", 36, table.getDataRowCount());
-        table.clearFilter("Summary");
-        // check the number of rows of raw data
-        table.setFilter("Summary", "Equals", "false");
-        assertEquals("Unexpected number of data rows for raw data", 72, table.getDataRowCount());
-        table.clearFilter("Summary");
-        // check the row count at the analyte level
-        table.setFilter("Analyte", "Equals", "Analyte1");
-        assertEquals("Unexpected number of data rows for Analyte1", 36, table.getDataRowCount());
-
-        // check the StdDev and % CV for a few samples
-        checkStdDevAndCV("Analyte1", "S10", 3, "0.35", "9.43%");
-        checkStdDevAndCV("Analyte2", "S4", 3, "3.18", "4.80%");
-        checkStdDevAndCV("Analyte3", "S8", 3, "1.77", "18.13%");
-    }
-
-    private void checkStdDevAndCV(String analyte, String type, int rowCount, String stddev, String cv)
-    {
-        DataRegionTable table = new DataRegionTable("Data", this);
-        table.setFilter("Analyte", "Equals", analyte);
-        table.setFilter("Type", "Equals", type);
-        assertEquals("Unexpected number of data rows for " + analyte + "/" + type, rowCount, table.getDataRowCount());
-        for (int i = 0; i < rowCount; i++)  
-        {
-            assertEquals("Wrong StdDev", stddev, table.getDataAsText(i, "StdDev"));
-            assertEquals("Wrong %CV", cv, table.getDataAsText(i, "CV"));
-        }
-        table.clearFilter("Type");
-        table.clearFilter("Analyte");
-    }
 
     @LogMethod
     protected void runEC50Test()
@@ -1125,7 +931,7 @@ public class LuminexTest extends AbstractQCAssayTest
         uploadMultipleCurveData();
     }
 
-    private void addFilesToAssayRun(File firstFile, File... additionalFiles)
+    protected void addFilesToAssayRun(File firstFile, File... additionalFiles)
     {
         setFormElement(Locator.name(ASSAY_DATA_FILE_LOCATION_MULTIPLE_FIELD), firstFile);
 
@@ -1146,7 +952,7 @@ public class LuminexTest extends AbstractQCAssayTest
      * postconditions: at data import screen for new test run
      * @param name name to give new assay run
      */
-    private void createNewAssayRun(String name)
+    protected void createNewAssayRun(String name)
     {
         goToTestRunList();
         clickButtonContainingText("Import Data");
@@ -1171,39 +977,6 @@ public class LuminexTest extends AbstractQCAssayTest
 
         deleteDir(getTestTempDir());
     } //doCleanup()
-
-    @LogMethod
-    protected void runJavaTransformTest()
-    {
-        // add the transform script to the assay
-        log("Uploading Luminex Runs with a transform script");
-
-
-        //TODO:  goToTestRunList
-        clickProject(TEST_ASSAY_PRJ_LUMINEX);
-        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
-        clickEditAssayDesign(false);
-
-        addTransformScript(new File(WebTestHelper.getLabKeyRoot(), "/sampledata/qc/transform.jar"), 0);
-        clickButton("Save & Close");
-
-        goToTestAssayHome();
-        clickButton("Import Data");
-        setFormElement(Locator.name("species"), TEST_ASSAY_LUM_SET_PROP_SPECIES);
-        clickButton("Next");
-        setFormElement(Locator.name("name"), "transformed assayId");
-        setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE1);
-        clickButton("Next", 60000);
-        clickButton("Save and Finish");
-
-        // verify the description error was generated by the transform script
-        clickAndWait(Locator.linkWithText("transformed assayId"), 2 * WAIT_FOR_PAGE);
-        DataRegionTable table = new DataRegionTable("Data", this);
-        for(int i = 1; i <= 40; i++)
-        {
-            assertEquals("Transformed", table.getDataAsText(i, "Description"));
-        }
-    }
 
     //helper function to go to test assay home from anywhere the project link is visible
     protected void goToTestAssayHome()
@@ -2126,6 +1899,7 @@ public class LuminexTest extends AbstractQCAssayTest
 
         waitForElement(Locator.tagWithText("td", today), 2*defaultWaitForPage);
         assertElementPresent(Locator.tagWithText("td", comment));
+        assertElementPresent(Locator.tagWithText("td", "Run-based"));
     }
 
     private void waitForGuideSetExtMaskToDisappear()
@@ -2330,41 +2104,4 @@ public class LuminexTest extends AbstractQCAssayTest
         // no op, currently used by LuminexPositivityTest
     }
 
-    @LogMethod
-    protected void runFileUploadTest()
-    {
-        String[] assayNames = {"Test Assay 1", "Test Assay 2", "Test Assay 3"};
-        String ERROR_TEXT = "already exists.";
-
-        log("Testing file upload conflict error messages and archive on delete");
-
-        // Create a run that imports 1 file
-        createNewAssayRun(assayNames[0]);
-
-        addFilesToAssayRun(TEST_ASSAY_MULTIPLE_STANDARDS_1);
-        clickButton("Next");
-        clickButton("Save and Finish", 2 * WAIT_FOR_PAGE);
-
-        // Create a second run that imports the file again and check for error message
-        createNewAssayRun(assayNames[1]);
-        addFilesToAssayRun(TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3);
-        // verify that conflict error message is present
-        waitForText(ERROR_TEXT, WAIT_FOR_JAVASCRIPT);
-        clickButton("Next");
-        clickButton("Cancel", 2 * WAIT_FOR_PAGE);
-
-        // Delete the first run, files should be archived
-        checkCheckbox(Locator.checkboxByName(".select"));
-        clickButton("Delete");
-        waitForText("Confirm Deletion", WAIT_FOR_JAVASCRIPT);
-        clickButton("Confirm Delete");
-        waitForText("Description for Luminex assay", WAIT_FOR_JAVASCRIPT);
-
-        // Create a run with a duplicate file within the set of files
-        createNewAssayRun(assayNames[2]);
-        addFilesToAssayRun(TEST_ASSAY_MULTIPLE_STANDARDS_1, TEST_ASSAY_MULTIPLE_STANDARDS_2, TEST_ASSAY_MULTIPLE_STANDARDS_3, TEST_ASSAY_MULTIPLE_STANDARDS_3);
-        // verify that the error message for duplicate entries pops up, and that the first remove button is enabled (checks prior bug)
-        waitForText("duplicate", WAIT_FOR_JAVASCRIPT);
-        clickButton("OK", 0);
-    }
 }
