@@ -403,7 +403,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("Johannesburg, South Africa");
 
         clickFolder(getFolderName());
-        click(Locator.linkWithText("Specimen Requests"));
+        waitAndClick(Locator.linkWithText("Specimen Requests"));
         clickAndWait(Locator.linkWithText("View Current Requests"));
         clickButton("Details");
         assertTextPresent("WARNING: Missing Specimens");
