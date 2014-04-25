@@ -424,6 +424,7 @@ src/org/labkey/test/tests/LabModulesTest.java -text
 src/org/labkey/test/tests/LibraTest.java -text
 src/org/labkey/test/tests/LinkedSchemaTest.java -text
 src/org/labkey/test/tests/ListExportTest.java -text
+src/org/labkey/test/tests/ListImportFieldsTest.java -text
 src/org/labkey/test/tests/ListPublishTest.java -text
 src/org/labkey/test/tests/ListTest.java -text
 src/org/labkey/test/tests/LuminexAsyncImportTest.java -text
@@ -494,6 +495,7 @@ src/org/labkey/test/tests/SpecimenReplaceTest.java -text
 src/org/labkey/test/tests/SpecimenTest.java -text
 src/org/labkey/test/tests/StudyBaseTest.java -text
 src/org/labkey/test/tests/StudyCohortExportTest.java -text
+src/org/labkey/test/tests/StudyDatasetImportFieldsTest.java -text
 src/org/labkey/test/tests/StudyDatasetsTest.java -text
 src/org/labkey/test/tests/StudyDataspaceTest.java -text
 src/org/labkey/test/tests/StudyDemoModeTest.java -text
