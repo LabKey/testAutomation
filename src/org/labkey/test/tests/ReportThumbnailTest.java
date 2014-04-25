@@ -194,8 +194,7 @@ public class ReportThumbnailTest extends BaseWebDriverTest
         }
 
         _ext4Helper.clickWindowButton("Save", "Save", 0, 0);
-        waitForElement(Locator.css("span.labkey-message").withText("Report Saved successfully"));
-        _extHelper.waitForExtDialogToDisappear("Saved");
+        _extHelper.waitForExtDialog("Saved");
     }
 
     @LogMethod

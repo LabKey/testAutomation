@@ -41,7 +41,7 @@ public abstract class Locator
     protected String _text;
 
     // XPATH fragments
-    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@style,'opacity: 0') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@class, 'x-hide-offsets')] or (@type = 'hidden'))";
+    public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@class, 'x-hide-offsets')] or (@type = 'hidden'))";
     public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'disabled')])";
 
     @Deprecated
