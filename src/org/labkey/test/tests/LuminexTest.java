@@ -1299,14 +1299,14 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     {
 
         // remove a run from the current guide set
-        setUpGuideSet("GS Analyte (2)");
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
         clickButtonContainingText("Edit", 0);
-        editGuideSet(new String[] {"guideRunSetRow_0"}, GUIDE_SET_5_COMMENT, false);
+        editRunBasedGuideSet(new String[]{"guideRunSetRow_0"}, GUIDE_SET_5_COMMENT, false);
 
         // create a new guide set for the second analyte so that we can test the apply guide set
-        setUpGuideSet("GS Analyte (2)");
-        createGuideSet("GS Analyte (2)", false);
-        editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_2", "allRunsRow_3"}, "create new analyte 2 guide set with 3 runs", true);
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
+        createGuideSet(false);
+        editRunBasedGuideSet(new String[]{"allRunsRow_1", "allRunsRow_2", "allRunsRow_3"}, "create new analyte 2 guide set with 3 runs", true);
 
         // apply the new guide set to a run
         verifyGuideSetToRun("NETWORK5", "create new analyte 2 guide set with 3 runs");
@@ -1332,7 +1332,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         createAndImpersonateUser(editor, "Editor");
 
         beginAt(ljUrl);
-        setUpGuideSet("GS Analyte (2)");
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
         assertTextPresent("Apply Guide Set");
         stopImpersonating();
         deleteUsers(true, editor);
@@ -1340,7 +1340,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         createAndImpersonateUser(reader, "Reader");
 
         beginAt(ljUrl);
-        setUpGuideSet("GS Analyte (2)");
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
         assertTextPresent("Levey-Jennings Reports", "Standard1");
         assertTextNotPresent("Apply Guide Set");
         stopImpersonating();
@@ -1390,10 +1390,10 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         //4. For GS Analyte (2), apply the non-current guide set to plate 5a
         //	- QC Flags added for EC50 and HMFI
         goToLeveyJenningsGraphPage("Standard1");
-        setUpGuideSet("GS Analyte (2)");
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
         String newQcFlags = "AUC, EC50-4, EC50-5, HMFI";
         assertTextNotPresent(newQcFlags);
-        applyGuideSetToRun("NETWORK5", GUIDE_SET_5_COMMENT, 2);
+        applyGuideSetToRun("NETWORK5", GUIDE_SET_5_COMMENT, false);
         //assert ec50 and HMFI red text present
         assertElementPresent(Locator.xpath("//div[text()='28040.51' and contains(@style,'red')]"));
         assertElementPresent(Locator.xpath("//div[text()='27950.73' and contains(@style,'red')]"));
@@ -1408,24 +1408,24 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         //5. For GS Analyte (2), apply the guide set for plate 5a back to the current guide set
         //	- the EC50 and HMFI QC Flags that were added in step 4 are removed
         goToLeveyJenningsGraphPage("Standard1");
-        setUpGuideSet("GS Analyte (2)");
-        applyGuideSetToRun("NETWORK5", GUIDE_SET_5_COMMENT, -1);
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
+        applyGuideSetToRun("NETWORK5", GUIDE_SET_5_COMMENT, true);
         assertTextNotPresent(newQcFlags);
 
         //6. Create new Guide Set for GS Analyte (2) that includes plate 5 (but not plate 5a)
         //	- the AUC QC Flag for plate 5 is removed
         Locator.XPathLocator aucLink =  Locator.xpath("//a[contains(text(),'AUC')]");
         int aucCount = getElementCount(aucLink);
-        createGuideSet("GS Analyte (2)", false);
-        editGuideSet(new String[]{"allRunsRow_1"}, "Guide set includes plate 5", true);
+        createGuideSet(false);
+        editRunBasedGuideSet(new String[]{"allRunsRow_1"}, "Guide set includes plate 5", true);
         assertEquals("Wrong count for AUC flag links", aucCount-1, (getElementCount(aucLink)));
 
         //7. Switch to GS Analyte (1), and edit the current guide set to include plate 3
         //	- the QC Flag for plate 3 (the run included) and the other plates (4, 5, and 5a) are all removed as all values are within the guide set ranges
-        setUpGuideSet("GS Analyte (1)");
+        setUpLeveyJenningsGraphParams("GS Analyte (1)");
         assertExpectedAnalyte1QCFlagsPresent();
         clickButtonContainingText("Edit", 0);
-        editGuideSet(new String[]{"allRunsRow_3"}, "edited analyte 1", false);
+        editRunBasedGuideSet(new String[]{"allRunsRow_3"}, "edited analyte 1", false);
         assertEC505PLQCFlagsPresent(1);
 
         //8. Edit the GS Analyte (1) guide set and remove plate 3
@@ -1649,7 +1649,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         clickAndWait(Locator.linkContainingText(TEST_ASSAY_LUM));
         excludeWellFromRun("Guide Set plate 5", "A6,B6");
         goToLeveyJenningsGraphPage("Standard1");
-        setUpGuideSet("GS Analyte (2)");
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
         assertTextPresent("28040.51");
     }
 
@@ -1694,7 +1694,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     private void verifyLeveyJenningsRplots()
     {
         goToLeveyJenningsGraphPage("Standard1");
-        setUpGuideSet("GS Analyte (2)");
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
 
         // check 4PL ec50 trending R plot
         click(Locator.tagWithText("span", "EC50 - 4PL"));
@@ -1803,36 +1803,28 @@ public abstract class LuminexTest extends AbstractQCAssayTest
 
     private void createInitialGuideSets()
     {
-        setUpGuideSet("GS Analyte (1)");
-        createGuideSet("GS Analyte (1)", true);
-        editGuideSet(new String[] {"allRunsRow_1", "allRunsRow_0"}, "Analyte 1", true);
+        setUpLeveyJenningsGraphParams("GS Analyte (1)");
+        createGuideSet(true);
+        editRunBasedGuideSet(new String[]{"allRunsRow_1", "allRunsRow_0"}, "Analyte 1", true);
 
-        setUpGuideSet("GS Analyte (2)");
-        createGuideSet("GS Analyte (2)", true);
-        editGuideSet(new String[] {"allRunsRow_1"}, "Analyte 2", true);
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
+        createGuideSet(true);
+        editRunBasedGuideSet(new String[]{"allRunsRow_1"}, "Analyte 2", true);
 
         //edit a guide set
         log("attempt to edit guide set after creation");
         clickButtonContainingText("Edit", 0);
-        editGuideSet(new String[] {"allRunsRow_0"}, "edited analyte 2", false);
+        editRunBasedGuideSet(new String[]{"allRunsRow_0"}, "edited analyte 2", false);
     }
 
-    private void setIsoAndConjugate()
-    {
-        log("unimplemented");
-        _extHelper.selectComboBoxItem("Isotype:", isotype);
-
-        _extHelper.selectComboBoxItem("Conjugate:", conjugate);
-
-    }
-
-    public void setUpGuideSet(String analyte)
+    public void setUpLeveyJenningsGraphParams(String analyte)
     {
         log("Setting Levey-Jennings Report graph parameters for Analyte " + analyte);
         waitForText(analyte);
         click(Locator.tagContainingText("span", analyte));
 
-        setIsoAndConjugate();
+        _extHelper.selectComboBoxItem("Isotype:", isotype);
+        _extHelper.selectComboBoxItem("Conjugate:", conjugate);
         click(Locator.extButton("Apply", 0));
 
         // wait for the test headers in the guide set and tracking data regions
@@ -1851,7 +1843,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         }
 
     }
-    public void createGuideSet(String analyte, boolean initialGuideSet)
+    public void createGuideSet(boolean initialGuideSet)
     {
         if (initialGuideSet)
             waitForText("No current guide set for the selected graph parameters");
@@ -1863,7 +1855,33 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         }
     }
 
-    public void editGuideSet(String[] rows, String comment, boolean creating)
+    public void editValueBasedGuideSet(Map<String, Double> metricInputs, String comment, boolean creating)
+    {
+        checkManageGuideSetHeader(creating);
+
+        if (creating)
+            checkRadioButton(Locator.radioButtonByNameAndValue("ValueBased", "true"));
+        setValueBasedMetricForm(metricInputs);
+
+        setFormElement(Locator.name("commentTextField"), comment);
+        saveGuideSet(creating);
+
+        checkLeveyJenningsGuideSetHeader(comment, "Value-based");
+    }
+
+    public void editRunBasedGuideSet(String[] rows, String comment, boolean creating)
+    {
+        checkManageGuideSetHeader(creating);
+
+        addRemoveGuideSetRuns(rows);
+
+        setFormElement(Locator.name("commentTextField"), comment);
+        saveGuideSet(creating);
+
+        checkLeveyJenningsGuideSetHeader(comment, "Run-based");
+    }
+
+    private void checkManageGuideSetHeader(boolean creating)
     {
         if (creating)
         {
@@ -1877,11 +1895,10 @@ public abstract class LuminexTest extends AbstractQCAssayTest
             waitForText("Guide Set ID:");
             assertTextPresentInThisOrder("Created:", today);
         }
+    }
 
-
-        addRemoveGuideSetRuns(rows);
-        setFormElement(Locator.name("commentTextField"), comment);
-
+    private void saveGuideSet(boolean creating)
+    {
         if (creating)
         {
             assertElementNotPresent(Locator.button("Save"));
@@ -1896,10 +1913,22 @@ public abstract class LuminexTest extends AbstractQCAssayTest
             clickButton("Save",0);
         }
         waitForGuideSetExtMaskToDisappear();
+    }
 
+    private void checkLeveyJenningsGuideSetHeader(String comment, String guideSetType)
+    {
         waitForElement(Locator.tagWithText("td", today), 2*defaultWaitForPage);
         assertElementPresent(Locator.tagWithText("td", comment));
-        assertElementPresent(Locator.tagWithText("td", "Run-based"));
+        assertElementPresent(Locator.tagWithText("td", guideSetType));
+    }
+
+    private void setValueBasedMetricForm(Map<String, Double> metricInputs)
+    {
+        for (Map.Entry<String, Double> metricEntry : metricInputs.entrySet())
+        {
+            String strVal = metricEntry.getValue() != null ? metricEntry.getValue().toString() : null;
+            setFormElement(Locator.name(metricEntry.getKey()), strVal);
+        }
     }
 
     private void waitForGuideSetExtMaskToDisappear()
@@ -1949,13 +1978,13 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     }
 
     @LogMethod
-    private void applyGuideSetToRun(String network, String comment, int guideSetIndex)
+    protected void applyGuideSetToRun(String network, String comment, boolean useCurrent)
     {
         click(ExtHelper.locateGridRowCheckbox(network));
         clickButton("Apply Guide Set", 0);
         sleep(1000);//we need a little time even after all the elements have appeared, so waits won't work
 
-        if(guideSetIndex!=-1) //not clicking anything will apply the current guide set
+        if(!useCurrent)
             click(ExtHelper.locateGridRowCheckbox(comment));
 
         waitAndClick(5000, getButtonLocator("Apply Thresholds"), 0);
@@ -1991,7 +2020,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     {
         String colValuePrefix = "NETWORK";
 
-        setUpGuideSet("GS Analyte (2)");
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
         // check that all 5 runs are present in the grid by clicking on them
         for (int i = 1; i <= 5; i++)
         {
@@ -2017,7 +2046,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         String colNetworkPrefix = "NETWORK";
         String colProtocolPrefix = "PROTOCOL";
 
-        setUpGuideSet("GS Analyte (2)");
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
         // check that all 5 runs are present in the grid by clicking on them
         for (int i = 1; i <= 5; i++)
         {
@@ -2049,7 +2078,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
 
     private void applyLogYAxisScale()
     {
-        setUpGuideSet("GS Analyte (2)");
+        setUpLeveyJenningsGraphParams("GS Analyte (2)");
         _extHelper.selectComboBoxItem(Locator.xpath("//input[@id='scale-combo-box']/.."), "Log");
         waitForLeveyJenningsTrendPlot();
     }

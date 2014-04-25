@@ -26,6 +26,8 @@ import org.testng.Assert;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 @Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexSinglePointTest  extends LuminexTest
@@ -65,25 +67,55 @@ public class LuminexSinglePointTest  extends LuminexTest
         tbl.setSort("SinglePointControl/Run/Name", SortDirection.ASC);
         Assert.assertEquals(tbl.getDataAsText(0, "Average Fi Bkgd"), "27.0");
         Assert.assertEquals(tbl.getDataAsText(1, "Average Fi Bkgd"), "30.0");
-        tbl.clearFilter("Analyte");
-
         clickAndWait(Locator.linkContainingText("graph"));
         assertTextNotPresent("ERROR");
 
-        createGuideSet("ENV1 (31)", true);
-        editGuideSet(new String[]{"allRunsRow_1", "allRunsRow_0"}, "Single Point Control Guide", true);
+        createGuideSet(true);
+        editRunBasedGuideSet(new String[]{"allRunsRow_1", "allRunsRow_0"}, "Single Point Control Guide Set 1", true);
 
         importRun(file3, 3);
         waitForPipelineJobsToFinish(4);
 
         goToLeviJennings();
-        waitForText("CTRL");
+        waitForElement(Locator.tagWithText("a", "CTRL"));
 
         importRun(file4, 4);
         waitForPipelineJobsToFinish(5);
 
         goToLeviJennings();
-        assertTextNotPresent("04-17A32-IgA-Biotin.xls");
+        waitForElement(Locator.linkWithText(file3));
+        assertTextNotPresent(file4);
+
+        verifyValueBasedGuideSet();
+    }
+
+    private void verifyValueBasedGuideSet()
+    {
+        String guideSetComment = "Single Point Control Guide Set 2";
+        Locator ctrlFlag = Locator.tagWithText("a", "CTRL");
+
+        Map<String, Double> metricInputs = new HashMap<>();
+        metricInputs.put("MaxFIAverage", 33.0);
+        metricInputs.put("MaxFIStdDev", 1.25);
+        createGuideSet(false);
+        editValueBasedGuideSet(metricInputs, guideSetComment, true);
+
+        applyGuideSetToRun("NETWORK3", guideSetComment, true);
+        waitForElementToDisappear(ctrlFlag);
+
+        metricInputs.put("MaxFIStdDev", 0.25);
+        clickButtonContainingText("Edit", 0);
+        editValueBasedGuideSet(metricInputs, guideSetComment, false);
+        waitForElement(ctrlFlag);
+
+        metricInputs.put("MaxFIAverage", 35.0);
+        metricInputs.put("MaxFIStdDev", null);
+        clickButtonContainingText("Edit", 0);
+        editValueBasedGuideSet(metricInputs, guideSetComment, false);
+        waitForElementToDisappear(ctrlFlag);
+
+        applyGuideSetToRun("NETWORK3", "Single Point Control Guide Set 1", false);
+        waitForElement(ctrlFlag);
     }
 
     protected void goToLeviJennings()
@@ -98,13 +130,15 @@ public class LuminexSinglePointTest  extends LuminexTest
 
         goToTestAssayHome();
         clickButton("Import Data");
+        setFormElement(Locator.name("network"), "NETWORK" + runNumber);
         clickButton("Next");
 
         Calendar testDate = Calendar.getInstance();
         testDate.add(Calendar.DATE, 1);
 
-        importLuminexRunPageTwo(filename, isotype, conjugate, "", "", "Notebook",
-                "Experimental", "TECH", df.format(testDate.getTime()), new File(getLabKeyRoot(),"sampledata/Luminex/"+filename), 1);
+        importLuminexRunPageTwo(filename, isotype, conjugate, "", "", "Notebook"+runNumber,
+                "Experimental", "TECH", df.format(testDate.getTime()),
+                new File(getLabKeyRoot(),"sampledata/Luminex/"+filename), 1);
 
          switch(runNumber){
              case 1 :
