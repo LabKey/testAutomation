@@ -831,14 +831,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void refresh(int millis)
     {
+        prepForPageLoad();
         getDriver().navigate().refresh();
-        simpleWaitForPageToLoad(millis);
+        waitForPageToLoad(millis);
     }
 
     public void goBack(int millis)
     {
+        prepForPageLoad();
         getDriver().navigate().back();
-        simpleWaitForPageToLoad(millis);
+        waitForPageToLoad(millis);
     }
 
     public void goBack()
@@ -2562,8 +2564,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             pauseJsErrorChecker();
 
             long startTime = System.currentTimeMillis();
+            prepForPageLoad();
             getDriver().navigate().to(getBaseURL() + relativeURL);
-            simpleWaitForPageToLoad(millis);
+            waitForPageToLoad(millis);
             long elapsedTime = System.currentTimeMillis() - startTime;
             logMessage += " [" + elapsedTime + " ms]";
 
@@ -2584,8 +2587,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             pauseJsErrorChecker();
             long startTime = System.currentTimeMillis();
+            prepForPageLoad();
             getDriver().navigate().to(url);
-            simpleWaitForPageToLoad(milliseconds);
+            waitForPageToLoad(milliseconds);
             long elapsedTime = System.currentTimeMillis() - startTime;
             logMessage += " [" + elapsedTime + " ms]";
 
@@ -3559,20 +3563,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void waitForPageToLoad()
     {
         waitForPageToLoad(defaultWaitForPage);
-    }
-
-    public void simpleWaitForPageToLoad(int msWaitForPageLoad)
-    {
-        waitFor(new Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                // Wait for marker to disappear
-                return executeScript("return document.readyState;").equals("complete");
-            }
-        }, "Page failed to load", msWaitForPageLoad);
-        waitForExtOnReady();
     }
 
     public void waitForExtReady()
