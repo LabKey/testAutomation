@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Category({DailyA.class, MiniTest.class, Assays.class})
-public class LuminexSinglePointTest  extends LuminexTest
+public class LuminexSinglePointTest extends LuminexGuideSetTest
 {
     private final String file1 = "01-11A12-IgA-Biotin.xls";
     private final String file2 = "02-14A22-IgA-Biotin.xls";
@@ -49,7 +49,7 @@ public class LuminexSinglePointTest  extends LuminexTest
         runSinglePointTest();
     }
 
-    protected void runSinglePointTest()
+    private void runSinglePointTest()
     {
         click(Locator.name("backgroundUpload"));
         saveAssay();
@@ -118,7 +118,7 @@ public class LuminexSinglePointTest  extends LuminexTest
         waitForElement(ctrlFlag);
     }
 
-    protected void goToLeviJennings()
+    private void goToLeviJennings()
     {
         goToTestAssayHome();
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'view qc report']"), "view single point control qc report");
@@ -126,7 +126,7 @@ public class LuminexSinglePointTest  extends LuminexTest
         clickAndWait(Locator.linkContainingText("graph"));
     }
 
-    protected void importRun(String filename, int runNumber) {
+    private void importRun(String filename, int runNumber) {
 
         goToTestAssayHome();
         clickButton("Import Data");

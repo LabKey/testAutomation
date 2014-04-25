@@ -31,6 +31,10 @@ import static org.junit.Assert.assertEquals;
 public class LuminexUploadAndCopyTest extends LuminexTest
 {
     private static final String THAW_LIST_NAME = "LuminexThawList";
+    private static final String TEST_ASSAY_LUM_SET_PROP_SPECIES2 = "testSpecies2";
+    private static final String TEST_ASSAY_LUM_RUN_NAME = "testRunName1";
+    private static final String TEST_ASSAY_LUM_RUN_NAME2 = "testRunName2";
+    private static final String TEST_ASSAY_LUM_RUN_NAME3 = "WithIndices.xls";
     private static final String TEST_ASSAY_LUM_RUN_NAME4 = "testRunName4";
 
     protected void runUITests()

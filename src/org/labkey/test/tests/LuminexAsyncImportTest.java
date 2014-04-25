@@ -22,6 +22,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
+import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 import java.util.Calendar;
@@ -50,7 +51,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         importBackgroundWarning();
     }
 
-    protected void importFirstRun() {
+    private void importFirstRun() {
         // IMPORT 1ST RUN
         // First file to be import which will subsequently be re-imported
         importRunForTestLuminexConfig(TEST_ASSAY_LUM_FILE5, Calendar.getInstance(), 0);
@@ -89,7 +90,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         assertTextPresent("Warning: No baseline visit data found", 12);
     }
 
-    protected void importSecondRun(int index, Calendar testDate, File file) {
+    private void importSecondRun(int index, Calendar testDate, File file) {
         // add a second run with different run values
         int i = index;
         goToTestAssayHome();
@@ -106,7 +107,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         assertElementNotPresent(Locator.linkWithText("ERROR"));
     }
 
-    protected void reimportFirstRun(int index, Calendar testDate, File file)
+    private void reimportFirstRun(int index, Calendar testDate, File file)
     {
         // test Luminex re-run import, check for identical values
         int i = index;
@@ -126,7 +127,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         assertElementNotPresent(Locator.linkWithText("ERROR"));
     }
 
-    protected void reimportLuminexRunPageTwo(String name, String isotype, String conjugate, String stndCurveFitInput,
+    private void reimportLuminexRunPageTwo(String name, String isotype, String conjugate, String stndCurveFitInput,
                                              String unkCurveFitInput, String notebookNo, String assayType, String expPerformer,
                                              String testDate, File file, int i)
     {
@@ -156,7 +157,7 @@ public class LuminexAsyncImportTest extends LuminexTest
         clickButton("Next", 60000);
     }
 
-    protected void assertLuminexLogInfoPresent()
+    private void assertLuminexLogInfoPresent()
     {
         waitForText("Finished assay upload");
 
@@ -181,4 +182,19 @@ public class LuminexAsyncImportTest extends LuminexTest
         assertTextPresent("Participant Visit", "Target Study", "Species", "Lab ID", "Analysis", "Network", "Transform Script Version", "Ruminex Version");
     }
 
+    @LogMethod
+    private void importRunForTestLuminexConfig(File file, Calendar testDate, int i)
+    {
+        goToTestAssayHome();
+        clickButton("Import Data");
+        setFormElement(Locator.name("network"), "NETWORK" + (i + 1));
+        clickButton("Next");
+
+        testDate.add(Calendar.DATE, 1);
+        importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
+                "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), file, i);
+        uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
+        checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
+        clickButton("Save and Finish");
+    }
 }

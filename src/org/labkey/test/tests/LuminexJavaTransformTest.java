@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 @Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexJavaTransformTest extends LuminexTest
 {
-    public void runUITests()
+    protected void runUITests()
     {
         runJavaTransformTest();
         runFileUploadTest();
@@ -71,7 +71,7 @@ public class LuminexJavaTransformTest extends LuminexTest
     }
 
     @LogMethod
-    protected void runFileUploadTest()
+    private void runFileUploadTest()
     {
         String[] assayNames = {"Test Assay 1", "Test Assay 2", "Test Assay 3"};
         String ERROR_TEXT = "already exists.";

@@ -27,10 +27,12 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @Category({DailyA.class, MiniTest.class, Assays.class})
-public class LuminexExcludedTitrationTest extends LuminexTest
+public class LuminexExcludedTitrationTest extends LuminexExcludableWellsTest
 {
-    protected static final Locator AVAILABLE_ANALYTES_CHECKBOX = Locator.xpath("//div[@class='x-grid3-hd-inner x-grid3-hd-checker']/div[@class='x-grid3-hd-checker']");
-    protected static final Locator COMMENT_LOCATOR = Locator.xpath("//input[@id='comment']") ;
+    private static final Locator AVAILABLE_ANALYTES_CHECKBOX = Locator.xpath("//div[@class='x-grid3-hd-inner x-grid3-hd-checker']/div[@class='x-grid3-hd-checker']");
+    private static final Locator COMMENT_LOCATOR = Locator.xpath("//input[@id='comment']") ;
+
+
     protected void ensureConfigured()
     {
 
