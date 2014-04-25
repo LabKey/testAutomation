@@ -37,13 +37,6 @@ public class LuminexSinglePointTest extends LuminexGuideSetTest
     private final String file3 = "03-31A82-IgA-Biotin.xls";
     private final String file4 = "04-17A32-IgA-Biotin.xls";
 
-    @Override
-    protected void ensureConfigured()
-    {
-        setUseXarImport(true);
-        super.ensureConfigured();
-    }
-
     protected void runUITests()
     {
         runSinglePointTest();

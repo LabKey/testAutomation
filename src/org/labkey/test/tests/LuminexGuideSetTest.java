@@ -38,14 +38,21 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexGuideSetTest  extends LuminexTest
 {
-    private static final String GUIDE_SET_5_COMMENT = "analyte 2 guide set run removed";
-    private final String[] expectedFlags = {"AUC, EC50-4, EC50-5, HMFI, PCV", "AUC, EC50-4, EC50-5, HMFI", "EC50-5, HMFI", "", "PCV"};
+    protected final File[] GUIDE_SET_FILES = {TEST_ASSAY_LUM_FILE5, TEST_ASSAY_LUM_FILE6, TEST_ASSAY_LUM_FILE7, TEST_ASSAY_LUM_FILE8, TEST_ASSAY_LUM_FILE9};
+    protected final String[] GUIDE_SET_ANALYTE_NAMES = {"GS Analyte (1)", "GS Analyte (2)"};
+    protected final String[] INITIAL_EXPECTED_FLAGS = {"AUC, EC50-4, EC50-5, HMFI, PCV", "AUC, EC50-4, EC50-5, HMFI", "EC50-5, HMFI", "", "PCV"};
+    protected Calendar TESTDATE = Calendar.getInstance();
+
+    private final String GUIDE_SET_5_COMMENT = "analyte 2 guide set run removed";
 
     @Override
     protected void ensureConfigured()
     {
         setUseXarImport(true);
         super.ensureConfigured();
+
+        // setup the testDate variable
+        TESTDATE.add(Calendar.DATE, -GUIDE_SET_FILES.length);
     }
 
     protected void runUITests()
@@ -60,9 +67,6 @@ public class LuminexGuideSetTest  extends LuminexTest
         log("Uploading Luminex run with a R transform script for Guide Set test");
         today = df.format(Calendar.getInstance().getTime());
 
-        File[] files = {TEST_ASSAY_LUM_FILE5, TEST_ASSAY_LUM_FILE6, TEST_ASSAY_LUM_FILE7, TEST_ASSAY_LUM_FILE8, TEST_ASSAY_LUM_FILE9};
-        String[] analytes = {"GS Analyte (1)", "GS Analyte (2)"};
-
         // add the R transform script to the assay
         goToTestAssayHome();
         clickEditAssayDesign(false);
@@ -71,26 +75,10 @@ public class LuminexGuideSetTest  extends LuminexTest
         // save changes to assay design
         clickButton("Save & Close");
 
-        // setup the testDate variable
-        Calendar testDate = Calendar.getInstance();
-        testDate.add(Calendar.DATE, -files.length);
-
         // upload the first set of files (2 runs)
         for (int i = 0; i < 2; i++)
         {
-            goToTestAssayHome();
-            clickButton("Import Data");
-            setFormElement(Locator.name("network"), "NETWORK" + (i + 1));
-            setFormElement(Locator.name("customProtocol"), "PROTOCOL" + (i + 1));
-            clickButton("Next");
-
-            testDate.add(Calendar.DATE, 1);
-            importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
-                    "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i], i);
-            uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
-            checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
-            clickButton("Save and Finish");
-
+            importGuideSetRun(i);
             verifyRunFileAssociations(i+1);
         }
 
@@ -103,7 +91,7 @@ public class LuminexGuideSetTest  extends LuminexTest
 
         // check guide set IDs and make sure appropriate runs are associated to created guide sets
         Map<String, Integer> guideSetIds = getGuideSetIdMap();
-        verifyGuideSetsApplied(guideSetIds, analytes, 2);
+        verifyGuideSetsApplied(guideSetIds, GUIDE_SET_ANALYTE_NAMES, 2);
 
         //nav trail check
         assertElementPresent(Locator.id("navTrailAncestors").append("/a").withText("assay.Luminex." + TEST_ASSAY_LUM + " Schema"));
@@ -112,39 +100,28 @@ public class LuminexGuideSetTest  extends LuminexTest
         int[] rowCounts = {2, 2};
         String[] ec504plAverages = {"179.78", "43426.10"};
         String[] ec504plStdDevs = {"22.21", "794.95"};
-        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, ec504plAverages, ec504plStdDevs, "Four Parameter", "EC50Average", "EC50Std Dev");
+        verifyGuideSetThresholds(guideSetIds, GUIDE_SET_ANALYTE_NAMES, rowCounts, ec504plAverages, ec504plStdDevs, "Four Parameter", "EC50Average", "EC50Std Dev");
         String[] aucAverages = {"8701.38", "80851.83"};
         String[] aucStdDevs = {"466.81", "6523.08"};
-        verifyGuideSetThresholds(guideSetIds, analytes, rowCounts, aucAverages, aucStdDevs, "Trapezoidal", "AUCAverage", "AUCStd Dev");
+        verifyGuideSetThresholds(guideSetIds, GUIDE_SET_ANALYTE_NAMES, rowCounts, aucAverages, aucStdDevs, "Trapezoidal", "AUCAverage", "AUCStd Dev");
 
         // upload the final set of runs (3 runs)
-        for (int i = 2; i < files.length; i++)
+        for (int i = 2; i < GUIDE_SET_FILES.length; i++)
         {
-            goToTestAssayHome();
-            clickButton("Import Data");
-            setFormElement(Locator.name("network"), "NETWORK" + (i + 1));
-            setFormElement(Locator.name("customProtocol"), "PROTOCOL" + (i + 1));
-            clickButton("Next");
-
-            importLuminexRunPageTwo("Guide Set plate " + (i+1), isotype, conjugate, "", "", "Notebook" + (i+1),
-                    "Experimental", "TECH" + (i+1), df.format(testDate.getTime()), files[i], i);
-            uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
-            checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
-            clickButton("Save and Finish");
-
+            importGuideSetRun(i);
             verifyRunFileAssociations(i+1);
         }
 
         // verify that the newly uploaded runs got the correct guide set applied to them
-        verifyGuideSetsApplied(guideSetIds, analytes, 5);
+        verifyGuideSetsApplied(guideSetIds, GUIDE_SET_ANALYTE_NAMES, 5);
 
         //verify Levey-Jennings report R plots are displayed without errors
         verifyLeveyJenningsRplots();
 
-        verifyQCFlags();
-        verifyQCAnalysis();
+        verifyQCFlags(GUIDE_SET_ANALYTE_NAMES[0], INITIAL_EXPECTED_FLAGS);
+        verifyQCReport();
 
-        verifyExcludingRuns(guideSetIds, analytes);
+        verifyExcludingRuns(guideSetIds, GUIDE_SET_ANALYTE_NAMES);
 
         // test the start and end date filter for the report
         goToLeveyJenningsGraphPage("Standard1");
@@ -300,6 +277,23 @@ public class LuminexGuideSetTest  extends LuminexTest
         waitForLeveyJenningsTrendPlot();
     }
 
+    protected void importGuideSetRun(int runIndex)
+    {
+        goToTestAssayHome();
+        clickButton("Import Data");
+        setFormElement(Locator.name("network"), "NETWORK" + (runIndex + 1));
+        if (isElementPresent(Locator.name("customProtocol")))
+            setFormElement(Locator.name("customProtocol"), "PROTOCOL" + (runIndex + 1));
+        clickButton("Next");
+
+        TESTDATE.add(Calendar.DATE, 1);
+        importLuminexRunPageTwo("Guide Set plate " + (runIndex + 1), isotype, conjugate, "", "", "Notebook" + (runIndex + 1),
+                "Experimental", "TECH" + (runIndex + 1), df.format(TESTDATE.getTime()), GUIDE_SET_FILES[runIndex], runIndex);
+        uncheckCheckbox(Locator.name("_titrationRole_standard_Standard1"));
+        checkCheckbox(Locator.name("_titrationRole_qccontrol_Standard1"));
+        clickButton("Save and Finish");
+    }
+
     @LogMethod
     private boolean verifyRunFileAssociations(int index)
     {
@@ -318,7 +312,7 @@ public class LuminexGuideSetTest  extends LuminexTest
     }
 
     @LogMethod
-    private void verifyGuideSetsNotApplied()
+    protected void verifyGuideSetsNotApplied()
     {
         goToSchemaBrowser();
         selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "AnalyteTitration");
@@ -332,7 +326,7 @@ public class LuminexGuideSetTest  extends LuminexTest
     }
 
     @LogMethod
-    private void verifyGuideSetsApplied(Map<String, Integer> guideSetIds, String[] analytes, int expectedRunCount)
+    protected void verifyGuideSetsApplied(Map<String, Integer> guideSetIds, String[] analytes, int expectedRunCount)
     {
 
         // see if the 3 uploaded runs got the correct 'current' guide set applied
@@ -421,7 +415,7 @@ public class LuminexGuideSetTest  extends LuminexTest
         waitForLeveyJenningsTrendPlot();
     }
 
-    private Map<String, Integer> getGuideSetIdMap()
+    protected Map<String, Integer> getGuideSetIdMap()
     {
         goToSchemaBrowser();
         selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "GuideSet");
@@ -520,23 +514,11 @@ public class LuminexGuideSetTest  extends LuminexTest
         clickButton("Close", 0);
     }
 
-    private void verifyQCFlags()
+    protected void verifyQCFlags(String analyteName, String[] expectedFlags)
     {
         goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
-        verifyQCFlagsInRunGrid();
-        verifyQCFlagsSchema();
-    }
 
-    private void verifyQCFlagsSchema()
-    {
-        goToSchemaBrowser();
-        selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "QCFlags");
-        waitForText("assay.Luminex." + TEST_ASSAY_LUM + ".QCFlags");
-    }
-
-    private void verifyQCFlagsInRunGrid()
-    {
         //add QC flag colum
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewColumn("QCFlags");
@@ -549,19 +531,20 @@ public class LuminexGuideSetTest  extends LuminexTest
         {
             assertEquals(expectedFlags[i], flags[i].trim());
         }
-        verifyQCFlagLink();
+
+        verifyQCFlagLink(analyteName, expectedFlags[0]);
     }
 
     @LogMethod
-    private void verifyQCFlagLink()
+    private void verifyQCFlagLink(String analyteName, String expectedFlag)
     {
-        click(Locator.linkContainingText(expectedFlags[0], 0));
+        click(Locator.linkContainingText(expectedFlag, 0));
         _extHelper.waitForExt3Mask(WAIT_FOR_JAVASCRIPT);
         sleep(1500);
         assertTextPresent("CV", 4); // 3 occurances of PCV and 1 of %CV
 
         //verify text is in expected form
-        waitForText("Standard1 GS Analyte (1) - " + isotype + " " + conjugate + " under threshold for AUC");
+        waitForText("Standard1 " + analyteName + " - " + isotype + " " + conjugate + " under threshold for AUC");
 
         //verify unchecking a box  removes the flag
         Locator aucCheckBox = Locator.xpath("//div[text()='AUC']/../../td/div/div[contains(@class, 'check')]");
@@ -578,29 +561,25 @@ public class LuminexGuideSetTest  extends LuminexTest
         waitAndClick(aucCheckBox);
         clickButton("Save", 0);
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
-        waitForText(expectedFlags[0]);
+        waitForText(expectedFlag);
         assertElementNotPresent(strikeoutAUC);
     }
 
-    private void verifyQCAnalysis()
-    {
-        goToQCAnalysisPage();
-        verifyQCReport();
-    }
-
-    private void goToQCAnalysisPage()
+    private void goToQCAnalysisPage(String submenuText)
     {
         goToProjectHome();
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
         clickAndWait(Locator.linkWithText("view results"));
-        _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'view qc report']"), "view titration qc report");
+        _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'view qc report']"), submenuText);
 
     }
 
     @LogMethod
-    private void verifyQCReport()
+    protected void verifyQCReport()
     {
+        goToQCAnalysisPage("view titration qc report");
+
         //make sure all the columns we want are viable
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.showHiddenItems();
@@ -634,7 +613,7 @@ public class LuminexGuideSetTest  extends LuminexTest
         }
 
 
-        //verify the Levey-Jennings plot
+        //verify link to Levey-Jennings plot
         clickAndWait(Locator.linkWithText("graph", 0));
         waitForText(" - " + isotype + " " + conjugate);
         assertTextPresent("Levey-Jennings Report", "Standard1");
@@ -835,7 +814,7 @@ public class LuminexGuideSetTest  extends LuminexTest
         clickButton("Save");
     }
 
-    private void setUpLeveyJenningsGraphParams(String analyte)
+    protected void setUpLeveyJenningsGraphParams(String analyte)
     {
         log("Setting Levey-Jennings Report graph parameters for Analyte " + analyte);
         waitForText(analyte);
@@ -958,13 +937,10 @@ public class LuminexGuideSetTest  extends LuminexTest
 
     protected void goToLeveyJenningsGraphPage(String titrationName)
     {
-        goToSchemaBrowser();
-        selectQuery("assay.Luminex." + TEST_ASSAY_LUM, "Titration");
-        waitForText("view data");
-        clickAndWait(Locator.linkContainingText("view data"));
-        clickAndWait(Locator.linkContainingText(titrationName));
-        waitForText("Levey-Jennings Report");
-        waitForText(titrationName);
+        goToTestRunList();
+        goToQCAnalysisPage("view levey-jennings reports");
+        waitAndClick(Locator.linkWithText(titrationName));
+
         // Make sure we have the expected help text
         waitForText("To begin, choose an Antigen, Isotype, and Conjugate from the panel to the left and click the Apply button.");
     }
@@ -972,7 +948,15 @@ public class LuminexGuideSetTest  extends LuminexTest
     @LogMethod
     protected void applyGuideSetToRun(String network, String comment, boolean useCurrent)
     {
-        click(ExtHelper.locateGridRowCheckbox(network));
+        applyGuideSetToRun(new String[]{network}, comment, useCurrent);
+    }
+
+    @LogMethod
+    protected void applyGuideSetToRun(String[] networks, String comment, boolean useCurrent)
+    {
+        for (String network : networks)
+            click(ExtHelper.locateGridRowCheckbox(network));
+
         clickButton("Apply Guide Set", 0);
         sleep(1000);//we need a little time even after all the elements have appeared, so waits won't work
 

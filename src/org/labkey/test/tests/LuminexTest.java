@@ -144,17 +144,17 @@ public abstract class LuminexTest extends AbstractQCAssayTest
 
         log("Testing Luminex Assay Designer");
         //create a new test project
-        _containerHelper.createProject(TEST_ASSAY_PRJ_LUMINEX, null);
+        _containerHelper.createProject(getProjectName(), null);
 
         //setup a pipeline for it
-        setupPipeline(TEST_ASSAY_PRJ_LUMINEX);
+        setupPipeline(getProjectName());
 
         //create a study within this project to which we will publish
-        clickProject(TEST_ASSAY_PRJ_LUMINEX);
+        goToProjectHome();
         addWebPart("Study Overview");
         clickButton("Create Study");
         clickButton("Create Study");
-        clickProject(TEST_ASSAY_PRJ_LUMINEX);
+        goToProjectHome();
 
         //add the Assay List web part so we can create a new luminex assay
         addWebPart("Assay List");
@@ -336,8 +336,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
      */
     protected void goToTestRunList()
     {
-        goToHome();
-        clickProject(TEST_ASSAY_PRJ_LUMINEX);
+        goToProjectHome();
         clickAndWait(Locator.linkContainingText(TEST_ASSAY_LUM));
     }
 
@@ -477,7 +476,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     {
         if (!isTextPresent(TEST_ASSAY_LUM + " Runs"))
         {
-            clickProject(TEST_ASSAY_PRJ_LUMINEX);
+            goToProjectHome();
             clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
         }
     }
