@@ -251,6 +251,7 @@ src/org/labkey/test/BaseFlowTest.java -text
 src/org/labkey/test/BaseWebDriverMultipleTest.java -text
 src/org/labkey/test/BaseWebDriverTest.java -text
 src/org/labkey/test/Cleanable.java -text
+src/org/labkey/test/LabKeyJDBCTest.java -text
 src/org/labkey/test/Locator.java -text
 src/org/labkey/test/Locators.java -text
 src/org/labkey/test/ModulePropertyValue.java -text
