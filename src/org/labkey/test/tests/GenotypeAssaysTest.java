@@ -181,7 +181,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
 
         Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
 
-        File exampleData = clickAndWaitForDownload(Locator.ext4Button("Download Example Data"));
+        File exampleData = clickAndWaitForDownload(Ext4Helper.Locators.ext4Button("Download Example Data"));
         assert exampleData.exists();
 
         waitAndClick(Ext4Helper.Locators.radiobutton(this, "File Upload"));
@@ -192,9 +192,9 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         Ext4CmpRef button = _ext4Helper.queryOne("button[text=\"Upload\"]", Ext4CmpRef.class);
         button.waitForEnabled();
 
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");
@@ -267,17 +267,17 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         log("Trying to save invalid data");
         String errorText = text.replaceAll("Positive", "NotRealResult");
         textarea.setValue(errorText);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Upload Failed"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for result: NotRealResult for primer: TestPrimer2");
 
         log("Saving valid data");
         textarea.setValue(text);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");
@@ -390,9 +390,9 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         log("Trying to save invalid data");
         String errorText = text.replaceAll("Positive", "NotRealResult");
         textarea.setValue(errorText);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Upload Failed"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown value for result: NotRealResult for primer: TestPrimer1");
 
@@ -400,17 +400,17 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         String fakePrimer = "FakePrimers";
         errorText = text.replaceAll(originalPrimer, fakePrimer);
         textarea.setValue(errorText);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Upload Failed"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: " + fakePrimer);
 
         log("Saving valid data");
         textarea.setValue(text);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");
@@ -469,17 +469,17 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         log("Trying to save invalid data");
         String errorText = text.replaceAll("13294", ",");
         textarea.setValue(errorText);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Upload Failed"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing subject Id");
 
         log("Saving valid data");
         textarea.setValue(text);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");

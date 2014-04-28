@@ -116,7 +116,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         setFormElementJS(Locator.name("text"), getIlluminaNames());
 
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
         _readsetCt += 14;
         assertTextPresent("Success!");
@@ -265,8 +265,8 @@ public class SequenceTest extends BaseWebDriverTest
         setFormElement(Locator.name("runDate"), "08/25/2011");
         setFormElement(Locator.name("fastqPrefix"), "Il");
 
-        click(Locator.ext4Button("Import Data"));
-        waitAndClickAndWait(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("Import Data"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
 
         waitAndClickAndWait(Locator.linkContainingText("All"));
         _startedPipelineJobs++;
@@ -360,7 +360,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Wrong number of files selected", 14, StringUtils.countMatches(url, "dataIds="));
         assertTrue("Improper URL to download sequences", url.contains("mergeFastqFiles.view?"));
 
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
         validateFastqDownload(fileName + ".fastq.gz");
 
         log("Verifying FASTQC Report");
@@ -439,7 +439,7 @@ public class SequenceTest extends BaseWebDriverTest
         _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "Analyze Selected");
         waitForElement(Ext4Helper.ext4Window("Import Data"));
         waitForText("Description");
-        waitAndClickAndWait(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
 
         log("Verifying analysis UI");
 
@@ -492,7 +492,7 @@ public class SequenceTest extends BaseWebDriverTest
         waitForElement(Ext4Helper.ext4Window("Choose Adapters"));
         waitForText("Choose Adapter Group");
         Ext4FieldRef.getForLabel(this, "Choose Adapter Group").setValue("Roche-454 FLX Amplicon");
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
 
         waitForText(rocheAdapters[0][0]);
         waitForText(rocheAdapters[1][0]);
@@ -857,7 +857,7 @@ public class SequenceTest extends BaseWebDriverTest
         assertTrue("Paired file column should be hidden", (Boolean) grid.getEval("columns[1].hidden"));
 
         //now set real values
-        click(Locator.ext4Button("Add"));
+        click(Ext4Helper.Locators.ext4Button("Add"));
         waitForElement(Ext4GridRef.locateExt4GridRow(2, grid.getId()));
 
         //the first field is pre-selected
@@ -865,10 +865,10 @@ public class SequenceTest extends BaseWebDriverTest
 
         grid.setGridCell(1, "fileName", filename1);
         grid.setGridCell(2, "fileName", filename1);
-        waitAndClick(Locator.ext4Button("Import Data"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
         waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("For each file, you must provide either the Id of an existing, unused readset or a name/platform to create a new one");
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
 
         grid.setGridCell(1, "readsetname", "Readset1");
         grid.setGridCellJS(1, "platform", "ILLUMINA");
@@ -881,17 +881,17 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCell(2, "subjectid", "Subject2");
         grid.setGridCell(2, "sampledate", "2010-10-20");
 
-        waitAndClick(Locator.ext4Button("Import Data"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
         waitForElement(Ext4Helper.ext4Window("Error"));
         waitForElement(Locator.tagContainingText("div", "Duplicate Sample: " + filename1 + ". Please remove or edit rows"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
 
         //verify paired end
         pairedField.setChecked(true);
-        waitAndClick(Locator.ext4Button("Import Data"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
         waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("Either choose a file or unchecked paired-end.");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         pairedField.setChecked(false);
 
         //try duplicate barcodes
@@ -899,10 +899,10 @@ public class SequenceTest extends BaseWebDriverTest
         String barcode = "FLD0376";
         grid.setGridCellJS(1, "mid5", barcode);
         grid.setGridCellJS(2, "mid3", barcode);
-        waitAndClick(Locator.ext4Button("Import Data"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
         waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("All samples must either use no barcodes, 5' only, 3' only or both ends");
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         barcodeField.setChecked(false);
         grid.setGridCell(2, "fileName", filename2);
 
@@ -1011,7 +1011,7 @@ public class SequenceTest extends BaseWebDriverTest
 
         pairedField.setValue(false);
         barcodeField.setValue(true);
-        waitAndClick(Locator.ext4Button("Add"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Add"));
         waitForElement(Ext4GridRef.locateExt4GridRow(2, grid.getId()));
         getDriver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
         sleep(100);
@@ -1077,8 +1077,8 @@ public class SequenceTest extends BaseWebDriverTest
         grid.setGridCell(2, "inputmaterial", "InputMaterial2");
         grid.setGridCell(2, "subjectid", "Subject2");
 
-        waitAndClick(Locator.ext4Button("Import Data"));
-        waitAndClickAndWait(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Import Data"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
 
         waitAndClickAndWait(Locator.linkWithText("All"));
         _startedPipelineJobs++;
@@ -1109,7 +1109,7 @@ public class SequenceTest extends BaseWebDriverTest
         waitForElement(Locator.tagContainingText("div", "There are errors with the input files"));
         isTextPresent("File is already used in existing readsets')]");
         assertElementPresent(Locator.xpath("//td[contains(@style, 'background: red')]"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         goToProjectHome();
     }
 

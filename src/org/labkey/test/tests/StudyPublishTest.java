@@ -22,6 +22,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.RReportHelper;
@@ -712,8 +713,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         goToManageViews();
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Time Chart");
 
-        waitForElement(Locator.ext4Button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
-        click(Locator.ext4Button("Choose a Measure"));
+        waitForElement(Ext4Helper.Locators.ext4Button("Choose a Measure"), WAIT_FOR_JAVASCRIPT);
+        click(Ext4Helper.Locators.ext4Button("Choose a Measure"));
         _extHelper.waitForExtDialog("Add Measure...");
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
@@ -723,17 +724,17 @@ public class StudyPublishTest extends StudyProtectedExportTest
         waitForElementToDisappear(Locator.xpath("(" + measureXpath + ")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
         waitForElement(Locator.xpath(measureXpath));
         click(Locator.xpath(measureXpath));
-        click(Locator.ext4Button("Select"));
+        click(Ext4Helper.Locators.ext4Button("Select"));
         waitForText("No data found for the following measures/dimensions", WAIT_FOR_JAVASCRIPT);
 
         if (datasetMeasurePairs.length > 1)
         {
             clickButton("Measures", 0);
             waitForText("Divide data into Series");
-            waitForElement(Locator.ext4Button("Add Measure"));
+            waitForElement(Ext4Helper.Locators.ext4Button("Add Measure"));
             for (int i = 1; i < datasetMeasurePairs.length; i++)
             {
-                click(Locator.ext4Button("Add Measure"));
+                click(Ext4Helper.Locators.ext4Button("Add Measure"));
                 _extHelper.waitForExtDialog("Add Measure...");
                 _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 
@@ -743,11 +744,11 @@ public class StudyPublishTest extends StudyProtectedExportTest
                 waitForElementToDisappear(Locator.xpath("("+measureXpath+")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
                 waitForElement(Locator.xpath(measureXpath));
                 click(Locator.xpath(measureXpath));
-                click(Locator.ext4Button("Select"));
+                click(Ext4Helper.Locators.ext4Button("Select"));
 
                 waitForText(datasetMeasurePairs[i][1] + " from " + datasetMeasurePairs[i][0]);
             }
-            click(Locator.ext4Button("OK"));
+            click(Ext4Helper.Locators.ext4Button("OK"));
         }
 
         _ext4Helper.checkGridRowCheckbox("All");
@@ -763,18 +764,18 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         // Add point click function
         clickButton("Developer", 0);
-        waitForElement(Locator.ext4Button("Cancel"));
+        waitForElement(Ext4Helper.Locators.ext4Button("Cancel"));
         clickButton("Enable", 0);
         setFormElement("point-click-fn-textarea", getFileContents(TEST_DATA_API_PATH + "/timeChartPointClickTestFn.js"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         _ext4Helper.waitForMaskToDisappear();
 
         // Visit-based chart
         waitForElement(Locator.css("svg text").containing("Days Since Contact Date"));
         fireEvent(Locator.css("svg text").containing("Days Since Contact Date").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), SeleniumEvent.click);
-        waitForElement(Locator.ext4Button("Cancel")); // Axis label windows always have a cancel button. It should be the only one on the page
+        waitForElement(Ext4Helper.Locators.ext4Button("Cancel")); // Axis label windows always have a cancel button. It should be the only one on the page
         _ext4Helper.selectRadioButton("Chart Type:", "Visit Based Chart");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForElement(Locator.css("svg text").containing("Visit"));
 
         clickButton("Save", 0);

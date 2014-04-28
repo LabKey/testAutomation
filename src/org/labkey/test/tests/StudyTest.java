@@ -470,7 +470,7 @@ public class StudyTest extends StudyBaseTest
         clickButtonContainingText("Save", 0);
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
         sleep(1000);
-        waitForElement(Locator.ext4Button("Delete Selected"));
+        waitForElement(Ext4Helper.Locators.ext4Button("Delete Selected"));
         selectListName(listName);
         clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
 
@@ -513,7 +513,7 @@ public class StudyTest extends StudyBaseTest
      */
     private void startCreateParticipantGroup()
     {
-        waitAndClick(Locator.ext4Button("Create"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Create"));
         _extHelper.waitForExtDialog("Define Mouse Group");
         String dataset = getFormElement(Locator.name("infoCombo"));
         if (dataset.length() > 0)

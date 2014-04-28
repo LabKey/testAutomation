@@ -244,7 +244,7 @@ public class LabModuleHelper
         }
 
         _test.waitForText("Sample Information");
-        _test.waitAndClick(Locator.ext4Button("Add From Spreadsheet"));
+        _test.waitAndClick(Ext4Helper.Locators.ext4Button("Add From Spreadsheet"));
         _test.waitForElement(Ext4Helper.Locators.window("Spreadsheet Import"));
 
         if (expectedColumns != null)
@@ -263,7 +263,7 @@ public class LabModuleHelper
 
         Ext4FieldRef textArea = _test._ext4Helper.queryOne("#textField", Ext4FieldRef.class);
         textArea.setValue(sb.toString());
-        _test.waitAndClick(Locator.ext4Button("Submit"));
+        _test.waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
 
         String[] lastRow = data[data.length - 1];
         String cell = lastRow[0];
@@ -303,7 +303,7 @@ public class LabModuleHelper
             _test._ext4Helper.clickExt4MenuItem(UPLOAD_RESULTS_TEXT);
 
         _test.waitForElement(Ext4Helper.Locators.window(supportsTemplates ? UPLOAD_RESULTS_TEXT : IMPORT_DATA_TEXT));
-        _test.waitAndClickAndWait(Locator.ext4Button("Submit"));
+        _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
         _test.waitForText("Data Import");
     }
 
@@ -361,9 +361,9 @@ public class LabModuleHelper
         queryField.waitForEnabled();
         queryField.setValue(query);
 
-        _test.waitAndClick(Locator.ext4Button("Save"));
+        _test.waitAndClick(Ext4Helper.Locators.ext4Button("Save"));
         _test.waitForElement(Ext4Helper.ext4Window("Success"));
-        _test.click(Locator.ext4Button("OK"));
+        _test.click(Ext4Helper.Locators.ext4Button("OK"));
 
         if (containerPath == null)
             _test.waitForElement(Locator.linkContainingText(schema + "." + query));
@@ -397,12 +397,12 @@ public class LabModuleHelper
         if (targetColumn != null)
             Ext4FieldRef.getForLabel(_test, "Target Column").setValue(targetColumn);
 
-        _test.waitAndClick(Locator.ext4Button("Save"));
+        _test.waitAndClick(Ext4Helper.Locators.ext4Button("Save"));
 
         if (expectSuccess)
         {
             _test.waitForElement(Ext4Helper.ext4Window("Success"));
-            _test.click(Locator.ext4Button("OK"));
+            _test.click(Ext4Helper.Locators.ext4Button("OK"));
 
             if (containerPath == null)
                 _test.waitForElement(Locator.linkContainingText(schema + "." + query));
@@ -415,14 +415,14 @@ public class LabModuleHelper
             {
                 //this indicates we did not expect this to be successful, so we make sure the right errors are shown
                 _test.waitForElement(Ext4Helper.ext4Window("Error"));
-                _test.click(Locator.ext4Button("OK"));
-                _test.click(Locator.ext4Button("Cancel"));
+                _test.click(Ext4Helper.Locators.ext4Button("OK"));
+                _test.click(Ext4Helper.Locators.ext4Button("Cancel"));
             }
             else
             {
                 _test.waitForElement(Ext4Helper.ext4Window("Error"));
-                _test.click(Locator.ext4Button("OK"));
-                _test.click(Locator.ext4Button("Cancel"));
+                _test.click(Ext4Helper.Locators.ext4Button("OK"));
+                _test.click(Ext4Helper.Locators.ext4Button("Cancel"));
             }
         }
     }

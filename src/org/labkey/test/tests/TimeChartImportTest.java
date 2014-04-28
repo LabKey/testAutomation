@@ -24,6 +24,7 @@ import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -227,19 +228,19 @@ public class TimeChartImportTest extends StudyBaseTest
         {
             click(Locator.css("svg a path"));
             _extHelper.waitForExtDialog("Data Point Information");
-            waitAndClick(Locator.ext4Button("OK"));
+            waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         }
 
         if (!isTimeChartWizard)
             return;
 
         // verify that clicking the Export as Script button works
-        _ext4Helper.clickExt4MenuButton(false, Locator.ext4Button("Export"), false, "Export as Script");
+        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Export as Script");
         _extHelper.waitForExtDialog("Export Script");
-        waitAndClick(Locator.ext4Button("Close"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
 
         // verify that there is a PDF export for each plot
-        _ext4Helper.clickExt4MenuButton(false, Locator.ext4Button("Export"), true, "Export as Script");
+        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), true, "Export as Script");
         assertElementPresent(Locator.xpath("//div[contains(@class, 'x4-menu-item-icon') and contains(@style, 'pdf.gif')]"), info.getCountSVGs());
 
         // verify the count of records in the view data grid
@@ -261,10 +262,10 @@ public class TimeChartImportTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText(info.getName()));
         waitForElements(Locator.css("div:not(.thumbnail) > svg"), info.getCountSVGs());
 
-        _ext4Helper.clickExt4MenuButton(false, Locator.ext4Button("Export"), false, "Export as Script");
+        _ext4Helper.clickExt4MenuButton(false, Ext4Helper.Locators.ext4Button("Export"), false, "Export as Script");
         _extHelper.waitForExtDialog("Export Script");
         String exportScript = _extHelper.getCodeMirrorValue("export-script-textarea");
-        waitAndClick(Locator.ext4Button("Close"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
 
         clickFolder(EXPORT_TEST_FOLDER);
         new PortalHelper(this).addWebPart("Wiki");

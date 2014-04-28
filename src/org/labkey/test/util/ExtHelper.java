@@ -19,7 +19,6 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
@@ -612,7 +611,7 @@ public class ExtHelper extends AbstractHelper
     @Deprecated
     public void checkCheckbox(String label)
     {
-        Locator checkbox = Locator.ext4Checkbox(label);
+        Locator checkbox = Ext4Helper.Locators.ext4Checkbox(label);
         if(!isChecked(label))
             _test.click(checkbox);
         if(!isChecked(label))
@@ -625,7 +624,7 @@ public class ExtHelper extends AbstractHelper
     @Deprecated
     public void uncheckCheckbox(String label)
     {
-        Locator checkbox = Locator.ext4Checkbox(label);
+        Locator checkbox = Ext4Helper.Locators.ext4Checkbox(label);
         if(isChecked(label))
             _test.click(checkbox);
         if(isChecked(label))

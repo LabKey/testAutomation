@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 
 import java.util.ArrayList;
@@ -132,7 +133,7 @@ public abstract class GenericChartsTest extends ReportTest
 
     protected void clickOptionButtonAndWaitForDialog(String btnTxt, String dialogTitle)
     {
-        click(Locator.ext4Button(btnTxt));
+        click(Ext4Helper.Locators.ext4Button(btnTxt));
         _extHelper.waitForExtDialog(dialogTitle);
     }
 }

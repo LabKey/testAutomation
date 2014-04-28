@@ -19,6 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.categories.Study;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
@@ -46,9 +47,9 @@ public class TruncationTest extends StudyBaseTest
     protected void truncateList()
     {
         click(Locator.linkContainingText("Delete All Rows"));
-        click(Locator.ext4Button("Yes"));
+        click(Ext4Helper.Locators.ext4Button("Yes"));
         waitForText("2 rows deleted");
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         click(Locator.linkContainingText("view data"));
         waitForText("No data to show.");
     }
@@ -60,9 +61,9 @@ public class TruncationTest extends StudyBaseTest
         waitForText("Create New Dataset");
         waitAndClick(Locator.linkContainingText("DEM-1"));
         waitAndClick(Locator.linkContainingText("Delete All Rows"));
-        click(Locator.ext4Button("Yes"));
+        click(Ext4Helper.Locators.ext4Button("Yes"));
         waitForText("24 rows deleted");
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         click(Locator.linkContainingText("View Data"));
         waitForText("No data to show.");
     }

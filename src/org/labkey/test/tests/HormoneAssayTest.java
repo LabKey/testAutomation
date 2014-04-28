@@ -213,9 +213,9 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         Ext4CmpRef button = _ext4Helper.queryOne("button[text=\"Upload\"]", Ext4CmpRef.class);
         button.waitForEnabled();
 
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
         Map<String, String[]> expected = new LinkedHashMap<>();
@@ -258,17 +258,17 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         Ext4CmpRef button = _ext4Helper.queryOne("button[text=\"Upload\"]", Ext4CmpRef.class);
         button.waitForEnabled();
 
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Upload Failed"), WAIT_FOR_JAVASCRIPT * 2);
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         waitForText("Unknown column: FakeTest (ng/ml)");
 
         log("Saving valid data");
         textarea.setValue(text);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
         Map<String, String[]> expected = new LinkedHashMap<>();
@@ -307,7 +307,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("Prepare Run");
         waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<>();
         expectedCols.add("well");
@@ -330,11 +330,11 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
 
         waitForText("904");  //this is the last sample
 
-        waitAndClick(Locator.ext4ButtonEnabled("Save and Close"));
+        waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("Save and Close"));
 
         waitForElement(Ext4Helper.ext4Window("Error"));
         assertElementPresent(Locator.xpath("//div[contains(text(), 'Unknown value for field category: " + category + "')]"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
 
         Ext4GridRef grid = _ext4Helper.queryOne("grid", Ext4GridRef.class);
         grid.setGridCellJS(1, "category", "Blank");
@@ -373,9 +373,9 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
             i++;
         }
 
-        waitAndClick(Locator.ext4Button("Save and Close"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Save and Close"));
         waitForText("Save Complete");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("View and Edit Workbooks");
     }
 
@@ -403,9 +403,9 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
 
         log("Trying to save data");
         textarea.setValue(text);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
         Map<String, String[]> expected = new LinkedHashMap<>();

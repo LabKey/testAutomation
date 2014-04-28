@@ -625,7 +625,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _ext4Helper.clickExt4MenuItem("Create Readsets");
         waitForElement(Ext4Helper.ext4Window("Create Readsets"));
-        waitAndClick(Locator.ext4Button("Close"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
 
     }
 
@@ -643,10 +643,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         Ext4FieldRef ref = _ext4Helper.queryOne("textfield[itemId='subjArea']", Ext4FieldRef.class);
         ref.setValue("12345,23456");
 
-        waitAndClick(Locator.ext4Button("Refresh"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Refresh"));
         waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("You must select a report to display by clicking the one of the 2nd tier tabs below");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
 
         waitAndClick(Ext4Helper.ext4Tab("Sequence Data"));
         waitForElement(Ext4Helper.ext4Tab("Sequence Readsets"));
@@ -717,13 +717,13 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitAndClick(Locator.id(addDataSourceBtn.getId()));
         waitAndClick(Ext4Helper.ext4MenuItem(DATA_SOURCE + " (\"/home\".core.Users)"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
 
         addDataSourceBtn = _ext4Helper.queryOne("#" + manageDataSources + " button[text='Add Default Sources']", Ext4CmpRef.class);
         waitAndClick(Locator.id(addDataSourceBtn.getId()));
         waitAndClick(Ext4Helper.ext4MenuItem(GROUP_SOURCE + " (core.Groups)"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
 
         waitForText("Item Type");
         assertEquals("Incorrect number of remove buttons", 2, getRemoveBtns(manageDataSources).size());
@@ -733,7 +733,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitAndClick(Locator.id(addDemographicsSourceBtn.getId()));
         waitAndClick(Ext4Helper.ext4MenuItem(SUBJECT_LIST + " (laboratory.subjects)"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
 
         waitForText("Table Name");
         waitForText("New Data Sources");
@@ -774,12 +774,12 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitAndClickAndWait(Locator.linkContainingText("laboratory module admin"));
         waitAndClickAndWait(Locator.linkContainingText("Manage Default Data and Demographics Sources"));
 
-        waitAndClick(Locator.ext4Button("View Summary of Data Sources"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("View Summary of Data Sources"));
         waitForText("The following sources have been defined:");
         waitForText("/" + getProjectName());
         assertTextPresent(DATA_SOURCE + " (\"/home\".core.Users)");
 
-        waitAndClick(Locator.ext4Button("View Summary of Demographics Sources"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("View Summary of Demographics Sources"));
         waitForText("The following sources have been defined:");
         assertTextPresent("/" + getProjectName());
         assertTextPresent(SUBJECT_LIST + " (laboratory.subjects)");
@@ -819,7 +819,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         List<Ext4CmpRef> removeBtns = _ext4Helper.componentQuery("#" + parentItemId + " button[text='Remove']", Ext4CmpRef.class);
         click(Locator.id(removeBtns.get(idx.intValue()).getId()));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
 
         waitForText("Loading...");
         waitForElementToDisappear(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(text(), 'Loading...')]"), WAIT_FOR_JAVASCRIPT);
@@ -886,9 +886,9 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         sleep(40); //wait for listener to act
         Assert.assertFalse("Radio was not toggled", (Boolean) Ext4FieldRef.getForBoxLabel(this, "View All Major Events").getValue());
 
-        click(Locator.ext4Button("Submit"));
+        click(Ext4Helper.Locators.ext4Button("Submit"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
 
         //should redirect to lab home
         waitForText("Types of Data:");
@@ -950,9 +950,9 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         sleep(100);
         assertTrue("Incorrect value for samples checkbox", (Boolean)_ext4Helper.queryOne(samplesSelector, Ext4FieldRef.class).getValue());
 
-        click(Locator.ext4Button("Submit"));
+        click(Ext4Helper.Locators.ext4Button("Submit"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
     }
 
     private void siteSettingsTest()
@@ -1053,9 +1053,9 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.clickNavPanelItem("View and Edit Workbooks:", "Create New Workbook");
         waitForElement(Ext4Helper.ext4Window("Create Workbook"));
-        assertElementNotPresent(Locator.ext4Radio("Add To Existing Workbook"));
-        waitForElement(Locator.ext4Button("Close"));
-        click(Locator.ext4Button("Close"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Radio("Add To Existing Workbook"));
+        waitForElement(Ext4Helper.Locators.ext4Button("Close"));
+        click(Ext4Helper.Locators.ext4Button("Close"));
         assertElementNotPresent(Ext4Helper.ext4Window("Create Workbook"));
 
         String workbookTitle = "NewWorkbook_" + INJECT_CHARS_1;
@@ -1098,7 +1098,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.clickNavPanelItem("DNA_Oligos:", IMPORT_DATA_TEXT);
         waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
-        waitAndClickAndWait(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
 
         waitForElement(Locator.name("purification"));
 
@@ -1116,7 +1116,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         _ext4Helper.clickTabContainingText("Import Spreadsheet");
         waitForText("Copy/Paste Data");
         setFormElementJS(Locator.name("text"), "Name\tSequence\nTestPrimer1\tatg\nTestPrimer2\tABCDEFG");
-        click(Locator.ext4Button("Upload"));
+        click(Ext4Helper.Locators.ext4Button("Upload"));
 
         waitForElement(Ext4Helper.ext4Window("Error"));
         waitForText(errorMsg);
@@ -1156,7 +1156,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.clickNavPanelItem("Samples:", IMPORT_DATA_TEXT);
         waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
-        waitAndClickAndWait(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
 
         waitForElement(Locator.name("samplename"));
 
@@ -1319,7 +1319,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
         _helper.clickNavPanelItem("Peptides:", IMPORT_DATA_TEXT);
         waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
-        waitAndClickAndWait(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
 
         waitForElement(Locator.name("sequence"));
 
@@ -1386,7 +1386,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitForElement(Locator.name("name"));
         sleep(50);
         _helper.setFormField("name", "TestPrimer");
-        waitAndClickAndWait(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
         DataRegionTable table = new DataRegionTable("query", this);
         assertEquals("Wrong number of rows found", _oligosTotal, table.getDataRowCount());
 
@@ -1432,10 +1432,10 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         String defaultVal = "LC480";
         _helper.waitForField(VIRAL_LOAD_ASSAYNAME);
         Ext4FieldRef.getForLabel(this, VIRAL_LOAD_ASSAYNAME).setValue(defaultVal);
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
 
         waitForElement(Ext4Helper.ext4Window("Success"));
-        waitAndClickAndWait(Locator.ext4Button("OK"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Types of Data");
         _helper.goToAssayResultImport(VIRAL_LOAD_ASSAYNAME);
         _helper.waitForField("Source Material");

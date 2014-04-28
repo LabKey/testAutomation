@@ -156,7 +156,7 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("Prepare Run");
         waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<>();
         expectedCols.add("well");
@@ -183,26 +183,26 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
         assertElementPresent(_helper.getAssayWell("H11", LabModuleHelper.UNKNOWN_COLOR));
 
         //the data are missing an ID
-        click(Locator.ext4Button("Save"));
+        click(Ext4Helper.Locators.ext4Button("Save"));
         waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("One or more required fields are missing from the sample records");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
 
         //save data using a fake ID
         Ext4GridRef grid = _ext4Helper.queryOne("grid", Ext4GridRef.class);
         grid.setGridCell(1, "subjectId", "FakeId");
 
-        click(Locator.ext4Button("Save"));
+        click(Ext4Helper.Locators.ext4Button("Save"));
         waitForElement(Ext4Helper.ext4Window("Error"));
         assertTextPresent("Must provide at least 2 negative controls for each subjectId/date.");
         assertTextPresent("Missing for: FakeId / 2012-02-09");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
 
         //restore valid values
         grid.setGridCell(1, "subjectId", originalID);
-        waitAndClick(Locator.ext4Button("Save and Close"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Save and Close"));
         waitForText("Save Complete");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         waitForText(LabModuleHelper.LAB_HOME_TEXT);
     }
 
@@ -230,9 +230,9 @@ public class ELISPOT_AssayTest extends AbstractLabModuleAssayTest
 
         log("Trying to save data");
         textarea.setValue(text);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
         verifyExpectedValues();

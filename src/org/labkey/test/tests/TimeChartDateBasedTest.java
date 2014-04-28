@@ -21,6 +21,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -309,17 +310,17 @@ public class TimeChartDateBasedTest extends TimeChartTest
         impersonate(USER1);
         popLocation(); // Saved chart
         waitForText(CHART_TITLE);
-        assertElementNotPresent(Locator.ext4Button("Edit"));
-        assertElementNotPresent(Locator.ext4Button("Save"));
-        assertElementPresent(Locator.ext4Button("Save As"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Edit"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Save As"));
         clickFolder(getFolderName());
         assertTextNotPresent(REPORT_NAME_2);
         stopImpersonating();
         signOut();
         popLocation(); // Saved chart
         waitForText(CHART_TITLE);
-        assertElementNotPresent(Locator.ext4Button("Save"));
-        assertElementNotPresent(Locator.ext4Button("Save As"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save As"));
         simpleSignIn();
     }
 
@@ -340,10 +341,10 @@ public class TimeChartDateBasedTest extends TimeChartTest
         setAxisValue(Axis.X, "xaxis_range_automatic", null, null, null, null, null, null, null);
         waitForText("249318596,\n Days", 20, WAIT_FOR_JAVASCRIPT); // 10 in first ptid chart and 10 in save dialog thumbnail preview
         // open the developer panel and verify that it is disabled by default
-        assertElementPresent(Locator.ext4Button("Developer"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Developer"));
         goToDeveloperTab();
-        assertElementPresent(Locator.ext4Button("Enable"));
-        assertElementNotPresent(Locator.ext4Button("Disable"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Enable"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Disable"));
         // enable the feature and verify that you can switch tabs
         clickButton("Enable", 0);
         _ext4Helper.clickTabContainingText("Help");
@@ -357,14 +358,14 @@ public class TimeChartDateBasedTest extends TimeChartTest
         // TODO: Is this actually the selector we want?
         click(Locator.css("svg g a path"));
         _extHelper.waitForExtDialog("Data Point Information");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         // open developer panel and test JS function validation
         goToDeveloperTab();
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", "");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("Error: the value provided does not begin with a function declaration.");
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", "function(){");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("Error parsing the function:");
         clickButton("Disable", 0);
         _extHelper.waitForExtDialog("Confirmation...");
@@ -394,14 +395,14 @@ public class TimeChartDateBasedTest extends TimeChartTest
         impersonate(USER2);
         popLocation();
         waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
-        assertElementNotPresent(Locator.ext4Button("Developer"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Developer"));
         stopImpersonating();
         // give USER2 developer perms and try again
         createSiteDeveloper(USER2);
         impersonate(USER2);
         popLocation();
         waitForText(X_AXIS_LABEL_MANUAL, WAIT_FOR_JAVASCRIPT);
-        assertElementPresent(Locator.ext4Button("Developer"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Developer"));
         stopImpersonating();
     }
 

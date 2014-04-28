@@ -244,7 +244,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         waitForImportDataEnabled();
         clickFileBrowserButton(BrowserAction.IMPORT_DATA);
         _test.waitAndClick(Locator.xpath("//input[@type='button' and not(@disabled)]/../label[contains(text(), " + Locator.xq(actionName) + ")]"));
-        _test.clickAndWait(Locator.ext4Button("Import"));
+        _test.clickAndWait(Ext4Helper.Locators.ext4Button("Import"));
     }
 
     @Override

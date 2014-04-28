@@ -19,6 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
@@ -253,7 +254,7 @@ public class StudyScheduleTest extends StudyBaseTest
         switch (type)
         {
             case defineManually:
-                click(Locator.ext4Radio("Define dataset manually"));
+                click(Ext4Helper.Locators.ext4Radio("Define dataset manually"));
                 clickButton("Next");
 
                 waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
@@ -263,7 +264,7 @@ public class StudyScheduleTest extends StudyBaseTest
                 clickButton("Save");
                 break;
             case importFromFile:
-                click(Locator.ext4Radio("Import data from file"));
+                click(Ext4Helper.Locators.ext4Radio("Import data from file"));
                 clickButton("Next");
 
                 String datasetFileName = _sampleDataPath + "/datasets/plate002.tsv";
@@ -282,7 +283,7 @@ public class StudyScheduleTest extends StudyBaseTest
                     fail("The dataset import .tsv file (plate002.tsv) does not exist");
                 break;
             case placeholder:
-                click(Locator.ext4Radio("do this later"));
+                click(Ext4Helper.Locators.ext4Radio("do this later"));
                 clickButton("Done", 0);
 
                 break;
@@ -325,7 +326,7 @@ public class StudyScheduleTest extends StudyBaseTest
         switch (type)
         {
             case defineManually:
-                click(Locator.ext4Radio("Define dataset manually"));
+                click(Ext4Helper.Locators.ext4Radio("Define dataset manually"));
                 clickButton("Next");
 
                 waitForElement(Locator.xpath("//input[@id='DatasetDesignerName']"), WAIT_FOR_JAVASCRIPT);
@@ -335,7 +336,7 @@ public class StudyScheduleTest extends StudyBaseTest
                 clickButton("Save");
                 break;
             case importFromFile:
-                click(Locator.ext4Radio("Import data from file"));
+                click(Ext4Helper.Locators.ext4Radio("Import data from file"));
                 clickButton("Next");
 
                 String datasetFileName = _sampleDataPath + "/datasets/plate002.tsv";
@@ -354,7 +355,7 @@ public class StudyScheduleTest extends StudyBaseTest
                     fail("The dataset import .tsv file (plate002.tsv) does not exist");
                 break;
             case linkeToExisting:
-                click(Locator.ext4Radio("Link to existing dataset"));
+                click(Ext4Helper.Locators.ext4Radio("Link to existing dataset"));
 
                 Locator.XPathLocator comboParent = Locator.xpath("//table[contains(@class, 'existing-dataset-combo')]");
                 _ext4Helper.selectComboBoxItem(comboParent, targetDataset);

@@ -213,7 +213,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
         _ext4Helper.clickExt4MenuItem("Prepare Run");
         waitForElement(Ext4Helper.ext4Window(IMPORT_DATA_TEXT));
-        waitAndClickAndWait(Locator.ext4Button("Submit"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));
 
         List<String> expectedCols = new ArrayList<>();
         expectedCols.add("well");
@@ -227,18 +227,18 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         waitForElement(Locator.xpath("//span[contains(text(), 'Freezer Id') and contains(@class, 'x4-column-header-text')]")); //ensure grid loaded
         _helper.addRecordsToAssayTemplate(TEMPLATE_DATA, expectedCols);
 
-        waitAndClick(Locator.ext4Button("Plate Layout"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Plate Layout"));
         waitForElement(Ext4Helper.ext4Window("Configure Plate"));
         waitForText("Group By Category");
         Ext4FieldRef.getForLabel(this, "Group By Category").setChecked(true);
         waitForText("Below are the sample categories");
         Ext4FieldRef ctlField = Ext4FieldRef.getForLabel(this, "Neg Control (2)");
         ctlField.setValue(8); //A8
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
         assertAlert("Error: Neg Control conflicts with an existing sample in well: A8");
 
         ctlField.setValue(73); //corresponds to G1
-        waitAndClick(Locator.ext4Button("Submit"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
 
         waitForElement(_helper.getAssayWell("G1", LabModuleHelper.NEG_COLOR));
         assertElementPresent(_helper.getAssayWell("G1", LabModuleHelper.NEG_COLOR));
@@ -249,9 +249,9 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
         Ext4FieldRef.getForLabel(this, "Run Name").setValue("TestRun");
 
-        waitAndClick(Locator.ext4ButtonEnabled("Save and Close"));
+        waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("Save and Close"));
         waitForText("Save Complete");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
 
         //verify template created
         _helper.clickNavPanelItem(ASSAY_NAME + ":", IMPORT_DATA_TEXT);
@@ -272,23 +272,23 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         //no duplicate wells allowed
         Ext4GridRef grid = _ext4Helper.queryOne("grid", Ext4GridRef.class);
         grid.setGridCell(1, "well", "H11");
-        click(Locator.ext4Button("Save"));
+        click(Ext4Helper.Locators.ext4Button("Save"));
         waitForElement(Ext4Helper.ext4Window("Error"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("another sample is already present in well: H11");
         grid.setGridCell(1, "well", "A5");  //restore original contents
 
         //verify neg controls enforced
         grid.setGridCell(70, "category", "Unknown");
-        click(Locator.ext4Button("Download"));
+        click(Ext4Helper.Locators.ext4Button("Download"));
         waitForElement(Ext4Helper.ext4Window("Error"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("Must provide at least 2 negative controls per run");
         grid.setGridCell(70, "category", "Neg Control");  //restore original contents
 
         //save valid data
-        click(Locator.ext4Button("Save"));
-        waitAndClick(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("Save"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         assertTextNotPresent("Must provide at least 2 negative controls per run");
 
         //test download
@@ -297,7 +297,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         beginAt(url);
         waitForElement(_helper.getAssayWell("G1", LabModuleHelper.NEG_COLOR), WAIT_FOR_PAGE);
 
-        waitAndClick(Locator.ext4Button("Download"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Download"));
 
         int i = 1;
 
@@ -377,9 +377,9 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("Subject1", "");
         errorText = errorText.replaceAll("Subject2\tDETECTOR1", "Subject2\tDETECTOR2");
         textarea.setValue(errorText);
-        waitAndClick(WAIT_FOR_PAGE, Locator.ext4Button("Upload"), 0);
+        waitAndClick(WAIT_FOR_PAGE, Ext4Helper.Locators.ext4Button("Upload"), 0);
         waitForElement(Ext4Helper.ext4Window("Upload Failed"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 9");
         assertTextPresent("Row 11: Unable to find detector information for detector: DETECTOR2");
@@ -387,9 +387,9 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
 
         log("Saving valid data");
         textarea.setValue(text);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        clickAndWait(Locator.ext4Button("OK"));
+        clickAndWait(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");
@@ -544,17 +544,17 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("\t35.85\t3.01E1\t0", "");
         errorText = errorText.replaceAll("d56053_2010.04.21_1_JBS", "");
         textarea.setValue(errorText);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Upload Failed"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 17");
 
         log("Saving valid data");
         textarea.setValue(text);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        waitAndClickAndWait(Locator.ext4Button("OK"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");
@@ -634,18 +634,18 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         String errorText = text.replaceAll("CTL_negative", "");
         errorText = errorText.replaceAll("de0115_2008.09.08_1_JG\t\t\t0", "");
         textarea.setValue(errorText);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Upload Failed"));
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         assertTextPresent("There were errors in the upload");
         assertTextPresent("Missing sample name for row: 23");
         assertTextPresent("Missing sample name for row: 27");
 
         log("Saving valid data");
         textarea.setValue(text);
-        waitAndClick(Locator.ext4Button("Upload"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("Upload"));
         waitForElement(Ext4Helper.ext4Window("Success"));
-        waitAndClickAndWait(Locator.ext4Button("OK"));
+        waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("Import Samples");
 
         log("Verifying results");

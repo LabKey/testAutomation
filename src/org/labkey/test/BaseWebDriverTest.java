@@ -2777,7 +2777,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickButton("Create New Group", 0);
         _extHelper.waitForExtDialog(groupName + " Information");
         assertTextPresent("Group " + groupName);
-        click(Locator.ext4Button("Done"));
+        click(Ext4Helper.Locators.ext4Button("Done"));
         waitForElement(Locator.css(".groupPicker .x4-grid-cell-inner").withText(groupName), WAIT_FOR_JAVASCRIPT);
     }
 
@@ -4702,22 +4702,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public Locator.XPathLocator getButtonLocator(String text, int index)
     {
         // check for normal labkey nav button:
-        Locator.XPathLocator locator = Locator.navButton(text, index);
+        Locator.XPathLocator locator = Locator.button(text).index(index);
         if (isElementPresent(locator))
             return locator;
 
         // check for normal labkey submit button:
-        locator = Locator.navButton(text, index);
+        locator = Locator.navButton(text).index(index);
         if (isElementPresent(locator))
             return locator;
 
         // check for Ext button:
-        locator = Locator.extButton(text, index);
+        locator = Locator.extButton(text).index(index);
         if (isElementPresent(locator))
             return locator;
 
         // check for Ext 4 button:
-        locator = Locator.ext4Button(text).index(index);
+        locator = Ext4Helper.Locators.ext4Button(text).index(index);
         if (isElementPresent(locator))
             return locator;
 
@@ -4742,7 +4742,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             return locator;
 
         // check for Ext 4 button:
-        locator = Locator.ext4Button(text);
+        locator = Ext4Helper.Locators.ext4Button(text);
         if (isElementPresent(locator))
             return locator;
 
@@ -4778,7 +4778,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             return locator;
 
         // check for Ext 4 button:
-        locator = Locator.ext4ButtonContainingText(text);
+        locator = Ext4Helper.Locators.ext4ButtonContainingText(text);
         if (isElementPresent(locator))
             return locator;
 

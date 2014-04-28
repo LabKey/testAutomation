@@ -26,6 +26,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.categories.Study;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
 
 import java.io.File;
@@ -1101,7 +1102,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         waitForText("Change Study Properties");
         clickAndWait(Locator.linkWithText("Change Study Properties"));
         waitForText("Study Properties");
-        waitForElement(Locator.ext4Button("Submit"));
+        waitForElement(Ext4Helper.Locators.ext4Button("Submit"));
 
         populateFormData(studyProperties, null);
         clickButton("Submit");
@@ -1120,7 +1121,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         waitForText("Change Study Properties");
         clickAndWait(Locator.linkWithText("Change Study Properties"));
         waitForText("Study Properties");
-        waitForElement(Locator.ext4Button("Submit"));
+        waitForElement(Ext4Helper.Locators.ext4Button("Submit"));
 
         verifyFormData(studyProperties);
     }

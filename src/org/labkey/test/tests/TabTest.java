@@ -197,9 +197,9 @@ public class TabTest extends SimpleModuleTest
         assertTreeButtonHidden("Revert", false);
         clickButton("Revert", 0);
         _extHelper.waitForExtDialog("Revert Folder(s)");
-        click(Locator.ext4Button("Yes"));
+        click(Ext4Helper.Locators.ext4Button("Yes"));
         _extHelper.waitForExtDialog("Revert Folder");
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         clickTab("Study Container");
         waitForText("Study tracks data in");
 
@@ -219,9 +219,9 @@ public class TabTest extends SimpleModuleTest
         assertTreeButtonHidden("Revert", false);
         clickButton("Revert", 0);
         _extHelper.waitForExtDialog("Revert Folder(s)");
-        click(Locator.ext4Button("Yes"));
+        click(Ext4Helper.Locators.ext4Button("Yes"));
         _extHelper.waitForExtDialog("Revert Folders");
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         clickTab("Study Container");
         waitForText("Study tracks data in");
 
@@ -249,7 +249,7 @@ public class TabTest extends SimpleModuleTest
         _extHelper.waitForExtDialog("Change Folder Type");
         assertTextPresent("Study Container");
         _ext4Helper.checkCheckbox("Study Container");     // recreate folder
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         waitForText("A customized web part");
         clickTab("Study Container");
         clickAndWait(Locator.linkWithText("Create Study"));     // Create study

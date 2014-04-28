@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
@@ -76,7 +77,7 @@ public class BoxPlotTest extends GenericChartsTest
         log("Set Y Axis");
         goToAxisTab("4c.Induration 1st measure");
         _extHelper.waitForExtDialog("Y Axis");
-        click(Locator.ext4Radio("log"));
+        click(Ext4Helper.Locators.ext4Radio("log"));
         waitForText("2.Body temperature", WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//div[text()='2.Body temperature']"));
         setFormElement(Locator.name("label"), "TestYAxis");
@@ -86,7 +87,7 @@ public class BoxPlotTest extends GenericChartsTest
         log("Set X Axis");
         goToAxisTab("Cohort");
         _extHelper.waitForExtDialog("X Axis");
-        click(Locator.ext4Radio("log"));
+        click(Ext4Helper.Locators.ext4Radio("log"));
         waitForText(MOUSE_GROUP_CATEGORY, WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath("//div[text()='"+ MOUSE_GROUP_CATEGORY +"']"));
         _extHelper.setExtFormElementByLabel("X Axis", "Label:", "TestXAxis");

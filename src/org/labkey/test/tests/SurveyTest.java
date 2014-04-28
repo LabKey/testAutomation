@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
 
@@ -212,14 +213,14 @@ public class SurveyTest extends BaseWebDriverTest
         clickFolder(folderName);
         clickEditForLabel(firstSurvey);
         _ext4Helper.waitForMaskToDisappear();
-        assertElementPresent(Locator.ext4Button("Save"));
-        assertElementPresent(Locator.ext4Button("Submit completed form"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Save"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Submit completed form"));
         clickButton("Submit completed form");
         // go back to the submitted survey and verify the submit button is gone
         // TODO: add verification that site/project admins can still see Save button but other users can not for a submitted survey
         clickEditForLabel(firstSurvey);
         _ext4Helper.waitForMaskToDisappear();
-        assertElementNotPresent(Locator.ext4Button("Submit completed form"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Submit completed form"));
         assertTextPresent("Submitted by");
 
         log("Verify that only admins can make changes to a submitted survey");
@@ -229,7 +230,7 @@ public class SurveyTest extends BaseWebDriverTest
         setFormElement(Locator.name("txtareafield"), "edit by admin after submit");
         _ext4Helper.checkCheckbox("Bool Field");
         sleep(500); // give the save button a split second to enable based on form changes
-        click(Locator.ext4Button("Save"));
+        click(Ext4Helper.Locators.ext4Button("Save"));
         _extHelper.waitForExtDialog("Success");
         _extHelper.waitForExtDialogToDisappear("Success");
 
@@ -241,8 +242,8 @@ public class SurveyTest extends BaseWebDriverTest
         assertTrue(getFormElement(Locator.name("txtareafield")).equals("edit by admin after submit"));
         assertTextPresent("Submitted by");
         assertTextNotPresent("You are allowed to make changes to this form");
-        assertElementNotPresent(Locator.ext4Button("Save"));
-        assertElementNotPresent(Locator.ext4Button("Submit completed form"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Submit completed form"));
         stopImpersonating();
         clickProject(getProjectName());
     }
@@ -280,9 +281,9 @@ public class SurveyTest extends BaseWebDriverTest
         assertElementPresent(Locator.xpath("//li[text()='Section 1']"));
         assertElementPresent(Locator.xpath("//li[text()='Section 2']"));
         assertElementPresent(Locator.xpath("//li[text()='Save / Submit']"));
-        assertElementPresent(Locator.ext4Button("Previous"));
-        assertElementPresent(Locator.ext4Button("Next"));
-        assertElementNotPresent(Locator.ext4Button("Submit completed form"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Previous"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Next"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Submit completed form"));
         assertTextPresentInThisOrder(headerWikiBody, footerWikiBody);
 
         // set form field values

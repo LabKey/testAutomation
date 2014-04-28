@@ -104,7 +104,7 @@ public class StudyHelper extends AbstractHelper
             }
         }
 
-        _test.click(Locator.ext4Button("Save"));
+        _test.click(Ext4Helper.Locators.ext4Button("Save"));
 //        _test._extHelper.clickExtButton("Define " + participantString + " Group", "Save", 0);
         _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
@@ -187,7 +187,7 @@ public class StudyHelper extends AbstractHelper
         _test.waitForElement(Locator.id("dataregion_demoDataRegion"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         String currentIds = _test.getFormElement(Locator.xpath("//textarea[@name='participantIdentifiers']"));
-        _test.click(Locator.ext4Button("Cancel"));
+        _test.click(Ext4Helper.Locators.ext4Button("Cancel"));
         _test._ext4Helper.waitForMaskToDisappear(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         return currentIds;
     }

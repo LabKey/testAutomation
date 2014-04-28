@@ -53,20 +53,20 @@ public class UIContainerHelper extends AbstractContainerHelper
         else
             _test.click(Locator.xpath("//td[./label[text()='Custom']]/input"));
 
-        _test.waitAndClickAndWait(Locator.ext4Button("Next"));
+        _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Next"));
 
         //second page of the wizard
-        _test.waitAndClickAndWait(Locator.ext4Button("Next"));
+        _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Next"));
 
         //third page of wizard
-        if (_test.isElementPresent(Locator.ext4Button("Finish")))
+        if (_test.isElementPresent(Ext4Helper.Locators.ext4Button("Finish")))
         {
-            _test.waitAndClickAndWait(Locator.ext4Button("Finish"));
+            _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Finish"));
         }
         else
         {
             // There may be additional steps based on
-            _test.waitAndClickAndWait(Locator.ext4Button("Next"));
+            _test.waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Next"));
         }
     }
 

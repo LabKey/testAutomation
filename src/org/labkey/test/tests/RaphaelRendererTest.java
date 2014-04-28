@@ -25,6 +25,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.Ext4Helper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -197,7 +198,7 @@ public class RaphaelRendererTest extends BaseWebDriverMultipleTest
         {
             click(Locator.css("svg a path"));
             _extHelper.waitForExtDialog("Data Point Information");
-            waitAndClick(Locator.ext4Button("OK"));
+            waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
         }
     }
 
@@ -256,14 +257,14 @@ public class RaphaelRendererTest extends BaseWebDriverMultipleTest
         verifyGenericChart(BOX_POINTCLICKFN_NAME, BOX_POINTCLICKFN);
         fireEvent(Locator.css("svg a path"), SeleniumEvent.click);
         _extHelper.waitForExtDialog("Data Point Information");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
 
         clickFolder(GENERIC_CHARTS_FOLDER_NAME);
         waitForElement(Locator.css("#exportedBoxPlot > svg"));
         assertSVG(BOX_EXPORTED, 1);
         fireEvent(Locator.css("#exportedBoxPlot svg a path"), SeleniumEvent.click);
         _extHelper.waitForExtDialog("Data Point Information");
-        waitAndClick(Locator.ext4Button("OK"));
+        waitAndClick(Ext4Helper.Locators.ext4Button("OK"));
     }
 
     private void verifyGenericChart(String chartName, String expectedSVG)

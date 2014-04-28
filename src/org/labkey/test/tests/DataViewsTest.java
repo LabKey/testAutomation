@@ -180,7 +180,7 @@ public class DataViewsTest extends ParticipantListTest
         waitForElement(Locator.linkContainingText(REPORT_TO_DELETE));
         enableEditMode();
         openEditPanel(REPORT_TO_DELETE);
-        waitForElement(Locator.ext4Button("Delete View"));
+        waitForElement(Ext4Helper.Locators.ext4Button("Delete View"));
         clickButton("Delete View", 0);
         waitForText("Delete View?");
         clickButton("Yes", 0);
@@ -225,13 +225,13 @@ public class DataViewsTest extends ParticipantListTest
     private void openCustomizePanel(String title)
     {
         _portalHelper.clickWebpartMenuItem(title, false, "Customize");
-        waitForElement(Locator.ext4Button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Ext4Helper.Locators.ext4Button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
     }
 
     private void closeCustomizePanel(String title)
     {
         _portalHelper.clickWebpartMenuItem(title, false, "Customize");
-        waitForElementToDisappear(Locator.ext4Button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
+        waitForElementToDisappear(Ext4Helper.Locators.ext4Button("Manage Categories"), WAIT_FOR_JAVASCRIPT);
     }
 
     private void enableEditMode()
@@ -362,7 +362,7 @@ public class DataViewsTest extends ParticipantListTest
         waitForElement(Ext4Helper.Locators.window("Manage Categories").append("//tr").withClass("x4-grid-row-selected").withText(CATEGORIES[3]));
         assertTextNotPresent("Subcategory1-" + CATEGORIES[1], "Subcategory2-" + CATEGORIES[1], "Subcategory1-" + CATEGORIES[2], "Subcategory2-" + CATEGORIES[2]);
 
-        click(Locator.ext4Button("Done"));
+        click(Ext4Helper.Locators.ext4Button("Done"));
         _extHelper.waitForExtDialogToDisappear("Manage Categories");
         closeCustomizePanel(ORIGINAL_WEBPART_TITLE);
         enableEditMode();

@@ -24,6 +24,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
 import org.labkey.test.util.DataIntegrationHelper;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.RemoteConnectionHelper;
 
 import java.io.File;
@@ -119,7 +120,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
     {
         click(Locator.linkContainingText(status));
         waitForElement(Locator.tag("span").withClass("x4-window-header-text").containing(".etl.log"));
-        waitAndClick(Locator.ext4ButtonContainingText("Close"));
+        waitAndClick(Ext4Helper.Locators.ext4ButtonContainingText("Close"));
     }
 
     protected void verifyTransformSummary()

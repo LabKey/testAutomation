@@ -25,6 +25,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.FileBrowser;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserExtendedProperty;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.LabKeyExpectedConditions;
@@ -124,10 +125,10 @@ public class FileContentTest extends BaseWebDriverTest
         _fileBrowserHelper.goToAdminMenu();
         // Setup custom file actions
 
-        waitAndClick(Locator.ext4CheckboxById("importAction"));
+        waitAndClick(Ext4Helper.Locators.ext4CheckboxById("importAction"));
 
         _ext4Helper.clickExtTab("File Properties");
-        click(Locator.ext4Radio("Use Custom File Properties"));
+        click(Ext4Helper.Locators.ext4Radio("Use Custom File Properties"));
         clickButton("edit properties");
 
         waitForElement(Locator.name("ff_name0"), WAIT_FOR_JAVASCRIPT);
@@ -142,14 +143,14 @@ public class FileContentTest extends BaseWebDriverTest
 
         // enable custom file properties.
         _ext4Helper.clickExtTab("File Properties");
-        click(Locator.ext4Radio("Use Custom File Properties"));
+        click(Ext4Helper.Locators.ext4Radio("Use Custom File Properties"));
 
         // Modify toolbar.
         _fileBrowserHelper.goToConfigureButtonsTab();
         waitForText("Import Data");
         _fileBrowserHelper.removeToolbarButton("createDirectory");
         click(Locator.xpath("//tr[@data-recordid='parentFolder']/td[2]")); // Add text to 'Parent Folder' button
-        click(Locator.ext4Button("submit"));
+        click(Ext4Helper.Locators.ext4Button("submit"));
 
         // Verify custom action buttons
         waitForElementToDisappear(Locator.xpath("//span[contains(@class, 'iconFolderNew')]"));
@@ -158,7 +159,7 @@ public class FileContentTest extends BaseWebDriverTest
         _fileBrowserHelper.goToConfigureButtonsTab();
         _fileBrowserHelper.removeToolbarButton("importData");
         _fileBrowserHelper.addToolbarButton("createDirectory");
-        click(Locator.ext4Button("submit"));
+        click(Ext4Helper.Locators.ext4Button("submit"));
         waitForElementToDisappear(Locator.xpath("//span[contains(@class, 'iconDBCommit')]"));
         waitForElement(Locator.xpath("//span[contains(@class, 'iconFolderNew')]"));
 

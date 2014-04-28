@@ -44,7 +44,6 @@ public abstract class Locator
     public static final String NOT_HIDDEN = "not(ancestor-or-self::*[contains(@style,'display: none') or contains(@style,'visibility: hidden') or contains(@class, 'x-hide-display') or contains(@class, 'x4-hide-offsets') or contains(@class, 'x-hide-offsets')] or (@type = 'hidden'))";
     public static final String ENABLED = "not(ancestor-or-self::*[contains(@class, 'disabled')])";
 
-    @Deprecated
     protected Locator(String loc)
     {
         _loc = loc;
@@ -77,13 +76,6 @@ public abstract class Locator
     public String getLocatorString()
     {
         return _loc;
-    }
-
-    @Deprecated
-    public String toXpath()
-    {
-        String xpath = _loc.substring(_loc.indexOf("=")+1);
-        return xpath;
     }
 
     public String getLoggableDescription()
@@ -353,34 +345,9 @@ public abstract class Locator
         return xpath("//button[" + NOT_HIDDEN + " and contains(@class, 'x-btn-text') and text() = " + xq(text) + "]");
     }
 
-    public static XPathLocator ext4Button(String cssPrefix, String text)
-    {
-        return xpath("//a").notHidden().withClass(cssPrefix + "btn").withText(text);
-    }
-
-    public static XPathLocator ext4ButtonEnabled(String cssPrefix, String text)
-    {
-        return ext4Button(cssPrefix, text).withoutClass(cssPrefix + "disabled");
-    }
-
-    public static XPathLocator ext4Button(String text)
-    {
-        return xpath("//a").notHidden().withClass("x4-btn").withText(text);
-    }
-
-    public static XPathLocator ext4ButtonEnabled(String text)
-    {
-        return ext4Button(text).withoutClass("x4-disabled");
-    }
-
     public static XPathLocator extButtonEnabled(String text)
     {
         return xpath("//table").withClass("x-btn").withoutClass("x-item-disabled").append("//button").withClass("x-btn-text").withText(text);
-    }
-
-    public static XPathLocator extButton(String text, Integer index)
-    {
-        return xpath("(//button[contains(@class, 'x-btn-text') and text() = " + xq(text) + "])[" + (index + 1) + "]");
     }
 
     public static XPathLocator extMenuItemEnabled(String text)
@@ -398,26 +365,6 @@ public abstract class Locator
         return xpath("//button[@class='x-btn-text' and contains(text(), " + xq(text) + ")]");
     }
 
-    public static XPathLocator ext4ButtonContainingText(String text)
-    {
-        return tag("a").withClass("x4-btn").containing(text);
-    }
-
-    public static XPathLocator ext4Checkbox(String label)
-    {
-        return xpath("//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
-    }
-
-    public static XPathLocator ext4CheckboxById(String label)
-    {
-        return xpath("//input[@type = 'button' and contains(@class, 'checkbox') and contains(@id, '" + label + "')]");
-    }
-
-    public static XPathLocator ext4Radio(String label)
-    {
-        return xpath("//input["+ NOT_HIDDEN +" and @type = 'button' and contains(@class, 'radio') and following-sibling::label[contains(text(), '" + label + "')]]");
-    }
-
     public static XPathLocator navButtonDisabled(String text)
     {
         return xpath("//a[normalize-space(@class)='labkey-disabled-button' or normalize-space(@class)='labkey-disabled-menu-button']/span[text() = " + xq(text) + "]");
@@ -426,11 +373,6 @@ public abstract class Locator
     public static XPathLocator navButtonContainingText(String text)
     {
         return xpath("//a[normalize-space(@class)='labkey-button' or normalize-space(@class)='labkey-menu-button']/span[contains(text(),  " + xq(text) + ")]");
-    }
-
-    public static XPathLocator navButton(String text, Integer index)
-    {
-        return xpath("(//a[normalize-space(@class)='labkey-button' or @class='labkey-menu-button']/span[text() = " + xq(text) + "])[" + (index + 1) + "]");
     }
 
     public static XPathLocator linkWithImage(String image, Integer index)
@@ -1102,49 +1044,6 @@ public abstract class Locator
         public By toBy()
         {
             return By.linkText(_linkText);
-        }
-    }
-
-    /**
-     * @deprecated Placeholder for tests before WebDriver conversion
-     */
-    @Deprecated
-    public static class DeprecatedLocator extends Locator
-    {
-        public DeprecatedLocator(String loc)
-        {
-            super(loc);
-        }
-
-        private DeprecatedLocator(String loc, Integer index, String contains, String text)
-        {
-            super(loc, index, contains, text);
-        }
-
-        public Locator containing(String contains)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public Locator withText(String text)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public Locator index(Integer index)
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public String toString()
-        {
-            return _loc;
-        }
-
-        public By toBy()
-        {
-            throw new UnsupportedOperationException("Deprecated Locator: '" + toString() +"' not supported by WebDriver");
         }
     }
 }

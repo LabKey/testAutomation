@@ -37,6 +37,7 @@ import org.labkey.test.WebTestHelper;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.openqa.selenium.WebElement;
@@ -141,7 +142,7 @@ public class ChartingAPITest extends ClientAPITest
         {
             waitForText(CHARTING_API_TITLES[currentTest]);
             checkSVGConversion();
-            click(Locator.ext4Button("Next"));
+            click(Ext4Helper.Locators.ext4Button("Next"));
         }
     }
 

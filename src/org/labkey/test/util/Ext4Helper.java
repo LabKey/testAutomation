@@ -505,7 +505,7 @@ public class Ext4Helper extends AbstractHelper
         // TOD0: Check not hidden
         String windowPath = "//div[contains(@class, '" + _cssPrefix + "window') and ./div/div/div/div/div/span[contains(@class, '" + _cssPrefix + "window-header-text')" +
                 " and contains(string(), '" + windowTitle + "')]]";
-        return Locator.xpath(windowPath + Locator.ext4Button(buttonText).toXpath());
+        return Locator.xpath(windowPath + Locators.ext4Button(buttonText).toXpath());
     }
 
     public static class Locators
@@ -564,6 +564,36 @@ public class Ext4Helper extends AbstractHelper
         public static Locator.XPathLocator tab(String tabName)
         {
             return Locator.xpath("//a[contains(@class, '" + _cssPrefix + "tab') and contains( normalize-space(), '" + tabName + "')]");
+        }
+
+        public static Locator.XPathLocator ext4Button(String text)
+        {
+            return Locator.xpath("//a").notHidden().withClass(_cssPrefix + "btn").withText(text);
+        }
+
+        public static Locator.XPathLocator ext4ButtonEnabled(String text)
+        {
+            return ext4Button(text).withoutClass(_cssPrefix + "disabled");
+        }
+
+        public static Locator.XPathLocator ext4ButtonContainingText(String text)
+        {
+            return Locator.tag("a").withClass(_cssPrefix + "btn").containing(text);
+        }
+
+        public static Locator.XPathLocator ext4Checkbox(String label)
+        {
+            return Locator.xpath("//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
+        }
+
+        public static Locator.XPathLocator ext4CheckboxById(String label)
+        {
+            return Locator.xpath("//input[@type = 'button' and contains(@class, 'checkbox') and contains(@id, '" + label + "')]");
+        }
+
+        public static Locator.XPathLocator ext4Radio(String label)
+        {
+            return Locator.xpath("//input[" + Locator.NOT_HIDDEN + " and @type = 'button' and contains(@class, 'radio') and following-sibling::label[contains(text(), '" + label + "')]]");
         }
     }
 

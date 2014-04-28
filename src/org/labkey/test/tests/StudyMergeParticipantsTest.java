@@ -19,6 +19,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.Ext4Helper;
 
 import java.io.File;
 
@@ -43,7 +44,7 @@ public class StudyMergeParticipantsTest extends StudyBaseTest
 
     private static final String ALIAS_SOURCE_1 = "a";
     private static final String ALIAS_SOURCE_2 = "b";
-    private static final Locator.XPathLocator CREATE_ALIAS_CB = Locator.ext4CheckboxById("createAliasCB");
+    private static final Locator.XPathLocator CREATE_ALIAS_CB = Ext4Helper.Locators.ext4CheckboxById("createAliasCB");
     private static final Locator.NameLocator OLD_ID_FIELD = Locator.name("oldIdField-inputEl");
     private static final Locator.NameLocator NEW_ID_FIELD = Locator.name("newIdField-inputEl");
     private static final Locator.NameLocator ALIAS_SOURCE_FIELD = Locator.name("aliasSourceField-inputEl");

@@ -822,7 +822,7 @@ public class LuminexGuideSetTest  extends LuminexTest
 
         _extHelper.selectComboBoxItem("Isotype:", isotype);
         _extHelper.selectComboBoxItem("Conjugate:", conjugate);
-        click(Locator.extButton("Apply", 0));
+        click(Locator.extButton("Apply"));
 
         // wait for the test headers in the guide set and tracking data regions
         waitForText(analyte + " - " + isotype + " " + conjugate);

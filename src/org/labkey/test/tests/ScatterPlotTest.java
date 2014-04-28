@@ -21,6 +21,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Charting;
 import org.labkey.test.categories.Reports;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.WebElement;
 
@@ -99,7 +100,7 @@ public class ScatterPlotTest extends GenericChartsTest
         log("Set Y Axis");
         goToAxisTab("1. Weight");
         _extHelper.waitForExtDialog("Y Axis");
-        click(Locator.ext4Radio("log"));
+        click(Ext4Helper.Locators.ext4Radio("log"));
         waitForText("2. Body Temp", WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath(_extHelper.getExtDialogXPath("Y Axis") + "//div[text()='2. Body Temp']"));
         setFormElement(Locator.name("label"), "TestYAxis");
@@ -109,7 +110,7 @@ public class ScatterPlotTest extends GenericChartsTest
         log("Set X Axis");
         goToAxisTab("4. Pulse");
         _extHelper.waitForExtDialog("X Axis");
-        click(Locator.ext4Radio("log"));
+        click(Ext4Helper.Locators.ext4Radio("log"));
         waitForText(MOUSE_GROUP_CATEGORY, WAIT_FOR_JAVASCRIPT);
         click(Locator.xpath(_extHelper.getExtDialogXPath("X Axis") + "//div[text()='" + MOUSE_GROUP_CATEGORY + "']"));
         _extHelper.setExtFormElementByLabel("X Axis", "Label:", "TestXAxis");
@@ -218,11 +219,11 @@ public class ScatterPlotTest extends GenericChartsTest
         _ext4Helper.waitForMaskToDisappear();
 
         // verify that we originally are in view mode and can switch to edit mode
-        assertElementNotPresent(Locator.ext4Button("Grouping"));
-        assertElementNotPresent(Locator.ext4Button("Save"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Grouping"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
         waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
         _ext4Helper.waitForMaskToDisappear();
-        assertElementNotPresent(Locator.ext4Button("Edit"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Edit"));
 
         // Verify default styling for point at origin - blue circles
 
@@ -240,7 +241,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
         click(Locator.id("colorCategory-inputEl"));
         _extHelper.selectExt4ComboBoxItem("Color Category:", "7. Neck");
-        click(Locator.ext4Radio("Single shape"));
+        click(Ext4Helper.Locators.ext4Radio("Single shape"));
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_COLORS);
@@ -254,7 +255,7 @@ public class ScatterPlotTest extends GenericChartsTest
         // Enable Grouping - Shapes
         log("Group with shapes");
         clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
-        click(Locator.ext4Radio("With a single color"));
+        click(Ext4Helper.Locators.ext4Radio("With a single color"));
         click(Locator.id("shapeCategory-inputEl"));
         _extHelper.selectExt4ComboBoxItem("Point Category:", "16. Evaluation Summary");
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
@@ -322,8 +323,8 @@ public class ScatterPlotTest extends GenericChartsTest
         assertTextPresent("\"APXcemh\", is not available. It may have been deleted or renamed.");
 
         clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
-        click(Locator.ext4Radio("With a single color"));
-        click(Locator.ext4Radio("Single shape"));
+        click(Ext4Helper.Locators.ext4Radio("With a single color"));
+        click(Ext4Helper.Locators.ext4Radio("Single shape"));
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         log("Set X Axis to categorical measure.");
@@ -399,20 +400,20 @@ public class ScatterPlotTest extends GenericChartsTest
         _ext4Helper.waitForMaskToDisappear();
 
         // verify that we originally are in view mode and can switch to edit mode
-        assertElementNotPresent(Locator.ext4Button("Grouping"));
-        assertElementNotPresent(Locator.ext4Button("Save"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Grouping"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
         waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
         _ext4Helper.waitForMaskToDisappear();
-        assertElementNotPresent(Locator.ext4Button("Edit"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Edit"));
 
         log("Check Scatter Plot Point Click Function (Developer Only)");
         // open the developer panel and verify that it is disabled by default
-        assertElementPresent(Locator.ext4Button("Developer"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Developer"));
         clickOptionButtonAndWaitForDialog("Developer", "Developer Options");
-        assertElementPresent(Locator.ext4Button("Enable"));
-        assertElementNotPresent(Locator.ext4Button("Disable"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Enable"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Disable"));
         // enable the feature and verify that you can switch tabs
-        click(Locator.ext4Button("Enable"));
+        click(Ext4Helper.Locators.ext4Button("Enable"));
         _ext4Helper.clickTabContainingText("Help");
         assertTextPresentInThisOrder("Your code should define a single function", "data:", "measureInfo:", "clickEvent:");
         assertTextPresentInThisOrder("YAxisMeasure:", "XAxisMeasure:", "ColorMeasure:", "PointMeasure:");
@@ -425,7 +426,7 @@ public class ScatterPlotTest extends GenericChartsTest
         waitForElement(svgCircleLoc);
         fireEvent(svgCircleLoc, SeleniumEvent.click);
         _extHelper.waitForExtDialog("Data Point Information");
-        click(Locator.ext4Button("OK"));
+        click(Ext4Helper.Locators.ext4Button("OK"));
         // open developer panel and test JS function validation
         clickOptionButtonAndWaitForDialog("Developer", "Developer Options");
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", "");
@@ -434,12 +435,12 @@ public class ScatterPlotTest extends GenericChartsTest
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", "function(){");
         _ext4Helper.clickWindowButton("Developer Options", "OK", 0, 0);
         assertTextPresent("Error parsing the function:");
-        click(Locator.ext4Button("Disable"));
+        click(Ext4Helper.Locators.ext4Button("Disable"));
         _extHelper.waitForExtDialog("Confirmation...");
         _ext4Helper.clickWindowButton("Confirmation...", "Yes", 0, 0);
         assertTextNotPresent("Error");
         // test use-case to navigate to query page on click
-        click(Locator.ext4Button("Enable"));
+        click(Ext4Helper.Locators.ext4Button("Enable"));
         String function = getFileContents(TEST_DATA_API_PATH + "/scatterPlotPointClickTestFn.js");
         _extHelper.setCodeMirrorValue("point-click-fn-textarea", function);
         clickDialogButtonAndWaitForMaskToDisappear("Developer Options", "OK");
@@ -458,10 +459,10 @@ public class ScatterPlotTest extends GenericChartsTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(SCATTER_PLOT_NAME_MV + " PointClickFn"));
-        clickAndWait(Locator.ext4Button("Edit"), WAIT_FOR_PAGE);
+        clickAndWait(Ext4Helper.Locators.ext4Button("Edit"), WAIT_FOR_PAGE);
         waitForText(CHART_TITLE);
         pushLocation();
-        assertElementNotPresent(Locator.ext4Button("Developer"));
+        assertElementNotPresent(Ext4Helper.Locators.ext4Button("Developer"));
         prepForPageLoad();
         fireEvent(svgCircleLoc, SeleniumEvent.click);
         waitForPageToLoad();
@@ -472,7 +473,7 @@ public class ScatterPlotTest extends GenericChartsTest
         impersonate(DEVELOPER_USER);
         popLocation();
         waitForText(CHART_TITLE);
-        assertElementPresent(Locator.ext4Button("Developer"));
+        assertElementPresent(Ext4Helper.Locators.ext4Button("Developer"));
         stopImpersonating();
     }
 }
