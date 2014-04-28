@@ -485,6 +485,7 @@ src/org/labkey/test/tests/SequenceTest.java -text
 src/org/labkey/test/tests/SimpleApiTest.java -text
 src/org/labkey/test/tests/SimpleModuleTest.java -text
 src/org/labkey/test/tests/SpecimenBaseTest.java -text
+src/org/labkey/test/tests/SpecimenCustomizeTest.java -text
 src/org/labkey/test/tests/SpecimenExportTest.java -text
 src/org/labkey/test/tests/SpecimenExtendedTest.java -text
 src/org/labkey/test/tests/SpecimenGridExportTest.java -text
