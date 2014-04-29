@@ -533,6 +533,12 @@ public class ListHelper extends AbstractHelper
             lineReader.useDelimiter("\t");
 
             name = lineReader.next();
+            if (name.equals("Property")){
+                line=reader.nextLine();
+                lineReader = new Scanner(line);
+                lineReader.useDelimiter("\t");
+                name= lineReader.next();
+            }
             label = lineReader.next();
             type = lineReader.next();
             format = lineReader.next();
@@ -544,9 +550,16 @@ public class ListHelper extends AbstractHelper
                 description = lineReader.next();
             }
             else description="";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#string")) type="String";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#double")) type="Double";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#int")) type="Integer";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#dateTime")) type="DateTime";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#multiLine")) type="MultiLine";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#boolean")) type="Boolean";
 
-            ListHelper.ListColumnType typeEnum = ListHelper.ListColumnType.valueOf(type);
-            ListHelper.ListColumn newCol = new ListHelper.ListColumn(name, label, typeEnum, description);
+
+            ListColumnType typeEnum = ListColumnType.valueOf(type);
+            ListColumn newCol = new ListColumn(name, label, typeEnum, description);
 
             if (required.equals("TRUE")) newCol.setRequired(true);
             if (mvenabled.equals("TRUE")) newCol.setMvEnabled(true);
