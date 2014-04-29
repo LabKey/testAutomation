@@ -8,8 +8,8 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by cnathe on 4/25/14.
@@ -50,7 +50,7 @@ public class LuminexValueBasedGuideSetTest extends LuminexGuideSetTest
     {
         goToLeveyJenningsGraphPage("Standard1");
 
-        Map<String, Double> metricInputs = new HashMap<>();
+        Map<String, Double> metricInputs = new TreeMap<>();
 
         setUpLeveyJenningsGraphParams(GUIDE_SET_ANALYTE_NAMES[0]);
         createGuideSet(true);
@@ -92,7 +92,7 @@ public class LuminexValueBasedGuideSetTest extends LuminexGuideSetTest
 
     private void udpateGuideSets()
     {
-        Map<String, Double> metricInputs = new HashMap<>();
+        Map<String, Double> metricInputs = new TreeMap<>();
 
         goToLeveyJenningsGraphPage("Standard1");
 

@@ -848,7 +848,7 @@ public class LuminexGuideSetTest  extends LuminexTest
         clickButtonContainingText("New", 0);
         if (!initialGuideSet)
         {
-            waitForText("Creating a new guide set will set the current guide set to be inactive. Would you like to proceed?");
+            waitForText("Creating a new guide set will cause the current guide set to be uneditable. Would you like to proceed?");
             clickButton("Yes", 0);
         }
     }

@@ -26,8 +26,8 @@ import org.testng.Assert;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 @Category({DailyA.class, MiniTest.class, Assays.class})
 public class LuminexSinglePointTest extends LuminexGuideSetTest
@@ -87,7 +87,7 @@ public class LuminexSinglePointTest extends LuminexGuideSetTest
         String guideSetComment = "Single Point Control Guide Set 2";
         Locator ctrlFlag = Locator.tagWithText("a", "CTRL");
 
-        Map<String, Double> metricInputs = new HashMap<>();
+        Map<String, Double> metricInputs = new TreeMap<>();
         metricInputs.put("MaxFIAverage", 33.0);
         metricInputs.put("MaxFIStdDev", 1.25);
         createGuideSet(false);
