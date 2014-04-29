@@ -703,6 +703,8 @@ public class StudyPublishTest extends StudyProtectedExportTest
         if (rootProjectOrFolder == 0)
             _containerHelper.addCreatedProject(name); // Add to list so that it will be deleted during cleanup
 
+        // remove this line once the SQLserver deadlock is resolved
+        waitForPipelineJobsToComplete(_pipelineJobs, "publish study", false);
         popLocation();
     }
 
