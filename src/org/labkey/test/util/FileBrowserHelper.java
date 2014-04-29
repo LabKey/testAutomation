@@ -88,9 +88,6 @@ public class FileBrowserHelper implements FileBrowserHelperParams
 
             nodeId.append(parts[i]);
 
-            if (i > 0 || startAtRoot)
-                scrollToGridRow(nodeId.toString());
-
             nodeId.append('/');
 
             if (i == parts.length - 1 && !path.endsWith("/")) // Trailing '/' indicates directory
@@ -100,6 +97,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
             }
             else
             {
+                WebElement gridRow = Locators.gridRow().findElement(_test.getDriver());
                 Locator.XPathLocator folderTreeNode = Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId.toString());
 
                 _test.waitForElement(folderTreeNode);
@@ -109,6 +107,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
                 _test.clickAt(folderTreeNode, 1, 1, 0);
                 _test.waitForElement(folderTreeNode.withClass("x4-grid-row-selected"));
                 _test._ext4Helper.waitForMaskToDisappear();
+                _test.shortWait().until(ExpectedConditions.stalenessOf(gridRow));
             }
         }
     }
