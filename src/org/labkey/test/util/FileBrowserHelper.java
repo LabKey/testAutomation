@@ -97,7 +97,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
             }
             else
             {
-                WebElement gridRow = Locators.gridRow().findElement(_test.getDriver());
+                WebElement gridRow = Locators.gridRow().waitForElement(_test.getDriver(), WAIT_FOR_JAVASCRIPT);
                 Locator.XPathLocator folderTreeNode = Locator.tag("tr").withPredicate("starts-with(@id, 'treeview')").attributeEndsWith("data-recordid", nodeId.toString());
 
                 _test.waitForElement(folderTreeNode);
