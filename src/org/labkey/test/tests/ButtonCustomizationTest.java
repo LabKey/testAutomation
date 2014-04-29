@@ -173,7 +173,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         _extHelper.clickExtTab("XML Metadata");
         setCodeEditorValue("metadataText", getMetadataXML(true));
         _extHelper.clickExtTab("Source");
-        clickButtonByIndex("Save", 1, 0);        // 0: source/save 1: metadata/save
+        clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
         clickButton("Execute Query", 0);
         waitForText("Seattle", WAIT_FOR_JAVASCRIPT);
