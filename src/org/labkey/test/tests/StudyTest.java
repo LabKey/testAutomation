@@ -717,7 +717,7 @@ public class StudyTest extends StudyBaseTest
         // add a comment field
         _listHelper.setColumnName(0, COMMENT_FIELD_NAME);
         _listHelper.setColumnLabel(0, PARTICIPANT_COMMENT_LABEL);
-        _listHelper.setColumnType(0, ListHelper.ListColumnType.MutliLine);
+        _listHelper.setColumnType(0, ListHelper.ListColumnType.MultiLine);
         clickButton("Save");
 
         log("creating the participant/visit comment dataset");
@@ -731,7 +731,7 @@ public class StudyTest extends StudyBaseTest
         // add a comment field
         _listHelper.setColumnName(0, COMMENT_FIELD_NAME);
         _listHelper.setColumnLabel(0, PARTICIPANT_VISIT_COMMENT_LABEL);
-        _listHelper.setColumnType(0, ListHelper.ListColumnType.MutliLine);
+        _listHelper.setColumnType(0, ListHelper.ListColumnType.MultiLine);
         clickButton("Save");
 
         log("configure comments");

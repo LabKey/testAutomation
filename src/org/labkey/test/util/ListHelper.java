@@ -24,6 +24,7 @@ import org.openqa.selenium.NoSuchElementException;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Scanner;
 
 import static org.junit.Assert.*;
 
@@ -512,6 +513,46 @@ public class ListHelper extends AbstractHelper
             _test.waitForElement(Locator.xpath("//img[@id='partstatus_" + index + "'][contains(@src, 'deleted')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
     }
+    public void addFieldsNoImport(String fieldList)
+    {
+        String name;
+        String label;
+        String type;
+        String format;
+        String hidden;
+        String required;
+        String mvenabled;
+        String description;
+
+        Scanner reader=new Scanner (fieldList);
+        //ListHelper listHelper = new ListHelper(this);
+        while (reader.hasNextLine())
+        {
+            String line = reader.nextLine();
+            Scanner lineReader = new Scanner(line);
+            lineReader.useDelimiter("\t");
+
+            name = lineReader.next();
+            label = lineReader.next();
+            type = lineReader.next();
+            format = lineReader.next();
+            required = lineReader.next();
+            hidden = lineReader.next();
+            mvenabled = lineReader.next();
+            if (lineReader.hasNext())
+            {
+                description = lineReader.next();
+            }
+            else description="";
+
+            ListHelper.ListColumnType typeEnum = ListHelper.ListColumnType.valueOf(type);
+            ListHelper.ListColumn newCol = new ListHelper.ListColumn(name, label, typeEnum, description);
+
+            if (required.equals("TRUE")) newCol.setRequired(true);
+            if (mvenabled.equals("TRUE")) newCol.setMvEnabled(true);
+            addField(newCol);
+        }
+    }
 
     public enum RangeType
     {
@@ -531,7 +572,7 @@ public class ListHelper extends AbstractHelper
 
     public enum ListColumnType
     {
-        MutliLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), Subject("Subject/Participant (String)"), DateTime("DateTime"), Boolean("Boolean"),
+        MultiLine("Multi-Line Text"), Integer("Integer"), String("Text (String)"), Subject("Subject/Participant (String)"), DateTime("DateTime"), Boolean("Boolean"),
         Double("Number (Double)"), File("File"), AutoInteger("Auto-Increment Integer"), Flag("Flag (String)");
 
         private final String _description;

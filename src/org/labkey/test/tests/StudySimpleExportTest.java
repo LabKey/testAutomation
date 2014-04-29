@@ -825,7 +825,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         addCustomField("TreatmentProductMap", "cust_map", ListHelper.ListColumnType.Integer);
         addCustomField("Product", "cust_product", ListHelper.ListColumnType.DateTime);
         addCustomField("ProductAntigen", "cust_antigen", ListHelper.ListColumnType.Double);
-        addCustomField("Personnel", "cust_personnel", ListHelper.ListColumnType.MutliLine);
+        addCustomField("Personnel", "cust_personnel", ListHelper.ListColumnType.MultiLine);
 
         // add data and export
         Map<String, List<Map>> tableData = new LinkedHashMap<>();
@@ -1080,7 +1080,7 @@ public class StudySimpleExportTest extends StudyBaseTest
         _listHelper.setColumnType(3, ListHelper.ListColumnType.Double);
         clickButton("Add Field", 0);
         _listHelper.setColumnName(4, "cust_multiline");
-        _listHelper.setColumnType(4, ListHelper.ListColumnType.MutliLine);
+        _listHelper.setColumnType(4, ListHelper.ListColumnType.MultiLine);
 
         clickButton("Save", WAIT_FOR_JAVASCRIPT);
 
