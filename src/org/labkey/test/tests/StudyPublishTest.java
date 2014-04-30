@@ -804,7 +804,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
             waitForElement(Locator.xpath(measureXpath), WAIT_FOR_JAVASCRIPT); // Make sure measure has appeared
             waitForElementToDisappear(Locator.xpath("("+measureXpath+")[2]"), WAIT_FOR_JAVASCRIPT); // Wait for filter to remove any duplicates
 
-            _extHelper.clickX4GridPanelCheckbox("label", pair[1], "measuresGridPanel", true);
+            _ext4Helper.selectGridItem("label", pair[1], -1, "measuresGridPanel", true);
         }
 
         clickButton("Select", 0);

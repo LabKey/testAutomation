@@ -220,9 +220,9 @@ public class StudyTest extends StudyBaseTest
         assertTextNotPresent(textToFilter);
 
         log("select some records and include them in a report");
-        _extHelper.clickX4GridPanelCheckbox(4, "measuresGridPanel", true);
-        _extHelper.clickX4GridPanelCheckbox(40, "measuresGridPanel", true);
-        _extHelper.clickX4GridPanelCheckbox(20, "measuresGridPanel", true);
+        _ext4Helper.selectGridItem(null, null, 4, "measuresGridPanel", true);
+        _ext4Helper.selectGridItem(null, null, 40, "measuresGridPanel", true);
+        _ext4Helper.selectGridItem(null, null, 20, "measuresGridPanel", true);
         clickButton("Select", 0);
         _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
 

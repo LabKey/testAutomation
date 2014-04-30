@@ -437,53 +437,6 @@ public class ExtHelper extends AbstractHelper
         _test.executeScript(script, columnName, columnVal, idx, markerCls, keepExisting);
     }
 
-    public void selectExt4GridItem(String columnName, String columnVal, int idx, String markerCls, boolean keepExisting)
-    {
-        String script =
-                "selectExt4GridItem = function (columnName, columnVal, idx, markerCls, keepExisting) {\n" +
-                "    var el = Ext4.DomQuery.selectNode(\".\"+markerCls);\n" +
-                "    if (el)\n" +
-                "    {\n" +
-                "        var grid = Ext4.getCmp(el.id);\n" +
-                "        if (grid)\n" +
-                "        {\n" +
-                "            if (idx == -1)\n" +
-                "                idx = grid.getStore().find(columnName, columnVal);\n" +
-
-                "            if (idx == -1)\n" +
-                "                throw 'Unable to locate ' + columnName + ': ' + columnVal;\n" +
-
-                "            if (idx >= grid.getStore().getCount())\n" +
-                "                throw 'No such row: ' + idx;\n" +
-
-                "            grid.getSelectionModel().select(idx, keepExisting);\n" +
-                "        }\n" +
-                "    }\n" +
-                "    else\n" +
-                "    {\n" +
-                "        throw 'Unable to locate grid: ' + markerCls;\n" +
-                "    }\n" +
-                "};" +
-                "selectExt4GridItem(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);";
-        _test.executeScript(script, columnName, columnVal, idx, markerCls, keepExisting);
-    }
-
-    public void clickX4GridPanelCheckbox(int index, String markerCls, boolean keepExisting)
-    {
-        clickX4GridPanelCheckbox(null, null, index, markerCls, keepExisting);
-    }
-
-    public void clickX4GridPanelCheckbox(String colName, String colValue, String markerCls, boolean keepExisting)
-    {
-        clickX4GridPanelCheckbox(colName, colValue, -1, markerCls, keepExisting);
-    }
-
-    protected void clickX4GridPanelCheckbox(String colName, String colValue, int rowIndex, String markerCls, boolean keepExisting)
-    {
-        _test.waitForElement(Locator.xpath("//div[contains(@class, '" + Ext4Helper.getCssPrefix() + "grid')]"), WAIT_FOR_PAGE);
-        selectExt4GridItem(colName, colValue, rowIndex, markerCls, keepExisting);
-    }
-
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
     {
@@ -497,7 +450,7 @@ public class ExtHelper extends AbstractHelper
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String selection)
     {
-        selectComboBoxItem(Locator.xpath("//div["+NOT_HIDDEN+" and ./label/span[text()='"+label+"']]/div/div"), selection);
+        selectComboBoxItem(Locator.xpath("//div[" + NOT_HIDDEN + " and ./label/span[text()='" + label + "']]/div/div"), selection);
     }
 
     public void selectGWTComboBoxItem(Locator.XPathLocator parentLocator, String selection)

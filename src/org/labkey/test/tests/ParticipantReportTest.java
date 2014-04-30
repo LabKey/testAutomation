@@ -153,9 +153,9 @@ public class ParticipantReportTest extends ReportTest
         waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][18]"));
         assertEquals("Wrong number of measures visible after filtering.", 17, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')]")));
 
-        _extHelper.clickX4GridPanelCheckbox("label", "2a. Creatinine", "measuresGridPanel", true);
-        _extHelper.clickX4GridPanelCheckbox("label", "1a.ALT AE Severity Grade", "measuresGridPanel", true);
-        _extHelper.clickX4GridPanelCheckbox("label", "1a. ALT (SGPT)", "measuresGridPanel", true);
+        _ext4Helper.selectGridItem("label", "2a. Creatinine", -1, "measuresGridPanel", true);
+        _ext4Helper.selectGridItem("label", "1a.ALT AE Severity Grade", -1, "measuresGridPanel", true);
+        _ext4Helper.selectGridItem("label", "1a. ALT (SGPT)", -1, "measuresGridPanel", true);
 
         clickButton("Select", 0);
 
@@ -172,7 +172,7 @@ public class ParticipantReportTest extends ReportTest
         pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
         waitForElementToDisappear(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')][5]"), WAIT_FOR_JAVASCRIPT);
         assertEquals("Wrong number of measures visible after filtering.", 4, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//tr[contains(@class, 'x4-grid-row')]")));
-        _extHelper.clickX4GridPanelCheckbox("queryName", "CPS-1", "measuresGridPanel", true);
+        _ext4Helper.selectGridItem("queryName", "CPS-1", -1, "measuresGridPanel", true);
         clickButton("Select", 0);
 
         // at this point the report should render some content
@@ -318,8 +318,8 @@ public class ParticipantReportTest extends ReportTest
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
 
-        _extHelper.clickX4GridPanelCheckbox("label", "17a. Preg. test result", "measuresGridPanel", true);
-        _extHelper.clickX4GridPanelCheckbox("label", "1.Adverse Experience (AE)", "measuresGridPanel", true);
+        _ext4Helper.selectGridItem("label", "17a. Preg. test result", -1, "measuresGridPanel", true);
+        _ext4Helper.selectGridItem("label", "1.Adverse Experience (AE)", -1, "measuresGridPanel", true);
 
         clickButton("Select", 0);
 
@@ -385,8 +385,8 @@ public class ParticipantReportTest extends ReportTest
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "primary type vial counts blood");
         pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
 
-        _extHelper.clickX4GridPanelCheckbox("label", "Blood (Whole):VialCount", "measuresGridPanel", true);
-        _extHelper.clickX4GridPanelCheckbox("label", "Blood (Whole):AvailableCount", "measuresGridPanel", true);
+        _ext4Helper.selectGridItem("label", "Blood (Whole):VialCount", -1, "measuresGridPanel", true);
+        _ext4Helper.selectGridItem("label", "Blood (Whole):AvailableCount", -1, "measuresGridPanel", true);
 
         clickButton("Select", 0);
         waitForElement(Locator.linkWithText(PTIDS_ONE[0]));
@@ -440,9 +440,9 @@ public class ParticipantReportTest extends ReportTest
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "demographic");
         pressEnter(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE)+"//input[contains(@class, 'x4-form-text') and @type='text']"));
 
-        _extHelper.clickX4GridPanelCheckbox("label", "1.Date of Birth", "measuresGridPanel", true);
-        _extHelper.clickX4GridPanelCheckbox("label", "2.What is your sex?", "measuresGridPanel", true);
-        _extHelper.clickX4GridPanelCheckbox("label", "5. Sexual orientation", "measuresGridPanel", true);
+        _ext4Helper.selectGridItem("label", "1.Date of Birth", -1, "measuresGridPanel", true);
+        _ext4Helper.selectGridItem("label", "2.What is your sex?", -1, "measuresGridPanel", true);
+        _ext4Helper.selectGridItem("label", "5. Sexual orientation", -1, "measuresGridPanel", true);
         clickButton("Select", 0);
         waitForText("Showing partial results while in edit mode.", WAIT_FOR_JAVASCRIPT);
 

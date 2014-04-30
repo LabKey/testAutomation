@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package org.labkey.test.util;
+
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
@@ -197,6 +198,37 @@ public class Ext4Helper extends AbstractHelper
         Locator loc = ext4WindowButton(windowTitle, buttonText);
         _test.waitForElement(loc, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.clickAndWait(loc, wait);
+    }
+
+    public void selectGridItem(String columnName, String columnVal, int idx, String markerCls, boolean keepExisting)
+    {
+        String script =
+                "selectExt4GridItem = function (columnName, columnVal, idx, markerCls, keepExisting) {\n" +
+                "    var el = Ext4.DomQuery.selectNode(\".\"+markerCls);\n" +
+                "    if (el)\n" +
+                "    {\n" +
+                "        var grid = Ext4.getCmp(el.id);\n" +
+                "        if (grid)\n" +
+                "        {\n" +
+                "            if (idx == -1)\n" +
+                "                idx = grid.getStore().find(columnName, columnVal);\n" +
+
+                "            if (idx == -1)\n" +
+                "                throw 'Unable to locate ' + columnName + ': ' + columnVal;\n" +
+
+                "            if (idx >= grid.getStore().getCount())\n" +
+                "                throw 'No such row: ' + idx;\n" +
+
+                "            grid.getSelectionModel().select(idx, keepExisting);\n" +
+                "        }\n" +
+                "    }\n" +
+                "    else\n" +
+                "    {\n" +
+                "        throw 'Unable to locate grid: ' + markerCls;\n" +
+                "    }\n" +
+                "};" +
+                "selectExt4GridItem(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);";
+        _test.executeScript(script, columnName, columnVal, idx, markerCls, keepExisting);
     }
 
     @LogMethod(quiet = true)
