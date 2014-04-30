@@ -513,6 +513,7 @@ public class ListHelper extends AbstractHelper
             _test.waitForElement(Locator.xpath("//img[@id='partstatus_" + index + "'][contains(@src, 'deleted')]"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
     }
+
     public void addFieldsNoImport(String fieldList)
     {
         String name;
@@ -524,8 +525,7 @@ public class ListHelper extends AbstractHelper
         String mvenabled;
         String description;
 
-        Scanner reader=new Scanner (fieldList);
-        //ListHelper listHelper = new ListHelper(this);
+        Scanner reader = new Scanner(fieldList);
         while (reader.hasNextLine())
         {
             String line = reader.nextLine();
@@ -533,11 +533,12 @@ public class ListHelper extends AbstractHelper
             lineReader.useDelimiter("\t");
 
             name = lineReader.next();
-            if (name.equals("Property")){
-                line=reader.nextLine();
+            if ("Property".equals(name))
+            {
+                line = reader.nextLine();
                 lineReader = new Scanner(line);
                 lineReader.useDelimiter("\t");
-                name= lineReader.next();
+                name = lineReader.next();
             }
             label = lineReader.next();
             type = lineReader.next();
@@ -549,13 +550,13 @@ public class ListHelper extends AbstractHelper
             {
                 description = lineReader.next();
             }
-            else description="";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#string")) type="String";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#double")) type="Double";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#int")) type="Integer";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#dateTime")) type="DateTime";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#multiLine")) type="MultiLine";
-            if (type.equals("http://www.w3.org/2001/XMLSchema#boolean")) type="Boolean";
+            else description = "";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#string")) type = "String";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#double")) type = "Double";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#int")) type = "Integer";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#dateTime")) type = "DateTime";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#multiLine")) type = "MultiLine";
+            if (type.equals("http://www.w3.org/2001/XMLSchema#boolean")) type = "Boolean";
 
 
             ListColumnType typeEnum = ListColumnType.valueOf(type);
