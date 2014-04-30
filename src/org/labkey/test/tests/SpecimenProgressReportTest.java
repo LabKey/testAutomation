@@ -364,7 +364,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private void configureAssayProgressDashboard(String assayName)
     {
         _portalHelper.clickWebpartMenuItem("Assay Progress Dashboard", "Customize");
-        _extHelper.checkCheckbox(assayName);
+        _ext4Helper.checkCheckbox(assayName);
         click(Locator.tagContainingText("label", "Specimen Report Study Folder Study"));
         clickButton("Save");
     }

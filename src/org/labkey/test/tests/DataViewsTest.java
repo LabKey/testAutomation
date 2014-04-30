@@ -109,7 +109,7 @@ public class DataViewsTest extends ParticipantListTest
         assertEquals("Incorrect number of datasets after collapsing category.", 10, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
         assertEquals("Incorrect number of dataset categories visible after collapsing category.", 2, getElementCount(Locator.xpath("//td").withClass("dvcategory").notHidden()));
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
-        _extHelper.uncheckCheckbox("datasets");
+        _ext4Helper.uncheckCheckbox("datasets");
         setFormElement(Locator.name("webpart.title"), RENAMED_WEBPART_TITLE);
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
@@ -121,8 +121,8 @@ public class DataViewsTest extends ParticipantListTest
 
         log("Verify cancel button");
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
-        _extHelper.checkCheckbox("datasets");
-        _extHelper.uncheckCheckbox("reports");
+        _ext4Helper.checkCheckbox("datasets");
+        _ext4Helper.uncheckCheckbox("reports");
         setFormElement(Locator.name("webpart.title"), "nothing");
         clickButton("Cancel", 0);
         sleep(500);               //TODO: \
@@ -134,7 +134,7 @@ public class DataViewsTest extends ParticipantListTest
 
         log("Verify category management: delete");
         openCustomizePanel(RENAMED_WEBPART_TITLE);
-        _extHelper.checkCheckbox("datasets");
+        _ext4Helper.checkCheckbox("datasets");
         clickButton("Manage Categories", 0);
         _extHelper.waitForExtDialog("Manage Categories");
         waitAndClick(Locator.xpath("//img[@data-qtip='Delete']"));
@@ -197,7 +197,7 @@ public class DataViewsTest extends ParticipantListTest
         assertTextPresent("Data Views", "Name", "Type", "Access");
 
         openCustomizePanel(RENAMED_WEBPART_TITLE);
-        _extHelper.checkCheckbox("Status");
+        _ext4Helper.checkCheckbox("Status");
         clickButton("Save", 0);
         clickAndWait(Locator.linkContainingText("Data & Reports"));
 
@@ -299,8 +299,8 @@ public class DataViewsTest extends ParticipantListTest
 //        mouseOut(Locator.linkWithText(EDITED_DATASET)); // Dismiss hover box
 //        waitForTextToDisappear("Type:");
         openCustomizePanel(RENAMED_WEBPART_TITLE);
-        _extHelper.checkCheckbox("Modified");
-        _extHelper.checkCheckbox("Data Cut Date");
+        _ext4Helper.checkCheckbox("Modified");
+        _ext4Helper.checkCheckbox("Data Cut Date");
         Locator manageButton = getButtonLocator("Manage Categories");
         clickButton("Save", 0);
         waitForElementToDisappear(manageButton, WAIT_FOR_JAVASCRIPT);

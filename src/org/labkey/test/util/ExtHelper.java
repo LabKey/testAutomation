@@ -572,42 +572,6 @@ public class ExtHelper extends AbstractHelper
         _test.clickAndWait(loc, wait);
     }
 
-    /**
-     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#checkCheckbox(String)}
-     */
-    @Deprecated
-    public void checkCheckbox(String label)
-    {
-        Locator checkbox = Ext4Helper.Locators.ext4Checkbox(label);
-        if(!isChecked(label))
-            _test.click(checkbox);
-        if(!isChecked(label))
-            fail("Failed to check checkbox '" + label + "'.");
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#uncheckCheckbox(String)}
-     */
-    @Deprecated
-    public void uncheckCheckbox(String label)
-    {
-        Locator checkbox = Ext4Helper.Locators.ext4Checkbox(label);
-        if(isChecked(label))
-            _test.click(checkbox);
-        if(isChecked(label))
-            fail("Failed to uncheck checkbox '" + label + "'.");
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#isChecked(String)}
-     */
-    @Deprecated
-    public boolean isChecked(String label)
-    {
-        Locator checked = Locator.xpath("//table[contains(@class, '" + Ext4Helper.getCssPrefix() + "form-cb-checked')]//input[@type = 'button' and contains(@class, 'checkbox') and following-sibling::label[text()='" + label + "']]");
-        return _test.isElementPresent(checked);
-    }
-
     private static String jsString(String s)
     {
         if (s == null)

@@ -311,8 +311,8 @@ public class NonStudyReportsTest extends ReportTest
         assertElementPresent(Locator.tag("li").containing("URL must be absolute"));
         setFormElement("linkUrl", getContextPath() + LINK_REPORT1_URL);
         waitForElementToDisappear(Locator.tag("li").containing("URL must be absolute"));
-        assertTrue("Expected targetNewWindow checkbox to be checked", _extHelper.isChecked("Open link report in new window?"));
-        _extHelper.uncheckCheckbox("Open link report in new window?");
+        assertTrue("Expected targetNewWindow checkbox to be checked", _ext4Helper.isChecked("Open link report in new window?"));
+        _ext4Helper.uncheckCheckbox("Open link report in new window?");
         clickButton("Save");
         // save should return back to manage views page
         waitForText("Manage Views");
@@ -324,7 +324,7 @@ public class NonStudyReportsTest extends ReportTest
         setFormElement("description", LINK_REPORT2_DESCRIPTION);
         setFormElement("linkUrl", getBaseURL() + LINK_REPORT1_URL);
         waitForElementToDisappear(Locator.tag("li").containing("URL must be absolute"));
-        assertTrue("Expected targetNewWindow checkbox to be checked", _extHelper.isChecked("Open link report in new window?"));
+        assertTrue("Expected targetNewWindow checkbox to be checked", _ext4Helper.isChecked("Open link report in new window?"));
         clickButton("Save");
         // save should return back to Portal
         waitForText("Data Views");

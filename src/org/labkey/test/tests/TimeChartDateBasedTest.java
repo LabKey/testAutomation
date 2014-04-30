@@ -254,8 +254,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         goToGroupingTab();
         setParticipantSelection(PARTICIPANTS);
         setNumberOfCharts(ONE_CHART_PER_PARTICIPANT);
-        _extHelper.uncheckCheckbox("Show Mean"); // select show mean
-        _extHelper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
+        _ext4Helper.uncheckCheckbox("Show Mean"); // select show mean
+        _ext4Helper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
         applyChanges();
         waitForText("HIV Test Results: 249318596");
         assertTextPresentInThisOrder("HIV Test Results: 249318596", "HIV Test Results: 249320107", "HIV Test Results: 249320489");
@@ -479,8 +479,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
         goToGroupingTab();
         setParticipantSelection(PARTICIPANTS_GROUPS);
         setNumberOfCharts(PER_GROUP);
-        _extHelper.uncheckCheckbox("Show Mean"); // select show mean
-        _extHelper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
+        _ext4Helper.uncheckCheckbox("Show Mean"); // select show mean
+        _ext4Helper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
 
         applyChanges();
         waitForText(GROUP1_NAME);
@@ -621,16 +621,16 @@ public class TimeChartDateBasedTest extends TimeChartTest
         goToGroupingTab();
         setParticipantSelection(PARTICIPANTS_GROUPS);
         setNumberOfCharts(PER_GROUP);
-        _extHelper.uncheckCheckbox("Show Mean"); // select show mean
-        _extHelper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
+        _ext4Helper.uncheckCheckbox("Show Mean"); // select show mean
+        _ext4Helper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
         applyChanges();
 
         waitForText("Lab Results: " + GROUP1_NAME);
         waitForCharts(4);
 
         goToGroupingTab();
-        _extHelper.checkCheckbox("Show Mean"); // select show mean
-        _extHelper.uncheckCheckbox("Show Individual Lines"); // de-select show individual lines
+        _ext4Helper.checkCheckbox("Show Mean"); // select show mean
+        _ext4Helper.uncheckCheckbox("Show Individual Lines"); // de-select show individual lines
         applyChanges();
         waitForCharts(4);
 
@@ -654,8 +654,8 @@ public class TimeChartDateBasedTest extends TimeChartTest
 //        assertElementPresent(Locator.tag("div").append("//*[name()='svg']/*[name()='a']").withAttributeContaining("*", GROUP2_NAME + ",\n Days"), 12);
 
         goToGroupingTab();
-        _extHelper.uncheckCheckbox("Show Mean"); // select show mean
-        _extHelper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
+        _ext4Helper.uncheckCheckbox("Show Mean"); // select show mean
+        _ext4Helper.checkCheckbox("Show Individual Lines"); // de-select show individual lines
         setNumberOfCharts(ONE_CHART_PER_MEASURE);
         applyChanges();
         waitForCharts(1);
