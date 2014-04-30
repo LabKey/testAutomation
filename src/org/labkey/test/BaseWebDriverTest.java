@@ -3070,9 +3070,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void hoverProjectBar()
     {
-        waitForElement(Locator.id("projectBar"));
+        Locator.IdLocator projectBar = Locator.id("projectBar");
+        waitForElement(projectBar);
         waitForHoverNavigationReady();
-        executeScript("HoverNavigation._project.show();"); // mouseOver doesn't work on old Firefox
+        click(projectBar);
         waitForElement(Locator.css("#projectBar_menu .project-nav"));
     }
 
@@ -3092,9 +3093,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public void hoverFolderBar()
     {
-        waitForElement(Locator.id("folderBar").withText());
+        Locator.XPathLocator folderBar = Locator.id("folderBar").withText();
+        waitForElement(folderBar);
         waitForFolderNavigationReady();
-        executeScript("HoverNavigation._folder.show();"); // mouseOver doesn't work on old Firefox
+        click(folderBar);
         waitForElement(Locator.css("#folderBar_menu .folder-nav"));
     }
 
@@ -4235,7 +4237,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
             catch (ElementNotVisibleException tryAgain)
             {
-                scrollIntoView(el); // TODO: WebDriver 2.33 sometimes fails to do this automatically in Firefox
+                scrollIntoView(el);
+                shortWait().until(ExpectedConditions.elementToBeClickable(el));
                 el.click();
             }
         }
