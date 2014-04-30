@@ -5741,7 +5741,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
         waitForElement(roleCombo);
-        _extHelper.selectExt4ComboBoxItem(roleCombo, group, true);
+        _ext4Helper.selectComboBoxItem(roleCombo, true, group);
         waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
         String oldId = getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
         savePermissions();

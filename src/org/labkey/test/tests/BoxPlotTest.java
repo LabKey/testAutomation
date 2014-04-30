@@ -54,7 +54,7 @@ public class BoxPlotTest extends GenericChartsTest
         //_extHelper.selectExt4ComboBoxItem("Schema", "assay");
         //_extHelper.selectExt4ComboBoxItem("Query", "AssayList");
         //_extHelper.selectExt4ComboBoxItem("Schema", "study");
-        _extHelper.selectExt4ComboBoxItem("Query", "RCF-1 (RCF-1: Reactogenicity-Day 2)");
+        _ext4Helper.selectComboBoxItem("Query", "RCF-1 (RCF-1: Reactogenicity-Day 2)");
 
         // Todo: put better wait here
         sleep(5000);

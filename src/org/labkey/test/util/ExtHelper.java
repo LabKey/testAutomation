@@ -500,39 +500,6 @@ public class ExtHelper extends AbstractHelper
         selectComboBoxItem(Locator.xpath("//div["+NOT_HIDDEN+" and ./label/span[text()='"+label+"']]/div/div"), selection);
     }
 
-    /**
-     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#selectComboBoxItem(org.labkey.test.Locator.XPathLocator, String...)}
-     */
-    @Deprecated
-    @LogMethod(quiet = true)
-    public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection)
-    {
-        selectExt4ComboBoxItem(parentLocator, selection, false);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#selectComboBoxItem(String, String...)}
-     */
-    @Deprecated
-    public void selectExt4ComboBoxItem(String label, String selection)
-    {
-        selectExt4ComboBoxItem(Locator.xpath("//tr["+NOT_HIDDEN+" and ./td/label[text()='"+label+"']]"), selection);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.Ext4Helper#selectComboBoxItem(org.labkey.test.Locator.XPathLocator, boolean, String...)}
-     */
-    @Deprecated
-    @LogMethod(quiet = true)
-    public void selectExt4ComboBoxItem(Locator.XPathLocator parentLocator, @LoggedParam String selection, boolean checkSelectionStartsWith)
-    {
-        _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, '" + Ext4Helper.getCssPrefix() + "form-arrow-trigger')]"));
-        if (checkSelectionStartsWith)
-            _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, '" + Ext4Helper.getCssPrefix() + "boundlist-item') and starts-with(text(), '" + selection + "')]"));
-        else
-            _test.waitAndClick(Locator.xpath("//li["+NOT_HIDDEN+" and contains(@class, '" + Ext4Helper.getCssPrefix() + "boundlist-item') and normalize-space()='" + selection + "']"));
-    }
-
     public void selectGWTComboBoxItem(Locator.XPathLocator parentLocator, String selection)
     {
         _test.click(Locator.xpath(parentLocator.getPath() + "//div[contains(@class, 'x-form-trigger-arrow')]"));

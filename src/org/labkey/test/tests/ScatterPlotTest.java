@@ -71,7 +71,7 @@ public class ScatterPlotTest extends GenericChartsTest
         //_extHelper.selectExt4ComboBoxItem("Schema", "assay");
         //_extHelper.selectExt4ComboBoxItem("Query", "AssayList");
         //_extHelper.selectExt4ComboBoxItem("Schema", "study");
-        _extHelper.selectExt4ComboBoxItem("Query", "APX-1 (APX-1: Abbreviated Physical Exam)");
+        _ext4Helper.selectComboBoxItem("Query", "APX-1 (APX-1: Abbreviated Physical Exam)");
 
         // Todo: put better wait here
         sleep(5000);
@@ -195,7 +195,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickDialogButtonAndWaitForMaskToDisappear("X Axis", "Ok");
 
         clickOptionButtonAndWaitForDialog("Options", "Plot Options");
-        _extHelper.selectExt4ComboBoxItem("Plot Type", "Scatter Plot");
+        _ext4Helper.selectComboBoxItem("Plot Type", "Scatter Plot");
         clickDialogButtonAndWaitForMaskToDisappear("Plot Options", "OK");
 
         assertSVG(SCATTER_PLOT_QC);
@@ -240,7 +240,7 @@ public class ScatterPlotTest extends GenericChartsTest
         log("Group with colors");
         clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
         click(Locator.id("colorCategory-inputEl"));
-        _extHelper.selectExt4ComboBoxItem("Color Category:", "7. Neck");
+        _ext4Helper.selectComboBoxItem("Color Category:", "7. Neck");
         click(Ext4Helper.Locators.ext4Radio("Single shape"));
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
@@ -257,7 +257,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
         click(Ext4Helper.Locators.ext4Radio("With a single color"));
         click(Locator.id("shapeCategory-inputEl"));
-        _extHelper.selectExt4ComboBoxItem("Point Category:", "16. Evaluation Summary");
+        _ext4Helper.selectComboBoxItem("Point Category:", "16. Evaluation Summary");
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_SHAPES);
@@ -278,7 +278,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickOptionButtonAndWaitForDialog("Grouping", "Grouping Options");
         click(Locator.id("colorCategory-inputEl"));
         click(Locator.id("shapeCategory-inputEl"));
-        _extHelper.selectExt4ComboBoxItem("Point Category:", "16. Evaluation Summary");
+        _ext4Helper.selectComboBoxItem("Point Category:", "16. Evaluation Summary");
         clickDialogButtonAndWaitForMaskToDisappear("Grouping Options", "OK");
 
         assertSVG(SCATTER_PLOT_CUSTOMIZED_BOTH);
