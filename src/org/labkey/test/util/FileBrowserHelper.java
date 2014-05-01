@@ -284,7 +284,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
             for (FileBrowserExtendedProperty prop : fileProperties)
             {
                 if (prop.isCombobox())
-                    _test._ext4Helper.selectComboBoxItem(prop.getName(), true, prop.getValue());
+                    _test._ext4Helper.selectComboBoxItem(prop.getName(), Ext4Helper.TextMatchTechnique.CONTAINS, prop.getValue());
                 else
                     _test.setFormElement(Locator.name(prop.getName()), prop.getValue());
             }

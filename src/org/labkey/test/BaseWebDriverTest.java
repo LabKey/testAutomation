@@ -5741,7 +5741,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
         waitForElement(roleCombo);
-        _ext4Helper.selectComboBoxItem(roleCombo, true, group);
+        _ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
         waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
         String oldId = getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
         savePermissions();
@@ -5832,7 +5832,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "Group");
         waitForElement(Ext4Helper.Locators.window("Impersonate Group"));
-        _ext4Helper.selectComboBoxItem("Group:", true, (isSiteGroup ? "Site: " : "") + group);
+        _ext4Helper.selectComboBoxItem("Group:", Ext4Helper.TextMatchTechnique.STARTS_WITH, (isSiteGroup ? "Site: " : "") + group);
         clickAndWait(Ext4Helper.ext4WindowButton("Impersonate Group", "Impersonate"));
     }
 
@@ -5870,7 +5870,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "User");
         waitForElement(Ext4Helper.Locators.window("Impersonate User"));
-        _ext4Helper.selectComboBoxItem("User:", true, fakeUser + " (");
+        _ext4Helper.selectComboBoxItem("User:", Ext4Helper.TextMatchTechnique.STARTS_WITH, fakeUser + " (");
         clickAndWait(Ext4Helper.ext4WindowButton("Impersonate User", "Impersonate"));
         _impersonationStack.push(fakeUser);
 

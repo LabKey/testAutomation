@@ -54,14 +54,30 @@ public class Ext4Helper extends AbstractHelper
         return _cssPrefix;
     }
 
+    public static enum TextMatchTechnique
+    {EXACT, CONTAINS, STARTS_WITH, REGEX}
+
     @LogMethod(quiet = true)
     public void selectComboBoxItem(Locator.XPathLocator comboBox, @LoggedParam String... selections)
     {
-        selectComboBoxItem(comboBox, false, selections);
+        selectComboBoxItem(comboBox, TextMatchTechnique.EXACT, selections);
+    }
+
+    /**
+     * @deprecated Use {@link #selectComboBoxItem(org.labkey.test.Locator.XPathLocator, org.labkey.test.util.Ext4Helper.TextMatchTechnique, String...)}
+     */
+    @Deprecated
+    @LogMethod(quiet = true)
+    public void selectComboBoxItem(Locator.XPathLocator comboBox, boolean containsText, @LoggedParam String... selections)
+    {
+        if (containsText)
+            selectComboBoxItem(comboBox, TextMatchTechnique.CONTAINS, selections);
+        else
+            selectComboBoxItem(comboBox, TextMatchTechnique.EXACT, selections);
     }
 
     @LogMethod(quiet = true)
-    public void selectComboBoxItem(Locator.XPathLocator comboBox, boolean containsText, @LoggedParam String... selections)
+    public void selectComboBoxItem(Locator.XPathLocator comboBox, TextMatchTechnique matchTechnique, @LoggedParam String... selections)
     {
         openComboList(comboBox);
 
@@ -69,14 +85,14 @@ public class Ext4Helper extends AbstractHelper
         {
             for (String selection : selections)
             {
-                selectItemFromOpenComboList(selection, containsText);
+                selectItemFromOpenComboList(selection, matchTechnique);
             }
         }
         catch (StaleElementReferenceException retry) // Combo-box might still be loading previous selection (no good way to detect)
         {
             for (String selection : selections)
             {
-                selectItemFromOpenComboList(selection, containsText);
+                selectItemFromOpenComboList(selection, matchTechnique);
             }
         }
 
@@ -94,13 +110,25 @@ public class Ext4Helper extends AbstractHelper
         _test.waitForElement(Locator.css("." + _cssPrefix + "boundlist-item"));
     }
 
-    private void selectItemFromOpenComboList(String itemText, boolean containsText)
+    private void selectItemFromOpenComboList(String itemText, TextMatchTechnique matchTechnique)
     {
         Locator.XPathLocator listItem = Locator.xpath("//*[contains(@class, '" + _cssPrefix + "boundlist-item')]").notHidden();
-        if (containsText)
-            listItem = listItem.containing(itemText);
-        else
-            listItem = listItem.withText(itemText);
+
+        switch (matchTechnique)
+        {
+            case EXACT:
+                listItem = listItem.withText(itemText);
+                break;
+            case CONTAINS:
+                listItem = listItem.containing(itemText);
+                break;
+            case STARTS_WITH:
+                listItem = listItem.startsWith(itemText);
+                break;
+            case REGEX:
+                listItem = listItem.withTextMatching(itemText);
+                break;
+        }
 
         WebElement element = listItem.waitForElement(_test.getDriver(), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         boolean elementAlreadySelected = element.getAttribute("class").contains("selected");
@@ -131,13 +159,13 @@ public class Ext4Helper extends AbstractHelper
     @LogMethod(quiet = true)
     public void selectComboBoxItem(@LoggedParam String label, @LoggedParam String... selections)
     {
-        selectComboBoxItem(label, false, selections);
+        selectComboBoxItem(label, TextMatchTechnique.EXACT, selections);
     }
 
     @LogMethod(quiet = true)
-    public void selectComboBoxItem(@LoggedParam String label, boolean containsText, @LoggedParam String... selections)
+    public void selectComboBoxItem(@LoggedParam String label, TextMatchTechnique matchTechnique, @LoggedParam String... selections)
     {
-        selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), containsText, selections);
+        selectComboBoxItem(Ext4Helper.Locators.formItemWithLabel(label), matchTechnique, selections);
     }
 
     @LogMethod(quiet = true)

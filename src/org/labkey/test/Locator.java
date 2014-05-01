@@ -726,6 +726,11 @@ public abstract class Locator
             return this.withPredicate("string-length() > 0");
         }
 
+        public XPathLocator withTextMatching(String regex)
+        {
+            return this.withPredicate("matches(normalize-space(), '" + xq(regex) + "')");
+        }
+
         public XPathLocator startsWith(String text)
         {
             return this.withPredicate("starts-with(normalize-space(), "+xq(text)+")");
