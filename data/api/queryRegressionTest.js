@@ -46,11 +46,11 @@ var testFunctions = [
 
         function()
         {
-            LABKEY.ExtAdapter.Ajax.request({
+            Ext4.Ajax.request({
                 url     : LABKEY.ActionURL.buildURL('query', 'selectRows'),
                 method  : 'POST',
                 success : function(json) {
-                    successHandler.call(this, LABKEY.ExtAdapter.decode(json.responseText));
+                    successHandler.call(this, Ext4.decode(json.responseText));
                 },
                 failure : failureHandler,
                 params  : {
