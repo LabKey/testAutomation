@@ -228,6 +228,39 @@ public class Ext4Helper extends AbstractHelper
         _test.clickAndWait(loc, wait);
     }
 
+    public void clearGridSelection(String markerCls)
+    {
+        String script =
+                "selectExt4GridItem = function (markerCls) {\n" +
+                "    var el = Ext4.DomQuery.selectNode(\".\"+markerCls);\n" +
+                "    if (el)\n" +
+                "    {\n" +
+                "        var grid = Ext4.getCmp(el.id);\n" +
+                "        if (grid)\n" +
+                "        {\n" +
+                "            grid.getSelectionModel().deselectAll();\n" +
+                "        }\n" +
+                "    }\n" +
+                "    else\n" +
+                "    {\n" +
+                "        throw 'Unable to locate grid: ' + markerCls;\n" +
+                "    }\n" +
+                "};" +
+                "selectExt4GridItem(arguments[0]);";
+        _test.executeScript(script, markerCls);
+    }
+
+    public void selectGridItem(String columnVal, String markerCls)
+    {
+        String gridSelector = "." + markerCls;
+        WebElement gridRow = Locator.css(gridSelector).append("." + _cssPrefix + "grid-data-row").withText(columnVal).findElement(_test.getDriver());
+        if (!gridRow.getAttribute("class").contains(_cssPrefix + "grid-row-selected"))
+        {
+            WebElement gridRowChecker = gridRow.findElement(By.cssSelector("." + _cssPrefix + "grid-cell-row-checker"));
+            gridRowChecker.click();
+        }
+    }
+
     public void selectGridItem(String columnName, String columnVal, int idx, String markerCls, boolean keepExisting)
     {
         String script =
