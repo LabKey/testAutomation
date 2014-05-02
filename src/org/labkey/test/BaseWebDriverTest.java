@@ -326,6 +326,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         Boolean reusingDriver = false;
 
+        if (_testFailed)
+        {
+            // In case the previous test failed so catastrophically that it couldn't clean up after itself
+            doTearDown();
+            _driver = null;
+        }
+
         switch (BROWSER_TYPE)
         {
             case IE: //experimental
@@ -1885,10 +1892,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 log("** Server may be in a bad state.                            **");
                 log("** Set tools directory manually or bootstrap to fix.        **");
                 log("**************************ERROR*******************************");
-                getArtifactCollector().dumpPageSnapshot(testName, "fixPipelineToolsDir");
             }
-
-            checkJsErrors();
 
             doTearDown();
             _driver = null;
