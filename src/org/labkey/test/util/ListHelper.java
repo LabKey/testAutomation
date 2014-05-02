@@ -501,7 +501,7 @@ public class ListHelper extends AbstractHelper
     public void deleteField(String areaTitle, int index)
     {
         String prefix = _test.getPropertyXPath(areaTitle);
-        _test.click(Locator.xpath(prefix + "//div[@id='partdelete_" + index + "']"));
+        _test.waitAndClick(Locator.xpath(prefix + "//div[@id='partdelete_" + index + "']"));
 
         // If domain hasn't been saved yet, the 'OK' prompt will not appear.
         Locator.XPathLocator buttonLocator = _test.getButtonLocator("OK");
