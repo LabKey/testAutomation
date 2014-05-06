@@ -184,7 +184,7 @@
             <include name="jaxrpc.jar" />
             <include name="junit-4.11.jar"/>
             <include name="saaj.jar" />
-            <include name="tika-app-1.3.jar"/>
+            <include name="tika-app-1.5.jar"/>
             <include name="xbean.jar" />
         </fileset>
         <fileset dir="${javaclientjar.dir}">
