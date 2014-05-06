@@ -49,8 +49,8 @@ public class FolderTest extends BaseWebDriverTest
     protected void checkQueries() // skip query validation
     { /* Too many folder to check queries. */ }
 
-    public boolean enableLinkCheck()
-    {return false;} // too many folders
+    @Override
+    public void checkLinks(){} // too many folders
 
     @Test
     public void testSteps()
