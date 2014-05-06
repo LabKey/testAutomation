@@ -21,6 +21,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.LogMethod;
 
 @Category({DailyB.class})
 public class FolderTest extends BaseWebDriverTest
@@ -59,6 +60,7 @@ public class FolderTest extends BaseWebDriverTest
         moveFolders();
     }
 
+    @LogMethod
     protected void createFolders()
     {
         // Initialize the Creation Wiki
@@ -78,6 +80,7 @@ public class FolderTest extends BaseWebDriverTest
         waitForElement(Locator.button("Done."), 60000);
     }
 
+    @LogMethod
     protected void moveFolders()
     {
         log("Moving Folders");
