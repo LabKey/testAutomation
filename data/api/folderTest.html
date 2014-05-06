@@ -21,6 +21,10 @@
                         containerPath : path,
                         success       : function(ci) {
                             createHelper(arr.slice(0, (arr.length-1)), ci.path, ci.title.substring(1, ci.title.length - 1));
+                        },
+                        failure       : function(xhr) {
+                            console.error(xhr);
+                            alert("Error trying to create container.");
                         }
                     });
 
@@ -37,6 +41,10 @@
                     containerPath : path,
                     success       : function(ci){
                         createHelper(arr.slice(0, (arr.length-1)), ci.path, ci.title.substring(1, ci.title.length - 1));
+                    },
+                    failure       : function() {
+                        console.error(xhr);
+                        alert("Error trying to create container.");
                     }
                 });
             }
