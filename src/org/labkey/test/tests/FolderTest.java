@@ -23,14 +23,15 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 
+import java.io.File;
+
 @Category({DailyB.class})
 public class FolderTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "FolderTest#Project";
     private static final String WIKITEST_NAME = "WikiTestFolderCreate";
-    private static final String FOLDER_CREATION_FILE = "folderTest.html";
+    private static final File FOLDER_CREATION_FILE = new File(getLabKeyRoot(), "server/test/data/api/folderTest.html");
     private static final String PROJECT_FOLDER_XPATH = "//li[@class='x-tree-node' and ./div/a/span[text()='"+PROJECT_NAME+"']]";
-    private static final String SERVER_ROOT = "LabKey Server Projects";
 
     @Override
     public String getAssociatedModuleDirectory()
@@ -70,10 +71,8 @@ public class FolderTest extends BaseWebDriverTest
         createNewWikiPage();
         setFormElement(Locator.id("wiki-input-name"), WIKITEST_NAME);
         setFormElement(Locator.id("wiki-input-title"), WIKITEST_NAME);
-        setWikiBody("Placeholder text.");
+        setWikiBody(getFileContents(FOLDER_CREATION_FILE));
         saveWikiPage();
-
-        setSourceFromFile(FOLDER_CREATION_FILE, WIKITEST_NAME);
 
         // Run the Test Script
         clickButton("Start Test", 0);
