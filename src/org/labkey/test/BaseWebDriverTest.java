@@ -1769,6 +1769,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @Before
     public void preClean() throws Exception
     {
+        _testFailed = false;
         setUp(); // Instantiate new WebDriver if needed
         simpleSignIn();
 
