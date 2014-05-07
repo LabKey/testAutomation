@@ -277,6 +277,12 @@ public class StudyScheduleTest extends StudyBaseTest
                     setFormElement(fileUpload, file.getAbsolutePath());
 
                     waitForElement(Locator.xpath("//div[@class = 'gwt-HTML' and contains(text(), 'Showing first 5 rows')]"), WAIT_FOR_JAVASCRIPT);
+
+                    Locator.XPathLocator mouseId = Locator.xpath("//label[contains(@class, 'x-form-item-label') and text() ='MouseId:']/../div/div");
+                    _extHelper.selectGWTComboBoxItem(mouseId, "ptid");
+                    Locator.XPathLocator sequenceNum = Locator.xpath("//label[contains(@class, 'x-form-item-label') and text() ='Sequence Num:']/../div/div");
+                    _extHelper.selectGWTComboBoxItem(sequenceNum, "visit");
+
                     clickButton("Import");
                 }
                 else
@@ -349,6 +355,12 @@ public class StudyScheduleTest extends StudyBaseTest
                     setFormElement(fileUpload, file.getAbsolutePath());
 
                     waitForElement(Locator.xpath("//div[@class = 'gwt-HTML' and contains(text(), 'Showing first 5 rows')]"), WAIT_FOR_JAVASCRIPT);
+
+                    Locator.XPathLocator mouseId = Locator.xpath("//label[contains(@class, 'x-form-item-label') and text() ='MouseId:']/../div/div");
+                    _extHelper.selectGWTComboBoxItem(mouseId, "ptid");
+                    Locator.XPathLocator sequenceNum = Locator.xpath("//label[contains(@class, 'x-form-item-label') and text() ='Sequence Num:']/../div/div");
+                    _extHelper.selectGWTComboBoxItem(sequenceNum, "visit");
+
                     clickButton("Import");
                 }
                 else
