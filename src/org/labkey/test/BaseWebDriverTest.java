@@ -1812,7 +1812,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         if (errorRef.get() instanceof UnhandledAlertException)    // Catch so we can record the alert's text
         {
-            errorRef.set(new RuntimeException("Unexpected Alert: " + getAlert(), errorRef.get()));
+            if (isAlertPresent())
+                errorRef.set(new RuntimeException("Unexpected Alert: " + getAlert(), errorRef.get()));
         }
         else if (errorRef.get() instanceof TestTimeoutException)
         {
