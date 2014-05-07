@@ -111,6 +111,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         prepForPageLoad();
         clickButton("Save and Finish", 0);
         getAlert();
+        waitForPageToLoad();
         clickAndWait(Locator.linkContainingText("run1"));
 
         DataRegionTable table = new DataRegionTable("Data", this);
