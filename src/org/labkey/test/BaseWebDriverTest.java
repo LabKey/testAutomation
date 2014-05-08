@@ -676,13 +676,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    @After
-    public void tearDown() throws Exception
-    {
-        //Poorly named method to prevent tearDown after each test case
-        checkJsErrors();
-    }
-
     public void doTearDown()
     {
         boolean skipTearDown = _testFailed && "false".equalsIgnoreCase(System.getProperty("close.on.fail"));
@@ -1901,6 +1894,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
+    @After
+    public void tearDown() throws Exception
+    {
+        checkJsErrors();
+    }
+
     @LogMethod @AfterClass
     public static void performFinalChecks() throws Throwable
     {
@@ -2322,7 +2321,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @LogMethod
     protected void checkJsErrors()
     {
-        if (isScriptCheckEnabled())
+        if (isScriptCheckEnabled() && getDriver() != null)
         {
             int duplicateCount = 0;
             try
