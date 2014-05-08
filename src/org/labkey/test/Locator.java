@@ -445,6 +445,11 @@ public abstract class Locator
         return tagWithName("input", name);
     }
 
+    public static XPathLocator inputByNameContaining(String partialName)
+    {
+        return xpath("//input[@type='text' and contains(@name,'" + partialName + "')]");
+    }
+
     public static XPathLocator radioButtonByTitle(String title)
     {
         return xpath("//input[@type='radio' and @title=" + xq(title) + "]");
