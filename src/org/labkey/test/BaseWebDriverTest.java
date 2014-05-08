@@ -676,13 +676,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    @After
-    public void tearDown() throws Exception
-    {
-        //Poorly named method to prevent tearDown after each test case
-        checkJsErrors();
-    }
-
     public void doTearDown()
     {
         boolean skipTearDown = _testFailed && "false".equalsIgnoreCase(System.getProperty("close.on.fail"));
@@ -704,7 +697,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return true;
     }
 
-    public void log(String str)
+    public static void log(String str)
     {
         str = str.replace(Locator.NOT_HIDDEN, "NOT_HIDDEN"); // This xpath fragment really clutters up the log
         TestLogger.log(str);
@@ -1696,6 +1689,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 return !t.isAlive();
             }
+
+            @Override
+            public void failed()
+            {
+                t.interrupt();
+            }
         }, "Timed out getting page text. Page is probably too complex. Refactor test to look for specific element(s) instead.", 60000);
 
         return getText.getResult();
@@ -1810,10 +1809,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _testFailed = true;
         _anyTestCaseFailed = true;
 
-        if (errorRef.get() instanceof UnhandledAlertException)    // Catch so we can record the alert's text
+        if (errorRef.get() instanceof UnhandledAlertException) // Record the alert's text
         {
             if (isAlertPresent())
-                errorRef.set(new RuntimeException("Unexpected Alert: " + getAlert(), errorRef.get()));
+                log("Unexpected Alert: " + getAlert());
+            else if(((UnhandledAlertException)errorRef.get()).getAlertText() != null)
+                log("Unexpected Alert: " + ((UnhandledAlertException)errorRef.get()).getAlertText());
         }
         else if (errorRef.get() instanceof TestTimeoutException)
         {
@@ -1899,6 +1900,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             doTearDown();
             _driver = null;
         }
+    }
+
+    @After
+    public void tearDown() throws Exception
+    {
+        checkJsErrors();
     }
 
     @LogMethod @AfterClass
@@ -3593,13 +3600,17 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         } while ((System.currentTimeMillis() - startTime) < wait);
         try
         {
-            if (!checker.check())
+            if (checker.check())
             {
-                _testTimeout = true;
-                return false;
+                return true;
             }
         }
         catch (Exception ignore){}
+        finally
+        {
+            _testTimeout = true;
+            checker.failed();
+        }
         return false;
     }
 
@@ -3842,9 +3853,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-    public interface Checker
+    public abstract class Checker
     {
-        public boolean check();
+        public abstract boolean check();
+        public void failed() {}
     }
 
     public void waitForExt4FolderTreeNode(String nodeText, int wait)

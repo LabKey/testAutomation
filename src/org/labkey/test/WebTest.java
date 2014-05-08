@@ -30,7 +30,6 @@ public interface WebTest
      * @return Page load time in ms
      */
     long beginAt(String url);
-    void log(String str);
     URL getURL() throws MalformedURLException;
     String[] getLinkAddresses();
     String getAssociatedModuleDirectory();
