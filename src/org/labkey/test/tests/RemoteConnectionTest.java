@@ -99,21 +99,20 @@ public class RemoteConnectionTest extends BaseWebDriverTest
         assertTrue(1 == rconnHelper.getNumConnections());
 
         // create a connection with a bad URL
-        rconnHelper.createConnection(CONNECTION_BAD_SERVER, "hptt://localhost/doesnotexist", getProjectName());
+        rconnHelper.createConnection(CONNECTION_BAD_SERVER, "hptt://localhost/doesnotexist", getProjectName(),
+                "USER", "PASSWORD", "The entered URL is not valid.");
         // create a connection with invalid credentials
         rconnHelper.createConnection(CONNECTION_BAD_CREDENTIALS, getBaseURL(), getProjectName(),
                 PasswordUtil.getUsername(), "invalid password buddy");
         // create a connection with a non-existent container
         rconnHelper.createConnection(CONNECTION_BAD_CONTAINER, getBaseURL(), "Container Does Not Exist");
 
-        assertTrue(4 == rconnHelper.getNumConnections());
+        assertTrue(3 == rconnHelper.getNumConnections());
         assertTrue(null != rconnHelper.findConnection(CONNECTION_VALID));
-        assertTrue(null != rconnHelper.findConnection(CONNECTION_BAD_SERVER));
         assertTrue(null != rconnHelper.findConnection(CONNECTION_BAD_CREDENTIALS));
         assertTrue(null != rconnHelper.findConnection(CONNECTION_BAD_CONTAINER));
 
         assertTrue(rconnHelper.testConnection(CONNECTION_VALID));
-        assertTrue(!rconnHelper.testConnection(CONNECTION_BAD_SERVER));
         assertTrue(!rconnHelper.testConnection(CONNECTION_BAD_CREDENTIALS));
         assertTrue(!rconnHelper.testConnection(CONNECTION_BAD_CONTAINER));
 
@@ -122,16 +121,15 @@ public class RemoteConnectionTest extends BaseWebDriverTest
                 "There is already a remote connection with the name '" + CONNECTION_VALID + "'.");
 
         // edit for real to correct server and test that conn is successful
-        rconnHelper.editConnection(CONNECTION_BAD_SERVER, CONNECTION_EDIT, getBaseURL(), null, null, null);
+        rconnHelper.editConnection(CONNECTION_VALID, CONNECTION_EDIT, getBaseURL(), null, null, null);
         // make sure the rename happend and we have the same number of connections
-        assertTrue(4 == rconnHelper.getNumConnections());
+        assertTrue(3 == rconnHelper.getNumConnections());
         // make sure rename happened
-        assertTrue(null == rconnHelper.findConnection(CONNECTION_BAD_SERVER));
+        assertTrue(null == rconnHelper.findConnection(CONNECTION_VALID));
         // ensure connection test is successful
         assertTrue(rconnHelper.testConnection(CONNECTION_EDIT));
 
         // clean ourselves up
-        rconnHelper.deleteConnection(CONNECTION_VALID);
         rconnHelper.deleteConnection(CONNECTION_EDIT);
         rconnHelper.deleteConnection(CONNECTION_BAD_CREDENTIALS);
         rconnHelper.deleteConnection(CONNECTION_BAD_CONTAINER);
