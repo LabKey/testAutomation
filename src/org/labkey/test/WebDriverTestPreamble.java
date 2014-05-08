@@ -44,7 +44,6 @@ public class WebDriverTestPreamble extends BaseWebDriverTest
         {
             checkLeaksAndErrors();
         }
-        Assert.fail();
     }
 
     @Override
