@@ -9,6 +9,8 @@
 
         var btn = Ext.getCmp('test-button');
 
+        var startTime = (new Date()).getTime();
+
         function createContainers(arr, path) {
 
             btn.setText('Running...');
@@ -30,6 +32,8 @@
 
                 }
                 if (arr[(arr.length-1)] == 0) {
+                    elapsedSeconds = ((new Date()).getTime() - startTime)/1000;
+                    console.log('Folder Creation Complete - ['+elapsedSeconds+' seconds]');
                     btn.setText('Done.');
                 }
             }
@@ -42,7 +46,7 @@
                     success       : function(ci){
                         createHelper(arr.slice(0, (arr.length-1)), ci.path, ci.title.substring(1, ci.title.length - 1));
                     },
-                    failure       : function() {
+                    failure       : function(xhr) {
                         console.error(xhr);
                         alert("Error trying to create container.");
                     }
