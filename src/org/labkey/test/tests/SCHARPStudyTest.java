@@ -36,7 +36,7 @@ public class SCHARPStudyTest extends BaseWebDriverTest implements PostgresOnlyTe
     private String _pipelinePathMain = new File(_labkeyRoot, "/sampledata/study").getPath();
     private String _zipFilePath = new File(_labkeyRoot, "/sampledata/study/studyshell.zip").getPath();
 
-    protected static class StatusChecker implements Checker
+    protected static class StatusChecker extends Checker
     {
         private BaseWebDriverTest _test;
         private String _waitForMessage;
