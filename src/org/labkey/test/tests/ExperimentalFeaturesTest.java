@@ -119,8 +119,7 @@ public class ExperimentalFeaturesTest extends BaseWebDriverTest implements DevMo
         DETAILS_URL ("details-url"),
         CONTAINER_REL_URLS ("containerRelativeURL"),
         JS_MOTHERSHITP ("javascriptMothership"),
-        HIDDEN_EMAIL ("permissionToSeeEmailAddresses"),
-        ISSUES_ACTIVITY ("issuesactivity");
+        HIDDEN_EMAIL ("permissionToSeeEmailAddresses");
 
         private final String title;
         private ExperimentalFeature (String title)
