@@ -97,7 +97,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         _helper.goToAssayResultImport(PHENOTYPE_ASSAY_NAME, false);
 
         //a proxy for page loading
-        _helper.waitForField("Sample Type");
+        _helper.waitForField("Sample Type", WAIT_FOR_JAVASCRIPT * 2);
 
         Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
         Ext4FieldRef.getForLabel(this, "Assay Type").setValue(3);
@@ -151,7 +151,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         _helper.goToAssayResultImport(PHENOTYPE_ASSAY_NAME, false);
 
         //a proxy for page loading
-        _helper.waitForField("Sample Type");
+        _helper.waitForField("Sample Type", WAIT_FOR_JAVASCRIPT * 2);
 
         Ext4FieldRef field = Ext4FieldRef.getForBoxLabel(this, "Pivoted By Population");
         field.setChecked(true);
@@ -229,7 +229,7 @@ public class FlowAssaysTest extends AbstractLabModuleAssayTest
         _helper.goToAssayResultImport(ICS_ASSAY_NAME, false);
 
         //a proxy for page loading
-        _helper.waitForField("Sample Type");
+        _helper.waitForField("Sample Type", WAIT_FOR_JAVASCRIPT * 2);
 
         Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
         Ext4FieldRef.getForLabel(this, "Assay Type").setValue(3);

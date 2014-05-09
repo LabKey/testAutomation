@@ -192,7 +192,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         _helper.goToAssayResultImport(ASSAY_NAME, true);
 
         //a proxy for page loading
-        _helper.waitForField("Sample Type");
+        _helper.waitForField("Sample Type", WAIT_FOR_JAVASCRIPT * 2);
 
         //switch import method
         Ext4FieldRef field = Ext4FieldRef.getForBoxLabel(this, "Pivoted By Test");
@@ -231,7 +231,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         _helper.goToAssayResultImport(ASSAY_NAME, true);
 
         //a proxy for page loading
-        _helper.waitForField("Sample Type");
+        _helper.waitForField("Sample Type", WAIT_FOR_JAVASCRIPT * 2);
 
         //switch import method
         Ext4FieldRef field = Ext4FieldRef.getForBoxLabel(this, "Pivoted By Test");

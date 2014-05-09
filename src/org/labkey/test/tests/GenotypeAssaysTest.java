@@ -250,7 +250,7 @@ public class GenotypeAssaysTest extends AbstractLabModuleAssayTest
         _helper.goToAssayResultImport(SSP_ASSAY_NAME, false);
 
         //a proxy for page loading
-        _helper.waitForField("Sample Type");
+        _helper.waitForField("Sample Type", WAIT_FOR_JAVASCRIPT * 2);
 
         Ext4FieldRef.getForLabel(this, "Run Description").setValue("Description");
 
