@@ -69,27 +69,130 @@ public class LuminexRTransformTest extends LuminexTest
     {
         log("Uploading Luminex run with a R transform script");
 
-
         // add the R transform script to the assay
         goToTestAssayHome();
         clickEditAssayDesign(false);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 0);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB), 1);
-
-        // save changes to assay design
         clickButton("Save & Close");
 
-        // upload the sample data file
+        uploadRunWithoutRumiCalc();
+        verifyPDFsGenerated(false);
+        verifyScriptVersions();
+        verifyLotNumber();
+        verifyRumiCalculatedValues(false);
+
+        reImportRunWithRumiCalc();
+        verifyPDFsGenerated(true);
+        verifyScriptVersions();
+        verifyLotNumber();
+        verifyRumiCalculatedValues(true);
+
+        R_TRANSFORM_SET = true;
+    }
+
+    private void verifyRumiCalculatedValues(boolean hasRumiCalcData)
+    {
+        DataRegionTable table;
+        table = new DataRegionTable("Data", this);
+        table.setFilter("fiBackgroundBlank", "Is Not Blank", null);
+        waitForElement(Locator.paginationText(1, 40, 40));
+        table.setFilter("Type", "Starts With", "X"); // filter to just the unknowns
+        waitForElement(Locator.paginationText(1, 32, 32));
+        // check values in the fi-bkgd-blank column
+        for(int i = 0; i < RTRANS_FIBKGDBLANK_VALUES.length; i++)
+        {
+            assertEquals(RTRANS_FIBKGDBLANK_VALUES[i], table.getDataAsText(i, "FI-Bkgd-Blank"));
+        }
+        table.clearFilter("fiBackgroundBlank");
+
+        table.setFilter("EstLogConc_5pl", "Is Not Blank", null);
+        if (!hasRumiCalcData)
+        {
+            waitForText("No data to show.");
+            assertEquals(0, table.getDataRowCount());
+        }
+        else
+        {
+            waitForElement(Locator.paginationText(1, 32, 32));
+            // check values in the est log conc 5pl column
+            for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_5PL.length; i++)
+            {
+                assertEquals(RTRANS_ESTLOGCONC_VALUES_5PL[i], table.getDataAsText(i, "Est Log Conc Rumi 5 PL"));
+            }
+        }
+        table.clearFilter("EstLogConc_5pl");
+
+        table.setFilter("EstLogConc_4pl", "Is Not Blank", null);
+        if (!hasRumiCalcData)
+        {
+            waitForText("No data to show.");
+            assertEquals(0, table.getDataRowCount());
+        }
+        else
+        {
+            waitForElement(Locator.paginationText(1, 32, 32));
+            // check values in the est log conc 4pl column
+            for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_4PL.length; i++)
+            {
+                assertEquals(RTRANS_ESTLOGCONC_VALUES_4PL[i], table.getDataAsText(i, "Est Log Conc Rumi 4 PL"));
+            }
+        }
+        table.clearFilter("EstLogConc_4pl");
+
+        table.clearFilter("Type");
+    }
+
+    private void verifyLotNumber()
+    {
+        clickAndWait(Locator.linkWithText("r script transformed assayId"));
+        DataRegionTable table;
+        table = new DataRegionTable("Data", this);
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.addCustomizeViewColumn("Analyte/Properties/LotNumber");
+        _customizeViewsHelper.applyCustomView();
+        table.setFilter("Analyte/Properties/LotNumber", "Equals", TEST_ANALYTE_LOT_NUMBER);
+        waitForElement(Locator.paginationText(1, 40, 40));
+        table.clearFilter("Analyte/Properties/LotNumber");
+    }
+
+    private void verifyScriptVersions()
+    {
+        assertTextPresent(TEST_ASSAY_LUM + " Runs");
+        DataRegionTable table = new DataRegionTable("Runs", this);
+        assertEquals("Unexpected Transform Script Version number", "8.0.20140509", table.getDataAsText(0, "Transform Script Version"));
+        assertEquals("Unexpected Lab Transform Script Version number", "1.0.20140228", table.getDataAsText(0, "Lab Transform Script Version"));
+        assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
+    }
+
+    private void verifyPDFsGenerated(boolean hasStandardPDFs)
+    {
+        click(Locator.tagWithAttribute("img", "src", "/labkey/_images/sigmoidal_curve.png"));
+        assertElementPresent(Locator.linkContainingText(".Standard1_QC_Curves_4PL.pdf"));
+        assertElementPresent(Locator.linkContainingText(".Standard1_QC_Curves_5PL.pdf"));
+        if (hasStandardPDFs)
+        {
+            assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_5PL.pdf"));
+            assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_4PL.pdf"));
+        }
+    }
+
+    private void uploadRunWithoutRumiCalc()
+    {
         clickProject(TEST_ASSAY_PRJ_LUMINEX);
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
+
         clickButton("Import Data");
         clickButton("Next");
+
         setFormElement(Locator.name("name"), "r script transformed assayId");
         setFormElement(Locator.name("stndCurveFitInput"), "FI");
         setFormElement(Locator.name("unkCurveFitInput"), "FI-Bkgd-Blank");
         checkCheckbox(Locator.name("curveFitLogTransform"));
+        checkCheckbox(Locator.name("skipRumiCalculation"));
         setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE4);
-        clickButton("Next", 60000);
+        clickButton("Next", defaultWaitForPage * 2);
+
         // make sure the Standard checkboxes are checked
         checkCheckbox(Locator.name("_titrationRole_standard_Standard1"));
         checkCheckbox(Locator.name("titration_MyAnalyte (1)_Standard1"));
@@ -100,61 +203,19 @@ public class LuminexRTransformTest extends LuminexTest
         // set LotNumber for the first analyte
         setFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_LotNumber')][1]"), TEST_ANALYTE_LOT_NUMBER);
         clickButton("Save and Finish");
+    }
 
-        // verify that the PDF of curves was generated
-        Locator l = Locator.tagWithAttribute("img", "src", "/labkey/_images/sigmoidal_curve.png");
-        click(l);
-        assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_5PL.pdf"));
-        assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_4PL.pdf"));
-        assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_QC_Curves_4PL.pdf"));
-        assertElementPresent(Locator.linkWithText("WithBlankBead.Standard1_QC_Curves_5PL.pdf"));
+    private void reImportRunWithRumiCalc()
+    {
+        clickProject(TEST_ASSAY_PRJ_LUMINEX);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM));
 
-        // verify that the transform script and ruminex versions are as expected
-        assertTextPresent(TEST_ASSAY_LUM + " Runs");
-        DataRegionTable table = new DataRegionTable("Runs", this);
-        assertEquals("Unexpected Transform Script Version number", "7.0.20140207", table.getDataAsText(0, "Transform Script Version"));
-        assertEquals("Unexpected Lab Transform Script Version number", "1.0.20140228", table.getDataAsText(0, "Lab Transform Script Version"));
-        assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
-
-        // verify that the lot number value are as expected
-        clickAndWait(Locator.linkWithText("r script transformed assayId"));
-        _customizeViewsHelper.openCustomizeViewPanel();
-        _customizeViewsHelper.addCustomizeViewColumn("Analyte/Properties/LotNumber");
-        _customizeViewsHelper.applyCustomView();
-        setFilter("Data", "Analyte/Properties/LotNumber", "Equals", TEST_ANALYTE_LOT_NUMBER);
-        waitForElement(Locator.paginationText(1, 40, 40));
-        clearFilter("Data", "Analyte/Properties/LotNumber");
-
-        // verfiy that the calculated values were generated by the transform script as expected
-        table = new DataRegionTable("Data", this);
-        setFilter("Data", "fiBackgroundBlank", "Is Not Blank");
-        waitForElement(Locator.paginationText(1, 40, 40));
-        setFilter("Data", "Type", "Starts With", "X"); // filter to just the unknowns
-        waitForElement(Locator.paginationText(1, 32, 32));
-        // check values in the fi-bkgd-blank column
-        for(int i = 0; i < RTRANS_FIBKGDBLANK_VALUES.length; i++)
-        {
-            assertEquals(RTRANS_FIBKGDBLANK_VALUES[i], table.getDataAsText(i, "FI-Bkgd-Blank"));
-        }
-        clearFilter("Data", "fiBackgroundBlank");
-        setFilter("Data", "EstLogConc_5pl", "Is Not Blank");
-        waitForElement(Locator.paginationText(1, 32, 32));
-        // check values in the est log conc 5pl column
-        for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_5PL.length; i++)
-        {
-            assertEquals(RTRANS_ESTLOGCONC_VALUES_5PL[i], table.getDataAsText(i, "Est Log Conc Rumi 5 PL"));
-        }
-        clearFilter("Data", "EstLogConc_5pl");
-        setFilter("Data", "EstLogConc_4pl", "Is Not Blank");
-        waitForElement(Locator.paginationText(1, 32, 32));
-        // check values in the est log conc 4pl column
-        for(int i = 0; i < RTRANS_ESTLOGCONC_VALUES_4PL.length; i++)
-        {
-            assertEquals(RTRANS_ESTLOGCONC_VALUES_4PL[i], table.getDataAsText(i, "Est Log Conc Rumi 4 PL"));
-        }
-        clearFilter("Data", "EstLogConc_4pl");
-        clearFilter("Data", "Type");
-
-        R_TRANSFORM_SET = true;
+        // all batch, run, analyte properties should be remembered from the first upload
+        checkDataRegionCheckbox("Runs", 0);
+        clickButton("Re-import run");
+        clickButton("Next");
+        uncheckCheckbox(Locator.name("skipRumiCalculation"));
+        clickButton("Next", defaultWaitForPage * 2);
+        clickButton("Save and Finish");
     }
 }

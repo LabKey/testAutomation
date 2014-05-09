@@ -199,16 +199,17 @@ public abstract class LuminexTest extends AbstractQCAssayTest
             _listHelper.addField("Run Fields", 9, "StndCurveFitInput", "Input Var for Curve Fit Calc of Standards", ListColumnType.String);
             _listHelper.addField("Run Fields", 10, "UnkCurveFitInput", "Input Var for Curve Fit Calc of Unknowns", ListColumnType.String);
             _listHelper.addField("Run Fields", 11, "CurveFitLogTransform", "Curve Fit Log Transform", ListColumnType.Boolean);
+            _listHelper.addField("Run Fields", 12, "SkipRumiCalculation", "Skip Ruminex Calculations", ListColumnType.Boolean);
 
             // add run properties for use with the Guide Set test
-            _listHelper.addField("Run Fields", 12, "NotebookNo", "Notebook Number", ListColumnType.String);
-            _listHelper.addField("Run Fields", 13, "AssayType", "Assay Type", ListColumnType.String);
-            _listHelper.addField("Run Fields", 14, "ExpPerformer", "Experiment Performer", ListColumnType.String);
+            _listHelper.addField("Run Fields", 13, "NotebookNo", "Notebook Number", ListColumnType.String);
+            _listHelper.addField("Run Fields", 14, "AssayType", "Assay Type", ListColumnType.String);
+            _listHelper.addField("Run Fields", 15, "ExpPerformer", "Experiment Performer", ListColumnType.String);
 
             // add run properties for use with Calculating Positivity
-            _listHelper.addField("Run Fields", 15, "CalculatePositivity", "Calculate Positivity", ListColumnType.Boolean);
-            _listHelper.addField("Run Fields", 16, "BaseVisit", "Baseline Visit", ListColumnType.Double);
-            _listHelper.addField("Run Fields", 17, "PositivityFoldChange", "Positivity Fold Change", ListColumnType.Integer);
+            _listHelper.addField("Run Fields", 16, "CalculatePositivity", "Calculate Positivity", ListColumnType.Boolean);
+            _listHelper.addField("Run Fields", 17, "BaseVisit", "Baseline Visit", ListColumnType.Double);
+            _listHelper.addField("Run Fields", 18, "PositivityFoldChange", "Positivity Fold Change", ListColumnType.Integer);
 
             // add analyte property for tracking lot number
             _listHelper.addField("Analyte Properties", 6, "LotNumber", "Lot Number", ListColumnType.String);
