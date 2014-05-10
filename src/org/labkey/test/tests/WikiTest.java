@@ -39,7 +39,7 @@ public class WikiTest extends BaseWebDriverTest
     private static final String WIKI_PAGE_CONTENT =
             "<b>Some HTML content</b>\n" +
                     "<b>${labkey.webPart(partName='Query', title='My Proteins', schemaName='ms2', " +
-                    "queryName='Sequences', allowChooseQuery='true', allowChooseView='true')}</b>\n";
+                    "queryName='Sequences', allowChooseQuery='true', allowChooseView='true', dataRegionName='" + WIKI_PAGE_WEBPART_ID + "')}</b>\n";
     private static final String WIKI_CHECK_CONTENT = "More HTML content";
 
     public WikiTest()
