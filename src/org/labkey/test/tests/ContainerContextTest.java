@@ -39,6 +39,7 @@ import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
 
 import java.io.IOException;
@@ -100,6 +101,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         doTestListLookupURL();
         doTestIssue15610();
         doTestIssue15751();
+        doTestIssue20375();
         doTestSimpleModuleTables();
     }
 
@@ -111,7 +113,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         enableModules(Arrays.asList("simpletest", "ViscStudies"), true);
         addWebPart("Workbooks");
 
-        createSubfolder(getProjectName(), SUB_FOLDER_A, new String[] {"List", "Study", "ViscStudies"});
+        createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies"});
         createSubfolder(getProjectName(), SUB_FOLDER_B, new String[]{"List", "Study", "ViscStudies"});
     }
 
@@ -295,6 +297,49 @@ public class ContainerContextTest extends BaseWebDriverTest
         waitForPipelineJobsToFinish(1);
     }
 
+    // Issue 20375: DetailsURL link has no container in certain cases
+    @LogMethod
+    protected void doTestIssue20375()
+    {
+        log("** Create wiki pages in subfolders");
+        WikiHelper wikiHelper = new WikiHelper(this);
+
+        clickFolder(SUB_FOLDER_A);
+        clickTab("Wiki");
+        wikiHelper.createWikiPage("subfolder-a", null, "title-a", "content-a", false, null, false);
+
+        clickFolder(SUB_FOLDER_B);
+        clickTab("Wiki");
+        wikiHelper.createWikiPage("subfolder-b", null, "title-b", "content-b", false, null, false);
+
+        // Bug would originally only repro when all columns with URLs have been removed so we only include the 'Created' column.
+        goToProjectHome();
+        navigateToQuery("wiki", "CurrentWikiVersions");
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.clearCustomizeViewColumns();
+        _customizeViewsHelper.addCustomizeViewColumn("Created");
+        _customizeViewsHelper.addCustomizeViewSort("Created", "Ascending");
+        _customizeViewsHelper.saveCustomView("CreatedOnly");
+
+        _extHelper.clickMenuButton("Views", "Folder Filter", "Current folder and subfolders");
+        DataRegionTable table = new DataRegionTable("query", this);
+        assertEquals(2, table.getDataRowCount());
+
+        log("** Validate detailsURL goes to " + SUB_FOLDER_A);
+        String detailsURL = table.getDetailsHref(0);
+        log("  detailsURL = " + detailsURL);
+        assertTrue("Expected details URL to contain subfolder A:" + detailsURL,
+                detailsURL.contains("/wiki/" + getProjectName() + "/" + SUB_FOLDER_A + "/page.view?name=subfolder-a") ||
+                        detailsURL.contains("/" + getProjectName() + "/" + SUB_FOLDER_A + "/wiki-page.view?name=subfolder-a"));
+
+        log("** Validate detailsURL goes to " + SUB_FOLDER_B);
+        detailsURL = table.getDetailsHref(1);
+        log("  detailsURL = " + detailsURL);
+        assertTrue("Expected details URL to contain subfolder B: " + detailsURL,
+                detailsURL.contains("/wiki/" + getProjectName() + "/" + SUB_FOLDER_B + "/page.view?name=subfolder-b") ||
+                detailsURL.contains("/" + getProjectName() + "/" + SUB_FOLDER_B + "/wiki-page.view?name=subfolder-b"));
+    }
+
     @LogMethod
     protected void doTestSimpleModuleTables() throws Exception
     {
@@ -402,7 +447,7 @@ public class ContainerContextTest extends BaseWebDriverTest
                 "FROM emissiontest";
 
         createQuery(getProjectName(), "EmissionTests XXX Container", "vehicle", customQueryXXXContainer, customMetadata, false);
-        verifySimpleModuleTables("EmissionTests XXX Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false);
+        verifySimpleModuleTables("EmissionTests XXX Container", "XXX.view", "detailsQueryRow.view", max, workbookIds, emissionIds, parentRowIds, rowIdToWorkbookId, false, false, vehicleId);
         */
 
 

@@ -53,7 +53,7 @@ public class WikiHelper extends AbstractHelper
     {
         create(name, format, title);
 
-        if (wikiVisualBody == true)
+        if (wikiVisualBody)
             setWikiVisualBody(body);
         else
             setSource(body);
@@ -71,9 +71,9 @@ public class WikiHelper extends AbstractHelper
         _test.saveWikiPage();
     }
 
-    public void createWikiPage(String name, @Nullable String format, @Nullable String title, String body, File file)
+    public void createWikiPage(String name, @Nullable String format, @Nullable String title, String body, @Nullable File attachment)
     {
-        createWikiPage(name, format, title, body, true, file, true);
+        createWikiPage(name, format, title, body, true, attachment, true);
     }
 
     private void setSourceFromFile(File file)
