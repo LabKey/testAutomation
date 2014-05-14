@@ -5259,6 +5259,11 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public String getPropertyXPath(String propertyHeading)
     {
+        return "//td[text() = '" + propertyHeading + "']/../..";
+    }
+
+    public String getPropertyXPathContains(String propertyHeading)
+    {
         return "//td[contains(text(), '" + propertyHeading + "')]/../..";
     }
 
