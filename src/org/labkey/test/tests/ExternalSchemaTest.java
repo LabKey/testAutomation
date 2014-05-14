@@ -21,6 +21,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
@@ -528,19 +529,18 @@ public class ExternalSchemaTest extends BaseWebDriverTest
             deleteUrl.append("&.select=").append(aPk);
         log("** Deleting via http POST to form action: " + deleteUrl);
 
-        HttpClient client = WebTestHelper.getHttpClient();
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpPost method = new HttpPost(deleteUrl.toString());
-        try
+        HttpResponse response = null;
+
+        try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
         {
-            HttpResponse response = client.execute(method, context);
+            response = client.execute(method, context);
             int status = response.getStatusLine().getStatusCode();
 
             assertTrue("Expected success, actual: " + status, (HttpStatus.SC_OK == status));
 
             String responseBody = WebTestHelper.getHttpResponseBody(response);
-            EntityUtils.consume(response.getEntity()); // close connection
-
             assertTrue("Expected error message not present", responseBody.contains("The row is from the wrong container."));
         }
         catch (IOException e)
@@ -549,8 +549,14 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         }
         finally
         {
-            if (client != null)
-                client.getConnectionManager().shutdown();
+            if (null != response)
+            {
+                try
+                {
+                    EntityUtils.consume(response.getEntity()); // close connection
+                }
+                catch (IOException ignore) {}
+            }
         }
     }
 

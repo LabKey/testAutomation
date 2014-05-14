@@ -17,19 +17,23 @@
 package org.labkey.test;
 
 import org.apache.http.HttpHost;
-import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.AuthCache;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.config.ConnectionConfig;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -41,8 +45,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import static org.junit.Assert.*;
+import java.nio.charset.Charset;
 
 public class WebTestHelper
 {
@@ -195,15 +198,9 @@ public class WebTestHelper
     // Writes message to the labkey server log. Message parameter is output as sent, except that \\n is translated to newline.
     public static void logToServer(String message) throws Exception
     {
-        DefaultHttpClient client = getHttpClient();
-        try
+        try(CloseableHttpClient client = (CloseableHttpClient)getHttpClient())
         {
             logToServer(message, client, WebTestHelper.getBasicHttpContext());
-        }
-        finally
-        {
-            if (client != null)
-                client.getConnectionManager().shutdown();
         }
     }
 
@@ -245,38 +242,56 @@ public class WebTestHelper
         return parameter.replaceAll(" ", "%20");
     }
 
-    public static DefaultHttpClient getHttpClient()
+    public static HttpClient getHttpClient()
     {
         return getHttpClient(PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
 
-    public static DefaultHttpClient getHttpClient(String username, String password)
+    public static HttpClient getHttpClient(String username, String password)
     {
+        return getHttpClientBuilder(username, password).build();
+    }
+
+    public static HttpClientBuilder getHttpClientBuilder()
+    {
+        return getHttpClientBuilder(PasswordUtil.getUsername(), PasswordUtil.getPassword());
+    }
+
+    public static HttpClientBuilder getHttpClientBuilder(String username, String password)
+    {
+        URI target;
         try
         {
-            DefaultHttpClient client = new DefaultHttpClient();
-
-            client.getParams().setParameter("http.protocol.version", HttpVersion.HTTP_1_1);
-            client.getParams().setParameter("http.socket.timeout", 60000);
-            client.getParams().setParameter("http.protocol.content-charset", "UTF-8");
-
-            URI target = new URI(getBaseURL());
-            HttpHost targetHost = new HttpHost(target.getHost(), target.getPort(), target.getScheme());
-
-            client.getCredentialsProvider().setCredentials(
-                    new AuthScope(targetHost.getHostName(), AuthScope.ANY_PORT, AuthScope.ANY_REALM),
-                    new UsernamePasswordCredentials(username, password)
-            );
-
-            //send basic auth header on first request
-            return client;
+            target = new URI(getBaseURL());
         }
-        catch (URISyntaxException e)
+        catch (URISyntaxException ex)
         {
-            fail("Unable to parse URL: " + getBaseURL());
-            return null; // unreachable
+            throw new RuntimeException(ex);
         }
 
+        HttpHost targetHost = new HttpHost(target.getHost(), target.getPort(), target.getScheme());
+        AuthScope authScope = new AuthScope(targetHost.getHostName(), target.getPort(), AuthScope.ANY_REALM);
+        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(username, password);
+
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(authScope, credentials);
+
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setSocketTimeout(60000)
+                .setConnectTimeout(60000)
+                .setConnectionRequestTimeout(60000)
+                .build();
+
+        ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                .setCharset(Charset.forName("UTF-8"))
+                .build();
+
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create()
+                .setDefaultCredentialsProvider(credentialsProvider)
+                .setDefaultRequestConfig(requestConfig)
+                .setDefaultConnectionConfig(connectionConfig);
+
+        return clientBuilder;
     }
 
     public static HttpContext getBasicHttpContext()
@@ -294,14 +309,13 @@ public class WebTestHelper
 
             // Add AuthCache to the execution context
             BasicHttpContext localcontext = new BasicHttpContext();
-            localcontext.setAttribute(ClientContext.AUTH_CACHE, authCache);
+            localcontext.setAttribute(HttpClientContext.AUTH_CACHE, authCache);
 
             return localcontext;
         }
         catch (URISyntaxException e)
         {
-            fail("Unable to parse URL: " + getBaseURL());
-            return null; // unreachable
+            throw new RuntimeException(e);
         }
     }
 
@@ -331,11 +345,10 @@ public class WebTestHelper
 
     public static int getHttpGetResponse(String url, String username, String password) throws HttpException, IOException
     {
-        HttpClient client = getHttpClient(username, password);
         HttpResponse response = null;
         int status;
 
-        try
+        try (CloseableHttpClient client = (CloseableHttpClient)getHttpClient(username, password))
         {
             HttpGet method = new HttpGet(url);
 
@@ -346,7 +359,6 @@ public class WebTestHelper
         {
             if (response != null)
                 EntityUtils.consume(response.getEntity());
-            client.getConnectionManager().shutdown();
         }
         return status;
     }
@@ -358,11 +370,10 @@ public class WebTestHelper
 
     public static String getHttpGetResponseBody(String url, String username, String password) throws HttpException, IOException
     {
-        HttpClient client = getHttpClient(username, password);
         HttpResponse response = null;
         String responseBody;
 
-        try
+        try (CloseableHttpClient client = (CloseableHttpClient)getHttpClient(username, password))
         {
             HttpGet method = new HttpGet(url);
 
@@ -373,7 +384,6 @@ public class WebTestHelper
         {
             if (response != null)
                 EntityUtils.consume(response.getEntity());
-            client.getConnectionManager().shutdown();
         }
         return responseBody;
     }

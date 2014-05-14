@@ -33,7 +33,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
@@ -762,7 +762,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             {
                 link = link.substring(0, link.indexOf("#"));
             }
-            if (link != null && link.trim().length() > 0)
+            if (link.trim().length() > 0)
             {
                 links.add(link);
             }
@@ -1389,7 +1389,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             if (performingUpgrade)
             {
-                verifyRedirectBehavior(upgradeText);
+                try
+                {
+                    verifyRedirectBehavior(upgradeText);
+                }
+                catch (IOException fail)
+                {
+                    throw new RuntimeException(fail);
+                }
 
                 int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
 
@@ -1474,17 +1481,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @LogMethod
-    private void verifyRedirectBehavior(String upgradeText)
+    private void verifyRedirectBehavior(String upgradeText) throws IOException
     {
         // Do these checks via direct http requests the primary upgrade window seems to interfere with this test, #15853
 
-        HttpClient client = WebTestHelper.getHttpClient();
         HttpContext context = WebTestHelper.getBasicHttpContext();
-        HttpResponse response;
+        HttpResponse response = null;
         HttpUriRequest method;
         int status;
 
-        try
+        try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
         {
             // These requests should NOT redirect to the upgrade page
 
@@ -1505,16 +1511,21 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
             // Check that sign out and sign in work properly during upgrade/install (once initial user is configured)
 
-            ((DefaultHttpClient)client).setRedirectStrategy(new DefaultRedirectStrategy()
+            DefaultRedirectStrategy redirectStrategy = new DefaultRedirectStrategy()
             {
                 @Override
                 public boolean isRedirected(HttpRequest httpRequest, HttpResponse httpResponse, HttpContext httpContext) throws ProtocolException
                 {
-                    boolean isRedirect=false;
-                    try {
+                    boolean isRedirect = false;
+                    try
+                    {
                         isRedirect = super.isRedirected(httpRequest, httpResponse, httpContext);
-                    } catch (ProtocolException ignore) {}
-                    if (!isRedirect) {
+                    }
+                    catch (ProtocolException ignore)
+                    {
+                    }
+                    if (!isRedirect)
+                    {
                         int responseCode = httpResponse.getStatusLine().getStatusCode();
                         if (responseCode == 301 || responseCode == 302)
                             return true;
@@ -1542,22 +1553,25 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 //                    else
 //                        return redirectRequest;
 //                }
-            });
-            method = new HttpPost(getBaseURL() + "/login/logout.view");
-            List<NameValuePair> args = new ArrayList<>();
-            args.add(new BasicNameValuePair("login", PasswordUtil.getUsername()));
-            args.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
-            ((HttpPost)method).setEntity(new UrlEncodedFormEntity(args));
-            response = client.execute(method, context);
-            status = response.getStatusLine().getStatusCode();
-            assertEquals("Unexpected response", HttpStatus.SC_OK, status);
-            // TODO: check login, once http-equiv redirect is sorted out
-            assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
-            EntityUtils.consume(response.getEntity());
+            };
+            try (CloseableHttpClient redirectClient = (CloseableHttpClient)getHttpClientBuilder().setRedirectStrategy(redirectStrategy).build();)
+            {
+                method = new HttpPost(getBaseURL() + "/login/logout.view");
+                List<NameValuePair> args = new ArrayList<>();
+                args.add(new BasicNameValuePair("login", PasswordUtil.getUsername()));
+                args.add(new BasicNameValuePair("password", PasswordUtil.getPassword()));
+                ((HttpPost) method).setEntity(new UrlEncodedFormEntity(args));
+                response = redirectClient.execute(method, context);
+                status = response.getStatusLine().getStatusCode();
+                assertEquals("Unexpected response", HttpStatus.SC_OK, status);
+                // TODO: check login, once http-equiv redirect is sorted out
+                assertFalse("Upgrade text found", WebTestHelper.getHttpResponseBody(response).contains(upgradeText));
+            }
         }
-        catch (IOException ex)
+        finally
         {
-            throw new RuntimeException(ex);
+            if (null != response)
+                EntityUtils.consume(response.getEntity());
         }
     }
 

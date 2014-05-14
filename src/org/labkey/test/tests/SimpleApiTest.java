@@ -24,6 +24,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
@@ -180,7 +181,6 @@ public abstract class SimpleApiTest extends BaseWebDriverTest
 
     private void sendRequestDirect(String name, String url, ActionType type, String formData, String expectedResponse, boolean failOnMatch, String username, String password, boolean acceptErrors) throws UnsupportedEncodingException
     {
-        HttpClient client = username == null ? WebTestHelper.getHttpClient() : WebTestHelper.getHttpClient(username, password);
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpUriRequest method = null;
         HttpResponse response = null;
@@ -197,7 +197,10 @@ public abstract class SimpleApiTest extends BaseWebDriverTest
                 break;
         }
 
-        try
+        try (CloseableHttpClient client = (CloseableHttpClient)(
+                username == null ?
+                WebTestHelper.getHttpClient() :
+                WebTestHelper.getHttpClient(username, password)))
         {
 
             response = client.execute(method, context);
@@ -223,8 +226,6 @@ public abstract class SimpleApiTest extends BaseWebDriverTest
             }
             catch (IOException ex)
             {/*ignore*/}
-            if (client != null)
-                client.getConnectionManager().shutdown();
         }
     }
 

@@ -22,6 +22,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
@@ -152,12 +153,11 @@ public class ChartingAPITest extends ClientAPITest
         String svgText = (String)executeScript("return LABKEY.vis.SVGConverter.svgToStr(Ext4.query('svg')[0]);");
 
         String url = WebTestHelper.getBaseURL() + "/visualization/" + EscapeUtil.encode(getProjectName())+ "/exportPDF.view";
-        HttpClient httpClient = WebTestHelper.getHttpClient();
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpPost method;
         HttpResponse response = null;
 
-        try
+        try (CloseableHttpClient httpClient = (CloseableHttpClient)WebTestHelper.getHttpClient())
         {
             method = new HttpPost(url);
             List<NameValuePair> args = new ArrayList<>();
@@ -173,8 +173,6 @@ public class ChartingAPITest extends ClientAPITest
         {
             if (null != response)
                 EntityUtils.consume(response.getEntity());
-            if (httpClient != null)
-                httpClient.getConnectionManager().shutdown();
         }
     }
 

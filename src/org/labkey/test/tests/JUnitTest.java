@@ -23,9 +23,11 @@ import junit.framework.TestSuite;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONValue;
@@ -117,10 +119,10 @@ public class JUnitTest extends TestSuite
 
     public static TestSuite suite(int attempt, boolean performedUpgrade) throws Exception
     {
-        HttpClient client = WebTestHelper.getHttpClient();
+
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpResponse response = null;
-        try
+        try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient())
         {
             String url = WebTestHelper.getBaseURL() + "/junit/testlist.view?";
             HttpGet method = new HttpGet(url);
@@ -193,8 +195,6 @@ public class JUnitTest extends TestSuite
         {
             if (response != null)
                 EntityUtils.consume(response.getEntity());
-            if (client != null)
-                client.getConnectionManager().shutdown();
         }
     }
 
@@ -205,31 +205,31 @@ public class JUnitTest extends TestSuite
         private final int _timeout;
 
         /** Stash and reuse so that we can keep using the same session instead of re-authenticating with every request */
-        private static HttpClient client = WebTestHelper.getHttpClient();
-        private static HttpContext context = WebTestHelper.getBasicHttpContext();
-
-        static
-        {
-            /** Configure to use cookies so that we remember our session ID */
-            context.setAttribute(ClientContext.COOKIE_STORE, new BasicCookieStore());
-        }
+        private HttpContext context = WebTestHelper.getBasicHttpContext();
 
         public RemoteTest(String remoteClass, int timeout)
         {
             super(remoteClass);
             _remoteClass = remoteClass;
             _timeout = timeout;
+
+            /** Configure to use cookies so that we remember our session ID */
+            context.setAttribute(HttpClientContext.COOKIE_STORE, new BasicCookieStore());
         }
 
         @Override
         protected void runTest() throws Throwable
         {
+            RequestConfig requestConfig = RequestConfig.custom()
+                    .setSocketTimeout(_timeout * 1000)
+                    .build();
+
             HttpResponse response = null;
-            try
+            try (CloseableHttpClient client = WebTestHelper.getHttpClientBuilder()
+                    .setDefaultRequestConfig(requestConfig).build())
             {
                 String url = WebTestHelper.getBaseURL() + "/junit/go.view?testCase=" + _remoteClass;
                 HttpGet method = new HttpGet(url);
-                client.getParams().setParameter("http.socket.timeout", _timeout * 1000);
                 long startTime = System.currentTimeMillis();
                 response = client.execute(method, context);
                 int status = response.getStatusLine().getStatusCode();
