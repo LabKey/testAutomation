@@ -306,33 +306,18 @@
         <antcall target="clean" />
         <antcall target="prepare" />
 
-        <!-- Temporary hack to work around the fact that our AspectJ build doesn't seem to suport Java 8.
-             TODO: Upgrade AspectJ library, #20054, and remove <if>, using iajc in all cases -->
-        <if>
-            <equals arg1="${ant.java.version}" arg2="1.8"/>
-            <then>
-                <javac
-                    destdir="${test.build.home}/classes"
-                    debug="${test.compile.debug}"
-                    deprecation="${test.compile.deprecation}"
-                    source="1.7"
-                    classpathref="full.test.build.classpath">
-                    <src path="${test.src.home}"/>
-                    <src refid="module.test.src.dirs"/>
-                </javac>
-            </then>
-            <else>
-                <iajc
-                    destdir="${test.build.home}/classes"
-                    debug="${test.compile.debug}"
-                    deprecation="${test.compile.deprecation}"
-                    source="1.7"
-                    classpathref="full.test.build.classpath">
-                    <src path="${test.src.home}"/>
-                    <src refid="module.test.src.dirs"/>
-                </iajc>
-            </else>
-        </if>
+        <!-- Note: Setting source="${ant.java.version}" is a workaround that allows AspectJ to compile on Java 8.
+             TODO: Remove this (return to source="1.7") once we upgrade to a version of AspectJ that fixes this
+             cross-compilation issue. See #20054. -->
+        <iajc
+            destdir="${test.build.home}/classes"
+            debug="${test.compile.debug}"
+            deprecation="${test.compile.deprecation}"
+            source="${ant.java.version}"
+            classpathref="full.test.build.classpath">
+            <src path="${test.src.home}"/>
+            <src refid="module.test.src.dirs"/>
+        </iajc>
         <copy todir="${test.build.home}/classes" >
             <fileset dir="${test.src.home}">
                 <include name="**/*.js"/>
