@@ -551,11 +551,7 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         {
             if (null != response)
             {
-                try
-                {
-                    EntityUtils.consume(response.getEntity()); // close connection
-                }
-                catch (IOException ignore) {}
+                EntityUtils.consumeQuietly(response.getEntity()); // close connection
             }
         }
     }

@@ -1571,7 +1571,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         finally
         {
             if (null != response)
-                EntityUtils.consume(response.getEntity());
+                EntityUtils.consumeQuietly(response.getEntity());
         }
     }
 
@@ -3180,7 +3180,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         try {
             getHttpGetResponse(WebTestHelper.getBaseURL() + "/dumbster/setRecordEmail.view?record=true", PasswordUtil.getUsername(), PasswordUtil.getPassword());}
-        catch (IOException | HttpException e) {
+        catch (IOException e) {
             throw new RuntimeException("Failed to enable email recorder", e);}
     }
 

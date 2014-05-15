@@ -194,7 +194,7 @@ public class JUnitTest extends TestSuite
         finally
         {
             if (response != null)
-                EntityUtils.consume(response.getEntity());
+                EntityUtils.consumeQuietly(response.getEntity());
         }
     }
 
@@ -254,7 +254,7 @@ public class JUnitTest extends TestSuite
             finally
             {
                 if (response != null)
-                    EntityUtils.consume(response.getEntity());
+                    EntityUtils.consumeQuietly(response.getEntity());
             }
         }
 

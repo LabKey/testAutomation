@@ -172,7 +172,7 @@ public class ChartingAPITest extends ClientAPITest
         finally
         {
             if (null != response)
-                EntityUtils.consume(response.getEntity());
+                EntityUtils.consumeQuietly(response.getEntity());
         }
     }
 

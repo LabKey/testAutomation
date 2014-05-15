@@ -230,7 +230,7 @@ public class WebTestHelper
         finally
         {
             if (null != response)
-                EntityUtils.consume(response.getEntity());
+                EntityUtils.consumeQuietly(response.getEntity());
         }
         if (responseCode != HttpStatus.SC_OK)
             throw new Exception("Contacting server failed: " + responseStatusLine);
@@ -338,12 +338,12 @@ public class WebTestHelper
         return builder.toString();
     }
 
-    public static int getHttpGetResponse(String url) throws HttpException, IOException
+    public static int getHttpGetResponse(String url) throws IOException
     {
         return getHttpGetResponse(url, PasswordUtil.getUsername(), PasswordUtil.getPassword());
     }
 
-    public static int getHttpGetResponse(String url, String username, String password) throws HttpException, IOException
+    public static int getHttpGetResponse(String url, String username, String password) throws IOException
     {
         HttpResponse response = null;
         int status;
@@ -358,7 +358,7 @@ public class WebTestHelper
         finally
         {
             if (response != null)
-                EntityUtils.consume(response.getEntity());
+                EntityUtils.consumeQuietly(response.getEntity());
         }
         return status;
     }
@@ -383,7 +383,7 @@ public class WebTestHelper
         finally
         {
             if (response != null)
-                EntityUtils.consume(response.getEntity());
+                EntityUtils.consumeQuietly(response.getEntity());
         }
         return responseBody;
     }

@@ -20,6 +20,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.Nullable;
@@ -237,11 +238,10 @@ public class EHRClientAPIHelper
     public String doSaveRows(String email, List<JSONObject> commands, JSONObject extraContext, boolean expectSuccess)
     {
         long start = System.currentTimeMillis();
-        HttpClient client = WebTestHelper.getHttpClient(email, PasswordUtil.getPassword());
         HttpContext context = WebTestHelper.getBasicHttpContext();
         HttpPost method = null;
         HttpResponse response = null;
-        try
+        try (CloseableHttpClient client = (CloseableHttpClient)WebTestHelper.getHttpClient(email, PasswordUtil.getPassword()))
         {
             JSONObject json = new JSONObject();
             json.put("commands", commands);
@@ -273,24 +273,14 @@ public class EHRClientAPIHelper
 
             return responseBody;
         }
-        catch (IOException e)
-        {
-            throw new RuntimeException(e);
-        }
-        catch (JSONException e)
+        catch (IOException | JSONException e)
         {
             throw new RuntimeException(e);
         }
         finally
         {
-            try{
-                if (response != null)
-                    EntityUtils.consume(response.getEntity());
-            }
-            catch (IOException ex)
-            {/*ignore*/}
-            if (client != null)
-                client.getConnectionManager().shutdown();
+            if (response != null)
+                EntityUtils.consumeQuietly(response.getEntity());
         }
     }
 

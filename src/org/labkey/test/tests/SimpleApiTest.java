@@ -219,13 +219,8 @@ public abstract class SimpleApiTest extends BaseWebDriverTest
         }
         finally
         {
-            try
-            {
-                if (response != null)
-                    EntityUtils.consume(response.getEntity());
-            }
-            catch (IOException ex)
-            {/*ignore*/}
+            if (response != null)
+                EntityUtils.consumeQuietly(response.getEntity());
         }
     }
 
