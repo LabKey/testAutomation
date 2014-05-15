@@ -20,12 +20,14 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Disabled;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 
 import java.io.File;
 
-@Category({DailyB.class})
+// TODO: Add to DailyB suite after fixing Issues 19632 & 20388
+@Category({Disabled.class})
 public class FolderTest extends BaseWebDriverTest
 {
     private static final String PROJECT_NAME = "FolderTest#Project";
