@@ -1231,6 +1231,7 @@
         <antcall target="install-flowStats" />
         <antcall target="install-knitr" />
         <antcall target="install-ehr-dependencies" />
+        <antcall target="install-rsurvival" />
         <touch file="${basedir}/rPackageDeployment.timestamp" />
     </target>
 
@@ -1364,6 +1365,13 @@
     <target name="install-flowWorkspace" if="flowWorkspace.uninstalled" depends="check-flowWorkspace-installed">
         <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="false" searchpath="true"
               input="${project.root}/tools/Rpackages/install-flowWorkspace.R">
+            <arg line="--vanilla --quiet"/>
+        </exec>
+    </target>
+
+    <target name="install-rsurvival" if="R.present" depends="check-rlabkey-installed">
+        <exec executable="${r.path}" dir="${project.root}/sampledata/rlabkey" failifexecutionfails="true" searchpath="true"
+              input="${project.root}/tools/Rpackages/install-survival.R">
             <arg line="--vanilla --quiet"/>
         </exec>
     </target>
