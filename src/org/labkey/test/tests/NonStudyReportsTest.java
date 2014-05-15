@@ -301,7 +301,7 @@ public class NonStudyReportsTest extends ReportTest
         goToManageViews();
 
         clickAddReport("Link Report");
-        assertElementPresent(Locator.tag("li").containing("URL must be absolute"));
+        waitForElement(Locator.tag("li").containing("URL must be absolute"));
         assertElementPresent(Locator.tag("li").containing("This field is required"), 2);
         setFormElement("viewName", LINK_REPORT1_NAME);
         waitForElementToDisappear(Locator.tag("li").containing("This field is required").index(1));
