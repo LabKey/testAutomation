@@ -167,20 +167,27 @@ public abstract class Locator
         secTimeout = secTimeout > 0 ? secTimeout : 1;
         WebDriverWait wait = new WebDriverWait(driver, secTimeout);
 
-        return wait.until(new ExpectedCondition<WebElement>()
+        try
         {
-            @Override
-            public WebElement apply(WebDriver d)
+            return wait.until(new ExpectedCondition<WebElement>()
             {
-                return findElement(driver);
-            }
+                @Override
+                public WebElement apply(WebDriver d)
+                {
+                    return findElement(driver);
+                }
 
-            @Override
-            public String toString()
-            {
-                return "waiting for element: " + getLoggableDescription();
-            }
-        });
+                @Override
+                public String toString()
+                {
+                    return "waiting for element: " + getLoggableDescription();
+                }
+            });
+        }
+        catch (TimeoutException notFound)
+        {
+            throw new NoSuchElementException(getLoggableDescription(), notFound);
+        }
     }
 
     public void waitForElementToDisappear(final WebDriver driver, final int msTimeout)
