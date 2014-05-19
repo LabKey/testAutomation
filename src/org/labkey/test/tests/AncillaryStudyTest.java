@@ -327,8 +327,10 @@ public class AncillaryStudyTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText(DEPENDENT_DATASETS[0]));
         assertTextNotPresent(UPDATED_DATASET_VAL);
         clickMenuButton("Views", "Edit Snapshot");
+        prepForPageLoad();
         clickButton("Update Snapshot", 0);
         assertAlert("Updating will replace all existing data with a new set of data. Continue?");
+        waitForPageToLoad();
         assertTextPresent(UPDATED_DATASET_VAL);
     }
 
