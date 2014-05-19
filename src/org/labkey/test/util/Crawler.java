@@ -655,7 +655,7 @@ public class Crawler
         {
             // Go to the site
             long loadTime = _test.beginAt(relativeURL);
-            try{ _test.dismissAlerts(); } catch(SeleniumException ignore){}
+            try{ _test.acceptAllAlerts(); } catch(SeleniumException ignore){}
 
             int depth = urlToCheck.getDepth();
             origin = urlToCheck.getOrigin();

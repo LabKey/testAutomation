@@ -2665,13 +2665,28 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         alert.accept();
     }
 
-    public void dismissAlerts()
+    public int dismissAllAlerts()
     {
+        int alertCount = 0;
+        while (isAlertPresent()){
+            Alert alert = getDriver().switchTo().alert();
+            log("Found unexpected alert: " + alert.getText());
+            alert.dismiss();
+            alertCount++;
+        }
+        return alertCount;
+    }
+
+    public int acceptAllAlerts()
+    {
+        int alertCount = 0;
         while (isAlertPresent()){
             Alert alert = getDriver().switchTo().alert();
             log("Found unexpected alert: " + alert.getText());
             alert.accept();
+            alertCount++;
         }
+        return alertCount;
     }
 
     public boolean isAlertPresent()

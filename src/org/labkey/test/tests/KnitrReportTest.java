@@ -190,7 +190,7 @@ public class KnitrReportTest extends ReportTest
             }
             catch(UnhandledAlertException e)
             {
-                dismissAlerts();
+                acceptAllAlerts();
             }
         }
 
