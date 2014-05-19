@@ -24,10 +24,10 @@ import java.io.File;
 import static org.junit.Assert.*;
 
 /**
- * This class should be used to create tests containing multiple individual test cases (specified by @Test)
- * rather than the single @Test defined in BaseWebDriverTest
+ * This class can be used to create tests containing multiple individual test cases (specified by @Test)
  * Test cases should be non-destructive and should not depend on a particular execution order
- * This class blocks execution of standard test methods in BaseWebDriverTest and SimpleApiTest
+ * This class blocks execution of standard test methods in SimpleApiTest. You should not inherit from this class
+ * unless your test requires access to helpers in SimpleApiTest
  *
  * Shared setup steps should be in a public static void method annotated with org.junit.BeforeClass
  * The name of the method is not important. The JUnit runner finds the method solely based on the BeforeClass annotation
