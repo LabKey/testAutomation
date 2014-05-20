@@ -209,6 +209,12 @@ public class CreateVialsTest extends AbstractViabilityTest
         clickButton("Save");
 
 
+        {
+            log("** temporary workaround until viability specimen aggregates are automatically updated");
+            click(Locator.linkWithText("recalc specimen aggregates"));
+            clickButton("OK", longWaitForPage);
+        }
+
         log("** checking cell counts and specimen IDs");
         table = new DataRegionTable("Data", this);
         assertEquals("B02", table.getDataAsText(1, "Participant ID"));
