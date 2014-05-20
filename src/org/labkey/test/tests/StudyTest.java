@@ -639,7 +639,7 @@ public class StudyTest extends StudyBaseTest
         Locator.XPathLocator nameField = Locator.xpath("//input[starts-with(@name, 'ff_name')]");
         waitForElement(nameField);
         int newFieldIndex = getElementCount(nameField);
-        _listHelper.addField("Dataset", newFieldIndex, "Bad Name", "Bad Name", ListHelper.ListColumnType.String);
+        _listHelper.addField("Dataset Fields", newFieldIndex, "Bad Name", "Bad Name", ListHelper.ListColumnType.String);
         clickButton("Save");
         clickButton("View Data");
         _customizeViewsHelper.openCustomizeViewPanel();
