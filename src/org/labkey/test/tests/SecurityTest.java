@@ -322,7 +322,7 @@ public class SecurityTest extends BaseWebDriverTest
         ensureSignedOut();
 
         clickAndWait(Locator.linkWithText("Sign In"));
-        clickAndWait(Locator.linkContainingText("Forgot your password?"));
+        clickAndWait(Locator.linkContainingText("forgot password"));
         setFormElement(Locator.id("EmailInput"), username);
         clickButtonContainingText("Submit", 0);
 
