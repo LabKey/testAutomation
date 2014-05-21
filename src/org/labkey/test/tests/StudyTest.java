@@ -15,7 +15,6 @@
  */
 package org.labkey.test.tests;
 
-import com.thoughtworks.selenium.SeleniumException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.experimental.categories.Category;
 import org.labkey.remoteapi.Connection;
@@ -30,6 +29,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.ChartHelper;
+import org.labkey.test.util.DataRegionExportHelper;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.ListHelper;
@@ -322,31 +322,14 @@ public class StudyTest extends StudyBaseTest
 
         // save the new group and use it
         setFormElement(Locator.name(LABEL_FIELD), "Participant Group from Grid");
-        clickButtonContainingText("Save", 0);
-        _extHelper.waitForExt3MaskToDisappear(WAIT_FOR_JAVASCRIPT);
+        clickButtonContainingText("Save");
 
         if(!quickTest)
         {
-            // the dataregion get's ajaxed into place, wait until the new group appears in the menu
             Locator menu = Locator.navButton(SUBJECT_NOUN + " Groups");
-            waitForElement(menu, WAIT_FOR_JAVASCRIPT);
-            Locator menuItem = Locator.menuItem("Participant Group from Grid");
-            for (int i = 0; i < 10; i++)
-            {
-                try{
-                    click(menu);
-                }
-                catch(SeleniumException e){
-                    /* Ignore. This button is unpredictable. */
-                }
-                if (isElementPresent(menuItem))
-                    break;
-                else
-                    sleep(1000);
-            }
-            clickAndWait(menuItem);
-            for (String identifier : selectedIDs)
-                assertTextPresent(identifier);
+            _extHelper.clickExtMenuButton(menu, "Participant Group from Grid");
+            waitForElement(Locator.paginationText(selectedIDs.length));
+            assertTextPresent(selectedIDs);
         }
     }
 
@@ -675,7 +658,7 @@ public class StudyTest extends StudyBaseTest
 
         //TODO: edit an entry, search for that
 
-        Map nameAndValue = new HashMap(1);
+        Map<String, String> nameAndValue = new HashMap<>();
         nameAndValue.put("Alt ID", "191919");
         (new ChartHelper(this)).editDrtRow(4, nameAndValue);
         searchHelper.searchFor("191919");
@@ -780,13 +763,14 @@ public class StudyTest extends StudyBaseTest
         clickFolder(getFolderName());
         waitForText("Blood (Whole)");
         clickAndWait(Locator.linkWithText("Blood (Whole)"));
-        setFilter("SpecimenDetail", "MouseId", "Equals", "999320812");
+        DataRegionTable specimenDetail = new DataRegionTable("SpecimenDetail", this);
+        specimenDetail.setFilter("MouseId", "Equals", "999320812");
 
         waitForElement(Locator.tagContainingText("td", "Mouse Comment"));
         clearAllFilters("SpecimenDetail", "MouseId");
 
         log("verify copying and moving vial comments");
-        setFilter("SpecimenDetail", "GlobalUniqueId", "Equals", "AAA07XK5-01");
+        specimenDetail.setFilter("GlobalUniqueId", "Equals", "AAA07XK5-01");
         checkCheckbox(Locator.name(".toggle"));
         clickButton("Enable Comments/QC");
         _extHelper.clickMenuButton("Comments and QC", "Set Vial Comment or QC State for Selected");
@@ -872,7 +856,9 @@ public class StudyTest extends StudyBaseTest
     private void verifyDatasetExport()
     {
         pushLocation();
-        exportDataRegion("Text", null);
+        DataRegionTable drt = new DataRegionTable("Dataset", this);
+        DataRegionExportHelper exportHelper = new DataRegionExportHelper(drt);
+        exportHelper.exportText();
         goToAuditLog();
         prepForPageLoad();
         selectOptionByText(Locator.name("view"), "Query export events");
@@ -1088,7 +1074,8 @@ public class StudyTest extends StudyBaseTest
         assertTextPresent("999320518");
 
         // verify that the participant view respects the cohort filter:
-        setSort("Dataset", "MouseId", SortDirection.ASC);
+        DataRegionTable drt = new DataRegionTable("Dataset", this);
+        drt.setSort("MouseId", SortDirection.ASC);
         clickAndWait(Locator.linkWithText("999320518"));
         if(!isManualTest)
             assertTextPresent("b: 888209407"); //Alternate ID
