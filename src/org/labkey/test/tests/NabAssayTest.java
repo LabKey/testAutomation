@@ -104,7 +104,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             "            \n" +
             "            for (var j = 0; j < runs.length; j += 1)\n" +
             "            {\n" +
-            "                if (runs[j].cutoffs[0] != 50) throw 'GetNabRuns failure';\n" +
+            "                if (runs[j].cutoffs[0] != 50) throw 'GetNabRuns failure 1';\n" +
             "                var sampleIds = [];\n" +
             "                var samples = runs[j].samples;\n" +
             "                for (var k = 0; k < samples.length; k += 1)\n" +
@@ -117,7 +117,7 @@ public class NabAssayTest extends AbstractQCAssayTest
             "                    success : function(runs)\n" +
             "                    {\n" +
             "                        if (runs.length == 0) return;\n" +
-            "                        if (runs[0].cutoffs[0] != 50) throw 'GetStudyNabRuns failure';\n" +
+            "                        if (runs[0].cutoffs[0] != 50) throw 'GetStudyNabRuns failure 1';\n" +
             "                        var studyRunsGraphConfig = {\n" +
             "                            objectIds : sampleIds,\n" +
             "                            containerPath : '" + STUDY_FOLDER + "',\n" +
@@ -131,12 +131,12 @@ public class NabAssayTest extends AbstractQCAssayTest
             "                        }\n" +
             "                        var nabStudyGraphURl = LABKEY.Assay.getStudyNabGraphURL(studyRunsGraphConfig);\n" +
             "                    },\n" +
-            "                    failure : function() {throw 'GetStudyNabRuns failure';}\n" +
+            "                    failure : function() {throw 'GetStudyNabRuns failure 2';}\n" +
             "                }\n" +
             "                var nabStudyRuns = LABKEY.Assay.getStudyNabRuns(studyRunsConfig);\n" +
             "            }\n" +
             "        },\n" +
-            "        failure : function() {throw 'GetNabRuns failure';}\n" +
+            "        failure : function() {throw 'GetNabRuns failure 2';}\n" +
             "    };\n" +
             "    var nabRuns = LABKEY.Assay.getNAbRuns(runsConfig);\n" +
             "}" +
@@ -582,6 +582,8 @@ public class NabAssayTest extends AbstractQCAssayTest
         saveWikiPage();
 
         setSource("runNabAssayTest({renderTo : 'testDiv'})", false);
+
+        portalHelper.removeWebPart(WIKIPAGE_NAME);
     }
 
     /**
