@@ -4993,6 +4993,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             return;
         }
 
+        fireEvent(el, SeleniumEvent.focus);
         if (StringUtils.isEmpty(text))
         {
             el.clear();
