@@ -155,7 +155,7 @@ public class LabKeyExpectedConditions
             @Override
             public WebElement apply(WebDriver d)
             {
-                List<WebElement> els = _dataRegion.toCssLocator().append(".labkey-data-region-header td.labkey-ribbon > div").findElements(d);
+                List<WebElement> els = _dataRegion.toCssLocator().append(".labkey-data-region-header td.labkey-ribbon > div:not(.x-hide-display)").findElements(d);
                 for (WebElement el : els)
                 {
                     try

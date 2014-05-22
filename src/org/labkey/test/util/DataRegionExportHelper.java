@@ -95,7 +95,7 @@ public class DataRegionExportHelper
     public void expandExportPanel()
     {
         ExpectedCondition expandedPanel = LabKeyExpectedConditions.dataRegionPanelIsExpanded(Locator.id(_drt.getTableName()));
-        if (expandedPanel.apply(_test.getDriver()) == null)
+        if (expandedPanel.apply(_test.getDriver()) == null || !_test.isElementPresent(Locator.tagWithClass("table", "labkey-export-tab-contents").notHidden()))
         {
             _test.clickButton("Export", 0);
             _test.shortWait().until(expandedPanel);
