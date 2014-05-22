@@ -136,7 +136,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         clickProject(PERM_PROJECT_NAME);
         clickFolder(GAMMA_SUB_FOLDER_NAME);
         clickWebpartMenuItem("Messages", "Email", "Preferences");
-        checkRadioButton("emailPreference", "0");
+        checkCheckbox(Locator.radioButtonByNameAndValue("emailPreference", "0"));
         clickButton("Update");
         clickFolder(GAMMA_SUB_FOLDER_NAME);
 
@@ -152,7 +152,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         clickProject(PERM_PROJECT_NAME);
         clickFolder(GAMMA_SUB_FOLDER_NAME);
         clickWebpartMenuItem("Messages", "Email", "Preferences");
-        checkRadioButton("emailPreference", "0");
+        checkCheckbox(Locator.radioButtonByNameAndValue("emailPreference", "0"));
         clickButton("Update");
         clickFolder(GAMMA_SUB_FOLDER_NAME);
 
@@ -262,7 +262,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         clickManageGroup(groupName);
         setFormElement(Locator.name("names"), userName);
         if (!sendEmail)
-            uncheckCheckbox("sendEmail");
+            uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
     }
 }

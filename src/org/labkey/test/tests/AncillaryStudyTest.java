@@ -229,7 +229,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         goToManageDatasets();
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
-        clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
         clickButton("Update Snapshot", 0);
         assertAlert("Updating will replace all existing data with a new set of data. Continue?");
         waitForElement(Locator.tagWithClass("table", "labkey-data-region"));
@@ -251,7 +251,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         goToManageDatasets();
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
-        clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
         clickButton("Update Snapshot", 0);
         assertAlert("Updating will replace all existing data with a new set of data. Continue?");
         waitForElement(Locator.tagWithClass("table", "labkey-data-region"));
@@ -264,7 +264,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         log("Delete row from source dataset");
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATASETS[0]));
-        checkCheckbox(".select", 1);
+        checkCheckbox(Locator.checkboxByName(".select").index(1));
         clickButton("Delete", 0);
         assertAlert("Delete selected row from this dataset?");
         waitForElement(Locator.paginationText(48));
@@ -274,7 +274,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         goToManageDatasets();
         clickAndWait(Locator.linkWithText(DATASETS[0]));
         clickButton("View Data");
-        clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
         clickButton("Update Snapshot", 0);
         assertAlert("Updating will replace all existing data with a new set of data. Continue?");
         waitForElement(Locator.tagWithClass("table", "labkey-data-region"));
@@ -326,7 +326,7 @@ public class AncillaryStudyTest extends StudyBaseTest
         }
         clickAndWait(Locator.linkWithText(DEPENDENT_DATASETS[0]));
         assertTextNotPresent(UPDATED_DATASET_VAL);
-        clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
         prepForPageLoad();
         clickButton("Update Snapshot", 0);
         assertAlert("Updating will replace all existing data with a new set of data. Continue?");

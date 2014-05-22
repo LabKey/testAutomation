@@ -57,7 +57,7 @@ public class PortalHelper extends AbstractHelper
             throw new IllegalArgumentException("Can't move folder tabs vertically.");
 
         String tabId = tabText.replace(" ", "") + "Tab";
-        int tabCount = _test.getXpathCount(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab')]"));
+        int tabCount = _test.getElementCount(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab')]"));
         int startIndex = _test.getElementIndex(Locator.xpath("//li[contains(@class, 'labkey-app-bar-tab')][./a[@id="+Locator.xq(tabId)+"]]"));
         clickTabMenuItem(tabText, false, "Move", direction.toString());
         int expectedEndIndex = startIndex;
@@ -182,7 +182,7 @@ public class PortalHelper extends AbstractHelper
 
     @LogMethod(quiet = true)public void removeWebPart(@LoggedParam String webPartTitle)
     {
-        int startCount = _test.getXpathCount(Locators.webPartTitle(webPartTitle));
+        int startCount = _test.getElementCount(Locators.webPartTitle(webPartTitle));
         if (_test.isElementPresent(Locators.sideWebpartTitle.withText(webPartTitle)))
         {
             clickWebpartMenuItem(webPartTitle, false, "Remove From Page");

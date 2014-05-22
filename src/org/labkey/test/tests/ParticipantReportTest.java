@@ -404,8 +404,8 @@ public class ParticipantReportTest extends ReportTest
         //Mouse down on SPEC GROUP 1
         _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_ONE, 0);
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 1 Results"));
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
+        assertEquals(1, getElementCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='23']")));
+        assertEquals(1, getElementCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='3']")));
 
         //Add SPEC GROUP 2
         _ext4Helper.checkGridRowCheckbox(SPECIMEN_GROUP_TWO, 0);
@@ -413,8 +413,8 @@ public class ParticipantReportTest extends ReportTest
         //Remove SPEC GROUP 1
         _ext4Helper.uncheckGridRowCheckbox(SPECIMEN_GROUP_ONE, 0);
         waitForElement(Locator.css("table.x4-toolbar-item").withText("Showing 1 Results"));
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
-        assertEquals(1, getXpathCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
+        assertEquals(1, getElementCount(Locator.xpath("//td[text()='Screening']/..//td[3][text()='15']")));
+        assertEquals(1, getElementCount(Locator.xpath("//td[text()='Screening']/..//td[4][text()='1']")));
 
         click(Locator.xpath("//a[./img[@title = 'Edit']]"));
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);

@@ -49,8 +49,8 @@ public class SystemMaintenanceTest extends BaseWebDriverTest
         // Manually start system maintenance... we'll check for completion at the end of the test (before mem check)
         startSystemMaintenance();
 
-        checkRadioButton("usageReportingLevel", "MEDIUM");     // Force devs to report full usage info
-        checkRadioButton("exceptionReportingLevel", "HIGH");   // Force devs to report full exception info
+        checkCheckbox(Locator.radioButtonByNameAndValue("usageReportingLevel", "MEDIUM"));
+        checkCheckbox(Locator.radioButtonByNameAndValue("exceptionReportingLevel", "HIGH"));
         clickButton("Save");
 
         // Now that the test is done, ensure that system maintenance is complete...

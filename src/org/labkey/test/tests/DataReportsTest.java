@@ -26,7 +26,6 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.RReportHelper;
 
@@ -236,10 +235,10 @@ public class DataReportsTest extends ReportTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
-        clickMenuButton("Views", "Create", "Crosstab View");
-        selectOptionByValue("rowField",  "DEMsex");
-        selectOptionByValue("colField", "DEMsexor");
-        selectOptionByValue("statField", "SequenceNum");
+        _extHelper.clickMenuButton("Views", "Create", "Crosstab View");
+        selectOptionByValue(Locator.name("rowField"), "DEMsex");
+        selectOptionByValue(Locator.name("colField"), "DEMsexor");
+        selectOptionByValue(Locator.name("statField"), "SequenceNum");
         clickButton("Submit");
 
         String[] row3 = new String[] {"Male", "2", "9", "3", "14"};
@@ -286,7 +285,7 @@ public class DataReportsTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
-        clickMenuButton("Views", "Create", "Advanced View");
+        _extHelper.clickMenuButton("Views", "Create", "Advanced View");
         selectOptionByText(Locator.name("queryName"), "DEM-1 (DEM-1: Demographics)");
         String java = System.getProperty("java.home") + "/bin/java";
         setFormElement(Locator.name("program"), java);
@@ -314,7 +313,7 @@ public class DataReportsTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
-        clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Views", "Create", "R View");
         setCodeEditorValue("script-report-editor", " ");
 
         log("Execute bad scripts");
@@ -349,7 +348,7 @@ public class DataReportsTest extends ReportTest
 
         log("Check that R respects column changes, filters and sorts of data");
         pushLocation();
-        clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Views", "Create", "R View");
         setCodeEditorValue("script-report-editor", "labkey.data");
         clickViewTab();
         waitForText(R_SORT1);
@@ -362,11 +361,11 @@ public class DataReportsTest extends ReportTest
         popLocation();
 
         log("Check saved R script");
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
         pushLocation();
         //clickButton("Reports >>", 0);
         //clickAndWait(Locator.linkWithText(R_SCRIPTS[0]));
-        clickMenuButton("Views", R_SCRIPTS[0]);
+        _extHelper.clickMenuButton("Views", R_SCRIPTS[0]);
         waitForText("Console output", WAIT_FOR_PAGE);
         assertTextPresent("null device", R_SCRIPT1_TEXT1, R_SCRIPT1_TEXT2, R_SCRIPT1_PDF);
         assertElementPresent(Locator.xpath("//img[starts-with(@id,'" + R_SCRIPT1_IMG + "')]"));
@@ -389,7 +388,7 @@ public class DataReportsTest extends ReportTest
 
 
         log("Create second R script");
-        clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Views", "Create", "R View");
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         assertTrue("Script didn't execute as expeced", _rReportHelper.executeScript(R_SCRIPT2(DATA_BASE_PREFIX, "mouseid"), R_SCRIPT2_TEXT1));
@@ -407,7 +406,7 @@ public class DataReportsTest extends ReportTest
         enterPermissionsUI();
         clickManageGroup("Users");
         setFormElement("names", R_USER);
-        uncheckCheckbox("sendEmail");
+        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
         enterPermissionsUI();
         setPermissions("Users", "Editor");
@@ -423,9 +422,9 @@ public class DataReportsTest extends ReportTest
         clickAndWait(Locator.linkWithText(DATA_SET));
         pushLocation();
         assertElementNotPresent(Locator.xpath("//select[@name='Dataset.viewName']//option[.='" + R_SCRIPTS[0] + "']"));
-        clickMenuButton("Views", R_SCRIPTS[1]);
+        _extHelper.clickMenuButton("Views", R_SCRIPTS[1]);
         goBack();
-        clickMenuButton("Views", AUTHOR_REPORT);
+        _extHelper.clickMenuButton("Views", AUTHOR_REPORT);
 
         popLocation();
         log("Change user permission");
@@ -441,7 +440,7 @@ public class DataReportsTest extends ReportTest
         clickProject(getProjectName());
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(DATA_SET));
-        clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Views", "Create", "R View");
         _rReportHelper.ensureFieldSetExpanded("Shared Scripts");
         _ext4Helper.checkCheckbox(R_SCRIPTS[0]);
         _ext4Helper.checkCheckbox(R_SCRIPTS[1]);
@@ -494,7 +493,7 @@ public class DataReportsTest extends ReportTest
     private void createRReport(String name, String scriptValue, boolean share, boolean shareSource, @NotNull String[] sharedScripts)
     {
 
-        clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Views", "Create", "R View");
         setCodeEditorValue("script-report-editor", scriptValue);
 
         // if there are any shared scripts, check the check box so they get included when the report is rendered

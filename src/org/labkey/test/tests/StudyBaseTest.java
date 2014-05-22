@@ -58,11 +58,11 @@ public abstract class StudyBaseTest extends SimpleApiTest
         setFormElement(Locator.name("newLabel"), "Processing");
         clickButton("Save");
         setFormElement(Locator.name("newLabel"), "Completed");
-        checkCheckbox("newFinalState");
+        checkCheckbox(Locator.checkboxByName("newFinalState"));
         clickButton("Save");
         setFormElement(Locator.name("newLabel"), "Rejected");
-        checkCheckbox("newFinalState");
-        uncheckCheckbox("newSpecimensLocked");
+        checkCheckbox(Locator.checkboxByName("newFinalState"));
+        uncheckCheckbox(Locator.checkboxByName("newSpecimensLocked"));
         clickButton("Done");
     }
 
@@ -287,9 +287,9 @@ public abstract class StudyBaseTest extends SimpleApiTest
         waitForElement(Locator.name("description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         if (demographics)
-            checkCheckbox("demographicData");
+            checkCheckbox(Locator.checkboxByName("demographicData"));
         else
-            uncheckCheckbox("demographicData");
+            uncheckCheckbox(Locator.checkboxByName("demographicData"));
 
         clickButton("Save");
     }
@@ -304,9 +304,9 @@ public abstract class StudyBaseTest extends SimpleApiTest
         waitForElement(Locator.name("description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
 
         if (showByDefault)
-            checkCheckbox("showByDefault");
+            checkCheckbox(Locator.checkboxByName("showByDefault"));
         else
-            uncheckCheckbox("showByDefault");
+            uncheckCheckbox(Locator.checkboxByName("showByDefault"));
 
         clickButton("Save");
     }
@@ -338,7 +338,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
-        checkRadioButton("folderType", "Study Redesign (ITN)");
+        checkCheckbox(Locator.radioButtonByNameAndValue("folderType", "Study Redesign (ITN)"));
         clickButton("Update Folder");
     }
 

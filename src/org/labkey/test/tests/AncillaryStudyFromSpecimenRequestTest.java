@@ -78,7 +78,7 @@ public class AncillaryStudyFromSpecimenRequestTest extends StudyBaseTest
 
     private void createRequest()
     {
-        clickMenuButton("Request Options", "Create New Request");
+        _extHelper.clickMenuButton("Request Options", "Create New Request");
 
         selectOptionByText(Locator.name("destinationLocation"), "Aurum Health KOSH Lab, Orkney, South Africa (Endpoint Lab, Repository)");
         setFormElement(Locator.id("input0"), "Assay Plan");

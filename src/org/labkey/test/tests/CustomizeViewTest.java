@@ -199,7 +199,7 @@ public class CustomizeViewTest extends BaseWebDriverTest
             _customizeViewsHelper.saveCustomView(name);
         }
 
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
         clickButton("Views", 0);
         assertTextPresentInThisOrder("default", viewNames[0], viewNames[2], viewNames[1], viewNames[3], viewNames[4]);
     }

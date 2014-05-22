@@ -194,7 +194,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         setFormElement("name", WIKI_PAGE3_NAME_TITLE);
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
-        selectOptionByText("parent", WIKI_PAGE2_TITLE + " (" + WIKI_PAGE2_NAME + ")");
+        selectOptionByText(Locator.name("parent"), WIKI_PAGE2_TITLE + " (" + WIKI_PAGE2_NAME + ")");
         setWikiBody(WIKI_PAGE3_CONTENT);
         log("test attachments in wiki");
         click(Locator.linkWithText("Attach a file"));
@@ -266,7 +266,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(WIKI_PAGE3_NAME_TITLE));
         clickAndWait(Locator.linkWithText("Manage"));
         prepForPageLoad();
-        selectOptionByText("parent", WIKI_PAGE1_TITLE + " (" + WIKI_PAGE1_NAME + ")");
+        selectOptionByText(Locator.name("parent"), WIKI_PAGE1_TITLE + " (" + WIKI_PAGE1_NAME + ")");
         waitForPageToLoad();
         clickButton("Save");
         clickAndWait(Locator.linkWithText(WIKI_PAGE1_TITLE));
@@ -360,7 +360,7 @@ public class WikiLongTest extends BaseWebDriverTest
         _portalHelper.addWebPart("Wiki");
         clickWebpartMenuItem("Wiki", "Customize");
         log("check that container is set to current project");
-        selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
+        selectOptionByText(Locator.name("webPartContainer"), "/" + PROJECT_NAME);
         click(Locator.linkWithText("Reset to Folder Default Page"));
         assertOptionEquals(Locator.name("webPartContainer"), "/" + PROJECT2_NAME);
         log("set container and page");
@@ -421,7 +421,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Check if readers can read from other projects");
         clickProject(PROJECT2_NAME);
         clickWebpartMenuItem(WIKI_PAGE2_TITLE, "Customize");
-        selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
+        selectOptionByText(Locator.name("webPartContainer"), "/" + PROJECT_NAME);
 
         //page names are now fetched via AJAX, so wait for them to be populated
         waitCycles = 0;
@@ -434,7 +434,7 @@ public class WikiLongTest extends BaseWebDriverTest
         if(waitCycles == MAX_AJAX_WAIT_CYCLES)
             fail("AJAX population of page names in wiki web part customize view took longer than " + (MAX_AJAX_WAIT_CYCLES/2) + " seconds!");
 
-        selectOptionByText("name", WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
+        selectOptionByText(Locator.name("name"), WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
         submit();
         assertTextPresent(WIKI_PAGE2_TITLE);
         enterPermissionsUI();
@@ -452,7 +452,7 @@ public class WikiLongTest extends BaseWebDriverTest
         enterPermissionsUI();
         clickManageGroup(USERS_GROUP);
         setFormElement("names", USER1);
-        uncheckCheckbox("sendEmail");
+        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
 
         impersonate(USER1);
@@ -489,7 +489,7 @@ public class WikiLongTest extends BaseWebDriverTest
         setFormElement("title", "Test Customize TOC");
         log("check that container is set to current project");
         assertOptionEquals(Locator.name("webPartContainer"), "/" + PROJECT2_NAME);
-        selectOptionByText("webPartContainer", "/" + PROJECT_NAME);
+        selectOptionByText(Locator.name("webPartContainer"), "/" + PROJECT_NAME);
         submit();
         log("check that TOC title is set correctly");
         assertTextPresent("Test Customize TOC");
@@ -560,7 +560,7 @@ public class WikiLongTest extends BaseWebDriverTest
         enterPermissionsUI();
         clickManageGroup(USERS_GROUP);
         setFormElement("names", USER2);
-        uncheckCheckbox("sendEmail");
+        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
 
         log("Test terms of use");
@@ -805,7 +805,7 @@ public class WikiLongTest extends BaseWebDriverTest
     {
         if (!renderType.equals(getSelectedOptionText(Locator.name("rendererType"))))
         {
-            selectOptionByText("rendererType", renderType);
+            selectOptionByText(Locator.name("rendererType"), renderType);
         }
 
         if ("HTML".equals(renderType) && isNavButtonPresent("Use HTML Source Editor"))

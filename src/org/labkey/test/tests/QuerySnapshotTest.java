@@ -137,11 +137,11 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText(DEMOGRAPHICS_SNAPSHOT));
-        clickMenuButton("QC State", "All data");
+        _extHelper.clickMenuButton("QC State", "All data");
         waitForSnapshotUpdate("Armenian");
 
         log("delete the snapshot");
-        clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
         deleteSnapshot();
 
         // snapshot over a custom view
@@ -166,12 +166,12 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText(APX_SNAPSHOT));
-        clickMenuButton("QC State", "All data");
+        _extHelper.clickMenuButton("QC State", "All data");
 
         waitForSnapshotUpdate("Slovakian");
 
         log("delete the snapshot");
-        clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
         deleteSnapshot();
 
         // snapshot over a custom query
@@ -184,7 +184,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         createNewQuery("study");
 
         setFormElement("ff_newQueryName", "APX: Custom Query");
-        selectOptionByText("ff_baseTableName", "APX-1 (APX-1: Abbreviated Physical Exam)");
+        selectOptionByText(Locator.name("ff_baseTableName"), "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create and Edit Source");
         clickButton("Save", 0);
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
@@ -201,7 +201,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
         // edit snapshot then delete
         log("edit the snapshot");
-        clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
         checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
         clickButton("Save");
         assertTrue(isChecked(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]")));
@@ -212,7 +212,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         waitForText("Dataset: Custom Query Snapshot", 10000);
 
         log("delete the snapshot");
-        clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
         deleteSnapshot();
 
         clickTab("Manage");
@@ -255,7 +255,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickFolder(CROSS_STUDY_SNAPSHOT);
         waitForSnapshotUpdate("Undecided");
 
-        clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
         deleteSnapshot();
 
         clickFolder(getStudyLabel());
@@ -264,11 +264,11 @@ public class QuerySnapshotTest extends StudyBaseTest
         changeDatasetLabel(DEMOGRAPHICS_SNAPSHOT, "New Demographics");
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("New Demographics"));
-        clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
         changeDatasetName(DEMOGRAPHICS_SNAPSHOT, "New Dem");
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("New Demographics"));
-        clickMenuButton("Views", "Edit Snapshot");
+        _extHelper.clickMenuButton("Views", "Edit Snapshot");
         deleteSnapshot();
     }
 
@@ -279,7 +279,7 @@ public class QuerySnapshotTest extends StudyBaseTest
 
     private void createQuerySnapshot(String snapshotName, boolean autoUpdate, boolean isDemographic, String keyField, int index)
     {
-        clickMenuButton("Views", "Create", "Query Snapshot");
+        _extHelper.clickMenuButton("Views", "Create", "Query Snapshot");
 
         setFormElement("snapshotName", snapshotName);
         if (autoUpdate)
@@ -293,7 +293,7 @@ public class QuerySnapshotTest extends StudyBaseTest
             _listHelper.addField("Dataset Fields", index, keyField, null, ListHelper.ListColumnType.Integer);
 
             click(Locator.name("ff_name0"));
-            clickRadioButtonById("button_managedField");
+            click(Locator.radioButtonById("button_managedField"));
             selectOptionByText(Locator.xpath("//select[@id='list_managedField']"), keyField);
             clickButton("Save", WAIT_FOR_JAVASCRIPT);
         }

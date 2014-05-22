@@ -112,7 +112,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         clickManageGroup("Testers");
         setFormElement(Locator.name("names"), AUDIT_TEST_USER);
-        uncheckCheckbox("sendEmail");
+        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
         deleteUsers(true, AUDIT_TEST_USER);
         deleteProject(AUDIT_TEST_PROJECT, true);

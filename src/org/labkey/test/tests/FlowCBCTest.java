@@ -66,7 +66,7 @@ public class FlowCBCTest extends BaseFlowTest
         if (!isElementPresent(Locator.linkWithText("Assay List")))
             addWebPart("Assay List");
         clickButton("New Assay Design");
-        checkRadioButton("providerName", "CBC");
+        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "CBC"));
         clickButton("Next");
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);
 
@@ -111,9 +111,9 @@ public class FlowCBCTest extends BaseFlowTest
 
         // Copy the sample wells to the STUDY_FOLDER
         beginAt("/flow" + getContainerPath() + "/query.view?schemaName=flow&query.queryName=FCSAnalyses");
-        clickCheckbox(".toggle");
+        click(Locator.checkboxByName(".toggle"));
         clickButton("Copy to Study");
-        selectOptionByText("targetStudy", "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
+        selectOptionByText(Locator.name("targetStudy"), "/" + getProjectName() + "/" + STUDY_FOLDER + " (" + STUDY_FOLDER + " Study)");
         clickButton("Next");
         assertTitleContains("Copy to " + STUDY_FOLDER + " Study: Verify Results");
         setFormElement(Locator.name("date", 0), "2012-03-17");

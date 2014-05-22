@@ -248,7 +248,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         int wait = BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
         _test.log("Choose existing protocol " + getProtocolName());
         _test.waitForElement(Locator.xpath("//select[@name='protocol']/option[.='" + getProtocolName() + "']" ), wait*12); // seems very long
-        _test.selectOptionByText("protocol", getProtocolName());
+        _test.selectOptionByText(Locator.name("protocol"), getProtocolName());
         _test.sleep(wait);
 
         _test.log("Start data processing");
@@ -272,7 +272,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
             id = id.substring(id.indexOf('=') + 1);
             _test.popLocation();
 
-            _test.checkCheckbox(".select", id);
+            _test.checkCheckbox(Locator.checkboxByNameAndValue(".select", id));
             _test.clickButton("Delete");
             _test.clickButton("Confirm Delete");
         }

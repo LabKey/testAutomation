@@ -148,7 +148,7 @@ public abstract class AbstractMS2ImportTest extends MS2TestBase
         clickButton("Go");
         selectOptionByText(Locator.name("grouping"), "Standard");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
-        clickMenuButton("Views", "ProteinProphet");
+        _extHelper.clickMenuButton("Views", "ProteinProphet");
         setFilter("MS2Peptides", "ProteinProphetData/ProteinGroupId/GroupProbability", "Is Greater Than", "0.7");
         clickButton("Save View");
         setFormElement(Locator.name("name"), QUERY_PROTEINPROPHET_VIEW_NAME);

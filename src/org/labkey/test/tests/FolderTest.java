@@ -91,7 +91,7 @@ public class FolderTest extends BaseWebDriverTest
         getDriver().manage().window().maximize();
 
         clickButton("Change Display Order");
-        checkRadioButton("resetToAlphabetical", "false");
+        checkCheckbox(Locator.radioButtonByNameAndValue("resetToAlphabetical", "false"));
         selectOptionByText(Locator.name("items"), PROJECT_NAME);
         for(int i = 0; i < 100 && getElementIndex(Locator.xpath("//option[@value='"+PROJECT_NAME+"']")) > 0; i++)
             clickButton("Move Up", 0);

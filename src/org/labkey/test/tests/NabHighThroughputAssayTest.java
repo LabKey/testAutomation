@@ -176,7 +176,7 @@ public class NabHighThroughputAssayTest extends AbstractAssayTest
 
         setFormElement("cutoff1", "50");
         setFormElement("cutoff2", "70");
-        selectOptionByText("curveFitMethod", "Polynomial");
+        selectOptionByText(Locator.name("curveFitMethod"), "Polynomial");
 
         if(metadataFileName != null)
         {

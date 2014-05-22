@@ -159,7 +159,7 @@ public class TimeChartDateBasedTest extends TimeChartTest
         _extHelper.setExtFormElementByType(ADD_MEASURE_DIALOG, "text", "nab");
         sleep(500);
         // Count search results (11 in study's NAb assay)
-        assertEquals("", 11, getXpathCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_DIALOG) + "//div[contains(@class, 'x4-grid-view')]/table/tbody/tr")));
+        assertEquals("", 11, getElementCount(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_DIALOG) + "//div[contains(@class, 'x4-grid-view')]/table/tbody/tr")));
 
         log("Check for appropriate message for measure with no data.");
         _ext4Helper.clickGridRowText("Cutoff Percentage (3)", 0);

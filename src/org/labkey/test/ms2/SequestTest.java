@@ -101,7 +101,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
 
         // Make sure we're not using a custom default view for the current user
-        selectOptionByText("viewParams", "<Standard View>");
+        selectOptionByText(Locator.name("viewParams"), "<Standard View>");
         clickButton("Go");
 
         log("Test filtering and sorting");
@@ -114,10 +114,10 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         clickButton("Save View");
         setFormElement("name", VIEW);
         clickButton("Save View");
-        selectOptionByText("viewParams", "<Standard View>");
+        selectOptionByText(Locator.name("viewParams"), "<Standard View>");
         clickButton("Go");
         assertTextPresent(PEPTIDE);
-        selectOptionByText("viewParams", VIEW);
+        selectOptionByText(Locator.name("viewParams"), VIEW);
         clickButton("Go");
         assertTextNotPresent(PEPTIDE);
         assertTextBefore(PEPTIDE2, PEPTIDE3);
@@ -138,7 +138,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Peptide"));
-        selectOptionByText("viewParams", VIEW);
+        selectOptionByText(Locator.name("viewParams"), VIEW);
         clickButton("Compare");
         assertTextPresent("(Mass > 1000)");
 

@@ -76,7 +76,7 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         clickProject(getProjectName());
         clickButton("Manage Assays");
         clickButton("New Assay Design");
-        checkRadioButton("providerName", "Drug Sensitivity");
+        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "Drug Sensitivity"));
         clickButton("Next");
 
         log("Setting up Drug Sensitivity assay");

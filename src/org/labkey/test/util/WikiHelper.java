@@ -59,9 +59,9 @@ public class WikiHelper extends AbstractHelper
             setSource(body);
 
         if(index)
-            _test.checkCheckbox("shouldIndex");
+            _test.checkCheckbox(Locator.checkboxByName("shouldIndex"));
         else
-            _test.uncheckCheckbox("shouldIndex");
+            _test.uncheckCheckbox(Locator.checkboxByName("shouldIndex"));
 
         if (null != attachment)
         {

@@ -385,10 +385,10 @@ public class SecurityTest extends BaseWebDriverTest
         // test for issue 13921
         goToSiteAdmins();
         setFormElement("names", NORMAL_USER);
-        uncheckCheckbox("sendEmail");
+        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
         assertTextPresent(NORMAL_USER);
-        checkCheckbox("delete", NORMAL_USER);
+        checkCheckbox(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
         clickButton("Update Group Membership", 0);
         assertAlert("Permanently remove selected users from this group?");
         assertElementNotPresent(Locator.checkboxByNameAndValue("delete", NORMAL_USER));
@@ -669,7 +669,7 @@ public class SecurityTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("audit log"));
 
         prepForPageLoad();
-        selectOptionByText("view", "User events");
+        selectOptionByText(Locator.name("view"), "User events");
         waitForPageToLoad();
 
         DataRegionTable table = new DataRegionTable("query", this, false);

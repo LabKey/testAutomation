@@ -139,14 +139,14 @@ public class FlowTest extends BaseFlowTest
 
         importAnalysis_begin( getContainerPath());
         importAnalysis_uploadWorkspace(getContainerPath(), "/8color/workspace.xml");
-        clickRadioButtonById("Previous");
+        click(Locator.radioButtonById("Previous"));
         clickButton("Next");
 
         assertTextPresent("Matched 0 of 59 samples.");
 
         //TODO:  how many to select?
         selectOptionByText(Locator.name("selectedSamples.rows[0.0.1].matchedFile"),"91745.fcs (L02-060120-QUV-JS)" );
-        clickCheckbox("selectedSamples.rows[0.0.1].selected");
+        click(Locator.checkboxByName("selectedSamples.rows[0.0.1].selected"));
         clickButton("Next");
         waitForText("Import Analysis: Analysis Engine");
         clickButton("Next");
@@ -234,7 +234,7 @@ public class FlowTest extends BaseFlowTest
         submit();
 
         clickAndWait(Locator.linkWithText("Define compensation calculation from scratch"));
-        selectOptionByText("selectedRunId", FCS_FILE_1);
+        selectOptionByText(Locator.name("selectedRunId"), FCS_FILE_1);
         submit();
 
         selectOptionByText(Locator.name("positiveKeywordName[3]"), "Comp");
@@ -265,7 +265,7 @@ public class FlowTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText("QUV analysis"));
         clickAndWait(Locator.linkWithText("Analyze some runs"));
 
-        checkCheckbox(".toggle");
+        checkCheckbox(Locator.checkboxByName(".toggle"));
         clickButton("Analyze selected runs");
         setFormElement("ff_analysisName", "FlowExperiment2");
         submit();
@@ -305,9 +305,9 @@ public class FlowTest extends BaseFlowTest
 
         clickAndWait(Locator.linkWithText("91918.fcs"));
         clickAndWait(Locator.linkWithText("More Graphs"));
-        selectOptionByText("subset", "Singlets/L/Live/3+/4+");
-        selectOptionByText("xaxis", "comp-PE Cy7-A IFNg");
-        selectOptionByText("yaxis", "comp-PE Green laser-A IL2");
+        selectOptionByText(Locator.name("subset"), "Singlets/L/Live/3+/4+");
+        selectOptionByText(Locator.name("xaxis"), "comp-PE Cy7-A IFNg");
+        selectOptionByText(Locator.name("yaxis"), "comp-PE Green laser-A IL2");
         clickButtonWithText("Show Graph");
 
         // change the name of an analysis
@@ -351,23 +351,23 @@ public class FlowTest extends BaseFlowTest
 
         assertEquals(1, countEnabledInputs(SELECT_CHECKBOX_NAME));
         prepForPageLoad();
-        selectOptionByText("ff_compensationMatrixOption", "Matrix: " + FCS_FILE_1 + " comp matrix");
+        selectOptionByText(Locator.name("ff_compensationMatrixOption"), "Matrix: " + FCS_FILE_1 + " comp matrix");
         waitForPageToLoad();
 
-        checkCheckbox(".toggle");
+        checkCheckbox(Locator.checkboxByName(".toggle"));
         clickButton("Analyze selected runs");
         waitForPipeline(getContainerPath());
 
         clickAndWait(Locator.linkWithText("Flow Dashboard"));
         clickAndWait(Locator.linkWithText("FlowExperiment2"));
-        clickMenuButton("Query", query1);
+        _extHelper.clickMenuButton("Query", query1);
         assertTextPresent("File Path Root");
 
         setSelectedFields(getContainerPath(), "flow", query1, "MostColumns", new String[] {"RowId", "Count","WellCount"});
         setSelectedFields(getContainerPath(), "flow", query1, "AllColumns", new String[] {"RowId", "Count","WellCount", "FilePathRoot"});
-        clickMenuButton("Views", "MostColumns");
+        _extHelper.clickMenuButton("Views", "MostColumns");
         assertTextNotPresent("File Path Root");
-        clickMenuButton("Views", "AllColumns");
+        _extHelper.clickMenuButton("Views", "AllColumns");
         assertTextPresent("File Path Root");
     }
 

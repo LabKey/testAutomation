@@ -77,7 +77,7 @@ public class LuminexEC50Test extends LuminexRTransformTest
         // quick check to see if we are using 32-bit or 64-bit R
         log("Checking R 32-bit vs 64-bit");
         pushLocation();
-        clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Views", "Create", "R View");
         boolean is64bit = _rReportHelper.executeScript("print(.Machine$sizeof.pointer)", "[1] 8", true);
         _rReportHelper.clickSourceTab();
         _rReportHelper.saveReport("dummy");

@@ -140,7 +140,7 @@ public class SequenceTest extends BaseWebDriverTest
         //verify CSV file creation
         DataRegionTable dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
-        clickMenuButton("More Actions", "Create Illumina Sample Sheet");
+        _extHelper.clickMenuButton("More Actions", "Create Illumina Sample Sheet");
 
         waitForText("You have chosen to export " + _readsetCt + " samples");
         _helper.waitForField("Investigator Name");

@@ -185,8 +185,8 @@ public class LuminexMultipleCurvesTest extends LuminexTest
     {
         String checkboxName = "titration_" + analyte + "_" + standard;
         if(checked)
-            checkCheckbox(checkboxName);
+            checkCheckbox(Locator.checkboxByName(checkboxName));
         else
-            uncheckCheckbox(checkboxName);
+            uncheckCheckbox(Locator.checkboxByName(checkboxName));
     }
 }

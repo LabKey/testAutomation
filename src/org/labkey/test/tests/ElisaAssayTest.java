@@ -85,7 +85,7 @@ public class ElisaAssayTest extends ElispotAssayTest
         clickProject(TEST_ASSAY_PRJ_ELISA);
         clickButton("Manage Assays");
         clickButton("New Assay Design");
-        checkRadioButton("providerName", "ELISA");
+        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "ELISA"));
         clickButton("Next");
 
         log("Setting up ELISA assay");

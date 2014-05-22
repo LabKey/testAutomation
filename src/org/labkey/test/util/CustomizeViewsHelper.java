@@ -109,7 +109,7 @@ public class CustomizeViewsHelper extends AbstractHelper
         _test._extHelper.waitForExtDialog("Save Custom View");
         
         if(shared)
-            _test.checkCheckbox("saveCustomView_shared");
+            _test.checkCheckbox(Locator.checkboxByName("saveCustomView_shared"));
 
         if (name != null)
         {
@@ -307,7 +307,7 @@ public class CustomizeViewsHelper extends AbstractHelper
 
         // XXX: why doesn't 'clauseIndex' work?
         String clauseXPath = itemXPath + "//tr[@clauseindex]";
-        int clauseCount = _test.getXpathCount(new Locator.XPathLocator(clauseXPath));
+        int clauseCount = _test.getElementCount(new Locator.XPathLocator(clauseXPath));
 
         String newClauseXPath = clauseXPath + "[" + clauseCount + "]";
         _test.assertElementPresent(Locator.xpath(newClauseXPath));
@@ -682,7 +682,7 @@ public class CustomizeViewsHelper extends AbstractHelper
     public void createRView(String view, String name, boolean shareView)
     {
         _test.waitForText(("Views"));
-        _test.clickMenuButton("Views", "Create", "R View");
+        _test._extHelper.clickMenuButton("Views", "Create", "R View");
 
         if(view!=null)
             fail("Unimplemented");

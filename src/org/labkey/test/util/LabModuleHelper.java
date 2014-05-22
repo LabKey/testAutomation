@@ -64,7 +64,7 @@ public class LabModuleHelper
         //copied from old test
         _test.goToManageAssays();
         _test.clickButton("New Assay Design");
-        _test.checkRadioButton("providerName", provider);
+        _test.checkCheckbox(Locator.radioButtonByNameAndValue("providerName", provider));
         _test.clickButton("Next");
 
         Locator l = Locator.xpath("//input[@id='AssayDesignerName']");

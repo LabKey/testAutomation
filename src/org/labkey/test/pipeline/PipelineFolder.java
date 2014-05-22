@@ -200,9 +200,9 @@ public class PipelineFolder
         private void check(String name, boolean check)
         {
             if (check)
-                _test.checkCheckbox(name);
+                _test.checkCheckbox(Locator.checkboxByName(name));
             else
-                _test.uncheckCheckbox(name);
+                _test.uncheckCheckbox(Locator.checkboxByName(name));
         }
 
         public boolean isNotifyOnSuccess()

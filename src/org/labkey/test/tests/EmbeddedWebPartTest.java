@@ -86,7 +86,7 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
 
         resetTracker.startTrackingRefresh();
 
-        clickMenuButtonAndContinue("Views", rViewName);
+        _extHelper.clickMenuButton(false, "Views", rViewName);
 
         resetTracker.assertWasNotRefreshed();
     }

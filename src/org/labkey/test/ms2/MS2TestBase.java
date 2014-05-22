@@ -16,7 +16,6 @@
 
 package org.labkey.test.ms2;
 
-import org.junit.Test;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
@@ -99,7 +98,7 @@ abstract public class MS2TestBase extends BaseWebDriverTest
                 log("Deleting View " + viewName);
                 if (isTextPresent(viewName))
                 {
-                    checkCheckbox("viewsToDelete", viewName);
+                    checkCheckbox(Locator.checkboxByNameAndValue("viewsToDelete", viewName));
                 }
             }
             clickButton("OK");
@@ -114,11 +113,11 @@ abstract public class MS2TestBase extends BaseWebDriverTest
 
         clickAndWait(Locator.linkWithText("MS2 Runs"));
         prepForPageLoad();
-        selectOptionByText("experimentRunFilter", "All Runs");
+        selectOptionByText(Locator.name("experimentRunFilter"), "All Runs");
         waitForPageToLoad();
         if (!isTextPresent("No data to show"))
         {
-            checkCheckbox(".toggle");
+            checkCheckbox(Locator.checkboxByName(".toggle"));
             clickButton("Delete");
 
             log("Confirm deletion");

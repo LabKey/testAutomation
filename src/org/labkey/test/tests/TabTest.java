@@ -289,7 +289,7 @@ public class TabTest extends SimpleModuleTest
         assertElementNotPresent(Locator.linkWithText(ASSAY_FOLDER_TAB_LABEL));
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
-        checkRadioButton("folderType", TABBED_FOLDER_TYPE);
+        checkCheckbox(Locator.radioButtonByNameAndValue("folderType", TABBED_FOLDER_TYPE));
         clickButton("Update Folder");
 
         // Verify that subfolders got moved into tabs
@@ -310,7 +310,7 @@ public class TabTest extends SimpleModuleTest
         clickFolder(COLLAB_FOLDER);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
-        checkRadioButton("folderType", "Collaboration");
+        checkCheckbox(Locator.radioButtonByNameAndValue("folderType", "Collaboration"));
         clickButton("Update Folder");
 
         // Study and Assay should be hidden now
@@ -320,7 +320,7 @@ public class TabTest extends SimpleModuleTest
         clickFolder(COLLAB_FOLDER);
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Folder Type"));
-        checkRadioButton("folderType", TABBED_FOLDER_TYPE);
+        checkCheckbox(Locator.radioButtonByNameAndValue("folderType", TABBED_FOLDER_TYPE));
         clickButton("Update Folder");
 
         // Verify that folder tabs are back

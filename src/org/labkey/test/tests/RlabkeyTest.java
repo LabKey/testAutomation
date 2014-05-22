@@ -63,7 +63,7 @@ public class RlabkeyTest extends SimpleApiTest
         clickProject(PROJECT_NAME);
         portalHelper.addWebPart("Issues List");
         clickButton("Admin");
-        uncheckCheckbox("requiredFields", "AssignedTo");
+        uncheckCheckbox(Locator.checkboxByNameAndValue("requiredFields", "AssignedTo"));
         clickButton("Update");
         clickButton("Back to Issues");
         clickButton("New Issue");
@@ -74,7 +74,7 @@ public class RlabkeyTest extends SimpleApiTest
         clickFolder(FOLDER_NAME);
         portalHelper.addWebPart("Issues List");
         clickButton("Admin");
-        uncheckCheckbox("requiredFields", "AssignedTo");
+        uncheckCheckbox(Locator.checkboxByNameAndValue("requiredFields", "AssignedTo"));
         clickButton("Update");
         clickButton("Back to Issues");
         clickButton("New Issue");
@@ -84,7 +84,7 @@ public class RlabkeyTest extends SimpleApiTest
         clickProject(PROJECT_NAME_2);
         addWebPart("Issues List");
         clickButton("Admin");
-        uncheckCheckbox("requiredFields", "AssignedTo");
+        uncheckCheckbox(Locator.checkboxByNameAndValue("requiredFields", "AssignedTo"));
         clickButton("Update");
         clickButton("Back to Issues");
         clickButton("New Issue");
@@ -107,7 +107,7 @@ public class RlabkeyTest extends SimpleApiTest
             {
                 clickProject(PROJECT_NAME);
                 clickAndWait(Locator.linkWithText(LIST_NAME));
-                clickMenuButton("Views", "Create", "R View");
+                _extHelper.clickMenuButton("Views", "Create", "R View");
 
                 // we want to load the Rlabkey package from the override location
                 File libPath = new File(getLabKeyRoot() + "/sampledata/rlabkey");

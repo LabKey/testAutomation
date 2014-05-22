@@ -125,7 +125,7 @@ public class BoxPlotTest extends GenericChartsTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("RCH-1: Reactogenicity-Day 1"));
         setFilter("Dataset", "RCHtempc", "Is Less Than", "39");
-        clickMenuButton("Charts", "Create Box Plot");
+        _extHelper.clickMenuButton("Charts", "Create Box Plot");
 
         _extHelper.waitForExtDialog("Y Axis");
         waitForText("2.Body temperature", WAIT_FOR_JAVASCRIPT);

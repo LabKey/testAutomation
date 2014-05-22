@@ -52,7 +52,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
 
         //only select if not already checked
         if (!("true".equals(checkbox.getAttribute("checked"))))
-            clickCheckbox("showRibbonMessage");
+            click(Locator.checkboxByName("showRibbonMessage"));
 
         clickButton("Save");
 
@@ -64,7 +64,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         //only check if not already checked
         checkbox = Locator.checkboxByName("showRibbonMessage").findElement(getDriver());
         if (!("true".equals(checkbox.getAttribute("checked"))))
-            clickCheckbox("showRibbonMessage");
+            click(Locator.checkboxByName("showRibbonMessage"));
 
         setFormElement(Locator.name("ribbonMessageHtml"), html);
         clickButton("Save");
@@ -95,7 +95,7 @@ public class AdminConsoleTest extends BaseWebDriverTest
         goToAdminConsole();
         waitAndClick(Locator.linkContainingText("site settings"));
         waitForElement(Locator.name("showRibbonMessage"));
-        clickCheckbox("showRibbonMessage");  //deactivate
+        click(Locator.checkboxByName("showRibbonMessage"));
         clickButton("Save");
         waitForElement(Locator.linkContainingText("site settings"));
         assertElementNotPresent(ribbon);

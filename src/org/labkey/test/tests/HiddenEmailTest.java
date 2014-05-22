@@ -83,7 +83,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         pushLocation();
         goToSiteAdmins();
         setFormElement(Locator.xpath("//textarea[@name='names']"), ADMIN_USER);
-        uncheckCheckbox("sendEmail");
+        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
         assertTextPresent(ADMIN_USER);
         clickButton("Update Group Membership");
@@ -158,12 +158,12 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         clickProject(getProjectName());
 
         log("Verify that emails cannot be seen in query webpart");
-        clickMenuButton("Views", EMAIL_VIEW);
+        _extHelper.clickMenuButton("Views", EMAIL_VIEW);
         assertTextNotPresent(CHECKED_USER, ADMIN_USER);
 
         log("Verify that emails cannot be seen in list via lookup");
         clickAndWait(Locator.linkWithText(EMAIL_TEST_LIST));
-        clickMenuButton("Views", EMAIL_VIEW);
+        _extHelper.clickMenuButton("Views", EMAIL_VIEW);
         assertTextNotPresent(CHECKED_USER, ADMIN_USER);
 
         stopImpersonating();

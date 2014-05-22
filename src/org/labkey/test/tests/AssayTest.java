@@ -232,7 +232,7 @@ public class AssayTest extends AbstractAssayTest
         assertElementPresent(Locator.xpath("//img[@src='/labkey/Experiment/unflagDefault.gif'][@title='Flag for review']"), 8);
 
         // Try a delete
-        checkCheckbox(".select");
+        checkCheckbox(Locator.checkboxByName(".select"));
         prepForPageLoad();
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected row?");

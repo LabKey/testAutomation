@@ -44,12 +44,12 @@ public class EmailRecordTable extends DataRegionTable
 
     public void startRecording()
     {
-        _test.checkCheckbox(RECORDER_CHECKBOX_NAME);
+        _test.checkCheckbox(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
     }
 
     public void stopRecording()
     {
-        _test.uncheckCheckbox(RECORDER_CHECKBOX_NAME);
+        _test.uncheckCheckbox(Locator.checkboxByName(RECORDER_CHECKBOX_NAME));
     }
 
     public void saveRecorderState()

@@ -47,7 +47,7 @@ public class MS2GZTest extends AbstractMS2ImportTest
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("ProteinProphet (Legacy)"));
-        selectOptionByText("viewParams", LEGACY_PROTEIN_PROPHET_VIEW_NAME);
+        selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_PROPHET_VIEW_NAME);
         clickButton("Compare");
         assertTextPresent("(GroupProbability > 0.7)");
         assertTextNotPresent("gi|30089158|emb|CAD89505.1|");
@@ -67,8 +67,8 @@ public class MS2GZTest extends AbstractMS2ImportTest
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("ProteinProphet (Legacy)"));
-        checkCheckbox("light2HeavyRatioMean");
-        uncheckCheckbox("groupProbability");
+        checkCheckbox(Locator.checkboxByName("light2HeavyRatioMean"));
+        uncheckCheckbox(Locator.checkboxByName("groupProbability"));
         clickButton("Compare");
         assertTextPresent("ratiomean");
         assertTextNotPresent("GroupProbability");
@@ -80,8 +80,8 @@ public class MS2GZTest extends AbstractMS2ImportTest
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Search Engine Protein"));
-        selectOptionByText("viewParams", LEGACY_PROTEIN_VIEW_NAME);
-        checkCheckbox("total");
+        selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_VIEW_NAME);
+        checkCheckbox(Locator.checkboxByName("total"));
         clickButton("Compare");
         assertTextPresent("(SequenceMass > 20000)");
         assertTextPresent("(DeltaMass > 0.0)");
@@ -100,7 +100,7 @@ public class MS2GZTest extends AbstractMS2ImportTest
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Peptide (Legacy)"));
-        selectOptionByText("viewParams", LEGACY_PROTEIN_VIEW_NAME);
+        selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_VIEW_NAME);
         clickButton("Compare");
         assertTextPresent("(DeltaMass > 0.0)");
         assertTextNotPresent("R.TIDPVIAR.K");

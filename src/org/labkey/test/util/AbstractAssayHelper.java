@@ -95,7 +95,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     //TODO:  best location for this?
     private int getLastPropertyFieldNumber()
     {
-        int count = _test.getXpathCount(Locator.xpath("//input[contains(@name, 'ff_name')]"));
+        int count = _test.getElementCount(Locator.xpath("//input[contains(@name, 'ff_name')]"));
         Locator l = Locator.xpath("(//input[contains(@name, 'ff_name')])["+count + "]");
         _test.isElementPresent(l);
         String name = _test.getAttribute(l,  "name");
@@ -152,7 +152,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
         if (transformScript.exists())
         {
             _test.waitForElement(Locator.navButton("Add Script"));
-            int index = _test.getXpathCount(Locator.xpath("//input[starts-with(@id, 'AssayDesignerTransformScript')]"));
+            int index = _test.getElementCount(Locator.xpath("//input[starts-with(@id, 'AssayDesignerTransformScript')]"));
             _test.clickButton("Add Script", 0);
             _test.setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
         }

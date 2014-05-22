@@ -616,7 +616,7 @@ public class FilterTest extends ListTest
             checkFilterWasApplied(textPresentAfterFilter, textNotPresentAfterFilter, columnName, filter1Type, filter1, filter2Type, filter2);
 
             log("** Checking filter present in R view");
-            clickMenuButton("Views", R_VIEW);
+            _extHelper.clickMenuButton("Views", R_VIEW);
         }
         else
             beginAt(url);
@@ -628,7 +628,7 @@ public class FilterTest extends ListTest
         if(url==null)
         {
 
-            clickMenuButton("Views", "default");
+            _extHelper.clickMenuButton("Views", "default");
 
             //open filter
             log("** Checking filter values in filter dialog");

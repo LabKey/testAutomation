@@ -96,7 +96,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         clickProject(TEST_ASSAY_PRJ_ELISPOT);
         clickButton("Manage Assays");
         clickButton("New Assay Design");
-        checkRadioButton("providerName", "ELISpot");
+        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "ELISpot"));
         clickButton("Next");
 
         log("Setting up Elispot assay");
@@ -149,7 +149,7 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
     protected void uploadFile(String filePath, String uniqueifier, String finalButton, boolean testPrepopulation, boolean subtractBackground)
     {
         if(subtractBackground)
-            checkCheckbox("subtractBackground");
+            checkCheckbox(Locator.checkboxByName("subtractBackground"));
         for (int i = 0; i < 4; i++)
         {
             Locator specimenLocator = Locator.name("specimen" + (i + 1) + "_ParticipantID");
@@ -284,19 +284,19 @@ public class ElispotAssayTest extends AbstractPlateBasedAssayTest
         _customizeViewsHelper.removeCustomizeViewColumn("Antigen 8_Median");
         _customizeViewsHelper.saveCustomView("Without Antigen7&8");
 
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.removeCustomizeViewColumn("Antigen 7_Mean");
         _customizeViewsHelper.removeCustomizeViewColumn("Antigen 7_Median");
         _customizeViewsHelper.saveDefaultView();
 
-        clickMenuButton("Views", "Without Antigen7&8");
+        _extHelper.clickMenuButton("Views", "Without Antigen7&8");
         assertTextNotPresent("Antigen 7 Mean");
         assertTextNotPresent("Antigen 7 Median");
         assertTextNotPresent("Antigen 8 Mean");
         assertTextNotPresent("Antigen 8 Median");
-        
-        clickMenuButton("Views", "default");
+
+        _extHelper.clickMenuButton("Views", "default");
         assertTextNotPresent("Antigen 7 Mean");
         assertTextNotPresent("Antigen 7 Median");
         assertTextPresent("Antigen 8 Mean");

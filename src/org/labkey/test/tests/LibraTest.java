@@ -93,7 +93,7 @@ public class LibraTest extends MS2TestBase
         waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Spectra Count"));
-        clickRadioButtonById("SpectraCountPeptide");
+        click(Locator.radioButtonById("SpectraCountPeptide"));
         clickButton("Compare");
         assertTextPresent("-.MM'EILRGSPALSAFR.I");
         assertElementPresent(Locator.linkWithText("itraq/iTRAQ (Libra)"), 27);
@@ -130,7 +130,7 @@ public class LibraTest extends MS2TestBase
         _customizeViewsHelper.addCustomizeViewFilter("Hyper", "Hyper", "Is Greater Than", "250");
         assertRadioButtonSelected(Locator.radioButtonByNameAndValue("spectraConfig", "SpectraCountPeptide"));
         _customizeViewsHelper.saveCustomView("HyperFilter");
-        clickRadioButtonById("SpectraCountPeptideCharge");
+        click(Locator.radioButtonById("SpectraCountPeptideCharge"));
         selectOptionByText(Locator.id("PeptidesFilter.viewName"), "HyperFilter");
         setFormElement("targetProtein", "");
         clickButton("Compare");
@@ -207,7 +207,7 @@ public class LibraTest extends MS2TestBase
 
     private void proteinProphetTest()
     {
-        clickMenuButton("Views", "ProteinProphet");
+        _extHelper.clickMenuButton("Views", "ProteinProphet");
 
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
         _customizeViewsHelper.openCustomizeViewPanel();

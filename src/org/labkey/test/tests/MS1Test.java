@@ -244,7 +244,7 @@ public class MS1Test extends BaseWebDriverTest
         addWebPart("Peptide Search");
 
         setFormElement("pepSeq", "EASGDLPEAQIVK, AVVQDPALKPLALVYGEATSR");
-        uncheckCheckbox("exact");
+        uncheckCheckbox(Locator.checkboxByName("exact"));
         clickButton("Search");
 
         //other scans should also be there
@@ -255,7 +255,7 @@ public class MS1Test extends BaseWebDriverTest
         assertTextPresent("K.E^ASGDLPEAQIVK.H");
 
         //make sure that an exact search doesn't find peptides with modifiers
-        checkCheckbox("exact");
+        checkCheckbox(Locator.checkboxByName("exact"));
         clickButton("Search");
         assertTextNotPresent("K.E^ASGDLPEAQIVK.H");
 
@@ -285,14 +285,14 @@ public class MS1Test extends BaseWebDriverTest
         assertTextPresent("1904");
 
         setFormElement("mzOffset", "100");
-        selectOptionByValue("mzUnits", "mz");
+        selectOptionByValue(Locator.name("mzUnits"), "mz");
         clickButton("Search");
 
         assertTextPresent("1888");
         assertTextPresent("1921");
         assertTextPresent("1976");
 
-        selectOptionByValue("timeUnits", "scans");
+        selectOptionByValue(Locator.name("timeUnits"), "scans");
         assertFormElementEquals("timeSource", "1948");
         setFormElement("timeOffset", "2");
         clickButton("Search");
@@ -364,7 +364,7 @@ public class MS1Test extends BaseWebDriverTest
         assertTextBefore("0.9956", "0.9862");
 
         //switch back to default view
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
         assertTextNotPresent("PepProphet");
         assertTextNotPresent("Protein");
         assertTextNotPresent("18protmix|P46406|G3P_RABIT");

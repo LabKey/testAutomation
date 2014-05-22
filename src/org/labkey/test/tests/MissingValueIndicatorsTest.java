@@ -239,7 +239,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
     private void deleteListData(int rowCount)
     {
-        checkCheckbox(".toggle");
+        checkCheckbox(Locator.checkboxByName(".toggle"));
         prepForPageLoad();
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected row" + (rowCount == 1 ? "?" : "s?"));
@@ -394,7 +394,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickAndWait(Locator.linkWithText(ASSAY_RUN_SINGLE_COLUMN));
         validateSingleColumnData();
-        checkCheckbox(".toggle");
+        checkCheckbox(Locator.checkboxByName(".toggle"));
         clickButton("Copy to Study");
         
         clickButton("Next");
@@ -410,14 +410,14 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         clickButton("Next");
         setFormElement(Locator.name("name"), ASSAY_EXCEL_RUN_SINGLE_COLUMN);
-        checkRadioButton("dataCollectorName", "File upload");
+        checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
 
         File file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE_BAD);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Save and Finish");
         assertLabkeyErrorPresent();
 
-        checkRadioButton("dataCollectorName", "File upload");
+        checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
         file = new File(ASSAY_SINGLE_COLUMN_EXCEL_FILE);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Save and Finish");
@@ -433,13 +433,13 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
         clickButton("Next");
         setFormElement(Locator.name("name"), ASSAY_EXCEL_RUN_TWO_COLUMN);
-        checkRadioButton("dataCollectorName", "File upload");
+        checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
         file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE_BAD);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Save and Finish");
         assertLabkeyErrorPresent();
 
-        checkRadioButton("dataCollectorName", "File upload");
+        checkCheckbox(Locator.radioButtonByNameAndValue("dataCollectorName", "File upload"));
         file = new File(ASSAY_TWO_COLUMN_EXCEL_FILE);
         setFormElement(Locator.name("__primaryFile__"), file);
         clickButton("Save and Finish");
@@ -469,7 +469,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
         //copied from old test
         clickButton("Manage Assays");
         clickButton("New Assay Design");
-        checkRadioButton("providerName", "General");
+        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "General"));
         clickButton("Next");
 
         waitForElement(Locator.id("AssayDesignerName"), WAIT_FOR_JAVASCRIPT);
@@ -495,7 +495,7 @@ public class MissingValueIndicatorsTest extends BaseWebDriverTest
 
     private void deleteDatasetData(int rowCount)
     {
-        checkCheckbox(".toggle");
+        checkCheckbox(Locator.checkboxByName(".toggle"));
         prepForPageLoad();
         clickButton("Delete", 0);
         assertAlert("Delete selected row" + (1 == rowCount ? "" : "s") + " from this dataset?");

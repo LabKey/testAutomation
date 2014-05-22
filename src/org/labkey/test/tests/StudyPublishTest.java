@@ -258,7 +258,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
 
         //Assert webparts/wikis are present
         waitForElement(Locator.xpath("//table[@name='webpart']"));
-        assert(getXpathCount(Locator.xpath("//table[@name='webpart']")) == 7);
+        assert(getElementCount(Locator.xpath("//table[@name='webpart']")) == 7);
         assertTextPresent("Test Wiki Title");
 
         //assert the added module is present
@@ -287,9 +287,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Verify correct published datasets
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         if (datasets.length > 0)
-            assertEquals("Unexpected number of datasets", datasets.length + dependentDatasets.length, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
+            assertEquals("Unexpected number of datasets", datasets.length + dependentDatasets.length, getElementCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
         else // All visits were published
-            assertEquals("Unexpected number of datasets", datasetCount, getXpathCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
+            assertEquals("Unexpected number of datasets", datasetCount, getElementCount(Locator.xpath("//td[contains(@class, 'datasets')]//tr")) - 1);
         for (String dataset: datasets)
         {
             pushLocation();
@@ -313,9 +313,9 @@ public class StudyPublishTest extends StudyProtectedExportTest
         goToManageStudy();
         clickAndWait(Locator.linkWithText("Manage Visits"));
         if (visits.length > 0)
-            assertEquals("Unexpected number of visits", visits.length, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
+            assertEquals("Unexpected number of visits", visits.length, getElementCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
         else // All visits were published
-            assertEquals("Unexpected number of visits", visitCount, getXpathCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
+            assertEquals("Unexpected number of visits", visitCount, getElementCount(Locator.xpath("//table[@id = 'visits']/tbody/tr")) - 1);
         for (String visit: visits)
         {
             assertTextPresent(visit);
@@ -360,7 +360,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
             }
 
             String viewXpath = "//tr[contains(@class, 'x4-grid-tree-node-leaf')]";
-            assertEquals("Unexpected number of views/reports", views.length + reports.length, getXpathCount(Locator.xpath(viewXpath)));
+            assertEquals("Unexpected number of views/reports", views.length + reports.length, getElementCount(Locator.xpath(viewXpath)));
         }
 
         // Verify published reports/views
@@ -433,7 +433,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         {
             goToModule("List");
             assertTextPresent(lists);
-            assertEquals("Unexpected number of lists", lists.length, getXpathCount(Locator.xpath("id('lists')//tr")));
+            assertEquals("Unexpected number of lists", lists.length, getElementCount(Locator.xpath("id('lists')//tr")));
             for (String list : lists)
             {
                 pushLocation();
@@ -606,7 +606,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
             _extHelper.waitForExtDialog("Error");
             assertTextPresent("You must select at least one Mouse group.");
             _extHelper.clickExtButton("Error", "OK", 0);
-            checkRadioButton("renderType", "existing");
+            checkCheckbox(Locator.radioButtonByNameAndValue("renderType", "existing"));
             for (String group : groups)
             {
                 _extHelper.selectExtGridItem("label", group, -1, "studyWizardParticipantList", true);
@@ -615,7 +615,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         }
         else
         {
-            checkRadioButton("renderType", "all");
+            checkCheckbox(Locator.radioButtonByNameAndValue("renderType", "all"));
         }
         clickButton("Next", 0);
 
@@ -648,7 +648,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         // Wizard page 5 : Specimens
         waitForElement(Locator.xpath("//div[@class = 'labkey-nav-page-header'][text() = 'Specimens']"));
         if (!includeSpecimens) uncheckCheckbox(Locator.name("includeSpecimens"));
-        if (refreshSpecimens) checkRadioButton("specimenRefresh", "true");
+        if (refreshSpecimens) checkCheckbox(Locator.radioButtonByNameAndValue("specimenRefresh", "true"));
         clickButton("Next", 0);
 
         // Wizard Page 6 : Study Objects

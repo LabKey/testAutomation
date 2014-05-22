@@ -106,7 +106,7 @@ public class CohortTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText("Reports"));
         clickButtonByIndex("View", 2); // Specimen Report: Type By Cohort
         assertTextPresent("Specimen Report: Type By Cohort");
-        checkCheckbox("viewPtidList");
+        checkCheckbox(Locator.checkboxByName("viewPtidList"));
         clickButton("Refresh");
         assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE), TABLE_NEGATIVE);
         assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_POSITIVE), TABLE_POSITIVE);
@@ -201,8 +201,8 @@ public class CohortTest extends BaseWebDriverTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("Change Visit Order"));
-        checkCheckbox("explicitChronologicalOrder");
-        checkCheckbox("explicitDisplayOrder");
+        checkCheckbox(Locator.checkboxByName("explicitChronologicalOrder"));
+        checkCheckbox(Locator.checkboxByName("explicitDisplayOrder"));
         selectOptionByText(Locator.name("displayOrderItems"), "Visit 3");
         clickButtonByIndex("Move Up", 0, 0);
         clickButtonByIndex("Move Up", 0, 0);
@@ -214,7 +214,7 @@ public class CohortTest extends BaseWebDriverTest
         click(Locator.tagContainingText("span", "Specimen Reports")); // expand
         clickAndWait(Locator.linkWithText("View Available Reports"));
         clickButtonByIndex("View", 2);
-        checkCheckbox("viewPtidList");
+        checkCheckbox(Locator.checkboxByName("viewPtidList"));
         clickButton("Refresh");
         assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE), TABLE_NEGATIVE);
         assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_POSITIVE), TABLE_POSITIVE);
@@ -295,7 +295,7 @@ public class CohortTest extends BaseWebDriverTest
 
         clickButtonByIndex("View", 2); // Specimen Report: Type By Cohort
         assertTextPresent("Specimen Report: Type By Cohort");
-        checkCheckbox("viewPtidList");
+        checkCheckbox(Locator.checkboxByName("viewPtidList"));
         clickButton("Refresh");
 
         // Basic cohorts should be determined only by the most recent cohort assignment.

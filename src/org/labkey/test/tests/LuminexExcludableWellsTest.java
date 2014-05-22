@@ -143,7 +143,7 @@ public class LuminexExcludableWellsTest extends LuminexTest
 
         String exclusionComment = "exclude single analyte for single well";
         setFormElement(EXCLUDE_COMMENT_FIELD, exclusionComment);
-        clickRadioButtonById(EXCLUDE_SELECTED_BUTTON);
+        click(Locator.radioButtonById(EXCLUDE_SELECTED_BUTTON));
         clickExcludeAnalyteCheckBox(excludedAnalyte);
         clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
 

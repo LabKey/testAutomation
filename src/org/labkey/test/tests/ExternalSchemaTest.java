@@ -19,7 +19,6 @@ package org.labkey.test.tests;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.protocol.HttpContext;
@@ -181,9 +180,9 @@ public class ExternalSchemaTest extends BaseWebDriverTest
         beginAt("/query/" + containerPath + "/admin.view");
         clickAndWait(Locator.linkWithText("edit"));
         if (editable)
-            checkCheckbox("editable");
+            checkCheckbox(Locator.checkboxByName("editable"));
         else
-            uncheckCheckbox("editable");
+            uncheckCheckbox(Locator.checkboxByName("editable"));
         clickButton("Update");
     }
 

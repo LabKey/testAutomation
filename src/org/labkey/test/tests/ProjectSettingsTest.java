@@ -90,7 +90,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
 
         //change global settings to exclude help link
         goToSiteLookAndFeel();
-        clickCheckbox("enableHelpMenu");
+        click(Locator.checkboxByName("enableHelpMenu"));
         clickButtonContainingText("Save");
 
 
@@ -100,7 +100,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
 
         //change proj 2 to exclude both help and suport
         goToProjectSettings(getProjectAltertedName());
-        uncheckCheckbox("enableHelpMenu");
+        uncheckCheckbox(Locator.checkboxByName("enableHelpMenu"));
         clickButtonContainingText("Save");
 
         //assert help link itself gone
@@ -111,7 +111,7 @@ public class ProjectSettingsTest extends BaseWebDriverTest
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
         goToSiteLookAndFeel();
-        checkCheckbox("enableHelpMenu");
+        checkCheckbox(Locator.checkboxByName("enableHelpMenu"));
         clickButtonContainingText("Save");
 
         deleteProject(getProjectName(), afterTest);

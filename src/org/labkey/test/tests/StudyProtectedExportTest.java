@@ -86,9 +86,9 @@ public class StudyProtectedExportTest extends StudyExportTest
         clickAndWait(Locator.linkContainingText("LLS-2"));
         DataRegionTable drt = new DataRegionTable( "Dataset", this);
         assertEquals("unexpected number of rows on initial viewing", 5, drt.getDataRowCount());
-        clickMenuButton("Mouse Groups", "Cohorts", "Group 1");
+        _extHelper.clickMenuButton("Mouse Groups", "Cohorts", "Group 1");
         assertEquals("unexpected number of rows for group 1", 3, drt.getDataRowCount());
-        clickMenuButton("Mouse Groups", "Cohorts", "Group 2");
+        _extHelper.clickMenuButton("Mouse Groups", "Cohorts", "Group 2");
         assertEquals("unexpected number of rows for cohort 2", 2, drt.getDataRowCount());
     }
 
@@ -116,7 +116,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         _fileBrowserHelper.selectFileBrowserItem("export/");
         Locator.XPathLocator fileRow = Locator.tag("tr").withClass("x4-grid-data-row").withAttributeContaining("data-recordid", "My Study_");
         waitForElement(fileRow);
-        int exportCount = getXpathCount(fileRow);
+        int exportCount = getElementCount(fileRow);
         fileRow = fileRow.index(exportCount - 1); // get most recent export
         waitForElement(fileRow);
         click(fileRow);
@@ -229,7 +229,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Locations"));
         foundClinics = 0;
-        rowCount = getXpathCount(Locator.xpath("id('manageLocationsTable')/tbody/tr"));
+        rowCount = getElementCount(Locator.xpath("id('manageLocationsTable')/tbody/tr"));
         for (int i = 2; i <= rowCount - 2; i++) // skip header row; Stop before Add Location row & Save/Cancel button row
         {
             Locator.XPathLocator rowLoc = Locator.xpath("id('manageLocationsTable')/tbody/tr["+i+"]");
@@ -277,7 +277,7 @@ public class StudyProtectedExportTest extends StudyExportTest
     private void setColumnProtected()
     {
         click(Locator.tagContainingText("span", "Advanced"));
-        checkCheckbox("protected");
+        checkCheckbox(Locator.checkboxByName("protected"));
     }
 
     String[] defaultStatsToCollect = {"Mouse Id", "Contact Date"};

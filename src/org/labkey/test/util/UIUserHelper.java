@@ -36,8 +36,8 @@ public class UIUserHelper extends AbstractUserHelper
             _test.clickButton("Add Users");
 
             _test.setFormElement(Locator.name("newUsers"), userName);
-            _test.uncheckCheckbox("sendMail");
-//            if (cloneUserName != null)
+        _test.uncheckCheckbox(Locator.checkboxByName("sendMail"));
+        //            if (cloneUserName != null)
 //            {
 //                checkCheckbox("cloneUserCheck");
 //                setFormElement("cloneUser", cloneUserName);

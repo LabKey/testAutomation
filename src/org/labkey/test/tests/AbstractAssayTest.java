@@ -236,9 +236,9 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickButton("Save");
         setFormElement("newLabel", "Pending Review");
         setFormElement("newDescription", "No one likes to be reviewed.");
-        clickCheckbox("newPublicData");
+        click(Locator.checkboxByName("newPublicData"));
         clickButton("Save");
-        selectOptionByText("defaultAssayQCState", "Pending Review");
+        selectOptionByText(Locator.name("defaultAssayQCState"), "Pending Review");
         clickButton("Save");
     }
     /**

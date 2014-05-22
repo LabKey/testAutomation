@@ -259,7 +259,7 @@ public class StudyManualTest extends StudyTest
         clickButton("Import", 0);
         waitForElement(Locator.xpath("//input[@name='ff_label3']"), WAIT_FOR_JAVASCRIPT);
 
-        clickRadioButtonById("button_dataField");
+        click(Locator.radioButtonById("button_dataField"));
 
         _listHelper.addField("Dataset Fields", 4, "otherData", "Other Data", ListHelper.ListColumnType.String);
         click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));

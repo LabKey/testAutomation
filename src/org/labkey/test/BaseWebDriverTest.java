@@ -4124,15 +4124,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return loc.findElement(getDriver()).getAttribute("value");
     }
 
-    /**
-     * @deprecated Use explicit Locator: {@link #getFormElement(Locator)}
-     */
-    @Deprecated public String getFormElement(String elementName)
-    {
-        Locator loc = Locator.name(elementName);
-        return getFormElement(loc);
-    }
-
     public void assertFormElementEquals(Locator loc, String value)
     {
         assertEquals("Form element '" + loc + "' was not equal to '" + value + "'", value, getFormElement(loc));
@@ -4329,14 +4320,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         Actions builder = new Actions(getDriver());
         builder.moveToElement(el).build().perform();
-    }
-
-    /**
-     * @deprecated Use {@link #click(Locator)}
-     */
-    @Deprecated public void mouseDown(Locator l)
-    {
-        click(l);
     }
 
     public int getElementIndex(Locator.XPathLocator l)
@@ -5283,14 +5266,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return "//td[contains(text(), '" + propertyHeading + "')]/../..";
     }
 
-    /**
-     * @deprecated Use {@link #getElementCount(org.labkey.test.Locator)}
-     */
-    @Deprecated public int getXpathCount(Locator.XPathLocator xpath)
-    {
-        return getElementCount(xpath);
-    }
-
     public int getElementCount(Locator locator)
     {
         return locator.findElements(getDriver()).size();
@@ -5390,25 +5365,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return _extHelper.clickExtComponent(EscapeUtil.filter(id));
     }
 
-    /**
-     * Clicks the labkey menu item and optional submenu labels (for cascading menus)
-     * @deprecated Use {@link org.labkey.test.util.ExtHelper#clickMenuButton(boolean, String, String...)}
-     */
-    @Deprecated public void clickMenuButton(String menusLabel, String ... subMenusLabels)
-    {
-        _extHelper.clickMenuButton(true, menusLabel, subMenusLabels);
-    }
-
-    /**
-     * Clicks the ext menu item and optional submenu labels's (for cascading menus)
-     * Does not wait for page load.
-     * @deprecated Use {@link org.labkey.test.util.ExtHelper#clickMenuButton(boolean, String, String...)}
-     */
-    @Deprecated public void clickMenuButtonAndContinue(String menusLabel, String ... subMenusLabels)
-    {
-        _extHelper.clickMenuButton(false, menusLabel, subMenusLabels);
-    }
-
     public void dataRegionPageFirst(String dataRegionName)
     {
         log("Clicking page first on data region '" + dataRegionName + "'");
@@ -5486,46 +5442,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     /**
-     * @deprecated Use {@link #click(Locator)}
-     */
-    @Deprecated public void clickCheckbox(String name)
-    {
-        click(Locator.checkboxByName(name));
-    }
-
-    /**
-     * @deprecated Use {@link #click(Locator)}
-     */
-    @Deprecated public void clickRadioButtonById(String id)
-    {
-        click(Locator.radioButtonById(id));
-    }
-
-    /**
-     * @deprecated Use {@link #checkCheckbox(Locator)}
-     */
-    @Deprecated public void checkRadioButton(String name, String value)
-    {
-        checkCheckbox(Locator.radioButtonByNameAndValue(name, value));
-    }
-
-    /**
-     * @deprecated Use {@link #checkCheckbox(Locator)}
-     */
-    @Deprecated public void checkCheckbox(String name, String value)
-    {
-        checkCheckbox(Locator.checkboxByNameAndValue(name, value));
-    }
-
-    /**
-     * @deprecated Use {@link #checkCheckbox(Locator)}
-     */
-    @Deprecated public void checkCheckbox(String name)
-    {
-        checkCheckbox(Locator.checkboxByName(name));
-    }
-
-    /**
      * @deprecated Use {@link #checkCheckbox(Locator)}
      */
     @Deprecated public void checkCheckboxByNameInDataRegion(String name)
@@ -5565,30 +5481,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         assertTrue("Radio Button is not selected at " + radioButtonLocator.toString(), isChecked(radioButtonLocator));
     }
 
-    /**
-     * @deprecated Use {@link #checkCheckbox(Locator)}
-     */
-    @Deprecated public void checkCheckbox(String name, int index)
-    {
-        checkCheckbox(Locator.checkboxByName(name).index(index));
-    }
-
-    /**
-     * @deprecated Use {@link #uncheckCheckbox(Locator)}
-     */
-    @Deprecated public void uncheckCheckbox(String name)
-    {
-        uncheckCheckbox(Locator.checkboxByName(name));
-    }
-
-    /**
-     * @deprecated Use {@link #uncheckCheckbox(Locator)}
-     */
-    @Deprecated public void uncheckCheckbox(String name, String value)
-    {
-        uncheckCheckbox(Locator.checkboxByNameAndValue(name, value));
-    }
-
     public void uncheckCheckbox(Locator checkBoxLocator)
     {
         WebElement checkbox = checkBoxLocator.findElement(getDriver());
@@ -5610,14 +5502,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return checkBoxLocator.findElement(getDriver()).isSelected();
     }
 
-    /**
-     * @deprecated Use {@link #selectOptionByValue(Locator, String)}
-     */
-    @Deprecated public void selectOptionByValue(String selectName, String value)
-    {
-        selectOptionByValue(Locator.name(selectName), value);
-    }
-
     public void selectOptionByValue(Locator locator, String value)
     {
         WebElement selectElement = locator.findElement(getDriver());
@@ -5628,14 +5512,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         Select select = new Select(selectElement);
         select.selectByValue(value);
-    }
-
-    /**
-     * @deprecated Use {@link #selectOptionByText(Locator, String)}
-     */
-    @Deprecated public void selectOptionByText(String selectName, String text)
-    {
-        selectOptionByText(Locator.name(selectName), text);
     }
 
     public void selectOptionByText(Locator locator, String text)

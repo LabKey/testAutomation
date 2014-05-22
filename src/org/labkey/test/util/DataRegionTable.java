@@ -645,7 +645,7 @@ public class DataRegionTable
 
     public void toggleAllFacetsCheckbox()
     {
-        _test.mouseDown(Locator.xpath("//b").withClass("lk-filter-panel-label").withText("All"));
+        _test.click(Locator.xpath("//b").withClass("lk-filter-panel-label").withText("All"));
     }
 
     public void clickHeaderButtonByText(String buttonText)

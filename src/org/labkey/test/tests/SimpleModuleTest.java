@@ -621,7 +621,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(LIST_NAME));
 
-        clickMenuButton("Views", "Crazy People");
+        _extHelper.clickMenuButton("Views", "Crazy People");
         assertTextPresent("Adam");
         assertTextPresent("Dave");
         assertTextPresent("Josh");
@@ -650,13 +650,13 @@ public class SimpleModuleTest extends BaseWebDriverTest
         log("Testing module-based JS reports...");
         clickProject(getProjectName());
         clickAndWait(Locator.linkWithText(LIST_NAME));
-        clickMenuButton("Views", "Want To Be Cool");
+        _extHelper.clickMenuButton("Views", "Want To Be Cool");
         waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
 
         clickProject(getProjectName());
         addWebPart("Report");
         setFormElement("title", "Report Tester Part");
-        selectOptionByValue("reportId", "module:simpletest/reports/schemas/lists/People/Less Cool JS Report.js");
+        selectOptionByValue(Locator.name("reportId"), "module:simpletest/reports/schemas/lists/People/Less Cool JS Report.js");
         clickButton("Submit");
         waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
 
@@ -675,7 +675,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         log("Testing module-based reports...");
         clickAndWait(Locator.linkWithText(LIST_NAME));
-        clickMenuButton("Views", "Super Cool R Report");
+        _extHelper.clickMenuButton("Views", "Super Cool R Report");
         waitForText("Console output", WAIT_FOR_JAVASCRIPT);
         assertTextPresent("\"name\"");
         assertTextPresent("\"age\"");
@@ -695,7 +695,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         assertTrue("Import message not present", isTextPresent("Please read this before you import data"));
 
         Locator l = Locator.xpath("//select[@id='importTemplate']//option");
-        assertTrue("Wrong number of templates found", getXpathCount((Locator.XPathLocator)l) == 2);
+        assertTrue("Wrong number of templates found", getElementCount((Locator.XPathLocator) l) == 2);
     }
 
     @LogMethod

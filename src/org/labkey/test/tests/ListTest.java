@@ -160,7 +160,7 @@ public class ListTest extends BaseWebDriverTest
     {
         // delete existing rows
         log("Test deleting rows");
-        checkCheckbox(".toggle");
+        checkCheckbox(Locator.checkboxByName(".toggle"));
         prepForPageLoad();
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected rows?");
@@ -223,13 +223,13 @@ public class ListTest extends BaseWebDriverTest
         assertEquals(1,table.getRow(TEST_DATA[0][1]));
         clickAndWait(Locator.linkWithText("edit", 1));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[1]);  // Has a funny format -- need to post converted date
-        checkCheckbox("quf_JewelTone");
+        checkCheckbox(Locator.checkboxByName("quf_JewelTone"));
         submit();
         // Third row (Red)
         assertEquals(2,table.getRow(TEST_DATA[0][2]));
         clickAndWait(Locator.linkWithText("edit", 2));
         setFormElement(Locator.name("quf_" + _listCol2.getName()), CONVERTED_MONTHS[2]);  // Has a funny format -- need to post converted date
-        uncheckCheckbox("quf_JewelTone");
+        uncheckCheckbox(Locator.checkboxByName("quf_JewelTone"));
         submit();
 
         table = new DataRegionTable("query", this);
@@ -571,11 +571,11 @@ public class ListTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("quf_Owner"), LIST2_FOREIGN_KEY_OUTSIDE);
         submit();
 
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
         assertTextPresent(TEST_DATA[1][1], 2);
 
         log("Test deleting rows");
-        checkCheckbox(".toggle");
+        checkCheckbox(Locator.checkboxByName(".toggle"));
         clickButton("Delete", 0);
         assertAlert("Are you sure you want to delete the selected rows?");
         waitForTextToDisappear(LIST2_KEY);
@@ -783,9 +783,9 @@ public class ListTest extends BaseWebDriverTest
         _extHelper.waitForExtDialog("Apply Conditional Format Where BoolCol", WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.id("value_1"), "true");
         _extHelper.clickExtButton("Apply Conditional Format Where BoolCol", "OK", 0);
-        checkCheckbox("Bold");
-        checkCheckbox("Italic");
-        checkCheckbox("Strikethrough");
+        checkCheckbox(Locator.checkboxByName("Bold"));
+        checkCheckbox(Locator.checkboxByName("Italic"));
+        checkCheckbox(Locator.checkboxByName("Strikethrough"));
         click(Locator.xpath("//div[@title='Color']"));
         waitForElement(Locator.xpath("//div[contains(@class, 'gwt-DialogBox')]//div[contains(@class, 'Caption') and text()='Conditional Format Colors']"), WAIT_FOR_JAVASCRIPT);
         setFormElement(Locator.xpath("//fieldset[./legend/span[text()='Background']]//input"), "FF0000"); // Red background
@@ -807,14 +807,14 @@ public class ListTest extends BaseWebDriverTest
         _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
         setFormElement(Locator.id("value_1"), "7");
         _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
-        checkCheckbox("Strikethrough");
+        checkCheckbox(Locator.checkboxByName("Strikethrough"));
         // If greater than 5, Bold  //TODO: Set before (>7) format. Blocked: 12865
         clickButton("Add Conditional Format", 0);
         _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
         setFormElement(Locator.id("value_1"), "5");
         _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
-        checkCheckbox("Bold", 1);
+        checkCheckbox(Locator.checkboxByName("Bold").index(1));
 
         // TODO: Blocked: 12865: ListTest failing to reorder conditional formats
         // Switch the order of filters so that >7 takes precedence over >5

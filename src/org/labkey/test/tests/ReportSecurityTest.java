@@ -74,7 +74,7 @@ public class ReportSecurityTest extends ReportTest
         // add user to the first test group
         clickManageGroup(TEST_GROUP);
         setFormElement("names", TEST_USER);
-        uncheckCheckbox("sendEmail");
+        uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
 
         enterPermissionsUI();
@@ -93,7 +93,7 @@ public class ReportSecurityTest extends ReportTest
         click(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//th/input[@value='READOWN']"));
         clickAndWait(Locator.id("groupUpdateButton"));
 
-        selectOptionByText("dataset.1", "Read");
+        selectOptionByText(Locator.name("dataset.1"), "Read");
         clickAndWait(Locator.xpath("//form[@id='datasetSecurityForm']//a[@class='labkey-button']/span[text() = 'Save']"));
     }
 
@@ -105,10 +105,10 @@ public class ReportSecurityTest extends ReportTest
         clickFolder(getFolderName());
 
         clickAndWait(Locator.linkWithText("APX-1: Abbreviated Physical Exam"));
-        clickMenuButton("Charts", "Create Chart View");
+        _extHelper.clickMenuButton("Charts", "Create Chart View");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
-        selectOptionByText("columnsX", "1. Weight");
-        selectOptionByText("columnsY", "4. Pulse");
+        selectOptionByText(Locator.name("columnsX"), "1. Weight");
+        selectOptionByText(Locator.name("columnsY"), "4. Pulse");
         fireEvent(Locator.name("columnsY"), SeleniumEvent.change);
         checkCheckbox(Locator.name("participantChart"));
         clickButton("Save", 0);
@@ -119,21 +119,21 @@ public class ReportSecurityTest extends ReportTest
 
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
 
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
-        clickMenuButton("Charts", "Create Chart View");
+        _extHelper.clickMenuButton("Charts", "Create Chart View");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
 
         // create a non-participant chart
-        selectOptionByText("columnsX", "1. Weight");
-        selectOptionByText("columnsY", "4. Pulse");
+        selectOptionByText(Locator.name("columnsX"), "1. Weight");
+        selectOptionByText(Locator.name("columnsY"), "4. Pulse");
         fireEvent(Locator.name("columnsY"), SeleniumEvent.change);
         clickButton("Save", 0);
         sleep(2000);
 
         setFormElement("reportName", "non participant chart");
         setFormElement("description", "a private chart");
-        checkCheckbox("shareReport");
+        checkCheckbox(Locator.checkboxByName("shareReport"));
         clickButton("OK", 0);
 
         waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
@@ -175,7 +175,7 @@ public class ReportSecurityTest extends ReportTest
         clickAndWait(Locator.linkWithText(TEST_GRID_VIEW));
         assertTextPresent("999320016");
         pushLocation();
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
         assertTextPresent("User does not have read permission on this dataset.");
 /*
         no longer showing the query button by default.

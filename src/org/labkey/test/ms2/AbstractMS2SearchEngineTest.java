@@ -16,7 +16,6 @@
 
 package org.labkey.test.ms2;
 
-import org.junit.Test;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.util.ListHelper;
@@ -64,7 +63,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         setFormElement("name", ANNOTATION_RUN_NAME);
         setFormElement("integerField", "10");
         setFormElement("textField", "Text value");
-        clickCheckbox("booleanField");
+        click(Locator.checkboxByName("booleanField"));
 
         int seconds = 0;
         while (!isTextPresent("<None>") && seconds < 20)
@@ -94,7 +93,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         log("Set analysis parameters.");
         setFormElement("protocolName", "test2");
         setFormElement("protocolDescription", "This is a test protocol for Verify.");
-        selectOptionByText("sequenceDB", DATABASE);
+        selectOptionByText(Locator.name("sequenceDB"), DATABASE);
         setFormElement("configureXml", "");
         waitAndClick(Locator.xpath("//a[@class='labkey-button']/span[text() = 'OK']"));
         setFormElement("configureXml", INPUT_XML);
@@ -179,9 +178,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         clickAndWait(Locator.linkWithImage(getContextPath() + "/MS2/images/runIcon.gif"));
 
         // Make sure we're not using a custom default view for the current user
-        selectOptionByText("viewParams", "<Standard View>");
+        selectOptionByText(Locator.name("viewParams"), "<Standard View>");
         clickButton("Go");
-        selectOptionByText("grouping", "Peptides (Legacy)");
+        selectOptionByText(Locator.name("grouping"), "Peptides (Legacy)");
         clickAndWait(Locator.id("viewTypeSubmitButton"));
 
         log("Test adding columns");
@@ -200,7 +199,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         assertTextPresent("Libra config name", "Libra normalization channel");
         setFormElement(Locator.xpath("//tr[td/table/tbody/tr/td/div[text()='Libra config name']]/td/input"), "foo");
         fireEvent(Locator.xpath("//tr[td/table/tbody/tr/td/div[text()='Libra config name']]/td/input"), SeleniumEvent.change);
-        String text = getFormElement("configureXml");
+        String text = getFormElement(Locator.name("configureXml"));
         assertTrue(text.contains("foo"));
     }
 }

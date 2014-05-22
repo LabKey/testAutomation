@@ -69,9 +69,9 @@ public class LuminexExcludedTitrationTest extends LuminexExcludableWellsTest
     {
         clickButton("Exclude Titration","Analytes excluded for a replicate group or at the assay level will not be re-included by changes in titration exclusions" );
         waitForElement(Locator.xpath("//td/div").withText(Titration));
-        mouseDown(Locator.xpath("//td/div").withText(Titration));
+        click(Locator.xpath("//td/div").withText(Titration));
         waitForElement(AVAILABLE_ANALYTES_CHECKBOX);
-        mouseDown(AVAILABLE_ANALYTES_CHECKBOX);
+        click(AVAILABLE_ANALYTES_CHECKBOX);
         String exclusionMessage =  "excluding all analytes for titration " + Titration;
         setFormElement(COMMENT_LOCATOR, exclusionMessage);
         sleep(10000);

@@ -74,7 +74,7 @@ public class MS2Test extends AbstractMS2ImportTest
         clickAndWait(Locator.linkContainingText("DRT1"));
 
         // Make sure we're not using a custom default view for the current user
-        selectOptionByText("viewParams", "<Standard View>");
+        selectOptionByText(Locator.name("viewParams"), "<Standard View>");
         clickButton("Go");
 
         assertTextPresent(
@@ -130,14 +130,14 @@ public class MS2Test extends AbstractMS2ImportTest
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
         peptidesTable.checkCheckbox(0);
-        clickMenuButton("Export Selected", "TSV");
+        _extHelper.clickMenuButton("Export Selected", "TSV");
         assertTextPresent("K.LLASMLAK.A");
         assertTextNotPresent("R.Q^YALHVDGVGTK.A");
         assertTextPresent("\n", 2);
         popLocation();
         pushLocation();
         peptidesTable.checkAllOnPage();
-        clickMenuButton("Export Selected", "AMT");
+        _extHelper.clickMenuButton("Export Selected", "AMT");
         assertTextPresent("\n", 60, true);
         assertTextPresent(
                 "Run",
@@ -171,7 +171,7 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test export");
         pushLocation();
-        clickMenuButton("Export All", "TSV");
+        _extHelper.clickMenuButton("Export All", "TSV");
         assertTextPresent("Scan");
         assertTextPresent("IonPercent");
         assertTextPresent("Protein");
@@ -181,7 +181,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextPresent("1373.4690");
         assertTextPresent("\n", 58, true);
         popLocation();
-        clickMenuButton("Export All", "AMT");
+        _extHelper.clickMenuButton("Export All", "AMT");
         assertTextBefore("R.Q^YALHVDGVGTK.A", "K.LLASMLAK.A");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
@@ -246,7 +246,7 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test export");
         addUrlParameter("exportAsWebPage=true");
-        clickMenuButton("Export All", "TSV");
+        _extHelper.clickMenuButton("Export All", "TSV");
         assertTextPresent("Scan");
         assertTextPresent("Run Description");
         assertTextPresent("Fraction Name");
@@ -259,7 +259,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextNotPresent("K.FVKKSNDVR.L");
         assertTextPresent("\n", 3, true);
         goBack();
-        clickMenuButton("Export All", "AMT");
+        _extHelper.clickMenuButton("Export All", "AMT");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
         assertTextBefore("R.LSSMRDSR.S", "R.GGNEESTK.T");
@@ -320,7 +320,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextBefore("gi|15668549|LSU_ribosomal_pro", "gi|14318169|AF379640_1_riboso");
 
         log("Test export Protein View");
-        clickMenuButton("Export All", "TSV");
+        _extHelper.clickMenuButton("Export All", "TSV");
         assertTextPresent("Protein");
         assertTextPresent("Description");
         assertTextBefore("gi|15668549|LSU_ribosomal_pro", "gi|14318169|AF379640_1_riboso");
@@ -333,9 +333,9 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test export expanded view");
         selectOptionByText(Locator.name("grouping"), "Protein (Legacy)");
-        checkCheckbox("expanded");
+        checkCheckbox(Locator.checkboxByName("expanded"));
         clickAndWait(Locator.id("viewTypeSubmitButton"));
-        clickMenuButton("Export All", "TSV");
+        _extHelper.clickMenuButton("Export All", "TSV");
         assertTextPresent("Protein");
         assertTextPresent("IonPercent");
         assertTextPresent("Protein");
@@ -346,7 +346,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextPresent("R.E^PVSPWGTPAKGYR.T");
         assertTextPresent("\n", 18, true);
         goBack();
-        clickMenuButton("Export All", "AMT");
+        _extHelper.clickMenuButton("Export All", "AMT");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
         assertTextBefore("K.TKDYEGMQVPVK.V", "R.RDYLHYLPKYNR.F");
@@ -387,7 +387,7 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test Query - Peptides Grouping");
         selectOptionByText(Locator.name("grouping"), "Standard");
-        checkCheckbox("expanded");
+        checkCheckbox(Locator.checkboxByName("expanded"));
         clickAndWait(Locator.id("viewTypeSubmitButton"));
 
         log("Check that saved view is working");
@@ -446,7 +446,7 @@ public class MS2Test extends AbstractMS2ImportTest
         _customizeViewsHelper.applyCustomView();
 
         log("Test Ignore View Filter");
-        clickMenuButton("Views", "Apply View Filter");
+        _extHelper.clickMenuButton("Views", "Apply View Filter");
         assertTextPresent("K.LLASMLAK.A");
         assertTextPresent("R.GGNEESTK.T");
         assertTextPresent("Next AA");
@@ -454,7 +454,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextBefore(PEPTIDE4, PEPTIDE3);
 
         log("Test Apply View Filter");
-        clickMenuButton("Views", "Apply View Filter");
+        _extHelper.clickMenuButton("Views", "Apply View Filter");
         assertTextNotPresent("K.LLASMLAK.A");
         assertTextNotPresent("R.GGNEESTK.T");
         assertTextPresent("Next AA");
@@ -467,7 +467,7 @@ public class MS2Test extends AbstractMS2ImportTest
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
         log("Test exporting in TSV");
-        clickMenuButton("Export All", "TSV");
+        _extHelper.clickMenuButton("Export All", "TSV");
         assertTextPresent("Scan");
         assertTextPresent("dMass");
         assertTextNotPresent("K.LLASMLAK.A");
@@ -483,7 +483,7 @@ public class MS2Test extends AbstractMS2ImportTest
         popLocation();
         pushLocation();
         log("Test exporting in AMT");
-        clickMenuButton("Export All", "AMT");
+        _extHelper.clickMenuButton("Export All", "AMT");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
         assertTextNotPresent("K.LLASMLAK.A");
@@ -500,7 +500,7 @@ public class MS2Test extends AbstractMS2ImportTest
         peptidesTable.uncheckAllOnPage();
         peptidesTable.checkCheckbox(0);
         peptidesTable.checkCheckbox(1);
-        clickMenuButton("Export Selected", "TSV");
+        _extHelper.clickMenuButton("Export Selected", "TSV");
         assertTextNotPresent("Expect");
         assertTextNotPresent("SeqHits");
         assertTextPresent("Next AA");
@@ -514,7 +514,7 @@ public class MS2Test extends AbstractMS2ImportTest
         peptidesTable.uncheckAllOnPage();
         peptidesTable.checkCheckbox(0);
         peptidesTable.checkCheckbox(1);
-        clickMenuButton("Export Selected", "AMT");
+        _extHelper.clickMenuButton("Export Selected", "AMT");
         assertTextPresent("Peptide");
         assertTextNotPresent("Next AA");
         assertTextBefore("K.ISNFIANNDCRYYIDAEHQKIISDEINR.Q", "K.E^TSSKNFDASVDVAIRLGVDPR.K");
@@ -522,7 +522,7 @@ public class MS2Test extends AbstractMS2ImportTest
         popLocation();
 
         log("Test default view");
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
         assertTextPresent("K.LLASMLAK.A");
         assertTextPresent("R.GGNEESTK.T");
         assertTextNotPresent("Next AA");
@@ -532,7 +532,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextPresent("SeqHits");
 
         log("Test load saved view");
-        clickMenuButton("Views", VIEW4);
+        _extHelper.clickMenuButton("Views", VIEW4);
         assertTextNotPresent("R.GGNEESTK.T");
         assertTextBefore(PEPTIDE1, PEPTIDE2);
         assertTextBefore(PEPTIDE3, PEPTIDE4);
@@ -548,7 +548,7 @@ public class MS2Test extends AbstractMS2ImportTest
         _customizeViewsHelper.addCustomizeViewColumn("Fraction");
         _customizeViewsHelper.removeCustomizeViewColumn("IonPercent");
         _customizeViewsHelper.saveCustomView("");
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
         assertTextNotPresent("K.LLASMLAK.A");
         assertTextPresent("Fraction");
         assertTextBefore("K.TKDYEGMQVPVK.V", "R.LGARRVSPVR.A");
@@ -563,7 +563,7 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextPresent("Ion%");
 
         log("Test delete view");
-        clickMenuButton("Views", VIEW4);
+        _extHelper.clickMenuButton("Views", VIEW4);
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.deleteView();
         assertTextPresent("K.LLASMLAK.A");
@@ -603,7 +603,7 @@ public class MS2Test extends AbstractMS2ImportTest
         log("Test exporting from Protein Prophet view");
         pushLocation();
         log("Test exporting in TSV");
-        clickMenuButton("Export All", "TSV");
+        _extHelper.clickMenuButton("Export All", "TSV");
         assertTextPresent("Group");
         assertTextPresent("Peptides");
         assertTextPresent("Prob");
@@ -620,7 +620,7 @@ public class MS2Test extends AbstractMS2ImportTest
         popLocation();
         pushLocation();
         log("Test exporting in AMT");
-        clickMenuButton("Export All", "AMT");
+        _extHelper.clickMenuButton("Export All", "AMT");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
         assertTextNotPresent("Best Name");
@@ -633,7 +633,7 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test Query - Proteins Grouping");
         selectOptionByText(Locator.name("grouping"), "Protein Groups");
-        checkCheckbox("expanded");
+        checkCheckbox(Locator.checkboxByName("expanded"));
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         assertTextPresent("Protein");
         assertTextPresent("Description");
@@ -659,7 +659,7 @@ public class MS2Test extends AbstractMS2ImportTest
         log("Test exporting in Query - Protein View");
         pushLocation();
         log("Test exporting in TSV");
-        clickMenuButton("Export All", "TSV");
+        _extHelper.clickMenuButton("Export All", "TSV");
         assertTextNotPresent("Unique");
         assertTextPresent("Sequence");
         assertTextPresent("MSASELATSYSALILADEGIEIKSDKLLSLTKAANVDVEPIWATIFAKALEGKDLKELLLNIGSGAGAAPVAGGAGAPAAADGERPAEEKEEAKEEEESDEDMGFG");
@@ -670,13 +670,13 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test exporting selected and non-expanded view");
         DataRegionTable proteinGroupsTable = new DataRegionTable("ProteinGroups", this);
-        uncheckCheckbox("expanded");
+        uncheckCheckbox(Locator.checkboxByName("expanded"));
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         pushLocation();
         proteinGroupsTable.uncheckAllOnPage();
         proteinGroupsTable.checkCheckbox(0);
         proteinGroupsTable.checkCheckbox(1);
-        clickMenuButton("Export Selected", "TSV");
+        _extHelper.clickMenuButton("Export Selected", "TSV");
         assertTextBefore("0.74", "0.78");
         assertTextPresent("\n", 3);
         popLocation();
@@ -688,7 +688,7 @@ public class MS2Test extends AbstractMS2ImportTest
         log("Test export");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
-        clickMenuButton("Export All", "AMT");
+        _extHelper.clickMenuButton("Export All", "AMT");
         assertTextPresent("Run");
         assertTextPresent("Peptide");
         assertTextBefore("K.MLNMAKSKMHK.M", "R.E^VNAEDLAPGEPGR.L");
@@ -710,11 +710,11 @@ public class MS2Test extends AbstractMS2ImportTest
         clickButton("Pick", 0);
         clickButton("Pick Columns");
         selectOptionByText(Locator.name("grouping"), "ProteinProphet (Legacy)");
-        checkCheckbox("expanded");
+        checkCheckbox(Locator.checkboxByName("expanded"));
         clickAndWait(Locator.id("viewTypeSubmitButton"));
         pushLocation();
         checkDataRegionCheckbox("ProteinGroupsWithQuantitation", 0);
-        clickMenuButton("Export Selected", "TSV");
+        _extHelper.clickMenuButton("Export Selected", "TSV");
         assertTextPresent("Group");
         assertTextPresent("PP Unique");
         assertTextPresent("Run Description");
@@ -729,7 +729,7 @@ public class MS2Test extends AbstractMS2ImportTest
         popLocation();
 
         log("Make sure sort is exported correctly too");
-        clickMenuButton("Export All", "TSV");
+        _extHelper.clickMenuButton("Export All", "TSV");
         assertTextBefore("gi|548772|RL4_HALHA_50S_RIBOS", "gi|23619029|60S_ribosomal_pro");
         assertTextPresent("MLNMAKSKMHK");
         assertTextPresent("\n", 3, true);
@@ -741,7 +741,7 @@ public class MS2Test extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         clickAndWait(Locator.linkWithText("drt/CAexample_mini (DRT2)"));
 
-        selectOptionByText("viewParams", "<Standard View>");
+        selectOptionByText(Locator.name("viewParams"), "<Standard View>");
         clickButton("Go");
 
         log("Test peptide filtering on protein page");
@@ -914,12 +914,12 @@ public class MS2Test extends AbstractMS2ImportTest
         assertTextNotPresent("gi|34849400|gb|AAP58899.1|");
 
         log("Check default view works");
-        clickMenuButton("Views", "default");
+        _extHelper.clickMenuButton("Views", "default");
         assertElementNotPresent(Locator.id("query:SeqId/Mass:header"));
         assertTextPresent("gi|34849400|");
 
         log("Check sorting");
-        clickMenuButton("Views", VIEW5);
+        _extHelper.clickMenuButton("Views", VIEW5);
         setSort("query", "SeqId", SortDirection.ASC);
         assertTextBefore("gi|13470573|ref|NP_102142.1|", "gi|15828808|ref|NP_326168.1|");
 
@@ -1135,7 +1135,7 @@ public class MS2Test extends AbstractMS2ImportTest
         log("Test Compare Runs using Query Peptides");
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         click(Locator.name(".toggle"));
-        clickMenuButton("Compare", "Peptide");
+        _extHelper.clickMenuButton("Compare", "Peptide");
         checkRadioButton(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));
         setFormElement(Locator.name("targetProtein"), "");
         clickButton("Compare");
@@ -1161,13 +1161,13 @@ public class MS2Test extends AbstractMS2ImportTest
                 "R.TQMPAASICVNYK.G");
 
         log("Check Ignore/Apply View Filter");
-        clickMenuButton("Views", "Apply View Filter");
+        _extHelper.clickMenuButton("Views", "Apply View Filter");
         assertTextPresent(
                 "K.EIRQRQGDDLDGLSFAELR.G",
                 "R.TQMPAASICVNYK.G",
                 "Avg XCorr");
 
-        clickMenuButton("Views", "Apply View Filter");
+        _extHelper.clickMenuButton("Views", "Apply View Filter");
         assertTextPresent(
                 "Avg XCorr",
                 "K.EIRQRQGDDLDGLSFAELR.G");
@@ -1199,7 +1199,7 @@ public class MS2Test extends AbstractMS2ImportTest
         Object[] windows = getDriver().getWindowHandles().toArray();
         getDriver().switchTo().window((String) windows[1]);
         waitForElement(Locator.imageWithAltText("Charge 3+ Cumulative Observed vs. Model", false));
-        assertEquals("Incorrect number of graphs", 13, getXpathCount(Locator.imageWithSrc("labkey/ms2/MS2VerifyProject/ms2folder", true)));
+        assertEquals("Incorrect number of graphs", 13, getElementCount(Locator.imageWithSrc("labkey/ms2/MS2VerifyProject/ms2folder", true)));
         assertTextPresent("PeptideProphet Details: ms2pipe/truncated (pepXML)");
         getDriver().close();
         getDriver().switchTo().window((String) windows[0]);

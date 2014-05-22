@@ -427,7 +427,7 @@ public class ClientAPITest extends BaseWebDriverTest
         //copied from old test
         clickButton("Manage Assays");
         clickButton("New Assay Design");
-        checkRadioButton("providerName", "General");
+        checkCheckbox(Locator.radioButtonByNameAndValue("providerName", "General"));
         clickButton("Next");
 
         waitForElement(Locator.xpath("//input[@id='AssayDesignerName']"), WAIT_FOR_JAVASCRIPT);

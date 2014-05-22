@@ -286,13 +286,13 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
 
         // specify PTID and Visit/Date columns
         if (specimenIdColumn != null)
-            selectOptionByText("ff_specimenIdColumn", specimenIdColumn);
+            selectOptionByText(Locator.name("ff_specimenIdColumn"), specimenIdColumn);
         if (participantColumn != null)
-            selectOptionByText("ff_participantColumn", participantColumn);
+            selectOptionByText(Locator.name("ff_participantColumn"), participantColumn);
         if (dateColumn != null)
-            selectOptionByText("ff_dateColumn", dateColumn);
+            selectOptionByText(Locator.name("ff_dateColumn"), dateColumn);
         if (visitColumn != null)
-            selectOptionByText("ff_visitColumn", visitColumn);
+            selectOptionByText(Locator.name("ff_visitColumn"), visitColumn);
 
         if (setBackground)
         {
@@ -489,7 +489,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
     {
         assertTitleEquals("Import Analysis: Analysis Engine: " + containerPath);
         waitForElement(Locator.id(engine.name()), defaultWaitForPage);
-        clickRadioButtonById(engine.name());
+        click(Locator.radioButtonById(engine.name()));
         clickButton("Next");
     }
 
@@ -505,7 +505,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             assertTextNotPresent("Normalization is current disabled");
             if (rEngineNormalization)
             {
-                checkCheckbox("rEngineNormalization");
+                checkCheckbox(Locator.checkboxByName("rEngineNormalization"));
                 if (rEngineNormalizationReference != null)
                 {
                     selectOptionByText(Locator.id("rEngineNormalizationReference"), rEngineNormalizationReference);
@@ -521,7 +521,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
             }
             else
             {
-                uncheckCheckbox("rEngineNormalization");
+                uncheckCheckbox(Locator.checkboxByName("rEngineNormalization"));
             }
         }
         else
@@ -539,7 +539,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         assertTitleEquals("Import Analysis: Analysis Folder: " + containerPath);
         if (existing)
         {
-            selectOptionByText("existingAnalysisId", analysisName);
+            selectOptionByText(Locator.name("existingAnalysisId"), analysisName);
         }
         else
         {

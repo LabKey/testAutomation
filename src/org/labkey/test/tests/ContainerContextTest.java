@@ -283,13 +283,13 @@ public class ContainerContextTest extends BaseWebDriverTest
         goToProjectHome();
         clickFolder(folder);
         clickAndWait(Locator.linkWithText(listName));
-        clickMenuButton("Views", "Create", "R View");
+        _extHelper.clickMenuButton("Views", "Create", "R View");
         _RReportHelper.selectOption(RReportHelper.ReportOption.runInPipeline);
         _RReportHelper.saveReport(folder + "-BackgroundReport");
         waitForElement(Locator.id("query"));
 
         log("** Executing background R script");
-        clickMenuButton("Views", folder + "-BackgroundReport");
+        _extHelper.clickMenuButton("Views", folder + "-BackgroundReport");
         waitForElement(Locator.navButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickButton("Start Job", 0);
         waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));

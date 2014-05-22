@@ -56,7 +56,7 @@ public class QuantitationTest extends AbstractXTandemTest
         log("Set analysis parameters.");
         setFormElement("protocolName", LIBRA_PROTOCOL_NAME);
         setFormElement("protocolDescription", "Search with Libra quantitation");
-        selectOptionByText("sequenceDB", DATABASE);
+        selectOptionByText(Locator.name("sequenceDB"), DATABASE);
         setFormElement("configureXml", "");
         waitAndClick(Locator.xpath("//a[@class='labkey-button']/span[text() = 'OK']"));
         setFormElement("configureXml", LIBRA_INPUT_XML);
