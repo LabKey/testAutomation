@@ -298,6 +298,58 @@ public class PortalHelper extends AbstractHelper
         _test._ext4Helper.waitForMaskToDisappear();
     }
 
+    public void openWebpartPermissionWindow(String webpart)
+    {
+        clickWebpartMenuItem(webpart, false, "Permissions");
+        _test._ext4Helper.waitForMask();
+        _test.waitForText("Check Permission");
+    }
+
+    /**
+     * @param webpart
+     * @param permission
+     * @param folder null=current folder
+     */
+    public void setWebpartPermission(String webpart, String permission, String folder)
+    {
+        openWebpartPermissionWindow(webpart);
+
+        _test._ext4Helper.selectComboBoxItem("Required Permission:", permission);
+
+        if(folder==null)
+            _test._ext4Helper.selectRadioButton("Check Permission On:", "Current Folder");
+        else
+        {
+            _test._ext4Helper.selectRadioButton("Check Permission On:", "Choose Folder");
+            _test.click(Locator.tagWithText("div", folder));
+        }
+        _test.click(Locator.tagWithText("span", "Save"));
+    }
+
+    /**
+     * @param webpart
+     * @param expectedPermission The permission that is expected to be set.
+     * @param expectedFolder The folder that is expected to be selected, null=current folder
+     */
+    public void checkWebpartPermission(String webpart, String expectedPermission, String expectedFolder)
+    {
+        openWebpartPermissionWindow(webpart);
+
+        _test.assertFormElementEquals("permission", expectedPermission);
+
+        if(expectedFolder == null)
+        {
+            _test.assertFormElementEquals("permissionContainer", "");
+        }
+        else
+        {
+            _test.assertFormElementEquals("permissionContainer", expectedFolder);
+        }
+
+        _test.click(Locator.tagWithText("span", "Cancel"));
+        _test._ext4Helper.waitForMaskToDisappear();
+    }
+
     public static enum Direction
     {
         UP("Up", Axis.VERTICAL),

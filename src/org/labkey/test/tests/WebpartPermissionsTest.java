@@ -21,6 +21,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 
@@ -78,7 +79,8 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
         goToProjectHome();
         goToProjectHome();
         String changedWebPart = "Flow Analyses";
-        _securityHelper.setWebpartPermission(changedWebPart, "Update", DUMMY_PROJECT_NAME);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.setWebpartPermission(changedWebPart, "Update", DUMMY_PROJECT_NAME);
 
         impersonate(users[0]);
         goToProjectHome();
@@ -90,7 +92,8 @@ public class WebpartPermissionsTest extends BaseWebDriverTest
     {
         goToProjectHome();
         String changedWebPart = "Flow Analyses";
-        _securityHelper.setWebpartPermission(changedWebPart, "Read", null);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.setWebpartPermission(changedWebPart, "Read", null);
 
         //all users are readers, so the changed part will be visible now
         impersonate(users[0]);
