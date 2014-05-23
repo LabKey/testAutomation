@@ -361,4 +361,65 @@ public abstract class StudyBaseTest extends SimpleApiTest
         fireEvent(Locator.css("svg text").containing(axisLabel).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT), SeleniumEvent.click);
         waitForElement(Ext4Helper.Locators.ext4Button("Cancel")); // Axis label windows always have a cancel button. It should be the only one on the page
     }
+
+    //this assumes a QWP for VisitTag schema has been created and is visible
+    protected void insertVisitTag(String QWPname, VisitTag tag)
+    {
+        clickAndWait(getBtnLocatorFromQWP(QWPname, "Insert New"));
+        waitForElement(Locator.input("quf_Name"));
+        setFormElement(Locator.input("quf_Name"), tag.name);
+        setFormElement(Locator.input("quf_Caption"), tag.caption);
+        setFormElement(Locator.textarea("quf_Description"), tag.description);
+        if(tag.isSingleUse)
+        {
+            click(Locator.checkboxByName("quf_SingleUse"));
+        }
+        clickAndWait(Locator.linkWithSpan("Submit"));
+    }
+
+    //this assumes a QWP for VisitTagMap schema has been created and is visible
+    protected void insertVisitTagMap(String QWPname, VisitTagMap map)
+    {
+        clickAndWait(getBtnLocatorFromQWP(QWPname, "Insert New"));
+        waitForElement(Locator.name("quf_VisitTag"));
+        selectOptionByValue(Locator.name("quf_VisitTag"), map.visitTag);
+        selectOptionByText(Locator.name("quf_Visit"), map.visit);
+        if(!map.cohort.isEmpty())selectOptionByText(Locator.name("quf_Cohort"), map.cohort);
+        clickAndWait(Locator.linkWithSpan("Submit"));
+    }
+
+    protected Locator getBtnLocatorFromQWP(String QWPTitle, String ButtonText)
+    {
+        return Locator.xpath("//th[@title= '" + QWPTitle + "']/../../..//span[contains(.,'" + ButtonText + "')]");
+    }
+
+    public class VisitTag
+    {
+        protected String name;
+        protected String caption;
+        protected String description;
+        protected Boolean isSingleUse;
+
+        public VisitTag(String name, String caption, String description, Boolean isSingleUse)
+        {
+            this.name = name;
+            this.caption = caption;
+            this.description = description;
+            this.isSingleUse = isSingleUse;
+        }
+    }
+
+    public class VisitTagMap
+    {
+        protected String visitTag;
+        protected String visit;
+        protected String cohort;
+
+        public VisitTagMap(String visitTag, String visit, String cohort)
+        {
+            this.visitTag = visitTag;
+            this.visit = visit;
+            this.cohort = cohort;
+        }
+    }
 }
