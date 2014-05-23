@@ -205,7 +205,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Create fake user for permissions check");
         _permissionsHelper.enterPermissionsUI();
-        clickManageGroup("Users");
+        _permissionsHelper.clickManageGroup("Users");
         setFormElement(Locator.name("names"), USER1);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
@@ -341,7 +341,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         // USER3 is a Project Administrator
         _permissionsHelper.enterPermissionsUI();
-        clickManageGroup("Administrators");
+        _permissionsHelper.clickManageGroup("Administrators");
         setFormElement(Locator.name("names"), USER3);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");

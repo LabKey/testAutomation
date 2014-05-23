@@ -4,10 +4,12 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.interactions.Actions;
 
 import java.util.Date;
 import java.util.List;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 /**
@@ -245,7 +247,7 @@ public class PermissionsHelper
             _test.clickProject(projectName);
         }
         enterPermissionsUI();
-        _test.clickManageGroup(groupName);
+        clickManageGroup(groupName);
         _test.addUserToGroupFromGroupScreen(userName);
     } //addUserToProjGroup()
 
@@ -396,5 +398,67 @@ public class PermissionsHelper
         _test.log("asserting that user " + email + " is not in group " + projectName + "/" + groupName + "...");
         if (isUserInGroup(email, groupName, projectName))
             fail("user " + email + " was found in group " + projectName + "/" + groupName);
+    }
+
+    public void createPermissionsGroup(String groupName, String... memberNames)
+    {
+        createPermissionsGroup(groupName);
+        clickManageGroup(groupName);
+
+        StringBuilder namesList = new StringBuilder();
+        for(String member : memberNames)
+        {
+            namesList.append(member).append("\n");
+        }
+
+        _test.log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
+        _test.addUserToGroupFromGroupScreen(namesList.toString());
+
+        enterPermissionsUI();
+    }
+
+    public void openGroupPermissionsDisplay(String groupName)
+    {
+        _test._ext4Helper.clickTabContainingText("Project Groups");
+        // warning Adminstrators can apper multiple times
+        List<Ext4CmpRef> refs = _test._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
+        Ext4CmpRef ref = refs.get(0);
+        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
+        assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
+        ref.eval("getSelectionModel().select(" + idx + ")");
+    }
+
+    public void clickManageGroup(String groupName)
+    {
+        openGroupPermissionsDisplay(groupName);
+        _test.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
+        _test.waitForElement(Locator.name("names"));
+    }
+
+    public void clickManageSiteGroup(String groupName, BaseWebDriverTest _test)
+    {
+        _test._ext4Helper.clickTabContainingText("Site Groups");
+        // warning Adminstrators can apper multiple times
+        List<Ext4CmpRef> refs = _test._ext4Helper.componentQuery("grid", Ext4CmpRef.class);
+        Ext4CmpRef ref = refs.get(0);
+        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
+        assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
+        ref.eval("getSelectionModel().select(" + idx + ")");
+        _test.waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
+        _test.waitForElement(Locator.name("names"));
+    }
+
+    @LogMethod(quiet = true)
+    public void dragGroupToRole(@LoggedParam String group, @LoggedParam String srcRole, @LoggedParam String destRole, BaseWebDriverTest _test)
+    {
+        Actions builder = new Actions(_test.getDriver());
+        builder
+                .clickAndHold(Locator.permissionButton(group, srcRole).findElement(_test.getDriver()))
+                .moveToElement(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + destRole + "']]/div/div").findElement(_test.getDriver()))
+                .release()
+                .build().perform();
+
+        _test.waitForElementToDisappear(Locator.permissionButton(group, srcRole), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.permissionButton(group, destRole));
     }
 }

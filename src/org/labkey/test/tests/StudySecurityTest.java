@@ -70,10 +70,10 @@ public class StudySecurityTest extends StudyBaseTest
         clickProject(getProjectName());
 
         //create groups for dataset reader, writer, and no-access
-        createPermissionsGroup(GROUP_READERS, READER);
-        createPermissionsGroup(GROUP_EDITORS, EDITOR);
-        createPermissionsGroup(GROUP_LIMITED, LIMITED);
-        createPermissionsGroup(GROUP_NONE, NONE);
+        _permissionsHelper.createPermissionsGroup(GROUP_READERS, READER);
+        _permissionsHelper.createPermissionsGroup(GROUP_EDITORS, EDITOR);
+        _permissionsHelper.createPermissionsGroup(GROUP_LIMITED, LIMITED);
+        _permissionsHelper.createPermissionsGroup(GROUP_NONE, NONE);
 
         _permissionsHelper.setPermissions(GROUP_READERS, "Reader");
         _permissionsHelper.setPermissions(GROUP_EDITORS, "Editor");

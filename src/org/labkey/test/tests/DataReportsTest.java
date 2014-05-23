@@ -404,7 +404,7 @@ public class DataReportsTest extends ReportTest
         log("Check that background run works");
 
         _permissionsHelper.enterPermissionsUI();
-        clickManageGroup("Users");
+        _permissionsHelper.clickManageGroup("Users");
         setFormElement("names", R_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");

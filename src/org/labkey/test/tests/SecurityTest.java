@@ -445,7 +445,7 @@ public class SecurityTest extends BaseWebDriverTest
         // create the project and set permissions
         _containerHelper.createProject(PROJECT_NAME, null);
         _permissionsHelper.createPermissionsGroup("Administrators");
-        clickManageGroup("Administrators");
+        _permissionsHelper.clickManageGroup("Administrators");
         setFormElement("names", ADMIN_USER_TEMPLATE);
         clickButton("Update Group Membership");
         _permissionsHelper.enterPermissionsUI();
@@ -454,7 +454,7 @@ public class SecurityTest extends BaseWebDriverTest
         _permissionsHelper.createPermissionsGroup("Testers");
         _permissionsHelper.assertPermissionSetting("Testers", "No Permissions");
         _permissionsHelper.setPermissions("Testers", "Editor");
-        clickManageGroup("Testers");
+        _permissionsHelper.clickManageGroup("Testers");
         setFormElement("names", NORMAL_USER_TEMPLATE);
         clickButton("Update Group Membership");
 

@@ -259,7 +259,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
             clickProject(projectName);
         }
         _permissionsHelper.enterPermissionsUI();
-        clickManageGroup(groupName);
+        _permissionsHelper.clickManageGroup(groupName);
         setFormElement(Locator.name("names"), userName);
         if (!sendEmail)
             uncheckCheckbox(Locator.checkboxByName("sendEmail"));

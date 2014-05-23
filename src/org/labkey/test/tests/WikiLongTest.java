@@ -388,7 +388,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Check Permissions");
         log("Create fake user for permissions check");
         _permissionsHelper.enterPermissionsUI();
-        clickManageGroup(USERS_GROUP);
+        _permissionsHelper.clickManageGroup(USERS_GROUP);
         setFormElement(Locator.name("names"), USER1);
         uncheckCheckbox(Locator.name("sendEmail"));
         clickButton("Update Group Membership");
@@ -450,7 +450,7 @@ public class WikiLongTest extends BaseWebDriverTest
         stopImpersonating();
         clickProject(PROJECT_NAME);
         _permissionsHelper.enterPermissionsUI();
-        clickManageGroup(USERS_GROUP);
+        _permissionsHelper.clickManageGroup(USERS_GROUP);
         setFormElement("names", USER1);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
@@ -558,7 +558,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Create user for terms of use checks");
         clickProject(PROJECT_NAME);
         _permissionsHelper.enterPermissionsUI();
-        clickManageGroup(USERS_GROUP);
+        _permissionsHelper.clickManageGroup(USERS_GROUP);
         setFormElement("names", USER2);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");

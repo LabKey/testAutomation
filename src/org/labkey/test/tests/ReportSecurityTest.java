@@ -72,7 +72,7 @@ public class ReportSecurityTest extends ReportTest
         _permissionsHelper.createPermissionsGroup(TEST_GROUP);
 
         // add user to the first test group
-        clickManageGroup(TEST_GROUP);
+        _permissionsHelper.clickManageGroup(TEST_GROUP);
         setFormElement("names", TEST_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");

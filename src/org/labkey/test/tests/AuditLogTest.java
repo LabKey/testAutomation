@@ -110,7 +110,7 @@ public class AuditLogTest extends BaseWebDriverTest
         _permissionsHelper.assertPermissionSetting("Testers", "No Permissions");
         _permissionsHelper.setPermissions("Testers", "Editor");
 
-        clickManageGroup("Testers");
+        _permissionsHelper.clickManageGroup("Testers");
         setFormElement(Locator.name("names"), AUDIT_TEST_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");

@@ -53,7 +53,6 @@ import org.labkey.remoteapi.query.Filter;
 import org.labkey.remoteapi.query.SelectRowsCommand;
 import org.labkey.remoteapi.query.SelectRowsResponse;
 import org.labkey.test.util.*;
-import org.labkey.test.util.ext4cmp.Ext4CmpRef;
 import org.labkey.test.util.ext4cmp.Ext4FieldRef;
 import org.labkey.test.util.ext4cmp.Ext4GridRef;
 import org.openqa.selenium.Alert;
@@ -2720,68 +2719,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                         "   ,true      // cancelable?\n" +
                         ");\n" +
                         "element.dispatchEvent(myEvent);", el, event.toString());
-    }
-
-    public void createPermissionsGroup(String groupName, String... memberNames)
-    {
-        _permissionsHelper.createPermissionsGroup(groupName);
-        clickManageGroup(groupName);
-
-        StringBuilder namesList = new StringBuilder();
-        for(String member : memberNames)
-        {
-            namesList.append(member).append("\n");
-        }
-
-        log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
-        addUserToGroupFromGroupScreen(namesList.toString());
-
-        _permissionsHelper.enterPermissionsUI();
-    }
-
-    public void openGroupPermissionsDisplay(String groupName)
-    {
-        _ext4Helper.clickTabContainingText("Project Groups");
-        // warning Adminstrators can apper multiple times
-        List<Ext4CmpRef> refs = _ext4Helper.componentQuery("grid", Ext4CmpRef.class);
-        Ext4CmpRef ref = refs.get(0);
-        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
-        assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
-        ref.eval("getSelectionModel().select(" + idx + ")");
-    }
-
-    public void clickManageGroup(String groupName)
-    {
-        openGroupPermissionsDisplay(groupName);
-        waitAndClickAndWait(Locator.tagContainingText("a","manage group"));
-        waitForElement(Locator.name("names"));
-    }
-
-    public void clickManageSiteGroup(String groupName)
-    {
-        _ext4Helper.clickTabContainingText("Site Groups");
-        // warning Adminstrators can apper multiple times
-        List<Ext4CmpRef> refs = _ext4Helper.componentQuery("grid", Ext4CmpRef.class);
-        Ext4CmpRef ref = refs.get(0);
-        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
-        assertFalse("Unable to locate group: \"" + groupName + "\"", idx < 0);
-        ref.eval("getSelectionModel().select(" + idx + ")");
-        waitAndClickAndWait(Locator.tagContainingText("a","manage group"));
-        waitForElement(Locator.name("names"));
-    }
-
-    @LogMethod(quiet = true)
-    public void dragGroupToRole(@LoggedParam String group, @LoggedParam String srcRole, @LoggedParam String destRole)
-    {
-        Actions builder = new Actions(getDriver());
-        builder
-                .clickAndHold(Locator.permissionButton(group, srcRole).findElement(getDriver()))
-                .moveToElement(Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + destRole + "']]/div/div").findElement(getDriver()))
-                .release()
-                .build().perform();
-
-        waitForElementToDisappear(Locator.permissionButton(group, srcRole), WAIT_FOR_JAVASCRIPT);
-        waitForElement(Locator.permissionButton(group, destRole));
     }
 
     public void createSubFolderFromTemplate(String project, String child, String template, @Nullable String[] objectsToSkip)

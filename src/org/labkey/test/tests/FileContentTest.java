@@ -88,7 +88,7 @@ public class FileContentTest extends BaseWebDriverTest
         _searchHelper.initialize();
 
         _containerHelper.createProject(PROJECT_NAME, null);
-        createPermissionsGroup(TEST_GROUP, TEST_USER);
+        _permissionsHelper.createPermissionsGroup(TEST_GROUP, TEST_USER);
         _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
         _permissionsHelper.exitPermissionsUI();
 

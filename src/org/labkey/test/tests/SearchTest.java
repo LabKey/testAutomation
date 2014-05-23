@@ -260,7 +260,7 @@ public class SearchTest extends StudyTest
 
     private void addSearchableIssues()
     {
-        createPermissionsGroup(GROUP_NAME, USER1);
+        _permissionsHelper.createPermissionsGroup(GROUP_NAME, USER1);
         _securityHelper.setProjectPerm(GROUP_NAME, "Reader");
         clickButton("Save and Finish");
         clickFolder(getFolderName());
