@@ -2363,7 +2363,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             Cookie cookie = getDriver().manage().getCookieNamed("JSESSIONID");
             if (cookie == null)
             {
-                throw new IllegalStateException("No session cookie available to resuse.");
+                throw new IllegalStateException("No session cookie available to reuse.");
             }
 
             try
