@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -605,7 +606,6 @@ public class IssuesTest extends BaseWebDriverTest
         assertTextNotPresent(ISSUE_TITLE_1);
 
         // view an issue
-        //clickAndWait(Locator.linkWithText(String.valueOf(issueId)));
         clickAndWait(Locator.linkWithText(ISSUE_TITLE_0));
 
         // assert .lastFilter is applied
@@ -680,6 +680,145 @@ public class IssuesTest extends BaseWebDriverTest
         href = getAttribute(Locator.linkContainingText(ISSUE_TITLE_3), "href");
         assertTrue("Expected issue details URL to link to sub-folder container",
             href.contains("/issues/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/details.view") || href.contains("/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/issues-details.view"));
+    }
+
+    @Test
+    public void duplicatesTest()
+    {
+        createIssue(getDisplayName(), "This Is some Issue -- let's say A", "2", "New issue");
+        String issueIdA = getCurrentIssueId();
+
+        createIssue(getDisplayName(), "This is another issue -- let's say B", "3", "I think this is a duplicate issue?");
+        String issueIdB = getCurrentIssueId();
+
+        click(Locator.linkWithText("Resolve"));
+        selectOptionByText(Locator.id("resolution"), "Duplicate");
+        setFormElement(Locator.name("duplicate"), issueIdA);
+        clickButton("Save");
+
+        assertElementPresent(Locator.linkWithText(issueIdA));
+        assertTextPresent("resolve as Duplicate of " + issueIdA);
+
+        click(Locator.linkWithText(issueIdA));
+
+        assertElementPresent(Locator.linkWithText(issueIdB));
+        assertTextPresent(String.format("Issue %s marked as duplicate of this issue.", issueIdB));
+        assertTextPresent("Duplicates");
+    }
+
+    @Test
+    public void relatedIssueTest()
+    {
+        Locator relatedLocator = Locator.name("related");
+        Locator updateLink = Locator.linkWithText("Update");
+
+        createIssue(getDisplayName(), "A is for Apple", "2", "New issue");
+        String issueIdA = getCurrentIssueId();
+
+        createIssue(getDisplayName(), "B is for Baking", "3", "What what ... in the ... ");
+        String issueIdB = getCurrentIssueId();
+
+        createIssue(getDisplayName(), "C is for Cat", "3", null);
+        String issueIdC = getCurrentIssueId();
+
+        // related C to A
+        click(updateLink);
+        setFormElement(relatedLocator, issueIdA);
+        clickButton("Save");
+
+        assertElementPresent(Locator.linkWithText(issueIdA));
+        click(Locator.linkWithText(issueIdA));
+
+        // try to link to non-existent issue
+        click(updateLink);
+        setFormElement(relatedLocator, "-1");
+        clickButton("Save");
+        assertTextPresent("Related issue '-1' not found");
+
+        // try to double link (reverse order to validate re-ordering)
+        setFormElement(relatedLocator, String.format("%s,%s", issueIdC, issueIdB));
+        clickButton("Save");
+
+        assertElementPresent(Locator.linkWithText(issueIdC));
+        assertElementPresent(Locator.linkWithText(issueIdB));
+        assertTextBefore(issueIdB, issueIdC);
+
+        // NOTE: still need to test for case where user doesn't have permission to related issue...
+    }
+
+    @Test
+    public void defaultAssignedToTest()
+    {
+        String user1DisplayName = displayNameFromEmail(USER1);
+        String user2DisplayName = displayNameFromEmail(USER2);
+
+        clickAndWait(Locator.linkWithText("Issues Summary"));
+
+        // check for no default
+        clickButton("New Issue");
+        assertEquals(getSelectedOptionText(Locator.id("assignedTo")), "");
+        clickButton("Cancel");
+
+        // set default
+        clickButton("Admin");
+        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToUser", "SpecificUser"));
+        selectOptionByText(Locator.name("defaultUser"), user1DisplayName);
+        clickButton("Update");
+        clickButton("Back to Issues");
+
+        // verify
+        clickButton("New Issue");
+        assertEquals(getSelectedOptionText(Locator.id("assignedTo")), user1DisplayName);
+        clickButton("Cancel");
+
+        // set default group and user
+        clickButton("Admin");
+        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToMethod", "Group"));
+        selectOptionByText(Locator.name("assignedToGroup"), "Site:Users");
+        selectOptionByText(Locator.name("defaultUser"), user2DisplayName);
+        clickButton("Update");
+        clickButton("Back to Issues");
+
+        // verify
+        clickButton("New Issue");
+        assertEquals(getSelectedOptionText(Locator.id("assignedTo")), user2DisplayName);
+        clickButton("Cancel");
+
+        // set no default user and return to project users assign list
+        clickButton("Admin");
+        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToMethod", "ProjectUsers"));
+        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToUser", "NoDefaultUser"));
+        clickButton("Update");
+        clickButton("Back to Issues");
+
+        // check for no default
+        clickButton("New Issue");
+        assertEquals(getSelectedOptionText(Locator.id("assignedTo")), "");
+        clickButton("Cancel");
+
+        // TODO: extend test to check validate full user selection list based on group selection...
+        // TODO: compare user dropdown list between admin and new issues page
+    }
+
+    public String getCurrentIssueId()
+    {
+        String title = getLastPageTitle();
+        return title.substring(title.indexOf(' '), title.indexOf(':')).trim();
+    }
+
+    // TODO: Aaron - use this more often!!!
+    public void createIssue(String assignedTo, String title, String priority, @Nullable String comment)
+    {
+        goToModule("Issues");
+        clickButton("New Issue");
+        selectOptionByText(Locator.id("assignedTo"), assignedTo);
+        setFormElement(Locator.name("title"), title);
+        selectOptionByText(Locator.name("priority"), priority);
+
+        if (comment != null)
+            setFormElement(Locator.name("comment"), comment);
+
+        clickButton("Save");
     }
 
 }
