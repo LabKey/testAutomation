@@ -438,7 +438,7 @@ public class StudyTest extends StudyBaseTest
 
         clickButtonContainingText("Edit Selected", APPEARS_AFTER_PICKER_LOAD);
         List<String> newPids = Arrays.asList(getFormElement(Locator.name(ID_FIELD)).replaceAll(" +", "").split(","));
-        assertSetsEqual(pIDs, newPids);
+        assertEquals(new HashSet<>(pIDs), new HashSet<>(newPids));
         log("IDs present after opening list: " + newPids);
 
         //remove first element

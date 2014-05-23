@@ -2036,38 +2036,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return _longWait;
     }
 
-    public void downloadFileFromLink(Locator downloadLink)
-    {
-        if (BROWSER_TYPE == BrowserType.FIREFOX)
-        {
-            click(downloadLink);
-        }
-        else
-        {
-            String href = downloadLink.findElement(getDriver()).getAttribute("href");
-            URL url;
-            try
-            {
-                url = new URL(href);
-            }
-            catch (MalformedURLException ex)
-            {
-                throw new RuntimeException(ex);
-            }
-
-            String fileName = href.substring(href.lastIndexOf("/") + 1);
-
-            try
-            {
-                FileUtils.copyURLToFile(url, new File(getDownloadDir(), fileName));
-            }
-            catch (IOException ex)
-            {
-                throw new RuntimeException(ex);
-            }
-        }
-    }
-
     public boolean isGuestModeTest()
     {
         return false;
@@ -3568,22 +3536,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
         catch (Exception ignore){}
         return false;
-    }
-
-    public interface ElementChecker
-    {
-        public boolean check(WebElement el);
-    }
-
-    public List<WebElement> filterElements(ElementChecker checker, List<WebElement> elements)
-    {
-        List<WebElement> filteredElements = new ArrayList<>();
-        for (WebElement el : elements)
-        {
-            if (checker.check(el))
-                filteredElements.add(el);
-        }
-        return filteredElements;
     }
 
     public void waitFor(Checker checker, String failMessage, int wait)
@@ -6223,13 +6175,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         assertTrue("Expected attribute '" + locator + "@" + attributeName + "' value to not contain '" + value + "', but was '" + actual + "' instead.", actual != null && !actual.contains(value));
     }
 
-    public void assertSetsEqual(List<String> firstSet, List<String> secondSet)
-    {
-        Set<String> firstHash= new HashSet<>(firstSet);
-        Set<String> secondHash= new HashSet<>(secondSet);
-        assertTrue("Sets are not equal.  First set:\n" + firstSet + "\nSecond set:\n" + secondSet, firstHash.equals(secondHash));
-    }
-
     public String getAttribute(Locator locator, String attributeName)
     {
         return locator.findElement(getDriver()).getAttribute(attributeName);
@@ -6699,11 +6644,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         waitForElementToDisappear(loc.index(count), WAIT_FOR_JAVASCRIPT);
         if (count > 0)
             waitForElement(loc.index(count - 1));
-    }
-
-    public String getTextFromElement(Locator loc)
-    {
-        return getText(loc);
     }
 
     private String prepareSvgText(String svgText)
