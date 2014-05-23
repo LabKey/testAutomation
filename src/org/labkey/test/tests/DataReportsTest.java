@@ -376,8 +376,8 @@ public class DataReportsTest extends ReportTest
         pushLocation();
         createSiteDeveloper(AUTHOR_USER);
         clickProject(getProjectName());
-        enterPermissionsUI();
-        setUserPermissions(AUTHOR_USER, "Author");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setUserPermissions(AUTHOR_USER, "Author");
         impersonate(AUTHOR_USER);
         clickProject(getProjectName());
         clickFolder(getFolderName());
@@ -403,14 +403,14 @@ public class DataReportsTest extends ReportTest
 
         log("Check that background run works");
 
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         clickManageGroup("Users");
         setFormElement("names", R_USER);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
-        enterPermissionsUI();
-        setPermissions("Users", "Editor");
-        exitPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setPermissions("Users", "Editor");
+        _permissionsHelper.exitPermissionsUI();
 
 
         //create R report with dev
@@ -432,9 +432,9 @@ public class DataReportsTest extends ReportTest
         clickProject(getProjectName());
         if (isTextPresent("Enable Admin"))
             clickAndWait(Locator.linkWithText("Enable Admin"));
-        enterPermissionsUI();
-        setPermissions("Users", "Project Administrator");
-        exitPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setPermissions("Users", "Project Administrator");
+        _permissionsHelper.exitPermissionsUI();
 
         log("Create a new R script that uses other R scripts");
         clickProject(getProjectName());

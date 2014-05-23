@@ -106,9 +106,9 @@ public class AuditLogTest extends BaseWebDriverTest
         log("testing group audit events");
 
         _containerHelper.createProject(AUDIT_TEST_PROJECT, null);
-        createPermissionsGroup("Testers");
-        assertPermissionSetting("Testers", "No Permissions");
-        setPermissions("Testers", "Editor");
+        _permissionsHelper.createPermissionsGroup("Testers");
+        _permissionsHelper.assertPermissionSetting("Testers", "No Permissions");
+        _permissionsHelper.setPermissions("Testers", "Editor");
 
         clickManageGroup("Testers");
         setFormElement(Locator.name("names"), AUDIT_TEST_USER);
@@ -151,7 +151,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
         // now grant CanSeeAuditLog permission to our audit user and verify
         // we see audit information
-        setSiteAdminRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
+        _permissionsHelper.setSiteAdminRoleUserPermissions(AUDIT_TEST_USER, "See Audit Log Events");
         impersonate(AUDIT_TEST_USER);
         verifyAuditQueries(true);
 

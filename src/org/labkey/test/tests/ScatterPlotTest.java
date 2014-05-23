@@ -453,8 +453,8 @@ public class ScatterPlotTest extends GenericChartsTest
         // verify that only developers can see the button to add point click function
         createUser(DEVELOPER_USER, null);
         clickProject(getProjectName());
-        enterPermissionsUI();
-        setUserPermissions(DEVELOPER_USER, "Editor");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setUserPermissions(DEVELOPER_USER, "Editor");
         impersonate(DEVELOPER_USER);
         clickProject(getProjectName());
         clickFolder(getFolderName());

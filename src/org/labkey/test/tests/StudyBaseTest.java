@@ -344,7 +344,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
 
     protected void enterStudySecurity()
     {
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Study Security");
         waitAndClickButton("Study Security");
     }

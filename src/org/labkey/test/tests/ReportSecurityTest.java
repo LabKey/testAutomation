@@ -67,9 +67,9 @@ public class ReportSecurityTest extends ReportTest
         clickFolder("My Study");
 
         // create a test group and give it container read perms
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
 
-        createPermissionsGroup(TEST_GROUP);
+        _permissionsHelper.createPermissionsGroup(TEST_GROUP);
 
         // add user to the first test group
         clickManageGroup(TEST_GROUP);
@@ -77,8 +77,8 @@ public class ReportSecurityTest extends ReportTest
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
         clickButton("Update Group Membership");
 
-        enterPermissionsUI();
-        setPermissions(TEST_GROUP, "Reader");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setPermissions(TEST_GROUP, "Reader");
         clickButton("Save and Finish");
 
         // give the test group read access to only the DEM-1 dataset

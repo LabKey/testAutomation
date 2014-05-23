@@ -63,10 +63,10 @@ public class BasicTest extends BaseWebDriverTest
         clickButton("Save");
 
         _containerHelper.createProject(PROJECT_NAME, null);
-        createPermissionsGroup("testers");
+        _permissionsHelper.createPermissionsGroup("testers");
         _ext4Helper.clickTabContainingText("Permissions");
-        assertPermissionSetting("testers", "No Permissions");
-        setPermissions("testers", "Editor");
+        _permissionsHelper.assertPermissionSetting("testers", "No Permissions");
+        _permissionsHelper.setPermissions("testers", "Editor");
         clickButton("Save and Finish");
         createSubfolder(getProjectName(), FOLDER_NAME, new String[] {"Messages", "Wiki", "MS2"});
 

@@ -96,12 +96,12 @@ public class SurveyTest extends BaseWebDriverTest
         log("Add users that will be used for permissions testing");
         createUser(EDITOR, null);
         clickProject(getProjectName());
-        enterPermissionsUI();
-        setUserPermissions(EDITOR, "Reader");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setUserPermissions(EDITOR, "Reader");
         clickButton("Save and Finish");
         clickFolder(folderName);
-        enterPermissionsUI();
-        setUserPermissions(EDITOR, "Editor");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setUserPermissions(EDITOR, "Editor");
         clickButton("Save and Finish");
     }
 

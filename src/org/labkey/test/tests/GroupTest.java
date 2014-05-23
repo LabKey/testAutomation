@@ -57,10 +57,10 @@ public class GroupTest extends BaseWebDriverTest
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException
     {
-        deleteGroup(COMPOUND_GROUP, afterTest);
-        deleteGroup(SIMPLE_GROUP, afterTest);
-        deleteGroup(BAD_GROUP, afterTest);
-        deleteGroup(CHILD_GROUP, afterTest);
+        _permissionsHelper.deleteGroup(COMPOUND_GROUP, afterTest);
+        _permissionsHelper.deleteGroup(SIMPLE_GROUP, afterTest);
+        _permissionsHelper.deleteGroup(BAD_GROUP, afterTest);
+        _permissionsHelper.deleteGroup(CHILD_GROUP, afterTest);
         deleteUsers(afterTest, TEST_USERS_FOR_GROUP);
         deleteProject(getProjectName(), afterTest);
         deleteProject(getProject2Name(), afterTest);
@@ -89,8 +89,8 @@ public class GroupTest extends BaseWebDriverTest
         stopImpersonating();
         //create users
 
-        createGlobalPermissionsGroup(SIMPLE_GROUP, TEST_USERS_FOR_GROUP[0], TEST_USERS_FOR_GROUP[1]);
-        createGlobalPermissionsGroup(COMPOUND_GROUP, SIMPLE_GROUP,  TEST_USERS_FOR_GROUP[2]);
+        _permissionsHelper.createGlobalPermissionsGroup(SIMPLE_GROUP, TEST_USERS_FOR_GROUP[0], TEST_USERS_FOR_GROUP[1]);
+        _permissionsHelper.createGlobalPermissionsGroup(COMPOUND_GROUP, SIMPLE_GROUP,  TEST_USERS_FOR_GROUP[2]);
 
         verifyExportFunction();
 
@@ -99,7 +99,7 @@ public class GroupTest extends BaseWebDriverTest
         //add read permissions to group2
         goToHome();
         clickProject(getProjectName());
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         waitForText("Author");
 
         _securityHelper.setSiteGroupPermissions(COMPOUND_GROUP, "Author");
@@ -112,7 +112,7 @@ public class GroupTest extends BaseWebDriverTest
 
         //give a system group permissions, so that we can verify copying them doesn't cause a problem
         clickProject(getProjectName());
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         waitForText("Author");
         _securityHelper.setSiteGroupPermissions("All Site Users", "Author");
 
@@ -224,8 +224,8 @@ public class GroupTest extends BaseWebDriverTest
         stopImpersonatingRole();
 
         //Issue 13802: add child group to SIMPLE_GROUP, child group should also have access to pages
-        createGlobalPermissionsGroup(CHILD_GROUP, "");
-        addUserToSiteGroup(CHILD_GROUP, SIMPLE_GROUP);
+        _permissionsHelper.createGlobalPermissionsGroup(CHILD_GROUP, "");
+        _permissionsHelper.addUserToSiteGroup(CHILD_GROUP, SIMPLE_GROUP);
         clickProject(getProjectName());
         impersonateGroup(CHILD_GROUP, true);
         verifyEditorPermission(nameTitleBody);
@@ -284,7 +284,7 @@ public class GroupTest extends BaseWebDriverTest
 
     @LogMethod private void verifyExportFunction()
     {
-        selectGroup(COMPOUND_GROUP, true);
+        _permissionsHelper.selectGroup(COMPOUND_GROUP, true);
         clickAndWait(Locator.linkWithText("manage group"));
         waitForElement(Locator.name("names"));
         //Selenium can't handle file exports, so there's nothing to be done here.
@@ -295,7 +295,7 @@ public class GroupTest extends BaseWebDriverTest
     @LogMethod
     private void verifyCantAddSystemGroupToUserGroup()
     {
-        startCreateGlobalPermissionsGroup(BAD_GROUP, true);
+        _permissionsHelper.startCreateGlobalPermissionsGroup(BAD_GROUP, true);
         _ext4Helper.selectComboBoxItem(Locator.xpath(_extHelper.getExtDialogXPath(BAD_GROUP + " Information") + "//table[contains(@id, 'labkey-principalcombo')]"), "Site: All Site Users");
 
         waitForText("Can't add a system group to another group");

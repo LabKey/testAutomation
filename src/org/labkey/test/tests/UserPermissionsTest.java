@@ -91,9 +91,9 @@ public class UserPermissionsTest extends BaseWebDriverTest
     private void userPermissionRightsTest()
     {
         _containerHelper.createProject(PERM_PROJECT_NAME, null);
-        createPermissionsGroup(GAMMA_EDITOR_GROUP_NAME);
-        assertPermissionSetting(GAMMA_EDITOR_GROUP_NAME, "No Permissions");
-        setPermissions(GAMMA_EDITOR_GROUP_NAME, "Editor");
+        _permissionsHelper.createPermissionsGroup(GAMMA_EDITOR_GROUP_NAME);
+        _permissionsHelper.assertPermissionSetting(GAMMA_EDITOR_GROUP_NAME, "No Permissions");
+        _permissionsHelper.setPermissions(GAMMA_EDITOR_GROUP_NAME, "Editor");
         createUserInProjectForGroup(GAMMA_EDITOR_USER, PERM_PROJECT_NAME, GAMMA_EDITOR_GROUP_NAME, false);
 
         createSubfolder(PERM_PROJECT_NAME, PERM_PROJECT_NAME, DENIED_SUB_FOLDER_NAME, "None", new String[] {"Messages", "Wiki"}, true);
@@ -107,24 +107,24 @@ public class UserPermissionsTest extends BaseWebDriverTest
 
         //Create Reader User
         clickProject(PERM_PROJECT_NAME);
-        enterPermissionsUI();
-        createPermissionsGroup(GAMMA_READER_GROUP_NAME);
-        assertPermissionSetting(GAMMA_READER_GROUP_NAME, "No Permissions");
-        setPermissions(GAMMA_READER_GROUP_NAME, "Reader");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.createPermissionsGroup(GAMMA_READER_GROUP_NAME);
+        _permissionsHelper.assertPermissionSetting(GAMMA_READER_GROUP_NAME, "No Permissions");
+        _permissionsHelper.setPermissions(GAMMA_READER_GROUP_NAME, "Reader");
         createUserInProjectForGroup(GAMMA_READER_USER, PERM_PROJECT_NAME, GAMMA_READER_GROUP_NAME, false);
         //Create Author User
         clickProject(PERM_PROJECT_NAME);
-        enterPermissionsUI();
-        createPermissionsGroup(GAMMA_AUTHOR_GROUP_NAME);
-        assertPermissionSetting(GAMMA_AUTHOR_GROUP_NAME, "No Permissions");
-        setPermissions(GAMMA_AUTHOR_GROUP_NAME, "Author");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.createPermissionsGroup(GAMMA_AUTHOR_GROUP_NAME);
+        _permissionsHelper.assertPermissionSetting(GAMMA_AUTHOR_GROUP_NAME, "No Permissions");
+        _permissionsHelper.setPermissions(GAMMA_AUTHOR_GROUP_NAME, "Author");
         createUserInProjectForGroup(GAMMA_AUTHOR_USER, PERM_PROJECT_NAME, GAMMA_AUTHOR_GROUP_NAME, false);
         //Create the Submitter User
         clickProject(PERM_PROJECT_NAME);
-        enterPermissionsUI();
-        createPermissionsGroup(GAMMA_SUBMITTER_GROUP_NAME);
-        assertPermissionSetting(GAMMA_SUBMITTER_GROUP_NAME, "No Permissions");
-        setPermissions(GAMMA_SUBMITTER_GROUP_NAME, "Submitter");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.createPermissionsGroup(GAMMA_SUBMITTER_GROUP_NAME);
+        _permissionsHelper.assertPermissionSetting(GAMMA_SUBMITTER_GROUP_NAME, "No Permissions");
+        _permissionsHelper.setPermissions(GAMMA_SUBMITTER_GROUP_NAME, "Submitter");
         // TODO: Add submitter to a group
         /*
          * I need a way to test submitter, I can't even view a folder where submitter has permissions when
@@ -198,20 +198,20 @@ public class UserPermissionsTest extends BaseWebDriverTest
         stopImpersonating();
         clickProject(PERM_PROJECT_NAME);
         clickFolder(GAMMA_SUB_FOLDER_NAME);
-        enterPermissionsUI();
-        uncheckInheritedPermissions();
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.uncheckInheritedPermissions();
         waitAndClickButton("Save and Finish");
         clickFolder(DENIED_SUB_FOLDER_NAME);
-        enterPermissionsUI();
-        uncheckInheritedPermissions();
-        removePermission(GAMMA_READER_GROUP_NAME, "Reader");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.uncheckInheritedPermissions();
+        _permissionsHelper.removePermission(GAMMA_READER_GROUP_NAME, "Reader");
         clickButton("Save and Finish");
 
         // Test that a project admin is confined to a single project when impersonating a project user. Site admins
         // are not restricted in this way, so we need to create and login as a new user with project admin permissions.
         clickProject(PERM_PROJECT_NAME);
-        createPermissionsGroup(GAMMA_ADMIN_GROUP_NAME);
-        setPermissions(GAMMA_ADMIN_GROUP_NAME, "Project Administrator");
+        _permissionsHelper.createPermissionsGroup(GAMMA_ADMIN_GROUP_NAME);
+        _permissionsHelper.setPermissions(GAMMA_ADMIN_GROUP_NAME, "Project Administrator");
         createUserInProjectForGroup(GAMMA_PROJECT_ADMIN_USER, PERM_PROJECT_NAME, GAMMA_ADMIN_GROUP_NAME, true);
         clickLinkWithTextNoTarget("here");
         clickAndWait(Locator.linkContainingText("setPassword.view"));
@@ -255,10 +255,10 @@ public class UserPermissionsTest extends BaseWebDriverTest
     {
         if (isElementPresent(Locator.permissionRendered()))
         {
-            exitPermissionsUI();
+            _permissionsHelper.exitPermissionsUI();
             clickProject(projectName);
         }
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         clickManageGroup(groupName);
         setFormElement(Locator.name("names"), userName);
         if (!sendEmail)

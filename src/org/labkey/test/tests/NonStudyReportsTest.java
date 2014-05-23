@@ -153,8 +153,8 @@ public class NonStudyReportsTest extends ReportTest
         //
         createUser(ATTACHMENT_USER, null);
         clickProject(getProjectName());
-        enterPermissionsUI();
-        setUserPermissions(ATTACHMENT_USER, "Editor");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setUserPermissions(ATTACHMENT_USER, "Editor");
         impersonate(ATTACHMENT_USER);
         clickProject(getProjectName());
 

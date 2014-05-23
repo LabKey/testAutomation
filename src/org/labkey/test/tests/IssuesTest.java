@@ -107,9 +107,9 @@ public class IssuesTest extends BaseWebDriverTest
     {
         PortalHelper portalHelper = new PortalHelper(this);
         _containerHelper.createProject(PROJECT_NAME, null);
-        createPermissionsGroup(TEST_GROUP);
-        assertPermissionSetting(TEST_GROUP, "No Permissions");
-        setPermissions(TEST_GROUP, "Editor");
+        _permissionsHelper.createPermissionsGroup(TEST_GROUP);
+        _permissionsHelper.assertPermissionSetting(TEST_GROUP, "No Permissions");
+        _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
         clickButton("Save and Finish");
 
         enableModule(PROJECT_NAME, "Dumbster");
@@ -144,8 +144,8 @@ public class IssuesTest extends BaseWebDriverTest
     {
         // Add to group so user appears
         clickProject("IssuesVerifyProject");
-        addUserToProjGroup(PasswordUtil.getUsername(), PROJECT_NAME, TEST_GROUP);
-        addUserToProjGroup(USER1, PROJECT_NAME, TEST_GROUP);
+        _permissionsHelper.addUserToProjGroup(PasswordUtil.getUsername(), PROJECT_NAME, TEST_GROUP);
+        _permissionsHelper.addUserToProjGroup(USER1, PROJECT_NAME, TEST_GROUP);
         createUser(USER2, null, false);
     }
 

@@ -101,19 +101,19 @@ public abstract class AbstractAssayTest extends SimpleApiTest
 
         //we should now be sitting on the new project security page
         //create a group in the project for PIs and make them readers by default
-        createPermissionsGroup(TEST_ASSAY_GRP_PIS);
+        _permissionsHelper.createPermissionsGroup(TEST_ASSAY_GRP_PIS);
         _securityHelper.setProjectPerm(TEST_ASSAY_GRP_PIS, TEST_ASSAY_PERMS_READER);
 
         //set Users group to be Readers by default
         _securityHelper.setProjectPerm(TEST_ASSAY_GRP_USERS, TEST_ASSAY_PERMS_READER);
 
         //add a PI user to that group
-        addUserToProjGroup(TEST_ASSAY_USR_PI1, TEST_ASSAY_PRJ_SECURITY,TEST_ASSAY_GRP_PIS);
+        _permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_PI1, TEST_ASSAY_PRJ_SECURITY,TEST_ASSAY_GRP_PIS);
         // give the PI user "CanSeeAuditLog" permission
-        setSiteAdminRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
+        _permissionsHelper.setSiteAdminRoleUserPermissions(TEST_ASSAY_USR_PI1, "See Audit Log Events");
 
         //add a lab tech user to the Users group
-        addUserToProjGroup(TEST_ASSAY_USR_TECH1, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_GRP_USERS);
+        _permissionsHelper.addUserToProjGroup(TEST_ASSAY_USR_TECH1, TEST_ASSAY_PRJ_SECURITY, TEST_ASSAY_GRP_USERS);
 
         //add folder structure
         log("Setting up folder structure and folder permissions");
@@ -182,15 +182,15 @@ public abstract class AbstractAssayTest extends SimpleApiTest
             clickButton("Save and Finish");
         clickProject(project);
         clickFolder(subfolder);
-        enterPermissionsUI();
-        uncheckInheritedPermissions();
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.uncheckInheritedPermissions();
         waitAndClickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
         waitForElement(Locator.permissionRendered());
         if (TEST_ASSAY_PERMS_NONE.equals(perms))
         {
-            removePermission(group, "Editor");
-            removePermission(group, "Reader");
+            _permissionsHelper.removePermission(group, "Editor");
+            _permissionsHelper.removePermission(group, "Reader");
         }
         else
             _securityHelper.setProjectPerm(group, perms);
@@ -285,7 +285,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
 
     protected void enterStudySecurity()
     {
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Study Security");
         waitAndClickButton("Study Security");
     }

@@ -75,11 +75,11 @@ public class StudySecurityTest extends StudyBaseTest
         createPermissionsGroup(GROUP_LIMITED, LIMITED);
         createPermissionsGroup(GROUP_NONE, NONE);
 
-        setPermissions(GROUP_READERS, "Reader");
-        setPermissions(GROUP_EDITORS, "Editor");
-        setPermissions(GROUP_LIMITED, "Reader");
-        setPermissions(GROUP_NONE, "Reader");
-        exitPermissionsUI();
+        _permissionsHelper.setPermissions(GROUP_READERS, "Reader");
+        _permissionsHelper.setPermissions(GROUP_EDITORS, "Editor");
+        _permissionsHelper.setPermissions(GROUP_LIMITED, "Reader");
+        _permissionsHelper.setPermissions(GROUP_NONE, "Reader");
+        _permissionsHelper.exitPermissionsUI();
 
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText("Manage Files"));

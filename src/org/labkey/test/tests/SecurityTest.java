@@ -398,10 +398,10 @@ public class SecurityTest extends BaseWebDriverTest
     @LogMethod protected void guestTest()
     {
         goToProjectHome();
-        enterPermissionsUI();
-        setSiteGroupPermissions("All Site Users", "Author");
-        setSiteGroupPermissions("Guests", "Reader");
-        exitPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Author");
+        _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
+        _permissionsHelper.exitPermissionsUI();
 
         addWebPart("Messages");
         assertNavButtonPresent("New");
@@ -444,16 +444,16 @@ public class SecurityTest extends BaseWebDriverTest
 
         // create the project and set permissions
         _containerHelper.createProject(PROJECT_NAME, null);
-        createPermissionsGroup("Administrators");
+        _permissionsHelper.createPermissionsGroup("Administrators");
         clickManageGroup("Administrators");
         setFormElement("names", ADMIN_USER_TEMPLATE);
         clickButton("Update Group Membership");
-        enterPermissionsUI();
-        setPermissions("Administrators", "Project Administrator");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setPermissions("Administrators", "Project Administrator");
 
-        createPermissionsGroup("Testers");
-        assertPermissionSetting("Testers", "No Permissions");
-        setPermissions("Testers", "Editor");
+        _permissionsHelper.createPermissionsGroup("Testers");
+        _permissionsHelper.assertPermissionSetting("Testers", "No Permissions");
+        _permissionsHelper.setPermissions("Testers", "Editor");
         clickManageGroup("Testers");
         setFormElement("names", NORMAL_USER_TEMPLATE);
         clickButton("Update Group Membership");
@@ -688,7 +688,7 @@ public class SecurityTest extends BaseWebDriverTest
         // 17037 Regression
         impersonate(PROJECT_ADMIN_USER);
         clickProject(PROJECT_NAME);
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Project Groups");
         assertTextPresent("Total Users");
         stopImpersonating();

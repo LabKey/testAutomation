@@ -26,12 +26,12 @@ public class SecurityHelper extends AbstractHelper
 
     public void setSiteGroupPermissions(String groupName, String permissionString)
     {
-        _test.setSiteGroupPermissions(groupName, permissionString);
+        _test._permissionsHelper.setSiteGroupPermissions(groupName, permissionString);
     }
 
     public void setProjectPerm(String userOrGroupName, String permission)
     {
-        _test.setPermissions(userOrGroupName, permission);
+        _test._permissionsHelper.setPermissions(userOrGroupName, permission);
     }
 
     public void setProjectPerm(String userOrGroupName, String folder, String permission)
@@ -40,6 +40,6 @@ public class SecurityHelper extends AbstractHelper
         String projectUrl = "/project/" + folder + "/begin.view?";
         if(_test.getCurrentRelativeURL().equals(projectUrl))
             _test.beginAt(projectUrl);
-        _test.setPermissions(userOrGroupName, permission);
+        _test._permissionsHelper.setPermissions(userOrGroupName, permission);
     }
 }

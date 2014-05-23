@@ -86,7 +86,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         CreateGroupResponse respNewGroup = cmdNewGroup.execute(cn, PROJECT_NAME);
         int groupId = respNewGroup.getGroupId().intValue();
 
-        assertGroupExists(GROUP_NAME, PROJECT_NAME);
+        _permissionsHelper.assertGroupExists(GROUP_NAME, PROJECT_NAME);
 
         //add user to that group and verify
         log("adding user to group...");
@@ -94,7 +94,7 @@ public class JavaClientApiTest extends BaseWebDriverTest
         cmdAddMem.addPrincipalId(userId);
         cmdAddMem.execute(cn, PROJECT_NAME);
 
-        assertUserInGroup(USER_NAME, GROUP_NAME, PROJECT_NAME);
+        _permissionsHelper.assertUserInGroup(USER_NAME, GROUP_NAME, PROJECT_NAME);
 
         //remove user from that group and verify
         log("removing user from group...");
@@ -102,14 +102,14 @@ public class JavaClientApiTest extends BaseWebDriverTest
         cmdRemMem.addPrincipalId(userId);
         cmdRemMem.execute(cn, PROJECT_NAME);
 
-        assertUserNotInGroup(USER_NAME, GROUP_NAME, PROJECT_NAME);
+        _permissionsHelper.assertUserNotInGroup(USER_NAME, GROUP_NAME, PROJECT_NAME);
 
         //delete group and verify
         log("deleting project group...");
         DeleteGroupCommand cmdDel = new DeleteGroupCommand(groupId);
         cmdDel.execute(cn, PROJECT_NAME);
 
-        assertGroupDoesNotExist(GROUP_NAME, PROJECT_NAME);
+        _permissionsHelper.assertGroupDoesNotExist(GROUP_NAME, PROJECT_NAME);
 
         //delete the user
         deleteUsers(true, USER_NAME);
@@ -135,9 +135,9 @@ public class JavaClientApiTest extends BaseWebDriverTest
 
         log("Setting permissions...");
         clickProject(PROJECT_NAME);
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         _securityHelper.setSiteGroupPermissions("Guests", "Editor");
-        exitPermissionsUI();
+        _permissionsHelper.exitPermissionsUI();
 
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(LIST_NAME));

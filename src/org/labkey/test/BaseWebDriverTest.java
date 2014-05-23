@@ -22,13 +22,11 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.FastDateFormat;
-import org.apache.http.HttpException;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.ProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -160,6 +158,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public AbstractAssayHelper _assayHelper = new APIAssayHelper(this);
     public SecurityHelper _securityHelper = new SecurityHelper(this);
     public FileBrowserHelper _fileBrowserHelper = new FileBrowserHelper(this);
+    public PermissionsHelper _permissionsHelper = new PermissionsHelper(this);
     private static File _downloadDir;
 
     private static final int MAX_SERVER_STARTUP_WAIT_SECONDS = 60;
@@ -934,7 +933,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     }
 
-
     public void attemptSignIn(String email, String password)
     {
         clickAndWait(Locator.linkWithText("Sign In"));
@@ -1198,7 +1196,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     // Clicks admin menu items. Tests should use helpers to make admin menu changes less disruptive.
-    protected void clickAdminMenuItem(String... items)
+    public void clickAdminMenuItem(String... items)
     {
         longWait().until(ExpectedConditions.elementToBeClickable(Locators.ADMIN_MENU.toBy()));
         _ext4Helper.clickExt4MenuButton(true, Locators.ADMIN_MENU, false, items);
@@ -2756,68 +2754,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                         "element.dispatchEvent(myEvent);", el, event.toString());
     }
 
-    @LogMethod
-    public void startCreateGlobalPermissionsGroup(@LoggedParam String groupName, boolean failIfAlreadyExists)
-    {
-        goToHome();
-        goToSiteGroups();
-        if(isElementPresent(Locator.tagWithText("div", groupName)))
-        {
-            if(failIfAlreadyExists)
-                throw new IllegalArgumentException("Group already exists: " + groupName);
-            else
-                return;
-        }
-
-        Locator l = Locator.xpath("//input[contains(@name, 'sitegroupsname')]");
-        waitForElement(l, defaultWaitForPage);
-
-        setFormElement(l,groupName);
-        clickButton("Create New Group", 0);
-        _extHelper.waitForExtDialog(groupName + " Information");
-    }
-
-    public void createGlobalPermissionsGroup(String groupName, String... users)
-    {
-        createGlobalPermissionsGroup(groupName, true, users);
-    }
-
-    @LogMethod
-    public void createGlobalPermissionsGroup(@LoggedParam String groupName, boolean failIfAlreadyExists, @LoggedParam String... users )
-    {
-        startCreateGlobalPermissionsGroup(groupName, failIfAlreadyExists);
-        StringBuilder namesList = new StringBuilder();
-
-        for (String member : users)
-        {
-            namesList.append(member).append("\n");
-        }
-
-        log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
-        waitAndClickAndWait(Locator.tagContainingText("a", "manage group"));
-        waitForElement(Locator.name("names"));
-        setFormElement(Locator.name("names"), namesList.toString());
-        uncheckCheckbox(Locator.name("sendEmail"));
-        clickButton("Update Group Membership");
-    }
-
-    public void createPermissionsGroup(String groupName)
-    {
-        log("Creating permissions group " + groupName);
-        if (!isElementPresent(Locator.permissionRendered()))
-            enterPermissionsUI();
-        _ext4Helper.clickTabContainingText("Project Groups");
-        setFormElement(Locator.xpath("//input[contains(@name, 'projectgroupsname')]"), groupName);
-        clickButton("Create New Group", 0);
-        _extHelper.waitForExtDialog(groupName + " Information");
-        assertTextPresent("Group " + groupName);
-        click(Ext4Helper.Locators.ext4Button("Done"));
-        waitForElement(Locator.css(".groupPicker .x4-grid-cell-inner").withText(groupName), WAIT_FOR_JAVASCRIPT);
-    }
-
     public void createPermissionsGroup(String groupName, String... memberNames)
     {
-        createPermissionsGroup(groupName);
+        _permissionsHelper.createPermissionsGroup(groupName);
         clickManageGroup(groupName);
 
         StringBuilder namesList = new StringBuilder();
@@ -2829,7 +2768,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         log("Adding [" + namesList.toString() + "] to group " + groupName + "...");
         addUserToGroupFromGroupScreen(namesList.toString());
 
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
     }
 
     public void openGroupPermissionsDisplay(String groupName)
@@ -5545,204 +5484,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 beginAt(currentURL.concat("?" + parameter + suffix));
     }
 
-    String toRole(String perm)
-    {
-        String R = "security.roles.";
-        if ("No Permissions".equals(perm))
-            return R + "NoPermissionsRole";
-        if ("Project Administrator".equals(perm))
-            return R + "ProjectAdminRole";
-        else if (!perm.contains("."))
-            return R + perm + "Role";
-        return perm;
-    }
-
-    public void assertNoPermission(String groupName, String permissionSetting)
-    {
-        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        waitForElementToDisappear(Locator.permissionButton(groupName,permissionSetting), WAIT_FOR_JAVASCRIPT);
-    }
-
-    public void assertPermissionSetting(String groupName, String permissionSetting)
-    {
-        String role = toRole(permissionSetting);
-        if ("security.roles.NoPermissionsRole".equals(role))
-        {
-            assertNoPermission(groupName,"Reader");
-            assertNoPermission(groupName,"Editor");
-            assertNoPermission(groupName,"Project Administrator");
-            return;
-        }
-        log("Checking permission setting for group " + groupName + " equals " + role);
-        waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        assertElementPresent(Locator.permissionButton(groupName,permissionSetting));
-    }
-
-    public void checkInheritedPermissions()
-    {
-        _ext4Helper.checkCheckbox("Inherit permissions from parent");
-    }
-
-    public void uncheckInheritedPermissions()
-    {
-        _ext4Helper.uncheckCheckbox("Inherit permissions from parent");
-    }
-
-    public void savePermissions()
-    {
-        clickButton("Save", 0);
-        waitForElement(Locator.permissionRendered(),defaultWaitForPage);
-        _ext4Helper.waitForMaskToDisappear();
-    }
-
-    @Deprecated
-    //use _securityHelper.setPermissions
-    @LogMethod
-    public void setPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
-    {
-        _setPermissions(groupName, permissionString, "pGroup");
-    }
-
-    @Deprecated
-    //use _securityHelper.setSiteGroupPermissions
-    @LogMethod
-    public void setSiteGroupPermissions(@LoggedParam String groupName, @LoggedParam String permissionString)
-    {
-        _setPermissions(groupName, permissionString, "pSite");
-    }
-
-    @LogMethod
-    public void setUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
-    {
-        log(new Date().toString());
-        _setPermissions(userName, permissionString, "pUser");
-
-        log(new Date().toString());
-    }
-
-    @LogMethod
-    public void setSiteAdminRoleUserPermissions(@LoggedParam String userName, @LoggedParam String permissionString)
-    {
-        log(new Date().toString());
-        goToSiteAdmins();
-        clickAndWait(Locator.linkContainingText("Permissions"));
-        _ext4Helper.clickTabContainingText("Permissions");
-        _selectPermission(userName, userName, permissionString);
-        log(new Date().toString());
-    }
-
-
-    private void _setPermissions(String userOrGroupName, String permissionString, String className)
-    {
-        String role = toRole(permissionString);
-        if ("org.labkey.api.security.roles.NoPermissionsRole".equals(role))
-        {
-            throw new IllegalArgumentException("Can't set NoPermissionRole; call removePermission()");
-        }
-        else
-        {
-            log("Setting permissions for group " + userOrGroupName + " to " + role);
-
-            if (!isElementPresent(Locator.permissionRendered()))
-                enterPermissionsUI();
-            _ext4Helper.clickTabContainingText("Permissions");
-
-            String group = userOrGroupName;
-            if (className.equals("pSite"))
-                group = "Site: " + group;
-            _selectPermission(userOrGroupName, group, permissionString);
-        }
-    }
-
-    private void _selectPermission(String userOrGroupName, String group, String permissionString)
-    {
-        Locator.XPathLocator roleCombo = Locator.xpath("//div[contains(@class, 'rolepanel')][.//h3[text()='" + permissionString + "']]");
-        waitForElement(roleCombo);
-        _ext4Helper.selectComboBoxItem(roleCombo, Ext4Helper.TextMatchTechnique.STARTS_WITH, group);
-        waitForElement(Locator.permissionButton(userOrGroupName, permissionString));
-        String oldId = getAttribute(Locator.permissionButton(userOrGroupName, permissionString), "id");
-        savePermissions();
-        _ext4Helper.waitForMaskToDisappear();
-        waitForElementToDisappear(Locator.id(oldId), WAIT_FOR_JAVASCRIPT); // Elements get new ids after save
-        assertPermissionSetting(userOrGroupName, permissionString);
-    }
-
-    public void removeSiteGroupPermission(String groupName, String permissionString)
-    {
-        _removePermission(groupName, permissionString, "pSite");
-    }
-
-    public void removePermission(String groupName, String permissionString)
-    {
-        _removePermission(groupName, permissionString, "pGroup");
-    }
-
-
-    public void _removePermission(String groupName, String permissionString, String className)
-    {
-        Locator close = Locator.closePermissionButton(groupName,permissionString);
-        if (isElementPresent(close))
-        {
-            click(close);
-            waitForElementToDisappear(close);
-            savePermissions();
-            assertNoPermission(groupName, permissionString);
-        }
-    }
-
-    protected void addUserToSiteGroup(String userName, String groupName)
-    {
-        goToHome();
-        goToSiteGroups();
-        Locator.XPathLocator groupLoc = Locator.tagWithText("div", groupName);
-        waitForElement(groupLoc, defaultWaitForPage);
-        click(groupLoc);
-        clickAndWait(Locator.linkContainingText("manage group"));
-        addUserToGroupFromGroupScreen(userName);
-    }
-
-    protected void addUserToGroupFromGroupScreen(String userName)
+    public void addUserToGroupFromGroupScreen(String userName)
     {
         waitForElement(Locator.name("names"));
         setFormElement(Locator.name("names"), userName );
         uncheckCheckbox(Locator.name("sendEmail"));
         clickButton("Update Group Membership");
 
-    }
-
-    /**
-     * Adds a new or existing user to an existing group within an existing project
-     *
-     * @param userName new or existing user name
-     * @param projectName existing project name
-     * @param groupName existing group within the project to which we should add the user
-     */
-    protected void addUserToProjGroup(String userName, String projectName, String groupName)
-    {
-        if (isElementPresent(Locator.permissionRendered()))
-        {
-            exitPermissionsUI();
-            clickProject(projectName);
-        }
-        enterPermissionsUI();
-        clickManageGroup(groupName);
-        addUserToGroupFromGroupScreen(userName);
-    } //addUserToProjGroup()
-
-    public void enterPermissionsUI()
-    {
-        //if the following assert triggers, you were already in the permissions UI when this was called
-        if (!isElementPresent(Locator.permissionRendered()))
-        {
-            clickAdminMenuItem("Folder", "Permissions");
-            waitForElement(Locator.permissionRendered());
-        }
-    }
-
-    public void exitPermissionsUI()
-    {
-        _ext4Helper.clickTabContainingText("Permissions");
-        clickButton("Save and Finish");
     }
 
     public void impersonateGroup(String group, boolean isSiteGroup)
@@ -5873,7 +5621,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             goToProjectHome();
         else
             clickProject(projectName);
-        setUserPermissions(userName, permissions);
+        _permissionsHelper.setUserPermissions(userName, permissions);
     }
 
     public void createUser(String userName, @Nullable String cloneUserName)
@@ -5927,83 +5675,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             uncheckCheckbox(Locator.name("sendEmail"));
             clickButton("Update Group Membership");
         }
-    }
-
-    public void deleteGroup(String groupName)
-    {
-        deleteGroup(groupName, false);
-    }
-
-    @LogMethod(quiet = true)
-    public void deleteGroup(@LoggedParam String groupName, boolean failIfNotFound)
-    {
-        log("Attempting to delete group: " + groupName);
-        if (selectGroup(groupName, failIfNotFound))
-        {
-            assertElementPresent(Locator.css(".x4-grid-cell-first").withText(groupName));
-            deleteAllUsersFromGroup();
-            click(Locator.xpath("//td/a/span[text()='Delete Empty Group']"));
-            waitForElementToDisappear(Locator.css(".x4-grid-cell-first").withText(groupName), WAIT_FOR_JAVASCRIPT);
-        }
-    }
-
-    private void deleteAllUsersFromGroup()
-    {
-        Locator.XPathLocator l = Locator.xpath("//td/a/span[text()='remove']");
-
-        while(isElementPresent(l))
-        {
-            int i = getElementCount(l) - 1;
-            click(l);
-            waitForElementToDisappear(l.index(i), WAIT_FOR_JAVASCRIPT);
-        }
-    }
-
-
-    public void removeUserFromGroup(String groupName, String userName)
-    {
-        if(!isTextPresent("Group " + groupName))
-            selectGroup(groupName);
-
-        Locator l = Locator.xpath("//td[text()='" + userName +  "']/..//td/a/span[text()='remove']");
-        click(l);
-    }
-
-    public void addUserToGroup(String groupName, String userName)
-    {
-        if(!isTextPresent("Group " + groupName))
-            selectGroup(groupName);
-        String dialogTitle = groupName + " Information";
-
-        _ext4Helper.selectComboBoxItem(Locator.xpath(_extHelper.getExtDialogXPath(dialogTitle) + "//table[contains(@id, 'labkey-principalcombo')]"), userName);
-        Locator.css(".userinfo td").withText(userName).waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
-        _extHelper.clickExtButton(dialogTitle, "Done", 0);
-        _extHelper.waitForExtDialogToDisappear(dialogTitle);
-
-        clickButton("Done");
-    }
-
-    public boolean selectGroup(String groupName)
-    {
-        return selectGroup(groupName, false);
-    }
-
-    public boolean selectGroup(String groupName, boolean failIfNotFound)
-    {
-        if(!isElementPresent(Locator.css(".x4-tab-active").withText("Site Groups")))
-            goToSiteGroups();
-
-        waitForElement(Locator.css(".groupPicker .x4-grid-body"), WAIT_FOR_JAVASCRIPT);
-        if (isElementPresent(Locator.xpath("//div[text()='" + groupName + "']")))
-        {
-            click(Locator.xpath("//div[text()='" + groupName + "']"));
-            _extHelper.waitForExtDialog(groupName + " Information");
-            return true;
-        }
-        else if (failIfNotFound)
-            throw new NoSuchElementException("Group not found:" + groupName);
-
-        return false;
     }
 
     @LogMethod
@@ -6062,63 +5733,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         goToSiteUsers();
         assertTextPresent(email);
         log("user " + email + " exists.");
-    }
-
-    public boolean doesGroupExist(String groupName, String projectName)
-    {
-        ensureAdminMode();
-        clickProject(projectName);
-        enterPermissionsUI();
-        _ext4Helper.clickTabContainingText("Project Groups");
-        waitForText("Member Groups");
-        List<Ext4CmpRef> refs = _ext4Helper.componentQuery("grid", Ext4CmpRef.class);
-        Ext4CmpRef ref = refs.get(0);
-        Long idx = (Long)ref.getEval("getStore().find(\"name\", \"" + groupName + "\")");
-        exitPermissionsUI();
-        return (idx >= 0);
-    }
-
-    public void assertGroupExists(String groupName, String projectName)
-    {
-        log("asserting that group " + groupName + " exists in project " + projectName + "...");
-        if (!doesGroupExist(groupName, projectName))
-            fail("group " + groupName + " does not exist in project " + projectName);
-    }
-
-    public void assertGroupDoesNotExist(String groupName, String projectName)
-    {
-        log("asserting that group " + groupName + " exists in project " + projectName + "...");
-        if (doesGroupExist(groupName, projectName))
-            fail("group " + groupName + " exists in project " + projectName);
-    }
-
-    public boolean isUserInGroup(String email, String groupName, String projectName)
-    {
-        ensureAdminMode();
-        clickProject(projectName);
-        enterPermissionsUI();
-        _ext4Helper.clickTabContainingText("Project Groups");
-        waitForElement(Locator.css(".groupPicker"), WAIT_FOR_JAVASCRIPT);
-        waitAndClick(Locator.xpath("//div[text()='" + groupName + "']"));
-        _extHelper.waitForExtDialog(groupName + " Information");
-        boolean ret = isElementPresent(Locator.xpath("//table[contains(@class, 'userinfo')]//td[starts-with(text(), '" + email +  "')]"));
-        clickButton("Done", 0);
-        _extHelper.waitForExtDialogToDisappear(groupName + " Information");
-        return ret;
-    }
-
-    public void assertUserInGroup(String email, String groupName, String projectName)
-    {
-        log("asserting that user " + email + " is in group " + projectName + "/" + groupName + "...");
-        if (!isUserInGroup(email, groupName, projectName))
-            fail("user " + email + " was not in group " + projectName + "/" + groupName);
-    }
-
-    public void assertUserNotInGroup(String email, String groupName, String projectName)
-    {
-        log("asserting that user " + email + " is not in group " + projectName + "/" + groupName + "...");
-        if (isUserInGroup(email, groupName, projectName))
-            fail("user " + email + " was found in group " + projectName + "/" + groupName);
     }
 
     public void saveWikiPage()

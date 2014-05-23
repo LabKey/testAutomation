@@ -84,12 +84,12 @@ public class MessagesLongTest extends BaseWebDriverTest
     protected void permissionCheck(String permission, boolean readAbility)
     {
         clickProject(PROJECT_NAME);
-        enterPermissionsUI();
-        removePermission("Users","Reader");
-        removePermission("Users","Author");
-        removePermission("Users","Editor");
-        setPermissions("Users", permission);
-        exitPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.removePermission("Users","Reader");
+        _permissionsHelper.removePermission("Users","Author");
+        _permissionsHelper.removePermission("Users","Editor");
+        _permissionsHelper.setPermissions("Users", permission);
+        _permissionsHelper.exitPermissionsUI();
         impersonate(USER1);
         clickProject(PROJECT_NAME);
         if (readAbility)
@@ -110,11 +110,11 @@ public class MessagesLongTest extends BaseWebDriverTest
     {
         log("Open new project, add group, alter permissions");
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");
-        createPermissionsGroup("Administrators");
-        setPermissions("Administrators", "Project Administrator");
-        createPermissionsGroup("testers1");
-        assertPermissionSetting("testers1", "No Permissions");
-        exitPermissionsUI();
+        _permissionsHelper.createPermissionsGroup("Administrators");
+        _permissionsHelper.setPermissions("Administrators", "Project Administrator");
+        _permissionsHelper.createPermissionsGroup("testers1");
+        _permissionsHelper.assertPermissionSetting("testers1", "No Permissions");
+        _permissionsHelper.exitPermissionsUI();
         enableModule(PROJECT_NAME, "Dumbster");
 
         enableEmailRecorder();
@@ -204,7 +204,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         assertElementPresent(Locator.css("#table1 td").withText(" (2 responses)")); // xpath doesn't work with nbsp
 
         log("Create fake user for permissions check");
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         clickManageGroup("Users");
         setFormElement(Locator.name("names"), USER1);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
@@ -326,10 +326,10 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         // USER1 is now a reader
         log("Test member list");
-        enterPermissionsUI();
-        removePermission("Users", "Editor");
-        setPermissions("Users", "Reader");
-        exitPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.removePermission("Users", "Editor");
+        _permissionsHelper.setPermissions("Users", "Reader");
+        _permissionsHelper.exitPermissionsUI();
 
         // USER2 is a nobody
         goToSiteUsers();
@@ -340,7 +340,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
 
         // USER3 is a Project Administrator
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         clickManageGroup("Administrators");
         setFormElement(Locator.name("names"), USER3);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
@@ -464,10 +464,10 @@ public class MessagesLongTest extends BaseWebDriverTest
         createUser(user, null);
         goToHome();
         goToProjectHome();
-        createPermissionsGroup(group);
-        setPermissions(group, "Editor");
+        _permissionsHelper.createPermissionsGroup(group);
+        _permissionsHelper.setPermissions(group, "Editor");
 //        add
-        addUserToProjGroup(user, getProjectName(), group);
+        _permissionsHelper.addUserToProjGroup(user, getProjectName(), group);
         goToProjectHome();
 
         log("Check that Plain Text message works and is added everywhere");

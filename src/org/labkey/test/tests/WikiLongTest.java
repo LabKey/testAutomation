@@ -130,7 +130,7 @@ public class WikiLongTest extends BaseWebDriverTest
         clickButton("Save and Finish");
         _containerHelper.createProject(PROJECT_NAME, null);
         enableModule(PROJECT_NAME, "MS2");
-        createPermissionsGroup("testers");
+        _permissionsHelper.createPermissionsGroup("testers");
         _securityHelper.setProjectPerm("testers", "Editor");
         _securityHelper.setProjectPerm(USERS_GROUP, "Editor");
         clickButton("Save and Finish");
@@ -387,15 +387,15 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Check Permissions");
         log("Create fake user for permissions check");
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         clickManageGroup(USERS_GROUP);
         setFormElement(Locator.name("names"), USER1);
         uncheckCheckbox(Locator.name("sendEmail"));
         clickButton("Update Group Membership");
 
         log("Check if permissions work");
-        enterPermissionsUI();
-        setPermissions(USERS_GROUP, "Reader");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setPermissions(USERS_GROUP, "Reader");
         clickButton("Save and Finish");
         impersonate(USER1);
         clickProject(PROJECT2_NAME);
@@ -405,11 +405,11 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextNotPresent("copy pages");
         stopImpersonating();
         clickProject(PROJECT2_NAME);
-        enterPermissionsUI();
-        removePermission(USERS_GROUP, "Editor");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.removePermission(USERS_GROUP, "Editor");
         clickButton("Save and Finish");
-        enterPermissionsUI();
-        removePermission(USERS_GROUP, "Reader");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.removePermission(USERS_GROUP, "Reader");
         clickButton("Save and Finish");
         impersonate(USER1);
         assertElementNotPresent(Locator.linkWithText(PROJECT2_NAME));     // Project should not be visible
@@ -437,8 +437,8 @@ public class WikiLongTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("name"), WIKI_PAGE2_NAME + " (" + WIKI_PAGE2_TITLE + ")");
         submit();
         assertTextPresent(WIKI_PAGE2_TITLE);
-        enterPermissionsUI();
-        setPermissions(USERS_GROUP, "Project Administrator");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setPermissions(USERS_GROUP, "Project Administrator");
         clickButton("Save and Finish");
         impersonate(USER1);
         clickProject(PROJECT2_NAME);
@@ -449,7 +449,7 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextNotPresent(PROJECT_NAME);
         stopImpersonating();
         clickProject(PROJECT_NAME);
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         clickManageGroup(USERS_GROUP);
         setFormElement("names", USER1);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
@@ -464,8 +464,8 @@ public class WikiLongTest extends BaseWebDriverTest
         assertElementNotPresent(Locator.linkWithText(PROJECT_NAME));
         stopImpersonating();
         clickProject(PROJECT_NAME);
-        enterPermissionsUI();
-        setPermissions(USERS_GROUP, "Project Administrator");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setPermissions(USERS_GROUP, "Project Administrator");
         clickButton("Save and Finish");
 
         log("make sure the changes went through");
@@ -557,7 +557,7 @@ public class WikiLongTest extends BaseWebDriverTest
     {
         log("Create user for terms of use checks");
         clickProject(PROJECT_NAME);
-        enterPermissionsUI();
+        _permissionsHelper.enterPermissionsUI();
         clickManageGroup(USERS_GROUP);
         setFormElement("names", USER2);
         uncheckCheckbox(Locator.checkboxByName("sendEmail"));
@@ -573,8 +573,8 @@ public class WikiLongTest extends BaseWebDriverTest
         pushLocation(); // For attempting to bypass Terms of Use (1 pop)
 
         _containerHelper.createProject(PROJECT3_NAME, null); // Public project
-        setSiteGroupPermissions("Guests", "Reader");
-        setSiteGroupPermissions("All Site Users", "Reader");
+        _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
         goToModule("Wiki");
         createNewWikiPage("RADEOX");
         setFormElement("name", "_termsOfUse");
@@ -584,7 +584,7 @@ public class WikiLongTest extends BaseWebDriverTest
         pushLocation(); // For attempting to bypass Terms of Use (2 pops)
 
         _containerHelper.createProject(PROJECT4_NAME, null);
-        setSiteGroupPermissions("All Site Users", "Reader");
+        _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
         goToModule("Wiki");
         createNewWikiPage("RADEOX");
         setFormElement("name", "_termsOfUse");

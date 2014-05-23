@@ -57,9 +57,9 @@ public class SecurityApiTest extends SimpleApiTest
         _containerHelper.createProject(PROJECT_NAME, null);
         createPermissionsGroup(GROUP_1, USER_1);
         createPermissionsGroup(GROUP_2, USER_1, USER_2);
-        setPermissions(GROUP_1, "Editor");
-        setPermissions(GROUP_2, "Reader");
-        exitPermissionsUI();
+        _permissionsHelper.setPermissions(GROUP_1, "Editor");
+        _permissionsHelper.setPermissions(GROUP_2, "Reader");
+        _permissionsHelper.exitPermissionsUI();
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException

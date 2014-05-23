@@ -525,7 +525,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         goToHome();
         createUser(user, null, false);
         goToProjectHome();
-        setUserPermissions(user, perms);
+        _permissionsHelper.setUserPermissions(user, perms);
         impersonate(user);
     }
 

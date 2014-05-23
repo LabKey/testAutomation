@@ -49,7 +49,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         super.doCleanup(afterTest);
 
         deleteUsers(afterTest, IMPERSONATED_USER, CHECKED_USER, ADMIN_USER);
-        deleteGroup(TEST_GROUP, afterTest);
+        _permissionsHelper.deleteGroup(TEST_GROUP, afterTest);
     }
 
     @Override
@@ -90,9 +90,9 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         popLocation();
 
         impersonate(ADMIN_USER); // Use created user to ensure we have a known 'Modified by' column for created users
-        createGlobalPermissionsGroup(TEST_GROUP, IMPERSONATED_USER, CHECKED_USER);
+        _permissionsHelper.createGlobalPermissionsGroup(TEST_GROUP, IMPERSONATED_USER, CHECKED_USER);
         _containerHelper.createProject(getProjectName(), null);
-        setSiteGroupPermissions(TEST_GROUP, "Reader");
+        _permissionsHelper.setSiteGroupPermissions(TEST_GROUP, "Reader");
         clickButton("Save and Finish");
         stopImpersonating();
         impersonate(CHECKED_USER);
@@ -145,7 +145,7 @@ public class HiddenEmailTest extends BaseWebDriverTest implements DevModeOnlyTes
         goToSiteGroups();
         _ext4Helper.clickExt4Tab("Permissions");
         waitForElement(Locator.permissionRendered(), WAIT_FOR_JAVASCRIPT);
-        removeSiteGroupPermission("All Site Users", "See Email Addresses");
+        _permissionsHelper.removeSiteGroupPermission("All Site Users", "See Email Addresses");
         assertElementNotPresent(Locator.permissionButton(TEST_GROUP, "See Email Addresses"));
         assertElementNotPresent(Locator.permissionButton(IMPERSONATED_USER, "See Email Addresses"));
         clickButton("Save and Finish");

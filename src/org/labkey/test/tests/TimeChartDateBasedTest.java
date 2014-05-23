@@ -49,9 +49,9 @@ public class TimeChartDateBasedTest extends TimeChartTest
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
-        enterPermissionsUI();
-        setUserPermissions(USER1, "Reader");
-        setUserPermissions(USER2, "Editor");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.setUserPermissions(USER1, "Reader");
+        _permissionsHelper.setUserPermissions(USER2, "Editor");
         _securityHelper.setSiteGroupPermissions("Guests", "Reader");
         clickButton("Save and Finish");
 

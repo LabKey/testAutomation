@@ -185,7 +185,7 @@ public class StudyTest extends StudyBaseTest
     {
         clickProject(getProjectName());
         createUser(authorUser, null, true);
-        setUserPermissions(authorUser, "Author");
+        _permissionsHelper.setUserPermissions(authorUser, "Author");
         impersonate(authorUser);
         beginAt(specimenUrl);
         clickButton("Request Options", 0);
