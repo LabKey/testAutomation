@@ -369,7 +369,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         waitForElement(Locator.input("quf_Name"));
         setFormElement(Locator.input("quf_Name"), tag.name);
         setFormElement(Locator.input("quf_Caption"), tag.caption);
-        setFormElement(Locator.textarea("quf_Description"), tag.description);
+        setFormElement(Locator.tagWithName("textarea", "quf_Description"), tag.description);
         if(tag.isSingleUse)
         {
             click(Locator.checkboxByName("quf_SingleUse"));
