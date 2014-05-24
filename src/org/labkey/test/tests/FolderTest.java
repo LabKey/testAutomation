@@ -22,6 +22,8 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 
@@ -64,15 +66,18 @@ public class FolderTest extends BaseWebDriverTest
     @LogMethod
     protected void createFolders()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
+
         // Initialize the Creation Wiki
         clickProject(PROJECT_NAME);
-        addWebPart("Wiki");
+        portalHelper.addWebPart("Wiki");
 
-        createNewWikiPage();
+        wikiHelper.createNewWikiPage();
         setFormElement(Locator.id("wiki-input-name"), WIKITEST_NAME);
         setFormElement(Locator.id("wiki-input-title"), WIKITEST_NAME);
-        setWikiBody(getFileContents(FOLDER_CREATION_FILE));
-        saveWikiPage();
+        wikiHelper.setWikiBody(getFileContents(FOLDER_CREATION_FILE));
+        wikiHelper.saveWikiPage();
 
         // Run the Test Script
         clickButton("Start Test", 0);

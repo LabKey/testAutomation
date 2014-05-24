@@ -25,6 +25,8 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.ExtHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.util.Calendar;
@@ -176,16 +178,19 @@ public class LuminexGuideSetTest  extends LuminexTest
     @LogMethod
     private void guideSetApiTest()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
+
         goToProjectHome();
         assertTextNotPresent("GS Analyte");
 
         String wikiName = "LuminexGuideSetTestWiki";
-        addWebPart("Wiki");
-        createNewWikiPage("HTML");
+        portalHelper.addWebPart("Wiki");
+        wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), wikiName);
-        setWikiBody("Placeholder text.");
-        saveWikiPage();
-        setSourceFromFile("LuminexGuideSet.html", wikiName);
+        wikiHelper.setWikiBody("Placeholder text.");
+        wikiHelper.saveWikiPage();
+        wikiHelper.setSourceFromFile("LuminexGuideSet.html", wikiName);
 
         waitAndClick(Locator.id("button_loadqwps"));
         waitForText("Done loading QWPs");

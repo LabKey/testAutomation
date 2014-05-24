@@ -24,6 +24,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.NoSuchElementException;
 
 import java.util.Arrays;
@@ -185,6 +186,8 @@ public class GroupTest extends BaseWebDriverTest
     @LogMethod
     private void verifyImpersonate()
     {
+        WikiHelper wikiHelper = new WikiHelper(this);
+
         //set simple group as editor
         _securityHelper.setSiteGroupPermissions(SIMPLE_GROUP, "Editor");
 
@@ -195,8 +198,8 @@ public class GroupTest extends BaseWebDriverTest
 
         for(String[] wikiValues : nameTitleBody)
         {
-            createNewWikiPage();
-            setWikiValuesAndSave(wikiValues[0], wikiValues[1], wikiValues[2]);
+            wikiHelper.createNewWikiPage();
+            wikiHelper.setWikiValuesAndSave(wikiValues[0], wikiValues[1], wikiValues[2]);
         }
         stopImpersonating();
 
@@ -369,18 +372,20 @@ public class GroupTest extends BaseWebDriverTest
     @LogMethod
     protected void groupSecurityApiTest()
     {
+        WikiHelper wikiHelper = new WikiHelper(this);
+        PortalHelper portalHelper = new PortalHelper(this);
+
         // Initialize the Wiki
         clickProject(getProjectName());
-        PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Wiki");
 
-        createNewWikiPage();
+        wikiHelper.createNewWikiPage();
         setFormElement(Locator.name("name"), WIKITEST_NAME);
         setFormElement(Locator.name("title"), WIKITEST_NAME);
-        setWikiBody("Placeholder text.");
-        saveWikiPage();
+        wikiHelper.setWikiBody("Placeholder text.");
+        wikiHelper.saveWikiPage();
 
-        setSourceFromFile(GROUP_SECURITY_API_FILE, WIKITEST_NAME);
+        wikiHelper.setSourceFromFile(GROUP_SECURITY_API_FILE, WIKITEST_NAME);
 
         // Run the Test Script
         clickButton("Start Test", 0);

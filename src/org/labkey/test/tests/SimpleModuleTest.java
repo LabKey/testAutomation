@@ -41,6 +41,7 @@ import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -645,6 +646,9 @@ public class SimpleModuleTest extends BaseWebDriverTest
     private void doTestReports()
     {
         RReportHelper _rReportHelper = new RReportHelper(this);
+        PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
+
         _rReportHelper.ensureRConfig();
 
         log("Testing module-based JS reports...");
@@ -654,20 +658,20 @@ public class SimpleModuleTest extends BaseWebDriverTest
         waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
 
         clickProject(getProjectName());
-        addWebPart("Report");
+        portalHelper.addWebPart("Report");
         setFormElement("title", "Report Tester Part");
         selectOptionByValue(Locator.name("reportId"), "module:simpletest/reports/schemas/lists/People/Less Cool JS Report.js");
         clickButton("Submit");
         waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
 
         String WikiName = "JS Report Wiki";
-        addWebPart("Wiki");
-        createNewWikiPage("HTML");
+        portalHelper.addWebPart("Wiki");
+        wikiHelper.createNewWikiPage("HTML");
         setFormElement("name", WikiName);
         setFormElement("title", WikiName);
-        setWikiBody("placeholder text");
-        saveWikiPage();
-        setSourceFromFile("jsReportTest.html", WikiName);
+        wikiHelper.setWikiBody("placeholder text");
+        wikiHelper.saveWikiPage();
+        wikiHelper.setSourceFromFile("jsReportTest.html", WikiName);
         waitForText("Console output", WAIT_FOR_JAVASCRIPT);
         waitForText("Less cool than expected. Loaded dependent scripts.", 2, WAIT_FOR_JAVASCRIPT);
         assertTextPresent("JS Module Report");
@@ -781,12 +785,14 @@ public class SimpleModuleTest extends BaseWebDriverTest
     @LogMethod
     private void doTestParameterizedQueries()
     {
+        WikiHelper wikiHelper = new WikiHelper(this);
+
         log("Create embedded QWP to test parameterized query.");
         clickFolder(FOLDER_NAME);
         goToModule("Wiki");
-        createNewWikiPage();
+        wikiHelper.createNewWikiPage();
         setFormElement("wiki-input-name", "Parameterized QWP");
-        setWikiBody(getFileContents("/server/test/modules/simpletest/resources/views/parameterizedQWP.html"));
+        wikiHelper.setWikiBody(getFileContents("/server/test/modules/simpletest/resources/views/parameterizedQWP.html"));
         clickButton("Save & Close");
 
         log("Check that parameterized query doesn't cause page load.");

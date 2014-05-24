@@ -22,9 +22,11 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.labkey.test.util.ResetTracker;
 import org.labkey.test.util.UIContainerHelper;
+import org.labkey.test.util.WikiHelper;
 
 import static org.junit.Assert.*;
 
@@ -66,15 +68,17 @@ public class EmbeddedWebPartTest extends BaseWebDriverTest
 
     private void embeddedQueryWebPartDoesNotRefreshOnChange()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
         log("testing that embedded query web part does not refresh on change");
 
         //embed query part in wiki page
-        addWebPart("Wiki");
-        createNewWikiPage();
+        portalHelper.addWebPart("Wiki");
+        wikiHelper.createNewWikiPage();
         click(Locator.linkContainingText("Source", 0));
         setFormElement(Locator.name("name"), TRICKY_CHARACTERS + "wiki page");
 
-        setWikiBody(getFileContents("server/test/data/api/EmbeddedQueryWebPart.html"));
+        wikiHelper.setWikiBody(getFileContents("server/test/data/api/EmbeddedQueryWebPart.html"));
 
         clickButton("Save & Close");
         waitForText("Display Name");

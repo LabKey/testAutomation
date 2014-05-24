@@ -21,19 +21,21 @@ import org.labkey.test.Locator;
 
 import java.io.File;
 
-public class WikiHelper extends AbstractHelper
+public class WikiHelper
 {
+    private BaseWebDriverTest _test;
+    
     public WikiHelper(BaseWebDriverTest test)
     {
-        super(test);
+        _test = test;
     }
 
     private void create(String name, @Nullable String format, @Nullable String title)
     {
         if (null != format)
-            _test.createNewWikiPage(format);
+            createNewWikiPage(format);
         else
-            _test.createNewWikiPage();
+            createNewWikiPage();
 
         _test.setFormElement(Locator.name("name"), name);
         if (null != title)
@@ -46,7 +48,7 @@ public class WikiHelper extends AbstractHelper
 
         setSourceFromFile(srcFile);
 
-        _test.saveWikiPage();
+        saveWikiPage();
     }
 
     public void createWikiPage(String name, @Nullable String format, @Nullable String title, String body, boolean index, @Nullable File attachment, boolean wikiVisualBody)
@@ -68,7 +70,7 @@ public class WikiHelper extends AbstractHelper
             _test.click(Locator.linkWithText("Attach a file"));
             _test.setFormElement(Locator.name("formFiles[0]"), attachment);
         }
-        _test.saveWikiPage();
+        saveWikiPage();
     }
 
     public void createWikiPage(String name, @Nullable String format, @Nullable String title, String body, @Nullable File attachment)
@@ -78,7 +80,7 @@ public class WikiHelper extends AbstractHelper
 
     private void setSourceFromFile(File file)
     {
-        setSource(_test.getFileContents(file));
+        setSource(BaseWebDriverTest.getFileContents(file));
     }
 
     private void setSource(String srcFragment)
@@ -95,7 +97,146 @@ public class WikiHelper extends AbstractHelper
     // assumes on Wiki edit page -- Source tab
     private void setWikiSourceTab(String srcFragment)
     {
-        _test.switchWikiToSourceView();
+        switchWikiToSourceView();
         _test.setFormElement(Locator.name("body"), srcFragment);
+    }
+
+    public void saveWikiPage()
+    {
+        String title = Locator.id("wiki-input-title").findElement(_test.getDriver()).getText();
+        if (title.equals("")) title = Locator.id("wiki-input-name").findElement(_test.getDriver()).getText();
+        _test.clickButton("Save & Close");
+        _test.waitForElement(Locator.linkWithText(title));
+    }
+
+    /**
+     * Creates a new wiki page, assuming that the [new page] link is available
+     * somewhere on the current page. This link is typically displayed above
+     * the Wiki table of contents, which is shown on collaboration portal pages,
+     * the wiki module home page, as well as any wiki page.
+     * @param format The format for the new page. Allowed values are "RADEOX" (for wiki),
+     * "HTML", and "TEXT_WITH_LINKS". Note that these are the string names for the
+     * WikiRendererType enum values.
+     * 
+     */
+    public void createNewWikiPage(String format)
+    {
+        if(_test.isElementPresent(Locator.linkWithText("new page")))
+            _test.clickAndWait(Locator.linkWithText("new page"));
+        else if(_test.isElementPresent(Locator.linkWithText("Create a new wiki page")))
+            _test.clickAndWait(Locator.linkWithText("Create a new wiki page"));
+        else if(_test.isElementPresent(Locator.linkWithText("add content")))
+            _test.clickAndWait(Locator.linkWithText("add content"));
+        else if(_test.isTextPresent("Pages"))
+        {
+            PortalHelper portalHelper = new PortalHelper(_test);
+            portalHelper.clickWebpartMenuItem("Pages", "New");
+        }
+        else
+            throw new IllegalStateException("Could not find a link on the current page to create a new wiki page." +
+                    " Ensure that you navigate to the wiki controller home page or an existing wiki page" +
+                    " before calling this method.");
+
+        convertWikiFormat(format);
+    }
+
+    //must already be on wiki page
+    public void setWikiValuesAndSave(String name, String title, String body)
+    {
+
+        _test.setFormElement(Locator.name("name"), name);
+        _test.setFormElement(Locator.name("title"), title);
+        setWikiBody(body);
+        _test.clickButtonContainingText("Save & Close");
+    }
+
+    /**
+     * Converts the current wiki page being edited to the specified format.
+     * If the page is already in that format, it will no-op.
+     * @param format The desired format ("RADEOX", "HTML", or "TEXT_WITH_LINKS")
+     * 
+     */
+    public void convertWikiFormat(String format)
+    {
+        String curFormat = (String) _test.executeScript("return window._wikiProps.rendererType;");
+        if(curFormat.equalsIgnoreCase(format))
+            return;
+
+        _test.clickButton("Convert To...", 0);
+        _test._extHelper.waitForExtDialog("Change Format");
+        _test.selectOptionByValue(Locator.id("wiki-input-window-change-format-to"), format);
+        _test.waitAndClickButton("Convert", 0);
+        _test.waitForElement(Locator.id("status").containing("Converted."));
+    }
+
+    /**
+     * Creates a new wiki page using HTML as the format. See {@link WikiHelper#createNewWikiPage(String)}
+     * for more details.
+     */
+    @LogMethod(quiet = true)public void createNewWikiPage()
+    {
+        createNewWikiPage("HTML");
+    }
+
+    /**
+     * Sets the wiki page body, automatically switching to source view if necessary
+     * @param body The body text to set
+     * 
+     */
+    @LogMethod(quiet = true)public void setWikiBody(String body)
+    {
+        switchWikiToSourceView();
+        _test.setFormElement(Locator.name("body"), body);
+    }
+
+    public String setSource(String srcFragment, String wikiName)
+    {
+        _test.waitForElement(Locator.linkWithText(wikiName));
+        PortalHelper portalHelper = new PortalHelper(_test);
+        portalHelper.clickWebpartMenuItem(wikiName, "Edit");
+
+        setWikiBody(srcFragment);
+        saveWikiPage();
+        return srcFragment;
+    }
+
+    /**
+     * Given a file name sets the wikiName page contents to a file in server/test/data/api
+     * @param fileName file will be found in server/test/data/api
+     * @param wikiName Name of the wiki where the source should be placed
+     * @return The source found in the file.
+     */
+    public String setSourceFromFile(String fileName, String wikiName)
+    {
+        return setSource(_test.getFileContents("server/test/data/api/" + fileName), wikiName);
+    }
+
+    /**
+     * Switches the wiki edit page to source view when the format type is HTML.
+     */
+    public void switchWikiToSourceView()
+    {
+        String curFormat = (String) _test.executeScript("return window._wikiProps.rendererType;");
+        if (curFormat.equalsIgnoreCase("HTML"))
+        {
+            if (_test.isElementPresent(Locator.css("#wiki-tab-source.labkey-tab-inactive")))
+            {
+                _test.click(Locator.css("#wiki-tab-source > a"));
+                _test.waitForElement(Locator.css("#wiki-tab-source.labkey-tab-active"));
+            }
+        }
+    }
+
+    public void switchWikiToVisualView()
+    {
+        String curFormat = (String) _test.executeScript("return window._wikiProps.rendererType;");
+        if (curFormat.equalsIgnoreCase("HTML"))
+        {
+            if (_test.isElementPresent(Locator.css("#wiki-tab-visual.labkey-tab-inactive")))
+            {
+                _test.click(Locator.css("#wiki-tab-visual > a"));
+                _test.waitForElement(Locator.css("#wiki-tab-visual.labkey-tab-active"));
+            }
+        }
     }
 }

@@ -25,6 +25,7 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 
@@ -251,18 +252,20 @@ public class SurveyTest extends BaseWebDriverTest
     @LogMethod(category = LogMethod.MethodType.VERIFICATION)
     private void verifySurveyFromSubfolder()
     {
+        WikiHelper wikiHelper = new WikiHelper(this);
+
         log("Create wikis for survey header/footer");
         clickFolder(folderName);
         goToModule("Wiki");
-        createNewWikiPage();
+        wikiHelper.createNewWikiPage();
         setFormElement(Locator.name("name"), "header_wiki");
-        setWikiBody(headerWikiBody);
-        saveWikiPage();
+        wikiHelper.setWikiBody(headerWikiBody);
+        wikiHelper.saveWikiPage();
         goToModule("Wiki");
-        createNewWikiPage();
+        wikiHelper.createNewWikiPage();
         setFormElement(Locator.name("name"), "footer_wiki");
-        setWikiBody(footerWikiBody);
-        saveWikiPage();
+        wikiHelper.setWikiBody(footerWikiBody);
+        wikiHelper.saveWikiPage();
 
         log("Customize the survey design metadata (card layout, multiple sections, show question counts, etc.)");
         clickFolder(folderName);

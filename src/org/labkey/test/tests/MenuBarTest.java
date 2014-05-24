@@ -22,6 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 
@@ -52,6 +53,7 @@ public class MenuBarTest extends BaseWebDriverTest
     public void testSteps()
     {
         PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
 
         log("Open new project");
         _containerHelper.createProject(PROJECT_NAME, "Collaboration");
@@ -65,11 +67,11 @@ public class MenuBarTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
 
         goToModule("Wiki");
-        createNewWikiPage("HTML");
+        wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKI_PAGE_TITLE);
         setFormElement(Locator.name("title"), WIKI_PAGE_TITLE);
-        setWikiBody(WIKI_PAGE_CONTENT);
-        saveWikiPage();
+        wikiHelper.setWikiBody(WIKI_PAGE_CONTENT);
+        wikiHelper.saveWikiPage();
         goToProjectSettings();
         clickAndWait(Locator.linkWithText("Menu Bar"));
 

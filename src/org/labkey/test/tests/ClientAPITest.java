@@ -28,6 +28,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 
@@ -36,6 +37,8 @@ import static org.junit.Assert.*;
 @Category({BVT.class, Wiki.class})
 public class ClientAPITest extends BaseWebDriverTest
 {
+    public WikiHelper _wikiHelper = new WikiHelper(this);
+
     private static final String PROJECT_NAME = "ClientAPITestProject";
     private static final String OTHER_PROJECT = "OtherClientAPITestProject"; // for cross-project query test
     protected static final String FOLDER_NAME = "api folder";
@@ -190,8 +193,8 @@ public class ClientAPITest extends BaseWebDriverTest
         if (!isTextPresent(WIKIPAGE_NAME))
             clickFolder(FOLDER_NAME);
         clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
-        setWikiBody("<p>" + message + "</p>");
-        saveWikiPage();
+        _wikiHelper.setWikiBody("<p>" + message + "</p>");
+        _wikiHelper.saveWikiPage();
     }
 
     protected String getListData(String listKeyName, ListHelper.ListColumn[] listColumns, String[][] listData)
@@ -284,11 +287,11 @@ public class ClientAPITest extends BaseWebDriverTest
     private void createWiki()
     {
         addWebPart("Wiki");
-        createNewWikiPage("HTML");
+        _wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
-        setWikiBody("placeholder text");
-        saveWikiPage();
+        _wikiHelper.setWikiBody("placeholder text");
+        _wikiHelper.saveWikiPage();
     }
 
     @LogMethod
@@ -526,8 +529,8 @@ public class ClientAPITest extends BaseWebDriverTest
             fullSource = getFullSource(srcFragment);
         log("Setting wiki page source:");
         log(fullSource);
-        setWikiBody(fullSource);
-        saveWikiPage();
+        _wikiHelper.setWikiBody(fullSource);
+        _wikiHelper.saveWikiPage();
         return waitForDivPopulation();
     }
 
@@ -548,8 +551,8 @@ public class ClientAPITest extends BaseWebDriverTest
             fullSource = srcFragment;
 
         setFormElement(Locator.name("name"), wikiName);
-        setWikiBody(fullSource);
-        saveWikiPage();
+        _wikiHelper.setWikiBody(fullSource);
+        _wikiHelper.saveWikiPage();
         return waitForDivPopulation();
     }
 

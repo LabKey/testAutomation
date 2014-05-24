@@ -24,6 +24,7 @@ import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 
 @Category({BVT.class, Wiki.class})
 public class ButtonCustomizationTest extends BaseWebDriverTest
@@ -199,19 +200,20 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
 
         // Create a wiki page to hold a query webpart with JavaScript-based button customization:
         PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
         clickProject(PROJECT_NAME);
         portalHelper.addWebPart("Wiki");
-        createNewWikiPage("HTML");
+        wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "buttonTest");
         setFormElement(Locator.name("title"), "buttonTest");
-        setWikiBody(getJavaScriptCustomizer());
+        wikiHelper.setWikiBody(getJavaScriptCustomizer());
         clickButton("Save & Close");
 
         portalHelper.addWebPart("Wiki");
-        createNewWikiPage("HTML");
+        wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "paramEcho");
         setFormElement(Locator.name("title"), "Parameter Echo");
-        setWikiBody(PARAM_ECHO_JAVASCRIPT);
+        wikiHelper.setWikiBody(PARAM_ECHO_JAVASCRIPT);
         clickButton("Save & Close");
 
         waitForElement(Locator.xpath("//*[starts-with(@id, 'aqwp')]"));

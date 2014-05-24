@@ -25,13 +25,15 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 
 import static org.junit.Assert.*;
 
 @Category({DailyA.class, Wiki.class})
 public class TimelineTest extends BaseWebDriverTest
 {
-    PortalHelper _portalHelper = new PortalHelper(this);
+    PortalHelper portalHelper = new PortalHelper(this);
+    WikiHelper wikiHelper = new WikiHelper(this);
 
     private static final String PROJECT_NAME = "TimelineTestProject";
     private static final String FOLDER_NAME = "timeline folder";
@@ -131,7 +133,7 @@ public class TimelineTest extends BaseWebDriverTest
 
     private void createWebPart()
     {
-        _portalHelper.addWebPart("Timeline");
+        portalHelper.addWebPart("Timeline");
         selectOptionByText(Locator.name("schemaName"), "lists");
         waitFor(new Checker(){
             public boolean check()
@@ -163,7 +165,7 @@ public class TimelineTest extends BaseWebDriverTest
         if (TestProperties.isLinkCheckEnabled())
         {
             clickFolder(FOLDER_NAME);
-            _portalHelper.removeWebPart(WIKIPAGE_NAME);
+            portalHelper.removeWebPart(WIKIPAGE_NAME);
         }
     }
 
@@ -221,12 +223,12 @@ public class TimelineTest extends BaseWebDriverTest
 
     private void createWiki()
     {
-        _portalHelper.addWebPart("Wiki");
-        createNewWikiPage("HTML");
+        portalHelper.addWebPart("Wiki");
+        wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
-        setWikiBody("placeholder text");
-        saveWikiPage();
+        wikiHelper.setWikiBody("placeholder text");
+        wikiHelper.saveWikiPage();
     }
 
 
@@ -234,13 +236,13 @@ public class TimelineTest extends BaseWebDriverTest
     {
         if (!isTextPresent(WIKIPAGE_NAME))
             clickFolder(FOLDER_NAME);
-        _portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
+        portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
 
         String fullSource = getFullSource(srcFragment);
         log("Setting wiki page source:");
         log(fullSource);
-        setWikiBody(fullSource);
-        saveWikiPage();
+        wikiHelper.setWikiBody(fullSource);
+        wikiHelper.saveWikiPage();
         return waitForDivPopulation();
     }
 

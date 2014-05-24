@@ -21,6 +21,8 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyB;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 import org.labkey.test.util.WorkbookHelper;
 
 import static org.junit.Assert.*;
@@ -62,8 +64,11 @@ public class WorkbookTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
+
         _containerHelper.createProject(PROJECT_NAME, null);
-        addWebPart("Workbooks");
+        portalHelper.addWebPart("Workbooks");
         int[] ids = createWorkbooks(PROJECT_NAME, FILE_WORKBOOK_NAME, FILE_WORKBOOK_DESCRIPTION, ASSAY_WORKBOOK_NAME,
                 ASSAY_WORKBOOK_DESCRIPTION, DEFAULT_WORKBOOK_NAME, DEFAULT_WORKBOOK_DESCRIPTION);
         //id's generated when workbooks are created should be sequential
@@ -107,15 +112,15 @@ public class WorkbookTest extends BaseWebDriverTest
 
         // Initialize the Creation Wiki
         clickProject(PROJECT_NAME);
-        addWebPart("Wiki");
+        portalHelper.addWebPart("Wiki");
 
-        createNewWikiPage();
+        wikiHelper.createNewWikiPage();
         setFormElement(Locator.name("name"), APITEST_NAME);
         setFormElement(Locator.name("title"), APITEST_NAME);
-        setWikiBody("Placeholder text.");
-        saveWikiPage();
+        wikiHelper.setWikiBody("Placeholder text.");
+        wikiHelper.saveWikiPage();
 
-        setSourceFromFile(APITEST_FILE, APITEST_NAME);
+        wikiHelper.setSourceFromFile(APITEST_FILE, APITEST_NAME);
 
 
         clickButton("RunAPITest", 0);
@@ -126,7 +131,7 @@ public class WorkbookTest extends BaseWebDriverTest
 
         //Create new project, add a workbook to it and ensure that the id is 1
         _containerHelper.createProject(PROJECT_NAME2, null);
-        addWebPart("Workbooks");
+        portalHelper.addWebPart("Workbooks");
         WorkbookHelper workbookHelper = new WorkbookHelper(this);
         int id = workbookHelper.createWorkbook(PROJECT_NAME2, FILE_WORKBOOK_NAME, FILE_WORKBOOK_DESCRIPTION, WorkbookHelper.WorkbookFolderType.FILE_WORKBOOK);
         assertEquals("workbook added to new project did not have id=1",id,1);

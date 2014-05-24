@@ -28,6 +28,7 @@ import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.DilutionAssayHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.util.regex.Pattern;
@@ -147,6 +148,8 @@ public class NabAssayTest extends AbstractQCAssayTest
     protected String setSource(String srcFragment, boolean excludeTags)
     {
         PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
+
         assertElementPresent(Locator.linkWithText(WIKIPAGE_NAME));
         portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
 
@@ -155,8 +158,8 @@ public class NabAssayTest extends AbstractQCAssayTest
             fullSource = NABJS_INCLUDE + ClientAPITest.getFullSource(srcFragment);
         log("Setting wiki page source:");
         log(fullSource);
-        setWikiBody(fullSource);
-        saveWikiPage();
+        wikiHelper.setWikiBody(fullSource);
+        wikiHelper.saveWikiPage();
         return waitForDivPopulation(30);
     }
 
@@ -571,15 +574,16 @@ public class NabAssayTest extends AbstractQCAssayTest
     private void doNabApiTest()
     {
         PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
 
         clickProject(TEST_ASSAY_PRJ_NAB);
         clickFolder(TEST_ASSAY_FLDR_NAB);
         portalHelper.addWebPart("Wiki");
-        createNewWikiPage("HTML");
+        wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), WIKIPAGE_NAME);
         setFormElement(Locator.name("title"), WIKIPAGE_NAME);
-        setWikiBody("placeholder text");
-        saveWikiPage();
+        wikiHelper.setWikiBody("placeholder text");
+        wikiHelper.saveWikiPage();
 
         setSource("runNabAssayTest({renderTo : 'testDiv'})", false);
 

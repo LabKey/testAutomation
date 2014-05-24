@@ -24,6 +24,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.util.List;
@@ -287,6 +288,7 @@ public class TimeChartAPITest extends TimeChartTest
                          @Nullable double[][] measureValue, @Nullable String[] testOutputText)
     {
         PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
         // check multi-measure calls to LABKEY.Query.Visualization.getData API requesting date information
         clickProject(getProjectName());
         clickFolder(getFolderName());
@@ -298,13 +300,13 @@ public class TimeChartAPITest extends TimeChartTest
         else
         {
             portalHelper.addWebPart("Wiki");
-            createNewWikiPage("HTML");
+            wikiHelper.createNewWikiPage("HTML");
             setFormElement(Locator.name("name"), WIKIPAGE_NAME);
             setFormElement(Locator.name("title"), WIKIPAGE_NAME);
         }
         // insert JS for getData calls and querywebpart
-        setWikiBody(getFileContents(htmlPage));
-        saveWikiPage();
+        wikiHelper.setWikiBody(getFileContents(htmlPage));
+        wikiHelper.saveWikiPage();
         waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
         clickAndWait(Locator.linkWithText(WIKIPAGE_NAME));
         waitForText("Current Config", WAIT_FOR_JAVASCRIPT);

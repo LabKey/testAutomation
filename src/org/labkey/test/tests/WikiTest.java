@@ -22,7 +22,9 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.BVT;
 import org.labkey.test.categories.Wiki;
+import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.UIContainerHelper;
+import org.labkey.test.util.WikiHelper;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 
@@ -66,6 +68,9 @@ public class WikiTest extends BaseWebDriverTest
     @Test
     public void testSteps()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
+
         log("Create Project");
         _containerHelper.createProject(PROJECT_NAME, null);
         goToFolderManagement();
@@ -82,21 +87,21 @@ public class WikiTest extends BaseWebDriverTest
         beginAt(getDriver().getCurrentUrl().replace("admin.view","waitForIdle.view"), 10*defaultWaitForPage);
 
         clickProject(PROJECT_NAME);
-        addWebPart("Wiki");
-        addWebPart("Search");
+        portalHelper.addWebPart("Wiki");
+        portalHelper.addWebPart("Search");
 
         log("test create new html page with a webpart");
-        createNewWikiPage("HTML");
+        wikiHelper.createNewWikiPage("HTML");
 
         setFormElement(Locator.name("name"), WIKI_PAGE_TITLE);
         setFormElement(Locator.name("title"), WIKI_PAGE_TITLE);
-        setWikiBody(WIKI_PAGE_CONTENT);
+        wikiHelper.setWikiBody(WIKI_PAGE_CONTENT);
 
         log("test attachments in wiki");
         click(Locator.linkWithText("Attach a file"));
         File file = new File(getLabKeyRoot() + "/common.properties");
         setFormElement(Locator.name("formFiles[0]"), file);
-        saveWikiPage();
+        wikiHelper.saveWikiPage();
 
         waitForElement(Locator.id(WIKI_PAGE_WEBPART_ID));
         assertTextPresent("common.properties");
@@ -111,17 +116,17 @@ public class WikiTest extends BaseWebDriverTest
         String wikiPageContentEdited =
             "<b>Some HTML content</b><br>\n" +
             "<b>" + WIKI_CHECK_CONTENT + "</b><br>\n";
-        setWikiBody(wikiPageContentEdited);
-        switchWikiToVisualView();
-        saveWikiPage();
+        wikiHelper.setWikiBody(wikiPageContentEdited);
+        wikiHelper.switchWikiToVisualView();
+        wikiHelper.saveWikiPage();
         verifyWikiPagePresent();
 
         doTestInlineEditor();
 
         log("Verify fix for issue 13937: NotFoundException when attempting to display a wiki from a different folder which has been deleted");
         createSubfolder(getProjectName(), getSubolderName(), new String[] {});
-        addWebPart("Wiki");
-        clickWebpartMenuItem("Wiki", "Customize");
+        portalHelper.addWebPart("Wiki");
+        portalHelper.clickWebpartMenuItem("Wiki", "Customize");
         selectOptionByText(Locator.name("webPartContainer"), "/"+getProjectName());
         waitForElement(Locator.xpath("//option[@value='Test Wiki']"));
         clickButton("Submit");

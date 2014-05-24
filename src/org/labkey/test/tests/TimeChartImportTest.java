@@ -26,6 +26,7 @@ import org.labkey.test.categories.Reports;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -251,6 +252,9 @@ public class TimeChartImportTest extends StudyBaseTest
     @Test
     public void verifyExportToScript()
     {
+        PortalHelper portalHelper = new PortalHelper(this);
+        WikiHelper wikiHelper = new WikiHelper(this);
+
         // TODO: this test does not test the d3 renderer for exported charts. We should fix this.
         log("Export Time Chart as Script and paste into Wiki");
         goToProjectHome();
@@ -268,11 +272,11 @@ public class TimeChartImportTest extends StudyBaseTest
         waitAndClick(Ext4Helper.Locators.ext4Button("Close"));
 
         clickFolder(EXPORT_TEST_FOLDER);
-        new PortalHelper(this).addWebPart("Wiki");
-        createNewWikiPage("HTML");
+        portalHelper.addWebPart("Wiki");
+        wikiHelper.createNewWikiPage("HTML");
         setFormElement(Locator.name("name"), "timeChartExportTest");
-        setWikiBody(exportScript);
-        saveWikiPage();
+        wikiHelper.setWikiBody(exportScript);
+        wikiHelper.saveWikiPage();
 
         verifyTimeChartInfo(EXPORTED_CHARTS.get(0), false);
     }

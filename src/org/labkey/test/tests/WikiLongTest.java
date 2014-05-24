@@ -24,6 +24,7 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Wiki;
 import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
 
 import java.io.File;
 
@@ -63,6 +64,7 @@ public class WikiLongTest extends BaseWebDriverTest
     private static final String WIKI_INDEX_EDIT_CHECKBOX = "wiki-input-shouldIndex";
     private static final String WIKI_INDEX_MANAGE_CHECKBOX = "shouldIndex";
     private final PortalHelper _portalHelper = new PortalHelper(this);
+    private WikiHelper _wikiHelper = new WikiHelper(this);
 
     private static final String WIKI_PAGE1_CONTENT =
             "1 Title\n" +
@@ -156,12 +158,12 @@ public class WikiLongTest extends BaseWebDriverTest
         _portalHelper.addWebPart("Search");
 
         log("Test new wiki page");
-        createNewWikiPage("RADEOX");
+        _wikiHelper.createNewWikiPage("RADEOX");
 
         setFormElement("name", WIKI_PAGE1_NAME);
         setFormElement("title", WIKI_PAGE1_TITLE);
         setFormElement("body", WIKI_PAGE1_CONTENT);
-        saveWikiPage();
+        _wikiHelper.saveWikiPage();
 
         searchFor(PROJECT_NAME, "normal normal normal", 1, WIKI_PAGE1_TITLE);
 
@@ -170,11 +172,11 @@ public class WikiLongTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(WIKI_PAGE2_NAME));
         assertTextPresent("page has no content");
         clickAndWait(Locator.linkWithText("add content"));
-        convertWikiFormat("RADEOX");
+        _wikiHelper.convertWikiFormat("RADEOX");
 
         setFormElement("title", WIKI_PAGE2_TITLE);
         setFormElement("body", WIKI_PAGE2_CONTENT);
-        saveWikiPage();
+        _wikiHelper.saveWikiPage();
 
         clickAndWait(Locator.linkWithText("Welcome"));
         assertElementNotPresent(Locator.linkWithText(WIKI_PAGE2_NAME));
@@ -182,25 +184,25 @@ public class WikiLongTest extends BaseWebDriverTest
         searchFor(PROJECT_NAME, "Page AAA", 1, WIKI_PAGE2_TITLE);
 
         log("test html wiki containing malformed javascript entities... we should allow this, see #12268");
-        createNewWikiPage();
+        _wikiHelper.createNewWikiPage();
         setFormElement("name", WIKI_PAGE5_NAME);
         setFormElement("title", WIKI_PAGE5_TITLE);
-        setWikiBody(WIKI_PAGE5_CONTENT);
-        saveWikiPage();
+        _wikiHelper.setWikiBody(WIKI_PAGE5_CONTENT);
+        _wikiHelper.saveWikiPage();
         assertTextNotPresent("New Page");  // Should not be an error, so should have left the editor
 
         log("test create new html page with a webpart");
-        createNewWikiPage("HTML");
+        _wikiHelper.createNewWikiPage("HTML");
 
         setFormElement("name", WIKI_PAGE3_NAME_TITLE);
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
         selectOptionByText(Locator.name("parent"), WIKI_PAGE2_TITLE + " (" + WIKI_PAGE2_NAME + ")");
-        setWikiBody(WIKI_PAGE3_CONTENT);
+        _wikiHelper.setWikiBody(WIKI_PAGE3_CONTENT);
         log("test attachments in wiki");
         click(Locator.linkWithText("Attach a file"));
         File file = new File(getLabKeyRoot() + "/common.properties");
         setFormElement(Locator.name("formFiles[0]"), file);
-        saveWikiPage();
+        _wikiHelper.saveWikiPage();
         assertTextPresent("common.properties");
         assertTextPresent(WIKI_PAGE3_WEBPART_TEST);
         assertTextPresent("Some HTML content");
@@ -214,25 +216,25 @@ public class WikiLongTest extends BaseWebDriverTest
             "<b>Some HTML content</b><br>\n" +
             "<b>More HTML content</b><br>\n" +
             "<a href='" + getContextPath() + "/wiki/" + PROJECT_NAME + "/page.view?name=PageAAA'>Page AAA</a><br>\n";
-        setWikiBody(wikiPage3ContentEdited);
-        saveWikiPage();
+        _wikiHelper.setWikiBody(wikiPage3ContentEdited);
+        _wikiHelper.saveWikiPage();
 
         assertTextPresent("More HTML content");
         clickAndWait(Locator.linkWithText("Edit"));
-        setWikiBody(WIKI_PAGE3_CONTENT_NO_QUERY);
+        _wikiHelper.setWikiBody(WIKI_PAGE3_CONTENT_NO_QUERY);
         setFormElement("title", WIKI_PAGE3_NAME_TITLE);
-        saveWikiPage();
+        _wikiHelper.saveWikiPage();
 
         log("test change renderer type");
         assertTextPresent("Some HTML content");
         clickAndWait(Locator.linkWithText("Edit"));
-        convertWikiFormat("TEXT_WITH_LINKS");
-        saveWikiPage();
+        _wikiHelper.convertWikiFormat("TEXT_WITH_LINKS");
+        _wikiHelper.saveWikiPage();
 
         assertTextPresent("<b>");
         clickAndWait(Locator.linkWithText("Edit"));
-        convertWikiFormat("HTML");
-        saveWikiPage();
+        _wikiHelper.convertWikiFormat("HTML");
+        _wikiHelper.saveWikiPage();
 
         log("Check Start Page series works");
         searchFor(PROJECT_NAME, "Some HTML", 1, WIKI_PAGE3_NAME_TITLE);
@@ -301,18 +303,18 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextNotPresent(DISC1_BODY);
 
         log("test navTree and header");
-        createNewWikiPage("RADEOX");
+        _wikiHelper.createNewWikiPage("RADEOX");
         setFormElement("name", "_navTree");
         setFormElement("title", WIKI_NAVTREE_TITLE);
-        setWikiBody(NAVBAR1_CONTENT);
-        saveWikiPage();
+        _wikiHelper.setWikiBody(NAVBAR1_CONTENT);
+        _wikiHelper.saveWikiPage();
 
         assertElementNotPresent(Locator.linkWithText("Home"));
         assertElementPresent(Locator.linkWithText(PROJECT_NAME));
 
         clickAndWait(Locator.linkWithText("Edit"));
-        setWikiBody(NAVBAR2_CONTENT);
-        saveWikiPage();
+        _wikiHelper.setWikiBody(NAVBAR2_CONTENT);
+        _wikiHelper.saveWikiPage();
         assertElementPresent(Locator.linkWithText("Projects"));
         assertElementPresent(Locator.linkWithText("Manage Project"));
         assertElementPresent(Locator.linkWithText("Manage Site"));
@@ -322,11 +324,11 @@ public class WikiLongTest extends BaseWebDriverTest
         deleteWikiPage();
         assertElementNotPresent(Locator.linkWithText(WIKI_NAVTREE_TITLE));
 
-        createNewWikiPage("HTML");
+        _wikiHelper.createNewWikiPage("HTML");
         setFormElement("name", "_header");
         setFormElement("title", "Header");
-        setWikiBody(HEADER_CONTENT);
-        saveWikiPage();
+        _wikiHelper.setWikiBody(HEADER_CONTENT);
+        _wikiHelper.saveWikiPage();
 
         clickAndWait(Locator.linkWithText("Header"));
         assertTextPresent(HEADER_CONTENT);
@@ -507,11 +509,11 @@ public class WikiLongTest extends BaseWebDriverTest
         clickProject(PROJECT2_NAME);
         clickTab("Portal");
         clickWebpartMenuItem("Test Customize TOC", "New");
-        convertWikiFormat("HTML");
+        _wikiHelper.convertWikiFormat("HTML");
 
         setFormElement("name", WIKI_PAGE4_TITLE);
-        setWikiBody(WIKI_PAGE4_CONTENT);
-        saveWikiPage();
+        _wikiHelper.setWikiBody(WIKI_PAGE4_CONTENT);
+        _wikiHelper.saveWikiPage();
         clickProject(PROJECT_NAME);
         clickTab("Wiki");
         assertTextPresent(WIKI_PAGE4_TITLE);
@@ -565,32 +567,32 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Test terms of use");
         goToModule("Wiki");
-        createNewWikiPage("RADEOX");
+        _wikiHelper.createNewWikiPage("RADEOX");
         setFormElement("name", "_termsOfUse");
         setFormElement("title", WIKI_TERMS_TITLE);
         setFormElement("body", "The first rule of fight club is do not talk about fight club.");
-        saveWikiPage();
+        _wikiHelper.saveWikiPage();
         pushLocation(); // For attempting to bypass Terms of Use (1 pop)
 
         _containerHelper.createProject(PROJECT3_NAME, null); // Public project
         _permissionsHelper.setSiteGroupPermissions("Guests", "Reader");
         _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
         goToModule("Wiki");
-        createNewWikiPage("RADEOX");
+        _wikiHelper.createNewWikiPage("RADEOX");
         setFormElement("name", "_termsOfUse");
         setFormElement("title", WIKI_TERMS_TITLE);
         setFormElement("body", "The second rule of fight club is do not talk about fight club.");
-        saveWikiPage();
+        _wikiHelper.saveWikiPage();
         pushLocation(); // For attempting to bypass Terms of Use (2 pops)
 
         _containerHelper.createProject(PROJECT4_NAME, null);
         _permissionsHelper.setSiteGroupPermissions("All Site Users", "Reader");
         goToModule("Wiki");
-        createNewWikiPage("RADEOX");
+        _wikiHelper.createNewWikiPage("RADEOX");
         setFormElement("name", "_termsOfUse");
         setFormElement("title", WIKI_TERMS_TITLE);
         setFormElement("body", "The third rule of fight club is do not talk about fight club.");
-        saveWikiPage();
+        _wikiHelper.saveWikiPage();
         pushLocation(); // For attempting to bypass Terms of Use (3 pops)
         createSubfolder(PROJECT4_NAME, "subfolder", null);
         pushLocation(); // For attempting to bypass Terms of Use (4 pops)
@@ -693,7 +695,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("test index option:  edit and turn on indexing for a page that was created unindexed");
         editIndexWiki(false);
         checkCheckbox(Locator.id(WIKI_INDEX_EDIT_CHECKBOX));
-        saveWikiPage();
+        _wikiHelper.saveWikiPage();
         searchFor(PROJECT_NAME, WIKI_SEARCH_TERM, 1, null);
 
         //
@@ -702,7 +704,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("test index option:  edit and turn off indexing for a page that was created indexed");
         editIndexWiki(true);
         uncheckCheckbox(Locator.id(WIKI_INDEX_EDIT_CHECKBOX));
-        saveWikiPage();
+        _wikiHelper.saveWikiPage();
         searchFor(PROJECT_NAME, WIKI_SEARCH_TERM, 0, null);
 
         //
@@ -744,7 +746,7 @@ public class WikiLongTest extends BaseWebDriverTest
     //
     private void createIndexWiki(boolean shouldIndex)
     {
-        createNewWikiPage("RADEOX");
+        _wikiHelper.createNewWikiPage("RADEOX");
         //
         // verify that the index option is checked by default
         //
@@ -752,14 +754,14 @@ public class WikiLongTest extends BaseWebDriverTest
 
         setFormElement("name", WIKI_PAGE6_NAME);
         setFormElement("title", WIKI_PAGE6_TITLE);
-        setWikiBody(WIKI_PAGE6_CONTENT);
+        _wikiHelper.setWikiBody(WIKI_PAGE6_CONTENT);
 
         if (!shouldIndex)
         {
             uncheckCheckbox(Locator.id(WIKI_INDEX_EDIT_CHECKBOX));
         }
 
-        saveWikiPage();
+        _wikiHelper.saveWikiPage();
     }
 
     private void editIndexWiki(boolean expectedShouldIndex)
