@@ -731,9 +731,9 @@ public class IssuesTest extends BaseWebDriverTest
 
         // try to link to non-existent issue
         click(updateLink);
-        setFormElement(relatedLocator, "-1");
+        setFormElement(relatedLocator, "0");
         clickButton("Save");
-        assertTextPresent("Related issue '-1' not found");
+        assertTextPresent("Invalid issue id in related string");
 
         // try to double link (reverse order to validate re-ordering)
         setFormElement(relatedLocator, String.format("%s,%s", issueIdC, issueIdB));
