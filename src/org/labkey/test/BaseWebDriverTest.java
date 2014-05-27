@@ -59,6 +59,7 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -501,6 +502,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
         _shortWait = new WebDriverWait(getDriver(), WAIT_FOR_JAVASCRIPT/1000);
         _longWait = new WebDriverWait(getDriver(), WAIT_FOR_PAGE/1000);
+
+        getDriver().manage().window().setSize(new Dimension(1280, 1024));
     }
 
     public Object executeScript(String script, Object... arguments)
@@ -1625,7 +1628,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
 
         Object[] windows = getDriver().getWindowHandles().toArray();
-        getDriver().switchTo().window((String)windows[1]);
+        getDriver().switchTo().window((String) windows[1]);
         log("Waiting for system maintenance to complete");
 
         int timeLeft = 10 * 60 * 1000 - ((Long)elapsed).intValue();
@@ -1638,7 +1641,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }, "System maintenance failed to complete in 10 minutes.", timeLeft > 0 ? timeLeft : 0);
 
         getDriver().close();
-        getDriver().switchTo().window((String)windows[0]);
+        getDriver().switchTo().window((String) windows[0]);
     }
 
     public void populateLastPageInfo()
