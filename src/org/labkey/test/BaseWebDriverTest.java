@@ -1577,8 +1577,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public void switchToMainWindow()
     {
-        Set<String> windows = new HashSet<>(getDriver().getWindowHandles());
-        getDriver().switchTo().window((String) windows.toArray()[0]);
+        List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
+        getDriver().switchTo().window(windows.get(0));
+    }
+
+    public void switchToWindow(int index)
+    {
+        List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
+        getDriver().switchTo().window(windows.get(index));
     }
 
     @LogMethod

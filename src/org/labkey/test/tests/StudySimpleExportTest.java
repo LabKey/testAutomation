@@ -267,7 +267,10 @@ public class StudySimpleExportTest extends StudyBaseTest
         goToModule("FileContent");
         _fileBrowserHelper.selectFileBrowserItem("/unzip/");
         doubleClick(Locator.tag("div").startsWith("folder_load_"));
+        switchToWindow(1);
         assertTextPresentInThisOrder("Loading folder properties (folder type, settings and active modules)", " queries imported", "Skipping query validation.");
+        getDriver().close();
+        switchToMainWindow();
     }
 
     @Test
