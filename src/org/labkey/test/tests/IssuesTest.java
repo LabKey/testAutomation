@@ -691,7 +691,7 @@ public class IssuesTest extends BaseWebDriverTest
         createIssue(getDisplayName(), "This is another issue -- let's say B", "3", "I think this is a duplicate issue?");
         String issueIdB = getCurrentIssueId();
 
-        click(Locator.linkWithText("Resolve"));
+        clickAndWait(Locator.linkWithText("Resolve"));
         selectOptionByText(Locator.id("resolution"), "Duplicate");
         setFormElement(Locator.name("duplicate"), issueIdA);
         clickButton("Save");
@@ -699,7 +699,7 @@ public class IssuesTest extends BaseWebDriverTest
         assertElementPresent(Locator.linkWithText(issueIdA));
         assertTextPresent("resolve as Duplicate of " + issueIdA);
 
-        click(Locator.linkWithText(issueIdA));
+        clickAndWait(Locator.linkWithText(issueIdA));
 
         assertElementPresent(Locator.linkWithText(issueIdB));
         assertTextPresent(String.format("Issue %s marked as duplicate of this issue.", issueIdB));
@@ -722,15 +722,15 @@ public class IssuesTest extends BaseWebDriverTest
         String issueIdC = getCurrentIssueId();
 
         // related C to A
-        click(updateLink);
+        clickAndWait(updateLink);
         setFormElement(relatedLocator, issueIdA);
         clickButton("Save");
 
         assertElementPresent(Locator.linkWithText(issueIdA));
-        click(Locator.linkWithText(issueIdA));
+        clickAndWait(Locator.linkWithText(issueIdA));
 
         // try to link to non-existent issue
-        click(updateLink);
+        clickAndWait(updateLink);
         setFormElement(relatedLocator, "0");
         clickButton("Save");
         assertTextPresent("Invalid issue id in related string");
