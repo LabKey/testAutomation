@@ -477,7 +477,8 @@ public class ListHelper extends AbstractHelper
         addField(areaTitle, name, label, type);
     }
 
-    public void addField(String areaTitle, String name, String label, ListColumnType type)
+    @LogMethod(quiet = true)
+    public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type)
     {
         String prefix = _test.getPropertyXPath(areaTitle);
         Locator addField = Locator.xpath(prefix + "//span" + Locator.navButton("Add Field").getPath());
