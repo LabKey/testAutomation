@@ -850,6 +850,8 @@ public class LuminexGuideSetTest  extends LuminexTest
     {
         if (initialGuideSet)
             waitForText("No current guide set for the selected graph parameters");
+        else
+            waitForLeveyJenningsTrendPlot();
         clickButtonContainingText("New", 0);
         if (!initialGuideSet)
         {
@@ -980,5 +982,6 @@ public class LuminexGuideSetTest  extends LuminexTest
         waitForTextToDisappear("Loading");
         assertTextNotPresent("ScriptException");
         assertElementNotPresent(Locator.tagContainingText("pre", "Error"));
+        waitForElement(Locator.tag("img").attributeStartsWith("id", "resultImage"));
     }
 }

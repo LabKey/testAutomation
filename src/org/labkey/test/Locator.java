@@ -817,6 +817,11 @@ public abstract class Locator
             return this.append("["+predicate+"]");
         }
 
+        public XPathLocator attributeStartsWith(String attribute, String text)
+        {
+            return this.withPredicate(String.format("starts-with(@%s, "+xq(text)+")", attribute));
+        }
+
         public XPathLocator attributeEndsWith(String attribute, String substring)
         {
             return this.withPredicate(String.format("substring(@%s, string-length(@%s) - %d) = %s", attribute, attribute, substring.length() - 1, xq(substring))); // XPath 1.0 doesn't support ends-with()
