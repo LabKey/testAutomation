@@ -117,7 +117,9 @@ public class DataViewsTest extends ParticipantListTest
         waitForElement(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden());
         waitForElement(Locator.linkWithText(REPORT_NAME), WAIT_FOR_JAVASCRIPT);
         assertElementPresent(PortalHelper.Locators.webPartTitle(RENAMED_WEBPART_TITLE));
-        assertEquals("Incorrect number of datasets after filter", 9, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        final Locator displayedDataViewsRow = Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden();
+        waitForElement(displayedDataViewsRow);
+        assertEquals("Incorrect number of datasets after filter", 9, getElementCount(displayedDataViewsRow));
 
         log("Verify cancel button");
         openCustomizePanel(ORIGINAL_WEBPART_TITLE);
@@ -130,7 +132,8 @@ public class DataViewsTest extends ParticipantListTest
         waitForText(REPORT_NAME); //TODO: /
         assertTextNotPresent("nothing");
         assertTextPresent(RENAMED_WEBPART_TITLE);
-        assertEquals("Incorrect number of datasets after filter", 9, getElementCount(Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").notHidden()));
+        waitForElement(displayedDataViewsRow);
+        assertEquals("Incorrect number of datasets after filter", 9, getElementCount(displayedDataViewsRow));
 
         log("Verify category management: delete");
         openCustomizePanel(RENAMED_WEBPART_TITLE);
