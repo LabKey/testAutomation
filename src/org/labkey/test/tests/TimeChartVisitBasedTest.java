@@ -47,7 +47,6 @@ public class TimeChartVisitBasedTest extends TimeChartTest
     protected void doCreateSteps()
     {
         configureVisitStudy();
-        windowMaximize();
     }
 
     @Override

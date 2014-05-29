@@ -430,7 +430,6 @@ public class MS2Test extends AbstractMS2ImportTest
 
         log("Test changing order of sorts and columns");
         _customizeViewsHelper.openCustomizeViewPanel();
-        windowMaximize();
         sleep(500);
         _customizeViewsHelper.moveCustomizeViewSort("Charge", false);
         // XXX: selenium test can't move columns that require scrolling the column list

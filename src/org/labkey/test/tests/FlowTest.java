@@ -390,7 +390,6 @@ public class FlowTest extends BaseFlowTest
     public void sampleSetAndMetadataTest()
     {
         // verify sample set and background values can be displayed in the FCSAnalysis grid
-        windowMaximize();
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("29 FCS files"));
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a/span[text()='Show Graphs']"), "Inline");

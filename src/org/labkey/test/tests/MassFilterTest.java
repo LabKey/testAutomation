@@ -42,7 +42,6 @@ public class MassFilterTest extends  FilterTest
 
     private void doVerify()
     {
-        windowMaximize();
         Locator advancedFilteringLoc = Locator.name("value_1");
         Locator.XPathLocator factedFilterLoc = Locator.linkContainingText("[All]");
 

@@ -61,8 +61,6 @@ public class TimeChartDateBasedTest extends TimeChartTest
         portalHelper.addWebPart("Views");
         portalHelper.addWebPart("Datasets");
         portalHelper.addWebPart("Specimens");
-
-        windowMaximize();
     }
 
     @Override

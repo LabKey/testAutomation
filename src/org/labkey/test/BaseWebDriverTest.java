@@ -2479,6 +2479,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         catch (IOException ignore){}
     }
 
+    /**
+     * @deprecated Window should be left at its default size for consistent test results
+     */
+    @Deprecated
     public void windowMaximize()
     {
         getDriver().manage().window().maximize();
