@@ -1,0 +1,205 @@
+/*
+ * Copyright (c) 2014 LabKey Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.labkey.test.tests;
+
+import org.junit.Assert;
+import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.Connection;
+import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyB;
+import org.labkey.test.categories.Study;
+import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.WikiHelper;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+
+@Category({DailyB.class, Study.class})
+public class StudyVisitTagTest extends StudyBaseTest
+{
+    protected final String VISIT_TAG_QWP_TITLE = "VisitTag";
+    protected final String VISIT_TAG_MAP_QWP_TITLE = "VisitTagMap";
+    protected final String PARENT_FOLDER_STUDY = "VisitTagsStarter";
+    protected final String STUDY_TEMPLATE = "StudyAxistTestTemplate";
+    protected final String DATE_FOLDER_STUDY1 = "StudyAxisTest1";
+    protected final String DATE_FOLDER_STUDY2 = "StudyAxisTest2";
+    protected final String DATE_FOLDER_STUDY3 = "StudyAxisTest3";
+    protected final String DATE_FOLDER_STUDY4 = "StudyAxisTest4";
+    protected final String DATE_FOLDER_STUDY5 = "StudyAxisTest5";
+    protected final String DATE_FOLDER_STUDY6 = "StudyAxisTest6";
+    protected final String DATE_FOLDER_STUDY7 = "StudyAxisTest11";
+    protected final String DATE_FOLDER_STUDY8 = "StudyAxisTest12";
+    protected final String VISIT_FOLDER_STUDY1 = "StudyAxisTestA";
+    protected final String VISIT_FOLDER_STUDY2 = "StudyAxisTestB";
+    protected final String VISIT_FOLDER_STUDY3 = "StudyAxisTestC";
+    protected final String VISIT_FOLDER_STUDY4 = "StudyAxisTestD";
+    protected final String VISIT_FOLDER_STUDY5 = "StudyAxisTestE";
+    protected final String VISIT_FOLDER_STUDY6 = "StudyAxisTestF";
+    protected final String VISIT_FOLDER_STUDY7 = "StudyAxisTestG";
+    protected final String VISIT_FOLDER_STUDY8 = "StudyAxisTestH";
+    protected final String[] DATE_BASED_STUDIES = {DATE_FOLDER_STUDY1, DATE_FOLDER_STUDY2, DATE_FOLDER_STUDY3, DATE_FOLDER_STUDY4, DATE_FOLDER_STUDY7, DATE_FOLDER_STUDY8};
+    protected final String[] SINGLE_USE_TAG_ERRORS = {DATE_FOLDER_STUDY5, DATE_FOLDER_STUDY6};
+    protected final String[] VISIT_BASED_STUDIES = {VISIT_FOLDER_STUDY1, VISIT_FOLDER_STUDY2, VISIT_FOLDER_STUDY3, VISIT_FOLDER_STUDY4, VISIT_FOLDER_STUDY5, VISIT_FOLDER_STUDY6, VISIT_FOLDER_STUDY7, VISIT_FOLDER_STUDY8};
+    protected final String[] VISIT_TAG_NAMES = {"day0", "finalvaccination", "finalvisit", "firstvaccination", "notsingleuse", "peakimmunogenicity"};
+    protected final String[] VISIT_TAG_CAPTIONS = {"Day 0 (meaning varies)", "Final Vaccination", "Final visit", "First Vaccination", "Not Single Use Tag", "Predicted peak immunogenicity visit"};
+    protected final String[] VISIT_TAG_MAP_TAGS = {"Day 0 (meaning varies)", "Final Vaccination", "Final Vaccination", "Final visit", "First Vaccination", "First Vaccination"};
+    protected final String[] VISIT_TAG_MAP_VISITS = {"Visit1", "Visit3", "Visit4", "Visit5", "Visit2", "Visit3"};
+    protected final String[] VISIT_TAG_MAP_COHORTS = {"", "Negative", "Positive", "", "Positive", "Negative"};
+    protected final String WIKIPAGE_NAME = "VisitTagGetDataAPITest";
+    protected final String TEST_DATA_API_PATH = "server/test/data/api";
+    //TODO: placeholder, need to create a new test page with appropriate js to test getData api in this context
+    protected final String TEST_DATA_API_CONTENT = "/getDataVisitTest.html";
+    //private Map<String, String> _visitTagMaps = new HashMap<>();
+    private final PortalHelper _portalHelper = new PortalHelper(this);
+    private final PortalHelper portalHelper = new PortalHelper(this);
+    private final WikiHelper wikiHelper = new WikiHelper(this);
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+
+    @Override
+    protected void doCreateSteps()
+    {
+        doCleanup(false);
+        initializeFolder();
+        setPipelineRoot(getStudySampleDataPath() + "VisitTags");
+        importStudies();
+    }
+
+    @Override
+    protected void initializeFolder()
+    {
+        _containerHelper.createProject(getProjectName(), "Study");
+        for(String Study : DATE_BASED_STUDIES)
+        {
+            createSubfolder(getProjectName(), getProjectName(), Study, "Study", null, true);
+        }
+        for(String Study : VISIT_BASED_STUDIES)
+        {
+            createSubfolder(getProjectName(), getProjectName(), Study, "Study", null, true);
+        }
+        for(String Study : SINGLE_USE_TAG_ERRORS)
+        {
+            createSubfolder(getProjectName(), getProjectName(), Study, "Study", null, true);
+        }
+    }
+
+    protected void importStudies()
+    {
+        goToProjectHome();
+        startImportStudyFromZip(new File(getSampledataPath() + "\\Study\\VisitTags", PARENT_FOLDER_STUDY + ".folder.zip"), false, false);
+        goToProjectHome();
+        addVisitTagAndTagMapQWP();
+        for(String Study : DATE_BASED_STUDIES)
+        {
+            clickFolder(Study);
+            startImportStudyFromZip(new File(getSampledataPath() + "\\Study\\VisitTags", Study + ".folder.zip"), false, false);
+            waitForPipelineJobsToComplete(1, "Study import", false);
+            clickFolder(Study);
+            addVisitTagAndTagMapQWP();
+            setupAPITestWiki();
+        }
+        for(String Study : VISIT_BASED_STUDIES)
+        {
+            clickFolder(Study);
+            startImportStudyFromZip(new File(getSampledataPath() + "\\Study\\VisitTags", Study + ".folder.zip"), false, false);
+            waitForPipelineJobsToComplete(1, "Study import", false);
+            clickFolder(Study);
+            addVisitTagAndTagMapQWP();
+            setupAPITestWiki();
+        }
+        for(String Study : SINGLE_USE_TAG_ERRORS)
+        {
+            clickFolder(Study);
+            startImportStudyFromZip(new File(getSampledataPath() + "\\Study\\VisitTags", Study + ".folder.zip"), false, false);
+            waitForPipelineJobsToComplete(1, "Study import", true);
+            clickFolder(Study);
+            addVisitTagAndTagMapQWP();
+            setupAPITestWiki();
+        }
+
+    }
+
+    @Override
+    protected void doVerifySteps() throws Exception
+    {
+        goToProjectHome();
+        DataRegionTable visitTags = getVisitTagTable();
+        DataRegionTable visitTagMaps = getVisitTagMapTable();
+        List<String> tagNames = visitTags.getColumnDataAsText("Name");
+        List<String> tagCaptions = visitTags.getColumnDataAsText("Caption");
+        for(String tagName : VISIT_TAG_NAMES)
+        {
+            assert(tagNames.contains(tagName));
+        }
+        for(String tagCaption : VISIT_TAG_CAPTIONS)
+        {
+            assert(tagCaptions.contains(tagCaption));
+        }
+        //TODO: need to add a method to return an entire row from DataTable as delimited strings so we can do this more easily
+        int mapCount = visitTagMaps.getColumnCount();
+        List<String> tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
+        List<String> tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
+        List<String> tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
+        for(int i = 0; i > mapCount; i++)
+        {
+            assert(tagMapNames.get(i).equals(VISIT_TAG_MAP_TAGS[i]));
+            assert(tagMapVisits.get(i).equals(VISIT_TAG_MAP_VISITS[i]));
+            assert(tagMapCohort.get(i).equals(VISIT_TAG_MAP_COHORTS[i]));
+        }
+    }
+
+    protected String getProjectName()
+    {
+        return "VisitTagStudyVerifyProject";
+    }
+
+    protected void addVisitTagAndTagMapQWP()
+    {
+        _portalHelper.addQueryWebPart(VISIT_TAG_QWP_TITLE, "study", "VisitTag", null);
+        _portalHelper.addQueryWebPart(VISIT_TAG_MAP_QWP_TITLE, "study", "VisitTagMap", null);
+    }
+
+    protected void setupAPITestWiki()
+    {
+        portalHelper.addWebPart("Wiki");
+        wikiHelper.createNewWikiPage("HTML");
+        setFormElement(Locator.name("name"), WIKIPAGE_NAME);
+        setFormElement(Locator.name("title"), WIKIPAGE_NAME);
+        wikiHelper.setWikiBody(getFileContents(TEST_DATA_API_PATH + "/getDataVisitTest.html"));
+        wikiHelper.saveWikiPage();
+        waitForText("Current Config", WAIT_FOR_JAVASCRIPT);
+    }
+
+    protected DataRegionTable getVisitTagTable()
+    {
+        return new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTag", this), this);
+    }
+
+    protected DataRegionTable getVisitTagMapTable()
+    {
+        return new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTagMap", this), this);
+    }
+}

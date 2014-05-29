@@ -512,6 +512,7 @@ src/org/labkey/test/tests/StudySecurityTest.java -text
 src/org/labkey/test/tests/StudyShortTest.java -text
 src/org/labkey/test/tests/StudySimpleExportTest.java -text
 src/org/labkey/test/tests/StudyTest.java -text
+src/org/labkey/test/tests/StudyVisitTagTest.java -text
 src/org/labkey/test/tests/SurveyTest.java -text
 src/org/labkey/test/tests/SystemMaintenanceTest.java -text
 src/org/labkey/test/tests/TabTest.java -text

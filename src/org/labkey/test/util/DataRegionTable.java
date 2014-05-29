@@ -68,6 +68,11 @@ public class DataRegionTable
         _headerRows = 2 + (floatingHeaders?2:0);
     }
 
+    public static String getTableNameByTitle(String title, BaseWebDriverTest test)
+    {
+        return Locator.xpath("//th[@title='" + title +"']/../..//table").findElement(test.getDriver()).getAttribute("id").replace("dataregion_", "");
+    }
+
     public String getTableName()
     {
         return _tableName;
