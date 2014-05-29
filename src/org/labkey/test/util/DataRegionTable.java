@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.SortDirection;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
 import java.net.MalformedURLException;
@@ -62,7 +63,7 @@ public class DataRegionTable
     {
         _tableName = tableName;
         _selectors = selectors;
-        reload(test);
+        _test = test;
         _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq(getHtmlName()) + "]"));
         _columnCount = _test.getTableColumnCount(getHtmlName());
         _headerRows = 2 + (floatingHeaders?2:0);
@@ -71,6 +72,23 @@ public class DataRegionTable
     public static String getTableNameByTitle(String title, BaseWebDriverTest test)
     {
         return Locator.xpath("//th[@title='" + title +"']/../..//table").findElement(test.getDriver()).getAttribute("id").replace("dataregion_", "");
+    }
+
+    public static String getQueryWebPartName(BaseWebDriverTest test)
+    {
+        return getQueryWebPartName(0, test);
+    }
+
+    public static String getQueryWebPartName(int qwpIndex, BaseWebDriverTest test)
+    {
+        Locator qwpLocator = Locator.tag("table").attributeStartsWith("id", "dataregion_aqwp");
+        test.waitForElement(qwpLocator);
+
+        List<WebElement> qwps = qwpLocator.findElements(test.getDriver());
+        if (qwps.size() > qwpIndex)
+            return qwps.get(qwpIndex).getAttribute("id").replace("dataregion_", "");
+        else
+            throw new NoSuchElementException(String.format("Not enough qwps on page. Looking for: %d, Found: %d", qwpIndex, qwps.size()));
     }
 
     public String getTableName()
@@ -86,11 +104,6 @@ public class DataRegionTable
     public int getColumnCount()
     {
         return _columnCount;
-    }
-
-    public void reload(BaseWebDriverTest test)
-    {
-        _test = test;
     }
 
     private boolean bottomBarPresent()
