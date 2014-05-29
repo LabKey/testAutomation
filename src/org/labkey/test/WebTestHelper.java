@@ -49,9 +49,9 @@ import java.nio.charset.Charset;
 
 public class WebTestHelper
 {
-    public static final String DEFAULT_CONTEXT_PATH = "/labkey";
-    public static final String DEFAULT_WEB_PORT = "8080";
-    public static final String DEFAULT_TARGET_SERVER = "http://localhost";
+    public static final String DEFAULT_CONTEXT_PATH = "/labkey"; //TODO: Make private
+    public static final String DEFAULT_WEB_PORT = "8080"; //TODO: Make private
+    public static final String DEFAULT_TARGET_SERVER = "http://localhost"; //TODO: Make private and add method to check if testing on localhost
     private static String _webPort = null;
     private static String _contextPath = null;
     public static final int MAX_LEAK_LIMIT = 0;
