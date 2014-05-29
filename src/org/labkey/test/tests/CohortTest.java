@@ -104,8 +104,8 @@ public class CohortTest extends BaseWebDriverTest
         verifyVialCount(specimenTable, 10);
 
         clickAndWait(Locator.linkWithText("Reports"));
-        clickButtonByIndex("View", 2); // Specimen Report: Type By Cohort
-        assertTextPresent("Specimen Report: Type By Cohort");
+        clickButtonByIndex("View", 2); // Specimen Report: Type by Cohort
+        assertTextPresent("Specimen Report: Type by Cohort");
         checkCheckbox(Locator.checkboxByName("viewPtidList"));
         clickButton("Refresh");
         assignId(Locator.xpath(XPATH_SPECIMEN_REPORT_TABLE_NEGATIVE), TABLE_NEGATIVE);
@@ -293,8 +293,8 @@ public class CohortTest extends BaseWebDriverTest
         assertTextPresent("Negative", 4);
         clickAndWait(Locator.linkWithText("Reports"));
 
-        clickButtonByIndex("View", 2); // Specimen Report: Type By Cohort
-        assertTextPresent("Specimen Report: Type By Cohort");
+        clickButtonByIndex("View", 2); // Specimen Report: Type by Cohort
+        assertTextPresent("Specimen Report: Type by Cohort");
         checkCheckbox(Locator.checkboxByName("viewPtidList"));
         clickButton("Refresh");
 
