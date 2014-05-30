@@ -34,7 +34,8 @@ public abstract class AbstractContainerHelper extends AbstractHelper
 
     /** @param folderType the name of the type of container to create.
      * May be null, in which case you get the server's default folder type */
-    public final void createProject(String projectName, @Nullable String folderType)
+    @LogMethod(quiet = true)
+    public final void createProject(@LoggedParam String projectName, @Nullable String folderType)
     {
         doCreateProject(projectName, folderType);
         _createdProjects.add(projectName);
@@ -62,7 +63,8 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         deleteProject(projectName, true, 90000);
     }
 
-    public final void deleteProject(String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException
+    @LogMethod(quiet = true)
+    public final void deleteProject(@LoggedParam String projectName, boolean failIfNotFound, int wait) throws TestTimeoutException
     {
         doDeleteProject(projectName, failIfNotFound, wait);
         _createdProjects.remove(projectName);
