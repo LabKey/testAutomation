@@ -79,13 +79,16 @@ public class WorkbookTest extends BaseWebDriverTest
         }
         // Edit Workbook Name
         waitAndClick(Locator.xpath("//span[preceding-sibling::span[contains(@class, 'wb-name')]]"));
-        waitForElement(Locator.xpath("//input[@value='"+DEFAULT_WORKBOOK_NAME+"']"), WAIT_FOR_JAVASCRIPT);
-        setFormElement(Locator.xpath("//input[@value='"+DEFAULT_WORKBOOK_NAME+"']"), "Renamed"+DEFAULT_WORKBOOK_NAME);
-        click(Locator.css("body"));
-        assertTextPresent("Renamed"+DEFAULT_WORKBOOK_NAME);
+        waitForElement(Locator.xpath("//input[@value='" + DEFAULT_WORKBOOK_NAME + "']"), WAIT_FOR_JAVASCRIPT);
+        setFormElement(Locator.xpath("//input[@value='" + DEFAULT_WORKBOOK_NAME + "']"), "Renamed" + DEFAULT_WORKBOOK_NAME);
+
+        // Change the focus to trigger a save
+        click(Locator.xpath("//div[@id='wb-description']"));
+
+        // Make sure that the edit stuck
+        assertTextPresent("Renamed" + DEFAULT_WORKBOOK_NAME);
 
         // Clear description
-        click(Locator.xpath("//div[@id='wb-description']"));
         setFormElement(Locator.xpath("//textarea"), ""); // textarea is a barely used tag, so this xpath is sufficient for now.
         waitForText("No description provided. Click to add one.", WAIT_FOR_JAVASCRIPT); // Takes a moment to appear.
 
