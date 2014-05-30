@@ -384,7 +384,8 @@ public abstract class StudyBaseTest extends SimpleApiTest
         waitForElement(Locator.name("quf_VisitTag"));
         selectOptionByValue(Locator.name("quf_VisitTag"), map.visitTag);
         selectOptionByText(Locator.name("quf_Visit"), map.visit);
-        if(!map.cohort.isEmpty())selectOptionByText(Locator.name("quf_Cohort"), map.cohort);
+        if(null != map.cohort && !map.cohort.isEmpty())
+            selectOptionByText(Locator.name("quf_Cohort"), map.cohort);
         clickAndWait(Locator.linkWithSpan("Submit"));
     }
 

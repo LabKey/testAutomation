@@ -171,6 +171,8 @@ public class StudyVisitTagTest extends StudyBaseTest
             assert(tagMapVisits.get(i).equals(VISIT_TAG_MAP_VISITS[i]));
             assert(tagMapCohort.get(i).equals(VISIT_TAG_MAP_COHORTS[i]));
         }
+
+        verifyInsertEditVisitTags();
     }
 
     protected String getProjectName()
@@ -203,5 +205,16 @@ public class StudyVisitTagTest extends StudyBaseTest
     protected DataRegionTable getVisitTagMapTable()
     {
         return new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTagMap", this), this);
+    }
+
+    protected void verifyInsertEditVisitTags()
+    {
+        goToProjectHome();
+        insertVisitTag(VISIT_TAG_QWP_TITLE, new VisitTag("FollowUp1", "Follow Up 1", "", false));
+        insertVisitTagMap(VISIT_TAG_MAP_QWP_TITLE, new VisitTagMap("FollowUp1", "Visit5", null));
+
+        insertVisitTagMap(VISIT_TAG_MAP_QWP_TITLE, new VisitTagMap("FollowUp1", "Visit5", null));
+        assertTextPresent("VisitTagMap may contain only one row for each (VisitTag, Visit, Cohort) combination.");
+        clickButton("Cancel");
     }
 }
