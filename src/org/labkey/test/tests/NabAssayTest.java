@@ -199,7 +199,7 @@ public class NabAssayTest extends AbstractQCAssayTest
     }
 
     /**
-     * Performs Luminex designer/upload/publish.
+     * Performs Nab designer/upload/publish.
      */
     protected void runUITests()
     {
@@ -588,84 +588,6 @@ public class NabAssayTest extends AbstractQCAssayTest
         setSource("runNabAssayTest({renderTo : 'testDiv'})", false);
 
         portalHelper.removeWebPart(WIKIPAGE_NAME);
-    }
-
-    /**
-     * Import a new run into this assay
-     */
-    private void importData(AssayImportOptions options)
-    {
-        Locator.XPathLocator buttonLocator = getButtonLocator("Import Data");
-        Locator linkLocator = Locator.linkContainingText("Import Data");
-        if (buttonLocator != null && isElementPresent(buttonLocator))
-            clickAndWait(buttonLocator);
-        else if (isElementPresent(linkLocator))
-            clickAndWait(linkLocator);
-        else
-            fail("No Import Data button available");
-
-        if (options.getVisitResolver() == AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit)
-        {
-            checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.SpecimenID.name()));
-            Locator checkBox = Locator.checkboxByName("includeParticipantAndVisit");
-            waitForElement(checkBox);
-            checkCheckbox(checkBox);
-        }
-        else
-            checkCheckbox(Locator.radioButtonByNameAndValue("participantVisitResolver", options.getVisitResolver().name()));
-        clickButton("Next");
-
-        if (options.getAssayId() != null)
-            setFormElement(Locator.name("name"), options.getAssayId());
-
-        setFormElement(Locator.name("cutoff1"), options.getCutoff1());
-        setFormElement(Locator.name("cutoff2"), options.getCutoff2());
-        if (options.getCutoff3() != null)
-            setFormElement(Locator.name("cutoff3"), options.getCutoff3());
-
-        setFormElement(Locator.name("virusName"), options.getVirusName());
-        setFormElement(Locator.name("virusID"), options.getVirusId());
-        selectOptionByText(Locator.name("curveFitMethod"), options.getCurveFitMethod());
-
-        // populate the sample well group information
-        for (int i=0; i < options.getPtids().length; i++)
-        {
-            setFormElement(Locator.name("specimen" + (i + 1) + "_ParticipantID"), options.getPtids()[i]);
-        }
-
-        for (int i=0; i < options.getVisits().length; i++)
-        {
-            setFormElement(Locator.name("specimen" + (i + 1) + "_VisitID"), options.getVisits()[i]);
-        }
-
-        for (int i=0; i < options.getInitialDilutions().length; i++)
-        {
-            setFormElement(Locator.name("specimen" + (i + 1) + "_InitialDilution"), options.getInitialDilutions()[i]);
-        }
-
-        for (int i=0; i < options.getDilutionFactors().length; i++)
-        {
-            setFormElement(Locator.name("specimen" + (i + 1) + "_Factor"), options.getDilutionFactors()[i]);
-        }
-
-        for (int i=0; i < options.getMethods().length; i++)
-        {
-            selectOptionByText(Locator.name("specimen" + (i + 1) + "_Method"), options.getMethods()[i]);
-        }
-
-        for (int i=0; i < options.getDates().length; i++)
-        {
-            setFormElement(Locator.name("specimen" + (i + 1) + "_Date"), options.getDates()[i]);
-        }
-
-        for (int i=0; i < options.getSampleIds().length; i++)
-        {
-            setFormElement(Locator.name("specimen" + (i + 1) + "_SpecimenID"), options.getSampleIds()[i]);
-        }
-
-        File file1 = new File(options.getFilePath());
-        setFormElement(Locator.name("__primaryFile__"), file1);
-        clickButton("Save and Finish", 60000);
     }
 
     private void assertStudyData(int ptidCount)

@@ -277,6 +277,16 @@ public class ListHelper extends AbstractHelper
         _test.clickButton("Import");
     }
 
+    /**
+     * Import a list archive to a target folder
+     * @param folderName target folder
+     * @param inputFile Full path/filename to list archive
+     */
+    public void importListArchive(String folderName, String inputFile)
+    {
+        importListArchive(folderName, new File(inputFile));
+    }
+
     public void importListArchive(String folderName, File inputFile)
     {
         assertTrue("Unable to locate input file: " + inputFile, inputFile.exists());

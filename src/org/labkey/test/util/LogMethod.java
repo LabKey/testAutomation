@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 public @interface LogMethod
 {
     // Should be used to mark methods that we want to log the execution time for
-    // but are not complex enough to warrent logging both their entrance and exit
+    // but are not complex enough to warrant logging both their entrance and exit
     // Such marked methods will only be logged upon returning
     boolean quiet() default false;
 

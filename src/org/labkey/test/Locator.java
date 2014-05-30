@@ -613,7 +613,7 @@ public abstract class Locator
 
     public static XPathLocator divById(String id)
     {
-        return xpath("//div[@name='" + id + "']");
+        return xpath("//div[@id='" + id + "']");
     }
 
     public static XPathLocator divByIdContaining(String partialId)

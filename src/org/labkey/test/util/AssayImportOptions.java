@@ -26,7 +26,9 @@ public class AssayImportOptions
         ParticipantDate,
         ParticipantVisitDate,
         SpecimenID,
-        SpecimenIDParticipantVisit
+        SpecimenIDParticipantVisit,
+        LookupText,
+        LookupList
     }
 
     private String assayId;
@@ -45,6 +47,7 @@ public class AssayImportOptions
     private String[] sampleIds;
     private String[] dates;
     private VisitResolverType visitResolver;
+    private boolean useDefaultResolver = false;
 
     private AssayImportOptions(ImportOptionsBuilder builder)
     {
@@ -64,6 +67,7 @@ public class AssayImportOptions
         this.sampleIds = builder.sampleIds;
         this.dates = builder.dates;
         this.visitResolver = builder.visitResolver;
+        this.useDefaultResolver = builder.useDefaultResolver;
     }
 
     public String getAssayId()
@@ -146,6 +150,11 @@ public class AssayImportOptions
         return visitResolver;
     }
 
+    public boolean isUseDefaultResolver()
+    {
+        return useDefaultResolver;
+    }
+
     public static class ImportOptionsBuilder
     {
         private String assayId;
@@ -164,6 +173,7 @@ public class AssayImportOptions
         private String[] sampleIds = new String[0];
         private String[] dates = new String[0];
         private VisitResolverType visitResolver = VisitResolverType.ParticipantVisit;
+        public boolean useDefaultResolver;
 
         public ImportOptionsBuilder assayId(String assayId)
         {
@@ -258,6 +268,12 @@ public class AssayImportOptions
         public ImportOptionsBuilder visitResolver(VisitResolverType visitResolver)
         {
             this.visitResolver = visitResolver;
+            return this;
+        }
+
+        public ImportOptionsBuilder useDefaultResolver(Boolean useDefaultResolver)
+        {
+            this.useDefaultResolver = Boolean.TRUE.equals(useDefaultResolver);
             return this;
         }
 
