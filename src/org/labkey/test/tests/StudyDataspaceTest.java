@@ -37,6 +37,9 @@ public class StudyDataspaceTest extends StudyBaseTest
     protected final String FOLDER_STUDY1 = "Study 1";
     protected final String FOLDER_STUDY2 = "Study 2";
     protected final String FOLDER_STUDY5 = "Study 5";
+    protected final String VISIT_TAG_QWP_TITLE = "VisitTag";
+    protected final String VISIT_TAG_MAP_QWP_TITLE = "VisitTagMap";
+    private final PortalHelper _portalHelper = new PortalHelper(this);
 
     @Override
     protected BrowserType bestBrowser()
@@ -122,7 +125,7 @@ public class StudyDataspaceTest extends StudyBaseTest
 
         log("Verify Product rows added");
         clickFolder(getProjectName());
-        Assert.assertTrue("Product row count incorrect.", getTableRowCount(qwpTableId) == qwpDefaultTableRowCount + 7);
+        Assert.assertTrue("Product row count incorrect.", getTableRowCount(qwpTableId) == qwpDefaultTableRowCount + 8);
         List<String> productNames = getTableColumnValues(qwpTableId, 3);
         Assert.assertTrue("Product table should contain these products.",
                 productNames.contains("gag") && productNames.contains("gag-pol-nef") && productNames.contains("gp145"));
@@ -189,6 +192,61 @@ public class StudyDataspaceTest extends StudyBaseTest
         assertEquals("Expected cell value.", "1850", labResultsTable3.getDataAsText(1, "Lymphocytes"));
         assertEquals("Expected cell value.", "LabKeyLab", labResultsTable3.getDataAsText(4, "Lab"));
         assertEquals("Expected cell value.", "gakkon", labResultsTable3.getDataAsText(4, "Product"));
+
+        verifyVisitTags();
     }
 
+    protected final String[] VISIT_TAG_MAP_TAGS = {"First Vaccination", "First Vaccination", "Second Vaccination", "Second Vaccination",
+                                                   "Follow Up", "Follow Up", "Second Vaccination", "First Vaccination", "Follow Up", "Follow Up",
+                                                   "Second Vaccination", "First Vaccination"};
+    protected final String[] VISIT_TAG_MAP_VISITS = {"Day 0", "Day 3", "Day 62", "Day 101", "Day -1377"};
+    protected final String[] VISIT_TAG_MAP_COHORTS = {"1/3 - Heterologous boost regimen", "2/4 - Heterologous boost regimen",
+                                                      "1/3 - Heterologous boost regimen", "2/4 - Heterologous boost regimen", ""};
+
+    protected final String[] STUDY5_VISIT_TAG_MAP_TAGS = {"Follow Up", "Follow Up", "Second Vaccination", "First Vaccination"};
+    protected final String[] STUDY5_VISIT_TAG_MAP_VISITS = {"Day -1377", "Day -1351", "Day -1316", "Day -1001"};
+    protected final String[] STUDY5_VISIT_TAG_MAP_COHORTS = {"", "", "", ""};
+
+    private void verifyVisitTags()
+    {
+        // Check visit tags
+        clickFolder(getProjectName());
+        _portalHelper.addQueryWebPart(VISIT_TAG_MAP_QWP_TITLE, "study", "VisitTagMap", null);
+        DataRegionTable visitTagMaps = new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTagMap", this), this);
+        int mapCount = visitTagMaps.getColumnCount();
+        List<String> tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
+        List<String> tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
+        List<String> tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
+        for(int i = 0; i < mapCount; i++)
+            assert(tagMapNames.get(i).equals(VISIT_TAG_MAP_TAGS[i]));
+
+        for(int i = 0; i < 5; i++)
+            assert(tagMapVisits.get(i).equals(VISIT_TAG_MAP_VISITS[i]));
+
+        for(int i = 0; i < 5; i++)
+            assert(tagMapCohort.get(i).equals(VISIT_TAG_MAP_COHORTS[i]));
+
+        _portalHelper.removeWebPart("Product");
+        assertTextNotPresent("Insert New");     // Is there a better way to assert which controls a table has?
+
+        clickFolder(FOLDER_STUDY5);
+        visitTagMaps = new DataRegionTable(DataRegionTable.getTableNameByTitle("VisitTagMap", this), this);
+        tagMapNames = visitTagMaps.getColumnDataAsText("Visit Tag");
+        tagMapVisits = visitTagMaps.getColumnDataAsText("Visit");
+        tagMapCohort = visitTagMaps.getColumnDataAsText("Cohort");
+        for(int i = 0; i < 4; i++)
+            assert(tagMapNames.get(i).equals(STUDY5_VISIT_TAG_MAP_TAGS[i]));
+
+        for(int i = 0; i < 4; i++)
+            assert(tagMapVisits.get(i).equals(STUDY5_VISIT_TAG_MAP_VISITS[i]));
+
+        for(int i = 0; i < 4; i++)
+            assert(tagMapCohort.get(i).equals(STUDY5_VISIT_TAG_MAP_COHORTS[i]));
+
+        assertTextPresent("Insert New");
+
+        _portalHelper.removeWebPart("VisitTagMap");
+        _portalHelper.addQueryWebPart(VISIT_TAG_QWP_TITLE, "study", "VisitTag", null);
+        assertTextNotPresent("Insert New");
+    }
 }
