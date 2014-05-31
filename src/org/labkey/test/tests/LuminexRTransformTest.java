@@ -96,7 +96,14 @@ public class LuminexRTransformTest extends LuminexTest
         DataRegionTable table;
         table = new DataRegionTable("Data", this);
         table.setFilter("fiBackgroundBlank", "Is Not Blank", null);
-        waitForElement(Locator.paginationText(1, 40, 40));
+        waitForElement(Locator.paginationText(1, 80, 80));
+        setFilter("Data", "Type", "Equals", "C9"); // issue 20457
+        assertEquals(4, table.getDataRowCount());
+        for(int i = 0; i < table.getDataRowCount(); i++)
+        {
+            assertEquals(table.getDataAsText(i, "FI-Bkgd"), table.getDataAsText(i, "FI-Bkgd-Blank"));
+        }
+        clearFilter("Data", "Type");
         table.setFilter("Type", "Starts With", "X"); // filter to just the unknowns
         waitForElement(Locator.paginationText(1, 32, 32));
         // check values in the fi-bkgd-blank column
@@ -186,6 +193,7 @@ public class LuminexRTransformTest extends LuminexTest
         clickButton("Next");
 
         setFormElement(Locator.name("name"), "r script transformed assayId");
+        checkCheckbox(Locator.name("subtBlankFromAll"));
         setFormElement(Locator.name("stndCurveFitInput"), "FI");
         setFormElement(Locator.name("unkCurveFitInput"), "FI-Bkgd-Blank");
         checkCheckbox(Locator.name("curveFitLogTransform"));

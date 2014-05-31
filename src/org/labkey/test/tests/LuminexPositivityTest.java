@@ -105,7 +105,7 @@ public class LuminexPositivityTest extends LuminexTest
         // now we actual test the case of getting baseline visit data from a previously uploaded run
         _negControlAnalyte = _analyteNames.get(1);
         uploadPositivityFile(assayName + " Baseline Visit Previous Run 2", TEST_ASSAY_LUM_FILE12, "1", "3", false, true);
-        String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A9", "B9"};
+        String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A9", "B9", "A10", "B10"};
         checkPositivityValues("positive", posWells.length, posWells);
         String[] negWells = new String[] {"A3", "B3", "A5", "B5"};
         checkPositivityValues("negative", negWells.length, negWells);
@@ -130,7 +130,7 @@ public class LuminexPositivityTest extends LuminexTest
         // file contains the baseline visit data, which is not used in this case since we don't have a baseline visit run property set
         setPositivityThresholdParams(101, 100);
         uploadPositivityFile(assayName + " No Base Visit 1", TEST_ASSAY_LUM_FILE11, "", "", false, true);
-        String[] posWells = new String[] {"A1", "B1", "A2", "B2", "A3", "B3", "A4", "B4", "A6", "B6", "A7", "B7", "A9", "B9"};
+        String[] posWells = new String[] {"A1", "B1", "A2", "B2", "A3", "B3", "A4", "B4", "A6", "B6", "A7", "B7", "A8", "B8", "A9", "B9", "A10", "B10"};
         checkPositivityValues("positive", posWells.length, posWells);
         String[] negWells = new String[] {"A5", "B5"};
         checkPositivityValues("negative", negWells.length, negWells);
@@ -141,7 +141,7 @@ public class LuminexPositivityTest extends LuminexTest
         uploadPositivityFile(assayName + " No Base Visit 2", TEST_ASSAY_LUM_FILE13, "", "", false, false);
         posWells = new String[] {"C1", "D1"};
         checkPositivityValues("positive", posWells.length, posWells);
-        negWells = new String[] {"C2", "D2", "C3", "D3"};
+        negWells = new String[] {"C2", "D2", "C3", "D3", "C4", "D4", "C5", "D5"};
         checkPositivityValues("negative", negWells.length, negWells);
         checkDescriptionParsing("P562, Wk 48, 7-27-2011", " ", "P562", "48.0", "2011-07-27");
     }
@@ -151,7 +151,7 @@ public class LuminexPositivityTest extends LuminexTest
         // file contains the baseline visit data
         setPositivityThresholdParams(100, 101);
         uploadPositivityFile(assayName + " 5x Fold Change", TEST_ASSAY_LUM_FILE11, "1", "5", false, true);
-        String[] posWells = new String[] {"A9", "B9"};
+        String[] posWells = new String[] {"A9", "B9", "A10", "B10"};
         checkPositivityValues("positive", posWells.length, posWells);
         String[] negWells = new String[] {"A2", "B2", "A3", "B3", "A5", "B5", "A6", "B6"};
         checkPositivityValues("negative", negWells.length, negWells);
@@ -164,7 +164,7 @@ public class LuminexPositivityTest extends LuminexTest
         // file contains the baseline visit data
         setPositivityThresholdParams(100, 100);
         uploadPositivityFile(assayName + " 3x Fold Change", TEST_ASSAY_LUM_FILE11, "1", "3", false, false);
-        String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A9", "B9"};
+        String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A9", "B9", "A10", "B10"};
         checkPositivityValues("positive", posWells.length, posWells);
         String[] negWells = new String[] {"A3", "B3", "A5", "B5"};
         checkPositivityValues("negative", negWells.length, negWells);
