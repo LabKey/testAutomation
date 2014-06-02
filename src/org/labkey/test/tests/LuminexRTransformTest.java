@@ -97,13 +97,13 @@ public class LuminexRTransformTest extends LuminexTest
         table = new DataRegionTable("Data", this);
         table.setFilter("fiBackgroundBlank", "Is Not Blank", null);
         waitForElement(Locator.paginationText(1, 80, 80));
-        setFilter("Data", "Type", "Equals", "C9"); // issue 20457
+        table.setFilter("Type", "Equals", "C9"); // issue 20457
         assertEquals(4, table.getDataRowCount());
         for(int i = 0; i < table.getDataRowCount(); i++)
         {
             assertEquals(table.getDataAsText(i, "FI-Bkgd"), table.getDataAsText(i, "FI-Bkgd-Blank"));
         }
-        clearFilter("Data", "Type");
+        table.clearFilter("Type");
         table.setFilter("Type", "Starts With", "X"); // filter to just the unknowns
         waitForElement(Locator.paginationText(1, 32, 32));
         // check values in the fi-bkgd-blank column
@@ -168,7 +168,7 @@ public class LuminexRTransformTest extends LuminexTest
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
         DataRegionTable table = new DataRegionTable("Runs", this);
         assertEquals("Unexpected Transform Script Version number", "8.0.20140509", table.getDataAsText(0, "Transform Script Version"));
-        assertEquals("Unexpected Lab Transform Script Version number", "1.0.20140228", table.getDataAsText(0, "Lab Transform Script Version"));
+        assertEquals("Unexpected Lab Transform Script Version number", "1.1.20140526", table.getDataAsText(0, "Lab Transform Script Version"));
         assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
     }
 
