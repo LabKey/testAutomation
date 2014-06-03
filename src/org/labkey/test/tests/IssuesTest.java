@@ -741,7 +741,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         assertElementPresent(Locator.linkWithText(issueIdC));
         assertElementPresent(Locator.linkWithText(issueIdB));
-        assertTextBefore(issueIdB, issueIdC);
+        assertTextPresent(String.format("%s, %s", issueIdB, issueIdC));
 
         // NOTE: still need to test for case where user doesn't have permission to related issue...
     }
