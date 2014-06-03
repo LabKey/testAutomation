@@ -21,6 +21,9 @@ import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.Reports;
 import org.labkey.test.util.LogMethod;
+import org.openqa.selenium.WebElement;
+
+import static org.junit.Assert.assertTrue;
 
 @Category({DailyA.class, Reports.class})
 public class ReportSecurityTest extends ReportTest
@@ -152,6 +155,9 @@ public class ReportSecurityTest extends ReportTest
         clickFolder("My Study");
 
         goToManageViews();
+        WebElement chartLink1 = Locator.linkWithText("participant chart").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        WebElement chartLink2 = Locator.linkWithText("non participant chart").waitForElement(getDriver(), WAIT_FOR_JAVASCRIPT);
+        assertTrue("Data Views webpart sort order is wrong", chartLink1.getLocation().getY() < chartLink2.getLocation().getY());
         clickReportPermissionsLink("participant chart");
         click(Locator.id("useCustom"));
         checkCheckbox(Locator.xpath("//td[.='" + TEST_GROUP + "']/..//td/input[@type='checkbox']"));

@@ -92,10 +92,9 @@ public abstract class ReportTest extends StudyBaseTest
 
     protected void clickReportPermissionsLink(String reportName)
     {
-        Locator link = Locator.xpath("//tr").withClass("x4-grid-row").containing(reportName).append("//a[contains(@data-qtip, 'Click to customize the permissions')]");
+        Locator link = Locator.xpath("//tr").withClass("x4-grid-row").withPredicate(Locator.linkWithText(reportName)).append("//a[contains(@data-qtip, 'Click to customize the permissions')]");
 
-        waitForElement(link);
-        clickAndWait(link);
+        waitAndClickAndWait(link);
     }
 
     @Override
