@@ -17,10 +17,12 @@ package org.labkey.test;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.remoteapi.CommandException;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.APIAssayHelper;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 
 import static org.junit.Assert.*;
@@ -35,7 +37,7 @@ public class AssayAPITest extends BaseWebDriverTest
     }
 
     @Test
-    public void testSteps()
+    public void testSteps() throws Exception
     {
         _containerHelper.createProject(getProjectName(), "Assay");
         goToProjectHome();
@@ -55,18 +57,11 @@ public class AssayAPITest extends BaseWebDriverTest
     }
 
     protected void  importAssayAndRun(File assayPath, int pipelineCount, String assayName, File runPath,
-                                      String runName, String[] textToCheck)
+                                      String runName, String[] textToCheck) throws IOException, CommandException
     {
         APIAssayHelper assayHelper = new APIAssayHelper(this);
         assayHelper.uploadXarFileAsAssayDesign(assayPath, pipelineCount);
-        try
-        {
-            assayHelper.importAssay(assayName, runPath, getProjectName(), Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo"));
-        }
-        catch (Exception e)
-        {
-            fail(e.getMessage());
-        }
+        assayHelper.importAssay(assayName, runPath, getProjectName(), Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo"));
 
         log("verify import worked");
         goToProjectHome();
