@@ -38,6 +38,7 @@ public class AuditLogTest extends BaseWebDriverTest
 
     private static final String AUDIT_TEST_USER = "audit_user1@auditlog.test";
     private static final String AUDIT_TEST_USER2 = "audit_user2@auditlog.test";
+    private static final String AUDIT_TEST_USER3 = "audit_user3@auditlog.test";
 
     private static final String AUDIT_TEST_PROJECT = "AuditVerifyTest";
     private static final String AUDIT_TEST_SUBFOLDER = "AuditVerifyTest_Subfolder";
@@ -47,6 +48,24 @@ public class AuditLogTest extends BaseWebDriverTest
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/audit";
+    }
+
+    public enum Visibility
+    {
+        ParentFolder, // an only see log events in parent
+        ChildFolder, // can only see log event in children
+        All, // can see all events
+        None // can see no events
+    }
+
+    public boolean canSeeParent(Visibility v)
+    {
+        return v == Visibility.ParentFolder || v == Visibility.All;
+    }
+
+    public boolean canSeeChild(Visibility v)
+    {
+        return v == Visibility.ChildFolder || v == Visibility.All;
     }
 
     @Override
@@ -163,18 +182,30 @@ public class AuditLogTest extends BaseWebDriverTest
         // verify our audit log only shows the row for the parent list since our user does not have project admin
         // permissions on the sub-folder
         impersonate(AUDIT_TEST_USER2);
-        verifyListAuditLogQueries(false);
+        verifyListAuditLogQueries(Visibility.ParentFolder);
         stopImpersonating();
         // now give access to the sub-folder
         clickProject(AUDIT_TEST_PROJECT);
         clickFolder(AUDIT_TEST_SUBFOLDER);
         _securityHelper.setProjectPerm(AUDIT_TEST_USER2, "Folder Administrator");
         impersonate(AUDIT_TEST_USER2);
-        verifyListAuditLogQueries(true);
+        verifyListAuditLogQueries(Visibility.All);
+        stopImpersonating();
+
+        // verify issue 19832 - opposite of above.  Ensure that user who has access to child folder but not parent folder can still see
+        // audit log events from the child forder if using a CurrentAndSubFolders container filter
+        createUserWithPermissions(AUDIT_TEST_USER3, AUDIT_TEST_PROJECT, "Editor");
+        clickButton("Save and Finish");
+        clickProject(AUDIT_TEST_PROJECT);
+        clickFolder(AUDIT_TEST_SUBFOLDER);
+        _securityHelper.setProjectPerm(AUDIT_TEST_USER3, "Folder Administrator");
+        impersonate(AUDIT_TEST_USER3);
+        verifyListAuditLogQueries(Visibility.ChildFolder);
         stopImpersonating();
 
         deleteUsers(true, AUDIT_TEST_USER);
         deleteUsers(true, AUDIT_TEST_USER2);
+        deleteUsers(true, AUDIT_TEST_USER3);
         deleteProject(AUDIT_TEST_PROJECT, true);
     }
 
@@ -189,11 +220,11 @@ public class AuditLogTest extends BaseWebDriverTest
         submit();
     }
 
-    protected void verifyListAuditLogQueries(boolean canSeeSubFolders)
+    protected void verifyListAuditLogQueries(Visibility v)
     {
         beginAt("/query/" + getProjectName() + "/executeQuery.view?schemaName=auditLog&query.queryName=ListAuditEvent&query.containerFilterName=CurrentAndSubfolders");
-        verifyAuditQueryEvent(this, "List", "Parent List", 1);
-        verifyAuditQueryEvent(this, "List", "Child List", 1, canSeeSubFolders);
+        verifyAuditQueryEvent(this, "List", "Parent List", 1, canSeeParent(v));
+        verifyAuditQueryEvent(this, "List", "Child List", 1, canSeeChild(v));
     }
 
     protected void verifyAuditQueries(boolean canSeeAuditLog)
