@@ -337,6 +337,7 @@ src/org/labkey/test/ms2/params/MS2Tests_20070101__3_0_2a.java -text
 src/org/labkey/test/ms2/params/MS2Tests_20070701__3_0_2.java -text
 src/org/labkey/test/ms2/params/MS2Tests_20070701__3_4_0.java -text
 src/org/labkey/test/ms2/params/MS2Tests_20070701__3_4_1.java -text
+src/org/labkey/test/pages/ConfigureReportsAndScriptsHelper.java -text
 src/org/labkey/test/pipeline/AbstractPipelineTestParams.java -text
 src/org/labkey/test/pipeline/ExperimentGraph.java -text
 src/org/labkey/test/pipeline/PipelineFolder.java -text

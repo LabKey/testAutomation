@@ -3507,30 +3507,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return new File(buildDir, "testTemp");
     }
 
-    /**
-     * pre-condition: on Views and Scripting Configuration page
-     * @return is a Perl enginge configured?
-     */
-    public boolean isPerlEngineConfigured()
-    {
-        waitForElement(Locator.xpath("//div[@id='enginesGrid']//td//div[.='js']"), WAIT_FOR_JAVASCRIPT);
-
-        return isElementPresent(Locator.xpath("//div[@id='enginesGrid']//td//div[.='pl']"));
-    }
-
-    /**
-     * pre-condition: on Views and Scripting Configuration page
-     * @return is an R enginge configured?
-     */
-    public boolean isREngineConfigured()
-    {
-        // need to allow time for the server to return the engine list and the ext grid to render
-        // wait for mozilla rhino (should be automatically included for all installations)
-        waitForElement(Locator.xpath("//div[@id='enginesGrid']//td//div[.='js']"), WAIT_FOR_JAVASCRIPT);
-
-        return isElementPresent(Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']"));
-    }
-
     protected void setSelectedFields(String containerPath, String schema, String query, String viewName, String[] fields)
     {
         pushLocation();

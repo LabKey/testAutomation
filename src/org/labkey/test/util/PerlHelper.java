@@ -18,8 +18,10 @@ package org.labkey.test.util;
 
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 
 import static org.junit.Assert.*;
@@ -31,15 +33,17 @@ public class PerlHelper extends AbstractHelper
         super(test);
     }
 
-    public boolean ensurePerlConfig()
+    @LogMethod
+    public void ensurePerlConfig()
     {
-
         _test.goToAdminConsole();
         _test.clickAndWait(Locator.linkWithText("views and scripting"));
-
         _test.log("Check if Perl already is configured");
-        if (_test.isPerlEngineConfigured())
-            return true;
+
+        ConfigureReportsAndScriptsHelper scripts = new ConfigureReportsAndScriptsHelper(_test);
+
+        if (scripts.isEnginePresent("Perl"))
+            return;
 
         _test.log("Try configuring Perl");
         String perlHome = System.getenv("PERL_HOME");
@@ -47,11 +51,11 @@ public class PerlHelper extends AbstractHelper
         {
             _test.log("PERL_HOME is set to: " + perlHome + " searching for the Perl application");
             File perlHomeDir = new File(perlHome);
-            FilenameFilter perlFilenameFilter = new FilenameFilter()
+            FileFilter perlFilenameFilter = new FileFilter()
             {
-                public boolean accept(File dir, String name)
+                public boolean accept(File file)
                 {
-                    return "perl.exe".equalsIgnoreCase(name) || "perl".equalsIgnoreCase(name);
+                    return ("perl.exe".equalsIgnoreCase(file.getName()) || "perl".equalsIgnoreCase(file.getName())) && file.canExecute();
                 }
             };
             File[] files = perlHomeDir.listFiles(perlFilenameFilter);
@@ -61,38 +65,18 @@ public class PerlHelper extends AbstractHelper
                 files = new File(perlHome, "bin").listFiles(perlFilenameFilter);
             }
 
-            if (files != null)
+            if (files.length == 1)
             {
+                ConfigureReportsAndScriptsHelper.EngineConfig config = new ConfigureReportsAndScriptsHelper.EngineConfig(files[0]);
+                scripts.addEngine(ConfigureReportsAndScriptsHelper.EngineType.PERL, config);
+                return;
+            }
+            else if (files.length > 1)
+            {
+                _test.log("Found too many Perl executables:");
                 for (File file : files)
                 {
-                    // add a new Perl engine configuration
-                    String id = _test._extHelper.getExtElementId("btn_addEngine");
-                    _test.click(Locator.id(id));
-
-                    id = _test._extHelper.getExtElementId("add_perlEngine");
-                    _test.click(Locator.id(id));
-
-                    id = _test._extHelper.getExtElementId("btn_submit");
-                    _test.waitForElement(Locator.id(id), 10000);
-
-                    id = _test._extHelper.getExtElementId("editEngine_exePath");
-                    _test.setFormElement(Locator.id(id), file.getAbsolutePath());
-
-                    id = _test._extHelper.getExtElementId("btn_submit");
-                    _test.click(Locator.id(id));
-
-                    // wait until the dialog has been dismissed
-                    int cnt = 3;
-                    while (_test.isElementPresent(Locator.id(id)) && cnt > 0)
-                    {
-                        _test.sleep(1000);
-                        cnt--;
-                    }
-
-                    if (_test.isPerlEngineConfigured())
-                        return true;
-
-                    _test.refresh();
+                    _test.log("\t" + file.getAbsolutePath());
                 }
             }
         }
@@ -102,9 +86,8 @@ public class PerlHelper extends AbstractHelper
         if (null == perlHome)
         {
             _test.log("");   // Blank line helps make the following message more readable
-            _test.log("PERL_HOME environment variable is not set.  Set PERL_HOME to your R bin directory to enable automatic configuration.");
+            _test.log("PERL_HOME environment variable is not set.  Set PERL_HOME to your Perl bin directory to enable automatic configuration.");
         }
         fail("Perl is not configured on this system.");
-        return false;
     }
 }

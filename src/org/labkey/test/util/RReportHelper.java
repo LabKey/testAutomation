@@ -21,8 +21,10 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -151,23 +153,21 @@ public class RReportHelper extends AbstractHelper
 
         _test.goToAdminConsole();
         _test.clickAndWait(Locator.linkWithText("views and scripting"));
+
         _test.log("Check if R already is configured");
 
-        try
+        ConfigureReportsAndScriptsHelper scripts = new ConfigureReportsAndScriptsHelper(_test);
+
+        String defaultScriptName = "R Scripting Engine";
+        if (scripts.isEnginePresent("R"))
         {
-            if (_test.isREngineConfigured())
-                if(TestProperties.isTestRunningOnTeamCity())
-                {
-                    _test.doubleClick(Locator.css("div.x-grid3-col-0").containing("R Scripting Engine"));
-                    return getRVersion(new File(_test.getFormElement(Locator.id("editEngine_exePath"))));
-                }
-                else // Reset R scripting engine on TeamCity
-                    deleteEngine();
-        }
-        catch (SeleniumException e)
-        {
-            _test.log("Ignoring Selenium Error");
-            _test.log(e.getMessage());
+            if (!TestProperties.isTestRunningOnTeamCity())
+            {
+                scripts.editEngine(defaultScriptName);
+                return getRVersion(new File(_test.getFormElement(Locator.id("editEngine_exePath"))));
+            }
+            else // Reset R scripting engine on TeamCity
+                scripts.deleteEngine(defaultScriptName);
         }
 
         _test.log("Try configuring R");
@@ -176,11 +176,11 @@ public class RReportHelper extends AbstractHelper
         {
             _test.log("R_HOME is set to: " + rHome + " searching for the R application");
             File rHomeDir = new File(rHome);
-            FilenameFilter rFilenameFilter = new FilenameFilter()
+            FileFilter rFilenameFilter = new FileFilter()
             {
-                public boolean accept(File dir, String name)
+                public boolean accept(File file)
                 {
-                    return "r.exe".equalsIgnoreCase(name) || "r".equalsIgnoreCase(name);
+                    return ("r.exe".equalsIgnoreCase(file.getName()) || "r".equalsIgnoreCase(file.getName())) && file.canExecute();
                 }
             };
             File[] files = rHomeDir.listFiles(rFilenameFilter);
@@ -192,46 +192,22 @@ public class RReportHelper extends AbstractHelper
 
             if (files != null)
             {
-                for (File file : files)
+                if (files.length == 1)
                 {
-                    if (file.canExecute() )
+                    String rVersion = getRVersion(files[0]);
+
+                    ConfigureReportsAndScriptsHelper.EngineConfig config = new ConfigureReportsAndScriptsHelper.EngineConfig(files[0]);
+                    config.setVersion(rVersion);
+                    scripts.addEngine(ConfigureReportsAndScriptsHelper.EngineType.R, config);
+
+                    return rVersion;
+                }
+                else if (files.length > 1)
+                {
+                    _test.log("Found too many R executables:");
+                    for (File file : files)
                     {
-                        // add a new r engine configuration
-                        String id = _test._extHelper.getExtElementId("btn_addEngine");
-                        _test.click(Locator.id(id));
-    
-                        id = _test._extHelper.getExtElementId("add_rEngine");
-                        _test.click(Locator.id(id));
-
-                        id = _test._extHelper.getExtElementId("btn_submit");
-                        _test.waitForElement(Locator.id(id), 10000);
-
-                        id = _test._extHelper.getExtElementId("editEngine_exePath");
-                        _test.setFormElement(Locator.id(id), file.getAbsolutePath());
-
-                        String rVersion = getRVersion(file);
-                        _test.setFormElement(Locator.id("editEngine_languageVersion"), rVersion);
-
-                        id = _test._extHelper.getExtElementId("btn_submit");
-                        _test.click(Locator.id(id));
-
-                        // wait until the dialog has been dismissed
-                        int cnt = 3;
-                        while (_test.isElementPresent(Locator.id(id)) && cnt > 0)
-                        {
-                            _test.sleep(1000);
-                            cnt--;
-                        }
-
-                        _test.waitFor(new BaseWebDriverTest.Checker()
-                        {
-                            public boolean check()
-                            {
-                                return _test.isREngineConfigured();
-                            }
-                        }, "unable to setup the R script engine", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-                        return rVersion;
+                        _test.log("\t" + file.getAbsolutePath());
                     }
                 }
             }
@@ -274,24 +250,6 @@ public class RReportHelper extends AbstractHelper
             if (versionOutput.length() > 0) _test.log("R --version > " + versionOutput);
             fail("Unable to determine R version: " + r.getAbsolutePath() + " due to " + ex.getMessage());
             return null; // Unreachable
-        }
-    }
-
-    @LogMethod
-    public void deleteEngine()
-    {
-        if (_test.isREngineConfigured())
-        {
-            Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='R,r']");
-            _test.click(engine);
-
-            String id = _test._extHelper.getExtElementId("btn_deleteEngine");
-            _test.click(Locator.id(id));
-
-            _test._extHelper.waitForExtDialog("Delete Engine Configuration", BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-
-            _test.clickButton("Yes", 0);
-            _test.waitForElementToDisappear(engine, BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         }
     }
 

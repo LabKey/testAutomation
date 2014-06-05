@@ -18,7 +18,9 @@ package org.labkey.test.tests;
 
 import org.labkey.test.Locator;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.pages.ConfigureReportsAndScriptsHelper;
 import org.labkey.test.util.AssayImportOptions;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 
 import java.io.BufferedWriter;
@@ -31,7 +33,18 @@ import static org.junit.Assert.*;
 
 public abstract class AbstractQCAssayTest extends AbstractAssayTest
 {
+    private final String engineLanguage = "java";
+    private final String engineName = "Java";
+
+    @LogMethod
     public void prepareProgrammaticQC()
+    {
+        createEngine();
+        createNetrcFile();
+    }
+
+    @LogMethod
+    private void createEngine()
     {
         ensureAdminMode();
 
@@ -39,20 +52,10 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("views and scripting"));
         log("setup a java engine");
 
-        if (!isEngineConfigured())
+        ConfigureReportsAndScriptsHelper scripts = new ConfigureReportsAndScriptsHelper(this);
+
+        if (!scripts.isEnginePresent(engineLanguage))
         {
-            // add a new r engine configuration
-            String id = _extHelper.getExtElementId("btn_addEngine");
-            click(Locator.id(id));
-
-            id = _extHelper.getExtElementId("add_externalEngine");
-            click(Locator.id(id));
-
-            id = _extHelper.getExtElementId("btn_submit");
-            waitForElement(Locator.id(id), 10000);
-
-            id = _extHelper.getExtElementId("editEngine_exePath");
-
             String javaHome = System.getProperty("java.home");
             File javaExe = new File(javaHome + "/bin/java.exe");
             if (!javaExe.exists())
@@ -61,38 +64,23 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
                 if (!javaExe.exists())
                     fail("unable to setup the java engine");
             }
-            setFormElement(Locator.id(id), javaExe.getAbsolutePath());
 
-            id = _extHelper.getExtElementId("editEngine_name");
-            setFormElement(Locator.id(id), "Java");
-
-            id = _extHelper.getExtElementId("editEngine_languageName");
-            setFormElement(Locator.id(id), "java");
-
-            id = _extHelper.getExtElementId("editEngine_extensions");
-            setFormElement(Locator.id(id), "jar");
-
-            id = _extHelper.getExtElementId("editEngine_exeCommand");
-            setFormElement(Locator.id(id), "-jar \"${scriptFile}\" \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"");
+            ConfigureReportsAndScriptsHelper.EngineConfig config = new ConfigureReportsAndScriptsHelper.EngineConfig(javaExe);
+            config.setName(engineName);
+            config.setLanguage(engineLanguage);
+            config.setExtensions("jar");
+            config.setCommand("-jar \"${scriptFile}\" \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"");
 
             // add -Xdebug and -Xrunjdwp parameters to the engine command in order to attach a debugger to you transform script
-            //setFormElement(Locator.id(id), "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006 -jar ${scriptFile} \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"");
+            //config.setCommand("-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5006 -jar ${scriptFile} \"${runInfo}\" \"" + PasswordUtil.getUsername() + "\" \"" + PasswordUtil.getPassword() + "\" \"" + WebTestHelper.getBaseURL() + "\"");
 
-            id = _extHelper.getExtElementId("btn_submit");
-            click(Locator.id(id));
-
-            // wait until the dialog has been dismissed
-            waitForElementToDisappear(Locator.id(id), WAIT_FOR_JAVASCRIPT);
-
-            waitFor(new Checker()
-            {
-                public boolean check()
-                {
-                    return isEngineConfigured();
-                }
-            }, "unable to setup the java engine", WAIT_FOR_JAVASCRIPT);
+            scripts.addEngine(ConfigureReportsAndScriptsHelper.EngineType.EXTERNAL, config);
         }
+    }
 
+    @LogMethod
+    private void createNetrcFile()
+    {
         // ensure the .netrc file exists
         try {
             File netrcFile = new File(System.getProperty("user.home") + "/" + "_netrc");
@@ -121,15 +109,6 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
         }
     }
 
-    public boolean isEngineConfigured()
-    {
-        // need to allow time for the server to return the engine list and the ext grid to render
-        Locator engine = Locator.xpath("//div[@id='enginesGrid']//td//div[.='jar']");
-
-        waitForElement(Locator.xpath("//div[@id='enginesGrid']//td//div[.='js']"), WAIT_FOR_JAVASCRIPT); //JS engine always present
-        return isElementPresent(engine);
-    }
-
     public void deleteEngine()
     {
         ensureAdminMode();
@@ -137,16 +116,11 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("views and scripting"));
 
-        if (isEngineConfigured())
+        ConfigureReportsAndScriptsHelper scripts = new ConfigureReportsAndScriptsHelper(this);
+
+        if (scripts.isEnginePresent(engineLanguage))
         {
-            click(Locator.xpath("//div[@id='enginesGrid']//td//div[.='jar']"));
-
-            String id = _extHelper.getExtElementId("btn_deleteEngine");
-            click(Locator.id(id));
-
-            _extHelper.waitForExtDialog("Delete Engine Configuration", WAIT_FOR_JAVASCRIPT);
-
-            _extHelper.clickExtButton("Delete Engine Configuration", "Yes");
+            scripts.deleteEngine(engineName);
         }
     }
 
