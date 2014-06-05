@@ -379,6 +379,7 @@ src/org/labkey/test/tests/CustomizeEmailTemplateTest.java -text
 src/org/labkey/test/tests/CustomizeViewTest.java -text
 src/org/labkey/test/tests/DataRegionTest.java -text
 src/org/labkey/test/tests/DataReportsTest.java -text
+src/org/labkey/test/tests/DataViewsPermissionsTest.java -text
 src/org/labkey/test/tests/DataViewsTest.java -text
 src/org/labkey/test/tests/DatabaseDiagnosticsTest.java -text
 src/org/labkey/test/tests/DatasetExportTest.java -text

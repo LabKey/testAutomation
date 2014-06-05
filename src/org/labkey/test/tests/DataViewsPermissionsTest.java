@@ -1,0 +1,140 @@
+package org.labkey.test.tests;
+
+import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.Locator;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.LogMethod;
+import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.PortalHelper;
+import org.labkey.test.util.RReportHelper;
+import org.labkey.test.util.PermissionsHelper;
+import org.openqa.selenium.WebElement;
+
+import static org.junit.Assert.*;
+
+@Category({DailyA.class})
+public class DataViewsPermissionsTest extends StudyBaseTest
+{
+
+    PortalHelper portalHelper = new PortalHelper(this);
+
+    protected void doCreateSteps()
+    {
+        importStudy();
+
+        clickFolder("My Study");
+        portalHelper.addWebPart("Data Views");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.uncheckInheritedPermissions();
+        waitAndClickButton("Save and Finish");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.createPermissionsGroup("Editor Group");
+        _permissionsHelper.assertPermissionSetting("Editor Group", "No Permissions");
+        _permissionsHelper.setPermissions("Editor Group", "Editor");
+        createUserInProjectForGroup("Editor@test.com", "StudyVerifyProject", "Editor Group", false);
+        clickFolder("My Study");
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.createPermissionsGroup("Author Group");
+        _permissionsHelper.assertPermissionSetting("Author Group", "No Permissions");
+        _permissionsHelper.setPermissions("Author Group", "Author");
+        createUserInProjectForGroup("Author@test.com", "StudyVerifyProject", "Author Group", false);
+
+        clickFolder("My Study");
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Views"));
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
+        setFormElement(Locator.id("label"), "Report 1");
+        waitAndClickButton("Create View");
+        clickFolder("My Study");
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Views"));
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
+        setFormElement(Locator.id("label"), "Report 2");
+        waitAndClickButton("Create View");
+        clickFolder("My Study");
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Views"));
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
+        setFormElement(Locator.id("label"), "Report 3");
+        waitAndClickButton("Create View");
+        clickFolder("My Study");
+        clickTab("Manage");
+        clickAndWait(Locator.linkWithText("Manage Views"));
+        _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
+        setFormElement(Locator.id("label"), "Report 4");
+        waitAndClickButton("Create View");
+        clickFolder("My Study");
+        portalHelper.removeWebPart("Views");
+        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
+        openEditPanel("Report 1");
+        //_ext4Helper.selectRadioButton ("Visibility","Hidden");
+        _ext4Helper.uncheckCheckbox("Shared");
+        _ext4Helper.clickWindowButton("Report 1","Save",0,0);
+        clickFolder("My Study");
+        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
+        openEditPanel("Report 2");
+        _ext4Helper.selectComboBoxItem("Author","author");
+        _ext4Helper.checkCheckbox("Shared");
+        _ext4Helper.clickWindowButton("Report 2","Save",0,0);
+        clickFolder("My Study");
+        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
+        openEditPanel("Report 3");
+        _ext4Helper.selectComboBoxItem("Author","editor");
+        _ext4Helper.checkCheckbox("Shared");
+        _ext4Helper.clickWindowButton("Report 3","Save",0,0);
+    }
+
+    protected void doVerifySteps()
+
+    {
+        impersonate ("editor@test.com");
+        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
+        openEditPanel("Report 4");
+        _ext4Helper.clickWindowButton("Report 4","Save",0,0);
+        stopImpersonating();
+
+        clickProject("StudyVerifyProject");
+        clickFolder("My Study");
+        impersonate("author@test.com");
+        clickWebpartMenuItem("Data Views", "Add Report", "Link Report");
+        setFormElement(Locator.name("viewName"), "Report 5");
+        setFormElement(Locator.name("linkUrl"), "http://www.google.com");
+        waitAndClickButton("Save");
+
+        click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
+        openEditPanel("Report 5");
+        _ext4Helper.clickWindowButton("Report 5","Save",0,0);
+
+
+    }
+
+    private void openEditPanel(String itemName)
+    {
+        waitAndClick(Locators.editViewsLink(itemName));
+        waitForElement(Ext4Helper.Locators.window(itemName));
+    }
+    public static class Locators
+    {
+        public static Locator.XPathLocator editViewsLink(String dataset)
+        {
+            return Locator.xpath("//tr").withClass("x4-grid-tree-node-leaf").withDescendant(Locator.xpath("td/div/a[normalize-space()="+Locator.xq(dataset)+"]")).append("//span").withClass("edit-views-link");
+        }
+    }
+    private void createUserInProjectForGroup(String userName, String projectName, String groupName, boolean sendEmail)
+    {
+        if (isElementPresent(Locator.permissionRendered()))
+        {
+            _permissionsHelper.exitPermissionsUI();
+            clickProject(projectName);
+        }
+        _permissionsHelper.enterPermissionsUI();
+        _permissionsHelper.clickManageGroup(groupName);
+        setFormElement(Locator.name("names"), userName);
+        if (!sendEmail)
+            uncheckCheckbox(Locator.checkboxByName("sendEmail"));
+        clickButton("Update Group Membership");
+    }
+}
+
