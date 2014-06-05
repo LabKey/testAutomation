@@ -276,6 +276,7 @@ public class CreateVialsTest extends AbstractViabilityTest
         table.checkCheckbox(3);
         clickButton("Move Vials", 0);
         _extHelper.waitForExtDialog("Move Vials");
+        waitForFormElementToNotEqual(Locator.id("changeLocationField"), "");
         setFormElement(Locator.id("changeLocationField"), "Site C");
         pressTab(Locator.id("changeLocationField"));
         _extHelper.clickExtButton("Move Vials", WAIT_FOR_JAVASCRIPT);
