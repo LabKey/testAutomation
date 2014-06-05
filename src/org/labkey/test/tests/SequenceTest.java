@@ -360,8 +360,8 @@ public class SequenceTest extends BaseWebDriverTest
         assertEquals("Wrong number of files selected", 14, StringUtils.countMatches(url, "dataIds="));
         assertTrue("Improper URL to download sequences", url.contains("mergeFastqFiles.view?"));
 
-        waitAndClick(Ext4Helper.Locators.ext4Button("Submit"));
-        validateFastqDownload(fileName + ".fastq.gz");
+        File exportFile = clickAndWaitForDownload(Ext4Helper.Locators.ext4Button("Submit"));
+        validateFastqDownload(exportFile);
 
         log("Verifying FASTQC Report");
         dr.uncheckAllOnPage();
@@ -735,15 +735,10 @@ public class SequenceTest extends BaseWebDriverTest
 
     /**
      * This method will make a request to download merged FASTQ files created during the illumina test
-     * @param filename
-     * @throws Exception
      */
-    private void validateFastqDownload(String filename) throws IOException
+    private void validateFastqDownload(File output) throws IOException
     {
         log("Verifying merged FASTQ export");
-
-        File output = new File(getDownloadDir(), filename);
-        _helper.waitForFileOfSize(output, 15000);  //size measured at 15924
 
         assertTrue("Unable to find file: " + output.getPath(), output.exists());
         log("File size: " + FileUtils.sizeOf(output));

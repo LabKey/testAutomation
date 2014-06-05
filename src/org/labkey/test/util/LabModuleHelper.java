@@ -467,16 +467,4 @@ public class LabModuleHelper
             }
         }, "Unable to find file: " + file.getPath(), WAIT_FOR_PAGE);
     }
-
-    public void waitForFileOfSize(final File file, final long size)
-    {
-        _test.waitFor(new BaseWebDriverTest.Checker()
-        {
-            @Override
-            public boolean check()
-            {
-                return file.exists() && FileUtils.sizeOf(file) >= size;
-            }
-        }, "Unable to find file: " + file.getPath() + ", with size greater than " + size, WAIT_FOR_PAGE);
-    }
 }
