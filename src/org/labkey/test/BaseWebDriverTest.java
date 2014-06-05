@@ -428,6 +428,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                             "application/vnd.ms-excel," + // .xls
                                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet," + // .xlsx
                                     "application/octet-stream," +
+                                    "application/zip," +
                                     "application/x-gzip," +
                                     "application/x-zip-compressed," +
                                     "application/xml," +
