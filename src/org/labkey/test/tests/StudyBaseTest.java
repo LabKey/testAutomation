@@ -22,6 +22,7 @@ import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.WebTestHelper;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.openqa.selenium.support.ui.Select;
@@ -389,9 +390,10 @@ public abstract class StudyBaseTest extends SimpleApiTest
         clickAndWait(Locator.linkWithSpan("Submit"));
     }
 
-    protected Locator getBtnLocatorFromQWP(String QWPTitle, String ButtonText)
+    protected Locator getBtnLocatorFromQWP(String QWPTitle, String buttonText)
     {
-        return Locator.xpath("//th[@title= '" + QWPTitle + "']/../../..//span[contains(.,'" + ButtonText + "')]");
+        Locator dataRegionLoc = Locator.tagWithName("table", "webpart").withPredicate(Locator.tagWithAttribute("th", "title", QWPTitle)).append(Locator.tagWithClass("table", "labkey-data-region").append("/../.."));
+        return DataRegionTable.Locators.headerButton(dataRegionLoc.findElement(getDriver()).getAttribute("id"), buttonText);
     }
 
     public class VisitTag
