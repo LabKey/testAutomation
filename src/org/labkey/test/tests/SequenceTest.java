@@ -64,7 +64,7 @@ public class SequenceTest extends BaseWebDriverTest
     protected LabModuleHelper _helper = new LabModuleHelper(this);
     protected String _pipelineRoot = null;
     protected final String _sequencePipelineLoc =  getLabKeyRoot() + "/externalModules/labModules/SequenceAnalysis/resources/sampleData";
-    protected final String _illuminaPipelineLoc =  getLabKeyRoot() + "/sampledata/genotyping";
+    protected final String _illuminaPipelineLoc =  getLabKeyRoot() + "/sampledata/sequenceAnalysis";
     protected final String _readsetPipelineName = "Import sequence data";
 
     private final String TEMPLATE_NAME = "SequenceTest Saved Template";
@@ -265,7 +265,7 @@ public class SequenceTest extends BaseWebDriverTest
         setFormElement(Locator.name("runDate"), "08/25/2011");
         setFormElement(Locator.name("fastqPrefix"), "Il");
 
-        click(Ext4Helper.Locators.ext4Button("Import Data"));
+        waitAndClick(Ext4Helper.Locators.ext4ButtonEnabled("Import Data"));
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("OK"));
 
         waitAndClickAndWait(Locator.linkContainingText("All"));
