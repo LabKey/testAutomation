@@ -342,7 +342,7 @@ public class SequenceTest extends BaseWebDriverTest
         _helper.waitForDataRegion("query");
         dr = new DataRegionTable("query", this);
         dr.checkAllOnPage();
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "Download Sequence Files");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "Download Sequence Files");
         waitForElement(Ext4Helper.ext4Window("Export Files"));
         waitForText("Export Files As");
         Ext4CmpRef window = _ext4Helper.queryOne("#exportFilesWin", Ext4CmpRef.class);
@@ -366,7 +366,7 @@ public class SequenceTest extends BaseWebDriverTest
         log("Verifying FASTQC Report");
         dr.uncheckAllOnPage();
         dr.checkCheckbox(2);
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "View FASTQC Report");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "View FASTQC Report");
 
         waitForText("File Summary");
         assertTextPresent("Per base sequence quality");
@@ -386,7 +386,7 @@ public class SequenceTest extends BaseWebDriverTest
         dr.checkCheckbox(2);
         String id2 = dr.getDataAsText(2, "Readset Id");
 
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "View Analyses");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "View Analyses");
 
         waitForText("Analysis Type"); //proxy for dataRegion loading
 
@@ -436,7 +436,7 @@ public class SequenceTest extends BaseWebDriverTest
         dr.checkCheckbox(6);
         rowIds.add(dr.getDataAsText(6, "Readset Id"));
 
-        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.navButton("More Actions").getPath()), "Analyze Selected");
+        _extHelper.clickExtMenuButton(false, Locator.xpath("//table[@id='dataregion_query']" + Locator.lkButton("More Actions").getPath()), "Analyze Selected");
         waitForElement(Ext4Helper.ext4Window("Import Data"));
         waitForText("Description");
         waitAndClickAndWait(Ext4Helper.Locators.ext4Button("Submit"));

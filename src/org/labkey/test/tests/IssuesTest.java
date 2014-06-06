@@ -189,7 +189,7 @@ public class IssuesTest extends BaseWebDriverTest
         final String issueTitle = "A general issue";
 
         clickAndWait(Locator.linkWithText("view open Issues"));
-        assertNavButtonPresent("New Issue");
+        assertButtonPresent("New Issue");
 
         // quick security test
         // TODO push lots of locations as we go and move this test to end
@@ -197,11 +197,11 @@ public class IssuesTest extends BaseWebDriverTest
         pushLocation();
         signOut();
         popLocation();                          // try open issues as guest
-        assertNavButtonNotPresent("New Issue");
+        assertButtonNotPresent("New Issue");
         assertElementPresent(Locator.tagWithName("form", "login"));
         signIn();
         popLocation();                          // and logged in again
-        assertNavButtonPresent("New Issue");
+        assertButtonPresent("New Issue");
 
         // AdminAction
         clickButton("Admin");
@@ -501,8 +501,8 @@ public class IssuesTest extends BaseWebDriverTest
 
         assertTextPresent("Tickets List");
         assertTextNotPresent("Issues List");
-        assertNavButtonPresent("New Ticket");
-        assertNavButtonPresent("Jump to Ticket");
+        assertButtonPresent("New Ticket");
+        assertButtonPresent("Jump to Ticket");
         assertTextPresent("Ticket ID");
         assertTextNotPresent("Issue ID");
 

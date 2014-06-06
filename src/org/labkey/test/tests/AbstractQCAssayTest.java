@@ -128,7 +128,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
     {
         assertTrue("unable to locate the Transform script", transformScript.exists());
 
-        waitForElement(Locator.navButton("Add Script"));
+        waitForElement(Locator.lkButton("Add Script"));
         clickButton("Add Script", 0);
         setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
     }

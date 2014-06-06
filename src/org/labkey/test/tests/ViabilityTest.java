@@ -292,7 +292,7 @@ public class ViabilityTest extends AbstractViabilityTest
         clickFolder(getFolderName());
         clickAndWait(Locator.linkWithText(getAssayName()));
         clickEditAssayDesign(true);
-        waitForElement(Locator.navButton("Add Script"));
+        waitForElement(Locator.lkButton("Add Script"));
 
         // remove TargetStudy field from the Batch domain and add it to the Result domain.
         _listHelper.deleteField("Batch Fields", 0);

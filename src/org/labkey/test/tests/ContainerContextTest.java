@@ -290,7 +290,7 @@ public class ContainerContextTest extends BaseWebDriverTest
 
         log("** Executing background R script");
         _extHelper.clickMenuButton("Views", folder + "-BackgroundReport");
-        waitForElement(Locator.navButton("Start Job"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickButton("Start Job", 0);
         waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
         goToModule("Pipeline");

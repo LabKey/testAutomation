@@ -178,7 +178,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     protected void setSubfolderSecurity(String project, String subfolder, String group, String perms)
     {
         log("Setting permissions for group '" + group + "' on subfolder '" + project + "/" + subfolder + "' to '" + perms + "'");
-        if (isElementPresent(Locator.permissionRendered()) && isNavButtonPresent("Save and Finish"))
+        if (isElementPresent(Locator.permissionRendered()) && isButtonPresent("Save and Finish"))
             clickButton("Save and Finish");
         clickProject(project);
         clickFolder(subfolder);
@@ -208,7 +208,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     protected void setStudyPerms(String project, String folder, String group, String perms)
     {
         log("Setting study-level read permissions for group " + group + " in project " + project + " to " + perms);
-        if (isElementPresent(Locator.permissionRendered()) && isNavButtonPresent("Save and Finish"))
+        if (isElementPresent(Locator.permissionRendered()) && isButtonPresent("Save and Finish"))
             clickButton("Save and Finish");
         clickProject(project);
         clickFolder(folder);

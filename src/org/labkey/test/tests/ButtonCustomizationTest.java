@@ -156,7 +156,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
 
         clickButton("Done");
         clickAndWait(Locator.linkWithText(LIST_NAME));
-        assertNavButtonNotPresent(METADATA_OVERRIDE_BUTTON);
+        assertButtonNotPresent(METADATA_OVERRIDE_BUTTON);
         clickButton("Insert New");
         setFormElement(Locator.name("quf_name"), "Seattle");
         clickButton("Submit");
@@ -178,11 +178,11 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         waitForText("Saved", WAIT_FOR_JAVASCRIPT);
         clickButton("Execute Query", 0);
         waitForText("Seattle", WAIT_FOR_JAVASCRIPT);
-        assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
+        assertButtonPresent(METADATA_OVERRIDE_BUTTON);
         _extHelper.clickExtTab("Source");
         clickButton("Save & Finish");
-        assertNavButtonPresent(METADATA_OVERRIDE_BUTTON);
-        assertNavButtonPresent("Insert New");
+        assertButtonPresent(METADATA_OVERRIDE_BUTTON);
+        assertButtonPresent("Insert New");
 
         // assert custom buttons can REPLACE the standard set:
         beginAt("/query/" + PROJECT_NAME + "/schema.view?schemaName=lists");
@@ -234,19 +234,19 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         _extHelper.clickMenuButton(false, JAVASCRIPT_MENU_BUTTON_TEXT, JAVASCRIPT_MENU_SUBBUTTON2_TEXT, JAVASCRIPT_MENU_SUBSUBBUTTON_TEXT);
         assertAlert(JAVASCRIPT_MENU_HANDLER_ALERT3_TEXT);
 
-        assertNavButtonNotPresent(METADATA_GET_BUTTON);
-        assertNavButtonNotPresent(METADATA_LINK_BUTTON);
+        assertButtonNotPresent(METADATA_GET_BUTTON);
+        assertButtonNotPresent(METADATA_LINK_BUTTON);
 
         checkCheckboxByNameInDataRegion("Portland");
         // wait for the button to enable:
-        waitForElement(Locator.navButton(METADATA_LINK_BUTTON), 10000);
+        waitForElement(Locator.lkButton(METADATA_LINK_BUTTON), 10000);
 
         // Verify that link buttons don't send parameters at all:
         clickButton(METADATA_LINK_BUTTON);
         assertElementNotPresent(Locator.id("params").containing(".select"));
 
         // wait for the button to enable:
-        waitForElement(Locator.navButton(METADATA_GET_BUTTON), 10000);
+        waitForElement(Locator.lkButton(METADATA_GET_BUTTON), 10000);
         
         // Verify that GET buttons to send form values as GET parameters:
         clickButton(METADATA_GET_BUTTON);
@@ -259,9 +259,9 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
     private void verifyMetadataButtons()
     {
         // The query view webpart populates asynchronously, so we may need to wait for it to appear:
-        waitForElement(Locator.navButton(METADATA_OVERRIDE_BUTTON), 10000);
+        waitForElement(Locator.lkButton(METADATA_OVERRIDE_BUTTON), 10000);
 
-        assertNavButtonNotPresent("Insert New");
+        assertButtonNotPresent("Insert New");
 
         _extHelper.clickMenuButton(false, METADATA_OVERRIDE_BUTTON, METADATA_OVERRIDE_ON_CLICK_BUTTON);
         assertAlert(METADATA_OVERRIDE_ON_CLICK_MSG);

@@ -44,7 +44,7 @@ public class MS2GZTest extends AbstractMS2ImportTest
         DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
         log("Test Protein Prophet Compare");
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("ProteinProphet (Legacy)"));
         selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_PROPHET_VIEW_NAME);
@@ -64,7 +64,7 @@ public class MS2GZTest extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("ProteinProphet (Legacy)"));
         checkCheckbox(Locator.checkboxByName("light2HeavyRatioMean"));
@@ -77,7 +77,7 @@ public class MS2GZTest extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Search Engine Protein"));
         selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_VIEW_NAME);
@@ -97,7 +97,7 @@ public class MS2GZTest extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
 
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Peptide (Legacy)"));
         selectOptionByText(Locator.name("viewParams"), LEGACY_PROTEIN_VIEW_NAME);

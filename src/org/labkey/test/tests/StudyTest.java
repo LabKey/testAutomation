@@ -326,7 +326,7 @@ public class StudyTest extends StudyBaseTest
 
         if(!quickTest)
         {
-            Locator menu = Locator.navButton(SUBJECT_NOUN + " Groups");
+            Locator menu = Locator.lkButton(SUBJECT_NOUN + " Groups");
             _extHelper.clickExtMenuButton(menu, "Participant Group from Grid");
             waitForElement(Locator.paginationText(selectedIDs.length));
             assertTextPresent(selectedIDs);

@@ -252,19 +252,19 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Create and View Details");
 
         assertTextPresent("This request has not been submitted");
-        assertNavButtonPresent("Cancel Request");
-        assertNavButtonPresent("Submit Request");
+        assertButtonPresent("Cancel Request");
+        assertButtonPresent("Submit Request");
         clickAndWait(Locator.linkWithText("Specimen Requests"));
 
-        assertNavButtonPresent("Submit");
-        assertNavButtonPresent("Cancel");
-        assertNavButtonPresent("Details");
+        assertButtonPresent("Submit");
+        assertButtonPresent("Cancel");
+        assertButtonPresent("Details");
         assertTextPresent("Not Yet Submitted");
         clickButton("Submit", 0);
         getAlert(); // TODO: add check for expected alert text
         waitAndClickAndWait(Locator.linkWithText("Specimen Requests"));
-        assertNavButtonNotPresent("Submit");
-        assertNavButtonPresent("Details");
+        assertButtonNotPresent("Submit");
+        assertButtonPresent("Details");
         assertTextPresent("New Request");
 
         // test auto-fill:

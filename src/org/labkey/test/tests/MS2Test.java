@@ -404,7 +404,7 @@ public class MS2Test extends AbstractMS2ImportTest
         clearSort("MS2Peptides", "Scan");
 
         log("Test customize view");
-        fireEvent(Locator.navButton("Clear All"), SeleniumEvent.click);
+        fireEvent(Locator.lkButton("Clear All"), SeleniumEvent.click);
         _customizeViewsHelper.openCustomizeViewPanel();
         _customizeViewsHelper.addCustomizeViewSort("Charge", "Z", "Descending");
         _customizeViewsHelper.addCustomizeViewSort("Mass", "CalcMH+", "Descending");
@@ -890,7 +890,7 @@ public class MS2Test extends AbstractMS2ImportTest
         log("Test that the compare run groups works");
         DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("ProteinProphet"));
         clickButton("Compare");
@@ -1004,7 +1004,7 @@ public class MS2Test extends AbstractMS2ImportTest
         log("Test Compare Peptides using Query");
         DataRegionTable searchRunsTable = new DataRegionTable("MS2SearchRuns", this);
         searchRunsTable.checkAllOnPage();
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Peptide"));
         click(Locator.radioButtonByNameAndValue("peptideFilterType", "none"));

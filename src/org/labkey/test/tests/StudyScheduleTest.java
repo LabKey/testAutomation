@@ -206,7 +206,7 @@ public class StudyScheduleTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
 
         linkDatasetFromDetails(GHOST_DATASET_4, DatasetType.linkeToExisting, "CPS-1: Screening Chemistry Panel");
-        waitForElement(Locator.navButton("Edit Definition"));
+        waitForElement(Locator.lkButton("Edit Definition"));
         goToManageDatasets();
         assertElementPresent(Locator.linkWithText(GHOST_DATASET_4));
         assertElementNotPresent(Locator.linkWithText("CPS-1: Screening Chemistry Panel"));

@@ -113,7 +113,7 @@ public class XTandemTest extends AbstractXTandemTest
         log("Test Comparing Peptides");
         clickAndWait(Locator.linkWithText("MS2 Dashboard"));
         click(Locator.name(".toggle"));
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Peptide (Legacy)"));
         selectOptionByText(Locator.name("viewParams"), VIEW);
@@ -192,7 +192,7 @@ public class XTandemTest extends AbstractXTandemTest
     {
         log("Test PeptideCrosstab");
         click(Locator.name(".toggle"));
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Peptide"));
 

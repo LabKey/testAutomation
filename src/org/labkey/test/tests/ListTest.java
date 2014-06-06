@@ -456,7 +456,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test Export");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
-        waitForElement(Locator.navButton("Export"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Export"), WAIT_FOR_JAVASCRIPT);
         clickExportToText();
         assertTextPresent(TEST_DATA[0][3]);
         assertTextPresentInThisOrder(TEST_DATA[0][3], TEST_DATA[0][2], TEST_DATA[0][1]);
@@ -553,7 +553,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test export");
         addUrlParameter("exportAsWebPage=true");
         pushLocation();
-        waitForElement(Locator.navButton("Export"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Export"), WAIT_FOR_JAVASCRIPT);
         clickExportToText();
         assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol1.getName());
         assertTextPresent(LIST_KEY_NAME2.toLowerCase() + _listCol2.getName());
@@ -1057,7 +1057,7 @@ public class ListTest extends BaseWebDriverTest
 
     void clickDone()
     {
-        if (isElementPresent(Locator.navButton("Save")))
+        if (isElementPresent(Locator.lkButton("Save")))
             clickSave();
         clickButton("Done");
     }

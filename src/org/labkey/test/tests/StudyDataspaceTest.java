@@ -93,8 +93,8 @@ public class StudyDataspaceTest extends StudyBaseTest
         log("Verify project has study, but can't import or export");
         clickFolder(getProjectName());
         clickTab("Manage");
-        assertMenuButtonNotPresent("Export Study");
-        assertMenuButtonNotPresent("Reload Study");
+        assertButtonNotPresent("Export Study");
+        assertButtonNotPresent("Reload Study");
         clickTab("Overview");
         portalHelper.addQueryWebPart(null, "study", "Product", null);
         assertTextPresent("Insert New", "Import Data");     // Can insert into Product table in project
@@ -120,8 +120,8 @@ public class StudyDataspaceTest extends StudyBaseTest
         assertEquals("Expected cell value.", "Frankie Lee", labResultsTable.getDataAsText(0, "Treatment By"));
 
         clickTab("Manage");
-        assertMenuButtonPresent("Export Study");
-        assertMenuButtonPresent("Reload Study");
+        assertButtonPresent("Export Study");
+        assertButtonPresent("Reload Study");
 
         log("Verify Product rows added");
         clickFolder(getProjectName());

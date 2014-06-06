@@ -272,7 +272,7 @@ public class DataReportsTest extends ReportTest
         selectOptionByText(Locator.name("params"), "ECI-1 (ECI-1: Eligibility Criteria)");
         clickButton("Create View");
         assertElementPresent(Locator.linkWithText("999320016"));
-        assertNavButtonNotPresent("go");
+        assertButtonNotPresent("go");
         clickAndWait(Locator.linkWithText(getStudyLabel()));
         clickTab("Manage");
         deleteReport(viewName);
@@ -464,7 +464,7 @@ public class DataReportsTest extends ReportTest
         clickReportGridLink(R_SCRIPTS[1]);
 
         clickViewTab();
-        waitForElement(Locator.navButton("Start Job"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Start Job"), WAIT_FOR_JAVASCRIPT);
         clickButton("Start Job", 0);
         waitForElementToDisappear(Ext4Helper.Locators.window("Start Pipeline Job"));
         goToModule("Pipeline");

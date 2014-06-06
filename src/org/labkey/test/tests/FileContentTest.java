@@ -98,7 +98,7 @@ public class FileContentTest extends BaseWebDriverTest
         // as they are now digest based.
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Notifications"));
-        click(Locator.navButton("Update Settings"));
+        click(Locator.lkButton("Update Settings"));
         shortWait().until(LabKeyExpectedConditions.animationIsDone(Locator.css(".labkey-ribbon > div")));
         // Set folder default
         _extHelper.selectComboBoxItem(Locator.xpath("//div[./input[@name='defaultFileEmailOption']]"), "15 minute digest");

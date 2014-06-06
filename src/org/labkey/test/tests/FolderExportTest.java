@@ -214,7 +214,7 @@ public class FolderExportTest extends BaseWebDriverTest
         log("verify notification default settings as expected");
         clickAndWait(Locator.linkWithText("Notifications"));
         waitForText("Email Notification Settings");
-        click(Locator.navButton("Update Settings"));
+        click(Locator.lkButton("Update Settings"));
         waitForElement(Locator.xpath("//li/a[text()='files']"), WAIT_FOR_JAVASCRIPT);
         isElementPresent(Locator.xpath("//div[text()='Daily digest' and contains(@class, 'x-combo-selected')]"));
         click(Locator.css("#dataregion_Users li > a").withText("messages"));

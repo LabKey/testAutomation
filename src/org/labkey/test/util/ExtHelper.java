@@ -47,7 +47,7 @@ public class ExtHelper extends AbstractHelper
     {
         Locator menu = Locator.extButton(menusLabel);
         if (!_test.isElementPresent(menu))
-            menu = Locator.navButton(menusLabel);
+            menu = Locator.lkButton(menusLabel);
         if (!_test.isElementPresent(menu))
             fail("No Ext or LabKey menu for label '" + menusLabel + "' found");
         clickExtMenuButton(wait, menu, subMenuLabels);
@@ -84,7 +84,7 @@ public class ExtHelper extends AbstractHelper
     {
         Locator menu = Locator.extButton(menuLabel);
         if (!_test.isElementPresent(menu))
-            menu = Locator.navButton(menuLabel);
+            menu = Locator.lkButton(menuLabel);
         if (!_test.isElementPresent(menu))
             fail("No Ext or LabKey menu for label '" + menuLabel + "' found");
         _test.click(menu);

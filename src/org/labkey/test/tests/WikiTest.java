@@ -166,7 +166,7 @@ public class WikiTest extends BaseWebDriverTest
         waitForElementToDisappear(inlineEditor);
         assertTextPresent(addedContent);
         assertTextNotPresent(WIKI_CHECK_CONTENT);
-        assertNavButtonNotPresent("Save");
+        assertButtonNotPresent("Save");
 
         log("** test second edit on inline wiki webpart editor");
         click(Locator.tagWithAttribute("img", "title", "Edit Inline"));

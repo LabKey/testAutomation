@@ -404,18 +404,18 @@ public class SecurityTest extends BaseWebDriverTest
         _permissionsHelper.exitPermissionsUI();
 
         addWebPart("Messages");
-        assertNavButtonPresent("New");
+        assertButtonPresent("New");
         pushLocation();
         signOut();
         popLocation();
         clickProject(PROJECT_NAME);
-        assertNavButtonNotPresent("New");
+        assertButtonNotPresent("New");
         signIn();
         clickProject(PROJECT_NAME);
-        assertNavButtonPresent("New");
+        assertButtonPresent("New");
         impersonate(NORMAL_USER);
         clickProject(PROJECT_NAME);
-        assertNavButtonPresent("New");
+        assertButtonPresent("New");
         stopImpersonating();
     }
 

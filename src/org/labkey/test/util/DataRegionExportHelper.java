@@ -51,7 +51,7 @@ public class DataRegionExportHelper
         _test._extHelper.clickSideTab("Excel");
         if (exportSelected != null) chooseExportSelectedRows(exportSelected);
         _test.checkRadioButton(type.getRadioLocator());
-        return _test.clickAndWaitForDownload(Locator.navButton("Export to Excel"), _expectedFileCount)[0];
+        return _test.clickAndWaitForDownload(Locator.lkButton("Export to Excel"), _expectedFileCount)[0];
     }
 
     public File exportText()
@@ -71,7 +71,7 @@ public class DataRegionExportHelper
         if (exportSelected != null) chooseExportSelectedRows(exportSelected);
         _test.selectOptionByValue(Locator.name("delim"), delim.toString());
         _test.selectOptionByValue(Locator.name("quote"), quote.toString());
-        return _test.clickAndWaitForDownload(Locator.navButton("Export to Text"), _expectedFileCount)[0];
+        return _test.clickAndWaitForDownload(Locator.lkButton("Export to Text"), _expectedFileCount)[0];
     }
 
     public String exportScript(ScriptExportType type)
@@ -79,7 +79,7 @@ public class DataRegionExportHelper
         expandExportPanel();
         _test._extHelper.clickSideTab("Script");
         _test.checkRadioButton(type.getRadioLocator());
-        _test.click(Locator.navButton("Create Script"));
+        _test.click(Locator.lkButton("Create Script"));
 
         Object[] windows = _test.getDriver().getWindowHandles().toArray();
         _test.getDriver().switchTo().window((String)windows[1]);

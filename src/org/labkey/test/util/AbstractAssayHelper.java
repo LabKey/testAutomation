@@ -60,7 +60,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
 
         _test.clickAndWait(Locator.linkWithText("upload"));
         _test.setFormElement(Locator.name("uploadFile"), file);
-        _test.clickAndWait(Locator.navButton("Upload"));
+        _test.clickAndWait(Locator.lkButton("Upload"));
         _test.waitForPipelineJobsToComplete(pipelineCount, "Uploaded file - " + file.getName(), false);
     }
 
@@ -151,7 +151,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     {
         if (transformScript.exists())
         {
-            _test.waitForElement(Locator.navButton("Add Script"));
+            _test.waitForElement(Locator.lkButton("Add Script"));
             int index = _test.getElementCount(Locator.xpath("//input[starts-with(@id, 'AssayDesignerTransformScript')]"));
             _test.clickButton("Add Script", 0);
             _test.setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
@@ -170,7 +170,7 @@ public abstract class AbstractAssayHelper extends AbstractHelper
     {
         if (transformScript.exists())
         {
-            _test.waitForElement(Locator.navButton("Add Script"));
+            _test.waitForElement(Locator.lkButton("Add Script"));
             _test.setFormElement(Locator.xpath("//input[@id='AssayDesignerTransformScript" + index + "']"), transformScript.getAbsolutePath());
         }
         else

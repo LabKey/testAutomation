@@ -810,7 +810,7 @@ public class WikiLongTest extends BaseWebDriverTest
             selectOptionByText(Locator.name("rendererType"), renderType);
         }
 
-        if ("HTML".equals(renderType) && isNavButtonPresent("Use HTML Source Editor"))
+        if ("HTML".equals(renderType) && isButtonPresent("Use HTML Source Editor"))
             clickButton("Use HTML Source Editor");
     }
 

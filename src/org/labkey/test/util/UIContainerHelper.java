@@ -103,7 +103,7 @@ public class UIContainerHelper extends AbstractContainerHelper
         _test.clickButton("Delete");
 
         // in case there are sub-folders
-        if (_test.isNavButtonPresent("Delete All Folders"))
+        if (_test.isButtonPresent("Delete All Folders"))
         {
             _test.clickButton("Delete All Folders");
         }

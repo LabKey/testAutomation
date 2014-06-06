@@ -1406,7 +1406,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
                 int waitMs = 10 * 60 * 1000; // we'll wait at most ten minutes
 
-                while (waitMs > 0 && (!(isNavButtonPresent("Next") || isElementPresent(Locator.linkWithText("Home")))))
+                while (waitMs > 0 && (!(isButtonPresent("Next") || isElementPresent(Locator.linkWithText("Home")))))
                 {
                     try
                     {
@@ -1436,12 +1436,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
                 if (waitMs <= 0)
                     throw new TestTimeoutException("Script runner took more than 10 minutes to complete.");
 
-                if (isNavButtonPresent("Next"))
+                if (isButtonPresent("Next"))
                 {
                     clickButton("Next");
 
                     // check for any additional upgrade pages inserted after module upgrade
-                    if (isNavButtonPresent("Next"))
+                    if (isButtonPresent("Next"))
                         clickButton("Next");
                 }
 
@@ -4551,7 +4551,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             return locator;
 
         // check for normal labkey submit button:
-        locator = Locator.navButton(text).index(index);
+        locator = Locator.lkButton(text).index(index);
         if (isElementPresent(locator))
             return locator;
 
@@ -4576,7 +4576,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             return locator;
 
         // check for normal labkey nav button:
-        locator = Locator.navButton(text);
+        locator = Locator.lkButton(text);
         if (isElementPresent(locator))
             return locator;
 
@@ -4612,7 +4612,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             return locator;
 
         // check for normal labkey submit/nav button:
-        locator = Locator.navButtonContainingText(text);
+        locator = Locator.lkButtonContainingText(text);
         if (isElementPresent(locator))
             return locator;
 
@@ -5148,34 +5148,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }, "Form element was not set.", WAIT_FOR_JAVASCRIPT);
     }
 
-    public boolean isNavButtonPresent(String buttonText)
+    public void assertButtonPresent(String buttonText)
     {
-        return isButtonPresent(buttonText);
+        assertTrue("Button '" + buttonText + "' was not present", isButtonPresent(buttonText));
     }
 
-    public boolean isMenuButtonPresent(String buttonText)
+    public void assertButtonNotPresent(String buttonText)
     {
-        return isButtonPresent(buttonText);
-    }
-
-    public void assertNavButtonPresent(String buttonText)
-    {
-        assertTrue("Nav button '" + buttonText + "' was not present", isNavButtonPresent(buttonText));
-    }
-
-    public void assertNavButtonNotPresent(String buttonText)
-    {
-        assertFalse("Nav button '" + buttonText + "' was present", isNavButtonPresent(buttonText));
-    }
-
-    public void assertMenuButtonPresent(String buttonText)
-    {
-        assertTrue("Nav button '" + buttonText + "' was not present", isMenuButtonPresent(buttonText));
-    }
-
-    public void assertMenuButtonNotPresent(String buttonText)
-    {
-        assertFalse("Menu button '" + buttonText + "' was present", isMenuButtonPresent(buttonText));
+        assertFalse("Button '" + buttonText + "' was present", isButtonPresent(buttonText));
     }
 
     /**
@@ -5423,9 +5403,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickAndWait(Ext4Helper.ext4WindowButton("Impersonate User", "Impersonate"));
         _impersonationStack.push(fakeUser);
 
-        if (isElementPresent(Locator.navButton("Home")))
+        if (isElementPresent(Locator.lkButton("Home")))
         {
-            clickAndWait(Locator.navButton("Home"));
+            clickAndWait(Locator.lkButton("Home"));
         }
     }
 

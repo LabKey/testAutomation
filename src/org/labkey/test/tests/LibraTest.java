@@ -90,7 +90,7 @@ public class LibraTest extends MS2TestBase
     {
         clickProject(getProjectName());
         checkAllOnPage("MS2SearchRuns");
-        waitForElement(Locator.navButton("Compare"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Compare"), WAIT_FOR_JAVASCRIPT);
         clickButton("Compare", 0);
         clickAndWait(Locator.linkWithText("Spectra Count"));
         click(Locator.radioButtonById("SpectraCountPeptide"));
@@ -209,7 +209,7 @@ public class LibraTest extends MS2TestBase
     {
         _extHelper.clickMenuButton("Views", "ProteinProphet");
 
-        waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Views"), WAIT_FOR_JAVASCRIPT);
         _customizeViewsHelper.openCustomizeViewPanel();
         for(int i=1; i<=normalizationCount; i++)
         {

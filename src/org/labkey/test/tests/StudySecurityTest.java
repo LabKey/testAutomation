@@ -174,9 +174,9 @@ public class StudySecurityTest extends StudyBaseTest
         clickFolder(getFolderName());
 
         if (canSetupPipeline)
-            assertNavButtonPresent("Setup");
+            assertButtonPresent("Setup");
         else
-            assertNavButtonNotPresent("Setup");
+            assertButtonNotPresent("Setup");
 
         for (String dsName : dsCanRead)
         {
@@ -194,8 +194,8 @@ public class StudySecurityTest extends StudyBaseTest
             clickAndWait(Locator.linkWithText(dsName));
             assertTextPresent(dsName);
             assertElementPresent(Locator.linkWithText("edit"));
-            assertNavButtonPresent("Insert New");
-            assertNavButtonPresent("Import Data");
+            assertButtonPresent("Insert New");
+            assertButtonPresent("Import Data");
             clickFolder(getFolderName());
         }
 
@@ -206,8 +206,8 @@ public class StudySecurityTest extends StudyBaseTest
                 clickAndWait(Locator.linkWithText(dsName));
                 assertTextPresent(dsName);
                 assertElementNotPresent(Locator.linkWithText("edit"));
-                assertNavButtonNotPresent("Insert New");
-                assertNavButtonNotPresent("Import Data");
+                assertButtonNotPresent("Insert New");
+                assertButtonNotPresent("Import Data");
                 clickFolder(getFolderName());
             }
         }

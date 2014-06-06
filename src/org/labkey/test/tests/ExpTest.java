@@ -156,9 +156,9 @@ public class ExpTest extends BaseWebDriverTest
         int lastFieldIndex = getElementCount(Locator.xpath("//input[starts-with(@name, 'ff_label')]")) - 1;
         Locator lastField = Locator.xpath("//input[@name='ff_label" + lastFieldIndex + "']");
         click(lastField);
-        click(Locator.xpath("//span").append(Locator.navButton("Alias Field")));
+        click(Locator.xpath("//span").append(Locator.lkButton("Alias Field")));
         selectOptionByText(Locator.name("sourceColumn"), "RowId");
-        click(Locator.xpath("//span").append(Locator.navButton("OK")));
+        click(Locator.xpath("//span").append(Locator.lkButton("OK")));
 
         // Make it a lookup into our custom query
         int fieldCount = getElementCount(Locator.xpath("//input[contains(@name, 'ff_type')]"));
@@ -184,8 +184,8 @@ public class ExpTest extends BaseWebDriverTest
         waitForText("edit metadata");
         clickAndWait(Locator.linkWithText("edit metadata"));
         waitForElement(Locator.xpath("//span[contains(text(), 'Reset to Default')]"), defaultWaitForPage);
-        click(Locator.xpath("//span").append(Locator.navButton("Reset to Default")));
-        click(Locator.xpath("//span").append(Locator.navButton("OK")));
+        click(Locator.xpath("//span").append(Locator.lkButton("Reset to Default")));
+        click(Locator.xpath("//span").append(Locator.lkButton("OK")));
         waitForText("Reset successful", WAIT_FOR_JAVASCRIPT);
     }
 }

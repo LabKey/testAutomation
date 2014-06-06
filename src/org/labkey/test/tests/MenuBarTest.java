@@ -92,13 +92,13 @@ public class MenuBarTest extends BaseWebDriverTest
 
         log("Assert wiki, assay, and study portals not loaded");
         assertTextNotPresent(WIKI_PAGE_CONTENT);
-        assertNavButtonNotPresent("Manage Assays");
+        assertButtonNotPresent("Manage Assays");
         assertTextNotPresent("No Studies Found");
 
         hoverMenu(WIKI_PAGE_TITLE);
         waitForElement(Locator.xpath("//div").withClass("labkey-wiki").withText(WIKI_PAGE_CONTENT));
         hoverMenu("Assays");
-        waitForElement(Locator.navButton("Manage Assays"), 3000);
+        waitForElement(Locator.lkButton("Manage Assays"), 3000);
 
         _assayHelper.uploadXarFileAsAssayDesign(getSampledataPath() + "/menubar/Test Assay.xar", 1);
         clickProject(PROJECT_NAME);

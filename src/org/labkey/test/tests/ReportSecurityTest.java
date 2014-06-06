@@ -120,10 +120,10 @@ public class ReportSecurityTest extends ReportTest
         setFormElement("reportName", "participant chart");
         clickButton("OK", 0);
 
-        waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Views"), WAIT_FOR_JAVASCRIPT);
 
         _extHelper.clickMenuButton("Views", "default");
-        waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Views"), WAIT_FOR_JAVASCRIPT);
         _extHelper.clickMenuButton("Charts", "Create Chart View");
         waitForElement(Locator.xpath("//select[@name='columnsX']"), WAIT_FOR_JAVASCRIPT);
 
@@ -139,7 +139,7 @@ public class ReportSecurityTest extends ReportTest
         checkCheckbox(Locator.checkboxByName("shareReport"));
         clickButton("OK", 0);
 
-        waitForElement(Locator.navButton("Views"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("Views"), WAIT_FOR_JAVASCRIPT);
 
         // create grid view
         clickFolder(getFolderName());

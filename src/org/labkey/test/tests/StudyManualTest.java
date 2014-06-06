@@ -112,7 +112,7 @@ public class StudyManualTest extends StudyTest
         clickAndWait(Locator.linkWithText("Manage Files"));
         clickButton("Process and Import Data");
         _fileBrowserHelper.selectFileBrowserItem("datasets/Study001.dataset");
-        if (isNavButtonPresent("Delete log"))
+        if (isButtonPresent("Delete log"))
             clickButton("Delete log");
         _fileBrowserHelper.selectImportDataAction("Import Datasets");
         clickButton("Start Import");
@@ -146,9 +146,9 @@ public class StudyManualTest extends StudyTest
         clickAndWait(Locator.linkWithText("Clear Custom Mapping"));
         clickAndWait(Locator.linkWithText("OK"));
         assertTextPresent("The custom mapping is currently empty");
-        assertNavButtonPresent("Import Custom Mapping");
-        assertNavButtonNotPresent("Replace Custom Mapping");
-        assertNavButtonNotPresent("Clear Custom Mapping");
+        assertButtonPresent("Import Custom Mapping");
+        assertButtonNotPresent("Replace Custom Mapping");
+        assertButtonNotPresent("Clear Custom Mapping");
         assertTextNotPresent("Vaccine 1");
         assertTextNotPresent("Vaccination 1");
         assertTextNotPresent("Cycle 10");
@@ -267,7 +267,7 @@ public class StudyManualTest extends StudyTest
         setFormElement(Locator.id("importAliases"), "aliasedColumn");
 
         clickButton("Save");
-        waitForElement(Locator.navButton("View Data"), WAIT_FOR_JAVASCRIPT);
+        waitForElement(Locator.lkButton("View Data"), WAIT_FOR_JAVASCRIPT);
         clickButton("View Data");
         clickButton("Import Data");
 

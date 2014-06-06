@@ -339,7 +339,7 @@ public class SampleSetTest extends BaseWebDriverTest
         String inputFormID =   "name2-input";
         String fileField = "FileAttachment";
         clickButton("Edit Fields");
-        waitForElement(Locator.navButton("Add Field"), defaultWaitForPage);
+        waitForElement(Locator.lkButton("Add Field"), defaultWaitForPage);
         ListHelper listHelper = new ListHelper(this);
         listHelper.addField(new ListHelper.ListColumn(fileField, fileField, ListHelper.ListColumnType.File, fileField));
         clickButton("Save");

@@ -440,14 +440,14 @@ public class MS1Test extends BaseWebDriverTest
 
         assertCharts();
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
-        assertElementPresent(Locator.navButtonDisabled("<< Previous Feature"));
+        assertElementPresent(Locator.lkButtonDisabled("<< Previous Feature"));
         //test next/prev buttons
         log("Testing Prev/Next buttons on feature details");
         clickButton("Next Feature >>");
-        assertElementPresent(Locator.navButtonDisabled("Next Feature >>"));
+        assertElementPresent(Locator.lkButtonDisabled("Next Feature >>"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
         clickButton("<< Previous Feature");
-        assertElementPresent(Locator.navButtonDisabled("<< Previous Feature"));
+        assertElementPresent(Locator.lkButtonDisabled("<< Previous Feature"));
         assertChartRendered(Locator.imageWithSrc("type=bubble", true));
 
         log("showFeatureDetails.view OK");
@@ -487,7 +487,7 @@ public class MS1Test extends BaseWebDriverTest
     {
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("ms1"));
-        if(isNavButtonPresent("Purge Deleted MS1 Data Now"))
+        if(isButtonPresent("Purge Deleted MS1 Data Now"))
         {
             log("Purging MS1 Test data files...");
             clickButton("Purge Deleted MS1 Data Now");

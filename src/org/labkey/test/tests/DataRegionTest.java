@@ -175,7 +175,7 @@ public class DataRegionTest extends BaseWebDriverTest
         assertEquals("aqua", table.getDataAsText(0, 3));
         assertEquals("#FFFF00", table.getDataAsText(15, 4));
 
-        assertMenuButtonPresent("Page Size");
+        assertButtonPresent("Page Size");
         assertElementNotPresent(Locator.linkWithTitle(PREV_LINK));
         assertElementNotPresent(Locator.linkWithTitle(NEXT_LINK));
 

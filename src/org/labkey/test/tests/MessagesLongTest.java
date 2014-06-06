@@ -139,7 +139,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickWebpartMenuItem("Messages", "Email", "Administration");
 
         assertElementNotPresent(Locator.xpath("//a[text()='messages']"));
-        click(Locator.navButton("Update Settings"));
+        click(Locator.lkButton("Update Settings"));
         shortWait().until(LabKeyExpectedConditions.dataRegionPanelIsExpanded(Locator.id("Users")));
         _extHelper.clickSideTab("messages");
         Locator.XPathLocator folderDefaultCombo = Locator.xpath("//input[@name='defaultEmailOption']/../../div");

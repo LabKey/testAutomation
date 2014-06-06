@@ -141,7 +141,7 @@ public class ListHelper extends AbstractHelper
         _test.log("Check that they were added");
         if (cols.length > 0)
         {
-            _test.waitForElement(Locator.navButton("Export Fields"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+            _test.waitForElement(Locator.lkButton("Export Fields"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
             for (ListColumn col : cols)
             {
                 _test.assertTextPresent(col.getName());
@@ -312,28 +312,28 @@ public class ListHelper extends AbstractHelper
 
     public void clickImportData()
     {
-        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.navButton("Import Data"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Import Data"), BaseWebDriverTest.WAIT_FOR_PAGE);
         _test.waitForElement(Locator.id("tsv3"));
     }
 
     public void clickEditDesign()
     {
-        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.navButton("Edit Design"), 0);
-        _test.waitForElement(Locator.navButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Edit Design"), 0);
+        _test.waitForElement(Locator.lkButton("Cancel"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         _test.waitForElement(Locator.id("ff_description"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElement(Locator.navButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.lkButton("Add Field"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void clickSave()
     {
-        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.navButton("Save"), 0);
-        _test.waitForElement(Locator.navButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
-        _test.waitForElement(Locator.navButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Save"), 0);
+        _test.waitForElement(Locator.lkButton("Edit Design"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
+        _test.waitForElement(Locator.lkButton("Done"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
     }
 
     public void clickDeleteList()
     {
-        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.navButton("Delete List"), BaseWebDriverTest.WAIT_FOR_PAGE);
+        _test.waitAndClick(BaseWebDriverTest.WAIT_FOR_JAVASCRIPT, Locator.lkButton("Delete List"), BaseWebDriverTest.WAIT_FOR_PAGE);
     }
 
     public void clickRow(int index)
@@ -491,7 +491,7 @@ public class ListHelper extends AbstractHelper
     public void addField(String areaTitle, @LoggedParam String name, String label, ListColumnType type)
     {
         String prefix = _test.getPropertyXPath(areaTitle);
-        Locator addField = Locator.xpath(prefix + "//span" + Locator.navButton("Add Field").getPath());
+        Locator addField = Locator.xpath(prefix + "//span" + Locator.lkButton("Add Field").getPath());
         _test.waitForElement(addField);
 
         clickLastFieldIfExists(prefix);
@@ -546,7 +546,7 @@ public class ListHelper extends AbstractHelper
     public void addLookupField(String areaTitle, int index, String name, String label, ListHelper.LookupInfo type)
     {
         String prefix = areaTitle==null ? "" : _test.getPropertyXPath(areaTitle);
-        String addField = prefix + "//span" + Locator.navButton("Add Field").getPath();
+        String addField = prefix + "//span" + Locator.lkButton("Add Field").getPath();
         _test.click(Locator.xpath(addField));
         _test.waitForElement(Locator.xpath(prefix + "//input[@name='ff_name" + index + "']"), BaseWebDriverTest.WAIT_FOR_JAVASCRIPT);
         setColumnName(prefix, index, name);

@@ -337,7 +337,7 @@ public abstract class Locator
         return tag("button").notHidden().withPredicate("not(contains(@class, 'tab'))").containing(text);
     }
 
-    public static XPathLocator navButton(String text)
+    public static XPathLocator lkButton(String text)
     {
         return tag("a").notHidden().withPredicate("contains(@class, 'labkey-button') or contains(@class, 'labkey-menu-button')").withText(text);
     }
@@ -372,12 +372,12 @@ public abstract class Locator
         return xpath("//button[@class='x-btn-text' and contains(text(), " + xq(text) + ")]");
     }
 
-    public static XPathLocator navButtonDisabled(String text)
+    public static XPathLocator lkButtonDisabled(String text)
     {
         return xpath("//a[normalize-space(@class)='labkey-disabled-button' or normalize-space(@class)='labkey-disabled-menu-button']/span[text() = " + xq(text) + "]");
     }
 
-    public static XPathLocator navButtonContainingText(String text)
+    public static XPathLocator lkButtonContainingText(String text)
     {
         return xpath("//a[normalize-space(@class)='labkey-button' or normalize-space(@class)='labkey-menu-button']/span[contains(text(),  " + xq(text) + ")]");
     }

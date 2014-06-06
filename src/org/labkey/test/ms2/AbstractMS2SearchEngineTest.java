@@ -137,7 +137,7 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
             assertTextPresent("running");
 
         log("Verify no work for protocol.");
-        assertNavButtonNotPresent("Search");
+        assertButtonNotPresent("Search");
 
         log("View full status.");
         clickFolder(FOLDER_NAME);

@@ -205,7 +205,7 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY));
         clickAndWait(Locator.linkWithText("view results"));
         assertElementNotPresent(Locator.linkWithText("edit"));
-        assertNavButtonNotPresent("Delete");
+        assertButtonNotPresent("Delete");
 
         // Edit the design to make them editable
         clickEditAssayDesign(true);

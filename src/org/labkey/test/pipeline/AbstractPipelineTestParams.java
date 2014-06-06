@@ -297,7 +297,7 @@ abstract public class AbstractPipelineTestParams implements PipelineTestParams
         validateEmail("COMPLETE", getDirStatusDesciption(), _mailSettings.isNotifyOnSuccess(),
                 _mailSettings.getNotifyUsersOnSuccess());
 
-        if (_test.isNavButtonPresent("Data"))
+        if (_test.isButtonPresent("Data"))
         {
             validateExperiment();
         }
