@@ -196,12 +196,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _downloadDir = new File(getArtifactCollector().ensureDumpDir(), "downloads");
 
         String seleniumBrowser = System.getProperty("selenium.browser");
-        if (seleniumBrowser == null || seleniumBrowser.length() == 0 || seleniumBrowser.toLowerCase().contains("best"))
+        if (seleniumBrowser == null || seleniumBrowser.length() == 0)
         {
             if (isTestRunningOnTeamCity())
                 BROWSER_TYPE = BrowserType.FIREFOX;
             else
                 BROWSER_TYPE = bestBrowser();
+        }
+        else if (seleniumBrowser.toLowerCase().contains("best"))
+        {
+            BROWSER_TYPE = bestBrowser();
         }
         else
         {
