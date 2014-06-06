@@ -749,20 +749,33 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void defaultAssignedToTest()
     {
-        String user1DisplayName = displayNameFromEmail(USER1);
-        String user2DisplayName = displayNameFromEmail(USER2);
+        String user = "reader@email.com";
+        Locator.XPathLocator defaultUserSelect = Locator.tagWithName("select", "defaultUser");
 
-        clickAndWait(Locator.linkWithText("Issues Summary"));
+        // create reader user (issue 20598)
+        _permissionsHelper.createPermissionsGroup("Readers");
+        _permissionsHelper.assertPermissionSetting("Readers", "No Permissions");
+        _permissionsHelper.setPermissions("Readers", "Reader");
+        _permissionsHelper.clickManageGroup("Readers");
+        setFormElement(Locator.name("names"), user);
+        clickButton("Update Group Membership");
+
+        String user1DisplayName = displayNameFromEmail(USER1);
+
+        goToModule("Issues");
 
         // check for no default
         clickButton("New Issue");
         assertEquals(getSelectedOptionText(Locator.id("assignedTo")), "");
         clickButton("Cancel");
 
-        // set default
+        /// check reader cannot be set as default user (issue 20598)
         clickButton("Admin");
+        assertElementNotPresent(defaultUserSelect.append(Locator.tagWithText("option", user)));
+
+        // set default
         checkRadioButton(Locator.radioButtonByNameAndValue("assignedToUser", "SpecificUser"));
-        selectOptionByText(Locator.name("defaultUser"), user1DisplayName);
+        selectOptionByText(defaultUserSelect, user1DisplayName);
         clickButton("Update");
         clickButton("Back to Issues");
 
@@ -775,13 +788,13 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Admin");
         checkRadioButton(Locator.radioButtonByNameAndValue("assignedToMethod", "Group"));
         selectOptionByText(Locator.name("assignedToGroup"), "Site:Users");
-        selectOptionByText(Locator.name("defaultUser"), user2DisplayName);
+        selectOptionByText(defaultUserSelect, getDisplayName());
         clickButton("Update");
         clickButton("Back to Issues");
 
         // verify
         clickButton("New Issue");
-        assertEquals(getSelectedOptionText(Locator.id("assignedTo")), user2DisplayName);
+        assertEquals(getSelectedOptionText(Locator.id("assignedTo")), getDisplayName());
         clickButton("Cancel");
 
         // set no default user and return to project users assign list
