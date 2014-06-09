@@ -215,6 +215,7 @@ public class StudyVisitTagTest extends StudyBaseTest
 
         insertVisitTagMap(VISIT_TAG_MAP_QWP_TITLE, new VisitTagMap("FollowUp1", "Visit5", null));
         assertTextPresent("VisitTagMap may contain only one row for each (VisitTag, Visit, Cohort) combination.");
+        checkExpectedErrors(3);     // resets errors
         clickButton("Cancel");
     }
 }
