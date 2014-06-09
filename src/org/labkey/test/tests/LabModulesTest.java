@@ -336,11 +336,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
             assertEquals("Incorrect container", workbook.getId(), container);
             assertEquals("Incorrect container name", workbook.getName(), containerName);
 
-            //TODO: update for new naming scheme on trunk.  this check isnt very important for now
-            //String path = workbook.getName();
-            //Integer rowId = Integer.parseInt(path);
-            //assertEquals("Incorrect container rowId", rowId, containerRowId);
-
             Integer expectedId = 1 + highestWorkbookId + idx;
             assertEquals("Incorrect workbookId", expectedId, workbookId);
             idx++;
@@ -374,11 +369,6 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
             assertEquals("Incorrect container", workbook.getId(), container);
             assertEquals("Incorrect container name", workbook.getName(), containerName);
-
-            //TODO: update for new naming scheme on trunk
-            //String path = workbook.getName();
-            //Integer rowId = Integer.parseInt(path);
-            //assertEquals("Incorrect container rowId", rowId, containerRowId);
 
             Integer expectedId = workbookIdOffset + idx;
             assertEquals("Incorrect workbookId", expectedId, workbookId);
@@ -837,7 +827,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
         waitAndClickAndWait(Locator.linkContainingText("Control Item Visibility"));
 
         waitForText("Sequence"); //proxy for page load
-        waitForText("TruCount", WAIT_FOR_JAVASCRIPT * 2); //proxy for page load
+        waitForText("TruCount", WAIT_FOR_JAVASCRIPT * 3); //proxy for page load
 
         log("Disabling items");
 

@@ -334,7 +334,7 @@ public class LabModuleHelper
         _test.waitForElement(Locator.xpath("//table[@id=" + Locator.xq("dataregion_" + name) + "]"));
     }
 
-    public void addDataSource(String type, String label, String category, String containerPath, String schema, String query)
+    public void addDataSource(String type, String label, String reportCategory, String containerPath, String schema, String query)
     {
         Ext4CmpRef addBtn = _test._ext4Helper.queryOne("#manageDataSources button[text='Add New']", Ext4CmpRef.class);
         _test.waitAndClick(Locator.id(addBtn.getId()));
@@ -344,7 +344,7 @@ public class LabModuleHelper
         waitForField("Item Type");
         Ext4FieldRef.getForLabel(_test, "Item Type").setValue(type);
         Ext4FieldRef.getForLabel(_test, "Label").setValue(label);
-        Ext4FieldRef.getForLabel(_test, "Category").setValue(category);
+        Ext4FieldRef.getForLabel(_test, "Report Category").setValue(reportCategory);
         if (containerPath != null)
         {
             Ext4ComboRef combo = new Ext4ComboRef(Ext4FieldRef.getForLabel(_test, "Container (optional)"), _test);
