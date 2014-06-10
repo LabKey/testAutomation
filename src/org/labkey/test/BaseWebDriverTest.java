@@ -1765,6 +1765,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @LogMethod @BeforeClass
     public static void performInitialChecks() throws Throwable
     {
+        killHungDriverOnTeamCity();
         _setupFailed = true;
         _anyTestCaseFailed = false;
         _startTime = System.currentTimeMillis();
@@ -2033,6 +2034,29 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public WebDriver getDriver()
     {
         return _driver;
+    }
+
+    private static void killHungDriverOnTeamCity() throws Exception
+    {
+        if (isTestRunningOnTeamCity() && _driver != null)
+        {
+            final WebDriver tempDriver = _driver;
+            _driver = null;
+
+            Runnable killDriver = new Runnable(){
+                @Override
+                public void run()
+                {
+                    tempDriver.quit();
+                }
+            };
+            final Thread t = new Thread(killDriver);
+            t.start();
+
+            long startTime = System.currentTimeMillis();
+            while (t.isAlive() && System.currentTimeMillis() - startTime < 10000){/*wait*/}
+            t.interrupt();
+        }
     }
 
     public static File getDownloadDir()
