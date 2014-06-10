@@ -113,6 +113,8 @@ public abstract class ReportTest extends StudyBaseTest
         {
             checkCheckbox(Locator.xpath("//td/a[contains(text(), '" + item + "')]/../../td/input"));
             clickButton("Delete");
+            assertTextPresent(item);
+            clickButton("Confirm Delete");
             assertTextNotPresent(item);
         }
     }
