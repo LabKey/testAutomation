@@ -28,6 +28,7 @@ import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LabKeyExpectedConditions;
 import org.labkey.test.util.PasswordUtil;
+import org.labkey.test.util.PortalHelper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -39,6 +40,8 @@ import static org.junit.Assert.assertTrue;
 @Category({DailyA.class})
 public class MessagesLongTest extends BaseWebDriverTest
 {
+    PortalHelper portalHelper = new PortalHelper(this);
+
     // TODO: This test and/or MessagesLongTest are misnamed
     private static final String PROJECT_NAME = "MessagesVerifyProject";
     private static final String MSG1_TITLE = "test message 1";
@@ -125,18 +128,18 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         clickProject(PROJECT_NAME);
         log("Check email preferences");
-        clickWebpartMenuItem("Messages", "Email", "Preferences");
+        portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
         checkCheckbox(Locator.radioButtonByName("emailPreference").index(2));
         clickButton("Update");
         clickButton("Done");
 
         log("Customize message board");
-        clickWebpartMenuItem("Messages", "Admin");
+        portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.checkboxByName("expires"));
         clickButton("Save");
 
         log("Check email admin works");
-        clickWebpartMenuItem("Messages", "Email", "Administration");
+        portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Administration");
 
         assertElementNotPresent(Locator.xpath("//a[text()='messages']"));
         click(Locator.lkButton("Update Settings"));
@@ -154,7 +157,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
 
         log("Check message works in Wiki");
-        clickWebpartMenuItem("Messages", "New");
+        portalHelper.clickWebpartMenuItem("Messages", true, "New");
         setFormElement(Locator.name("title"), MSG1_TITLE);
         setFormElement(Locator.name("expires"), EXPIRES1);
         setFormElement(Locator.id("body"), "1 <b>first message testing</b>");
@@ -216,7 +219,7 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check with security");
         clickProject(PROJECT_NAME);
-        clickWebpartMenuItem("Messages", "Admin");
+        portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.radioButtonByName("secure").index(1));
         clickButton("Save");
         permissionCheck("Reader", false);
@@ -224,19 +227,19 @@ public class MessagesLongTest extends BaseWebDriverTest
 
         log("Check if the customized names work");
         clickProject(PROJECT_NAME);
-        clickWebpartMenuItem("Messages", "Admin");
+        portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         setFormElement(Locator.name("boardName"), "Notes");
         setFormElement(Locator.name("conversationName"), "Thread");
         clickButton("Save");
         assertTextPresent("Notes");
         assertTextPresent("thread");
-        clickWebpartMenuItem("Notes", "Admin");
+        portalHelper.clickWebpartMenuItem("Notes", true, "Admin");
         setFormElement(Locator.name("boardName"), "Messages");
         setFormElement(Locator.name("conversationName"), "Message");
         clickButton("Save");
 
         log("Check if sorting works");
-        clickWebpartMenuItem("Messages", "New");
+        portalHelper.clickWebpartMenuItem("Messages", true, "New");
         setFormElement(Locator.name("title"), MSG2_TITLE);
         clickButton("Submit");
         clickAndWait(Locator.linkWithText("Messages"));
@@ -284,7 +287,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         testMemberLists();
 
         clickProject(PROJECT_NAME);
-        clickWebpartMenuItem("Messages", "Admin");
+        portalHelper.clickWebpartMenuItem("Messages", true, "Admin");
         checkCheckbox(Locator.radioButtonByName("secure").index(0));
         clickButton("Save");
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
@@ -347,7 +350,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         clickButton("Update Group Membership");
 
         clickProject(PROJECT_NAME);
-        clickWebpartMenuItem("Messages", "New");
+        portalHelper.clickWebpartMenuItem("Messages", true, "New");
         setFormElement(Locator.id(MEMBER_LIST), USER2);
         clickButtonContainingText("Submit", "Title must not be blank");
         clickButtonContainingText("OK", 0);
@@ -413,7 +416,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         createUserWithPermissions(RESPONDER, PROJECT_NAME, "Editor");
         clickButton("Save and Finish");
 
-        clickWebpartMenuItem("Messages", "Email", "Preferences");
+        portalHelper.clickWebpartMenuItem("Messages", true, "Email", "Preferences");
         checkCheckbox(Locator.radioButtonByName("emailPreference").index(1));
         clickButton("Update");
         clickButton("Done");

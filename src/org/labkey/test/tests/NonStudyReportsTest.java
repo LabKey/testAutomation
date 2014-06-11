@@ -32,6 +32,7 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Reports.class})
 public class NonStudyReportsTest extends ReportTest
 {
+    protected final PortalHelper portalHelper = new PortalHelper(this);
     protected static final String ATTACHMENT_USER = "attachment_user1@report.test";
 
     private static final String ATTACHMENT_REPORT_NAME = "Attachment Report1";
@@ -99,9 +100,8 @@ public class NonStudyReportsTest extends ReportTest
 
         // test creation from Data Views menu option
         clickTab("Overview");
-        PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addWebPart("Data Views");
-        clickWebpartMenuItem("Data Views", true, "Add Report", "Attachment Report");
+        portalHelper.clickWebpartMenuItem("Data Views", true, "Add Report", "Attachment Report");
         setFormElement("viewName", ATTACHMENT_REPORT2_NAME);
         setFormElement("description", ATTACHMENT_REPORT2_DESCRIPTION);
         click(Locator.xpath("//input[../label[string()='Full file path on server']]"));
@@ -160,7 +160,7 @@ public class NonStudyReportsTest extends ReportTest
 
         // can edit local
         clickTab("Overview");
-        clickWebpartMenuItem("Data Views", true, "Manage Views");
+        portalHelper.clickWebpartMenuItem("Data Views", true, "Manage Views");
         waitForText("Manage Views");
         clickReportDetailsLink(ATTACHMENT_REPORT_NAME);
         waitForText("Report Details");
@@ -319,7 +319,7 @@ public class NonStudyReportsTest extends ReportTest
 
         // test creation from menu option on Data Views webpart
         clickTab("Overview");
-        clickWebpartMenuItem("Data Views", true, "Add Report", "Link Report");
+        portalHelper.clickWebpartMenuItem("Data Views", true, "Add Report", "Link Report");
         setFormElement("viewName", LINK_REPORT2_NAME);
         setFormElement("description", LINK_REPORT2_DESCRIPTION);
         setFormElement("linkUrl", getBaseURL() + LINK_REPORT1_URL);

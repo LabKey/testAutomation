@@ -33,6 +33,8 @@ import static org.junit.Assert.*;
 @Category({DailyA.class, Wiki.class})
 public class WikiLongTest extends BaseWebDriverTest
 {
+    PortalHelper portalHelper = new PortalHelper(this);
+
     private static final String PROJECT_NAME = "WikiVerifyProject";
     private static final String PROJECT2_NAME = "WikiCopied";
     private static final String PROJECT3_NAME = "WikiLong Public Project";
@@ -353,14 +355,14 @@ public class WikiLongTest extends BaseWebDriverTest
         termsOfUseTest();
 
         log("test copy wiki");
-        clickWebpartMenuItem("Pages", "Copy");
+        portalHelper.clickWebpartMenuItem("Pages", true, "Copy");
         clickAndWait(Locator.linkWithText(PROJECT2_NAME));
         clickButton("Copy Pages");
 
         log("test wiki customize link");
         clickTab("Portal");
         _portalHelper.addWebPart("Wiki");
-        clickWebpartMenuItem("Wiki", "Customize");
+        portalHelper.clickWebpartMenuItem("Wiki", true, "Customize");
         log("check that container is set to current project");
         selectOptionByText(Locator.name("webPartContainer"), "/" + PROJECT_NAME);
         click(Locator.linkWithText("Reset to Folder Default Page"));
@@ -422,7 +424,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("Check if readers can read from other projects");
         clickProject(PROJECT2_NAME);
-        clickWebpartMenuItem(WIKI_PAGE2_TITLE, "Customize");
+        portalHelper.clickWebpartMenuItem(WIKI_PAGE2_TITLE, true, "Customize");
         selectOptionByText(Locator.name("webPartContainer"), "/" + PROJECT_NAME);
 
         //page names are now fetched via AJAX, so wait for them to be populated
@@ -447,7 +449,7 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextNotPresent("Welcome");
         log("Also check copying permission");
         clickTab("Wiki");
-        clickWebpartMenuItem("Pages", "Copy");
+        portalHelper.clickWebpartMenuItem("Pages", true, "Copy");
         assertTextNotPresent(PROJECT_NAME);
         stopImpersonating();
         clickProject(PROJECT_NAME);
@@ -462,7 +464,7 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextPresent(WIKI_PAGE2_TITLE);
         log("Also check copying permission");
         clickTab("Wiki");
-        clickWebpartMenuItem("Pages", "Copy");
+        portalHelper.clickWebpartMenuItem("Pages", true, "Copy");
         assertElementNotPresent(Locator.linkWithText(PROJECT_NAME));
         stopImpersonating();
         clickProject(PROJECT_NAME);
@@ -474,7 +476,7 @@ public class WikiLongTest extends BaseWebDriverTest
         impersonate(USER1);
         clickProject(PROJECT2_NAME);
         clickTab("Wiki");
-        clickWebpartMenuItem("Pages", "Copy");
+        portalHelper.clickWebpartMenuItem("Pages", true, "Copy");
         assertElementPresent(Locator.linkWithText(PROJECT_NAME));
         stopImpersonating();
 
@@ -487,7 +489,7 @@ public class WikiLongTest extends BaseWebDriverTest
 
         log("test wiki TOC customize link");
         _portalHelper.addWebPart("Wiki Table of Contents");
-        clickWebpartMenuItem("Pages", "Customize");
+        portalHelper.clickWebpartMenuItem("Pages", true, "Customize");
         setFormElement("title", "Test Customize TOC");
         log("check that container is set to current project");
         assertOptionEquals(Locator.name("webPartContainer"), "/" + PROJECT2_NAME);
@@ -498,7 +500,7 @@ public class WikiLongTest extends BaseWebDriverTest
         assertTextPresent(WIKI_PAGE2_TITLE);
 
         log("Check that 'Copy Pages' in TOC works");
-        clickWebpartMenuItem("Test Customize TOC", "Copy");
+        portalHelper.clickWebpartMenuItem("Test Customize TOC", true, "Copy");
         clickAndWait(Locator.linkWithText(PROJECT_NAME));
         clickButton("Copy Pages");
         clickProject(PROJECT_NAME);
@@ -508,7 +510,7 @@ public class WikiLongTest extends BaseWebDriverTest
         log("Check that 'New Page' works");
         clickProject(PROJECT2_NAME);
         clickTab("Portal");
-        clickWebpartMenuItem("Test Customize TOC", "New");
+        portalHelper.clickWebpartMenuItem("Test Customize TOC", true, "New");
         _wikiHelper.convertWikiFormat("HTML");
 
         setFormElement("name", WIKI_PAGE4_TITLE);

@@ -1176,33 +1176,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickAndWait(Locator.linkWithText("audit log"));
     }
 
-    public void hideNavigationBar()
-    {
-        clickAndWait(Locator.xpath("//a/span[text() = 'Admin']"), 0);
-        waitForElement(Locator.tagContainingText("span", "Navigation Bar"), 1000);
-        if (isElementPresent(Locator.tagContainingText("span", "Hide Navigation Bar")))
-            clickAndWait(Locator.tagContainingText("span", "Hide Navigation Bar"));
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.PortalHelper#clickWebpartMenuItem(String, String...)}
-     * Allows test code to navigate to a Webpart Ext-based navigation menu.
-     * @param webPartTitle title (not name) of webpart to be clicked.  Multiple web parts with the same title not supported.
-     * @param items Text of cascading sub-menus
-     */
-    @Deprecated public void clickWebpartMenuItem(String webPartTitle, String... items)
-    {
-        clickWebpartMenuItem(webPartTitle, true, items);
-    }
-
-    /**
-     * @deprecated Use {@link org.labkey.test.util.PortalHelper#clickWebpartMenuItem(String, boolean, String...)}
-     */
-    @Deprecated public void clickWebpartMenuItem(String webPartTitle, boolean wait, String... items)
-    {
-        _extHelper.clickExtMenuButton(wait, Locator.xpath("//img[@id='more-" + webPartTitle.toLowerCase() + "']"), items);
-    }
-
     // Clicks admin menu items. Tests should use helpers to make admin menu changes less disruptive.
     public void clickAdminMenuItem(String... items)
     {

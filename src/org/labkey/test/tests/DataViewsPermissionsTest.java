@@ -16,18 +16,10 @@
 package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
-import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.Ext4Helper;
-import org.labkey.test.util.LogMethod;
-import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
-import org.labkey.test.util.RReportHelper;
-import org.labkey.test.util.PermissionsHelper;
-import org.openqa.selenium.WebElement;
-
-import static org.junit.Assert.*;
 
 @Category({DailyA.class})
 public class DataViewsPermissionsTest extends StudyBaseTest
@@ -113,7 +105,8 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         clickProject("StudyVerifyProject");
         clickFolder("My Study");
         impersonate("author@test.com");
-        clickWebpartMenuItem("Data Views", "Add Report", "Link Report");
+        PortalHelper portalHelper1 = new PortalHelper(this);
+        portalHelper1.clickWebpartMenuItem("Data Views", true, "Add Report", "Link Report");
         setFormElement(Locator.name("viewName"), "Report 5");
         setFormElement(Locator.name("linkUrl"), "http://www.google.com");
         waitAndClickButton("Save");

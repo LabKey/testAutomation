@@ -38,6 +38,7 @@ import static org.junit.Assert.*;
 public class ClientAPITest extends BaseWebDriverTest
 {
     public WikiHelper _wikiHelper = new WikiHelper(this);
+    private final PortalHelper portalHelper = new PortalHelper(this);
 
     private static final String PROJECT_NAME = "ClientAPITestProject";
     private static final String OTHER_PROJECT = "OtherClientAPITestProject"; // for cross-project query test
@@ -192,7 +193,7 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         if (!isTextPresent(WIKIPAGE_NAME))
             clickFolder(FOLDER_NAME);
-        clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
+        portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, true, "Edit");
         _wikiHelper.setWikiBody("<p>" + message + "</p>");
         _wikiHelper.saveWikiPage();
     }
@@ -522,7 +523,7 @@ public class ClientAPITest extends BaseWebDriverTest
     {
         if (!isElementPresent(Locator.linkWithText(WIKIPAGE_NAME)))
             clickFolder(FOLDER_NAME);
-        clickWebpartMenuItem(WIKIPAGE_NAME, "Edit");
+        portalHelper.clickWebpartMenuItem(WIKIPAGE_NAME, true, "Edit");
 
         String fullSource = srcFragment;
         if (!excludeTags)
@@ -539,7 +540,6 @@ public class ClientAPITest extends BaseWebDriverTest
         if (!isElementPresent(Locator.folderTab("Wiki")))
             goToModule("Wiki");
 
-        PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.clickWebpartMenuItem("Pages", "New");
 
         String fullSource;
