@@ -346,7 +346,6 @@ src/org/labkey/test/pipeline/PipelineTestsBase.java -text
 src/org/labkey/test/pipeline/PipelineWebTestBase.java -text
 src/org/labkey/test/qc/JavaQC.java -text
 src/org/labkey/test/qc/build.xml -text
-src/org/labkey/test/seleniumHelpers.js -text
 src/org/labkey/test/studysampler/Runner.java -text
 src/org/labkey/test/studysampler/words.txt -text
 src/org/labkey/test/testpicker/CheckNode.java -text
