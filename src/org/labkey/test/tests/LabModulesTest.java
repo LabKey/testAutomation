@@ -793,7 +793,7 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
 
     private String replaceNonVisibleChars(String value)
     {
-        //the DB might not store unicode chars correctly, so we just elinimate them here
+        //the DB might not store unicode chars correctly, so we just eliminate them here
         String ret = value.replaceAll("[^\\p{Print}]", "?");
         ret = ret.replaceAll("\\$", ""); //fieldkeys encode these
         return ret;
