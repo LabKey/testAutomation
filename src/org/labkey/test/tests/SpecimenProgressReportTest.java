@@ -51,6 +51,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     private static final String assay1XarPath = "/assays/PCR.xar";
     private static final String assay2 = "RNA";
     private static final String assay2File = "RNA Data.tsv";
+    private static final String assay2File2 = "RNA Data 2.tsv";
     private static final String assay2XarPath = "/assays/RNA.xar";
     private Locator.XPathLocator tableLoc = Locator.xpath("//table[@id='dataregion_ProgressReport']");
 
@@ -116,7 +117,10 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         clickFolder(assayFolder);
         waitForElement(tableLoc);
         ignoreSampleMindedData(assay2);
-        verifyProgressReport(assay2, true);
+
+        // verify upload with match on Specimen ID
+        verifySpecimenIdDataUpload(assay2);
+
         verifyUnassayedSpecimenQuery(assay2);
     }
 
@@ -263,28 +267,44 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         flagSpecimenForReview(assayName, "2011-03-02");
 
         clickFolder(assayFolder);
-        verifyProgressReport(assayName, false);
+        verifyProgressReport(assayName, false, true, false);
 
         clickAndWait(Locator.linkWithText("8 results from " + assayName + " have been uploaded."));
         assertTextPresent("Result reported with no corresponding specimen collected", 2);
         assertTextPresent("This specimen type is not expected for this visit", 1);
     }
 
-    private void verifyProgressReport(String assayName, boolean ignoreSampleminded)
+    private void verifyProgressReport(String assayName, boolean ignoreSampleminded, boolean hasInvalid, boolean bySpecimenId)
     {
         int ignored = ignoreSampleminded ? 2 : 0;
+        int invalid = hasInvalid ? 1 : 0;
+        int specimenmatch = bySpecimenId ? 0 : 2;
 
         waitForElement(tableLoc);
         _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
         waitForElement(tableLoc);
         assertTextPresentInThisOrder("SR1", "SR2");
-        assertEquals(4, getElementCount(Locator.xpath("//td[contains(@class, 'available')]")));
-        assertEquals(3, getElementCount(Locator.xpath("//td[contains(@class, 'query')]")));
+        assertEquals(5 - invalid, getElementCount(Locator.xpath("//td[contains(@class, 'available')]")));
+        assertEquals(1 + specimenmatch, getElementCount(Locator.xpath("//td[contains(@class, 'query')]")));
         assertEquals(2 + ignored, getElementCount(Locator.xpath("//td[contains(@class, 'collected')]")));
         assertEquals(2 - ignored, getElementCount(Locator.xpath("//td[contains(@class, 'received')]")));
-        assertEquals(1, getElementCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
-        assertEquals(10, getElementCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        assertEquals(invalid, getElementCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
+        assertEquals(12 - specimenmatch, getElementCount(Locator.xpath("//td[contains(@class, 'expected')]")));
         assertEquals(3, getElementCount(Locator.xpath("//td[contains(@class, 'missing')]")));
+    }
+
+    private void verifySpecimenIdDataUpload(String assayName) throws CommandException, IOException
+    {
+        clickAndWait(Locator.linkWithText(assayName));
+        checkDataRegionCheckbox("Runs", 0);
+        clickButton("Re-import run");
+        clickButton("Next");
+        checkRadioButton(Locator.radioButtonById("Fileupload"));
+        setFormElement(Locator.name("__primaryFile__"), new File(STUDY_PIPELINE_ROOT + "/assays/" + assay2File2));
+        clickButton("Save and Finish");
+
+        clickFolder(assayFolder);
+        verifyProgressReport(assayName, true, false, true);
     }
 
     private void verifyUnassayedSpecimenQuery(String assayName)
@@ -384,5 +404,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         click(ignoreSamplemindedCheckbox);
         assertElementPresent(ignoreSamplemindedCheckboxChecked);
         clickButton("Save");
+
+        verifyProgressReport(assay2, true, true, false);
     }
 }
