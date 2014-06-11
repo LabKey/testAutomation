@@ -182,9 +182,9 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         if (testAuthentication) {
             // Case 6: auto-detect server, wrong user password
             log("Testing wrong password fo Mascot user " + mascotUserAccount + "  and server auto-detection via " + mascotServerURL);
-            setFormElement("mascotServer", altMascotServer);
-            setFormElement("mascotUserAccount", mascotUserAccount);
-            setFormElement("mascotUserPassword", "wrongpassword");
+            setFormElement(Locator.name("mascotServer"), altMascotServer);
+            setFormElement(Locator.name("mascotUserAccount"), mascotUserAccount);
+            setFormElement(Locator.name("mascotUserPassword"), "wrongpassword");
             pushLocation();
             clickAndWait(Locator.linkWithText("Test Mascot settings"));
             assertTextPresent("Test failed.");
@@ -197,9 +197,9 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         // Case 7: wrong server
         altMascotServer = "http://bogus.domain/";
         log("Testing wrong Mascot server via " + altMascotServer);
-        setFormElement("mascotServer", altMascotServer);
-        setFormElement("mascotUserAccount", mascotUserAccount);
-        setFormElement("mascotUserPassword", mascotUserPassword);
+        setFormElement(Locator.name("mascotServer"), altMascotServer);
+        setFormElement(Locator.name("mascotUserAccount"), mascotUserAccount);
+        setFormElement(Locator.name("mascotUserPassword"), mascotUserPassword);
         pushLocation();
         clickAndWait(Locator.linkWithText("Test Mascot settings"));
         assertTextPresent("Test failed.");
@@ -286,7 +286,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
 
         log("Test Save View");
         clickButton("Save View");
-        setFormElement("name", VIEW);
+        setFormElement(Locator.name("name"), VIEW);
         clickButton("Save View");
         selectOptionByText(Locator.name("viewParams"), "<Standard View>");
         clickButton("Go");
@@ -329,21 +329,21 @@ public class MascotTest extends AbstractMS2SearchEngineTest
         assertElementPresent(Locator.linkWithText(PROTOCOL));
 
         log("Test Protein Search");
-        setFormElement("identifier", SEARCH);
+        setFormElement(Locator.name("identifier"), SEARCH);
         click(Locator.name("exactMatch"));
         clickButton("Search");
         assertElementPresent(Locator.linkContainingText(SAMPLE_BASE_NAME + " (test2)"));
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
 
-        setFormElement("minimumProbability", "2.0");
+        setFormElement(Locator.name("minimumProbability"), "2.0");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTrue(isTextPresent(SEARCH_FIND) || isTextPresent(SEARCH_FIND_ALT));
         assertElementNotPresent(Locator.linkWithText(SAMPLE_BASE_NAME + " (test2)"));
 
-        setFormElement("identifier", "GarbageProteinName");
-        setFormElement("minimumProbability", "");
+        setFormElement(Locator.name("identifier"), "GarbageProteinName");
+        setFormElement(Locator.name("minimumProbability"), "");
         clickButton("Search");
         clickAndWait(Locator.id("expandCollapse-ProteinSearchProteinMatches"), 0);
         assertTextNotPresent(SEARCH_FIND);

@@ -279,7 +279,7 @@ public class SearchTest extends StudyTest
         // Create new issue.
         clickButton("Back to Issues");
         clickButton("New Issue");
-        setFormElement(Locator.id("title"), ISSUE_TITLE);
+        setFormElement(Locator.name("title"), ISSUE_TITLE);
         selectOptionByText(Locator.name("type"), "UFO");
         selectOptionByText(Locator.name("area"), "Area51");
         selectOptionByText(Locator.name("priority"), "1");
@@ -303,7 +303,7 @@ public class SearchTest extends StudyTest
         clickFolder(getFolderName());
         portalHelper.addWebPart("Messages");
         portalHelper.clickWebpartMenuItem("Messages", "New");
-        setFormElement(Locator.id("title"), MESSAGE_TITLE);
+        setFormElement(Locator.name("title"), MESSAGE_TITLE);
         setFormElement(Locator.id("body"), MESSAGE_BODY);
         click(Locator.linkWithText("Attach a file"));
         File file = new File(getLabKeyRoot() + "/sampledata/dataloading/excel/fruits.tsv");

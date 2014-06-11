@@ -659,7 +659,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
 
         clickProject(getProjectName());
         portalHelper.addWebPart("Report");
-        setFormElement("title", "Report Tester Part");
+        setFormElement(Locator.name("title"), "Report Tester Part");
         selectOptionByValue(Locator.name("reportId"), "module:simpletest/reports/schemas/lists/People/Less Cool JS Report.js");
         clickButton("Submit");
         waitForText("Less cool than expected. Loaded dependent scripts.", WAIT_FOR_JAVASCRIPT);
@@ -667,8 +667,8 @@ public class SimpleModuleTest extends BaseWebDriverTest
         String WikiName = "JS Report Wiki";
         portalHelper.addWebPart("Wiki");
         wikiHelper.createNewWikiPage("HTML");
-        setFormElement("name", WikiName);
-        setFormElement("title", WikiName);
+        setFormElement(Locator.name("name"), WikiName);
+        setFormElement(Locator.name("title"), WikiName);
         wikiHelper.setWikiBody("placeholder text");
         wikiHelper.saveWikiPage();
         wikiHelper.setSourceFromFile("jsReportTest.html", WikiName);
@@ -791,7 +791,7 @@ public class SimpleModuleTest extends BaseWebDriverTest
         clickFolder(FOLDER_NAME);
         goToModule("Wiki");
         wikiHelper.createNewWikiPage();
-        setFormElement("wiki-input-name", "Parameterized QWP");
+        setFormElement(Locator.id("wiki-input-name"), "Parameterized QWP");
         wikiHelper.setWikiBody(getFileContents("/server/test/modules/simpletest/resources/views/parameterizedQWP.html"));
         clickButton("Save & Close");
 

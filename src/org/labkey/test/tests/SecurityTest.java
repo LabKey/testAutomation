@@ -283,10 +283,10 @@ public class SecurityTest extends BaseWebDriverTest
                 fail("unsupported use of change password type");
                 break;
             case RESET_PASSWORD:
-                setFormElement("password", passwords[0]);
+                setFormElement(Locator.id("password"), passwords[0]);
                 String password2 = passwords[1];
                 if(password2==null) password2 = passwords[0];
-                setFormElement("password2", password2);
+                setFormElement(Locator.id("password2"), password2);
                 clickButton("Set Password");
                 assertTextPresent(errors);
         }
@@ -704,13 +704,13 @@ public class SecurityTest extends BaseWebDriverTest
         setInitialPassword(NORMAL_USER, simplePassword);
         assertTextPresent("Your password must contain three of the following"); // fail, too simple
 
-        setFormElement("password", shortPassword);
-        setFormElement("password2", shortPassword);
+        setFormElement(Locator.id("password"), shortPassword);
+        setFormElement(Locator.id("password2"), shortPassword);
         clickButton("Set Password");
         assertTextPresent("Your password must be eight characters or more."); // fail, too short
 
-        setFormElement("password", PASSWORDS[0]);
-        setFormElement("password2", PASSWORDS[0]);
+        setFormElement(Locator.id("password"), PASSWORDS[0]);
+        setFormElement(Locator.id("password2"), PASSWORDS[0]);
         clickButton("Set Password");
         assertSignOutAndMyAccountPresent();
         //success

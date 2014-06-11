@@ -60,9 +60,9 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
 
         log("Describe MS2 run.");
         clickButton("Next");
-        setFormElement("name", ANNOTATION_RUN_NAME);
-        setFormElement("integerField", "10");
-        setFormElement("textField", "Text value");
+        setFormElement(Locator.name("name"), ANNOTATION_RUN_NAME);
+        setFormElement(Locator.name("integerField"), "10");
+        setFormElement(Locator.name("textField"), "Text value");
         click(Locator.checkboxByName("booleanField"));
 
         int seconds = 0;
@@ -91,14 +91,14 @@ public abstract class AbstractMS2SearchEngineTest extends MS2TestBase
         searchMS2LibraCheck();
 
         log("Set analysis parameters.");
-        setFormElement("protocolName", "test2");
-        setFormElement("protocolDescription", "This is a test protocol for Verify.");
+        setFormElement(Locator.name("protocolName"), "test2");
+        setFormElement(Locator.name("protocolDescription"), "This is a test protocol for Verify.");
         selectOptionByText(Locator.name("sequenceDB"), DATABASE);
-        setFormElement("configureXml", "");
+        setFormElement(Locator.name("configureXml"), "");
         waitAndClick(Locator.xpath("//a[@class='labkey-button']/span[text() = 'OK']"));
-        setFormElement("configureXml", INPUT_XML);
+        setFormElement(Locator.name("configureXml"), INPUT_XML);
         assertTextPresent("Quantitation mass tolerance", "Quantitation residue mass label");
-        setFormElement("minPeptideProphetProb", "0");
+        setFormElement(Locator.name("minPeptideProphetProb"), "0");
         clickButton("Search");
         // Search is submitted as AJAX, and upon success the browser is redirected to a new page. Wait for it to load
         waitForElement(Locator.linkWithText("Data Pipeline"), WAIT_FOR_JAVASCRIPT);

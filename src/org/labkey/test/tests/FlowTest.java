@@ -478,7 +478,7 @@ public class FlowTest extends BaseFlowTest
         goToFlowDashboard();
         clickAndWait(Locator.linkWithText("QUV analysis"));
         clickAndWait(Locator.linkWithText("Make a copy of this analysis script"));
-        setFormElement("name", "QUV analysis");
+        setFormElement(Locator.name("name"), "QUV analysis");
         submit();
         assertTextPresent("There is already a protocol named 'QUV analysis'");
     }

@@ -183,7 +183,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Modify Dataset List (Advanced)"));
         createNewQuery("study");
 
-        setFormElement("ff_newQueryName", "APX: Custom Query");
+        setFormElement(Locator.id("ff_newQueryName"), "APX: Custom Query");
         selectOptionByText(Locator.name("ff_baseTableName"), "APX-1 (APX-1: Abbreviated Physical Exam)");
         clickButton("Create and Edit Source");
         clickButton("Save", 0);
@@ -223,7 +223,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         goToModule("Query");
         createNewQuery("study");
 
-        setFormElement("ff_newQueryName", "cross study query");
+        setFormElement(Locator.id("ff_newQueryName"), "cross study query");
         clickButton("Create and Edit Source");
         setCodeEditorValue("queryText", CROSS_STUDY_QUERY_SQL);
         clickButton("Save & Finish");

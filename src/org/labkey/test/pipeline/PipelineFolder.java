@@ -183,16 +183,16 @@ public class PipelineFolder
             {
                 check("notifyOwnerOnSuccess", _notifyOwnerOnSuccess);
                 if (_notifyUsersOnSuccess != null)
-                    _test.setFormElement("notifyUsersOnSuccess", StringUtils.join(_notifyUsersOnSuccess, '\n'));
+                    _test.setFormElement(Locator.id("notifyUsersOnSuccess"), StringUtils.join(_notifyUsersOnSuccess, '\n'));
             }
             check("notifyOnError", _notifyOnError);
             if (_notifyOnError)
             {
                 check("notifyOwnerOnError", _notifyOwnerOnError);
                 if (_notifyUsersOnError != null)
-                    _test.setFormElement("notifyUsersOnError", StringUtils.join(_notifyUsersOnError, '\n'));
+                    _test.setFormElement(Locator.id("notifyUsersOnError"), StringUtils.join(_notifyUsersOnError, '\n'));
                 if (_escalateUsers != null)
-                    _test.setFormElement("escalationUsers", StringUtils.join(_escalateUsers, '\n'));
+                    _test.setFormElement(Locator.id("escalationUsers"), StringUtils.join(_escalateUsers, '\n'));
             }
             _test.clickButton("Update");
         }

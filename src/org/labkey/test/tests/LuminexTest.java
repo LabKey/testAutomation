@@ -487,7 +487,7 @@ public abstract class LuminexTest extends AbstractQCAssayTest
         String prefix = getPropertyXPath(where);
         _listHelper.clickRow(prefix, index);
         click(Locator.xpath(prefix + "//span[contains(@class,'x-tab-strip-text') and text()='Format']"));
-        setFormElement("propertyFormat", formatStr);
+        setFormElement(Locator.id("propertyFormat"), formatStr);
     }
 
     protected void importLuminexRunPageTwo(String name, String isotype, String conjugate, String stndCurveFitInput,

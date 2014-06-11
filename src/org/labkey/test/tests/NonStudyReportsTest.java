@@ -263,7 +263,7 @@ public class NonStudyReportsTest extends ReportTest
         _extHelper.clickExtMenuButton(true, Locator.id("discussionMenuToggle"), "Start new discussion");
 
         waitForElement(Locator.id("title"), WAIT_FOR_JAVASCRIPT);
-        setFormElement("title", DISCUSSION_TITLE_1);
+        setFormElement(Locator.name("title"), DISCUSSION_TITLE_1);
         setFormElement("body", DISCUSSION_BODY_1);
         clickButton("Submit");
 

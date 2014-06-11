@@ -218,13 +218,13 @@ public class StudyExportTest extends StudyManualTest
         clickAndWait(Locator.linkWithText("Delete"));
         assertTextNotPresent("To be deleted");
         selectOptionByText(Locator.name("providerActor"), "Institutional Review Board");
-        setFormElement("providerDescription", "Providing lab approval");
+        setFormElement(Locator.id("providerDescription"), "Providing lab approval");
         clickButtonByIndex("Add Requirement", 1);
         selectOptionByText(Locator.name("receiverActor"), "Institutional Review Board");
-        setFormElement("receiverDescription", "Receiving lab approval");
+        setFormElement(Locator.id("receiverDescription"), "Receiving lab approval");
         clickButtonByIndex("Add Requirement", 2);
         selectOptionByText(Locator.name("generalActor"), "Scientific Leadership Group");
-        setFormElement("generalDescription", "SLG Request Approval");
+        setFormElement(Locator.id("generalDescription"), "SLG Request Approval");
         clickButtonByIndex("Add Requirement", 3);
         clickTab("Manage");
 
@@ -290,8 +290,8 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("Duke University");
         assertTextPresent("Providing lab approval");
         checkCheckbox(Locator.checkboxByName("complete"));
-        setFormElement("comment", "Approval granted.");
-        setFormElement("formFiles[0]", new File(getLabKeyRoot() + VISIT_MAP).getPath());
+        setFormElement(Locator.id("comment"), "Approval granted.");
+        setFormElement(Locator.name("formFiles[0]"), VISIT_MAP);
             log("File upload skipped.");
         clickButton("Save Changes and Send Notifications");
         assertTextPresent("Complete");
@@ -309,7 +309,7 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("Request is now pending.");
         assertTextPresent("Approval granted.");
         assertTextPresent("Institutional Review Board (Duke University), Receiving lab approval");
-        assertTextPresent(VISIT_MAP.substring(VISIT_MAP.lastIndexOf("/") + 1));
+        assertTextPresent(VISIT_MAP.getName());
 
         clickProject(getProjectName());
         clickFolder(getFolderName());

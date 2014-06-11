@@ -24,6 +24,7 @@ import org.labkey.test.categories.Disabled;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.StudyHelper;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,7 +35,7 @@ public class StudyManualTest extends StudyTest
 
     private final String CRF_SCHEMAS = getStudySampleDataPath() + "datasets/schema.tsv";
 
-    protected final String VISIT_MAP = getStudySampleDataPath() + "v068_visit_map.txt";
+    protected final File VISIT_MAP = new File(getLabKeyRoot(), getStudySampleDataPath() + "v068_visit_map.txt");
 
     protected final StudyHelper _studyHelper = new StudyHelper(this);
 

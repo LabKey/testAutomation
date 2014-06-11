@@ -384,35 +384,35 @@ public class AssayTest extends AbstractAssayTest
         log("Run properties and data");
         clickButton("Save and Finish");
         assertTextPresent(TEST_ASSAY_RUN_PROP_NAME + "0 is required and must be of type Text (String).");
-        setFormElement("name", TEST_RUN1);
-		setFormElement("comments", TEST_RUN1_COMMENTS);
+        setFormElement(Locator.name("name"), TEST_RUN1);
+        setFormElement("comments", TEST_RUN1_COMMENTS);
         setFormElement(TEST_ASSAY_RUN_PROP_NAME + "0", TEST_ASSAY_RUN_PROP1);
         clickButton("Save and Finish");
         assertTextPresent("Data file contained zero data rows");
         click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement("TextAreaDataCollector.textArea", TEST_RUN1_DATA1);
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA1);
         clickButton("Save and Finish");
 
         click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement("TextAreaDataCollector.textArea", TEST_RUN1_DATA2);
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA2);
         clickButton("Save and Finish");
         assertTextPresent("There are errors in the uploaded data: VisitID must be of type Number (Double)");
         assertFormElementEquals(Locator.name("name"), TEST_RUN1);
         assertFormElementEquals(Locator.name("comments"), TEST_RUN1_COMMENTS);
         click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement("TextAreaDataCollector.textArea", TEST_RUN1_DATA3);
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA3);
         clickButton("Save and Import Another Run");
         assertTextPresent("There are errors in the uploaded data: " + TEST_ASSAY_DATA_PROP_NAME + "6 is required. ");
 
         click(Locator.xpath("//input[@value='textAreaDataProvider']"));
-        setFormElement("TextAreaDataCollector.textArea", TEST_RUN1_DATA4);
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN1_DATA4);
         clickButton("Save and Import Another Run");
 
         assertFormElementEquals(Locator.name("name"), "");
         assertFormElementEquals(Locator.name("comments"), "");
-        setFormElement("name", TEST_RUN2);
+        setFormElement(Locator.name("name"), TEST_RUN2);
 		setFormElement("comments", TEST_RUN2_COMMENTS);
-        setFormElement("TextAreaDataCollector.textArea", TEST_RUN2_DATA1);
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN2_DATA1);
         clickButton("Save and Finish");
 
         log("Check out the data for one of the runs");

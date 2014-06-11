@@ -158,9 +158,9 @@ public class FlowCBCTest extends BaseFlowTest
         clickAndWait(Locator.linkWithText(ASSAY_NAME));
         clickButton("Import Data");
 
-        setFormElement("name", "run01");
+        setFormElement(Locator.name("name"), "run01");
         String cbcDataPath = "/server/modules/cbcassay/data/ex_20081016_131859.small.dat";
-        setFormElement("TextAreaDataCollector.textArea", getFileContents(cbcDataPath));
+        setFormElement(Locator.id("TextAreaDataCollector.textArea"), getFileContents(cbcDataPath));
         clickButton("Save and Finish", 8000);
 
         // filter to rows we'd like to copy

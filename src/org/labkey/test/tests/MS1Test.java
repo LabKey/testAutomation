@@ -243,7 +243,7 @@ public class MS1Test extends BaseWebDriverTest
         ensureAdminMode();
         addWebPart("Peptide Search");
 
-        setFormElement("pepSeq", "EASGDLPEAQIVK, AVVQDPALKPLALVYGEATSR");
+        setFormElement(Locator.id("pepSeq"), "EASGDLPEAQIVK, AVVQDPALKPLALVYGEATSR");
         uncheckCheckbox(Locator.checkboxByName("exact"));
         clickButton("Search");
 

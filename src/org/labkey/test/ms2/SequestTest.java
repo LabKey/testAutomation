@@ -112,7 +112,7 @@ public class SequestTest extends AbstractMS2SearchEngineTest
 
         log("Test Save View");
         clickButton("Save View");
-        setFormElement("name", VIEW);
+        setFormElement(Locator.name("name"), VIEW);
         clickButton("Save View");
         selectOptionByText(Locator.name("viewParams"), "<Standard View>");
         clickButton("Go");

@@ -163,7 +163,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Save");
 
         clickAndWait(Locator.linkWithText("New Issue"));
-        setFormElement(Locator.id("title"), ISSUE_TITLE_1);
+        setFormElement(Locator.name("title"), ISSUE_TITLE_1);
         selectOptionByText(Locator.id("priority"), "1");
         setFormElement(Locator.id("comment"), "alien autopsy");
         selectOptionByText(Locator.id("assignedTo"), getDisplayName());

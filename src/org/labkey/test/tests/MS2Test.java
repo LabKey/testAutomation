@@ -817,7 +817,7 @@ public class MS2Test extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithImage(getContextPath() + "/Experiment/images/graphIcon.gif"));
         clickAndWait(Locator.id("expandCollapse-experimentRunGroup"), 0);
         clickButton("Create new group");
-        setFormElement("name", RUN_GROUP1_NAME1);
+        setFormElement(Locator.name("name"), RUN_GROUP1_NAME1);
         setFormElement("contactId", RUN_GROUP1_CONTACT);
         setFormElement("experimentDescriptionURL", RUN_GROUP1_DESCRIPTION);
         setFormElement("hypothesis", RUN_GROUP1_HYPOTHESIS);
@@ -833,11 +833,11 @@ public class MS2Test extends AbstractMS2ImportTest
         clickAndWait(Locator.linkWithText("Run Groups"));
         clickButton("Create Run Group");
         clickButton("Submit");
-        setFormElement("name", RUN_GROUP3_NAME);
+        setFormElement(Locator.name("name"), RUN_GROUP3_NAME);
         clickButton("Submit");
 
         clickButton("Create Run Group");
-        setFormElement("name", RUN_GROUP2_NAME);
+        setFormElement(Locator.name("name"), RUN_GROUP2_NAME);
         clickButton("Submit");
 
         log("Test editing run group info");
@@ -849,7 +849,7 @@ public class MS2Test extends AbstractMS2ImportTest
                 RUN_GROUP1_HYPOTHESIS,
                 RUN_GROUP1_COMMENTS);
         clickButton("Edit");
-        setFormElement("name", RUN_GROUP1_NAME2);
+        setFormElement(Locator.name("name"), RUN_GROUP1_NAME2);
         clickButton("Submit");
 
         log("Test customizing view to include the run groups");

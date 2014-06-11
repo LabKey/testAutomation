@@ -135,7 +135,7 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         {
             beginAt("/admin/begin.view");
             clickAndWait(Locator.linkWithText("flow cytometry"));
-            setFormElement("workingDirectory", "");
+            setFormElement(Locator.id("workingDirectory"), "");
             clickButton("update");
         }
         catch (Throwable ignored) {}
@@ -162,11 +162,11 @@ abstract public class BaseFlowTest extends BaseWebDriverTest
         beginAt("/admin/begin.view");
         clickAndWait(Locator.linkWithText("flow cytometry"));
         deletePipelineWorkDirectory();
-        setFormElement("workingDirectory", getPipelineWorkDirectory().toString());
+        setFormElement(Locator.id("workingDirectory"), getPipelineWorkDirectory().toString());
         clickButton("update");
         assertTextPresent("Path does not exist");
         getPipelineWorkDirectory().mkdir();
-        setFormElement("workingDirectory", getPipelineWorkDirectory().toString());
+        setFormElement(Locator.id("workingDirectory"), getPipelineWorkDirectory().toString());
 
         boolean normalizationEnabled = requiresNormalization();
         if (normalizationEnabled)

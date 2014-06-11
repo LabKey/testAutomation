@@ -241,8 +241,8 @@ public class UserTest extends SecurityTest
 
         clickAndWait(Locator.linkContainingText("setPassword")); // Set Password URL
         assertTextPresent(NORMAL_USER);
-        setFormElement("password", TEST_PASSWORD);
-        setFormElement("password2", TEST_PASSWORD);
+        setFormElement(Locator.id("password"), TEST_PASSWORD);
+        setFormElement(Locator.id("password2"), TEST_PASSWORD);
 
         clickButton("Set Password");
 
