@@ -37,7 +37,7 @@ public class WikiTest extends BaseWebDriverTest
 
     private static final String WIKI_PAGE_ALTTITLE = "PageBBB has HTML";
     private static final String WIKI_PAGE_WEBPART_ID = "qwp999";
-    private static final String WIKI_PAGE_TITLE = "Test Wiki";
+    private static final String WIKI_PAGE_TITLE = "_Test Wiki";
     private static final String WIKI_PAGE_CONTENT =
             "<b>Some HTML content</b>\n" +
                     "<b>${labkey.webPart(partName='Query', title='My Proteins', schemaName='ms2', " +
@@ -89,6 +89,7 @@ public class WikiTest extends BaseWebDriverTest
         clickProject(PROJECT_NAME);
         portalHelper.addWebPart("Wiki");
         portalHelper.addWebPart("Search");
+        portalHelper.addWebPart("Wiki Table of Contents");
 
         log("test create new html page with a webpart");
         wikiHelper.createNewWikiPage("HTML");
@@ -106,6 +107,10 @@ public class WikiTest extends BaseWebDriverTest
         waitForElement(Locator.id(WIKI_PAGE_WEBPART_ID));
         assertTextPresent("common.properties");
         assertTextPresent("Some HTML content");
+        assertElementPresent (Locator.linkContainingText("_Test Wiki"));
+        impersonateRole ("Reader");
+        assertElementNotPresent(Locator.linkContainingText("_Test Wiki"));
+        stopImpersonatingRole();
 
         log("test search wiki");
         searchFor(PROJECT_NAME, "Wiki", 1, WIKI_PAGE_TITLE);
@@ -128,7 +133,7 @@ public class WikiTest extends BaseWebDriverTest
         portalHelper.addWebPart("Wiki");
         portalHelper.clickWebpartMenuItem("Wiki", "Customize");
         selectOptionByText(Locator.name("webPartContainer"), "/"+getProjectName());
-        waitForElement(Locator.xpath("//option[@value='Test Wiki']"));
+        waitForElement(Locator.xpath("//option[@value='_Test Wiki']"));
         clickButton("Submit");
         verifyWikiPagePresent();
 
