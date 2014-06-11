@@ -27,6 +27,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -270,7 +271,19 @@ public class KnitrReportTest extends ReportTest
         assertReportContents(reportContains, reportNotContains);
 
         _rReportHelper.clickSourceTab();
-        assertEquals("Incorrect number of lines present in code editor.", reportSource.split("\n").length, getElementCount(Locator.css(".CodeMirror-gutter-text pre")));
+
+        List<WebElement> lines;
+        WebElement prevLastLine, lastLine = null;
+        long startTime = System.currentTimeMillis();
+        do
+        {
+            prevLastLine = lastLine;
+            lines = Locator.css(".CodeMirror-linenumber").findElements(getDriver());
+            lastLine = lines.get(lines.size() - 1);
+            scrollIntoView(lastLine);
+        }while(!lastLine.equals(prevLastLine) && System.currentTimeMillis() - startTime < 1000);
+
+        assertEquals("Incorrect number of lines present in code editor.", reportSource.split("\n").length, Integer.parseInt(lastLine.getText()));
 
         saveAndVerifyKnitrReport(reportName, reportContains, reportNotContains);
     }
