@@ -165,7 +165,7 @@ public class WikiHelper
         _test.clickButton("Convert To...", 0);
         _test._extHelper.waitForExtDialog("Change Format");
         _test.selectOptionByValue(Locator.id("wiki-input-window-change-format-to"), format);
-        _test.waitAndClickButton("Convert", 0);
+        _test.clickButton("Convert", 0);
         _test.waitForElement(Locator.id("status").containing("Converted."));
     }
 

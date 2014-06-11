@@ -202,7 +202,7 @@ public class UserPermissionsTest extends BaseWebDriverTest
         clickFolder(GAMMA_SUB_FOLDER_NAME);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
-        waitAndClickButton("Save and Finish");
+        clickButton("Save and Finish", defaultWaitForPage);
         clickFolder(DENIED_SUB_FOLDER_NAME);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();

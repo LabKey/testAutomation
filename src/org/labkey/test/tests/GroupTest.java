@@ -320,7 +320,7 @@ public class GroupTest extends BaseWebDriverTest
 
         click(Locator.xpath("//td[./label[text()='Custom']]/input"));
 
-        waitAndClickButton("Next");
+        clickButton("Next", defaultWaitForPage);
 
         //second page of the wizard
         waitAndClick(Locator.xpath("//td[./label[text()='Copy From Existing Project']]/input"));
@@ -344,10 +344,10 @@ public class GroupTest extends BaseWebDriverTest
             }
         }, "Failed to select project", WAIT_FOR_JAVASCRIPT);
 
-        waitAndClickButton("Next");
+        clickButton("Next", defaultWaitForPage);
 
         //third page of wizard
-        waitAndClickButton("Finish");
+        clickButton("Finish", defaultWaitForPage);
 
         assertUserCanSeeProject(TEST_USERS_FOR_GROUP[1], getProject2Name());
 

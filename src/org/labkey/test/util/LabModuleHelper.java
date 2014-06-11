@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -141,7 +140,7 @@ public class LabModuleHelper
         if (shouldNavigateToTab)
             _test.clickTab("Workbooks");
 
-        _test.waitAndClickButton("Create New Workbook", 0);
+        _test.clickButton("Create New Workbook", 0);
         _test.waitForElement(Ext4Helper.Locators.window("Create Workbook"));
         _test.setFormElement(Locator.name("title"), workbookTitle);
         _test.setFormElement(Locator.name("description"), workbookDescription);

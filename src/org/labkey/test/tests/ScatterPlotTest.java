@@ -221,7 +221,7 @@ public class ScatterPlotTest extends GenericChartsTest
         // verify that we originally are in view mode and can switch to edit mode
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Grouping"));
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
-        waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
+        clickButton("Edit", WAIT_FOR_PAGE);
         _ext4Helper.waitForMaskToDisappear();
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Edit"));
 
@@ -316,7 +316,7 @@ public class ScatterPlotTest extends GenericChartsTest
         clickAndWait(Locator.linkContainingText(SCATTER_PLOT_NAME_DR + " Colored"));
         _ext4Helper.waitForMaskToDisappear();
 
-        waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
+        clickButton("Edit", WAIT_FOR_PAGE);
         _ext4Helper.waitForMaskToDisappear();
 
         waitForText("\"APXneck\", is not available. It may have been deleted or renamed.");
@@ -402,7 +402,7 @@ public class ScatterPlotTest extends GenericChartsTest
         // verify that we originally are in view mode and can switch to edit mode
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Grouping"));
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Save"));
-        waitAndClickButton("Edit", WAIT_FOR_PAGE); // switch to edit mode
+        clickButton("Edit", WAIT_FOR_PAGE);
         _ext4Helper.waitForMaskToDisappear();
         assertElementNotPresent(Ext4Helper.Locators.ext4Button("Edit"));
 

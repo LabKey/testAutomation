@@ -99,8 +99,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         // assertAlert("Could not convert the value 'text' from line #202 in column #6 (Primary) to Integer");
         _listHelper.setColumnType(5, ListHelper.ListColumnType.String); // Row 201 is a string
         clickButton("Begin import");
-        waitAndClickButton("Next");
-        waitAndClickButton("Save and Finish");
+        clickButton("Next", defaultWaitForPage);
+        clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLS));
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
@@ -128,8 +128,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         assertFormElementEquals("Date", "DrawDt");
         _listHelper.setColumnType(5, ListHelper.ListColumnType.String); // Row 201 is a string
         clickButton("Begin import");
-        waitAndClickButton("Next");
-        waitAndClickButton("Save and Finish");
+        clickButton("Next", defaultWaitForPage);
+        clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_XLSX));
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
@@ -167,8 +167,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         pressTab(Locator.xpath(getPropertyXPath(ASSAY_NAME_TSV + " Data Fields") + "//td/input[@id='importAliases']"));
 
         clickButton("Save & Close");
-        waitAndClickButton("Next");
-        waitAndClickButton("Save and Finish");
+        clickButton("Next", defaultWaitForPage);
+        clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_TSV));
         waitForElement(Locator.css(".labkey-pagination").containing("1 - 100 of 201"));
         assertElementNotPresent(Locator.css(".labkey-column-header").withText("Role")); // excluded column
@@ -215,8 +215,8 @@ public class GpatAssayTest extends BaseWebDriverTest
         fireEvent(Locator.xpath("//input[@id='AssayDesignerName']"), SeleniumEvent.blur);
 
         clickButton("Begin import");
-        waitAndClickButton("Next");
-        waitAndClickButton("Save and Finish");
+        clickButton("Next", defaultWaitForPage);
+        clickButton("Save and Finish", defaultWaitForPage);
         waitAndClick(Locator.linkWithText(GPAT_ASSAY_FNA));
 
         waitForText("Sequence");

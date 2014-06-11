@@ -197,7 +197,7 @@ public class UserTest extends SecurityTest
             checkRequiredField(field, true);
 
         clickButton("Save");
-        waitAndClickButton("Change User Properties");
+        clickButton("Change User Properties", defaultWaitForPage);
 
         for (String field : REQUIRED_FIELDS)
         {
@@ -205,7 +205,7 @@ public class UserTest extends SecurityTest
             checkRequiredField(field, false);
         }
         clickButton("Save", 0);
-        waitAndClickButton("Change User Properties");
+        clickButton("Change User Properties", defaultWaitForPage);
 
         checkRequiredField("FirstName", true);
         clickButton("Save");

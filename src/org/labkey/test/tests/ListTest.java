@@ -822,7 +822,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextBefore("Is Greater Than 7", "Is Greater Than 5");
 
         clickButton("Save", 0);
-        waitAndClickButton("Done");
+        clickButton("Done", defaultWaitForPage);
 
         // Verify conditional format of boolean column
         // look for cells that do not match the

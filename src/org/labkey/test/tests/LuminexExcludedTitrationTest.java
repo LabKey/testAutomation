@@ -75,7 +75,7 @@ public class LuminexExcludedTitrationTest extends LuminexExcludableWellsTest
         String exclusionMessage =  "excluding all analytes for titration " + Titration;
         setFormElement(COMMENT_LOCATOR, exclusionMessage);
         sleep(10000);
-        waitAndClickButton("Save", 0);
+        clickButton("Save", 0);
         _extHelper.waitForExtDialog("Confirm Exclusions", WAIT_FOR_JAVASCRIPT);
         clickButtonContainingText("Yes");
         verifyTitrationExclusion(Titration, exclusionMessage);
@@ -91,7 +91,7 @@ public class LuminexExcludedTitrationTest extends LuminexExcludableWellsTest
         String exclusionMessage =  "excluding " + Analyte + " analyte for titration " + Titration;
         setFormElement(COMMENT_LOCATOR, exclusionMessage);
         sleep(10000) ;
-        waitAndClickButton("Save", 0);
+        clickButton("Save", 0);
         _extHelper.waitForExtDialog("Confirm Exclusions", WAIT_FOR_JAVASCRIPT);
         clickButtonContainingText("Yes");
         verifyTitrationAnalyteExclusion(Titration, Analyte, exclusionMessage);

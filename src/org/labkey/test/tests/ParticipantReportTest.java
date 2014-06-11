@@ -145,7 +145,7 @@ public class ParticipantReportTest extends ReportTest
         clickAddReport("Mouse Report");
 
         // select some measures from a dataset
-        waitAndClickButton("Choose Measures", 0);
+        clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "cpf-1");
@@ -190,7 +190,7 @@ public class ParticipantReportTest extends ReportTest
         waitForElementToDisappear(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT);
         clickButton("Save", 0);
         _extHelper.waitForExtDialog("Error");
-        waitAndClickButton("OK", 0);
+        clickButton("OK", 0);
 
         String transposeCheckPtid = "999320646";
         Locator.XPathLocator reportRow = Locator.tag("table").withClass("report").append("/tbody/tr").containing(transposeCheckPtid).append("/following-sibling::tr");
@@ -272,7 +272,7 @@ public class ParticipantReportTest extends ReportTest
         clickButtonByIndex("Save", 1, 0);
         _extHelper.waitForExtDialog("Failure");
         assertTextPresent("Another report with the same name already exists.");
-        waitAndClickButton("OK", 0);
+        clickButton("OK", 0);
         clickButton("Cancel", 0); // Verify cancel button.
         waitForElement(Locator.xpath("id('participant-report-panel-1-body')/div[contains(@style, 'display: none')]"), WAIT_FOR_JAVASCRIPT); // Edit panel should be hidden
 
@@ -314,7 +314,7 @@ public class ParticipantReportTest extends ReportTest
         goToManageViews();
         clickAddReport("Mouse Report");
         // select some measures from a dataset
-        waitAndClickButton("Choose Measures", 0);
+        clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
 
@@ -379,7 +379,7 @@ public class ParticipantReportTest extends ReportTest
         goToManageViews();
         clickAddReport("Mouse Report");
         // select some measures from a dataset
-        waitAndClickButton("Choose Measures", 0);
+        clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "primary type vial counts blood");
@@ -434,7 +434,7 @@ public class ParticipantReportTest extends ReportTest
         clickAddReport("Mouse Report");
 
         // select some measures from the demographics
-        waitAndClickButton("Choose Measures", 0);
+        clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         waitForElement(Locator.xpath(_extHelper.getExtDialogXPath(ADD_MEASURE_TITLE) + "//tr[contains(@class, 'x4-grid-row')][1]"));
         _extHelper.setExtFormElementByType(ADD_MEASURE_TITLE, "text", "demographic");

@@ -612,7 +612,7 @@ public class StudyExportTest extends StudyManualTest
         Locator.XPathLocator sequenceNum = Locator.xpath("//label[contains(@class, 'x-form-item-label') and text() ='Sequence Num:']/../div/div");
         _extHelper.selectGWTComboBoxItem(sequenceNum, "visit number");
 
-        waitAndClickButton("Import");
+        clickButton("Import", defaultWaitForPage);
         waitForElement(Locator.paginationText(9));
         assertTextPresent("kevin");
         assertTextPresent("chimpanzee");

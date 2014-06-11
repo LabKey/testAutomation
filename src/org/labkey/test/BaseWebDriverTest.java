@@ -2822,7 +2822,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
         }
 
-        waitAndClickButton("Next");
+        clickButton("Next", defaultWaitForPage);
         _createdFolders.add(new WebTestHelper.FolderIdentifier(project, child));
 
         //second page of the wizard
@@ -2832,7 +2832,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             waitAndClick(Locator.xpath("//td[./label[text()='My User Only']]/input"));
         }
 
-        waitAndClickButton("Finish");
+        clickButton("Finish", defaultWaitForPage);
         waitForElement(Locator.id("folderBar").withText(project));
 
         //unless we need addtional tabs, we end here.
@@ -4680,27 +4680,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     /**
-     * Wait for button to appear, click it, wait for page to load.
-     * @deprecated clickButton() will now wait for the button to appear before clicking.
-     */
-    @Deprecated
-    public void waitAndClickButton(final String text)
-    {
-        clickButton(text, defaultWaitForPage);
-    }
-
-    /**
-     * Wait for button to appear, click it, then wait.
-     * @deprecated clickButton() will now wait for the button to appear before clicking.
-     */
-    @Deprecated
-    public void waitAndClickButton(final String text, final int wait)
-    {
-        clickButton(text, wait);
-    }
-
-
-    /**
      *  wait for element, click it, return immediately
      */
     public void waitAndClick(Locator l)
@@ -6190,7 +6169,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             }
 
             clickAndWait(Locator.linkWithText("Manage Files"));
-            waitAndClickButton("Process and Import Data");
+            clickButton("Process and Import Data", defaultWaitForPage);
 
             // TempDir is somewhere underneath the pipeline root.  Determine each subdirectory we need to navigate to reach it.
             File testDir = _tempDir;

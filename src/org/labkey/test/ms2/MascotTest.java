@@ -266,7 +266,7 @@ public class MascotTest extends AbstractMS2SearchEngineTest
     protected void setupEngine()
     {
         log("Analyze " + SEARCH_NAME + " sample data.");
-        waitAndClickButton(SEARCH_BUTTON + " Peptide Search");
+        clickButton(SEARCH_BUTTON + " Peptide Search", defaultWaitForPage);
     }
 
     protected void basicChecks()

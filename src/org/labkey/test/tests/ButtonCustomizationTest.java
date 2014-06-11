@@ -170,7 +170,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         waitForText("edit metadata", 10000);
         clickAndWait(Locator.linkWithText("edit metadata"));
         // wait for the domain editor to appear:
-        waitAndClickButton("Edit Source");
+        clickButton("Edit Source", defaultWaitForPage);
         _extHelper.clickExtTab("XML Metadata");
         setCodeEditorValue("metadataText", getMetadataXML(true));
         _extHelper.clickExtTab("Source");
@@ -189,7 +189,7 @@ public class ButtonCustomizationTest extends BaseWebDriverTest
         selectQuery("lists", "Cities");
         waitForText("edit metadata", 10000);
         clickAndWait(Locator.linkWithText("edit metadata"));
-        waitAndClickButton("Edit Source");
+        clickButton("Edit Source", defaultWaitForPage);
         _extHelper.clickExtTab("XML Metadata");
         setCodeEditorValue("metadataText", getMetadataXML(false));
         clickButton("Save", 0);

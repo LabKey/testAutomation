@@ -35,7 +35,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         portalHelper.addWebPart("Data Views");
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
-        waitAndClickButton("Save and Finish");
+        clickButton("Save and Finish", defaultWaitForPage);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.createPermissionsGroup("Editor Group");
         _permissionsHelper.assertPermissionSetting("Editor Group", "No Permissions");
@@ -53,25 +53,25 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         clickAndWait(Locator.linkWithText("Manage Views"));
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
         setFormElement(Locator.id("label"), "Report 1");
-        waitAndClickButton("Create View");
+        clickButton("Create View", defaultWaitForPage);
         clickFolder("My Study");
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
         setFormElement(Locator.id("label"), "Report 2");
-        waitAndClickButton("Create View");
+        clickButton("Create View", defaultWaitForPage);
         clickFolder("My Study");
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
         setFormElement(Locator.id("label"), "Report 3");
-        waitAndClickButton("Create View");
+        clickButton("Create View", defaultWaitForPage);
         clickFolder("My Study");
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Views"));
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Grid View");
         setFormElement(Locator.id("label"), "Report 4");
-        waitAndClickButton("Create View");
+        clickButton("Create View", defaultWaitForPage);
         clickFolder("My Study");
         portalHelper.removeWebPart("Views");
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
@@ -109,7 +109,7 @@ public class DataViewsPermissionsTest extends StudyBaseTest
         portalHelper1.clickWebpartMenuItem("Data Views", true, "Add Report", "Link Report");
         setFormElement(Locator.name("viewName"), "Report 5");
         setFormElement(Locator.name("linkUrl"), "http://www.google.com");
-        waitAndClickButton("Save");
+        clickButton("Save", defaultWaitForPage);
 
         click(Locator.tag("a").withAttributeContaining("href", "editDataViews"));
         openEditPanel("Report 5");

@@ -792,7 +792,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
     {
         goToManageViews();
         _extHelper.clickExtMenuButton(true, Locator.linkContainingText("Add Report"), "Mouse Report");
-        waitAndClickButton("Choose Measures", 0);
+        clickButton("Choose Measures", 0);
         _extHelper.waitForExtDialog(ADD_MEASURE_TITLE);
         _extHelper.waitForLoadingMaskToDisappear(WAIT_FOR_JAVASCRIPT);
 

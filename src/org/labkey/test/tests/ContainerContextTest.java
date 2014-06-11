@@ -472,7 +472,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         waitForText("edit metadata", 10000);
         clickAndWait(Locator.linkWithText("edit metadata"));
         waitForText("Label", 10000);
-        waitAndClickButton("Edit Source", WAIT_FOR_PAGE);
+        clickButton("Edit Source", WAIT_FOR_PAGE);
         _extHelper.clickExtTab("XML Metadata");
         setCodeEditorValue("metadataText", xml);
         clickButton("Save", 0);

@@ -274,7 +274,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
         // Set a magic variable to prevent the data region from refreshing out from under us, which causes problems
         // in IE testing
         executeScript("LABKEY.disablePipelineRefresh = true;");
-        waitAndClickButton("Setup");
+        clickButton("Setup", defaultWaitForPage);
         setPipelineRoot(pipelinePath);
     }
 
@@ -347,7 +347,7 @@ public abstract class StudyBaseTest extends SimpleApiTest
     {
         _permissionsHelper.enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Study Security");
-        waitAndClickButton("Study Security");
+        clickButton("Study Security", defaultWaitForPage);
     }
 
     public void goToManageDatasets()

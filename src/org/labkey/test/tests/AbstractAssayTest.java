@@ -184,7 +184,7 @@ public abstract class AbstractAssayTest extends SimpleApiTest
         clickFolder(subfolder);
         _permissionsHelper.enterPermissionsUI();
         _permissionsHelper.uncheckInheritedPermissions();
-        waitAndClickButton("Save", 0);
+        clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear();
         waitForElement(Locator.permissionRendered());
         if (TEST_ASSAY_PERMS_NONE.equals(perms))
@@ -287,6 +287,6 @@ public abstract class AbstractAssayTest extends SimpleApiTest
     {
         _permissionsHelper.enterPermissionsUI();
         _ext4Helper.clickTabContainingText("Study Security");
-        waitAndClickButton("Study Security");
+        clickButton("Study Security", defaultWaitForPage);
     }
 }
