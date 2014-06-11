@@ -16,7 +16,6 @@
 
 package org.labkey.test.tests;
 
-import org.jetbrains.annotations.Nullable;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,8 +28,11 @@ import org.labkey.test.categories.Data;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.EmailRecordTable;
 import org.labkey.test.util.EmailRecordTable.EmailMessage;
+import org.labkey.test.util.Ext4Helper;
+import org.labkey.test.util.IssuesHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
+import org.labkey.test.util.Maps;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
@@ -46,25 +48,26 @@ public class IssuesTest extends BaseWebDriverTest
     private static final String ISSUE_TITLE_0 = "A very serious issue";
     private static final String ISSUE_TITLE_1 = "Even more serious issue";
     private static final String ISSUE_TITLE_2 = "A not so serious issue";
-    private static final String ISSUE_TITLE_3 = "A sub-folder issue";
     private static final String USER1 = "user1_issuetest@issues.test";
     private static final String USER2 = "user2_issuetest@issues.test";
     private static final String USER3 = "user3_issuetest@issues.test";
 
     private static final String[] REQUIRED_FIELDS = {"Title", "AssignedTo", "Type", "Area", "Priority", "Milestone",
-                "NotifyList", "String1", "Int1"};
+            "NotifyList", "String1", "Int1"};
     private static final String TEST_GROUP = "testers";
     private static final String TEST_EMAIL_TEMPLATE =
-                "You can review this issue here: ^detailsURL^\n" +
-                "Modified by: ^user^\n" +
-                "^modifiedFields^\n" +
-                "^string2|This line shouldn't appear: %s^\n" +
-                "^string3|This line shouldn't appear: %s^\n" +
-                "^string5|Customized template line: %s^\n" +
-                "^comment^";
+            "You can review this issue here: ^detailsURL^\n" +
+                    "Modified by: ^user^\n" +
+                    "^modifiedFields^\n" +
+                    "^string2|This line shouldn't appear: %s^\n" +
+                    "^string3|This line shouldn't appear: %s^\n" +
+                    "^string5|Customized template line: %s^\n" +
+                    "^comment^";
 
     private static final String TEST_EMAIL_TEMPLATE_BAD = TEST_EMAIL_TEMPLATE +
-                "\n\'^asdf|The current date is: %1$tb %1$te, %1$tY^"; // Single quote for regression: 11389
+            "\n\'^asdf|The current date is: %1$tb %1$te, %1$tY^"; // Single quote for regression: 11389
+
+    private IssuesHelper _issuesHelper = new IssuesHelper(this);
 
     public String getAssociatedModuleDirectory()
     {
@@ -102,6 +105,20 @@ public class IssuesTest extends BaseWebDriverTest
     public void returnToProject()
     {
         clickProject(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText("Issues Summary"));
+        readyState();
+    }
+
+    public void readyState()
+    {
+        DataRegionTable issuesTable = new DataRegionTable("Issues", this);
+
+        // clear region selection and filters
+        issuesTable.uncheckAll();
+        issuesTable.clearAllFilters("IssueId");
+
+        // reset folder filter
+        _extHelper.clickMenuButton(true, "Views", "Folder Filter", "Current folder");
     }
 
     public void setupProject()
@@ -133,8 +150,6 @@ public class IssuesTest extends BaseWebDriverTest
     private void checkEmptyToAssignedList()
     {
         // InsertAction -- user isn't in any groups, so shouldn't appear in the assigned-to list yet
-        clickProject(PROJECT_NAME);
-        clickAndWait(Locator.linkWithText("Issues Summary"));
 
         clickButton("New Issue");
         String assignedToText = getText(Locator.name("assignedTo"));
@@ -154,28 +169,9 @@ public class IssuesTest extends BaseWebDriverTest
     {
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("Issues Summary"));
-
-        clickButton("New Issue");
-        selectOptionByText(Locator.id("assignedTo"), getDisplayName());
-        setFormElement(Locator.name("title"), ISSUE_TITLE_0);
-        selectOptionByText(Locator.name("priority"), "2");
-        setFormElement(Locator.name("comment"), "a bright flash of light");
-        clickButton("Save");
-
-        clickAndWait(Locator.linkWithText("New Issue"));
-        setFormElement(Locator.name("title"), ISSUE_TITLE_1);
-        selectOptionByText(Locator.id("priority"), "1");
-        setFormElement(Locator.id("comment"), "alien autopsy");
-        selectOptionByText(Locator.id("assignedTo"), getDisplayName());
-        clickButton("Save");
-
-        clickAndWait(Locator.linkWithText("New Issue"));
-        setFormElement(Locator.name("title"), ISSUE_TITLE_2);
-        selectOptionByText(Locator.name("assignedTo"), displayNameFromEmail(USER1));
-        selectOptionByText(Locator.name("priority"), "4");
-        setFormElement(Locator.name("notifyList"), USER2);
-        setFormElement(Locator.name("comment"), "No big whup");
-        clickButton("Save");
+        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_0, "priority", "2", "comment", "a bright flash of light"));
+        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", ISSUE_TITLE_1, "priority", "1", "comment", "alien autopsy"));
+        _issuesHelper.addIssue(Maps.of("assignedTo", displayNameFromEmail(USER1), "title", ISSUE_TITLE_2, "priority", "4", "comment", "No big whup", "notifyList", USER2));
     }
 
     public void validateQueries()
@@ -188,7 +184,6 @@ public class IssuesTest extends BaseWebDriverTest
     {
         final String issueTitle = "A general issue";
 
-        clickAndWait(Locator.linkWithText("view open Issues"));
         assertButtonPresent("New Issue");
 
         // quick security test
@@ -283,9 +278,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickButton("Save");
 
         // find issueId - parse the text from first space to :
-        String title = getLastPageTitle();
-        title = title.substring(title.indexOf(' '), title.indexOf(':')).trim();
-        int issueId = Integer.parseInt(title);
+        String issueId = getLastPageIssueId();
 
         // DetailsAction
         assertTextPresent("Issue " + issueId + ": " + issueTitle);
@@ -333,7 +326,7 @@ public class IssuesTest extends BaseWebDriverTest
         pushLocation();
         String index = getContextPath() + "/search/" + PROJECT_NAME + "/index.view?wait=1";
         log(index);
-        beginAt(index, 5*defaultWaitForPage);
+        beginAt(index, 5 * defaultWaitForPage);
         popLocation();
         // UNDONE: test grid search box
 
@@ -368,7 +361,7 @@ public class IssuesTest extends BaseWebDriverTest
     }
 
     // Add a keyword to the given field, without verifying the operation.  Need to be on the issues admin page already.
-    @LogMethod
+    @LogMethod(quiet = true)
     private static void addKeyword(BaseWebDriverTest test, @LoggedParam String fieldName, String caption, String value)
     {
         test.setFormElement(Locator.xpath("//form[@name='add" + fieldName + "']/input[@name='keyword']"), value);
@@ -390,8 +383,6 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void emailTest()
     {
-        log("Test notification emails");
-
         goToModule("Dumbster");
         assertTextPresent("No email recorded.");
 
@@ -409,7 +400,7 @@ public class IssuesTest extends BaseWebDriverTest
         assertFormElementEquals("emailSubject", subject); // regression check for issue #11389
         goToModule("Portal");
 
-       // EmailPrefsAction
+        // EmailPrefsAction
         clickAndWait(Locator.linkWithText("Issues Summary"));
         clickButton("Email Preferences");
         checkCheckbox(Locator.checkboxByNameAndValue("emailPreference", "8")); // self enter/edit an issue
@@ -448,7 +439,7 @@ public class IssuesTest extends BaseWebDriverTest
 
         // Presumed to get the first message
         List<String> recipients = emailTable.getColumnDataAsText("To");
-        assertTrue("User did not receive issue notification",      recipients.contains(PasswordUtil.getUsername()));
+        assertTrue("User did not receive issue notification", recipients.contains(PasswordUtil.getUsername()));
         assertTrue(USER2 + " did not receieve issue notification", recipients.contains(USER2));
         assertTrue(USER1 + " did not receieve issue notification", recipients.contains(USER1));
 
@@ -575,12 +566,10 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void viewSelectedDetailsTest()
     {
-        clickAndWait(Locator.linkWithText("Issues Summary"));
-
         DataRegionTable issuesTable = new DataRegionTable("Issues", this);
 
         issuesTable.setFilter("Status", "Has Any Value", null);
-        click(Locator.checkboxByName(".toggle"));
+        issuesTable.checkAll();
         clickButton("View Details");
         assertTextPresent("a bright flash of light");
         assertTextPresent("alien autopsy");
@@ -591,10 +580,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void lastFilterTest()
     {
-        log("Testing .lastFilter");
-
         // assert both issues are present
-        clickAndWait(Locator.linkWithText("Issues Summary"));
         clearAllFilters("Issues", "IssueId");
         assertTextPresent(ISSUE_TITLE_0);
         assertTextPresent(ISSUE_TITLE_1);
@@ -619,6 +605,7 @@ public class IssuesTest extends BaseWebDriverTest
     @Test
     public void queryTest()
     {
+        clickProject(PROJECT_NAME);
         PortalHelper portalHelper = new PortalHelper(this);
         portalHelper.addQueryWebPart("issues");
 
@@ -649,47 +636,46 @@ public class IssuesTest extends BaseWebDriverTest
     // Test issues grid with issues in a sub-folder
     public void subFolderIssuesTest()
     {
-        log("Testing issues in sub-folders");
+        String[] issueTitles = {"This is for the subfolder test", "A sub-folder issue"};
+
+        // NOTE: be afraid -- very afraid. this data is used other places and could lead to false+ or false-
+        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", issueTitles[0], "priority", "2", "comment", "a bright flash of light"));
 
         clickFolder(SUB_FOLDER_NAME);
 
         //Issue 15550: Better tests for view details, admin, and email preferences
-        for(String button : new String[] {"Admin", "Email Preferences"})
+        for (String button : new String[]{"Admin", "Email Preferences"})
         {
             Locator l = Locator.xpath("//span/a[span[text()='" + button + "']]");
-            assertTrue(getAttribute(l,  "href").contains(PROJECT_NAME + "/" + SUB_FOLDER_NAME));
+            assertTrue(getAttribute(l, "href").contains(PROJECT_NAME + "/" + SUB_FOLDER_NAME));
         }
 
-        clickButton("New Issue");
-        setFormElement(Locator.name("title"), ISSUE_TITLE_3);
-        selectOptionByText(Locator.name("assignedTo"), getDisplayName());
-        setFormElement(Locator.name("comment"), "We are in a sub-folder");
-        clickButton("Save");
+        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", issueTitles[1], "priority", "2", "comment", "We are in a sub-folder"));
 
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText("Issues Summary"));
         // Set the container filter to include subfolders
         _extHelper.clickMenuButton(true, "Views", "Folder Filter", "Current folder and subfolders");
 
-        // Verify the URL of ISSUE_TITLE_0 goes to PROJECT_NAME
-        String href = getAttribute(Locator.linkContainingText(ISSUE_TITLE_0), "href");
+        // Verify the URL of issueTitles[0] goes to PROJECT_NAME
+        String href = getAttribute(Locator.linkContainingText(issueTitles[0]), "href");
         assertTrue("Expected issue details URL to link to project container",
                 href.contains("/issues/" + PROJECT_NAME + "/details.view") || href.contains("/" + PROJECT_NAME + "/issues-details.view"));
 
-        // Verify the URL of ISSUE_TITLE_3 goes to PROJECT_NAME/SUB_FOLDER_NAME
-        href = getAttribute(Locator.linkContainingText(ISSUE_TITLE_3), "href");
+        // Verify the URL of issueTitles[1] goes to PROJECT_NAME/SUB_FOLDER_NAME
+        href = getAttribute(Locator.linkContainingText(issueTitles[1]), "href");
         assertTrue("Expected issue details URL to link to sub-folder container",
-            href.contains("/issues/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/details.view") || href.contains("/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/issues-details.view"));
+                href.contains("/issues/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/details.view") || href.contains("/" + PROJECT_NAME + "/" + SUB_FOLDER_NAME + "/issues-details.view"));
     }
 
     @Test
     public void duplicatesTest()
     {
-        createIssue(getDisplayName(), "This Is some Issue -- let's say A", "2", "New issue");
-        String issueIdA = getCurrentIssueId();
+        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "This Is some Issue -- let's say A"));
+        String issueIdA = getLastPageIssueId();
 
-        createIssue(getDisplayName(), "This is another issue -- let's say B", "3", "I think this is a duplicate issue?");
-        String issueIdB = getCurrentIssueId();
+        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "This is another issue -- let's say B"));
+        String issueIdB = getLastPageIssueId();
 
         clickAndWait(Locator.linkWithText("Resolve"));
         selectOptionByText(Locator.id("resolution"), "Duplicate");
@@ -707,22 +693,100 @@ public class IssuesTest extends BaseWebDriverTest
     }
 
     @Test
+    public void moveIssueTest()
+    {
+        String issueTitle = "This issue will be moved";
+        String displayName = getDisplayName();
+        String path = String.format("/%s/%s", PROJECT_NAME, SUB_FOLDER_NAME);
+
+        goToModule("Issues");
+
+        DataRegionTable issuesTable = new DataRegionTable("Issues", this);
+        issuesTable.uncheckAll();
+
+        // validate that the move button not active without destination (here we validate list view)
+        assertElementPresent(Locator.xpath("//a[@class=' labkey-disabled-button']/span[text()='Move']"));
+
+        // create a new issue to be moved
+        _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitle));
+
+        // validate that the move button not active without desintation (here we validate details view)
+        assertElementNotPresent(Locator.linkWithText("move"));
+
+        goToModule("Issues");
+        clickButton("Admin");
+
+        /// attempt a bad destination
+        checkRadioButton(Locator.radioButtonByNameAndValue("moveToContainer", "SpecificMoveToContainer"));
+        setFormElement(Locator.name("moveToContainerSelect"), "/this/is/a/bad/path");
+        updateIssue();
+        assertTextPresent("Container does not exist!");
+        clickAndWait(Locator.linkWithText("back"));
+
+        // this is needed in FF as after going back, the browser does not remember the form state.
+        checkRadioButton(Locator.radioButtonByNameAndValue("moveToContainer", "SpecificMoveToContainer"));
+
+        // setup a good destination
+        setFormElement(Locator.name("moveToContainerSelect"), path);
+        updateIssue();
+
+        // move the created issue
+        goToModule("Issues");
+        clickAndWait(Locator.linkWithText(issueTitle));
+        click(Locator.linkWithText("move"));
+
+        // handle move dialog
+        waitForElement(Locator.xpath("//input[@name='moveIssueCombo']"));
+        _ext4Helper.selectComboBoxItem("Container:", path);
+        clickAndWait(Ext4Helper.Locators.ext4Button("Move"));
+
+        // validate new container
+        assertEquals(path, getCurrentContainerPath());
+
+        // perform multi-issue move
+        returnToProject();
+        goToModule("Issues");
+
+
+        String issueTitleA = "Multi-Issue Move A";
+        _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitleA));
+        String issueIdA = getLastPageIssueId();
+
+        String issueTitleB = "Multi-Issue Move B";
+        _issuesHelper.addIssue(Maps.of("assignedTo", displayName, "title", issueTitleB));
+        String issueIdB = getLastPageIssueId();
+
+        goToModule("Issues");
+        issuesTable.checkCheckbox(issueIdA);
+        issuesTable.checkCheckbox(issueIdB);
+        click(Locator.linkWithText("move"));
+
+        // handle move dialog (copy pasta)
+        waitForElement(Locator.xpath("//input[@name='moveIssueCombo']"));
+        _ext4Helper.selectComboBoxItem("Container:", path);
+        clickAndWait(Ext4Helper.Locators.ext4Button("Move"));
+
+        // make sure the moved issues are no longer shwoing up
+        assertTextNotPresent(issueTitleA);
+        assertTextNotPresent(issueTitleB);
+    }
+
+    @Test
     public void relatedIssueTest()
     {
         Locator relatedLocator = Locator.name("related");
-        Locator updateLink = Locator.linkWithText("Update");
 
-        createIssue(getDisplayName(), "A is for Apple", "2", "New issue");
-        String issueIdA = getCurrentIssueId();
+        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "A is for Apple"));
+        String issueIdA = getLastPageIssueId();
 
-        createIssue(getDisplayName(), "B is for Baking", "3", "What what ... in the ... ");
-        String issueIdB = getCurrentIssueId();
+        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "B is for Baking"));
+        String issueIdB = getLastPageIssueId();
 
-        createIssue(getDisplayName(), "C is for Cat", "3", null);
-        String issueIdC = getCurrentIssueId();
+        _issuesHelper.addIssue(Maps.of("assignedTo", getDisplayName(), "title", "C is for Cat"));
+        String issueIdC = getLastPageIssueId();
 
         // related C to A
-        clickAndWait(updateLink);
+        updateIssue();
         setFormElement(relatedLocator, issueIdA);
         clickButton("Save");
 
@@ -730,7 +794,7 @@ public class IssuesTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(issueIdA));
 
         // try to link to non-existent issue
-        clickAndWait(updateLink);
+        updateIssue();
         setFormElement(relatedLocator, "0");
         clickButton("Save");
         assertTextPresent("Invalid issue id in related string");
@@ -813,25 +877,11 @@ public class IssuesTest extends BaseWebDriverTest
         // TODO: compare user dropdown list between admin and new issues page
     }
 
-    public String getCurrentIssueId()
+    // NOTE: returning string here to avoid extra casting
+    public String getLastPageIssueId()
     {
         String title = getLastPageTitle();
         return title.substring(title.indexOf(' '), title.indexOf(':')).trim();
-    }
-
-    // TODO: Aaron - use this more often!!!
-    public void createIssue(String assignedTo, String title, String priority, @Nullable String comment)
-    {
-        goToModule("Issues");
-        clickButton("New Issue");
-        selectOptionByText(Locator.id("assignedTo"), assignedTo);
-        setFormElement(Locator.name("title"), title);
-        selectOptionByText(Locator.name("priority"), priority);
-
-        if (comment != null)
-            setFormElement(Locator.name("comment"), comment);
-
-        clickButton("Save");
     }
 
 }
