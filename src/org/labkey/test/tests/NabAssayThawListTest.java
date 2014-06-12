@@ -112,8 +112,12 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
         // Now override
         click(Locator.radioButtonByNameAndValue("participantVisitResolver", "Lookup"));
+
+        // 20583 We now hide the option to paste in a tsv for the default value
+        assertElementNotPresent(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
+
         click(Locator.radioButtonByNameAndValue("ThawListType", "List"));
-        waitForElement(getButtonLocatorContainingText("Choose list"));
+//        waitForElement(getButtonLocatorContainingText("Choose list"));
         click(getButtonLocatorContainingText("Choose list"));
         click(Locator.divById("partdown_table"));
         Locator tableListBox = Locator.tagWithClass("select", "gwt-ListBox");
