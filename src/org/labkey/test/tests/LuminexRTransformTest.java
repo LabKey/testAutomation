@@ -168,7 +168,7 @@ public class LuminexRTransformTest extends LuminexTest
         assertTextPresent(TEST_ASSAY_LUM + " Runs");
         DataRegionTable table = new DataRegionTable("Runs", this);
         assertEquals("Unexpected Transform Script Version number", "8.0.20140509", table.getDataAsText(0, "Transform Script Version"));
-        assertEquals("Unexpected Lab Transform Script Version number", "1.1.20140526", table.getDataAsText(0, "Lab Transform Script Version"));
+        assertEquals("Unexpected Lab Transform Script Version number", "1.2.20140612", table.getDataAsText(0, "Lab Transform Script Version"));
         assertEquals("Unexpected Ruminex Version number", "0.0.9", table.getDataAsText(0, "Ruminex Version"));
     }
 

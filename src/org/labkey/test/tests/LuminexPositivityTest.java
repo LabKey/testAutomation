@@ -79,6 +79,8 @@ public class LuminexPositivityTest extends LuminexTest
         setNegativeControlParams(true, false);
         uploadPositivityFile(assayName + " Baseline Visit Previous Run Error", TEST_ASSAY_LUM_FILE12, "1", "3", false, false);
         assertTextPresent("Error: Baseline visit data found in more than one prevoiusly uploaded run: Analyte=" + _analyteNames.get(0) + ", Participant=123400001, Visit=1.");
+        assertTextPresent("Error: Baseline visit data found in more than one prevoiusly uploaded run: Analyte=" + _analyteNames.get(0) + ", Participant=123400002, Visit=1.");
+        assertTextPresent("Error: Baseline visit data found in more than one prevoiusly uploaded run: Analyte=" + _analyteNames.get(0) + ", Participant=123400003, Visit=1.");
         clickButton("Cancel");
 
         // delete all but one run of data so we have the expected number of previous baseline visits rows
