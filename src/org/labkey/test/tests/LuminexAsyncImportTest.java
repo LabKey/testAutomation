@@ -87,7 +87,7 @@ public class LuminexAsyncImportTest extends LuminexTest
             Assert.fail();
         }
         clickAndWait(Locator.linkWithText("COMPLETE", 0));
-        assertTextPresent("Warning: No baseline visit data found", 12);
+        assertTextPresent("Warning: No baseline visit data found", 6);
     }
 
     private void importSecondRun(int index, Calendar testDate, File file) {
