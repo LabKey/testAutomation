@@ -431,7 +431,7 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
     protected void gotoQueryWebPart(String webpartName, String queryName)
     {
         clickTab("Portal");
-        click(Locator.xpath("//span[text()='" + queryName + "']"));
+        clickAndWait(Locator.xpath("//span[text()='" + queryName + "']"));
         waitForText(webpartName);
     }
 
