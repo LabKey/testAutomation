@@ -347,6 +347,14 @@ public class Ext4Helper extends AbstractHelper
             _test.click(rowLoc.append("//div").withClass(_cssPrefix + "grid-row-checker"));
     }
 
+    @LogMethod(quiet = true)
+    public void checkGridRowCheckboxAlt(String cellText, int index, boolean useContainsForCellText)
+    {
+        Locator.XPathLocator rowLoc = useContainsForCellText ? getGridRowContains(cellText, index) : getGridRow(cellText, index);
+        if (!isGridRowChecked(rowLoc))
+            _test.click(rowLoc.append("//div").withClass(_cssPrefix + "grid-cell-inner-checkcolumn"));
+    }
+
     /**
      * Uncheck the checkbox for an Ext4 grid row
      * @param cellText Exact text from any cell in the desired row
@@ -548,6 +556,11 @@ public class Ext4Helper extends AbstractHelper
     private Locator.XPathLocator getGridRow(String cellText, int index)
     {
         return Locator.tag("tr").withClass(_cssPrefix + "grid-row").withPredicate("(td|td/table/tbody/tr/td)[string() = " + Locator.xq(cellText) + "]").notHidden().index(index);
+    }
+
+    private Locator.XPathLocator getGridRowContains(String cellText, int index)
+    {
+        return Locator.tag("tr").withClass(_cssPrefix + "grid-row").withPredicate("(td|td/div|td/table/tbody/tr/td)[contains(text(), " + Locator.xq(cellText) + ")]").notHidden().index(index);
     }
 
     public static Locator.XPathLocator invalidField()
