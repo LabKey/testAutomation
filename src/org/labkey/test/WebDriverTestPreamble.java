@@ -25,9 +25,6 @@ public class WebDriverTestPreamble extends BaseWebDriverTest
 {
     public void preamble() throws Exception
     {
-        log("\n\n=============== Starting " + Runner.getCurrentTestName() + Runner.getProgress() + " =================");
-
-        logToServer("=== Starting " + Runner.getCurrentTestName() + Runner.getProgress() + " ===");
         signIn();
         enableEmailRecorder();
         resetErrors();

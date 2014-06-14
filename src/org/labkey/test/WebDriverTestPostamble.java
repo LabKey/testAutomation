@@ -74,10 +74,6 @@ public class WebDriverTestPostamble extends BaseWebDriverTest
             }
             catch (IOException ignore) { }
         }
-
-        logToServer("=== Completed " + Runner.getCurrentTestName() + Runner.getProgress() + " ===");
-
-        log("=============== Completed " + Runner.getCurrentTestName() + Runner.getProgress() + " =================");
     }
 
     @Override

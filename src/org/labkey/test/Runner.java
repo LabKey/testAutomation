@@ -44,6 +44,7 @@ import org.labkey.test.aspects.MethodPerfAspect;
 import org.labkey.test.util.PostgresOnlyTest;
 import org.labkey.test.util.SqlserverOnlyTest;
 import org.labkey.test.util.AdvancedSqlTest;
+import org.labkey.test.util.TestLogger;
 import org.labkey.test.util.WindowsOnlyTest;
 
 import java.io.BufferedReader;
@@ -71,6 +72,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import static org.labkey.test.WebTestHelper.logToServer;
 
 public class Runner extends TestSuite
 {
@@ -257,9 +260,16 @@ public class Runner extends TestSuite
                 else
                     _curentTest = test.getClass();
 
+                try{logToServer("=== Starting " + getCurrentTestName() + getProgress() + " ===");} catch (Exception ignore){}
+                TestLogger.log("\n\n=============== Starting " + getCurrentTestName() + getProgress() + " =================");
                 super.runTest(test, testResult);
+
                 failed = testResult.failureCount() > failCount;
                 errored = testResult.errorCount() > errorCount;
+
+                String result = failed || errored ? "Failed " : "Completed ";
+                TestLogger.log("=============== " + result + getCurrentTestName() + getProgress() + " =================");
+                try{logToServer("=== " + result + getCurrentTestName() + getProgress() + " ===");} catch (Exception ignore){}
             }
             else
             {
