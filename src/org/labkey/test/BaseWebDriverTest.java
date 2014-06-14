@@ -6278,6 +6278,23 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         assertTrue("Running pipeline jobs were found.  Timeout:" + wait, statusValues.size() == 0);
     }
 
+    @LogMethod
+    protected void deletePipelineJob(@LoggedParam String jobDescription, @LoggedParam boolean deleteRuns)
+    {
+        goToModule("Pipeline");
+
+        PipelineStatusTable table = new PipelineStatusTable(this, true, false);
+        int tableJobRow = table.getJobRow(jobDescription);
+        assertNotEquals("Failed to find job rowid", -1, tableJobRow);
+        table.checkCheckbox(tableJobRow);
+
+        clickButton("Delete");
+        assertElementPresent(Locator.linkContainingText(jobDescription));
+        if (deleteRuns)
+            checkCheckbox(Locator.id("deleteRuns"));
+        clickButton("Confirm Delete");
+    }
+
     public void setCodeEditorValue(String id, String value)
     {
         _extHelper.setCodeMirrorValue(id, value);

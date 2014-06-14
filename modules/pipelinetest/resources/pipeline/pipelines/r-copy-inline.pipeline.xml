@@ -1,5 +1,5 @@
 <pipeline xmlns="http://labkey.org/pipeline/xml" name="r-copy-inline" version="0.0">
-    <description>Use R to duplicate a file and generate xar exp run (inline script)</description>
+    <description>Use R to duplicate a file and generate xar exp run (r-copy-inline)</description>
     <analyzeURL>/pipelinetest/rinline.view</analyzeURL>
     <tasks>
         <taskref ref="pipelinetest:task:r-copy-inline"/>

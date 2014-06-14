@@ -66,6 +66,7 @@ public class ETLErrorTest extends ETLBaseTest
         verifyTransformSummary();
         assertTextNotPresent("Should not have loaded invalid transform xml", TRANSFORM_BAD_XML);
         insertSourceRow("0", "Subject 0", null);
+
         List<String> errors = new ArrayList<String>();
         errors.add("AK_etltarget");
         errors.add("duplicate");
@@ -73,16 +74,20 @@ public class ETLErrorTest extends ETLBaseTest
         errors.add("org.labkey.api.pipeline.PipelineJobException: Error running executeCopy");
         runETLandCheckErrors(TRANSFORM_KEYCONSTRAINT_ERROR, true, false, errors);
         errors.clear();
+
         errors.add("Could not find table: vehicle.etl_source_cheeseburger");
         runETLandCheckErrors(TRANSFORM_QUERY_ERROR, false, true, errors);
+
         _runETL_NoNav(TRANSFORM_NOCOL_ERROR, false, true);
         assertTextPresent("Column not found: etl_source.monkeys");
         errors.clear();
+
         //run remote etl without remote connection configured
         errors.add("ERROR: The remote connection EtlTest_RemoteConnection has not yet been setup in the remote connection manager.  You may configure a new remote connection through the schema browser.");
         errors.add("ERROR: Error running executeCopy");
         runETLandCheckErrors(TRANSFORM_REMOTE, true, false, errors);
         errors.clear();
+
         // create our remote connection
         RemoteConnectionHelper rconnHelper = new RemoteConnectionHelper(this);
         rconnHelper.createConnection(TRANSFORM_REMOTE_CONNECTION, getBaseURL(), getProjectName());
@@ -90,9 +95,11 @@ public class ETLErrorTest extends ETLBaseTest
         errors.add("Error running executeCopy");
         runETLandCheckErrors(TRANSFORM_REMOTE_BAD_DEST, true, false, errors);
         errors.clear();
+
         //remote etl constraint violation
         insertSourceRow("12", "Patient 12", "");
         runETL(TRANSFORM_REMOTE_NOTRUNC);
+
         //since we just moved patient 12 to etl_target, running the etl a second time should give us a constraint violation
         errors.add("AK_etltarget");
         errors.add("constraint");
@@ -100,13 +107,16 @@ public class ETLErrorTest extends ETLBaseTest
         errors.add("org.labkey.api.pipeline.PipelineJobException: Error running executeCopy");
         runETLandCheckErrors(TRANSFORM_REMOTE_NOTRUNC, true, false, errors);
         errors.clear();
+
         errors.add("contains value not castable to a date:");
         runETLandCheckErrors(TRANSFORM_BADCAST, false, true, errors);
         errors.clear();
+
         errors.add("Table not found:");
         waitForElement(Locator.xpath(".//*[@id='bodypanel']"));
         runETLandCheckErrors(TRANSFORM_BADTABLE, false, true, errors);
         errors.clear();
+
         clickTab("DataIntegration");
         enableScheduledRun("Error Bad Source Schema");
         //schedule for job is 15 seconds

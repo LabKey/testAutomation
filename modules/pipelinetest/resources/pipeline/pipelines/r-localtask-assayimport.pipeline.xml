@@ -1,7 +1,7 @@
 <pipeline xmlns="http://labkey.org/pipeline/xml"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           name="r-localtask-assayimport" version="0.0">
-    <description>Use R to create tsv file using locally defined task and import into 'myassay'</description>
+    <description>Use R to create tsv file using locally defined task and import into 'myassay' (r-localtask-assayimport)</description>
     <tasks>
         <task xsi:type="ScriptTaskType">
             <inputs>

@@ -24,6 +24,7 @@ import org.labkey.test.BaseWebDriverMultipleTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.FileBrowserHelper;
 import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
@@ -89,7 +90,6 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
             "protocolDescription", "");
 
         final Map<String, Set<String>> outputFiles = Maps.of(
-            "r-copy.r", Collections.<String>emptySet(),
             "r-copy.xml", Collections.<String>emptySet(),
             "sample.log", Collections.<String>emptySet(),
             "sample-taskInfo.tsv", Collections.<String>emptySet(),
@@ -110,7 +110,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         final String containerPath = getProjectName() + "/" + folderName;
         final File fileRoot = getDefaultFileRoot(containerPath);
         final String pipelineName = "r-copy-inline";
-        final String importAction = "Use R to duplicate a file and generate xar exp run (inline script)";
+        final String importAction = "Use R to duplicate a file and generate xar exp run (r-copy-inline)";
         final String protocolName = "InlineRCopy";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
         final Map<String, String> protocolProperties = Maps.of(
@@ -119,7 +119,6 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
 
         final Map<String, Set<String>> outputFiles = new HashMap<>();
         outputFiles.put("r-copy-inline.xml", Collections.<String>emptySet());
-        outputFiles.put("script.R", Collections.<String>emptySet());
         outputFiles.put("sample-taskInfo.tsv", Collections.<String>emptySet());
         outputFiles.put("sample.pipe.xar.xml", Collections.<String>emptySet());
         outputFiles.put("sample.log", Collections.<String>emptySet());
@@ -129,7 +128,24 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
-        runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)");
+        runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", true);
+        verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
+
+        // Running same protocol again is an error
+        runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", false);
+        waitForElement(Ext4Helper.Locators.window("Error"));
+        assertEquals("Cannot redefine an existing protocol", getText(Ext4Helper.Locators.windowBody("Error")));
+        clickButton("OK", 0);
+
+        // Delete the job, including any refernced runs
+        String jobDescription = "@files/sample (InlineRCopy)";
+        deletePipelineJob(jobDescription, true);
+
+        // Verify the analysis dir was deleted
+        verifyPipelineAnalysisDeleted(pipelineName, protocolName);
+
+        // Running the same protocol again should now be a-ok.
+        runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", true);
         verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
     }
 
@@ -140,7 +156,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         final String containerPath = getProjectName() + "/" + folderName;
         final File fileRoot = getDefaultFileRoot(containerPath);
         final String pipelineName = "r-localtask-assayimport";
-        final String importAction = "Use R to create tsv file using locally defined task and import into 'myassay'";
+        final String importAction = "Use R to create tsv file using locally defined task and import into 'myassay' (r-localtask-assayimport)";
         final String protocolName = "assay_import";
         final String[] targetFiles = {SAMPLE_FILE.getName()};
         final Map<String, String> protocolProperties = Maps.of(
@@ -148,7 +164,6 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
 
         final Map<String, Set<String>> outputFiles = new HashMap<>();
         outputFiles.put("r-localtask-assayimport.xml", Collections.<String>emptySet());
-        outputFiles.put("script.R", Collections.<String>emptySet());
         outputFiles.put("sample-taskInfo.tsv", Collections.<String>emptySet());
         outputFiles.put("sample.log", Collections.<String>emptySet());
         outputFiles.put("sample.tsv", Collections.<String>emptySet());
@@ -191,11 +206,11 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
     @LogMethod
     private void runPipelineAnalysis(@LoggedParam String importAction, String[] files, Map<String, String> protocolProperties)
     {
-        runPipelineAnalysis(importAction, files, protocolProperties, "Analyze");
+        runPipelineAnalysis(importAction, files, protocolProperties, "Analyze", true);
     }
 
     @LogMethod
-    private void runPipelineAnalysis(@LoggedParam String importAction, String[] files, Map<String, String> protocolProperties, String analyzeButtonText)
+    private void runPipelineAnalysis(@LoggedParam String importAction, String[] files, Map<String, String> protocolProperties, String analyzeButtonText, boolean expectSuccess)
     {
         StringBuilder fileString = new StringBuilder();
 
@@ -215,7 +230,15 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
             setFormElement(Locator.id(property.getKey() + "Input"), property.getValue());
         }
 
-        clickButton(analyzeButtonText);
+        if (expectSuccess)
+            clickButton(analyzeButtonText);
+        else
+            clickButton(analyzeButtonText, 0);
+    }
+
+    private String jobDescription(String pipelineName, String protocolName)
+    {
+        return "R pipeline script: " + pipelineName + " - " + protocolName;
     }
 
     @LogMethod
@@ -224,7 +247,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         String analysisPath = "/" + pipelineName + "/" + protocolName + "/";
 
         goToModule("Pipeline");
-        waitForPipelineJobsToComplete(1, "R pipeline script: " + pipelineName + " - " + protocolName, false);
+        waitForPipelineJobsToComplete(1, jobDescription(pipelineName, protocolName), false);
 
         goToModule("FileContent");
 
@@ -247,6 +270,15 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
                 }
             }
         }
+    }
+
+    @LogMethod
+    private void verifyPipelineAnalysisDeleted(@LoggedParam String pipelineName, String protocolName)
+    {
+        goToModule("FileContent");
+
+        _fileBrowserHelper.selectFileBrowserItem("/" + pipelineName);
+        assertElementNotPresent(FileBrowserHelper.Locators.gridRowWithNodeId(protocolName));
     }
 
     // Create an assay with 'Name' and 'Age' columns.
@@ -290,7 +322,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         assertTrue("Expected 'Bob' and 'Sally' in names column; got '" + names + "' instead",
                 names.contains("Bob") && names.contains("Sally"));
 
-        // UNDONE: Verify 'script.R' and 'sample.txt' are data inputs to the assay exp.run
+        // UNDONE: Verify 'r-localtask-assayimport.xml' and 'sample.txt' are data inputs to the assay exp.run
         // UNDONE: and 'sample.tsv' is a data output of the assay exp.run.
     }
 

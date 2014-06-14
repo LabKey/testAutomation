@@ -1,6 +1,6 @@
 <pipeline xmlns="http://labkey.org/pipeline/xml"
           name="r-copy" version="0.0">
-    <description>Use R to duplicate a file and generate exp run</description>
+    <description>Use R to duplicate a file and generate exp run (r-copy)</description>
     <tasks>
         <taskref ref="pipelinetest:task:r-copy"/>
         <taskref ref="org.labkey.api.exp.pipeline.ExpGeneratorId"/>
