@@ -117,13 +117,12 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         assertElementNotPresent(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
 
         click(Locator.radioButtonByNameAndValue("ThawListType", "List"));
-//        waitForElement(getButtonLocatorContainingText("Choose list"));
-        click(getButtonLocatorContainingText("Choose list"));
-        click(Locator.divById("partdown_table"));
-        Locator tableListBox = Locator.tagWithClass("select", "gwt-ListBox");
-        waitForElement(tableListBox);
-        selectOptionByValue(tableListBox, THAW_LIST_NAME);
-        click(getButtonLocatorContainingText("Close"));
+
+        waitForElement(Locator.css(".schema-loaded-marker"));
+        _ext4Helper.selectComboBoxItem(Locator.id("thawListSchemaName"), "lists");
+        waitForElement(Locator.css(".query-loaded-marker"));
+        _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), THAW_LIST_NAME);
+
         clickButton("Save Defaults");
 
         log("Uploading NAb Run");

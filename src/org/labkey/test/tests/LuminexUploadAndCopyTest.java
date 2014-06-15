@@ -97,12 +97,13 @@ public class LuminexUploadAndCopyTest extends LuminexTest
         assertEquals(TEST_ASSAY_LUM_SET_PROP_SPECIES2, getFormElement(Locator.name("species")));
         assertRadioButtonSelected(Locator.radioButtonByNameAndValue("participantVisitResolver", "Lookup"));
         assertRadioButtonSelected(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
+
         checkCheckbox(Locator.radioButtonByNameAndValue("ThawListType", "List"));
-        waitForElement(Locator.id("button_Choose list..."), WAIT_FOR_JAVASCRIPT);
-        clickButton("Choose list...", 0);
-        setFormElement(Locator.id("schema"), "lists");
-        setFormElement(Locator.id("table"), THAW_LIST_NAME);
-        clickButton("Close", 0);
+        waitForElement(Locator.css(".schema-loaded-marker"));
+        _ext4Helper.selectComboBoxItem(Locator.id("thawListSchemaName"), "lists");
+        waitForElement(Locator.css(".query-loaded-marker"));
+        _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), THAW_LIST_NAME);
+
         clickButton("Next");
         setFormElement(Locator.name("name"), TEST_ASSAY_LUM_RUN_NAME4);
         setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE3);
