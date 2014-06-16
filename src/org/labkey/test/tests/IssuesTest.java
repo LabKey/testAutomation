@@ -716,11 +716,20 @@ public class IssuesTest extends BaseWebDriverTest
         goToModule("Issues");
         clickButton("Admin");
 
-        /// attempt a bad destination
+        // attempt a bad destination
         checkRadioButton(Locator.radioButtonByNameAndValue("moveToContainer", "SpecificMoveToContainer"));
         setFormElement(Locator.name("moveToContainerSelect"), "/this/is/a/bad/path");
         updateIssue();
         assertTextPresent("Container does not exist!");
+        clickAndWait(Locator.linkWithText("back"));
+
+        // this is needed in FF as after going back, the browser does not remember the form state.
+        checkRadioButton(Locator.radioButtonByNameAndValue("moveToContainer", "SpecificMoveToContainer"));
+
+        // attempt an empty destination
+        setFormElement(Locator.name("moveToContainerSelect"), "");
+        updateIssue();
+        assertTextPresent("The move to specific container option was selected with a blank.");
         clickAndWait(Locator.linkWithText("back"));
 
         // this is needed in FF as after going back, the browser does not remember the form state.
