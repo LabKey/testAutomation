@@ -547,8 +547,7 @@ public class StudyExportTest extends StudyManualTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText(dataset));
         clickButton("Edit Definition");
-        waitForElement(Locator.name("ff_name0"), WAIT_FOR_PAGE);
-        click(Locator.name("ff_name0"));
+        waitAndClick(Locator.name("ff_label0"));
         click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
         waitForElement(Locator.name("mvEnabled"), WAIT_FOR_JAVASCRIPT);
         checkCheckbox(Locator.checkboxByName("mvEnabled"));
