@@ -2138,28 +2138,22 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         goToHome();         // Don't leave on an empty page
     }
 
-    public void checkExpectedErrors(int count)
+    @LogMethod
+    public void checkExpectedErrors(@LoggedParam int expectedErrors)
     {
         // Need to remember our location or the next test could start with a blank page
         pushLocation();
         beginAt("/admin/showErrorsSinceMark.view");
 
-        //IE and Firefox have different notions of empty.
-        //IE returns html for all pages even empty text...
-        String text = getHtmlSource();
-        if (null == text)
-            text = "";
-        text = text.trim();
-        if ("".equals(text))
+        String text = getBodyText();
+        Pattern errorPattern = Pattern.compile("^ERROR", Pattern.MULTILINE);
+        Matcher errorMatcher = errorPattern.matcher(text);
+        int count = 0;
+        while (errorMatcher.find())
         {
-            text = getBodyText();
-            if (null == text)
-                text = "";
-            text = text.trim();
+            count++;
         }
-
-        assertEquals("Expected error count does not match actual count for this run.", count, StringUtils.countMatches(text, "ERROR"));
-        log("Found " + count + " expected errors.");
+        assertEquals("Expected error count does not match actual count for this run.", expectedErrors, count);
 
         // Clear the errors to prevent the test from failing.
         resetErrors();
