@@ -873,6 +873,25 @@ public class IssuesTest extends BaseWebDriverTest
         assertEquals(getSelectedOptionText(Locator.id("assignedTo")), "");
         clickButton("Cancel");
 
+        // issue 20699 - NPE b/c default assign to user deleted!
+        String deletedUser = "deleteme@deletronia.com";
+        _permissionsHelper.addUserToProjGroup(deletedUser, PROJECT_NAME, TEST_GROUP);
+        clickProject(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText("Issues Summary"));
+        clickButton("Admin");
+        checkRadioButton(Locator.radioButtonByNameAndValue("assignedToUser", "SpecificUser"));
+        selectOptionByText(defaultUserSelect, displayNameFromEmail(deletedUser));
+        clickButton("Update");
+
+        // taking care of some clean-up while here for the test.
+        deleteUsers(true, deletedUser, user);
+
+        clickProject(PROJECT_NAME);
+        clickAndWait(Locator.linkWithText("Issues Summary"));
+        clickButton("New Issue");
+        // NPE
+        //clickButton("Cancel");
+
         // TODO: extend test to check validate full user selection list based on group selection...
         // TODO: compare user dropdown list between admin and new issues page
     }
