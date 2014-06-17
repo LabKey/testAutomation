@@ -58,20 +58,6 @@ public class JUnitTest extends TestSuite
     {
     }
 
-    @Override
-    public void run(TestResult testResult)
-    {
-        log("\n\n=============== Starting " + getClass().getSimpleName() + Runner.getProgress() + " =================");
-        try
-        {
-            super.run(testResult);
-        }
-        finally
-        {
-            log("=============== Completed " + getClass().getSimpleName() + Runner.getProgress() + " =================");
-        }
-    }
-
     // used when writing JUnitTest class name to the remainingTests.txt log file
     public String toString()
     {
