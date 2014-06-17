@@ -135,6 +135,24 @@ public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
         assertExcelExportContents(exportedFile, dataRegion.getDataRowCount());
     }
 
+    @Test
+    public final void testExportAllPagedExcel()
+    {
+        int allRows = dataRegion.getDataRowCount();
+
+        List<String> expectedExportColumn = new ArrayList<>();
+        expectedExportColumn.add(getTestColumnTitle());
+        expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()));
+
+        assertEquals(allRows, expectedExportColumn.size()-1);
+
+        // Issue 19854: Check that all rows will be exported when nothing is selected and page size is less than grid row count.
+        dataRegion.setMaxRows(2);
+        assertEquals(2, dataRegion.getDataRowCount());
+        File exportedFile = exportHelper.exportExcel(DataRegionExportHelper.ExcelFileType.XLSX);
+        assertExcelExportContents(exportedFile, allRows, expectedExportColumn);
+    }
+
     protected final List<String> checkFirstNRows(int n)
     {
         List<String> rowIds = new ArrayList<>();
@@ -186,16 +204,21 @@ public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
 
     protected final void assertExcelExportContents(File exportedFile, int expectedDataRowCount)
     {
+        List<String> expectedExportColumn = new ArrayList<>();
+        expectedExportColumn.add(getTestColumnTitle());
+        expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()).subList(0, expectedDataRowCount));
+
+        assertExcelExportContents(exportedFile, expectedDataRowCount, expectedExportColumn);
+    }
+
+    protected final void assertExcelExportContents(File exportedFile, int expectedDataRowCount, List<String> expectedExportColumn)
+    {
         try
         {
             Workbook workbook = ExcelHelper.create(exportedFile);
             Sheet sheet = workbook.getSheetAt(0);
 
             assertEquals("Wrong number of rows exported to " + exportedFile.getName(), expectedDataRowCount, sheet.getLastRowNum());
-
-            List<String> expectedExportColumn = new ArrayList<>();
-            expectedExportColumn.add(getTestColumnTitle());
-            expectedExportColumn.addAll(dataRegion.getColumnDataAsText(getTestColumnTitle()).subList(0, expectedDataRowCount));
 
             List<String> exportedColumn = ExcelHelper.getColumnData(sheet, getTestColumnIndex());
             assertEquals("Wrong rows exported", expectedExportColumn, exportedColumn);
