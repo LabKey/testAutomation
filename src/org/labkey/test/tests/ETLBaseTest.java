@@ -67,22 +67,19 @@ public abstract class ETLBaseTest extends BaseWebDriverTest
      *  This can depend on the source of an expected error, and at the moment all errors generate
      *  at least two occurances anyway.
      *
-     * @param dbError true when the expected error is a SQLException from the database
      * @param twoErrors true when a given error generates two occurances of the string "ERROR" in the log.
      */
-    protected void incrementExpectedErrorCount(boolean dbError, boolean twoErrors)
+    protected void incrementExpectedErrorCount(boolean twoErrors)
     {
         _expectedErrors++;
-        if (dbError)
-            _expectedErrors = getExpectedErrorCount(_expectedErrors);
-        // At the moment, the ETL log files usually have two occurances of the string "ERROR" for every error that occurs.
         if (twoErrors)
             _expectedErrors++;
     }
 
-    protected void incrementExpectedErrorCount(boolean dbError)
+    protected void incrementExpectedErrorCount()
     {
-        incrementExpectedErrorCount(dbError, true);
+        // ETL log files usually have two occurances of the string "ERROR" for every error that occurs.
+        incrementExpectedErrorCount(true);
     }
 
     // looks like postgres inserts an "ERROR" word in their error string for the duplicate key

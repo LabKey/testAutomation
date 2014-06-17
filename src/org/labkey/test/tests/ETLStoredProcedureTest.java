@@ -48,12 +48,8 @@ public class ETLStoredProcedureTest extends ETLTest
         // TODO: only need a subset of the initialSetup operations
         runInitialSetup(false);
 
-        //stored proc based etl supported on MS SQL and Postgres
-        WebTestHelper.DatabaseType dbType = WebTestHelper.getDatabaseType();
-        if (dbType == WebTestHelper.DatabaseType.MicrosoftSQLServer || dbType == WebTestHelper.DatabaseType.PostgreSQL)
-        {
-            verifyStoredProcTransform();
-        }
+        verifyStoredProcTransform();
+
         // be sure to check for all expected errors here so that the test won't fail on exit
         checkExpectedErrors(_expectedErrors);
 
@@ -87,30 +83,25 @@ public class ETLStoredProcedureTest extends ETLTest
         // test mode 2, return code > 0, should be an error
         rtr = runETL_API(TRANSFORM_BAD_NON_ZERO_RETURN_CODE_SP);
         assertEquals("ERROR", _diHelper.getTransformStatus(rtr.getJobId()));
-        incrementExpectedErrorCount(false);
+        incrementExpectedErrorCount();
         // That should have an error ERROR: Error: Sproc exited with return code 1
 
         // try to run a non-existent proc
         rtr = runETL_API(TRANSFORM_BAD_PROCEDURE_NAME_SP);
         assertEquals("ERROR", _diHelper.getTransformStatus(rtr.getJobId()));
-        incrementExpectedErrorCount(false);
+        incrementExpectedErrorCount();
         // Error on missing procedure or @transformRunId; over api that didn't create a job
 
         // try to run a proc missing the required transformRunId param
         rtr = runETL_API(TRANSFORM_BAD_MISSING_TRANSFORM_RUN_ID_PARM_SP);
         assertEquals("ERROR", _diHelper.getTransformStatus(rtr.getJobId()));
-        incrementExpectedErrorCount(false);
+        incrementExpectedErrorCount();
         // Error on missing procedure or @transformRunId
 
         // test mode 3, raise an error inside the sproc
         rtr = runETL_API(TRANSFORM_BAD_THROW_ERROR_SP);
         assertEquals("ERROR", _diHelper.getTransformStatus(rtr.getJobId()));
-        incrementExpectedErrorCount(true, false);
-        // Postgres throws even more errors in there than SQL Server for this case
-        if (WebTestHelper.getDatabaseType() == WebTestHelper.DatabaseType.PostgreSQL)
-        {
-            incrementExpectedErrorCount(true, false);
-        }
+        incrementExpectedErrorCount(false);
 
         // test mode 4, parameter persistance. Run twice. First time, the value of the in/out parameter supplied in the xml file
         // is changed in the sproc, which should be persisted into the transformConfiguration.state variable map.

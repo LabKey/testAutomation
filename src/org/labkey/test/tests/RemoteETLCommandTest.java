@@ -141,7 +141,7 @@ public class RemoteETLCommandTest extends ETLTest
         _jobsComplete++;
         // verify we had two runs complete (one success, one error)
         checkRun(true);
-        incrementExpectedErrorCount(true);
+        incrementExpectedErrorCount();
 
         // not found
         invokeCommand(new UpdateTransformConfigurationCommand(TRANSFORM_NOTFOUND), cn, TRANSFORM_NOTFOUND);
