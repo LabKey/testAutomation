@@ -979,7 +979,7 @@ public class LuminexGuideSetTest  extends LuminexTest
 
     protected void waitForLeveyJenningsTrendPlot()
     {
-        waitForTextToDisappear("Loading");
+        waitForTextToDisappear("Loading", WAIT_FOR_JAVASCRIPT * 2);
         assertTextNotPresent("ScriptException");
         assertElementNotPresent(Locator.tagContainingText("pre", "Error"));
         waitForElement(Locator.tag("img").attributeStartsWith("id", "resultImage"));
