@@ -306,6 +306,7 @@ public class ListHelper extends AbstractHelper
 
         _test.setFormElement(Locator.name("listZip"), inputFile);
         _test.clickButton("Import List Archive");
+        _test.assertElementNotPresent(Locator.tagWithClass("div", "labkey-error"));
     }
 
 
