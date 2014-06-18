@@ -207,8 +207,7 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Save");
         clickAndWait(Locator.linkWithText("Update Members"));
         clickAndWait(Locator.linkWithText("FHCRC - Seattle (Endpoint Lab, Site Affiliated Lab, Clinic)"));
-        assertTextPresent("Institutional Review Board, FHCRC - Seattle");
-        assertTextPresent("This group currently has no members.");
+        assertTextPresent("Institutional Review Board, FHCRC - Seattle", "This group currently has no members.");
         clickTab("Manage");
         clickAndWait(Locator.linkWithText("Manage Default Requirements"));
         selectOptionByText(Locator.name("providerActor"), "Institutional Review Board");
@@ -244,8 +243,7 @@ public class StudyExportTest extends StudyManualTest
         assertElementPresent(Locator.linkWithText("999320016"));
         checkCheckbox(Locator.checkboxByName(".toggle"));
         _extHelper.clickMenuButton("Request Options", "Create New Request");
-        assertTextPresent("HAQ0003Y-09");
-        assertTextPresent("BAQ00051-09");
+        assertTextPresent("HAQ0003Y-09", "BAQ00051-09");
         assertTextNotPresent("KAQ0003Q-01");
         selectOptionByText(Locator.name("destinationLocation"), "Duke University (Repository, Site Affiliated Lab, Clinic)");
         setFormElements("textarea", "inputs", new String[] { "An Assay Plan", "Duke University, NC", "My comments" });
@@ -260,8 +258,10 @@ public class StudyExportTest extends StudyManualTest
         assertButtonPresent("Cancel");
         assertButtonPresent("Details");
         assertTextPresent("Not Yet Submitted");
+        prepForPageLoad();
         clickButton("Submit", 0);
         getAlert(); // TODO: add check for expected alert text
+        waitForPageToLoad();
         waitAndClickAndWait(Locator.linkWithText("Specimen Requests"));
         assertButtonNotPresent("Submit");
         assertButtonPresent("Details");
@@ -287,10 +287,9 @@ public class StudyExportTest extends StudyManualTest
         assertTextNotPresent("New Request");
         assertTextPresent("Pending Approval");
         clickAndWait(Locator.linkWithText("Details", 0));
-        assertTextPresent("Duke University");
-        assertTextPresent("Providing lab approval");
+        assertTextPresent("Duke University", "Providing lab approval");
         checkCheckbox(Locator.checkboxByName("complete"));
-        setFormElement(Locator.id("comment"), "Approval granted.");
+        setFormElement(Locator.name("comment"), "Approval granted.");
         setFormElement(Locator.name("formFiles[0]"), VISIT_MAP);
             log("File upload skipped.");
         clickButton("Save Changes and Send Notifications");
@@ -301,15 +300,15 @@ public class StudyExportTest extends StudyManualTest
         assertTextNotPresent("Receiving lab approval");
 
         clickAndWait(Locator.linkWithText("Originating Location Specimen Lists"));
-        assertTextPresent("WARNING: The requirements for this request are incomplete");
-        assertTextPresent("KCMC, Moshi, Tanzania");
+        assertTextPresent("WARNING: The requirements for this request are incomplete",
+                "KCMC, Moshi, Tanzania");
         clickButton("Cancel");
 
         clickAndWait(Locator.linkWithText("View History"));
-        assertTextPresent("Request is now pending.");
-        assertTextPresent("Approval granted.");
-        assertTextPresent("Institutional Review Board (Duke University), Receiving lab approval");
-        assertTextPresent(VISIT_MAP.getName());
+        assertTextPresent("Request is now pending.",
+                "Approval granted.",
+                "Institutional Review Board (Duke University), Receiving lab approval",
+                VISIT_MAP.getName());
 
         clickProject(getProjectName());
         clickFolder(getFolderName());
@@ -347,8 +346,10 @@ public class StudyExportTest extends StudyManualTest
         assertTextPresent("These vials are very important.", 25);
         setFilter("SpecimenDetail", "MouseId", "Equals", "999320824");
         checkAllOnPage("SpecimenDetail");
+        prepForPageLoad();
         _extHelper.clickMenuButton(false, "Comments and QC", "Clear Vial Comments for Selected");
         getAlert(); // TODO: add check for expected alert text
+        waitForPageToLoad();
         assertTextNotPresent("These vials are very important.");
         clearFilter("SpecimenDetail", "MouseId");
         assertTextPresent("These vials are very important.", 23);
@@ -396,27 +397,28 @@ public class StudyExportTest extends StudyManualTest
         assertElementPresent(Locator.linkWithText("999320528"), 6);
         assertTextNotPresent("DRT000XX-01");
         clickAndWait(Locator.linkWithText("[history]"));
-        assertTextPresent("GAA082NH-01");
-        assertTextPresent("BAD");
-        //assertTextPresent("1.0&nbsp;ML");
-        assertTextPresent("Added Comments");
-        assertTextPresent("Johannesburg, South Africa");
+        assertTextPresent("GAA082NH-01",
+                "BAD",
+                "Added Comments",
+                "Johannesburg, South Africa");
 
         clickFolder(getFolderName());
         waitAndClick(Locator.linkWithText("Specimen Requests"));
         clickAndWait(Locator.linkWithText("View Current Requests"));
         clickButton("Details");
         assertTextPresent("WARNING: Missing Specimens");
+        prepForPageLoad();
         clickButton("Delete missing specimens", 0);
         getAlert(); // TODO: add check for expected alert text
-        assertTextNotPresent("WARNING: Missing Specimens");
-        assertTextPresent("Duke University");
-        assertTextPresent("An Assay Plan");
-        assertTextPresent("Providing lab approval");
-        assertTextPresent("HAQ0003Y-09");
-        assertTextPresent("BAQ00051-09");
-        assertTextNotPresent("BAQ00051-10");
-        assertTextPresent("BAQ00051-11");
+        waitForPageToLoad();
+        assertTextPresent("Duke University",
+                "An Assay Plan",
+                "Providing lab approval",
+                "HAQ0003Y-09",
+                "BAQ00051-09",
+                "BAQ00051-11");
+        assertTextNotPresent("BAQ00051-10",
+                "WARNING: Missing Specimens");
 
         log("Test editing rows in a dataset");
         clickProject(getProjectName());
@@ -451,14 +453,16 @@ public class StudyExportTest extends StudyManualTest
         // Make sure that we can view its participant page immediately
         pushLocation();
         clickAndWait(Locator.linkWithText(TEST_ADD_ENTRY));
-        assertTextPresent("Mouse - " + TEST_ADD_ENTRY);
-        assertTextPresent("DEM-1: Demographics");
+        assertTextPresent("Mouse - " + TEST_ADD_ENTRY,
+                "DEM-1: Demographics");
         popLocation();
 
         log("Test deleting rows in a dataset");
         checkCheckbox(Locator.xpath("//input[contains(@value, '999320529')]"));
+        prepForPageLoad();
         clickButton("Delete", 0);
         getAlert(); // TODO: add check for expected alert text
+        waitForPageToLoad();
         assertTextNotPresent("999320529");
 
         // configure QC state management to show all data by default so the next steps don't have to keep changing the state:
@@ -547,7 +551,7 @@ public class StudyExportTest extends StudyManualTest
         clickAndWait(Locator.linkWithText("Manage Datasets"));
         clickAndWait(Locator.linkWithText(dataset));
         clickButton("Edit Definition");
-        waitAndClick(Locator.name("ff_label0"));
+        waitAndClick(Locator.name("ff_label1"));
         click(Locator.xpath("//span[contains(@class,'x-tab-strip-text') and text()='Advanced']"));
         waitForElement(Locator.name("mvEnabled"), WAIT_FOR_JAVASCRIPT);
         checkCheckbox(Locator.checkboxByName("mvEnabled"));
@@ -613,8 +617,7 @@ public class StudyExportTest extends StudyManualTest
 
         clickButton("Import", defaultWaitForPage);
         waitForElement(Locator.paginationText(9));
-        assertTextPresent("kevin");
-        assertTextPresent("chimpanzee");
+        assertTextPresent("kevin", "chimpanzee");
     }
 
     @Override
