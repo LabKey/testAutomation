@@ -455,6 +455,7 @@ public class DataViewsTest extends ParticipantListTest
     {
         waitAndClick(Locators.editViewsLink(itemName));
         waitForElement(Ext4Helper.Locators.window(itemName));
+        waitForElementToDisappear(Locator.tagWithClass("input", "x4-form-invalid-field"));
     }
 
     public void saveDatasetProperties(String dataset)
@@ -462,7 +463,7 @@ public class DataViewsTest extends ParticipantListTest
         clickButton("Save", 0);
         _ext4Helper.waitForMaskToDisappear(WAIT_FOR_JAVASCRIPT);
         waitForElementToDisappear(Locator.css(".x4-grid-row-selected"));
-        waitForElement(Locator.css(".x4-grid-row"));
+        waitForElement(Locator.css(".x4-grid-row").containing(dataset));
     }
 
     public static class Locators
