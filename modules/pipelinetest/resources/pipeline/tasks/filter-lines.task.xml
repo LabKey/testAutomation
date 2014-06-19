@@ -1,0 +1,13 @@
+<task xmlns="http://labkey.org/pipeline/xml"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:type="ScriptTaskType"
+      name="filter-lines" version="0.0">
+    <description>Filter lines in a file</description>
+    <inputs>
+        <file name="input.xxx" useProtocolNameAsBaseName="true"/>
+    </inputs>
+    <outputs>
+        <file name="output.yyy" useProtocolNameAsBaseName="true"/>
+    </outputs>
+    <script file="filter-lines.R"/>
+</task>

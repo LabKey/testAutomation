@@ -1,0 +1,17 @@
+<pipeline xmlns="http://labkey.org/pipeline/xml"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          name="two-steps" version="0.0">
+    <description>two-steps</description>
+    <tasks>
+        <task xsi:type="ScriptTaskType">
+            <inputs>
+                <file name="input.txt" />
+            </inputs>
+            <outputs>
+                <file name="output.xxx" useProtocolNameAsBaseName="true"/>
+            </outputs>
+            <script file="../tasks/r-copy.r"/>
+        </task>
+        <taskref ref="pipelinetest:task:filter-lines"/>
+    </tasks>
+</pipeline>

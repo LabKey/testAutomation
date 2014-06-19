@@ -93,6 +93,9 @@ modules/pipelinetest/module.properties -text
 modules/pipelinetest/resources/pipeline/pipelines/r-copy-inline.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/pipelines/r-copy.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/pipelines/r-localtask-assayimport.pipeline.xml -text
+modules/pipelinetest/resources/pipeline/pipelines/two-steps.pipeline.xml -text
+modules/pipelinetest/resources/pipeline/tasks/filter-lines.R -text
+modules/pipelinetest/resources/pipeline/tasks/filter-lines.task.xml -text
 modules/pipelinetest/resources/pipeline/tasks/r-copy-inline.task.xml -text
 modules/pipelinetest/resources/pipeline/tasks/r-copy.r -text
 modules/pipelinetest/resources/pipeline/tasks/r-copy.task.xml -text
