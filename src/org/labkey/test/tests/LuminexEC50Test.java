@@ -17,6 +17,7 @@ package org.labkey.test.tests;
 
 import org.junit.experimental.categories.Category;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
@@ -129,10 +130,12 @@ public class LuminexEC50Test extends LuminexRTransformTest
         assertEquals("Unexpected number of Five Parameter EC50 values (expected 9 of 13).", 9, rum5ec50count);
 
         // check that the 5PL parameters are within the expected ranges (note: exact values can change based on R 32-bit vs R 64-bit)
-        Double[] FiveParameterEC50mins = {32211.66, 44975.52, 110.24, 7826.89, 0.4199, 36465.56, 0.03962, 21075.08, 460.75};
-        Double[] FiveParameterEC50maxs = {32211.67, 45012.09, 112.85, 7826.90, 0.4377, 36469.51, 0.03967, 21075.29, 480.26};
+        Double[] FiveParameterEC50mins = {110.24, 460.75, 36465.56, 21075.08, 7826.89, 32211.66, 44975.52, 0.4199, 0.03962};
+        Double[] FiveParameterEC50maxs = {112.85, 480.26, 36469.5, 21075.29, 7826.90, 32211.67, 45012.09, 0.43771, 0.03967};
         table.setFilter("CurveType", "Equals", "Five Parameter");
         table.setFilter("EC50", "Is Not Blank", "");
+        table.setSort("AnalyteId", SortDirection.ASC);
+        table.setSort("TitrationId", SortDirection.ASC);
         ec50 = table.getColumnDataAsText("EC50");
         assertEquals("Unexpected number of Five Parameter EC50 values (expected " + FiveParameterEC50maxs.length + ")", FiveParameterEC50maxs.length, ec50.size());
         for (int i = 0; i < ec50.size(); i++)
@@ -140,7 +143,9 @@ public class LuminexEC50Test extends LuminexRTransformTest
             Double val = Double.parseDouble(ec50.get(i));
             Double min = FiveParameterEC50mins[i];
             Double max = FiveParameterEC50maxs[i];
-            assertTrue("Unexpected 5PL EC50 value for " + table.getDataAsText(i, "Analyte"), min <= val && val <= max);
+            Double expected = (max + min) / 2;
+            Double delta = (max - min) / 2;
+            assertEquals(String.format("Unexpected 5PL EC50 value for %s - %s", table.getDataAsText(i, "Titration"), table.getDataAsText(i, "Analyte")), expected, val, delta);
         }
         table.clearFilter("EC50");
         table.clearFilter("CurveType");
