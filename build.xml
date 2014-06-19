@@ -785,7 +785,7 @@
 
     <target name="set-user-props" depends="init_database_properties">
         <!-- Set property sysprop.test: empty string if not provided, user string otherwise -->
-        <condition property="sysprop.test" value="${test}" else="false">
+        <condition property="sysprop.test" value="${test}" else="">
             <isset property="test"/>
         </condition>
 
