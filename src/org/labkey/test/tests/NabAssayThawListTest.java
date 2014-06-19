@@ -40,6 +40,15 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
     private final String THAW_LIST_NAME = "NabThawList";
     private final String THAW_LIST_ARCHIVE = SAMPLE_DATA_ROOT + THAW_LIST_NAME + ".zip";
 
+    private final String THAW_LIST_MISSING_COLUMNS = THAW_LIST_NAME + "MissingColumns";
+    private final String THAW_LIST_ARCHIVE_MISSING_COLUMNS = SAMPLE_DATA_ROOT + THAW_LIST_NAME + "_MISSING_COLUMNS.zip";
+
+    private final String THAW_LIST_MISSING_ROWS = THAW_LIST_NAME + "MissingRows";
+    private final String THAW_LIST_ARCHIVE_MISSING_ROWS = SAMPLE_DATA_ROOT + THAW_LIST_NAME + "_MISSING_ROWS.zip";
+
+    private final String THAW_LIST_BAD_DATATYPES = THAW_LIST_NAME + "BadDataTypes";
+    private final String THAW_LIST_ARCHIVE_BAD_DATATYPES = SAMPLE_DATA_ROOT + THAW_LIST_NAME + "_BAD_DATATYPES.zip";
+
     public String getAssociatedModuleDirectory()
     {
         return "server/modules/nab";
@@ -127,25 +136,25 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
 
         log("Uploading NAb Run");
 
-        importData(
-                new AssayImportOptions.ImportOptionsBuilder().
-                        assayId(THAW_LIST_ASSAY_ID).
-                        visitResolver(AssayImportOptions.VisitResolverType.LookupList).
-                        useDefaultResolver(true).
-                        cutoff1("50").
-                        cutoff2("70").
-                        virusName("Nasty Virus").
-                        virusId("5433211").
-                        curveFitMethod("Polynomial").
-                        //ptids(new String[]{"ptid 1 A", "ptid 2 A", "ptid 3 A", "ptid 4 A", "ptid 5 A"}).
+        AssayImportOptions.ImportOptionsBuilder iob = new AssayImportOptions.ImportOptionsBuilder().
+                assayId(THAW_LIST_ASSAY_ID).
+                visitResolver(AssayImportOptions.VisitResolverType.LookupList).
+                useDefaultResolver(true).
+                cutoff1("50").
+                cutoff2("70").
+                virusName("Nasty Virus").
+                virusId("5433211").
+                curveFitMethod("Polynomial").
+                //ptids(new String[]{"ptid 1 A", "ptid 2 A", "ptid 3 A", "ptid 4 A", "ptid 5 A"}).
                         //visits(new String[]{"1", "2", "3", "4", "5"}).
                         sampleIds(new String[]{"1", "2", "3", "4", "5"}).
-                        initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
-                        dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
-                        methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
-                        filePath(TEST_ASSAY_NAB_FILE1).
-                        build()
-        );
+                initialDilutions(new String[]{"20", "20", "20", "20", "20"}).
+                dilutionFactors(new String[]{"3", "3", "3", "3", "3"}).
+                methods(new String[]{"Dilution", "Dilution", "Dilution", "Dilution", "Dilution"}).
+                filePath(TEST_ASSAY_NAB_FILE1);
+
+
+        importData(iob.build());
 
         verifyRunDetails();
 
@@ -165,17 +174,73 @@ public class NabAssayThawListTest extends AbstractQCAssayTest
         assertChecked(Locator.radioButtonByNameAndValue("participantVisitResolver", AssayImportOptions.VisitResolverType.ParticipantVisitDate.name()));
         assertTextPresent("These values are overridden by defaults");
 
+        log("Verify Delete and Re-import doesn't autofill SpecimenId");
+        navToRunDetails();
+        click(Locator.linkWithText("Delete and Re-import"));
+        assertChecked(Locator.radioButtonByNameAndValue("ThawListType", "List"));
+        // TODO: verify its the NabThawList thats selected
+        clickButton("Next");
+        assertElementPresent(Locator.input("specimen1_SpecimenID").withAttribute("value", ""));
+        // Let's make sure *some* of the last enetered values did get auto-filled.
+        assertElementPresent(Locator.input("specimen1_InitialDilution").withAttribute("value", "20.0"));
+
+        verifyValidation(iob);
+
+    }
+
+    protected void navToRunDetails()
+    {
+        clickProject(TEST_ASSAY_PRJ_NAB);
+        clickFolder(TEST_ASSAY_FLDR_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        clickAndWait(Locator.linkWithText("run details"));
     }
 
     protected void verifyRunDetails()
     {
-        clickAndWait(Locator.linkWithText("View Runs"));
         DilutionAssayHelper assayHelper = new DilutionAssayHelper(this);
 
         log("verify " + THAW_LIST_ASSAY_ID);
-        clickAndWait(Locator.linkWithText("View Runs"));
-        clickAndWait(Locator.linkWithText(THAW_LIST_ASSAY_ID));
-        clickAndWait(Locator.linkWithText("run details"));
-        assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.ParticipantVisit, "A");
+        navToRunDetails();
+        assayHelper.verifyDataIdentifiers(AssayImportOptions.VisitResolverType.SpecimenIDParticipantVisit, "A");
+    }
+
+    protected void verifyValidation(AssayImportOptions.ImportOptionsBuilder iob)
+    {
+        ListHelper lh = new ListHelper(this);
+        lh.importListArchive(TEST_ASSAY_FLDR_NAB, THAW_LIST_ARCHIVE_MISSING_ROWS);
+        lh.importListArchive(TEST_ASSAY_FLDR_NAB, THAW_LIST_ARCHIVE_MISSING_COLUMNS);
+        lh.importListArchive(TEST_ASSAY_FLDR_NAB, THAW_LIST_ARCHIVE_BAD_DATATYPES);
+
+        log("Verify can't select a thaw list with missing required columns.");
+        setDefaultThawList(THAW_LIST_MISSING_COLUMNS);
+        assertElementPresent(Locator.tagContainingText("font", "missing required column(s)"));
+
+        log("Verify import with datatype mismatch for visitId fails.");
+        _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), THAW_LIST_BAD_DATATYPES);
+        clickButton("Save Defaults");
+        importData(iob.resetDefaults(true).assayId(THAW_LIST_ASSAY_ID + " Bad Datatype").build());
+        assertTextPresent("Can not convert VisitId value: 1x to double for specimenId: 1");
+        assertTextPresent("Can not convert VisitId value: 4x to double for specimenId: 4");
+
+        log("Verify import with unresolved specimens fails.");
+        setDefaultThawList(THAW_LIST_MISSING_ROWS);
+        importData(iob.assayId(THAW_LIST_ASSAY_ID + " Missing thaw list rows").build());
+        assertTextPresent("Can not resolve thaw list entry for specimenId: 4");
+        assertTextPresent("Can not resolve thaw list entry for specimenId: 5");
+
+    }
+
+    private void setDefaultThawList(String listName)
+    {
+        clickProject(TEST_ASSAY_PRJ_NAB);
+        clickFolder(TEST_ASSAY_FLDR_NAB);
+        clickAndWait(Locator.linkWithText(TEST_ASSAY_NAB));
+        click(Locator.linkWithText("manage assay design"));
+        mouseOver(Locator.linkWithText("set default values"));
+        prepForPageLoad();
+        waitAndClick(Locator.menuItem(TEST_ASSAY_NAB + " Batch Fields"));
+        _ext4Helper.selectComboBoxItem(Locator.id("thawListQueryName"), listName);
+        clickButton("Save Defaults");
     }
 }

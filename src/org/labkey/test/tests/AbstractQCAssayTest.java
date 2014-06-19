@@ -190,6 +190,9 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
             }
         }
 
+        if (options.isResetDefaults())
+            clickButton("Reset Default Values");
+
         clickButton("Next");
 
         if (options.getAssayId() != null)
