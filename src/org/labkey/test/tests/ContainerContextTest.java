@@ -110,7 +110,7 @@ public class ContainerContextTest extends BaseWebDriverTest
         _RReportHelper.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), null);
-        enableModules(Arrays.asList("simpletest", "ViscStudies"), true);
+        _containerHelper.enableModules(Arrays.asList("simpletest", "ViscStudies"));
         addWebPart("Workbooks");
 
         createSubfolder(getProjectName(), SUB_FOLDER_A, new String[]{"List", "Study", "ViscStudies"});

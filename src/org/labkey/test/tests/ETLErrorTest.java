@@ -28,6 +28,7 @@ import org.labkey.test.util.RemoteConnectionHelper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Category({DailyA.class, Data.class})
@@ -153,9 +154,7 @@ public class ETLErrorTest extends ETLBaseTest
         _containerHelper.createProject(getProjectName(), null);
         _jobsComplete = 0;
 
-        enableModule("DataIntegration", true);
-        enableModule("simpletest", true);
-        enableModule("Study", true);
+        _containerHelper.enableModules(Arrays.asList("DataIntegration", "simpletest", "Study"));
 
         portalHelper.addQueryWebPart("Source", "vehicle", "etl_source", null);
         portalHelper.addQueryWebPart("Target1", "vehicle", "etl_target", null);

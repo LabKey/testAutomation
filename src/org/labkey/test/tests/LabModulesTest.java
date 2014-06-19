@@ -232,11 +232,11 @@ public class LabModulesTest extends BaseWebDriverTest implements AdvancedSqlTest
     {
         goToHome();
         beginAt("/project/shared/begin.view");
-        enableModule("Laboratory", true);
+        _containerHelper.enableModule("Laboratory");
         goToHome();
 
         _containerHelper.createProject(getProjectName(), "Laboratory Folder");
-        enableModules(getEnabledModules(), true);
+        _containerHelper.enableModules(getEnabledModules());
 
         setupAssays();
     }

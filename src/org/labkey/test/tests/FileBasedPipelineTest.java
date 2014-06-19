@@ -61,7 +61,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         initTest.doCleanup(false);
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
-        initTest.enableModules(Arrays.asList(PIPELINETEST_MODULE, "Pipeline"), true);
+        initTest._containerHelper.enableModules(Arrays.asList(PIPELINETEST_MODULE, "Pipeline"));
 
         RReportHelper rReportHelper = new RReportHelper(initTest);
         rReportHelper.ensureRConfig();
@@ -195,7 +195,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
                 "protocolDescription", "");
 
         _containerHelper.createSubfolder(getProjectName(), folderName, null);
-        disableModules("pipelinetest");
+        _containerHelper.disableModules("pipelinetest");
 
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);

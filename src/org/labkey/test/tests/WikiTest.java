@@ -78,7 +78,7 @@ public class WikiTest extends BaseWebDriverTest
         checkCheckbox(Locator.checkboxByTitle("Wiki"));
         submit();
 
-        enableModule(PROJECT_NAME, "MS2");
+        _containerHelper.enableModule(PROJECT_NAME, "MS2");
 
         goToAdminConsole();
         clickAndWait(Locator.linkWithText("full-text search"));

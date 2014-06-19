@@ -69,8 +69,8 @@ public class ScriptValidationTest extends SimpleModuleTest
     {
         assertModuleDeployed(MODULE_NAME);
         _containerHelper.createProject(getProjectName(), null);
-        enableModule(getProjectName(), MODULE_NAME);
-        enableModule(getProjectName(), "Query");
+        _containerHelper.enableModule(getProjectName(), MODULE_NAME);
+        _containerHelper.enableModule(getProjectName(), "Query");
 
         clickProject(getProjectName());
         doTestTransformation();

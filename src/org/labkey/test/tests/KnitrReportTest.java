@@ -77,7 +77,7 @@ public class KnitrReportTest extends ReportTest
         rReportHelper.ensureRConfig();
 
         _containerHelper.createProject(getProjectName(), "Collaboration");
-        enableModule(getProjectName(), "scriptpad");
+        _containerHelper.enableModule(getProjectName(), "scriptpad");
 
         PortalHelper portalHelper = new PortalHelper(this);
 

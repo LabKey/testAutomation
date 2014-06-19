@@ -130,7 +130,7 @@ public class IssuesTest extends BaseWebDriverTest
         _permissionsHelper.setPermissions(TEST_GROUP, "Editor");
         clickButton("Save and Finish");
 
-        enableModule(PROJECT_NAME, "Dumbster");
+        _containerHelper.enableModule(PROJECT_NAME, "Dumbster");
 
         clickProject(PROJECT_NAME);
 

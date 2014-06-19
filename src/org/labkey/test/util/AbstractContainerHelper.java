@@ -21,6 +21,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractContainerHelper extends AbstractHelper
@@ -78,6 +79,40 @@ public abstract class AbstractContainerHelper extends AbstractHelper
         _test.goToFolderManagement();
         _test.clickAndWait(Locator.linkWithText("Folder Type"));
         _test.click(Locator.radioButtonByNameAndValue("folderType", folderType));
+        _test.clickButton("Update Folder");
+    }
+
+    public void enableModule(String projectName, String moduleName)
+    {
+        _test.ensureAdminMode();
+        _test.clickProject(projectName);
+        enableModule(moduleName);
+    }
+
+    public void enableModule(String moduleName)
+    {
+        enableModules(Collections.singletonList(moduleName));
+    }
+
+    public void enableModules(List<String> moduleNames)
+    {
+        _test.goToFolderManagement();
+        _test.clickAndWait(Locator.linkWithText("Folder Type"));
+        for (String moduleName : moduleNames)
+        {
+            _test.checkCheckbox(Locator.checkboxByTitle(moduleName));
+        }
+        _test.clickButton("Update Folder");
+    }
+
+    public void disableModules(String... moduleNames)
+    {
+        _test.goToFolderManagement();
+        _test.clickAndWait(Locator.linkWithText("Folder Type"));
+        for (String moduleName : moduleNames)
+        {
+            _test.uncheckCheckbox(Locator.checkboxByTitle(moduleName));
+        }
         _test.clickButton("Update Folder");
     }
 }

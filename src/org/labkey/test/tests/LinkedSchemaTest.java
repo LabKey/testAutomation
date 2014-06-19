@@ -463,7 +463,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         _containerHelper.createProject(getProjectName(), null);
         _containerHelper.createSubfolder(getProjectName(), SOURCE_FOLDER, null);
         // Enable linkedschematest in source folder so the "BPeopleTemplate" is visible.
-        enableModule("linkedschematest", false);
+        _containerHelper.enableModule("linkedschematest");
 
         _containerHelper.createSubfolder(getProjectName(), TARGET_FOLDER, null);
     }
@@ -563,7 +563,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
 
         log("** Verify table metadata overrides when simplemodule is active in TargetFolder");
         pushLocation();
-        enableModules(Arrays.asList("linkedschematest"), false);
+        _containerHelper.enableModules(Arrays.asList("linkedschematest"));
         popLocation();
 
         waitForElement(Locator.id("dataregion_query"));
@@ -608,7 +608,7 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
         assertHrefNotPresent(table, "Original List Z");
 
         // Disable the module in the TargetFolder container so query validation will pass at the end of the test
-        disableModules("linkedschematest");
+        _containerHelper.disableModules("linkedschematest");
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)

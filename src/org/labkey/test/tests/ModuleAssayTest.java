@@ -161,7 +161,7 @@ public class ModuleAssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkContainingText("view runs"));
         assertTextPresent("Simple Assay Button");
         pushLocation();
-        enableModule(PROJECT_NAME, "miniassay");
+        _containerHelper.enableModule(PROJECT_NAME, "miniassay");
         popLocation();
         clickButton("Simple Assay Button", 0);
         assertAlert("button clicked");
@@ -202,7 +202,7 @@ public class ModuleAssayTest extends AbstractAssayTest
     protected void setupProject()
     {
         _containerHelper.createProject(PROJECT_NAME, null);
-        enableModule("miniassay", true);
+        _containerHelper.enableModule("miniassay");
         setupPipeline(PROJECT_NAME);
         createAssayDesign();
         createSampleSet();

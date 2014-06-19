@@ -23,6 +23,7 @@ import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RemoteConnectionHelper;
 import org.labkey.test.categories.Data;
 import java.io.File;
+import java.util.Arrays;
 
 @Category({DailyB.class, Data.class})
 public class ETLTest extends ETLBaseTest
@@ -143,11 +144,10 @@ UNDONE: need to fix the merge case
         _expectedErrors = 0;
         _jobsComplete = 0;
 
-        enableModule("DataIntegration", true);
-        enableModule("simpletest", true);
+        _containerHelper.enableModules(Arrays.asList("DataIntegration", "simpletest"));
 
         if(!remoteOnly)
-            enableModule("Study", true);
+            _containerHelper.enableModule("Study");
 
         portalHelper.addQueryWebPart("Source", "vehicle", "etl_source", null);
         portalHelper.addQueryWebPart("Target1", "vehicle", "etl_target", null);

@@ -65,7 +65,7 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
         assertModuleDeployed(MODULE_NAME);
         _containerHelper.createProject(getProjectName(), FOLDER_TYPE);
 
-        enableModule(getProjectName(), MODULE_NAME);
+        _containerHelper.enableModule(getProjectName(), MODULE_NAME);
         _containerHelper.createSubfolder(getProjectName(), "Labs", FOLDER_TYPE);
         _containerHelper.createSubfolder(getProjectName() + "/Labs", "Test", FOLDER_TYPE);
         _containerHelper.createSubfolder(getProjectName() + "/Labs/Test", FOLDER_NAME, FOLDER_TYPE);
@@ -73,10 +73,8 @@ public class PeptideModuleTest extends BaseWebDriverTest implements PostgresOnly
         clickFolder("Test");
         clickFolder(FOLDER_NAME);
 
-        enableModule("Issues", false);
-        enableModule("Wiki", false);
-        enableModule("Peptide", false);
-        disableModules("Portal");
+        _containerHelper.enableModules(Arrays.asList("Issues", "Wiki", "Peptide"));
+        _containerHelper.disableModules("Portal");
         setDefaultModule("Peptide");
         log("Finished setupProject()");
     }

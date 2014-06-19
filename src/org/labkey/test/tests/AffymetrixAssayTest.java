@@ -82,7 +82,7 @@ public class AffymetrixAssayTest extends BaseWebDriverTest
         log("Setup the pipeline");
         setPipelineRoot(getLabKeyRoot() + PIPELINE_ROOT);
         assertTextPresent("The pipeline root was set to");
-        enableModule("Microarray", true);
+        _containerHelper.enableModule("Microarray");
 
         log("Create Affymetrix Assay");
         goToManageAssays();

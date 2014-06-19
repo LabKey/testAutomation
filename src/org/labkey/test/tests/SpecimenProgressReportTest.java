@@ -346,7 +346,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     {
         goToProjectHome();
         _containerHelper.createSubfolder(getProjectName(), assayFolder, "Assay");
-        enableModule("rho", false);
+        _containerHelper.enableModule("rho");
 
         _assayHelper.uploadXarFileAsAssayDesign(STUDY_PIPELINE_ROOT + assay1XarPath, ++pipelineCount);
         _assayHelper.importAssay(assay1, new File(STUDY_PIPELINE_ROOT + "/assays/" + assay1File),  getProjectName() + "/" + assayFolder, Collections.<String, Object>singletonMap("ParticipantVisitResolver", "SampleInfo") );

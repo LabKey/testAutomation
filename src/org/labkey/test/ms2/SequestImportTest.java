@@ -128,7 +128,7 @@ public class SequestImportTest extends BaseWebDriverTest
     {
         _containerHelper.createProject(PROJECT_NAME, "MS2 Extensions");
         setPipelineRoot(getLabKeyRoot()+ "/sampledata/raftflow");
-        enableModule(PROJECT_NAME, "MS2Extensions");
+        _containerHelper.enableModule(PROJECT_NAME, "MS2Extensions");
         List<ModulePropertyValue> properties = new ArrayList<>();
         // Clear out any custom queries that might have been set by the user
         properties.add(new ModulePropertyValue("MS2Extensions", "/", "peptideCountQuery", ""));

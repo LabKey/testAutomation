@@ -52,7 +52,7 @@ public class SpecimenExtendedTest extends SpecimenBaseTest
     protected void doCreateSteps()
     {
         initializeFolder();
-        enableModule("nPOD", true);
+        _containerHelper.enableModule("nPOD");
 
         importStudyFromZip(new File(getSampledataPath(), "/study/LabkeyDemoStudy.zip"));
 

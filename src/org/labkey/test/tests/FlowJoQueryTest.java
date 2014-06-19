@@ -80,7 +80,7 @@ public class FlowJoQueryTest extends BaseFlowTest
         _customizeViewsHelper.applyCustomView();
 
         clickProject(PROJECT_NAME);
-        enableModules(Arrays.asList("Query", "Flow"), true);
+        _containerHelper.enableModules(Arrays.asList("Query", "Flow"));
 
         createQuery(PROJECT_NAME, "PassFailDetails", getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFailDetails.xml"), true);
         createQuery(PROJECT_NAME, "PassFail", getFileContents("/sampledata/flow/flowjoquery/query/PassFail.sql"), getFileContents("/sampledata/flow/flowjoquery/query/PassFail.xml"), true);

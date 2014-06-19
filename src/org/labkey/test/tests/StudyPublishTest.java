@@ -158,7 +158,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         createWiki("Test Wiki", "Test Wiki Title");
 
         //Add a module to find later
-        enableModule("List", false);
+        _containerHelper.enableModule("List");
 
 
         // Create some views and reports

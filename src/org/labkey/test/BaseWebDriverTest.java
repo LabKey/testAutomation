@@ -5662,40 +5662,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickButton("Submit");
     }
 
-    public void enableModule(String projectName, String moduleName)
-    {
-        ensureAdminMode();
-        clickProject(projectName);
-        enableModule(moduleName, true);
-    }
-
-    public void enableModule(String moduleName, boolean isProject)
-    {
-        enableModules(Collections.singletonList(moduleName), isProject);
-    }
-
-    public void enableModules(List<String> moduleNames, boolean isProject)
-    {
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Folder Type"));
-        for (String moduleName : moduleNames)
-        {
-            checkCheckbox(Locator.checkboxByTitle(moduleName));
-        }
-        clickButton("Update Folder");
-    }
-
-    public void disableModules(String... moduleNames)
-    {
-        goToFolderManagement();
-        clickAndWait(Locator.linkWithText("Folder Type"));
-        for (String moduleName : moduleNames)
-        {
-            uncheckCheckbox(Locator.checkboxByTitle(moduleName));
-        }
-        clickButton("Update Folder");
-    }
-
     public void goToProjectHome()
     {
         if(!isElementPresent(Locator.linkWithText(getProjectName())))
