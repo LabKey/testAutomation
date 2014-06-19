@@ -305,7 +305,7 @@ public class TimeChartImportTest extends StudyBaseTest
             clickTab("Clinical and Assay Data");
             waitAndClickAndWait(Locator.linkWithText(chartInfo.getName()));
             beginAt("/reports/" + getProjectName() + "/" + VISIT_STUDY_FOLDER_NAME + "/" + publishFolderName + "/reportInfo.view?reportId="
-                    + getUrlParam(getURL().toString(), "reportId", false));
+                    + getUrlParam("reportId"));
             waitForText("Report Debug Information");
             for (String origMouseId : origMouseIds)
             {

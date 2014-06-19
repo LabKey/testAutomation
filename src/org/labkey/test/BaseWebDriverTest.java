@@ -5560,26 +5560,39 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         log("user " + email + " exists.");
     }
 
-    public String getUrlParam(String url, String paramName, boolean decode)
+    public String getUrlParam(String paramName)
     {
-        String paramStart = paramName + "=";
-        int idxStart = url.indexOf(paramStart);
-        if(idxStart > 0)
+        return getUrlParam(paramName);
+    }
+
+    public String getUrlParam(String paramName, boolean decode)
+    {
+        String urlQuery = getURL().getQuery();
+        String[] urlParams = urlQuery.split("&");
+        Map<String, String> params = new HashMap<>();
+        for (String param : urlParams)
         {
-            idxStart += paramStart.length();
-            int idxEnd = url.indexOf("&", idxStart);
-            if(idxEnd < 0)
-                idxEnd = url.length();
-            String ret = url.substring(idxStart, idxEnd);
-            if(decode)
-            {
-                ret = ret.replace("+", "%20");
-                try {ret = URLDecoder.decode(ret, "UTF-8");} catch(UnsupportedEncodingException ignore) {}
-            }
-            return ret.trim();
+            String[] keyValue = param.split("=");
+            if (keyValue.length == 2)
+                params.put(keyValue[0].trim(), keyValue[1].trim());
+            else if (keyValue.length ==1)
+                params.put(keyValue[0], "");
+            else
+                log("Unable to parse url parameter: " + param);
         }
-        else
-            return null;
+
+        String paramValue = params.get(paramName);
+
+        if (paramValue != null && decode)
+        {
+            paramValue = paramValue.replace("+", "%20");
+            try
+            {
+                paramValue = URLDecoder.decode(paramValue, "UTF-8");
+            } catch(UnsupportedEncodingException ignore) {}
+        }
+
+        return paramValue;
     }
 
     private long start = 0;

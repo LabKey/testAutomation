@@ -115,17 +115,17 @@ public class ListPublishTest extends BaseWebDriverTest
         goToProjectHome();
         int id;
         goToList("Lab Machines");
-        id = Integer.parseInt(getUrlParam(getURL().toString(), "listId", false))-1;
+        id = Integer.parseInt(getUrlParam("listId"))-1;
         listIds[id] = "Lab Machines";
 
         goToProjectHome();
         goToList("Reagents");
-        id = Integer.parseInt(getUrlParam(getURL().toString(), "listId", false))-1;
+        id = Integer.parseInt(getUrlParam("listId"))-1;
         listIds[id] = "Reagents";
 
         goToProjectHome();
         goToList("Technicians");
-        id = Integer.parseInt(getUrlParam(getURL().toString(), "listId", false))-1;
+        id = Integer.parseInt(getUrlParam("listId"))-1;
         listIds[id] = "Technicians";
 
         listIds[3] = "List4";
@@ -137,7 +137,7 @@ public class ListPublishTest extends BaseWebDriverTest
         {
             clickFolder("PublishedLists");
             goToList(listIds[i]);
-            assertEquals(getUrlParam(getURL().toString(), "listId", false), ""+(i+1));
+            assertEquals(getUrlParam("listId"), ""+(i+1));
         }
     }
 

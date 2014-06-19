@@ -198,7 +198,7 @@ public class ViabilityTest extends AbstractViabilityTest
         runsTable.clickLink(0, "Run Groups");
 
         // Run Group name should be "Assay Name-XXX" where XXX is the run group rowid
-        String runGroupRowId = getUrlParam(getDriver().getCurrentUrl(), "rowId", true);
+        String runGroupRowId = getUrlParam("rowId", true);
         assertEquals(getAssayName() + "-" + runGroupRowId, runGroupName);
         assertTextPresent("Re-importing any Viability run in this run group will place the new run in this same run group.");
         runsTable = new DataRegionTable("Runs", this);
