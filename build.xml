@@ -785,98 +785,52 @@
 
     <target name="set-user-props" depends="init_database_properties">
         <!-- Set property sysprop.test: empty string if not provided, user string otherwise -->
-        <condition property="sysprop.test" value="">
-            <not><isset property="test"/></not>
-        </condition>
-        <condition property="sysprop.test" value="${test}">
+        <condition property="sysprop.test" value="${test}" else="false">
             <isset property="test"/>
         </condition>
 
         <!-- Set property sysprop.cleanOnly: true or false -->
-        <condition property="sysprop.cleanOnly" value="false">
-            <not><isset property="cleanOnly"/></not>
-        </condition>
-        <condition property="sysprop.cleanOnly" value="${cleanOnly}">
+        <condition property="sysprop.cleanOnly" value="${cleanOnly}" else="false">
             <isset property="cleanOnly"/>
         </condition>
 
         <!-- Set property sysprop.haltOnError: true or false -->
-        <condition property="sysprop.haltOnError" value="true">
-            <not>
-                <isset property="haltOnError"/>
-            </not>
-        </condition>
-        <condition property="sysprop.haltOnError" value="${haltOnError}">
+        <condition property="sysprop.haltOnError" value="${haltOnError}" else="true">
             <isset property="haltOnError"/>
         </condition>
 
         <!-- Set property sysprop.loop: true or false -->
-        <condition property="sysprop.loop" value="false">
-            <not>
-                <isset property="loop"/>
-            </not>
-        </condition>
-        <condition property="sysprop.loop" value="${loop}">
+        <condition property="sysprop.loop" value="${loop}" else="false">
             <isset property="loop"/>
         </condition>
 
         <!-- Set property sysprop.noclean: true or false -->
-        <condition property="sysprop.clean" value="true">
-            <not>
-                <isset property="clean"/>
-            </not>
-        </condition>
-        <condition property="sysprop.clean" value="${clean}">
+        <condition property="sysprop.clean" value="${clean}" else="true">
             <isset property="clean"/>
         </condition>
 
         <!-- Set property sysprop.linkCheck: true or false -->
-        <condition property="sysprop.linkCheck" value="false">
-            <not>
-                <isset property="linkCheck"/>
-            </not>
-        </condition>
-        <condition property="sysprop.linkCheck" value="${linkCheck}">
+        <condition property="sysprop.linkCheck" value="${linkCheck}" else="false">
             <isset property="linkCheck"/>
         </condition>
 
         <!-- Set property sysprop.injectCheck: true or false -->
-        <condition property="sysprop.injectCheck" value="false">
-            <not>
-                <isset property="injectCheck"/>
-            </not>
-        </condition>
-        <condition property="sysprop.injectCheck" value="${injectCheck}">
+        <condition property="sysprop.injectCheck" value="${injectCheck}" else="false">
             <isset property="injectCheck"/>
         </condition>
 
         <!-- Set property sysprop.memCheck: true or false -->
-        <condition property="sysprop.memCheck" value="true">
-            <not>
-                <isset property="memCheck"/>
-            </not>
-        </condition>
-        <condition property="sysprop.memCheck" value="${memCheck}">
+        <condition property="sysprop.memCheck" value="${memCheck}" else="true">
             <isset property="memCheck"/>
         </condition>
 
         <!-- Set property sysprop.scriptCheck: true or false -->
-        <condition property="sysprop.scriptCheck" value="true">
-            <not>
-                <isset property="scriptCheck"/>
-            </not>
-        </condition>
-        <condition property="sysprop.scriptCheck" value="${scriptCheck}">
+        <condition property="sysprop.scriptCheck" value="${scriptCheck}" else="true">
             <isset property="scriptCheck"/>
         </condition>
 
         <!-- Set property sysprop.queryCheck: true or false -->
-        <condition property="sysprop.queryCheck" value="true">
-            <not>
-                <isset property="queryCheck"/>
-            </not>
-        </condition>
-        <condition property="sysprop.queryCheck" value="${queryCheck}">
+        <condition property="sysprop.queryCheck" value="${queryCheck}" else="true">
             <isset property="queryCheck"/>
         </condition>
 
@@ -886,52 +840,27 @@
         </condition>
 
         <!-- Set property sysprop.labkey.port: user provided or '8080' -->
-        <condition property="sysprop.labkey.port" value="8080">
-            <not>
-                <isset property="labkey.port"/>
-            </not>
-        </condition>
-        <condition property="sysprop.labkey.port" value="${labkey.port}">
+        <condition property="sysprop.labkey.port" value="${labkey.port}" else="8080">
             <isset property="labkey.port"/>
         </condition>
 
         <!-- Set property sysprop.labkey.server: user provided or 'http://localhost' -->
-        <condition property="sysprop.labkey.server" value="http://localhost">
-            <not>
-                <isset property="labkey.server"/>
-            </not>
-        </condition>
-        <condition property="sysprop.labkey.server" value="${labkey.server}">
+        <condition property="sysprop.labkey.server" value="${labkey.server}" else="http://localhost">
             <isset property="labkey.server"/>
         </condition>
 
         <!-- Set property sysprop.cpas.contextpath: user provided or '/labkey' -->
-        <condition property="sysprop.labkey.contextpath" value="/labkey">
-            <not>
-                <isset property="labkey.contextpath"/>
-            </not>
-        </condition>
-        <condition property="sysprop.labkey.contextpath" value="${labkey.contextpath}">
+        <condition property="sysprop.labkey.contextpath" value="${labkey.contextpath}" else="/labkey">
             <isset property="labkey.contextpath"/>
         </condition>
 
         <!-- Set property sysprop.closeOnFail: true or false -->
-        <condition property="sysprop.close.on.fail" value="false">
-            <not>
-                <isset property="close.on.fail"/>
-            </not>
-        </condition>
-        <condition property="sysprop.close.on.fail" value="${close.on.fail}">
+        <condition property="sysprop.close.on.fail" value="${close.on.fail}" else="false">
             <isset property="close.on.fail"/>
         </condition>
 
         <!-- Set property sysprop.selenium.browser -->
-        <condition property="sysprop.selenium.browser" value="best">
-            <not>
-                <isset property="selenium.browser"/>
-            </not>
-        </condition>
-        <condition property="sysprop.selenium.browser" value="${selenium.browser}">
+        <condition property="sysprop.selenium.browser" value="${selenium.browser}" else="best">
             <isset property="selenium.browser"/>
         </condition>
 
@@ -941,12 +870,7 @@
         </condition>
 
         <!-- Set property sysprop.selenium.browser.path -->
-        <condition property="sysprop.selenium.browser.path" value="">
-            <not>
-                <isset property="selenium.browser.path"/>
-            </not>
-        </condition>
-        <condition property="sysprop.selenium.browser.path" value="${selenium.browser.path}">
+        <condition property="sysprop.selenium.browser.path" value="${selenium.browser.path}" else="">
             <isset property="selenium.browser.path"/>
         </condition>
 
