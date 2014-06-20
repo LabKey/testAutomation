@@ -1260,6 +1260,10 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         clickAdminMenuItem("Manage Assays");
     }
+    public void goToManageLists()
+    {
+        clickAdminMenuItem("Manage Lists");
+    }
 
     public void goToCreateProject()
     {
