@@ -516,8 +516,7 @@ public class SecurityTest extends BaseWebDriverTest
         // Make sure we redirected to the right place
         assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
 
-        Map<String, String> params = getUrlParameters();
-        String email = params.get("labkeyEmail");
+        String email = getUrlParam("labkeyEmail", true);
         String emailName;
         String userName = PasswordUtil.getUsername();
         // If we are using IE, then the email will be stripped of its @etc.
@@ -530,7 +529,7 @@ public class SecurityTest extends BaseWebDriverTest
             emailName = email;
         }
         assertTrue(emailName.equals(userName));
-        String token = params.get("labkeyToken");
+        String token = getUrlParam("labkeyToken", true);
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertSuccessAuthenticationToken(xml, token, email, 32783);
 
@@ -547,10 +546,9 @@ public class SecurityTest extends BaseWebDriverTest
         // Make sure we redirected to the right place
         assertTrue(removeUrlParameters(getURL().toString()).equals(homePageUrl));
 
-        params = getUrlParameters();
-        email = params.get("labkeyEmail");
+        email = getUrlParam("labkeyEmail", true);
         assertTrue(email.equals(NORMAL_USER));
-        token = params.get("labkeyToken");
+        token = getUrlParam("labkeyToken", true);
         xml = retrieveFromUrl(baseUrl + "verifyToken.view?labkeyToken=" + token);
         assertSuccessAuthenticationToken(xml, token, email, 15);
 
