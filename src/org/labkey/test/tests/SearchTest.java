@@ -321,8 +321,6 @@ public class SearchTest extends StudyTest
         goToModule("FileContent");
         File file = new File(getLabKeyRoot() + "/sampledata/security", "InlineFile.html");
         _fileBrowserHelper.uploadFile(file);
-
-        goToModule("FileContent");
         File MLfile = new File(getLabKeyRoot() + "/sampledata/mzxml", "test_nocompression.mzXML");
         _fileBrowserHelper.uploadFile(MLfile);
 

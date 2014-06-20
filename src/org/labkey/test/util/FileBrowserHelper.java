@@ -264,7 +264,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
             }
         }, "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
 
-        _test.setFormElement(Locator.css(".single-upload-panel input[type=file]"), file);
+        _test.setFormElement(Locator.css(".single-upload-panel input:last-of-type[type=file]"), file);
         if (description != null)
             _test.setFormElement(Locator.name("description"), description);
 
