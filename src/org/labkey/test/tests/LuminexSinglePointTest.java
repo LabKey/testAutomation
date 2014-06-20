@@ -51,6 +51,7 @@ public class LuminexSinglePointTest extends LuminexGuideSetTest
         importRun(file2, 2);
         assertTextPresent(TEST_ASSAY_LUM + " Upload Jobs");
         waitForPipelineJobsToFinish(3);
+        assertElementNotPresent(Locator.linkWithText("ERROR"));
         goToTestAssayHome();
         _extHelper.clickExtMenuButton(true, Locator.xpath("//a[text() = 'view qc report']"), "view single point control qc report");
         waitForText("Average Fi Bkgd");

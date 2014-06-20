@@ -63,6 +63,7 @@ public class LuminexPositivityTest extends LuminexTest
         testWithoutBaselineVisitOrFoldChange(assayName);
         testWithNegativeControls(assayName);
         testBaselineVisitDataFromPreviousRun(assayName);
+        testDefaultAnalyteProperties(assayName);
     }
 
     private void addTransformScriptsToAssayDesign()
@@ -71,6 +72,37 @@ public class LuminexPositivityTest extends LuminexTest
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LABKEY), 1);
         addTransformScript(new File(WebTestHelper.getLabKeyRoot(), getAssociatedModuleDirectory() + RTRANSFORM_SCRIPT_FILE_LAB), 2);
         saveAssay();
+    }
+
+    private void testDefaultAnalyteProperties(String assayName)
+    {
+        // for issue 20549 :upload a run that unchecks the "Calucate Positivity" and then verify the default value for re-runs and new imports
+
+        preUploadPositivityFile(assayName + " No Pos Calc");
+        uncheckCheckbox(Locator.name("calculatePositivity"));
+        selectPositivityFile(TEST_ASSAY_LUM_FILE12, true);
+        clickButton("Save and Finish");
+
+        verifyThresholdForReImportRun(3, 100);
+        verifyThresholdForReImportRun(2, 99);
+        verifyThresholdForReImportRun(1, 98);
+
+        preUploadPositivityFile(assayName + " Threshold Default Test");
+        checkCheckbox(Locator.name("calculatePositivity"));
+        selectPositivityFile(TEST_ASSAY_LUM_FILE12, true);
+        verifyAnalytePosThresholdValue(_analyteNames.get(0), 98);
+        clickButton("Cancel");
+    }
+
+    private void verifyThresholdForReImportRun(int runIndex, int expectedThresholdValue)
+    {
+        checkDataRegionCheckbox("Runs", runIndex);
+        clickButton("Re-import run");
+        clickButton("Next"); // batch
+        clickButton("Next"); // run
+        for (String analyteName : _analyteNames)
+            verifyAnalytePosThresholdValue(analyteName, expectedThresholdValue);
+        clickButton("Cancel");
     }
 
     private void testBaselineVisitDataFromPreviousRun(String assayName)
@@ -96,6 +128,7 @@ public class LuminexPositivityTest extends LuminexTest
         // now we exclude the analytes in the remaining run to test that version of the baseline visit query
         waitAndClickAndWait(Locator.linkWithText("Positivity 3x Fold Change"));
         excludeAnalyteForRun(_analyteNames.get(0), true, "");
+        setPositivityThresholdParams(100, 99);
         uploadPositivityFile(assayName + " Baseline Visit Previous Run 1", TEST_ASSAY_LUM_FILE12, "1", "3", false, false);
         checkPositivityValues("positive", 0, new String[0]);
         checkPositivityValues("negative", 0, new String[0]);
@@ -104,6 +137,7 @@ public class LuminexPositivityTest extends LuminexTest
         excludeAnalyteForRun(_analyteNames.get(0), false, "");
 
         // now we actual test the case of getting baseline visit data from a previously uploaded run
+        setPositivityThresholdParams(99, 98);
         _negControlAnalyte = _analyteNames.get(1);
         uploadPositivityFile(assayName + " Baseline Visit Previous Run 2", TEST_ASSAY_LUM_FILE12, "1", "3", false, true);
         String[] posWells = new String[] {"A2", "B2", "A6", "B6", "A9", "B9", "A10", "B10"};
@@ -195,16 +229,12 @@ public class LuminexPositivityTest extends LuminexTest
     {
         for (String analyteName : _analyteNames)
         {
-            String inputName = "_analyte_" + analyteName + "_PositivityThreshold";
-            Locator l = Locator.xpath("//input[@type='text' and @name='" + inputName + "'][1]");
-            waitForElement(l);
-            assertEquals(Integer.toString(_expectedThresholdValue), getFormElement(l));
+            Locator l = verifyAnalytePosThresholdValue(analyteName, _expectedThresholdValue);
             setFormElement(l, Integer.toString(_newThresholdValue));
 
-            inputName = "_analyte_" + analyteName + "_NegativeControl";
+            String inputName = "_analyte_" + analyteName + "_NegativeControl";
             l = Locator.xpath("//input[@type='checkbox' and @name='" + inputName + "'][1]");
             waitForElement(l);
-//            assertEquals(_expectedNegativeControlValue ? "1" : "0", getFormElement(l));
             if (!_expectedNegativeControlValue && _newNegativeControlValue)
                 checkCheckbox(l);
             else if (_expectedNegativeControlValue && !_newNegativeControlValue)
@@ -220,6 +250,15 @@ public class LuminexPositivityTest extends LuminexTest
 
         if (!_expectedNegativeControlValue.equals(_newNegativeControlValue))
             _expectedNegativeControlValue = _newNegativeControlValue;
+    }
+
+    private Locator verifyAnalytePosThresholdValue(String analyteName, int expectedValue)
+    {
+        String inputName = "_analyte_" + analyteName + "_PositivityThreshold";
+        Locator l = Locator.xpath("//input[@type='text' and @name='" + inputName + "'][1]");
+        waitForElement(l);
+        assertEquals(Integer.toString(expectedValue), getFormElement(l));
+        return l;
     }
 
     private void checkDescriptionParsing(String description, String specimenID, String participantID, String visitID, String date)

@@ -533,22 +533,37 @@ public abstract class LuminexTest extends AbstractQCAssayTest
     @LogMethod
     public void uploadPositivityFile(String assayName, File file, String baseVisit, String foldChange, boolean isBackgroundUpload, boolean expectDuplicateFile)
     {
-        goToTestAssayHome();
-        clickButton("Import Data");
-        clickButton("Next");
-        setFormElement(Locator.name("name"), assayName);
+        preUploadPositivityFile(assayName);
         checkCheckbox(Locator.name("calculatePositivity"));
         setFormElement(Locator.name("baseVisit"), baseVisit);
         setFormElement(Locator.name("positivityFoldChange"), foldChange);
+        selectPositivityFile(file, expectDuplicateFile);
+        setAnalytePropertyValues();
+        finishUploadPositivityFile(assayName, isBackgroundUpload);
+    }
+
+    public void finishUploadPositivityFile(String assayName, boolean isBackgroundUpload)
+    {
+        clickButton("Save and Finish");
+        if (!isBackgroundUpload && !isElementPresent(Locator.css(".labkey-error").containing("Error: ")))
+            clickAndWait(Locator.linkWithText(assayName), 2 * WAIT_FOR_PAGE);
+    }
+
+    public void selectPositivityFile(File file, boolean expectDuplicateFile)
+    {
         assertTrue("Positivity Data absent: " + file.toString(), file.exists());
         setFormElement(Locator.name("__primaryFile__"), file);
         if (expectDuplicateFile)
             waitForText("A file with name '" + file.getName() + "' already exists");
         clickButton("Next");
-        setAnalytePropertyValues();
-        clickButton("Save and Finish");
-        if (!isBackgroundUpload && !isElementPresent(Locator.css(".labkey-error").containing("Error: ")))
-            clickAndWait(Locator.linkWithText(assayName), 2 * WAIT_FOR_PAGE);
+    }
+
+    public void preUploadPositivityFile(String assayName)
+    {
+        goToTestAssayHome();
+        clickButton("Import Data");
+        clickButton("Next");
+        setFormElement(Locator.name("name"), assayName);
     }
 
     protected void setAnalytePropertyValues()
