@@ -606,38 +606,6 @@ public class SecurityTest extends BaseWebDriverTest
         }
     }
 
-
-    // Move to BaseWebTest?
-    private Map<String, String> getUrlParameters()
-    {
-        String queryString = null;
-
-        try
-        {
-            queryString = getURL().toURI().getQuery();  // URI decodes the query string
-        }
-        catch (URISyntaxException e)
-        {
-            log(e.getMessage());
-            fail();
-        }
-
-        Map<String, String> map = new HashMap<>();
-        if (queryString != null)
-        {
-            String[] params = queryString.split("&");
-
-            for (String param : params)
-            {
-                int index = param.indexOf('=');
-                map.put(param.substring(0, index), param.substring(index + 1));
-            }
-        }
-
-        return map;
-    }
-
-
     private String removeUrlParameters(String url)
     {
         int index = url.indexOf('?');

@@ -5562,25 +5562,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     public String getUrlParam(String paramName)
     {
-        return getUrlParam(paramName);
+        return getUrlParam(paramName, false);
     }
 
     public String getUrlParam(String paramName, boolean decode)
     {
-        String urlQuery = getURL().getQuery();
-        String[] urlParams = urlQuery.split("&");
-        Map<String, String> params = new HashMap<>();
-        for (String param : urlParams)
-        {
-            String[] keyValue = param.split("=");
-            if (keyValue.length == 2)
-                params.put(keyValue[0].trim(), keyValue[1].trim());
-            else if (keyValue.length ==1)
-                params.put(keyValue[0], "");
-            else
-                log("Unable to parse url parameter: " + param);
-        }
-
+        Map<String, String> params = getUrlParameters();
         String paramValue = params.get(paramName);
 
         if (paramValue != null && decode)
@@ -5593,6 +5580,27 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
 
         return paramValue;
+    }
+
+    public Map<String, String> getUrlParameters()
+    {
+        Map<String, String> params = new HashMap<>();
+        String urlQuery = getURL().getQuery();
+        if (urlQuery != null)
+        {
+            String[] urlParams = urlQuery.split("&");
+            for (String param : urlParams)
+            {
+                String[] keyValue = param.split("=");
+                if (keyValue.length == 2)
+                    params.put(keyValue[0].trim(), keyValue[1].trim());
+                else if (keyValue.length == 1)
+                    params.put(keyValue[0], "");
+                else
+                    log("Unable to parse url parameter: " + param);
+            }
+        }
+        return params;
     }
 
     private long start = 0;
