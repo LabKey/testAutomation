@@ -351,17 +351,17 @@ public class AssayTest extends AbstractAssayTest
         log("Batch properties");
         clickButton("Next");
         assertTextPresent(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + " is required and must be of type Number (Double).");
-        setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1), "Bad Test");
-        setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 2), "Bad Test");
-        setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 3), "Bad Test");
+        setFormElement(Locator.name(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1)), "Bad Test");
+        setFormElement(Locator.name(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 2)), "Bad Test");
+        setFormElement(Locator.name(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 3)), "Bad Test");
         clickButton("Next");
         assertTextPresent(
                 TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1) + " must be of type Number (Double).",
                 TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 2) + " must be of type Integer.",
                 TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 3) + " must be of type Date and Time.");
-        setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1), TEST_ASSAY_SET_PROPERTIES[1]);
-        setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 2), TEST_ASSAY_SET_PROPERTIES[2]);
-        setFormElement(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 3), TEST_ASSAY_SET_PROPERTIES[3]);
+        setFormElement(Locator.name(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 1)), TEST_ASSAY_SET_PROPERTIES[1]);
+        setFormElement(Locator.name(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 2)), TEST_ASSAY_SET_PROPERTIES[2]);
+        setFormElement(Locator.name(TEST_ASSAY_SET_PROP_NAME + (TEST_ASSAY_SET_PREDEFINED_PROP_COUNT + 3)), TEST_ASSAY_SET_PROPERTIES[3]);
 
         //ensure that the target study drop down contains Study 1 and Study 2 only and not Study 3
         //(labtech1 does not have read perms to Study 3)
@@ -385,8 +385,8 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Save and Finish");
         assertTextPresent(TEST_ASSAY_RUN_PROP_NAME + "0 is required and must be of type Text (String).");
         setFormElement(Locator.name("name"), TEST_RUN1);
-        setFormElement("comments", TEST_RUN1_COMMENTS);
-        setFormElement(TEST_ASSAY_RUN_PROP_NAME + "0", TEST_ASSAY_RUN_PROP1);
+        setFormElement(Locator.name("comments"), TEST_RUN1_COMMENTS);
+        setFormElement(Locator.name(TEST_ASSAY_RUN_PROP_NAME + "0"), TEST_ASSAY_RUN_PROP1);
         clickButton("Save and Finish");
         assertTextPresent("Data file contained zero data rows");
         click(Locator.xpath("//input[@value='textAreaDataProvider']"));
@@ -411,7 +411,7 @@ public class AssayTest extends AbstractAssayTest
         assertFormElementEquals(Locator.name("name"), "");
         assertFormElementEquals(Locator.name("comments"), "");
         setFormElement(Locator.name("name"), TEST_RUN2);
-		setFormElement("comments", TEST_RUN2_COMMENTS);
+        setFormElement(Locator.name("comments"), TEST_RUN2_COMMENTS);
         setFormElement(Locator.id("TextAreaDataCollector.textArea"), TEST_RUN2_DATA1);
         clickButton("Save and Finish");
 
@@ -505,7 +505,7 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("Manage"));
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("Import Visit Map"));
-        setFormElement("content", "301-302|X|Test Visit");
+        setFormElement(Locator.name("content"), "301-302|X|Test Visit");
         clickButton("Import");
 
         log("Publishing the data as the PI");
@@ -547,7 +547,7 @@ public class AssayTest extends AbstractAssayTest
         clickButton("Next");
         assertTextPresent("Copy to " + TEST_ASSAY_FLDR_STUDY1 + " Study: Verify Results");
 
-        setFormElement("visitId", "301.5");
+        setFormElement(Locator.name("visitId"), "301.5");
         clickButton("Copy to Study");
 
         log("Verifying that the data was published");
@@ -632,9 +632,9 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("Manage"));
         clickAndWait(Locator.linkWithText("Manage Timepoints"));
         clickAndWait(Locator.linkWithText("Create New Timepoint"));
-        setFormElement("label", "Preexisting Timepoint");
-        setFormElement("sequenceNumMin", "50");
-        setFormElement("sequenceNumMax", "89");
+        setFormElement(Locator.name("label"), "Preexisting Timepoint");
+        setFormElement(Locator.name("sequenceNumMin"), "50");
+        setFormElement(Locator.name("sequenceNumMax"), "89");
         selectOptionByText(Locator.name("typeCode"), "Screening");
 
         clickButton("Save");
@@ -729,7 +729,7 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText("Manage"));
         clickAndWait(Locator.linkWithText("Manage Visits"));
         clickAndWait(Locator.linkWithText("Import Visit Map"));
-        setFormElement("content",
+        setFormElement(Locator.name("content"),
             "6-13|X|Test Visit1\n" +
             "50-70|X|Test Visit2\n" +
             "302-303|X|Test Visit3\n"
@@ -939,9 +939,9 @@ public class AssayTest extends AbstractAssayTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_FLDR_STUDY1 + " Study"));
         click(Locator.tagWithAttribute("img", "title", "Edit"));
         waitForElement(Locator.name("Investigator"), WAIT_FOR_JAVASCRIPT);
-        setFormElement("Investigator", INVESTIGATOR);
-        setFormElement("Grant", GRANT);
-        setFormElement("Description", DESCRIPTION);
+        setFormElement(Locator.name("Investigator"), INVESTIGATOR);
+        setFormElement(Locator.name("Grant"), GRANT);
+        setFormElement(Locator.name("Description"), DESCRIPTION);
         clickButton("Submit");
 
         //verify study properties (grid view)
