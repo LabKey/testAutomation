@@ -1563,14 +1563,19 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
      */
     public void switchToMainWindow()
     {
-        List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
-        getDriver().switchTo().window(windows.get(0));
+        switchToWindow(0);
     }
 
     public void switchToWindow(int index)
     {
         List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
         getDriver().switchTo().window(windows.get(index));
+    }
+
+    public void switchToNewestWindow()
+    {
+        List<String> windows = new ArrayList<>(getDriver().getWindowHandles());
+        getDriver().switchTo().window(windows.get(windows.size() - 1));
     }
 
     @LogMethod
@@ -1593,9 +1598,14 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public void startSystemMaintenance(String task)
     {
         goToAdminConsole();
-        clickAndWait(Locator.linkWithText("system maintenance"));
-        click(Locator.linkWithText(task));
+        WebElement link = Locator.linkWithText("system maintenance").findElement(getDriver());
+        Actions builder = new Actions(getDriver());
+        builder.keyDown(Keys.SHIFT).click(link).keyUp(Keys.SHIFT).build().perform(); // Make sure system maintenance opens in a new window (rather than tab)
+        switchToNewestWindow();
+        waitAndClick(Locator.linkWithText(task));
+        getDriver().close();
         smStart = System.currentTimeMillis();
+        switchToMainWindow();
     }
 
     public void waitForSystemMaintenanceCompletion()

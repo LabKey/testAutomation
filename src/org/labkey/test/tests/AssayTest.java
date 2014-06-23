@@ -968,4 +968,9 @@ public class AssayTest extends AbstractAssayTest
         assertTextPresent("BAQ00051", baq00051Count);
     }
 
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
 }
