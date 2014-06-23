@@ -398,6 +398,7 @@ src/org/labkey/test/tests/ElispotAssayTest.java -text
 src/org/labkey/test/tests/EmbeddedWebPartTest.java -text
 src/org/labkey/test/tests/ExpTest.java -text
 src/org/labkey/test/tests/ExperimentalFeaturesTest.java -text
+src/org/labkey/test/tests/ExpressionMatrixAssayTest.java -text
 src/org/labkey/test/tests/ExternalSchemaTest.java -text
 src/org/labkey/test/tests/ExtraKeyStudyTest.java -text
 src/org/labkey/test/tests/FieldValidatorTest.java -text
@@ -591,6 +592,7 @@ src/org/labkey/test/util/OlapHelper.java -text
 src/org/labkey/test/util/PasswordUtil.java -text
 src/org/labkey/test/util/PerlHelper.java -text
 src/org/labkey/test/util/PermissionsHelper.java -text
+src/org/labkey/test/util/PipelineAnalysisHelper.java -text
 src/org/labkey/test/util/PipelineHelper.java -text
 src/org/labkey/test/util/PipelineStatusTable.java -text
 src/org/labkey/test/util/PipelineToolsHelper.java -text

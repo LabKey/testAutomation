@@ -188,6 +188,15 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(fileName));
     }
 
+    public void deleteFile(String fileName)
+    {
+        selectFileBrowserItem(fileName);
+        clickFileBrowserButton(BrowserAction.DELETE);
+        _test.waitForElement(Ext4Helper.Locators.window("Delete Files"));
+        _test.clickButton("Yes", WAIT_FOR_EXT_MASK_TO_DISSAPEAR);
+        _test.waitForElementToDisappear(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(fileName));
+    }
+
     @Override
     public void createFolder(String folderName)
     {
@@ -254,7 +263,7 @@ public class FileBrowserHelper implements FileBrowserHelperParams
 
     @Override
     @LogMethod
-    public void uploadFile(@LoggedParam File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties, boolean replace)
+    public void uploadFile(@LoggedParam final File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties, boolean replace)
     {
         _test.waitFor(new BaseWebDriverTest.Checker()
         {
@@ -265,6 +274,14 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         }, "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
 
         _test.setFormElement(Locator.css(".single-upload-panel input:last-of-type[type=file]"), file);
+        _test.waitFor(new BaseWebDriverTest.Checker()
+        {
+            public boolean check()
+            {
+                return _test.getFormElement(Locator.xpath("//label[text() = 'Choose a File:']/../..//input[contains(@class, 'x4-form-field')]")).contains(file.getName());
+            }
+        }, "Upload field did not clear after upload.", WAIT_FOR_JAVASCRIPT);
+
         if (description != null)
             _test.setFormElement(Locator.name("description"), description);
 

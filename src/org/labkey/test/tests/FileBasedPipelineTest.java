@@ -30,6 +30,7 @@ import org.labkey.test.util.ListHelper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.Maps;
+import org.labkey.test.util.PipelineAnalysisHelper;
 import org.labkey.test.util.PortalHelper;
 import org.labkey.test.util.RReportHelper;
 import org.openqa.selenium.NoSuchElementException;
@@ -45,14 +46,12 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by tchadick on 12/9/13.
- */
 @Category({DailyB.class})
 public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
 {
     private static final String PIPELINETEST_MODULE = "pipelinetest";
     private static final File SAMPLE_FILE = new File(getSampledataPath(), "fileTypes/sample.txt");
+    private final PipelineAnalysisHelper pipelineAnalysis = new PipelineAnalysisHelper(this);
 
     @BeforeClass
     public static void doSetup() throws Exception
@@ -65,6 +64,8 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
 
         RReportHelper rReportHelper = new RReportHelper(initTest);
         rReportHelper.ensureRConfig();
+
+        PipelineAnalysisHelper.resetExpectedJobCount();
 
         currentTest = initTest;
     }
@@ -99,8 +100,8 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
-        runPipelineAnalysis(importAction, targetFiles, protocolProperties);
-        verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
     }
 
     @Test
@@ -128,11 +129,11 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
-        runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", true);
-        verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", true);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
 
         // Running same protocol again is an error
-        runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", false);
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", false);
         waitForElement(Ext4Helper.Locators.window("Error"));
         assertEquals("Cannot redefine an existing protocol", getText(Ext4Helper.Locators.windowBody("Error")));
         clickButton("OK", 0);
@@ -145,8 +146,8 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         verifyPipelineAnalysisDeleted(pipelineName, protocolName);
 
         // Running the same protocol again should now be a-ok.
-        runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", true);
-        verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties, "Duplicate File(s)", true);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
     }
 
     @Test
@@ -178,8 +179,8 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
-        runPipelineAnalysis(importAction, targetFiles, protocolProperties);
-        verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
+        pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
         verifyAssayImport("myassay");
     }
 
@@ -200,76 +201,7 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         goToModule("FileContent");
         _fileBrowserHelper.uploadFile(SAMPLE_FILE);
 
-        runPipelineAnalysis(importAction, targetFiles, protocolProperties);
-    }
-
-    @LogMethod
-    private void runPipelineAnalysis(@LoggedParam String importAction, String[] files, Map<String, String> protocolProperties)
-    {
-        runPipelineAnalysis(importAction, files, protocolProperties, "Analyze", true);
-    }
-
-    @LogMethod
-    private void runPipelineAnalysis(@LoggedParam String importAction, String[] files, Map<String, String> protocolProperties, String analyzeButtonText, boolean expectSuccess)
-    {
-        StringBuilder fileString = new StringBuilder();
-
-        goToModule("FileContent");
-        for (String file : files)
-        {
-            _fileBrowserHelper.selectFileBrowserItem(file);
-            if (fileString.length() > 0)
-                fileString.append("\n");
-            fileString.append(file.substring(file.lastIndexOf("/") + 1, file.length()));
-        }
-        _fileBrowserHelper.selectImportDataAction(importAction);
-
-        assertEquals("Wrong file(s)", fileString.toString(), getText(Locator.id("fileStatus")));
-        for (Map.Entry<String, String> property : protocolProperties.entrySet())
-        {
-            setFormElement(Locator.id(property.getKey() + "Input"), property.getValue());
-        }
-
-        if (expectSuccess)
-            clickButton(analyzeButtonText);
-        else
-            clickButton(analyzeButtonText, 0);
-    }
-
-    private String jobDescription(String pipelineName, String protocolName)
-    {
-        return "R pipeline script: " + pipelineName + " - " + protocolName;
-    }
-
-    @LogMethod
-    private void verifyPipelineAnalysis(@LoggedParam String pipelineName, String protocolName, File fileRoot, Map<String, Set<String>> expectedFilesAndContents)
-    {
-        String analysisPath = "/" + pipelineName + "/" + protocolName + "/";
-
-        goToModule("Pipeline");
-        waitForPipelineJobsToComplete(1, jobDescription(pipelineName, protocolName), false);
-
-        goToModule("FileContent");
-
-        _fileBrowserHelper.selectFileBrowserItem(analysisPath);
-        assertElementNotPresent(FileBrowserHelper.Locators.gridRowWithNodeId(".work"));
-
-        for (Map.Entry fileAndContents : expectedFilesAndContents.entrySet())
-        {
-            String filePath = analysisPath + fileAndContents.getKey();
-            Set<String> fileContents = (Set<String>)fileAndContents.getValue();
-            log("Verify " + filePath);
-            _fileBrowserHelper.selectFileBrowserItem(analysisPath + fileAndContents.getKey());
-            File actualFile = new File(fileRoot, filePath);
-            if (!fileContents.isEmpty())
-            {
-                String actualFileContents = getFileContents(actualFile);
-                for (String fileContent : fileContents)
-                {
-                    assertTrue("File didn't contain expected text:" + fileContent, actualFileContents.contains(fileContent));
-                }
-            }
-        }
+        pipelineAnalysis.runPipelineAnalysis(importAction, targetFiles, protocolProperties);
     }
 
     @LogMethod
@@ -314,9 +246,9 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
     private void verifyAssayImport(String protocolName)
     {
         goToManageAssays();
-        click(Locator.linkContainingText(protocolName));
+        clickAndWait(Locator.linkWithText(protocolName));
 
-        click(Locator.linkContainingText("view results"));
+        clickAndWait(Locator.linkWithText("view results"));
         DataRegionTable table = new DataRegionTable("Data", this);
         List<String> names = table.getColumnDataAsText("Name");
         assertTrue("Expected 'Bob' and 'Sally' in names column; got '" + names + "' instead",
