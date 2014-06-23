@@ -90,6 +90,7 @@ modules/miniassay/resources/queries/assay/simple/My[!!-~]Simple[!!-~]Assay/Batch
 modules/miniassay/resources/queries/assay/simple/My[!!-~]Simple[!!-~]Assay/Data/AssayDesignChildSchemaData.qview.xml -text
 modules/miniassay/resources/queries/assay/simple/My[!!-~]Simple[!!-~]Assay/Runs/AssayDesignChildSchemaRuns.qview.xml -text
 modules/pipelinetest/module.properties -text
+modules/pipelinetest/resources/pipeline/pipelines/create-matrix.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/pipelines/r-copy-inline.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/pipelines/r-copy.pipeline.xml -text
 modules/pipelinetest/resources/pipeline/pipelines/r-localtask-assayimport.pipeline.xml -text

@@ -1,0 +1,27 @@
+<pipeline xmlns="http://labkey.org/pipeline/xml"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          name="create-matrix" version="0.0">
+    <description>Use R to generate a dummy matrix tsv output file with two samples and two features.</description>
+    <tasks>
+        <task xsi:type="ScriptTaskType">
+            <inputs>
+                <file name="input.CEL" splitFiles="true"/>
+            </inputs>
+            <outputs>
+                <file name="output.tsv"/>
+            </outputs>
+            <script interpreter="r">
+                <![CDATA[
+# Generate a dummy matrix tsv output file with two samples and two features.
+df <- data.frame(ID_REF=c("78495_at", "78383_at"), SampleA=c(10, 20), SampleB=c(30, 40))
+write.table(df, file="${output.tsv}", sep="\t", qmethod="double", col.names=TRUE, row.names=FALSE)
+              ]]>
+            </script>
+        </task>
+        <task xsi:type="AssayImportRunTaskType" >
+            <providerName>ExpressionMatrix</providerName>
+        </task>
+    </tasks>
+
+</pipeline>
+
