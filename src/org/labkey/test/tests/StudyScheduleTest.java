@@ -23,6 +23,7 @@ import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
 import org.labkey.test.util.PortalHelper;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
 
@@ -88,7 +89,18 @@ public class StudyScheduleTest extends StudyBaseTest
         datasetStatusTest(); //2.5min
         linkDatasetTest();  //5.5min
         linkFromDatasetDetailsTest(); //4 min
-        //studyScheduleWebPartTest();
+        studyScheduleWebPartTest();
+    }
+
+    private void studyScheduleWebPartTest()
+    {
+        clickTab("Manage");
+        click(Locator.linkWithText("Study Schedule"));
+        shortWait().until(ExpectedConditions.elementToBeClickable(Locator.xpath("//div[.='ECI-1: Eligibility Criteria']/../../..//div[@class='unchecked']").toBy()));
+        click(Locator.xpath("//div[.='ECI-1: Eligibility Criteria']/../../..//div[@class='unchecked']"));
+        shortWait().until(ExpectedConditions.elementToBeClickable(Locator.xpath("//span[.='Save Changes']").toBy()));
+        click(Locator.xpath("//span[.='Save Changes']"));
+        waitForElement(Locator.xpath("//div[.='ECI-1: Eligibility Criteria']/../../..//div[@class='checked']"));
     }
 
     @LogMethod (category = LogMethod.MethodType.VERIFICATION)
