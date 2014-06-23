@@ -86,6 +86,64 @@ public class LuminexUploadAndCopyTest extends LuminexTest
                 "3\tSpecimenID3\tParticipantID3\t1.3\n" +
                 "4\tSpecimenID4\tParticipantID4\t1.4");
         clickButton("Next");
+        assertElementPresent(Locator.tagContainingText("font", "Pasted TSV is missing required column"));
+
+        setFormElement(Locator.id("ThawListTextArea"), "Index\tParticipantID\tVisitID\tSpecimenID\tDate\n" +
+                "1\tListParticipant1\t1001.1\t\t\n" +
+                "2\tListParticipant2\t1001.2\t\t\n" +
+                "3\tListParticipant3\t1001.3\t\t\n" +
+                "4\tListParticipant4\t1001.4\t\t\n" +
+                "5\tListParticipant5\t1001.5\t\t\n" +
+                "6\tListParticipant6\t1001.6\t\t\n" +
+                "7\tListParticipant7\t1001.7\t\t\n" +
+                "8\tListParticipant8\t1001.8\t\t\n" +
+                "9\tListParticipant9\t1001.9\t\t\n" +
+                "10\tListParticipant10\t1001.10\t\t\n" +
+                "11\tListParticipant11\t1001.11\t\t\n" +
+                "C1\tListParticipantC1\t1001.001\t\t\n" +
+                "C2\tListParticipantC2\t1001.002\t\t\n" +
+                "275001\tListParticipant275001\t1001.275001\t\t\n" +
+                "275005\tListParticipant275005\t1001.275005\t\t\n" +
+                "275010\tListParticipant275010\t1001.275010\t\t\n" +
+                "275-12M\tListParticipant275-12M\t1001.27512\t\t\n" +
+                "335001\tListParticipant335001\t1001.335001\t\t\n" +
+                "335006\tListParticipant335006\t1001.335006\t\t\n" +
+                "335-12M\tListParticipant335-12M\t1001.33512\t\t\n" +
+                "9016-05\tListParticipant9016-05\t1001.901605\t\t\n" +
+                "9016-06\tListParticipant9016-06\t1001.901606\t\t\n" +
+                "9016-07\tListParticipant9016-07\t1001.901607\t\t\n" +
+                "9016-08\tListParticipant9016-08\t1001.901608\t\t\n" +
+                "9016-09\tListParticipant9016-09\t1001.901609\t\t\n" +
+                "9016-10\tListParticipant9016-10\t1001.901610\t\t\n" +
+                "9021-01\tListParticipant9021-01\t1001.902101\t\t\n" +
+                "9021-02\tListParticipant9021-02\t1001.902102\t\t\n" +
+                "9021-03\tListParticipant9021-03\t1001.902103\t\t\n" +
+                "9021-04\tListParticipant9021-04\t1001.902104\t\t\n" +
+                "9021-05\tListParticipant9021-05\t1001.902105\t\t\n" +
+                "9021-06\tListParticipant9021-06\t1001.902106\t\t\n" +
+                "9021-07\tListParticipant9021-07\t1001.902107\t\t\n" +
+                "9021-08\tListParticipant9021-08\t1001.902108\t\t\n" +
+                "9021-09\tListParticipant9021-09\t1001.902109\t\t\n" +
+                "9021-10\tListParticipant9021-10\t1001.902110\t\t\n" +
+                "9021-11\tListParticipant9021-11\t1001.902111\t\t\n" +
+                "9021-12\tListParticipant9021-12\t1001.902112\t\t\n" +
+                "9021-13\tListParticipant9021-13\t1001.902113\t\t\n" +
+                "9021-14\tListParticipant9021-14\t1001.902114\t\t\n" +
+                "9021-15\tListParticipant9021-15\t1001.902115\t\t\n" +
+                "9021-16\tListParticipant9021-16\t1001.902116\t\t\n" +
+                "9021-17\tListParticipant9021-17\t1001.902117\t\t\n" +
+                "9011-01\tListParticipant9011-01\t1001.901101\t\t\n" +
+                "9011-02\tListParticipant9011-02\t1001.901102\t\t\n" +
+                "9011-03\tListParticipant9011-03\t1001.901103\t\t\n" +
+                "9011-04\tListParticipant9011-04\t1001.901104\t\t\n" +
+                "9016-01\tListParticipant9016-01\t1001.901601\n" +
+                "9016-02\tListParticipant9016-02\t1001.901602\n" +
+                "9016-03\tListParticipant9016-03\t1001.901603\n" +
+                "9016-04\tListParticipant9016-04\t1001.901604\n" +
+                "Standard1\tListParticipantStandard1\t1001.0001\n" +
+                "FakeSample57\tListParticipantFakeSample57\t1001.0057\n" +
+                "FakeSample1\tListParticipantFakeSample1\t1001.0001\n");
+        clickButton("Next");
         setFormElement(Locator.name("__primaryFile__"), TEST_ASSAY_LUM_FILE3);
         clickButton("Next", 60000);
         assertEquals("StandardName1b", getFormElement(Locator.xpath("//input[@type='text' and contains(@name, '_analyte_')][1]")));
@@ -120,13 +178,13 @@ public class LuminexUploadAndCopyTest extends LuminexTest
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM + " Runs"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM_RUN_NAME3));
         assertTextPresent("IL-1b (1)");
-        assertTextPresent("ParticipantID1");
-        assertTextPresent("ParticipantID2");
-        assertTextPresent("ParticipantID3");
-        setFilter("Data", "ParticipantID", "Equals", "ParticipantID1");
+        assertTextPresent("ListParticipant1");
+        assertTextPresent("ListParticipant2");
+        assertTextPresent("ListParticipant3");
+        setFilter("Data", "ParticipantID", "Equals", "ListParticipant1");
         assertTextPresent("1.1");
-        setFilter("Data", "ParticipantID", "Equals", "ParticipantID2");
-        assertTextPresent("1.2");
+        setFilter("Data", "ParticipantID", "Equals", "ListParticipant2");
+        assertTextPresent("1001.2");
 
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM + " Runs"));
         clickAndWait(Locator.linkWithText(TEST_ASSAY_LUM_RUN_NAME4));
