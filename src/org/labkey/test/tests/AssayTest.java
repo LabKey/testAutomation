@@ -638,6 +638,7 @@ public class AssayTest extends AbstractAssayTest
         selectOptionByText(Locator.name("typeCode"), "Screening");
 
         clickButton("Save");
+        assertElementPresent(Locator.linkWithText("edit"), 1);
 
         //select the Lab1 folder and view all the data for the test assay
         clickFolder(TEST_ASSAY_FLDR_LAB1);
