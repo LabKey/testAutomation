@@ -23,6 +23,8 @@ import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Specimen;
 import org.labkey.test.util.DataRegionTable;
 
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 @Category({DailyB.class, Specimen.class})
@@ -114,7 +116,18 @@ public class CreateVialsTest extends AbstractViabilityTest
         waitForPageToLoad();
         clickAndWait(Locator.linkContainingText("run1"));
 
+        // Add the hidden 'TargetStudy' column on the results table and the actual 'TargetStudy' column from batch
+        _customizeViewsHelper.openCustomizeViewPanel();
+        _customizeViewsHelper.showHiddenItems();
+        _customizeViewsHelper.addCustomizeViewColumn("TargetStudy");
+        _customizeViewsHelper.addCustomizeViewColumn(new String[] { "Run", "Batch", "TargetStudy" }, "BatchTargetStudy");
+        _customizeViewsHelper.setColumnProperties("Run/Batch/TargetStudy", "BatchTargetStudy", (List)null);
+        _customizeViewsHelper.saveCustomView();
+
         DataRegionTable table = new DataRegionTable("Data", this);
+        assertEquals(" ", table.getDataAsText(0, "Target Study"));
+        assertEquals(" ", table.getDataAsText(0, "BatchTargetStudy"));
+
         table.checkAllOnPage();
         clickButton("Create Vials", 0);
         assertExtMsgBox("Error", "ParticipantID 'B01' missing TargetStudy.");
@@ -123,7 +136,8 @@ public class CreateVialsTest extends AbstractViabilityTest
         // Delete run
         clickAndWait(Locator.linkWithText("view runs"));
         checkAllOnPage("Runs");
-        clickButton("Delete"); clickButton("Confirm Delete");
+        clickButton("Delete");
+        clickButton("Confirm Delete");
 
 
         log("** Upload run again but this time set a TargetStudy, visit ids, and a single specimen id on the first row");
@@ -138,6 +152,8 @@ public class CreateVialsTest extends AbstractViabilityTest
 
         clickAndWait(Locator.linkContainingText("run2"));
         table = new DataRegionTable("Data", this);
+        assertEquals(getFolderName() + " Study", table.getDataAsText(0, "Target Study"));
+        assertEquals(getFolderName() + " Study", table.getDataAsText(0, "BatchTargetStudy"));
 
         table.checkAllOnPage();
         clickButton("Create Vials", 0);
@@ -208,12 +224,6 @@ public class CreateVialsTest extends AbstractViabilityTest
 
         clickButton("Save");
 
-
-        {
-            log("** temporary workaround until viability specimen aggregates are automatically updated");
-            click(Locator.linkWithText("recalc specimen aggregates"));
-            clickButton("OK", longWaitForPage);
-        }
 
         log("** checking cell counts and specimen IDs");
         table = new DataRegionTable("Data", this);
