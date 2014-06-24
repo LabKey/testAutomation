@@ -261,7 +261,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     {
         clickFolder(assayFolder);
         waitForElement(tableLoc);
-        configureAssayProgressDashboard(assay2);
+        configureAssayProgressDashboard(assay2, "7");
         configureAssaySchema(assayName);
 
         flagSpecimenForReview(assayName, "2011-03-02");
@@ -360,7 +360,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         _portalHelper.addWebPart("Assay Progress Report");
         assertTextPresent("You must first configure the assay(s) that you want to run reports from. Click on the customize menu for this web part and select the Assays that should be included in this report", 2);
 
-        configureAssayProgressDashboard(assay1);
+        configureAssayProgressDashboard(assay1, null);
         configureAssaySchema(assay1);
         clickFolder(assayFolder);
         waitForElement(tableLoc);
@@ -381,11 +381,15 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         _customizeViewsHelper.saveCustomView();
     }
 
-    private void configureAssayProgressDashboard(String assayName)
+    private void configureAssayProgressDashboard(String assayName, @Nullable String specimenMatchLength)
     {
         _portalHelper.clickWebpartMenuItem("Assay Progress Dashboard", "Customize");
+
         _ext4Helper.checkCheckbox(assayName);
         click(Locator.tagContainingText("label", "Specimen Report Study Folder Study"));
+        if (specimenMatchLength != null)
+            setFormElement(Locator.name("specimenMatch"), specimenMatchLength);
+
         clickButton("Save");
     }
 
