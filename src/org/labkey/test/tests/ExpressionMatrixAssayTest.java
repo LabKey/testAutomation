@@ -8,7 +8,7 @@ import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.categories.Assays;
-import org.labkey.test.categories.InDevelopment;
+import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -25,7 +25,7 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
-@Category({InDevelopment.class, Assays.class})
+@Category({DailyA.class, Assays.class})
 public class ExpressionMatrixAssayTest extends BaseWebDriverTest
 {
     private static final String PIPELINE_NAME = "create-matrix";
