@@ -206,8 +206,8 @@ public class StudyTest extends StudyBaseTest
         String textToFilter = "AE-1:(VTN) AE Log";
         Locator measureRow = Locator.tagWithText("div", textToFilter);
         waitForElement(measureRow, WAIT_FOR_JAVASCRIPT * 2);
-        assertElementPresent(measureRow, 27);
-        assertElementPresent(Locator.tagContainingText("div", "Abbrevi"), 79);
+        assertElementPresent(measureRow, 28);
+        assertElementPresent(Locator.tagContainingText("div", "Abbrevi"), 81);
 
         log("filter participant results down");
         Locator filterSearchText = Locator.xpath("//input[@name='filterSearch']");
@@ -216,7 +216,7 @@ public class StudyTest extends StudyBaseTest
         setFormElement(Locator.xpath("//input[@type='text']"), "abbrevi");
         fireEvent(filterSearchText, SeleniumEvent.change);
         sleep(1000);
-        assertTextPresent("Abbrevi", 79);
+        assertTextPresent("Abbrevi", 81);
         assertTextNotPresent(textToFilter);
 
         log("select some records and include them in a report");
