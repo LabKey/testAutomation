@@ -912,7 +912,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         if (isElementPresent(Locator.css(".labkey-nav-page-header").withText("Startup Modules"))||
             isElementPresent(Locator.css(".labkey-nav-page-header").withText("Upgrade Modules")))
         {
-            waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"));
+            waitForElement(Locator.id("status-progress-bar").withText("Module startup complete"), WAIT_FOR_PAGE);
             clickButton("Next");
         }
     }
