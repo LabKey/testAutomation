@@ -3618,7 +3618,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             @Override
             public boolean accept(File file)
             {
-                return !existingFiles.contains(file) && !tempFilesFilter.accept(file);
+                return !existingFiles.contains(file) && !tempFilesFilter.accept(file) && file.length() > 0;
             }
         };
 
