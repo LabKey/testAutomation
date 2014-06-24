@@ -15,11 +15,12 @@ public class PipelineAnalysisHelper
 {
     private BaseWebDriverTest _test;
 
-    private static int expectedJobCount = 0;
+    private static int expectedJobCount = 1;
 
     public PipelineAnalysisHelper(BaseWebDriverTest test)
     {
         _test = test;
+        expectedJobCount = 1;
     }
 
     @LogMethod
@@ -28,9 +29,9 @@ public class PipelineAnalysisHelper
         runPipelineAnalysis(importAction, files, protocolProperties, "Analyze", true);
     }
 
-    public static void resetExpectedJobCount()
+    public static void setExpectedJobCount(int count)
     {
-        expectedJobCount = 0;
+        expectedJobCount = count;
     }
 
     @LogMethod
@@ -67,10 +68,7 @@ public class PipelineAnalysisHelper
         }
 
         if (expectSuccess)
-        {
             _test.clickButton(analyzeButtonText);
-            expectedJobCount++;
-        }
         else
             _test.clickButton(analyzeButtonText, 0);
     }

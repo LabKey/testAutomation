@@ -38,6 +38,7 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
     private static final File CEL_FILE2 = getSampleData("Affymetrix/CEL_files/sample_file_2.CEL");
     private static final String PROTOCOL_NAME = "Expression Matrix Protocol";
     private static int featureSetId;
+    private static int expectedPipelineJobCount;
 
     private final PipelineAnalysisHelper pipelineAnalysis = new PipelineAnalysisHelper(this);
 
@@ -48,7 +49,7 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
         initTest.doCleanup(false);
 
         initTest.doSetupSteps();
-        PipelineAnalysisHelper.resetExpectedJobCount();
+        expectedPipelineJobCount = 0;
 
         currentTest = initTest;
     }
@@ -119,6 +120,7 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
                 protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),
                 protocolName + ".log", Collections.<String>emptySet(),
                 protocolName + ".tsv", Collections.<String>emptySet());
+        PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
 
         goToProjectHome();
@@ -160,6 +162,7 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
                 protocolName + "-taskInfo.tsv", Collections.<String>emptySet(),
                 protocolName + ".log", Collections.<String>emptySet(),
                 protocolName + ".tsv", Collections.<String>emptySet());
+        PipelineAnalysisHelper.setExpectedJobCount(++expectedPipelineJobCount);
         pipelineAnalysis.verifyPipelineAnalysis(pipelineName, protocolName, fileRoot, outputFiles);
 
         goToProjectHome();

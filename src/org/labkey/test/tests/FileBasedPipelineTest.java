@@ -65,8 +65,6 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
         RReportHelper rReportHelper = new RReportHelper(initTest);
         rReportHelper.ensureRConfig();
 
-        PipelineAnalysisHelper.resetExpectedJobCount();
-
         currentTest = initTest;
     }
 
