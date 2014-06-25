@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
+import org.labkey.test.SortDirection;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.util.DataRegionTable;
@@ -129,11 +130,12 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
         clickAndWait(Locator.linkWithText(protocolName));
 
         DataRegionTable resultTable = new DataRegionTable("Data", this);
-        assertEquals(Arrays.asList("10.000000", "30.000000", "20.000000", "40.000000"),
+        resultTable.setSort("Value", SortDirection.ASC);
+        assertEquals(Arrays.asList("10.000000", "20.000000", "30.000000", "40.000000"),
                 resultTable.getColumnDataAsText("Value"));
-        assertEquals(Arrays.asList("78495_at", "78495_at", "78383_at", "78383_at"),
+        assertEquals(Arrays.asList("78495_at", "78383_at", "78495_at", "78383_at"),
                 resultTable.getColumnDataAsText("Probe Id"));
-        assertEquals(Arrays.asList("SampleA", "SampleB", "SampleA", "SampleB"),
+        assertEquals(Arrays.asList("SampleA", "SampleA", "SampleB", "SampleB"),
                 resultTable.getColumnDataAsText("Sample Id"));
         assertEquals(Arrays.asList(protocolName, protocolName, protocolName, protocolName),
                 resultTable.getColumnDataAsText("Run"));
