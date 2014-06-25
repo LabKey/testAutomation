@@ -106,7 +106,7 @@ public class ListHelper extends AbstractHelper
     }
 
     @LogMethod
-    public void createList(String folderName, String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
+    public void createList(String folderName, @LoggedParam String listName, ListColumnType listKeyType, String listKeyName, ListColumn... cols)
     {
         beginCreateList(folderName, listName);
         createListHelper(listName, listKeyType, listKeyName, cols);

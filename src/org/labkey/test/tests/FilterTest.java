@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
 import org.labkey.test.TestTimeoutException;
 import org.labkey.test.categories.BVT;
@@ -43,11 +44,36 @@ import static org.junit.Assert.*;
  * it was convenient to use the list test helpers for filter
  */
 @Category({BVT.class, Data.class})
-public class FilterTest extends ListTest
+public class FilterTest extends BaseWebDriverTest
 {
     protected final static String PROJECT_NAME = "FilterVerifyProject";
     protected final static String R_VIEW = TRICKY_CHARACTERS + "R view";
     protected final static String FACET_TEST_LIST = "FacetList";
+
+    protected final static String LIST_NAME_COLORS = TRICKY_CHARACTERS_NO_QUOTES + "Colors";
+    protected final static ListHelper.ListColumnType LIST_KEY_TYPE = ListHelper.ListColumnType.String;
+    protected final static String LIST_KEY_NAME2 = "Color";
+    protected final static String HIDDEN_TEXT = "CantSeeMe";
+
+    protected final ListHelper.ListColumn _listCol1 = new ListHelper.ListColumn("Desc", "Description", ListHelper.ListColumnType.String, "What the color is like");
+    protected final ListHelper.ListColumn _listCol2 = new ListHelper.ListColumn("Month", "Month to Wear", ListHelper.ListColumnType.DateTime, "When to wear the color", "M");
+    protected final ListHelper.ListColumn _listCol3 = new ListHelper.ListColumn("JewelTone", "Jewel Tone", ListHelper.ListColumnType.Boolean, "Am I a jewel tone?");
+    protected final ListHelper.ListColumn _listCol4 = new ListHelper.ListColumn("Good", "Quality", ListHelper.ListColumnType.Integer, "How nice the color is");
+    protected final ListHelper.ListColumn _listCol5 = new ListHelper.ListColumn("HiddenColumn", HIDDEN_TEXT, ListHelper.ListColumnType.String, "I should be hidden!");
+    protected final ListHelper.ListColumn _listCol6 = new ListHelper.ListColumn("Aliased,Column", "Element", ListHelper.ListColumnType.String, "I show aliased data.");
+    protected final static String[][] TEST_DATA = {
+            { "Blue", "Green", "Red", "Yellow" },
+            { "Light", "Mellow", "Robust", "ZanzibarMasinginiTanzaniaAfrica" },
+            { "true", "false", "true", "false"},
+            { "1", "4", "3", "2" },
+            { "10", "9", "8", "7"},
+            { "Water", "Earth", "Fire", "Air"}};
+    protected final static String[] CONVERTED_MONTHS = { "2000-01-01", "2000-04-04", "2000-03-03", "2000-02-02" };
+    protected final static ListHelper.ListColumnType LIST2_KEY_TYPE = ListHelper.ListColumnType.String;
+    protected final static String LIST2_KEY_NAME = "Car";
+
+    protected final ListHelper.ListColumn _list2Col1 = new ListHelper.ListColumn(LIST_KEY_NAME2, LIST_KEY_NAME2, LIST2_KEY_TYPE, "The color of the car", new ListHelper.LookupInfo(null, "lists", LIST_NAME_COLORS));
+
     protected String listUrl = "";
 
     @Override
@@ -111,14 +137,12 @@ public class FilterTest extends ListTest
         log("Add list -- " + LIST_NAME_COLORS);
         _listHelper.createList(PROJECT_NAME, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME2, _listCol1, _listCol2, _listCol3, _listCol4, _listCol5, _listCol6);
         log("Set title field of 'Colors' to 'Desc'");
-        clickEditDesign();
+        _listHelper.clickEditDesign();
         selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
-        clickDone();
-        clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
+        _listHelper.clickSave();
+        _listHelper.clickImportData();
+        _listHelper.submitTsvData(testDataFull.toString());
         listUrl = getCurrentRelativeURL();
-        clickImportData();
-        setFormElement(Locator.name("text"), testDataFull.toString());
-        submitImportTsv();
 
         _customizeViewsHelper.createRView(null, R_VIEW);
     }
@@ -713,5 +737,11 @@ public class FilterTest extends ListTest
             assertFilterTextPresent(columnName, filter2Type, filter2);
         }
 
+    }
+
+    @Override
+    public String getAssociatedModuleDirectory()
+    {
+        return "list";
     }
 }

@@ -126,8 +126,8 @@ public class ListTest extends BaseWebDriverTest
     public static final String LIST_AUDIT_EVENT = "List events";
     public static final String DOMAIN_AUDIT_EVENT = "Domain events";
 
-    private final String EXCEL_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/fruits.xls";
-    private final String TSV_DATA_FILE = getLabKeyRoot() + "/sampledata/dataLoading/excel/fruits.tsv";
+    private final File EXCEL_DATA_FILE = getSampleData("dataLoading/excel/fruits.xls");
+    private final File TSV_DATA_FILE = getSampleData("dataLoading/excel/fruits.tsv");
     private final String TSV_LIST_NAME = "Fruits from TSV";
 
     public String getAssociatedModuleDirectory()
@@ -166,7 +166,7 @@ public class ListTest extends BaseWebDriverTest
         assertAlert("Are you sure you want to delete the selected rows?");
         waitForPageToLoad();
         // load test data
-        clickImportData();
+        _listHelper.clickImportData();
         setFormElement(Locator.name("text"), LIST_DATA2);
         submitImportTsv();
     }
@@ -174,7 +174,6 @@ public class ListTest extends BaseWebDriverTest
     @LogMethod
     protected void setUpList(String projectName)
     {
-
         log("Setup project and list module");
         _containerHelper.createProject(projectName, null);
 
@@ -182,10 +181,10 @@ public class ListTest extends BaseWebDriverTest
         _listHelper.createList(projectName, LIST_NAME_COLORS, LIST_KEY_TYPE, LIST_KEY_NAME, _listCol1Fake, _listCol2, _listCol3);
 
         log("Add description and test edit");
-        clickEditDesign();
+        _listHelper.clickEditDesign();
         setFormElement(Locator.id("ff_description"), LIST_DESCRIPTION);
         setColumnName(0, LIST_KEY_NAME2);
-        clickSave();
+        _listHelper.clickSave();
 
         log("Check that edit list definition worked");
         assertTextPresent(LIST_KEY_NAME2);
@@ -193,7 +192,7 @@ public class ListTest extends BaseWebDriverTest
 
         log("Test upload data");
 
-        clickImportData();
+        _listHelper.clickImportData();
         submitImportTsv("Form contains no data");
 
         setFormElement(Locator.id("tsv3"), TEST_FAIL);
@@ -240,7 +239,7 @@ public class ListTest extends BaseWebDriverTest
         log("Test edit and adding new field with imported data present");
         clickTab("List");
         clickAndWait(Locator.linkWithText("view design"));
-        clickEditDesign();
+        _listHelper.clickEditDesign();
         setColumnName(1, _listCol1.getName());
         setColumnLabel(1, _listCol1.getLabel());
         ListHelper listHelper = new ListHelper(this);
@@ -260,13 +259,13 @@ public class ListTest extends BaseWebDriverTest
 
         click(Locator.id("partdown_2"));
 
-        clickSave();
+        _listHelper.clickSave();
 
         log("Check new field was added correctly");
         assertTextPresent(_listCol4.getName());
 
         log("Set title field of 'Colors' to 'Desc'");
-        clickEditDesign();
+        _listHelper.clickEditDesign();
         selectOptionByText(Locator.id("ff_titleColumn"), "Desc");
         clickDone();
 
@@ -587,7 +586,7 @@ public class ListTest extends BaseWebDriverTest
         clickTab("List");
         clickAndWait(Locator.linkWithText(LIST_NAME_COLORS));
         clickAndWait(Locator.linkWithText("View Design"));
-        clickDeleteList();
+        _listHelper.clickDeleteList();
         assertTextPresent("The following depend upon this list:", "Custom view '" + TEST_VIEW + "'");
         clickButton("OK");
 
@@ -661,7 +660,7 @@ public class ListTest extends BaseWebDriverTest
         //create list with look up A
         String lookupColumn = "lookup";
         _listHelper.createList(PROJECT_OTHER, crossContainerLookupList, ListHelper.ListColumnType.AutoInteger, "Key",  col(PROJECT_VERIFY, lookupColumn, Integer, "A" ));
-        clickImportData();
+        _listHelper.clickImportData();
         setListImportAsTestDataField(lookupColumn + "\n1");
 
         log("verify look column set properly");
@@ -735,12 +734,10 @@ public class ListTest extends BaseWebDriverTest
     private void doUploadTest()
     {
         log("Infer from excel file, then import data");
-        File excelFile = new File(EXCEL_DATA_FILE);
-        _listHelper.createListFromFile(PROJECT_VERIFY, "Fruits from Excel", excelFile);
+        _listHelper.createListFromFile(PROJECT_VERIFY, "Fruits from Excel", EXCEL_DATA_FILE);
         waitForElement(Locator.linkWithText("pomegranate"));
         assertNoLabkeyErrors();
 
-        File tsvFile = new File(TSV_DATA_FILE);
         //Cancel test disabled because teamcity is too slow to run it successfully
         /*log("Infer from tsv file, but cancel before completion");
         clickProject(PROJECT_NAME);
@@ -759,7 +756,7 @@ public class ListTest extends BaseWebDriverTest
         assertTextNotPresent(TSV_LIST_NAME);*/
 
         log("Infer from a tsv file, then import data");
-        _listHelper.createListFromFile(PROJECT_VERIFY, TSV_LIST_NAME, tsvFile);
+        _listHelper.createListFromFile(PROJECT_VERIFY, TSV_LIST_NAME, TSV_DATA_FILE);
         waitForElement(Locator.linkWithText("pomegranate"));
         assertNoLabkeyErrors();
         log("Verify correct types are inferred from file");
@@ -866,17 +863,17 @@ public class ListTest extends BaseWebDriverTest
         log("8329: Test that renaming a field then creating a new field with the old name doesn't result in awful things");
         _listHelper.createList(PROJECT_VERIFY, "new", ListHelper.ListColumnType.AutoInteger, "key", new ListColumn("BarBar", "BarBar", ListHelper.ListColumnType.String, "Some new column"));
         assertTextPresent("BarBar");
-        clickEditDesign();
+        _listHelper.clickEditDesign();
         setColumnName(1,"FooFoo");
         setColumnLabel(1,"");
-        clickSave();
+        _listHelper.clickSave();
         assertTextPresent("FooFoo");
         assertTextNotPresent("BarBar");
-        clickEditDesign();
+        _listHelper.clickEditDesign();
         ListHelper listHelper = new ListHelper(this);
         ListColumn newCol = new ListColumn("BarBar","BarBar", ListHelper.ListColumnType.String, "None");
         listHelper.addField(newCol);
-        clickSave();
+        _listHelper.clickSave();
         assertTextPresent("FooFoo");
         assertTextPresent("BarBar");
         assertTextBefore("FooFoo", "BarBar");
@@ -982,10 +979,10 @@ public class ListTest extends BaseWebDriverTest
         log("Add List -- " + name);
         _listHelper.createList(PROJECT_VERIFY, name, cols.get(0).getType(), cols.get(0).getName(),
                 cols.subList(1, cols.size()).toArray(new ListHelper.ListColumn[cols.size() - 1]));
-        clickEditDesign();
+        _listHelper.clickEditDesign();
         selectOptionByText(Locator.id("ff_titleColumn"), cols.get(1).getName());    // Explicitly set to the PK (auto title will pick wealth column)
-        clickSave();
-        clickImportData();
+        _listHelper.clickSave();
+        _listHelper.clickImportData();
         setListImportAsTestDataField(toTSV(cols,data));
     }
 
@@ -1047,39 +1044,17 @@ public class ListTest extends BaseWebDriverTest
         popLocation();
     }
 
-
-
     void dataregionToEditDesign()
     {
         clickButton("View Design");
-        clickEditDesign();
+        _listHelper.clickEditDesign();
     }
 
     void clickDone()
     {
         if (isElementPresent(Locator.lkButton("Save")))
-            clickSave();
+            _listHelper.clickSave();
         clickButton("Done");
-    }
-
-    void clickImportData()
-    {
-        _listHelper.clickImportData();
-    }
-
-    void clickEditDesign()
-    {
-        _listHelper.clickEditDesign();
-    }
-
-    void clickSave()
-    {
-        _listHelper.clickSave();
-    }
-
-    void clickDeleteList()
-    {
-        _listHelper.clickDeleteList();
     }
 
     void selectPropertyTab(String name)
