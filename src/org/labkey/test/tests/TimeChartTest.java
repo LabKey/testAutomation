@@ -95,6 +95,8 @@ public abstract class TimeChartTest extends ReportTest
         clickFolder(VISIT_FOLDER_NAME);
         clickButton("Process and Import Data");
         _fileBrowserHelper.importFile("study.xml", "Import Study");
+        waitForText("Import Study from Pipeline");
+        clickButton("Start Import");
 
         waitForPipelineJobsToComplete(1, "study import", false);
     }

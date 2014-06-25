@@ -397,6 +397,8 @@ public class AncillaryStudyTest extends StudyBaseTest
 
         log("Verify reloading study");
         _fileBrowserHelper.importFile("export/study/study.xml", "Reload Study");
+        waitForText("Import Study from Pipeline");
+        clickButton("Start Import");
         waitForPipelineJobsToComplete(1, "study import", false);
     }
 

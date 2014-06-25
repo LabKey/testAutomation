@@ -70,6 +70,8 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Import Study");
         clickButton("Import Study Using Pipeline");
         _fileBrowserHelper.importFile("export/study/study.xml", "Import Study");
+        waitForText("Import Study from Pipeline");
+        clickButton("Start Import");
         // wait for study & specimen load to complete
         waitForPipelineJobsToComplete(3, "study and specimen import (legacy formats)", false);
 
@@ -106,6 +108,8 @@ public class StudyExportTest extends StudyManualTest
         waitForElement(gridRow);
         click(gridRow);
         _fileBrowserHelper.selectImportDataAction("Import Study");
+        waitForText("Import Study from Pipeline");
+        clickButton("Start Import");
 
         // wait for study & specimen load
         waitForPipelineJobsToComplete(4, "study and specimen import (xml formats)", false);

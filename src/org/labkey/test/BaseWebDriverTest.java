@@ -5826,6 +5826,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Import Folder Using Pipeline");
         _fileBrowserHelper.importFile(folderFile, "Import Folder");
+        waitForText("Import Folder from Pipeline");
+        clickButton("Start Import");
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
     }
 
