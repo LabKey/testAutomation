@@ -336,7 +336,7 @@
 
         <!-- Create a path that includes all sampledata directories -->
         <path id="sampledata.roots">
-            <path location="../../"/>
+            <path location="${project.root}"/>
             <path>
                 <dirset dir="${project.root}" includes="${moduleDirectories}">
                     <selector refid="sampledata.selector"/>
