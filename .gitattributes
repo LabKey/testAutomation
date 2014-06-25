@@ -401,6 +401,7 @@ src/org/labkey/test/tests/ExperimentalFeaturesTest.java -text
 src/org/labkey/test/tests/ExpressionMatrixAssayTest.java -text
 src/org/labkey/test/tests/ExternalSchemaTest.java -text
 src/org/labkey/test/tests/ExtraKeyStudyTest.java -text
+src/org/labkey/test/tests/FacetedFilterCutoffTest.java -text
 src/org/labkey/test/tests/FieldValidatorTest.java -text
 src/org/labkey/test/tests/FileBasedPipelineTest.java -text
 src/org/labkey/test/tests/FileContentTest.java -text
@@ -451,7 +452,6 @@ src/org/labkey/test/tests/MS1Test.java -text
 src/org/labkey/test/tests/MS2ExportTest.java -text
 src/org/labkey/test/tests/MS2GZTest.java -text
 src/org/labkey/test/tests/MS2Test.java -text
-src/org/labkey/test/tests/MassFilterTest.java -text
 src/org/labkey/test/tests/MenuBarTest.java -text
 src/org/labkey/test/tests/MessagesLongTest.java -text
 src/org/labkey/test/tests/MicroarrayTest.java -text

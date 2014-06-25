@@ -493,6 +493,18 @@ public class DataRegionTable
         _test.setSort(_tableName, columnName, direction);
     }
 
+    public void openFilterDialog(String columnName)
+    {
+        _test.click(Locator.id(_tableName).append(Locator.tagWithClass("td", "labkey-column-header")).append(Locator.tagWithText("div", columnName)));
+        _test.waitAndClick(Locator.tagWithText("span", "Filter...").notHidden());
+
+        Locator.XPathLocator filterDialog = ExtHelper.Locators.extDialog("Show Rows Where " + columnName + "...");
+        _test.waitForElement(filterDialog);
+
+        if (_test.isElementPresent(filterDialog.append(Locator.tagWithClass("span", "x-tab-strip-text").withText("Choose Values"))))
+            _test.waitForElement(Locator.tag("div").withClass("labkey-filter-dialog").append("//tr").withClass("x-grid3-row-table").withPredicate(Locator.tag("a").withText("[All]")).append("//div").withClass("x-grid3-hd-checker-on"));
+    }
+
     public void setFilter(String columnName, String filterType, String filter)
     {
         setFilter(columnName, filterType, filter, BaseWebDriverTest.WAIT_FOR_PAGE);
@@ -652,7 +664,7 @@ public class DataRegionTable
         return url.getFile();
     }
 
-    // ======== Site facet panel =========
+    // ======== Side facet panel =========
 
     public void openSideFilterPanel()
     {
