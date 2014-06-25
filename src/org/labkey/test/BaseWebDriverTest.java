@@ -5854,7 +5854,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     {
         log("Signing out");
         beginAt("/login/logout.view");
-        waitForElement(Locator.xpath("//a").withText("Sign In")); // Will recognize link [BeginAction] or button [LoginAction]
+        waitForElement(Locator.xpath("//a").withText("Sign\u00a0In")); // Will recognize link [BeginAction] or button [LoginAction]
     }
 
     /*
