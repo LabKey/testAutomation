@@ -16,6 +16,7 @@
 
 package org.labkey.test.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
@@ -694,7 +695,8 @@ public class ListTest extends BaseWebDriverTest
         click(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
 
         assertElementNotPresent(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x-combo-list-item') and text()='Starts With']"));
-        assertElementPresent(Locator.xpath("//div["+Locator.NOT_HIDDEN+" and contains(@class, 'x-combo-list-item') and text()='Is Blank']"));
+        assertElementPresent(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and contains(@class, 'x-combo-list-item') and text()='Is Blank']"));
+        click(Locator.xpath("//div[" + Locator.NOT_HIDDEN + " and ./label/span[text()='Filter Type:']]/div/div//img[contains(@class, 'x-form-arrow-trigger')]"));
         _extHelper.clickExtButton("Show Rows Where " + _listCol4.getLabel(), "CANCEL", 0);
 
         log("Test that filters don't affect multiple web parts");
@@ -798,24 +800,23 @@ public class ListTest extends BaseWebDriverTest
         // Set multiple conditional formats on int column.
         click(Locator.name("ff_name4")); // IntCol
         click(Locator.xpath("//span[text()='Format']"));
-        // If greater than 7, strikethrough //TODO: Set after (>5) format. Blocked: 12865
-        clickButton("Add Conditional Format", 0);
-        _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
-        _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
-        setFormElement(Locator.id("value_1"), "7");
-        _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
-        checkCheckbox(Locator.checkboxByName("Strikethrough"));
-        // If greater than 5, Bold  //TODO: Set before (>7) format. Blocked: 12865
+        // If greater than 5, Bold
         clickButton("Add Conditional Format", 0);
         _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
         _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
         setFormElement(Locator.id("value_1"), "5");
         _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
-        checkCheckbox(Locator.checkboxByName("Bold").index(1));
+        checkCheckbox(Locator.checkboxByName("Bold"));
+        // If greater than 7, strikethrough
+        clickButton("Add Conditional Format", 0);
+        _extHelper.waitForExtDialog("Apply Conditional Format Where IntCol", WAIT_FOR_JAVASCRIPT);
+        _extHelper.selectComboBoxItem("Filter Type:", "Is Greater Than");
+        setFormElement(Locator.id("value_1"), "7");
+        _extHelper.clickExtButton("Apply Conditional Format Where IntCol", "OK", 0);
+        checkCheckbox(Locator.checkboxByName("Strikethrough").index(1));
 
-        // TODO: Blocked: 12865: ListTest failing to reorder conditional formats
         // Switch the order of filters so that >7 takes precedence over >5
-//        dragAndDrop(Locator.xpath("//div[text()='Is Greater Than 5']"), Locator.xpath("//div[text()='Is Greater Than 7']"));
+        dragAndDrop(Locator.xpath("//div[text()='Is Greater Than 5']"), Locator.xpath("//div[text()='Is Greater Than 7']"));
         assertTextBefore("Is Greater Than 7", "Is Greater Than 5");
 
         clickButton("Save", 0);
@@ -1082,5 +1083,11 @@ public class ListTest extends BaseWebDriverTest
         click(typeLoc);
         setFormElement(typeLoc, type.toString());
         pressTab(typeLoc);
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
     }
 }
