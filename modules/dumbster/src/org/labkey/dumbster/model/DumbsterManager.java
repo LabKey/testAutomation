@@ -118,7 +118,13 @@ public class DumbsterManager implements ShutdownListener
             _server = null;
         }
     }
-    
+
+    @Override
+    public String getName()
+    {
+        return "Dumbster manager";
+    }
+
     public void shutdownPre(ServletContextEvent servletContextEvent)
     {
     }
