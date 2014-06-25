@@ -726,6 +726,15 @@ public class IssuesTest extends BaseWebDriverTest
         // this is needed in FF as after going back, the browser does not remember the form state.
         checkRadioButton(Locator.radioButtonByNameAndValue("moveToContainer", "SpecificMoveToContainer"));
 
+        // attempt an empty destination
+        setFormElement(Locator.name("moveToContainerSelect"), "");
+        updateIssue();
+        assertTextPresent("The move to specific container option was selected with a blank.");
+        clickAndWait(Locator.linkWithText("back"));
+
+        // this is needed in FF as after going back, the browser does not remember the form state.
+        checkRadioButton(Locator.radioButtonByNameAndValue("moveToContainer", "SpecificMoveToContainer"));
+
         // setup a good destination
         setFormElement(Locator.name("moveToContainerSelect"), path);
         updateIssue();
