@@ -42,7 +42,7 @@ public class FolderExportTest extends BaseWebDriverTest
     File dataDir = new File(getSampledataPath(), "FolderExport");
     private final String folderFromZip = "1 Folder From Zip"; // add numbers to folder names to keep ordering for created folders
     private final String folderFromPipelineZip = "2 Folder From Pipeline Zip";
-    private final String folderFromPipelineExport = "3 Folder From Pipline Export";
+    private final String folderFromPipelineExport = "3 Folder From Pipeline Export";
     private final String folderFromTemplate = "4 Folder From Template";
     String folderZip = "SampleWithSubfolders.folder.zip";
 
