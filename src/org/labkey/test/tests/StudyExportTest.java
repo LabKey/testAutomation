@@ -439,7 +439,7 @@ public class StudyExportTest extends StudyManualTest
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
 
         clickAndWait(Locator.linkWithText("edit"));
-        setFormElement("quf_DEMbdt", "2001-11-11");
+        setFormElement(Locator.name("quf_DEMbdt"), "2001-11-11");
         clickButton("Submit");
         _extHelper.clickMenuButton("QC State", "unknown QC");
         assertTextPresent("2001-11-11");
@@ -448,8 +448,8 @@ public class StudyExportTest extends StudyManualTest
         clickButton("Insert New");
         clickButton("Submit");
         assertTextPresent("This field is required");
-        setFormElement("quf_MouseId", TEST_ADD_ENTRY);
-        setFormElement("quf_SequenceNum", "123");
+        setFormElement(Locator.name("quf_MouseId"), TEST_ADD_ENTRY);
+        setFormElement(Locator.name("quf_SequenceNum"), "123");
         clickButton("Submit");
         _extHelper.clickMenuButton("QC State", "All data");
         assertTextPresent(TEST_ADD_ENTRY);

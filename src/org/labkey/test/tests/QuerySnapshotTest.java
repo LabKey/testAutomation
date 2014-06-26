@@ -130,8 +130,8 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButton("Insert New");
-        setFormElement("quf_MouseId", "999121212");
-        setFormElement("quf_DEMraco", "Armenian");
+        setFormElement(Locator.name("quf_MouseId"), "999121212");
+        setFormElement(Locator.name("quf_DEMraco"), "Armenian");
 
         clickButton("Submit");
 
@@ -161,7 +161,7 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickFolder(getStudyLabel());
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickAndWait(Locator.xpath("//a[.='999320016']/../..//td/a[.='edit']"));
-        setFormElement("quf_DEMraco", "Slovakian");
+        setFormElement(Locator.name("quf_DEMraco"), "Slovakian");
         clickButton("Submit");
 
         clickFolder(getStudyLabel());
@@ -234,8 +234,8 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickFolder(FOLDER_1);
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButton("Insert New");
-        setFormElement("quf_MouseId", "999121212");
-        setFormElement("quf_DEMsex", "Unknown");
+        setFormElement(Locator.name("quf_MouseId"), "999121212");
+        setFormElement(Locator.name("quf_DEMsex"), "Unknown");
 
         clickButton("Submit");
 
@@ -246,8 +246,8 @@ public class QuerySnapshotTest extends StudyBaseTest
         clickFolder(FOLDER_2);
         clickAndWait(Locator.linkWithText("DEM-1: Demographics"));
         clickButton("Insert New");
-        setFormElement("quf_MouseId", "999151515");
-        setFormElement("quf_DEMsexor", "Undecided");
+        setFormElement(Locator.name("quf_MouseId"), "999151515");
+        setFormElement(Locator.name("quf_DEMsexor"), "Undecided");
 
         clickButton("Submit");
 
@@ -281,7 +281,7 @@ public class QuerySnapshotTest extends StudyBaseTest
     {
         _extHelper.clickMenuButton("Views", "Create", "Query Snapshot");
 
-        setFormElement("snapshotName", snapshotName);
+        setFormElement(Locator.name("snapshotName"), snapshotName);
         if (autoUpdate)
             checkCheckbox(Locator.xpath("//input[@type='radio' and @name='updateType' and not (@id)]"));
 
