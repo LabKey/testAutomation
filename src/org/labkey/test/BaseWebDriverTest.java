@@ -1750,7 +1750,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @LogMethod @BeforeClass
-    public static void performInitialChecks() throws Throwable
+    public static final void performInitialChecks() throws Throwable
     {
         killHungDriverOnTeamCity();
         _setupFailed = true;
@@ -1774,7 +1774,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @Before
-    public void preClean() throws Exception
+    public final void preClean() throws Exception
     {
         setUp(); // Instantiate new WebDriver if needed
         _testFailed = false;
@@ -1909,13 +1909,13 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @After
-    public void tearDown() throws Exception
+    public final void tearDown() throws Exception
     {
         checkJsErrors();
     }
 
     @LogMethod @AfterClass
-    public static void performFinalChecks() throws Throwable
+    public static final void performFinalChecks() throws Throwable
     {
         _testFailed = false;
         WebDriverTestPostamble postamble = new WebDriverTestPostamble();
