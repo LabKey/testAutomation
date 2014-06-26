@@ -122,6 +122,7 @@ public class StudyProtectedExportTest extends StudyExportTest
         click(fileRow);
 
         _fileBrowserHelper.selectImportDataAction("Import Study");
+        clickButton("Start Import"); // Validate queries page
     }
 
     @Override
