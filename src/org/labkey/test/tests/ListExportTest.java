@@ -36,6 +36,12 @@ public class ListExportTest extends AbstractExportTest
     }
 
     @Override
+    protected boolean hasSelectors()
+    {
+        return true;
+    }
+
+    @Override
     protected String getTestColumnTitle()
     {
         return "Name";
@@ -77,6 +83,7 @@ public class ListExportTest extends AbstractExportTest
         currentTest = initTest;
     }
 
+    @Override
     public void goToDataRegionPage()
     {
         clickProject(getProjectName());
@@ -95,9 +102,4 @@ public class ListExportTest extends AbstractExportTest
         return "server/modules/list";
     }
 
-    @Override
-    protected BrowserType bestBrowser()
-    {
-        return BrowserType.CHROME;
-    }
 }

@@ -37,6 +37,12 @@ public class AssayResultsExportTest extends AbstractExportTest
     }
 
     @Override
+    protected boolean hasSelectors()
+    {
+        return true;
+    }
+
+    @Override
     protected String getTestColumnTitle()
     {
         return "Participant ID";

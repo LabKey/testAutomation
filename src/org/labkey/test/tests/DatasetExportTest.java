@@ -36,6 +36,12 @@ public class DatasetExportTest extends AssayResultsExportTest
     }
 
     @Override
+    protected boolean hasSelectors()
+    {
+        return true;
+    }
+
+    @Override
     protected int getTestColumnIndex()
     {
         return 0;

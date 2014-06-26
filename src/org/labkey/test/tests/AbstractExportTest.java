@@ -18,6 +18,7 @@ package org.labkey.test.tests;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.labkey.test.BaseWebDriverMultipleTest;
@@ -43,6 +44,8 @@ public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
     protected DataRegionTable dataRegion;
     protected DataRegionExportHelper exportHelper;
 
+    /** Return true if the rows can be selected in the grid. */
+    protected abstract boolean hasSelectors();
     protected abstract String getTestColumnTitle();
     protected abstract int getTestColumnIndex();
     protected abstract String getExportedTsvTestColumnHeader(); // tsv column headers might be field name, rather than label
@@ -63,15 +66,18 @@ public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
             recallLocation();
         }
 
-        dataRegion = new DataRegionTable(getDataRegionId(), this);
+        dataRegion = new DataRegionTable(getDataRegionId(), this, hasSelectors());
         exportHelper = new DataRegionExportHelper(dataRegion);
 
-        dataRegion.uncheckAll();
+        if (hasSelectors())
+            dataRegion.uncheckAll();
     }
 
     @Test
     public final void testExportSelectedTSV()
     {
+        Assume.assumeTrue("Skipping test for grid that doesn't support selecting rows", hasSelectors());
+
         int rowCount = 2;
         checkFirstNRows(rowCount);
 
@@ -84,6 +90,8 @@ public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
     @Test
     public final void testExportIgnoreSelectedTSV()
     {
+        Assume.assumeTrue("Skipping test for grid that doesn't support selecting rows", hasSelectors());
+
         int rowCount = 3;
         checkFirstNRows(rowCount);
 
@@ -105,6 +113,8 @@ public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
     @Test
     public final void testExportSelectedExcel()
     {
+        Assume.assumeTrue("Skipping test for grid that doesn't support selecting rows", hasSelectors());
+
         int rowCount = 4;
         checkFirstNRows(rowCount);
 
@@ -117,6 +127,8 @@ public abstract class AbstractExportTest extends BaseWebDriverMultipleTest
     @Test
     public final void testExportIgnoreSelectedExcel()
     {
+        Assume.assumeTrue("Skipping test for grid that doesn't support selecting rows", hasSelectors());
+
         int rowCount = 5;
         checkFirstNRows(rowCount);
 
