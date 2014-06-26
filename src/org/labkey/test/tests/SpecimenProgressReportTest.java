@@ -261,7 +261,7 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     {
         clickFolder(assayFolder);
         waitForElement(tableLoc);
-        configureAssayProgressDashboard(assay2, "7");
+        configureAssayProgressDashboard(assay2, "3");
         configureAssaySchema(assayName);
 
         flagSpecimenForReview(assayName, "2011-03-02");
@@ -278,18 +278,18 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
     {
         int ignored = ignoreSampleminded ? 2 : 0;
         int invalid = hasInvalid ? 1 : 0;
-        int specimenmatch = bySpecimenId ? 0 : 2;
+        int specimen = bySpecimenId ? 0 : 2;
 
         waitForElement(tableLoc);
         _ext4Helper.selectRadioButtonById(assayName + "-boxLabelEl");
         waitForElement(tableLoc);
         assertTextPresentInThisOrder("SR1", "SR2");
         assertEquals(5 - invalid, getElementCount(Locator.xpath("//td[contains(@class, 'available')]")));
-        assertEquals(1 + specimenmatch, getElementCount(Locator.xpath("//td[contains(@class, 'query')]")));
+        assertEquals(1 + specimen, getElementCount(Locator.xpath("//td[contains(@class, 'query')]")));
         assertEquals(2 + ignored, getElementCount(Locator.xpath("//td[contains(@class, 'collected')]")));
         assertEquals(2 - ignored, getElementCount(Locator.xpath("//td[contains(@class, 'received')]")));
         assertEquals(invalid, getElementCount(Locator.xpath("//td[contains(@class, 'invalid')]")));
-        assertEquals(12 - specimenmatch, getElementCount(Locator.xpath("//td[contains(@class, 'expected')]")));
+        assertEquals(12 - specimen, getElementCount(Locator.xpath("//td[contains(@class, 'expected')]")));
         assertEquals(3, getElementCount(Locator.xpath("//td[contains(@class, 'missing')]")));
     }
 
@@ -381,14 +381,14 @@ public class SpecimenProgressReportTest extends BaseWebDriverTest
         _customizeViewsHelper.saveCustomView();
     }
 
-    private void configureAssayProgressDashboard(String assayName, @Nullable String specimenMatchLength)
+    private void configureAssayProgressDashboard(String assayName, @Nullable String specimenTrimLength)
     {
         _portalHelper.clickWebpartMenuItem("Assay Progress Dashboard", "Customize");
 
         _ext4Helper.checkCheckbox(assayName);
         click(Locator.tagContainingText("label", "Specimen Report Study Folder Study"));
-        if (specimenMatchLength != null)
-            setFormElement(Locator.name("specimenMatch"), specimenMatchLength);
+        if (specimenTrimLength != null)
+            setFormElement(Locator.name("specimenTrimLength"), specimenTrimLength);
 
         clickButton("Save");
     }
