@@ -105,6 +105,12 @@ public class StudyDatasetImportFieldsTest extends StudyBaseTest
         //waitForText("47");
         waitForText("No data to show.");
         assertTextPresent(REPLACEMENT_COL);
-        checkExpectedErrors(1);
+
+        /* Formerly something in this test produced 1 expected error. This changed between r33104 and r33123, and there are now no errors
+            produced by the test steps. Unfortunately the original developer (myself) wasn't nice enough to say in comments
+            what the expected error was. None of the steps look like they were intentionally triggering an error via a negative test
+            case.
+        */
+        checkExpectedErrors(0);
     }
 }
