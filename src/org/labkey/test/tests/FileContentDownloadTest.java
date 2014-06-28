@@ -1,0 +1,252 @@
+package org.labkey.test.tests;
+
+import org.jetbrains.annotations.Nullable;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.labkey.test.BaseWebDriverTest;
+import org.labkey.test.TestTimeoutException;
+import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.FileBrowser;
+import org.labkey.test.util.EscapeUtil;
+import org.labkey.test.util.FileBrowserHelper;
+import org.labkey.test.util.PortalHelper;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import com.google.common.base.Function;
+
+import static org.junit.Assert.assertEquals;
+
+@Category({DailyA.class, FileBrowser.class})
+public class FileContentDownloadTest extends BaseWebDriverTest
+{
+    @BeforeClass
+    public static void doSetup() throws Exception
+    {
+        FileContentDownloadTest initTest = new FileContentDownloadTest();
+        initTest.doCleanup(false);
+
+        initTest.doSetupSteps();
+
+        currentTest = initTest;
+    }
+
+    protected void doCleanup(boolean afterTest) throws TestTimeoutException
+    {
+        deleteProject(getProjectName(), afterTest);
+    }
+
+    private void doSetupSteps()
+    {
+        _containerHelper.createProject(getProjectName(), null);
+        PortalHelper portalHelper = new PortalHelper(this);
+        portalHelper.addWebPart("Files");
+    }
+
+    @Before
+    public void preTest()
+    {
+        goToProjectHome();
+        _fileBrowserHelper.waitForFileGridReady();
+    }
+
+    @Test
+    public void testMultipleDownloadToZip() throws Exception
+    {
+        File file1 = getNextSampleFile();
+        File file2 = getNextSampleFile();
+        Set<String> expectedFiles = new HashSet<>();
+
+        _fileBrowserHelper.uploadFile(file1);
+        _fileBrowserHelper.uploadFile(file2);
+
+        _fileBrowserHelper.selectFileBrowserItem(file1.getName());
+        expectedFiles.add(file1.getName());
+        _fileBrowserHelper.selectFileBrowserItem(file2.getName());
+        expectedFiles.add(file2.getName());
+
+        File download = clickAndWaitForDownload(FileBrowserHelper.BrowserAction.DOWNLOAD.button());
+        assertEquals(getZipDownloadFileName(), download.getName());
+
+        Set<String> filesInZip = new HashSet<>();
+        try (
+                InputStream is = new FileInputStream(download);
+                ZipInputStream zip = new ZipInputStream(is))
+        {
+            while (zip.available() != 0)
+            {
+                ZipEntry entry = zip.getNextEntry();
+                if (entry != null)
+                    filesInZip.add(entry.getName());
+            }
+        }
+
+        assertEquals(expectedFiles, filesInZip);
+    }
+
+    @Test
+    public void testFolderDownload() throws Exception
+    {
+        File file1 = getNextSampleFile();
+        File file2 = getNextSampleFile();
+        String folderName = "folderDownload";
+        String subfolderName = "subFolder";
+        Set<String> expectedFiles = new HashSet<>();
+
+        String folderPath;
+        _fileBrowserHelper.createFolder(folderName);
+        folderPath = folderName + "/";
+        _fileBrowserHelper.selectFileBrowserItem("/" + folderPath);
+        _fileBrowserHelper.uploadFile(file1);
+        expectedFiles.add(folderPath + file1.getName());
+
+        _fileBrowserHelper.createFolder(subfolderName);
+        folderPath = folderPath + subfolderName + "/";
+        _fileBrowserHelper.selectFileBrowserItem("/" + folderPath);
+        _fileBrowserHelper.uploadFile(file2);
+        expectedFiles.add(folderPath + file2.getName());
+
+        _fileBrowserHelper.selectFileBrowserItem("/" + folderName);
+        File download = clickAndWaitForDownload(FileBrowserHelper.BrowserAction.DOWNLOAD.button());
+        assertEquals(getZipDownloadFileName(), download.getName());
+
+        Set<String> filesInZip = new HashSet<>();
+        try (
+                InputStream is = new FileInputStream(download);
+                ZipInputStream zip = new ZipInputStream(is))
+        {
+            while (zip.available() != 0)
+            {
+                ZipEntry entry = zip.getNextEntry();
+                if (entry != null)
+                    filesInZip.add(entry.getName());
+            }
+        }
+
+        assertEquals(expectedFiles, filesInZip);
+    }
+
+    @Test
+    public void testDoubleClickDownload()
+    {
+        final File file1 = getNextSampleFile();
+
+        _fileBrowserHelper.uploadFile(file1);
+
+        Function func = new Function()
+        {
+            @Override
+            public Object apply(Object o)
+            {
+                doubleClick(FileBrowserHelper.Locators.gridRow(file1.getName()));
+                return null;
+            }
+        };
+        File download = applyAndWaitForDownload(func);
+        assertEquals(file1.getName(), download.getName());
+    }
+
+    @Test
+    public void testDoubleClickDoesNotDownloadFolder()
+    {
+        File file = getNextSampleFile();
+        String folderName = "noDownload";
+
+        _fileBrowserHelper.createFolder(folderName);
+        _fileBrowserHelper.selectFileBrowserItem("/" + folderName + "/");
+
+        _fileBrowserHelper.uploadFile(file);
+
+        _fileBrowserHelper.selectFileBrowserRoot();
+
+        waitForElement(FileBrowserHelper.Locators.gridRow(folderName));
+        doubleClick(FileBrowserHelper.Locators.gridRow(folderName));
+
+        waitForElement(FileBrowserHelper.Locators.gridRow(file.getName()));
+    }
+
+    @Test
+    public void testDoubleClickDisplaysTxtInWindow()
+    {
+        File textFile = getSampleData("fileTypes/sample.txt");
+
+        _fileBrowserHelper.uploadFile(textFile);
+
+        waitForElement(FileBrowserHelper.Locators.gridRow(textFile.getName()));
+        doubleClick(FileBrowserHelper.Locators.gridRow(textFile.getName()));
+
+        switchToWindow(1);
+        assertTextPresent("Sample text file");
+        getDriver().close();
+        switchToMainWindow();
+    }
+
+    @Test
+    public void testRenderAsRedirect()
+    {
+        File textFile = getSampleData("fileTypes/sample.txt");
+
+        String folderName = "redirectTest";
+        _fileBrowserHelper.createFolder(folderName);
+        doubleClick(FileBrowserHelper.Locators.gridRow(folderName));
+        _fileBrowserHelper.uploadFile(textFile);
+
+        signOut();
+        // Test that renderAs can be observed through a login
+        beginAt("files/" + EscapeUtil.encode(getProjectName()) + "/%40files/" + EscapeUtil.encode(folderName) + "/" + textFile.getName() + "?renderAs=INLINE");
+        assertTitleEquals("Sign In");
+
+        log("Test renderAs through login and ensure that page is rendered inside of server UI");
+        // If this succeeds, then page has been rendered in frame
+        simpleSignIn();
+
+        assertTextPresent("Sample text file");
+    }
+
+    private static int zipDownloads = 0;
+    private String getZipDownloadFileName()
+    {
+        String duplicateFileUniquifier = "";
+        if(zipDownloads > 0)
+        {
+            duplicateFileUniquifier = "(" + (zipDownloads) + ")";
+            if (getBrowserType() == BrowserType.CHROME)
+                duplicateFileUniquifier = " " + duplicateFileUniquifier;
+        }
+        String suffix = " files" + duplicateFileUniquifier + ".zip";
+        zipDownloads++;
+        return getProjectName() + suffix;
+    }
+
+    private static int sampleFileCounter = 0;
+    private File getNextSampleFile()
+    {
+        return getSampleData("Affymetrix/CEL_files/sample_file_" + (++sampleFileCounter) + ".CEL");
+    }
+
+    @Nullable
+    @Override
+    protected String getProjectName()
+    {
+        return getClass().getSimpleName() + " Project";
+    }
+
+    @Override
+    public String getAssociatedModuleDirectory()
+    {
+        return "filecontent";
+    }
+
+    @Override
+    protected BrowserType bestBrowser()
+    {
+        return BrowserType.CHROME;
+    }
+}

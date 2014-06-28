@@ -23,13 +23,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
 
-public class FileBrowserHelper implements FileBrowserHelperParams
+public class FileBrowserHelper
 {
     BaseWebDriverTest _test;
     public FileBrowserHelper(BaseWebDriverTest test)
@@ -112,7 +113,6 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         }
     }
 
-    @Override
     public void clickFileBrowserFileCheckbox(@LoggedParam String fileName)
     {
         waitForFileGridReady();
@@ -152,13 +152,11 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         }
     }
 
-    @Override
     public void selectFileBrowserRoot()
     {
         selectFileBrowserItem("/");
     }
 
-    @Override
     public void renameFile(String currentName, String newName)
     {
         selectFileBrowserItem(currentName);
@@ -169,7 +167,6 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(newName));
     }
 
-    @Override
     public void moveFile(String fileName, String destinationPath)
     {
         selectFileBrowserItem(fileName);
@@ -197,7 +194,6 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         _test.waitForElementToDisappear(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(fileName));
     }
 
-    @Override
     public void createFolder(String folderName)
     {
         clickFileBrowserButton(BrowserAction.NEW_FOLDER);
@@ -206,7 +202,6 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         _test.waitForElement(Locator.css(".labkey-filecontent-grid div.x4-grid-cell-inner").withText(folderName));
     }
 
-    @Override
     public void addToolbarButton(String buttonId)
     {
         String checkboxXpath = "//*[contains(@class, 'x4-grid-checkcolumn')]";
@@ -217,7 +212,6 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         _test.click(Locator.xpath("//tr[@data-recordid='" + buttonId + "']").append(checkboxXpath));
     }
 
-    @Override
     public void removeToolbarButton(String buttonId)
     {
         String checkboxXpath = "//*[contains(@class, 'x4-grid-checkcolumn')]";
@@ -228,7 +222,6 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         _test.click(Locator.xpath("//tr[@data-recordid='" + buttonId + "']").append(checkboxXpath));
     }
 
-    @Override
     public void goToConfigureButtonsTab()
     {
         if (!_test.isElementPresent(Ext4Helper.Locators.window("Manage File Browser Configuration")))
@@ -238,14 +231,12 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         _test.waitForText("Configure Toolbar Options");
     }
 
-    @Override
     public void goToAdminMenu()
     {
         clickFileBrowserButton(BrowserAction.ADMIN);
         _test.waitForElement(Ext4Helper.Locators.window("Manage File Browser Configuration"));
     }
 
-    @Override
     public void selectImportDataAction(@LoggedParam String actionName)
     {
         waitForFileGridReady();
@@ -255,13 +246,11 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         _test.clickAndWait(Ext4Helper.Locators.ext4Button("Import"));
     }
 
-    @Override
     public void uploadFile(File file)
     {
         uploadFile(file, null, null, false);
     }
 
-    @Override
     @LogMethod
     public void uploadFile(@LoggedParam final File file, @Nullable String description, @Nullable List<FileBrowserExtendedProperty> fileProperties, boolean replace)
     {
@@ -321,26 +310,19 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         _test.assertFormElementEquals(Locator.name("description"), "");
     }
 
-    @Override
     public void importFile(String filePath, String importAction)
     {
         selectFileBrowserItem(filePath);
         selectImportDataAction(importAction);
     }
 
-    @Override
-    public void clickFileBrowserButton(String actionName)
-    {
-        clickFileBrowserButton(BrowserAction.getEnum(actionName));
-    }
-
     @LogMethod (quiet = true)
     public void clickFileBrowserButton(@LoggedParam BrowserAction action)
     {
         waitForFileGridReady();
-        WebElement button = action.getButton(_test);
+        WebElement button = action.findButton(_test);
         if (button.isDisplayed())
-            _test.clickAndWait(action.getButton(_test), action._triggersPageLoad ? WAIT_FOR_PAGE : 0);
+            _test.clickAndWait(action.findButton(_test), action._triggersPageLoad ? WAIT_FOR_PAGE : 0);
         else
             clickFileBrowserButtonOverflow(action);
     }
@@ -354,37 +336,76 @@ public class FileBrowserHelper implements FileBrowserHelperParams
         _test.waitAndClick(WAIT_FOR_JAVASCRIPT, menuItem, action._triggersPageLoad ? WAIT_FOR_PAGE : 0);
     }
 
+    public List<WebElement> findBrowserButtons()
+    {
+        return Locator.css(".fbrowser > .x4-toolbar a.x4-btn[data-qtip]").findElements(_test.getDriver());
+    }
+
+    public List<BrowserAction> getAvailableBrowserActions()
+    {
+        List<BrowserAction> actions = new ArrayList<>();
+        List<WebElement> buttons = findBrowserButtons();
+
+        for (WebElement button : buttons)
+        {
+            String cssClassString = button.getAttribute("class");
+            String[] cssClasses = cssClassString.split("[ ]+");
+            BrowserAction action = null;
+            for (int i = 0; action == null && i < cssClasses.length; i++)
+            {
+                action = BrowserAction.getActionFromButtonClass(cssClasses[i]);
+            }
+            if (action == null)
+                throw new IllegalStateException("No button found for unrecognize action: " + button.getAttribute("data-qtip"));
+            actions.add(action);
+        }
+
+        return actions;
+    }
+
     public static enum BrowserAction
     {
-        FOLDER_TREE("FolderTree", "Toggle Folder Tree"),
-        UP("Up", "Parent Folder"),
-        RELOAD("Reload", "Refresh"),
-        NEW_FOLDER("FolderNew", "Create Folder"),
-        DOWNLOAD("Download", "Download"),
-        DELETE("Delete", "Delete"),
-        RENAME("Rename", "Rename"),
-        MOVE("Move", "Move"),
-        EDIT_PROPERTIES("EditFileProps", "Edit Properties"),
-        UPLOAD("Upload", "Upload Files"),
-        IMPORT_DATA("DBCommit", "Import Data"),
-        EMAIL_SETTINGS("EmailSettings", "Email Preferences"),
-        AUDIT_HISTORY("AuditLog", "Audit History", true),
-        ADMIN("Configure", "Admin");
+        FOLDER_TREE("FolderTree", "Toggle Folder Tree", "folderTreeToggle"),
+        UP("Up", "Parent Folder", "parentFolder"),
+        RELOAD("Reload", "Refresh", "refresh"),
+        NEW_FOLDER("FolderNew", "Create Folder", "createDirectory"),
+        DOWNLOAD("Download", "Download", "download"),
+        DELETE("Delete", "Delete", "deletePath"),
+        RENAME("Rename", "Rename", "renamePath"),
+        MOVE("Move", "Move", "movePath"),
+        EDIT_PROPERTIES("EditFileProps", "Edit Properties", "editFileProps"),
+        UPLOAD("Upload", "Upload Files", "upload"),
+        IMPORT_DATA("DBCommit", "Import Data", "importData"),
+        EMAIL_SETTINGS("EmailSettings", "Email Preferences", "emailPreferences"),
+        AUDIT_HISTORY("AuditLog", "Audit History", "auditLog", true),
+        ADMIN("Configure", "Admin", "customize");
 
         private String _iconName;
         private String _buttonText;
+        private String _extId; // from Browser.js
         private boolean _triggersPageLoad;
 
-        private BrowserAction(String iconName, String buttonText, boolean triggersPageLoad)
+        private BrowserAction(String iconName, String buttonText, String extId, boolean triggersPageLoad)
         {
             _iconName = iconName;
             _buttonText = buttonText;
+            _extId = extId;
             _triggersPageLoad = triggersPageLoad;
         }
 
-        private BrowserAction(String iconName, String buttonText)
+        private BrowserAction(String iconName, String buttonText, String extId)
         {
-            this(iconName, buttonText, false);
+            this(iconName, buttonText, extId, false);
+        }
+
+        private static BrowserAction getActionFromButtonClass(String cssClass)
+        {
+            for (BrowserAction a : BrowserAction.values())
+            {
+                if (a.buttonCls().equals(cssClass))
+                    return a;
+            }
+            return null;
         }
 
         public String toString()
@@ -392,48 +413,51 @@ public class FileBrowserHelper implements FileBrowserHelperParams
             return _buttonText;
         }
 
-        public static BrowserAction getEnum(String buttonText)
+        public WebElement findButton(final BaseWebDriverTest test)
         {
-            for (BrowserAction a : BrowserAction.values())
-            {
-                if (a.toString().equals(buttonText))
-                    return a;
-            }
-            throw new IllegalArgumentException("No such file browser action: " + buttonText);
+            return Locator.css("." + buttonCls()).findElement(test.getDriver());
+//            List<WebElement> possibleButtons = getButtonIconLocator().findElements(test.getDriver());
+//            if (possibleButtons.size() > 0)
+//                return possibleButtons.get(0);
+//
+//            possibleButtons = getButtonTextLocator().findElements(test.getDriver());
+//            if (possibleButtons.size() > 0)
+//                return possibleButtons.get(0);
+//
+//            throw new ElementNotFoundException("File browser button", "text", _buttonText);
         }
 
-        public WebElement getButton(final BaseWebDriverTest test)
+        private String buttonCls()
         {
-            List<WebElement> possibleIcons = getButtonIconLocator().findElements(test.getDriver());
-            if (possibleIcons.size() > 0)
-                return possibleIcons.get(0);
-
-            Locator button = test.findButton(_buttonText);
-            if (button != null)
-                return button.findElement(test.getDriver());
-
-            throw new ElementNotFoundException("File browser button not present: " + _buttonText, "Button", _buttonText);
+            return _extId + "Btn";
         }
 
-        private Locator getButtonIconLocator()
+        public Locator button()
+        {
+            return Locator.tagWithClass("a", buttonCls());
+        }
+
+        public Locator getButtonIconLocator()
         {
             return Locator.css(".icon" + _iconName);
         }
+
+        public Locator getButtonTextLocator()
+        {
+            return button().containing(_buttonText);
+        }
     }
 
-    @Override
     public void waitForFileGridReady()
     {
         _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-file-grid-initialized')]"), 6 * WAIT_FOR_JAVASCRIPT);
     }
 
-    @Override
     public void waitForImportDataEnabled()
     {
         _test.waitForElement(Locator.xpath("//div[contains(@class, 'labkey-import-enabled')]"), 6 * WAIT_FOR_JAVASCRIPT);
     }
 
-    @Override
     public void openFolderTree()
     {
         Locator collapsedTreePanel = Locator.css("#treeNav-body.x4-collapsed");

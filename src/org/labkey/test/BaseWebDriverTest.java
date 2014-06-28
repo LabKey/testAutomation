@@ -16,6 +16,7 @@
 
 package org.labkey.test;
 
+import com.google.common.base.Function;
 import com.thoughtworks.selenium.SeleniumException;
 import net.jsourcerer.webdriver.jserrorcollector.JavaScriptError;
 import org.apache.commons.httpclient.URIException;
@@ -3590,7 +3591,27 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         return clickAndWaitForDownload(elementToClick, 1)[0];
     }
 
-    public File[] clickAndWaitForDownload(Locator elementToClick, final int expectedFileCount)
+    public File[] clickAndWaitForDownload(final Locator elementToClick, final int expectedFileCount)
+    {
+        Function clicker = new Function()
+        {
+            @Override
+            public Object apply(Object o)
+            {
+                click(elementToClick);
+                return null;
+            }
+        };
+
+        return applyAndWaitForDownload(clicker, expectedFileCount);
+    }
+
+    public File applyAndWaitForDownload(Function func)
+    {
+        return applyAndWaitForDownload(func, 1)[0];
+    }
+
+    public File[] applyAndWaitForDownload(Function func, final int expectedFileCount)
     {
         final File downloadDir = getDownloadDir();
         File[] existingFilesArray = downloadDir.listFiles();
@@ -3601,7 +3622,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         else
             existingFiles = new ArrayList<>();
 
-        click(elementToClick);
+        func.apply(null);
 
         final FileFilter tempFilesFilter = new FileFilter()
         {
@@ -3855,18 +3876,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         prepForPageLoad();
         executeScript("arguments[0].submit()", form);
         waitForPageToLoad();
-    }
-
-    /**
-     * @deprecated Use {@link #clickButton(String)}
-     */
-    @Deprecated public void submit(String buttonName)
-    {
-        Locator l = findButton(buttonName);
-
-        assertTrue("Button with name '" + buttonName + "' not found", null != l);
-
-        clickAndWait(l);
     }
 
     public Locator findButton(String name)
@@ -5345,11 +5354,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         impersonateRoles(role);
     }
 
-    public void impersonateRoles(String... roles)
+    public void impersonateRoles(String oneRole, String... roles)
     {
         _ext4Helper.clickExt4MenuButton(false, Locators.USER_MENU, false, "Impersonate", "Roles");
         waitForElement(Ext4Helper.Locators.window("Impersonate Roles"));
 
+        waitAndClick(Ext4GridRef.locateExt4GridCell(oneRole));
         for (String role : roles)
             waitAndClick(Ext4GridRef.locateExt4GridCell(role));
 

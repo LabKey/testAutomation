@@ -404,7 +404,9 @@ src/org/labkey/test/tests/ExtraKeyStudyTest.java -text
 src/org/labkey/test/tests/FacetedFilterCutoffTest.java -text
 src/org/labkey/test/tests/FieldValidatorTest.java -text
 src/org/labkey/test/tests/FileBasedPipelineTest.java -text
-src/org/labkey/test/tests/FileContentTest.java -text
+src/org/labkey/test/tests/FileContentActionButtonsTest.java -text
+src/org/labkey/test/tests/FileContentDownloadTest.java -text
+src/org/labkey/test/tests/FileContentUploadTest.java -text
 src/org/labkey/test/tests/FilterTest.java -text
 src/org/labkey/test/tests/FlowAnalysisResolverTest.java -text
 src/org/labkey/test/tests/FlowAssaysTest.java -text
@@ -578,7 +580,6 @@ src/org/labkey/test/util/Ext4Helper.java -text
 src/org/labkey/test/util/ExtHelper.java -text
 src/org/labkey/test/util/FileBrowserExtendedProperty.java -text
 src/org/labkey/test/util/FileBrowserHelper.java -text
-src/org/labkey/test/util/FileBrowserHelperParams.java -text
 src/org/labkey/test/util/IssuesHelper.java -text
 src/org/labkey/test/util/JSONHelper.java -text
 src/org/labkey/test/util/JUnitFooter.java -text
