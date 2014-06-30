@@ -109,9 +109,9 @@ public class DrugSensitivityAssayTest extends AbstractPlateBasedAssayTest
         // verify details view has a custom sample label
         assertTextPresent("Drug Treatment Information");
 
-        click(Locator.linkContainingText("View Runs"));
+        clickAndWait(Locator.linkContainingText("View Runs"));
         assertElementPresent(Locator.linkContainingText("assaydata" + File.separator + "acquisition3"));
-        click(Locator.linkContainingText("3.txt"));
+        clickAndWait(Locator.linkContainingText("3.txt"));
 
         DataRegionTable table = new DataRegionTable("Data", this);
 
