@@ -80,6 +80,11 @@ public class ListHelper extends AbstractHelper
     {
 
         _test.clickButton("Insert New");
+        setRowData(data);
+    }
+
+    private void setRowData(Map<String, String> data)
+    {
         for(String key : data.keySet())
         {
             _test.setFormElement(Locator.name("quf_" + key), data.get(key));
@@ -87,6 +92,19 @@ public class ListHelper extends AbstractHelper
         _test.clickButton("Submit");
         _test.assertTextPresent(data.get(data.keySet().iterator().next()));  //make sure some text from the map is present
     }
+
+    /**
+     * From the list data grid, edit an existing row
+     *
+     * @param id the row number (1 based)
+     */
+    public void updateRow(int id, Map<String, String> data)
+    {
+        DataRegionTable dr = new DataRegionTable("query", _test);
+        _test.click(dr.updateLink(id - 1));
+        setRowData(data);
+    }
+
 
     /**
      * Starting at the grid view of a list, delete it

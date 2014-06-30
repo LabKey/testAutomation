@@ -122,24 +122,36 @@ public class SearchTest extends StudyTest
         _searchHelper.verifySearchResults("/" + getProjectName() + "/" + getFolderName(), false);
         moveFolder(getProjectName(), getFolderName(), FOLDER_B, true);
         alterListsAndReSearch();
-        _searchHelper.verifySearchResults("/" + getProjectName() + "/" + FOLDER_B + "/" + getFolderName(), false);
 
         verifySyntaxErrorMessages();
     }
 
     private void alterListsAndReSearch()
     {
+        log("Verifying list index updated on row insertion.");
         clickFolder(FOLDER_C);
         clickAndWait(Locator.linkWithText(listIndexAsWhole));
         HashMap<String, String> data = new HashMap<>();
         String newAnimal = "Zebra Seal";
         data.put("Animal", newAnimal);
         _listHelper.insertNewRow(data);
-        goBack();
-
         _searchHelper.enqueueSearchItem(newAnimal, Locator.linkContainingText(listIndexAsWhole));
-//        _searchHelper.verifySearchResults(this, "/" + getProjectName() + "/" + getFolderName(), false);
-        log("TODO");
+        goBack();
+        _searchHelper.verifySearchResults("/" + getProjectName() + "/" + FOLDER_B + "/" + getFolderName(), false);
+
+        // Test case for 20109 Regression after migration to hard tables, updating a row didn't update the index
+        log("Verifying list index updated on row update.");
+        clickFolder(FOLDER_C);
+        clickAndWait(Locator.linkWithText(fullySearchableList));
+        String updateAnimal = "BearCatThing";
+        data.clear();
+        data.put("Name", updateAnimal);
+        _listHelper.updateRow(1, data); // Change the "Panda" row
+        _searchHelper.enqueueSearchItem("Panda"); // Search for Panda should now return no results.
+        _searchHelper.enqueueSearchItem(updateAnimal, Locator.linkContainingText(fullySearchableList));
+        goBack();
+        _searchHelper.verifySearchResults("/" + getProjectName() + "/" + FOLDER_B + "/" + getFolderName(), false);
+
     }
 
     public void runApiTests() throws Exception

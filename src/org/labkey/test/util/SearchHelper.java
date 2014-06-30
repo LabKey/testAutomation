@@ -23,12 +23,13 @@ import org.labkey.test.WebTestHelper;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SearchHelper extends AbstractHelper
 {
     private static LinkedList<SearchItem> _searchQueue = new LinkedList<>();
-
     public SearchHelper(BaseWebDriverTest test)
     {
         super(test);
@@ -153,13 +154,23 @@ public class SearchHelper extends AbstractHelper
         }
     }
 
+    /**
+     * Add searchTerm and all expected results to list of terms to search for.
+     * If searchTerm is already in the list, replaces the expected results.
+     * @param searchTerm
+     * @param expectedResults Omit if expecting 0 results for the search
+     */
     public void enqueueSearchItem(String searchTerm, Locator... expectedResults)
     {
+        if (_searchQueue.contains(searchTerm))
+            _searchQueue.remove(searchTerm);
         _searchQueue.add(new SearchItem(searchTerm, false, expectedResults));
     }
 
     public void enqueueSearchItem(String searchTerm, boolean file, Locator... expectedResults)
     {
+        if (_searchQueue.contains(searchTerm))
+            _searchQueue.remove(searchTerm);
         _searchQueue.add(new SearchItem(searchTerm, file, expectedResults));
     }
 
