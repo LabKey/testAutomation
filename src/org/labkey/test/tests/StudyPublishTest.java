@@ -448,7 +448,7 @@ public class StudyPublishTest extends StudyProtectedExportTest
         if (includeSpecimens)
         {
             waitForText("By Vial Group");
-            clickAndWait(Locator.linkWithText("By Individual Vial"));
+            waitAndClickAndWait(Locator.linkWithText("By Individual Vial"));
             waitForElement(Locator.paginationText(expectedSpecimenCount));
 
             // verify that the alternate IDs are used
