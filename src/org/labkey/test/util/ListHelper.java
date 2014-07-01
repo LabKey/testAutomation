@@ -683,7 +683,7 @@ public class ListHelper extends AbstractHelper
         private String _schema;
         private String _table;
 
-        public LookupInfo(String folder, String schema, String table)
+        public LookupInfo(@Nullable String folder, String schema, String table)
         {
             _folder = ("".equals(folder) ? null : folder);
             //container must exactly match an item in the dropdown
