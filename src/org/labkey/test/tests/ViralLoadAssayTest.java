@@ -594,7 +594,7 @@ public class ViralLoadAssayTest extends AbstractLabModuleAssayTest
         expected.put("CTL_negative", new String[]{"CTL_negative", "Control", "", "0"});
         expected.put("CTL_r02007", new String[]{"CTL_r02007", "Control", "", "46600"});
         expected.put("d02056", new String[]{"d02056", "Unknown", "2010-04-19", "102000"});
-        expected.put("d03830", new String[]{"d03830", "Unknown", "2010-04-19", "8450"});
+        expected.put("d03830", new String[]{"d03830", "Unknown", "2010-04-19", "8500"});
         expected.put("d04291", new String[]{"d04291", "Unknown", "2010-04-19", "252000"});
         expected.put("d03504", new String[]{"d03504", "Unknown", "2010-04-19", "171000"});
         expected.put("dh6U10", new String[]{"dh6U10", "Unknown", "2010-04-20", "1300"});

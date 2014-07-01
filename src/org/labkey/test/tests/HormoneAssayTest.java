@@ -449,7 +449,7 @@ public class HormoneAssayTest extends AbstractLabModuleAssayTest
         expected.put("Subject12_Estradiol_21.65", new String[]{"Subject12", "2012-01-13", "Estradiol", "21.65", "pg/ml", "Unknown", "", "1", ""});
         expected.put("Subject13_Progesterone_0.19", new String[]{"Subject13", "2012-01-14", "Progesterone", "0.19", "ng/ml", "Unknown", "", "1", ""});
         expected.put("Subject13_Estradiol_44.98", new String[]{"Subject13", "2012-01-14", "Estradiol", "44.98", "pg/ml", "Unknown", "", "1", ""});
-        expected.put("Subject14_Progesterone_0.26", new String[]{"Subject14", "2012-01-15", "Progesterone", "0.26", "ng/ml", "Unknown", "", "1", ""});
+        expected.put("Subject14_Progesterone_0.27", new String[]{"Subject14", "2012-01-15", "Progesterone", "0.27", "ng/ml", "Unknown", "", "1", ""});
         expected.put("Subject14_Estradiol_87.17", new String[]{"Subject14", "2012-01-15", "Estradiol", "87.17", "pg/ml", "Unknown", "", "1", ""});
         expected.put("Subject15_Progesterone_0.3", new String[]{"Subject15", "2012-01-16", "Progesterone", "0.3", "ng/ml", "Unknown", "", "1", ""});
         expected.put("Subject15_Estradiol_155.9", new String[]{"Subject15", "2012-01-16", "Estradiol", "155.9", "pg/ml", "Unknown", "", "1", ""});
