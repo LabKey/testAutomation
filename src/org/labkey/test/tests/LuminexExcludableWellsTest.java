@@ -20,6 +20,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.Assays;
 import org.labkey.test.categories.DailyA;
 import org.labkey.test.categories.MiniTest;
+import org.labkey.test.util.DataRegionTable;
 import org.labkey.test.util.LogMethod;
 
 import java.util.Arrays;
@@ -120,32 +121,38 @@ public class LuminexExcludableWellsTest extends LuminexTest
      */
     private void excludeAllAnalytesForSingleWellTest(String wellName)
     {
+        DataRegionTable table = new DataRegionTable("Data", this);
+        table.setFilter("WellRole", "Equals", "Unknown");
         clickExclusionMenuIconForWell(wellName);
-
         String comment = "exclude all for single well";
         setFormElement(Locator.name(EXCLUDE_COMMENT_FIELD), comment);
         clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
+        table.clearFilter("WellRole");
 
         excludeForSingleWellVerify("Excluded for replicate group: " + comment, new HashSet<>(Arrays.asList(getListOfAnalytesMultipleCurveData())));
 
         //remove exclusions to leave in clean state
+        table.setFilter("WellRole", "Equals", "Unknown");
         clickExclusionMenuIconForWell(wellName);
         click(Locator.radioButtonById("excludeselected"));
         clickButton(SAVE_CHANGES_BUTTON, 0);
         _extHelper.waitForExtDialog("Warning");
         clickButton("Yes", 2 * defaultWaitForPage);
+        table.clearFilter("WellRole");
     }
 
     private void excludeOneAnalyteForSingleWellTest(String wellName, String excludedAnalyte)
     {
         waitForText("Well Role");
+        DataRegionTable table = new DataRegionTable("Data", this);
+        table.setFilter("WellRole", "Equals", "Unknown");
         clickExclusionMenuIconForWell(wellName);
-
         String exclusionComment = "exclude single analyte for single well";
         setFormElement(EXCLUDE_COMMENT_FIELD, exclusionComment);
         click(Locator.radioButtonById(EXCLUDE_SELECTED_BUTTON));
         clickExcludeAnalyteCheckBox(excludedAnalyte);
         clickButton(SAVE_CHANGES_BUTTON, 2 * defaultWaitForPage);
+        table.clearFilter("WellRole");
 
         excludeForSingleWellVerify("Excluded for replicate group: " + exclusionComment, new HashSet<>((Arrays.asList(excludedAnalyte))));
     }
