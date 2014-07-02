@@ -362,7 +362,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         selectOptionByText(Locator.name("assignedTo"), displayNameFromEmail(USER3));
         clickButton("Submit");
         clickAndWait(Locator.linkWithText("view message or respond"));
-        assertTextPresent("Members: "+USER1);
+        assertTextPresent("Members: "+displayNameFromEmail(USER1));
         assertElementPresent(Locator.css("#webpart_-1 td").withText("Assigned To: "+ displayNameFromEmail(USER3)));
         impersonate(USER1);
         clickProject(PROJECT_NAME);
@@ -402,7 +402,7 @@ public class MessagesLongTest extends BaseWebDriverTest
         log("Verify admin user still sees email address");
         clickProject(PROJECT_NAME);
         clickAndWait(Locator.linkWithText(MSG3_TITLE));
-        assertTextPresent("Members: " + USER1);
+        assertTextPresent("Members: " + displayNameFromEmail(USER1) );
     }
 
     //Expects an empty email record
