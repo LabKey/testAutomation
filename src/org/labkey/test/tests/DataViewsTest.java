@@ -18,7 +18,7 @@ package org.labkey.test.tests;
 import org.junit.experimental.categories.Category;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.categories.DailyA;
+import org.labkey.test.categories.InDevelopment;
 import org.labkey.test.util.Ext4Helper;
 import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.LoggedParam;
@@ -28,7 +28,8 @@ import org.openqa.selenium.WebElement;
 
 import static org.junit.Assert.*;
 
-@Category({DailyA.class})
+//TODO: Add to DailyA suite: 20994: DataViewsTest is unreliable on TeamCity
+@Category({InDevelopment.class})
 public class DataViewsTest extends ParticipantListTest
 {
     private static final String REPORT_NAME = "TestReport";
