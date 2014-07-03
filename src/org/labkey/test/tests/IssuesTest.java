@@ -381,6 +381,24 @@ public class IssuesTest extends BaseWebDriverTest
     }
 
     @Test
+    public void badUserNotifyList()
+    {
+        String badUsername = "junk";
+        String errorMessage = String.format("Failed to add user %s: Invalid user display name", badUsername);
+
+        // NOTE: re using issue but in idempotent manner!
+        clickAndWait(Locator.linkWithText(ISSUE_TITLE_0));
+
+        updateIssue();
+        setFormElement(Locator.name("notifyList"), badUsername);
+        clickButton("Save");
+
+        assertTextPresent(errorMessage);
+
+        clickButton("Cancel");
+    }
+
+    @Test
     public void emailTest()
     {
         goToModule("Dumbster");
