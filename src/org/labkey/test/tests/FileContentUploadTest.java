@@ -74,12 +74,9 @@ public class FileContentUploadTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        FileContentUploadTest initTest = new FileContentUploadTest();
-        initTest.doCleanup(false);
+        FileContentUploadTest initTest = (FileContentUploadTest)getCurrentTest();
 
         initTest.doSetupSteps();
-
-        currentTest = initTest;
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException

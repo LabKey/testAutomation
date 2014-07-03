@@ -123,8 +123,7 @@ public class DataReportsTest extends ReportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        DataReportsTest initTest = new DataReportsTest();
-        initTest.doCleanup(false);
+        DataReportsTest initTest = (DataReportsTest)getCurrentTest();
 
         // fail fast if R is not configured
         initTest._rReportHelper.ensureRConfig();
@@ -136,8 +135,6 @@ public class DataReportsTest extends ReportTest
         // need this to turn off the demographic bit in the DEM-1 dataset
         initTest.clickFolder(initTest.getFolderName());
         initTest.setDemographicsBit("DEM-1: Demographics", false);
-
-        currentTest = initTest;
     }
 
     @Test @Ignore

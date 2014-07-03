@@ -74,13 +74,10 @@ public class ListExportTest extends AbstractExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        ListExportTest initTest = new ListExportTest();
-        initTest.doCleanup(false);
+        ListExportTest initTest = (ListExportTest)getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest._listHelper.importListArchive(initTest.getProjectName(), LIST_ARCHIVE);
-
-        currentTest = initTest;
     }
 
     @Override

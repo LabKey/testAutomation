@@ -77,8 +77,7 @@ public class StudySimpleExportTest extends StudyBaseTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        StudySimpleExportTest initTest = new StudySimpleExportTest();
-        initTest.doCleanup(false);
+        StudySimpleExportTest initTest = (StudySimpleExportTest)getCurrentTest();
 
         initTest.initializeFolder();
         initTest.setPipelineRoot(initTest.getPipelinePath());
@@ -95,8 +94,6 @@ public class StudySimpleExportTest extends StudyBaseTest
         initTest.clickTab("Overview");
         initTest.waitForElement(Locator.linkWithText("1 dataset"));
         initTest.assertTextPresentInThisOrder("Study tracks data in", "over 1 visit. Data is present for 1 Participant");
-
-        currentTest = initTest;
     }
 
     @Override

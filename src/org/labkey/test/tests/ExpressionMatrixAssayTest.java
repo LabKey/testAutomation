@@ -61,13 +61,10 @@ public class ExpressionMatrixAssayTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        ExpressionMatrixAssayTest initTest = new ExpressionMatrixAssayTest();
-        initTest.doCleanup(false);
+        ExpressionMatrixAssayTest initTest = (ExpressionMatrixAssayTest)getCurrentTest();
 
         initTest.doSetupSteps();
         expectedPipelineJobCount = 0;
-
-        currentTest = initTest;
     }
 
     private void doSetupSteps()

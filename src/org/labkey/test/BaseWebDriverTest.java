@@ -124,9 +124,9 @@ import static org.labkey.test.WebTestHelper.*;
 
 public abstract class BaseWebDriverTest implements Cleanable, WebTest
 {
-    public static BaseWebDriverTest currentTest;
-
+    private static BaseWebDriverTest currentTest;
     private static WebDriver _driver;
+
     private String _lastPageTitle = null;
     private URL _lastPageURL = null;
     private String _lastPageText = null;
@@ -136,7 +136,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
     protected static boolean _testFailed = false;
     protected static Boolean _anyTestCaseFailed;
-    protected static boolean _setupFailed;
+    protected static boolean _subclassSetupFailed;
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 30000;
     public int defaultWaitForPage = WAIT_FOR_PAGE;
@@ -226,6 +226,16 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public static long getStartTime()
     {
         return _startTime;
+    }
+
+    protected static BaseWebDriverTest getCurrentTest()
+    {
+        return currentTest;
+    }
+
+    public WebDriver getDriver()
+    {
+        return _driver;
     }
 
     public void pauseSearchCrawler()
@@ -1750,46 +1760,81 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             beginAt("/admin/resetErrorMark.view");
     }
 
+    @ClassRule
+    public static TestWatcher testClassName = new TestWatcher()
+    {
+        private String name;
+
+        @Override
+        public void starting(Description description)
+        {
+            name = description.getClassName();
+            super.starting(description);
+        }
+
+        @Override
+        public String toString()
+        {
+            return name;
+        }
+    };
+
     @LogMethod @BeforeClass
-    public static final void performInitialChecks() throws Throwable
+    public static void performInitialChecks() throws Throwable
     {
         killHungDriverOnTeamCity();
-        _setupFailed = true;
+
+        Class testClass = Class.forName(testClassName.toString());
+        currentTest = (BaseWebDriverTest)testClass.newInstance();
+
         _anyTestCaseFailed = false;
         _startTime = System.currentTimeMillis();
         ArtifactCollector.forgetArtifactDirs();
 
-        WebDriverTestPreamble preamble = new WebDriverTestPreamble();
-
         try
         {
-            preamble.setUp();
-            preamble.preamble();
+            currentTest.setUp();
+            currentTest.preamble();
         }
         catch (Exception t)
         {
             AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(t);
-            preamble.handleFailure(errorRef, "performInitialChecks");
+            currentTest.handleFailure(errorRef, "BeforeClass");
             throw errorRef.get();
         }
+        _subclassSetupFailed = true; // Assume failure until proven otherwise
+    }
+
+    private void preamble() throws Exception
+    {
+        signIn();
+        enableEmailRecorder();
+        resetErrors();
+
+        if (isSystemMaintenanceDisabled())
+        {
+            // Disable scheduled system maintenance to prevent timeouts during nightly tests.
+            disableMaintenance();
+        }
+
+        // Only do this as part of test startup if we haven't already checked. Since we do this as the last
+        // step in the test, there's no reason to bother doing it again at the beginning of the next test
+        if (!_checkedLeaksAndErrors && !"DRT".equals(System.getProperty("suite")))
+        {
+            checkLeaksAndErrors();
+        }
+
+        doCleanup(false);
     }
 
     @Before
     public final void preClean() throws Exception
     {
+        _subclassSetupFailed = false; // If we make it this far, all @BeforeClass methods were successful
+
         setUp(); // Instantiate new WebDriver if needed
         _testFailed = false;
         simpleSignIn();
-
-        // Perform initial cleanup for tests using doTestSteps.
-        if (currentTest == null && getDriver() != null)
-        {
-            currentTest = this;
-            log("Pre-cleaning " + getClass().getSimpleName());
-            currentTest.doCleanup(false);
-        }
-
-        _setupFailed = false;
     }
 
     @ClassRule
@@ -1916,42 +1961,78 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     }
 
     @LogMethod @AfterClass
-    public static final void performFinalChecks() throws Throwable
+    public static void performFinalChecks() throws Throwable
     {
-        _testFailed = false;
-        WebDriverTestPostamble postamble = new WebDriverTestPostamble();
-
-        if (_setupFailed)
+        try
         {
-            try
+            if (_subclassSetupFailed)
             {
                 AtomicReference<Throwable> errorRef = new AtomicReference<>(null);
-                postamble.setUp();
-                postamble.handleFailure(errorRef, "TestSetup");
+                currentTest.setUp();
+                currentTest.handleFailure(errorRef, "BeforeClass");
             }
-            finally
+            else
             {
-                currentTest = null;
-                postamble.doTearDown();
+                currentTest.postamble();
             }
+        }
+        catch (Throwable t)
+        {
+            AtomicReference<Throwable> errorRef = new AtomicReference<>(t);
+            currentTest.handleFailure(errorRef, "AfterClass");
+            throw errorRef.get();
+        }
+        finally
+        {
+            currentTest.doTearDown();
+            currentTest = null;
+        }
+    }
+
+    private void postamble() throws Exception
+    {
+        if (!_anyTestCaseFailed)
+        {
+            //make sure you're signed in as admin, because this won't work otherwise
+            ensureSignedInAsAdmin();
+
+            checkQueries();
+
+            checkViews();
+
+            if(!isPerfTest)
+                checkActionCoverage();
+
+            checkLinks();
+
+            if (!isTestCleanupSkipped())
+            {
+                goToHome();
+                doCleanup(true);
+            }
+            else
+            {
+                log("Skipping test cleanup as requested.");
+            }
+
+            if (!"DRT".equals(System.getProperty("suite")) || Runner.isFinalTest())
+            {
+                checkLeaksAndErrors();
+            }
+
+            checkJsErrors();
         }
         else
         {
-            try
-            {
-                postamble.postamble();
+            log("Skipping post-test checks because a test case failed.");
+        }
+
+        if (!_anyTestCaseFailed && getDownloadDir().exists())
+        {
+            try{
+                FileUtils.deleteDirectory(getDownloadDir());
             }
-            catch (Throwable t)
-            {
-                AtomicReference<Throwable> errorRef = new AtomicReference<>(t);
-                postamble.handleFailure(errorRef, "performFinalChecks");
-                throw errorRef.get();
-            }
-            finally
-            {
-                currentTest = null;
-                postamble.doTearDown();
-            }
+            catch (IOException ignore) { }
         }
     }
 
@@ -2017,11 +2098,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         {
             tearDown();
         }
-    }
-
-    public WebDriver getDriver()
-    {
-        return _driver;
     }
 
     private static void killHungDriverOnTeamCity() throws Exception

@@ -97,12 +97,8 @@ public class ChartingAPITest extends ClientAPITest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        ChartingAPITest initTest = new ChartingAPITest();
-        initTest.doCleanup(false);
-
+        ChartingAPITest initTest = (ChartingAPITest)getCurrentTest();
         initTest.initProject();
-
-        currentTest = initTest;
     }
 
     public void initProject()

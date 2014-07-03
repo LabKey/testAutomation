@@ -89,10 +89,8 @@ public class IssuesTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        IssuesTest initTest = new IssuesTest();
-        initTest.doCleanup(false);
+        IssuesTest initTest = (IssuesTest)getCurrentTest();
         initTest.setupProject();
-        currentTest = initTest;
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException

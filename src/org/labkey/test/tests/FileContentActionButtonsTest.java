@@ -42,12 +42,9 @@ public class FileContentActionButtonsTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        FileContentActionButtonsTest initTest = new FileContentActionButtonsTest();
-        initTest.doCleanup(false);
+        FileContentActionButtonsTest initTest = (FileContentActionButtonsTest)getCurrentTest();
 
         initTest.doSetupSteps();
-
-        currentTest = initTest;
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException

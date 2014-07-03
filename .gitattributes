@@ -266,8 +266,6 @@ src/org/labkey/test/TestConfig.java -text
 src/org/labkey/test/TestProperties.java -text
 src/org/labkey/test/TestSet.java -text
 src/org/labkey/test/TestTimeoutException.java -text
-src/org/labkey/test/WebDriverTestPostamble.java -text
-src/org/labkey/test/WebDriverTestPreamble.java -text
 src/org/labkey/test/WebTest.java -text
 src/org/labkey/test/WebTestHelper.java -text
 src/org/labkey/test/aspects/ImpersonationLoggingAspect.java -text

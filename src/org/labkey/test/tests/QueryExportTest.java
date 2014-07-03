@@ -75,16 +75,13 @@ public class QueryExportTest extends AbstractExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        QueryExportTest initTest = new QueryExportTest();
-        initTest.doCleanup(false);
+        QueryExportTest initTest = (QueryExportTest)getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest._listHelper.importListArchive(initTest.getProjectName(), LIST_ARCHIVE);
 
         String sql = "SELECT SubjectId, Name FROM " + LIST_NAME;
         initTest.createQuery(initTest.getProjectName(), QUERY_NAME, "lists", sql, null, false);
-
-        currentTest = initTest;
     }
 
     @Override

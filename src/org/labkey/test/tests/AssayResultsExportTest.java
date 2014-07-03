@@ -75,12 +75,8 @@ public class AssayResultsExportTest extends AbstractExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        AssayResultsExportTest initTest = new AssayResultsExportTest();
-        initTest.doCleanup(false);
-
+        AssayResultsExportTest initTest = (AssayResultsExportTest)getCurrentTest();
         initTest.setupTestContainers();
-
-        currentTest = initTest;
     }
     
     protected void setupTestContainers() throws Exception

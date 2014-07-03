@@ -51,12 +51,9 @@ public class PortalTest extends BaseWebDriverMultipleTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        PortalTest initTest = new PortalTest();
-        initTest.doCleanup(false);
+        PortalTest initTest = (PortalTest)getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
-
-        currentTest = initTest;
     }
 
     @Test

@@ -355,14 +355,11 @@ public class LinkedSchemaTest extends BaseWebDriverMultipleTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        LinkedSchemaTest initTest = new LinkedSchemaTest();
-        initTest.doCleanup(false);
+        LinkedSchemaTest initTest = (LinkedSchemaTest)getCurrentTest();
 
         initTest.setupProject();
         initTest.createList();
         initTest.importListData();
-
-        currentTest = initTest;
     }
 
     @Test

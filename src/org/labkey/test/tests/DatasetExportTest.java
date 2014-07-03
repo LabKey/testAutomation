@@ -68,12 +68,8 @@ public class DatasetExportTest extends AssayResultsExportTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        DatasetExportTest initTest = new DatasetExportTest();
-        initTest.doCleanup(false);
-
+        DatasetExportTest initTest = (DatasetExportTest)getCurrentTest();
         initTest.setupDataset();
-
-        currentTest = initTest;
     }
 
     public void setupDataset() throws Exception

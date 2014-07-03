@@ -49,12 +49,10 @@ public class RaphaelRendererTest extends BaseWebDriverMultipleTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        RaphaelRendererTest initTest = new RaphaelRendererTest();
-        initTest.doCleanup(false);
+        RaphaelRendererTest initTest = (RaphaelRendererTest)getCurrentTest();
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest.importFolderFromZip(new File(getLabKeyRoot(), MULTI_FOLDER_ZIP));
         initTest.populateTimeChartConfigs();
-        currentTest = initTest;
     }
     private void populateTimeChartConfigs()
     {

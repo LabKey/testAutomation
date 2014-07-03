@@ -59,15 +59,12 @@ public class TimeChartImportTest extends StudyBaseTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        TimeChartImportTest initTest = new TimeChartImportTest();
-        initTest.doCleanup(false);
+        TimeChartImportTest initTest = (TimeChartImportTest)getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest.importFolderFromZip(new File(getLabKeyRoot(), MULTI_FOLDER_ZIP));
         initTest._containerHelper.createSubfolder(initTest.getProjectName(), EXPORT_TEST_FOLDER, "Collaboration");
         initTest.populateChartConfigs();
-
-        currentTest = initTest;
     }
 
     @Test @Ignore

@@ -63,11 +63,8 @@ public class ListImportFieldsTest extends BaseWebDriverMultipleTest
     @LogMethod(category = LogMethod.MethodType.SETUP)
     public static void doSetup() throws Exception
     {
-        ListImportFieldsTest initTest = new ListImportFieldsTest();
-        initTest.doCleanup(false);
+        ListImportFieldsTest initTest = (ListImportFieldsTest)getCurrentTest();
         initTest.setupProject();
-
-        currentTest = initTest;
     }
 
     @LogMethod(category = LogMethod.MethodType.SETUP)

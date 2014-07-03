@@ -45,12 +45,9 @@ public class FileContentDownloadTest extends BaseWebDriverTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        FileContentDownloadTest initTest = new FileContentDownloadTest();
-        initTest.doCleanup(false);
+        FileContentDownloadTest initTest = (FileContentDownloadTest)getCurrentTest();
 
         initTest.doSetupSteps();
-
-        currentTest = initTest;
     }
 
     protected void doCleanup(boolean afterTest) throws TestTimeoutException

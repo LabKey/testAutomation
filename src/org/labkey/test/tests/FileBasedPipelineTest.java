@@ -56,16 +56,13 @@ public class FileBasedPipelineTest extends BaseWebDriverMultipleTest
     @BeforeClass
     public static void doSetup() throws Exception
     {
-        FileBasedPipelineTest initTest = new FileBasedPipelineTest();
-        initTest.doCleanup(false);
+        FileBasedPipelineTest initTest = (FileBasedPipelineTest)getCurrentTest();
 
         initTest._containerHelper.createProject(initTest.getProjectName(), null);
         initTest._containerHelper.enableModules(Arrays.asList(PIPELINETEST_MODULE, "Pipeline"));
 
         RReportHelper rReportHelper = new RReportHelper(initTest);
         rReportHelper.ensureRConfig();
-
-        currentTest = initTest;
     }
 
     @Before
