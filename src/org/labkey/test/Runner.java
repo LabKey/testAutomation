@@ -375,7 +375,7 @@ public class Runner extends TestSuite
 
                 for (String c : sortedTests)
                     System.err.println("    " + c);
-                System.exit(1);
+                System.exit(0);
             }
             testClasses.add(testClass);
             if (testMethods != null)
@@ -537,7 +537,7 @@ public class Runner extends TestSuite
                         {
                             System.err.println("    " + ignoredTest);
                         }
-                        System.exit(1);
+                        System.exit(0);
                     }
                 }
             }
@@ -744,7 +744,7 @@ public class Runner extends TestSuite
                     System.out.println("Couldn't find suite '" + suiteName + "'.  Valid suites are:");
                     for (Class suite : _suites.getSuites())
                         System.out.println("   " + suite.getSimpleName());
-                    System.exit(1);
+                    System.exit(0);
                 }
             }
             return tests;
