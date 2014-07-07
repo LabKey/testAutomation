@@ -206,8 +206,8 @@ public class StudyTest extends StudyBaseTest
         String textToFilter = "AE-1:(VTN) AE Log";
         Locator measureRow = Locator.tagWithText("div", textToFilter);
         waitForElement(measureRow, WAIT_FOR_JAVASCRIPT * 2);
-        assertElementPresent(measureRow, 28);
-        assertElementPresent(Locator.tagContainingText("div", "Abbrevi"), 81);
+        assertElementPresent(measureRow, 27);
+        assertElementPresent(Locator.tagContainingText("div", "Abbrevi"), 79);
 
         log("filter participant results down");
         Locator filterSearchText = Locator.xpath("//input[@name='filterSearch']");
