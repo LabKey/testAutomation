@@ -178,6 +178,7 @@ public abstract class AbstractQCAssayTest extends AbstractAssayTest
             {
                 case LookupList:
                     assertChecked(Locator.radioButtonByNameAndValue("ThawListType", "List"));
+                    waitForFormElementToNotEqual(Locator.name("ThawListList-QueryName"), "");
                     break;
                 case LookupText:
                     assertChecked(Locator.radioButtonByNameAndValue("ThawListType", "Text"));
