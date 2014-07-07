@@ -740,7 +740,7 @@ public abstract class Locator
 
         public XPathLocator withTextMatching(String regex)
         {
-            return this.withPredicate("matches(normalize-space(), '" + xq(regex) + "')");
+            return this.withPredicate("matches(normalize-space(), " + xq(regex) + ")");
         }
 
         public XPathLocator startsWith(String text)
