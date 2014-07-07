@@ -598,7 +598,7 @@ public class CohortTest extends BaseWebDriverTest
     private void verifyUnfilteredSpecimens(String specimenLink, int allRowCount)
     {
         clickTab("Specimen Data");
-        clickAndWait(Locator.linkWithText(specimenLink));
+        waitAndClickAndWait(Locator.linkWithText(specimenLink));
 
         DataRegionTable specimenTable = new DataRegionTable("SpecimenDetail", this, true, true);
         verifyVialCount(specimenTable, allRowCount);
