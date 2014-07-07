@@ -242,7 +242,16 @@ public class FileBrowserHelper
         waitForFileGridReady();
         waitForImportDataEnabled();
         clickFileBrowserButton(BrowserAction.IMPORT_DATA);
-        _test.waitAndClick(Locator.xpath("//input[@type='button' and not(@disabled)]/../label[contains(text(), " + Locator.xq(actionName) + ")]"));
+        _test.waitForElement(Ext4Helper.Locators.window("Import Data"));
+        Locator.XPathLocator actionRadioButton = Locator.xpath("//input[@type='button' and not(@disabled)]/../label[contains(text(), " + Locator.xq(actionName) + ")]");
+        if (!_test.isElementPresent(actionRadioButton))
+        { // Retry if action isn't present
+            _test._ext4Helper.clickWindowButton("Import Data", "Cancel", 0, 0);
+            _test._ext4Helper.waitForMaskToDisappear();
+            clickFileBrowserButton(BrowserAction.IMPORT_DATA);
+            _test.waitForElement(Ext4Helper.Locators.window("Import Data"));
+        }
+        _test.click(actionRadioButton);
         _test.clickAndWait(Ext4Helper.Locators.ext4Button("Import"));
     }
 
