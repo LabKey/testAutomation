@@ -3548,23 +3548,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         Long startTime = System.currentTimeMillis();
         do
         {
-            try
-            {
-                if( checker.check() )
-                    return true;
-            }
-            catch (Exception ignore) {} // Checker exceptions count as a false check
+            if( checker.check() )
+                return true;
             sleep(100);
         } while ((System.currentTimeMillis() - startTime) < wait);
-        try
-        {
-            if (!checker.check())
-            {
-                _testTimeout = true;
-                return false;
-            }
-        }
-        catch (Exception ignore){}
+
+        _testTimeout = true;
         return false;
     }
 
