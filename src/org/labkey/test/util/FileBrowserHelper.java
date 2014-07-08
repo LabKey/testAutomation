@@ -15,7 +15,6 @@
  */
 package org.labkey.test.util;
 
-import com.gargoylesoftware.htmlunit.ElementNotFoundException;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
@@ -29,6 +28,7 @@ import java.util.List;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_EXT_MASK_TO_DISSAPEAR;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_JAVASCRIPT;
 import static org.labkey.test.BaseWebDriverTest.WAIT_FOR_PAGE;
+import static org.labkey.test.BaseWebDriverTest.getStartTime;
 
 public class FileBrowserHelper
 {
@@ -244,8 +244,9 @@ public class FileBrowserHelper
         clickFileBrowserButton(BrowserAction.IMPORT_DATA);
         _test.waitForElement(Ext4Helper.Locators.window("Import Data"));
         Locator.XPathLocator actionRadioButton = Locator.xpath("//input[@type='button' and not(@disabled)]/../label[contains(text(), " + Locator.xq(actionName) + ")]");
-        if (!_test.isElementPresent(actionRadioButton))
-        { // Retry if action isn't present
+        long startTime = System.currentTimeMillis();
+        while (!_test.isElementPresent(actionRadioButton) && (System.currentTimeMillis() - startTime) < WAIT_FOR_JAVASCRIPT)
+        { // Retry until action is present
             _test._ext4Helper.clickWindowButton("Import Data", "Cancel", 0, 0);
             _test._ext4Helper.waitForMaskToDisappear();
             clickFileBrowserButton(BrowserAction.IMPORT_DATA);
