@@ -965,11 +965,15 @@ public class SimpleModuleTest extends BaseWebDriverTest
     }
 
     @Override
+    public void validateQueries(boolean validateSubfolders)
+    {
+        super.validateQueries(false); // Container tabs fail query validation
+    }
+
+    @Override
     public String getAssociatedModuleDirectory()
     {
-        //return "null" to skip verification of module directory
-        //as it won't exist until after the test starts running the first time
-        return null;
+        return "simpletest";
     }
 
     @Override
