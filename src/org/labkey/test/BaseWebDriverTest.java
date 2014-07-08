@@ -1791,6 +1791,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _startTime = System.currentTimeMillis();
         ArtifactCollector.forgetArtifactDirs();
 
+        assertNotNull(currentTest);
+
         try
         {
             currentTest.setUp();
