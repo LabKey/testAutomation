@@ -216,7 +216,7 @@ public class StudyTest extends StudyBaseTest
         setFormElement(Locator.xpath("//input[@type='text']"), "abbrevi");
         fireEvent(filterSearchText, SeleniumEvent.change);
         sleep(1000);
-        assertTextPresent("Abbrevi", 81);
+        assertTextPresent("Abbrevi", 79);
         assertTextNotPresent(textToFilter);
 
         log("select some records and include them in a report");
