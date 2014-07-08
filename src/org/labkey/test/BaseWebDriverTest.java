@@ -5893,16 +5893,23 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
 
     protected void importFolderFromPipeline(String folderFile)
     {
-        importFolderFromPipeline(folderFile, 1);
+        importFolderFromPipeline(folderFile, 1, true);
     }
 
     protected void importFolderFromPipeline(String folderFile, int completedJobsExpected)
+    {
+        importFolderFromPipeline(folderFile, completedJobsExpected, true);
+    }
+
+    protected void importFolderFromPipeline(String folderFile, int completedJobsExpected, boolean validateQueries)
     {
         goToFolderManagement();
         clickAndWait(Locator.linkWithText("Import"));
         clickButtonContainingText("Import Folder Using Pipeline");
         _fileBrowserHelper.importFile(folderFile, "Import Folder");
         waitForText("Import Folder from Pipeline");
+        if (!validateQueries)
+            uncheckCheckbox(Locator.name("validateQueries"));
         clickButton("Start Import");
         waitForPipelineJobsToComplete(completedJobsExpected, "Folder import", false);
     }

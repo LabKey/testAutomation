@@ -22,6 +22,7 @@ import org.labkey.test.Locator;
 import org.labkey.test.categories.DailyB;
 import org.labkey.test.categories.Study;
 import org.labkey.test.util.DataRegionTable;
+import org.labkey.test.util.LogMethod;
 import org.labkey.test.util.PasswordUtil;
 import org.labkey.test.util.PortalHelper;
 
@@ -67,6 +68,13 @@ public class StudyDataspaceTest extends StudyBaseTest
         return getPipelinePath() + "Dataspace";
     }
 
+    @LogMethod
+    @Override
+    protected void checkQueries()
+    {
+        // Don't check the queries because CDS module has invalid queries without the CDS app
+    }
+
     @Override
     protected void doCreateSteps()
     {
@@ -104,7 +112,7 @@ public class StudyDataspaceTest extends StudyBaseTest
         // Import first study
         log("Import first study and verify");
         clickFolder(FOLDER_STUDY1);
-        startImportStudyFromZip(new File(getDataspaceSampledataPath(), "DataspaceStudyTest-Study1B.zip"), false, false);
+        startImportStudyFromZip(new File(getDataspaceSampledataPath(), "DataspaceStudyTest-Study1B.zip"), true, false);
         waitForPipelineJobsToComplete(1, "Study import", false);
         clickTab("Overview");
         assertTextPresent("tracks data in", "over 97 time points", "Data is present for 8 Participants");
@@ -132,7 +140,7 @@ public class StudyDataspaceTest extends StudyBaseTest
 
         // Import second study
         clickFolder(FOLDER_STUDY2);
-        startImportStudyFromZip(new File(getDataspaceSampledataPath(), "DataspaceStudyTest-Study2B.zip"), false, false);
+        startImportStudyFromZip(new File(getDataspaceSampledataPath(), "DataspaceStudyTest-Study2B.zip"), true, false);
         waitForPipelineJobsToComplete(1, "Study import", false);
         clickTab("Overview");
         assertTextPresent("tracks data in", "over 103 time points", "Data is present for 8 Participants");
@@ -156,7 +164,7 @@ public class StudyDataspaceTest extends StudyBaseTest
 
         // Import third study
         clickFolder(FOLDER_STUDY5);
-        startImportStudyFromZip(new File(getDataspaceSampledataPath(), "DataspaceStudyTest-Study5.zip"), false, false);
+        startImportStudyFromZip(new File(getDataspaceSampledataPath(), "DataspaceStudyTest-Study5.zip"), true, false);
         waitForPipelineJobsToComplete(1, "Study import", false);
 
         log("Verify Product rows added");
@@ -180,9 +188,10 @@ public class StudyDataspaceTest extends StudyBaseTest
         createSubfolder(getProjectName(), getProjectName(), "SubFolder 5", "Collaboration", null, true);
         clickFolder("SubFolder 5");
         setPipelineRoot(getPipelinePath());
-        importFolderFromPipeline("/export/folder.xml");
+        importFolderFromPipeline("/export/folder.xml", 1, false);
 
         log("Check dataset 'Lab Results'");
+        clickProject(getProjectName());
         clickFolder("SubFolder 5");
         clickAndWait(Locator.linkContainingText("1 dataset"));
         clickAndWait(Locator.linkContainingText("Lab Results"));
