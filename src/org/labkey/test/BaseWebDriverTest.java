@@ -1791,8 +1791,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         _startTime = System.currentTimeMillis();
         ArtifactCollector.forgetArtifactDirs();
 
-        assertNotNull(currentTest);
-
         try
         {
             currentTest.setUp();
@@ -1801,7 +1799,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         catch (Exception t)
         {
             AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(t);
-            currentTest.handleFailure(errorRef, "BeforeClass");
+            if (currentTest != null)
+                currentTest.handleFailure(errorRef, "BeforeClass");
             throw errorRef.get();
         }
         _subclassSetupFailed = true; // Assume failure until proven otherwise
