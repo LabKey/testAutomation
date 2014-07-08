@@ -246,4 +246,9 @@ public class TargetStudyTest extends AbstractAssayTest
         assertEquals(404, getResponseCode());
     }
 
+    @Override
+    public void validateQueries(boolean validateSubfolders)
+    {
+        super.validateQueries(false); // Too many folders
+    }
 }
