@@ -22,7 +22,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.labkey.test.BaseWebDriverTest;
 import org.labkey.test.Locator;
-import org.labkey.test.Runner;
 import org.labkey.test.TestProperties;
 import org.labkey.test.WebTestHelper;
 import org.openqa.selenium.OutputType;
@@ -60,7 +59,7 @@ public class ArtifactCollector
 
     public File ensureDumpDir()
     {
-        File dumpDir = new File(TestProperties.getDumpDir(), Runner.getCurrentTestName());
+        File dumpDir = new File(TestProperties.getDumpDir(), BaseWebDriverTest.getCurrentTestClassName());
         if ( !dumpDir.exists() )
             dumpDir.mkdirs();
 

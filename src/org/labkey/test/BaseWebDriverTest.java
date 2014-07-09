@@ -135,8 +135,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     private Stack<String> _impersonationStack = new Stack<>();
     private Set<WebTestHelper.FolderIdentifier> _createdFolders = new HashSet<>();
     protected static boolean _testFailed = false;
-    protected static Boolean _anyTestCaseFailed;
-    protected static boolean _subclassSetupFailed;
+    protected static Boolean _anyTestCaseFailed = false;
     protected boolean _testTimeout = false;
     public final static int WAIT_FOR_PAGE = 30000;
     public int defaultWaitForPage = WAIT_FOR_PAGE;
@@ -1760,8 +1759,12 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
             beginAt("/admin/resetErrorMark.view");
     }
 
+    private static final String BEFORE_CLASS = "BeforeClass";
+    private static final String AFTER_CLASS = "AfterClass";
+    private static boolean beforeClassSucceeded = false;
+
     @ClassRule
-    public static TestWatcher testClassName = new TestWatcher()
+    public static TestWatcher testClassWatcher = new TestWatcher()
     {
         private String name;
 
@@ -1769,7 +1772,33 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         public void starting(Description description)
         {
             name = description.getClassName();
+
             super.starting(description);
+        }
+
+        @Override
+        protected void failed(Throwable e, Description description)
+        {
+            if (currentTest != null)
+            {
+                AtomicReference<Throwable> errorRef = new AtomicReference<>(e);
+                currentTest.handleFailure(errorRef, beforeClassSucceeded ? AFTER_CLASS : BEFORE_CLASS);
+                e = errorRef.get();
+            }
+
+            super.failed(e, description);
+        }
+
+        @Override
+        protected void finished(Description description)
+        {
+            if (currentTest != null)
+            {
+                currentTest.doTearDown();
+                currentTest = null;
+            }
+
+            super.finished(description);
         }
 
         @Override
@@ -1779,31 +1808,26 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     };
 
+    public static String getCurrentTestClassName()
+    {
+        return testClassWatcher.toString();
+    }
+
     @LogMethod @BeforeClass
     public static void performInitialChecks() throws Throwable
     {
-        killHungDriverOnTeamCity();
-
-        Class testClass = Class.forName(testClassName.toString());
-        currentTest = (BaseWebDriverTest)testClass.newInstance();
-
+        beforeClassSucceeded = false;
         _anyTestCaseFailed = false;
         _startTime = System.currentTimeMillis();
-        ArtifactCollector.forgetArtifactDirs();
 
-        try
-        {
-            currentTest.setUp();
-            currentTest.preamble();
-        }
-        catch (Exception t)
-        {
-            AtomicReference<Throwable> errorRef = new AtomicReference<Throwable>(t);
-            if (currentTest != null)
-                currentTest.handleFailure(errorRef, "BeforeClass");
-            throw errorRef.get();
-        }
-        _subclassSetupFailed = true; // Assume failure until proven otherwise
+        ArtifactCollector.forgetArtifactDirs();
+        killHungDriverOnTeamCity();
+
+        Class testClass = Class.forName(getCurrentTestClassName());
+        currentTest = (BaseWebDriverTest)testClass.newInstance();
+
+        currentTest.setUp();
+        currentTest.preamble();
     }
 
     private void preamble() throws Exception
@@ -1831,7 +1855,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @Before
     public final void preClean() throws Exception
     {
-        _subclassSetupFailed = false; // If we make it this far, all @BeforeClass methods were successful
+        beforeClassSucceeded = true;
 
         setUp(); // Instantiate new WebDriver if needed
         _testFailed = false;
@@ -1964,30 +1988,8 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     @LogMethod @AfterClass
     public static void performFinalChecks() throws Throwable
     {
-        try
-        {
-            if (_subclassSetupFailed)
-            {
-                AtomicReference<Throwable> errorRef = new AtomicReference<>(null);
-                currentTest.setUp();
-                currentTest.handleFailure(errorRef, "BeforeClass");
-            }
-            else
-            {
-                currentTest.postamble();
-            }
-        }
-        catch (Throwable t)
-        {
-            AtomicReference<Throwable> errorRef = new AtomicReference<>(t);
-            currentTest.handleFailure(errorRef, "AfterClass");
-            throw errorRef.get();
-        }
-        finally
-        {
-            currentTest.doTearDown();
-            currentTest = null;
-        }
+        if (beforeClassSucceeded)
+            currentTest.postamble();
     }
 
     private void postamble() throws Exception
@@ -3779,7 +3781,6 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
     public static abstract class Checker
     {
         public abstract boolean check();
-        public void failed() {}
     }
 
     public void waitForExt4FolderTreeNode(String nodeText, int wait)
