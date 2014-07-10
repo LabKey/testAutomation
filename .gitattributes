@@ -609,6 +609,7 @@ src/org/labkey/test/util/SearchHelper.java -text
 src/org/labkey/test/util/SecurityHelper.java -text
 src/org/labkey/test/util/SqlserverOnlyTest.java -text
 src/org/labkey/test/util/StudyHelper.java -text
+src/org/labkey/test/util/StudyImporter.java -text
 src/org/labkey/test/util/TestLogger.java -text
 src/org/labkey/test/util/TimeChartHelper.java -text
 src/org/labkey/test/util/UIAssayHelper.java -text
@@ -617,6 +618,7 @@ src/org/labkey/test/util/UIUserHelper.java -text
 src/org/labkey/test/util/WikiHelper.java -text
 src/org/labkey/test/util/WindowsOnlyTest.java -text
 src/org/labkey/test/util/WorkbookHelper.java -text
+src/org/labkey/test/util/ZipUtil.java -text
 src/org/labkey/test/util/ext4cmp/Ext4CmpRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4ComboRef.java -text
 src/org/labkey/test/util/ext4cmp/Ext4FieldRef.java -text
