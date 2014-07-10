@@ -102,12 +102,7 @@ public class WebTestHelper
     {
         if (_labkeyRoot == null)
         {
-            _labkeyRoot = System.getProperty("labkey.root");
-
-            if (_labkeyRoot.length() == 0)
-            {
-                throw new IllegalStateException("No LabKey root directory specified. Configure this by passing VM arg '-Dlabkey.root=[yourroot]'.");
-            }
+            _labkeyRoot = System.getProperty("labkey.root", "..");
 
             File labkeyRoot = new File(_labkeyRoot);
 

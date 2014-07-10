@@ -15,13 +15,15 @@
  */
 package org.labkey.test;
 
+import org.apache.commons.lang3.SystemUtils;
+
 import java.io.File;
 
 public abstract class TestProperties
 {
     public static boolean isTestCleanupSkipped()
     {
-        return "false".equals(System.getProperty("clean"));
+        return "false".equals(System.getProperty("clean", "false"));
     }
 
     public static boolean isLinkCheckEnabled()
@@ -56,7 +58,9 @@ public abstract class TestProperties
 
     public static boolean isTestRunningOnTeamCity()
     {
-        return !System.getProperty("teamcity.buildType.id").equals("${teamcity.buildType.id}");
+        String buildTypeProperty = "teamcity.buildType.id";
+        String undefinedBuildTypeProperty = "${" + buildTypeProperty + "}";
+        return !undefinedBuildTypeProperty.equals(System.getProperty(buildTypeProperty, undefinedBuildTypeProperty));
     }
 
     public static boolean isLeakCheckSkipped()
@@ -77,6 +81,46 @@ public abstract class TestProperties
     public static boolean isSystemMaintenanceDisabled()
     {
         return "never".equals(System.getProperty("systemMaintenance"));
+    }
+
+    public static String ensureChromedriverExeProperty()
+    {
+        final String key = "webdriver.chrome.driver";
+        String currentProperty = System.getProperty(key);
+        if (currentProperty == null)
+        {
+            String chromeExe = null;
+            if(SystemUtils.IS_OS_MAC)
+            {
+                chromeExe = "mac/chromedriver";
+            }
+            else if (SystemUtils.IS_OS_WINDOWS)
+            {
+                chromeExe = "windows/chromedriver.exe";
+            }
+            else if (SystemUtils.IS_OS_LINUX)
+            {
+                switch (SystemUtils.OS_ARCH)
+                {
+                    case "amd64":
+                        chromeExe = "linux/amd64/chromedriver";
+                        break;
+                    case "i386":
+                        chromeExe = "linux/i386/chromedriver";
+                        break;
+                }
+            }
+            if (chromeExe != null)
+            {
+                File testBin = new File(WebTestHelper.getLabKeyRoot(), "server/test/bin");
+                File chromePath = new File(testBin, chromeExe);
+                System.setProperty(key, chromePath.getAbsolutePath());
+            }
+            else
+                System.out.println("Unable to locate chromedriver executable - Using Firefox instead");
+        }
+
+        return System.getProperty(key);
     }
 
     public static String getAdditionalPipelineTools()

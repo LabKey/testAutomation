@@ -82,7 +82,6 @@ public class Runner extends TestSuite
     private static SuiteBuilder _suites = SuiteBuilder.getInstance();
     private static Map<Test, Long> _testStats = new LinkedHashMap<>();
     private static int _testCount;
-    private static Class _curentTest;
     private static List<Class> _remainingTests;
     private static List<String> _passedTests = new ArrayList<>();
     private static List<String> _failedTests = new ArrayList<>();
@@ -185,15 +184,10 @@ public class Runner extends TestSuite
         return new File(labkeyRoot, "server/test/remainingTests.txt");
     }
 
-    public static String getProgress()
+    private String getProgress()
     {
         int completed = _testCount -_remainingTests.size() + 1;
         return " (" + completed + " of " + _testCount + ")";
-    }
-
-    public static String getCurrentTestName()
-    {
-        return _curentTest != null ? _curentTest.getSimpleName() : "Unknown Test";
     }
 
     public static boolean isFinalTest()
@@ -255,21 +249,22 @@ public class Runner extends TestSuite
             {
                 int failCount = testResult.failureCount();
                 int errorCount = testResult.errorCount();
+                String currentTestName;
                 if (test instanceof JUnit4TestAdapter)
-                    _curentTest = ((JUnit4TestAdapter)test).getTestClass();
+                    currentTestName = ((JUnit4TestAdapter)test).getTestClass().getSimpleName();
                 else
-                    _curentTest = test.getClass();
+                    currentTestName = test.getClass().getSimpleName();
 
-                try{logToServer("=== Starting " + getCurrentTestName() + getProgress() + " ===");} catch (Exception ignore){}
-                TestLogger.log("\n\n=============== Starting " + getCurrentTestName() + getProgress() + " =================");
+                try{logToServer("=== Starting " + currentTestName + getProgress() + " ===");} catch (Exception ignore){}
+                TestLogger.log("\n\n=============== Starting " + currentTestName + getProgress() + " =================");
                 super.runTest(test, testResult);
 
                 failed = testResult.failureCount() > failCount;
                 errored = testResult.errorCount() > errorCount;
 
                 String result = failed || errored ? "Failed " : "Completed ";
-                TestLogger.log("=============== " + result + getCurrentTestName() + getProgress() + " =================");
-                try{logToServer("=== " + result + getCurrentTestName() + getProgress() + " ===");} catch (Exception ignore){}
+                TestLogger.log("=============== " + result + currentTestName + getProgress() + " =================");
+                try{logToServer("=== " + result + currentTestName + getProgress() + " ===");} catch (Exception ignore){}
             }
             else
             {

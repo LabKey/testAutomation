@@ -198,7 +198,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         String seleniumBrowser = System.getProperty("selenium.browser");
         if (seleniumBrowser == null || seleniumBrowser.length() == 0)
         {
-            if (isTestRunningOnTeamCity())
+            if (isTestRunningOnTeamCity() || (bestBrowser() == BrowserType.CHROME && ensureChromedriverExeProperty() == null))
                 BROWSER_TYPE = BrowserType.FIREFOX;
             else
                 BROWSER_TYPE = bestBrowser();
