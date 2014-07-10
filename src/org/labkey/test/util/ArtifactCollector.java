@@ -59,7 +59,17 @@ public class ArtifactCollector
 
     public File ensureDumpDir()
     {
-        File dumpDir = new File(TestProperties.getDumpDir(), BaseWebDriverTest.getCurrentTestClassName());
+        String currentTestClassName;
+        try
+        {
+            currentTestClassName = BaseWebDriverTest.getCurrentTestClass().getSimpleName();
+        }
+        catch (ClassNotFoundException e)
+        {
+            currentTestClassName = "UnknownTest";
+        }
+
+        File dumpDir = new File(TestProperties.getDumpDir(), currentTestClassName);
         if ( !dumpDir.exists() )
             dumpDir.mkdirs();
 

@@ -1808,9 +1808,9 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         }
     };
 
-    public static String getCurrentTestClassName()
+    public static Class getCurrentTestClass() throws ClassNotFoundException
     {
-        return testClassWatcher.toString();
+        return Class.forName(testClassWatcher.toString());
     }
 
     @LogMethod @BeforeClass
@@ -1823,7 +1823,7 @@ public abstract class BaseWebDriverTest implements Cleanable, WebTest
         ArtifactCollector.forgetArtifactDirs();
         killHungDriverOnTeamCity();
 
-        Class testClass = Class.forName(getCurrentTestClassName());
+        Class testClass = getCurrentTestClass();
         currentTest = (BaseWebDriverTest)testClass.newInstance();
 
         currentTest.setUp();
