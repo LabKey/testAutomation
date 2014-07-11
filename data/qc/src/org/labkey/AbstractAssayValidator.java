@@ -104,7 +104,6 @@ public abstract class AbstractAssayValidator
         if (_errorFile != null)
         {
             _errors.add(message);
-            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(_errorFile, true)));
 
             StringBuilder sb = new StringBuilder();
             sb.append("error\t");
@@ -113,8 +112,10 @@ public abstract class AbstractAssayValidator
             sb.append(message);
             sb.append('\n');
 
-            pw.write(sb.toString().replaceAll("\\\\", "\\\\\\\\"));
-            pw.close();
+            try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(_errorFile, true))))
+            {
+                pw.write(sb.toString().replaceAll("\\\\", "\\\\\\\\"));
+            }
         }
         else
             throw new RuntimeException("Errors file does not exist");
