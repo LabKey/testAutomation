@@ -337,20 +337,18 @@ public class Runner
         }
 
         System.out.println("\nCreate empty files.");
+
         for (File inFile : clearTargets)
         {
             File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
             outFile.getParentFile().mkdirs();
 
-            BufferedReader input = new BufferedReader(new FileReader(inFile));
-            BufferedWriter output = new BufferedWriter(new FileWriter(outFile));
-
-            //Copy column headers only.
-            String line = input.readLine();
-            output.write(line);
-
-            output.close();
-            input.close();
+            try (BufferedReader input = new BufferedReader(new FileReader(inFile)); BufferedWriter output = new BufferedWriter(new FileWriter(outFile)))
+            {
+                //Copy column headers only.
+                String line = input.readLine();
+                output.write(line);
+            }
 
             System.out.println("wrote " + outFile.length() + " bytes from " + inFile + " to " + outFile);
         }
@@ -361,13 +359,12 @@ public class Runner
             File outFile = new File(destStudyRoot, studyRoot.toURI().relativize(inFile.toURI()).getPath());
             outFile.getParentFile().mkdirs();
 
-            FileInputStream input = new FileInputStream(inFile);
-            FileOutputStream output = new FileOutputStream(outFile);
+            int bytes;
 
-            int bytes = IOUtils.copy(input,output);
-
-            output.close();
-            input.close();
+            try (FileInputStream input = new FileInputStream(inFile); FileOutputStream output = new FileOutputStream(outFile))
+            {
+                bytes = IOUtils.copy(input, output);
+            }
 
             System.out.println("wrote " + bytes + " bytes from " + inFile + " to " + outFile);
         }
@@ -377,24 +374,25 @@ public class Runner
 
     static void loadSubjectList(File subjectListFile, AliasFactory aliaser) throws IOException
     {
-        BufferedReader reader;
         String line;
         subjectIds = newStringSet();
 
-        reader = new BufferedReader(new FileReader(subjectListFile));
-        random = new Random(Long.parseLong(reader.readLine())); // First line is seed.
+        try (BufferedReader reader = new BufferedReader(new FileReader(subjectListFile)))
+        {
+            random = new Random(Long.parseLong(reader.readLine())); // First line is seed.
 
-        while(!(line = reader.readLine()).equals("")){
-            subjectIds.add(line);
-            aliaser.get(line, ANIMAL_PREFIX); // Pre-generate aliases to ensure consistency.
+            while (!(line = reader.readLine()).equals(""))
+            {
+                subjectIds.add(line);
+                aliaser.get(line, ANIMAL_PREFIX); // Pre-generate aliases to ensure consistency.
+            }
+            // Animal IDs separated from non animal IDs by a single blank line.
+            while ((line = reader.readLine()) != null)
+            {
+                subjectIds.add(line);
+                aliaser.get(line); // Pre-generate aliases to ensure consistency (non-animal id).
+            }
         }
-        // Animal IDs separated from non animal IDs by a single blank line.
-        while((line = reader.readLine()) != null){
-            subjectIds.add(line);
-            aliaser.get(line); // Pre-generate aliases to ensure consistency (non-animal id).
-        }
-
-        reader.close();
     }
 
     static ArrayList<File> listFilesRecursive(File path)

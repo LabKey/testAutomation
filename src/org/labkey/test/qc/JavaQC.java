@@ -53,8 +53,6 @@ public class JavaQC
     {
         if (_errorFile != null)
         {
-            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(_errorFile, true)));
-
             StringBuilder sb = new StringBuilder();
             sb.append("error\t");
             sb.append(prop);
@@ -62,8 +60,10 @@ public class JavaQC
             sb.append(message);
             sb.append('\n');
 
-            pw.write(sb.toString());
-            pw.close();
+            try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(_errorFile, true))))
+            {
+                pw.write(sb.toString());
+            }
         }
         else
             throw new RuntimeException("Errors file does not exist");
