@@ -1109,7 +1109,7 @@
         <mkdir dir="${project.root}/sampledata/qc"/>
         <jar destfile="${project.root}/sampledata/qc/validator.jar">
             <fileset dir="${project.root}/build/client-api/java/classes"/>
-            <zipfileset src="${project.root}/remoteapi/java/lib/commons-codec-1.2.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/commons-codec-1.5.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/commons-httpclient-3.1.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/commons-logging.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/json_simple-1.1.jar" includes="**/*.class"/>
@@ -1122,7 +1122,7 @@
         </jar>
         <jar destfile="${project.root}/sampledata/qc/transform.jar">
             <fileset dir="${project.root}/build/client-api/java/classes"/>
-            <zipfileset src="${project.root}/remoteapi/java/lib/commons-codec-1.2.jar" includes="**/*.class"/>
+            <zipfileset src="${project.root}/remoteapi/java/lib/commons-codec-1.5.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/commons-httpclient-3.1.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/commons-logging.jar" includes="**/*.class"/>
             <zipfileset src="${project.root}/remoteapi/java/lib/json_simple-1.1.jar" includes="**/*.class"/>
